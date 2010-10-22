@@ -64,7 +64,7 @@ public class SWORDMETSIngester implements SWORDIngester
 	private SWORDService swordService;
 
 	/** Log4j logger */
-	public static Logger log = Logger.getLogger(SWORDMETSIngester.class);
+	public static final Logger log = Logger.getLogger(SWORDMETSIngester.class);
 
 	/* (non-Javadoc)
 	 * @see org.dspace.sword.SWORDIngester#ingest(org.dspace.core.Context, org.purl.sword.base.Deposit)

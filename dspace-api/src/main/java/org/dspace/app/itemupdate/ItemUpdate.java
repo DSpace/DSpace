@@ -94,13 +94,13 @@ import org.dspace.eperson.EPerson;
  */
 public class ItemUpdate {
 	
-	static public String SUPPRESS_UNDO_FILENAME = "suppress_undo"; 
+	static public final String SUPPRESS_UNDO_FILENAME = "suppress_undo";
 
 	static public final String CONTENTS_FILE = "contents"; 	
 	static public final String DELETE_CONTENTS_FILE = "delete_contents"; 
 
 	static public String HANDLE_PREFIX = null;	
-	static public Map<String, String> filterAliases = new HashMap<String, String>();
+	static public final Map<String, String> filterAliases = new HashMap<String, String>();
 	
 	static public boolean verbose = false;
 	

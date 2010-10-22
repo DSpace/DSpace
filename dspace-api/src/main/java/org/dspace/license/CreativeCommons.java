@@ -80,7 +80,7 @@ public class CreativeCommons
 
     private static final String BSN_LICENSE_RDF = "license_rdf";
 
-    protected static Templates templates = null;
+    protected static final Templates templates;
     
     private static boolean enabled_p;
 

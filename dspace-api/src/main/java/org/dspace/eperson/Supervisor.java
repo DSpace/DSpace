@@ -66,13 +66,13 @@ public class Supervisor {
     private static Logger log = Logger.getLogger(Supervisor.class);
     
     /** value to use for no policy set */
-    public static int POLICY_NONE = 0;
+    public static final int POLICY_NONE = 0;
     
     /** value to use for editor policies */
-    public static int POLICY_EDITOR = 1;
+    public static final int POLICY_EDITOR = 1;
     
     /** value to use for observer policies */
-    public static int POLICY_OBSERVER = 2;
+    public static final int POLICY_OBSERVER = 2;
     
     /** Creates a new instance of Supervisor */
     private Supervisor() 

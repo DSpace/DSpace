@@ -567,7 +567,7 @@ public abstract class AbstractAdapter
      * then it should use the string "OTHER" and provide additional 
      * attributes describing the metadata type 
      */
-    public static String[] METS_DEFINED_TYPES = 
+    public static final String[] METS_DEFINED_TYPES = 
     	{"MARC","MODS","EAD","DC","NISOIMG","LC-AV","VRA","TEIHDR","DDI","FGDC","PREMIS"/*,"OTHER"*/};
     
     /**

@@ -71,10 +71,10 @@ public class CurrentActivityAction extends AbstractAction
 {
 
 	/** The maximum number of events that are recorded */
-	public static int MAX_EVENTS = 250;
+	public static final int MAX_EVENTS;
 	
 	/** The HTTP header that contains the real IP for this request, this is used when DSpace is placed behind a load balancer */
-	public static String IP_HEADER = "X-Forwarded-For";
+	public static final String IP_HEADER;
 	
 	/** The ordered list of events, by access time */
 	private static Queue<Event> events = new LinkedList<Event>();
@@ -91,10 +91,22 @@ public class CurrentActivityAction extends AbstractAction
 	static {
 		// If the dspace.cfg has a max event count then use it.
 		if (ConfigurationManager.getProperty("xmlui.controlpanel.activity.max") != null)
+        {
 			MAX_EVENTS = ConfigurationManager.getIntProperty("xmlui.controlpanel.activity.max");
+        }
+        else
+        {
+            MAX_EVENTS = 250;
+        }
 		
 		if (ConfigurationManager.getProperty("xmlui.controlpanel.activity.ipheader") != null)
+        {
 			IP_HEADER = ConfigurationManager.getProperty("xmlui.controlpanel.activity.ipheader");
+        }
+        else
+        {
+            IP_HEADER = "X-Forwarded-For";
+        }
 	}
 	
 	

@@ -93,7 +93,7 @@ public abstract class JSPStep
      * Value to return from doPreProcessing to specify not to load any JSP Page
      * (equal to "") *
      */
-    public static String NO_JSP = "";
+    public static final String NO_JSP = "";
 
     /**
      * Do any pre-processing to determine which JSP (if any) is used to generate

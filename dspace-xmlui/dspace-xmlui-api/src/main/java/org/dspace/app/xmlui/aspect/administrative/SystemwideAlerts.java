@@ -64,9 +64,9 @@ public class SystemwideAlerts extends AbstractDSpaceTransformer implements Cache
 	private static final Message T_COUNTDOWN = message("xmlui.administrative.SystemwideAlerts.countdown");
 
 	/** Possible user restricted states */
-	public static int STATE_ALL_SESSIONS = 1;
-	public static int STATE_CURRENT_SESSIONS = 2;
-	public static int STATE_ONLY_ADMINISTRATIVE_SESSIONS = 3;
+	public static final int STATE_ALL_SESSIONS = 1;
+	public static final int STATE_CURRENT_SESSIONS = 2;
+	public static final int STATE_ONLY_ADMINISTRATIVE_SESSIONS = 3;
 	
 	
 	// Is an alert activated?

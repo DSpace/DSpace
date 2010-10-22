@@ -69,8 +69,8 @@ public class RepositoryAdapter extends AbstractAdapter
 {
 
 	/** MODS namespace */
-    public static String MODS_URI = "http://www.loc.gov/mods/v3";
-    public static Namespace MODS = new Namespace(MODS_URI);
+    public static final String MODS_URI = "http://www.loc.gov/mods/v3";
+    public static final Namespace MODS = new Namespace(MODS_URI);
 
 	
     /** A space separated list of descriptive metadata sections */

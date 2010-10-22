@@ -87,22 +87,22 @@ public abstract class AbstractProcessingStep
     /***************************************************************************
      * Constant - Name of the "<-Previous" button
      **************************************************************************/
-    public static String PREVIOUS_BUTTON = "submit_prev";
+    public static final String PREVIOUS_BUTTON = "submit_prev";
 
     /***************************************************************************
      * Constant - Name of the "Next->" button
      **************************************************************************/
-    public static String NEXT_BUTTON = "submit_next";
+    public static final String NEXT_BUTTON = "submit_next";
 
     /***************************************************************************
      * Constant - Name of the "Cancel/Save" button
      **************************************************************************/
-    public static String CANCEL_BUTTON = "submit_cancel";
+    public static final String CANCEL_BUTTON = "submit_cancel";
 
     /***************************************************************************
      * Constant - Prefix of all buttons in the Progress Bar
      **************************************************************************/
-    public static String PROGRESS_BAR_PREFIX = "submit_jump_";
+    public static final String PROGRESS_BAR_PREFIX = "submit_jump_";
 
     /***************************************************************************
      * Flag which specifies that the LAST PAGE of a step has been reached. This
@@ -110,13 +110,13 @@ public abstract class AbstractProcessingStep
      * workspace) to specify that the LAST PAGE of the LAST STEP has already
      * been reached
      **************************************************************************/
-    public static int LAST_PAGE_REACHED = Integer.MAX_VALUE;
+    public static final int LAST_PAGE_REACHED = Integer.MAX_VALUE;
 
     /***************************************************************************
      * STATUS / ERROR FLAGS (returned by doProcessing() if an error occurs or
      * additional user interaction may be required)
      **************************************************************************/
-    public static int STATUS_COMPLETE = 0;
+    public static final int STATUS_COMPLETE = 0;
 
     /** Maps each status/error flag to a textual, human understandable message * */
     private Map errorMessages = null;

@@ -65,7 +65,7 @@ import org.purl.sword.base.ServiceDocumentRequest;
 public class DSpaceSWORDServer implements SWORDServer
 {
 	/** Log4j logger */
-	public static Logger log = Logger.getLogger(DSpaceSWORDServer.class);
+	public static final Logger log = Logger.getLogger(DSpaceSWORDServer.class);
 
 	// methods required by SWORDServer interface
 	////////////////////////////////////////////

@@ -81,7 +81,7 @@ public class UIUtil extends Util
     private static Boolean useProxies;
 
     /** log4j category */
-    public static Logger log = Logger.getLogger(UIUtil.class);
+    public static final Logger log = Logger.getLogger(UIUtil.class);
     
     /**
 	 * Pattern used to get file.ext from filename (which can be a path)

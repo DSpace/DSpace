@@ -71,9 +71,9 @@ import org.dspace.core.Context;
 public class LicenseCleanup
 {
 
-    private static Logger log = Logger.getLogger(LicenseCleanup.class);
+    private static final Logger log = Logger.getLogger(LicenseCleanup.class);
 
-    protected static Templates templates = null;
+    protected static final Templates templates;
 
     static
     {

@@ -1054,7 +1054,7 @@ public class OAIHarvester {
 		static EPerson harvestAdmin;
 		static Context mainContext;
 		
-		public static Object lock = new Object();
+		public static final Object lock = new Object();
 		
 		private static Stack<HarvestThread> harvestThreads;
 		private static Integer maxActiveThreads;

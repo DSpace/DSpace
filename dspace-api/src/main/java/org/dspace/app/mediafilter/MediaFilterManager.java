@@ -85,13 +85,13 @@ import org.dspace.search.DSIndexer;
 public class MediaFilterManager
 {
 	//key (in dspace.cfg) which lists all enabled filters by name
-    public static String MEDIA_FILTER_PLUGINS_KEY = "filter.plugins";
+    public static final String MEDIA_FILTER_PLUGINS_KEY = "filter.plugins";
 	
     //prefix (in dspace.cfg) for all filter properties
-    public static String FILTER_PREFIX = "filter";
+    public static final String FILTER_PREFIX = "filter";
     
     //suffix (in dspace.cfg) for input formats supported by each filter
-    public static String INPUT_FORMATS_SUFFIX = "inputFormats";
+    public static final String INPUT_FORMATS_SUFFIX = "inputFormats";
     
     public static boolean updateIndex = true; // default to updating index
 
@@ -117,7 +117,7 @@ public class MediaFilterManager
     
     //separator in filterFormats Map between a filter class name and a plugin name,
     //for MediaFilters which extend SelfNamedPlugin (\034 is "file separator" char)
-    public static String FILTER_PLUGIN_SEPARATOR = "\034";
+    public static final String FILTER_PLUGIN_SEPARATOR = "\034";
     
     public static void main(String[] argv) throws Exception
     {

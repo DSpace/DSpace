@@ -63,7 +63,7 @@ import org.purl.sword.base.Deposit;
 public class SWORDService
 {
 	/** Log4j logging instance */
-	public static Logger log = Logger.getLogger(SWORDService.class);
+	public static final Logger log = Logger.getLogger(SWORDService.class);
 
 	/** The SWORD context of the request */
 	private SWORDContext swordContext;

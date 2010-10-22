@@ -62,7 +62,7 @@ public final class BitstreamInfoDAO extends DAOSupport
      * This value should be returned by <code>next()</code> to indicate that
      * there are no more values.
      */
-    public static int SENTINEL = -1;
+    public static final int SENTINEL = -1;
 
     /** Query that gets bitstream information for a specified ID. */
     private static final String FIND_BY_BITSTREAM_ID = "select bitstream.deleted, bitstream.store_number, bitstream.size_bytes, "

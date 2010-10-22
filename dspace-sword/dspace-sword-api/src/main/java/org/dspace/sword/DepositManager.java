@@ -64,7 +64,7 @@ import org.purl.sword.base.SWORDErrorException;
 public class DepositManager
 {
 	/** Log4j logger */
-	public static Logger log = Logger.getLogger(DepositManager.class);
+	public static final Logger log = Logger.getLogger(DepositManager.class);
 
 	/** The SWORD service implementation */
 	private SWORDService swordService;

@@ -100,13 +100,13 @@ public class DCInput
      * The scope of the input sets, this restricts hidden metadata fields from 
      * view during workflow processing. 
      */
-    public static String WORKFLOW_SCOPE = "workflow";
+    public static final String WORKFLOW_SCOPE = "workflow";
 
     /** 
      * The scope of the input sets, this restricts hidden metadata fields from 
      * view by the end user during submission. 
      */
-    public static String SUBMISSION_SCOPE = "submit";
+    public static final String SUBMISSION_SCOPE = "submit";
     
     /**
      * Class constructor for creating a DCInput object based on the contents of

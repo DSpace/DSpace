@@ -68,7 +68,7 @@ import ORG.oclc.oai.server.verb.ServerVerb;
 public class DIDLCrosswalk extends Crosswalk
 {
     /** default value if no oai.didl.maxresponse property is defined */
-    public static int MAXRESPONSE_INLINE_BITSTREAM = 0;
+    public static final int MAXRESPONSE_INLINE_BITSTREAM = 0;
     
     /** another crosswalk that will be used to generate the metadata section */
     private Crosswalk metadataCrosswalk;

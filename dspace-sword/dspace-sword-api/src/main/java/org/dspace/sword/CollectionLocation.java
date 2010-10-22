@@ -61,7 +61,7 @@ import org.dspace.handle.HandleManager;
 public class CollectionLocation
 {
 	/** Log4j logger */
-	public static Logger log = Logger.getLogger(CollectionLocation.class);
+	public static final Logger log = Logger.getLogger(CollectionLocation.class);
 	
 	/**
 	 * Obtain the deposit URL for the given collection.  These URLs
