@@ -190,11 +190,11 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
         {
             try
             {
-                DSpaceValidity validity = new DSpaceValidity();
+                DSpaceValidity newValidity = new DSpaceValidity();
                 DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
                 if (dso != null)
-                    validity.add(dso);
+                    newValidity.add(dso);
 
                 BrowseInfo info = getBrowseInfo();
 
@@ -204,7 +204,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
                     // Add the browse items to the validity
                     for (BrowseItem item : (java.util.List<BrowseItem>) info.getResults())
                     {
-                        validity.add(item);
+                        newValidity.add(item);
                     }
                 }
                 else
@@ -212,9 +212,11 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
                     // Add the metadata to the validity
                     for (String[] singleEntry : browseInfo.getStringResults())
                     {
-                        validity.add(singleEntry[0]+"#"+singleEntry[1]);
+                        newValidity.add(singleEntry[0]+"#"+singleEntry[1]);
                     }
                 }
+
+                validity = newValidity;
             }
             catch (Exception e)
             {
@@ -822,17 +824,17 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
 
             if (bix.isMetadataIndex())
             {
-                titleMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata." + bix.getName())
+                trailMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata." + bix.getName())
                         .parameterize(scopeName);
             }
             else if (info.getSortOption() != null)
             {
-                titleMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.trail.item." + info.getSortOption().getName())
+                trailMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.trail.item." + info.getSortOption().getName())
                         .parameterize(scopeName);
             }
             else
             {
-                titleMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.trail.item." + bix.getSortOption().getName())
+                trailMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.trail.item." + bix.getSortOption().getName())
                         .parameterize(scopeName);
             }
         }

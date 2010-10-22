@@ -547,10 +547,9 @@ public class LogAnalyser
         {
             // FIXME: this is dependent on their being a query on the db, which
             // there might not always be if it becomes configurable
-            Double avg = new Double(
-                        Math.ceil(
-                            ((Integer) actionAggregator.get("view_item")).intValue() / 
-                            ((Integer) archiveStats.get("All Items")).intValue()));
+            Double avg = Math.ceil(
+                            ((Integer)actionAggregator.get("view_item")).doubleValue() /
+                            ((Integer)archiveStats.get("All Items")).doubleValue());
             views = avg.intValue();
         }
         

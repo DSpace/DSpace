@@ -190,7 +190,7 @@ public class EditProfile extends AbstractDSpaceTransformer
             {
                 return a.getDisplayName().compareTo(b.getDisplayName());
             }
-            public boolean equals(Object o) { return false; }});
+        });
     }
     
     /** The email address of the user registering for the first time.*/

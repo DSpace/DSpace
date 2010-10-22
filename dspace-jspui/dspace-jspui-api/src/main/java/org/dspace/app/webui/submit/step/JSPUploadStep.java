@@ -164,11 +164,15 @@ public class JSPUploadStep extends JSPStep
             {
                 throw new ServletException(e);
             }
+
+            // show whichever upload page is appropriate
+            // (based on if this item already has files or not)
+            showUploadPage(context, request, response, subInfo, false);
         }
-             
-        // show whichever upload page is appropriate
-        // (based on if this item already has files or not)
-        showUploadPage(context, request, response, subInfo, false);
+        else
+        {
+            throw new IllegalStateException("SubInfo must not be null");
+        }
     }
     
     /**

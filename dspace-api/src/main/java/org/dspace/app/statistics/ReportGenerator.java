@@ -241,6 +241,11 @@ public class ReportGenerator
                                      String myMap)
         throws Exception, SQLException
     {
+        if (myMap != null)
+        {
+            map = myMap;
+        }
+
         // create the relevant report type
         // FIXME: at the moment we only support HTML report generation
         Report report = null;
@@ -250,9 +255,9 @@ public class ReportGenerator
             ((HTMLReport)report).setOutput(myOutput);
         }
 
-        if (myMap != null)
+        if (report == null)
         {
-            map = myMap;
+            throw new IllegalStateException("Must specify a valid report format");
         }
 
         ReportGenerator.processReport(context, report, myInput);

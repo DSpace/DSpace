@@ -188,9 +188,8 @@ public class CreateAdministrator
                 if (language != null)
                 {
                     language = language.trim();
+                    language = I18nUtil.getSupportedLocale(new Locale(language)).getLanguage();
                 }
-                
-    		    language = I18nUtil.getSupportedLocale(new Locale(language)).getLanguage();
             }
             
     		System.out.println("WARNING: Password will appear on-screen.");
