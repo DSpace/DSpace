@@ -96,7 +96,10 @@ public class ShibbolethFilter implements Filter
             {
 				java.util.Enumeration names = ((HttpServletRequest) request).getHeaderNames();
 				String name;
-				while(names.hasMoreElements()) log.debug("header:"+(name = names.nextElement().toString())+"="+((HttpServletRequest)request).getHeader(name));
+				while(names.hasMoreElements())
+                {
+                    log.debug("header:" + (name = names.nextElement().toString()) + "=" + ((HttpServletRequest) request).getHeader(name));
+                }
 
                 // No current user, prompt authentication
             	Authenticate.startAuthentication(context, hrequest, hresponse);

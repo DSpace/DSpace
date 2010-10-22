@@ -227,18 +227,26 @@ public class HandleUtil
             	Collection collection = (Collection) pop;
             	String name = collection.getMetadata("name");
             	if (name == null || name.length() == 0)
-            		pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), new Message("default","xmlui.general.untitled") );
+                {
+                    pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), new Message("default", "xmlui.general.untitled"));
+                }
             	else
-            		pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), name);
+                {
+                    pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), name);
+                }
             }
             else if (pop instanceof Community)
             {
             	Community community = (Community) pop;
             	String name = community.getMetadata("name");
             	if (name == null || name.length() == 0)
-            		pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), new Message("default","xmlui.general.untitled") );
+                {
+                    pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), new Message("default", "xmlui.general.untitled"));
+                }
             	else
-            		pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), name);
+                {
+                    pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), name);
+                }
             }
 
         }

@@ -166,14 +166,18 @@ public class DSpaceMETSGenerator extends AbstractGenerator
         AbstractAdapter adapter = null;
 		 if (handle != null)
          {
-			// Specified using a regular handle. 
-         	DSpaceObject dso = HandleManager.resolveToObject(context, handle);
-         	
-         	// Handles can be either items or containers.
-         	if (dso instanceof Item)
-                        adapter = new ItemAdapter(context, (Item) dso, contextPath);
+            // Specified using a regular handle.
+            DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+
+            // Handles can be either items or containers.
+            if (dso instanceof Item)
+            {
+                adapter = new ItemAdapter(context, (Item) dso, contextPath);
+            }
          	else if (dso instanceof Collection || dso instanceof Community)
-         		adapter = new ContainerAdapter(context, dso, contextPath);
+            {
+                adapter = new ContainerAdapter(context, dso, contextPath);
+            }
          }
          else if (internal != null)
          {

@@ -104,8 +104,12 @@ public class EPersonUtils
     private static String render(int givenStep, int step)
     {
         if (givenStep == step)
+        {
             return "current";
+        }
         else
+        {
             return null;
+        }
     }
 }

@@ -839,7 +839,9 @@ public class MediaFilterManager
             return true;
         }    
         else
+        {
             return false;
+        }
     }
     
 }

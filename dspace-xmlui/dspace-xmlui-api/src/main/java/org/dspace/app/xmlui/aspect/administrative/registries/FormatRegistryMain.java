@@ -146,9 +146,13 @@ public class FormatRegistryMain extends AbstractDSpaceTransformer
 			
 			Row row;
 			if (highlight)
-				row = table.addRow(null,null,"highlight");
+            {
+                row = table.addRow(null, null, "highlight");
+            }
 			else
-				row = table.addRow();
+            {
+                row = table.addRow();
+            }
 			
 			// Select checkbox
 			Cell cell = row.addCell();

@@ -186,9 +186,13 @@ public class EditBitstreamFormat extends AbstractDSpaceTransformer
         // DIVISION: edit-bitstream-format
 		Division main = body.addInteractiveDivision("edit-bitstream-format",contextPath+"/admin/format-registry",Division.METHOD_POST,"primary administrative format-registry");
 		if (formatID == -1)
-			main.setHead(T_head1);
+        {
+            main.setHead(T_head1);
+        }
 		else
-			main.setHead(T_head2.parameterize(nameValue));
+        {
+            main.setHead(T_head2.parameterize(nameValue));
+        }
 		main.addPara(T_para1);
 	
 		List form = main.addList("edit-bitstream-format",List.TYPE_FORM);
@@ -200,7 +204,9 @@ public class EditBitstreamFormat extends AbstractDSpaceTransformer
 		name.setValue(nameValue);
 		name.setSize(35);
 		if (errors.contains("short_description"))
-			name.addError(T_name_error);
+        {
+            name.addError(T_name_error);
+        }
 		
 		Text mimeType = form.addItem().addText("mimetype");
 		mimeType.setLabel(T_mimetype);
@@ -210,7 +216,9 @@ public class EditBitstreamFormat extends AbstractDSpaceTransformer
 		
 		// Do not allow anyone to change the name of the unknown format.
 		if (format != null && format.getID() == 1)
-			name.setDisabled(); 
+        {
+            name.setDisabled();
+        }
 
 		TextArea description = form.addItem().addTextArea("description");
 		description.setLabel(T_description);

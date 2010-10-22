@@ -163,7 +163,10 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
         else if (policy != null) {
         	currentGroup = policy.getGroup();
         }
-        else currentGroup = null;
+        else
+        {
+            currentGroup = null;
+        }
         
         // Same for the current action; it can either blank (-1), manually set, or inherited from the current policy
         if (policy != null && actionID == -1)
@@ -201,7 +204,9 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
         	main.setHead(T_main_head_edit.parameterize(policyID,Constants.typeText[objectType],objectID));
         }
         else
-        	main.setHead(T_main_head_new.parameterize(Constants.typeText[objectType],objectID));
+        {
+            main.setHead(T_main_head_new.parameterize(Constants.typeText[objectType], objectID));
+        }
 		
 	    int resourceRelevance = 1 << objectType; 
 		
@@ -226,9 +231,13 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
             if( (Constants.actionTypeRelevance[i] & resourceRelevance) > 0)
             {
             	if (actionID == i)
-            		actionSelect.addOption(true, i, Constants.actionText[i]);
+                {
+                    actionSelect.addOption(true, i, Constants.actionText[i]);
+                }
             	else
-            		actionSelect.addOption(i, Constants.actionText[i]);
+                {
+                    actionSelect.addOption(i, Constants.actionText[i]);
+                }
             }
         }
         if (errors.contains("action_id"))
@@ -242,9 +251,13 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
     	for (Group group : Group.findAll(context, Group.NAME))
     	{
     		if (group == currentGroup)
-    			groupSelect.addOption(true, group.getID(), group.getName());
+            {
+                groupSelect.addOption(true, group.getID(), group.getName());
+            }
     		else
-    			groupSelect.addOption(group.getID(), group.getName());
+            {
+                groupSelect.addOption(group.getID(), group.getName());
+            }
     	}
     	if (errors.contains("group_id"))
     		groupSelect.addError(T_error_no_group);
@@ -337,13 +350,19 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
         	if (groupsMatched > 0) {
         		row.addCell().addContent(otherAuthorizations.substring(0,otherAuthorizations.lastIndexOf(", ")));
         	}
-        	else 
-        		row.addCell().addContent("-");
+        	else
+            {
+                row.addCell().addContent("-");
+            }
         	
         	if (group != sourceGroup)
-    			row.addCell().addButton("submit_group_id_"+groupID).setValue(T_set_group);
+            {
+                row.addCell().addButton("submit_group_id_" + groupID).setValue(T_set_group);
+            }
     		else
-    			row.addCell().addContent(T_current_group);
+            {
+                row.addCell().addContent(T_current_group);
+            }
         	
         }
         if (groups.length <= 0) {

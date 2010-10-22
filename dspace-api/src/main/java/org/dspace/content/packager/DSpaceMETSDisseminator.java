@@ -133,9 +133,13 @@ public class DSpaceMETSDisseminator
     public String bundleToFileGrp(String bname)
     {
         if (bname.equals("ORIGINAL"))
+        {
             return "CONTENT";
+        }
         else
+        {
             return bname;
+        }
     }
 
     /**
@@ -205,7 +209,9 @@ public class DSpaceMETSDisseminator
             return result;
     }
         else
+        {
             return new String[0];
+        }
     }
 
     @Override
@@ -244,13 +250,20 @@ public class DSpaceMETSDisseminator
         {
             Item item = (Item)dso;
             if (PackageUtils.findDepositLicense(context, item) != null)
+            {
                 result.add(DSPACE_DEPOSIT_LICENSE_MDTYPE);
+            }
 
             if (CreativeCommons.getLicenseRdfBitstream(item) != null)
+            {
                 result.add(CREATIVE_COMMONS_RDF_MDTYPE);
+            }
             else if (CreativeCommons.getLicenseTextBitstream(item) != null)
+            {
                 result.add(CREATIVE_COMMONS_TEXT_MDTYPE);
             }
+        }
+        
         return result.toArray(new String[result.size()]);
     }
 

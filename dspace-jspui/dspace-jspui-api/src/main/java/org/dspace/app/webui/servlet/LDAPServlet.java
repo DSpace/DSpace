@@ -81,9 +81,13 @@ public class LDAPServlet extends DSpaceServlet
         // check if ldap is enables and forward to the correct login form
         boolean ldap_enabled = ConfigurationManager.getBooleanProperty("ldap.enable");
         if (ldap_enabled)
+        {
             JSPManager.showJSP(request, response, "/login/ldap.jsp");
+        }
         else
+        {
             JSPManager.showJSP(request, response, "/login/password.jsp");
+        }
     }
 
 

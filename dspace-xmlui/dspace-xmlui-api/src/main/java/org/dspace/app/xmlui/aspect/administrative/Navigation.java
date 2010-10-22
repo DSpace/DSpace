@@ -153,7 +153,9 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         	}
         }
         else
-        	key = "anonymous";
+        {
+            key = "anonymous";
+        }
         
         return HashUtil.hash(key);
     }

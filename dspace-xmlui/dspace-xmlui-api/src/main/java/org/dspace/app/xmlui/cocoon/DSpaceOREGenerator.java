@@ -122,9 +122,13 @@ public class DSpaceOREGenerator extends AbstractGenerator
          	
          	// Handles can be either items or containers.
          	if (dso instanceof Item)
-         		return (Item)dso;
+             {
+                 return (Item) dso;
+             }
          	else
-         		throw new CrosswalkException("ORE dissemination only available for DSpace Items.");
+             {
+                 throw new CrosswalkException("ORE dissemination only available for DSpace Items.");
+             }
          }
          else if (internal != null)
          {
@@ -141,7 +145,9 @@ public class DSpaceOREGenerator extends AbstractGenerator
                      return Item.find(context,id);
          		}
          		else
-             		throw new CrosswalkException("ORE dissemination only available for DSpace Items.");
+                 {
+                     throw new CrosswalkException("ORE dissemination only available for DSpace Items.");
+                 }
          		
          	}
          }

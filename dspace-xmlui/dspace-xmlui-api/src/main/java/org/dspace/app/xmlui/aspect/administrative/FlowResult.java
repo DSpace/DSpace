@@ -144,9 +144,13 @@ public class FlowResult {
 	public void setOutcome(boolean success)
 	{
 		if (success)
-			outcome = Outcome.SUCCESS;
+        {
+            outcome = Outcome.SUCCESS;
+        }
 		else
-			outcome = Outcome.FAILURE;
+        {
+            outcome = Outcome.FAILURE;
+        }
 	}
 	
 	/**
@@ -260,15 +264,21 @@ public class FlowResult {
 	public String getErrorString()
 	{
 		if (errors == null || errors.size() == 0)
-			return null;
+        {
+            return null;
+        }
 		
 		String errorString = null;
 		for (String error : errors)
 		{
 			if (errorString == null)
-				errorString = error;
+            {
+                errorString = error;
+            }
 			else
-				errorString += ","+error;
+            {
+                errorString += "," + error;
+            }
 		}
 		return errorString;
 	}

@@ -225,19 +225,24 @@ public class LDAPHierarchicalAuthentication
         {
             // e-mail address corresponds to active account
             if (eperson.getRequireCertificate())
-                return CERT_REQUIRED;
-            else if (!eperson.canLogIn())
-                return BAD_ARGS;
             {
-                if (ldap.ldapAuthenticate(dn, password, context))
-                {
-                    context.setCurrentUser(eperson);
-                    log.info(LogManager
-                        .getHeader(context, "authenticate", "type=ldap"));
-                    return SUCCESS;
-                }
-                else
-                   return BAD_CREDENTIALS;
+                return CERT_REQUIRED;
+            }
+            else if (!eperson.canLogIn())
+            {
+                return BAD_ARGS;
+            }
+
+            if (ldap.ldapAuthenticate(dn, password, context))
+            {
+                context.setCurrentUser(eperson);
+                log.info(LogManager
+                    .getHeader(context, "authenticate", "type=ldap"));
+                return SUCCESS;
+            }
+            else
+            {
+                return BAD_CREDENTIALS;
             }
         }
 

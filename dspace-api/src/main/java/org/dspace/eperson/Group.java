@@ -897,11 +897,17 @@ public class Group extends DSpaceObject
         // Create the parameter array, including limit and offset if part of the query
         Object[] paramArr = new Object[]{params, int_param};
         if (limit > 0 && offset > 0)
-            paramArr = new Object[] {params, int_param,limit,offset};
+        {
+            paramArr = new Object[]{params, int_param, limit, offset};
+        }
         else if (limit > 0)
-            paramArr = new Object[] {params, int_param,limit};
+        {
+            paramArr = new Object[]{params, int_param, limit};
+        }
         else if (offset > 0)
-            paramArr = new Object[] {params, int_param,offset};
+        {
+            paramArr = new Object[]{params, int_param, offset};
+        }
 
         TableRowIterator rows =
 			DatabaseManager.query(context, dbquery, paramArr);

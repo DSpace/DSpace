@@ -113,7 +113,9 @@ public class DSpaceAIPIngester
     {
         String profile = manifest.getProfile();
         if (profile == null)
+        {
             throw new MetadataValidationException("Cannot accept METS with no PROFILE attribute!");
+        }
         else if (!profile.equals(DSpaceAIPDisseminator.PROFILE_1_0))
             throw new MetadataValidationException("METS has unacceptable PROFILE attribute, profile="+profile);
     }
@@ -209,7 +211,9 @@ public class DSpaceAIPIngester
 
         // it's an error if there is nothing to crosswalk:
         else
+        {
             throw new MetadataValidationException("DSpaceAIPIngester: Could not find an acceptable object-wide DMD section in manifest.");
+        }
     }
 
 

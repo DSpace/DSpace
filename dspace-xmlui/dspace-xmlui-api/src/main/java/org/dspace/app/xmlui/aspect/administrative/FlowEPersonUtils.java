@@ -331,9 +331,13 @@ public class FlowEPersonUtils {
     		for(String unable : unableList )
     		{
     			if (characters == null)
-    				characters = unable;
+                {
+                    characters = unable;
+                }
     			else
-    				characters += ", "+unable;
+                {
+                    characters += ", " + unable;
+                }
     		}
     		
     		result.setCharacters(characters);

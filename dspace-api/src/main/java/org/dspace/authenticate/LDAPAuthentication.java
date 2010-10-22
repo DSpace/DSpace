@@ -188,19 +188,24 @@ public class LDAPAuthentication
         {
             // e-mail address corresponds to active account
             if (eperson.getRequireCertificate())
-                return CERT_REQUIRED;
-            else if (!eperson.canLogIn())
-                return BAD_ARGS;
             {
-                if (ldap.ldapAuthenticate(netid, password, context))
-                {
-                    context.setCurrentUser(eperson = EPerson.findByNetid(context, netid.toLowerCase()));
-                    log.info(LogManager
-                        .getHeader(context, "authenticate", "type=ldap"));
-                    return SUCCESS;
-                }
-                else
-                   return BAD_CREDENTIALS;
+                return CERT_REQUIRED;
+            }
+            else if (!eperson.canLogIn())
+            {
+                return BAD_ARGS;
+            }
+
+            if (ldap.ldapAuthenticate(netid, password, context))
+            {
+                context.setCurrentUser(eperson = EPerson.findByNetid(context, netid.toLowerCase()));
+                log.info(LogManager
+                    .getHeader(context, "authenticate", "type=ldap"));
+                return SUCCESS;
+            }
+            else
+            {
+                return BAD_CREDENTIALS;
             }
         }
 
@@ -240,11 +245,26 @@ public class LDAPAuthentication
 	                            {
 	                                context.setIgnoreAuthorization(true);
 	                                eperson = EPerson.create(context);
-	                                if ((ldap.ldapEmail!=null)&&(!ldap.ldapEmail.equals(""))) eperson.setEmail(ldap.ldapEmail);
-	                                else eperson.setEmail(netid);
-	                                if ((ldap.ldapGivenName!=null)&&(!ldap.ldapGivenName.equals(""))) eperson.setFirstName(ldap.ldapGivenName);
-	                                if ((ldap.ldapSurname!=null)&&(!ldap.ldapSurname.equals(""))) eperson.setLastName(ldap.ldapSurname);
-	                                if ((ldap.ldapPhone!=null)&&(!ldap.ldapPhone.equals(""))) eperson.setMetadata("phone", ldap.ldapPhone);
+	                                if ((ldap.ldapEmail!=null)&&(!ldap.ldapEmail.equals("")))
+                                    {
+                                        eperson.setEmail(ldap.ldapEmail);
+                                    }
+	                                else
+                                    {
+                                        eperson.setEmail(netid);
+                                    }
+	                                if ((ldap.ldapGivenName!=null)&&(!ldap.ldapGivenName.equals("")))
+                                    {
+                                        eperson.setFirstName(ldap.ldapGivenName);
+                                    }
+	                                if ((ldap.ldapSurname!=null)&&(!ldap.ldapSurname.equals("")))
+                                    {
+                                        eperson.setLastName(ldap.ldapSurname);
+                                    }
+	                                if ((ldap.ldapPhone!=null)&&(!ldap.ldapPhone.equals("")))
+                                    {
+                                        eperson.setMetadata("phone", ldap.ldapPhone);
+                                    }
 	                                eperson.setNetid(netid.toLowerCase());
 	                                eperson.setCanLogIn(true);
 	                                AuthenticationManager.initEPerson(context, request, eperson);

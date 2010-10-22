@@ -111,11 +111,15 @@ public class LDAPLogin extends AbstractDSpaceTransformer implements
 		// cachable
 		if (header == null && message == null && characters == null
 				&& previous_username == null)
-			// cacheable
-			return "1";
+        {
+            // cacheable
+            return "1";
+        }
 		else
-			// Uncachable
-			return "0";
+        {
+            // Uncachable
+            return "0";
+        }
 	}
 
 	/**
@@ -138,11 +142,15 @@ public class LDAPLogin extends AbstractDSpaceTransformer implements
 		// cachable
 		if (header == null && message == null && characters == null
 				&& previous_username == null)
-			// Always valid
-			return NOPValidity.SHARED_INSTANCE;
+        {
+            // Always valid
+            return NOPValidity.SHARED_INSTANCE;
+        }
 		else
-			// invalid
-			return null;
+        {
+            // invalid
+            return null;
+        }
 	}
 
 	/**
@@ -177,10 +185,14 @@ public class LDAPLogin extends AbstractDSpaceTransformer implements
 			Division reason = body.addDivision("login-reason");
 
 			if (header != null)
-				reason.setHead(message(header));
+            {
+                reason.setHead(message(header));
+            }
 			else
-				// Allways have a head.
-				reason.setHead("Authentication Required");
+            {
+                // Always have a head.
+                reason.setHead("Authentication Required");
+            }
 
 			if (message != null)
 				reason.addPara(message(message));

@@ -353,7 +353,9 @@ public class JSPStepManager
             return completeStep(context, request, response, subInfo);
         }
         else
+        {
             return false; // step not completed
+        }
     }
 
     /**
@@ -519,8 +521,10 @@ public class JSPStepManager
             return true;
         }
         else
+        {
             return false; // couldn't return to controller since response is
                             // committed
+        }
     }
 
     /**

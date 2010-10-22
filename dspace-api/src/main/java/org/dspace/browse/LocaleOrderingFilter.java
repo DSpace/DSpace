@@ -147,9 +147,13 @@ public class LocaleOrderingFilter implements TextFilter
             String[] localeArr = locale.split("_");
 
             if (localeArr.length > 1)
+            {
                 theLocale = new Locale(localeArr[0], localeArr[1]);
+            }
             else
+            {
                 theLocale = new Locale(locale);
+            }
             
             // Return the configured locale, or English default
             if (theLocale == null)
@@ -159,7 +163,9 @@ public class LocaleOrderingFilter implements TextFilter
             }
         }
         else
+        {
             return Locale.ENGLISH;
+        }
 
         return theLocale;
     }

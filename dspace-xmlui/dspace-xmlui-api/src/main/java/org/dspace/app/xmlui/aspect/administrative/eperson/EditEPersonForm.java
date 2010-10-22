@@ -250,9 +250,13 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 	        email.setLabel(T_email_address);
 	        email.setValue(emailValue);
 	        if (errors.contains("eperson_email_key"))
-	        	email.addError(T_error_email_unique);
+            {
+                email.addError(T_error_email_unique);
+            }
 	        else if (errors.contains("email_address"))
-	        	email.addError(T_error_email);
+            {
+                email.addError(T_error_email);
+            }
         }
         else
         {
@@ -348,13 +352,21 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 	        			hi.addContent(", ");
 	        		
 	        		if ("item".equals(constraint))
-	        			hi.addContent(T_constraint_item);
+                    {
+                        hi.addContent(T_constraint_item);
+                    }
 	        		else if ("workflowitem".equals(constraint))
-	        			hi.addContent(T_constraint_workflowitem);
+                    {
+                        hi.addContent(T_constraint_workflowitem);
+                    }
 	        		else if ("tasklistitem".equals(constraint))
-	        			hi.addContent(T_constraint_tasklistitem);
+                    {
+                        hi.addContent(T_constraint_tasklistitem);
+                    }
 	        		else
-	        			hi.addContent(T_constraint_unknown);
+                    {
+                        hi.addContent(T_constraint_unknown);
+                    }
         			
         		}
 	        	hi.addContent(".");

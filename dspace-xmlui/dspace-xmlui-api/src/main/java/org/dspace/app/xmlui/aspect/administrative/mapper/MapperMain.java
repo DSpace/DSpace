@@ -167,9 +167,13 @@ public class MapperMain extends AbstractDSpaceTransformer {
                 Item item = iterator.next();
 
                 if (item.isOwningCollection(collection))
+                {
                     count_native++;
+                }
                 else
+                {
                     count_import++;
+                }
             }
         }
         finally

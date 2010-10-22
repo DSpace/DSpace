@@ -325,9 +325,13 @@ public class Harvest
 
                     // resolved, now make sure it's a collection
                     if (dso == null || dso.getType() != Constants.COLLECTION)
+                    {
                         targetCollection = null;
+                    }
                     else
-                        targetCollection = (Collection)dso;
+                    {
+                        targetCollection = (Collection) dso;
+                    }
                 }
                 // not a handle, try and treat it as an integer collection
                 // database ID

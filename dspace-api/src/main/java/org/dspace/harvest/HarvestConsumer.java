@@ -96,7 +96,9 @@ public class HarvestConsumer implements Consumer
 	            		hi.update();
 	            	}	            		
 	            	else
-	            		log.debug("Deleted item '" + id + "' and the associated harvested_item.");
+                    {
+                        log.debug("Deleted item '" + id + "' and the associated harvested_item.");
+                    }
 	            } 
 	            break;
 	        case Constants.COLLECTION:
@@ -109,7 +111,9 @@ public class HarvestConsumer implements Consumer
 	            		hc.update();
 	            	}	            		
 	            	else
-	            		log.debug("Deleted collection '" + id + "' and the associated harvested_collection.");
+                    {
+                        log.debug("Deleted collection '" + id + "' and the associated harvested_collection.");
+                    }
 	            }
 	        default:
 	            log.warn("consume() got unrecognized event: " + event.toString());

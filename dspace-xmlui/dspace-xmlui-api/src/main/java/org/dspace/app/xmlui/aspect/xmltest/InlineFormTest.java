@@ -101,14 +101,22 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         div.addPara("There are two options you can use to control how this page is generated. First is the help parameter, if this is present then help text will be provided for all fields. Next is the error parameter, if it is provided then all fields will be generated in error conditions.");
 		
 		if (help)
-			div.addPara().addXref(makeURL(false,error),"Turn help OFF");
-		else 
-			div.addPara().addXref(makeURL(true,error),"Turn help ON");
+        {
+            div.addPara().addXref(makeURL(false, error), "Turn help OFF");
+        }
+		else
+        {
+            div.addPara().addXref(makeURL(true, error), "Turn help ON");
+        }
 			
 		if (error)
-			div.addPara().addXref(makeURL(help,false),"Turn errors OFF");
-		else 
-			div.addPara().addXref(makeURL(help,true),"Turn errors ON");
+        {
+            div.addPara().addXref(makeURL(help, false), "Turn errors OFF");
+        }
+		else
+        {
+            div.addPara().addXref(makeURL(help, true), "Turn errors ON");
+        }
 		
 		
 		Division suited = body.addDivision("suited");

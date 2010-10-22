@@ -247,8 +247,14 @@ public class FlowAuthorizationUtils {
 	    
 	    result.setContinue(true);
 	    result.setOutcome(true);
-	    if (added) result.setMessage(new Message("default","A new policy was created successfully"));
-	    else result.setMessage(new Message("default","The policy was edited successfully"));
+	    if (added)
+        {
+            result.setMessage(new Message("default", "A new policy was created successfully"));
+        }
+	    else
+        {
+            result.setMessage(new Message("default", "The policy was edited successfully"));
+        }
 	    
 	    result.setParameter("policyID", policy.getID());
 	    

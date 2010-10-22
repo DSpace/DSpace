@@ -45,10 +45,14 @@ public class StripLeadingNonAlphaNum implements TextFilter
         int i = 0;
 
         while (i < str.length() && !Character.isLetterOrDigit(str.charAt(i)))
+        {
             i++;
+        }
 
         if (i > 0)
+        {
             return str.substring(i);
+        }
 
         return str;
     }

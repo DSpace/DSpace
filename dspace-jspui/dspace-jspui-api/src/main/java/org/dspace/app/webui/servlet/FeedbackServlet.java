@@ -86,7 +86,9 @@ public class FeedbackServlet extends DSpaceServlet
         String basicHost = "";
         if (host.equals("localhost") || host.equals("127.0.0.1")
         		|| host.equals(InetAddress.getLocalHost().getHostAddress()))
+        {
             basicHost = host;
+        }
         else
         {
             // cut off all but the hostname, to cover cases where more than one URL

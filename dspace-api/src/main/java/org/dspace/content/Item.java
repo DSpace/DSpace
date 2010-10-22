@@ -636,7 +636,9 @@ public class Item extends DSpaceObject
             addMetadata(schema, element, qualifier, lang, values, authorities, confidences);
         }
         else
+        {
             addMetadata(schema, element, qualifier, lang, values, null, null);
+        }
     }
 
     /**
@@ -1632,11 +1634,17 @@ public class Item extends DSpaceObject
                                 {
                                     String text = tr.getStringColumn("text_value");
                                     if (dcv.value == null && text == null)
+                                    {
                                         matched = true;
+                                    }
                                     else if (dcv.value != null && dcv.value.equals(text))
+                                    {
                                         matched = true;
+                                    }
                                     else
+                                    {
                                         matched = false;
+                                    }
                                 }
 
                                 // Check the language is the same
@@ -1644,11 +1652,17 @@ public class Item extends DSpaceObject
                                 {
                                     String lang = tr.getStringColumn("text_lang");
                                     if (dcv.language == null && lang == null)
+                                    {
                                         matched = true;
+                                    }
                                     else if (dcv.language != null && dcv.language.equals(lang))
+                                    {
                                         matched = true;
+                                    }
                                     else
+                                    {
                                         matched = false;
+                                    }
                                 }
 
                                 // check that authority and confidence match

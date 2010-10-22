@@ -207,7 +207,9 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	    item = metadataList.addItem();
 	    
 	    if (thisCollection.getTemplateItem() == null)
-	    	item.addButton("submit_create_template").setValue(T_submit_create_template);
+        {
+            item.addButton("submit_create_template").setValue(T_submit_create_template);
+        }
 	    else 
 	    {
 	    	item.addButton("submit_edit_template").setValue(T_submit_edit_template);

@@ -224,9 +224,13 @@ public class OpenSearch
     {
         // Encode results in requested format
         if ("rss".equals(format))
+        {
             format = "rss_2.0";
+        }
         else if ("atom".equals(format))
+        {
             format = "atom_1.0";
+        }
     	
         SyndicationFeed feed = new SyndicationFeed(labels.get(SyndicationFeed.MSG_UITYPE));
         feed.populate(null, scope, results, labels);

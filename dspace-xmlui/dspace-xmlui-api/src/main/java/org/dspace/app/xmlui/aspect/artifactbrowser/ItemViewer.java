@@ -180,9 +180,13 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         String title = getItemTitle(item);
 
         if (title != null)
+        {
             pageMeta.addMetadata("title").addContent(title);
+        }
         else
+        {
             pageMeta.addMetadata("title").addContent(item.getHandle());
+        }
 
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         HandleUtil.buildHandleTrail(item,pageMeta,contextPath);
@@ -256,9 +260,13 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         Division division = body.addDivision("item-view","primary");
         String title = getItemTitle(item);
         if (title != null)
+        {
             division.setHead(title);
+        }
         else
+        {
             division.setHead(item.getHandle());
+        }
 
         Para showfullPara = division.addPara(null, "item-view-toggle item-view-toggle-top");
 
@@ -333,9 +341,13 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 
         String title;
         if (titles != null && titles.length > 0)
+        {
             title = titles[0].value;
+        }
         else
+        {
             title = null;
+        }
         return title;
     }
 

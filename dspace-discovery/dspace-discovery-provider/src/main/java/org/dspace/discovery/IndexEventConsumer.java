@@ -121,7 +121,9 @@ public class IndexEventConsumer implements Consumer {
                     log.debug("Transforming Bundle event into MODIFY of Item "
                             + subject.getHandle());
             } else
+            {
                 return;
+            }
         }
 
         switch (et) {
@@ -129,10 +131,12 @@ public class IndexEventConsumer implements Consumer {
             case Event.MODIFY:
             case Event.MODIFY_METADATA:
                 if (subject == null)
+                {
                     log.warn(event.getEventTypeAsString() + " event, could not get object for "
                             + event.getSubjectTypeAsString() + " id="
                             + String.valueOf(event.getSubjectID())
                             + ", perhaps it has been deleted.");
+                }
                 else {
                     log.debug("consume() adding event to update queue: " + event.toString());
                     objectsToUpdate.add(subject);
@@ -142,10 +146,12 @@ public class IndexEventConsumer implements Consumer {
             case Event.REMOVE:
             case Event.ADD:
                 if (object == null)
+                {
                     log.warn(event.getEventTypeAsString() + " event, could not get object for "
                             + event.getObjectTypeAsString() + " id="
                             + String.valueOf(event.getObjectID())
                             + ", perhaps it has been deleted.");
+                }
                 else {
                     log.debug("consume() adding event to update queue: " + event.toString());
                     objectsToUpdate.add(object);
@@ -155,7 +161,9 @@ public class IndexEventConsumer implements Consumer {
             case Event.DELETE:
                 String detail = event.getDetail();
                 if (detail == null)
+                {
                     log.warn("got null detail on DELETE event, skipping it.");
+                }
                 else {
                     log.debug("consume() adding event to delete queue: " + event.toString());
                     handlesToDelete.add(detail);

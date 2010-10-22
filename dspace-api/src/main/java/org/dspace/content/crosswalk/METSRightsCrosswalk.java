@@ -159,10 +159,14 @@ public class METSRightsCrosswalk
                IOException, SQLException, AuthorizeException
     {
         if(dso==null)
+        {
             return null;
+        }
         // we don't have a way to provide METSRights for a SITE object
         else if(dso.getType() == Constants.SITE)
+        {
             throw new CrosswalkObjectNotSupported("The METSRightsCrosswalk cannot crosswalk a SITE object");
+        }
 
 
         //Root element: RightsDeclarationMD
@@ -203,9 +207,13 @@ public class METSRightsCrosswalk
               String contextClass=GROUP_CONTEXTCLASS;
 
               if(group.getID()==0) //DSpace Anonymous Group = 'GENERAL PUBLIC' type
-                contextClass = ANONYMOUS_CONTEXTCLASS;
+              {
+                  contextClass = ANONYMOUS_CONTEXTCLASS;
+              }
               else if(group.getID()==1) //DSpace Administrator Group = 'REPOSITORY MGR' type
-                contextClass = ADMIN_CONTEXTCLASS;
+              {
+                  contextClass = ADMIN_CONTEXTCLASS;
+              }
 
               rightsContext.setAttribute("CONTEXTCLASS", contextClass);
 
@@ -423,7 +431,9 @@ public class METSRightsCrosswalk
 
             // if we're fed a <RightsDeclarationMD> wrapper object, recurse on its guts:
             if (element.getName().equals("RightsDeclarationMD"))
+            {
                 ingest(context, dso, element.getChildren());
+            }
             // "Context" section (where permissions are stored)
             else if (element.getName().equals("Context"))
             {

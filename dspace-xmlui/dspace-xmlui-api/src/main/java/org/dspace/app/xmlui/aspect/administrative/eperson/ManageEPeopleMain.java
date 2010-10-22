@@ -222,16 +222,22 @@ public class ManageEPeopleMain extends AbstractDSpaceTransformer
         	
         	Row row;
         	if (person.getID() == highlightID)
-        		// This is a highlighted eperson
-        		row = table.addRow(null, null, "highlight");
+            {
+                // This is a highlighted eperson
+                row = table.addRow(null, null, "highlight");
+            }
         	else
-        		row = table.addRow();
+            {
+                row = table.addRow();
+            }
         	
         	selectEPerson = row.addCell().addCheckBox("select_eperson");
         	selectEPerson.setLabel(epersonID);
         	selectEPerson.addOption(epersonID);
         	if (deleteConstraints != null && deleteConstraints.size() > 0)
-        		selectEPerson.setDisabled();
+            {
+                selectEPerson.setDisabled();
+            }
         	
         	
         	row.addCellContent(epersonID);

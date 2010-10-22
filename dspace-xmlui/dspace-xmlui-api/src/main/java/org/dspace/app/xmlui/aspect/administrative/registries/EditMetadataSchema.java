@@ -175,11 +175,15 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 		
 		// DIVISION: add or updating a metadata field
 		if (updateID >= 0)
-			// Updating an existing field
-			addUpdateFieldForm(main, schemaName, updateID,  errors);
+        {
+            // Updating an existing field
+            addUpdateFieldForm(main, schemaName, updateID, errors);
+        }
 		else
-			// Add a new field
-			addNewFieldForm(main, schemaName, errors);
+        {
+            // Add a new field
+            addNewFieldForm(main, schemaName, errors);
+        }
 		
 		
 		
@@ -215,9 +219,13 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 			
 			Row row;
 			if (highlight)
-				row = table.addRow(null,null,"highlight");
+            {
+                row = table.addRow(null, null, "highlight");
+            }
 			else
-				row = table.addRow();
+            {
+                row = table.addRow();
+            }
 			
 			CheckBox select = row.addCell().addCheckBox("select_field");
 			select.setLabel(id);

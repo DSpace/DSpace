@@ -217,28 +217,42 @@ public class EditProfile extends AbstractDSpaceTransformer
         
         String errors = parameters.getParameter("errors","");
         if (errors.length() > 0)
+        {
             this.errors = Arrays.asList(errors.split(","));
+        }
         else
+        {
             this.errors = new ArrayList<String>();
+        }
         
         // Ensure that the email variable is set.
         if (eperson != null)
+        {
             this.email = eperson.getEmail();
+        }
     }
        
     public void addPageMeta(PageMeta pageMeta) throws WingException
     {
         // Set the page title
         if (registering)
+        {
             pageMeta.addMetadata("title").addContent(T_title_create);
+        }
         else
+        {
             pageMeta.addMetadata("title").addContent(T_title_update);
+        }
         
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         if (registering)
+        {
             pageMeta.addTrail().addContent(T_trail_new_registration);
+        }
         else
+        {
             pageMeta.addTrail().addContent(T_trail_update);
+        }
     }
     
     
@@ -268,9 +282,13 @@ public class EditProfile extends AbstractDSpaceTransformer
        
        String action = contextPath;
        if (registering)
+       {
            action += "/register";
+       }
        else
+       {
            action += "/profile";
+       }
        
        
        
@@ -279,13 +297,19 @@ public class EditProfile extends AbstractDSpaceTransformer
                action,Division.METHOD_POST,"primary");
        
        if (registering)
+       {
            profile.setHead(T_head_create);
+       }
        else
+       {
            profile.setHead(T_head_update);
+       }
        
        // Add the progress list if we are registering a new user
        if (registering)
-           EPersonUtils.registrationProgressList(profile,2);
+       {
+           EPersonUtils.registrationProgressList(profile, 2);
+       }
        
        
        
@@ -425,9 +449,13 @@ public class EditProfile extends AbstractDSpaceTransformer
        
        Button submit = form.addItem().addButton("submit");
        if (registering)
+       {
            submit.setValue(T_submit_update);
+       }
        else
+       {
            submit.setValue(T_submit_create);
+       }
        
        profile.addHidden("eperson-continue").setValue(knot.getId());
        
@@ -441,7 +469,9 @@ public class EditProfile extends AbstractDSpaceTransformer
                 
                         // Not a member of any groups then don't do anything.
                         if (!(memberships.length > 0))
-                                return;
+                        {
+                            return;
+                        }
                         
                         List list = profile.addList("memberships");
                         list.setHead(T_head_auth);

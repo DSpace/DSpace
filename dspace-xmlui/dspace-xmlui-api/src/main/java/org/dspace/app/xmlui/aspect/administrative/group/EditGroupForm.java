@@ -239,12 +239,16 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 		{
 			int collectionID = FlowGroupUtils.getCollectionId(group.getName());
 			if (collectionID > -1)
-				collection = Collection.find(context, collectionID);
+            {
+                collection = Collection.find(context, collectionID);
+            }
 			else
 			{
 			    int communityID = FlowGroupUtils.getCommunityId(group.getName());
 			    if (communityID > -1)
-			        community = Community.find(context, communityID);
+                {
+                    community = Community.find(context, communityID);
+                }
 		    }
 		}
 		
@@ -297,9 +301,13 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	    //DIVISION: group-edit
 	    Division main = body.addInteractiveDivision("group-edit",contextPath+"/admin/groups",Division.METHOD_POST,"primary administrative groups");
 	    if (group == null)
-		    main.setHead(T_main_head_new);
+        {
+            main.setHead(T_main_head_new);
+        }
 	    else
-	    	main.setHead(T_main_head.parameterize(group.getName(),groupID));
+        {
+            main.setHead(T_main_head.parameterize(group.getName(), groupID));
+        }
 	 
 	    
 	    if(collection != null)
@@ -427,9 +435,13 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 			{
 				// Check if they really members or just pending members
 				if (group != null && group.isMember(person))
-					personData.addCellContent(T_member);
+                {
+                    personData.addCellContent(T_member);
+                }
 				else
-					personData.addCell().addHighlight("warn").addContent(T_pending);
+                {
+                    personData.addCell().addHighlight("warn").addContent(T_pending);
+                }
 			}
 			else
 			{
@@ -492,9 +504,13 @@ public class EditGroupForm extends AbstractDSpaceTransformer
         	row.addCell().addContent(groupID);
         	if (AuthorizeManager.isAdmin(context))
         		// Only administrators can edit other groups.
-        		row.addCell().addXref(url,name);
+            {
+                row.addCell().addXref(url, name);
+            }
         	else
-        		row.addCell().addContent(name);
+            {
+                row.addCell().addContent(name);
+            }
         	
         	
         	
@@ -509,9 +525,13 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	        		String collectionName = collection.getMetadata("name");
 	        		
 	        		if (collectionName == null)
-	        			collectionName = "";
+                    {
+                        collectionName = "";
+                    }
 	        		else if (collectionName.length() > MAX_COLLECTION_NAME)
-	        			collectionName = collectionName.substring(0,MAX_COLLECTION_NAME-3) + "...";
+                    {
+                        collectionName = collectionName.substring(0, MAX_COLLECTION_NAME - 3) + "...";
+                    }
 	        		
 	        		cell.addContent(collectionName+" ");
 	        		
@@ -528,9 +548,13 @@ public class EditGroupForm extends AbstractDSpaceTransformer
         	{
         		// Check if they really members or just pending members
 				if (parent != null && parent.isMember(group))
-					row.addCellContent(T_member);
+                {
+                    row.addCellContent(T_member);
+                }
 				else
-					row.addCell().addHighlight("warn").addContent(T_pending);
+                {
+                    row.addCell().addHighlight("warn").addContent(T_pending);
+                }
         	}
         	else if (isDescendant(sourceGroup, group, memberGroupIDs)) 
         	{
@@ -691,9 +715,13 @@ public class EditGroupForm extends AbstractDSpaceTransformer
     	// Mark if this member is pending or not.
     	Cell nameCell = groupData.addCell();
     	if (AuthorizeManager.isAdmin(context))
-    		nameCell.addHighlight("bold").addXref(url,T_members_group_name.parameterize(name));
+        {
+            nameCell.addHighlight("bold").addXref(url, T_members_group_name.parameterize(name));
+        }
     	else
-    		nameCell.addHighlight("bold").addContent(T_members_group_name.parameterize(name));
+        {
+            nameCell.addHighlight("bold").addContent(T_members_group_name.parameterize(name));
+        }
     	
     	if (pendingAddition)
     	{
@@ -704,9 +732,13 @@ public class EditGroupForm extends AbstractDSpaceTransformer
     	groupData.addCell().addContent("-");
     	
     	if (pendingRemoval)
-    		groupData.addCell().addHighlight("warn").addContent(T_pending);
+        {
+            groupData.addCell().addHighlight("warn").addContent(T_pending);
+        }
     	else
-    		groupData.addCell().addButton("submit_remove_group_"+group.getID()).setValue(T_submit_remove);
+        {
+            groupData.addCell().addButton("submit_remove_group_" + group.getID()).setValue(T_submit_remove);
+        }
 	}
 	
 	/**
@@ -740,8 +772,12 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 		personData.addCell().addXref(url, email);
 		
 		if (pendingRemoval)
-			personData.addCell().addHighlight("warn").addContent(T_pending);
+        {
+            personData.addCell().addHighlight("warn").addContent(T_pending);
+        }
 		else
-			personData.addCell().addButton("submit_remove_eperson_"+eperson.getID()).setValue(T_submit_remove);
+        {
+            personData.addCell().addButton("submit_remove_eperson_" + eperson.getID()).setValue(T_submit_remove);
+        }
 	}
 }

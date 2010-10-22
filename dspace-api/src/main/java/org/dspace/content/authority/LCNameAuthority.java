@@ -205,11 +205,17 @@ public class LCNameAuthority implements ChoiceAuthority
 
                 int confidence;
                 if (handler.hits == 0)
+                {
                     confidence = Choices.CF_NOTFOUND;
+                }
                 else if (handler.hits == 1)
+                {
                     confidence = Choices.CF_UNCERTAIN;
+                }
                 else
+                {
                     confidence = Choices.CF_AMBIGUOUS;
+                }
                 return new Choices(handler.result.toArray(new Choice[handler.result.size()]),
                                    start, handler.hits, confidence, more);
             }
@@ -271,9 +277,13 @@ public class LCNameAuthority implements ChoiceAuthority
             if (newValue.length() > 0)
             {
                 if (textValue == null)
+                {
                     textValue = newValue;
+                }
                 else
+                {
                     textValue += newValue;
+                }
             }
         }
 
@@ -308,7 +318,9 @@ public class LCNameAuthority implements ChoiceAuthority
                     result.add(new Choice(lccn, name, name));
                 }
                 else
-                    log.warn("Got anomalous result, at least one of these null: lccn="+lccn+", name="+name);
+                {
+                    log.warn("Got anomalous result, at least one of these null: lccn=" + lccn + ", name=" + name);
+                }
                 name = null;
                 lccn = null;
             }
@@ -318,13 +330,16 @@ public class LCNameAuthority implements ChoiceAuthority
             {
                 if (lastTag != null && lastCode != null)
                 {
-                    // 010.a is lccn, "authority code"
                     if (lastTag.equals("010") && lastCode.equals("a"))
+                    {
+                        // 010.a is lccn, "authority code"
                         lccn = textValue;
-                     
-                    // 100.a is the personal name
+                    }
                     else if (lastTag.equals("100") && lastCode.equals("a"))
+                    {
+                        // 100.a is the personal name
                         name = textValue;
+                    }
 
                         if (lastTag.equals("100") && lastCode.equals("d") && (name != null)) 
                         name = name+"  "+textValue; 

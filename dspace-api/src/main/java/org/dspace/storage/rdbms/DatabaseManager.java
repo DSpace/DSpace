@@ -1558,7 +1558,9 @@ public class DatabaseManager
             Set pks = new HashSet();
 
             while (pkcolumns.next())
+            {
                 pks.add(pkcolumns.getString(4));
+            }
 
             columns = metadata.getColumns(catalog, schema, tname, null);
 

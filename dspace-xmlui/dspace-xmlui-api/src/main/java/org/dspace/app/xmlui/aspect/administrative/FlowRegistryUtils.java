@@ -472,20 +472,30 @@ public class FlowRegistryUtils
         // Get or create the format
         BitstreamFormat format;
 		if (formatID >= 0)
-			format = BitstreamFormat.find(context, formatID);
+        {
+            format = BitstreamFormat.find(context, formatID);
+        }
 		else
-			format = BitstreamFormat.create(context);
+        {
+            format = BitstreamFormat.create(context);
+        }
         
 		// Update values
 		format.setMIMEType(mimeType);
 		if (formatID != 1) // don't change the unknow format.
-			format.setShortDescription(shortDescription);
+        {
+            format.setShortDescription(shortDescription);
+        }
 		format.setDescription(description);
 		format.setSupportLevel(Integer.valueOf(supportLevel));
 		if (internal == null)
-			format.setInternal(false);
+        {
+            format.setInternal(false);
+        }
 		else
-			format.setInternal(true);
+        {
+            format.setInternal(true);
+        }
 		format.setExtensions(extensions);
 
 		

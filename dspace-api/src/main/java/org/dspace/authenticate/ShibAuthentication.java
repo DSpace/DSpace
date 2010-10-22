@@ -80,8 +80,10 @@ public class ShibAuthentication implements AuthenticationMethod
         java.util.Enumeration names = request.getHeaderNames();
         String name;
         while (names.hasMoreElements())
+        {
             log.debug("header:" + (name = names.nextElement().toString()) + "="
                     + request.getHeader(name));
+        }
 
         boolean isUsingTomcatUser = ConfigurationManager
                 .getBooleanProperty("authentication.shib.email-use-tomcat-remote-user");

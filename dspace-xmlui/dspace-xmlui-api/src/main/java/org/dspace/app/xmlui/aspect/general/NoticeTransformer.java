@@ -106,22 +106,36 @@ public class NoticeTransformer extends AbstractDSpaceTransformer
 		
 		String rend = "notice";
 		if ("netural".equals(outcome))
-			rend += " netural";
+        {
+            rend += " netural";
+        }
 		else if ("success".equals(outcome))
-			rend += " success";
+        {
+            rend += " success";
+        }
 		else if ("failure".equals(outcome))
-			rend += " failure";
+        {
+            rend += " failure";
+        }
 		
 		Division div = body.addDivision("general-message",rend);
 		if ((header != null) && (!"".equals(header)))
-			div.setHead(message(header));
+        {
+            div.setHead(message(header));
+        }
 		else
-			div.setHead(T_head);
+        {
+            div.setHead(T_head);
+        }
 
 		if (message != null && message.length() > 0)
-			div.addPara(message(message));
+        {
+            div.addPara(message(message));
+        }
 		
 		if (characters != null && characters.length() > 0)
-			div.addPara(characters);
+        {
+            div.addPara(characters);
+        }
 	}
 }

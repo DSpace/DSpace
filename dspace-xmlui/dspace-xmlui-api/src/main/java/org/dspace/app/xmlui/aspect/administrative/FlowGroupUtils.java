@@ -473,23 +473,41 @@ public class FlowGroupUtils {
 				if (groupName.endsWith(suffix))
 				{
 					if (COLLECTION_SUFFIXES[0].equals(suffix))
-						return Role.Submitters;
+                    {
+                        return Role.Submitters;
+                    }
 					else if (COLLECTION_SUFFIXES[1].equals(suffix))
-						return Role.Administrators;
+                    {
+                        return Role.Administrators;
+                    }
 					else if (COLLECTION_SUFFIXES[2].equals(suffix))
-						return Role.WorkflowStep1;
+                    {
+                        return Role.WorkflowStep1;
+                    }
 					else if (COLLECTION_SUFFIXES[3].equals(suffix))
-						return Role.WorkflowStep1;
+                    {
+                        return Role.WorkflowStep1;
+                    }
 					else if (COLLECTION_SUFFIXES[4].equals(suffix))
-						return Role.WorkflowStep2;
+                    {
+                        return Role.WorkflowStep2;
+                    }
 					else if (COLLECTION_SUFFIXES[5].equals(suffix))
-						return Role.WorkflowStep2;
+                    {
+                        return Role.WorkflowStep2;
+                    }
 					else if (COLLECTION_SUFFIXES[6].equals(suffix))
-						return Role.WorkflowStep3;
+                    {
+                        return Role.WorkflowStep3;
+                    }
 					else if (COLLECTION_SUFFIXES[7].equals(suffix))
-						return Role.WorkflowStep3;
+                    {
+                        return Role.WorkflowStep3;
+                    }
 					else if (COLLECTION_SUFFIXES[8].equals(suffix))
-						return Role.DefaultRead;
+                    {
+                        return Role.DefaultRead;
+                    }
 					
 				} // if it ends with a proper suffix.
 			} // for each possible suffix
@@ -557,23 +575,41 @@ public class FlowGroupUtils {
                 if (groupName.endsWith(suffix))
                 {
                     if (COLLECTION_SUFFIXES[0].equals(suffix))
+                    {
                         return Role.Submitters;
+                    }
                     else if (COLLECTION_SUFFIXES[1].equals(suffix))
+                    {
                         return Role.Administrators;
+                    }
                     else if (COLLECTION_SUFFIXES[2].equals(suffix))
+                    {
                         return Role.WorkflowStep1;
+                    }
                     else if (COLLECTION_SUFFIXES[3].equals(suffix))
+                    {
                         return Role.WorkflowStep1;
+                    }
                     else if (COLLECTION_SUFFIXES[4].equals(suffix))
+                    {
                         return Role.WorkflowStep2;
+                    }
                     else if (COLLECTION_SUFFIXES[5].equals(suffix))
+                    {
                         return Role.WorkflowStep2;
+                    }
                     else if (COLLECTION_SUFFIXES[6].equals(suffix))
+                    {
                         return Role.WorkflowStep3;
+                    }
                     else if (COLLECTION_SUFFIXES[7].equals(suffix))
+                    {
                         return Role.WorkflowStep3;
+                    }
                     else if (COLLECTION_SUFFIXES[8].equals(suffix))
+                    {
                         return Role.DefaultRead;
+                    }
                     
                 } // if it ends with a proper suffix.
             } // for each possible suffix

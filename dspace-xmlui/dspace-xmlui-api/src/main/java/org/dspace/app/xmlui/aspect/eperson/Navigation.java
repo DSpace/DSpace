@@ -136,9 +136,13 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         
     	String key;
         if (context.getCurrentUser() != null)
+        {
             key = context.getCurrentUser().getEmail();
+        }
         else
-        	key = "anonymous";
+        {
+            key = "anonymous";
+        }
         
         // Add the user's language
         Enumeration locales = request.getLocales();

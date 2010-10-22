@@ -166,9 +166,13 @@ public class EditCollectionHarvestingForm extends AbstractDSpaceTransformer
 
 	    String displayName;
     	if (metadataString.indexOf(',') != -1)
-    		displayName = metadataString.substring(metadataString.indexOf(',') + 1);
+        {
+            displayName = metadataString.substring(metadataString.indexOf(',') + 1);
+        }
     	else
-    		displayName = metadataFormatValue + "(" + metadataString + ")";
+        {
+            displayName = metadataFormatValue + "(" + metadataString + ")";
+        }
     	    	
     	settings.addItem(displayName);
     	

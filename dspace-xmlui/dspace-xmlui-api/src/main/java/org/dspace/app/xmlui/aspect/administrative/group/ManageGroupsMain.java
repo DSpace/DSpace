@@ -224,9 +224,13 @@ public class ManageGroupsMain extends AbstractDSpaceTransformer
         {
         	Row row;
         	if (group.getID() == highlightID)
-        		row = table.addRow(null,null,"highlight");
+            {
+                row = table.addRow(null, null, "highlight");
+            }
         	else
-        		row = table.addRow();
+            {
+                row = table.addRow();
+            }
         	
         	if (group.getID() > 1)
         	{
@@ -278,9 +282,13 @@ public class ManageGroupsMain extends AbstractDSpaceTransformer
             if (collectionOrCommunity != null)
             {
                 if (collectionOrCommunityName == null)
+                {
                     collectionOrCommunityName = "";
+                }
                 else if (collectionOrCommunityName.length() > MAX_COLLECTION_OR_COMMUNITY_NAME)
-                    collectionOrCommunityName = collectionOrCommunityName.substring(0,MAX_COLLECTION_OR_COMMUNITY_NAME-3) + "...";
+                {
+                    collectionOrCommunityName = collectionOrCommunityName.substring(0, MAX_COLLECTION_OR_COMMUNITY_NAME - 3) + "...";
+                }
 	        		
                 cell.addContent(collectionOrCommunityName + " ");
 	        		

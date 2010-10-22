@@ -274,9 +274,13 @@ public class HarvestedCollection
     	TableRow row = tri.next();
     	
     	if (row != null)
-    		return row.getIntColumn("collection_id");
+        {
+            return row.getIntColumn("collection_id");
+        }
     	else
-    		return -1;
+        {
+            return -1;
+        }
     }
     
     /** Find the collection that was harvested most recently. 
@@ -293,9 +297,13 @@ public class HarvestedCollection
     	TableRow row = tri.next();
 		
     	if (row != null)
-    		return row.getIntColumn("collection_id");
+        {
+            return row.getIntColumn("collection_id");
+        }
     	else
-    		return -1;
+        {
+            return -1;
+        }
     }
     
     

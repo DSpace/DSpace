@@ -149,9 +149,13 @@ public class EditContainerPolicies extends AbstractDSpaceTransformer
     	{
     		Row row;
 			if (policy.getID() == highlightID)
-				row = table.addRow(null, null, "highlight");
+            {
+                row = table.addRow(null, null, "highlight");
+            }
 			else
-				row = table.addRow();
+            {
+                row = table.addRow();
+            }
     		
     		CheckBox select = row.addCell().addCheckBox("select_policy");
         	select.setLabel(String.valueOf(policy.getID()));

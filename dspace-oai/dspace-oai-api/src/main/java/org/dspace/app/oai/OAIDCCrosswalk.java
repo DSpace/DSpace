@@ -256,16 +256,24 @@ public class OAIDCCrosswalk extends Crosswalk
                                 // test the contents and replace appropriately
 
                                 if (group.equals("&"))
+                                {
                                     xmlMatcher.appendReplacement(valueBuf,
                                             "&amp;");
+                                }
                                 else if (group.equals("<"))
+                                {
                                     xmlMatcher.appendReplacement(valueBuf,
                                             "&lt;");
+                                }
                                 else if (group.equals(">"))
+                                {
                                     xmlMatcher.appendReplacement(valueBuf,
                                             "&gt;");
+                                }
                                 else
+                                {
                                     xmlMatcher.appendReplacement(valueBuf, " ");
+                                }
                             }
 
                             // add bit of the string after the final match

@@ -116,8 +116,11 @@ public class JSONSolrSearcher extends AbstractReader implements Recyclable {
                 //Should an invalid value be supplied use -1
                 facetLimit = -1;
             }
-        }else
+        }
+        else
+        {
             facetLimit = -1;
+        }
 
         //Retrieve our sorting value
         facetSort = request.getParameter(FacetParams.FACET_SORT);

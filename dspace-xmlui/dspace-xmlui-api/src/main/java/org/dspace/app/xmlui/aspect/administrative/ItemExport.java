@@ -232,8 +232,11 @@ public class ItemExport extends AbstractDSpaceTransformer implements
 			if (request.getQueryString() != null) {
 				key.append(request.getQueryString());
 			}
-		} else
-			key.append("anonymous");
+		}
+        else
+        {
+            key.append("anonymous");
+        }
 
 		return HashUtil.hash(key.toString());
 	}

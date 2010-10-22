@@ -360,11 +360,17 @@ public class EPerson extends DSpaceObject
         // Create the parameter array, including limit and offset if part of the query
         Object[] paramArr = new Object[] {int_param,params,params,params};
         if (limit > 0 && offset > 0)
-            paramArr = new Object[] {int_param,params,params,params,limit,offset};
+        {
+            paramArr = new Object[]{int_param, params, params, params, limit, offset};
+        }
         else if (limit > 0)
-            paramArr = new Object[] {int_param,params,params,params,limit};
+        {
+            paramArr = new Object[]{int_param, params, params, params, limit};
+        }
         else if (offset > 0)
-            paramArr = new Object[] {int_param,params,params,params,offset};
+        {
+            paramArr = new Object[]{int_param, params, params, params, offset};
+        }
 
         // Get all the epeople that match the query
 		TableRowIterator rows = DatabaseManager.queryTable(context, "eperson",

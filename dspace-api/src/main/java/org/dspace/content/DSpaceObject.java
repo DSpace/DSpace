@@ -71,9 +71,13 @@ public abstract class DSpaceObject
     protected void addDetails(String d)
     {
         if (eventDetails == null)
+        {
             eventDetails = new StringBuffer(d);
+        }
         else
+        {
             eventDetails.append(", ").append(d);
+        }
     }
 
     /**

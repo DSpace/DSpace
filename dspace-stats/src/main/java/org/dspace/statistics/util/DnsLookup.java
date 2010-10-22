@@ -39,8 +39,12 @@ public class DnsLookup {
 
          Record[] answers = response.getSectionArray(Section.ANSWER);
          if (answers.length == 0)
-            return hostIp;
+         {
+             return hostIp;
+         }
          else
-            return answers[0].rdataToString();
+         {
+             return answers[0].rdataToString();
+         }
    }
 }

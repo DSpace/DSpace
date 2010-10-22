@@ -1145,7 +1145,9 @@ public class ItemExport
             return new FileInputStream(file);
         }
         else
+        {
             return null;
+        }
     }
 
     /**

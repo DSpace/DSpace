@@ -119,9 +119,13 @@ public abstract class InitialArticleWord implements TextFilter
                             // then it must be followed by whitespace, if not, it can be anything
                             // Setting endPos signifies that we have found an article word
                             if (endsLetterOrDigit && isNextWhitespace)
+                            {
                                 initialEnd = curPos + initialArticleWord.length();
+                            }
                             else if (!endsLetterOrDigit)
+                            {
                                 initialEnd = curPos + initialArticleWord.length();
+                            }
                         }
                     }
 
@@ -139,7 +143,9 @@ public abstract class InitialArticleWord implements TextFilter
                 // Find a cut point in the source string, removing any whitespace after the article word
                 int cutPos = initialEnd;
                 while (cutPos < str.length() && Character.isWhitespace(str.charAt(cutPos)))
+                {
                     cutPos++;
+                }
                 
                 // Are we stripping the article word?
                 if (stripInitialArticle)
@@ -202,7 +208,9 @@ public abstract class InitialArticleWord implements TextFilter
     {
         int testPos = pos + len;
         while (testPos < str.length() && Character.isWhitespace(str.charAt(testPos)))
+        {
             testPos++;
+        }
         
         if (testPos < str.length())
             return str.substring(pos, pos + len);

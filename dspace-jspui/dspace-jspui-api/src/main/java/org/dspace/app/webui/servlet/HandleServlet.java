@@ -541,7 +541,9 @@ public class HandleServlet extends DSpaceServlet
                     !Authenticate
                             .startAuthentication(context, request, response))
 
+                {
                     return;
+                }
                 else
                 {
                     Subscribe.subscribe(context, context.getCurrentUser(),

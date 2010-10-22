@@ -248,7 +248,9 @@ public class DSpaceAIPDisseminator
             return result;
         }
         else
+        {
             return dmdTypes.split("\\s*,\\s*");
+        }
     }
 
     /**
@@ -284,7 +286,9 @@ public class DSpaceAIPDisseminator
             }
         }
         else
+        {
             return techTypes.split("\\s*,\\s*");
+        }
     }
 
     /**
@@ -317,7 +321,9 @@ public class DSpaceAIPDisseminator
             return result;
         }
         else
+        {
             return sourceTypes.split("\\s*,\\s*");
+        }
     }
 
     /**
@@ -340,9 +346,13 @@ public class DSpaceAIPDisseminator
     {
         String dpTypes = ConfigurationManager.getProperty("aip.disseminate.digiprovMD");
         if (dpTypes == null)
+        {
             return new String[0];
+        }
         else
+        {
             return dpTypes.split("\\s*,\\s*");
+        }
     }
 
     /**
@@ -380,7 +390,9 @@ public class DSpaceAIPDisseminator
                     result.add(DSPACE_DEPOSIT_LICENSE_MDTYPE);
 
                 if (CreativeCommons.getLicenseRdfBitstream((Item)dso) != null)
+                {
                     result.add(CREATIVE_COMMONS_RDF_MDTYPE);
+                }
                 else if (CreativeCommons.getLicenseTextBitstream((Item)dso) != null)
                     result.add(CREATIVE_COMMONS_TEXT_MDTYPE);
             }
@@ -389,7 +401,9 @@ public class DSpaceAIPDisseminator
             result.add("METSRights");
         }
         else
+        {
             return rTypes.split("\\s*,\\s*");
+        }
 
         return result.toArray(new String[result.size()]);
     }
@@ -504,9 +518,13 @@ public class DSpaceAIPDisseminator
             case Constants.COMMUNITY:
                 Community parent = ((Community)dso).getParentCommunity();
                 if (parent == null)
+                {
                     parentHandle = Site.getSiteHandle();
+                }
                 else
+                {
                     parentHandle = parent.getHandle();
+                }
            case Constants.SITE:
                 break;
         }

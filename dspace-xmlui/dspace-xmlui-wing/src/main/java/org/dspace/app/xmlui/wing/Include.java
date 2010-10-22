@@ -177,17 +177,23 @@ public class Include extends AbstractTransformer implements CacheableProcessingC
         {
         	if (source.exists())
         		// The file exists so return it's validity.
-        		return source.getValidity();
+            {
+                return source.getValidity();
+            }
         	else
+            {
         		// The file does not exist so we will just return always valid. This
         		// will have an nastly side effect that if a file is removed from a
         		// running system the cache will remain valid. However if the other
         		// option is to always invalidate the cache if the file is not present
         		// which is not desirable either.
-        		return NOPValidity.SHARED_INSTANCE;
+                return NOPValidity.SHARED_INSTANCE;
+            }
         }
         else
+        {
             return null;
+        }
     }
     
     
@@ -253,7 +259,9 @@ public class Include extends AbstractTransformer implements CacheableProcessingC
         	// or not found in startDocument()
         }
         else if (stack.size() == 0)
+        {
             stack.push(w3cDocument.getDocumentElement());
+        }
         else
         {
             Element peek = stack.peek();

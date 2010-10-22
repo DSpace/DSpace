@@ -131,7 +131,9 @@ public class LicenseStep extends AbstractSubmissionStep
            ccLicenseStep.setup(resolver, objectModel, src, parameters);
         }
         else
-           ccLicenseStep = null;
+        {
+            ccLicenseStep = null;
+        }
     
     }
     

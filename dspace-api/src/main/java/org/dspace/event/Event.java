@@ -306,9 +306,13 @@ public class Event implements Serializable
     {
         Integer mask = objTypeToMask.get(core);
         if (mask == null)
+        {
             return -1;
+        }
         else
+        {
             return mask.intValue();
+        }
     }
 
     // translate bitmask object-type to "core.Constants" object type.
@@ -316,9 +320,13 @@ public class Event implements Serializable
     {
         Integer core = objMaskToType.get(mask);
         if (core == null)
+        {
             return -1;
+        }
         else
+        {
             return core.intValue();
+        }
     }
 
     /**
@@ -331,9 +339,13 @@ public class Event implements Serializable
         int type = getObjectType();
         int id = getObjectID();
         if (type < 0 || id < 0)
+        {
             return null;
+        }
         else
+        {
             return DSpaceObject.find(context, type, id);
+        }
     }
 
     /**
@@ -387,9 +399,13 @@ public class Event implements Serializable
     {
         int i = log2(subjectType);
         if (i >= 0 && i < Constants.typeText.length)
+        {
             return Constants.typeText[i];
+        }
         else
+        {
             return "(Unknown)";
+        }
     }
 
     /**
@@ -399,9 +415,13 @@ public class Event implements Serializable
     {
         int i = log2(objectType);
         if (i >= 0 && i < Constants.typeText.length)
+        {
             return Constants.typeText[i];
+        }
         else
+        {
             return "(Unknown)";
+        }
     }
 
     /**
@@ -416,7 +436,9 @@ public class Event implements Serializable
     public static int parseObjectType(String s)
     {
         if ("*".equals(s) || "all".equalsIgnoreCase(s))
+        {
             return ALL_OBJECTS_MASK;
+        }
         else
         {
             int id = Constants.getTypeID(s.toUpperCase());
@@ -445,9 +467,13 @@ public class Event implements Serializable
     {
         int i = log2(eventType);
         if (i >= 0 && i < eventTypeText.length)
+        {
             return eventTypeText[i];
+        }
         else
+        {
             return "(Unknown)";
+        }
     }
 
     /**

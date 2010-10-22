@@ -220,9 +220,13 @@ public class METSManifest
                 {
                     File xsd = new File(xsdPath1, val[1]);
                     if (!xsd.exists())
-                         xsd = new File(xsdPath2, val[1]);
+                    {
+                        xsd = new File(xsdPath2, val[1]);
+                    }
                     if (!xsd.exists())
-                        log.warn("Schema file not found for config entry=\""+spec+"\"");
+                    {
+                        log.warn("Schema file not found for config entry=\"" + spec + "\"");
+                    }
                     else
                     {
                         try
@@ -239,12 +243,16 @@ public class METSManifest
                     }
                 }
                 else
-                    log.warn("Schema config entry has wrong format, entry=\""+spec+"\"");
+                {
+                    log.warn("Schema config entry has wrong format, entry=\"" + spec + "\"");
+                }
             }
         }
         localSchemas = result.toString();
         if (log.isDebugEnabled())
-        log.debug("Got local schemas = \""+localSchemas+"\"");
+        {
+            log.debug("Got local schemas = \"" + localSchemas + "\"");
+        }
     }
 
     /**
@@ -437,9 +445,13 @@ public class METSManifest
     private static String normalizeBundleName(String in)
     {
         if (in.equals("CONTENT"))
+        {
             return Constants.CONTENT_BUNDLE_NAME;
+        }
         else if (in.equals("MANIFESTMD"))
+        {
             return Constants.METADATA_BUNDLE_NAME;
+        }
         return in;
     }
 
@@ -456,7 +468,9 @@ public class METSManifest
         Element fg = file.getParentElement();
         String fgUse = fg.getAttributeValue("USE");
         if (fgUse == null)
+        {
             throw new MetadataValidationException("Invalid METS Manifest: every fileGrp element must have a USE attribute.");
+        }
         return normalizeBundleName(fgUse);
     }
 
@@ -480,21 +494,31 @@ public class METSManifest
             {
                 // check for forbidden FContent child first:
                 if (file.getChild("FContent", metsNS) == null)
+                {
                     throw new MetadataValidationException("Invalid METS Manifest: Every file element must have FLocat child.");
+                }
                 else
+                {
                     throw new MetadataValidationException("Invalid METS Manifest: file element has forbidden FContent child, only FLocat is allowed.");
+                }
             }
         }
         else if (file.getName().equals("mdRef"))
+        {
             ref = file;
+        }
         else
-            throw new MetadataValidationException("getFileName() called with recognized element type: "+file.toString());
+        {
+            throw new MetadataValidationException("getFileName() called with recognized element type: " + file.toString());
+        }
         String loctype = ref.getAttributeValue("LOCTYPE");
         if (loctype != null && loctype.equals("URL"))
         {
             String result = ref.getAttributeValue("href", xlinkNS);
             if (result == null)
+            {
                 throw new MetadataValidationException("Invalid METS Manifest: FLocat/mdRef is missing the required xlink:href attribute.");
+            }
             return result;
         }
         throw new MetadataValidationException("Invalid METS Manifest: FLocat/mdRef does not have LOCTYPE=\"URL\" attribute.");
@@ -604,7 +628,9 @@ public class METSManifest
                 {
                     Element bin = mdWrap.getChild("binData", metsNS);
                     if (bin == null)
+                    {
                         throw new MetadataValidationException("Invalid METS Manifest: mdWrap element with neither xmlData nor binData child.");
+                    }
 
                     // if binData is actually XML, return it; otherwise ignore.
                     else
@@ -647,7 +673,9 @@ public class METSManifest
                 }
             }
             else
+            {
                 throw new MetadataValidationException("Invalid METS Manifest: ?mdSec element with neither mdRef nor mdWrap child.");
+            }
         }
         catch (JDOMException je)
         {
@@ -676,7 +704,9 @@ public class METSManifest
             {
                 Element bin = mdWrap.getChild("binData", metsNS);
                 if (bin == null)
+                {
                     throw new MetadataValidationException("Invalid METS Manifest: mdWrap element with neither xmlData nor binData child.");
+                }
 
                 else
                 {
@@ -696,7 +726,9 @@ public class METSManifest
             return callback.getInputStream(mdRef);
         }
         else
+        {
             throw new MetadataValidationException("Invalid METS Manifest: ?mdSec element with neither mdRef nor mdWrap child.");
+        }
     }
 
 
@@ -853,11 +885,17 @@ public class METSManifest
             xpath.addNamespace(xlinkNS);
             Object result = xpath.selectSingleNode(mets);
             if (result == null && nullOk)
+            {
                 return null;
+            }
             else if (result instanceof Element)
-                return (Element)result;
+            {
+                return (Element) result;
+            }
             else
-                throw new MetadataValidationException("METSManifest: Failed to resolve XPath, path=\""+path+"\"");
+            {
+                throw new MetadataValidationException("METSManifest: Failed to resolve XPath, path=\"" + path + "\"");
+            }
         }
         catch (JDOMException je)
         {
@@ -1102,7 +1140,9 @@ public class METSManifest
                         {
                             Element bin = mdWrap.getChild("binData", metsNS);
                             if (bin == null)
+                            {
                                 throw new MetadataValidationException("Invalid METS Manifest: mdWrap element for streaming crosswalk without binData child.");
+                            }
                             else
                             {
                                 byte value[] = Base64.decodeBase64(bin.getText().getBytes());
@@ -1112,13 +1152,17 @@ public class METSManifest
                             }
                         }
                         else
-            throw new MetadataValidationException("Cannot process METS Manifest: "+
-                              "Metadata of type="+type+" requires a reference to a stream (mdRef), which was not found in "+xmd.getName());
+                        {
+                            throw new MetadataValidationException("Cannot process METS Manifest: " +
+                                    "Metadata of type=" + type + " requires a reference to a stream (mdRef), which was not found in " + xmd.getName());
+                        }
                     }
                 }
                 else
-                    throw new MetadataValidationException("Cannot process METS Manifest: "+
-                        "No crosswalk found for contents of "+xmd.getName()+" element, MDTYPE="+type);
+                {
+                    throw new MetadataValidationException("Cannot process METS Manifest: " +
+                            "No crosswalk found for contents of " + xmd.getName() + " element, MDTYPE=" + type);
+                }
             }
         }
         catch (CrosswalkObjectNotSupported e)

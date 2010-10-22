@@ -182,9 +182,13 @@ public class EditFileStep extends AbstractStep
         {
         	String supportLevel = "Unknown";
         	if (bitstreamFormat.getSupportLevel() == BitstreamFormat.KNOWN)
-        		supportLevel = "known";
+            {
+                supportLevel = "known";
+            }
         	else if (bitstreamFormat.getSupportLevel() == BitstreamFormat.SUPPORTED)
-        		supportLevel = "Supported";
+            {
+                supportLevel = "Supported";
+            }
         	String name = bitstreamFormat.getShortDescription()+" ("+supportLevel+")";
         	int id = bitstreamFormat.getID();
        

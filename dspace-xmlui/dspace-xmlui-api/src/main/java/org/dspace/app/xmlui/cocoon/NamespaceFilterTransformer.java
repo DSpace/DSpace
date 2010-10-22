@@ -82,9 +82,13 @@ public class NamespaceFilterTransformer extends AbstractTransformer implements C
 	 */
 	public Serializable getKey() {
 		if (filterNamespace != null)
-			return filterNamespace;
-		else 
-			return "1";
+        {
+            return filterNamespace;
+        }
+		else
+        {
+            return "1";
+        }
 	}
 
 

@@ -208,17 +208,27 @@ public class EditItemPolicies extends AbstractDSpaceTransformer
 	    	{
 				Row row;
 				if (policy.getID() == highlightID)
-					row = table.addRow(null, null, "highlight");
+                {
+                    row = table.addRow(null, null, "highlight");
+                }
 				else
-					row = table.addRow();
+                {
+                    row = table.addRow();
+                }
 				
 				Cell cell;
 				if (objectType == Constants.BUNDLE)
-					cell = row.addCell(null, null, "indent");
+                {
+                    cell = row.addCell(null, null, "indent");
+                }
 				else if (objectType == Constants.BITSTREAM)
-					cell = row.addCell(null, null, "doubleIndent");
+                {
+                    cell = row.addCell(null, null, "doubleIndent");
+                }
 				else
-					cell = row.addCell();
+                {
+                    cell = row.addCell();
+                }
 	    		
 				
 	    		CheckBox select = cell.addCheckBox("select_policy");

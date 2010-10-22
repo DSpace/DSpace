@@ -288,8 +288,10 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
                 String val = modsConfig.getProperty(qdc);
                 String pair[] = val.split("\\s+\\|\\s+", 2);
                 if (pair.length < 2)
-                    log.warn("Illegal MODS mapping in "+propsFile.toString()+", line = "+
+                {
+                    log.warn("Illegal MODS mapping in " + propsFile.toString() + ", line = " +
                             qdc + " = " + val);
+                }
                 else
                 {
                     modsTriple trip = modsTriple.create(qdc, pair[0], pair[1]);
@@ -379,7 +381,9 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
 
             modsTriple trip = (modsTriple)modsMap.get(qdc);
             if (trip == null)
-                log.warn("WARNING: "+getPluginInstanceName()+": No MODS mapping for \"" + qdc+"\"");
+            {
+                log.warn("WARNING: " + getPluginInstanceName() + ": No MODS mapping for \"" + qdc + "\"");
+            }
             else
             {
                 try
@@ -397,13 +401,21 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
                     {
                         Object what = ni.next();
                         if (what instanceof Element)
-                            ((Element)what).setText(checkedString(value));
+                        {
+                            ((Element) what).setText(checkedString(value));
+                        }
                         else if (what instanceof Attribute)
-                            ((Attribute)what).setValue(checkedString(value));
+                        {
+                            ((Attribute) what).setValue(checkedString(value));
+                        }
                         else if (what instanceof Text)
-                            ((Text)what).setText(checkedString(value));
+                        {
+                            ((Text) what).setText(checkedString(value));
+                        }
                         else
-                            log.warn("Got unknown object from XPath, class="+what.getClass().getName());
+                        {
+                            log.warn("Got unknown object from XPath, class=" + what.getClass().getName());
+                        }
                     }
                     result.add(me);
                 }
@@ -584,14 +596,20 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     private String checkedString(String value)
     {
         if (value == null)
+        {
             return null;
+        }
         String reason = Verifier.checkCharacterData(value);
         if (reason == null)
+        {
             return value;
+        }
         else
         {
             if (log.isDebugEnabled())
-                log.debug("Filtering out non-XML characters in string, reason="+reason);
+            {
+                log.debug("Filtering out non-XML characters in string, reason=" + reason);
+            }
             StringBuffer result = new StringBuffer(value.length());
             for (int i = 0; i < value.length(); ++i)
             {

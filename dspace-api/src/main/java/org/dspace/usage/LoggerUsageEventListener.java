@@ -93,11 +93,16 @@ public class LoggerUsageEventListener extends AbstractUsageEventListener{
 			
 			/* Emulate Item logger */
 			if(handle != null && object instanceof Item)
-				return "handle=" + object.getHandle();
-			else 
-				return objText + "_id=" + object.getID();
+            {
+                return "handle=" + object.getHandle();
+            }
+			else
+            {
+                return objText + "_id=" + object.getID();
+            }
 
-		}catch(Exception e)
+		}
+        catch(Exception e)
 		{
 			
 		}

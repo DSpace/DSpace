@@ -279,7 +279,9 @@ public class HandleManager
 
         }
         else
+        {
             log.warn("Cannot find Handle entry to unbind for object " + Constants.typeText[dso.getType()] + " id=" + dso.getID());
+        }
     }
 
     /**
@@ -384,12 +386,18 @@ public class HandleManager
         if (row == null)
         {
             if (dso.getType() == Constants.SITE)
+            {
                 return Site.getSiteHandle();
+            }
             else
+            {
                 return null;
+            }
         }
         else
+        {
             return row.getStringColumn("handle");
+        }
     }
 
     /**

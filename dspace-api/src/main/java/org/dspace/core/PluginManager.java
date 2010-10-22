@@ -690,7 +690,9 @@ public class PluginManager
         allInterfaces.addAll(reusableKey.keySet());
         Iterator ii = allInterfaces.iterator();
         while (ii.hasNext())
-            checkClassname((String)ii.next(), "key interface or class");
+        {
+            checkClassname((String) ii.next(), "key interface or class");
+        }
 
         // Check implementation classes:
         //  - each class is loadable.

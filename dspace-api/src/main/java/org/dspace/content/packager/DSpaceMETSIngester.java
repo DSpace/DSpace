@@ -92,9 +92,13 @@ public class DSpaceMETSIngester
     {
         String profile = manifest.getProfile();
         if (profile == null)
+        {
             throw new MetadataValidationException("Cannot accept METS with no PROFILE attribute!");
+        }
         else if (!profile.startsWith(PROFILE_START))
-            throw new MetadataValidationException("METS has unacceptable PROFILE value, profile="+profile);
+        {
+            throw new MetadataValidationException("METS has unacceptable PROFILE value, profile=" + profile);
+        }
     }
 
     /**

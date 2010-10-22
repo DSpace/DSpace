@@ -169,9 +169,13 @@ public class ItemAdapter extends AbstractAdapter
     protected String getMETSID()
     {
         if (item.getHandle() == null)
-                return "item:"+item.getID();
+        {
+            return "item:" + item.getID();
+        }
         else
-                return "hdl:"+item.getHandle();
+        {
+            return "hdl:" + item.getHandle();
+        }
     }
 
     /**
@@ -212,9 +216,13 @@ public class ItemAdapter extends AbstractAdapter
     protected String getAmdSecID(String admSecName, String mdType, DSpaceObject dso)
     {
         if (dso.getType() == Constants.BITSTREAM)
-          return admSecName + "_" + getFileID((Bitstream)dso) + "_" + mdType;
+        {
+            return admSecName + "_" + getFileID((Bitstream) dso) + "_" + mdType;
+        }
         else
-          return admSecName + "_" + dso.getID() + "_" + mdType;
+        {
+            return admSecName + "_" + dso.getID() + "_" + mdType;
+        }
     }
 
     /**
@@ -581,17 +589,25 @@ public class ItemAdapter extends AbstractAdapter
           // Add this to our list of each file's administrative section IDs
           String fileID = getFileID((Bitstream) dso);
           if(fileAmdSecIDs.containsKey(fileID))
-            fileAmdSecIDs.get(fileID).append(" " + amdSecID);
+          {
+              fileAmdSecIDs.get(fileID).append(" " + amdSecID);
+          }
           else
-            fileAmdSecIDs.put(fileID, new StringBuffer(amdSecID));
+          {
+              fileAmdSecIDs.put(fileID, new StringBuffer(amdSecID));
+          }
         }//else if an Item
         else if (dso.getType() == Constants.ITEM)
         {
            //Add this to our list of item's administrative section IDs
            if(amdSecIDS==null)
-             amdSecIDS = new StringBuffer(amdSecID);
+           {
+               amdSecIDS = new StringBuffer(amdSecID);
+           }
            else
-             amdSecIDS.append(" " + amdSecID);
+           {
+               amdSecIDS.append(" " + amdSecID);
+           }
         }
 
         ////////////////////////////////
@@ -889,7 +905,9 @@ public class ItemAdapter extends AbstractAdapter
         // the all bundles.
         List<Bundle> bundles;
         if (fileGrpTypes.size() == 0)
-                bundles = Arrays.asList(item.getBundles());
+        {
+            bundles = Arrays.asList(item.getBundles());
+        }
         else
         {
                 bundles = new ArrayList<Bundle>();

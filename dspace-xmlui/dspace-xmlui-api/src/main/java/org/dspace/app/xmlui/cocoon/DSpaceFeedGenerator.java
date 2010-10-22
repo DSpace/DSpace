@@ -294,7 +294,9 @@ public class DSpaceFeedGenerator extends AbstractGenerator
         String source = ConfigurationManager.getProperty("recent.submissions.sort-option");
         BrowserScope scope = new BrowserScope(context);
         if (dso instanceof Collection)
-                scope.setCollection((Collection) dso);
+        {
+            scope.setCollection((Collection) dso);
+        }
         else if (dso instanceof Community)
                 scope.setCommunity((Community) dso);
         scope.setResultsPerPage(itemCount);

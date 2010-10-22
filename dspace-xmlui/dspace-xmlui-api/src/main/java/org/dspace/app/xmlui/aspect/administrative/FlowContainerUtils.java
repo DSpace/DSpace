@@ -214,9 +214,13 @@ public class FlowContainerUtils
 				boolean oaiAllSets = "all".equals(request.getParameter("oai-set-setting"));
                 String oaiSetId;
                 if(oaiAllSets)
+                {
                     oaiSetId = "all";
+                }
                 else
+                {
                     oaiSetId = request.getParameter("oai_setid");
+                }
 
 
 				String metadataKey = request.getParameter("metadata_format");
@@ -352,15 +356,25 @@ public class FlowContainerUtils
 		int harvestTypeInt = 0;
 		
 		if (oaiProvider == null || oaiProvider.length() == 0)
-			result.addError("oai_provider");
+        {
+            result.addError("oai_provider");
+        }
 		if (oaiSetId == null || oaiSetId.length() == 0)
-			result.addError("oai_setid");
+        {
+            result.addError("oai_setid");
+        }
 		if (metadataKey == null || metadataKey.length() == 0)
-			result.addError("metadata_format");
+        {
+            result.addError("metadata_format");
+        }
 		if (harvestType == null || harvestType.length() == 0)
-			result.addError("harvest_level");
+        {
+            result.addError("harvest_level");
+        }
 		else
-			harvestTypeInt = Integer.parseInt(harvestType);
+        {
+            harvestTypeInt = Integer.parseInt(harvestType);
+        }
 			
 		
 		if (result.getErrors() == null) {
@@ -781,9 +795,13 @@ public class FlowContainerUtils
 		Community newCommunity;
 		
 		if (parent != null)
-			newCommunity = parent.createSubcommunity();
+        {
+            newCommunity = parent.createSubcommunity();
+        }
 		else
-			newCommunity = Community.create(null, context);
+        {
+            newCommunity = Community.create(null, context);
+        }
 		
 		String name = request.getParameter("name");
 		String shortDescription = request.getParameter("short_description");
