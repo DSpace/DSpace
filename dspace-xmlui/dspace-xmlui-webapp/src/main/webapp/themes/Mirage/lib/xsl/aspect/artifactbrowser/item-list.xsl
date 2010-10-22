@@ -69,7 +69,7 @@
     <xsl:output indent="yes"/>
 
     <!--these templates are modfied to support the 2 different item list views that
-    can be configured with the property 'xmlui.item-list.emphasis' in dspace.cfg-->
+    can be configured with the property 'xmlui.theme.mirage.item-list.emphasis' in dspace.cfg-->
 
     <xsl:template name="itemSummaryList-DIM">
         <xsl:variable name="itemWithdrawn" select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim/@withdrawn" />
@@ -85,7 +85,7 @@
             </xsl:choose>
         </xsl:variable>
 
-        <xsl:variable name="emphasis" select="confman:getProperty('xmlui.item-list.emphasis')"/>
+        <xsl:variable name="emphasis" select="confman:getProperty('xmlui.theme.mirage.item-list.emphasis')"/>
         <xsl:choose>
             <xsl:when test="'file' = $emphasis">
 
