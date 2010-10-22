@@ -61,7 +61,6 @@
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:xalan="http://xml.apache.org/xalan"
     xmlns:encoder="xalan://java.net.URLEncoder"
-    xmlns:confman="org.dspace.core.ConfigurationManager"
     exclude-result-prefixes="xalan encoder i18n dri mets dim  xlink xsl">
 
     <xsl:output indent="yes"/>
@@ -360,10 +359,6 @@
         </div>
     </xsl:template>
 
-
-
-    <xsl:variable name="maxheight" select="confman:getIntProperty('thumbnail.maxheight', 80)"/>
-
     <xsl:template match="mets:file">
         <xsl:param name="context" select="."/>
         <div class="file-wrapper clearfix">
@@ -383,12 +378,12 @@
                             </img>
                         </xsl:when>
                         <xsl:otherwise>
-                            <img alt="Icon" src="{concat($theme-path, '/images/mime.png')}" style="height: {$maxheight}px;"/>
+                            <img alt="Icon" src="{concat($theme-path, '/images/mime.png')}" style="height: {$thumbnail.maxheight}px;"/>
                         </xsl:otherwise>
                     </xsl:choose>
                 </a>
             </div>
-            <div class="file-metadata" style="height: {$maxheight}px;">
+            <div class="file-metadata" style="height: {$thumbnail.maxheight}px;">
                 <span class="bold">
                     <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-name</i18n:text>
                     <xsl:text>:</xsl:text>
@@ -446,7 +441,7 @@
                 </xsl:if>
 
             </div>
-            <div class="file-link" style="height: {$maxheight}px;">
+            <div class="file-link" style="height: {$thumbnail.maxheight}px;">
                 <a>
                     <xsl:attribute name="href">
                         <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>

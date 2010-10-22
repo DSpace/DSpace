@@ -40,16 +40,16 @@
 package org.dspace.app.xmlui.utils;
 
 /**
- * Cuts off the string at the space nearest to the targetLength if there is one within the
- * maxDeviation, or at the targetLength if none is found
+ * Utilities that are needed in XSL transformations.
  *
  * @author Art Lowel (art dot lowel at atmire dot com)
  */
 public class XSLUtils {
 
     /*
-     * Cuts off the string at the space nearest to the targetLength if there is one within the
-     * maxDeviation, or at the targetLength if none is found
+     * Cuts off the string at the space nearest to the targetLength if there is one within
+     * maxDeviation chars from the targetLength, or at the targetLength if no such space is
+     * found
      */
     public static String shortenString(String string, int targetLength, int maxDeviation) {
         targetLength = Math.abs(targetLength);
@@ -58,16 +58,15 @@ public class XSLUtils {
             return string;
 
 
-        int currentLength = targetLength;
         int currentDeviation = 0;
         while (currentDeviation <= maxDeviation) {
             try {
-                if (string.charAt(currentLength) == ' ')
-                        return string.substring(0, currentLength) + " ...";
-                if (string.charAt(currentLength + currentDeviation) == ' ')
-                    return string.substring(0, currentLength + currentDeviation) + " ...";
-                if (string.charAt(currentLength - currentDeviation) == ' ')
-                        return string.substring(0, currentLength - currentDeviation) + " ...";
+                if (string.charAt(targetLength) == ' ')
+                    return string.substring(0, targetLength) + " ...";
+                if (string.charAt(targetLength + currentDeviation) == ' ')
+                    return string.substring(0, targetLength + currentDeviation) + " ...";
+                if (string.charAt(targetLength - currentDeviation) == ' ')
+                    return string.substring(0, targetLength - currentDeviation) + " ...";
             } catch (Exception e) {
                 //just in case
             }
@@ -75,7 +74,7 @@ public class XSLUtils {
             currentDeviation++;
         }
 
-        return string.substring(0, targetLength) + "...";
+        return string.substring(0, targetLength) + " ...";
 
     }
 }

@@ -109,6 +109,16 @@
                     <!--The trail is built by applying a template over pageMeta's trail children. -->
                     <xsl:call-template name="buildTrail"/>
 
+                    <!--javascript-disabled warning, will be invisible if javascript is enabled-->
+                    <div id="no-js-warning-wrapper" class="hidden">
+                        <div id="no-js-warning">
+                            <div class="notice failure">
+                                <xsl:text>JavaScript is disabled for your browser. Some features of this site may not work without it.</xsl:text>
+                            </div>
+                        </div>
+                    </div>
+
+
                     <!--ds-content is a groups ds-body and the navigation together and used to put the clearfix on, center, etc.
                         ds-content-wrapper is necessary for IE6 to allow it to center the page content-->
                     <div id="ds-content-wrapper">
@@ -167,7 +177,7 @@
                 </xsl:attribute>
             </link>
             <link rel="apple-touch-icon">
-                <xsl:attribute name="href">                                       
+                <xsl:attribute name="href">
                     <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
                     <xsl:text>/themes/</xsl:text>
                     <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
@@ -516,7 +526,7 @@
 
     <xsl:template name="addJavascript">
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js">&#160;</script>
-        
+
         <xsl:variable name="localJQuerySrc">
                 <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
                 <xsl:text>/static/js/jquery-1.4.2.min.js</xsl:text>
@@ -558,10 +568,10 @@
                 <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
                 <xsl:text>/themes/</xsl:text>
                 <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-                <xsl:text>/lib/js/dd_belatedpng.js?v=1</xsl:text>
+                <xsl:text>/lib/js/DD_belatedPNG_0.0.8a.js?v=1</xsl:text>
             </xsl:attribute>&#160;</script>
         <script type="text/javascript">
-            <xsl:text>DD_belatedPNG.fix('#ds-header-logo');DD_belatedPNG.fix('#ds-footer-logo');</xsl:text>
+            <xsl:text>DD_belatedPNG.fix('#ds-header-logo');DD_belatedPNG.fix('#ds-footer-logo');$.each($('img[src$=png]'), function() {DD_belatedPNG.fixPng(this);});</xsl:text>
         </script>
         <xsl:text disable-output-escaping="yes" >&lt;![endif]--&gt;</xsl:text>
 
@@ -581,5 +591,5 @@
            </xsl:text></script>
         </xsl:if>
     </xsl:template>
-    
+
 </xsl:stylesheet>

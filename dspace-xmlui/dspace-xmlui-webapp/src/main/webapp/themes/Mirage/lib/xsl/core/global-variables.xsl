@@ -1,7 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?>
-
 <!--
-  Mirage.xsl
+  global-variables.xsl
 
   Version: $Revision: 3705 $
 
@@ -41,7 +39,11 @@
 -->
 
 <!--
-    TODO: Describe this XSL file
+    Global variables accessible from other templates
+
+    Author: art.lowel at atmire.com
+    Author: lieven.droogmans at atmire.com
+    Author: ben at atmire.com
     Author: Alexey Maslov
 
 -->
@@ -56,20 +58,13 @@
 	xmlns:mods="http://www.loc.gov/mods/v3"
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
 	xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:confman="org.dspace.core.ConfigurationManager"
 	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
 
-    <xsl:import href="../dri2xhtml-alt/dri2xhtml.xsl"/>
-    <xsl:import href="lib/xsl/core/global-variables.xsl"/>
-    <xsl:import href="lib/xsl/core/page-structure.xsl"/>
-    <xsl:import href="lib/xsl/core/navigation.xsl"/>
-    <xsl:import href="lib/xsl/core/elements.xsl"/>
-    <xsl:import href="lib/xsl/core/forms.xsl"/>
-    <xsl:import href="lib/xsl/core/attribute-handlers.xsl"/>
-    <xsl:import href="lib/xsl/core/utils.xsl"/>
-    <xsl:import href="lib/xsl/aspect/administrative/administrative.xsl"/>
-    <xsl:import href="lib/xsl/aspect/artifactbrowser/item-list.xsl"/>
-    <xsl:import href="lib/xsl/aspect/artifactbrowser/item-view.xsl"/>
     <xsl:output indent="yes"/>
-    
+
+    <!--the max thumbnail height & width from dspace.cfg, needed for item view and item list pages-->
+    <xsl:variable name="thumbnail.maxheight" select="confman:getIntProperty('thumbnail.maxheight', 80)"/>
+    <xsl:variable name="thumbnail.maxwidth" select="confman:getIntProperty('thumbnail.maxwidth', 80)"/>
 
 </xsl:stylesheet>
