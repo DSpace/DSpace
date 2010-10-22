@@ -151,7 +151,11 @@ public class CreateAdministrator
     		System.out.print("E-mail address: ");
     		System.out.flush();
     		
-    		email = input.readLine().trim();
+    		email = input.readLine();
+            if (email != null)
+            {
+                email = email.trim();
+            }
     		
     		System.out.print("First name: ");
     		System.out.flush();

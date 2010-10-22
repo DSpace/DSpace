@@ -261,7 +261,7 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
                     {
                         // TODO: Check valid encoding?  We assume UTF-8
                         // TODO: Check escaping "<>&
-                        e.setAttribute("content", v.value == null ? "" : v.value);
+                        e.setAttribute("content", v.value);
                     }
                     else
                     {

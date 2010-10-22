@@ -114,9 +114,8 @@ public class Language
     
     private static synchronized Language create(String iana, String iso639_1, String iso639_2)
     {
-        Language lang = null;
+        Language lang = LanguageMaps.getLanguageForIANA(iana);
         
-        lang = (lang != null ? lang : LanguageMaps.getLanguageForIANA(iana));
         lang = (lang != null ? lang : LanguageMaps.getLanguageForISO639_1(iso639_1));
         lang = (lang != null ? lang : LanguageMaps.getLanguageForISO639_2(iso639_2));
         
