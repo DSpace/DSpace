@@ -812,17 +812,6 @@ public class BrowseIndex
     	
     	return field;
     }
-    
-    /**
-     * Does the browse index represent one of the internal item indexes
-     * 
-     * @param bi
-     * @return
-     */
-    public static boolean isInternalIndex(BrowseIndex bi)
-    {
-        return (bi == itemIndex || bi == withdrawnIndex);
-    }
 
     /**
      * Does this browse index represent one of the internal item indexes

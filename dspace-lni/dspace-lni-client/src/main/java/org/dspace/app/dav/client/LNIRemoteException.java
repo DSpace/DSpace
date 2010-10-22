@@ -68,7 +68,7 @@ public class LNIRemoteException  extends org.apache.axis.AxisFault  implements j
         LNIRemoteException other = (LNIRemoteException) obj;
         if (this == obj) return true;
         if (__equalsCalc != null) {
-            return (__equalsCalc == obj);
+            return (__equalsCalc.equals(obj));
         }
         __equalsCalc = obj;
         boolean _equals;

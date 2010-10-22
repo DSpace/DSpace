@@ -499,6 +499,7 @@ public class PluginManager
         Iterator ci = values.iterator();
         while (ci.hasNext())
         {
+            // Identity comparison is valid for this usage
             Object val = ci.next();
             if (val == plugin)
                 values.remove(val);
