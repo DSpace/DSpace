@@ -249,7 +249,7 @@ class DAVEPersonEPerson extends DAVResource
         catch (NumberFormatException ne)
         {
             throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,
-                    "Error parsing number in request URI.");
+                    "Error parsing number in request URI.", ne);
         }
     }
 

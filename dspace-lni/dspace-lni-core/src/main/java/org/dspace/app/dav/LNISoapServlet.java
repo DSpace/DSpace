@@ -310,7 +310,7 @@ public class LNISoapServlet extends AxisServlet
         catch (DAVStatusException e)
         {
             throw new LNIRemoteException("PROPFIND request failed: "
-                    + e.getStatusLine());
+                    + e.getStatusLine(), e);
         }
         catch (AuthorizeException e)
         {
@@ -386,7 +386,7 @@ public class LNISoapServlet extends AxisServlet
         catch (DAVStatusException e)
         {
             throw new LNIRemoteException("PROPPATCH request failed: "
-                    + e.getStatusLine());
+                    + e.getStatusLine(), e);
         }
         catch (AuthorizeException e)
         {
@@ -516,7 +516,7 @@ public class LNISoapServlet extends AxisServlet
         catch (DAVStatusException e)
         {
             throw new LNIRemoteException("COPY request failed: "
-                    + e.getStatusLine());
+                    + e.getStatusLine(), e);
         }
         catch (AuthorizeException e)
         {

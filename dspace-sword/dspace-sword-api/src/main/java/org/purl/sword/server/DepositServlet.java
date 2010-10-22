@@ -115,7 +115,7 @@ public class DepositServlet extends HttpServlet {
 								+ className);
 				throw new ServletException(
 						"Unable to instantiate class from 'sword-server-class': "
-								+ className);
+								+ className, e);
 			}
 		}
 

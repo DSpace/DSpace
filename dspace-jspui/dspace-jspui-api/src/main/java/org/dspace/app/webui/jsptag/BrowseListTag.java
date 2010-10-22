@@ -824,11 +824,11 @@ public class BrowseListTag extends TagSupport
         }
         catch (SQLException sqle)
         {
-            throw new JspException(sqle.getMessage());
+            throw new JspException(sqle.getMessage(), sqle);
         }
         catch (IOException ioe)
         {
-            throw new JspException(ioe.getMessage());
+            throw new JspException(ioe.getMessage(), ioe);
         }
 
         // now get the image dimensions
@@ -906,7 +906,7 @@ public class BrowseListTag extends TagSupport
         }
         catch (SQLException sqle)
         {
-        	throw new JspException(sqle.getMessage());
+        	throw new JspException(sqle.getMessage(), sqle);
         }
         catch (UnsupportedEncodingException e)
         {

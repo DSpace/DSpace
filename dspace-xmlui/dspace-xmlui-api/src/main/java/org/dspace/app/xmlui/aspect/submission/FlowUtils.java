@@ -195,7 +195,7 @@ public class FlowUtils {
             }
             catch(Exception e)
             {
-                throw new SQLException("Error loading Submission Info: " + e.getMessage());
+                throw new SQLException("Error loading Submission Info: " + e.getMessage(), e);
             }
         }    
         else if(subInfo==null && submission==null)

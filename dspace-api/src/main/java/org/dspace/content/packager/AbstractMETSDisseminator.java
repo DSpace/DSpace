@@ -660,11 +660,11 @@ public abstract class AbstractMETSDisseminator
         }
         catch (InstantiationException e)
         {
-            throw new PackageValidationException("Error instantiating Mdsec object: "+ e.toString());
+            throw new PackageValidationException("Error instantiating Mdsec object: "+ e.toString(), e);
         }
         catch (IllegalAccessException e)
         {
-            throw new PackageValidationException("Error instantiating Mdsec object: "+ e.toString());
+            throw new PackageValidationException("Error instantiating Mdsec object: "+ e.toString(), e);
         }
     }
 

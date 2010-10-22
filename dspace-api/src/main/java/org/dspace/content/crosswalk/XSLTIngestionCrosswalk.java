@@ -162,7 +162,7 @@ public class XSLTIngestionCrosswalk
         catch (XSLTransformException e)
         {
             log.error("Got error: "+e.toString());
-            throw new CrosswalkInternalException("XSL Transformation failed: "+e.toString());
+            throw new CrosswalkInternalException("XSL Transformation failed: "+e.toString(), e);
         }
     }
 
@@ -185,7 +185,7 @@ public class XSLTIngestionCrosswalk
         catch (XSLTransformException e)
         {
             log.error("Got error: "+e.toString());
-            throw new CrosswalkInternalException("XSL Transformation failed: "+e.toString());
+            throw new CrosswalkInternalException("XSL Transformation failed: "+e.toString(), e);
         }
 
     }

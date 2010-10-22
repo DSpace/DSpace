@@ -149,6 +149,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
             // Log the error
             log.warn(LogManager.getHeader(context, "database_error", ""), se);
 
+            // Stack trace loss as OAI Exception does not support cause
             throw new OAIInternalServerError(se.toString());
         }
         finally
@@ -276,10 +277,12 @@ public class DSpaceOAICatalog extends AbstractCatalog
             // Log the error
             log.warn(LogManager.getHeader(context, "database_error", ""), se);
 
+            // Stack trace loss as OAI Exception does not support cause
             throw new OAIInternalServerError(se.toString());
         }
         catch (ParseException pe)
         {
+            // Stack trace loss as OAI Exception does not support cause
             throw new OAIInternalServerError(pe.toString());
         }
         finally
@@ -412,6 +415,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
             // Log the error
             log.warn(LogManager.getHeader(context, "database_error", ""), se);
 
+            // Stack trace loss as OAI Exception does not support cause
             throw new OAIInternalServerError(se.toString());
         }
         finally
@@ -656,10 +660,12 @@ public class DSpaceOAICatalog extends AbstractCatalog
             // Log the error
             log.warn(LogManager.getHeader(context, "database_error", ""), se);
 
+            // Stack trace loss as OAI Exception does not support cause
             throw new OAIInternalServerError(se.toString());
         }
         catch (ParseException pe)
         {
+            // Stack trace loss as OAI Exception does not support cause
         	throw new OAIInternalServerError(pe.toString());
         }
         finally
@@ -678,7 +684,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
      * 
      * @return a Map object containing "sets" Iterator object (contains
      *         <setSpec/>XML Strings) as well as an optional resumptionMap Map.
-     * @exception OAIBadRequestException
+     * @exception NoSetHierarchyException
      *                signals an http status code 400 problem
      * @exception OAIInternalServerError
      *                signals an http status code 500 problem
@@ -751,6 +757,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
             // Log the error
             log.warn(LogManager.getHeader(context, "database_error", ""), se);
 
+            // Stack trace loss as OAI Exception does not support cause
             throw new OAIInternalServerError(se.toString());
         }
         finally
@@ -950,10 +957,12 @@ public class DSpaceOAICatalog extends AbstractCatalog
         }
         catch (NumberFormatException nfe)
         {
+            // Stack trace loss as OAI Exception does not support cause
             throw new BadResumptionTokenException();
         }
         catch (NoSuchElementException nsee)
         {
+            // Stack trace loss as OAI Exception does not support cause
             throw new BadResumptionTokenException();
         }
 

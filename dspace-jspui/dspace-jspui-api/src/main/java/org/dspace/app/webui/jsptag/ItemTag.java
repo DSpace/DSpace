@@ -962,7 +962,7 @@ public class ItemTag extends TagSupport
         }
         catch(SQLException sqle)
         {
-        	throw new IOException(sqle.getMessage());
+        	throw new IOException(sqle.getMessage(), sqle);
         }
 
         out.println("</td></tr></table>");
@@ -990,7 +990,7 @@ public class ItemTag extends TagSupport
         }
         catch(SQLException sqle)
         {
-        	throw new IOException(sqle.getMessage());
+        	throw new IOException(sqle.getMessage(), sqle);
         }
 
         out.println("<table align=\"center\" class=\"attentionTable\"><tr>");

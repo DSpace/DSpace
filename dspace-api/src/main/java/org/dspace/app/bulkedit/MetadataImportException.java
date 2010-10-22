@@ -53,4 +53,15 @@ public class MetadataImportException extends Exception
     {
        super(message);
     }
+
+    /**
+     * Instantiate a new MetadataImportException
+     *
+     * @param message the error message
+     * @param exception the root cause
+     */
+    public MetadataImportException(String message, Exception exception)
+    {
+       super(message, exception);
+    }
 }

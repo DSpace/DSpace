@@ -279,7 +279,7 @@ public class ConfigurationManager
 
             // FIXME: Maybe something more graceful here, but with the
             // configuration we can't do anything
-            throw new RuntimeException("Failed to read default license.");
+            throw new RuntimeException("Failed to read default license.", e);
         }
         finally
         {

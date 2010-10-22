@@ -57,7 +57,6 @@ import org.dspace.administer.RegistryLoader;
 import org.dspace.browse.IndexBrowse;
 import org.dspace.browse.MockBrowseCreateDAOOracle;
 import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;

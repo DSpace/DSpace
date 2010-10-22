@@ -71,4 +71,9 @@ public class PackageValidationException extends PackageException
     {
         super(exception);
     }
+
+    public PackageValidationException(String message, Exception exception)
+    {
+        super(message, exception);
+    }
 }

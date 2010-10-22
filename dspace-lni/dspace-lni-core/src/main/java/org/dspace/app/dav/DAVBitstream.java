@@ -246,7 +246,7 @@ class DAVBitstream extends DAVDSpaceObject
         catch (NumberFormatException nfe)
         {
             throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,
-                    "Invalid Bitstream Sequence ID in URI: " + pathElt);
+                    "Invalid Bitstream Sequence ID in URI: " + pathElt, nfe);
         }
     }
 

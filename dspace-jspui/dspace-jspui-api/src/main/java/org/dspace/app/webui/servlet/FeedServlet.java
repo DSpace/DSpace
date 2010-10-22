@@ -283,7 +283,7 @@ public class FeedServlet extends DSpaceServlet
         }
         catch( FeedException fex )
         {
-        	throw new IOException(fex.getMessage());
+        	throw new IOException(fex.getMessage(), fex);
         }
     }
        
@@ -374,12 +374,12 @@ public class FeedServlet extends DSpaceServlet
         catch (SortException se)
         {
             log.error("caught exception: ", se);
-            throw new IOException(se.getMessage());
+            throw new IOException(se.getMessage(), se);
         }
     	catch (BrowseException e)
     	{
     		log.error("caught exception: ", e);
-    		throw new IOException(e.getMessage());
+    		throw new IOException(e.getMessage(), e);
     	}
     }
     

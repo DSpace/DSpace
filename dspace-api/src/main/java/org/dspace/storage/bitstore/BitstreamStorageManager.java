@@ -448,7 +448,7 @@ public class BitstreamStorageManager
 			catch (NoSuchAlgorithmException e) 
 			{
 				log.warn("Caught NoSuchAlgorithmException", e);
-				throw new IOException("Invalid checksum algorithm");
+				throw new IOException("Invalid checksum algorithm", e);
 			}
 			catch (IOException e) 
 			{
@@ -491,7 +491,7 @@ public class BitstreamStorageManager
 			catch (NoSuchAlgorithmException e) 
 			{
 				log.error("Caught NoSuchAlgorithmException", e);
-				throw new IOException("Invalid checksum algorithm");
+				throw new IOException("Invalid checksum algorithm", e);
 			}
 			bitstream.setColumn("checksum", 
 					Utils.toHex(md.digest(sFilename.getBytes())));

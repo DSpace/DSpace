@@ -128,9 +128,7 @@ public class FileUploadRequest extends HttpServletRequestWrapper
         }
         catch (Exception e)
         {
-            IOException t = new IOException(e.getMessage());
-            t.initCause(e);
-            throw t;
+            throw new IOException(e.getMessage(), e);
         }
     }
 

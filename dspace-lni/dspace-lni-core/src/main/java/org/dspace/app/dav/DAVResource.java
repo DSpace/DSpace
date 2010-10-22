@@ -567,7 +567,7 @@ abstract class DAVResource
             {
                 throw new DAVStatusException(
                         HttpServletResponse.SC_BAD_REQUEST,
-                        "Bad Depth header: " + sdepth);
+                        "Bad Depth header: " + sdepth, nfe);
             }
         }
 
@@ -671,14 +671,14 @@ abstract class DAVResource
                         .toString()));
                 throw new DAVStatusException(
                         HttpServletResponse.SC_BAD_REQUEST,
-                        "Could not parse request document: " + je.toString());
+                        "Could not parse request document: " + je.toString(), je);
             }
         }
         catch (JDOMException je)
         {
             log.error(LogManager.getHeader(this.context, "propfind", je.toString()));
             throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,
-                    "Could not parse request document: " + je.toString());
+                    "Could not parse request document: " + je.toString(), je);
         }
 
         // At this point, pfProps, pfType and URI define the whole request.
@@ -883,7 +883,7 @@ abstract class DAVResource
                 throw new DAVStatusException(
                         HttpServletResponse.SC_BAD_REQUEST,
                         "Could not parse PROPERTYUPDATE request document: "
-                                + je.toString());
+                                + je.toString(), je);
             }
         }
         catch (JDOMException je)
@@ -893,7 +893,7 @@ abstract class DAVResource
                             .toString()));
             throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,
                     "Could not parse PROPERTYUPDATE request document: "
-                            + je.toString());
+                            + je.toString(), je);
         }
         if (reqdoc == null)
         {
@@ -1178,7 +1178,7 @@ abstract class DAVResource
         {
             throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,
                     "Illegal URI syntax in value of \"Destination\" header: "
-                            + destination);
+                            + destination, e);
         }
 
         // Depth arg from header
@@ -1202,7 +1202,7 @@ abstract class DAVResource
             {
                 throw new DAVStatusException(
                         HttpServletResponse.SC_BAD_REQUEST,
-                        "Illegal value in Depth request header: " + sdepth);
+                        "Illegal value in Depth request header: " + sdepth, nfe);
             }
         }
 
@@ -1229,14 +1229,14 @@ abstract class DAVResource
             {
                 throw new DAVStatusException(
                         HttpServletResponse.SC_BAD_REQUEST,
-                        "Error parsing XML document in COPY request.");
+                        "Error parsing XML document in COPY request.", je);
             }
         }
         catch (JDOMException je)
         {
             throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,
                     "Error parsing XML document in COPY request: "
-                            + je.toString());
+                            + je.toString(), je);
         }
         if (reqdoc != null)
         {
@@ -1700,14 +1700,14 @@ abstract class DAVResource
                 throw new DAVStatusException(
                         HttpServletResponse.SC_BAD_REQUEST,
                         "Could not parse DELETE request document: "
-                                + je.toString());
+                                + je.toString(), je);
             }
         }
         catch (JDOMException je)
         {
             log.error(LogManager.getHeader(this.context, "delete", je.toString()));
             throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,
-                    "Could not parse DELETE request document: " + je.toString());
+                    "Could not parse DELETE request document: " + je.toString(), je);
         }
         if (reqdoc == null)
         {
@@ -1793,14 +1793,14 @@ abstract class DAVResource
                 throw new DAVStatusException(
                         HttpServletResponse.SC_BAD_REQUEST,
                         "Could not parse MKCOL request document: "
-                                + je.toString());
+                                + je.toString(), je);
             }
         }
         catch (JDOMException je)
         {
             log.error(LogManager.getHeader(this.context, "mkcol", je.toString()));
             throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,
-                    "Could not parse MKCOL request document: " + je.toString());
+                    "Could not parse MKCOL request document: " + je.toString(), je);
         }
         if (reqdoc == null)
         {

@@ -211,7 +211,7 @@ class DAVWorkflowItem extends DAVInProgressSubmission
         catch (NumberFormatException ne)
         {
             throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,
-                    "Error parsing number in request URI.");
+                    "Error parsing number in request URI.", ne);
         }
     }
 

@@ -320,7 +320,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
             }
             catch (org.jdom.JDOMException je)
             {
-                throw new CrosswalkInternalException("Failed parsing XML fragment in properties file: \""+prolog+val+postlog+"\": "+je.toString());
+                throw new CrosswalkInternalException("Failed parsing XML fragment in properties file: \""+prolog+val+postlog+"\": "+je.toString(), je);
             }
         }
     }

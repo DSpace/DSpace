@@ -238,7 +238,7 @@ public class OpenSearchServlet extends DSpaceServlet
         catch (TransformerException e)
         {
             log.error(e);
-            throw new ServletException(e.toString());
+            throw new ServletException(e.toString(), e);
         }
     }
     

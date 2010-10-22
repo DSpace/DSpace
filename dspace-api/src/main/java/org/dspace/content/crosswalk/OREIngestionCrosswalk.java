@@ -146,7 +146,7 @@ public class OREIngestionCrosswalk
 	        xpathLinks.addNamespace(ATOM_NS);
 	        entryId = ((Attribute)xpathLinks.selectSingleNode(doc)).getValue();
 		} catch (JDOMException e) {
-			throw new CrosswalkException("JDOM exception occured while ingesting the ORE");
+			throw new CrosswalkException("JDOM exception occured while ingesting the ORE", e);
 		}
 
 		// Next for each resource, create a bitstream

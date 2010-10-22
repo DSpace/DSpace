@@ -224,7 +224,7 @@ public class MetadataImport
                         }
                         catch (Exception ex)
                         {
-                            throw new MetadataImportException("'" + handle + "' is not a Collection! You must specify a valid collection for new items");
+                            throw new MetadataImportException("'" + handle + "' is not a Collection! You must specify a valid collection for new items", ex);
                         }
                     }
 

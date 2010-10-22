@@ -287,11 +287,11 @@ public class OAIHarvester {
 	    	}
 	    	catch (FileNotFoundException fe) {
 	    		log.error("The OAI server did not respond.");
-	    		throw new HarvestingException("The OAI server did not respond.");
+	    		throw new HarvestingException("The OAI server did not respond.", fe);
 	    	}
 	    	catch (ConnectException fe) {
 	    		log.error("The OAI server did not respond.");
-	    		throw new HarvestingException("The OAI server did not respond.");
+	    		throw new HarvestingException("The OAI server did not respond.", fe);
 	    	}	    	
 			if (descMDPrefix == null) {
 				log.error("The OAI server does not support this metadata format");

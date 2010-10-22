@@ -261,7 +261,7 @@ public class DummyServer implements SWORDServer {
                 filenames.append(" ").append(ze.toString());
 			}
 		} catch (IOException ioe) {
-			throw new SWORDException("Failed to open deposited zip file", null, ErrorCodes.ERROR_CONTENT);
+			throw new SWORDException("Failed to open deposited zip file", ioe, ErrorCodes.ERROR_CONTENT);
 		}
 		
 		// Handle the deposit

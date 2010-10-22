@@ -37,8 +37,6 @@
  */
 package org.dspace.plugin;
 
-import java.lang.Exception;
-
 /**
  * General exception class for all code that runs as a plugin in DSpace
  * 

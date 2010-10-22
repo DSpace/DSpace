@@ -269,7 +269,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
         }
         catch (IllegalArgumentException iae)
         {
-                throw new ResourceNotFoundException("Syndication feed format, '"+this.format+"', is not supported.");
+                throw new ResourceNotFoundException("Syndication feed format, '"+this.format+"', is not supported.", iae);
         }
         catch (FeedException fe)
         {

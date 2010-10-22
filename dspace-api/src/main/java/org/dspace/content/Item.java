@@ -1934,7 +1934,7 @@ public class Item extends DSpaceObject
         catch (BrowseException e)
         {
             log.error("caught exception: ", e);
-            throw new SQLException(e.getMessage());
+            throw new SQLException(e.getMessage(), e);
         }
 
         // Delete the Dublin Core

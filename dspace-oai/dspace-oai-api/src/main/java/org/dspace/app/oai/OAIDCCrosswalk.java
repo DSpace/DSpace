@@ -281,6 +281,7 @@ public class OAIDCCrosswalk extends Crosswalk
             }
                     catch (SQLException e)
                     {
+                        // Stack loss as exception does not support cause
                         throw new CannotDisseminateFormatException(e.toString());
         }
                 }

@@ -587,7 +587,7 @@ class DAVCollection extends DAVDSpaceObject
         {
             pe.log(log);
             throw new DAVStatusException(
-                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR, pe.toString());
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR, pe.toString(), pe);
         }
         catch (CrosswalkException ie)
         {
@@ -599,7 +599,7 @@ class DAVCollection extends DAVDSpaceObject
             log.error(ie.toString() + reason);
             throw new DAVStatusException(
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ie.toString()
-                            + reason);
+                            + reason, ie);
         }
     }
 

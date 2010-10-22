@@ -231,7 +231,7 @@ public class XSLTDisseminationCrosswalk
         catch (XSLTransformException e)
         {
             log.error("Got error: "+e.toString());
-            throw new CrosswalkInternalException("XSL translation failed: "+e.toString());
+            throw new CrosswalkInternalException("XSL translation failed: "+e.toString(), e);
         }
     }
 
@@ -263,7 +263,7 @@ public class XSLTDisseminationCrosswalk
         catch (XSLTransformException e)
         {
             log.error("Got error: "+e.toString());
-            throw new CrosswalkInternalException("XSL translation failed: "+e.toString());
+            throw new CrosswalkInternalException("XSL translation failed: "+e.toString(), e);
         }
     }
 

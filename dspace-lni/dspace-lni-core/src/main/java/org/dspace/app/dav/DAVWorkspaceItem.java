@@ -197,7 +197,7 @@ class DAVWorkspaceItem extends DAVInProgressSubmission
         catch (NumberFormatException ne)
         {
             throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,
-                    "Error parsing number in request URI.");
+                    "Error parsing number in request URI.", ne);
         }
     }
 
@@ -285,7 +285,7 @@ class DAVWorkspaceItem extends DAVInProgressSubmission
             {
                 throw new DAVStatusException(
                         HttpServletResponse.SC_BAD_REQUEST,
-                        "Error parsing number in property value.");
+                        "Error parsing number in property value.", ne);
             }
         }
         else

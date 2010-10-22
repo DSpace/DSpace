@@ -89,7 +89,7 @@ public class AuthorityChooseServlet extends DSpaceServlet {
         }
         catch(SAXException e)
         {
-            throw new IOException(e.toString());
+            throw new IOException(e.toString(), e);
         }
         finally
         {

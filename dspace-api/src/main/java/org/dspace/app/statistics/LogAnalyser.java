@@ -38,8 +38,6 @@
 
 package org.dspace.app.statistics;
 
-import org.dspace.app.statistics.LogLine;
-
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -47,9 +45,6 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 
 import java.sql.SQLException;
-
-import java.lang.Long;
-import java.lang.StringBuffer;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

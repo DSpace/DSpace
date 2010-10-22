@@ -272,7 +272,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
             {
                 log.error("Error opening or reading MODS properties file: "+propsFile.toString()+": "+e.toString());
                 throw new CrosswalkInternalException("MODS crosswalk cannot "+
-                    "open config file: "+e.toString());
+                    "open config file: "+e.toString(), e);
             }
             finally
             {

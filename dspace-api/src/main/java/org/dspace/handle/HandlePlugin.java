@@ -302,6 +302,7 @@ public class HandlePlugin implements HandleStorage
                 log.debug("Exception in getRawHandleValues", e);
             }
 
+            // Stack loss as exception does not support cause
             throw new HandleException(HandleException.INTERNAL_ERROR);
         }
         finally
@@ -419,6 +420,7 @@ public class HandlePlugin implements HandleStorage
                 log.debug("Exception in getHandlesForNA", sqle);
             }
 
+            // Stack loss as exception does not support cause
             throw new HandleException(HandleException.INTERNAL_ERROR);
         }
         finally

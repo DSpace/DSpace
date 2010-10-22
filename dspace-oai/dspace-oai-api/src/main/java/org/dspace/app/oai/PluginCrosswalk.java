@@ -190,6 +190,7 @@ public class PluginCrosswalk extends Crosswalk
                 log.error("*** Stack trace follows:");
                 log.error(sw.toString());
 
+            // Stack loss as exception does not support cause
             throw new CannotDisseminateFormatException(schemaLabel);
         }
     }

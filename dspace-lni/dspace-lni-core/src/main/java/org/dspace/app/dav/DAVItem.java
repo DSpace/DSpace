@@ -227,7 +227,7 @@ class DAVItem extends DAVDSpaceObject
         catch (NumberFormatException ne)
         {
             throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,
-                    "Error parsing number in request URI.");
+                    "Error parsing number in request URI.", ne);
         }
     }
 
@@ -518,14 +518,14 @@ class DAVItem extends DAVDSpaceObject
             {
                 throw new DAVStatusException(
                         HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                        "Failed in crosswalk of metadata: " + pe.toString());
+                        "Failed in crosswalk of metadata: " + pe.toString(), pe);
             }
             catch (PackageException pe)
             {
                 pe.log(log);
                 throw new DAVStatusException(
                         HttpServletResponse.SC_INTERNAL_SERVER_ERROR, pe
-                                .toString());
+                                .toString(), pe);
             }
         }
     }

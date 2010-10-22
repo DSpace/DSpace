@@ -561,7 +561,7 @@ public class METSExport
             // We don't pass up a MetsException, so callers don't need to
             // know the details of the METS toolkit
             e.printStackTrace();
-            throw new IOException(e.getMessage());
+            throw new IOException(e.getMessage(), e);
         }
     }
 

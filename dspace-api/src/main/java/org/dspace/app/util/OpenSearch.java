@@ -187,7 +187,7 @@ public class OpenSearch
         catch (FeedException e)
             {
             log.error(e.toString(), e);
-            	throw new IOException("Unable to generate feed");
+            	throw new IOException("Unable to generate feed", e);
             }
         }
     
@@ -214,7 +214,7 @@ public class OpenSearch
         catch (FeedException e)
         	{
             log.error(e.toString(), e);
-            throw new IOException("Unable to generate feed");
+            throw new IOException("Unable to generate feed", e);
         	}
     
         }
@@ -350,7 +350,7 @@ public class OpenSearch
         }
         catch(JDOMException jde)
         {
-        	throw new IOException("JDOM output exception");
+        	throw new IOException("JDOM output exception", jde);
         }
     }
 }

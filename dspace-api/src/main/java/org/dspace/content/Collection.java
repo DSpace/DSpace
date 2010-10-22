@@ -1131,7 +1131,7 @@ public class Collection extends DSpaceObject
         catch (BrowseException e)
         {
         	log.error("caught exception: ", e);
-        	throw new IOException(e.getMessage());
+        	throw new IOException(e.getMessage(), e);
         }
         finally
         {

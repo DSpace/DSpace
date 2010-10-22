@@ -94,7 +94,7 @@ public class ServiceDocumentServlet extends HttpServlet {
 						+ className);
 				throw new ServletException(
 						"Unable to instantiate class from 'server-class': "
-								+ className);
+								+ className, e);
 			}
 		}
 
