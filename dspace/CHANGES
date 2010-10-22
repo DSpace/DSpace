@@ -35,6 +35,7 @@
 - [DS-387] Add ability for various Packager plugins to report their custom "options" via command line
 
 (Claudia Juergen)
+- [DS-426] Item's submission license accessible without being configured to be public
 - [DS-569] Trailing white spaces lead to wrong order of texts in browse
 - [DS-596] Cannot Delete Community which has two or more levels of SubCommunities
 - [DS-628] Make the timeout for the extended resolver dnslookup configurable

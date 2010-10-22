@@ -52,7 +52,9 @@ import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
+import org.dspace.content.Bundle;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -92,6 +94,9 @@ public class RetrieveServlet extends DSpaceServlet
             SQLException, AuthorizeException
     {
         Bitstream bitstream = null;
+        boolean displayLicense = ConfigurationManager.getBooleanProperty("webui.licence_bundle.show", false);
+        boolean isLicense = false;
+        
 
         // Get the ID from the URL
         String idString = request.getPathInfo();
@@ -128,6 +133,21 @@ public class RetrieveServlet extends DSpaceServlet
         // Did we get a bitstream?
         if (bitstream != null)
         {
+            
+            // Check whether we got a License and if it should be displayed
+            Bundle bundle = bitstream.getBundles()[0];
+            
+            if (bundle.getName().equals(Constants.LICENSE_BUNDLE_NAME) && 
+                bitstream.getName().equals(Constants.LICENSE_BITSTREAM_NAME))
+            {
+                    isLicense = true;
+            }
+            
+            
+            if (isLicense && !displayLicense && !AuthorizeManager.isAdmin(context))
+            {
+                throw new AuthorizeException();
+            }
             log.info(LogManager.getHeader(context, "view_bitstream",
                     "bitstream_id=" + bitstream.getID()));
 
