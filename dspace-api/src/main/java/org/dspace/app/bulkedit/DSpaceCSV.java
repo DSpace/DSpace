@@ -398,7 +398,7 @@ public class DSpaceCSV implements Serializable
             for (String part : bits)
             {
                 int bitcounter = part.length() - part.replaceAll("\"", "").length();
-                if ((part.startsWith("\"")) && ((!part.endsWith("\"")) || ((bitcounter %2) == 1)))
+                if ((part.startsWith("\"")) && ((!part.endsWith("\"")) || ((bitcounter & 1) == 1)))
                 {
                     found = true;
                     String add = bits.get(i) + fieldSeparator + bits.get(i + 1);

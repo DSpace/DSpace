@@ -405,7 +405,7 @@ public class ItemListTag extends TagSupport
                 }
                 else
                 {
-                    rOddOrEven = ((i % 2) == 1 ? "odd" : "even");
+                    rOddOrEven = ((i & 1) == 1 ? "odd" : "even");
                 }
 
                 for (int colIdx = 0; colIdx < fieldArr.length; colIdx++)

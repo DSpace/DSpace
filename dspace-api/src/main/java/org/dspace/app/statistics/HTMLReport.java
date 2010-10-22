@@ -403,7 +403,7 @@ public class HTMLReport implements Report
         {
             String style = null;
  
-            if ((i % 2) == 1)
+            if ((i & 1) == 1)
             {
                 style = "reportOddRow";
             }
