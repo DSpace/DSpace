@@ -46,6 +46,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
@@ -167,15 +168,7 @@ public class EditProfileServlet extends DSpaceServlet
         eperson.setLanguage(language);
 
         // Check all required fields are there
-        if ((lastName == null) || lastName.equals("") || (firstName == null)
-                || firstName.equals(""))
-        {
-            return false;
-        }
-        else
-        {
-            return true;
-        }
+        return (!StringUtils.isEmpty(lastName) && !StringUtils.isEmpty(firstName));
     }
 
     /**

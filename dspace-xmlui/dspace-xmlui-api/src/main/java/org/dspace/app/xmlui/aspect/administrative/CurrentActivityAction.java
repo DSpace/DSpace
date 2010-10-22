@@ -251,10 +251,7 @@ public class CurrentActivityAction extends AbstractAction
     	 */
     	public boolean isAnonymous()
     	{
-    		if (epersonID == -1)
-    			return true;
-    		else
-    			return false;
+    		return (epersonID == -1);
     	}
     	
     	/**
@@ -267,16 +264,13 @@ public class CurrentActivityAction extends AbstractAction
     			return false;
     		String ua = userAgent.toLowerCase();
     		
-    		if (ua.contains("google/") || 
+    		return (ua.contains("google/") ||
     			ua.contains("msnbot/") ||
     			ua.contains("googlebot/") || 
     			ua.contains("webcrawler/") ||
     			ua.contains("inktomi") ||
     			ua.contains("teoma") ||
-    			ua.contains("bot"))
-    			return true;
-    		else
-    			return false;
+    			ua.contains("bot"));
     	}
     	
     	/**

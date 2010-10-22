@@ -348,7 +348,7 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
             
             DSpaceObject obj = HandleManager.resolveToObject(context, value.replaceFirst(handlePrefix, ""));
 
-            if (obj != null && obj instanceof Item)
+            if (obj instanceof Item)
             {
                 return (Item) obj;
             }
@@ -687,10 +687,7 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
      * @return true if the scope is variable, false otherwise.
      */
     protected boolean variableScope() throws SQLException {
-        if (HandleUtil.obtainHandle(objectModel) == null)
-            return true;
-        else
-            return false;
+        return (HandleUtil.obtainHandle(objectModel) == null);
     }
 
     /**

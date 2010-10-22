@@ -130,10 +130,7 @@ public class DIMDisseminationCrosswalk
     /* Only interested in disseminating items at this time */
     public boolean canDisseminate(DSpaceObject dso)
     {
-    	if (dso.getType() == Constants.ITEM)
-    		return true;
-    	else
-    		return false;
+    	return (dso.getType() == Constants.ITEM);
     }
 
     public boolean preferList()

@@ -209,12 +209,9 @@ public class PackageParameters extends Properties
      */
     public boolean restoreModeEnabled()
     {
-        if(getBooleanProperty("restoreMode", false) ||
+        return (getBooleanProperty("restoreMode", false) ||
            replaceModeEnabled() ||
-           keepExistingModeEnabled())
-            return true;
-        else
-            return false;
+           keepExistingModeEnabled());
     }
 
     /***

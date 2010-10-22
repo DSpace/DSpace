@@ -543,14 +543,7 @@ public class JSPStepManager
     {
         int numberOfPages = stepProcessing.getNumberOfPages(request, subInfo);
 
-        if (pageNumber < numberOfPages)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return (pageNumber < numberOfPages);
     }
 
     /**

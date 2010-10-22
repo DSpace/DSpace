@@ -430,11 +430,7 @@ public class PluginManager
             String iname = intfc.getName();
             configureNamedPlugin(iname);
             String key = iname + SEP + name;
-            String cname = (String)namedPluginClasses.get(key);
-            if (cname != null)
-                return true;
-            else
-                return false;
+            return namedPluginClasses.get(key) != null;
         }
         catch (ClassNotFoundException e)
         {

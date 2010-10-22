@@ -424,13 +424,10 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      */
     public boolean canDisseminate(DSpaceObject dso)
     {
-        if (dso.getType() == Constants.ITEM ||
+        return (dso.getType() == Constants.ITEM ||
             dso.getType() == Constants.COLLECTION ||
             dso.getType() == Constants.COMMUNITY ||
-            dso.getType() == Constants.SITE)
-                return true;
-        else
-                return false;
+            dso.getType() == Constants.SITE);
     }
 
     /**

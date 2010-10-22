@@ -147,14 +147,7 @@ public class LogLine
     {
         if (date != null)
         {
-            if (date.compareTo(this.getDate()) >= 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return (date.compareTo(this.getDate()) >= 0);
         }
         return false;
     }
@@ -171,14 +164,7 @@ public class LogLine
     {
         if (date != null)
         {
-            if (date.compareTo(this.getDate()) <= 0)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
+            return (date.compareTo(this.getDate()) <= 0);
         }
         return false;
     }

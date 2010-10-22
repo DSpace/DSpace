@@ -143,16 +143,11 @@ public class AIPTechMDCrosswalk
     public boolean canDisseminate(DSpaceObject dso)
     {
         //can only Disseminate SITE, COMMUNITY, COLLECTION, ITEM, BITSTREAM
-        if(dso.getType()==Constants.SITE
+        return (dso.getType()==Constants.SITE
                 || dso.getType()==Constants.COMMUNITY
                 || dso.getType()==Constants.COLLECTION
                 || dso.getType()==Constants.ITEM
-                || dso.getType()==Constants.BITSTREAM)
-        {
-            return true;
-        }
-        else
-            return false;
+                || dso.getType()==Constants.BITSTREAM);
     }
 
     /**

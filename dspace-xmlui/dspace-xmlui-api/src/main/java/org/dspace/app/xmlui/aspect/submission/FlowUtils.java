@@ -394,14 +394,7 @@ public class FlowUtils {
 
         context.commit();
         
-        if (handle != null)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return (handle != null);
 	}
 	
 	

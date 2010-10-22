@@ -1137,10 +1137,7 @@ public class DescribeStep extends AbstractSubmissionStep
          */
         private boolean isFieldInError(String fieldName)
         {
-                if(this.errorFields.contains(fieldName))
-                        return true;
-                else
-                        return false;
+            return (this.errorFields.contains(fieldName));
         }
         
         /**

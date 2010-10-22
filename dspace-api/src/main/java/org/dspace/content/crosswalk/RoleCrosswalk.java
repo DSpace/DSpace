@@ -142,14 +142,9 @@ public class RoleCrosswalk
     {
         //We can only disseminate SITE, COMMUNITY or COLLECTION objects,
         //as Groups are only associated with those objects.
-        if(dso.getType() == Constants.SITE ||
+        return (dso.getType() == Constants.SITE ||
            dso.getType() == Constants.COMMUNITY ||
-           dso.getType() == Constants.COLLECTION)
-        {
-            return true;
-        }
-        else
-            return false;
+           dso.getType() == Constants.COLLECTION);
     }
 
     /**

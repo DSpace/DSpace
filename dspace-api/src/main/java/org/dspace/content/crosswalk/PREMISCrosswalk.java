@@ -218,10 +218,7 @@ public class PREMISCrosswalk
     public boolean canDisseminate(DSpaceObject dso)
     {
         //PREMISCrosswalk can only crosswalk a Bitstream
-        if (dso.getType() == Constants.BITSTREAM)
-          return true;
-        else
-          return false;
+        return (dso.getType() == Constants.BITSTREAM);
     }
 
     public Element disseminateElement(DSpaceObject dso)

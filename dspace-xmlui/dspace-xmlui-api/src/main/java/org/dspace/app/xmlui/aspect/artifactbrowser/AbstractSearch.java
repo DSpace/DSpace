@@ -558,10 +558,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
      */
     protected boolean variableScope() throws SQLException
     {
-        if (HandleUtil.obtainHandle(objectModel) == null)
-            return true;
-        else 
-            return false;
+        return (HandleUtil.obtainHandle(objectModel) == null);
     }
     
     /**

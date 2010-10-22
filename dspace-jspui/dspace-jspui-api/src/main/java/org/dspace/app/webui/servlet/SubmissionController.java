@@ -1096,14 +1096,7 @@ public class SubmissionController extends DSpaceServlet
     {
         SubmissionStepConfig step = getCurrentStepConfig(request, si);
 
-        if ((step != null) && (getPreviousVisibleStep(request, si) == null))
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return ((step != null) && (getPreviousVisibleStep(request, si) == null));
     }
     
     /**

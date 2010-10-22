@@ -138,10 +138,7 @@ public class METSRightsCrosswalk
     public boolean canDisseminate(DSpaceObject dso)
     {
         //can disseminate all types of DSpace Objects, except for SITE
-        if(dso.getType()!=Constants.SITE)
-            return true;
-        else
-            return false;
+        return (dso.getType()!=Constants.SITE);
     }
 
     /**

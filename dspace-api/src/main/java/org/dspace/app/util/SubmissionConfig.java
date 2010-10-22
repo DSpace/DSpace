@@ -198,13 +198,6 @@ public class SubmissionConfig implements Serializable
 
     public boolean hasMoreSteps(int stepNum)
     {
-        if (getStep(stepNum + 1) != null)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return (getStep(stepNum + 1) != null);
     }
 }

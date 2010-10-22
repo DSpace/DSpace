@@ -106,7 +106,7 @@ public class SelectCollectionStep extends AbstractSubmissionStep
 		String actionURL = contextPath + "/submit/" + knot.getId() + ".continue";
 		DSpaceObject dso = HandleManager.resolveToObject(context, handle);
 
-		if (dso != null && dso instanceof Community)
+		if (dso instanceof Community)
 		{
 			collections = Collection.findAuthorized(context, ((Community) dso), Constants.ADD);   
 		} 

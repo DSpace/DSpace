@@ -167,10 +167,7 @@ public class Metadata extends TextContainer implements MetadataElement
     {
         if (current == null)
         {
-            if (test == null)
-                return true;
-            else
-                return false;
+            return (test == null);
         }
         else
         {

@@ -380,10 +380,7 @@ public class OREDisseminationCrosswalk
     /* Only interested in disseminating items at this time */
     public boolean canDisseminate(DSpaceObject dso)
     {
-    	if (dso.getType() == Constants.ITEM || dso.getType() == Constants.COLLECTION || dso.getType() == Constants.COMMUNITY)
-    		return true;
-    	else
-    		return false;
+    	return (dso.getType() == Constants.ITEM || dso.getType() == Constants.COLLECTION || dso.getType() == Constants.COMMUNITY);
     }
 
     public boolean preferList()

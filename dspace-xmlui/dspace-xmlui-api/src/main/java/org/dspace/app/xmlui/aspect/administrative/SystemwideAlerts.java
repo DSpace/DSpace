@@ -212,13 +212,10 @@ public class SystemwideAlerts extends AbstractDSpaceTransformer implements Cache
 	 */
 	public static boolean canUserStartSession()
 	{
-		if (SystemwideAlerts.active &&
-		    (restrictsessions == STATE_ONLY_ADMINISTRATIVE_SESSIONS ||
-		     restrictsessions == STATE_CURRENT_SESSIONS))
-		    	return false;
-		else
-			return true;
-	}
+        return !SystemwideAlerts.active ||
+                (restrictsessions != STATE_ONLY_ADMINISTRATIVE_SESSIONS &&
+                        restrictsessions != STATE_CURRENT_SESSIONS);
+    }
 	
 	/**
 	 * Are users able to maintain a session, will return false if there is 
@@ -229,9 +226,6 @@ public class SystemwideAlerts extends AbstractDSpaceTransformer implements Cache
 	 */
 	public static boolean canUserMaintainSession()
 	{
-		if (SystemwideAlerts.active && restrictsessions == STATE_ONLY_ADMINISTRATIVE_SESSIONS)
-			return false;
-		else
-			return true;
-	}
+        return !SystemwideAlerts.active || restrictsessions != STATE_ONLY_ADMINISTRATIVE_SESSIONS;
+    }
 }
