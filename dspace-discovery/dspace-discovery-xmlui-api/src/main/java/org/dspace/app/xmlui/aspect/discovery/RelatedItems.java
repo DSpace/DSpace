@@ -93,16 +93,6 @@ public class RelatedItems extends AbstractFiltersTransformer
         message("xmlui.ArtifactBrowser.ItemViewer.head_parent_collections");
 
     /**
-     * The cache of recently submitted items
-     */
-    protected QueryResponse queryResults;
-
-    /**
-     * Cached query arguments
-     */
-    protected SolrQuery queryArgs;
-
-    /**
      * Display a single item
      */
     public void addBody(Body body) throws SAXException, WingException,
