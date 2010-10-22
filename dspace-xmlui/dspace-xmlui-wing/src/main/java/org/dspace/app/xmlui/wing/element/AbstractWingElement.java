@@ -433,9 +433,13 @@ public abstract class AbstractWingElement implements WingElement
             Namespace namespace = attributeMap.getNamespace();
             String URI;
             if (namespace != null)
+            {
                 URI = namespace.URI;
+            }
             else
+            {
                 URI = WingConstants.DRI.URI;
+            }
 
             String prefix = namespaces.getPrefix(URI);
 
@@ -478,9 +482,13 @@ public abstract class AbstractWingElement implements WingElement
     private String qName(String prefix, String localName)
     {
         if (prefix == null || prefix.equals(""))
+        {
             return localName;
+        }
         else
+        {
             return prefix + ":" + localName;
+        }
     }
 
     /**

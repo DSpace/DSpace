@@ -51,13 +51,17 @@ public class ApacheLogRobotsProcessor {
         String logFileLoc;
         String spiderIpPath;
         if (line.hasOption("l"))
+        {
             logFileLoc = line.getOptionValue("l");
+        }
         else {
             System.out.println("We need our log file");
             return;
         }
         if (line.hasOption("s"))
+        {
             spiderIpPath = line.getOptionValue("s");
+        }
         else {
             System.out.println("We need a spider IP output file");
             return;

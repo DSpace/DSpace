@@ -148,9 +148,13 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             if (bi == null)
             {
                 if (sortBy > 0)
+                {
                     bi = BrowseIndex.getBrowseIndex(SortOption.getSortOption(sortBy));
+                }
                 else
+                {
                     bi = BrowseIndex.getBrowseIndex(SortOption.getDefaultSortOption());
+                }
             }
 
             // If we don't have a sort column

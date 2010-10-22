@@ -154,12 +154,18 @@ public class ContainerAdapter extends AbstractAdapter
     	if (dso.getHandle() == null)
     	{
         	if (dso instanceof Collection)
-        		return "collection:"+dso.getID();
+            {
+                return "collection:" + dso.getID();
+            }
         	else
-        		return "community:"+dso.getID();
+            {
+                return "community:" + dso.getID();
+            }
     	}
         else
-        	return "hdl:"+dso.getHandle();
+        {
+            return "hdl:" + dso.getHandle();
+        }
     }
 
     /**
@@ -178,9 +184,13 @@ public class ContainerAdapter extends AbstractAdapter
     protected String getMETSLabel()
     {
         if (dso instanceof Community)
+        {
             return "DSpace Community";
+        }
         else
+        {
             return "DSpace Collection";
+        }
     }
 
     /**

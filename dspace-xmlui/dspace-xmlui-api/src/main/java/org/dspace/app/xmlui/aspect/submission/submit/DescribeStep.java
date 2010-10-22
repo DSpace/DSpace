@@ -409,7 +409,9 @@ public class DescribeStep extends AbstractSubmissionStep
                             authItem.addContent(displayValue);
                         }
                         else
-                        describeSection.addItem(displayValue);
+                        {
+                            describeSection.addItem(displayValue);
+                        }
                     }
                 } // For each DCValue
             } // If values exist
@@ -496,9 +498,13 @@ public class DescribeStep extends AbstractSubmissionStep
                                 if (isAuthorityControlled)
                                 {
                                     if (dcValue.authority == null || dcValue.authority.equals(""))
+                                    {
                                         fi.setAuthorityValue("", "blank");
+                                    }
                                     else
+                                    {
                                         fi.setAuthorityValue(dcValue.authority, Choices.getConfidenceText(dcValue.confidence));
+                                    }
                         }
                 }
                 }
@@ -511,9 +517,13 @@ public class DescribeStep extends AbstractSubmissionStep
                         if (isAuthorityControlled)
                         {
                             if (dcValues[0].authority == null || dcValues[0].authority.equals(""))
+                            {
                                 lastName.setAuthorityValue("", "blank");
+                            }
                             else
+                            {
                                 lastName.setAuthorityValue(dcValues[0].authority, Choices.getConfidenceText(dcValues[0].confidence));
+                            }
                 }
         }
         }
@@ -604,9 +614,13 @@ public class DescribeStep extends AbstractSubmissionStep
                         // Check if the day field is not specified, if so then just
                         // put a blank value in instead of the wiered looking -1.
                         if (dcDate.getDay() == -1)
-                                day.setValue("");
+                        {
+                            day.setValue("");
+                        }
                         else
-                                day.setValue(String.valueOf(dcDate.getDay()));
+                        {
+                            day.setValue(String.valueOf(dcDate.getDay()));
+                        }
                 }
         }
         
@@ -818,9 +832,13 @@ public class DescribeStep extends AbstractSubmissionStep
                                 if (isAuth)
                                 {
                                     if (dcValue.authority == null || dcValue.authority.equals(""))
+                                    {
                                         ti.setAuthorityValue("", "blank");
+                                    }
                                     else
+                                    {
                                         ti.setAuthorityValue(dcValue.authority, Choices.getConfidenceText(dcValue.confidence));
+                                    }
                         }
                 }
                 }
@@ -830,9 +848,13 @@ public class DescribeStep extends AbstractSubmissionStep
                         if (isAuth)
                         {
                             if (dcValues[0].authority == null || dcValues[0].authority.equals(""))
+                            {
                                 textArea.setAuthorityValue("", "blank");
+                            }
                             else
+                            {
                                 textArea.setAuthorityValue(dcValues[0].authority, Choices.getConfidenceText(dcValues[0].confidence));
+                            }
                 }
         }
         }
@@ -879,7 +901,9 @@ public class DescribeStep extends AbstractSubmissionStep
                         select.setSize(6);
                 }
                 else
-                        select.setSize(1);
+                {
+                    select.setSize(1);
+                }
 
                 if (readonly)
                 {
@@ -1108,9 +1132,13 @@ public class DescribeStep extends AbstractSubmissionStep
                                 if (isAuth)
                                 {
                                     if (dcValue.authority == null || dcValue.authority.equals(""))
+                                    {
                                         ti.setAuthorityValue("", "blank");
+                                    }
                                     else
+                                    {
                                         ti.setAuthorityValue(dcValue.authority, Choices.getConfidenceText(dcValue.confidence));
+                                    }
                         }
                 }
                 }
@@ -1120,9 +1148,13 @@ public class DescribeStep extends AbstractSubmissionStep
                         if (isAuth)
                         {
                             if (dcValues[0].authority == null || dcValues[0].authority.equals(""))
+                            {
                                 text.setAuthorityValue("", "blank");
+                            }
                             else
+                            {
                                 text.setAuthorityValue(dcValues[0].authority, Choices.getConfidenceText(dcValues[0].confidence));
+                            }
                 }
         }
         }

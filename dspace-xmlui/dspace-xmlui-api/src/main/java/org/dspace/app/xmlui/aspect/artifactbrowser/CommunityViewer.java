@@ -207,9 +207,13 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
         // Set the page title
         String name = community.getMetadata("name");
         if (name == null || name.length() == 0)
-        	pageMeta.addMetadata("title").addContent(T_untitled);
+        {
+            pageMeta.addMetadata("title").addContent(T_untitled);
+        }
         else
-        	pageMeta.addMetadata("title").addContent(name);
+        {
+            pageMeta.addMetadata("title").addContent(name);
+        }
 
         // Add the trail back to the repository root.
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
@@ -259,9 +263,13 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
         Division home = body.addDivision("community-home", "primary repository community");
         String name = community.getMetadata("name");
         if (name == null || name.length() == 0)
-        	home.setHead(T_untitled);
+        {
+            home.setHead(T_untitled);
+        }
         else
-        	home.setHead(name);
+        {
+            home.setHead(name);
+        }
 
         // The search / browse box.
         {

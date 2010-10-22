@@ -123,12 +123,14 @@ public class ConsumerProfile
         {
             String fpart[] = part[j].split("\\+");
             if (fpart.length != 2)
+            {
                 log
                         .error("Bad Filter clause in consumer stanza in Configuration entry for "
                                 + CONSUMER_PREFIX
                                 + name
                                 + ".consumers: "
                                 + part[j]);
+            }
             else
             {
                 int filter[] = new int[2];
@@ -138,26 +140,34 @@ public class ConsumerProfile
                 {
                     int ot = Event.parseObjectType(objectNames[k]);
                     if (ot == 0)
+                    {
                         log
                                 .error("Bad ObjectType in Consumer Stanza in Configuration entry for "
                                         + CONSUMER_PREFIX
                                         + name
                                         + ".consumers: " + objectNames[k]);
+                    }
                     else
+                    {
                         filter[Event.SUBJECT_MASK] |= ot;
+                    }
                 }
                 String eventNames[] = fpart[1].split("\\|");
                 for (int k = 0; k < eventNames.length; ++k)
                 {
                     int et = Event.parseEventType(eventNames[k]);
                     if (et == 0)
+                    {
                         log
                                 .error("Bad EventType in Consumer Stanza in Configuration entry for "
                                         + CONSUMER_PREFIX
                                         + name
                                         + ".consumers: " + eventNames[k]);
+                    }
                     else
+                    {
                         filter[Event.EVENT_MASK] |= et;
+                    }
                 }
                 filters.add(filter);
             }

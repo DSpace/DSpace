@@ -223,9 +223,13 @@ public class CommunitySearch extends AbstractDSpaceTransformer implements Cachea
         Division home = body.addDivision("community-home", "primary repository community");
         String name = community.getMetadata("name");
         if (name == null || name.length() == 0)
-        	home.setHead(T_untitled);
+        {
+            home.setHead(T_untitled);
+        }
         else
-        	home.setHead(name);
+        {
+            home.setHead(name);
+        }
 
         // The search / browse box.
 

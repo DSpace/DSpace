@@ -125,8 +125,14 @@ public class DeletePoliciesConfirm extends AbstractDSpaceTransformer
     		Row row = table.addRow();
     		row.addCell().addContent(policy.getID());
         	row.addCell().addContent(policy.getActionText());
-        	if (policy.getGroup() != null) row.addCell().addContent(policy.getGroup().getName());
-        	else row.addCell().addContent("...");
+        	if (policy.getGroup() != null)
+            {
+                row.addCell().addContent(policy.getGroup().getName());
+            }
+        	else
+            {
+                row.addCell().addContent("...");
+            }
 	    }
     	Para buttons = deleted.addPara();
     	buttons.addButton("submit_confirm").setValue(T_submit_confirm);

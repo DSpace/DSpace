@@ -268,9 +268,13 @@ public class BitstreamReader extends AbstractReader implements Recyclable
 
                     //build redirect URL based on whether item has a handle assigned yet
                     if(item.getHandle()!=null && item.getHandle().length()>0)
-                      redirectURL = request.getContextPath() + "/bitstream/handle/" + item.getHandle();
+                    {
+                        redirectURL = request.getContextPath() + "/bitstream/handle/" + item.getHandle();
+                    }
                     else
-                      redirectURL = request.getContextPath() + "/bitstream/item/" + item.getID();
+                    {
+                        redirectURL = request.getContextPath() + "/bitstream/item/" + item.getID();
+                    }
 
                         redirectURL += "/" + name + "?sequence=" + bitstream.getSequenceID();
 

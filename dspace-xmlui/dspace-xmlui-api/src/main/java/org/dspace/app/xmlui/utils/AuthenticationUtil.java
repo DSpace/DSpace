@@ -433,10 +433,14 @@ public class AuthenticationUtil
         Context context = ContextUtil.obtainContext(objectModel);
         
         if (SystemwideAlerts.canUserStartSession())
-        	return AuthenticationManager.canSelfRegister(context,request,email);
+        {
+            return AuthenticationManager.canSelfRegister(context, request, email);
+        }
         else
-        	// System wide alerts is preventing new sessions.
-        	return false;
+        {
+            // System wide alerts is preventing new sessions.
+            return false;
+        }
     }
     
     /**

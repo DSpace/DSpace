@@ -505,9 +505,11 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             // Do nothing -- Crosswalks will handle anything necessary to ingest at Site-level
         }
         else
+        {
             throw new PackageValidationException(
                     "Unknown DSpace Object type in package, type="
                             + String.valueOf(type));
+        }
 
         // -- Step 5 --
         // Run our Descriptive metadata (dublin core, etc) crosswalks!
@@ -757,9 +759,13 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             Bundle bundle;
             Bundle bns[] = item.getBundles(bundleName);
             if (bns != null && bns.length > 0)
+            {
                 bundle = bns[0];
+            }
             else
+            {
                 bundle = item.createBundle(bundleName);
+            }
 
             // Create the bitstream in the bundle & initialize its name
             Bitstream bitstream = bundle.createBitstream(fileStream);
@@ -909,9 +915,13 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
 
                     // Add this logo to the Community/Collection
                     if (dso.getType() == Constants.COLLECTION)
+                    {
                         ((Collection) dso).setLogo(fileStream);
+                    }
                     else
+                    {
                         ((Community) dso).setLogo(fileStream);
+                    }
 
                     break;
                 }
@@ -1029,8 +1039,10 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                     }
                 }
                 else
+                {
                     throw new UnsupportedOperationException(
                             "Could not find a parent DSpaceObject where we can ingest this package.  A valid parent DSpaceObject must be specified in the METS Manifest itself.");
+                }
 
                 // As this object doesn't already exist, we will perform an
                 // ingest of a new object in order to restore it
@@ -1128,9 +1140,13 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
     protected String decodeHandleURN(String value)
     {
         if (value != null && value.startsWith("hdl:"))
+        {
             return value.substring(4);
+        }
         else
+        {
             return null;
+        }
     }
 
     /**
@@ -1244,8 +1260,10 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             }
         }
         else
+        {
             throw new UnsupportedOperationException(
                     "Could not find a parent DSpaceObject where we can ingest this package.  A parent DSpaceObject must be specified from either the 'packager' command or noted in the METS Manifest itself.");
+        }
 
         return parent;
     }

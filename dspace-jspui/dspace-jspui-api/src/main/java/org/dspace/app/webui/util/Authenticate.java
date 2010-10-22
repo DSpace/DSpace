@@ -233,9 +233,13 @@ public class Authenticate
                 }
             }
             if (count == 1)
+            {
                 response.sendRedirect(url);
+            }
             else
+            {
                 JSPManager.showJSP(request, response, "/login/chooser.jsp");
+            }
         }
         return false;
     }

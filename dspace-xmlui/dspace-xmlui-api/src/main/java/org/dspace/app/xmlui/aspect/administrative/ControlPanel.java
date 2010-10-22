@@ -434,9 +434,13 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 		message.setLabel(T_alerts_message_label);
 		message.setSize(5, 45);
 		if (SystemwideAlerts.getMessage() == null)
-			message.setValue(T_alerts_message_default);
+        {
+            message.setValue(T_alerts_message_default);
+        }
 		else
-			message.setValue(SystemwideAlerts.getMessage());
+        {
+            message.setValue(SystemwideAlerts.getMessage());
+        }
 		
 		Select countdown = form.addItem().addSelect("countdown");
 		countdown.setLabel(T_alerts_countdown_label);
@@ -449,9 +453,13 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 		
 		// Is there a current count down active?
 		if (SystemwideAlerts.isAlertActive() && SystemwideAlerts.getCountDownToo() - System.currentTimeMillis() > 0)
-			countdown.addOption(true,-1,T_alerts_countdown_keep);
+        {
+            countdown.addOption(true, -1, T_alerts_countdown_keep);
+        }
 		else
-			countdown.setOptionSelected(0);
+        {
+            countdown.setOptionSelected(0);
+        }
 		
 		Select restrictsessions = form.addItem().addSelect("restrictsessions");
 		restrictsessions.setLabel(T_alerts_session_label);
@@ -627,11 +635,17 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         	long ago = System.currentTimeMillis() - event.getTimeStamp();
         	
         	if (ago > 2*60*60*1000)
-        		timeStampMessage = T_hours.parameterize((ago / (60*60*1000))); 
+            {
+                timeStampMessage = T_hours.parameterize((ago / (60 * 60 * 1000)));
+            }
         	else if (ago > 60*1000)
-        		timeStampMessage = T_minutes.parameterize((ago / (60*1000))); 
+            {
+                timeStampMessage = T_minutes.parameterize((ago / (60 * 1000)));
+            }
         	else
-        		timeStampMessage = T_seconds.parameterize((ago / (1000)));
+            {
+                timeStampMessage = T_seconds.parameterize((ago / (1000)));
+            }
         	
         	
 			Row eventRow = activeUsers.addRow();

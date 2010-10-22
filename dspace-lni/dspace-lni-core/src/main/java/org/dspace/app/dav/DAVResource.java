@@ -1332,6 +1332,7 @@ abstract class DAVResource
             typeMask = TYPE_ALL;
         }
         else
+        {
             for (String element : types)
             {
                 String key = element.trim();
@@ -1362,6 +1363,7 @@ abstract class DAVResource
                             "Unrecognized type keyword: " + key);
                 }
             }
+        }
         return typeMask;
     }
 

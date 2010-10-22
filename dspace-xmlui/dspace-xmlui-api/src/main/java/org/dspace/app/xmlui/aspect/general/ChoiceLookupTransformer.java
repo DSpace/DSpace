@@ -161,9 +161,13 @@ public class ChoiceLookupTransformer extends AbstractDSpaceTransformer
 
         Division idiv = body.addInteractiveDivision("lookup", "", "get", "popup");
         if (isFieldMessage(field, "title"))
+        {
             idiv.setHead(getFieldMessage(field, "title"));
+        }
         else
+        {
             idiv.setHead(getFieldLabel(field, "title"));
+        }
         List fl = idiv.addList("choicesList", "form", "choices-lookup");
         fl.setHead(T_results);
 
@@ -204,9 +208,13 @@ public class ChoiceLookupTransformer extends AbstractDSpaceTransformer
         {
             h = selectItem.addHidden("paramNonAuthority");
             if (isFieldMessage(field, "nonauthority"))
+            {
                 h.setValue(getFieldMessage(field, "nonauthority"));
+            }
             else
+            {
                 h.setValue(getFieldLabel(field, "nonauthority"));
+            }
         }
         h = selectItem.addHidden("contextPath");
         h.setValue(contextPath);
@@ -315,9 +323,13 @@ public class ChoiceLookupTransformer extends AbstractDSpaceTransformer
     {
         String cv = getFieldLabel(field, name);
         if (cv == null)
-            return message(MESSAGE_PREFIX+"field."+field+"."+name);
+        {
+            return message(MESSAGE_PREFIX + "field." + field + "." + name);
+        }
         else
+        {
             return message(cv);
+        }
     }
 
     private int atoi(String s)

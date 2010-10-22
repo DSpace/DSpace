@@ -339,10 +339,14 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
                                 //Also make sure we don't go above our newest year
                                 int currentTop = year;
                                 if((year == topYear))
+                                {
                                     currentTop = newestYear;
+                                }
                                 else
+                                {
                                     //We need to do -1 on this one to get a better result
                                     currentTop--;
+                                }
                                 facetQueries.add(dateFacet + ":[" + bottomYear + " TO " + currentTop + "]");
                             }
                             for (String facetQuery : facetQueries) {

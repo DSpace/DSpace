@@ -664,9 +664,13 @@ public class BrowseIndex
         else
         {
             if (sortOption != null)
+            {
                 focusField = "sort_" + sortOption.getNumber();
+            }
             else
+            {
                 focusField = "sort_1";  // Use the first sort column
+            }
         }
         
         return focusField;

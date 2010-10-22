@@ -482,9 +482,13 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
 
         if (sortBy != null) {
             if (sortOrder == null || sortOrder.equals("DESC"))
+            {
                 queryArgs.addSortField(sortBy, SolrQuery.ORDER.desc);
+            }
             else
+            {
                 queryArgs.addSortField(sortBy, SolrQuery.ORDER.asc);
+            }
         } else {
             queryArgs.addSortField("score", SolrQuery.ORDER.asc);
         }
@@ -514,9 +518,13 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
         queryArgs.setQuery(query != null && !query.trim().equals("") ? query : "*:*");
 
         if (page > 1)
+        {
             queryArgs.setStart((page - 1) * queryArgs.getRows());
+        }
         else
+        {
             queryArgs.setStart(0);
+        }
 
 
 
@@ -590,11 +598,15 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
         // Are we in a community or collection?
         DSpaceObject dso;
         if (scopeString == null || "".equals(scopeString))
+        {
             // get the search scope from the url handle
             dso = HandleUtil.obtainHandle(objectModel);
+        }
         else
+        {
             // Get the search scope from the location parameter
             dso = HandleManager.resolveToObject(context, scopeString);
+        }
 
         return dso;
     }

@@ -532,16 +532,24 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
             if (ConfigurationManager.getBooleanProperty("webui.browse.metadata.case-insensitive", false))
             {
                 if (isValueColumnClob())
+                {
                     select = select + " WHERE UPPER(TO_CHAR(value))=UPPER(?)";
+                }
                 else
+                {
                     select = select + " WHERE UPPER(value)=UPPER(?)";
+                }
             }
             else
             {
                 if (isValueColumnClob())
+                {
                     select = select + " WHERE TO_CHAR(value)=?";
+                }
                 else
+                {
                     select = select + " WHERE value=?";
+                }
             }
             
 			if (authority != null)

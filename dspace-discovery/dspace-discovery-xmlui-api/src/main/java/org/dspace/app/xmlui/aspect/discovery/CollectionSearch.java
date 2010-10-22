@@ -193,9 +193,13 @@ public class CollectionSearch extends AbstractDSpaceTransformer implements Cache
         // Set the page title
         String name = collection.getMetadata("name");
         if (name == null || name.length() == 0)
-        	pageMeta.addMetadata("title").addContent(T_untitled);
+        {
+            pageMeta.addMetadata("title").addContent(T_untitled);
+        }
         else
-        	pageMeta.addMetadata("title").addContent(name);
+        {
+            pageMeta.addMetadata("title").addContent(name);
+        }
 
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         HandleUtil.buildHandleTrail(collection,pageMeta,contextPath);

@@ -888,9 +888,13 @@ public class BrowseDAOOracle implements BrowseDAO
         {
             queryBuf.append("rec WHERE rownum<=? ");
             if (offset > 0)
+            {
                 params.add(Integer.valueOf(limit + offset));
+            }
             else
+            {
                 params.add(Integer.valueOf(limit));
+            }
         }
 
         if (offset > 0)

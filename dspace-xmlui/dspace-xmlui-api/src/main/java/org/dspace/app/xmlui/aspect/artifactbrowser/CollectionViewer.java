@@ -242,9 +242,13 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
         Division home = body.addDivision("collection-home", "primary repository collection");
         String name = collection.getMetadata("name");
         if (name == null || name.length() == 0)
-        	home.setHead(T_untitled);
+        {
+            home.setHead(T_untitled);
+        }
         else
-        	home.setHead(name);
+        {
+            home.setHead(name);
+        }
 
         // The search / browse box.
         {

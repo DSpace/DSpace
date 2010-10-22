@@ -190,9 +190,13 @@ public abstract class AbstractProcessingStep
     private static final void setErrorFields(HttpServletRequest request, List errorFields)
     {
         if(errorFields==null)
+        {
             request.removeAttribute(ERROR_FIELDS_ATTRIBUTE);
+        }
         else
+        {
             request.setAttribute(ERROR_FIELDS_ATTRIBUTE, errorFields);
+        }
     }
 
     /**
@@ -260,9 +264,13 @@ public abstract class AbstractProcessingStep
     public final String getErrorMessage(int errorFlag)
     {
         if (this.errorMessages == null || this.errorMessages.size() == 0)
+        {
             return null;
+        }
         else
+        {
             return (String) this.errorMessages.get(Integer.valueOf(errorFlag));
+        }
     }
 
     /**

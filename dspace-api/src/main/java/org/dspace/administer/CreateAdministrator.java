@@ -160,12 +160,22 @@ public class CreateAdministrator
     		System.out.print("First name: ");
     		System.out.flush();
     		
-    		firstName = input.readLine().trim();
+    		firstName = input.readLine();
+
+            if (firstName != null)
+            {
+                firstName = firstName.trim();
+            }
     		
     		System.out.print("Last name: ");
     		System.out.flush();
     		
-    		lastName = input.readLine().trim();
+    		lastName = input.readLine();
+
+            if (lastName != null)
+            {
+                lastName = lastName.trim();
+            }
    		
             if (ConfigurationManager.getProperty("webui.supported.locales") != null)
             {
@@ -173,7 +183,13 @@ public class CreateAdministrator
                 System.out.print("Language: ");
                 System.out.flush();
             
-    		    language = input.readLine().trim();
+    		    language = input.readLine();
+
+                if (language != null)
+                {
+                    language = language.trim();
+                }
+                
     		    language = I18nUtil.getSupportedLocale(new Locale(language)).getLanguage();
             }
             
@@ -181,12 +197,22 @@ public class CreateAdministrator
     		System.out.print("Password: ");
     		System.out.flush();
     		
-    		password1 = input.readLine().trim();
+    		password1 = input.readLine();
+
+            if (password1 != null)
+            {
+                password1 = password1.trim();
+            }
     		
     		System.out.print("Again to confirm: ");
     		System.out.flush();
     		
-    		password2 = input.readLine().trim();
+    		password2 = input.readLine();
+
+            if (password2 != null)
+            {
+                password2 = password2.trim();
+            }
     		
     		if (!password1.equals("") && password1.equals(password2))
     		{
@@ -194,7 +220,12 @@ public class CreateAdministrator
     			System.out.print("Is the above data correct? (y or n): ");
     			System.out.flush();
     			
-    			String s = input.readLine().trim();
+    			String s = input.readLine();
+
+                if (s != null)
+                {
+                    s = s.trim();
+                }
     			
     			if (s.toLowerCase().startsWith("y"))
     			{

@@ -88,9 +88,13 @@ public class DefaultEmbargoSetter implements EmbargoSetter
     	if (terms != null && terms.length() > 0)
     	{
     		if (termsOpen.equals(terms))
+            {
                 return EmbargoManager.FOREVER;
+            }
             else
+            {
                 return new DCDate(terms);
+            }
     	}
         return null;
     }

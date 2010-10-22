@@ -115,9 +115,13 @@ public abstract class AbstractTextFilterOFD implements OrderFormatDelegate
 	        for (int idx = 0; idx < filters.length; idx++)
 	        {
 	            if (language != null)
-	                value = filters[idx].filter(value, language);
+                {
+                    value = filters[idx].filter(value, language);
+                }
 	            else
-	                value = filters[idx].filter(value);
+                {
+                    value = filters[idx].filter(value);
+                }
 	        }
 		}
 		

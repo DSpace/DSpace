@@ -335,9 +335,13 @@ public abstract class AbstractMETSDisseminator
                     //actually add the file to the Zip package
                     ZipEntry ze = new ZipEntry(fname);
                     if (lmTime != 0)
+                    {
                         ze.setTime(lmTime);
+                    }
                     else //Set a default modified date so that checksum of Zip doesn't change if Zip contents are unchanged
+                    {
                         ze.setTime(DEFAULT_MODIFIED_DATE);
+                    }
                     zip.putNextEntry(ze);
                     Utils.copy(is, zip);
                     zip.closeEntry();
@@ -350,9 +354,13 @@ public abstract class AbstractMETSDisseminator
         // write manifest after metadata.
         ZipEntry me = new ZipEntry(METSManifest.MANIFEST_FILE);
         if (lmTime != 0)
+        {
             me.setTime(lmTime);
+        }
         else //Set a default modified date so that checksum of Zip doesn't change if Zip contents are unchanged
+        {
             me.setTime(DEFAULT_MODIFIED_DATE);
+        }
 
         zip.putNextEntry(me);
 
@@ -407,7 +415,9 @@ public abstract class AbstractMETSDisseminator
                             continue;
                         }
                         else
-                            throw new AuthorizeException("Not authorized to read Bundle named \""+bundles[i].getName()+"\"");
+                        {
+                            throw new AuthorizeException("Not authorized to read Bundle named \"" + bundles[i].getName() + "\"");
+                        }
                     }
                     Bitstream[] bitstreams = bundles[i].getBitstreams();
                     for (int k = 0; k < bitstreams.length; k++)
@@ -424,15 +434,23 @@ public abstract class AbstractMETSDisseminator
                                 log.debug(new StringBuilder().append("Writing CONTENT stream of bitstream(").append(bitstreams[k].getID()).append(") to Zip: ").append(zname).append(", size=").append(bitstreams[k].getSize()).toString());
                             }
                             if (lmTime != 0)
+                            {
                                 ze.setTime(lmTime);
+                            }
                             else //Set a default modified date so that checksum of Zip doesn't change if Zip contents are unchanged
+                            {
                                 ze.setTime(DEFAULT_MODIFIED_DATE);
+                            }
                             ze.setSize(auth ? bitstreams[k].getSize() : 0);
                             zip.putNextEntry(ze);
                             if (auth)
+                            {
                                 Utils.copy(bitstreams[k].retrieve(), zip);
+                            }
                             else
-                                log.warn("Adding zero-length file for Bitstream, SID="+String.valueOf(bitstreams[k].getSequenceID())+", not authorized for READ.");
+                            {
+                                log.warn("Adding zero-length file for Bitstream, SID=" + String.valueOf(bitstreams[k].getSequenceID()) + ", not authorized for READ.");
+                            }
                             zip.closeEntry();
                         }
                         else if (unauth != null &&
@@ -549,7 +567,9 @@ public abstract class AbstractMETSDisseminator
                 xwalkName = parts[1];
             }
             else
+            {
                 xwalkName = metsName = typeSpec;
+            }
 
             // First, check to see if the crosswalk we are using is a normal DisseminationCrosswalk
             boolean xwalkFound = PluginManager.hasNamedPlugin(DisseminationCrosswalk.class, xwalkName);
@@ -583,10 +603,14 @@ public abstract class AbstractMETSDisseminator
                         return mdSec;
                     }
                     else
+                    {
                         return null;
+                    }
                 }
                 else
+                {
                     return null;
+                }
             }
             // If we didn't find the correct crosswalk, we will check to see if this is
             // a StreamDisseminationCrosswalk -- a Stream crosswalk disseminates to an OutputStream
@@ -649,13 +673,18 @@ public abstract class AbstractMETSDisseminator
                             mdWrap.getContent().add(binData);
                             mdSec.getContent().add(mdWrap);
                         }
+
                         return mdSec;
                     }
                     else
+                    {
                         return null;
+                    }
                 }
                 else
-                    throw new PackageValidationException("Cannot find "+xwalkName+" crosswalk plugin, either DisseminationCrosswalk or StreamDisseminationCrosswalk");
+                {
+                    throw new PackageValidationException("Cannot find " + xwalkName + " crosswalk plugin, either DisseminationCrosswalk or StreamDisseminationCrosswalk");
+                }
             }
         }
         catch (InstantiationException e)
@@ -715,7 +744,9 @@ public abstract class AbstractMETSDisseminator
             return result;
         }
         else
+        {
             return null;
+        }
     }
 
     // make the most "persistent" identifier possible, preferably a URN
@@ -726,9 +757,13 @@ public abstract class AbstractMETSDisseminator
 
         // If no Handle, punt to much-less-satisfactory database ID and type..
         if (handle == null)
-            return "DSpace_DB_"+Constants.typeText[dso.getType()] + "_" + String.valueOf(dso.getID());
+        {
+            return "DSpace_DB_" + Constants.typeText[dso.getType()] + "_" + String.valueOf(dso.getID());
+        }
         else
+        {
             return getHandleURN(handle);
+        }
     }
 
     /**
@@ -833,9 +868,13 @@ public abstract class AbstractMETSDisseminator
                 {
                     if (unauth != null &&
                         (unauth.equalsIgnoreCase("skip")))
+                    {
                         continue;
+                    }
                     else
-                        throw new AuthorizeException("Not authorized to read Bundle named \""+bundles[i].getName()+"\"");
+                    {
+                        throw new AuthorizeException("Not authorized to read Bundle named \"" + bundles[i].getName() + "\"");
+                    }
                 }
 
                 Bitstream[] bitstreams = bundles[i].getBitstreams();
@@ -1168,9 +1207,13 @@ public abstract class AbstractMETSDisseminator
         }
 
         if(emptyDiv)
+        {
             return null;
+        }
         else
+        {
             return div;
+        }
     }
 
     // put handle in canonical URN format -- note that HandleManager's
@@ -1246,9 +1289,13 @@ public abstract class AbstractMETSDisseminator
             {
                 String uri = ns[i].getURI();
                 if (sloc != null && sloc.length > 1 && uri.equals(sloc[0]))
+                {
                     me.setSchema(ns[i].getPrefix(), uri, sloc[1]);
+                }
                 else
+                {
                     me.setSchema(ns[i].getPrefix(), uri);
+                }
             }
 
             // add result of crosswalk

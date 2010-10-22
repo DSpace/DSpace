@@ -91,9 +91,13 @@ public class DeleteCollectionRoleConfirm extends AbstractDSpaceTransformer
 	    main.setHead(T_main_head.parameterize(role));
 	    // Different help message for the default read group to enforce its non-retroactive nature
 	    if (role == "DEFAULT_READ")
-	    	main.addPara(T_main_para_read.parameterize(toBeDeleted.getName()));
+        {
+            main.addPara(T_main_para_read.parameterize(toBeDeleted.getName()));
+        }
 	    else
-	    	main.addPara(T_main_para.parameterize(toBeDeleted.getName()));
+        {
+            main.addPara(T_main_para.parameterize(toBeDeleted.getName()));
+        }
 	    
 	    Para buttonList = main.addPara();
 	    buttonList.addButton("submit_confirm").setValue(T_submit_confirm);

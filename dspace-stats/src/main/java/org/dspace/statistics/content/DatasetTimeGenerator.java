@@ -99,7 +99,9 @@ public class DatasetTimeGenerator extends DatasetGenerator {
             endPos = true;
         }else
         if(0 < difEnd)
+        {
             endPos = true;
+        }
         else{
             difEnd++;
         }
@@ -209,7 +211,9 @@ public class DatasetTimeGenerator extends DatasetGenerator {
             cal2 = backup;
             toAdd = 1;
         }else
+        {
             toAdd = -1;
+        }
 
 
         

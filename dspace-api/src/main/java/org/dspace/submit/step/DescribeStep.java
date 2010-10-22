@@ -610,14 +610,18 @@ public class DescribeStep extends AbstractProcessingStep
                         addErrorField(request, metadataField);
                     }
                     else
+                    {
                         item.addMetadata(schema, element, qualifier, null,
                                 new DCPersonName(l, f).toString(), authKey,
                                 (sconf != null && sconf.length() > 0) ?
-                                    Choices.getConfidenceValue(sconf) : Choices.CF_ACCEPTED);
+                                        Choices.getConfidenceValue(sconf) : Choices.CF_ACCEPTED);
+                    }
                 }
                 else
+                {
                     item.addMetadata(schema, element, qualifier, null,
-                        new DCPersonName(l, f).toString());
+                            new DCPersonName(l, f).toString());
+                }
             }
         }
     }
@@ -738,12 +742,16 @@ public class DescribeStep extends AbstractProcessingStep
                         addErrorField(request, metadataField);
                     }
                     else
+                    {
                         item.addMetadata(schema, element, qualifier, lang, s,
                                 authKey, (sconf != null && sconf.length() > 0) ?
-                                           Choices.getConfidenceValue(sconf) : Choices.CF_ACCEPTED);
+                                        Choices.getConfidenceValue(sconf) : Choices.CF_ACCEPTED);
+                    }
                 }
                 else
+                {
                     item.addMetadata(schema, element, qualifier, lang, s);
+                }
             }
         }
     }

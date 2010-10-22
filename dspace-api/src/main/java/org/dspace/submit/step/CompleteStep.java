@@ -126,9 +126,13 @@ public class CompleteStep extends AbstractProcessingStep
         {
         // commit changes to database
             if (success)
-        context.commit();
+            {
+                context.commit();
+            }
             else
+            {
                 context.getDBConnection().rollback();
+            }
         }
         return STATUS_COMPLETE;
     }

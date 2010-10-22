@@ -899,7 +899,9 @@ public class ConfigurationManager
                 from = end+1;
             }
             else
+            {
                 break;
+            }
         }
         if (result != null && from < value.length())
         {

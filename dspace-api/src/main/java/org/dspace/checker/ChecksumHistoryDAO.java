@@ -137,14 +137,16 @@ public class ChecksumHistoryDAO extends DAOSupport
         {
             conn = DatabaseManager.getConnection();
             if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-	            stmt = conn.prepareStatement(INSERT_HISTORY_ORACLE);
+            {
+                stmt = conn.prepareStatement(INSERT_HISTORY_ORACLE);
+            }
             else
-            	stmt = conn.prepareStatement(INSERT_HISTORY);
+            {
+                stmt = conn.prepareStatement(INSERT_HISTORY);
+            }
             stmt.setInt(1, info.getBitstreamId());
-            stmt.setTimestamp(2, new java.sql.Timestamp(info
-                    .getProcessStartDate().getTime()));
-            stmt.setTimestamp(3, new java.sql.Timestamp(info
-                    .getProcessEndDate().getTime()));
+            stmt.setTimestamp(2, new java.sql.Timestamp(info.getProcessStartDate().getTime()));
+            stmt.setTimestamp(3, new java.sql.Timestamp(info.getProcessEndDate().getTime()));
             stmt.setString(4, info.getStoredChecksum());
             stmt.setString(5, info.getCalculatedChecksum());
             stmt.setString(6, info.getChecksumCheckResult());
@@ -210,9 +212,13 @@ public class ChecksumHistoryDAO extends DAOSupport
         try
         {
             if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-	            stmt = conn.prepareStatement(INSERT_MISSING_HISTORY_BITSTREAMS_ORACLE);
+            {
+                stmt = conn.prepareStatement(INSERT_MISSING_HISTORY_BITSTREAMS_ORACLE);
+            }
             else
-            	stmt = conn.prepareStatement(INSERT_MISSING_HISTORY_BITSTREAMS);
+            {
+                stmt = conn.prepareStatement(INSERT_MISSING_HISTORY_BITSTREAMS);
+            }
             stmt.executeUpdate();
         }
         catch (SQLException e)

@@ -449,13 +449,21 @@ public class DCDate
     private synchronized String toStringInternal()
     {
         if (granularity == DateGran.YEAR)
+        {
             return String.format("%4d", getYearUTC());
+        }
         else if (granularity == DateGran.MONTH)
+        {
             return String.format("%4d-%02d", getYearUTC(), getMonthUTC());
+        }
         else if (granularity == DateGran.DAY)
+        {
             return String.format("%4d-%02d-%02d", getYearUTC(), getMonthUTC(), getDayUTC());
+        }
         else
+        {
             return fullIso.format(calendar.getTime());
+        }
     }
 
     /**
@@ -466,9 +474,13 @@ public class DCDate
     public Date toDate()
     {
         if (calendar == null)
+        {
             return null;
+        }
         else
+        {
             return calendar.getTime();
+        }
     }
 
     /**

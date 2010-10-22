@@ -127,7 +127,9 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
                 log.debug("Found pairs for name="+pname);
             }
             else
-                log.error("Failed to find any pairs for name="+pname, new IllegalStateException());
+            {
+                log.error("Failed to find any pairs for name=" + pname, new IllegalStateException());
+            }
         }
     }
 

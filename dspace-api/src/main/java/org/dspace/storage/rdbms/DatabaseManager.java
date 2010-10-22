@@ -1198,9 +1198,13 @@ public class DatabaseManager
                     // Otherwise, store it as long
                     long longValue = results.getLong(i);
                     if (longValue <= (long)Integer.MAX_VALUE)
-                        row.setColumn(name, (int)longValue);
+                    {
+                        row.setColumn(name, (int) longValue);
+                    }
                     else
+                    {
                         row.setColumn(name, longValue);
+                    }
                 }
                 else
                 { // Not Oracle
@@ -1402,7 +1406,9 @@ public class DatabaseManager
                 {
                     // If we are using Oracle, we can pass in long values, so always do so.
                     if ("oracle".equals(dbName))
+                    {
                         statement.setLong(count, row.getLongColumn(column));
+                    }
                     else
                     { // not Oracle
                         if (jdbctype == Types.INTEGER)

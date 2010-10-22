@@ -444,9 +444,13 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
 
         queryArgs.setQuery(query);
         if (page > 1)
+        {
             queryArgs.setStart((Integer.valueOf(page) - 1) * queryArgs.getPageSize());
+        }
         else
+        {
             queryArgs.setStart(0);
+        }
 
         QueryResults qResults = null;
         if (scope instanceof Community)
@@ -480,11 +484,15 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
         // Are we in a community or collection?
         DSpaceObject dso;
         if (scopeString == null || "".equals(scopeString))
+        {
             // get the search scope from the url handle
             dso = HandleUtil.obtainHandle(objectModel);
+        }
         else
+        {
             // Get the search scope from the location parameter
             dso = HandleManager.resolveToObject(context, scopeString);
+        }
 
         return dso;
     }

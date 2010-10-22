@@ -320,9 +320,13 @@ public class AuthenticationManager
         // request, and most sites will only have 0 or 1 auth methods
         // actually returning groups, so it pays..
         if (totalLen == 0)
+        {
             return new int[0];
+        }
         else if (gll.size() == 1)
-            return (int [])gll.get(0);
+        {
+            return (int[]) gll.get(0);
+        }
         else
         {
             // Have to do it this painful way since list.toArray() doesn't

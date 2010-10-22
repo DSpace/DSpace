@@ -99,9 +99,13 @@ public class CreateCommunityForm extends AbstractDSpaceTransformer
 	    /* Whether the parent community is null is what determines if 
 		  we are creating a top-level community or a sub-community */
 	    if (parentCommunity != null)
-	    	main.setHead(T_main_head_sub.parameterize(parentCommunity.getMetadata("name")));
+        {
+            main.setHead(T_main_head_sub.parameterize(parentCommunity.getMetadata("name")));
+        }
 	    else
-	    	main.setHead(T_main_head_top);
+        {
+            main.setHead(T_main_head_top);
+        }
 	        
 	    
 	    // The grand list of metadata options

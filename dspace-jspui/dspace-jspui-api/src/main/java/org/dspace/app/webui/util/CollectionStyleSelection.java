@@ -77,7 +77,9 @@ public class CollectionStyleSelection extends AKeyBasedStyleSelection
             return getFromMap(c.getHandle());
         }
         else
+        {
             return "default";  //no specific style - item is an in progress Submission
+        }
     }
     
     /**

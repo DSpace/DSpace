@@ -311,9 +311,13 @@ public final class BitstreamInfoDAO extends DAOSupport
             LOG.debug("updating missing bitstreams");
             conn = DatabaseManager.getConnection();
             if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+            {
                 stmt = conn.prepareStatement(INSERT_MISSING_CHECKSUM_BITSTREAMS_ORACLE);
+            }
             else
-            	stmt = conn.prepareStatement(INSERT_MISSING_CHECKSUM_BITSTREAMS);
+            {
+                stmt = conn.prepareStatement(INSERT_MISSING_CHECKSUM_BITSTREAMS);
+            }
             stmt.setTimestamp(1, new java.sql.Timestamp(new Date().getTime()));
             stmt.setTimestamp(2, new java.sql.Timestamp(new Date().getTime()));
             stmt.executeUpdate();
@@ -425,9 +429,13 @@ public final class BitstreamInfoDAO extends DAOSupport
 
             conn = DatabaseManager.getConnection();
             if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-            	prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM_ORACLE);
+            {
+                prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM_ORACLE);
+            }
             else
-            	prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM);
+            {
+                prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM);
+            }
             rs = prepStmt.executeQuery();
             if (rs.next())
             {
@@ -469,9 +477,13 @@ public final class BitstreamInfoDAO extends DAOSupport
         {
             conn = DatabaseManager.getConnection();
             if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-            	prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM_DATE_ORACLE);
+            {
+                prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM_DATE_ORACLE);
+            }
             else
-            	prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM_DATE);
+            {
+                prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM_DATE);
+            }
             prepStmt.setTimestamp(1, lessThanDate);
             rs = prepStmt.executeQuery();
             if (rs.next())

@@ -474,11 +474,17 @@ public abstract class AbstractAdapter
         // with an item (such as a community logo) then reference the bitstreamID directly.
         String identifier = null;
         if (item != null && item.getHandle() != null)
-        	identifier = "handle/"+item.getHandle();
+        {
+            identifier = "handle/" + item.getHandle();
+        }
         else if (item != null)
-        	identifier = "item/"+item.getID();
+        {
+            identifier = "item/" + item.getID();
+        }
         else
-        	identifier = "id/"+bitstream.getID();
+        {
+            identifier = "id/" + bitstream.getID();
+        }
         
         
         String url = contextPath + "/bitstream/"+identifier+"/";
@@ -710,9 +716,13 @@ public abstract class AbstractAdapter
     {
     	String prefix = namespaces.getPrefix(namespace.URI);
         if (prefix == null || prefix.equals(""))
+        {
             return localName;
+        }
         else
+        {
             return prefix + ":" + localName;
+        }
     }
     
 }

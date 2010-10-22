@@ -381,7 +381,9 @@ public class AIPTechMDCrosswalk
 
             // if we get <dim> in a list, recurse.
             if (field.getName().equals("dim") && field.getNamespace().equals(XSLTCrosswalk.DIM_NS))
+            {
                 ingest(context, dso, field.getChildren());
+            }
             else if (field.getName().equals("field") && field.getNamespace().equals(XSLTCrosswalk.DIM_NS))
             {
                 String schema = field.getAttributeValue("mdschema");
@@ -426,16 +428,22 @@ public class AIPTechMDCrosswalk
                         {
                             int sl = BitstreamFormat.getSupportLevelID(value);
                             if (sl < 0)
-                                throw new MetadataValidationException("Got unrecognized value for bitstream support level: "+value);
+                            {
+                                throw new MetadataValidationException("Got unrecognized value for bitstream support level: " + value);
+                            }
                             else
+                            {
                                 bsfSupport = sl;
+                            }
                         }
                         else if (dcField.equals("format.internal"))
                         {
                             bsfInternal = (Boolean.valueOf(value)).booleanValue();
                         }
                         else
-                            log.warn("Got unrecognized DC field for Bitstream: "+dcField);
+                        {
+                            log.warn("Got unrecognized DC field for Bitstream: " + dcField);
+                        }
                     }
                     else if (type == Constants.ITEM)
                     {
@@ -462,7 +470,9 @@ public class AIPTechMDCrosswalk
                                     sub.update();
                                 }
                                 else
-                                    log.warn("Ignoring unknown Submitter="+value+" in AIP Tech MD, no matching EPerson and 'mets.dspaceAIP.ingest.createSubmitter' is false in dspace.cfg.");
+                                {
+                                    log.warn("Ignoring unknown Submitter=" + value + " in AIP Tech MD, no matching EPerson and 'mets.dspaceAIP.ingest.createSubmitter' is false in dspace.cfg.");
+                                }
                             }
                             if (sub != null)
                             {

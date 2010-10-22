@@ -160,7 +160,9 @@ public abstract class AbstractPackageIngester
                 log.warn(LogManager.getHeader(context, "skip_package_ingest", "Object already exists, package-skipped=" + pkgFile));
             }
             else // Pass this exception on -- which essentially causes a full rollback of all changes (this is the default)
+            {
                 throw ie;
+            }
         }
 
         //as long as our first object was ingested successfully

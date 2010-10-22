@@ -70,9 +70,13 @@ public abstract class AbstractUsageEventListener implements EventListener {
 
 	public void setEventService(EventService service) throws Exception {
 		if(service != null)
-			service.registerEventListener(this);
+        {
+            service.registerEventListener(this);
+        }
 		else
-			throw new RuntimeException("EventService handed to Listener cannot be null");
+        {
+            throw new RuntimeException("EventService handed to Listener cannot be null");
+        }
 	
 	}
 	

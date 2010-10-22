@@ -504,9 +504,13 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
 		if (errors!=null && errors.length() > 0)
 		{	
 			if(errors.indexOf(',') > 0)
-				fields = Arrays.asList(errors.split(","));
+            {
+                fields = Arrays.asList(errors.split(","));
+            }
 			else//only one error field
-				fields.add(errors);
+            {
+                fields.add(errors);
+            }
 		}
 		
 		return fields;
@@ -532,11 +536,17 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
         try
         {
             if (givenStepAndPage.equals(this.stepAndPage))
-    			return "current";
+            {
+                return "current";
+            }
             else if (givenStepAndPage.compareTo(getMaxStepAndPageReached())>0)
+            {
                 return "disabled";
+            }
             else
-    			return null;
+            {
+                return null;
+            }
         }
         catch(Exception e)
         {

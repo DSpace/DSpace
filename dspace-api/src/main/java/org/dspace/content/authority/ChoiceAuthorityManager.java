@@ -140,7 +140,9 @@ public class ChoiceAuthorityManager
                     closed.put(fkey, Boolean.valueOf(ConfigurationManager.getBooleanProperty(key)));
                 }
                 else
-                    log.error("Illegal configuration property: "+key);
+                {
+                    log.error("Illegal configuration property: " + key);
+                }
             }
         }
     }
