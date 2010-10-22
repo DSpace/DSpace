@@ -193,6 +193,33 @@ public class ConfigurationManager
     }
 
     /**
+     * Get a configuration property and specify the fallback default
+     *
+     * @param property
+     *            the name of the property
+     *
+     * @param defaultValue
+     *            the default value of the property
+     *
+     * @return the value of the property or the default value if the property
+     *         does not exist.
+     */
+    public static String getProperty(String property, String defaultValue)
+    {
+        if (properties == null) {
+            loadConfig(null);
+        }
+        String propertyValue = properties.getProperty(property);
+
+        if (propertyValue != null) {
+            propertyValue = propertyValue.trim();
+        } else {
+            propertyValue = defaultValue;
+        }
+        return propertyValue;
+    }
+
+    /**
      * Get a configuration property as a long
      *
      * @param property

@@ -48,6 +48,7 @@
 - [DS-563] Brazilian Portuguese (pt_BR) translation for XML-UI 1.6.2
 
 (Peter Dietz)
+- [DS-192] Bitstreams should be returned ordered
 - [DS-549] Added <a name> anchors in XMLUI
 
 (Stuart Lewis, Christophe Dupriez)
