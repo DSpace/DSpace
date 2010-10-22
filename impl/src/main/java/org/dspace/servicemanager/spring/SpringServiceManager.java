@@ -29,7 +29,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * This is the Spring implementation of the service manager.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class SpringServiceManager implements ServiceManagerSystem {
@@ -37,7 +37,7 @@ public class SpringServiceManager implements ServiceManagerSystem {
     private static Logger log = LoggerFactory.getLogger(SpringServiceManager.class);
 
     private ClassPathXmlApplicationContext applicationContext;
-    
+
     /**
      * @return the parent core Spring {@link ApplicationContext}
      */
@@ -82,10 +82,11 @@ public class SpringServiceManager implements ServiceManagerSystem {
 
     public static final String configPath = "spring/spring-dspace-applicationContext.xml";
     public static final String corePath = "classpath*:spring/spring-dspace-core-services.xml";
+    public static final String pluginPath = "classpath*:spring/spring-dspace-plugin-*-services.xml";
 
     /**
-     * Spring does not actually allow us to add in new singletons which 
-     * have bean definitions so we have to track the added singleton 
+     * Spring does not actually allow us to add in new singletons which
+     * have bean definitions so we have to track the added singleton
      * names ourselves manually.
      */
     private Vector<String> singletonNames = new Vector<String>();
@@ -94,7 +95,7 @@ public class SpringServiceManager implements ServiceManagerSystem {
     public <T> T getServiceByName(String name, Class<T> type) {
         T bean = null;
         // handle special case to return the core AC
-        if (ApplicationContext.class.getName().equals(name) 
+        if (ApplicationContext.class.getName().equals(name)
                 && ApplicationContext.class.isAssignableFrom(type)) {
             bean = (T) getApplicationContext();
         } else {
@@ -116,7 +117,7 @@ public class SpringServiceManager implements ServiceManagerSystem {
                 }
             }
             // if still no luck then try by type only
-            if (name == null 
+            if (name == null
                     && bean == null) {
                 try {
                     Map<String, Object> map = applicationContext.getBeansOfType(type);
@@ -170,6 +171,7 @@ public class SpringServiceManager implements ServiceManagerSystem {
         // get all spring config paths
         ArrayList<String> pathList = new ArrayList<String>();
         pathList.add(configPath);
+        pathList.add(pluginPath);
         if (testMode) {
             log.warn("TEST Spring Service Manager running in test mode, no core beans will be started");
         } else {
@@ -229,7 +231,7 @@ public class SpringServiceManager implements ServiceManagerSystem {
     }
 
     /**
-     * This handles the common part of the 2 types of service 
+     * This handles the common part of the 2 types of service
      * registrations.
      *
      * @param name
