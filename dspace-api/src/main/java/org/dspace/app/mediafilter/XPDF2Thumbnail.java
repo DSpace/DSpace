@@ -214,10 +214,10 @@ public class XPDF2Thumbnail extends MediaFilter
                 }
                 else
                 {
-                    float x0 = Float.parseFloat(mediaBox.group(1));
-                    float y0 = Float.parseFloat(mediaBox.group(2));
-                    float x1 = Float.parseFloat(mediaBox.group(3));
-                    float y1 = Float.parseFloat(mediaBox.group(4));
+                    double x0 = Double.parseDouble(mediaBox.group(1));
+                    double y0 = Double.parseDouble(mediaBox.group(2));
+                    double x1 = Double.parseDouble(mediaBox.group(3));
+                    double y1 = Double.parseDouble(mediaBox.group(4));
                     int maxdim = (int)Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0));
                     dpi = Math.min(MAX_DPI, (MAX_PX * 72 / maxdim));
                     log.debug("DPI: pdfinfo method got dpi="+dpi+" for max dim="+maxdim+" (points, 1/72\")");

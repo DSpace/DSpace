@@ -280,7 +280,7 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
                             }
                         }
                         //Check if we have found a range, if not then retrieve our first & last year by using solr
-                        if(oldestYear == -1 && oldestYear == -1){
+                        if(oldestYear == -1 && newestYear == -1){
 
                             SolrQuery yearRangeQuery = new SolrQuery();
                             yearRangeQuery.setRows(1);

@@ -622,7 +622,7 @@ public class WorkflowManager
             break;
         }
 
-        if ((wi != null) && !archived)
+        if (!archived)
         {
             wi.update();
         }

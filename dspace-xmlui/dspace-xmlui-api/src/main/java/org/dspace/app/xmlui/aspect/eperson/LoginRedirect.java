@@ -77,6 +77,12 @@ public class LoginRedirect extends AbstractAction {
 		final Iterator<AuthenticationMethod> authMethods = (Iterator<AuthenticationMethod>) AuthenticationManager
 				    .authenticationMethodIterator();
 
+        if (authMethods == null)
+        {
+            throw new IllegalStateException(
+                    "No explicit authentication methods found when exactly one was expected.");
+        }
+
 		AuthenticationMethod authMethod = null;
 
         while (authMethods.hasNext())
@@ -92,12 +98,6 @@ public class LoginRedirect extends AbstractAction {
                 }
                 authMethod = currAuthMethod;
             }
-        }
-
-        if (authMethods == null)
-        {
-            throw new IllegalStateException(
-                    "No explicit authentication methods found when exactly one was expected.");
         }
 
         final String url = ((AuthenticationMethod) authMethod).loginPageURL(

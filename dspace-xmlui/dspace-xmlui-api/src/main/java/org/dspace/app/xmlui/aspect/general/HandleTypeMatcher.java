@@ -90,9 +90,6 @@ public class HandleTypeMatcher extends AbstractLogEnabled implements Matcher
         String[] expressions = pattern.split(",");
         for (String expression : expressions)
         {
-            // Strip out any spaces.
-            expression.replace(" ", "");
-
             if (!(COMMUNITY_EXPRESSION.equals(expression)
                     || COLLECITON_EXPRESSION.equals(expression) || ITEM_EXPRESSION
                     .equals(expression)))

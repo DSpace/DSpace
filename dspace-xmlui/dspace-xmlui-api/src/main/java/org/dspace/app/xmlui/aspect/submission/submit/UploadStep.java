@@ -265,9 +265,7 @@ public class UploadStep extends AbstractSubmissionStep
 	        	String desc = bitstream.getDescription();
 	        	String algorithm = bitstream.getChecksumAlgorithm();
 	        	String checksum = bitstream.getChecksum();
-	        	BitstreamFormat format = bitstream.getFormat();
-	        	int support = format.getSupportLevel();
-	        	
+
 	        	
 	        	Row row = summary.addRow();
 
@@ -300,12 +298,14 @@ public class UploadStep extends AbstractSubmissionStep
 	            else
 	            	row.addCellContent(desc);
 	            
+                BitstreamFormat format = bitstream.getFormat();
 	            if (format == null)
 	            {
 	            	row.addCellContent(T_unknown_format);
 	            }
 	            else
 	            {
+                    int support = format.getSupportLevel();
 	            	Cell cell = row.addCell();
 	            	cell.addContent(format.getMIMEType());
 	            	cell.addContent(" ");

@@ -185,11 +185,11 @@ public class CreativeCommons
 
         // set the format
         BitstreamFormat bs_format;
-        if (mimeType.equalsIgnoreCase("text/xml"))
+        if ("text/xml".equalsIgnoreCase(mimeType))
         {
             bs_format = BitstreamFormat.findByShortDescription(context, "CC License");
         }
-        else if (mimeType.equalsIgnoreCase("text/rdf")) {
+        else if ("text/rdf".equalsIgnoreCase(mimeType)) {
             bs_format = BitstreamFormat.findByShortDescription(context, "RDF XML");
         }
         else {

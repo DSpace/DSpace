@@ -846,7 +846,7 @@ public class ItemExport
         // keep track of the commulative size of all bitstreams in each of the
         // items
         // it will be checked against the config file entry
-        float size = 0;
+        double size = 0;
         final ArrayList<Integer> items = new ArrayList<Integer>();
         for (DSpaceObject dso : dsObjects)
         {

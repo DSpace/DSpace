@@ -576,7 +576,9 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 			currentGroup = toVisit.poll();
 			
 			// 2. See if it's the descendant we're looking for
-			if (currentGroup.equals(descendant)) return true;
+			if (currentGroup.equals(descendant)) {
+                return true;
+            }
 			
 			// 3. If not, add that group's children to the queue
 			for (Group nextBatch : currentGroup.getMemberGroups()) {

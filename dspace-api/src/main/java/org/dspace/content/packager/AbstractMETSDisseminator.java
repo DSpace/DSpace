@@ -1194,7 +1194,7 @@ public abstract class AbstractMETSDisseminator
         {
             //determine file extension of child references,
             //based on whether we are exporting just a manifest or a full Zip pkg
-            String childFileExtension  = (params!=null && params.getBooleanProperty("manifestOnly", false)) ? "xml" : "zip";
+            String childFileExtension  = (params.getBooleanProperty("manifestOnly", false)) ? "xml" : "zip";
 
             //create <mptr> with file-name reference to child package
             Mptr mptr2 = new Mptr();

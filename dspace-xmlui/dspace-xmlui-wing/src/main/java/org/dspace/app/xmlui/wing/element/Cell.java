@@ -189,12 +189,12 @@ public class Cell extends RichTextContainer implements StructuralElement
      */
     public void dispose()
     {
-        for (AbstractWingElement content : contents)
-        {
-            content.dispose();
-        }
         if (contents != null)
         {
+            for (AbstractWingElement content : contents)
+            {
+                content.dispose();
+            }
             contents.clear();
         }
         contents = null;

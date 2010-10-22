@@ -316,30 +316,33 @@ public class Harvest
     	
     	try {
 	    	// is the ID a handle?
-	        if (collectionID.indexOf('/') != -1)
-	        {
-	            // string has a / so it must be a handle - try and resolve it
-	            dso = HandleManager.resolveToObject(context, collectionID);
-	
-	            // resolved, now make sure it's a collection
-	            if (dso == null || dso.getType() != Constants.COLLECTION)
-	                targetCollection = null;
-	            else
-	            	targetCollection = (Collection)dso;
-	        }
-	        // not a handle, try and treat it as an integer collection
-	        // database ID
-	        else if (collectionID != null)
-	        {
-	        	System.out.println("Looking up by id: " + collectionID + ", parsed as '" + Integer.parseInt(collectionID) + "', " + "in context: " + context);
-	            targetCollection = Collection.find(context, Integer.parseInt(collectionID));
-	        }
-	        // was the collection valid?
-	        if (targetCollection == null)
-	        {
-	        	System.out.println("Cannot resolve " + collectionID + " to collection");
-	            System.exit(1);
-	        }
+	        if (collectionID != null)
+            {
+                if (collectionID.indexOf('/') != -1)
+                {
+                    // string has a / so it must be a handle - try and resolve it
+                    dso = HandleManager.resolveToObject(context, collectionID);
+
+                    // resolved, now make sure it's a collection
+                    if (dso == null || dso.getType() != Constants.COLLECTION)
+                        targetCollection = null;
+                    else
+                        targetCollection = (Collection)dso;
+                }
+                // not a handle, try and treat it as an integer collection
+                // database ID
+                else
+                {
+                    System.out.println("Looking up by id: " + collectionID + ", parsed as '" + Integer.parseInt(collectionID) + "', " + "in context: " + context);
+                    targetCollection = Collection.find(context, Integer.parseInt(collectionID));
+                }
+            }
+            // was the collection valid?
+            if (targetCollection == null)
+            {
+                System.out.println("Cannot resolve " + collectionID + " to collection");
+                System.exit(1);
+            }
     	}
     	catch (SQLException se) {
     		se.printStackTrace();
@@ -374,7 +377,10 @@ public class Harvest
     		System.exit(1);
     	}
     	finally {
-    		context.restoreAuthSystemState();
+            if (context != null)
+            {
+    		    context.restoreAuthSystemState();
+            }
     	}
     }
     

@@ -519,22 +519,6 @@ public class SubmissionController extends DSpaceServlet
     {
         int result = doSaveCurrentState(context, request, response, subInfo, currentStepConfig);
         
-        int currStep=currentStepConfig.getStepNumber();
-        int currPage=AbstractProcessingStep.getCurrentPage(request);
-        double currStepAndPage = Float.parseFloat(currStep+"."+currPage);
-        // default value if we are in workflow
-        double stepAndPageReached = -1;
-        
-        if (!subInfo.isInWorkflow())
-        {
-            stepAndPageReached = Float.parseFloat(getStepReached(subInfo)+"."+JSPStepManager.getPageReached(subInfo));
-        }
-        
-        if (result != AbstractProcessingStep.STATUS_COMPLETE && currStepAndPage != stepAndPageReached)
-        {
-            doStep(context, request, response, subInfo, currStep);
-        }
-        
         // find current Step number
         int currentStepNum;
         if (currentStepConfig == null)
@@ -546,7 +530,22 @@ public class SubmissionController extends DSpaceServlet
             currentStepNum = currentStepConfig.getStepNumber();
         }
 
-        //Check to see if we are actually just going to a 
+        int currPage=AbstractProcessingStep.getCurrentPage(request);
+        double currStepAndPage = Double.parseDouble(currentStepNum+"."+currPage);
+        // default value if we are in workflow
+        double stepAndPageReached = -1;
+        
+        if (!subInfo.isInWorkflow())
+        {
+            stepAndPageReached = Float.parseFloat(getStepReached(subInfo)+"."+JSPStepManager.getPageReached(subInfo));
+        }
+        
+        if (result != AbstractProcessingStep.STATUS_COMPLETE && currStepAndPage != stepAndPageReached)
+        {
+            doStep(context, request, response, subInfo, currentStepNum);
+        }
+        
+        //Check to see if we are actually just going to a
         //previous PAGE within the same step.
         int currentPageNum = AbstractProcessingStep.getCurrentPage(request);
         

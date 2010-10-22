@@ -146,8 +146,8 @@ public class EditCollectionHarvestingForm extends AbstractDSpaceTransformer
 	    
 	    harvestSource.addLabel(T_label_source);
 	    Radio source = harvestSource.addItem().addRadio("source");
-    	source.addOption(hc == null, "source_normal", T_source_normal);
-    	source.addOption(hc != null, "source_harvested", T_source_harvested);
+    	source.addOption(false, "source_normal", T_source_normal);      // was hc == null - always false
+    	source.addOption(true, "source_harvested", T_source_harvested); // was hc != null - always true
 	    
 	    List settings = main.addList("harvestSettings", "form");
 	    settings.setHead(T_main_settings_head);

@@ -811,11 +811,12 @@ public class OAIHarvester {
 				email.addArgument(targetCollection.getID());
 				email.addArgument(new Date());
 				email.addArgument(status);
-				email.addArgument(ex.getMessage());
 
 				String stackTrace;
 
 				if (ex != null) {
+                    email.addArgument(ex.getMessage());
+
 					StringWriter sw = new StringWriter();
 					PrintWriter pw = new PrintWriter(sw);
 					ex.printStackTrace(pw);

@@ -597,51 +597,50 @@ public abstract class Field extends AbstractWingElement implements
             help.dispose();
         }
 
-        for (Error error : errors)
-        {
-            error.dispose();
-        }
         if (errors != null)
         {
+            for (Error error : errors)
+            {
+                error.dispose();
+            }
             errors.clear();
         }
 
-        for (Field field : fields)
-        {
-            field.dispose();
-        }
         if (fields != null)
         {
+            for (Field field : fields)
+            {
+                field.dispose();
+            }
             fields.clear();
         }
         
-        for (Option option : options)
-        {
-            option.dispose();
-        }
         if (options != null)
         {
+            for (Option option : options)
+            {
+                option.dispose();
+            }
             options.clear();
         }
         
-        for (Value value : values)
-        {
-            value.dispose();
-        }
         if (values != null)
         {
+            for (Value value : values)
+            {
+                value.dispose();
+            }
             values.clear();
         }
 
-        for (Instance instance : instances)
-        {
-            instance.dispose();
-        }
         if (instances != null)
         {
+            for (Instance instance : instances)
+            {
+                instance.dispose();
+            }
             instances.clear();
         }
-        
 
         params = null;
         label = null;

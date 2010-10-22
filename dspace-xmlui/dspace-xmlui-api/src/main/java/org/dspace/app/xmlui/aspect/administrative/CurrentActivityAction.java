@@ -115,17 +115,26 @@ public class CurrentActivityAction extends AbstractAction
 	        // Check if we should record the event
 	        boolean record = true;
 	        if (!recordAnonymousEvents && event.isAnonymous())
+            {
 	        	record = false;
+            }
+
 	        if (!recordBotEvents && event.isBot())
+            {
 	        	record = false;
+            }
 	        
 	        if (record)
+            {
 	        	events.add(event);
+            }
 	        
 	        // Remove the oldest element from the list if we are over our max
 	        // number of elements.
-	        while(events.size() > MAX_EVENTS)
+	        while (events.size() > MAX_EVENTS)
+            {
 	        	events.poll();
+            }
         }
        
         return null;
