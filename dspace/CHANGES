@@ -38,6 +38,7 @@
 - [DS-569] Trailing white spaces lead to wrong order of texts in browse
 - [DS-596] Cannot Delete Community which has two or more levels of SubCommunities
 - [DS-628] Make the timeout for the extended resolver dnslookup configurable
+- [DS-715] Unification of license treatment in xmlui and jspui
 
 (Claudia Juergen, Andreas Schwander)
 - [DS-709] ArrayIndexOutOfBoundsException when editing group roles
