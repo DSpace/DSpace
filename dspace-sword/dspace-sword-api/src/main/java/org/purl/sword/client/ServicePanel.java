@@ -658,7 +658,7 @@ implements TreeSelectionListener
          addTableRow(buffer, "Date Updated", entry.getUpdated());
 
          String authorString = getAuthorDetails(entry.getAuthors());
-         addTableRow(buffer, "Authors", authorString.toString());
+         addTableRow(buffer, "Authors", authorString);
 
          // process summary 
          String summaryString = getTextConstructDetails(entry.getSummary());
@@ -700,7 +700,7 @@ implements TreeSelectionListener
 
          // process contributors
          String contributorString = getContributorDetails(entry.getContributors());
-         addTableRow(buffer, "Contributors", contributorString.toString());
+         addTableRow(buffer, "Contributors", contributorString);
 
          // process source
          String sourceString="";
