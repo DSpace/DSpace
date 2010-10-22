@@ -1,11 +1,7 @@
 /*
- * WordFilter.java
+ * PowerPointFilter.java
  *
- * Version: $Revision$
- *
- * Date: $Date$
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
+ * Copyright (c) 2002-2010, Duraspace.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -18,7 +14,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the DSpace Foundation nor the names of its
+ * - Neither the name of Duraspace nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -35,28 +31,29 @@
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
  */
+
 package org.dspace.app.mediafilter;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.IOException;
+import java.io.ByteArrayOutputStream;
+
+import org.apache.poi.extractor.ExtractorFactory;
+import org.apache.poi.xslf.extractor.XSLFPowerPointExtractor;
+import org.apache.poi.hslf.extractor.PowerPointExtractor;
+import org.apache.poi.POITextExtractor;
 
 import org.apache.log4j.Logger;
 
-import org.textmining.extraction.TextExtractor;
-import org.textmining.extraction.word.WordTextExtractor;
-import org.textmining.extraction.word.WordTextExtractorFactory;
 
 /*
+ * TODO: Allow user to configure extraction of only text or only notes
  * 
- * to do: helpful error messages - can't find mediafilter.cfg - can't
- * instantiate filter - bitstream format doesn't exist
- *  
  */
-public class WordFilter extends MediaFilter
+public class PowerPointFilter extends MediaFilter
 {
 
-    private static Logger log = Logger.getLogger(WordFilter.class);
+    private static Logger log = Logger.getLogger(PowerPointFilter.class);
 
     public String getFilteredName(String oldFilename)
     {
@@ -65,7 +62,7 @@ public class WordFilter extends MediaFilter
 
     /**
      * @return String bundle name
-     *  
+     *
      */
     public String getBundleName()
     {
@@ -74,6 +71,8 @@ public class WordFilter extends MediaFilter
 
     /**
      * @return String bitstreamformat
+     *
+     *  TODO: Check that this is correct
      */
     public String getFormatString()
     {
@@ -91,38 +90,62 @@ public class WordFilter extends MediaFilter
     /**
      * @param source
      *            source input stream
-     * 
+     *
      * @return InputStream the resulting input stream
      */
     public InputStream getDestinationStream(InputStream source)
             throws Exception
     {
-        // get input stream from bitstream
-        // pass to filter, get string back
-        try  
+        
+        try
         {
-            WordTextExtractorFactory factory = new WordTextExtractorFactory();
-            TextExtractor e = factory.textExtractor(source);
-            String extractedText = e.getText();
+	  
+            String extractedText = null;  
+	    POITextExtractor pptExtractor = 
+		new ExtractorFactory().createExtractor(source);
+	
+            // PowerPoint XML files and legacy format PowerPoint files
+            // require different classes and APIs for text extraction
 
-            // if verbose flag is set, print out extracted text
-            // to STDOUT
-            if (MediaFilterManager.isVerbose)
+            // If this is a PowerPoint XML file, extract accordingly  
+	    if (pptExtractor instanceof XSLFPowerPointExtractor)
+	    {  
+                
+                // The true method arguments indicate that text from
+                // the slides and the notes is desired
+		extractedText = 
+                       ((XSLFPowerPointExtractor)pptExtractor).getText(true, true);
+	    }    
+            
+            // Legacy PowerPoint files
+            else if (pptExtractor instanceof PowerPointExtractor)
             {
-                System.out.println(extractedText);
+
+                extractedText = ((PowerPointExtractor)pptExtractor).getText() 
+                    + " " + ((PowerPointExtractor)pptExtractor).getNotes();
+
             }
+            if (extractedText != null)
+            {
+                // if verbose flag is set, print out extracted text
+                // to STDOUT
+                if (MediaFilterManager.isVerbose)
+                {
+                    System.out.println(extractedText);
+                }
 
-            // generate an input stream with the extracted text
-            byte[] textBytes = extractedText.getBytes();
-            ByteArrayInputStream bais = new ByteArrayInputStream(textBytes);
+                // generate an input stream with the extracted text
+                byte[] textBytes = extractedText.getBytes();
+                ByteArrayInputStream bais = new ByteArrayInputStream(textBytes);
 
-            return bais; // will this work? or will the byte array be out of scope?
-        } 
-        catch (IOException ioe)
-        {
-             System.out.println("Invalid Word Format");
-             log.error("Error detected - Word File format not recognized: " + ioe.getMessage(), ioe); 
-        }
+                return bais; 
+            }
+	}
+	catch(Exception e)
+	{
+	    log.error("Error filtering bitstream: " + e.getMessage(), e);
+	}
+	
         return null;
     }
 }

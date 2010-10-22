@@ -75,8 +75,8 @@
          <artifactId>mets</artifactId>
       </dependency>
       <dependency>
-         <groupId>org.textmining</groupId>
-         <artifactId>tm-extractors</artifactId>
+         <groupId>org.dspace.dependencies</groupId>
+         <artifactId>dspace-tm-extractors</artifactId>
       </dependency>
       <dependency>
          <groupId>org.apache.lucene</groupId>
@@ -161,11 +161,19 @@
           <groupId>org.jempbox</groupId>
           <artifactId>jempbox</artifactId>
        </dependency>
-      <dependency>
-         <groupId>poi</groupId>
-         <artifactId>poi</artifactId>
-      </dependency>
-      <dependency>
+       <dependency>
+           <groupId>org.apache.poi</groupId>
+           <artifactId>poi</artifactId>
+         </dependency>
+         <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-scratchpad</artifactId>
+         </dependency>
+         <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+         </dependency>     
+         <dependency>
          <groupId>rome</groupId>
          <artifactId>rome</artifactId>
       </dependency>

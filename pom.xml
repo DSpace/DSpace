@@ -388,9 +388,9 @@
             <version>1.5.48</version>
          </dependency>
          <dependency>
-            <groupId>org.textmining</groupId>
-            <artifactId>tm-extractors</artifactId>
-            <version>0.4</version>
+            <groupId>org.dspace.dependencies</groupId>
+            <artifactId>dspace-tm-extractors</artifactId>
+            <version>1.0.1</version>
          </dependency>
          <dependency>
             <groupId>commons-cli</groupId>
@@ -502,9 +502,19 @@
             <version>0.2.0</version>
          </dependency>
          <dependency>
-            <groupId>poi</groupId>
-            <artifactId>poi</artifactId>
-            <version>2.5.1-final-20040804</version>
+           <groupId>org.apache.poi</groupId>
+           <artifactId>poi</artifactId>
+           <version>3.6</version>
+         </dependency>
+         <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-scratchpad</artifactId>
+            <version>3.6</version>
+         </dependency>
+         <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>3.6</version>
          </dependency>
          <dependency>
             <groupId>rome</groupId>
