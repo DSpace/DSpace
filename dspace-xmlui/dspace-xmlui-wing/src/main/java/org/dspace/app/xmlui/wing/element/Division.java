@@ -944,7 +944,9 @@ public class Division extends AbstractWingElement implements StructuralElement, 
             head.dispose();
         head = null;
         for (AbstractWingElement content : contents)
+        {
             content.dispose();
+        }
         if (contents != null)
             contents.clear();
         contents = null;

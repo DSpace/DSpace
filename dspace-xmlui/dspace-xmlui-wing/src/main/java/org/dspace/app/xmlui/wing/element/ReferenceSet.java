@@ -235,9 +235,13 @@ public class ReferenceSet extends AbstractWingElement implements
     public void dispose()
     {
         for (AbstractWingElement content : contents)
+        {
             content.dispose();
+        }
         if (contents != null)
+        {
             contents.clear();
+        }
         contents = null;
         super.dispose();
     }

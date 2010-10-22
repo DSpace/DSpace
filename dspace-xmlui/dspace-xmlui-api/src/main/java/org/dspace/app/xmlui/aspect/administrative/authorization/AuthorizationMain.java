@@ -115,7 +115,9 @@ public class AuthorizationMain extends AbstractDSpaceTransformer
 		if (errorString != null)
 		{
 			for (String error : errorString.split(","))
-				errors.add(error);
+            {
+                errors.add(error);
+            }
 		}
         
         Division main = body.addInteractiveDivision("authorization-main",contextPath+"/admin/authorize",Division.METHOD_POST,"primary administrative authorization");

@@ -159,7 +159,7 @@ public class OpenSearchGenerator extends AbstractGenerator
         if (this.validity == null)
         {
                 long expiry = System.currentTimeMillis() +
-                ConfigurationManager.getIntProperty("websvc.opensearch.validity") * 60 * 60 * 1000;
+                    ConfigurationManager.getLongProperty("websvc.opensearch.validity") * 60 * 60 * 1000;
                 this.validity = new ExpiresValidity(expiry);
         }
         return this.validity;

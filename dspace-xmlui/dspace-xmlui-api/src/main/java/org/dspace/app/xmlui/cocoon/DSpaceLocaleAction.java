@@ -188,8 +188,12 @@ public class DSpaceLocaleAction extends ServiceableAction implements Configurabl
 			
 			// Otherwise check if they are listed
 			for (Locale locale : supportedLocales)
+            {
 				if (locale.equals(test))
+                {
 					return true;
+                }
+            }
 			
 			// Fail if not found
 			return false;

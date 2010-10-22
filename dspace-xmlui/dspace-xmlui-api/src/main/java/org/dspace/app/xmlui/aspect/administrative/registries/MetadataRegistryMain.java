@@ -125,7 +125,9 @@ public class MetadataRegistryMain extends AbstractDSpaceTransformer
 		if (errorString != null)
 		{
 			for (String error : errorString.split(","))
+            {
 				errors.add(error);
+            }
 		}
 		MetadataSchema[] schemas = MetadataSchema.findAll(context); 
         

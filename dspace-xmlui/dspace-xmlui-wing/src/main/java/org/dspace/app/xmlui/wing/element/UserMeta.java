@@ -315,10 +315,14 @@ public class UserMeta extends AbstractWingElement implements
         }
 
         for (Metadata metadata : metadatum)
+        {
             metadata.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
 
         if (!merged)
+        {
             endElement(contentHandler, namespaces, E_USER_META);
+        }
     }
 
     /**
@@ -327,7 +331,9 @@ public class UserMeta extends AbstractWingElement implements
     public void dispose()
     {
         for (AbstractWingElement content : metadatum)
+        {
             content.dispose();
+        }
         metadatum.clear();
         metadatum = null;
         super.dispose();

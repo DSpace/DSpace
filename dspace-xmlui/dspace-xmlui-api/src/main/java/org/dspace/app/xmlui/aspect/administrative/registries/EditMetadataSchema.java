@@ -161,7 +161,9 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 		if (errorString != null)
 		{
 			for (String error : errorString.split(","))
+            {
 				errors.add(error);
+            }
 		}
 		
 	

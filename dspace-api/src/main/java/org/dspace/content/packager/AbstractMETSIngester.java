@@ -293,7 +293,9 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                 // NOTE: The AbstractPackageIngester itself will perform the
                 // recursive ingest call, based on these child pkg references
                 for (int i = 0; i < childFilePaths.length; i++)
+                {
                     addPackageReference(dso, childFilePaths[i]);
+                }
             }
 
             return dso;
@@ -1075,7 +1077,9 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                 // NOTE: The AbstractPackageIngester itself will perform the
                 // recursive ingest call, based on these child pkg references.
                 for (int i = 0; i < childFilePaths.length; i++)
+                {
                     addPackageReference(dso, childFilePaths[i]);
+                }
             }
 
             return dso;

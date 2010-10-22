@@ -730,8 +730,12 @@ public class PluginManager
                 val = val.trim();
                 String classname[] = val.split("\\s*,\\s*");
                 for (int i = 0; i < classname.length; ++i)
+                {
                     if (checkClassname(classname[i], "implementation class"))
+                    {
                         allImpls.put(classname[i], classname[i]);
+                    }
+                }
             }
         }
 
@@ -749,11 +753,13 @@ public class PluginManager
                 val = val.trim();
                 String classname[] = val.split("\\s*,\\s*");
                 for (int i = 0; i < classname.length; ++i)
+                {
                     if (checkClassname(classname[i], "selfnamed implementation class"))
                     {
                         allImpls.put(classname[i], classname[i]);
                         checkSelfNamed(classname[i]);
                     }
+                }
                 checkNames(key);
             }
         }

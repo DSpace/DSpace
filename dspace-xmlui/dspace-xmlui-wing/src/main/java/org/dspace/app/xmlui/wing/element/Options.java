@@ -211,7 +211,9 @@ public class Options extends AbstractWingElement implements
         }
 
         for (AbstractWingElement content : contents)
+        {
             content.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
 
         if (!merged)
         {
@@ -225,7 +227,9 @@ public class Options extends AbstractWingElement implements
     public void dispose()
     {
         for (AbstractWingElement content : contents)
+        {
             content.dispose();
+        }
         contents.clear();
         contents = null;
         super.dispose();

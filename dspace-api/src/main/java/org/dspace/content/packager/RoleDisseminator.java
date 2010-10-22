@@ -242,7 +242,9 @@ public class RoleDisseminator implements PackageDisseminator
                     writer.writeStartElement(GROUPS);
 
                     for (Group group : groups)
+                    {
                         writeGroup(context, object, group, writer);
+                    }
 
                     writer.writeEndElement(); // GROUPS
                 }
@@ -253,7 +255,9 @@ public class RoleDisseminator implements PackageDisseminator
                     writer.writeStartElement(EPERSONS);
 
                     for (EPerson eperson : people)
+                    {
                         writeEPerson(eperson, writer, emitPasswords);
+                    }
 
                     writer.writeEndElement(); // EPERSONS
                 }

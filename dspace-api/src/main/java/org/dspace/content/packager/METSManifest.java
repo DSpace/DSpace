@@ -590,7 +590,9 @@ public class METSManifest
                 String id = mdSec.getAttributeValue("ID");
                 StringBuffer sb = new StringBuffer();
                 for (Iterator mi = mdc.iterator(); mi.hasNext();)
+                {
                     sb.append(", ").append(((Content)mi.next()).toString());
+                }
                 throw new MetadataValidationException("Cannot parse METS with "+mdSec.getQualifiedName()+" element that contains more than one child, size="+String.valueOf(mdc.size())+", ID="+id+"Kids="+sb.toString());
             }
             Element mdRef = null;
@@ -905,7 +907,9 @@ public class METSManifest
         Element result[] = new Element[dmdID.length];
 
         for (int i = 0; i < dmdID.length; ++i)
+        {
             result[i] = getElementByXPath("mets:dmdSec[@ID=\""+dmdID[i]+"\"]", false);
+        }
         return result;
     }
 
@@ -964,11 +968,17 @@ public class METSManifest
         {
             Element amdSec = getElementByXPath("mets:amdSec[@ID=\""+amdID+"\"]", false);
             for (Iterator ti = amdSec.getChildren("techMD", metsNS).iterator(); ti.hasNext();)
+            {
                 crosswalkXmd(context, params, dso, (Element)ti.next(), callback);
+            }
             for (Iterator ti = amdSec.getChildren("digiprovMD", metsNS).iterator(); ti.hasNext();)
+            {
                 crosswalkXmd(context, params, dso, (Element)ti.next(), callback);
+            }
             for (Iterator ti = amdSec.getChildren("rightsMD", metsNS).iterator(); ti.hasNext();)
+            {
                 crosswalkXmd(context, params, dso, (Element)ti.next(), callback);
+            }
         }
     }
 
@@ -1150,9 +1160,13 @@ public class METSManifest
         {
             Element amdSec = getElementByXPath("mets:amdSec[@ID=\""+amdID[i]+"\"]", false);
             for (Iterator ti = amdSec.getChildren("techMD", metsNS).iterator(); ti.hasNext();)
+            {
                 crosswalkXmd(context, params, bitstream, (Element)ti.next(), callback);
+            }
             for (Iterator ti = amdSec.getChildren("sourceMD", metsNS).iterator(); ti.hasNext();)
+            {
                 crosswalkXmd(context, params, bitstream, (Element)ti.next(), callback);
+            }
         }
     }
 

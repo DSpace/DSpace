@@ -463,13 +463,19 @@ public class Event implements Serializable
         {
             int result = 0;
             for (int i = 0; i < eventTypeText.length; ++i)
+            {
                 result |= (1 << i);
+            }
             return result;
         }
 
         for (int i = 0; i < eventTypeText.length; ++i)
+        {
             if (eventTypeText[i].equalsIgnoreCase(s))
+            {
                 return 1 << i;
+            }
+        }
         return 0;
     }
 
@@ -571,10 +577,16 @@ public class Event implements Serializable
     private static int log2(int n)
     {
         for (int i = 0; i < 32; ++i)
+        {
             if (n == 1)
+            {
                 return i;
+            }
             else
+            {
                 n = n >> 1;
+            }
+        }
         return -1;
     }
 

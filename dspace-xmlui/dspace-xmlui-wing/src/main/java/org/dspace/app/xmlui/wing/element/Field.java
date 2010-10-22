@@ -494,8 +494,12 @@ public abstract class Field extends AbstractWingElement implements
     {
         List<Value> found = new ArrayList<Value>();
         for (Value value : values)
+        {
             if (value.getType().equals(removeType))
+            {
                 found.add(value);
+            }
+        }
 
         for (Value remove : found)
         {
@@ -546,19 +550,29 @@ public abstract class Field extends AbstractWingElement implements
             help.toSAX(contentHandler, lexicalHandler, namespaces);
 
         for (Error error : errors)
+        {
             error.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
         
         for (Field field : fields)
+        {
             field.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
 
         for (Option option : options)
+        {
             option.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
         
         for (Value value : values)
+        {
             value.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
         
         for (Instance instance : instances)
+        {
             instance.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
 
         endElement(contentHandler, namespaces, E_FIELD);
     }
@@ -569,38 +583,64 @@ public abstract class Field extends AbstractWingElement implements
     public void dispose()
     {
         if (params != null)
+        {
             params.dispose();
+        }
 
         if (label != null)
+        {
             label.dispose();
+        }
         
         if (help != null)
+        {
             help.dispose();
+        }
 
         for (Error error : errors)
+        {
             error.dispose();
+        }
         if (errors != null)
+        {
             errors.clear();
+        }
 
         for (Field field : fields)
+        {
             field.dispose();
+        }
         if (fields != null)
+        {
             fields.clear();
+        }
         
         for (Option option : options)
+        {
             option.dispose();
+        }
         if (options != null)
+        {
             options.clear();
+        }
         
         for (Value value : values)
+        {
             value.dispose();
+        }
         if (values != null)
+        {
             values.clear();
+        }
 
         for (Instance instance : instances)
+        {
             instance.dispose();
+        }
         if (instances != null)
+        {
             instances.clear();
+        }
         
 
         params = null;

@@ -240,12 +240,16 @@ public class Packager
                 String pn[] = PluginManager
                         .getAllPluginNames(PackageIngester.class);
                 for (int i = 0; i < pn.length; ++i)
+                {
                     System.out.println("  " + pn[i]);
+                }
                 System.out
                         .println("\nAvailable Dissemination Package (DIP) types:");
                 pn = PluginManager.getAllPluginNames(PackageDisseminator.class);
                 for (int i = 0; i < pn.length; ++i)
+                {
                     System.out.println("  " + pn[i]);
+                }
             }
             System.exit(0);
         }

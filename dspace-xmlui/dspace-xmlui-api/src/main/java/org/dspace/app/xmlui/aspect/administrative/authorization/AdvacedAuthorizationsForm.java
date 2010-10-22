@@ -125,14 +125,18 @@ public class AdvacedAuthorizationsForm extends AbstractDSpaceTransformer
         groupSelect.setMultiple(true);
         groupSelect.setSize(15);
         for (Group group : Group.findAll(context, Group.NAME))
-       		groupSelect.addOption(false, group.getID(), group.getName());
+        {
+            groupSelect.addOption(false, group.getID(), group.getName());
+        }
         
         // Grant the ability to perform the following action...
         actionsList.addItem().addContent(T_actions_actionSentence);
         actionsList.addLabel(T_actions_policyAction);
         Select actionSelect = actionsList.addItem().addSelect("action_id");
         for( int i = 0; i < Constants.actionText.length; i++ )
+        {
             actionSelect.addOption(i, Constants.actionText[i]);
+        }
         
         // For all following object types...
         actionsList.addItem().addContent(T_actions_resourceSentence);
@@ -148,7 +152,9 @@ public class AdvacedAuthorizationsForm extends AbstractDSpaceTransformer
         collectionsSelect.setMultiple(true);
         collectionsSelect.setSize(15);
         for (Collection collection : Collection.findAll(context))
-        	collectionsSelect.addOption(false, collection.getID(), collection.getMetadata("name"));
+        {
+            collectionsSelect.addOption(false, collection.getID(), collection.getMetadata("name"));
+        }
         
         
     	Para buttons = main.addPara();

@@ -152,8 +152,12 @@ public class WorkflowManager
     public static int getWorkflowID(String state)
     {
         for (int i = 0; i < workflowText.length; ++i)
+        {
             if (state.equalsIgnoreCase(workflowText[i]))
+            {
                 return i;
+            }
+        }
         return -1;
     }
 

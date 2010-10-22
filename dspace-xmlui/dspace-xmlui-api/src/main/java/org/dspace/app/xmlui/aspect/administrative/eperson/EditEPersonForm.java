@@ -199,7 +199,9 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 		if (errorString != null)
 		{
 			for (String error : errorString.split(","))
-				errors.add(error);
+            {
+                errors.add(error);
+            }
 		}
 		
 		// Grab the person in question 

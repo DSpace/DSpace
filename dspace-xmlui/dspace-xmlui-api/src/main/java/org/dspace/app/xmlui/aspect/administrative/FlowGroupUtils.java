@@ -112,7 +112,9 @@ public class FlowGroupUtils {
 		
 		String[] epeopleIDs = new String[epeople.length];
 		for (int i=0; i < epeople.length; i++)
+        {
 			epeopleIDs[i] = String.valueOf(epeople[i].getID());
+        }
 		
 		return epeopleIDs;
 	}
@@ -138,7 +140,9 @@ public class FlowGroupUtils {
 		
 		String[] groupIDs = new String[groups.length];
 		for (int i=0; i < groups.length; i++)
+        {
 			groupIDs[i] = String.valueOf(groups[i].getID());
+        }
 		
 		return groupIDs;
 	}
@@ -270,10 +274,14 @@ public class FlowGroupUtils {
 		// Second, Prepare to check members by turning arrays into lists
 		List<Integer> newEPeopleIDs = new ArrayList<Integer>();
 		for (String epeopleID : newEPeopleIDsArray)
+        {
 			newEPeopleIDs.add(Integer.valueOf(epeopleID));
+        }
 		List<Integer> newGroupIDs = new ArrayList<Integer>();
 		for (String _groupID : newGroupIDsArray)
+        {
 			newGroupIDs.add(Integer.valueOf(_groupID));
+        }
 		
 		
 		// Third, check if there are any members to remove

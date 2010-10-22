@@ -552,13 +552,19 @@ public class List extends AbstractWingElement implements WingMergeableElement,
         }
             
         if (childMerged == false && head != null)
-        	head.toSAX(contentHandler, lexicalHandler, namespaces);
+        {
+            head.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
 
         for (AbstractWingElement content : contents)
-            content.toSAX(contentHandler, lexicalHandler,  namespaces);
+        {
+            content.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
 
         if (this.merged == false)
+        {
             endElement(contentHandler, namespaces, E_LIST);
+        }
     }
 
     /**
@@ -567,10 +573,14 @@ public class List extends AbstractWingElement implements WingMergeableElement,
     public void dispose()
     {
         if (head != null)
+        {
             head.dispose();
+        }
         head = null;
         for (AbstractWingElement content : contents)
+        {
             content.dispose();
+        }
         contents.clear();
         contents = null;
         super.dispose();

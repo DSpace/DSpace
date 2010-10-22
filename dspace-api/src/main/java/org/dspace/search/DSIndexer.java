@@ -812,10 +812,14 @@ public class DSIndexer
         int i = 0;
 
         for (i = 0; i < communities.length; i++)
+        {
             location.append(" m").append(communities[i].getID());
+        }
 
         for (i = 0; i < collections.length; i++)
+        {
             location.append(" l").append(collections[i].getID());
+        }
 
         return location.toString();
     }
@@ -831,7 +835,9 @@ public class DSIndexer
         int i = 0;
 
         for (i = 0; i < communities.length; i++)
+        {
             location.append(" m").append(communities[i].getID());
+        }
 
         return location.toString();
     }

@@ -229,7 +229,9 @@ public class RoleIngester implements PackageIngester
                 if (params.replaceModeEnabled()) // -r -f
                 {
                     for (Group member : collider.getMemberGroups())
+                    {
                         collider.removeMember(member);
+                    }
                     for (EPerson member : collider.getMembers())
                     {
                         // Remove all group members *EXCEPT* we don't ever want

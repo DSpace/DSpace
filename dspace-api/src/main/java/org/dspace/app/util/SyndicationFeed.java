@@ -312,7 +312,9 @@ public class SyndicationFeed
                         {
                             List<String> creators = new ArrayList<String>();
                             for (DCValue author : dcAuthors)
+                            {
                                 creators.add(author.value);
+                            }
                             dc.setCreators(creators);
                         }
                     }

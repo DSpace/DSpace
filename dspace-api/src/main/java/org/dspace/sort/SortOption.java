@@ -357,7 +357,9 @@ public class SortOption
     public static SortOption getDefaultSortOption() throws SortException
     {
         for (SortOption so : getSortOptions())
+        {
             return so;
+        }
         
         return null;
     }

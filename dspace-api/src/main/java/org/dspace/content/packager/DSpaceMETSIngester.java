@@ -124,28 +124,40 @@ public class DSpaceMETSIngester
         if (userDmd != null && userDmd.length() > 0)
         {
             for (int i = 0; i < dmds.length; ++i)
+            {
                 if (userDmd.equalsIgnoreCase(manifest.getMdType(dmds[i])))
+                {
                     found = i;
+                }
+            }
         }
 
         // MODS is preferred, if nothing specified by user
         if (found == -1)
         {
             for (int i = 0; i < dmds.length; ++i)
+            {
                 //NOTE: METS standard actually says this should be MODS (all uppercase). But,
                 // just in case, we're going to be a bit more forgiving.
                 if ("MODS".equalsIgnoreCase(manifest.getMdType(dmds[i])))
+                {
                     found = i;
+                }
+            }
         }
 
         // DC acceptable if no MODS
         if (found == -1)
         {
             for (int i = 0; i < dmds.length; ++i)
+            {
                 //NOTE: METS standard actually says this should be DC (all uppercase). But,
                 // just in case, we're going to be a bit more forgiving.
                 if ("DC".equalsIgnoreCase(manifest.getMdType(dmds[i])))
+                {
                     found = i;
+                }
+            }
         }
 
         String groupID = null;

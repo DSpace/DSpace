@@ -278,8 +278,10 @@ public class AuthenticationManager
                                    EPerson eperson)
         throws SQLException
     {
-        for (int i = 0; i < methodStack.length; ++i)
-            methodStack[i].initEPerson(context, request, eperson);
+        for (AuthenticationMethod method : methodStack)
+        {
+            method.initEPerson(context, request, eperson);
+        }
     }
 
     /**
@@ -330,8 +332,10 @@ public class AuthenticationManager
             for (int i = 0; i < gll.size(); ++i)
             {
                 int gl[] = (int [])gll.get(i);
-                for (int j = 0; j < gl.length; ++j)
-                    result[k++] = gl[j];
+                for (int aGl : gl)
+                {
+                    result[k++] = aGl;
+                }
             }
             return result;
         }

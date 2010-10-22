@@ -260,11 +260,17 @@ public class Include extends AbstractTransformer implements CacheableProcessingC
 
             Element foundChild = null;
             for (Element child : getElementList(peek))
+            {
                 if (isEqual(child, uri, localName, qName, attributes))
+                {
                     foundChild = child;
+                }
+            }
 
             if (foundChild != null)
+            {
                 peek.removeChild(foundChild);
+            }
 
             stack.push(foundChild);
         }
@@ -304,7 +310,9 @@ public class Include extends AbstractTransformer implements CacheableProcessingC
 	            //getLogger().debug("startElement: streaming");
 	
 	            for (Node node : getNodeList(poped))
+                {
 	                streamer.stream(node);
+                }
 	        }
         }
 

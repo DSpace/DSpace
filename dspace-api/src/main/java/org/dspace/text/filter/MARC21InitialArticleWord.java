@@ -38,12 +38,7 @@
 
 package org.dspace.text.filter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.dspace.core.ConfigurationManager;
@@ -292,7 +287,9 @@ public class MARC21InitialArticleWord extends InitialArticleWord
             String[] words = new String[wordList.size()];
 
             for (int idx = 0; idx < wordList.size(); idx++)
+            {
                 words[idx] = (String)wordList.get(idx);
+            }
 
             // Sort the array into length order - longest to shortest
             // This ensures maximal matching on the article words

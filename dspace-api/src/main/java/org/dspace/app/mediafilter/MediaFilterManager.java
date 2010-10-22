@@ -419,7 +419,9 @@ public class MediaFilterManager
             Community[] topLevelCommunities = Community.findAllTop(c);
           
             for(int i=0; i<topLevelCommunities.length; i++)
+            {
                 applyFiltersCommunity(c, topLevelCommunities[i]);
+            }
         }
         else 
         {

@@ -372,7 +372,9 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         Stack<TreeNode> stack = new Stack<TreeNode>();
 
         for (Community community : communities)
+        {
             stack.push(newRoot.addChild(community));
+        }
 
         while (!stack.empty())
         {

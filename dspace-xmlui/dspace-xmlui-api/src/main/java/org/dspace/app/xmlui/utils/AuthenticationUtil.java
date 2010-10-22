@@ -224,7 +224,9 @@ public class AuthenticationUtil
         int[] groupIDs = AuthenticationManager.getSpecialGroups(context,
                 request);
         for (int groupID : groupIDs)
+        {
             context.setSpecialGroup(groupID);
+        }
 
         // and the remote IP address to compare against later requests
         // so we can detect session hijacking.
@@ -303,7 +305,9 @@ public class AuthenticationUtil
                     // Set any special groups - invoke the authentication mgr.
                     int[] groupIDs = AuthenticationManager.getSpecialGroups(context, request);
                     for (int groupID : groupIDs)
+                    {
                         context.setSpecialGroup(groupID);
+                    }
                 }
                 else
                 {
@@ -366,7 +370,9 @@ public class AuthenticationUtil
         // Set any special groups - invoke the authentication mgr.
         int[] groupIDs = AuthenticationManager.getSpecialGroups(context,request);
         for (int groupID : groupIDs)
+        {
             context.setSpecialGroup(groupID);
+        }
 	    	        
         // Set both the effective and authenticated user to the same.
         session.setAttribute(EFFECTIVE_USER_ID, loginAs.getID());

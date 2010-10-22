@@ -146,8 +146,12 @@ public class DSpaceAIPIngester
         if (userDmd != null && userDmd.length() > 0)
         {
             for (int i = 0; i < dmds.length; ++i)
+            {
                 if (userDmd.equalsIgnoreCase(manifest.getMdType(dmds[i])))
+                {
                     found = i;
+                }
+            }
         }
 
         // DIM is preferred, if nothing specified by user
@@ -155,20 +159,28 @@ public class DSpaceAIPIngester
         {
             // DIM is preferred for AIP
             for (int i = 0; i < dmds.length; ++i)
+            {
                 //NOTE: METS standard actually says this should be DIM (all uppercase). But,
                 // just in case, we're going to be a bit more forgiving.
                 if ("DIM".equalsIgnoreCase(manifest.getMdType(dmds[i])))
+                {
                     found = i;
+                }
+            }
         }
 
         // MODS is acceptable otehrwise..
         if (found == -1)
         {
             for (int i = 0; i < dmds.length; ++i)
+            {
                 //NOTE: METS standard actually says this should be MODS (all uppercase). But,
                 // just in case, we're going to be a bit more forgiving.
                 if ("MODS".equalsIgnoreCase(manifest.getMdType(dmds[i])))
+                {
                     found = i;
+                }
+            }
         }
 
         String groupID = null;

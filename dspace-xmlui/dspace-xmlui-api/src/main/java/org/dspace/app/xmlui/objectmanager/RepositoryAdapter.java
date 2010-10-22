@@ -333,10 +333,14 @@ public class RepositoryAdapter extends AbstractAdapter
         if (dso instanceof Community)
         {
         	for (DSpaceObject child : ((Community)dso).getCollections())
-        		renderStructuralDiv(child);
+            {
+                renderStructuralDiv(child);
+            }
         	
         	for (DSpaceObject child : ((Community)dso).getSubcommunities())
-        		renderStructuralDiv(child);
+            {
+                renderStructuralDiv(child);
+            }
         }
         
         // ////////////////////

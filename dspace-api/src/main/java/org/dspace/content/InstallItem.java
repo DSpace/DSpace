@@ -171,10 +171,16 @@ public class InstallItem
         boolean identifierExists = false;
         DCValue[] identifiers = item.getDC("identifier", "uri", Item.ANY);
         for (DCValue identifier : identifiers)
+        {
         	if (handleref.equals(identifier.value))
+            {
         		identifierExists = true;
+            }
+        }
         if (!identifierExists)
+        {
         	item.addDC("identifier", "uri", null, handleref);
+        }
     }
 
     // fill in metadata needed by new Item.

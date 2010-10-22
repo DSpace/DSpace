@@ -242,7 +242,9 @@ public class Table extends AbstractWingElement implements StructuralElement
         if (head != null)
             head.toSAX(contentHandler, lexicalHandler, namespaces);
         for (AbstractWingElement content : contents)
+        {
             content.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
         endElement(contentHandler, namespaces, E_TABLE);
     }
 
@@ -252,9 +254,13 @@ public class Table extends AbstractWingElement implements StructuralElement
     public void dispose()
     {
         if (head != null)
+        {
             head.dispose();
+        }
         for (AbstractWingElement content : contents)
+        {
             content.dispose();
+        }
 
         head = null;
         contents.clear();

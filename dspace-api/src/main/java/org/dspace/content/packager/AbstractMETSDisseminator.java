@@ -188,7 +188,9 @@ public abstract class AbstractMETSDisseminator
             throws IOException
         {
             for (InputStream is : extraFiles.values())
+            {
                 is.close();
+            }
         }
     }
 

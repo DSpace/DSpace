@@ -111,7 +111,9 @@ public abstract class Container extends AbstractWingElement
         if (this.contents != null)
         {
             for (AbstractWingElement element : contents)
+            {
                 element.dispose();
+            }
             this.contents.clear();
         }
         this.contents = null;

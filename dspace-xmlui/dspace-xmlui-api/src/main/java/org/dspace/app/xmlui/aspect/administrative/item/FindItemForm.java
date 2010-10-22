@@ -85,8 +85,12 @@ public class FindItemForm extends AbstractDSpaceTransformer {
 		String errorString = parameters.getParameter("errors",null);
 		ArrayList<String> errors = new ArrayList<String>();
 		if (errorString != null)
+        {
 			for (String error : errorString.split(","))
+            {
 				errors.add(error);
+            }
+        }
 		
 		// DIVISION: find-item
 		Division findItem = body.addInteractiveDivision("find-item",contextPath + "/admin/item", Division.METHOD_GET,"primary administrative item");

@@ -266,8 +266,12 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 		if (memberEPeopleIDsString != null)
 		{
 			for (String id : memberEPeopleIDsString.split(","))
+            {
 				if (id.length() > 0)
+                {
 					memberEPeopleIDs.add(Integer.valueOf(id));
+                }
+            }
 		}
 		
 		// Get highlight parameters
@@ -283,10 +287,12 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	    String errorString = parameters.getParameter("errors",null);
 		ArrayList<String> errors = new ArrayList<String>();
 		if (errorString != null)
+        {
 			for (String error : errorString.split(","))
+            {
 				errors.add(error);
-	    
-    
+            }
+        }
 	    
 	    //DIVISION: group-edit
 	    Division main = body.addInteractiveDivision("group-edit",contextPath+"/admin/groups",Division.METHOD_POST,"primary administrative groups");

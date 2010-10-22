@@ -262,7 +262,9 @@ public class Body extends AbstractWingElement implements WingMergeableElement
     public void dispose()
     {
         for (Division division : divisions)
+        {
             division.dispose();
+        }
         super.dispose();
     }
 

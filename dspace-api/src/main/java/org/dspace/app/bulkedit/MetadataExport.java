@@ -124,7 +124,11 @@ public class MetadataExport
         Collection[] collections = community.getCollections();
         for (Collection collection : collections)
         {
-            for (int i = 0; i < indent; i++) System.out.print(" ");
+            for (int i = 0; i < indent; i++)
+            {
+                System.out.print(" ");
+            }
+
             ItemIterator items = collection.getAllItems();
             while (items.hasNext())
             {
@@ -141,7 +145,10 @@ public class MetadataExport
         Community[] communities = community.getSubcommunities();
         for (Community subCommunity : communities)
         {
-            for (int i = 0; i < indent; i++) System.out.print(" ");
+            for (int i = 0; i < indent; i++)
+            {
+                System.out.print(" ");
+            }
             buildFromCommunity(subCommunity, itemIDs, indent + 1);
         }
 

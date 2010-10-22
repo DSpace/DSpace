@@ -262,7 +262,9 @@ public class PageMeta extends AbstractWingElement implements
     	if (WingConstants.DRI.URI.equals(namespace) && Trail.E_TRAIL.equals(localName))
     	{
             for (Trail trail : trails)
+            {
                 trail.dispose();
+            }
     		trails.clear();
     	}
     	
@@ -324,13 +326,19 @@ public class PageMeta extends AbstractWingElement implements
         }
 
         for (Metadata metadata : metadatum)
+        {
             metadata.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
         
         for (Trail trail : trails)
+        {
             trail.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
 
         if (!merged)
+        {
             endElement(contentHandler, namespaces, E_PAGE_META);
+        }
     }
 
     /**
@@ -339,10 +347,14 @@ public class PageMeta extends AbstractWingElement implements
     public void dispose()
     {
     	for (Metadata metadata : metadatum)
-    		metadata.dispose();
+        {
+            metadata.dispose();
+        }
     	
     	for (Trail trail : trails)
-    		trail.dispose();
+        {
+            trail.dispose();
+        }
     	
     	trails.clear();
     	trails = null;

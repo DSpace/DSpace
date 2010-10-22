@@ -281,18 +281,24 @@ public class ShibAuthentication implements AuthenticationMethod
 
                 // revert back to original entry when no mapping is provided
                 if (groupLabels == null)
+                {
                     groupLabels = affiliation;
+                }
 
                 String[] labels = groupLabels.split(",");
                 for (int i = 0; i < labels.length; i++)
+                {
                     addGroup(groups, context, labels[i].trim());
+                }
             }
         }
 
         int ids[] = new int[groups.size()];
         java.util.Iterator it = groups.iterator();
         for (int i = 0; it.hasNext(); i++)
+        {
             ids[i] = ((Integer) it.next()).intValue();
+        }
 
         // store the special group, if already transformed from headers
         // since subsequent header may not have the values anymore

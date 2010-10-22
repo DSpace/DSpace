@@ -159,7 +159,9 @@ public class FlowRegistryUtils
 			// First remove and fields in the schema
 			MetadataField[] fields = MetadataField.findAllInSchema(context, schema.getSchemaID());
 			for (MetadataField field : fields)
+            {
 				field.delete(context);
+            }
 			
 			// Once all the fields are gone, then delete the schema.
 	        schema.delete(context);
@@ -459,8 +461,12 @@ public class FlowRegistryUtils
         
         // Remove leading periods from file extensions.
         for (int i = 0; i < extensions.length; i++)
+        {
         	if (extensions[i].startsWith("."))
-        		extensions[i] = extensions[i].substring(1);
+            {
+                extensions[i] = extensions[i].substring(1);
+            }
+        }
         
         
         // Get or create the format

@@ -298,7 +298,9 @@ public class Row extends AbstractWingElement implements StructuralElement
 
         startElement(contentHandler, namespaces, E_ROW, attributes);
         for (AbstractWingElement content : contents)
+        {
             content.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
         endElement(contentHandler, namespaces, E_ROW);
     }
 
@@ -308,7 +310,9 @@ public class Row extends AbstractWingElement implements StructuralElement
     public void dispose()
     {
         for (AbstractWingElement content : contents)
+        {
             content.dispose();
+        }
         contents.clear();
         contents = null;
         super.dispose();

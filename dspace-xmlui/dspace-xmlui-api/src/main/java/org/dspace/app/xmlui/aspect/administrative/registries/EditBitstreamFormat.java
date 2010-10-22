@@ -139,8 +139,12 @@ public class EditBitstreamFormat extends AbstractDSpaceTransformer
 		String errorString = parameters.getParameter("errors",null);
 		ArrayList<String> errors = new ArrayList<String>();
 		if (errorString != null)
-			for (String error : errorString.split(","))
-				errors.add(error);
+        {
+            for (String error : errorString.split(","))
+            {
+                errors.add(error);
+            }
+        }
 		
 		Request request = ObjectModelHelper.getRequest(objectModel);
         String mimetypeValue = request.getParameter("mimetype");
@@ -153,8 +157,12 @@ public class EditBitstreamFormat extends AbstractDSpaceTransformer
         
         // Remove leading periods from file extensions.
         for (int i = 0; i < extensionValues.length; i++)
+        {
         	if (extensionValues[i].startsWith("."))
-        		extensionValues[i] = extensionValues[i].substring(1);
+            {
+                extensionValues[i] = extensionValues[i].substring(1);
+            }
+        }
         
         if (format != null)
         {
