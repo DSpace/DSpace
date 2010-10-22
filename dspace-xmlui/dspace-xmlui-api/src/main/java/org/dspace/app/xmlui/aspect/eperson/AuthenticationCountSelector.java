@@ -96,7 +96,7 @@ public class AuthenticationCountSelector implements Selector{
             }
 		}
 		
-		final Integer exp = new Integer(expression);
+		final Integer exp = Integer.valueOf(expression);
 		
 		return (authMethodCount == exp);
 	}

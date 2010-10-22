@@ -156,7 +156,7 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
         	{
         		String identifier = "unknown";
         		try {
-        			Bitstream bit = Bitstream.find(context, new Integer(request.getParameter("bitstreamId")));
+        			Bitstream bit = Bitstream.find(context, Integer.valueOf(request.getParameter("bitstreamId")));
 	        		if (bit != null) {
 	        			identifier = bit.getName();
 	        		}

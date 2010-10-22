@@ -124,7 +124,7 @@ public class Client implements SWORDClient {
 	public Client() {
 		client = new HttpClient();
 		client.getParams().setParameter("http.socket.timeout",
-				new Integer(DEFAULT_TIMEOUT));
+				Integer.valueOf(DEFAULT_TIMEOUT));
 		log.debug("proxy host: " + client.getHostConfiguration().getProxyHost());
 		log.debug("proxy port: " + client.getHostConfiguration().getProxyPort());
         doAuthentication = false;

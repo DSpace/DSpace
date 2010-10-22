@@ -946,7 +946,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
                 throw new BadResumptionTokenException();
             }
 
-            obj[4] = new Integer(st.nextToken());
+            obj[4] = Integer.valueOf(st.nextToken());
         }
         catch (NumberFormatException nfe)
         {
