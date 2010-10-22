@@ -375,6 +375,9 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                                                 ObjectModelHelper.getRequest(objectModel),
                                                 ContextUtil.obtainContext(ObjectModelHelper.getRequest(objectModel)),
                                                 bitstream));
+            
+            // Force close of database connection in case sending a large file 
+            context.complete();
 
         }
         catch (SQLException sqle)
