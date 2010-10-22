@@ -44,7 +44,6 @@
 (Claudia Juergen, Andreas Schwander)
 - [DS-709] ArrayIndexOutOfBoundsException when editing group roles
 
-
 (Erick Rocha Fonseca, Claudia Juergen)
 - [DS-563] Brazilian Portuguese (pt_BR) translation for XML-UI 1.6.2
 
@@ -59,6 +58,7 @@
 - [DS-550] Upgrade to latest Google Analytics tracking code
 - [DS-632] Batch Metadata Import needs to validate metadata fields specified in CSVs
 - [DS-646] Remove /bin scripts (replaced by 'dspace' command)
+- [DS-713] dspace.log only logs remoteAddr, needs extending to include X-Forwarded-For
 
 (Graham Triggs)
 - [DS-698] Clear primary_bitstream_id references when deleting a bitstream

@@ -48,6 +48,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.log4j.Logger;
 import org.dspace.authenticate.AuthenticationManager;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
 /**
@@ -60,12 +61,16 @@ import org.dspace.core.Context;
  */
 public class ContextUtil
 {
+    /** Whether to look for x-forwarded headers for logging IP addresses */
+    private static Boolean useProxies;
 
+    /** The log4j logger */
     private static final Logger log = Logger.getLogger(ContextUtil.class);
     
     /** Where the context is stored on an HTTP Request object */
     public final static String DSPACE_CONTEXT = "dspace.context";
 
+    
     /**
      * Obtain a new context object. If a context object has already been created
      * for this HTTP request, it is re-used, otherwise it is created.
@@ -114,7 +119,22 @@ public class ContextUtil
             }
 
             // Set the session ID and IP address
-            context.setExtraLogInfo("session_id=" + request.getSession().getId() + ":ip_addr=" + request.getRemoteAddr());
+            String ip = request.getRemoteAddr();
+            if (useProxies == null) {
+                useProxies = ConfigurationManager.getBooleanProperty("useProxies", false);
+            }
+            if(useProxies && request.getHeader("X-Forwarded-For") != null)
+            {
+                /* This header is a comma delimited list */
+	            for(String xfip : request.getHeader("X-Forwarded-For").split(","))
+                {
+                    if(!request.getHeader("X-Forwarded-For").contains(ip))
+                    {
+                        ip = xfip.trim();
+                    }
+                }
+	        }
+            context.setExtraLogInfo("session_id=" + request.getSession().getId() + ":ip_addr=" + ip);
 
             // Store the context in the request
             request.setAttribute(DSPACE_CONTEXT, context);

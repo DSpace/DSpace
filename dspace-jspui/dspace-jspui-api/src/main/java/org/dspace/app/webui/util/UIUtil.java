@@ -77,6 +77,9 @@ import org.dspace.eperson.EPerson;
  */
 public class UIUtil extends Util
 {
+    /** Whether to look for x-forwarded headers for logging IP addresses */
+    private static Boolean useProxies;
+
     /** log4j category */
     public static Logger log = Logger.getLogger(UIUtil.class);
     
@@ -155,7 +158,22 @@ public class UIUtil extends Util
             }
 
             // Set the session ID and IP address
-            c.setExtraLogInfo("session_id=" + request.getSession().getId() + ":ip_addr=" + request.getRemoteAddr());
+            String ip = request.getRemoteAddr();
+            if (useProxies == null) {
+                useProxies = ConfigurationManager.getBooleanProperty("useProxies", false);
+            }
+            if(useProxies && request.getHeader("X-Forwarded-For") != null)
+            {
+                /* This header is a comma delimited list */
+	            for(String xfip : request.getHeader("X-Forwarded-For").split(","))
+                {
+                    if(!request.getHeader("X-Forwarded-For").contains(ip))
+                    {
+                        ip = xfip.trim();
+                    }
+                }
+	        }
+            c.setExtraLogInfo("session_id=" + request.getSession().getId() + ":ip_addr=" + ip);
 
             // Store the context in the request
             request.setAttribute("dspace.context", c);
