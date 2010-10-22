@@ -42,6 +42,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URLEncoder;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
 
@@ -141,7 +142,7 @@ public class SFXFileReader {
         String sfxfield = "";
         int i = 0;
 
-        while ((i < len) && (sfxfield == ""))
+        while ((i < len) && StringUtils.isEmpty(sfxfield))
         {
             Node nd = nl.item(i);
             if ((nd == null) || isEmptyTextNode(nd))
@@ -211,7 +212,7 @@ public class SFXFileReader {
                         {
                             qualifier = getValue(vn);
                             finish ++;
-                            if (qualifier == "")
+                            if (StringUtils.isEmpty(qualifier))
                             {
                                 qualifier = null;
                             }

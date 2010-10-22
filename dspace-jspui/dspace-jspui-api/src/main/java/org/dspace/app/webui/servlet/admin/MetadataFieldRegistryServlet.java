@@ -349,7 +349,7 @@ public class MetadataFieldRegistryServlet extends DSpaceServlet
         }
 
         String qualifier = request.getParameter("qualifier");
-        if (qualifier == "")
+        if ("".equals(qualifier))
         {
             qualifier = null;
         }

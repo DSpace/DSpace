@@ -90,7 +90,7 @@ public class DeleteCollectionRoleConfirm extends AbstractDSpaceTransformer
 	    Division main = body.addInteractiveDivision("collection-role-delete",contextPath+"/admin/collection",Division.METHOD_POST,"primary administrative collection");
 	    main.setHead(T_main_head.parameterize(role));
 	    // Different help message for the default read group to enforce its non-retroactive nature
-	    if (role == "DEFAULT_READ")
+	    if ("DEFAULT_READ".equals(role))
         {
             main.addPara(T_main_para_read.parameterize(toBeDeleted.getName()));
         }

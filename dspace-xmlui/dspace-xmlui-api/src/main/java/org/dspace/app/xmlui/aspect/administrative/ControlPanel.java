@@ -51,6 +51,7 @@ import org.apache.avalon.framework.service.ServiceManager;
 import org.apache.avalon.framework.service.Serviceable;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
@@ -858,14 +859,14 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 		
 		generatorSettings.addLabel(T_harvest_label_oai_url);
 		String oaiUrl = ConfigurationManager.getProperty("dspace.oai.url");
-		if (oaiUrl != null && oaiUrl != "")
+		if (!StringUtils.isEmpty(oaiUrl))
         {
             generatorSettings.addItem(oaiUrl);
         }
 
 		generatorSettings.addLabel(T_harvest_label_oai_source);
 		String oaiAuthoritativeSource = ConfigurationManager.getProperty("ore.authoritative.source");
-		if (oaiAuthoritativeSource != null && oaiAuthoritativeSource != "")
+		if (!StringUtils.isEmpty(oaiAuthoritativeSource))
         {
             generatorSettings.addItem(oaiAuthoritativeSource);
         }

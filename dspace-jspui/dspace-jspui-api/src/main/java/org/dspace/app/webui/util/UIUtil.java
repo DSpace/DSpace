@@ -56,6 +56,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.jsp.jstl.core.Config;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.Util;
 import org.dspace.authenticate.AuthenticationManager;
@@ -338,7 +339,7 @@ public class UIUtil extends Util
         Locale sessionLocale = null;
         Locale supportedLocale = null;
 
-        if (paramLocale != null && paramLocale != "")
+        if (!StringUtils.isEmpty(paramLocale))
         {
             /* get session locale according to user selection */
             sessionLocale = new Locale(paramLocale);
