@@ -80,13 +80,19 @@ public class AJAXMenuGenerator extends AbstractGenerator
         String field = parameters.getParameter("field",null);
         String sstart = parameters.getParameter("start",null);
         if (sstart != null && sstart.length() > 0)
+        {
             start = Integer.parseInt(sstart);
+        }
         String slimit = parameters.getParameter("limit",null);
         if (slimit != null && slimit.length() > 0)
+        {
             limit = Integer.parseInt(slimit);
+        }
         String scoll = parameters.getParameter("collection",null);
         if (scoll != null && scoll.length() > 0)
+        {
             collection = Integer.parseInt(scoll);
+        }
         String query = parameters.getParameter("query",null);
 
         // localization

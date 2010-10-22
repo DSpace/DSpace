@@ -116,7 +116,9 @@ public class CollectionSearch extends AbstractDSpaceTransformer implements Cache
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
             if (dso == null)
+            {
                 return "0";
+            }
 
             return HashUtil.hash(dso.getHandle());
         }
@@ -145,10 +147,14 @@ public class CollectionSearch extends AbstractDSpaceTransformer implements Cache
 	            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
 	            if (dso == null)
-	                return null;
+                {
+                    return null;
+                }
 
 	            if (!(dso instanceof Collection))
-	                return null;
+                {
+                    return null;
+                }
 
 	            collection = (Collection) dso;
 
@@ -178,7 +184,9 @@ public class CollectionSearch extends AbstractDSpaceTransformer implements Cache
     {
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof Collection))
+        {
             return;
+        }
 
         Collection collection = (Collection) dso;
 
@@ -201,7 +209,9 @@ public class CollectionSearch extends AbstractDSpaceTransformer implements Cache
 				// Remove the protocol number, i.e. just list 'rss' or' atom'
 				String[] parts = format.split("_");
 				if (parts.length < 1)
-					continue;
+                {
+                    continue;
+                }
 
 				String feedFormat = parts[0].trim()+"+xml";
 
@@ -219,7 +229,9 @@ public class CollectionSearch extends AbstractDSpaceTransformer implements Cache
     {
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof Collection))
+        {
             return;
+        }
 
         // Set up the major variables
         Collection collection = (Collection) dso;
@@ -228,9 +240,13 @@ public class CollectionSearch extends AbstractDSpaceTransformer implements Cache
         Division home = body.addDivision("collection-home", "primary repository collection");
         String name = collection.getMetadata("name");
         if (name == null || name.length() == 0)
-        	home.setHead(T_untitled);
+        {
+            home.setHead(T_untitled);
+        }
         else
-        	home.setHead(name);
+        {
+            home.setHead(name);
+        }
 
         // The search / browse box.
         {

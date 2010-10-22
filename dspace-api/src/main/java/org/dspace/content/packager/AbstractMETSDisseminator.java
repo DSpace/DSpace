@@ -292,7 +292,9 @@ public abstract class AbstractMETSDisseminator
     {
         long lmTime = 0;
         if (dso.getType() == Constants.ITEM)
-            lmTime = ((Item)dso).getLastModified().getTime();
+        {
+            lmTime = ((Item) dso).getLastModified().getTime();
+        }
 
         // map of extra streams to put in Zip (these are located during makeManifest())
         MdStreamCache extraStreams = new MdStreamCache();
@@ -325,7 +327,9 @@ public abstract class AbstractMETSDisseminator
                     // link up this 'mdRef' to point to that file
                     ref.setXlinkHref(fname);
                     if (log.isDebugEnabled())
-                        log.debug("Writing EXTRA stream to Zip: "+fname);
+                    {
+                        log.debug("Writing EXTRA stream to Zip: " + fname);
+                    }
                     //actually add the file to the Zip package
                     ZipEntry ze = new ZipEntry(fname);
                     if (lmTime != 0)
@@ -414,8 +418,9 @@ public abstract class AbstractMETSDisseminator
                             String zname = makeBitstreamURL(bitstreams[k], params);
                             ZipEntry ze = new ZipEntry(zname);
                             if (log.isDebugEnabled())
-                                log.debug("Writing CONTENT stream of bitstream("+String.valueOf(bitstreams[k].getID())+") to Zip: "+zname+
-                                            ", size="+String.valueOf(bitstreams[k].getSize()));
+                            {
+                                log.debug(new StringBuilder().append("Writing CONTENT stream of bitstream(").append(bitstreams[k].getID()).append(") to Zip: ").append(zname).append(", size=").append(bitstreams[k].getSize()).toString());
+                            }
                             if (lmTime != 0)
                                 ze.setTime(lmTime);
                             else //Set a default modified date so that checksum of Zip doesn't change if Zip contents are unchanged
@@ -454,7 +459,9 @@ public abstract class AbstractMETSDisseminator
                 String zname = makeBitstreamURL(logoBs, params);
                 ZipEntry ze = new ZipEntry(zname);
                 if (log.isDebugEnabled())
-                    log.debug("Writing CONTENT stream of bitstream("+String.valueOf(logoBs.getID())+") to Zip: "+zname+", size="+String.valueOf(logoBs.getSize()));
+                {
+                    log.debug("Writing CONTENT stream of bitstream(" + String.valueOf(logoBs.getID()) + ") to Zip: " + zname + ", size=" + String.valueOf(logoBs.getSize()));
+                }
                 ze.setSize(logoBs.getSize());
                 //Set a default modified date so that checksum of Zip doesn't change if Zip contents are unchanged
                 ze.setTime(DEFAULT_MODIFIED_DATE);
@@ -673,7 +680,9 @@ public abstract class AbstractMETSDisseminator
         {
             MdSec md = makeMdSec(context, dso, mdSecClass, mdTypes[i], params, extraStreams);
             if (md != null)
+            {
                 fAmdSec.getContent().add(md);
+            }
         }
     }
 
@@ -735,7 +744,9 @@ public abstract class AbstractMETSDisseminator
         
         String identifier = "DB-ID-" + dso.getID();
         if(dso.getHandle()!=null)
-            identifier =  dso.getHandle().replace('/', '-');
+        {
+            identifier = dso.getHandle().replace('/', '-');
+        }
         
         // this ID should be globally unique (format: DSpace_[objType]_[handle with slash replaced with a dash])
         mets.setID("DSpace_" + Constants.typeText[dso.getType()] + "_" + identifier);
@@ -750,7 +761,9 @@ public abstract class AbstractMETSDisseminator
 
         MetsHdr metsHdr = makeMetsHdr(context, dso, params);
         if (metsHdr != null)
+        {
             mets.getContent().add(metsHdr);
+        }
 
         // add DMD sections
         // Each type element MAY be either just a MODS-and-crosswalk name, OR
@@ -807,7 +820,9 @@ public abstract class AbstractMETSDisseminator
             for (int i = 0; i < bundles.length; i++)
             {
                 if (!includeBundle(bundles[i]))
+                {
                     continue;
+                }
 
                 // unauthorized bundle?
                 // NOTE: This must match the logic in disseminate()
@@ -827,12 +842,16 @@ public abstract class AbstractMETSDisseminator
                 FileGrp fileGrp = new FileGrp();
                 String bName = bundles[i].getName();
                 if ((bName != null) && !bName.equals(""))
+                {
                     fileGrp.setUSE(bundleToFileGrp(bName));
+                }
 
                 // add technical metadata for a bundle
                 String techBundID = addAmdSec(context, bundles[i], params, mets, extraStreams);
                 if (techBundID != null)
+                {
                     fileGrp.setADMID(techBundID);
+                }
 
                 // watch for primary bitstream
                 int primaryBitstreamID = -1;
@@ -856,9 +875,13 @@ public abstract class AbstractMETSDisseminator
                     if (!auth)
                     {
                         if (unauth != null && unauth.equalsIgnoreCase("skip"))
+                        {
                             continue;
+                        }
                         else if (!(unauth != null && unauth.equalsIgnoreCase("zero")))
-                            throw new AuthorizeException("Not authorized to read Bitstream, SID="+String.valueOf(bitstreams[bits].getSequenceID()));
+                        {
+                            throw new AuthorizeException("Not authorized to read Bitstream, SID=" + String.valueOf(bitstreams[bits].getSequenceID()));
+                        }
                     }
 
                     String sid = String.valueOf(bitstreams[bits].getSequenceID());
@@ -878,7 +901,9 @@ public abstract class AbstractMETSDisseminator
 
                     // if this is content, add to structmap too:
                     if (isContentBundle)
+                    {
                         div0.getContent().add(makeFileDiv(fileID, getObjectTypeString(bitstreams[bits])));
+                    }
 
                     /*
                      * If we're in THUMBNAIL or TEXT bundles, the bitstream is
@@ -929,7 +954,9 @@ public abstract class AbstractMETSDisseminator
                     // technical metadata for bitstream
                     String techID = addAmdSec(context, bitstreams[bits], params, mets, extraStreams);
                     if (techID != null)
+                    {
                         file.setADMID(techID);
+                    }
                 }
                 fileSec.getContent().add(fileGrp);
             }
@@ -943,7 +970,9 @@ public abstract class AbstractMETSDisseminator
                 Item item = ii.next();
                 Div childDiv = makeChildDiv(getObjectTypeString(item), item, params);
                 if(childDiv!=null)
+                {
                     div0.getContent().add(childDiv);
+                }
             }
             Bitstream logoBs = ((Collection)dso).getLogo();
             if (logoBs != null)
@@ -962,7 +991,9 @@ public abstract class AbstractMETSDisseminator
                 //add a child <div> for each subcommunity in this community
                 Div childDiv = makeChildDiv(getObjectTypeString(subcomms[i]), subcomms[i], params);
                 if(childDiv!=null)
+                {
                     div0.getContent().add(childDiv);
+                }
             }
             // Collections are also directly under "DSpace Object Contents" <div>,
             // but are labeled as Collections.
@@ -972,7 +1003,9 @@ public abstract class AbstractMETSDisseminator
                 //add a child <div> for each collection in this community
                 Div childDiv = makeChildDiv(getObjectTypeString(colls[i]), colls[i], params);
                 if(childDiv!=null)
+                {
                     div0.getContent().add(childDiv);
+                }
             }
             //add Community logo bitstream
             Bitstream logoBs = ((Community)dso).getLogo();
@@ -993,21 +1026,30 @@ public abstract class AbstractMETSDisseminator
                 Div childDiv = makeChildDiv(getObjectTypeString(comms[i]),
                         comms[i], params);
                 if(childDiv!=null)
+                {
                     div0.getContent().add(childDiv);
+                }
             }
         }
         if (fileSec != null)
+        {
             mets.getContent().add(fileSec);
+        }
         mets.getContent().add(structMap);
 
         // set links to metadata for object -- after type-specific
         // code since that can add to the object metadata.
         StringBuilder dmdIds = new StringBuilder();
-        for (int i = 0; i < dmdId.length; ++i)
-            dmdIds.append(" ").append(dmdId[i]);
+        for (String currdmdId : dmdId)
+        {
+            dmdIds.append(" ").append(currdmdId);
+        }
+
         div0.setDMDID(dmdIds.substring(1));
         if (objectAMDID != null)
+        {
             div0.setADMID(objectAMDID);
+        }
 
         // Does subclass have something to add to structMap?
         addStructMap(context, dso, params, mets);
@@ -1134,7 +1176,9 @@ public abstract class AbstractMETSDisseminator
     protected String getHandleURN(String handle)
     {
         if (handle.startsWith("hdl:"))
+        {
             return handle;
+        }
         return "hdl:"+handle;
     }
 
@@ -1211,13 +1255,17 @@ public abstract class AbstractMETSDisseminator
             {
                 List res = xwalk.disseminateList(dso);
                 if (!(res == null || res.isEmpty()))
+                {
                     pXML = new PreformedXML(outputter.outputString(res));
+                }
             }
             else
             {
                 Element res = xwalk.disseminateElement(dso);
                 if (res != null)
+                {
                     pXML = new PreformedXML(outputter.outputString(res));
+                }
             }
             if (pXML != null)
             {
@@ -1230,7 +1278,9 @@ public abstract class AbstractMETSDisseminator
         {
             // ignore this xwalk if object is unsupported.
             if (log.isDebugEnabled())
-                log.debug("Skipping MDsec because of CrosswalkObjectNotSupported: dso="+dso.toString()+", xwalk="+xwalk.getClass().getName());
+            {
+                log.debug("Skipping MDsec because of CrosswalkObjectNotSupported: dso=" + dso.toString() + ", xwalk=" + xwalk.getClass().getName());
+            }
             return null;
         }
     }

@@ -87,9 +87,13 @@ public class AdvancedFormTest extends AbstractDSpaceTransformer {
 		Request request = ObjectModelHelper.getRequest(objectModel);
 		boolean help = false, error = false;
 		if (request.getParameter("help") != null)
-			help = true;
+        {
+            help = true;
+        }
 		if (request.getParameter("error") != null)
-			error = true;
+        {
+            error = true;
+        }
 		
 		Division div = body.addInteractiveDivision("test", "", "post", "primary");
 		div.setHead("Advanced form test");
@@ -115,9 +119,13 @@ public class AdvancedFormTest extends AbstractDSpaceTransformer {
 		text.enableAddOperation();
 		text.enableDeleteOperation();
 		if (help)
-			text.setHelp("This is helpfull text.");
+        {
+            text.setHelp("This is helpfull text.");
+        }
 		if (error)
-			text.addError("This field is in error.");
+        {
+            text.addError("This field is in error.");
+        }
 		text.setValue("First is special");
 		Instance instance = text.addInstance();
 		instance.setValue("Second raw");
@@ -134,9 +142,13 @@ public class AdvancedFormTest extends AbstractDSpaceTransformer {
 		select.setMultiple();
 		select.setSize(4);
 		if (help)
-			select.setHelp("This is helpfull text.");
+        {
+            select.setHelp("This is helpfull text.");
+        }
 		if (error)
-			select.addError("This field is in error.");
+        {
+            select.addError("This field is in error.");
+        }
 		select.addOption("one", "uno");
 		select.addOption("two", "dos");
 		select.addOption("three", "tres");
@@ -175,19 +187,27 @@ public class AdvancedFormTest extends AbstractDSpaceTransformer {
         composite.enableAddOperation();
         composite.enableDeleteOperation();
         if (help)
-        	composite.setHelp("This field is composed of two text fields, fill them both in.");
+        {
+            composite.setHelp("This field is composed of two text fields, fill them both in.");
+        }
         if (error)
-        	composite.addError("Just the composite is in error.");
+        {
+            composite.addError("Just the composite is in error.");
+        }
         text = composite.addText("firstA");
         if (help)
-        	text.setHelp("This is helpfull text.");
+        {
+            text.setHelp("This is helpfull text.");
+        }
         text.addInstance().setValue("1, Raw A");
         text.addInstance().setValue("2, Raw A");
         text.addInstance().setValue("3, Raw A");
         
         text = composite.addText("secondA");
         if (help)
-        	text.setHelp("This is helpfull text.");
+        {
+            text.setHelp("This is helpfull text.");
+        }
         text.addInstance().setValue("1, Raw B");
         text.addInstance().setValue("2, Raw B");
         text.addInstance().setValue("3, Raw B");
@@ -198,13 +218,19 @@ public class AdvancedFormTest extends AbstractDSpaceTransformer {
         composite.enableAddOperation();
         composite.enableDeleteOperation();
         if (help)
-        	composite.setHelp("This field is composed of a select and text field, select one and type the other.");
+        {
+            composite.setHelp("This field is composed of a select and text field, select one and type the other.");
+        }
   
         select = composite.addSelect("selectB");
         if (help)
-        	select.setHelp("Me, me, me..... select me!");
+        {
+            select.setHelp("Me, me, me..... select me!");
+        }
         if (error)
-        	select.addError("The composite elements are in error.");
+        {
+            select.addError("The composite elements are in error.");
+        }
         select.addOption("one","uno");
         select.addOption("two","dos");
         select.addOption("three","tres");
@@ -218,9 +244,13 @@ public class AdvancedFormTest extends AbstractDSpaceTransformer {
         
         text = composite.addText("TextB");
         if (help)
-        	text.setHelp("Yay, yet another text field");
+        {
+            text.setHelp("Yay, yet another text field");
+        }
         if (error)
-        	text.addError("The composite elements are in error.");
+        {
+            text.addError("The composite elements are in error.");
+        }
         text.addInstance().setValue("1, Raw B");
         text.addInstance().setValue("2, Raw B");
         text.addInstance().setValue("3, Raw B");
@@ -235,15 +265,23 @@ public class AdvancedFormTest extends AbstractDSpaceTransformer {
         composite.enableAddOperation();
         composite.enableDeleteOperation();
         if (help)
-        	composite.setHelp("The date when something happened.");
+        {
+            composite.setHelp("The date when something happened.");
+        }
         if (error)
-        	composite.setHelp("The composite is in error.");
+        {
+            composite.setHelp("The composite is in error.");
+        }
         
         text = composite.addText("day");
         if (help)
-        	text.setHelp("day");
+        {
+            text.setHelp("day");
+        }
         if (error)
-        	text.setHelp("The first text field is in error.");
+        {
+            text.setHelp("The first text field is in error.");
+        }
         text.setSize(4,2);
         
         text.addInstance().setValue("1");
@@ -254,7 +292,9 @@ public class AdvancedFormTest extends AbstractDSpaceTransformer {
         
         select = composite.addSelect("month");
         if (error)
-        	select.setHelp("The select box is in error.");
+        {
+            select.setHelp("The select box is in error.");
+        }
         select.addOption("","(Select Month)");
         select.addOption(1,"January");
         select.addOption(2,"Feburary");
@@ -279,9 +319,13 @@ public class AdvancedFormTest extends AbstractDSpaceTransformer {
         text = composite.addText("year");
         text.setSize(4,4);
         if (help)
-        	text.setHelp("year");
+        {
+            text.setHelp("year");
+        }
         if (error)
-        	text.setHelp("The second text field is in error.");
+        {
+            text.setHelp("The second text field is in error.");
+        }
         text.addInstance().setValue("2001");
         text.addInstance().setValue("2002");
         text.addInstance().setValue("2003");
@@ -301,13 +345,19 @@ public class AdvancedFormTest extends AbstractDSpaceTransformer {
 	private String makeURL(boolean help, boolean error)
 	{
 		if (help && error)
-			return "?help&error";
+        {
+            return "?help&error";
+        }
 		
 		if (help)
-			return "?help";
+        {
+            return "?help";
+        }
 		
 		if (error)
-			return "?error";
+        {
+            return "?error";
+        }
 		
 		return "?neither";
 	}

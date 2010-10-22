@@ -204,20 +204,32 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 			UIException, SQLException, IOException, AuthorizeException {
 		
 		if (!AuthorizeManager.isAdmin(context))
-			throw new AuthorizeException("You are not authorized to view this page.");
+        {
+            throw new AuthorizeException("You are not authorized to view this page.");
+        }
 		
 		Request request = ObjectModelHelper.getRequest(objectModel);
 		OPTIONS option = null;
 		if (request.getParameter("java") != null)
-			option = OPTIONS.java;
+        {
+            option = OPTIONS.java;
+        }
 		if (request.getParameter("dspace") != null)
-			option = OPTIONS.dspace;
+        {
+            option = OPTIONS.dspace;
+        }
 		if (request.getParameter("alerts") != null)
-			option = OPTIONS.alerts;
+        {
+            option = OPTIONS.alerts;
+        }
 		if (request.getParameter("activity") != null)
-			option = OPTIONS.activity;
+        {
+            option = OPTIONS.activity;
+        }
 		if (request.getParameter("harvest") != null)
-			option = OPTIONS.harvest;
+        {
+            option = OPTIONS.harvest;
+        }
 		
 		Division div = body.addInteractiveDivision("control-panel", contextPath+"/admin/panel", Division.METHOD_POST, "primary administrative");
 		div.setHead(T_head);
@@ -227,45 +239,77 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 		
 		// our options, selected or not....
 		if (option == OPTIONS.java)
-			options.addItem().addHighlight("bold").addXref("?java",T_option_java);
+        {
+            options.addItem().addHighlight("bold").addXref("?java", T_option_java);
+        }
 		else
-			options.addItemXref("?java",T_option_java);
+        {
+            options.addItemXref("?java", T_option_java);
+        }
 		
 		if (option == OPTIONS.dspace)
-			options.addItem().addHighlight("bold").addXref("?dspace",T_option_dspace);
+        {
+            options.addItem().addHighlight("bold").addXref("?dspace", T_option_dspace);
+        }
 		else
-			options.addItemXref("?dspace",T_option_dspace);
+        {
+            options.addItemXref("?dspace", T_option_dspace);
+        }
 		
 		if (option == OPTIONS.alerts)
-			options.addItem().addHighlight("bold").addXref("?alerts",T_option_alerts);
+        {
+            options.addItem().addHighlight("bold").addXref("?alerts", T_option_alerts);
+        }
 		else
-			options.addItemXref("?alerts",T_option_alerts);
+        {
+            options.addItemXref("?alerts", T_option_alerts);
+        }
 		
 		if (option == OPTIONS.harvest)
-			options.addItem().addHighlight("bold").addXref("?harvest",T_option_harvest);
+        {
+            options.addItem().addHighlight("bold").addXref("?harvest", T_option_harvest);
+        }
 		else
-			options.addItemXref("?harvest",T_option_harvest);
+        {
+            options.addItemXref("?harvest", T_option_harvest);
+        }
 		
 		String userSortTarget = "?activity";
 		if (request.getParameter("sortBy") != null)
-			userSortTarget += "&sortBy="+request.getParameter("sortBy");
+        {
+            userSortTarget += "&sortBy=" + request.getParameter("sortBy");
+        }
 		if (option == OPTIONS.activity)
-			options.addItem().addHighlight("bold").addXref(userSortTarget,"Current Activity");
+        {
+            options.addItem().addHighlight("bold").addXref(userSortTarget, "Current Activity");
+        }
 		else
-			options.addItemXref(userSortTarget,"Current Activity");
+        {
+            options.addItemXref(userSortTarget, "Current Activity");
+        }
 		
 		
 		// The main content:
 		if (option == OPTIONS.java)
-			addJavaInformation(div);
+        {
+            addJavaInformation(div);
+        }
 		else if (option == OPTIONS.dspace)
-			addDSpaceConfiguration(div);
+        {
+            addDSpaceConfiguration(div);
+        }
 		else if (option == OPTIONS.alerts)
-			addAlerts(div);
+        {
+            addAlerts(div);
+        }
 		else if (option == OPTIONS.activity)
-			addActivity(div);
+        {
+            addActivity(div);
+        }
 		else if (option == OPTIONS.harvest)
-			addHarvest(div);
+        {
+            addHarvest(div);
+        }
 		else
 		{
 			div.addPara(T_select_panel);
@@ -442,9 +486,13 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 		if (recordAnonymousString != null)
 		{
 			if ("ON".equals(recordAnonymousString))
-				CurrentActivityAction.setRecordAnonymousEvents(true);
+            {
+                CurrentActivityAction.setRecordAnonymousEvents(true);
+            }
 			if ("OFF".equals(recordAnonymousString))
-				CurrentActivityAction.setRecordAnonymousEvents(false);
+            {
+                CurrentActivityAction.setRecordAnonymousEvents(false);
+            }
 		}
 		
 		// Toggle bot recording
@@ -452,24 +500,38 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 		if (recordBotString != null)
 		{
 			if ("ON".equals(recordBotString))
-				CurrentActivityAction.setRecordBotEvents(true);
+            {
+                CurrentActivityAction.setRecordBotEvents(true);
+            }
 			if ("OFF".equals(recordBotString))
-				CurrentActivityAction.setRecordBotEvents(false);
+            {
+                CurrentActivityAction.setRecordBotEvents(false);
+            }
 		}		
 		
 		// 1) Determine how to sort
 		EventSort sortBy = EventSort.TIME;
 		String sortByString = request.getParameter("sortBy");
 		if (EventSort.TIME.toString().equals(sortByString))
-			sortBy = EventSort.TIME;
+        {
+            sortBy = EventSort.TIME;
+        }
 		if (EventSort.URL.toString().equals(sortByString))
-			sortBy = EventSort.URL;
+        {
+            sortBy = EventSort.URL;
+        }
 		if (EventSort.SESSION.toString().equals(sortByString))
-			sortBy = EventSort.SESSION;
+        {
+            sortBy = EventSort.SESSION;
+        }
 		if (EventSort.AGENT.toString().equals(sortByString))
-			sortBy = EventSort.AGENT;
+        {
+            sortBy = EventSort.AGENT;
+        }
 		if (EventSort.IP.toString().equals(sortByString))
-			sortBy = EventSort.IP;
+        {
+            sortBy = EventSort.IP;
+        }
 		
 		// 2) Sort the events by the requested sorting parameter
 		java.util.List<CurrentActivityAction.Event> events = CurrentActivityAction.getEvents();
@@ -478,14 +540,22 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         
         // 3) Toggle controls for anonymous and bot activity
         if (CurrentActivityAction.getRecordAnonymousEvents())
-        	div.addPara().addXref("?activity&sortBy="+sortBy+"&recordanonymous=OFF").addContent(T_stop_anonymous);
+        {
+            div.addPara().addXref("?activity&sortBy=" + sortBy + "&recordanonymous=OFF").addContent(T_stop_anonymous);
+        }
         else
-        	div.addPara().addXref("?activity&sortBy="+sortBy+"&recordanonymous=ON").addContent(T_start_anonymous);
+        {
+            div.addPara().addXref("?activity&sortBy=" + sortBy + "&recordanonymous=ON").addContent(T_start_anonymous);
+        }
         
         if (CurrentActivityAction.getRecordBotEvents())
-        	div.addPara().addXref("?activity&sortBy="+sortBy+"&recordbots=OFF").addContent(T_stop_bot);
+        {
+            div.addPara().addXref("?activity&sortBy=" + sortBy + "&recordbots=OFF").addContent(T_stop_bot);
+        }
         else
-        	div.addPara().addXref("?activity&sortBy="+sortBy+"&recordbots=ON").addContent(T_start_bot);
+        {
+            div.addPara().addXref("?activity&sortBy=" + sortBy + "&recordbots=ON").addContent(T_start_bot);
+        }
        	
         
 		// 4) Display the results Table
@@ -494,29 +564,49 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         activeUsers.setHead(T_activity_head.parameterize(CurrentActivityAction.MAX_EVENTS));
         Row row = activeUsers.addRow(Row.ROLE_HEADER);
         if (sortBy == EventSort.TIME)
-        	row.addCell().addHighlight("bold").addXref("?activity&sortBy="+EventSort.TIME).addContent(T_activity_sort_time);
+        {
+            row.addCell().addHighlight("bold").addXref("?activity&sortBy=" + EventSort.TIME).addContent(T_activity_sort_time);
+        }
         else
-        	row.addCell().addXref("?activity&sortBy="+EventSort.TIME).addContent(T_activity_sort_time);
+        {
+            row.addCell().addXref("?activity&sortBy=" + EventSort.TIME).addContent(T_activity_sort_time);
+        }
         
         if (sortBy == EventSort.SESSION)
-        	row.addCell().addHighlight("bold").addXref("?activity&sortBy="+EventSort.SESSION).addContent(T_activity_sort_user);
+        {
+            row.addCell().addHighlight("bold").addXref("?activity&sortBy=" + EventSort.SESSION).addContent(T_activity_sort_user);
+        }
         else
-        	row.addCell().addXref("?activity&sortBy="+EventSort.SESSION).addContent(T_activity_sort_user);
+        {
+            row.addCell().addXref("?activity&sortBy=" + EventSort.SESSION).addContent(T_activity_sort_user);
+        }
         
         if (sortBy == EventSort.IP)
-        	row.addCell().addHighlight("bold").addXref("?activity&sortBy="+EventSort.IP).addContent(T_activity_sort_ip);
+        {
+            row.addCell().addHighlight("bold").addXref("?activity&sortBy=" + EventSort.IP).addContent(T_activity_sort_ip);
+        }
         else
-        	row.addCell().addXref("?activity&sortBy="+EventSort.IP).addContent(T_activity_sort_ip);
+        {
+            row.addCell().addXref("?activity&sortBy=" + EventSort.IP).addContent(T_activity_sort_ip);
+        }
         
         if (sortBy == EventSort.URL)
-        	row.addCell().addHighlight("bold").addXref("?activity&sortBy="+EventSort.URL).addContent(T_activity_sort_url);
+        {
+            row.addCell().addHighlight("bold").addXref("?activity&sortBy=" + EventSort.URL).addContent(T_activity_sort_url);
+        }
         else
-        	row.addCell().addXref("?activity&sortBy="+EventSort.URL).addContent(T_activity_sort_url);
+        {
+            row.addCell().addXref("?activity&sortBy=" + EventSort.URL).addContent(T_activity_sort_url);
+        }
         
         if (sortBy == EventSort.AGENT)
-        	row.addCell().addHighlight("bold").addXref("?activity&sortBy="+EventSort.AGENT).addContent(T_activity_sort_agent);
+        {
+            row.addCell().addHighlight("bold").addXref("?activity&sortBy=" + EventSort.AGENT).addContent(T_activity_sort_agent);
+        }
         else
-        	row.addCell().addXref("?activity&sortBy="+EventSort.AGENT).addContent(T_activity_sort_agent);
+        {
+            row.addCell().addXref("?activity&sortBy=" + EventSort.AGENT).addContent(T_activity_sort_agent);
+        }
    
         // Keep track of how many individual anonymous users there are, each unique anonymous
         // user is assigned an index based upon the servlet session id.
@@ -527,7 +617,9 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 		for (CurrentActivityAction.Event event : events)
 		{	
 			if (event == null)
-				continue;
+            {
+                continue;
+            }
 			
 			shown++;
 			
@@ -556,7 +648,9 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 			{
 				// Is this a new anonymous user?
 				if (!anonymousHash.containsKey(event.getSessionID()))
-					anonymousHash.put(event.getSessionID(), anonymousCount++);
+                {
+                    anonymousHash.put(event.getSessionID(), anonymousCount++);
+                }
 				
 				eventRow.addCellContent(T_activity_anonymous.parameterize(anonymousHash.get(event.getSessionID())));
 			}
@@ -592,11 +686,17 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 		{
 			// Protect against null events while sorting
 			if (a != null && b == null)
-				return 1; // A > B
+            {
+                return 1; // A > B
+            }
 			else if (a == null && b != null)
-				return -1; // B > A
+            {
+                return -1; // B > A
+            }
 			else if (a == null && b == null)
-				return 0; // A == B
+            {
+                return 0; // A == B
+            }
 			
 			// Sort by the given ordering matrix
 			if (EventSort.URL == sortBy)
@@ -605,7 +705,9 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 				String bURL = b.getURL();
 				int cmp = aURL.compareTo(bURL);
 				if (cmp != 0)
-					return cmp;
+                {
+                    return cmp;
+                }
 			}
 			else if (EventSort.AGENT == sortBy)
 			{
@@ -613,7 +715,9 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 				String bAgent = b.getDectectedBrowser();
 				int cmp = aAgent.compareTo(bAgent);
 				if (cmp != 0)
-					return cmp;
+                {
+                    return cmp;
+                }
 			}
 			else if (EventSort.IP == sortBy)
 			{
@@ -621,7 +725,9 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 				String bIP = b.getIP();
 				int cmp = aIP.compareTo(bIP);
 				if (cmp != 0)
-					return cmp;
+                {
+                    return cmp;
+                }
 				
 			}
 			else if (EventSort.SESSION == sortBy)
@@ -631,22 +737,32 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 				// IDs. Unfortunitaly we can not compare eperson names because 
 				// we do not have access to a context object.
 				if (a.getEPersonID() > 0  && b.getEPersonID() < 0)
-					return 1; // A > B
+                {
+                    return 1; // A > B
+                }
 				else if (a.getEPersonID() < 0  && b.getEPersonID() > 0)
-					return -1; // B > A
+                {
+                    return -1; // B > A
+                }
 				
 				String aSession = a.getSessionID();
 				String bSession = b.getSessionID();
 				int cmp = aSession.compareTo(bSession);
 				if (cmp != 0)
-					return cmp;
+                {
+                    return cmp;
+                }
 			}
 			
 			// All ways fall back to sorting by time, when events are equal.
 			if (a.getTimeStamp() > b.getTimeStamp())
-				return 1;  // A > B
+            {
+                return 1;  // A > B
+            }
 			else if (a.getTimeStamp() > b.getTimeStamp())
-				return -1; // B > A
+            {
+                return -1; // B > A
+            }
 			return 0; // A == B
 		}
 	}
@@ -675,12 +791,18 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 			actionsItem.addButton("submit_harvest_reset").setValue(T_harvest_submit_reset);
 		}
 		if (HarvestScheduler.status == HarvestScheduler.HARVESTER_STATUS_PAUSED)
-			actionsItem.addButton("submit_harvest_resume").setValue(T_harvest_submit_resume);
+        {
+            actionsItem.addButton("submit_harvest_resume").setValue(T_harvest_submit_resume);
+        }
 		if (HarvestScheduler.status == HarvestScheduler.HARVESTER_STATUS_RUNNING || 
 				HarvestScheduler.status == HarvestScheduler.HARVESTER_STATUS_SLEEPING)
-			actionsItem.addButton("submit_harvest_pause").setValue(T_harvest_submit_pause);
+        {
+            actionsItem.addButton("submit_harvest_pause").setValue(T_harvest_submit_pause);
+        }
 		if (HarvestScheduler.status != HarvestScheduler.HARVESTER_STATUS_STOPPED)
-			actionsItem.addButton("submit_harvest_stop").setValue(T_harvest_submit_stop);
+        {
+            actionsItem.addButton("submit_harvest_stop").setValue(T_harvest_submit_stop);
+        }
 		
 		// Can be retrieved via "{context-path}/admin/collection?collectionID={id}"
 		String baseURL = contextPath + "/admin/collection?collectionID=";
@@ -723,14 +845,20 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 		generatorSettings.addLabel(T_harvest_label_oai_url);
 		String oaiUrl = ConfigurationManager.getProperty("dspace.oai.url");
 		if (oaiUrl != null && oaiUrl != "")
-			generatorSettings.addItem(oaiUrl);
+        {
+            generatorSettings.addItem(oaiUrl);
+        }
 
 		generatorSettings.addLabel(T_harvest_label_oai_source);
 		String oaiAuthoritativeSource = ConfigurationManager.getProperty("ore.authoritative.source");
 		if (oaiAuthoritativeSource != null && oaiAuthoritativeSource != "")
-			generatorSettings.addItem(oaiAuthoritativeSource);
+        {
+            generatorSettings.addItem(oaiAuthoritativeSource);
+        }
 		else
-			generatorSettings.addItem("oai");
+        {
+            generatorSettings.addItem("oai");
+        }
 		
 		// OAI Harvester settings (just iterate over all the values that start with "harvester")
 		List harvesterSettings = div.addList("oai-harvester-settings");

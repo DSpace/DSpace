@@ -170,9 +170,13 @@ public class Body extends AbstractWingElement implements WingMergeableElement
             Attributes attributes) throws SAXException, WingException
     {
         if (!WingConstants.DRI.URI.equals(namespace))
+        {
             return false;
+        }
         if (!E_BODY.equals(localName))
+        {
             return false;
+        }
         return true;
     }
 
@@ -197,7 +201,9 @@ public class Body extends AbstractWingElement implements WingMergeableElement
         for (Division candidate : divisions)
         {
             if (candidate.mergeEqual(namespace, localName, qName, attributes))
+            {
                 found = candidate;
+            }
 
         }
         divisions.remove(found);
@@ -235,13 +241,19 @@ public class Body extends AbstractWingElement implements WingMergeableElement
             throws SAXException
     {
         if (!merged)
+        {
             startElement(contentHandler, namespaces, E_BODY, null);
+        }
 
         for (Division division : divisions)
+        {
             division.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
 
         if (!merged)
+        {
             endElement(contentHandler, namespaces, E_BODY);
+        }
     }
 
     /**

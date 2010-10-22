@@ -201,7 +201,9 @@ public class Bitstream extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         Bitstream[] bitstreamArray = new Bitstream[bitstreams.size()];
@@ -605,7 +607,9 @@ public class Bitstream extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
         
         return count == 1;
@@ -670,7 +674,9 @@ public class Bitstream extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         Bundle[] bundleArray = new Bundle[bundles.size()];

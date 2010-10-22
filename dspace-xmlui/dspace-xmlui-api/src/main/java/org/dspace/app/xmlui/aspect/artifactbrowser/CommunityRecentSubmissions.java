@@ -96,7 +96,9 @@ public class CommunityRecentSubmissions extends AbstractDSpaceTransformer implem
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
             if (dso == null)
-                return "0"; // no item, something is wrong
+            {
+                return "0";
+            } // no item, something is wrong
 
             return HashUtil.hash(dso.getHandle());
         }
@@ -116,10 +118,14 @@ public class CommunityRecentSubmissions extends AbstractDSpaceTransformer implem
 	            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
 	            if (dso == null)
-	                return null;
+                {
+                    return null;
+                }
 
 	            if (!(dso instanceof Community))
-	                return null;
+                {
+                    return null;
+                }
 
 	            community = (Community) dso;
 
@@ -147,7 +153,9 @@ public class CommunityRecentSubmissions extends AbstractDSpaceTransformer implem
     public void addBody(Body body) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof Community))
+        {
             return;
+        }
 
         Community community = (Community) dso;
 
@@ -155,7 +163,9 @@ public class CommunityRecentSubmissions extends AbstractDSpaceTransformer implem
 
         java.util.List<BrowseItem> items = getRecentlySubmittedItems(community);
         if(items.size() == 0)
+        {
             return;
+        }
         
         Division lastSubmittedDiv = home
                 .addDivision("community-recent-submission","secondary recent-submission");
@@ -181,12 +191,16 @@ public class CommunityRecentSubmissions extends AbstractDSpaceTransformer implem
             throws SQLException
     {
         if (recentSubmittedItems != null)
+        {
             return recentSubmittedItems;
+        }
 
         String source = ConfigurationManager.getProperty("recent.submissions.sort-option");
         int numRecentSubmissions = ConfigurationManager.getIntProperty("recent.submissions.count", RECENT_SUBMISSIONS);
         if(numRecentSubmissions == 0)
+        {
             return new ArrayList<BrowseItem>();
+        }
         BrowserScope scope = new BrowserScope(context);
         scope.setCommunity(community);
         scope.setResultsPerPage(numRecentSubmissions);

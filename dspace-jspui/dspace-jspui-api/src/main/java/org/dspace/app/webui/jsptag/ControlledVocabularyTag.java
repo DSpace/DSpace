@@ -231,7 +231,9 @@ public class ControlledVocabularyTag extends TagSupport
             boolean allowMultipleSelection, String contextPath)
     {
         if (vocabulary == null)
+        {
             return "";
+        }
 
         String result = "";
         try
@@ -267,7 +269,9 @@ public class ControlledVocabularyTag extends TagSupport
             String vocabularyPrunningXSLT, String filter)
     {
         if (vocabulary == null)
+        {
             return null;
+        }
 
         try
         {

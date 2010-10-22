@@ -135,7 +135,10 @@ public abstract class AbstractPackageIngester
                SQLException, IOException
     {
         //If unset, make sure the Parameters specifies this is a recursive ingest
-        if(!params.recursiveModeEnabled()) params.setRecursiveModeEnabled(true);
+        if(!params.recursiveModeEnabled())
+        {
+            params.setRecursiveModeEnabled(true);
+        }
 
         //Initial DSpace Object to ingest
         DSpaceObject dso = null;
@@ -197,7 +200,9 @@ public abstract class AbstractPackageIngester
                             Item childItem = (Item)dsoIngestedList.get(oldSize);
                             Collection collection = (Collection)dso;
                             if (!childItem.isIn(collection))
+                            {
                                 collection.addItem(childItem);
+                            }
                         }
                     }
                 }//end if child pkgs
@@ -249,7 +254,10 @@ public abstract class AbstractPackageIngester
                SQLException, IOException
     {
         //If unset, make sure the Parameters specifies this is a recursive replace
-        if(!params.recursiveModeEnabled()) params.setRecursiveModeEnabled(true);
+        if(!params.recursiveModeEnabled())
+        {
+            params.setRecursiveModeEnabled(true);
+        }
 
         //actually ingest pkg using provided PackageIngester, and replace object
         //NOTE: 'dso' may be null! If it is null, the PackageIngester must determine
@@ -294,7 +302,9 @@ public abstract class AbstractPackageIngester
                         Item childItem = (Item)dsoIngestedList.get(oldSize);
                         Collection collection = (Collection)replacedDso;
                         if (!childItem.isIn(collection))
+                        {
                             collection.addItem(childItem);
+                        }
                     }
                 }
             }//end if child pkgs

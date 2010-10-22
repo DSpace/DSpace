@@ -86,7 +86,9 @@ public class CommunityRecentSubmissions extends AbstractFiltersTransformer
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof Community))
+        {
             return;
+        }
 
         // Build the community viewer division.
         Division home = body.addDivision("community-home", "primary repository community");
@@ -118,7 +120,9 @@ public class CommunityRecentSubmissions extends AbstractFiltersTransformer
 
 
         if(queryResults != null)
-            return;// queryResults;
+        {
+            return;
+        }// queryResults;
 
         queryArgs = prepareDefaultFilters("community");
 

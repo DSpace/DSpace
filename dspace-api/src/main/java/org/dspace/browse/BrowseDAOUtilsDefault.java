@@ -194,13 +194,19 @@ public class BrowseDAOUtilsDefault implements BrowseDAOUtils
     private String trunctateString(String value, int maxChars, String omissionMark)
     {
         if (value == null || maxChars < 1)
+        {
             return value;
+        }
         
         if (maxChars > value.length())
+        {
             return value;
+        }
         
         if (omissionMark != null && omissionMark.length() > 0)
+        {
             return value.substring(0, maxChars - omissionMark.length()) + omissionMark;
+        }
         
         return value.substring(0, maxChars);
     }

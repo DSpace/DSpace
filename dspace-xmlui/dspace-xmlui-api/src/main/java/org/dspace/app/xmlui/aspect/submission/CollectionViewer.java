@@ -92,7 +92,9 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
             if (dso == null)
+            {
                 return "0";
+            }
                 
             return HashUtil.hash(dso.getHandle());
         }
@@ -120,10 +122,14 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 	            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 	
 	            if (dso == null)
-	                return null;
+                {
+                    return null;
+                }
 	
 	            if (!(dso instanceof Collection))
-	                return null;
+                {
+                    return null;
+                }
 	
 	            Collection collection = (Collection) dso;
 	
@@ -161,7 +167,9 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
     {
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof Collection))
+        {
             return;
+        }
  
         // Set up the major variables
         Collection collection = (Collection) dso;

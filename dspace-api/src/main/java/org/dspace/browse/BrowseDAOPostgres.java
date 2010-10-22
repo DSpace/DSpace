@@ -252,7 +252,9 @@ public class BrowseDAOPostgres implements BrowseDAO
         TableRowIterator tri = null;
 
         if (column == null || value == null)
+        {
             return 0;
+        }
 
         try
         {
@@ -959,7 +961,9 @@ public class BrowseDAOPostgres implements BrowseDAO
             if (tableMap != null)
             {
                 if (tableDis != null)
+                {
                     queryBuf.append(" AND ");
+                }
 
                 queryBuf.append(tableMap).append(".item_id=")
                         .append(containerTable).append(".item_id AND ");
@@ -987,12 +991,16 @@ public class BrowseDAOPostgres implements BrowseDAO
         if (tableMap != null)
         {
             if (containerTable != null)
+            {
                 queryBuf.append(", ");
+            }
 
             queryBuf.append(tableMap);
 
             if (tableDis != null)
+            {
                 queryBuf.append(", ").append(tableDis);
+            }
         }
     }
 

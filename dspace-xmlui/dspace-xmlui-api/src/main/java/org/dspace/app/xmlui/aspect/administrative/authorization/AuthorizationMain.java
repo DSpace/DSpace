@@ -132,9 +132,13 @@ public class AuthorizationMain extends AbstractDSpaceTransformer
         Item actionItem = actionsList.addItem();
         Text queryField = actionItem.addText("identifier");
         if (query != null)
-        	queryField.setValue(query);
-        if (errors.contains("identifier")) 
-        	queryField.addError(T_bad_name);
+        {
+            queryField.setValue(query);
+        }
+        if (errors.contains("identifier"))
+        {
+            queryField.addError(T_bad_name);
+        }
         queryField.setHelp(T_search_help);
         actionItem.addButton("submit_edit").setValue(T_submit_find);
         actionsList.addLabel(T_actions_advanced);
@@ -167,17 +171,25 @@ public class AuthorizationMain extends AbstractDSpaceTransformer
 			for (Collection subCols : currentCommunity.getCollections()) 
 			{
 				if (containerSubList == null)
-					containerSubList = parentList.addList("subList" + currentCommunity.getID());
+                {
+                    containerSubList = parentList.addList("subList" + currentCommunity.getID());
+                }
 				String name = subCols.getMetadata("name");
 				if (name == null || name.length() == 0)
-					containerSubList.addItemXref(baseURL+"&submit_edit&collection_id="+subCols.getID(), T_untitled);
+                {
+                    containerSubList.addItemXref(baseURL + "&submit_edit&collection_id=" + subCols.getID(), T_untitled);
+                }
 				else
-					containerSubList.addItemXref(baseURL+"&submit_edit&collection_id="+subCols.getID(), name);
+                {
+                    containerSubList.addItemXref(baseURL + "&submit_edit&collection_id=" + subCols.getID(), name);
+                }
         	}
 			for (Community subComs : currentCommunity.getSubcommunities()) 
 			{
 				if (containerSubList == null)
-					containerSubList = parentList.addList("subList" + currentCommunity.getID());
+                {
+                    containerSubList = parentList.addList("subList" + currentCommunity.getID());
+                }
 				containerListBuilder(baseURL,containerSubList,subComs);
 			}
 		}

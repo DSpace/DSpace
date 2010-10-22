@@ -212,19 +212,29 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
 			
 			// Check required error conditions
 			if (this.requireSubmission && this.submission == null)
-				throw new ProcessingException("Unable to find submission for id: "+this.id);
+            {
+                throw new ProcessingException("Unable to find submission for id: " + this.id);
+            }
 			
 			if (this.requireWorkflow && !(submission instanceof WorkflowItem))
-				throw new ProcessingException("The submission is not a workflow, "+this.id);
+            {
+                throw new ProcessingException("The submission is not a workflow, " + this.id);
+            }
 			
 			if (this.requireWorkspace && !(submission instanceof WorkspaceItem))
-				throw new ProcessingException("The submission is not a workspace, "+this.id);
+            {
+                throw new ProcessingException("The submission is not a workspace, " + this.id);
+            }
 			
 			if (this.requireStep && stepAndPage.getStep() < 0)
-				throw new ProcessingException("Step is a required parameter.");
+            {
+                throw new ProcessingException("Step is a required parameter.");
+            }
 			
 			if (this.requireHandle && handle == null)
-				throw new ProcessingException("Handle is a required parameter.");
+            {
+                throw new ProcessingException("Handle is a required parameter.");
+            }
 			
 		} 
 		catch (SQLException sqle) 
@@ -359,16 +369,22 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
         
         //only have "<-Previous" button if not first step
         if(!isFirstStep())
+        {
             actions.addButton(AbstractProcessingStep.PREVIOUS_BUTTON).setValue(T_previous);
+        }
         
         //always show "Save/Cancel"
         actions.addButton(AbstractProcessingStep.CANCEL_BUTTON).setValue(T_save);
         
         //If last step, show "Complete Submission"
         if(isLastStep())
+        {
             actions.addButton(AbstractProcessingStep.NEXT_BUTTON).setValue(T_complete);
+        }
         else //otherwise, show "Next->"
+        {
             actions.addButton(AbstractProcessingStep.NEXT_BUTTON).setValue(T_next);
+        }
     }
     
 	
@@ -455,12 +471,16 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
             WorkspaceItem workspaceItem = (WorkspaceItem) submission;
 
             int step = workspaceItem.getStageReached();
-            if(step<0) 
-                step=0;
+            if(step<0)
+            {
+                step = 0;
+            }
             
             int page = workspaceItem.getPageReached();
             if (page < 0)
+            {
                 page = 0;
+            }
 
             return new StepAndPage(step, page);
         }

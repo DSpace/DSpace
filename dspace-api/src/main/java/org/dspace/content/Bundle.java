@@ -135,7 +135,9 @@ public class Bundle extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         // Cache ourselves
@@ -363,7 +365,9 @@ public class Bundle extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         Item[] itemArray = new Item[items.size()];
@@ -530,7 +534,9 @@ public class Bundle extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
     }
 

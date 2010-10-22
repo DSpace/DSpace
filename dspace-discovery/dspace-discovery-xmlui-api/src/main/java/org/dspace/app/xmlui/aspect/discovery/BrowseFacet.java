@@ -132,7 +132,9 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
             if (dso == null)
+            {
                 return "0";
+            }
 
             return HashUtil.hash(dso.getHandle());
         }
@@ -207,7 +209,9 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
         Request request = ObjectModelHelper.getRequest(objectModel);
 
         if (queryResults != null)
+        {
             return queryResults;
+        }
 
         queryArgs = new SolrQuery();
 
@@ -241,7 +245,9 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
 
         int offset = RequestUtils.getIntParameter(request, OFFSET);
         if (offset == -1)
+        {
             offset = 0;
+        }
         queryArgs.setParam(FacetParams.FACET_OFFSET, String.valueOf(offset));
 
         //We add +1 so we can use the extra one to make sure that we need to show the next page
@@ -282,7 +288,9 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
             // We shouldn't go lower then our max bottom year
             // Make sure to substract one so the bottom year is also counted !
             if(startYear < maxEndYear)
+            {
                 startYear = maxEndYear - 1;
+            }
 
             if(0 < offset){
                 //Say that we have an offset of 10 years
@@ -384,7 +392,9 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
 
             java.util.List<FacetField> facetFields = this.queryResults.getFacetFields();
             if (facetFields == null)
+            {
                 facetFields = new ArrayList<FacetField>();
+            }
 
             facetFields.addAll(this.queryResults.getFacetDates());
 
@@ -416,7 +426,9 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
                     //Only show the nextpageurl if we have at least one result following our current results
                     String nextPageUrl = null;
                     if (values.size() == (DEFAULT_PAGE_SIZE + 1))
+                    {
                         nextPageUrl = getNextPageURL(request);
+                    }
 
                     results.setSimplePagination((int) queryResults.getResults().getNumFound(), offSet + 1,
                             (offSet + (values.size() - 1)), getPreviousPageURL(request), nextPageUrl);
@@ -426,7 +438,9 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
 
                     List<String> filterQueries = new ArrayList<String>();
                     if(request.getParameterValues("fq") != null)
+                    {
                         filterQueries = Arrays.asList(request.getParameterValues("fq"));
+                    }
                     for (int i = 0; i < values.size(); i++) {
                         FacetField.Count value = values.get(i);
 
@@ -487,7 +501,9 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put(FACET_FIELD, request.getParameter(FACET_FIELD));
         if (queryArgs.get(FacetParams.FACET_OFFSET) != null)
+        {
             parameters.put(OFFSET, String.valueOf(Integer.parseInt(queryArgs.get(FacetParams.FACET_OFFSET)) + DEFAULT_PAGE_SIZE));
+        }
 
         // Add the filter queries
         String url = generateURL("browse-discovery", parameters);
@@ -504,12 +520,16 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
     private String getPreviousPageURL(Request request) {
         //If our offset should be 0 then we shouldn't be able to view a previous page url
         if ("0".equals(queryArgs.get(FacetParams.FACET_OFFSET)))
+        {
             return null;
+        }
 
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put(FACET_FIELD, request.getParameter(FACET_FIELD));
         if (queryArgs.get(FacetParams.FACET_OFFSET) != null)
+        {
             parameters.put(OFFSET, String.valueOf(Integer.parseInt(queryArgs.get(FacetParams.FACET_OFFSET)) - DEFAULT_PAGE_SIZE));
+        }
 
         // Add the filter queries
         String url = generateURL("browse-discovery", parameters);

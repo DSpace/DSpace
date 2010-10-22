@@ -246,7 +246,9 @@ public class BrowseDAOOracle implements BrowseDAO
         TableRowIterator tri = null;
 
         if (column == null || value == null)
+        {
             return 0;
+        }
 
         try
         {
@@ -955,7 +957,9 @@ public class BrowseDAOOracle implements BrowseDAO
             if (tableMap != null)
             {
                 if (tableDis != null)
+                {
                     queryBuf.append(" AND ");
+                }
 
                 queryBuf.append(tableMap).append(".item_id=")
                         .append(containerTable).append(".item_id AND ");
@@ -983,12 +987,16 @@ public class BrowseDAOOracle implements BrowseDAO
         if (tableMap != null)
         {
             if (containerTable != null)
+            {
                 queryBuf.append(", ");
+            }
 
             queryBuf.append(tableMap);
 
             if (tableDis != null)
+            {
                 queryBuf.append(", ").append(tableDis);
+            }
         }
     }
 
@@ -1073,10 +1081,14 @@ public class BrowseDAOOracle implements BrowseDAO
     private void buildSelectStatement(StringBuffer queryBuf, List params) throws BrowseException
     {
         if (queryBuf.length() == 0)
+        {
             throw new BrowseException("No arguments for SELECT statement");
+        }
 
         if (table == null || "".equals(table))
+        {
             throw new BrowseException("No table for SELECT statement");
+        }
 
         // queryBuf already contains what we are selecting,
         // so insert the statement at the beginning

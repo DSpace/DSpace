@@ -83,7 +83,9 @@ public class CommunitySearch extends AbstractDSpaceTransformer {
     {
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof Community))
+        {
             return;
+        }
 
         // Set up the major variables
         Community community = (Community) dso;

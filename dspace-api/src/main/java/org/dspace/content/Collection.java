@@ -270,8 +270,10 @@ public class Collection extends DSpaceObject
             //Remove the collection we just created -- as it is incomplete
             try
             {
-                if(c!=null) 
+                if(c!=null)
+                {
                     c.delete();
+                }
             } catch(Exception e) { }
 
             //pass exception on up the chain
@@ -351,7 +353,9 @@ public class Collection extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         Collection[] collectionArray = new Collection[collections.size()];
@@ -689,7 +693,9 @@ public class Collection extends DSpaceObject
 
         // just return if there is no administrative group.
         if (submitters == null)
-        	return; 
+        {
+            return;
+        }
 
         // Remove the link to the collection table.
         collectionRow.setColumnNull("submitter");
@@ -763,7 +769,9 @@ public class Collection extends DSpaceObject
 
         // just return if there is no administrative group.
         if (admins == null)
-        	return; 
+        {
+            return;
+        }
 
         // Remove the link to the collection table.
         collectionRow.setColumnNull("admin");
@@ -1128,7 +1136,9 @@ public class Collection extends DSpaceObject
         finally
         {
             if (items != null)
+            {
                 items.close();
+            }
         }
 
         // Delete bitstream logo
@@ -1262,7 +1272,9 @@ public class Collection extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         Community[] communityArray = new Community[communities.size()];
@@ -1293,7 +1305,10 @@ public class Collection extends DSpaceObject
              return false;
          }
          final Collection otherCollection = (Collection) other;
-         if (this.getID() != otherCollection.getID()) return false;
+         if (this.getID() != otherCollection.getID())
+         {
+             return false;
+         }
 
          return true;
      }

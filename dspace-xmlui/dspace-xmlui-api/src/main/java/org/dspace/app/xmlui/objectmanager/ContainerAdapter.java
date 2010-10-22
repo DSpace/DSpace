@@ -132,7 +132,9 @@ public class ContainerAdapter extends AbstractAdapter
     protected String getMETSOBJID()
     {
     	if (dso.getHandle() != null)
-    		return contextPath+"/handle/" + dso.getHandle();
+        {
+            return contextPath + "/handle/" + dso.getHandle();
+        }
     	return null;
     }
 
@@ -359,23 +361,21 @@ public class ContainerAdapter extends AbstractAdapter
           
         }
         
-        
-        
-        
-        
-        
-        
     	for (String dmdType : dmdTypes)
     	{
     		// If DIM was requested then it was generated above without using
     		// the crosswalk API. So we can skip this one.
     		if ("DIM".equals(dmdType))
-    			continue;
+            {
+                continue;
+            }
     		
     		DisseminationCrosswalk crosswalk = getDisseminationCrosswalk(dmdType);
     		
     		if (crosswalk == null)
-    			continue;
+            {
+                continue;
+            }
     		
         	String dmdID = getGenericID("dmd_");
 	   		// Add our id to the list.
@@ -513,7 +513,6 @@ public class ContainerAdapter extends AbstractAdapter
     {
     	AttributeMap attributes;
     	
-    	
     	// ///////////////////////
     	// Start a new structure map
     	attributes = new AttributeMap();
@@ -527,7 +526,9 @@ public class ContainerAdapter extends AbstractAdapter
     	attributes.put("TYPE", getMETSLabel());
     	// add references to the Descriptive metadata
     	if (dmdSecIDS != null)
-    		attributes.put("DMDID", dmdSecIDS.toString());
+        {
+            attributes.put("DMDID", dmdSecIDS.toString());
+        }
     	startElement(METS,"div",attributes);
     	
     	
@@ -612,7 +613,9 @@ public class ContainerAdapter extends AbstractAdapter
     private int countOccurances(String string, char character)
     {
     	if (string == null || string.length() == 0)
-    		return 0;
+        {
+            return 0;
+        }
     	
     	int fromIndex = -1;
         int count = 0;
@@ -622,7 +625,9 @@ public class ContainerAdapter extends AbstractAdapter
         	fromIndex = string.indexOf('>', fromIndex+1);
         	
         	if (fromIndex == -1)
-        		break;
+            {
+                break;
+            }
         	
         	count++;
         }
@@ -643,13 +648,17 @@ public class ContainerAdapter extends AbstractAdapter
     {
     	// Is the string long enough?
     	if (string.length() <= index + characters.length)
-    		return false;
+        {
+            return false;
+        }
     	
     	// Do all the characters match?
     	for (char character : characters)
     	{
     		if (string.charAt(index) != character)
-    			return false;
+            {
+                return false;
+            }
     		index++;
     	}
     	
@@ -675,9 +684,13 @@ public class ContainerAdapter extends AbstractAdapter
 		attributes.put("mdschema",schema);
 		attributes.put("element", element);
 		if (qualifier != null)
-			attributes.put("qualifier", qualifier);
+        {
+            attributes.put("qualifier", qualifier);
+        }
 		if (language != null)
-			attributes.put("language", language);
+        {
+            attributes.put("language", language);
+        }
 		startElement(DIM,"field",attributes);
 		
 		// Only try and add the metadata's value, but only if it is non null.
@@ -697,27 +710,39 @@ public class ContainerAdapter extends AbstractAdapter
 	        	{
 	        		// Is it an xml entity named by number?
 	        		if (substringCompare(value,amp+1,'#'))
-	        			continue;
+                    {
+                        continue;
+                    }
 	        		
 	        		// &amp;
 	        		if (substringCompare(value,amp+1,'a','m','p',';'))
-	        			continue;
+                    {
+                        continue;
+                    }
 	        		
 	        		// &apos;
 	        		if (substringCompare(value,amp+1,'a','p','o','s',';'))
-	        			continue;
+                    {
+                        continue;
+                    }
 	        		
 	        		// &quot;
 	        		if (substringCompare(value,amp+1,'q','u','o','t',';'))
-	        			continue;
+                    {
+                        continue;
+                    }
 	        			
 	        		// &lt;
 	        		if (substringCompare(value,amp+1,'l','t',';'))
-	        			continue;
+                    {
+                        continue;
+                    }
 	        		
 	        		// &gt;
 	        		if (substringCompare(value,amp+1,'g','t',';'))
-	        			continue;
+                    {
+                        continue;
+                    }
 	        		
 	        		// Replace the ampersand with an XML entity.
 	        		value = value.substring(0,amp) + "&amp;" + value.substring(amp+1);

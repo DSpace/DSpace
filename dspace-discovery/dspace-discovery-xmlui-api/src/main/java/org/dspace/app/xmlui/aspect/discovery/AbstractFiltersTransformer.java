@@ -123,7 +123,9 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
             if (dso == null)
+            {
                 return "0";
+            }
 
             return HashUtil.hash(dso.getHandle());
         }
@@ -155,7 +157,9 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
 
                 // Add the actual collection;
                 if (dso != null)
+                {
                     val.add(dso);
+                }
 
                 val.add("numFound:" + queryResults.getResults().getNumFound());
 
@@ -297,7 +301,9 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
                             }
                             //No values found!
                             if(newestYear == -1 || oldestYear == -1)
+                            {
                                 continue;
+                            }
 
                         }
 
@@ -326,7 +332,9 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
                                 int bottomYear = year - gap;
                                 //Make sure we don't go below our last year found
                                 if(bottomYear < oldestYear)
+                                {
                                     bottomYear = oldestYear;
+                                }
 
                                 //Also make sure we don't go above our newest year
                                 int currentTop = year;
@@ -361,7 +369,9 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
     public void addOptions(Options options) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {
         //Should not happen
         if(scope == null)
+        {
             return;
+        }
         Request request = ObjectModelHelper.getRequest(objectModel);
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
@@ -386,7 +396,9 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
                     if(facet != null){
                         java.util.List<FacetField.Count> facetVals = facet.getValues();
                         if(facetVals == null)
+                        {
                             continue;
+                        }
                         for (FacetField.Count count : facetVals) {
                             values.add(new FilterDisplayValue(count.getName(), count.getCount(), count.getAsFilterQuery()));
                         }
@@ -400,7 +412,9 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
                             for (FilterDisplayValue filterDisplayValue : values) {
                                 //No need to show empty years
                                 if(0 < filterDisplayValue.getCount())
+                                {
                                     sortedVals.put(filterDisplayValue.getDisplayedVal(), filterDisplayValue);
+                                }
                             }
                             //Make sure we retrieve our sorted values
                             values = Arrays.asList(sortedVals.values().toArray(new FilterDisplayValue[sortedVals.size()]));
@@ -418,7 +432,9 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
 
                                     //No need to show empty years
                                     if(0 < count)
+                                    {
                                         values.add(new FilterDisplayValue(name, count, facetQuery));
+                                    }
                                 }
                             }
                         }
@@ -437,7 +453,9 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
                         for (int i = 0; i < shownFacets; i++) {
 
                             if (!iter.hasNext())
+                            {
                                 break;
+                            }
 
                             FilterDisplayValue value = iter.next();
 

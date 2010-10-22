@@ -78,7 +78,9 @@ public class CollectionSearch extends AbstractDSpaceTransformer {
     public void addBody(Body body) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof Collection))
+        {
             return;
+        }
 
         // Set up the major variables
         Collection collection = (Collection) dso;

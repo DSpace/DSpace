@@ -106,7 +106,9 @@ public class BrowseItemDAOPostgres implements BrowseItemDAO
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
         
         BrowseItem[] bis = new BrowseItem[items.size()];
@@ -159,7 +161,9 @@ public class BrowseItemDAOPostgres implements BrowseItemDAO
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
         
         DCValue[] dcvs = new DCValue[values.size()];

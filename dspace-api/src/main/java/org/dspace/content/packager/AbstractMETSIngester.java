@@ -168,8 +168,10 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         {
             String path = METSManifest.getFileName(mdref);
             if (packageFile == null)
+            {
                 throw new MetadataValidationException(
                         "Failed referencing mdRef element, because there is no package specified.");
+            }
 
             // Use the 'getFileInputStream()' method from the
             // AbstractMETSIngester to retrieve the inputstream for the
@@ -231,10 +233,12 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
 
             // must have a METS Manifest to ingest anything
             if (manifest == null)
+            {
                 throw new PackageValidationException(
                         "No METS Manifest found (filename="
                                 + METSManifest.MANIFEST_FILE
                                 + ").  Package is unacceptable!");
+            }
 
             // validate our manifest
             checkManifest(manifest);
@@ -265,7 +269,9 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             // (restore previously existing obj)
             String action = "package_ingest";
             if (params.restoreModeEnabled())
+            {
                 action = "package_restore";
+            }
             log.info(LogManager.getHeader(context, action,
                     "Created new Object, type="
                             + Constants.typeText[dso.getType()] + ", handle="
@@ -465,7 +471,9 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
 
                 // Get the collection this workflow item belongs to
                 if (wfi != null)
+                {
                     collection = wfi.getCollection();
+                }
             }
 
             // save manifest as a bitstream in Item if desired
@@ -506,7 +514,9 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
 
         // For Items, also sanity-check the metadata for minimum requirements.
         if (type == Constants.ITEM)
+        {
             PackageUtils.checkItemMetadata((Item) dso);
+        }
 
         // -- Step 6 --
         // Finish things up!
@@ -569,9 +579,11 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         }
 
         if (log.isDebugEnabled())
+        {
             log.debug("Object to be replaced (handle=" + dso.getHandle()
                     + ") is " + Constants.typeText[dso.getType()] + " id="
                     + dso.getID());
+        }
 
         // -- Step 2 --
         // Clear out current object (as we are replacing all its contents &
@@ -649,7 +661,9 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
 
         // For Items, also sanity-check the metadata for minimum requirements.
         if (dso.getType() == Constants.ITEM)
+        {
             PackageUtils.checkItemMetadata((Item) dso);
+        }
 
         // -- Step 6 --
         // Finish things up!
@@ -701,9 +715,9 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         {
             primaryID = primaryFile.getAttributeValue("ID");
             if (log.isDebugEnabled())
-                log
-                        .debug("Got primary bitstream file ID=\"" + primaryID
-                                + "\"");
+            {
+                log.debug("Got primary bitstream file ID=\"" + primaryID + "\"");
+            }
         }
 
         // Step 2 -- find list of all content files from manifest
@@ -722,8 +736,10 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             // basic validation -- check that it has an ID attribute
             String mfileID = mfile.getAttributeValue("ID");
             if (mfileID == null)
+            {
                 throw new PackageValidationException(
                         "Invalid METS Manifest: file element without ID attribute.");
+            }
 
             // retrieve path/name of file in manifest
             String path = METSManifest.getFileName(mfile);
@@ -771,13 +787,17 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             if (bitstream.getFormat().equals(unknownFormat))
             {
                 if (log.isDebugEnabled())
+                {
                     log.debug("Guessing format of Bitstream left un-set: "
                             + bitstream.toString());
+                }
                 String mimeType = mfile.getAttributeValue("MIMETYPE");
                 BitstreamFormat bf = (mimeType == null) ? null
                         : BitstreamFormat.findByMIMEType(context, mimeType);
                 if (bf == null)
+                {
                     bf = FormatIdentifier.guessFormat(context, bitstream);
+                }
                 bitstream.setFormat(bf);
             }
             bitstream.update();
@@ -786,9 +806,11 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         // Step 3 -- Sanity checks
         // sanity check for primary bitstream
         if (primaryID != null && !setPrimaryBitstream)
+        {
             log.warn("Could not find primary bitstream file ID=\"" + primaryID
                     + "\" in manifest file \"" + pkgFile.getAbsolutePath()
                     + "\"");
+        }
     }
 
     /**
@@ -822,9 +844,11 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         // Get magic bitstream format to identify manifest.
         String fmtName = getManifestBitstreamFormat();
         if (fmtName == null)
+        {
             throw new PackageValidationException(
                     "Configuration Error: No Manifest BitstreamFormat configured for METS ingester type="
                             + getConfigurationName());
+        }
         BitstreamFormat manifestFormat = PackageUtils
                 .findOrCreateBitstreamFormat(context, fmtName,
                         "application/xml", fmtName + " package manifest");
@@ -944,10 +968,12 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
 
             // must have a METS Manifest to replace anything
             if (manifest == null)
+            {
                 throw new PackageValidationException(
                         "No METS Manifest found (filename="
                                 + METSManifest.MANIFEST_FILE
                                 + ").  Package is unacceptable!");
+            }
 
             // It's possible that the object to replace will be passed in as
             // null.  Let's determine the handle of the object to replace.
@@ -993,10 +1019,12 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                 {
                     parent = HandleManager.resolveToObject(context, parentLink);
                     if (parent == null)
+                    {
                         throw new UnsupportedOperationException(
                                 "Could not find a parent DSpaceObject referenced as '"
                                         + parentLink
                                         + "' in the METS Manifest. A valid parent DSpaceObject must be specified in the METS Manifest itself.");
+                    }
                 }
                 else
                     throw new UnsupportedOperationException(
@@ -1111,8 +1139,10 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             throws AuthorizeException, SQLException, IOException
     {
         if (log.isDebugEnabled())
+        {
             log.debug("Removing object " + Constants.typeText[dso.getType()]
                     + " id=" + dso.getID());
+        }
 
         switch (dso.getType())
         {
@@ -1202,10 +1232,12 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         {
             parent = HandleManager.resolveToObject(context, parentLink);
             if (parent == null)
+            {
                 throw new UnsupportedOperationException(
                         "Could not find a parent DSpaceObject references as '"
                                 + parentLink
                                 + "' in the METS Manifest. A parent DSpaceObject must be specified from either the 'packager' command or noted in the METS Manifest itself.");
+            }
         }
         else
             throw new UnsupportedOperationException(

@@ -157,7 +157,9 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
             // What scope the search is at
             DSpaceObject scope = getScope();
             if (scope != null)
+            {
                 key += "-" + scope.getHandle();
+            }
 
             // The actual search query.
             key += "-" + getQuery();
@@ -333,7 +335,9 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
         String value = getSingleValue(item, "dc.relation.ispartof");
 
         if (value == null)
+        {
             return null;
+        }
 
         try {
             String handlePrefix = ConfigurationManager.getProperty("handle.canonical.prefix");
@@ -345,7 +349,9 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
             DSpaceObject obj = HandleManager.resolveToObject(context, value.replaceFirst(handlePrefix, ""));
 
             if (obj != null && obj instanceof Item)
+            {
                 return (Item) obj;
+            }
         }
         catch (Exception e) {
 
@@ -427,7 +433,9 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
     public void performSearch(DSpaceObject scope) throws UIException, SearchServiceException {
 
         if (queryResults != null)
+        {
             return;
+        }
         
 
         String query = getQuery();
@@ -448,7 +456,9 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
         String[] fqs = getSolrFilterQueries();
 
         if (fqs != null)
+        {
             filterQueries.addAll(Arrays.asList(fqs));
+        }
 
 
         queryArgs = this.prepareDefaultFilters("search", filterQueries.toArray(new String[filterQueries.size()]));

@@ -140,7 +140,9 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 		Group defaultRead = null;
 		int defaultReadID = FlowContainerUtils.getCollectionDefaultRead(context, collectionID);
 		if (defaultReadID >= 0)
-			defaultRead = Group.find(context, defaultReadID);
+        {
+            defaultRead = Group.find(context, defaultReadID);
+        }
 		
 		// DIVISION: main
 	    Division main = body.addInteractiveDivision("collection-assign-roles",contextPath+"/admin/collection",Division.METHOD_POST,"primary administrative collection");

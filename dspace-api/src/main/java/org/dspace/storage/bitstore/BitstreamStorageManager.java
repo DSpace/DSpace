@@ -628,9 +628,15 @@ public class BitstreamStorageManager
                     if (deleteDbRecords)
                     {
                         log.debug("deleting record");
-                        if (verbose) System.out.println(" - Deleting bitstream information (ID: " + bid + ")");
+                        if (verbose)
+                        {
+                            System.out.println(" - Deleting bitstream information (ID: " + bid + ")");
+                        }
                         bitstreamInfoDAO.deleteBitstreamInfoWithHistory(bid);
-                        if (verbose) System.out.println(" - Deleting bitstream record from database (ID: " + bid + ")");
+                        if (verbose)
+                        {
+                            System.out.println(" - Deleting bitstream record from database (ID: " + bid + ")");
+                        }
                         DatabaseManager.delete(context, "Bitstream", bid);
                     }
                     continue;
@@ -647,9 +653,15 @@ public class BitstreamStorageManager
                 if (deleteDbRecords)
                 {
                     log.debug("deleting db record");
-                    if (verbose) System.out.println(" - Deleting bitstream information (ID: " + bid + ")");
+                    if (verbose)
+                    {
+                        System.out.println(" - Deleting bitstream information (ID: " + bid + ")");
+                    }
                     bitstreamInfoDAO.deleteBitstreamInfoWithHistory(bid);
-                    if (verbose) System.out.println(" - Deleting bitstream record from database (ID: " + bid + ")");
+                    if (verbose)
+                    {
+                        System.out.println(" - Deleting bitstream record from database (ID: " + bid + ")");
+                    }
                     DatabaseManager.delete(context, "Bitstream", bid);
                 }
 
@@ -666,7 +678,10 @@ public class BitstreamStorageManager
                 {
                     log.debug(message);
                 }
-                if (verbose) System.out.println(message);
+                if (verbose)
+                {
+                    System.out.println(message);
+                }
 
                 // if the file was deleted then
                 // try deleting the parents
@@ -700,13 +715,19 @@ public class BitstreamStorageManager
         // time around will be a no-op.
         catch (SQLException sqle)
         {
-            if (verbose) System.err.println("Error: " + sqle.getMessage());
+            if (verbose)
+            {
+                System.err.println("Error: " + sqle.getMessage());
+            }
             context.abort();
             throw sqle;
         }
         catch (IOException ioe)
         {
-            if (verbose) System.err.println("Error: " + ioe.getMessage());
+            if (verbose)
+            {
+                System.err.println("Error: " + ioe.getMessage());
+            }
             context.abort();
             throw ioe;
         }
@@ -824,7 +845,9 @@ public class BitstreamStorageManager
 			// prefix.  The internal-ID is supposed to be just a
 			// filename, so this will not affect normal operation.
 			if (sInternalId.indexOf(File.separator) != -1)
-				sInternalId = sInternalId.substring(sInternalId.lastIndexOf(File.separator)+1);
+            {
+                sInternalId = sInternalId.substring(sInternalId.lastIndexOf(File.separator) + 1);
+            }
 			
 			sIntermediatePath = getIntermediatePath(sInternalId);
 		}

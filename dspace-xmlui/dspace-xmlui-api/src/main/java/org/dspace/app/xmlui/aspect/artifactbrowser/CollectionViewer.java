@@ -114,7 +114,9 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
             if (dso == null)
+            {
                 return "0";
+            }
                 
             return HashUtil.hash(dso.getHandle());
         }
@@ -143,10 +145,14 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 	            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 	
 	            if (dso == null)
-	                return null;
+                {
+                    return null;
+                }
 	
 	            if (!(dso instanceof Collection))
-	                return null;
+                {
+                    return null;
+                }
 	
 	            collection = (Collection) dso;
 	
@@ -176,16 +182,22 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
     {
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof Collection))
+        {
             return;
+        }
 
         Collection collection = (Collection) dso;
 
         // Set the page title
         String name = collection.getMetadata("name");
         if (name == null || name.length() == 0)
-        	pageMeta.addMetadata("title").addContent(T_untitled);
+        {
+            pageMeta.addMetadata("title").addContent(T_untitled);
+        }
         else
-        	pageMeta.addMetadata("title").addContent(name);
+        {
+            pageMeta.addMetadata("title").addContent(name);
+        }
 
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         HandleUtil.buildHandleTrail(collection,pageMeta,contextPath);
@@ -198,8 +210,10 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
 			{
 				// Remove the protocol number, i.e. just list 'rss' or' atom'
 				String[] parts = format.split("_");
-				if (parts.length < 1) 
-					continue;
+				if (parts.length < 1)
+                {
+                    continue;
+                }
 				
 				String feedFormat = parts[0].trim()+"+xml";
 					
@@ -217,7 +231,9 @@ public class CollectionViewer extends AbstractDSpaceTransformer implements Cache
     {
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof Collection))
+        {
             return;
+        }
 
         // Set up the major variables
         Collection collection = (Collection) dso;

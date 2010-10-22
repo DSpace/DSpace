@@ -284,10 +284,26 @@ public class ConfigurationManager
         finally
         {
             if (br != null)
-                try { br.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    br.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
 
             if (fr != null)
-                try { fr.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    fr.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
         }
 
         return license;
@@ -358,7 +374,9 @@ public class ConfigurationManager
     public static Enumeration<?> propertyNames()
     {
         if (properties == null)
+        {
             loadConfig(null);
+        }
 
         return properties.propertyNames();
     }
@@ -431,7 +449,9 @@ public class ConfigurationManager
         email.setContent(contentBuffer.toString());
 
         if (charset != null)
+        {
             email.setCharset(charset);
+        }
 
         return email;
     }
@@ -574,7 +594,9 @@ public class ConfigurationManager
     {
         // in case it hasn't been done yet.
         if (loadedFile == null)
+        {
             loadConfig(null);
+        }
 
         return loadedFile;
     }
@@ -660,7 +682,9 @@ public class ConfigurationManager
                     String key = (String)pe.nextElement();
                     String value = interpolate(key, 1);
                     if (value != null)
+                    {
                         properties.setProperty(key, value);
+                    }
                 }
             }
 
@@ -676,7 +700,15 @@ public class ConfigurationManager
         finally
         {
             if (is != null)
-                try { is.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    is.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
         }
 
         // Load in default license
@@ -714,17 +746,39 @@ public class ConfigurationManager
         finally
         {
             if (br != null)
-                try { br.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    br.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
 
             if (ir != null)
-                try { ir.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    ir.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
 
             if (fir != null)
-                try { fir.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    fir.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
         }
 
-        
-        
         try
         {
             /*
@@ -799,7 +853,9 @@ public class ConfigurationManager
     private static String interpolate(String key, int level)
     {
         if (level > RECURSION_LIMIT)
-            throw new IllegalArgumentException("ConfigurationManager: Too many levels of recursion in configuration property variable interpolation, property="+key);
+        {
+            throw new IllegalArgumentException("ConfigurationManager: Too many levels of recursion in configuration property variable interpolation, property=" + key);
+        }
         String value = (String)properties.get(key);
         int from = 0;
         StringBuffer result = null;
@@ -810,12 +866,18 @@ public class ConfigurationManager
             {
                 int end = value.indexOf('}', start);
                 if (end < 0)
+                {
                     break;
+                }
                 String var = value.substring(start+2, end);
                 if (result == null)
+                {
                     result = new StringBuffer(value.substring(from, start));
+                }
                 else
+                {
                     result.append(value.substring(from, start));
+                }
                 if (properties.containsKey(var))
                 {
                     String ivalue = interpolate(var, level+1);
@@ -825,7 +887,9 @@ public class ConfigurationManager
                         properties.setProperty(var, ivalue);
                     }
                     else
-                        result.append((String)properties.getProperty(var));
+                    {
+                        result.append((String) properties.getProperty(var));
+                    }
                 }
                 else
                 {
@@ -838,7 +902,9 @@ public class ConfigurationManager
                 break;
         }
         if (result != null && from < value.length())
+        {
             result.append(value.substring(from));
+        }
         return (result == null) ? null : result.toString();
     }
 
@@ -949,7 +1015,9 @@ public class ConfigurationManager
             {
                 Category c = (Category) cats.nextElement();
                 if (!(c.getAllAppenders() instanceof org.apache.log4j.helpers.NullEnumeration))
+                {
                     return true;
+                }
             }
         }
         return false;

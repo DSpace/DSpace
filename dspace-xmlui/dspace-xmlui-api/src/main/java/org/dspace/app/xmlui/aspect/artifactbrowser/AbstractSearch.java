@@ -162,7 +162,9 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             // What scope the search is at
             DSpaceObject scope = getScope();
             if (scope != null)
+            {
                 key += "-" + scope.getHandle();
+            }
             
             // The actual search query.
             key += "-" + getQuery();
@@ -276,7 +278,9 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
                 int lastItemIndex = queryResults.getStart()
                         + queryResults.getPageSize();
                 if (itemsTotal < lastItemIndex)
+                {
                     lastItemIndex = itemsTotal;
+                }
                 int currentPage = (queryResults.getStart() / queryResults
                         .getPageSize()) + 1;
                 int pagesTotal = ((queryResults.getHitCount() - 1) / queryResults
@@ -331,7 +335,9 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
                                     ReferenceSet.TYPE_SUMMARY_LIST,null,"repository-search-results");
                             // Only set a heading if there are both containers and items.
                             if (resultsContainsBothContainersAndItems)
-                            	referenceSet.setHead(T_head3);  
+                            {
+                                referenceSet.setHead(T_head3);
+                            }
                         }
                         referenceSet.addReference(resultDSO);
                     }
@@ -415,7 +421,9 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
     protected void performSearch() throws SQLException, IOException, UIException
     {
         if (queryResults != null)
+        {
             return;
+        }
         
         Context context = ContextUtil.obtainContext(objectModel);
         String query = getQuery();

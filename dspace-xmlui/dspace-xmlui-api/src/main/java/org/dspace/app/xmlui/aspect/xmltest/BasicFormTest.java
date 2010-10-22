@@ -96,9 +96,13 @@ public class BasicFormTest extends AbstractDSpaceTransformer
     	Request request = ObjectModelHelper.getRequest(objectModel);
 		boolean help = false, error = false;
 		if (request.getParameter("help") != null)
-			help = true;
+        {
+            help = true;
+        }
 		if (request.getParameter("error") != null)
-			error = true;
+        {
+            error = true;
+        }
 		
 				
         Division div = body.addInteractiveDivision("test", "", "post", "primary");
@@ -106,14 +110,22 @@ public class BasicFormTest extends AbstractDSpaceTransformer
         div.addPara("There are two options you can use to control how this page is generated. First is the help parameter, if this is present then help text will be provided for all fields. Next is the error parameter, if it is provided then all fields will be generated in error conditions.");
 		
 		if (help)
-			div.addPara().addXref(makeURL(false,error),"Turn help OFF");
-		else 
-			div.addPara().addXref(makeURL(true,error),"Turn help ON");
+        {
+            div.addPara().addXref(makeURL(false, error), "Turn help OFF");
+        }
+		else
+        {
+            div.addPara().addXref(makeURL(true, error), "Turn help ON");
+        }
 			
 		if (error)
-			div.addPara().addXref(makeURL(help,false),"Turn errors OFF");
-		else 
-			div.addPara().addXref(makeURL(help,true),"Turn errors ON");
+        {
+            div.addPara().addXref(makeURL(help, false), "Turn errors OFF");
+        }
+		else
+        {
+            div.addPara().addXref(makeURL(help, true), "Turn errors ON");
+        }
 		
 
         List list = div.addList("fieldTest",List.TYPE_FORM);
@@ -123,70 +135,102 @@ public class BasicFormTest extends AbstractDSpaceTransformer
         Text text = list.addItem().addText("text");
         text.setLabel("Text");
         if (help)
-        	text.setHelp("This is helpfull text.");
+        {
+            text.setHelp("This is helpfull text.");
+        }
         if (error)
-        	text.addError("This field is in error.");
+        {
+            text.addError("This field is in error.");
+        }
         text.setValue("Current raw value");
         
         // Long help
         Text longHelp = list.addItem().addText("longHelp");
         longHelp.setLabel("Long Help");
         if (help)
-        	longHelp.setHelp("This is a really long help message. It could potentially be a paragraph of material, really really long. Actually we don't know how long it can be because there is no upper limit on it! Although if you do find your self adding a long help message consider whether your user will actually read any of this, my bet is that they won't. However we still need to support these really, really, really, long messages that may break across multiple lines!");
+        {
+            longHelp.setHelp("This is a really long help message. It could potentially be a paragraph of material, really really long. Actually we don't know how long it can be because there is no upper limit on it! Although if you do find your self adding a long help message consider whether your user will actually read any of this, my bet is that they won't. However we still need to support these really, really, really, long messages that may break across multiple lines!");
+        }
         if (error)
-        	longHelp.addError("This field is in error.");
+        {
+            longHelp.addError("This field is in error.");
+        }
         longHelp.setValue("Current raw value");
         
         // Long error
         Text longError = list.addItem().addText("longError");
         longError.setLabel("Long Error");
         if (help)
-        	longError.setHelp("TThis is helpfull text.");
+        {
+            longError.setHelp("TThis is helpfull text.");
+        }
         if (error)
-        	longError.addError("This field is very much is serious trouble, it's so horrible wrong that i now have to give you a very long stern message that may break across multiple lines! To fix this problem you should examine what you are attempting to do and consider other factors like what might have lead you to this path vs another path. Are you sure you even want this field or might another one work just as well?");
+        {
+            longError.addError("This field is very much is serious trouble, it's so horrible wrong that i now have to give you a very long stern message that may break across multiple lines! To fix this problem you should examine what you are attempting to do and consider other factors like what might have lead you to this path vs another path. Are you sure you even want this field or might another one work just as well?");
+        }
         longError.setValue("Current raw value");
         
         // Text Area Field
         TextArea textArea = list.addItem().addTextArea("textarea");
         textArea.setLabel("Text Area");
         if (help)
-        	textArea.setHelp("This is helpfull text.");
+        {
+            textArea.setHelp("This is helpfull text.");
+        }
         if (error)
-        	textArea.addError("This field is in error.");
+        {
+            textArea.addError("This field is in error.");
+        }
         textArea.setValue("This is the raw value");
         
         // Blank Text Area Field
         TextArea emptyTextArea = list.addItem().addTextArea("emptyTextarea");
         emptyTextArea.setLabel("Empty Text Area");
         if (help)
-        	emptyTextArea.setHelp("This is helpfull text.");
+        {
+            emptyTextArea.setHelp("This is helpfull text.");
+        }
         if (error)
-        	emptyTextArea.addError("This field is in error.");
+        {
+            emptyTextArea.addError("This field is in error.");
+        }
         
         
         // Password field
         Password password = list.addItem().addPassword("password");
         password.setLabel("password");
         if (help)
-        	password.setHelp("This is helpfull text.");
+        {
+            password.setHelp("This is helpfull text.");
+        }
         if (error)
-        	password.addError("This field is in error.");
+        {
+            password.addError("This field is in error.");
+        }
         
         // Hidden field
         Hidden hidden = list.addItem().addHidden("hidden");
         hidden.setLabel("Hidden");
         hidden.setValue("You can not see this.");
         if (help)
-        	hidden.setHelp("This is hidden help?");
+        {
+            hidden.setHelp("This is hidden help?");
+        }
         if (error)
-        	hidden.addError("This a hidden error - I have no idea what this means?");
+        {
+            hidden.addError("This a hidden error - I have no idea what this means?");
+        }
         
         // Checkbox field
         CheckBox checkBox = list.addItem().addCheckBox("fruit");
         if (help)
-        	checkBox.setHelp("Select all the fruits that you like to eat");
+        {
+            checkBox.setHelp("Select all the fruits that you like to eat");
+        }
         if (error)
-        	checkBox.addError("You are incorrect you actualy do like Tootse Rolls.");
+        {
+            checkBox.addError("You are incorrect you actualy do like Tootse Rolls.");
+        }
         checkBox.setLabel("fruits");
         checkBox.addOption("apple","Apples");
         checkBox.addOption(true,"orange","Oranges");
@@ -199,9 +243,13 @@ public class BasicFormTest extends AbstractDSpaceTransformer
         Radio radio = list.addItem().addRadio("sex");
         radio.setLabel("Football colors");         
         if (help)
-        	radio.setHelp("Select the colors of the best (college) football team.");
+        {
+            radio.setHelp("Select the colors of the best (college) football team.");
+        }
         if (error)
-        	radio.addError("Error, Maroon & White is the only acceptable answer.");
+        {
+            radio.addError("Error, Maroon & White is the only acceptable answer.");
+        }
         radio.addOption("ut","Burnt Orange & White");
         radio.addOption(true,"tamu","Maroon & White");
         radio.addOption("ttu","Tech Red & Black");
@@ -213,17 +261,25 @@ public class BasicFormTest extends AbstractDSpaceTransformer
         File file = list.addItem().addFile("file");
         file.setLabel("File");
         if (help)
-        	file.setHelp("Upload a file.");
+        {
+            file.setHelp("Upload a file.");
+        }
         if (error)
-        	file.addError("This field is in error.");
+        {
+            file.addError("This field is in error.");
+        }
         
         // Select (single)
         Select select = list.addItem().addSelect("select");
         select.setLabel("Select (single)");
         if (help)
-        	select.setHelp("Select one of the options");
+        {
+            select.setHelp("Select one of the options");
+        }
         if (error)
-        	select.addError("This field is in error.");
+        {
+            select.addError("This field is in error.");
+        }
         select.addOption("one","uno");
         select.addOption("two","dos");
         select.addOption("three","tres");
@@ -236,9 +292,13 @@ public class BasicFormTest extends AbstractDSpaceTransformer
         select.setMultiple();
         select.setSize(4);
         if (help)
-        	select.setHelp("Select one or more options");
+        {
+            select.setHelp("Select one or more options");
+        }
         if (error)
-        	select.addError("This field is in error.");
+        {
+            select.addError("This field is in error.");
+        }
         select.addOption("one","uno");
         select.addOption("two","dos");
         select.addOption("three","tres");
@@ -257,9 +317,13 @@ public class BasicFormTest extends AbstractDSpaceTransformer
         button.setLabel("Button");
         button.setValue("When you touch me I do things, lots of things");
         if (help)
-        	button.setHelp("Submit buttons allow the user to submit the form.");
+        {
+            button.setHelp("Submit buttons allow the user to submit the form.");
+        }
         if (error)
-        	button.addError("This button is in error.");
+        {
+            button.addError("This button is in error.");
+        }
         
         // Non-field-unlabeled-item
         list.addItem().addContent("The following fields are all various use cases of composites. Also note that this item is an item inside a list of type form that 1) does not contain a field and 2) does not have a label.");
@@ -268,32 +332,46 @@ public class BasicFormTest extends AbstractDSpaceTransformer
         Composite composite = list.addItem().addComposite("composite-2text");
         composite.setLabel("Composite (two text fields)");
         if (help)
-        	composite.setHelp("I am the help for the entire composite");
+        {
+            composite.setHelp("I am the help for the entire composite");
+        }
         if (error)
-        	composite.addError("Just the composite is in error");
+        {
+            composite.addError("Just the composite is in error");
+        }
         text = composite.addText("partA");
         text.setLabel("Part A");
         text.setValue("Value for part A");
         if (help)
-        	text.setHelp("Part A");
+        {
+            text.setHelp("Part A");
+        }
         text = composite.addText("partB");
         text.setLabel("Part B");
         text.setValue("Value for part B");
         if (help)
-        	text.setHelp("Part B");
+        {
+            text.setHelp("Part B");
+        }
         
         // composite select & text fields  
         composite = list.addItem().addComposite("compositeB");
         composite.setLabel("Composite (select & text fields)");
         if (help)
-        	composite.setHelp("This field is composed of a select and text field, select one and type the other.");
+        {
+            composite.setHelp("This field is composed of a select and text field, select one and type the other.");
+        }
   
         select = composite.addSelect("selectB");
         select.setLabel("Numbers");
         if (help)
-        	select.setHelp("Me, me, me..... select me!");
+        {
+            select.setHelp("Me, me, me..... select me!");
+        }
         if (error)
-        	select.addError("The composite components are in error.");
+        {
+            select.addError("The composite components are in error.");
+        }
         select.addOption("one","uno");
         select.addOption("two","dos");
         select.addOption("three","tres");
@@ -304,34 +382,50 @@ public class BasicFormTest extends AbstractDSpaceTransformer
         text = composite.addText("TextB");
         text.setLabel("Spanish Numbers");
         if (help)
-        	text.setHelp("Yay, yet another text field");
+        {
+            text.setHelp("Yay, yet another text field");
+        }
         if (error)
-        	text.addError("The composite components are in error.");
+        {
+            text.addError("The composite components are in error.");
+        }
         
         
         // Composite 
         composite = list.addItem().addComposite("composite-date");
         composite.setLabel("Composite (date)");
         if (help)
-        	composite.setHelp("The data the item was published.");
+        {
+            composite.setHelp("The data the item was published.");
+        }
         if (error)
-        	composite.addError("The date is in error.");
+        {
+            composite.addError("The date is in error.");
+        }
         
         text = composite.addText("year");
         text.setLabel("Year");
         text.setSize(4,4);
         if (help)
-        	text.setHelp("year");
+        {
+            text.setHelp("year");
+        }
         if (error)
-        	text.addError("The year is in error");
+        {
+            text.addError("The year is in error");
+        }
         
         
         select = composite.addSelect("month");
         select.setLabel("Month");
         if (error)
-        	select.addError("The month is in error");
+        {
+            select.addError("The month is in error");
+        }
         if (help)
-        	text.setHelp("month");
+        {
+            text.setHelp("month");
+        }
         select.addOption("","(Select Month)");
         select.addOption(1,"January");
         select.addOption(2,"Feburary");
@@ -350,9 +444,13 @@ public class BasicFormTest extends AbstractDSpaceTransformer
         text = composite.addText("day");
         text.setLabel("Day");
         if (help)
-        	text.setHelp("day");
+        {
+            text.setHelp("day");
+        }
         if (error)
-        	text.addError("The day is in error.");
+        {
+            text.addError("The day is in error.");
+        }
         text.setSize(4,2);
         
         // Buttons one typical finds at the end of forums
@@ -377,16 +475,24 @@ public class BasicFormTest extends AbstractDSpaceTransformer
         Text name = identity.addItem().addText("name");
         name.setLabel("Username");
         if (help)
-        	name.setHelp("The username you wish to chooose");
+        {
+            name.setHelp("The username you wish to chooose");
+        }
         if (error)
-        	name.addError("Sorry, that username is allready used by another user.");
+        {
+            name.addError("Sorry, that username is allready used by another user.");
+        }
         
         Composite ssn = identity.addItem().addComposite("ssn");
         ssn.setLabel("SSN");
         if (help)
-        	ssn.setHelp("Your Social Security Number, really we won't use it for anything bad.... you can trust me.");
+        {
+            ssn.setHelp("Your Social Security Number, really we won't use it for anything bad.... you can trust me.");
+        }
         if (error)
-        	ssn.addError("The SSN you entered is invalid.");
+        {
+            ssn.addError("The SSN you entered is invalid.");
+        }
         Text ssn1 = ssn.addText("ssn1");
         ssn1.setSize(4,4);
         Text ssn2 = ssn.addText("ssn2");
@@ -400,9 +506,13 @@ public class BasicFormTest extends AbstractDSpaceTransformer
         CheckBox intrest = intrests.addItem().addCheckBox("intrests");
         intrest.setLabel("Intrests");
         if (help)
-        	intrest.setHelp("Select all topics which are of intrests to you.");
+        {
+            intrest.setHelp("Select all topics which are of intrests to you.");
+        }
         if (error)
-        	intrest.addError("You're intrests are in error?");
+        {
+            intrest.addError("You're intrests are in error?");
+        }
         intrest.addOption("DL","Digital Libraries");
         intrest.addOption("HT","Hypertexts");
         intrest.addOption("IM","Information Managment");
@@ -415,16 +525,24 @@ public class BasicFormTest extends AbstractDSpaceTransformer
         Text institution = affiliation.addItem().addText("institution");
         institution.setLabel("Institution");
         if (help)
-        	name.setHelp("The institution you are affiliated with");
+        {
+            name.setHelp("The institution you are affiliated with");
+        }
         if (error)
-        	name.addError("That institution is an invalid option.");
+        {
+            name.addError("That institution is an invalid option.");
+        }
         
         Radio geography = affiliation.addItem().addRadio("geography");
         geography.setLabel("Geography");
         if (help)
-        	geography.setHelp("Select your institution's geographical region");
+        {
+            geography.setHelp("Select your institution's geographical region");
+        }
         if (error)
-        	geography.addError("Your entry is invalid.");
+        {
+            geography.addError("Your entry is invalid.");
+        }
         geography.addOption("na","North America");
         geography.addOption("sa","South America");
         geography.addOption("eu","Europe");
@@ -445,13 +563,19 @@ public class BasicFormTest extends AbstractDSpaceTransformer
     private String makeURL(boolean help, boolean error)
 	{
 		if (help && error)
-			return "?help&error";
+        {
+            return "?help&error";
+        }
 		
 		if (help)
-			return "?help";
+        {
+            return "?help";
+        }
 		
 		if (error)
-			return "?error";
+        {
+            return "?error";
+        }
 		
 		return "?neither";
 	}

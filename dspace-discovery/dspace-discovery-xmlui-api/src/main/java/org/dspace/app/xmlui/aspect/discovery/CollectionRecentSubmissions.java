@@ -87,7 +87,9 @@ public class CollectionRecentSubmissions extends AbstractFiltersTransformer {
         performSearch(collection);
 
         if(queryResults == null)
-            return;// queryResults;
+        {
+            return;
+        }// queryResults;
 
         // Build the collection viewer division.
         Division home = body.addDivision("collection-home", "primary repository collection");
@@ -119,7 +121,9 @@ public class CollectionRecentSubmissions extends AbstractFiltersTransformer {
 
 
         if(queryResults != null)
-            return;// queryResults;
+        {
+            return;
+        }// queryResults;
 
         queryArgs = prepareDefaultFilters("collection");
 

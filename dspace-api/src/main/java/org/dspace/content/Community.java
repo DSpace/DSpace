@@ -230,8 +230,10 @@ public class Community extends DSpaceObject
             //Remove the community we just created -- as it is incomplete
             try
             {
-                if(c!=null) 
+                if(c!=null)
+                {
                     c.delete();
+                }
             } catch(Exception e) { }
 
             //pass exception on up the chain
@@ -257,7 +259,9 @@ public class Community extends DSpaceObject
 
         // if creating a top-level Community, simulate an ADD event at the Site.
         if (parent == null)
+        {
             context.addEvent(new Event(Event.ADD, Constants.SITE, Site.SITE_ID, Constants.COMMUNITY, c.getID(), c.handle));
+        }
 
         log.info(LogManager.getHeader(context, "create_community",
                 "community_id=" + row.getIntColumn("community_id"))
@@ -306,7 +310,9 @@ public class Community extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         Community[] communityArray = new Community[communities.size()];
@@ -359,7 +365,9 @@ public class Community extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         Community[] communityArray = new Community[topCommunities.size()];
@@ -601,7 +609,9 @@ public class Community extends DSpaceObject
 
         // just return if there is no administrative group.
         if (admins == null)
-            return; 
+        {
+            return;
+        }
 
         // Remove the link to the community table.
         communityRow.setColumnNull("admin");
@@ -669,7 +679,9 @@ public class Community extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         // Put them in an array
@@ -724,7 +736,9 @@ public class Community extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         // Put them in an array
@@ -777,7 +791,9 @@ public class Community extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         return parentCommunity;
@@ -879,7 +895,9 @@ public class Community extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
     }
 
@@ -953,7 +971,9 @@ public class Community extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
     }
 

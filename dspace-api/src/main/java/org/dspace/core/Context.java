@@ -438,7 +438,9 @@ public class Context
         try
         {
             if (!connection.isClosed())
+            {
                 connection.rollback();
+            }
         }
         catch (SQLException se)
         {
@@ -450,7 +452,9 @@ public class Context
             try
             {
                 if (!connection.isClosed())
+                {
                     DatabaseManager.freeConnection(connection);
+                }
             }
             catch (Exception ex)
             {

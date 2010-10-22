@@ -121,7 +121,9 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
             
             if (dso == null)
-                return "0"; // no item, something is wrong
+            {
+                return "0";  // no item, something is wrong
+            }
             
             return HashUtil.hash(dso.getHandle());
         } 
@@ -148,10 +150,14 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 	            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 	            
 	            if (dso == null)
-	                return null;
+                {
+                    return null;
+                }
 	            
 	            if (!(dso instanceof Community))
-	                return null;
+                {
+                    return null;
+                }
 	            
 	            community = (Community) dso;
 	            
@@ -192,7 +198,9 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
     {
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof Community))
+        {
             return;
+        }
 
         // Set up the major variables
         Community community = (Community) dso;
@@ -215,8 +223,10 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 			{
 				// Remove the protocol number, i.e. just list 'rss' or' atom'
 				String[] parts = format.split("_");
-				if (parts.length < 1) 
-					continue;
+				if (parts.length < 1)
+                {
+                    continue;
+                }
 				
 				String feedFormat = parts[0].trim()+"+xml";
 					
@@ -236,7 +246,9 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof Community))
+        {
             return;
+        }
 
         // Set up the major variables
         Community community = (Community) dso;

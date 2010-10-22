@@ -348,7 +348,9 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 for (ResourcePolicy rp : AuthorizeManager.getPoliciesActionFilter(context, bitstream, Constants.READ))
                 {
                     if (rp.getGroupID() == 0)
+                    {
                         this.isAnonymouslyReadable = true;
+                    }
                 }
             }
 
@@ -404,7 +406,9 @@ public class BitstreamReader extends AbstractReader implements Recyclable
     private Bitstream findBitstreamBySequence(Item item, int sequence) throws SQLException
     {
         if (item == null)
-                return null;
+        {
+            return null;
+        }
         
         Bundle[] bundles = item.getBundles();
         for (Bundle bundle : bundles)
@@ -435,12 +439,16 @@ public class BitstreamReader extends AbstractReader implements Recyclable
     private Bitstream findBitstreamByName(Item item, String name) throws SQLException
     {
         if (name == null || item == null)
-                return null;
+        {
+            return null;
+        }
     
         // Determine our the maximum number of directories that will be removed for a path.
         int maxDepthPathSearch = 3;
         if (ConfigurationManager.getProperty("xmlui.html.max-depth-guess") != null)
-                maxDepthPathSearch = ConfigurationManager.getIntProperty("xmlui.html.max-depth-guess");
+        {
+            maxDepthPathSearch = ConfigurationManager.getIntProperty("xmlui.html.max-depth-guess");
+        }
         
         // Search for the named bitstream on this item. Each time through the loop
         // a directory is removed from the name until either our maximum depth is
@@ -469,9 +477,11 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 int indexOfSlash = name.indexOf('/');
                 
                 if (indexOfSlash < 0)
-                        // No more directories to remove from the path, so return null for no
-                        // bitstream found.
-                        return null;
+                {
+                    // No more directories to remove from the path, so return null for no
+                    // bitstream found.
+                    return null;
+                }
                
                 name = name.substring(indexOfSlash+1);
                 
@@ -481,7 +491,9 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 {
                         int indexOfLastSlash = name.lastIndexOf('/');
                         if (indexOfLastSlash > -1)
-                                name = name.substring(indexOfLastSlash+1);
+                        {
+                            name = name.substring(indexOfLastSlash + 1);
+                        }
                 }
                 
         }
@@ -510,7 +522,9 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             ProcessingException
     {
         if (this.bitstreamInputStream == null)
-                return;
+        {
+            return;
+        }
         
         // Only allow If-Modified-Since protocol if request is from a spider
         // since response headers would encourage a browser to cache results
@@ -553,8 +567,9 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         // Only encourage caching if this is not a restricted resource, i.e.
         // if it is accessed anonymously or is readable by Anonymous:
         if (isAnonymouslyReadable)
-            response.setDateHeader("Expires", System.currentTimeMillis()
-                    + expires);
+        {
+            response.setDateHeader("Expires", System.currentTimeMillis() + expires);
+        }
         
         // If this is a large bitstream then tell the browser it should treat it as a download.
         int threshold = ConfigurationManager.getIntProperty("xmlui.content_disposition_threshold");
@@ -566,9 +581,13 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 try {
                         String agent = request.getHeader("USER-AGENT");
                         if (agent != null && agent.contains("MSIE"))
-                                name = URLEncoder.encode(name,"UTF8");
+                        {
+                            name = URLEncoder.encode(name, "UTF8");
+                        }
                         else if (agent != null && agent.contains("Mozilla"))
-                                name = MimeUtility.encodeText(name, "UTF8", "B");
+                        {
+                            name = MimeUtility.encodeText(name, "UTF8", "B");
+                        }
                 }
                 catch (UnsupportedEncodingException see)
                 {

@@ -177,7 +177,9 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 	            // Check if we are configured to assume validity.
 	            String assumeCacheValidity = ConfigurationManager.getProperty("xmlui.community-list.cache");
 	            if (assumeCacheValidity != null)
-	            	validity.setAssumedValidityDelay(assumeCacheValidity);
+                {
+                    validity.setAssumedValidityDelay(assumeCacheValidity);
+                }
 	            
 	            this.validity = validity.complete();
 	        } 
@@ -296,9 +298,13 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         
         String name = null;
         if (dso instanceof Community)
-        	name = ((Community) dso).getMetadata("name");
+        {
+            name = ((Community) dso).getMetadata("name");
+        }
         else if (dso instanceof Collection)
-        	name = ((Collection) dso).getMetadata("name");
+        {
+            name = ((Collection) dso).getMetadata("name");
+        }
         
         String url = contextPath + "/handle/"+dso.getHandle();
         list.addItem().addHighlight("bold").addXref(url, name);
@@ -325,7 +331,9 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         if (communityNodes != null && communityNodes.size() > 0)
         {
         	if (subList == null)
-        		subList = list.addList("sub-list-"+dso.getID());
+            {
+                subList = list.addList("sub-list-" + dso.getID());
+            }
             
             for (TreeNode communityNode : communityNodes)
             {
@@ -354,7 +362,9 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
     private TreeNode buildTree(Community[] communities) throws SQLException
     {
         if (root != null)
+        {
             return root;
+        }
         
         TreeNode newRoot = new TreeNode();
 
@@ -370,7 +380,9 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 
             // Short circuit if we have reached our max depth.
             if (node.getLevel() >= this.depth)
+            {
                 continue;
+            }
 
             // Only communities nodes are pushed on the stack.
             Community community = (Community) node.getDSO();
@@ -465,7 +477,9 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
             for (TreeNode node : children)
             {
                 if (node.dso.getType() == type)
+                {
                     results.add(node);
+                }
             }
             return results;
         }

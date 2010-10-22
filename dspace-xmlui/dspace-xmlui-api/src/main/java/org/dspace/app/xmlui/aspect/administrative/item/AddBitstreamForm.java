@@ -123,17 +123,23 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
 		// or one supplied from the dspace.cfg.
 		String bundleString = ConfigurationManager.getProperty("xmlui.bundle.upload");
         if (bundleString == null || bundleString.length() == 0)
-        	bundleString = DEFAULT_BUNDLE_LIST;
+        {
+            bundleString = DEFAULT_BUNDLE_LIST;
+        }
         String[] parts = bundleString.split(",");
         for (String part : parts)
         {
         	if (addBundleOption(item,select,part.trim()))
-        		bundleCount++;
+            {
+                bundleCount++;
+            }
         }
         select.setOptionSelected("ORIGINAL");
 		
 		if (bundleCount == 0)
-			select.setDisabled();
+        {
+            select.setDisabled();
+        }
 		
 
 		File file = upload.addItem().addFile("file");
@@ -142,24 +148,32 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
 		file.setRequired();
 
 		if (bundleCount == 0)
-			file.setDisabled();
+        {
+            file.setDisabled();
+        }
 		
 		Text description = upload.addItem().addText("description");
 		description.setLabel(T_description_label);
 		description.setHelp(T_description_help);
 
 		if (bundleCount == 0)
-			description.setDisabled();
+        {
+            description.setDisabled();
+        }
 		
 		if (bundleCount == 0)
-			upload.addItem().addContent(T_no_bundles);
+        {
+            upload.addItem().addContent(T_no_bundles);
+        }
 		
 		// ITEM: actions
 		Item actions = upload.addItem();
 		Button button = actions.addButton("submit_upload");
 		button.setValue(T_submit_upload);
 		if (bundleCount == 0)
-			button.setDisabled();
+        {
+            button.setDisabled();
+        }
 		
 		actions.addButton("submit_cancel").setValue(T_submit_cancel);
 
@@ -177,18 +191,24 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
 			// to upload to this bundle because at upload time the bundle will be created but
 			// there is no way anyone but super admin could have access to add to the bundle.
 			if ( ! AuthorizeManager.isAdmin(context))
-				return false; // you can't upload to this bundle.
+            {
+                return false;  // you can't upload to this bundle.
+            }
 		}
 		else
 		{
 			// At least one bundle exists, does the user have privleges to upload to it?
 			Bundle bundle = bundles[0];
 			if ( ! AuthorizeManager.authorizeActionBoolean(context, bundle, Constants.ADD))
-				return false; // you can't upload to this bundle.
+            {
+                return false; // you can't upload to this bundle.
+            }
 			
 			// You also need the write privlege on the bundle.
 			if ( ! AuthorizeManager.authorizeActionBoolean(context, bundle, Constants.WRITE))
-				return false; // you can't upload.
+            {
+                return false;  // you can't upload
+            }
 		}
 		
 		// It's okay to upload.

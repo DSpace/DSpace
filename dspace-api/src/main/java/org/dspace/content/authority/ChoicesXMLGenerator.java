@@ -60,9 +60,13 @@ public class ChoicesXMLGenerator
     {
         AttributesImpl resultAtts = new AttributesImpl();
         if (result.more)
+        {
             resultAtts.addAttribute("", "more", "more", "boolean", "true");
+        }
         if (result.isError())
+        {
             resultAtts.addAttribute("", "error", "error", "boolean", "true");
+        }
         resultAtts.addAttribute("", "start", "start", "int", String.valueOf(result.start));
         resultAtts.addAttribute("", "total", "total", "int", String.valueOf(result.total));
 
@@ -79,7 +83,9 @@ public class ChoicesXMLGenerator
                 va.addAttribute("", "authority", "authority", "string", mdav.authority == null ? "":mdav.authority);
                 va.addAttribute("", "value", "value", "string", mdav.value);
                 if (result.defaultSelected == i)
+                {
                     va.addAttribute("", "selected", "selected", "boolean", "");
+                }
                 contentHandler.startElement(NS_URI, NS_NAME, "option", va);
                   contentHandler.characters(mdav.label.toCharArray(), 0, mdav.label.length());
                 contentHandler.endElement(NS_URI, NS_NAME, "option");
@@ -101,7 +107,9 @@ public class ChoicesXMLGenerator
                 AttributesImpl va = new AttributesImpl();
                 va.addAttribute("", "authority", "authority", "string", mdav.authority == null ? "":mdav.authority);
                 if (result.defaultSelected == i)
+                {
                     va.addAttribute("", "selected", "selected", "boolean", "");
+                }
                 contentHandler.startElement(NS_URI, NS_NAME, "li", va);
                   contentHandler.startElement(NS_URI, NS_NAME, "span", classLabel);
                     contentHandler.characters(mdav.label.toCharArray(), 0, mdav.label.length());
@@ -125,7 +133,9 @@ public class ChoicesXMLGenerator
                 va.addAttribute("", "authority", "authority", "string", mdav.authority == null ? "":mdav.authority);
                 va.addAttribute("", "value", "value", "string", mdav.value);
                 if (result.defaultSelected == i)
+                {
                     va.addAttribute("", "selected", "selected", "boolean", "");
+                }
                 contentHandler.startElement(NS_URI, NS_NAME, "Choice", va);
                   contentHandler.characters(mdav.label.toCharArray(), 0, mdav.label.length());
                 contentHandler.endElement(NS_URI, NS_NAME, "Choice");

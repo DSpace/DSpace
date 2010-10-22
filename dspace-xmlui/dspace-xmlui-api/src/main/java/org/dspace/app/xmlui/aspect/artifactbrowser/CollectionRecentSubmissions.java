@@ -100,7 +100,9 @@ public class CollectionRecentSubmissions extends AbstractDSpaceTransformer imple
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
             if (dso == null)
+            {
                 return "0";
+            }
 
             return HashUtil.hash(dso.getHandle());
         }
@@ -129,10 +131,14 @@ public class CollectionRecentSubmissions extends AbstractDSpaceTransformer imple
 	            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
 	            if (dso == null)
-	                return null;
+                {
+                    return null;
+                }
 
 	            if (!(dso instanceof Collection))
-	                return null;
+                {
+                    return null;
+                }
 
 	            collection = (Collection) dso;
 
@@ -161,7 +167,9 @@ public class CollectionRecentSubmissions extends AbstractDSpaceTransformer imple
     public void addBody(Body body) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof Collection))
+        {
             return;
+        }
 
         // Set up the major variables
         Collection collection = (Collection) dso;
@@ -169,7 +177,9 @@ public class CollectionRecentSubmissions extends AbstractDSpaceTransformer imple
 
         java.util.List<BrowseItem> items = getRecientlySubmittedItems(collection);
         if(items.size() == 0)
+        {
             return;
+        }
         
         Division home = body.addDivision("collection-home", "primary repository collection");
         
@@ -195,12 +205,16 @@ public class CollectionRecentSubmissions extends AbstractDSpaceTransformer imple
         throws SQLException
     {
         if (recentSubmissionItems != null)
+        {
             return recentSubmissionItems;
+        }
 
         String source = ConfigurationManager.getProperty("recent.submissions.sort-option");
         int numRecentSubmissions = ConfigurationManager.getIntProperty("recent.submissions.count", RECENT_SUBMISSIONS);
         if(numRecentSubmissions == 0)
+        {
             return new ArrayList<BrowseItem>();
+        }
         BrowserScope scope = new BrowserScope(context);
         scope.setCollection(collection);
         scope.setResultsPerPage(numRecentSubmissions);

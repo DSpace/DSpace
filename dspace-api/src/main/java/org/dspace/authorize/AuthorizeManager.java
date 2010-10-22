@@ -567,7 +567,9 @@ public class AuthorizeManager
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         return policies;
@@ -613,7 +615,9 @@ public class AuthorizeManager
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         return policies;
@@ -664,7 +668,9 @@ public class AuthorizeManager
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         return policies;
@@ -883,7 +889,9 @@ public class AuthorizeManager
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         Group[] groupArray = new Group[groups.size()];

@@ -183,7 +183,9 @@ public class BrowseListTag extends TagSupport
                 // We haven't got a sort option defined, so get one for the index
                 // - it may be required later
                 if (so == null)
+                {
                     so = bix.getSortOption();
+                }
             }
 
             // If no config found, attempt to get one for this sort option
@@ -248,7 +250,9 @@ public class BrowseListTag extends TagSupport
                         if (browseListTok != null)
                         {
                             if (newBLLine.length() > 0)
+                            {
                                 newBLLine.append(",");
+                            }
 
                             newBLLine.append(browseListTok);
                         }
@@ -256,7 +260,9 @@ public class BrowseListTag extends TagSupport
                         if (browseWidthTok != null)
                         {
                             if (newBWLine.length() > 0)
+                            {
                                 newBWLine.append(",");
+                            }
 
                             newBWLine.append(browseWidthTok);
                         }

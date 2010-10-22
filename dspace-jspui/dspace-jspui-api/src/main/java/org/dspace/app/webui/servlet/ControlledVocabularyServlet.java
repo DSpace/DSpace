@@ -64,10 +64,14 @@ public class ControlledVocabularyServlet extends DSpaceServlet
         String callerUrl = request.getParameter("callerUrl");
 
         if (request.getParameter("ID") != null)
+        {
             ID = request.getParameter("ID");
+        }
 
         if (request.getParameter("filter") != null)
+        {
             filter = request.getParameter("filter");
+        }
 
         request.getSession()
                 .setAttribute("controlledvocabulary.filter", filter);

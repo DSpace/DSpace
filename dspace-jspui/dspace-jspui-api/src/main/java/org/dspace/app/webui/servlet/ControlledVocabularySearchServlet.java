@@ -361,7 +361,9 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         {
             result += iterator.next().toString();
             if (iterator.hasNext())
+            {
                 result += separator;
+            }
         }
         return result;
     }

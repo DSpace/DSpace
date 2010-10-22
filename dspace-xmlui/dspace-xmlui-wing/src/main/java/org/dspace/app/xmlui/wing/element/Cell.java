@@ -161,15 +161,23 @@ public class Cell extends RichTextContainer implements StructuralElement
         }
 
         if (role != null)
+        {
             attributes.put(A_ROLE, role);
+        }
         // else
         // attributes.put(A_ROLE, ROLE_DATA);
         if (rows > 0)
+        {
             attributes.put(A_ROWS, rows);
+        }
         if (cols > 0)
+        {
             attributes.put(A_COLS, cols);
+        }
         if (rend != null)
+        {
             attributes.put(A_RENDER, rend);
+        }
 
         startElement(contentHandler, namespaces, E_CELL, attributes);
         super.toSAX(contentHandler, lexicalHandler, namespaces);
@@ -182,9 +190,13 @@ public class Cell extends RichTextContainer implements StructuralElement
     public void dispose()
     {
         for (AbstractWingElement content : contents)
+        {
             content.dispose();
+        }
         if (contents != null)
+        {
             contents.clear();
+        }
         contents = null;
         super.dispose();
     }

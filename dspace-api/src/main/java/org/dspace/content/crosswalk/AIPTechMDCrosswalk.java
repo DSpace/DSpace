@@ -229,12 +229,16 @@ public class AIPTechMDCrosswalk
             Item item = (Item)dso;
             EPerson is = item.getSubmitter();
             if (is != null)
+            {
                 dc.add(makeDC("creator", null, is.getEmail()));
+            }
             dc.add(makeDC("identifier", "uri", "hdl:" + item.getHandle()));
             Collection owningColl = item.getOwningCollection();
             String owner = owningColl.getHandle();
             if (owner != null)
-                dc.add(makeDC("relation", "isPartOf", "hdl:"+owner));
+            {
+                dc.add(makeDC("relation", "isPartOf", "hdl:" + owner));
+            }
             Collection inColl[] = item.getCollections();
             for (int i = 0; i < inColl.length; ++i)
             {
@@ -242,27 +246,39 @@ public class AIPTechMDCrosswalk
                 {
                     String h = inColl[i].getHandle();
                     if (h != null)
-                        dc.add(makeDC("relation", "isReferencedBy", "hdl:"+h));
+                    {
+                        dc.add(makeDC("relation", "isReferencedBy", "hdl:" + h));
+                    }
                 }
             }
             if (item.isWithdrawn())
+            {
                 dc.add(makeDC("rights", "accessRights", "WITHDRAWN"));
+            }
         }
         else if (dso.getType() == Constants.BITSTREAM)
         {
             Bitstream bitstream = (Bitstream)dso;
             String bsName = bitstream.getName();
             if (bsName != null)
+            {
                 dc.add(makeDC("title", null, bsName));
+            }
             String bsSource = bitstream.getSource();
             if (bsSource != null)
+            {
                 dc.add(makeDC("title", "alternative", bsSource));
+            }
             String bsDesc = bitstream.getDescription();
             if (bsDesc != null)
+            {
                 dc.add(makeDC("description", null, bsDesc));
+            }
             String bsUfmt = bitstream.getUserFormatDescription();
             if (bsUfmt != null)
+            {
                 dc.add(makeDC("format", null, bsUfmt));
+            }
             BitstreamFormat bsf = bitstream.getFormat();
             dc.add(makeDC("format", "medium", bsf.getShortDescription()));
             dc.add(makeDC("format", "mimetype", bsf.getMIMEType()));
@@ -276,12 +292,16 @@ public class AIPTechMDCrosswalk
             Community owners[] = collection.getCommunities();
             String ownerHdl = owners[0].getHandle();
             if (ownerHdl != null)
+            {
                 dc.add(makeDC("relation", "isPartOf", "hdl:" + ownerHdl));
+            }
             for (int i = 1; i < owners.length; ++i)
             {
                 String h = owners[i].getHandle();
                 if (h != null)
+                {
                     dc.add(makeDC("relation", "isReferencedBy", "hdl:" + h));
+                }
             }
         }
         else if (dso.getType() == Constants.COMMUNITY)
@@ -291,11 +311,18 @@ public class AIPTechMDCrosswalk
             Community owner = community.getParentCommunity();
             String ownerHdl = null;
             if (owner == null)
+            {
                 ownerHdl = Site.getSiteHandle();
+            }
             else
+            {
                 ownerHdl = owner.getHandle();
+            }
+
             if (ownerHdl != null)
+            {
                 dc.add(makeDC("relation", "isPartOf", "hdl:" + ownerHdl));
+            }
         }
         else if (dso.getType() == Constants.SITE)
         {
@@ -368,7 +395,9 @@ public class AIPTechMDCrosswalk
                     String dcField = field.getAttributeValue("element");
                     String qualifier = field.getAttributeValue("qualifier");
                     if (qualifier != null)
-                        dcField += "."+qualifier;
+                    {
+                        dcField += "." + qualifier;
+                    }
                     String value = field.getText();
 
                     if (type == Constants.BITSTREAM)
@@ -441,13 +470,17 @@ public class AIPTechMDCrosswalk
                                     log.warn("Ignoring unknown Submitter="+value+" in AIP Tech MD, no matching EPerson and 'mets.dspaceAIP.ingest.createSubmitter' is false in dspace.cfg.");
                             }
                             if (sub != null)
+                            {
                                 item.setSubmitter(sub);
+                            }
                         }
                         else if (dcField.equals("rights.accessRights"))
                         {
                             //check if item is withdrawn
                             if (value.equalsIgnoreCase("WITHDRAWN"))
+                            {
                                 item.withdraw();
+                            }
                         }
                         else if(dcField.equals("identifier.uri") ||
                                 dcField.equals("relation.isPartOf"))
@@ -464,14 +497,14 @@ public class AIPTechMDCrosswalk
                             // These get connected when collections are re-mapped.
                         }
                         else
-                            log.warn("Got unrecognized DC field for Item: "+dcField);
+                        {
+                            log.warn("Got unrecognized DC field for Item: " + dcField);
+                        }
 
                     }
-                    else if (type == Constants.COMMUNITY ||
-                             type == Constants.COLLECTION)
+                    else if (type == Constants.COMMUNITY || type == Constants.COLLECTION)
                     {
-                        if (dcField.equals("identifier.uri") ||
-                            dcField.equals("relation.isPartOf"))
+                        if (dcField.equals("identifier.uri") || dcField.equals("relation.isPartOf"))
                         {
                             // Ignore identifier.uri (which specifies object handle)
                             // and relation.isPartOf (which specifies primary parent object)
@@ -485,11 +518,15 @@ public class AIPTechMDCrosswalk
                             // These get connected when collections are re-mapped.
                         }
                         else
-                            log.warn("Got unrecognized DC field for Collection/Community: "+dcField);
+                        {
+                            log.warn("Got unrecognized DC field for Collection/Community: " + dcField);
+                        }
                     } 
                 }
                 else
-                    log.warn("Skipping DIM field with mdschema=\""+schema+"\".");
+                {
+                    log.warn("Skipping DIM field with mdschema=\"" + schema + "\".");
+                }
 
             }
             else
@@ -505,16 +542,22 @@ public class AIPTechMDCrosswalk
         {
             BitstreamFormat bsf = BitstreamFormat.findByShortDescription(context, bsfShortName);
             if (bsf == null && bsfMIMEType != null)
+            {
                 bsf = PackageUtils.findOrCreateBitstreamFormat(context,
-                                                               bsfShortName,
-                                                               bsfMIMEType,
-                                                               bsfShortName,
-                                                               bsfSupport,
-                                                               bsfInternal);
+                        bsfShortName,
+                        bsfMIMEType,
+                        bsfShortName,
+                        bsfSupport,
+                        bsfInternal);
+            }
             if (bsf != null)
-                ((Bitstream)dso).setFormat(bsf);
+            {
+                ((Bitstream) dso).setFormat(bsf);
+            }
             else
-                log.warn("Failed to find or create bitstream format named \""+bsfShortName+"\"");
+            {
+                log.warn("Failed to find or create bitstream format named \"" + bsfShortName + "\"");
+            }
         }
     }
 }

@@ -141,13 +141,19 @@ public class ClassicDSpaceLogConverter {
                 {
                     // Read inthe line and covnert it to a LogLine
                     lines++;
-                    if (verbose) System.out.println("  - IN: " + line);
+                    if (verbose)
+                    {
+                        System.out.println("  - IN: " + line);
+                    }
                     lline = LogAnalyser.getLogLine(line);
 
                     // Get rid of any lines that aren't INFO
                     if ((lline == null) || (!lline.isLevel("INFO")))
                     {
-                        if (verbose) System.out.println("   - IGNORED!");
+                        if (verbose)
+                        {
+                            System.out.println("   - IGNORED!");
+                        }
                         continue;
                     }
 
@@ -218,8 +224,14 @@ public class ClassicDSpaceLogConverter {
                     }
                     catch (Exception e)
                     {
-                        if (verbose) System.out.println("  - IN: " + line);
-                        if (verbose) System.err.println("Error with log line! " + e.getMessage());
+                        if (verbose)
+                        {
+                            System.out.println("  - IN: " + line);
+                        }
+                        if (verbose)
+                        {
+                            System.err.println("Error with log line! " + e.getMessage());
+                        }
                         continue;
                     }
 

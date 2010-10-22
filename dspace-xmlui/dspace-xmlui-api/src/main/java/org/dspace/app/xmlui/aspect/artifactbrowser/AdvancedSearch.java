@@ -161,7 +161,9 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
         Request request = ObjectModelHelper.getRequest(objectModel);
         String numSearchField = request.getParameter("num_search_field");
         if (numSearchField == null || numSearchField.length() == 0)
-        	numSearchField = "3";
+        {
+            numSearchField = "3";
+        }
     	
         // Build the DRI Body
         Division search = body.addDivision("advanced-search","primary");
@@ -202,7 +204,9 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
         	// Skip over all the fields we've displayed.
         	int i = field.getIndex();
         	if (i <= FIELD_DISPLAY_COUNT)
-        		continue;
+            {
+                continue;
+            }
         	
         	query.addHidden("conjunction"+i).setValue(field.getConjunction());
         	query.addHidden("field"+i).setValue(field.getField());
@@ -228,14 +232,18 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
     {
         // No conjunction for the first row.
         if (row == 1)
+        {
             return;
+        }
 
         Request request = ObjectModelHelper.getRequest(objectModel);
         String current = request.getParameter("conjunction" + row);
 
         // default to AND if nothing specified.
         if (current == null || current.length() == 0)
+        {
             current = "AND";
+        }
         
         Select select = cell.addSelect("conjunction" + row);
 
@@ -308,7 +316,9 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
 
         Text text = cell.addText("query" + row);
         if (current != null)
+        {
             text.setValue(current);
+        }
     }
 
     /**
@@ -324,15 +334,21 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
         
         String numSearchField = request.getParameter("num_search_field");
         if (numSearchField != null)
-        	parameters.put("num_search_field", numSearchField);
+        {
+            parameters.put("num_search_field", numSearchField);
+        }
 
         String resultsPerPage = request.getParameter("results_per_page");
         if (resultsPerPage != null)
-        	parameters.put("results_per_page", resultsPerPage);
+        {
+            parameters.put("results_per_page", resultsPerPage);
+        }
         
         String scope = request.getParameter("scope");
         if (scope != null)
-        	parameters.put("scope", scope);
+        {
+            parameters.put("scope", scope);
+        }
         
         for (SearchField searchField : getSearchFields(request))
         {
@@ -347,19 +363,29 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
         }
         
         if (parameters.get("page") == null)
-        	parameters.put("page", String.valueOf(getParameterPage()));
+        {
+            parameters.put("page", String.valueOf(getParameterPage()));
+        }
         
         if (parameters.get("rpp") == null)
-        	parameters.put("rpp", String.valueOf(getParameterRpp()));
+        {
+            parameters.put("rpp", String.valueOf(getParameterRpp()));
+        }
         
         if (parameters.get("sort_by") == null)
-        	parameters.put("sort_by", String.valueOf(getParameterSortBy()));
+        {
+            parameters.put("sort_by", String.valueOf(getParameterSortBy()));
+        }
         
         if (parameters.get("order") == null)
-        	parameters.put("order",getParameterOrder());
+        {
+            parameters.put("order", getParameterOrder());
+        }
         
         if (parameters.get("etal") == null)
-        	parameters.put("etal",String.valueOf(getParameterEtAl()));
+        {
+            parameters.put("etal", String.valueOf(getParameterEtAl()));
+        }
         
         return super.generateURL("advanced-search", parameters);
     }
@@ -394,11 +420,15 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
     	{	
     		// if the field is empty, then skip it and try a later one.
     		if (field.getQuery() == null)
-    			continue;
+            {
+                continue;
+            }
     		
     		// Add the conjunction for everything but the first field.
     		if (fields.indexOf(field) > 0)
-    			query.append(" ").append(field.getConjunction()).append(" ").toString();
+            {
+                query.append(" ").append(field.getConjunction()).append(" ").toString();
+            }
             
     		// Two cases, one if a specific search field is specified or if 
     		// ANY is given then just a general search is performed.
@@ -449,7 +479,9 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
     public ArrayList<SearchField> getSearchFields(Request request) throws UIException
 	{
     	if (this.fields != null)
-    		return this.fields;
+        {
+            return this.fields;
+        }
     	
     	// Get how many fields to search
 	    int numSearchField;
@@ -474,7 +506,9 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
 			{
 				field = field.trim();
 				if (field.length() == 0)
-					field = null;
+                {
+                    field = null;
+                }
 			}
 			
 			
@@ -482,23 +516,33 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
 			{
 				query = query.trim();
 				if (query.length() == 0)
-					query = null;
+                {
+                    query = null;
+                }
 			}
 			
 			if (conjunction != null)
 			{
 				conjunction = conjunction.trim();
 				if (conjunction.length() == 0)
-					conjunction = null;
+                {
+                    conjunction = null;
+                }
 			}
 			
 			if (field == null)
-				field = "ANY";
+            {
+                field = "ANY";
+            }
 			if (conjunction == null)
-				conjunction = "AND";
+            {
+                conjunction = "AND";
+            }
 			
 			if (query != null)
-				fields.add(new SearchField(i,field,query,conjunction));
+            {
+                fields.add(new SearchField(i, field, query, conjunction));
+            }
 		}
 		
 		this.fields = fields;

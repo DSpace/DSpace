@@ -204,7 +204,9 @@ public class AuthenticationUtil
             EPerson eperson) throws SQLException
     {
         if (eperson == null)
+        {
             return;
+        }
         
         HttpSession session = request.getSession();
 
@@ -328,25 +330,35 @@ public class AuthenticationUtil
     {
     	// Only allow loginAs if the administrator has allowed it.
     	if (!ConfigurationManager.getBooleanProperty("xmlui.user.assumelogin", false))
-    		return;
+        {
+            return;
+        }
     	
     	// Only super administrators can login as someone else.
     	if (!AuthorizeManager.isAdmin(context))
-    		throw new AuthorizeException("xmlui.utils.AuthenticationUtil.onlyAdmins");
+        {
+            throw new AuthorizeException("xmlui.utils.AuthenticationUtil.onlyAdmins");
+        }
     		
     	// Just to be double be sure, make sure the administrator
     	// is the one who actually authenticated himself.
 	    HttpSession session = request.getSession(false);
 	    Integer authenticatedID = (Integer) session.getAttribute(AUTHENTICATED_USER_ID); 
 	    if (context.getCurrentUser().getID() != authenticatedID)
-	    	throw new AuthorizeException("xmlui.utils.AuthenticationUtil.onlyAuthenticatedAdmins");
+        {
+            throw new AuthorizeException("xmlui.utils.AuthenticationUtil.onlyAuthenticatedAdmins");
+        }
 	    
 	    // You may not assume the login of another super administrator
 	    if (loginAs == null)
-	    	return;
+        {
+            return;
+        }
 	    Group administrators = Group.find(context,1);
 	    if (administrators.isMember(loginAs))
-	    	throw new AuthorizeException("xmlui.utils.AuthenticationUtil.notAnotherAdmin");
+        {
+            throw new AuthorizeException("xmlui.utils.AuthenticationUtil.notAnotherAdmin");
+        }
 	    
 	    // Success, allow the user to login as another user.
 	    context.setCurrentUser(loginAs);

@@ -190,9 +190,13 @@ public class Choices
         for (int i = 0; i < confidenceValue.length; ++i)
         {
             if (confidenceValue[i] == cv)
+            {
                 return confidenceText[i];
+            }
             else if (confidenceValue[i] == CF_NOVALUE)
+            {
                 novalue = confidenceText[i];
+            }
         }
         return novalue;
     }
@@ -223,7 +227,9 @@ public class Choices
         for (int i = 0; i < confidenceText.length; ++i)
         {
             if (confidenceText[i].equalsIgnoreCase(ct))
+            {
                 return confidenceValue[i];
+            }
         }
         return dflt;
     }

@@ -140,13 +140,19 @@ public class ChoiceLookupTransformer extends AbstractDSpaceTransformer
             authorityInput = parameters.getParameter("authorityInput");
             String sStart = parameters.getParameter("start");
             if (sStart != null)
+            {
                 start = atoi(sStart);
+            }
             String sLimit = parameters.getParameter("limit");
             if (sLimit != null)
+            {
                 limit = atoi(sLimit);
+            }
             collection = parameters.getParameter("collection");
             if (collection == null)
+            {
                 collection = "-1";
+            }
         }
         catch (org.apache.avalon.framework.parameters.ParameterException e)
         {

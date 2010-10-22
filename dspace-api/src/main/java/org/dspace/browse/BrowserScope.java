@@ -339,11 +339,15 @@ public class BrowserScope
     public String getOrder()
     {
         if (order != null)
+        {
             return order;
+        }
 
         BrowseIndex bi = getBrowseIndex();
         if (bi != null)
+        {
             return bi.getDefaultOrder();
+        }
 
         return SortOption.ASCENDING;
     }
@@ -381,7 +385,9 @@ public class BrowserScope
     public void setResultsPerPage(int resultsPerPage)
     {
         if (resultsPerPage > -1)
+        {
             this.resultsPerPage = resultsPerPage;
+        }
     }
 
     /**
@@ -466,7 +472,9 @@ public class BrowserScope
                             for (SortOption so : SortOption.getSortOptions())
                             {
                                 if (so.getNumber() == sortBy)
+                                {
                                     sortOption = so;
+                                }
                             }
                         }
                     }
@@ -593,7 +601,9 @@ public class BrowserScope
         BrowseIndex bi = getBrowseIndex();
 
         if (bi != null && SortOption.DESCENDING.equalsIgnoreCase(bi.getDefaultOrder()))
+        {
             return false;
+        }
 
         return true;
     }

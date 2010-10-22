@@ -113,7 +113,9 @@ public abstract class AbstractDSpaceTransformer extends AbstractWingTransformer
             Request request = ObjectModelHelper.getRequest(objectModel);
             this.contextPath = request.getContextPath();
             if (contextPath == null)
-            	contextPath = "/";
+            {
+                contextPath = "/";
+            }
             
             this.servletPath = request.getServletPath();
             this.sitemapURI = request.getSitemapURI(); 
@@ -175,7 +177,9 @@ public abstract class AbstractDSpaceTransformer extends AbstractWingTransformer
     public ObjectManager getObjectManager() 
     {
         if (this.objectManager == null)
+        {
             this.objectManager = new DSpaceObjectManager();
+        }
         return this.objectManager;
     }
     
@@ -184,7 +188,9 @@ public abstract class AbstractDSpaceTransformer extends AbstractWingTransformer
     {
         String name = this.getClass().getName();
         if (name.startsWith(NAME_TRIM))
+        {
             name = name.substring(NAME_TRIM.length());
+        }
         return name;
     }
 
@@ -198,7 +204,9 @@ public abstract class AbstractDSpaceTransformer extends AbstractWingTransformer
     public static String URLEncode(String unencodedString) throws UIException
     {
     	if (unencodedString == null)
-    		return "";
+        {
+            return "";
+        }
 
         try
         {
@@ -221,7 +229,9 @@ public abstract class AbstractDSpaceTransformer extends AbstractWingTransformer
     public static String URLDecode(String encodedString) throws UIException
     {
     	if (encodedString == null)
-    		return null;
+        {
+            return null;
+        }
     	
         try
         {

@@ -94,7 +94,9 @@ public class AspectGenerator extends FileGenerator implements
 
         // If no aspect ID found, assume it's the first one.
         if (aspectID == null)
+        {
             aspectID = 0;
+        }
 
         // Get the aspect ID of the next aspect & store it for later.
         aspectID++;

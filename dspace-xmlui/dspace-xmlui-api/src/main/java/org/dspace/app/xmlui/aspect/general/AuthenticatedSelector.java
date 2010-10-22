@@ -102,8 +102,10 @@ public class AuthenticatedSelector extends AbstractLogEnabled implements
             EPerson eperson = context.getCurrentUser();
 
             if (eperson == null)
+            {
                 // No one is authenticated.
                 return false;
+            }
 
             if (EPERSON.equals(expression))
             {

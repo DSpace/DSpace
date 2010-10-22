@@ -121,7 +121,9 @@ public class CommunitySearch extends AbstractDSpaceTransformer implements Cachea
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
             if (dso == null)
+            {
                 return "0"; // no item, something is wrong
+            }
 
             return HashUtil.hash(dso.getHandle());
         }
@@ -149,10 +151,14 @@ public class CommunitySearch extends AbstractDSpaceTransformer implements Cachea
 	            DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
 	            if (dso == null)
-	                return null;
+                {
+                    return null;
+                }
 
 	            if (!(dso instanceof Community))
-	                return null;
+                {
+                    return null;
+                }
 
 	            community = (Community) dso;
 
@@ -206,7 +212,9 @@ public class CommunitySearch extends AbstractDSpaceTransformer implements Cachea
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
         if (!(dso instanceof Community))
+        {
             return;
+        }
 
         // Set up the major variables
         Community community = (Community) dso;

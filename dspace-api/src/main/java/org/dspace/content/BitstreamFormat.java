@@ -129,7 +129,9 @@ public class BitstreamFormat
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         // Cache ourselves
@@ -209,7 +211,9 @@ public class BitstreamFormat
             mimeType);
 
         if (formatRow == null)
+        {
             return null;
+        }
         return findByFinish(context, formatRow);
     }
 
@@ -334,7 +338,9 @@ public class BitstreamFormat
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         // Return the formats as an array
@@ -392,7 +398,9 @@ public class BitstreamFormat
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         // Return the formats as an array
@@ -633,7 +641,9 @@ public class BitstreamFormat
         BitstreamFormat unknown = findUnknown(bfContext);
 
         if (unknown.getID() == getID())
-	     throw new IllegalArgumentException("The Unknown bitstream format may not be deleted."); 
+        {
+            throw new IllegalArgumentException("The Unknown bitstream format may not be deleted.");
+        }
 
         // Remove from cache
         bfContext.removeCached(this, getID());

@@ -88,7 +88,9 @@ public abstract class AbstractWingElement implements WingElement
     protected AbstractWingElement(WingContext context)
     {
         if (context == null)
+        {
             throw new NullPointerException("Context may not be null.");
+        }
         this.context = context;
     }
 
@@ -145,7 +147,9 @@ public abstract class AbstractWingElement implements WingElement
             throws WingInvalidArgument
     {
         if (parameter == null || parameter.equals(""))
+        {
             throw new WingInvalidArgument(message);
+        }
     }
 
     /**
@@ -160,7 +164,9 @@ public abstract class AbstractWingElement implements WingElement
             throws WingInvalidArgument
     {
         if (parameter == null)
+        {
             throw new WingInvalidArgument(message);
+        }
     }
 
     /**
@@ -180,11 +186,17 @@ public abstract class AbstractWingElement implements WingElement
             throws WingInvalidArgument
     {
         if (parameter == null)
+        {
             return;
+        }
 
         for (String test : options)
+        {
             if (parameter.equals(test))
-                return; // short circuit the method call.
+            {
+                return;
+            }
+        } // short circuit the method call.
 
         throw new WingInvalidArgument(message);
     }
@@ -204,7 +216,9 @@ public abstract class AbstractWingElement implements WingElement
             throws WingInvalidArgument
     {
         if (parameter <= greater)
+        {
             throw new WingInvalidArgument(message);
+        }
     }
 
     /**
@@ -222,7 +236,9 @@ public abstract class AbstractWingElement implements WingElement
             throws WingInvalidArgument
     {
         if (parameter >= lesser)
+        {
             throw new WingInvalidArgument(message);
+        }
     }
 
     /**
@@ -237,7 +253,9 @@ public abstract class AbstractWingElement implements WingElement
             throws WingInvalidArgument
     {
         if (test)
+        {
             throw new WingInvalidArgument(message);
+        }
     }
 
     /**
@@ -252,7 +270,9 @@ public abstract class AbstractWingElement implements WingElement
             throws WingInvalidArgument
     {
         if (!test)
+        {
             throw new WingInvalidArgument(message);
+        }
     }
     
     /**
@@ -404,7 +424,9 @@ public abstract class AbstractWingElement implements WingElement
     {
 
         if (attributes == null)
+        {
             attributes = new AttributesImpl();
+        }
         if (attributeMap != null)
         {
             // Figure out the namespace issue

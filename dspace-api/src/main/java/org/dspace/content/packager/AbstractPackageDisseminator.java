@@ -110,7 +110,10 @@ public abstract class AbstractPackageDisseminator
                AuthorizeException, SQLException, IOException
     {
         //If unset, make sure the Parameters specifies this is a recursive dissemination
-        if(!params.recursiveModeEnabled()) params.setRecursiveModeEnabled(true);
+        if(!params.recursiveModeEnabled())
+        {
+            params.setRecursiveModeEnabled(true);
+        }
 
         //try to disseminate the first object using provided PackageDisseminator
         disseminate(context, dso, params, pkgFile);
@@ -125,7 +128,10 @@ public abstract class AbstractPackageDisseminator
             //Determine where first file package was disseminated to, as all
             //others will be written to same directory
             String pkgDirectory = pkgFile.getCanonicalFile().getParent();
-            if(!pkgDirectory.endsWith(File.separator)) pkgDirectory += File.separator;
+            if(!pkgDirectory.endsWith(File.separator))
+            {
+                pkgDirectory += File.separator;
+            }
             String fileExtension = PackageUtils.getFileExtension(pkgFile.getName());
 
             //recursively disseminate content, based on object type

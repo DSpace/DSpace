@@ -263,7 +263,9 @@ public abstract class AbstractWingTransformer extends AbstractTransformer
 
                 // Update any attributes of this merged element.
                 if (child != null)
+                {
                     attributes = child.merge(attributes);
+                }
                 stack.push(child);
             }
             // Send off the event with nothing modified except for the

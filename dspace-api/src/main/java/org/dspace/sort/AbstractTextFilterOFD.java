@@ -101,10 +101,14 @@ public abstract class AbstractTextFilterOFD implements OrderFormatDelegate
 	        if (language != null)
 	        {
 	            if (language.length() > 2 && language.charAt(2) == '_')
-	                language = language.substring(0,2);
+                {
+                    language = language.substring(0, 2);
+                }
 
 	            if (language.length() > 3)
-	                language = language.substring(0,3);
+                {
+                    language = language.substring(0, 3);
+                }
 	        }
 
 	        // Iterate through filters, applying each in turn

@@ -156,7 +156,9 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
             array.add("CREATE INDEX " + table + "_item_id_idx ON " + table + "(item_id);");
 
             if (value)
+            {
                 array.add("CREATE INDEX " + table + "_value_idx ON " + table + "(sort_value);");
+            }
 
             for (Integer i : sortCols)
             {
@@ -250,7 +252,9 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
             for (int i = 0; i < distinctIDs.length; i++)
             {
                 if (!isFirstOccurrence(distinctIDs, i))
+                {
                     distinctIDs[i] = -1;
+                }
             }
 
             // Find all existing mappings for this item
@@ -279,7 +283,9 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
 
                         // The item is no longer mapped to this community, so remove the database record
                         if (!itemIsMapped)
+                        {
                             DatabaseManager.delete(context, tr);
+                        }
                     }
                 }
                 finally
@@ -605,7 +611,9 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
             for (int i = 0; i < commID.length; i++)
             {
                 if (!isFirstOccurrence(commID, i))
+                {
                     commID[i] = -1;
+                }
             }
 
             // Find all existing mappings for this item
@@ -634,7 +642,9 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
 
                         // The item is no longer mapped to this community, so remove the database record
                         if (!itemIsMapped)
+                        {
                             DatabaseManager.delete(context, tr);
+                        }
                     }
                 }
                 finally
@@ -734,7 +744,9 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
 
             // If the item does not exist in the table, return that it couldn't be found
             if (row == null)
+            {
                 return false;
+            }
 
             // Iterate through all the sort values
             for (Map.Entry<Integer, String> sortCol : sortCols.entrySet())
@@ -747,7 +759,9 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
 
                 // Check the column exists - if it doesn't, something has gone seriously wrong
                 if (!row.hasColumn(column))
+                {
                     throw new BrowseException("Column '" + column + "' does not exist in table " + table);
+                }
 
                 // Get the existing value from the column
                 String oldValue = row.getStringColumn(column);
@@ -767,7 +781,9 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
 
             // We've updated the row, so save it back to the database
             if (rowUpdated)
+            {
                 DatabaseManager.update(context, row);
+            }
         }
         catch (SQLException e)
         {
@@ -932,7 +948,9 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         // Need to iterate the array as toArray will produce an array Integers,
@@ -971,7 +989,9 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         return null;
@@ -988,13 +1008,17 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
     private boolean isFirstOccurrence(int[] ids, int pos)
     {
         if (pos < 0 || pos >= ids.length)
+        {
             return false;
+        }
 
         int id = ids[pos];
         for (int i = 0; i < pos; i++)
         {
             if (id == ids[i])
+            {
                 return false;
+            }
         }
 
         return true;

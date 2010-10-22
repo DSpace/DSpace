@@ -179,7 +179,9 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             {
                 DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
                 if (dso != null)
+                {
                     key += "-" + dso.getHandle();
+                }
 
                 return HashUtil.hash(key);
             }
@@ -202,7 +204,9 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                 DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
                 if (dso != null)
+                {
                     validity.add(dso);
+                }
                 
                 BrowseInfo info = getBrowseInfo();
                 
@@ -251,7 +255,9 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
         if (dso != null)
+        {
             HandleUtil.buildHandleTrail(dso, pageMeta, contextPath);
+        }
 
         pageMeta.addTrail().addContent(getTrailMessage(info));
     }
@@ -566,7 +572,9 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
     {
         // Don't create a previous page link if this is the first page
         if (info.isFirst())
+        {
             return null;
+        }
 
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.putAll(params.getCommonParametersEncoded());
@@ -592,7 +600,9 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
     {
         // Don't create a next page link if this is the last page
         if (info.isLast())
+        {
             return null;
+        }
 
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.putAll(params.getCommonParametersEncoded());
@@ -616,7 +626,9 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
     private BrowseParams getUserParams() throws SQLException, UIException
     {
         if (this.userParams != null)
+        {
             return this.userParams;
+        }
 
         Context context = ContextUtil.obtainContext(objectModel);
         Request request = ObjectModelHelper.getRequest(objectModel);
@@ -632,9 +644,13 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         // Are we in a community or collection?
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (dso instanceof Community)
+        {
             params.scope.setCommunity((Community) dso);
+        }
         if (dso instanceof Collection)
+        {
             params.scope.setCollection((Collection) dso);
+        }
 
         try
         {
@@ -690,8 +706,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             params.scope.setOrder(request.getParameter(BrowseParams.ORDER));
             int offset = RequestUtils.getIntParameter(request, BrowseParams.OFFSET);
             params.scope.setOffset(offset > 0 ? offset : 0);
-            params.scope.setResultsPerPage(RequestUtils.getIntParameter(request,
-                    BrowseParams.RESULTS_PER_PAGE));
+            params.scope.setResultsPerPage(RequestUtils.getIntParameter(request, BrowseParams.RESULTS_PER_PAGE));
             params.scope.setStartsWith(URLDecode(request.getParameter(BrowseParams.STARTS_WITH)));
             String filterValue = request.getParameter(BrowseParams.FILTER_VALUE[0]);
             if (filterValue == null)
@@ -707,7 +722,9 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
             // Filtering to a value implies this is a second level browse
             if (params.scope.getFilterValue() != null)
+            {
                 params.scope.setBrowseLevel(1);
+            }
 
             // if year and perhaps month have been selected, we translate these
             // into "startsWith"
@@ -715,8 +732,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             if (params.year != null && !"".equals(params.year) && !"-1".equals(params.year))
             {
                 String startsWith = params.year;
-                if ((params.month != null) && !"-1".equals(params.month)
-                        && !"".equals(params.month))
+                if ((params.month != null) && !"-1".equals(params.month) && !"".equals(params.month))
                 {
                     // subtract 1 from the month, so the match works
                     // appropriately
@@ -763,7 +779,9 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
     private BrowseInfo getBrowseInfo() throws SQLException, UIException
     {
         if (this.browseInfo != null)
+        {
             return this.browseInfo;
+        }
 
         Context context = ContextUtil.obtainContext(objectModel);
 

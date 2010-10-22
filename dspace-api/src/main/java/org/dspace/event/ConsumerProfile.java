@@ -104,11 +104,15 @@ public class ConsumerProfile
                 + name + ".filters");
 
         if (className == null)
+        {
             throw new IllegalArgumentException(
                     "No class configured for consumer named: " + name);
+        }
         if (filterString == null)
+        {
             throw new IllegalArgumentException(
                     "No filters configured for consumer named: " + name);
+        }
 
         consumer = (Consumer) Class.forName(className.trim()).newInstance();
 

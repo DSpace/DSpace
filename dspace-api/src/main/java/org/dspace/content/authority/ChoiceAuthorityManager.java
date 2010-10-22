@@ -162,7 +162,9 @@ public class ChoiceAuthorityManager
         // field is expected to be "schema.element.qualifier"
         int dot = field.indexOf('.');
         if (dot < 0)
+        {
             return null;
+        }
         String schema = field.substring(0, dot);
         String element = field.substring(dot+1);
         String qualifier = null;
@@ -215,9 +217,11 @@ public class ChoiceAuthorityManager
     {
         ChoiceAuthority ma = controller.get(fieldKey);
         if (ma == null)
+        {
             throw new IllegalArgumentException(
                     "No choices plugin was configured for  field \"" + fieldKey
                             + "\".");
+        }
         return ma.getMatches(query, collection, start, limit, locale);
     }
 
@@ -237,9 +241,11 @@ public class ChoiceAuthorityManager
     {
         ChoiceAuthority ma = controller.get(fieldKey);
         if (ma == null)
+        {
             throw new IllegalArgumentException(
                     "No choices plugin was configured for  field \"" + fieldKey
                             + "\".");
+        }
         return ma.getBestMatch(query, collection, locale);
     }
 
@@ -261,7 +267,9 @@ public class ChoiceAuthorityManager
     {
         ChoiceAuthority ma = controller.get(fieldKey);
         if (ma == null)
-            throw new IllegalArgumentException("No choices plugin was configured for  field \""+fieldKey+"\".");
+        {
+            throw new IllegalArgumentException("No choices plugin was configured for  field \"" + fieldKey + "\".");
+        }
         return ma.getLabel(authKey, locale);
     }
 

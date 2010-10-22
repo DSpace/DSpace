@@ -192,9 +192,13 @@ public class AuthenticationManager
                     ret = AuthenticationMethod.NO_SUCH_USER;
                 }
                 if (ret == AuthenticationMethod.SUCCESS)
+                {
                     return ret;
+                }
                 if (ret < bestRet)
+                {
                     bestRet = ret;
+                }
             }
         }
         return bestRet;
@@ -219,8 +223,12 @@ public class AuthenticationManager
         throws SQLException
     {
         for (int i = 0; i < methodStack.length; ++i)
+        {
             if (methodStack[i].canSelfRegister(context, request, username))
+            {
                 return true;
+            }
+        }
         return false;
     }
 
@@ -243,8 +251,12 @@ public class AuthenticationManager
         throws SQLException
     {
         for (int i = 0; i < methodStack.length; ++i)
+        {
             if (methodStack[i].allowSetPassword(context, request, username))
+            {
                 return true;
+            }
+        }
         return false;
     }
 

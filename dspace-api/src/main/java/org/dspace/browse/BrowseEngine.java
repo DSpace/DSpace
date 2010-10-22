@@ -342,7 +342,9 @@ public class BrowseEngine
                     // In this case, we will calculate a new offset for the last page of results
                     offset = total - scope.getResultsPerPage();
                     if (offset < 0)
+                    {
                         offset = 0;
+                    }
 
                     // And rerun the query
                     dao.setOffset(offset);
@@ -515,7 +517,9 @@ public class BrowseEngine
                     // In this case, we will calculate a new offset for the last page of results
                     offset = total - scope.getResultsPerPage();
                     if (offset < 0)
+                    {
                         offset = 0;
+                    }
 
                     // And rerun the query
                     dao.setOffset(offset);
@@ -620,7 +624,9 @@ public class BrowseEngine
         if (so == null || so.getNumber() == 0)
         {
             if (browseIndex.getSortOption() != null)
+            {
                 so = browseIndex.getSortOption();
+            }
         }
 
         String col = "sort_1";
@@ -658,7 +664,9 @@ public class BrowseEngine
         if (so == null || so.getNumber() == 0)
         {
             if (browseIndex.getSortOption() != null)
+            {
                 so = browseIndex.getSortOption();
+            }
         }
 
         String col = "sort_1";
@@ -683,7 +691,9 @@ public class BrowseEngine
         throws BrowseException
     {
         if (!browseIndex.isMetadataIndex())
+        {
             throw new IllegalArgumentException("getOffsetForDistinctValue called when not a metadata index");
+        }
 
         // now get the DAO to do the query for us, returning the highest
         // string value in the given column in the given table for the

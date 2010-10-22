@@ -237,7 +237,9 @@ public abstract class AbstractProcessingStep
         List errorFields = getErrorFields(request);
         
         if (errorFields != null)
-            setErrorFields(request,null);
+        {
+            setErrorFields(request, null);
+        }
     }
 
     /**
@@ -280,7 +282,9 @@ public abstract class AbstractProcessingStep
     protected final void addErrorMessage(int errorFlag, String errorMessage)
     {
         if (this.errorMessages == null)
+        {
             this.errorMessages = new HashMap();
+        }
 
         errorMessages.put(Integer.valueOf(errorFlag), errorMessage);
     }

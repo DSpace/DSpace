@@ -160,13 +160,19 @@ public class BrowseIndex
                     datatype = matcher.group(4);
 
                     if (metadataAll != null)
+                    {
                         metadata = metadataAll.split(",");
+                    }
 
                     if (metadata == null || metadata.length == 0)
+                    {
                         valid = false;
+                    }
 
                     if (datatype == null || datatype.equals(""))
+                    {
                         valid = false;
+                    }
 
                     // If an optional ordering configuration is supplied,
                     // set the defaultOrder appropriately (asc or desc)
@@ -174,7 +180,9 @@ public class BrowseIndex
                     {
                         String order = matcher.group(5);
                         if (SortOption.DESCENDING.equalsIgnoreCase(order))
+                        {
                             this.defaultOrder = SortOption.DESCENDING;
+                        }
                     }
 
                     tableBaseName = getItemBrowseIndex().tableBaseName;
@@ -186,11 +194,15 @@ public class BrowseIndex
                     for (SortOption so : SortOption.getSortOptions())
                     {
                         if (so.getName().equals(sortName))
+                        {
                             sortOption = so;
+                        }
                     }
 
                     if (sortOption == null)
+                    {
                         valid = false;
+                    }
 
                     // If an optional ordering configuration is supplied,
                     // set the defaultOrder appropriately (asc or desc)
@@ -198,7 +210,9 @@ public class BrowseIndex
                     {
                         String order = matcher.group(4);
                         if (SortOption.DESCENDING.equalsIgnoreCase(order))
+                        {
                             this.defaultOrder = SortOption.DESCENDING;
+                        }
                     }
 
                     tableBaseName = getItemBrowseIndex().tableBaseName;
@@ -239,7 +253,9 @@ public class BrowseIndex
 	public String getDataType()
 	{
         if (sortOption != null)
+        {
             return sortOption.getType();
+        }
 
 		return datatype;
 	}
@@ -258,7 +274,9 @@ public class BrowseIndex
     public int getMetadataCount()
     {
         if (isMetadataIndex())
+        {
             return metadata.length;
+        }
 
         return 0;
     }
@@ -269,7 +287,9 @@ public class BrowseIndex
 	public String[] getMdBits(int idx)
 	{
 	    if (isMetadataIndex())
-	        return mdBits[idx];
+        {
+            return mdBits[idx];
+        }
 	    
 	    return null;
 	}
@@ -345,7 +365,9 @@ public class BrowseIndex
     public String getSequenceName(boolean isDistinct, boolean isMap)
     {
         if (isDistinct || isMap)
+        {
             return BrowseIndex.getSequenceName(number, isDistinct, isMap);
+        }
         
         return BrowseIndex.getSequenceName(tableBaseName, isDistinct, isMap);
     }
@@ -454,7 +476,9 @@ public class BrowseIndex
     public String getTableName(boolean isCommunity, boolean isCollection, boolean isDistinct, boolean isMap)
     {
         if (isDistinct || isMap)
+        {
             return BrowseIndex.getTableName(number, isCommunity, isCollection, isDistinct, isMap);
+        }
         
         return BrowseIndex.getTableName(tableBaseName, isCommunity, isCollection, isDistinct, isMap);
     }
@@ -706,7 +730,9 @@ public class BrowseIndex
         for (BrowseIndex bix : BrowseIndex.getBrowseIndices())
         {
             if (bix.getName().equals(name))
+            {
                 return bix;
+            }
         }
          
         return null;
@@ -724,7 +750,9 @@ public class BrowseIndex
         for (BrowseIndex bix : BrowseIndex.getBrowseIndices())
         {
             if (bix.getSortOption() == so)
+            {
                 return bix;
+            }
         }
         
         return null;

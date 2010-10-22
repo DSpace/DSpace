@@ -123,7 +123,9 @@ public class CCLicenseStep extends AbstractSubmissionStep
 	    String exitURL = (https) ? "https://" : "http://";
 	    exitURL += server;
 	    if (! (port == 80 || port == 443))
-	    	exitURL += ":"+port;
+        {
+            exitURL += ":" + port;
+        }
 			
 	    exitURL += actionURL + "?submission-continue="+knot.getId()+"&cc_license_url=[license_url]";
 	

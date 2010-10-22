@@ -147,7 +147,9 @@ public class CheckBox extends Field
             throws WingException
     {
     	if (selected)
-    		setOptionSelected(returnValue);
+        {
+            setOptionSelected(returnValue);
+        }
         return addOption(returnValue);
     }
     
@@ -180,7 +182,9 @@ public class CheckBox extends Field
     public void addOption(boolean selected,String returnValue, String characters) throws WingException
     {
     	if (selected)
-    		setOptionSelected(returnValue);
+        {
+            setOptionSelected(returnValue);
+        }
         addOption(returnValue,characters);
     }
     
@@ -213,7 +217,9 @@ public class CheckBox extends Field
     public void addOption(boolean selected, int returnValue, String characters) throws WingException
     {
     	if (selected)
-    		setOptionSelected(returnValue);
+        {
+            setOptionSelected(returnValue);
+        }
         addOption(returnValue,characters);
     }
     
@@ -246,7 +252,9 @@ public class CheckBox extends Field
     public void addOption(boolean selected, String returnValue, Message message) throws WingException
     {
     	if (selected)
-    		setOptionSelected(returnValue);
+        {
+            setOptionSelected(returnValue);
+        }
         addOption(returnValue,message);
     }
     
@@ -279,7 +287,9 @@ public class CheckBox extends Field
     public void addOption(boolean selected, int returnValue, Message message) throws WingException
     {
     	if (selected)
-    		setOptionSelected(returnValue);
+        {
+            setOptionSelected(returnValue);
+        }
         addOption(returnValue,message);
     }
 
