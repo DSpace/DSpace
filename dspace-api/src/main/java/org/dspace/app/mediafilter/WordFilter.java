@@ -44,7 +44,6 @@ import java.io.IOException;
 import org.apache.log4j.Logger;
 
 import org.textmining.extraction.TextExtractor;
-import org.textmining.extraction.word.WordTextExtractor;
 import org.textmining.extraction.word.WordTextExtractorFactory;
 
 /*

@@ -36,7 +36,6 @@ package org.dspace.app.mediafilter;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.ByteArrayOutputStream;
 
 import org.apache.poi.extractor.ExtractorFactory;
 import org.apache.poi.xslf.extractor.XSLFPowerPointExtractor;
