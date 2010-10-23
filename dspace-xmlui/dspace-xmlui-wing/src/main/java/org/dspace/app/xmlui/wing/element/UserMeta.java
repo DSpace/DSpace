@@ -308,9 +308,13 @@ public class UserMeta extends AbstractWingElement implements
         {
             AttributeMap attributes = new AttributeMap();
             if (authenticated)
+            {
                 attributes.put(A_AUTHENTICATED, "yes");
+            }
             else
+            {
                 attributes.put(A_AUTHENTICATED, "no");
+            }
             startElement(contentHandler, namespaces, E_USER_META, attributes);
         }
 

@@ -147,11 +147,17 @@ public class XPDF2Text extends MediaFilter
             status = pdfProc.waitFor();
             String msg = null;
             if (status == 1)
-                msg = "pdftotext failed opening input: file="+sourceTmp.toString();
+            {
+                msg = "pdftotext failed opening input: file=" + sourceTmp.toString();
+            }
             else if (status == 3)
-                msg = "pdftotext permission failure (perhaps copying of text from this document is not allowed - check PDF file's internal permissions): file="+sourceTmp.toString();
+            {
+                msg = "pdftotext permission failure (perhaps copying of text from this document is not allowed - check PDF file's internal permissions): file=" + sourceTmp.toString();
+            }
             else if (status != 0)
-                msg = "pdftotext failed, maybe corrupt PDF? status="+String.valueOf(status);
+            {
+                msg = "pdftotext failed, maybe corrupt PDF? status=" + String.valueOf(status);
+            }
 
             if (msg != null)
             {

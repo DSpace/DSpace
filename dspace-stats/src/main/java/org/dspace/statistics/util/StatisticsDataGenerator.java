@@ -80,7 +80,9 @@ public class StatisticsDataGenerator {
 		long epersonEndId;
 
 		if (line.hasOption("n"))
-			nrLogs = Integer.parseInt(line.getOptionValue("n"));
+        {
+            nrLogs = Integer.parseInt(line.getOptionValue("n"));
+        }
 		else {
 			System.out
 					.println("We need to know how many logs we need to create");
@@ -89,53 +91,97 @@ public class StatisticsDataGenerator {
 		if (line.hasOption("s")) {
 			startDate = getDateInMiliseconds(line.getOptionValue("s"));
 		} else
-			startDate = getDateInMiliseconds("01/01/2006");
+        {
+            startDate = getDateInMiliseconds("01/01/2006");
+        }
 		if (line.hasOption("e")) {
 			endDate = getDateInMiliseconds(line.getOptionValue("e"));
 		} else
-			endDate = new Date().getTime();
+        {
+            endDate = new Date().getTime();
+        }
 
 		if (line.hasOption("a"))
-			commStartId = Long.parseLong(line.getOptionValue("a"));
+        {
+            commStartId = Long.parseLong(line.getOptionValue("a"));
+        }
 		else
-			return;
+        {
+            return;
+        }
 
 		if (line.hasOption("b"))
-			commEndId = Long.parseLong(line.getOptionValue("b"));
+        {
+            commEndId = Long.parseLong(line.getOptionValue("b"));
+        }
 		else
-			return;
+        {
+            return;
+        }
 		if (line.hasOption("c"))
-			collStartId = Long.parseLong(line.getOptionValue("c"));
+        {
+            collStartId = Long.parseLong(line.getOptionValue("c"));
+        }
 		else
-			return;
+        {
+            return;
+        }
 		if (line.hasOption("d"))
-			collEndId = Long.parseLong(line.getOptionValue("d"));
+        {
+            collEndId = Long.parseLong(line.getOptionValue("d"));
+        }
 		else
-			return;
+        {
+            return;
+        }
 		if (line.hasOption("f"))
-			itemStartId = Long.parseLong(line.getOptionValue("f"));
+        {
+            itemStartId = Long.parseLong(line.getOptionValue("f"));
+        }
 		else
-			return;
+        {
+            return;
+        }
 		if (line.hasOption("g"))
-			itemEndId = Long.parseLong(line.getOptionValue("g"));
+        {
+            itemEndId = Long.parseLong(line.getOptionValue("g"));
+        }
 		else
-			return;
+        {
+            return;
+        }
 		if (line.hasOption("h"))
-			bitStartId = Long.parseLong(line.getOptionValue("h"));
+        {
+            bitStartId = Long.parseLong(line.getOptionValue("h"));
+        }
 		else
-			return;
+        {
+            return;
+        }
 		if (line.hasOption("i"))
-			bitEndId = Long.parseLong(line.getOptionValue("i"));
+        {
+            bitEndId = Long.parseLong(line.getOptionValue("i"));
+        }
 		else
-			return;
+        {
+            return;
+        }
 		if (line.hasOption("j"))
-			epersonStartId = Long.parseLong(line.getOptionValue("j"));
+        {
+            epersonStartId = Long.parseLong(line.getOptionValue("j"));
+        }
 		else
-			return;
+        {
+            return;
+        }
 		if (line.hasOption("k"))
-			epersonEndId = Long.parseLong(line.getOptionValue("k"));
+        {
+            epersonEndId = Long.parseLong(line.getOptionValue("k"));
+        }
 		else
-			return;
+        {
+            return;
+        }
 
 		// Get the max id range
 		long maxIdTotal = Math.max(commEndId, collEndId);
@@ -253,9 +299,13 @@ public class StatisticsDataGenerator {
 					substract = true;
 
 				if (substract)
-					dsoId--;
+                {
+                    dsoId--;
+                }
 				else
-					dsoId++;
+                {
+                    dsoId++;
+                }
 
 				dso = DSpaceObject.find(context, type, dsoId);
 				if (dso instanceof Bitstream) {

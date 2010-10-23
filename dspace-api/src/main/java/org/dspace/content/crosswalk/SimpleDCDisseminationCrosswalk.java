@@ -135,9 +135,13 @@ public class SimpleDCDisseminationCrosswalk extends SelfNamedPlugin
                 if (allDC[i].element.equals("contributor")
                         && (allDC[i].qualifier != null)
                         && allDC[i].qualifier.equals("author"))
+                {
                     element = "creator";
+                }
                 else
+                {
                     element = allDC[i].element;
+                }
                 Element field = new Element(element, DC_NS);
                 field.addContent(allDC[i].value);
                 if (addSchema)

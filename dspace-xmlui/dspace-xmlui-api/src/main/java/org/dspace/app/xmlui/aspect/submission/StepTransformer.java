@@ -163,9 +163,13 @@ public class StepTransformer extends AbstractDSpaceTransformer
 	    
 	    //call the setup for this step
 	    if(step!=null)
-	    	step.setup(resolver, objectModel, src, parameters);
+        {
+            step.setup(resolver, objectModel, src, parameters);
+        }
 	    else
-	    	throw new ProcessingException("Step class is null!  We do not have a valid AbstractStep in " + this.transformerClassName + ". ");
+        {
+            throw new ProcessingException("Step class is null!  We do not have a valid AbstractStep in " + this.transformerClassName + ". ");
+        }
 	}
 
 

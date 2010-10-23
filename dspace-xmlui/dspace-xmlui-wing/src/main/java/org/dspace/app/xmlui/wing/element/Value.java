@@ -147,9 +147,13 @@ public class Value extends RichTextContainer
 
         this.type = type;
         if (type.equals(TYPE_AUTHORITY))
+        {
             this.confidence = optionOrConfidence;
+        }
         else
+        {
             this.option = optionOrConfidence;
+        }
     }
 
     /**

@@ -302,8 +302,11 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
                 //Do not put a wildcard after a range query
                 if (fq.matches(".*\\:\\[.* TO .*\\](?![a-z 0-9]).*")) {
                     allFilterQueries.add(fq);
-                } else
+                }
+                else
+                {
                     allFilterQueries.add(fq.endsWith("*") ? fq : fq + " OR " + fq + "*");
+                }
             }
 
             return allFilterQueries.toArray(new String[allFilterQueries.size()]);

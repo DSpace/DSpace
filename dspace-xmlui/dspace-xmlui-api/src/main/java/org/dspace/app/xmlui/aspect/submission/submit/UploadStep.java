@@ -175,7 +175,9 @@ public class UploadStep extends AbstractSubmissionStep
             this.editFile.setup(resolver, objectModel, src, parameters);   
         }
         else
+        {
             this.editFile = null;
+        }
     }
     
     public void addBody(Body body) throws SAXException, WingException,
@@ -294,9 +296,13 @@ public class UploadStep extends AbstractSubmissionStep
 	            row.addCell().addXref(url,name);
 	            row.addCellContent(bytes + " bytes");
 	            if (desc == null || desc.length() == 0)
-	            	row.addCellContent(T_unknown_name);
+                {
+                    row.addCellContent(T_unknown_name);
+                }
 	            else
-	            	row.addCellContent(desc);
+                {
+                    row.addCellContent(desc);
+                }
 	            
                 BitstreamFormat format = bitstream.getFormat();
 	            if (format == null)
@@ -396,9 +402,13 @@ public class UploadStep extends AbstractSubmissionStep
             String format = bitstreamFormat.getShortDescription();
             Message support = ReviewStep.T_unknown;
             if (bitstreamFormat.getSupportLevel() == BitstreamFormat.KNOWN)
+            {
                 support = T_known;
+            }
             else if (bitstreamFormat.getSupportLevel() == BitstreamFormat.SUPPORTED)
+            {
                 support = T_supported;
+            }
             
             org.dspace.app.xmlui.wing.element.Item file = uploadSection.addItem();
             file.addXref(url,name);

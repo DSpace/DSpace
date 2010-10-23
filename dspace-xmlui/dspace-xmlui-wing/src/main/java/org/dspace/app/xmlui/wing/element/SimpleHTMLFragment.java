@@ -273,7 +273,9 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 		}
 
 		if (empty == true)
-			return false;
+        {
+            return false;
+        }
 
 		// May be usefull for debugging:
 		// contents.add(0, new Text("("+index+") "));
@@ -281,9 +283,13 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 		Element para = new Element(Para.E_PARA);
 		para.addContent(contents);
 		if (index >= 0)
-			parent.addContent(index, para);
+        {
+            parent.addContent(index, para);
+        }
 		else
-			parent.addContent(para);
+        {
+            parent.addContent(para);
+        }
 
 		return true;
 	}
@@ -582,9 +588,13 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 			String prefix = namespaces.getPrefix(URI);
 
 			if (prefix == null || prefix.equals(""))
-				return localName;
+            {
+                return localName;
+            }
 			else
-				return prefix + ":" + localName;
+            {
+                return prefix + ":" + localName;
+            }
 		}
 
 		/** ContentHandler methods: */

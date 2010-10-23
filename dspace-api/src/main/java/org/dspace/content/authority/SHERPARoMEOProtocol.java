@@ -140,11 +140,17 @@ public abstract class SHERPARoMEOProtocol implements ChoiceAuthority
                 xr.parse(new InputSource(get.getResponseBodyAsStream()));
                 int confidence;
                 if (handler.total == 0)
+                {
                     confidence = Choices.CF_NOTFOUND;
+                }
                 else if (handler.total == 1)
+                {
                     confidence = Choices.CF_UNCERTAIN;
+                }
                 else
+                {
                     confidence = Choices.CF_AMBIGUOUS;
+                }
                 return new Choices(handler.result, start, handler.total, confidence, false);
             }
         }
@@ -214,9 +220,13 @@ public abstract class SHERPARoMEOProtocol implements ChoiceAuthority
             if (newValue.length() > 0)
             {
                 if (textValue == null)
+                {
                     textValue = newValue;
+                }
                 else
+                {
                     textValue += newValue;
+                }
             }
         }
 
@@ -239,27 +249,27 @@ public abstract class SHERPARoMEOProtocol implements ChoiceAuthority
                     }
                 }
             }
-
-            // after start of result element, get next hit ready
             else if (localName.equals(resultElement))
             {
+                // after start of result element, get next hit ready
                 if (++rindex < result.length)
                     result[rindex] = new Choice();
             }
-
-            // plug in label value
             else if (localName.equals(labelElement) && textValue != null)
-                result[rindex].value =
-                result[rindex].label = textValue.trim();
-
-            // plug in authority value
-            else if (authorityElement != null &&
-                     localName.equals(authorityElement) && textValue != null)
+            {
+                // plug in label value
+                result[rindex].value = result[rindex].label = textValue.trim();
+            }
+            else if (authorityElement != null && localName.equals(authorityElement) && textValue != null)
+            {
+                // plug in authority value
                 result[rindex].authority = textValue.trim();
-
-            // error message
+            }
             else if (localName.equals("message") && textValue != null)
-                log.warn("SHERPA/RoMEO response error message: "+textValue.trim());
+            {
+                // error message
+                log.warn("SHERPA/RoMEO response error message: " + textValue.trim());
+            }
         }
 
         // subclass overriding this MUST call it with super()

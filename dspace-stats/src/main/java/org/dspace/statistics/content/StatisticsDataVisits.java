@@ -106,9 +106,13 @@ public class StatisticsDataVisits extends StatisticsData
                         .get(1) instanceof DatasetTimeGenerator))
         {
             if(getDatasetGenerators().get(0) instanceof DatasetTimeGenerator)
+            {
                 dateFacet = (DatasetTimeGenerator) getDatasetGenerators().get(0);
+            }
             else
+            {
                 dateFacet = (DatasetTimeGenerator) getDatasetGenerators().get(1);
+            }
         }
 
         /////////////////////////
@@ -335,7 +339,9 @@ public class StatisticsDataVisits extends StatisticsData
             dataset.setRowTitle("Dataset 1");
             dataset.setColTitle("Dataset 2");
         }else
-            dataset = new Dataset(0,0);
+        {
+            dataset = new Dataset(0, 0);
+        }
         return dataset;
     }
 
@@ -540,11 +546,17 @@ public class StatisticsDataVisits extends StatisticsData
                         // with an item (such as a community logo) then reference the bitstreamID directly.
                         String identifier = null;
                         if (owningItem != null && owningItem.getHandle() != null)
-                            identifier = "handle/"+owningItem.getHandle();
+                        {
+                            identifier = "handle/" + owningItem.getHandle();
+                        }
                         else if (owningItem != null)
-                            identifier = "item/"+owningItem.getID();
+                        {
+                            identifier = "item/" + owningItem.getID();
+                        }
                         else
-                            identifier = "id/"+bit.getID();
+                        {
+                            identifier = "id/" + bit.getID();
+                        }
 
 
                         String url = ConfigurationManager.getProperty("dspace.url") + "/bitstream/"+identifier+"/";

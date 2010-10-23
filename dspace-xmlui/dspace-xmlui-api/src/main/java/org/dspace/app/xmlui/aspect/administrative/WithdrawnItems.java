@@ -400,11 +400,17 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
                 year.addOption(false, String.valueOf(i), String.valueOf(i));
 
                 if (i <= fiveYearBreak)
+                {
                     i -= 10;
+                }
                 else if (i <= oneYearBreak)
+                {
                     i -= 5;
+                }
                 else
+                {
                     i--;
+                }
             }
             while (i > tenYearBreak);
 
@@ -784,9 +790,13 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
             String scopeName = "";
 
             if (info.getBrowseContainer() != null)
+            {
                 scopeName = info.getBrowseContainer().getName();
+            }
             else
+            {
                 scopeName = "";
+            }
 
             if (bix.isMetadataIndex())
             {
@@ -818,9 +828,13 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
             String scopeName = "";
 
             if (info.getBrowseContainer() != null)
+            {
                 scopeName = info.getBrowseContainer().getName();
+            }
             else
+            {
                 scopeName = "";
+            }
 
             if (bix.isMetadataIndex())
             {

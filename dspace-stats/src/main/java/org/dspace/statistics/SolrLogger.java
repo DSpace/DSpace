@@ -111,9 +111,13 @@ public class SolrLogger
         locationService = service;
 
         if ("true".equals(ConfigurationManager.getProperty("useProxies")))
+        {
             useProxies = true;
+        }
         else
+        {
             useProxies = false;
+        }
 
         log.info("useProxies=" + useProxies);
 

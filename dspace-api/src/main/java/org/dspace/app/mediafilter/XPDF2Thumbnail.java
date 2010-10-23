@@ -302,7 +302,9 @@ public class XPDF2Thumbnail extends MediaFilter
         // ALSO pass through if min and max are both 0
         if ((min == 0 && max == 0) ||
             (msize >= min && Math.min(xsize, ysize) <= max))
+        {
             return source;
+        }
         else
         {
             int xnew = xsize * max / msize;

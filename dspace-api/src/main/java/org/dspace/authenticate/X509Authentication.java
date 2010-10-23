@@ -588,7 +588,9 @@ public class X509Authentication implements AuthenticationMethod
                     .getAttribute("javax.servlet.request.X509Certificate");
 
         if ((certs == null) || (certs.length == 0))
+        {
             return BAD_ARGS;
+        }
         else
         {
             // We have a cert -- check it and get username from it.

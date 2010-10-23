@@ -82,7 +82,9 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
                 startCal.set(Calendar.DATE, 1);
                 dateType = Calendar.YEAR;
             } else
+            {
                 return "";
+            }
 
             Calendar endCal = (Calendar) startCal.clone();
 

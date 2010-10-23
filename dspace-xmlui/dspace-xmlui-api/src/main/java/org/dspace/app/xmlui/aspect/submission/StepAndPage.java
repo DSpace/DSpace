@@ -58,12 +58,18 @@ public class StepAndPage implements Comparable<StepAndPage>
         {
             step = Integer.parseInt(components[0]);
             if (components.length > 1)
+            {
                 page = Integer.parseInt(components[1]);
+            }
             else
+            {
                 page = UNSET;
+            }
         }
         else
+        {
             step = UNSET;
+        }
     }
 
     public int getStep()
@@ -113,8 +119,12 @@ public class StepAndPage implements Comparable<StepAndPage>
     public int compareTo(StepAndPage o)
     {
         if (this.step == o.step)
+        {
             return this.page - o.page;
+        }
         else
+        {
             return this.step - o.step;
+        }
     }
 }

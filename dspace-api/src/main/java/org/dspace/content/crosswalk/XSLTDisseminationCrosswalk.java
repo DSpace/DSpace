@@ -448,14 +448,20 @@ public class XSLTDisseminationCrosswalk
     private static String checkedString(String value)
     {
         if (value == null)
+        {
             return null;
+        }
         String reason = Verifier.checkCharacterData(value);
         if (reason == null)
+        {
             return value;
+        }
         else
         {
             if (log.isDebugEnabled())
-                log.debug("Filtering out non-XML characters in string, reason="+reason);
+            {
+                log.debug("Filtering out non-XML characters in string, reason=" + reason);
+            }
             StringBuffer result = new StringBuffer(value.length());
             for (int i = 0; i < value.length(); ++i)
             {

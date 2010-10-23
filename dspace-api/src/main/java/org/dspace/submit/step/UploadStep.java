@@ -600,7 +600,9 @@ public class UploadStep extends AbstractProcessingStep
             return STATUS_UNKNOWN_FORMAT;
         }
         else
+        {
             return STATUS_COMPLETE;
+        }
               
     }
 

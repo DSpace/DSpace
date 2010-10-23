@@ -140,9 +140,13 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
 
                     // Get a file for the report data
                     if (reportDate != null)
+                    {
                         analysisFile = StatisticsLoader.getAnalysisFor(reportDate);
+                    }
                     else
+                    {
                         analysisFile = StatisticsLoader.getGeneralAnalysis();
+                    }
 
                     if (analysisFile != null)
                     {
@@ -234,14 +238,20 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
 
         // Check that the reports are either public, or user is an administrator
         if (!publicise && !AuthorizeManager.isAdmin(context))
+        {
             throw new AuthorizeException();
+        }
 
         // Retrieve the report data to display
         File analysisFile;
         if (reportDate != null)
+        {
             analysisFile = StatisticsLoader.getAnalysisFor(reportDate);
+        }
         else
+        {
             analysisFile = StatisticsLoader.getGeneralAnalysis();
+        }
 
         // Create the renderer for the results
         Division div = body.addDivision("statistics", "primary");

@@ -268,11 +268,15 @@ public class Submissions extends AbstractDSpaceTransformer
         		{
         			String displayTitle = titles[0].value;
         			if (displayTitle.length() > 50)
-        				displayTitle = displayTitle.substring(0,50)+ " ...";
+                    {
+                        displayTitle = displayTitle.substring(0, 50) + " ...";
+                    }
         			row.addCell().addXref(url,displayTitle);
         		}
         		else
-        			row.addCell().addXref(url,T_untitled);
+                {
+                    row.addCell().addXref(url, T_untitled);
+                }
 
         		// Submitted too
         		row.addCell().addXref(url,collectionName);
@@ -337,12 +341,16 @@ public class Submissions extends AbstractDSpaceTransformer
         		{
         			String displayTitle = titles[0].value;
         			if (displayTitle.length() > 50)
-        				displayTitle = displayTitle.substring(0,50)+ " ...";
+                    {
+                        displayTitle = displayTitle.substring(0, 50) + " ...";
+                    }
         			
         			row.addCell().addXref(url,displayTitle);
         		}
         		else
-        			row.addCell().addXref(url,T_untitled);
+                {
+                    row.addCell().addXref(url, T_untitled);
+                }
 
         		// Submitted too
         		row.addCell().addXref(url,collectionName);
@@ -450,11 +458,15 @@ public class Submissions extends AbstractDSpaceTransformer
 	        	{
 	        		String displayTitle = titles[0].value;
         			if (displayTitle.length() > 50)
-        				displayTitle = displayTitle.substring(0,50)+ " ...";
+                    {
+                        displayTitle = displayTitle.substring(0, 50) + " ...";
+                    }
 	        		row.addCell().addXref(url,displayTitle);
 	        	}
 	        	else
-	        		row.addCell().addXref(url,T_untitled);
+                {
+                    row.addCell().addXref(url, T_untitled);
+                }
 	        	row.addCell().addXref(url,collectionName);
 	        	Cell cell = row.addCell();
 	        	cell.addContent(T_email);
@@ -495,11 +507,15 @@ public class Submissions extends AbstractDSpaceTransformer
         	{
         		String displayTitle = titles[0].value;
     			if (displayTitle.length() > 50)
-    				displayTitle = displayTitle.substring(0,50)+ " ...";
+                {
+                    displayTitle = displayTitle.substring(0, 50) + " ...";
+                }
         		row.addCell().addXref(url,displayTitle);
         	}
         	else
-        		row.addCell().addXref(url,T_untitled);
+            {
+                row.addCell().addXref(url, T_untitled);
+            }
         	row.addCell().addXref(url,collectionName);
         	Cell cell = row.addCell();
         	cell.addContent(T_email);
@@ -553,11 +569,15 @@ public class Submissions extends AbstractDSpaceTransformer
         	{
         		String displayTitle = titles[0].value;
     			if (displayTitle.length() > 50)
-    				displayTitle = displayTitle.substring(0,50)+ " ...";
+                {
+                    displayTitle = displayTitle.substring(0, 50) + " ...";
+                }
         		row.addCellContent(displayTitle);
         	}
         	else
-        		row.addCellContent(T_untitled);
+            {
+                row.addCellContent(T_untitled);
+            }
         	
         	// Collection name column
         	row.addCellContent(collectionName);

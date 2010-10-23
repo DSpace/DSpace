@@ -400,11 +400,15 @@ public class Utils
         // SimpleDateFormat can't handle "Z"
         char tzSign = s.charAt(s.length()-6);
         if (s.endsWith("Z"))
-            s = s.substring(0, s.length()-1) + "GMT+00:00";
+        {
+            s = s.substring(0, s.length() - 1) + "GMT+00:00";
+        }
 
         // check for trailing timezone
         else if (tzSign == '-' || tzSign == '+')
-            s = s.substring(0, s.length()-6) + "GMT" + s.substring(s.length()-6);
+        {
+            s = s.substring(0, s.length() - 6) + "GMT" + s.substring(s.length() - 6);
+        }
 
         // try to parse without milliseconds
         ParseException lastError = null;
@@ -438,9 +442,13 @@ public class Utils
         String result;
         outCal.setTime(d);
         if (outCal.get(Calendar.MILLISECOND) == 0)
+        {
             result = outFmtSecond.format(d);
+        }
         else
+        {
             result = outFmtMillisec.format(d);
+        }
         int rl = result.length();
         return result.substring(0, rl-2) + ":" + result.substring(rl-2);
     }

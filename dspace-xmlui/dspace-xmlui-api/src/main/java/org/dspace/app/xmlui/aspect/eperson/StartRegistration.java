@@ -145,9 +145,13 @@ public class StartRegistration extends AbstractDSpaceTransformer implements Cach
         this.accountExists = parameters.getParameterAsBoolean("accountExists",false);
         String errors = parameters.getParameter("errors","");
         if (errors.length() > 0)
+        {
             this.errors = Arrays.asList(errors.split(","));
+        }
         else
+        {
             this.errors = new ArrayList<String>();
+        }
     }
      
     
@@ -159,11 +163,15 @@ public class StartRegistration extends AbstractDSpaceTransformer implements Cach
     {
         // Only cache on the first attempt.
         if (email == null && accountExists == false && errors != null && errors.size() == 0)
+        {
             // cacheable
             return "1";
+        }
         else
+        {
             // Uncachable
             return "0";
+        }
     }
 
     /**
@@ -172,11 +180,15 @@ public class StartRegistration extends AbstractDSpaceTransformer implements Cach
     public SourceValidity getValidity()
     {
         if (email == null && accountExists == false && errors != null && errors.size() == 0)
+        {
             // Always valid
             return NOPValidity.SHARED_INSTANCE;
+        }
         else
+        {
             // invalid
             return null;
+        }
     }
     
     

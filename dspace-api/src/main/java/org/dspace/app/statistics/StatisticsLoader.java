@@ -138,15 +138,25 @@ public class StatisticsLoader
             public int compare(Date d1, Date d2)
             {
                 if (d1 == null && d2 == null)
+                {
                     return 0;
+                }
                 else if (d1 == null)
+                {
                     return -1;
+                }
                 else if (d2 == null)
+                {
                     return 1;
+                }
                 else if (d1.before(d2))
+                {
                     return 1;
+                }
                 else if (d2.before(d1))
+                {
                     return -1;
+                }
 
                 return 0;
             }
@@ -213,11 +223,17 @@ public class StatisticsLoader
         File[] fileList = StatisticsLoader.getAnalysisAndReportFileList();
 
         if (fileList != null && fileList.length != fileCount)
+        {
             StatisticsLoader.loadFileList(fileList);
+        }
         else if (lastLoaded == null)
+        {
             StatisticsLoader.loadFileList(fileList);
+        }
         else if (DateUtils.addHours(lastLoaded, 1).before(new Date()))
+        {
             StatisticsLoader.loadFileList(fileList);
+        }
     }
 
     /**

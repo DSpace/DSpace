@@ -693,14 +693,22 @@ public class UKETDDCCrosswalk extends Crosswalk
            		// group will either contain a character that we need to encode for xml
            		// (ie. <, > or &), or it will be an invalid character
            		// test the contents and replace appropriately
-           		if (group.equals("&"))
-           			xmlMatcher.appendReplacement(valueBuf, "&amp;");
-           		else if (group.equals("<"))
-           			xmlMatcher.appendReplacement(valueBuf, "&lt;");
-           		else if (group.equals(">"))
-           			xmlMatcher.appendReplacement(valueBuf, "&gt;");
+           		if ("&".equals(group))
+                   {
+                       xmlMatcher.appendReplacement(valueBuf, "&amp;");
+                   }
+           		else if ("<".equals(group))
+                   {
+                       xmlMatcher.appendReplacement(valueBuf, "&lt;");
+                   }
+           		else if (">".equals(group))
+                   {
+                       xmlMatcher.appendReplacement(valueBuf, "&gt;");
+                   }
            		else
-           			xmlMatcher.appendReplacement(valueBuf, " ");
+                   {
+                       xmlMatcher.appendReplacement(valueBuf, " ");
+                   }
               }
 
            	  // add bit of the string after the final match
@@ -708,19 +716,15 @@ public class UKETDDCCrosswalk extends Crosswalk
 
             if (qualifier == null)
             {
-                buffer.append("<" + namespace + ":" + element + ">" +
-                              valueBuf.toString() +
-                              "</" + namespace + ":" + element + ">\n");
+                buffer.append("<").append(namespace).append(":").append(element).append(">").append(valueBuf.toString()).append("</").append(namespace).append(":").append(element).append(">\n");
             } else
             {
-                buffer.append("<" + namespace + ":" + element +
-                              " xsi:type=\"" + terms + ":" + qualifier + "\">" +
-                              valueBuf.toString() +
-                              "</" + namespace + ":" + element + ">\n");
+                buffer.append("<").append(namespace).append(":").append(element).append(" xsi:type=\"").append(terms).append(":").append(qualifier).append("\">").append(valueBuf.toString()).append("</").append(namespace).append(":").append(element).append(">\n");
             }
-        } else
+        }
+        else
         {
-                buffer.append("<" + namespace + ":" + element + " />\n");
+            buffer.append("<").append(namespace).append(":").append(element).append(" />\n");
         }
 
         // Return the updated buffer

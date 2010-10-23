@@ -270,9 +270,13 @@ public class SyndicationFeed
                         for (DCValue v : dcv)
                         {
                             if (first)
+                            {
                                 first = false;
+                            }
                             else
+                            {
                                 db.append("; ");
+                            }
                             db.append(isDate ? new DCDate(v.value).toString() : v.value);
                         }
                         db.append("\n");
@@ -441,7 +445,9 @@ public class SyndicationFeed
             if (baseURL == null)
             {
                 if (request == null)
+                {
                     baseURL = ConfigurationManager.getProperty("dspace.url");
+                }
                 else
                 {
                     baseURL = (request.isSecure()) ? "https://" : "http://";

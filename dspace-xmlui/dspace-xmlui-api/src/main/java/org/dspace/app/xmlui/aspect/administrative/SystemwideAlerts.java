@@ -87,10 +87,14 @@ public class SystemwideAlerts extends AbstractDSpaceTransformer implements Cache
     public Serializable getKey()
     {
     	if (active)
-    		// Don't cache any alert messages
-    		return null;
+        {
+            // Don't cache any alert messages
+            return null;
+        }
     	else
-    		return "1";
+        {
+            return "1";
+        }
     }
 
     /**
@@ -99,9 +103,13 @@ public class SystemwideAlerts extends AbstractDSpaceTransformer implements Cache
     public SourceValidity getValidity()
     {
     	if (active)
-    		return null;
+        {
+            return null;
+        }
     	else
-    		return NOPValidity.SHARED_INSTANCE;
+        {
+            return NOPValidity.SHARED_INSTANCE;
+        }
     }
 	
     /**

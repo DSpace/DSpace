@@ -132,9 +132,13 @@ public class SetupCollectionHarvestingForm extends AbstractDSpaceTransformer
 			String[] errorPieces = error.split(":",2);
 			
 			if (errorPieces.length > 1)
-				errorMap.put(errorPieces[0], errorPieces[1]);
+            {
+                errorMap.put(errorPieces[0], errorPieces[1]);
+            }
 			else
-				errorMap.put(errorPieces[0], errorPieces[0]);
+            {
+                errorMap.put(errorPieces[0], errorPieces[0]);
+            }
 		}
 		
 		
@@ -153,13 +157,19 @@ public class SetupCollectionHarvestingForm extends AbstractDSpaceTransformer
 			oaiProviderValue = parameters.getParameter("oaiProviderValue", "");
 			oaiSetIdValue = parameters.getParameter("oaiSetAll", "");
             if(!"all".equals(oaiSetIdValue))
-			    oaiSetIdValue = parameters.getParameter("oaiSetIdValue", null);
+            {
+                oaiSetIdValue = parameters.getParameter("oaiSetIdValue", null);
+            }
 			metadataFormatValue = parameters.getParameter("metadataFormatValue", "");
 			String harvestLevelString = parameters.getParameter("harvestLevelValue","0");
 			if (harvestLevelString.length() == 0)
-				harvestLevelValue = 0;
+            {
+                harvestLevelValue = 0;
+            }
 			else
-				harvestLevelValue = Integer.parseInt(harvestLevelString);
+            {
+                harvestLevelValue = Integer.parseInt(harvestLevelString);
+            }
 		}
 		
 		// DIVISION: main
@@ -237,9 +247,13 @@ public class SetupCollectionHarvestingForm extends AbstractDSpaceTransformer
             	String displayName;
 
             	if (metadataString.indexOf(',') != -1)
-            		displayName = metadataString.substring(metadataString.indexOf(',') + 1);
+                {
+                    displayName = metadataString.substring(metadataString.indexOf(',') + 1);
+                }
             	else
-            		displayName = metadataKey + "(" + metadataString + ")";
+                {
+                    displayName = metadataKey + "(" + metadataString + ")";
+                }
             	
             	metadataFormat.addOption(metadataKey.equalsIgnoreCase(metadataFormatValue), metadataKey, displayName);
             }

@@ -893,9 +893,13 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             for (String location : locations) {
                 doc.addField("location", location);
                 if (location.startsWith("m"))
+                {
                     doc.addField("location.comm", location.substring(1));
+                }
                 else
+                {
                     doc.addField("location.coll", location.substring(1));
+                }
             }
         }
 

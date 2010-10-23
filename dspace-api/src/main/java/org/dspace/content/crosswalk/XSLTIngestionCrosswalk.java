@@ -98,13 +98,15 @@ public class XSLTIngestionCrosswalk
         while (di.hasNext())
         {
             Element elt = (Element)di.next();
-            if (elt.getName().equals("field") && elt.getNamespace().equals(DIM_NS))
+            if ("field".equals(elt.getName()) && DIM_NS.equals(elt.getNamespace()))
+            {
                 applyDimField(elt, item);
-
-            // if it's a <dim> container, apply its guts
-            else if (elt.getName().equals("dim") && elt.getNamespace().equals(DIM_NS))
+            }
+            else if ("dim".equals(elt.getName()) && DIM_NS.equals(elt.getNamespace()))
+            {
+                // if it's a <dim> container, apply its guts
                 applyDim(elt.getChildren(), item);
-
+            }
             else
             {
                 log.error("Got unexpected element in DIM list: "+elt.toString());
@@ -241,33 +243,43 @@ public class XSLTIngestionCrosswalk
             {
                 Element field = (Element)di.next();
                 String schema = field.getAttributeValue("mdschema");
-                if (field.getName().equals("dim") &&
-                    field.getNamespace().equals(DIM_NS))
+                if ("dim".equals(field.getName()) && DIM_NS.equals(field.getNamespace()))
+                {
                     ingestDIM(context, dso, field.getChildren());
-
-                else if (field.getName().equals("field") &&
-                    field.getNamespace().equals(DIM_NS) &&
-                    schema != null && schema.equals("dc"))
+                }
+                else if ("field".equals(field.getName()) &&
+                        DIM_NS.equals(field.getNamespace()) &&
+                    schema != null && "dc".equals(schema))
                 {
                     String md = getMetadataForDIM(field);
                     if (md == null)
-                        log.warn("Cannot map to Coll/Comm metadata field, DIM element="+
-                            field.getAttributeValue("element")+", qualifier="+field.getAttributeValue("qualifier"));
+                    {
+                        log.warn("Cannot map to Coll/Comm metadata field, DIM element=" +
+                                field.getAttributeValue("element") + ", qualifier=" + field.getAttributeValue("qualifier"));
+                    }
                     else
                     {
                         if (type == Constants.COLLECTION)
-                            ((Collection)dso).setMetadata(md, field.getText());
+                        {
+                            ((Collection) dso).setMetadata(md, field.getText());
+                        }
                         else
-                            ((Community)dso).setMetadata(md, field.getText());
+                        {
+                            ((Community) dso).setMetadata(md, field.getText());
+                        }
                     }
                 }
 
                 else
-                    log.warn("ignoring unrecognized DIM element: "+field.toString());
+                {
+                    log.warn("ignoring unrecognized DIM element: " + field.toString());
+                }
             }
         }
         else
+        {
             throw new CrosswalkObjectNotSupported("XsltSubmissionionCrosswalk can only crosswalk to an Item.");
+        }
 
     }
 

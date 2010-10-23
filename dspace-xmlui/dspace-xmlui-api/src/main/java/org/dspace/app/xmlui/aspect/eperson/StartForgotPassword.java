@@ -120,9 +120,13 @@ public class StartForgotPassword extends AbstractDSpaceTransformer
         
         String errors = parameters.getParameter("errors","");
         if (errors.length() > 0)
+        {
             this.errors = Arrays.asList(errors.split(","));
+        }
         else
+        {
             this.errors = new ArrayList<String>();
+        }
     }
      
     public void addPageMeta(PageMeta pageMeta) throws WingException 

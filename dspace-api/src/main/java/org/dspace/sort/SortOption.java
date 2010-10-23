@@ -148,9 +148,13 @@ public class SortOption
         // If the option is configured to be hidden, then set the visible flag to false
         // otherwise, flag it as visible (true)
         if (matcher.groupCount() > 3 && "hide".equalsIgnoreCase(matcher.group(4)))
+        {
             visible = false;
+        }
         else
+        {
             visible = true;
+        }
 
         generateMdBits();
 	}

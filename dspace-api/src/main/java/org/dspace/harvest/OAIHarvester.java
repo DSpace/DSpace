@@ -233,9 +233,13 @@ public class OAIHarvester {
             	metadataString = ConfigurationManager.getProperty(key);
             	String namespacePiece;
             	if (metadataString.indexOf(',') != -1)
-            		namespacePiece = metadataString.substring(0, metadataString.indexOf(','));
+                {
+                    namespacePiece = metadataString.substring(0, metadataString.indexOf(','));
+                }
             	else
-            		namespacePiece = metadataString;
+                {
+                    namespacePiece = metadataString;
+                }
 
             	return Namespace.getNamespace(namespacePiece);
             }
@@ -486,9 +490,13 @@ public class OAIHarvester {
 			// Otherwise, clear and re-import the metadata and bitstreams
     		item.clearMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
     		if (descMD.size() == 1)
-    			MDxwalk.ingest(ourContext, item, descMD.get(0));
+            {
+                MDxwalk.ingest(ourContext, item, descMD.get(0));
+            }
     		else
-    			MDxwalk.ingest(ourContext, item, descMD);
+            {
+                MDxwalk.ingest(ourContext, item, descMD);
+            }
 
     		// Import the actual bitstreams
     		if (harvestRow.getHarvestType() == 3) {
@@ -514,9 +522,13 @@ public class OAIHarvester {
     		//item.setOaiID(itemOaiID);
     		
     		if (descMD.size() == 1)
-    			MDxwalk.ingest(ourContext, item, descMD.get(0));
+            {
+                MDxwalk.ingest(ourContext, item, descMD.get(0));
+            }
     		else
-    			MDxwalk.ingest(ourContext, item, descMD);
+            {
+                MDxwalk.ingest(ourContext, item, descMD);
+            }
     		
     		if (harvestRow.getHarvestType() == 3) {
     			ORExwalk.ingest(ourContext, item, oreREM);

@@ -80,9 +80,13 @@ public class Theme
         this.id = id;
         this.regex = regex;
         if (regex != null && regex.length() > 0)
+        {
             this.pattern = Pattern.compile(regex);
+        }
         else
+        {
             this.pattern = null;
+        }
         this.handle = handle;
     }
     
