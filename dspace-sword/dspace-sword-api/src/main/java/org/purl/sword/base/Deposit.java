@@ -36,6 +36,8 @@
  */
 package org.purl.sword.base;
 
+import org.apache.log4j.Logger;
+
 import java.io.File;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -49,6 +51,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class Deposit 
 {
+    private static final Logger log = Logger.getLogger(Deposit.class);
    
    /** The File deposited */
    private File file;
@@ -333,7 +336,7 @@ public class Deposit
 		   }
 		   catch( Exception ex )
 		   {
-			   ex.printStackTrace();
+               log.error("Unable to extract filename", ex);
 		   }
 	   }
 	   return filename; 

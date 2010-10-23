@@ -163,7 +163,7 @@ public class ChecksumChecker
             }
             catch (FileNotFoundException e)
             {
-                e.printStackTrace();
+                LOG.error("File not found", e);
                 System.exit(1);
             }
             int count = rp.prune();

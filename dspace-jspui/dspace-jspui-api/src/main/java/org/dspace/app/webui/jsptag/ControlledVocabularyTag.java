@@ -248,7 +248,7 @@ public class ControlledVocabularyTag extends TagSupport
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            log.error("Error rendering HTML", e);
         }
         return result;
     }
@@ -283,7 +283,7 @@ public class ControlledVocabularyTag extends TagSupport
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            log.error("Error filtering vocabulary", e);
             return null;
         }
 

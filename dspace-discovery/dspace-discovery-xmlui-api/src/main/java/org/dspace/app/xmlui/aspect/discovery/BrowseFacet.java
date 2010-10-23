@@ -348,7 +348,7 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
                 return (Date) rsp.getResults().get(0).getFieldValue(dateField);
             }
         }catch (Exception e){
-            e.printStackTrace();
+            log.error("Unable to get lowest date", e);
         }
         return null;
     }

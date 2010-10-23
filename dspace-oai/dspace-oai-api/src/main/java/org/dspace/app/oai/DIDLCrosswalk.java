@@ -42,6 +42,7 @@ import java.util.Date;
 import java.util.Properties;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
 import org.dspace.app.didl.UUIDFactory;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -67,12 +68,14 @@ import ORG.oclc.oai.server.verb.ServerVerb;
 
 public class DIDLCrosswalk extends Crosswalk
 {
+    private final static Logger log = Logger.getLogger(DIDLCrosswalk.class);
+    
     /** default value if no oai.didl.maxresponse property is defined */
     public static final int MAXRESPONSE_INLINE_BITSTREAM = 0;
     
     /** another crosswalk that will be used to generate the metadata section */
     private Crosswalk metadataCrosswalk;
-    
+
     public DIDLCrosswalk(Properties properties)
     {
     	super("urn:mpeg:mpeg21:2002:02-DIDL-NS http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/did/didl.xsd ");
@@ -172,7 +175,6 @@ public class DIDLCrosswalk extends Crosswalk
                            }
                            else
                            {    
-                            
                                 try
                                 {
                                     metadata.append("<didl:Resource mimeType=\"");
@@ -210,9 +212,13 @@ public class DIDLCrosswalk extends Crosswalk
                                 }
                                 catch (Exception ex)
                                 {
-                                    ex.printStackTrace();                       
+                                    log.error("Error creating resource didl", ex);
                                     
-                                    metadata.append("<didl:Resource ref=\""+ConfigurationManager.getProperty("dspace.url")+"/bitstream/"+itemhandle+"/"+bitstreams[k].getSequenceID()+"/"+bitstreams[k].getName() );
+                                    metadata.append("<didl:Resource ref=\"")
+                                            .append(ConfigurationManager.getProperty("dspace.url"))
+                                            .append("/bitstream/")
+                                            .append(itemhandle).append("/").append(bitstreams[k].getSequenceID())
+                                            .append("/").append(bitstreams[k].getName());
                                     metadata.append("\" mimeType=\"");
                                     metadata.append(bitstreams[k].getFormat().getMIMEType());
                                     metadata.append("\">");
@@ -231,7 +237,7 @@ public class DIDLCrosswalk extends Crosswalk
         catch (SQLException sqle)
         {
             System.err.println("Caught exception:"+sqle.getCause());
-            sqle.printStackTrace();
+            log.error("Database error", sqle);
         }
     		
         //**END CYCLE HERE **//		

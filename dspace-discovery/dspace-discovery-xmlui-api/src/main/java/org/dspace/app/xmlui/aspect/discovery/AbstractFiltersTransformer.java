@@ -355,7 +355,6 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
                         }
                     }catch (Exception e){
                         log.error(LogManager.getHeader(context, "Error in discovery while setting up date facet range", "date facet: " + dateFacet), e);
-                        e.printStackTrace();
                     }
                 }else{
                     queryArgs.addFacetField(facet.getFacetField());

@@ -444,8 +444,7 @@ public class Context
         }
         catch (SQLException se)
         {
-            log.error(se.getMessage());
-            se.printStackTrace();
+            log.error(se.getMessage(), se);
         }
         finally
         {
@@ -458,7 +457,7 @@ public class Context
             }
             catch (Exception ex)
             {
-                ex.printStackTrace();
+                log.error("Exception aborting context", ex);
             }
             connection = null;
             events = null;

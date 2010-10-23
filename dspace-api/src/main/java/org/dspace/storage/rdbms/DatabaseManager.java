@@ -654,8 +654,7 @@ public class DatabaseManager
         }
         catch (SQLException e)
         {
-            log.warn(e.getMessage());
-            e.printStackTrace();
+            log.warn(e.getMessage(), e);
         }
     }
 

@@ -39,6 +39,7 @@
 package org.dspace.statistics.util;
 
 import org.apache.commons.cli.*;
+import org.apache.log4j.Logger;
 import org.dspace.app.statistics.LogAnalyser;
 import org.dspace.app.statistics.LogLine;
 import org.dspace.content.*;
@@ -60,6 +61,7 @@ import java.text.ParsePosition;
  * @author Stuart Lewis
  */
 public class ClassicDSpaceLogConverter {
+    private Logger log = Logger.getLogger(ClassicDSpaceLogConverter.class);
 
     /** A DSpace context */
     private Context context;
@@ -260,7 +262,7 @@ public class ClassicDSpaceLogConverter {
         }
         catch (Exception ex)
         {
-            ex.printStackTrace();
+            log.error("Unexpected error in conversion", ex);
         }
 
         // Tell the user what we have done

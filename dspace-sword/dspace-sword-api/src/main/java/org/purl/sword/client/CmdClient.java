@@ -135,7 +135,7 @@ public class CmdClient implements ClientType
 		catch (SWORDClientException ex)
 		{
 			System.out.println("Exception: " + ex.getMessage());
-			ex.printStackTrace();
+            log.error("Unable to process request", ex);
 		}
 	}
 
