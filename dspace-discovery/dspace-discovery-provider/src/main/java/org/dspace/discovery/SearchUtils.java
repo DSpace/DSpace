@@ -72,8 +72,11 @@ public class SearchUtils {
 
     private static List<String> sortFields = new ArrayList<String>();
 
-    static{
- 
+    private static List<String> dateIndexableFields = new ArrayList<String>();
+
+    static {
+
+        log.debug("loading configuration");
         //Method that will retrieve all the possible configs we have
 
         props = ExtendedProperties
@@ -91,6 +94,9 @@ public class SearchUtils {
                                 .getResourceAsStream("dspace-solr-search.cfg"));
                 props.combine(defaults);
             }
+
+            log.debug("combined configuration");
+
         }
         catch (Exception e) {
             log.error(e.getMessage(), e);
@@ -100,7 +106,7 @@ public class SearchUtils {
             Iterator allPropsIt = props.getKeys();
             while (allPropsIt.hasNext()) {
                 String propName = String.valueOf(allPropsIt.next());
-                if (propName.startsWith("solr.facets.")){
+                if (propName.startsWith("solr.facets.")) {
                     String[] propVals = props.getStringArray(propName);
 
                     log.info("loading scope, " + propName);
@@ -108,7 +114,7 @@ public class SearchUtils {
                     allFacets.addAll(Arrays.asList(propVals));
                     List<SolrFacetConfig> facets = new ArrayList<SolrFacetConfig>();
                     for (String propVal : propVals) {
-                        if (propVal.endsWith("_dt") || propVal.endsWith(".year")){
+                        if (propVal.endsWith("_dt") || propVal.endsWith(".year")) {
                             facets.add(new SolrFacetConfig(propVal.replace("_dt", ".year"), true));
 
                             log.info("value, " + propVal);
@@ -121,24 +127,25 @@ public class SearchUtils {
                     }
 
                     //All the values are split into date & facetfields, so now store em
-                    solrFacets.put(propName.replace("solr.facets.",""), facets.toArray(new SolrFacetConfig[facets.size()]));
+                    solrFacets.put(propName.replace("solr.facets.", ""), facets.toArray(new SolrFacetConfig[facets.size()]));
 
                     log.info("solrFacets size: " + solrFacets.size());
                 }
             }
 
             String[] filterFieldsProps = SearchUtils.getConfig().getStringArray("solr.search.filters");
-            if(filterFieldsProps != null){
+            if (filterFieldsProps != null) {
                 searchFilters.addAll(Arrays.asList(filterFieldsProps));
             }
 
             String[] sortFieldProps = SearchUtils.getConfig().getStringArray("solr.search.sort");
-            if(sortFieldProps != null){
+            if (sortFieldProps != null) {
                 sortFields.addAll(Arrays.asList(sortFieldProps));
             }
 
 
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             throw new RuntimeException(e.getMessage(), e);
         }
 
@@ -149,20 +156,19 @@ public class SearchUtils {
         return props;
     }
 
-    public static SolrFacetConfig[] getFacetsForType(String type)
-    {
+    public static SolrFacetConfig[] getFacetsForType(String type) {
         return solrFacets.get(type);
     }
 
-    public static List<String> getAllFacets(){
+    public static List<String> getAllFacets() {
         return allFacets;
     }
 
-    public static List<String> getSearchFilters(){
+    public static List<String> getSearchFilters() {
         return searchFilters;
     }
 
-    public static List<String> getSortFields(){
+    public static List<String> getSortFields() {
         return sortFields;
     }
 
@@ -182,22 +188,32 @@ public class SearchUtils {
     }
 
 
-    public static String[] getDefaultFilters(String scope){
+    public static String[] getDefaultFilters(String scope) {
         List<String> result = new ArrayList<String>();
         // Check (and add) any default filters which may be configured
         String defaultFilters = getConfig().getString("solr.default.filter");
-        if(defaultFilters != null)
+        if (defaultFilters != null)
             result.addAll(Arrays.asList(defaultFilters.split(";")));
 
-        if(scope != null){
+        if (scope != null) {
             String scopeDefaultFilters = SearchUtils.getConfig().getString("solr." + scope + ".default.filter");
-            if(scopeDefaultFilters != null)
+            if (scopeDefaultFilters != null)
                 result.addAll(Arrays.asList(scopeDefaultFilters.split(";")));
         }
         return result.toArray(new String[result.size()]);
     }
 
-    public static class SolrFacetConfig{
+    public static List<String> getDateIndexableFields() {
+        String[] dateFieldsProps = SearchUtils.getConfig().getStringArray("solr.index.type.date");
+        if (dateFieldsProps != null) {
+            for (String dateField : dateFieldsProps) {
+                dateIndexableFields.add(dateField.trim());
+            }
+        }
+        return dateIndexableFields;
+    }
+
+    public static class SolrFacetConfig {
 
         private String facetField;
         private boolean isDate;

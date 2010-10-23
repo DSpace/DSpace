@@ -95,30 +95,16 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
     private static final String LAST_INDEXED_FIELD = "SolrIndexer.lastIndexed";
 
-
+    /**
+     * Non-Static CommonsHttpSolrServer for processing indexing events.
+     */
+    private CommonsHttpSolrServer solr = null;
 
     /**
-     * CommonsHttpSolrServer for processing indexing events.
+     * Non-Static Singelton instance of Configuration Service
      */
-    private static CommonsHttpSolrServer solr = null;
-
-
     private ConfigurationService configurationService;
-
-    private static List<String> dateIndexableFields;
-
-
-    static{
-        //Retrieve all metadata fields configured as a date
-        String[] dateFieldsProps = SearchUtils.getConfig().getStringArray("solr.index.type.date");
-        dateIndexableFields = new ArrayList<String>();
-        if(dateFieldsProps != null){
-            for (String dateField : dateFieldsProps) {
-                dateIndexableFields.add(dateField.trim());
-            }
-        }
-    }
-
+    
     @Autowired
     @Required
     public void setConfigurationService(ConfigurationService configurationService) {
@@ -127,41 +113,16 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     
     protected CommonsHttpSolrServer getSolr() throws java.net.MalformedURLException, org.apache.solr.client.solrj.SolrServerException
     {
-
-
         if ( solr == null)
         {
-            ExtendedProperties props = null;
-            //Method that will retrieve all the possible configs we have
-
-            props = ExtendedProperties
-                    .convertProperties(ConfigurationManager.getProperties());
-
-            try {
-                File config = new File(props.getProperty("dspace.dir")
-                        + "/config/dspace-solr-search.cfg");
-                if (config.exists()) {
-                    props.combine(new ExtendedProperties(config.getAbsolutePath()));
-                } else {
-                    ExtendedProperties defaults = new ExtendedProperties();
-                    defaults
-                            .load(SolrServiceImpl.class
-                                    .getResourceAsStream("dspace-solr-search.cfg"));
-                    props.combine(defaults);
-                }
-            }
-            catch (Exception e) {
-                log.error(e.getMessage(), e);
-            }
-
-            String solrService = configurationService.getProperty("solr.search.server") ;
+           String solrService = configurationService.getProperty("solr.search.server") ;
 
             /*
              * @deprecated need to remove this in favor of looking up above.
              */
             if(solrService == null)
             {
-                solrService = props.getString("solr.search.server","http://localhost:8080/solr/search");
+                solrService = SearchUtils.getConfig().getString("solr.search.server","http://localhost:8080/solr/search");
             }
 
             log.debug("Solr URL: " + solrService);
@@ -717,6 +678,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 //Add the field to all for autocomplete so our autocomplete works for all fields
                 doc.addField("all_ac", value);
 
+                List<String> dateIndexableFields = SearchUtils.getDateIndexableFields();
+
                 if (dateIndexableFields.contains(field) || dateIndexableFields.contains(unqualifiedField + "." + Item.ANY))
                 {
                     try{
@@ -739,6 +702,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     }
                     continue;
                 }
+
                 if(SearchUtils.getSearchFilters().contains(field) || SearchUtils.getSearchFilters().contains(unqualifiedField + "." + Item.ANY)){
                     //Add a dynamic fields for autocomplete in search
                     doc.addField(field + "_ac", value);
