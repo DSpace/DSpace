@@ -77,7 +77,6 @@ public class ResultsLogger implements ChecksumResultsCollector
      */
     private ResultsLogger()
     {
-        ;
     }
 
     /**

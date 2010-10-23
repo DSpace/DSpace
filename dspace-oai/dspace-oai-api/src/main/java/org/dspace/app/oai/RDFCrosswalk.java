@@ -188,7 +188,6 @@ public class RDFCrosswalk extends Crosswalk
         }
         catch(SQLException sqlE)
         {
-        	;
         }
         
         // all parent communities map to DC source

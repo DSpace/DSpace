@@ -66,7 +66,6 @@ public class ChecksumHistory
 
     public ChecksumHistory()
     {
-        ;
     }
 
     /**

@@ -200,7 +200,7 @@ public class SFXFileReader {
                     }
                     else if (vName.equals("dc-schema"))
                     {
-                        schema = getValue(vn);;
+                        schema = getValue(vn);
                         finish ++;
                         }
                         else if (vName.equals("dc-element"))

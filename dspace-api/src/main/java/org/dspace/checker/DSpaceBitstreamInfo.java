@@ -80,7 +80,6 @@ public final class DSpaceBitstreamInfo
      */
     private DSpaceBitstreamInfo()
     {
-        ;
     }
 
     /**

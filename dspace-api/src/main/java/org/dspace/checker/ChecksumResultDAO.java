@@ -70,7 +70,6 @@ public final class ChecksumResultDAO extends DAOSupport
      */
     public ChecksumResultDAO()
     {
-        ;
     }
 
     /**

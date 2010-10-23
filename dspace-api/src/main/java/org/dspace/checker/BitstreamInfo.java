@@ -82,7 +82,6 @@ public final class BitstreamInfo
      */
     private BitstreamInfo()
     {
-        ;
     }
 
     /**

@@ -56,7 +56,6 @@ public class ListDispatcher implements BitstreamDispatcher
      */
     private ListDispatcher()
     {
-        ;
     }
 
     /**

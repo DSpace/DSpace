@@ -55,7 +55,6 @@ public class BitstreamDAO
      */
     public BitstreamDAO()
     {
-        ;
     }
 
     /**

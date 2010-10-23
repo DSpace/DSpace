@@ -75,7 +75,6 @@ public class HandleDispatcher implements BitstreamDispatcher
      */
     private HandleDispatcher()
     {
-        ;
     }
 
     /**

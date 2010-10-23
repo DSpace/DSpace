@@ -82,7 +82,6 @@ public class SimpleDispatcher implements BitstreamDispatcher
      */
     private SimpleDispatcher()
     {
-        ;
     }
 
     /**

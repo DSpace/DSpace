@@ -119,7 +119,6 @@ public class ReporterDAO extends DAOSupport
      */
     public ReporterDAO()
     {
-        ;
     }
 
     /**

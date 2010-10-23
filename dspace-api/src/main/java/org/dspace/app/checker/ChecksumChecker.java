@@ -77,7 +77,6 @@ public class ChecksumChecker
      */
     private ChecksumChecker()
     {
-        ;
     }
 
     /**
