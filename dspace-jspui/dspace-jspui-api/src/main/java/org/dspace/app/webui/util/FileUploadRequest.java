@@ -66,11 +66,11 @@ public class FileUploadRequest extends HttpServletRequestWrapper
     /** Multipart request */
     private List items = null;
 
-    private Map parameters = new HashMap();
+    private Map<String, String> parameters = new HashMap<String, String>();
 
-    private Map fileitems = new HashMap();
+    private Map<String, FileItem> fileitems = new HashMap<String, FileItem>();
 
-    private List filenames = new ArrayList();
+    private List<String> filenames = new ArrayList<String>();
 
     private String tempDir = null;
 
@@ -108,8 +108,7 @@ public class FileUploadRequest extends HttpServletRequestWrapper
                 FileItem item = (FileItem) i.next();
                 if (item.isFormField())
                 {
-                    parameters
-                            .put(item.getFieldName(), item.getString("UTF-8"));
+                    parameters.put(item.getFieldName(), item.getString("UTF-8"));
                 }
                 else
                 {
@@ -135,23 +134,23 @@ public class FileUploadRequest extends HttpServletRequestWrapper
     // Methods to replace HSR methods
     public Enumeration getParameterNames()
     {
-        Collection c = parameters.keySet();
+        Collection<String> c = parameters.keySet();
         return Collections.enumeration(c);
     }
 
     public String getParameter(String name)
     {
-        return (String) parameters.get(name);
+        return parameters.get(name);
     }
 
     public String[] getParameterValues(String name)
     {
-        return (String[]) parameters.values().toArray();
+        return parameters.values().toArray(new String[parameters.values().size()]);
     }
 
     public Map getParameterMap()
     {
-        Map map = new HashMap();
+        Map<String, String[]> map = new HashMap<String, String[]>();
         Enumeration eNum = getParameterNames();
 
         while (eNum.hasMoreElements())
@@ -165,19 +164,19 @@ public class FileUploadRequest extends HttpServletRequestWrapper
 
     public String getFilesystemName(String name)
     {
-        String filename = getFilename(((FileItem) fileitems.get(name))
+        String filename = getFilename((fileitems.get(name))
                 .getName());
         return tempDir + File.separator + filename;
     }
 
     public String getContentType(String name)
     {
-        return ((FileItem) fileitems.get(name)).getContentType();
+        return (fileitems.get(name)).getContentType();
     }
 
     public File getFile(String name)
     {
-        FileItem temp = (FileItem) fileitems.get(name);
+        FileItem temp = fileitems.get(name);
         String tempName = temp.getName();
         String filename = getFilename(tempName);
         if ("".equals(filename.trim()))
@@ -187,13 +186,13 @@ public class FileUploadRequest extends HttpServletRequestWrapper
         return new File(tempDir + File.separator + filename);
     }
 
-    public Enumeration getFileParameterNames()
+    public Enumeration<String> getFileParameterNames()
     {
-        Collection c = fileitems.keySet();
+        Collection<String> c = fileitems.keySet();
         return Collections.enumeration(c);
     }
     
-    public Enumeration getFileNames()
+    public Enumeration<String> getFileNames()
     {
         return Collections.enumeration(filenames);
     }
