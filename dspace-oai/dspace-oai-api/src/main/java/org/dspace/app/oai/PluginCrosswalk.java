@@ -175,9 +175,13 @@ public class PluginCrosswalk extends Crosswalk
         {
             log.debug("OAI plugin, schema="+schemaLabel+", preferList="+String.valueOf(xwalk.preferList()));
             if (xwalk.preferList())
+            {
                 return outputUgly.outputString(xwalk.disseminateList(item));
+            }
             else
+            {
                 return outputUgly.outputString(xwalk.disseminateElement(item));
+            }
         }
         catch (Exception e)
         {

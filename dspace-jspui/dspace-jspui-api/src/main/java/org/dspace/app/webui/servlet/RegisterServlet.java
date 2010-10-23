@@ -414,20 +414,24 @@ public class RegisterServlet extends DSpaceServlet
 
             if (registering)
             {
-                if (ldap_enabled) JSPManager.showJSP(request, response, "/register/new-ldap-user.jsp");
-                else JSPManager.showJSP(request, response, "/register/new-user.jsp");
+                if (ldap_enabled)
+                {
+                    JSPManager.showJSP(request, response, "/register/new-ldap-user.jsp");
+                }
+                else
+                {
+                    JSPManager.showJSP(request, response, "/register/new-user.jsp");
+                }
             }
             else
             {
-                JSPManager.showJSP(request, response,
-                        "/register/forgot-password.jsp");
+                JSPManager.showJSP(request, response, "/register/forgot-password.jsp");
             }
         }
         catch (MessagingException me)
         {
             // Some other mailing error
-            log.info(LogManager.getHeader(context, "error_emailing", "email="
-                    + email), me);
+            log.info(LogManager.getHeader(context, "error_emailing", "email=" + email), me);
 
             JSPManager.showInternalError(request, response);
         }

@@ -121,13 +121,16 @@ public class RoleIngester implements PackageIngester
             {
                 netid = netids.item(0).getTextContent();
                 if (netid.equals(myNetid))
+                {
                     continue; // Cannot operate on my own EPerson!
+                }
                 identity = netid;
                 collider = EPerson.findByNetid(context, identity);
             }
             else
-                throw new PackageException(
-                        "EPerson has neither email nor netid.");
+            {
+                throw new PackageException("EPerson has neither email nor netid.");
+            }
 
             if (null != collider)
                 if (params.replaceModeEnabled()) // -r -f
@@ -136,13 +139,13 @@ public class RoleIngester implements PackageIngester
                 }
                 else if (params.keepExistingModeEnabled()) // -r -k
                 {
-                    log.warn("Existing EPerson {} was not restored from the package.",
-                             identity);
+                    log.warn("Existing EPerson {} was not restored from the package.", identity);
                     continue;
                 }
                 else
-                    throw new PackageException("EPerson " + identity
-                            + " already exists.");
+                {
+                    throw new PackageException("EPerson " + identity + " already exists.");
+                }
             else
             {
                 eperson = EPerson.create(context);
@@ -156,27 +159,38 @@ public class RoleIngester implements PackageIngester
 
             data = user.getElementsByTagName(RoleDisseminator.FIRST_NAME);
             if (data.getLength() > 0)
+            {
                 eperson.setFirstName(data.item(0).getTextContent());
+            }
             else
+            {
                 eperson.setFirstName(null);
+            }
 
             data = user.getElementsByTagName(RoleDisseminator.LAST_NAME);
             if (data.getLength() > 0)
+            {
                 eperson.setLastName(data.item(0).getTextContent());
+            }
             else
+            {
                 eperson.setLastName(null);
+            }
 
             data = user.getElementsByTagName(RoleDisseminator.LANGUAGE);
             if (data.getLength() > 0)
+            {
                 eperson.setLanguage(data.item(0).getTextContent());
+            }
             else
+            {
                 eperson.setLanguage(null);
+            }
 
             data = user.getElementsByTagName(RoleDisseminator.CAN_LOGIN);
             eperson.setCanLogIn(data.getLength() > 0);
 
-            data = user
-                    .getElementsByTagName(RoleDisseminator.REQUIRE_CERTIFICATE);
+            data = user.getElementsByTagName(RoleDisseminator.REQUIRE_CERTIFICATE);
             eperson.setRequireCertificate(data.getLength() > 0);
 
             data = user.getElementsByTagName(RoleDisseminator.SELF_REGISTERED);
@@ -184,9 +198,13 @@ public class RoleIngester implements PackageIngester
 
             data = user.getElementsByTagName(RoleDisseminator.PASSWORD_HASH);
             if (data.getLength() > 0)
+            {
                 eperson.setPasswordHash(data.item(0).getTextContent());
+            }
             else
+            {
                 eperson.setPasswordHash(null);
+            }
 
             // Actually write Eperson info to DB
             // NOTE: this update() doesn't call a commit(). So, Eperson info
@@ -251,8 +269,9 @@ public class RoleIngester implements PackageIngester
                     continue;
                 }
                 else
-                    throw new PackageException("Group " + name
-                            + " already exists");
+                {
+                    throw new PackageException("Group " + name + " already exists");
+                }
             }
             else
             { // No such group exists  -- so, we'll need to create it!
@@ -269,15 +288,25 @@ public class RoleIngester implements PackageIngester
 
                         // Create this Collection-associated group, based on its group type
                         if(type.equals(RoleDisseminator.GROUP_TYPE_ADMIN))
+                        {
                             groupObj = collection.createAdministrators();
+                        }
                         else if(type.equals(RoleDisseminator.GROUP_TYPE_SUBMIT))
+                        {
                             groupObj = collection.createSubmitters();
+                        }
                         else if(type.equals(RoleDisseminator.GROUP_TYPE_WORKFLOW_STEP_1))
+                        {
                             groupObj = collection.createWorkflowGroup(1);
+                        }
                         else if(type.equals(RoleDisseminator.GROUP_TYPE_WORKFLOW_STEP_2))
+                        {
                             groupObj = collection.createWorkflowGroup(2);
+                        }
                         else if(type.equals(RoleDisseminator.GROUP_TYPE_WORKFLOW_STEP_3))
+                        {
                             groupObj = collection.createWorkflowGroup(3);
+                        }
                     }
                     else if(parent.getType()==Constants.COMMUNITY)
                     {
@@ -285,7 +314,9 @@ public class RoleIngester implements PackageIngester
 
                         // Create this Community-associated group, based on its group type
                         if(type.equals(RoleDisseminator.GROUP_TYPE_ADMIN))
+                        {
                             groupObj = community.createAdministrators();
+                        }
                     }
                     //Ignore all other dspace object types
                 }
@@ -301,8 +332,7 @@ public class RoleIngester implements PackageIngester
             }
 
             // Add EPeople to newly created Group
-            NodeList members = group
-                    .getElementsByTagName(RoleDisseminator.MEMBER);
+            NodeList members = group.getElementsByTagName(RoleDisseminator.MEMBER);
             for (int memberx = 0; memberx < members.getLength(); memberx++)
             {
                 Element member = (Element) members.item(memberx);

@@ -123,13 +123,19 @@ public class OREDisseminationCrosswalk
         String dsUrl = ConfigurationManager.getProperty("dspace.url");
         
         String remSource = ConfigurationManager.getProperty("ore.authoritative.source");
-    	if (remSource == null || remSource.equalsIgnoreCase("oai")) 
-    		oaiUrl = ConfigurationManager.getProperty("dspace.oai.url");
+    	if (remSource == null || remSource.equalsIgnoreCase("oai"))
+        {
+            oaiUrl = ConfigurationManager.getProperty("dspace.oai.url");
+        }
     	else if (remSource.equalsIgnoreCase("xmlui") || remSource.equalsIgnoreCase("manakin"))
-    		oaiUrl = dsUrl;
+        {
+            oaiUrl = dsUrl;
+        }
     	
     	if (oaiUrl == null)
-    		throw new CrosswalkInternalException("Base uri for the ore generator has not been set. Check the ore.authoritative.source setting.");
+        {
+            throw new CrosswalkInternalException("Base uri for the ore generator has not been set. Check the ore.authoritative.source setting.");
+        }
         
     	String uriA = oaiUrl + "/metadata/handle/" + item.getHandle() + "/ore.xml";
     	
@@ -185,9 +191,13 @@ public class OREDisseminationCrosswalk
         Element aggTitle = new Element("title",ATOM_NS);
         DCValue[] titles = item.getMetadata(MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
         if (titles != null && titles.length>0)
-        	aggTitle.addContent(titles[0].value);
+        {
+            aggTitle.addContent(titles[0].value);
+        }
         else
-        	aggTitle.addContent("");
+        {
+            aggTitle.addContent("");
+        }
         aggregation.addContent(aggTitle);
         
         Element aggAuthor;

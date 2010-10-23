@@ -119,9 +119,13 @@ public class RepositoryAdapter extends AbstractAdapter
 	protected String getMETSOBJID() throws WingException {
 		
 		if (contextPath == null)
-			return "/";
+        {
+            return "/";
+        }
 		else
-			return contextPath + "/";
+        {
+            return contextPath + "/";
+        }
 	}
 
     /**
@@ -312,9 +316,13 @@ public class RepositoryAdapter extends AbstractAdapter
         // Start the new div for this repository container
         attributes = new AttributeMap();
         if (dso instanceof Community)
-        	attributes.put("TYPE", "DSpace Community");
+        {
+            attributes.put("TYPE", "DSpace Community");
+        }
         else if (dso instanceof Collection)
-        	attributes.put("TYPE", "DSpace Collection");
+        {
+            attributes.put("TYPE", "DSpace Collection");
+        }
         startElement(METS,"div",attributes);
         
         // //////////////////////////////////

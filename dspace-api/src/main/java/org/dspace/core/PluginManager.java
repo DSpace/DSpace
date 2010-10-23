@@ -151,9 +151,13 @@ public class PluginManager
         // configuration format is  prefix.<interface> = <classname>
         String classname = ConfigurationManager.getProperty(SINGLE_PREFIX+iname);
         if (classname != null)
+        {
             return getAnonymousPlugin(classname.trim());
+        }
         else
-            throw new PluginConfigurationError("No Single Plugin configured for interface \""+iname+"\"");
+        {
+            throw new PluginConfigurationError("No Single Plugin configured for interface \"" + iname + "\"");
+        }
     }
 
 
@@ -192,7 +196,9 @@ public class PluginManager
             sequenceConfig.put(iname, classname);
         }
         else
-            classname = (String[])sequenceConfig.get(iname);
+        {
+            classname = (String[]) sequenceConfig.get(iname);
+        }
 
         Object result[] = (Object[])Array.newInstance(intfc, classname.length);
         for (int i = 0; i < classname.length; ++i)
@@ -225,7 +231,9 @@ public class PluginManager
                 return cached;
             }
             else
+            {
                 return pluginClass.newInstance();
+            }
         }
         catch (ClassNotFoundException e)
         {
@@ -305,9 +313,13 @@ public class PluginManager
                         String names[] = (String[])pluginClass.getMethod("getPluginNames").
                                                    invoke(null);
                         if (names == null || names.length == 0)
-                            log.error("Self-named plugin class \""+classnames[i]+"\" returned null or empty name list!");
+                        {
+                            log.error("Self-named plugin class \"" + classnames[i] + "\" returned null or empty name list!");
+                        }
                         else
+                        {
                             found += installNamedConfigs(iname, classnames[i], names);
+                        }
                     }
                     catch (NoSuchMethodException e)
                     {
@@ -321,7 +333,9 @@ public class PluginManager
             }
             namedPluginClasses.put(iname, "org.dspace.core.marker");
             if (found == 0)
-                log.error("No named plugins found for interface="+iname);
+            {
+                log.error("No named plugins found for interface=" + iname);
+            }
         }
     }
 
@@ -334,10 +348,14 @@ public class PluginManager
         {
             String key = iname+SEP+names[i];
             if (namedPluginClasses.containsKey(key))
-                log.error("Name collision in named plugin, implementation class=\""+classname+
-                            "\", name=\""+names[i]+"\"");
+            {
+                log.error("Name collision in named plugin, implementation class=\"" + classname +
+                        "\", name=\"" + names[i] + "\"");
+            }
             else
+            {
                 namedPluginClasses.put(key, classname);
+            }
             log.debug("Got Named Plugin, intfc="+iname+", name="+names[i]+", class="+classname);
             ++found;
         }
@@ -364,7 +382,9 @@ public class PluginManager
             String key = iname + SEP + name;
             String cname = (String)namedPluginClasses.get(key);
             if (cname == null)
-                log.warn("Cannot find named plugin for interface="+iname+", name=\""+name+"\"");
+            {
+                log.warn("Cannot find named plugin for interface=" + iname + ", name=\"" + name + "\"");
+            }
             else
             {
                 Class pluginClass = Class.forName(cname);
@@ -548,11 +568,17 @@ public class PluginManager
     {
         Class sup = cls.getSuperclass();
         if (sup == null)
+        {
             return false;
+        }
         else if (sup.equals(SelfNamedPlugin.class))
+        {
             return true;
+        }
         else
+        {
             return checkSelfNamed(sup);
+        }
     }
 
     // check named-plugin names by interface -- call the usual
@@ -617,7 +643,9 @@ public class PluginManager
             {
                 line = line.trim();
                 if (line.startsWith("!") || line.startsWith("#"))
+                {
                     continued = false;
+                }
                 else
                 {
                     if (!continued && line.startsWith("plugin."))
@@ -627,22 +655,38 @@ public class PluginManager
                         {
                             String key = line.substring(0, km.end(1));
                             if (keyMap.containsKey(key))
-                                log.error("Duplicate key \""+key+"\" in DSpace configuration file="+config.toString());
+                            {
+                                log.error("Duplicate key \"" + key + "\" in DSpace configuration file=" + config.toString());
+                            }
                             else
+                            {
                                 keyMap.put(key, key);
+                            }
 
                             if (key.startsWith(SINGLE_PREFIX))
+                            {
                                 singleKey.put(key.substring(SINGLE_PREFIX.length()), key);
+                            }
                             else if (key.startsWith(SEQUENCE_PREFIX))
+                            {
                                 sequenceKey.put(key.substring(SEQUENCE_PREFIX.length()), key);
+                            }
                             else if (key.startsWith(NAMED_PREFIX))
+                            {
                                 namedKey.put(key.substring(NAMED_PREFIX.length()), key);
+                            }
                             else if (key.startsWith(SELFNAMED_PREFIX))
+                            {
                                 selfnamedKey.put(key.substring(SELFNAMED_PREFIX.length()), key);
+                            }
                             else if (key.startsWith(REUSABLE_PREFIX))
+                            {
                                 reusableKey.put(key.substring(REUSABLE_PREFIX.length()), key);
+                            }
                             else
-                                log.error("Key with unknown prefix \""+key+"\" in DSpace configuration file="+config.toString());
+                            {
+                                log.error("Key with unknown prefix \"" + key + "\" in DSpace configuration file=" + config.toString());
+                            }
                         }
                     }
                     continued = line.length() > 0 && line.charAt(line.length()-1) == '\\';
@@ -707,7 +751,9 @@ public class PluginManager
             String key = (String)ii.next();
             String val = ConfigurationManager.getProperty(SINGLE_PREFIX+key);
             if (val == null)
-                log.error("Single plugin config not found for: "+SINGLE_PREFIX+key);
+            {
+                log.error("Single plugin config not found for: " + SINGLE_PREFIX + key);
+            }
             else
             {
                 val = val.trim();
@@ -723,7 +769,9 @@ public class PluginManager
             String key = (String)ii.next();
             String val = ConfigurationManager.getProperty(SEQUENCE_PREFIX+key);
             if (val == null)
-                log.error("Sequence plugin config not found for: "+SEQUENCE_PREFIX+key);
+            {
+                log.error("Sequence plugin config not found for: " + SEQUENCE_PREFIX + key);
+            }
             else
             {
                 val = val.trim();
@@ -746,7 +794,9 @@ public class PluginManager
             String key = (String)ii.next();
             String val = ConfigurationManager.getProperty(SELFNAMED_PREFIX+key);
             if (val == null)
-                log.error("Selfnamed plugin config not found for: "+SELFNAMED_PREFIX+key);
+            {
+                log.error("Selfnamed plugin config not found for: " + SELFNAMED_PREFIX + key);
+            }
             else
             {
                 val = val.trim();
@@ -772,7 +822,9 @@ public class PluginManager
             String key = (String)ii.next();
             String val = ConfigurationManager.getProperty(NAMED_PREFIX+key);
             if (val == null)
-                log.error("Named plugin config not found for: "+NAMED_PREFIX+key);
+            {
+                log.error("Named plugin config not found for: " + NAMED_PREFIX + key);
+            }
             else
             {
                 checkNames(key);
@@ -794,7 +846,9 @@ public class PluginManager
         {
             String rk = (String)ri.next();
             if (!(allImpls.containsKey(rk)))
-                log.error("In plugin.reusable configuration, class \""+rk+"\" is NOT a plugin implementation class.");
+            {
+                log.error("In plugin.reusable configuration, class \"" + rk + "\" is NOT a plugin implementation class.");
+            }
         }
     }
 

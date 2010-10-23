@@ -114,9 +114,13 @@ public class PasswordServlet extends DSpaceServlet
                 return;
         }
         else if (status == AuthenticationMethod.CERT_REQUIRED)
+        {
             jsp = "/error/require-certificate.jsp";
+        }
         else
+        {
             jsp = "/login/incorrect.jsp";
+        }
 
         // If we reach here, supplied email/password was duff.
         log.info(LogManager.getHeader(context, "failed_login",

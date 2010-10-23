@@ -230,9 +230,13 @@ public class PackageUtils
     {
         Bundle[] bundles;
         if (bnName == null)
+        {
             bundles = item.getBundles();
+        }
         else
+        {
             bundles = item.getBundles(bnName);
+        }
         for (int i = 0; i < bundles.length; i++)
         {
             Bitstream[] bitstreams = bundles[i].getBitstreams();
@@ -262,9 +266,13 @@ public class PackageUtils
         int fid = bsf.getID();
         Bundle[] bundles;
         if (bnName == null)
+        {
             bundles = item.getBundles();
+        }
         else
+        {
             bundles = item.getBundles(bnName);
+        }
         for (int i = 0; i < bundles.length; i++)
         {
             Bitstream[] bitstreams = bundles[i].getBitstreams();
@@ -463,9 +471,13 @@ public class PackageUtils
             case Constants.COMMUNITY:
                 // top-level community?
                 if (parent == null || parent.getType() == Constants.SITE)
+                {
                     dso = Community.create(null, context, handle);
+                }
                 else
-                    dso = ((Community)parent).createSubcommunity(handle);
+                {
+                    dso = ((Community) parent).createSubcommunity(handle);
+                }
                 return dso;
 
             case Constants.ITEM:
@@ -606,16 +618,23 @@ public class PackageUtils
         String handle = dso.getHandle();
         // if Handle is empty, use internal ID for name
         if(handle==null || handle.isEmpty())
+        {
             handle = "internal-id-" + dso.getID();
+        }
         else // if Handle exists, replace '/' with '-' to meet normal file naming conventions
+        {
             handle = handle.replace("/", "-");
+        }
 
         //Get type name
         int typeID = dso.getType();
         String type = Constants.typeText[typeID];
 
         //check if passed in file extension already starts with "."
-        if(!fileExtension.startsWith(".")) fileExtension = "." + fileExtension;
+        if(!fileExtension.startsWith("."))
+        {
+            fileExtension = "." + fileExtension;
+        }
 
         //Here we go, here's our magical file name!
         //Format: typeName@handle.extension
@@ -892,14 +911,18 @@ public class PackageUtils
 
                 //verify our group specified object Type corresponds to this object's type
                 if(Constants.getTypeID(objType)!=dso.getType())
+                {
                     throw new PackageValidationException("DSpace Object referenced by handle '" + objID + "' does not correspond to the object type specified by Group named '" + groupName + "'.  This Group doesn't seem to correspond to this DSpace Object!");
+                }
 
                 //Create an updated group name, using the Internal ID to replace the Handle
                 // Format: <DSpace-Obj-Type>_<DSpace-Obj-ID>_<Group-Type>
                 return objType + "_" + dso.getID() + "_" + groupType;
             }
             else // default -- return group name as is
+            {
                 return groupName;
+            }
         }
         catch (SQLException sqle)
         {

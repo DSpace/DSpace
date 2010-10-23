@@ -90,16 +90,22 @@ public class PackageParameters extends Properties
             String name = (String)pe.nextElement();
             String v[] = request.getParameterValues(name);
             if (v.length == 0)
+            {
                 result.setProperty(name, "");
+            }
             else if (v.length == 1)
+            {
                 result.setProperty(name, v[0]);
+            }
             else
             {
                 StringBuffer sb = new StringBuffer();
                 for (int i = 0; i < v.length; ++i)
                 {
                     if (i > 0)
+                    {
                         sb.append(SEPARATOR);
+                    }
                     sb.append(v[i]);
                 }
                 result.setProperty(name, sb.toString());
@@ -122,9 +128,13 @@ public class PackageParameters extends Properties
     {
         String oldVal = getProperty(key);
         if (oldVal == null)
+        {
             setProperty(key, value);
+        }
         else
+        {
             setProperty(key, oldVal + SEPARATOR + value);
+        }
         return oldVal;
     }
 
@@ -138,9 +148,13 @@ public class PackageParameters extends Properties
     {
         String val = getProperty(key);
         if (val == null)
+        {
             return null;
+        }
         else
+        {
             return val.split(SEPARATOR_REGEX);
+        }
     }
 
     /**
@@ -155,11 +169,15 @@ public class PackageParameters extends Properties
         String stringValue = getProperty(key);
 
         if (stringValue == null)
+        {
             return defaultAnswer;
+        }
         else
+        {
             return stringValue.equalsIgnoreCase("true") ||
-                   stringValue.equalsIgnoreCase("on") ||
-                   stringValue.equalsIgnoreCase("yes");
+                    stringValue.equalsIgnoreCase("on") ||
+                    stringValue.equalsIgnoreCase("yes");
+        }
     }
 
 

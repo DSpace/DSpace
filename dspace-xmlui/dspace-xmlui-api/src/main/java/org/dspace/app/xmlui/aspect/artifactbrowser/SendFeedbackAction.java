@@ -103,9 +103,11 @@ public class SendFeedbackAction extends AbstractAction
         }
 
         String basicHost = "";
-        if (host.equals("localhost") || host.equals("127.0.0.1")
+        if ("localhost".equals(host) || "127.0.0.1".equals(host)
                         || host.equals(InetAddress.getLocalHost().getHostAddress()))
+        {
             basicHost = host;
+        }
         else
         {
             // cut off all but the hostname, to cover cases where more than one URL
@@ -142,9 +144,13 @@ public class SendFeedbackAction extends AbstractAction
             map.put("page",page);
 
             if (address == null || address.equals(""))
-                map.put("email",eperson);
+            {
+                map.put("email", eperson);
+            }
             else
-                map.put("email",address);
+            {
+                map.put("email", address);
+            }
 
             map.put("comments",comments);
 

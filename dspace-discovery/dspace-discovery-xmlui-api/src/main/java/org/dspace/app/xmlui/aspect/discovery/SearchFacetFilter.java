@@ -446,9 +446,13 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
                     if(field.getName().endsWith(".year")){
                         if((values.size() - offSet) < DEFAULT_PAGE_SIZE)
+                        {
                             shownItemsMax = values.size();
+                        }
                         else
+                        {
                             shownItemsMax = DEFAULT_PAGE_SIZE;
+                        }
                     }else{
                         shownItemsMax = offSet + (DEFAULT_PAGE_SIZE < values.size() ? values.size() - 1 : values.size());
 
@@ -469,10 +473,15 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
                         int start = (values.size() - 1) - offSet;
                         int end = start - DEFAULT_PAGE_SIZE;
                         if(end < 0)
+                        {
                             end = 0;
+                        }
                         else
+                        {
                             end++;
-                        for(int i = start; end <= i; i--){
+                        }
+                        for(int i = start; end <= i; i--)
+                        {
                             FacetField.Count value = values.get(i);
 
                             renderFacetField(browseParams, dso, field, singleTable, filterQueries, value);

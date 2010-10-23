@@ -234,39 +234,44 @@ public class PasswordAuthentication
             }
             catch (AuthorizeException e)
             {
-                // ignore exception, treat it as lookup failure.
+                log.trace("Failed to authorize looking up EPerson", e);
             }
 
-            // lookup failed.
             if (eperson == null)
+            {
+                // lookup failed.
                 return NO_SUCH_USER;
-
-            // cannot login this way
+            }
             else if (!eperson.canLogIn())
+            {
+                // cannot login this way
                 return BAD_ARGS;
-
-            // this user can only login with x.509 certificate
+            }
             else if (eperson.getRequireCertificate())
             {
+                // this user can only login with x.509 certificate
                 log.warn(LogManager.getHeader(context, "authenticate", "rejecting PasswordAuthentication because "+username+" requires certificate."));
                 return CERT_REQUIRED;
             }
-
-            // login is ok if password matches:
             else if (eperson.checkPassword(password))
             {
+                // login is ok if password matches:
                 context.setCurrentUser(eperson);
                 log.info(LogManager.getHeader(context, "authenticate", "type=PasswordAuthentication"));
                 return SUCCESS;
             }
             else
+            {
                 return BAD_CREDENTIALS;
+            }
         }
 
         // BAD_ARGS always defers to the next authentication method.
         // It means this method cannot use the given credentials.
         else
+        {
             return BAD_ARGS;
+        }
     }
 
     /**

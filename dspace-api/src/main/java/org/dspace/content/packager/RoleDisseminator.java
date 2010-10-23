@@ -371,39 +371,50 @@ public class RoleDisseminator implements PackageDisseminator
      */
     private String getGroupType(DSpaceObject dso, Group group)
     {
-        if(dso.getType()==Constants.COMMUNITY)
+        if (dso == null || group == null)
+        {
+            return null;
+        }
+
+        if( dso.getType()==Constants.COMMUNITY)
         {
             Community community = (Community) dso;
 
             //Check if this is the ADMIN group for this community
-            if(community.getAdministrators()!=null &&
-               community.getAdministrators().equals(group))
+            if (group.equals(community.getAdministrators()))
+            {
                 return GROUP_TYPE_ADMIN;
+            }
         }
         else if(dso.getType() == Constants.COLLECTION)
         {
             Collection collection = (Collection) dso;
 
-            //Check if this is the ADMIN group for this collection
-            if(collection.getAdministrators()!=null &&
-               collection.getAdministrators().equals(group))
+            if (group.equals(collection.getAdministrators()))
+            {
+                //Check if this is the ADMIN group for this collection
                 return GROUP_TYPE_ADMIN;
-            //Check if Submitters group
-            else if(collection.getSubmitters()!=null &&
-                    collection.getSubmitters().equals(group))
+            }
+            else if (group.equals(collection.getSubmitters()))
+            {
+                //Check if Submitters group
                 return GROUP_TYPE_SUBMIT;
-            //Check if workflow step 1 group
-            else if(collection.getWorkflowGroup(1)!=null &&
-                    collection.getWorkflowGroup(1).equals(group))
+            }
+            else if (group.equals(collection.getWorkflowGroup(1)))
+            {
+                //Check if workflow step 1 group
                 return GROUP_TYPE_WORKFLOW_STEP_1;
-            //check if workflow step 2 group
-            else if(collection.getWorkflowGroup(2)!=null &&
-                    collection.getWorkflowGroup(2).equals(group))
+            }
+            else if (group.equals(collection.getWorkflowGroup(2)))
+            {
+                //check if workflow step 2 group
                 return GROUP_TYPE_WORKFLOW_STEP_2;
-            //check if workflow step 3 group
-            else if(collection.getWorkflowGroup(3)!=null &&
-                    collection.getWorkflowGroup(3).equals(group))
+            }
+            else if (group.equals(collection.getWorkflowGroup(3)))
+            {
+                //check if workflow step 3 group
                 return GROUP_TYPE_WORKFLOW_STEP_3;
+            }
         }
 
         //by default, return null

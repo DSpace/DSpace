@@ -216,10 +216,14 @@ public class QueryArgs
             if (tmp_query != null && !tmp_query.equals(""))
         	{
         		query.add(tmp_query.trim());
-        		if (tmp_field == null)        		        			
-        			field.add("ANY");
-        		else  			
-        			field.add(tmp_field.trim());
+        		if (tmp_field == null)
+                {
+                    field.add("ANY");
+                }
+        		else
+                {
+                    field.add(tmp_field.trim());
+                }
         		if (i != numField)
             	{
             		conjunction.add(request.getParameter("conjunction"+i) != null?

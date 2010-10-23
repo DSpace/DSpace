@@ -206,9 +206,13 @@ public class ReporterDAO extends DAOSupport
             conn = DatabaseManager.getConnection();
 
             if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-            	prepStmt = conn.prepareStatement(DATE_RANGE_NOT_PROCESSED_BITSTREAMS_ORACLE);
+            {
+                prepStmt = conn.prepareStatement(DATE_RANGE_NOT_PROCESSED_BITSTREAMS_ORACLE);
+            }
            	else
-            	prepStmt = conn.prepareStatement(DATE_RANGE_NOT_PROCESSED_BITSTREAMS);
+            {
+                prepStmt = conn.prepareStatement(DATE_RANGE_NOT_PROCESSED_BITSTREAMS);
+            }
 
             prepStmt.setDate(1, new java.sql.Date(startDate.getTime()));
             prepStmt.setDate(2, new java.sql.Date(endDate.getTime()));

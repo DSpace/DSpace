@@ -369,16 +369,24 @@ public class Params extends AbstractWingElement implements StructuralElement
         if (addOperation )
         {
             if (operations == null)
+            {
                 operations = OPERATION_ADD;
+            }
             else
+            {
                 operations += " " + OPERATION_ADD;
+            }
         }
         if (addOperation)
         {
             if (operations == null)
+            {
                 operations = OPERATION_DELETE;
+            }
             else
+            {
                 operations += " " + OPERATION_DELETE;
+            }
         }
         if (operations != null)
             attributes.put(A_OPERATIONS, operations);
@@ -416,15 +424,25 @@ public class Params extends AbstractWingElement implements StructuralElement
         }
 
         if (this.authority)
+        {
             attributes.put(A_AUTHORITY_CONTROLLED, this.authority);
+        }
         if (this.authority_required)
+        {
             attributes.put(A_AUTHORITY_REQUIRED, this.authority_required);
+        }
         if (this.choices != null)
+        {
             attributes.put(A_CHOICES, this.choices);
+        }
         if (this.presentation != null)
+        {
             attributes.put(A_CHOICES_PRESENTATION, this.presentation);
+        }
         if (this.choicesClosed)
+        {
             attributes.put(A_CHOICES_CLOSED, true);
+        }
 
         startElement(contentHandler, namespaces, E_PARAMS, attributes);
         endElement(contentHandler, namespaces, E_PARAMS);

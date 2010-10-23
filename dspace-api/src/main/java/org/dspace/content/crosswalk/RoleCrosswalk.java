@@ -223,9 +223,13 @@ public class RoleCrosswalk
             // Initialize our packaging parameters
             PackageParameters pparams;
             if(this.getPackagingParameters()!=null)
+            {
                 pparams = this.getPackagingParameters();
+            }
             else
+            {
                 pparams = new PackageParameters();
+            }
 
             //actually disseminate to our temp file.
             Context context = new Context();
@@ -243,9 +247,13 @@ public class RoleCrosswalk
                 Document xmlDocument = builder.build(tempFile);
                 //If XML parsed successfully, return root element of doc
                 if(xmlDocument!=null && xmlDocument.hasRootElement())
+                {
                     return xmlDocument.getRootElement();
+                }
                 else
+                {
                     return null;
+                }
             }
             catch (JDOMException je)
             {
@@ -312,9 +320,13 @@ public class RoleCrosswalk
         // Initialize our packaging parameters
         PackageParameters pparams;
         if(this.getPackagingParameters()!=null)
+        {
             pparams = this.getPackagingParameters();
+        }
         else
+        {
             pparams = new PackageParameters();
+        }
         
         // Initialize our license info
         String license = null;

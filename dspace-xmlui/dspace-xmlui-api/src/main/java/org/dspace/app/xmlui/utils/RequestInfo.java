@@ -192,9 +192,13 @@ public class RequestInfo
     		String[] values = parameters.get(arg0);
     		
     		if (values == null || values.length == 0)
-    			return null;
+            {
+                return null;
+            }
     		else
-    			return values[0];
+            {
+                return values[0];
+            }
     	}
 
     	public Map getParameterMap() {

@@ -85,13 +85,19 @@ public class RequestUtils {
 
 			// Get the component field's name
 			if (i == 0)
-				value = request.getParameter(componentFieldName);
+            {
+                value = request.getParameter(componentFieldName);
+            }
 			else
-				value = request.getParameter(componentFieldName + "_" + i);
+            {
+                value = request.getParameter(componentFieldName + "_" + i);
+            }
 
 			// If this is null then it's the last one.
 			if (value == null)
-				break valueLoop;
+            {
+                break valueLoop;
+            }
 
 
 			// Check to make sure that this value is not selected to be removed.
@@ -111,7 +117,9 @@ public class RequestUtils {
 
 			// Only add non blank items to the list
 			if (value.length() == 0)
-				continue valueLoop;
+            {
+                continue valueLoop;
+            }
 			
 			// Finaly add it to the list
 			values.add(value.trim());
@@ -149,13 +157,19 @@ public class RequestUtils {
 
 			// Get the component field's name
 			if (i == 0)
-				value = request.getParameter(fieldName);
+            {
+                value = request.getParameter(fieldName);
+            }
 			else
-				value = request.getParameter(fieldName + "_" + i);
+            {
+                value = request.getParameter(fieldName + "_" + i);
+            }
 
 			// If this is null then it's the last one.
 			if (value == null)
-				break valueLoop;
+            {
+                break valueLoop;
+            }
 
 
 			// Check to make sure that this value is not selected to be removed.

@@ -45,6 +45,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -114,17 +115,21 @@ public class PREMISCrosswalk
         {
             Element me = (Element)mi.next();
 
-            // if we're fed a <premis> wrapper object, recurse on its guts:
             if (me.getName().equals("premis"))
+            {
+                // if we're fed a <premis> wrapper object, recurse on its guts:
                 ingest(context, dso, me.getChildren());
-
-            // "object" section:
+            }
             else if (me.getName().equals("object"))
             {
+                // "object" section:
+
                 // originalName becomes new bitstream source and (default) name
                 Element on = me.getChild("originalName", PREMIS_NS);
                 if (on != null)
+                {
                     bsName = on.getTextTrim();
+                }
 
                 // Reconcile technical metadata with bitstream content;
                 // check that length and message digest (checksum) match.
@@ -139,9 +144,11 @@ public class PREMISCrosswalk
                         {
                             int size = Integer.parseInt(ssize);
                             if (bitstream.getSize() != size)
+                            {
                                 throw new MetadataValidationException(
-                                 "Bitstream size ("+String.valueOf(bitstream.getSize())+
-                                 ") does not match size in PREMIS ("+ssize+"), rejecting it.");
+                                        "Bitstream size (" + String.valueOf(bitstream.getSize()) +
+                                                ") does not match size in PREMIS (" + ssize + "), rejecting it.");
+                            }
                         }
                         catch (NumberFormatException ne)
                         {
@@ -155,18 +162,22 @@ public class PREMISCrosswalk
                         String md = fixity.getChildTextTrim("messageDigest", PREMIS_NS);
                         String b_alg = bitstream.getChecksumAlgorithm();
                         String b_md = bitstream.getChecksum();
-                        if (alg != null && md != null &&
-                            b_alg != null && b_md != null &&
-                            alg.equals(b_alg))
+                        if (StringUtils.equals(alg, b_alg))
                         {
-                            if (md.equals(b_md))
-                                log.debug("Bitstream checksum agrees with PREMIS: "+bitstream.getName());
+                            if (StringUtils.equals(md, b_md))
+                            {
+                                log.debug("Bitstream checksum agrees with PREMIS: " + bitstream.getName());
+                            }
                             else
-                                throw new MetadataValidationException("Bitstream "+alg+" Checksum does not match value in PREMIS ("+b_md+" != "+md+"), for bitstream: "+bitstream.getName());
+                            {
+                                throw new MetadataValidationException("Bitstream " + alg + " Checksum does not match value in PREMIS (" + b_md + " != " + md + "), for bitstream: " + bitstream.getName());
+                            }
                         }
                         else
-                            log.warn("Cannot test checksum on bitstream="+bitstream.getName()+
-                                     ", algorithm in PREMIS is different: "+alg);
+                        {
+                            log.warn("Cannot test checksum on bitstream=" + bitstream.getName() +
+                                    ", algorithm in PREMIS is different: " + alg);
+                        }
                     }
 
                     // Look for formatDesignation/formatName, which is
@@ -193,12 +204,19 @@ public class PREMISCrosswalk
                 BitstreamFormat bf = (MIMEType == null) ? null :
                         BitstreamFormat.findByMIMEType(context, MIMEType);
                 if (bf == null)
+                {
                     bf = FormatIdentifier.guessFormat(context, bitstream);
+                }
+
                 if (bf != null)
+                {
                     bitstream.setFormat(bf);
+                }
             }
             else
-                log.debug("Skipping element: "+me.toString());
+            {
+                log.debug("Skipping element: " + me.toString());
+            }
         }
         bitstream.update();
     }
@@ -263,6 +281,7 @@ public class PREMISCrosswalk
             bsName = "bitstream_"+sid+ (ext.length > 0 ? ext[0] : "");
         }
         if (handle != null && baseUrl != null)
+        {
             oiv.setText(baseUrl
                     + "/bitstream/"
                     + URLEncoder.encode(handle, "UTF-8")
@@ -270,8 +289,11 @@ public class PREMISCrosswalk
                     + sid
                     + "/"
                     + URLEncoder.encode(bsName, "UTF-8"));
+        }
         else
+        {
             oiv.setText(URLEncoder.encode(bsName, "UTF-8"));
+        }
 
         oid.addContent(oiv);
         object.addContent(oid);

@@ -220,7 +220,9 @@ public class Packager
                     System.out.println(sip.getParameterHelp());
                 }
                 else
+                {
                     System.out.println("\nNo valid Submission plugin found for " + line.getOptionValue('t') + " type.");
+                }
 
                 PackageDisseminator dip = (PackageDisseminator) PluginManager
                     .getNamedPlugin(PackageDisseminator.class, line.getOptionValue('t'));
@@ -231,7 +233,9 @@ public class Packager
                     System.out.println(dip.getParameterHelp());
                 }
                 else
+                {
                     System.out.println("\nNo valid Dissemination plugin found for " + line.getOptionValue('t') + " type.");
+                }
 
             }
             else  //otherwise, display list of valid packager types
@@ -292,13 +296,19 @@ public class Packager
             {
                 String pair[] = popt[i].split("\\=", 2);
                 if (pair.length == 2)
+                {
                     pkgParams.addProperty(pair[0].trim(), pair[1].trim());
+                }
                 else if (pair.length == 1)
+                {
                     pkgParams.addProperty(pair[0].trim(), "");
+                }
                 else
+                {
                     System.err
                             .println("Warning: Illegal package option format: \""
                                     + popt[i] + "\"");
+                }
             }
         }
 
@@ -306,11 +316,9 @@ public class Packager
         // REQUIRED: sourceFile, ePerson (-e), packageType (-t)
         if (sourceFile == null || eperson == null || myPackager.packageType == null)
         {
-            System.err
-                    .println("Error - missing a REQUIRED argument or option.\n");
+            System.err.println("Error - missing a REQUIRED argument or option.\n");
             HelpFormatter myhelp = new HelpFormatter();
-            myhelp.printHelp("PackageManager  [options]  package-file|-\n",
-                    options);
+            myhelp.printHelp("PackageManager  [options]  package-file|-\n", options);
             System.exit(0);
         }
 
@@ -526,11 +534,15 @@ public class Packager
                     for(DSpaceObject result : dsoResults)
                     {
                         if(pkgParams.restoreModeEnabled())
+                        {
                             System.out.println("RESTORED DSpace " + Constants.typeText[result.getType()] +
                                     " [ hdl=" + result.getHandle() + ", dbID=" + result.getID() + " ] ");
+                        }
                         else
+                        {
                             System.out.println("CREATED new DSpace " + Constants.typeText[result.getType()] +
                                     " [ hdl=" + result.getHandle() + ", dbID=" + result.getID() + " ] ");
+                        }
                     }
                 }
 
@@ -548,11 +560,15 @@ public class Packager
                 if(dso!=null)
                 {
                     if(pkgParams.restoreModeEnabled())
+                    {
                         System.out.println("RESTORED DSpace " + Constants.typeText[dso.getType()] +
                                 " [ hdl=" + dso.getHandle() + ", dbID=" + dso.getID() + " ] ");
+                    }
                     else
+                    {
                         System.out.println("CREATED new DSpace " + Constants.typeText[dso.getType()] +
                                 " [ hdl=" + dso.getHandle() + ", dbID=" + dso.getID() + " ] ");
+                    }
                 }
             }
             catch(IllegalStateException ie)
@@ -566,7 +582,9 @@ public class Packager
                     System.out.println("\nSKIPPED processing package '" + pkgFile + "', as an Object already exists with this handle.");
                 }
                 else // Pass this exception on -- which essentially causes a full rollback of all changes (this is the default)
+                {
                     throw ie;
+                }
             }
 
         }

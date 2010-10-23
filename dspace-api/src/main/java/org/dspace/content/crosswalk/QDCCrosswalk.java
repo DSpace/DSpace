@@ -449,8 +449,10 @@ public class QDCCrosswalk extends SelfNamedPlugin
             String key = makeQualifiedTagName(me);
 
             // if the root element gets passed here, recurse:
-            if (me.getName().equals("qualifieddc"))
+            if ("qualifieddc".equals(me.getName()))
+            {
                 ingest(context, dso, me.getChildren());
+            }
 
             else if (element2qdc.containsKey(key))
             {
@@ -462,14 +464,22 @@ public class QDCCrosswalk extends SelfNamedPlugin
                     lang = me.getAttributeValue("lang");
 
                 if (qdc.length == 3)
+                {
                     item.addMetadata(qdc[0], qdc[1], qdc[2], lang, me.getText());
+                }
                 else if (qdc.length == 2)
-                    item.addMetadata(qdc[0], qdc[1], null,   lang, me.getText());
+                {
+                    item.addMetadata(qdc[0], qdc[1], null, lang, me.getText());
+                }
                 else
-                    throw new CrosswalkInternalException("Unrecognized format in QDC element identifier for key=\""+key+"\", qdc=\""+(String)element2qdc.get(key)+"\"");
+                {
+                    throw new CrosswalkInternalException("Unrecognized format in QDC element identifier for key=\"" + key + "\", qdc=\"" + (String) element2qdc.get(key) + "\"");
+                }
             }
             else
-                log.warn("WARNING: "+myName+": No mapping for Element=\"" + key+"\" to qdc.");
+            {
+                log.warn("WARNING: " + myName + ": No mapping for Element=\"" + key + "\" to qdc.");
+            }
         }
     }
 
