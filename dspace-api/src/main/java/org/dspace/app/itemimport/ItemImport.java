@@ -53,6 +53,7 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.lang.StringUtils;
 import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -973,7 +974,7 @@ public class ItemImport
         }
 
         // if language isn't set, use the system's default value
-        if (language.equals(""))
+        if (StringUtils.isEmpty(language))
         {
             language = ConfigurationManager.getProperty("default.language");
         }

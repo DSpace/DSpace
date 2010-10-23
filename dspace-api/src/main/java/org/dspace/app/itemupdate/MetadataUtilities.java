@@ -272,7 +272,7 @@ public class MetadataUtilities {
 	        	language = language.trim();
 	        }
 
-	        if (qualifier.equals("none") || "".equals(qualifier))
+	        if ("none".equals(qualifier) || "".equals(qualifier))
 	        {
 	            qualifier = null;
 	        }

@@ -693,47 +693,47 @@ public class ReportGenerator
             
             // if the line is real, then we carry on
             // read the analysis contents in
-            if (section.equals("archive"))
+            if ("archive".equals(section))
             {
                 archiveStats.put(key, value);
             }
-            else if (section.equals("action"))
+            else if ("action".equals(section))
             {
                 actionAggregator.put(key, value);
             }
-            else if (section.equals("user"))
+            else if ("user".equals(section))
             {
                 userAggregator.put(key, value);
             }
-            else if (section.equals("search"))
+            else if ("search".equals(section))
             {
                 searchAggregator.put(key, value);
             }
-            else if (section.equals("item"))
+            else if ("item".equals(section))
             {
                 itemAggregator.put(key, value);
             }
-            else if (section.equals("user_email"))
+            else if ("user_email".equals(section))
             {
                 userEmail = value;
             }
-            else if (section.equals("item_floor"))
+            else if ("item_floor".equals(section))
             {
                 itemFloor = Integer.parseInt(value);
             }
-            else if (section.equals("search_floor"))
+            else if ("search_floor".equals(section))
             {
                 searchFloor = Integer.parseInt(value);
             }
-            else if (section.equals("host_url"))
+            else if ("host_url".equals(section))
             {
                 url = value;
             }
-            else if (section.equals("item_lookup"))
+            else if ("item_lookup".equals(section))
             {
                 itemLookup = Integer.parseInt(value);
             }
-            else if (section.equals("avg_item_views"))
+            else if ("avg_item_views".equals(section))
             {
                 try 
                 {
@@ -744,35 +744,35 @@ public class ReportGenerator
                     avgItemViews = 0;
                 }
             }
-            else if (section.equals("server_name"))
+            else if ("server_name".equals(section))
             {
                 serverName = value;
             }
-            else if (section.equals("service_name"))
+            else if ("service_name".equals(section))
             {
                 name = value;
             }
-            else if (section.equals("start_date"))
+            else if ("start_date".equals(section))
             {
                 startDate = sdf.parse(value);
             }
-            else if (section.equals("end_date"))
+            else if ("end_date".equals(section))
             {
                 endDate = sdf.parse(value);
             }
-            else if (section.equals("analysis_process_time"))
+            else if ("analysis_process_time".equals(section))
             {
                 processTime = Integer.parseInt(value);
             }
-            else if (section.equals("general_summary"))
+            else if ("general_summary".equals(section))
             {
                 generalSummary.add(value);
             }
-            else if (section.equals("log_lines"))
+            else if ("log_lines".equals(section))
             {
                 logLines = Integer.parseInt(value);
             }
-            else if (section.equals("warnings"))
+            else if ("warnings".equals(section))
             {
                 warnings = Integer.parseInt(value);
             }

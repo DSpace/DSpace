@@ -46,6 +46,7 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 
+import org.apache.commons.lang.StringUtils;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
@@ -213,7 +214,7 @@ public class CreateAdministrator
                 password2 = password2.trim();
             }
     		
-    		if (!password1.equals("") && password1.equals(password2))
+    		if (!StringUtils.isEmpty(password1) && StringUtils.equals(password1, password2))
     		{
     			// password OK
     			System.out.print("Is the above data correct? (y or n): ");
@@ -224,12 +225,11 @@ public class CreateAdministrator
                 if (s != null)
                 {
                     s = s.trim();
+                    if (s.toLowerCase().startsWith("y"))
+                    {
+                        dataOK = true;
+                    }
                 }
-    			
-    			if (s.toLowerCase().startsWith("y"))
-    			{
-    				dataOK = true;
-    			}
     		}
     		else
     		{

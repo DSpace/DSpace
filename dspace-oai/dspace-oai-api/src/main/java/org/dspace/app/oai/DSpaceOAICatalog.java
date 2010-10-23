@@ -136,7 +136,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
             context = new Context();
 
             // Valid identifiers all have prefix "oai:hostname:"
-            if (identifier.startsWith(OAI_ID_PREFIX))
+            if (identifier != null && identifier.startsWith(OAI_ID_PREFIX))
             {
                 itemInfo = Harvest.getSingle(context, identifier
                         .substring(OAI_ID_PREFIX.length()), // Strip prefix to
@@ -357,7 +357,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
         try
         {
             // Valid IDs start with oai:hostname:
-            if (identifier.startsWith(OAI_ID_PREFIX))
+            if (identifier != null && identifier.startsWith(OAI_ID_PREFIX))
             {
                 context = new Context();
 

@@ -61,7 +61,7 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
      * @return Solr date filter expression
      */
     public String toQuery() {
-        if(startDate == null && endDate == null){
+        if(startDate == null || endDate == null){
             // We have got strings instead of dates so calculate our dates out
             // of these strings
             Calendar startCal = Calendar.getInstance();
@@ -86,21 +86,27 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
 
             Calendar endCal = (Calendar) startCal.clone();
 
-            if(startStr.startsWith("+"))
+            if (startDate == null)
             {
-                startStr = startStr.substring(startStr.indexOf('+') + 1);
+                if(startStr.startsWith("+"))
+                {
+                    startStr = startStr.substring(startStr.indexOf('+') + 1);
+                }
+
+                startCal.add(dateType, Integer.parseInt(startStr));
+                startDate = startCal.getTime();
             }
 
-            if(endStr.startsWith("+"))
+            if (endDate == null)
             {
-                endStr = endStr.substring(endStr.indexOf('+') + 1);
+                if(endStr.startsWith("+"))
+                {
+                    endStr = endStr.substring(endStr.indexOf('+') + 1);
+                }
+
+                endCal.add(dateType, Integer.parseInt(endStr));
+                endDate = endCal.getTime();
             }
-
-            startCal.add(dateType, Integer.parseInt(startStr));
-            endCal.add(dateType, Integer.parseInt(endStr));
-
-            startDate = startCal.getTime();
-            endDate = endCal.getTime();
         }
 
         //Parse the dates

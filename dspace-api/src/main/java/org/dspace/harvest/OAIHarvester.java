@@ -686,27 +686,29 @@ public class OAIHarvester {
     				throw new HarvestingException("The '" + value.schema + "' schema has not been defined in this DSpace instance. ");
     			}
     		}
-    		
-    		// Verify that the element exists; this part is reachable only if the metadata schema is valid
-    		MetadataField mdField = MetadataField.findByElement(ourContext, mdSchema.getSchemaID(), value.element, value.qualifier);
-    		if (mdField == null) {
-    			if (fieldChoice.equals("add")) {
-    				mdField = new MetadataField(mdSchema, value.element, value.qualifier, null);
-    				try {
-						mdField.create(ourContext);
-						mdField.update(ourContext);
-					} catch (NonUniqueMetadataException e) {
-						// This case should also not be possible
-						e.printStackTrace();
-					}
-    			}
-    			else if (fieldChoice.equals("ignore")) {
-    				item.clearMetadata(value.schema, value.element, value.qualifier, Item.ANY);
-    			}
-    			else {
-    				throw new HarvestingException("The '" + value.element + "." + value.qualifier + "' element has not been defined in this DSpace instance. ");
-    			}
-    		}
+
+            if (mdSchema != null) {
+                // Verify that the element exists; this part is reachable only if the metadata schema is valid
+                MetadataField mdField = MetadataField.findByElement(ourContext, mdSchema.getSchemaID(), value.element, value.qualifier);
+                if (mdField == null) {
+                    if (fieldChoice.equals("add")) {
+                        mdField = new MetadataField(mdSchema, value.element, value.qualifier, null);
+                        try {
+                            mdField.create(ourContext);
+                            mdField.update(ourContext);
+                        } catch (NonUniqueMetadataException e) {
+                            // This case should also not be possible
+                            e.printStackTrace();
+                        }
+                    }
+                    else if (fieldChoice.equals("ignore")) {
+                        item.clearMetadata(value.schema, value.element, value.qualifier, Item.ANY);
+                    }
+                    else {
+                        throw new HarvestingException("The '" + value.element + "." + value.qualifier + "' element has not been defined in this DSpace instance. ");
+                    }
+                }
+            }
     	}
     	
     	return;    	

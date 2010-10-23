@@ -883,7 +883,7 @@ implements TreeSelectionListener
             {
                Collection col = (Collection)data;
                String location = col.getLocation();
-               if( location != null & location.equals(url))
+               if( location != null && location.equals(url))
                {
                   newParentNode = node; 
                   break;

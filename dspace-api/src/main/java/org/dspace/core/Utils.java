@@ -47,6 +47,7 @@ import java.rmi.dgc.VMID;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -230,7 +231,7 @@ public class Utils
         random.nextBytes(junk);
 
         String input = new StringBuffer().append(vmid).append(
-                new java.util.Date()).append(junk).append(counter++).toString();
+                new java.util.Date()).append(Arrays.toString(junk)).append(counter++).toString();
 
         return getMD5Bytes(input.getBytes());
     }
