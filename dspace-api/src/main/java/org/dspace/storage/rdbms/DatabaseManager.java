@@ -695,11 +695,15 @@ public class DatabaseManager
         {
             // Get an ID (primary key) for this row by using the "getnextid"
             // SQL function in Postgres, or directly with sequences in Oracle
-            String myQuery = "SELECT getnextid('" + table + "') AS result";
+            String myQuery;
 
             if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
             {
                 myQuery = "SELECT " + table + "_seq" + ".nextval FROM dual";
+            }
+            else
+            {
+                myQuery = "SELECT getnextid('" + table + "') AS result";
             }
 
             statement = context.getDBConnection().createStatement();

@@ -39,6 +39,7 @@
  */
 package org.dspace.app.webui.jsptag;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.UIUtil;
@@ -693,7 +694,7 @@ public class BrowseListTag extends TagSupport
      */
     public void setItems(BrowseItem[] itemsIn)
     {
-        items = itemsIn;
+        items = (BrowseItem[]) ArrayUtils.clone(itemsIn);
     }
 
     /**

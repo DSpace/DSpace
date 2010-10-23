@@ -37,6 +37,8 @@
  */
 package org.dspace.content.authority;
 
+import org.apache.commons.lang.ArrayUtils;
+
 /**
  * Record class to hold a set of Choices returned by an authority in response
  * to a search.
@@ -129,7 +131,7 @@ public class Choices
     public Choices(Choice values[], int start, int total, int confidence, boolean more)
     {
         super();
-        this.values = values;
+        this.values = (Choice[]) ArrayUtils.clone(values);
         this.start = start;
         this.total = total;
         this.confidence = confidence;
@@ -142,7 +144,7 @@ public class Choices
     public Choices(Choice values[], int start, int total, int confidence, boolean more, int defaultSelected)
     {
         super();
-        this.values = values;
+        this.values = (Choice[]) ArrayUtils.clone(values);
         this.start = start;
         this.total = total;
         this.confidence = confidence;

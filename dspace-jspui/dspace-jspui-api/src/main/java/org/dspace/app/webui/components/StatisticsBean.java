@@ -10,6 +10,8 @@
  */
 
 package org.dspace.app.webui.components;
+import org.apache.commons.lang.ArrayUtils;
+
 import java.util.List;
 /**
  *
@@ -67,7 +69,7 @@ public class StatisticsBean implements java.io.Serializable
     }
     public void setMatrix(final String[][] matrix)
     {
-        this.matrix = matrix;
+        this.matrix = (String[][]) ArrayUtils.clone(matrix);
     }
 }
 

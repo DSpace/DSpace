@@ -40,6 +40,7 @@ package org.dspace.text.filter;
 
 import java.util.*;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.core.ConfigurationManager;
 
@@ -348,7 +349,7 @@ public class MARC21InitialArticleWord extends InitialArticleWord
         ArticlesForLang(Language lang, String[] words)
         {
            this.lang  = lang;
-           this.words = words;
+           this.words = (String[]) ArrayUtils.clone(words);
         }
     }
     

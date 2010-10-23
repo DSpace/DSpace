@@ -47,6 +47,7 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.dspace.content.Collection;
 
 /**
@@ -132,7 +133,7 @@ public class CollectionListTag extends TagSupport
      */
     public void setCollections(Collection[] collectionsIn)
     {
-        collections = collectionsIn;
+        collections = (Collection[]) ArrayUtils.clone(collectionsIn);
     }
 
     public void release()

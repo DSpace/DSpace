@@ -47,6 +47,7 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.dspace.content.Community;
 
 /**
@@ -132,7 +133,7 @@ public class CommunityListTag extends TagSupport
      */
     public void setCommunities(Community[] communitiesIn)
     {
-        communities = communitiesIn;
+        communities = (Community[]) ArrayUtils.clone(communitiesIn);
     }
 
     public void release()

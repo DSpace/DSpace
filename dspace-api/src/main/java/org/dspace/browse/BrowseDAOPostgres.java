@@ -41,6 +41,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -617,7 +618,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      */
     public void setCountValues(String[] fields)
     {
-        this.countValues = fields;
+        this.countValues = (String[]) ArrayUtils.clone(fields);
         this.rebuildQuery = true;
     }
 
@@ -689,7 +690,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      */
     public void setSelectValues(String[] selectValues)
     {
-        this.selectValues = selectValues;
+        this.selectValues = (String[]) ArrayUtils.clone(selectValues);
         this.rebuildQuery = true;
     }
 

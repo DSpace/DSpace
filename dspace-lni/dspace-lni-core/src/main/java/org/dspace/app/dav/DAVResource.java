@@ -55,6 +55,7 @@ import java.util.regex.Pattern;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -191,7 +192,7 @@ abstract class DAVResource
     protected DAVResource(Context context, HttpServletRequest request,
             HttpServletResponse response, String pathElt[])
     {
-        this.pathElt = pathElt;
+        this.pathElt = (String[]) ArrayUtils.clone(pathElt);
         this.request = request;
         this.response = response;
         this.context = context;

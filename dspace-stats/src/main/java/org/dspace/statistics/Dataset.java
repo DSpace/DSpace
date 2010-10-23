@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.Ostermiller.util.ExcelCSVPrinter;
+import org.apache.commons.lang.ArrayUtils;
 
 /**
  * 
@@ -58,7 +59,7 @@ public class Dataset {
     }
 
     public Dataset(float[][] matrix){
-        this.matrix = matrix;
+        this.matrix = (float[][]) ArrayUtils.clone(matrix);
         nbRows = matrix.length;
         if(0 < matrix.length && 0 < matrix[0].length)
             nbCols = matrix[0].length;

@@ -55,6 +55,7 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.MetadataExposure;
 import org.dspace.app.webui.util.StyleSelection;
@@ -345,7 +346,7 @@ public class ItemTag extends TagSupport
      */
     public void setCollections(Collection[] collectionsIn)
     {
-        collections = collectionsIn;
+        collections = (Collection[]) ArrayUtils.clone(collectionsIn);
     }
 
     /**

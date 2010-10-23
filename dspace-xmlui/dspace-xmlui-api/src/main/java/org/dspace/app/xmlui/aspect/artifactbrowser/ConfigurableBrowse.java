@@ -234,8 +234,11 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             {
                 // Just ignore all errors and return an invalid cache.
             }
-            
-            log.info(LogManager.getHeader(context, "browse", this.validity.toString()));
+
+            if (this.validity != null)
+            {
+                log.info(LogManager.getHeader(context, "browse", this.validity.toString()));
+            }
         }
         
         return this.validity;

@@ -39,6 +39,7 @@
  */
 package org.dspace.app.webui.components;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.dspace.content.Item;
 
 
@@ -62,7 +63,7 @@ public class RecentSubmissions
 	 */
 	public RecentSubmissions(Item[] items)
 	{
-		this.items = items;
+		this.items = (Item[]) ArrayUtils.clone(items);
 	}
 
 	/**
