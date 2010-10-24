@@ -193,7 +193,7 @@ public class BrowseEngine
         dao.setOrderField(orderBy);
 
         // now run the query
-        List results = dao.doQuery();
+        List<BrowseItem> results = dao.doQuery();
 
         // construct the mostly empty BrowseInfo object to pass back
         BrowseInfo browseInfo = new BrowseInfo(results, 0, scope.getResultsPerPage(), 0);
@@ -326,7 +326,7 @@ public class BrowseEngine
             dao.setLimit(scope.getResultsPerPage());
 
             // Holder for the results
-            List results = null;
+            List<BrowseItem> results = null;
 
             // Does this browse have any contents?
             if (total > 0)
@@ -354,7 +354,7 @@ public class BrowseEngine
             else
             {
                 // No records, so make an empty list
-                results = new ArrayList();
+                results = new ArrayList<BrowseItem>();
             }
 
             // construct the BrowseInfo object to pass back
@@ -501,7 +501,7 @@ public class BrowseEngine
             dao.setLimit(scope.getResultsPerPage());
 
             // Holder for the results
-            List results = null;
+            List<String[]> results = null;
 
             // Does this browse have any contents?
             if (total > 0)
@@ -529,7 +529,7 @@ public class BrowseEngine
             else
             {
                 // No records, so make an empty list
-                results = new ArrayList();
+                results = new ArrayList<String[]>();
             }
 
             // construct the BrowseInfo object to pass back
@@ -869,7 +869,7 @@ public class BrowseEngine
      * @throws SQLException
      * @throws BrowseException
      */
-    private int getPreviousPageID(List callback)
+    private int getPreviousPageID(List<BrowseItem> callback)
         throws SQLException, BrowseException
     {
         log.debug(LogManager.getHeader(context, "get_previous_page_id", ""));
@@ -910,14 +910,14 @@ public class BrowseEngine
 
         // now we have a query which is exactly the opposite of the
         // original query.  So lets execute it:
-        List results = dao.doQuery();
+        List<BrowseItem> results = dao.doQuery();
 
         // before we continue, put back the variables we messed with
         dao.setAscending(isAscending);
         dao.setEqualsComparator(useEquals);
         dao.setLimit(resultLimit);
 
-        Iterator itr = results.iterator();
+        Iterator<BrowseItem> itr = results.iterator();
 
         // work our way through the list, capturing if necessary, and finally
         // having the last result, which will be the top of the previous page
@@ -925,7 +925,7 @@ public class BrowseEngine
         BrowseItem prev = null;
         while (itr.hasNext())
         {
-            BrowseItem browseItem = (BrowseItem) itr.next();
+            BrowseItem browseItem = itr.next();
 
             // we need to copy this, because of the scoping vs by-reference issue
             prev = browseItem;
@@ -966,7 +966,7 @@ public class BrowseEngine
      * @throws SQLException
      * @throws BrowseException
      */
-    private String getPreviousPageValue(List callback)
+    private String getPreviousPageValue(List<String> callback)
         throws SQLException, BrowseException
     {
         // do we want to capture the results?
@@ -1007,25 +1007,21 @@ public class BrowseEngine
 
         // now we have a query which is exactly the opposite of the
         // original query.  So lets execute it:
-        List results = dao.doValueQuery();
+        List<String[]> results = dao.doValueQuery();
 
         // before we continue, put back the variables we messed with
         dao.setAscending(isAscending);
         dao.setEqualsComparator(useEquals);
         dao.setLimit(resultLimit);
 
-        Iterator itr = results.iterator();
-
         // work our way through the list, capturing if necessary, and finally
         // having the last result, which will be the top of the previous page
         int i = 0;
         String prev = null;
-        while (itr.hasNext())
+        for (String[] value : results)
         {
-            String value = (String) itr.next();
-
             // we need to copy this, because of the scoping vs by-reference issue
-            prev = value;
+            prev = value[0];
 
             // if we need to capture the results in the call back, do it here.
             // Note that since the results will come in backwards, we place
@@ -1035,7 +1031,7 @@ public class BrowseEngine
             // of results (see note above about limit)
             if (capture && i < scope.getResultsPerPage())
             {
-                callback.add(0, value);
+                callback.add(0, value[0]);
                 i++;
             }
         }

@@ -69,7 +69,7 @@ public class BrowseItem extends DSpaceObject
 	private Context context;
 	
 	/** a List of all the metadata */
-	private List metadata = new ArrayList();
+	private List<DCValue> metadata = new ArrayList<DCValue>();
 	
 	/** database id of the item */
 	private int id = -1;
@@ -128,12 +128,12 @@ public class BrowseItem extends DSpaceObject
 
             if (!metadata.isEmpty())
             {
-                List values = new ArrayList();
-                Iterator i = metadata.iterator();
+                List<DCValue> values = new ArrayList<DCValue>();
+                Iterator<DCValue> i = metadata.iterator();
 
                 while (i.hasNext())
                 {
-                    DCValue dcv = (DCValue) i.next();
+                    DCValue dcv = i.next();
 
                     if (match(schema, element, qualifier, lang, dcv))
                     {

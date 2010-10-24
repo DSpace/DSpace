@@ -84,7 +84,7 @@ public interface BrowseDAO
      * @return  List of Strings representing the single value query results
      * @throws BrowseException
      */
-    public List doValueQuery() throws BrowseException;
+    public List<String[]> doValueQuery() throws BrowseException;
 
     /**
      * This executes a query which returns a List object containing BrowseItem objects
@@ -93,7 +93,7 @@ public interface BrowseDAO
      * @return  List of BrowseItem objects
      * @throws BrowseException
      */
-    public List doQuery() throws BrowseException;
+    public List<BrowseItem> doQuery() throws BrowseException;
 
     /**
      * This executes a query which returns the value of the "highest" (max) value

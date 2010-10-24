@@ -37,6 +37,7 @@
  */
 package org.dspace.browse;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -134,7 +135,7 @@ public class BrowseDAOPostgres implements BrowseDAO
 
     /** a cache of the actual query to be executed */
     private String querySql    = "";
-    private List   queryParams = new ArrayList();
+    private List<Serializable> queryParams = new ArrayList<Serializable>();
 
     /** whether the query (above) needs to be regenerated */
     private boolean rebuildQuery = true;
@@ -259,7 +260,7 @@ public class BrowseDAOPostgres implements BrowseDAO
 
         try
         {
-            List paramsList = new ArrayList();
+            List<Serializable> paramsList = new ArrayList<Serializable>();
             StringBuffer queryBuf = new StringBuffer();
 
             queryBuf.append("COUNT(").append(column).append(") AS offset ");
@@ -318,7 +319,7 @@ public class BrowseDAOPostgres implements BrowseDAO
 
         try
         {
-            List paramsList = new ArrayList();
+            List<Serializable> paramsList = new ArrayList<Serializable>();
             StringBuffer queryBuf = new StringBuffer();
 
             queryBuf.append("COUNT(").append(column).append(") AS offset ");
@@ -370,7 +371,7 @@ public class BrowseDAOPostgres implements BrowseDAO
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseDAO#doQuery()
      */
-    public List doQuery()
+    public List<BrowseItem> doQuery()
         throws BrowseException
     {
         String query = getQuery();
@@ -388,7 +389,7 @@ public class BrowseDAOPostgres implements BrowseDAO
             tri = DatabaseManager.query(context, query, params);
 
             // go over the query results and process
-            List results = new ArrayList();
+            List<BrowseItem> results = new ArrayList<BrowseItem>();
             while (tri.hasNext())
             {
                 TableRow row = tri.next();
@@ -417,7 +418,7 @@ public class BrowseDAOPostgres implements BrowseDAO
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseDAO#doValueQuery()
      */
-    public List doValueQuery()
+    public List<String[]> doValueQuery()
         throws BrowseException
     {
         String query = getQuery();
@@ -432,7 +433,7 @@ public class BrowseDAOPostgres implements BrowseDAO
             tri = DatabaseManager.query(context, query, params);
 
             // go over the query results and process
-            List results = new ArrayList();
+            List<String[]> results = new ArrayList<String[]>();
             while (tri.hasNext())
             {
                 TableRow row = tri.next();
@@ -770,7 +771,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      * @return      the query to be executed
      * @throws BrowseException
      */
-    private String buildDistinctQuery(List params)
+    private String buildDistinctQuery(List<Serializable> params)
         throws BrowseException
     {
         StringBuffer queryBuf = new StringBuffer();
@@ -811,7 +812,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      * @return      the query to be executed
      * @throws BrowseException
      */
-    private String buildQuery(List params)
+    private String buildQuery(List<Serializable> params)
         throws BrowseException
     {
         StringBuffer queryBuf = new StringBuffer();
@@ -886,7 +887,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      *
      * @return  the limit clause
      */
-    private void buildRowLimitAndOffset(StringBuffer queryBuf, List params)
+    private void buildRowLimitAndOffset(StringBuffer queryBuf, List<Serializable> params)
     {
         // prepare the LIMIT clause
         if (limit > 0)
@@ -911,7 +912,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      * @param queryBuf
      * @param params
      */
-    private void buildFocusedSelectClauses(StringBuffer queryBuf, List params)
+    private void buildFocusedSelectClauses(StringBuffer queryBuf, List<Serializable> params)
     {
         if (tableMap != null && tableDis != null)
         {
@@ -1085,7 +1086,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      * @param queryBuf  the string value obtained from distinctClause, countClause or selectValues
      * @return  the SELECT part of the query
      */
-    private void buildSelectStatement(StringBuffer queryBuf, List params) throws BrowseException
+    private void buildSelectStatement(StringBuffer queryBuf, List<Serializable> params) throws BrowseException
     {
         if (queryBuf.length() == 0)
         {
@@ -1135,7 +1136,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      * @param queryBuf  the string value obtained from distinctClause, countClause or selectValues
      * @return  the SELECT part of the query
      */
-    private void buildSelectStatementDistinct(StringBuffer queryBuf, List params) throws BrowseException
+    private void buildSelectStatementDistinct(StringBuffer queryBuf, List<Serializable> params) throws BrowseException
     {
         if (queryBuf.length() == 0)
         {
@@ -1178,7 +1179,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      *
      * @return  the sub-query
      */
-    private void buildWhereClauseDistinctConstraints(StringBuffer queryBuf, List params)
+    private void buildWhereClauseDistinctConstraints(StringBuffer queryBuf, List<Serializable> params)
     {
         // add the constraint to community or collection if necessary
         // and desired
@@ -1205,7 +1206,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      *
      * @return  the focus clause
      */
-    private void buildWhereClauseJumpTo(StringBuffer queryBuf, List params)
+    private void buildWhereClauseJumpTo(StringBuffer queryBuf, List<Serializable> params)
     {
         // get the operator (<[=] | >[=]) which the focus of the browse will
         // be matched using
@@ -1246,7 +1247,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      *
      * @return  the constraint clause
      */
-    private void buildWhereClauseFullConstraints(StringBuffer queryBuf, List params)
+    private void buildWhereClauseFullConstraints(StringBuffer queryBuf, List<Serializable> params)
     {
         // add the constraint to community or collection if necessary
         // and desired
@@ -1276,7 +1277,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      *
      * @return  the value clause
      */
-    private void buildWhereClauseFilterValue(StringBuffer queryBuf, List params)
+    private void buildWhereClauseFilterValue(StringBuffer queryBuf, List<Serializable> params)
     {
         // assemble the value clause if we are to have one
         if (value != null && valueField != null)
