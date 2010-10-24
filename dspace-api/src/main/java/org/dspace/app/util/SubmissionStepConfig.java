@@ -119,15 +119,15 @@ public class SubmissionStepConfig implements Serializable
      *            the HashMap containing all required information about this
      *            step
      */
-    public SubmissionStepConfig(Map stepMap)
+    public SubmissionStepConfig(Map<String, String> stepMap)
     {
-        id = (String) stepMap.get("id");
-        heading = (String) stepMap.get("heading");
-        processingClassName = (String) stepMap.get("processing-class");
-        jspBindingClassName = (String) stepMap.get("jspui-binding");
-        xmlBindingClassName = (String) stepMap.get("xmlui-binding");
+        id = stepMap.get("id");
+        heading = stepMap.get("heading");
+        processingClassName = stepMap.get("processing-class");
+        jspBindingClassName = stepMap.get("jspui-binding");
+        xmlBindingClassName = stepMap.get("xmlui-binding");
 
-        String wfEditString = (String) stepMap.get("workflow-editable");
+        String wfEditString = stepMap.get("workflow-editable");
         if (wfEditString != null && wfEditString.length() > 0)
         {
             workflowEditable = Boolean.parseBoolean(wfEditString);

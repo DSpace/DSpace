@@ -88,7 +88,7 @@ public class SubmissionConfig implements Serializable
      *            not. If it is a workflow process this may limit the steps that
      *            are available for editing.
      */
-    public SubmissionConfig(String submissionName, List<Map> steps,
+    public SubmissionConfig(String submissionName, List<Map<String, String>> steps,
             boolean isWorkflowProcess)
     {
         this.submissionName = submissionName;

@@ -96,19 +96,19 @@ public class SubmissionConfigReader
      * which collection, computed from the item submission config file
      * (specifically, the 'submission-map' tag)
      */
-    private Map collectionToSubmissionConfig = null;
+    private Map<String, String> collectionToSubmissionConfig = null;
 
     /**
      * Reference to the global submission step definitions defined in the
      * "step-definitions" section
      */
-    private Map<String, Map> stepDefns = null;
+    private Map<String, Map<String, String>> stepDefns = null;
 
     /**
      * Reference to the item submission definitions defined in the
      * "submission-definitions" section
      */
-    private Map<String, List<Map>> submitDefns = null;
+    private Map<String, List<Map<String, String>>> submitDefns = null;
 
     /**
      * Mini-cache of last SubmissionConfig object requested (so that we don't
@@ -138,8 +138,8 @@ public class SubmissionConfigReader
      */
     private void buildInputs(String fileName) throws ServletException
     {
-        collectionToSubmissionConfig = new HashMap();
-        submitDefns = new HashMap<String, List<Map>>();
+        collectionToSubmissionConfig = new HashMap<String, String>();
+        submitDefns = new HashMap<String, List<Map<String, String>>>();
 
         String uri = "file:" + new File(fileName).getAbsolutePath();
 
@@ -185,11 +185,11 @@ public class SubmissionConfigReader
             boolean isWorkflow) throws ServletException
     {
         // get the name of the submission process config for this collection
-        String submitName = (String) collectionToSubmissionConfig
+        String submitName = collectionToSubmissionConfig
                 .get(collectionHandle);
         if (submitName == null)
         {
-            submitName = (String) collectionToSubmissionConfig
+            submitName = collectionToSubmissionConfig
                     .get(DEFAULT_COLLECTION);
         }
         if (submitName == null)
@@ -213,7 +213,7 @@ public class SubmissionConfigReader
         }
 
         // cache miss - construct new SubmissionConfig
-        List<Map> steps = submitDefns.get(submitName);
+        List<Map<String, String>> steps = submitDefns.get(submitName);
 
         if (steps == null)
         {
@@ -255,7 +255,7 @@ public class SubmissionConfigReader
         if (stepDefns != null)
         {
             // retreive step info
-            Map stepInfo = stepDefns.get(stepID);
+            Map<String, String> stepInfo = stepDefns.get(stepID);
 
             if (stepInfo != null)
             {
@@ -373,7 +373,7 @@ public class SubmissionConfigReader
     private void processStepDefinition(Node e) throws SAXException,
             ServletException
     {
-        stepDefns = new HashMap<String, Map>();
+        stepDefns = new HashMap<String, Map<String, String>>();
 
         NodeList nl = e.getChildNodes();
         int len = nl.getLength();
@@ -395,7 +395,7 @@ public class SubmissionConfigReader
                             "There are two step elements with the id '" + stepID + "' in 'item-submission.xml'");
                 }
 
-                Map stepInfo = processStepChildNodes("step-definition", nd);
+                Map<String, String> stepInfo = processStepChildNodes("step-definition", nd);
 
                 stepDefns.put(stepID, stepInfo);
             } // ignore any child that is not a 'step'
@@ -441,7 +441,7 @@ public class SubmissionConfigReader
             ServletException
     {
         int numSubmitProcesses = 0;
-        List submitNames = new ArrayList();
+        List<String> submitNames = new ArrayList<String>();
 
         // find all child nodes of the 'submission-definition' node and loop
         // through
@@ -470,7 +470,7 @@ public class SubmissionConfigReader
                 submitNames.add(submitName);
 
                 // the 'submission-process' definition contains steps
-                List steps = new ArrayList();
+                List<Map<String, String>> steps = new ArrayList<Map<String, String>>();
                 submitDefns.put(submitName, steps);
 
                 // loop through all the 'step' nodes of the 'submission-process'
@@ -486,7 +486,7 @@ public class SubmissionConfigReader
                         // check for an 'id' attribute
                         String stepID = getAttribute(nStep, "id");
 
-                        Map stepInfo;
+                        Map<String, String> stepInfo;
 
                         // if this step has an id, load its information from the
                         // step-definition section
@@ -496,7 +496,7 @@ public class SubmissionConfigReader
                             {
                                 // load the step information from the
                                 // step-definition
-                                stepInfo = (HashMap) stepDefns.get(stepID);
+                                stepInfo = stepDefns.get(stepID);
                             }
                             else
                             {
@@ -537,7 +537,7 @@ public class SubmissionConfigReader
                 // (from the 'step-definition' section)
                 // Note: we already did a sanity check that this "collection"
                 // step exists.
-                steps.add(0, (HashMap) stepDefns
+                steps.add(0, stepDefns
                         .get(SubmissionStepConfig.SELECT_COLLECTION_STEP));
 
                 // ALL Item Submission processes MUST END with the
@@ -546,7 +546,7 @@ public class SubmissionConfigReader
                 // (from the 'step-definition' section)
                 // Note: we already did a sanity check that this "complete"
                 // step exists.
-                steps.add((HashMap) stepDefns
+                steps.add(stepDefns
                         .get(SubmissionStepConfig.COMPLETE_STEP));
 
             }
@@ -564,11 +564,11 @@ public class SubmissionConfigReader
      * and the value is the field value.
      * 
      */
-    private Map processStepChildNodes(String configSection, Node nStep)
+    private Map<String, String> processStepChildNodes(String configSection, Node nStep)
             throws SAXException, ServletException
     {
         // initialize the HashMap of step Info
-        HashMap stepInfo = new HashMap();
+        Map<String, String> stepInfo = new HashMap<String, String>();
 
         NodeList flds = nStep.getChildNodes();
         int lenflds = flds.getLength();
