@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -217,7 +218,7 @@ public class BrowserServlet extends AbstractBrowserServlet
             // Export a browse view
             BrowseEngine be = new BrowseEngine(context);
             BrowseInfo binfo = be.browse(scope);
-            ArrayList iids = new ArrayList();
+            List<Integer> iids = new ArrayList<Integer>();
             for (BrowseItem bi : binfo.getBrowseItemResults())
             {
                 iids.add(bi.getID());

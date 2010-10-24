@@ -41,6 +41,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -95,7 +96,7 @@ public class MetadataExportServlet extends DSpaceServlet
             {
                 if (thing.getType() == Constants.ITEM)
                 {
-                    ArrayList item = new ArrayList();
+                    List<Integer> item = new ArrayList<Integer>();
                     item.add(thing.getID());
                     exporter = new MetadataExport(context, new ItemIterator(context, item), false);
                 }

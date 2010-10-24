@@ -91,7 +91,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
 
         if (action.equals("search"))
         {
-            List keywords = extractKeywords(request);
+            List<String> keywords = extractKeywords(request);
             String query = join(keywords, " or ");
             doSearch(context, request, query);
             JSPManager.showJSP(request, response, RESULTS_JSP);
@@ -116,9 +116,9 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
      *            The HttpServletRequest
      * @return A Vector with the selected terms from the taxonomy.
      */
-    private List extractKeywords(HttpServletRequest request)
+    private List<String> extractKeywords(HttpServletRequest request)
     {
-        List keywords = new ArrayList();
+        List<String> keywords = new ArrayList<String>();
         Enumeration enumeration = request.getParameterNames();
         while (enumeration.hasMoreElements())
         {
@@ -157,9 +157,9 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
             start = 0;
         }
 
-        List itemHandles = new ArrayList();
-        List collectionHandles = new ArrayList();
-        List communityHandles = new ArrayList();
+        List<String> itemHandles = new ArrayList<String>();
+        List<String> collectionHandles = new ArrayList<String>();
+        List<String> communityHandles = new ArrayList<String>();
 
         Item[] resultsItems;
         Collection[] resultsCollections;
@@ -263,7 +263,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
 
         for (int i = 0; i < numItems; i++)
         {
-            String myhandle = (String) itemHandles.get(i);
+            String myhandle = itemHandles.get(i);
 
             Object o = HandleManager.resolveToObject(context, myhandle);
 
@@ -278,7 +278,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
 
         for (int i = 0; i < collectionHandles.size(); i++)
         {
-            String myhandle = (String) collectionHandles.get(i);
+            String myhandle = collectionHandles.get(i);
 
             Object o = HandleManager.resolveToObject(context, myhandle);
 
@@ -293,7 +293,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
 
         for (int i = 0; i < communityHandles.size(); i++)
         {
-            String myhandle = (String) communityHandles.get(i);
+            String myhandle = communityHandles.get(i);
 
             Object o = HandleManager.resolveToObject(context, myhandle);
 
@@ -353,10 +353,10 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
      * @return A string with all the elements concatened and separated by the
      *         provided connector
      */
-    public static String join(List list, String separator)
+    public static String join(List<String> list, String separator)
     {
         String result = "";
-        Iterator iterator = list.listIterator();
+        Iterator<String> iterator = list.listIterator();
         while (iterator.hasNext())
         {
             result += iterator.next().toString();

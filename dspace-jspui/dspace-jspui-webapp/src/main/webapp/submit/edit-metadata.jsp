@@ -943,7 +943,7 @@
     {
                 DCValue[] unfiltered = item.getMetadata(schema, element, Item.ANY, Item.ANY);
                 // filter out both unqualified and qualified values occuring elsewhere in inputs
-                ArrayList filtered = new ArrayList();
+                List<DCValue> filtered = new ArrayList<DCValue>();
                 for (int i = 0; i < unfiltered.length; i++)
                 {
                     String unfilteredFieldName = unfiltered[i].element;
@@ -955,7 +955,7 @@
                                 filtered.add( unfiltered[i] );
                         }
                 }
-                DCValue[] defaults = (DCValue[])filtered.toArray(new DCValue[0]);
+                DCValue[] defaults = filtered.toArray(new DCValue[0]);
       //DCValue[] defaults = item.getMetadata(element, Item.ANY, Item.ANY);
       int fieldCount = defaults.length + fieldCountIncr;
       StringBuffer sb = new StringBuffer();

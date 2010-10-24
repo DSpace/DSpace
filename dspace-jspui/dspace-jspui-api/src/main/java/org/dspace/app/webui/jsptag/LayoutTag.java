@@ -170,8 +170,8 @@ public class LayoutTag extends TagSupport
 
         // These lists will contain titles and links to put in the location
         // bar
-        List parents = new ArrayList();
-        List parentLinks = new ArrayList();
+        List<String> parents = new ArrayList<String>();
+        List<String> parentLinks = new ArrayList<String>();
 
         if (locbar.equalsIgnoreCase("off"))
         {
@@ -320,7 +320,7 @@ public class LayoutTag extends TagSupport
         	
         	// build a list of link attributes for each link format
         	String[] formats = feedData.substring(feedData.indexOf(':')+1).split(",");
-        	List linkParts = new ArrayList();
+        	List<String> linkParts = new ArrayList<String>();
         	// each link has a mime-type, title, and format (used in href URL)
         	for (int i = 0; i < formats.length; i++)
         	{

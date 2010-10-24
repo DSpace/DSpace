@@ -46,6 +46,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.ServletException;
@@ -404,11 +405,11 @@ public class SimpleSearchServlet extends DSpaceServlet
 
             queryHash = qArgs.buildQueryMap(request);
 
-            Iterator i = queryHash.keySet().iterator();
+            Iterator<String> i = queryHash.keySet().iterator();
 
             while (i.hasNext())
             {
-                String key = (String) i.next();
+                String key = i.next();
                 String value = (String) queryHash.get(key);
 
                 request.setAttribute(key, value);
@@ -442,7 +443,7 @@ public class SimpleSearchServlet extends DSpaceServlet
         log.info(LogManager.getHeader(context, "metadataexport", "exporting_search"));
 
         // Export a search view
-        ArrayList iids = new ArrayList();
+        List<Integer> iids = new ArrayList<Integer>();
         for (Item item : items)
         {
             iids.add(item.getID());

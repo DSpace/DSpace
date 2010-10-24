@@ -139,7 +139,7 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
 
         try
         {
-            List monthsList = new ArrayList();
+            List<Date> monthsList = new ArrayList<Date>();
 
             Pattern monthly = Pattern.compile("report-([0-9][0-9][0-9][0-9]-[0-9]+)\\.html");
             Pattern general = Pattern.compile("report-general-([0-9]+-[0-9]+-[0-9]+)\\.html");
