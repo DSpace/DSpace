@@ -51,10 +51,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -427,20 +427,16 @@ public class ItemExport
     private static void writeMetadata(Context c, Item i, File destDir, boolean migrate)
             throws Exception
     {
-        // Build a list of schemas for the item
-        HashMap map = new HashMap();
-        DCValue[] dcorevalues = i.getMetadata(Item.ANY, Item.ANY, Item.ANY,
-                Item.ANY);
-        for (int ii = 0; ii < dcorevalues.length; ii++)
+        Set<String> schemas = new HashSet<String>();
+        DCValue[] dcValues = i.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        for (DCValue dcValue : dcValues)
         {
-            map.put(dcorevalues[ii].schema, null);
+            schemas.add(dcValue.schema);
         }
 
         // Save each of the schemas into it's own metadata file
-        Iterator iterator = map.keySet().iterator();
-        while (iterator.hasNext())
+        for (String schema : schemas)
         {
-            String schema = (String) iterator.next();
             writeMetadata(c, schema, i, destDir, migrate);
         }
     }

@@ -54,7 +54,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -84,19 +83,19 @@ public class ReportGenerator
     /////////////////
     
     /** aggregator for all actions performed in the system */
-    private static Map actionAggregator;
+    private static Map<String, String> actionAggregator;
     
     /** aggregator for all searches performed */
-    private static Map searchAggregator;
+    private static Map<String, String> searchAggregator;
     
     /** aggregator for user logins */
-    private static Map userAggregator;
+    private static Map<String, String> userAggregator;
     
     /** aggregator for item views */
-    private static Map itemAggregator;
+    private static Map<String, String> itemAggregator;
     
     /** aggregator for current archive state statistics */
-    private static Map archiveStats;
+    private static Map<String, String> archiveStats;
     
     
     //////////////////
@@ -143,7 +142,7 @@ public class ReportGenerator
     private static int warnings;
     
     /** the list of results to be displayed in the general summary */
-    private static List generalSummary;
+    private static List<String> generalSummary;
     
     //////////////////
     // regular expressions
@@ -160,7 +159,7 @@ public class ReportGenerator
    private static Calendar startTime = null;
    
    /** a map from log file action to human readable action */
-   private static Map actionMap = null;
+   private static Map<String, String> actionMap = null;
    
     /////////////////
     // report generator config data
@@ -275,15 +274,15 @@ public class ReportGenerator
         startTime = new GregorianCalendar();
              
         /** instantiate aggregators */
-        actionAggregator = new HashMap();
-        searchAggregator = new HashMap();
-        userAggregator = new HashMap();
-        itemAggregator = new HashMap();
-        archiveStats = new HashMap();
-        actionMap = new HashMap();
+        actionAggregator = new HashMap<String, String>();
+        searchAggregator = new HashMap<String, String>();
+        userAggregator = new HashMap<String, String>();
+        itemAggregator = new HashMap<String, String>();
+        archiveStats = new HashMap<String, String>();
+        actionMap = new HashMap<String, String>();
         
         /** instantite lists */
-        generalSummary = new ArrayList();
+        generalSummary = new ArrayList<String>();
                 
         // set the parameters for this analysis
         setParameters(myInput);
@@ -300,7 +299,7 @@ public class ReportGenerator
         
         // define our standard variables for re-use
         // FIXME: we probably don't need these once we've finished re-factoring
-        Iterator keys = null;
+        Iterator<String> keys = null;
         int i = 0;
         String explanation = null;
         int value;
@@ -312,13 +311,13 @@ public class ReportGenerator
         
         overview.setSectionHeader("General Overview");
         
-        Iterator summaryEntries = generalSummary.iterator();
+        Iterator<String> summaryEntries = generalSummary.iterator();
         while (summaryEntries.hasNext())
         {
-            String entry = (String) summaryEntries.next();
+            String entry = summaryEntries.next();
             if (actionAggregator.containsKey(entry))
             {
-                int count = Integer.parseInt((String) actionAggregator.get(entry));
+                int count = Integer.parseInt(actionAggregator.get(entry));
                 overview.add(new Stat(translate(entry), count));
             }
         }
@@ -350,9 +349,9 @@ public class ReportGenerator
         i = 0;
         while (keys.hasNext())
         {
-            String key = (String) keys.next();
+            String key = keys.next();
             String link = url + "handle/" + key;
-            value = Integer.parseInt((String) itemAggregator.get(key));
+            value = Integer.parseInt(itemAggregator.get(key));
             items[i] = new Stat(key, value, link);
             i++;
         }
@@ -489,16 +488,16 @@ public class ReportGenerator
      *
      * @return      a Statistics object containing all the relevant information
      */
-    public static Statistics prepareStats(Map aggregator, boolean sort, boolean translate)
+    public static Statistics prepareStats(Map<String, String> aggregator, boolean sort, boolean translate)
     {
         Stat[] stats = new Stat[aggregator.size()];
         if (aggregator.size() > 0)
         {
             int i = 0;
-            for (Map.Entry aggregatorEntry : (Set<Map.Entry>)aggregator.entrySet())
+            for (Map.Entry<String, String> aggregatorEntry : aggregator.entrySet())
             {
-                String key = (String) aggregatorEntry.getKey();
-                int value = Integer.parseInt((String) aggregatorEntry.getValue());
+                String key = aggregatorEntry.getKey();
+                int value = Integer.parseInt(aggregatorEntry.getValue());
                 if (translate)
                 {
                     stats[i] = new Stat(translate(key), value);
@@ -538,7 +537,7 @@ public class ReportGenerator
     {
         if (actionMap.containsKey(text))
         {
-            return (String) actionMap.get(text);
+            return actionMap.get(text);
         }
         else
         {

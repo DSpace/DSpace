@@ -99,13 +99,13 @@ public class DCInputsReader
      * Reference to the collections to forms map, computed from the forms
      * definition file
      */
-    private Map whichForms = null;
+    private Map<String, String> whichForms = null;
 
     /**
      * Reference to the forms definitions map, computed from the forms
      * definition file
      */
-    private Map formDefns  = null;
+    private Map<String, List<List<Map<String, String>>>> formDefns  = null;
 
     /**
      * Reference to the forms which allow, disallow or mandate files to be
@@ -116,7 +116,7 @@ public class DCInputsReader
     /**
      * Reference to the value-pairs map, computed from the forms definition file
      */
-    private Map valuePairs = null;    // Holds display/storage pairs
+    private Map<String, List<String>> valuePairs = null;    // Holds display/storage pairs
     
     /**
      * Mini-cache of last DCInputSet requested. If submissions are not typically
@@ -149,9 +149,9 @@ public class DCInputsReader
     private void buildInputs(String fileName)
          throws DCInputsReaderException
     {
-        whichForms = new HashMap();
-        formDefns  = new HashMap();
-        valuePairs = new HashMap();
+        whichForms = new HashMap<String, String>();
+        formDefns  = new HashMap<String, List<List<Map<String, String>>>>();
+        valuePairs = new HashMap<String, List<String>>();
 
         String uri = "file:" + new File(fileName).getAbsolutePath();
 
@@ -177,14 +177,14 @@ public class DCInputsReader
         }
     }
    
-    public Iterator getPairsNameIterator()
+    public Iterator<String> getPairsNameIterator()
     {
         return valuePairs.keySet().iterator();
     }
 
-    public List getPairs(String name)
+    public List<String> getPairs(String name)
     {
-        return (List)valuePairs.get(name);
+        return valuePairs.get(name);
     }
 
     /**
@@ -200,10 +200,10 @@ public class DCInputsReader
     public DCInputSet getInputs(String collectionHandle)
                 throws DCInputsReaderException
     {
-        String formName = (String)whichForms.get(collectionHandle);
+        String formName = whichForms.get(collectionHandle);
         if (formName == null)
         {
-                formName = (String)whichForms.get(DEFAULT_COLLECTION);
+                formName = whichForms.get(DEFAULT_COLLECTION);
         }
         if (formName == null)
         {
@@ -215,7 +215,7 @@ public class DCInputsReader
                 return lastInputSet;
         }
         // cache miss - construct new DCInputSet
-        List pages = (List)formDefns.get(formName);
+        List<List<Map<String, String>>> pages = formDefns.get(formName);
         if ( pages == null )
         {
                 throw new DCInputsReaderException("Missing the " + formName  + " form");
@@ -349,7 +349,7 @@ public class DCInputsReader
                         {
                                 throw new SAXException("form element has no name attribute");
                         }
-                        List pages = new ArrayList(); // the form contains pages
+                        List<List<Map<String, String>>> pages = new ArrayList<List<Map<String, String>>>(); // the form contains pages
                         formDefns.put(formName, pages);
                         NodeList pl = nd.getChildNodes();
                         int lenpg = pl.getLength();
@@ -364,7 +364,7 @@ public class DCInputsReader
                                         {
                                                 throw new SAXException("Form " + formName + " has no identified pages");
                                         }
-                                        List page = new ArrayList();
+                                        List<Map<String, String>> page = new ArrayList<Map<String, String>>();
                                         pages.add(page);
                                         NodeList flds = npg.getChildNodes();
                                         int lenflds = flds.getLength();
@@ -374,7 +374,7 @@ public class DCInputsReader
                                                 if ( nfld.getNodeName().equals("field") )
                                                 {
                                                         // process each field definition
-                                                        HashMap field = new HashMap();
+                                                        Map<String, String> field = new HashMap<String, String>();
                                                         page.add(field);
                                                         processPageParts(formName, pgNum, nfld, field);
                                                         String error = checkForDups(formName, field, pages);
@@ -405,7 +405,7 @@ public class DCInputsReader
      * 'twobox' are marked repeatable. Complain if dc-element, label,
      * or input-type are missing.
      */
-    private void processPageParts(String formName, String page, Node n, Map field)
+    private void processPageParts(String formName, String page, Node n, Map<String, String> field)
         throws SAXException
     {
         NodeList nl = n.getChildNodes();
@@ -463,10 +463,10 @@ public class DCInputsReader
                 String msg = "Required field " + missing + " missing on page " + page + " of form " + formName;
                 throw new SAXException(msg);
         }
-        String type = (String)field.get("input-type");
+        String type = field.get("input-type");
         if (type.equals("twobox") || type.equals("qualdrop_value"))
         {
-                String rpt = (String)field.get("repeatable");
+                String rpt = field.get("repeatable");
                 if ((rpt == null) ||
                                 ((!rpt.equalsIgnoreCase("yes")) &&
                                                 (!rpt.equalsIgnoreCase("true"))))
@@ -481,13 +481,13 @@ public class DCInputsReader
      * Check that this is the only field with the name dc-element.dc-qualifier
      * If there is a duplicate, return an error message, else return null;
      */
-    private String checkForDups(String formName, Map field, List pages)
+    private String checkForDups(String formName, Map<String, String> field, List<List<Map<String, String>>> pages)
     {
         int matches = 0;
         String err = null;
-        String schema = (String)field.get("dc-schema");
-        String elem = (String)field.get("dc-element");
-        String qual = (String)field.get("dc-qualifier");
+        String schema = field.get("dc-schema");
+        String elem = field.get("dc-element");
+        String qual = field.get("dc-qualifier");
         if ((schema == null) || (schema.equals("")))
         {
             schema = MetadataSchema.DC_SCHEMA;
@@ -496,25 +496,25 @@ public class DCInputsReader
         
         for (int i = 0; i < pages.size(); i++)
         {
-            List pg = (List)pages.get(i);
+            List<Map<String, String>> pg = pages.get(i);
             for (int j = 0; j < pg.size(); j++)
             {
-                HashMap fld = (HashMap)pg.get(j);
+                Map<String, String> fld = pg.get(j);
                 if ((fld.get("dc-schema") == null) ||
-                    (((String)fld.get("dc-schema")).equals("")))
+                    ((fld.get("dc-schema")).equals("")))
                 {
                     schemaTest = MetadataSchema.DC_SCHEMA;
                 }
                 else
                 {
-                    schemaTest = (String)fld.get("dc-schema");
+                    schemaTest = fld.get("dc-schema");
                 }
                 
                 // Are the schema and element the same? If so, check the qualifier
-                if ((((String)fld.get("dc-element")).equals(elem)) &&
+                if (((fld.get("dc-element")).equals(elem)) &&
                     (schemaTest.equals(schema)))
                 {
-                    String ql = (String)fld.get("dc-qualifier");
+                    String ql = fld.get("dc-qualifier");
                     if (qual != null)
                     {
                         if ((ql != null) && ql.equals(qual))
@@ -573,7 +573,7 @@ public class DCInputsReader
                                 throw new SAXException(errString);
 
                         }
-                        List pairs = new ArrayList();
+                        List<String> pairs = new ArrayList<String>();
                         valuePairs.put(pairsName, pairs);
                         NodeList cl = nd.getChildNodes();
                         int lench = cl.getLength();
@@ -624,25 +624,25 @@ public class DCInputsReader
                 throws DCInputsReaderException
     {
         // Step through every field of every page of every form
-        Iterator ki = formDefns.keySet().iterator();
+        Iterator<String> ki = formDefns.keySet().iterator();
         while (ki.hasNext())
         {
-                String idName = (String)ki.next();
-                List pages = (List)formDefns.get(idName);
+                String idName = ki.next();
+                List<List<Map<String, String>>> pages = formDefns.get(idName);
                 for (int i = 0; i < pages.size(); i++)
                 {
-                        List page = (List)pages.get(i);
+                        List<Map<String, String>> page = pages.get(i);
                         for (int j = 0; j < page.size(); j++)
                         {
-                                HashMap fld = (HashMap)page.get(j);
+                                Map<String, String> fld = page.get(j);
                                 // verify reference in certain input types
-                                String type = (String)fld.get("input-type");
+                                String type = fld.get("input-type");
                     if (type.equals("dropdown")
                             || type.equals("qualdrop_value")
                             || type.equals("list"))
                                 {
-                                        String pairsName = (String)fld.get(PAIR_TYPE_NAME);
-                                        List v = (List)valuePairs.get(pairsName);
+                                        String pairsName = fld.get(PAIR_TYPE_NAME);
+                                        List<String> v = valuePairs.get(pairsName);
                                         if (v == null)
                                         {
                                                 String errString = "Cannot find value pairs for " + pairsName;
@@ -650,13 +650,13 @@ public class DCInputsReader
                                         }
                                 }
                                 // if visibility restricted, make sure field is not required
-                                String visibility = (String)fld.get("visibility");
+                                String visibility = fld.get("visibility");
                                 if (visibility != null && visibility.length() > 0 )
                                 {
-                                        String required = (String)fld.get("required");
+                                        String required = fld.get("required");
                                         if (required != null && required.length() > 0)
                                         {
-                                                String errString = "Field '" + (String)fld.get("label") +
+                                                String errString = "Field '" + fld.get("label") +
                                                                         "' is required but invisible";
                                                 throw new DCInputsReaderException(errString);
                                         }

@@ -116,7 +116,7 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
         if (values == null)
         {
             String pname = this.getPluginInstanceName();
-            List<String> pairs = (List<String>)dci.getPairs(pname);
+            List<String> pairs = dci.getPairs(pname);
             if (pairs != null)
             {
                 values = new String[pairs.size()/2];

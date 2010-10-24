@@ -91,19 +91,19 @@ public class LogAnalyser
     /////////////////
     
     /** aggregator for all actions performed in the system */
-    private static Map actionAggregator;
+    private static Map<String, Integer> actionAggregator;
     
     /** aggregator for all searches performed */
-    private static Map searchAggregator;
+    private static Map<String, Integer> searchAggregator;
     
     /** aggregator for user logins */
-    private static Map userAggregator;
+    private static Map<String, Integer> userAggregator;
     
     /** aggregator for item views */
-    private static Map itemAggregator;
+    private static Map<String, Integer> itemAggregator;
     
     /** aggregator for current archive state statistics */
-    private static Map archiveStats;
+    private static Map<String, Integer> archiveStats;
     
     /** warning counter */
     private static int warnCount = 0;
@@ -116,19 +116,19 @@ public class LogAnalyser
     //////////////////
     
     /** list of actions to be included in the general summary */
-    private static List generalSummary;
+    private static List<String> generalSummary;
     
     /** list of words not to be aggregated */
-    private static List excludeWords;
+    private static List<String> excludeWords;
     
     /** list of search types to be ignored, such as "author:" */
-    private static List excludeTypes;
+    private static List<String> excludeTypes;
     
     /** list of characters to be excluded */
-    private static List excludeChars;
+    private static List<String> excludeChars;
     
     /** list of item types to be reported on in the current state */
-    private static List itemTypes;
+    private static List<String> itemTypes;
     
     /** bottom limit to output for search word analysis */
     private static int searchFloor;
@@ -342,18 +342,18 @@ public class LogAnalyser
         startTime = new GregorianCalendar();
                 
         //instantiate aggregators
-        actionAggregator = new HashMap();
-        searchAggregator = new HashMap();
-        userAggregator = new HashMap();
-        itemAggregator = new HashMap();
-        archiveStats = new HashMap();
+        actionAggregator = new HashMap<String, Integer>();
+        searchAggregator = new HashMap<String, Integer>();
+        userAggregator = new HashMap<String, Integer>();
+        itemAggregator = new HashMap<String, Integer>();
+        archiveStats = new HashMap<String, Integer>();
         
         //instantiate lists
-        generalSummary = new ArrayList();
-        excludeWords = new ArrayList();
-        excludeTypes = new ArrayList();
-        excludeChars = new ArrayList();
-        itemTypes = new ArrayList();
+        generalSummary = new ArrayList<String>();
+        excludeWords = new ArrayList<String>();
+        excludeTypes = new ArrayList<String>();
+        excludeChars = new ArrayList<String>();
+        itemTypes = new ArrayList<String>();
               
         // set the parameters for this analysis
         setParameters(myLogDir, myFileTemplate, myConfigFile, myOutFile, myStartDate, myEndDate, myLookUp);
@@ -530,7 +530,7 @@ public class LogAnalyser
         archiveStats.put("All Items", getNumItems(context));
         for (i = 0; i < itemTypes.size(); i++)
         {
-            archiveStats.put(itemTypes.get(i), getNumItems(context, (String) itemTypes.get(i)));
+            archiveStats.put(itemTypes.get(i), getNumItems(context, itemTypes.get(i)));
         }
         
         // now do the host name and url lookup
@@ -543,13 +543,13 @@ public class LogAnalyser
         }
         
         // do the average views analysis
-        if (((Integer) archiveStats.get("All Items")).intValue() != 0)
+        if ((archiveStats.get("All Items")).intValue() != 0)
         {
             // FIXME: this is dependent on their being a query on the db, which
             // there might not always be if it becomes configurable
             Double avg = Math.ceil(
-                            ((Integer)actionAggregator.get("view_item")).doubleValue() /
-                            ((Integer)archiveStats.get("All Items")).doubleValue());
+                            (actionAggregator.get("view_item")).doubleValue() /
+                            (archiveStats.get("All Items")).doubleValue());
             views = avg.intValue();
         }
         
@@ -627,7 +627,7 @@ public class LogAnalyser
         StringBuffer summary = new StringBuffer();
         
         // define an iterator that will be used to go over the hashmap keys
-        Iterator keys = null;
+        Iterator<String> keys = null;
         
         // output the number of lines parsed
         summary.append("log_lines=" + Integer.toString(lineCount) + "\n");
@@ -672,7 +672,7 @@ public class LogAnalyser
         keys = archiveStats.keySet().iterator();
         while (keys.hasNext())
         {
-            String key = (String) keys.next();
+            String key = keys.next();
             summary.append("archive." + key + "=" + archiveStats.get(key) + "\n");
         }
         
@@ -680,7 +680,7 @@ public class LogAnalyser
         keys = actionAggregator.keySet().iterator();
         while (keys.hasNext())
         {
-            String key = (String) keys.next();
+            String key = keys.next();
             summary.append("action." + key + "=" + actionAggregator.get(key) + "\n");
         }
         
@@ -695,7 +695,7 @@ public class LogAnalyser
         // FIXME: the users reporting should also have a floor value
         while (keys.hasNext())
         {
-            String key = (String) keys.next();
+            String key = keys.next();
             summary.append("user.");
             if (userEmail.equals("on"))
             {
@@ -716,8 +716,8 @@ public class LogAnalyser
         keys = searchAggregator.keySet().iterator();
         while (keys.hasNext())
         {
-            String key = (String) keys.next();
-            if (((Integer) searchAggregator.get(key)).intValue() >= searchFloor)
+            String key = keys.next();
+            if ((searchAggregator.get(key)).intValue() >= searchFloor)
             {
                 summary.append("search." + key + "=" + searchAggregator.get(key) + "\n");
             }
@@ -739,8 +739,8 @@ public class LogAnalyser
         keys = itemAggregator.keySet().iterator();
         while (keys.hasNext())
         {
-            String key = (String) keys.next();
-            if (((Integer) itemAggregator.get(key)).intValue() >= itemFloor)
+            String key = keys.next();
+            if ((itemAggregator.get(key)).intValue() >= itemFloor)
             {
                 summary.append("item." + key + "=" + itemAggregator.get(key) + "\n");
             }
@@ -815,7 +815,7 @@ public class LogAnalyser
         charRegEx.append("[");
         for (int i = 0; i < excludeChars.size(); i++)
         {
-            charRegEx.append("\\").append((String) excludeChars.get(i));
+            charRegEx.append("\\").append(excludeChars.get(i));
         }
         charRegEx.append("]");
         excludeCharRX = Pattern.compile(charRegEx.toString());
@@ -859,7 +859,7 @@ public class LogAnalyser
             {
                 typeRXString.append("|");
             }
-            typeRXString.append((String) excludeTypes.get(i));
+            typeRXString.append(excludeTypes.get(i));
         }
         typeRXString.append(")");
         typeRX = Pattern.compile(typeRXString.toString());
@@ -873,11 +873,11 @@ public class LogAnalyser
             {
                 wordRXString.append("|");
             }
-            wordRXString.append(" " + (String) excludeWords.get(i) + " ");
+            wordRXString.append(" " + excludeWords.get(i) + " ");
             wordRXString.append("|");
-            wordRXString.append("^" + (String) excludeWords.get(i) + " ");
+            wordRXString.append("^" + excludeWords.get(i) + " ");
             wordRXString.append("|");
-            wordRXString.append(" " + (String) excludeWords.get(i) + "$");
+            wordRXString.append(" " + excludeWords.get(i) + "$");
         }
         wordRXString.append(")");
         wordRX = Pattern.compile(wordRXString.toString());
@@ -895,18 +895,18 @@ public class LogAnalyser
         throws IOException
     {
         //instantiate aggregators
-        actionAggregator = new HashMap();
-        searchAggregator = new HashMap();
-        userAggregator = new HashMap();
-        itemAggregator = new HashMap();
-        archiveStats = new HashMap();
+        actionAggregator = new HashMap<String, Integer>();
+        searchAggregator = new HashMap<String, Integer>();
+        userAggregator = new HashMap<String, Integer>();
+        itemAggregator = new HashMap<String, Integer>();
+        archiveStats = new HashMap<String, Integer>();
 
         //instantiate lists
-        generalSummary = new ArrayList();
-        excludeWords = new ArrayList();
-        excludeTypes = new ArrayList();
-        excludeChars = new ArrayList();
-        itemTypes = new ArrayList();
+        generalSummary = new ArrayList<String>();
+        excludeWords = new ArrayList<String>();
+        excludeTypes = new ArrayList<String>();
+        excludeChars = new ArrayList<String>();
+        itemTypes = new ArrayList<String>();
 
         // prepare our standard file readers and buffered readers
         FileReader fr = null;
@@ -1003,13 +1003,13 @@ public class LogAnalyser
      *
      * @return          an integer object containing the new value
      */
-    public static Integer increment(Map map, String key)
+    public static Integer increment(Map<String, Integer> map, String key)
     {
         Integer newValue = null;
         if (map.containsKey(key))
         {
             // FIXME: this seems like a ridiculous way to add Integers
-            newValue = Integer.valueOf(((Integer) map.get(key)).intValue() + 1);
+            newValue = Integer.valueOf((map.get(key)).intValue() + 1);
         }
         else
         {

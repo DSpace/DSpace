@@ -42,6 +42,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.List;
 
@@ -111,9 +112,9 @@ public class MediaFilterManager
     
     private static FormatFilter[] filterClasses = null;
     
-    private static Map filterFormats = new HashMap();
+    private static Map<String, List<String>> filterFormats = new HashMap<String, List<String>>();
     
-    private static List skipList = null; //list of identifiers to skip during processing
+    private static List<String> skipList = null; //list of identifiers to skip during processing
     
     //separator in filterFormats Map between a filter class name and a plugin name,
     //for MediaFilters which extend SelfNamedPlugin (\034 is "file separator" char)
@@ -245,7 +246,7 @@ public class MediaFilterManager
         }
                 
         //initialize an array of our enabled filters
-        List filterList = new ArrayList();
+        List<FormatFilter> filterList = new ArrayList<FormatFilter>();
                 
         //set up each filter
         for(int i=0; i< filterNames.length; i++)
@@ -305,10 +306,10 @@ public class MediaFilterManager
         if(isVerbose)
         {   
             System.out.println("The following MediaFilters are enabled: ");
-            java.util.Iterator i = filterFormats.keySet().iterator();
+            Iterator<String> i = filterFormats.keySet().iterator();
             while(i.hasNext())
             {
-                String filterName = (String) i.next();
+                String filterName = i.next();
                 System.out.println("Full Filter Name: " + filterName);
                 String pluginName = null;
                 if(filterName.contains(FILTER_PLUGIN_SEPARATOR))
@@ -572,7 +573,7 @@ public class MediaFilterManager
     	    //  <class-name><separator><plugin-name>
     	    //For other MediaFilters, map key is just:
     	    //  <class-name>
-    	    List fmts = (List)filterFormats.get(filterClasses[i].getClass().getName() + 
+    	    List<String> fmts = filterFormats.get(filterClasses[i].getClass().getName() +
     	                       (pluginName!=null ? FILTER_PLUGIN_SEPARATOR + pluginName : ""));
     	   
     	    if (fmts.contains(myBitstream.getFormat().getShortDescription()))

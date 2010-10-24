@@ -567,7 +567,7 @@ public class ItemImport
     private void addItems(Context c, Collection[] mycollections,
             String sourceDir, String mapFile, boolean template) throws Exception
     {
-        Map<String, String> skipItems = new HashMap(); // set of items to skip if in 'resume'
+        Map<String, String> skipItems = new HashMap<String, String>(); // set of items to skip if in 'resume'
         // mode
 
         System.out.println("Adding items from directory: " + sourceDir);
@@ -600,8 +600,7 @@ public class ItemImport
 
         if (d == null)
         {
-            System.out.println("Error, cannot open source directory "
-                    + sourceDir);
+            System.out.println("Error, cannot open source directory " + sourceDir);
             System.exit(1);
         }
 
