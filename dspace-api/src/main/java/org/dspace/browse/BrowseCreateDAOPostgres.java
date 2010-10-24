@@ -348,7 +348,7 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#createPrimaryTable(java.lang.String, java.util.List, boolean)
      */
-    public String createPrimaryTable(String table, List sortCols, boolean execute)
+    public String createPrimaryTable(String table, List<Integer> sortCols, boolean execute)
         throws BrowseException
     {
         try

@@ -82,7 +82,7 @@ public class DCInput
     private String valueListName = null;
 
     /** if input list-controlled, the list itself */
-    private List valueList = null;
+    private List<String> valueList = null;
 
     /** if non-null, visibility scope restriction */
     private String visibility = null;
@@ -115,39 +115,38 @@ public class DCInput
      * @param fieldMap
      *            ???
      * @param listMap
-     *            ?the corresponding row in the table?
      */
-    public DCInput(Map fieldMap, Map listMap)
+    public DCInput(Map<String, String> fieldMap, Map<String, List<String>> listMap)
     {
-        dcElement = (String) fieldMap.get("dc-element");
-        dcQualifier = (String) fieldMap.get("dc-qualifier");
+        dcElement = fieldMap.get("dc-element");
+        dcQualifier = fieldMap.get("dc-qualifier");
 
         // Default the schema to dublin core
-        dcSchema = (String) fieldMap.get("dc-schema");
+        dcSchema = fieldMap.get("dc-schema");
         if (dcSchema == null)
         {
             dcSchema = MetadataSchema.DC_SCHEMA;
         }
 
-        String repStr = (String) fieldMap.get("repeatable");
+        String repStr = fieldMap.get("repeatable");
         repeatable = "true".equalsIgnoreCase(repStr)
                 || "yes".equalsIgnoreCase(repStr);
-        label = (String) fieldMap.get("label");
-        inputType = (String) fieldMap.get("input-type");
+        label = fieldMap.get("label");
+        inputType = fieldMap.get("input-type");
         // these types are list-controlled
         if ("dropdown".equals(inputType) || "qualdrop_value".equals(inputType)
                 || "list".equals(inputType))
         {
-            valueListName = (String) fieldMap.get("value-pairs-name");
-            valueList = (List) listMap.get(valueListName);
+            valueListName = fieldMap.get("value-pairs-name");
+            valueList = listMap.get(valueListName);
         }
-        hint = (String) fieldMap.get("hint");
-        warning = (String) fieldMap.get("required");
+        hint = fieldMap.get("hint");
+        warning = fieldMap.get("required");
         required = (warning != null && warning.length() > 0);
-        visibility = (String) fieldMap.get("visibility");
-        readOnly = (String) fieldMap.get("readonly");
-        vocabulary = (String) fieldMap.get("vocabulary");
-        String closedVocabularyStr = (String) fieldMap.get("closedVocabulary");
+        visibility = fieldMap.get("visibility");
+        readOnly = fieldMap.get("readonly");
+        vocabulary = fieldMap.get("vocabulary");
+        String closedVocabularyStr = fieldMap.get("closedVocabulary");
         closedVocabulary = "true".equalsIgnoreCase(closedVocabularyStr)
                             || "yes".equalsIgnoreCase(closedVocabularyStr);
     }
@@ -351,13 +350,13 @@ public class DCInput
      */
     public String getDisplayString(String pairTypeName, String storedString)
     {
-        if (valueList != null)
+        if (valueList != null && storedString != null)
         {
             for (int i = 0; i < valueList.size(); i += 2)
             {
-                if (((String) valueList.get(i + 1)).equals(storedString))
+                if (storedString.equals(valueList.get(i + 1)))
                 {
-                    return (String) valueList.get(i);
+                    return valueList.get(i);
                 }
             }
         }
@@ -378,13 +377,13 @@ public class DCInput
      */
     public String getStoredString(String pairTypeName, String displayedString)
     {
-        if (valueList != null)
+        if (valueList != null && displayedString != null)
         {
             for (int i = 0; i < valueList.size(); i += 2)
             {
-                if (((String) valueList.get(i)).equals(displayedString))
+                if (displayedString.equals(valueList.get(i)))
                 {
-                    return (String) valueList.get(i + 1);
+                    return valueList.get(i + 1);
                 }
             }
         }

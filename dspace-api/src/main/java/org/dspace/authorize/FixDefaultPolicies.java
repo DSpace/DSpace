@@ -146,11 +146,9 @@ public class FixDefaultPolicies
             int myaction) throws SQLException
     {
         // check to see if any policies exist for this action
-        List policies = AuthorizeManager
-                .getPoliciesActionFilter(c, t, myaction);
-        Iterator i = policies.iterator();
+        List<ResourcePolicy> policies = AuthorizeManager.getPoliciesActionFilter(c, t, myaction);
 
-        return i.hasNext();
+        return policies.size() > 0;
     }
 
     /**

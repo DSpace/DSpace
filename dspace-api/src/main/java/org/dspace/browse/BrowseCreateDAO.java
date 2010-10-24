@@ -275,7 +275,7 @@ public interface BrowseCreateDAO
      * @return          the instructions (SQL) that effect the creation
      * @throws BrowseException
      */
-    public String createPrimaryTable(String table, List sortCols, boolean execute) throws BrowseException;
+    public String createPrimaryTable(String table, List<Integer> sortCols, boolean execute) throws BrowseException;
 	
     /**
 	 * Create any indices that the implementing DAO sees fit to maximise performance.

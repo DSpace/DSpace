@@ -398,7 +398,7 @@ public class MockBrowseCreateDAOOracle
     }
 
     @Mock
-    public String createPrimaryTable(String table, List sortCols, boolean execute) throws BrowseException
+    public String createPrimaryTable(String table, List<Integer> sortCols, boolean execute) throws BrowseException
     {
         try
         {            

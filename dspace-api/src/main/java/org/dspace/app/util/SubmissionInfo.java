@@ -94,7 +94,7 @@ public class SubmissionInfo
     private String jumpToField;
 
     /** If non-empty, form-relative indices of missing fields */
-    private List missingFields;
+    private List<String> missingFields;
 
     /** Specific bundle we're dealing with */
     private Bundle bundle;
@@ -393,7 +393,7 @@ public class SubmissionInfo
      * 
      * @return a List of empty fields which are required
      */
-    public List getMissingFields()
+    public List<String> getMissingFields()
     {
         return this.missingFields;
     }
@@ -405,7 +405,7 @@ public class SubmissionInfo
      * @param missing
      *            the List of empty fields which are required
      */
-    public void setMissingFields(List missing)
+    public void setMissingFields(List<String> missing)
     {
         this.missingFields = missing;
     }

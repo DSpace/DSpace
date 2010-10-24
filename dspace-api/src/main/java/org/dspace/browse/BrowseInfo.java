@@ -61,6 +61,7 @@ public class BrowseInfo
 {
     /**
      * The results of the browse.
+     * FIXME: Unable to generify due to mixed usage
      */
     private List results;
 
@@ -133,6 +134,7 @@ public class BrowseInfo
 
     /**
      * Constructor
+     * FIXME: Unable to generify due to mixed usage
      *
      * @param results
      *            A List of Browse results

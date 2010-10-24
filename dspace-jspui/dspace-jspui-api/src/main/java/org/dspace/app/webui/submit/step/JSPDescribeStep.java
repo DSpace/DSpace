@@ -200,12 +200,12 @@ public class JSPDescribeStep extends JSPStep
         }
         else if (status == DescribeStep.STATUS_MISSING_REQUIRED_FIELDS)
         {
-            List missingFields = DescribeStep.getErrorFields(request);
+            List<String> missingFields = DescribeStep.getErrorFields(request);
 
             // return to current edit metadata screen if any fields missing
             if (missingFields.size() > 0)
             {
-                subInfo.setJumpToField((String) missingFields.get(0));
+                subInfo.setJumpToField(missingFields.get(0));
                 subInfo.setMissingFields(missingFields);
 
                 // reload this same JSP to display missing fields info
