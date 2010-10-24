@@ -109,13 +109,13 @@ public class FeedServlet extends DSpaceServlet
     // number of DSpace items per feed
     private static int itemCount = 0;
     // optional cache of feeds
-    private static Map feedCache = null;
+    private static Map<String, CacheFeed> feedCache = null;
     // maximum size of cache - 0 means caching disabled
     private static int cacheSize = 0;
     // how many days to keep a feed in cache before checking currency
     private static int cacheAge = 0;
     // supported syndication formats
-    private static List formats = null;
+    private static List<String> formats = null;
     // Whether to include private items or not
     private static boolean includeAll = true;
     
@@ -136,7 +136,7 @@ public class FeedServlet extends DSpaceServlet
     		String fmtsStr = ConfigurationManager.getProperty("webui.feed.formats");
     		if ( fmtsStr != null )
     		{
-    			formats = new ArrayList();
+    			formats = new ArrayList<String>();
     			String[] fmts = fmtsStr.split(",");
     			for (int i = 0; i < fmts.length; i++)
     			{
@@ -147,7 +147,7 @@ public class FeedServlet extends DSpaceServlet
     		cacheSize = ConfigurationManager.getIntProperty("webui.feed.cache.size");
     		if (cacheSize > 0)
     		{
-    			feedCache = new HashMap();
+    			feedCache = new HashMap<String, CacheFeed>();
     	   		cacheAge = ConfigurationManager.getIntProperty("webui.feed.cache.age");
     		}
     	}
@@ -240,7 +240,7 @@ public class FeedServlet extends DSpaceServlet
         SyndicationFeed feed = null;
         if (feedCache != null)
         {
-                CacheFeed cFeed = (CacheFeed)feedCache.get(cacheKey);
+                CacheFeed cFeed = feedCache.get(cacheKey);
         	if (cFeed != null)  // cache hit, but...
         	{
         		// Is the feed current?
@@ -410,11 +410,11 @@ public class FeedServlet extends DSpaceServlet
 	    	CacheFeed minFeed = null;
 	    	CacheFeed maxFeed = null;
 	    	
-	    	Iterator iter = feedCache.keySet().iterator();
+	    	Iterator<String> iter = feedCache.keySet().iterator();
 	    	while (iter.hasNext())
 	    	{
-	    		String key = (String)iter.next();
-	    		CacheFeed feed = (CacheFeed)feedCache.get(key);
+	    		String key = iter.next();
+	    		CacheFeed feed = feedCache.get(key);
 	    		if (minKey != null)
 	    		{
 	    			if (feed.hits < minFeed.hits)

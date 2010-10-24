@@ -375,7 +375,7 @@
     // Keep a count of the number of values of each element+qualifier
     // key is "element" or "element_qualifier" (String)
     // values are Integers - number of values that element/qualifier so far
-    Map dcCounter = new HashMap();
+    Map<String, Integer> dcCounter = new HashMap<String, Integer>();
     
     for (int i = 0; i < dcv.length; i++)
     {
@@ -383,7 +383,7 @@
 
         String key = ChoiceAuthorityManager.makeFieldKey(dcv[i].schema, dcv[i].element, dcv[i].qualifier);
 
-        Integer count = (Integer) dcCounter.get(key);
+        Integer count = dcCounter.get(key);
         if (count == null)
         {
             count = new Integer(0);

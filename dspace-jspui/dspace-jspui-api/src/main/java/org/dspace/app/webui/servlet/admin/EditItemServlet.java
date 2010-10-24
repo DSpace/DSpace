@@ -52,6 +52,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
@@ -417,7 +418,7 @@ public class EditItemServlet extends DSpaceServlet
         MetadataField[] types = MetadataField.findAll(context);
         
         // Get a HashMap of metadata field ids and a field name to display
-        HashMap metadataFields = new HashMap();
+        Map<Integer, String> metadataFields = new HashMap<Integer, String>();
         
         // Get all existing Schemas
         MetadataSchema[] schemas = MetadataSchema.findAll(context);

@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.LinkedHashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -138,7 +139,7 @@ public class JSPVerifyStep extends JSPStep
         // key = stepNumber.pageNumber
         // value = path to review JSP for this Step (which will load the users
         // answers)
-        LinkedHashMap reviewData = new LinkedHashMap();
+        Map<String, String> reviewData = new LinkedHashMap<String, String>();
 
         // this shouldn't happen...but just in case!
         if (subInfo.getProgressBarInfo() == null)
@@ -152,13 +153,13 @@ public class JSPVerifyStep extends JSPStep
 
         // loop through the steps in our Progress Bar
         // (since these are steps the user visited)
-        Iterator stepIterator = subInfo.getProgressBarInfo().keySet()
+        Iterator<String> stepIterator = subInfo.getProgressBarInfo().keySet()
                 .iterator();
         while (stepIterator.hasNext())
         {
             // remember, the keys of the progressBar hashmap is in the
             // format: stepNumber.pageNumber
-            String stepAndPage = (String) stepIterator.next();
+            String stepAndPage = stepIterator.next();
 
             // extract out the step number (which is before the period)
             String[] fields = stepAndPage.split("\\."); // split on period

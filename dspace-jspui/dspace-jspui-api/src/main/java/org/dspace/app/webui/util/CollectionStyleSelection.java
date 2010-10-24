@@ -87,13 +87,13 @@ public class CollectionStyleSelection extends AKeyBasedStyleSelection
      */
     private void readKeyStyleConfig()
     {
-        styles = new HashMap();
+        styles = new HashMap<String, String>();
 
-        Enumeration e = ConfigurationManager.propertyNames();
+        Enumeration<String> e = (Enumeration<String>)ConfigurationManager.propertyNames();
 
         while (e.hasMoreElements())
         {
-            String key = (String) e.nextElement();
+            String key = e.nextElement();
 
             if (key.startsWith("webui.itemdisplay.")
                     && key.endsWith(".collections"))

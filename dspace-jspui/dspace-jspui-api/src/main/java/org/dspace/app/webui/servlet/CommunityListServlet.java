@@ -75,10 +75,10 @@ public class CommunityListServlet extends DSpaceServlet
         log.info(LogManager.getHeader(context, "view_community_list", ""));
 
         // This will map community IDs to arrays of collections
-        Map colMap = new HashMap();
+        Map<Integer, Collection[]> colMap = new HashMap<Integer, Collection[]>();
 
         // This will map communityIDs to arrays of sub-communities
-        Map commMap = new HashMap();
+        Map<Integer, Community[]> commMap = new HashMap<Integer, Community[]>();
 
         Community[] communities = Community.findAllTop(context);
 

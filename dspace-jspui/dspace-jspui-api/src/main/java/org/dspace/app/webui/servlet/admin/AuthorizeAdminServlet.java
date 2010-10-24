@@ -336,7 +336,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             // edit the collection's permissions
             Community target = Community.find(c, UIUtil.getIntParameter(
                     request, "community_id"));
-            List policies = AuthorizeManager.getPolicies(c, target);
+            List<ResourcePolicy> policies = AuthorizeManager.getPolicies(c, target);
 
             request.setAttribute("community", target);
             request.setAttribute("policies", policies);
@@ -359,7 +359,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             // return to collection permission page
             request.setAttribute("collection", collection);
 
-            List policies = AuthorizeManager.getPolicies(c, collection);
+            List<ResourcePolicy> policies = AuthorizeManager.getPolicies(c, collection);
             request.setAttribute("policies", policies);
 
             JSPManager.showJSP(request, response,
@@ -381,7 +381,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             // return to collection permission page
             request.setAttribute("community", community);
 
-            List policies = AuthorizeManager.getPolicies(c, community);
+            List<ResourcePolicy> policies = AuthorizeManager.getPolicies(c, community);
             request.setAttribute("policies", policies);
 
             JSPManager.showJSP(request, response,
@@ -548,7 +548,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                 if (action_id == Constants.READ)
                 {
                     // first get a list of READ policies from collection
-                    List rps = AuthorizeManager.getPoliciesActionFilter(c,
+                    List<ResourcePolicy> rps = AuthorizeManager.getPoliciesActionFilter(c,
                             collection, Constants.READ);
 
                     // remove all bitstream policies, then add READs
@@ -580,7 +580,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
                 if (action_id == Constants.READ)
                 {
                     // first get a list of READ policies from collection
-                    List rps = AuthorizeManager.getPoliciesActionFilter(c,
+                    List<ResourcePolicy> rps = AuthorizeManager.getPoliciesActionFilter(c,
                             community, Constants.READ);
 
                     // remove all bitstream policies, then add READs
@@ -719,7 +719,7 @@ public class AuthorizeAdminServlet extends DSpaceServlet
             // edit the collection's permissions
             Collection collection = Collection.find(c, UIUtil.getIntParameter(
                     request, "collection_id"));
-            List policies = AuthorizeManager.getPolicies(c, collection);
+            List<ResourcePolicy> policies = AuthorizeManager.getPolicies(c, collection);
 
             request.setAttribute("collection", collection);
             request.setAttribute("policies", policies);
@@ -746,18 +746,18 @@ public class AuthorizeAdminServlet extends DSpaceServlet
     void prepItemEditForm(Context c, HttpServletRequest request, Item item)
             throws SQLException
     {
-        List item_policies = AuthorizeManager.getPolicies(c, item);
+        List<ResourcePolicy> item_policies = AuthorizeManager.getPolicies(c, item);
 
         // Put bundle and bitstream policies in their own hashes
-        Map bundle_policies = new HashMap();
-        Map bitstream_policies = new HashMap();
+        Map<Integer, List<ResourcePolicy>> bundle_policies = new HashMap<Integer, List<ResourcePolicy>>();
+        Map<Integer, List<ResourcePolicy>> bitstream_policies = new HashMap<Integer, List<ResourcePolicy>>();
 
         Bundle[] bundles = item.getBundles();
 
         for (int i = 0; i < bundles.length; i++)
         {
             Bundle myBundle = bundles[i];
-            List myPolicies = AuthorizeManager.getPolicies(c, myBundle);
+            List<ResourcePolicy> myPolicies = AuthorizeManager.getPolicies(c, myBundle);
 
             // add bundle's policies to bundle_policies map
             bundle_policies.put(Integer.valueOf(myBundle.getID()), myPolicies);

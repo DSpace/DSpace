@@ -120,9 +120,9 @@ public class ItemMapServlet extends DSpaceServlet
     		// also holds for interruption by pressing 'Cancel'
     		int count_native = 0; // # of items owned by this collection
     		int count_import = 0; // # of virtual items
-    		Map myItems = new HashMap(); // # for the browser
-    		Map myCollections = new HashMap(); // collections for list
-    		Map myCounts = new HashMap(); // counts for each collection
+    		Map<Integer, Item> myItems = new HashMap<Integer, Item>(); // # for the browser
+    		Map<Integer, Collection> myCollections = new HashMap<Integer, Collection>(); // collections for list
+    		Map<Integer, Integer> myCounts = new HashMap<Integer, Integer>(); // counts for each collection
     		
     		// get all items from that collection, add them to a hash
     		ItemIterator i = myCollection.getItems();
@@ -153,7 +153,7 @@ public class ItemMapServlet extends DSpaceServlet
 
                     if (myCollections.containsKey(cKey))
                     {
-                        Integer x = (Integer) myCounts.get(cKey);
+                        Integer x = myCounts.get(cKey);
                         int myCount = x.intValue() + 1;
 
                         // increment count for that collection
@@ -205,7 +205,7 @@ public class ItemMapServlet extends DSpaceServlet
     		// get item IDs to remove
     		String[] itemIDs = request.getParameterValues("item_ids");
     		String message = "remove";
-    		LinkedList removedItems = new LinkedList();
+    		LinkedList<String> removedItems = new LinkedList<String>();
     		
                 if (itemIDs == null)
                 {
@@ -253,7 +253,7 @@ public class ItemMapServlet extends DSpaceServlet
     		// get item IDs to add
     		String[] itemIDs = request.getParameterValues("item_ids");
     		String message = "added";
-    		LinkedList addedItems = new LinkedList();
+    		LinkedList<String> addedItems = new LinkedList<String>();
     		
     		
     		if (itemIDs == null)
@@ -309,7 +309,7 @@ public class ItemMapServlet extends DSpaceServlet
     		{
     			throw new ServletException("There is no configuration for itemmap.author.index");
     		}
-    		Map items = new HashMap();
+    		Map<Integer, Item> items = new HashMap<Integer, Item>();
     		try
     		{
     			BrowserScope bs = new BrowserScope(context);
@@ -333,7 +333,7 @@ public class ItemMapServlet extends DSpaceServlet
     			ItemIterator itr = myCollection.getItems();
                 try
                 {
-                    ArrayList idslist = new ArrayList();
+                    ArrayList<Integer> idslist = new ArrayList<Integer>();
                     while (itr.hasNext())
                     {
                         idslist.add(Integer.valueOf(itr.nextID()));
@@ -383,7 +383,7 @@ public class ItemMapServlet extends DSpaceServlet
     		
     		// now find all imported items from that collection
     		// seemingly inefficient, but database should have this query cached
-            Map items = new HashMap();
+            Map<Integer, Item> items = new HashMap<Integer, Item>();
     		ItemIterator i = myCollection.getItems();
             try
             {
