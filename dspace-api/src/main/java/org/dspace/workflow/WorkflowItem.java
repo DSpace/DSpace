@@ -165,7 +165,7 @@ public class WorkflowItem implements InProgressSubmission
      */
     public static WorkflowItem[] findAll(Context c) throws SQLException
     {
-        List wfItems = new ArrayList();
+        List<WorkflowItem> wfItems = new ArrayList<WorkflowItem>();
         TableRowIterator tri = DatabaseManager.queryTable(c, "workflowitem",
                 "SELECT * FROM workflowitem");
 
@@ -187,10 +187,7 @@ public class WorkflowItem implements InProgressSubmission
             }
         }
 
-        WorkflowItem[] wfArray = new WorkflowItem[wfItems.size()];
-        wfArray = (WorkflowItem[]) wfItems.toArray(wfArray);
-
-        return wfArray;
+        return wfItems.toArray(new WorkflowItem[wfItems.size()]);
     }
 
     /**
@@ -208,7 +205,7 @@ public class WorkflowItem implements InProgressSubmission
     public static WorkflowItem[] findByEPerson(Context context, EPerson ep)
             throws SQLException
     {
-        List wfItems = new ArrayList();
+        List<WorkflowItem> wfItems = new ArrayList<WorkflowItem>();
 
         TableRowIterator tri = DatabaseManager.queryTable(context, "workflowitem",
                 "SELECT workflowitem.* FROM workflowitem, item WHERE " +
@@ -243,10 +240,7 @@ public class WorkflowItem implements InProgressSubmission
             }
         }
 
-        WorkflowItem[] wfArray = new WorkflowItem[wfItems.size()];
-        wfArray = (WorkflowItem[]) wfItems.toArray(wfArray);
-
-        return wfArray;
+        return wfItems.toArray(new WorkflowItem[wfItems.size()]);
     }
 
     /**
@@ -262,7 +256,7 @@ public class WorkflowItem implements InProgressSubmission
     public static WorkflowItem[] findByCollection(Context context, Collection c)
             throws SQLException
     {
-        List wsItems = new ArrayList();
+        List<WorkflowItem> wsItems = new ArrayList<WorkflowItem>();
 
         TableRowIterator tri = DatabaseManager.queryTable(context, "workflowitem",
                 "SELECT workflowitem.* FROM workflowitem WHERE " +
@@ -296,10 +290,7 @@ public class WorkflowItem implements InProgressSubmission
             }
         }
 
-        WorkflowItem[] wsArray = new WorkflowItem[wsItems.size()];
-        wsArray = (WorkflowItem[]) wsItems.toArray(wsArray);
-
-        return wsArray;
+        return wsItems.toArray(new WorkflowItem[wsItems.size()]);
     }
 
 

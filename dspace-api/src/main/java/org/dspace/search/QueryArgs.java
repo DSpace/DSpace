@@ -44,6 +44,7 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
@@ -198,9 +199,9 @@ public class QueryArgs
             numFieldStr = "3";
         }
         int numField = Integer.parseInt(numFieldStr);
-        ArrayList<String> query = new ArrayList<String>();
-        ArrayList<String> field = new ArrayList<String>();
-        ArrayList<String> conjunction = new ArrayList<String>();
+        List<String> query = new ArrayList<String>();
+        List<String> field = new ArrayList<String>();
+        List<String> conjunction = new ArrayList<String>();
         
         for (int i = 1; i <= numField; i++)
         {

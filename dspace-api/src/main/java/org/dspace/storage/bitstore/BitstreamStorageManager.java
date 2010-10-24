@@ -143,7 +143,7 @@ public class BitstreamStorageManager
     /* Read in the asset stores from the config. */
     static
     {
-        ArrayList stores = new ArrayList();
+        List stores = new ArrayList();
 
 		// 'assetstore.dir' is always store number 0
 		String sAssetstoreDir = ConfigurationManager
@@ -611,12 +611,12 @@ public class BitstreamStorageManager
 
             String myQuery = "select * from Bitstream where deleted = '1'";
 
-            List storage = DatabaseManager.queryTable(context, "Bitstream", myQuery)
+            List<TableRow> storage = DatabaseManager.queryTable(context, "Bitstream", myQuery)
                     .toList();
 
-            for (Iterator iterator = storage.iterator(); iterator.hasNext();)
+            for (Iterator<TableRow> iterator = storage.iterator(); iterator.hasNext();)
             {
-                TableRow row = (TableRow) iterator.next();
+                TableRow row = iterator.next();
                 int bid = row.getIntColumn("bitstream_id");
 
 				GeneralFile file = getFile(row);

@@ -258,7 +258,7 @@ public class MARC21InitialArticleWord extends InitialArticleWord
 
         // Iterate through word/language array
         // Generate temporary language map
-        Map<Language, List> langWordMap = new HashMap<Language, List>();
+        Map<Language, List<String>> langWordMap = new HashMap<Language, List<String>>();
         for (wordIdx = 0; wordIdx < articleWordArray.length; wordIdx++)
         {
             for (langIdx = 1; langIdx < articleWordArray[wordIdx].length; langIdx++)
@@ -271,7 +271,7 @@ public class MARC21InitialArticleWord extends InitialArticleWord
                     
                     if (words == null)
                     {
-                        words = new ArrayList();
+                        words = new ArrayList<String>();
                         langWordMap.put(lang, words);
                     }
                     
@@ -285,17 +285,17 @@ public class MARC21InitialArticleWord extends InitialArticleWord
         }
         
         // Iterate through languages
-        for (Map.Entry<Language, List> langToWord : langWordMap.entrySet())
+        for (Map.Entry<Language, List<String>> langToWord : langWordMap.entrySet())
         {
             Language lang = langToWord.getKey();
-            List wordList = langToWord.getValue();
+            List<String> wordList = langToWord.getValue();
 
             // Convert the list into an array of strings
             String[] words = new String[wordList.size()];
 
             for (int idx = 0; idx < wordList.size(); idx++)
             {
-                words[idx] = (String)wordList.get(idx);
+                words[idx] = wordList.get(idx);
             }
 
             // Sort the array into length order - longest to shortest
