@@ -516,9 +516,9 @@ public final class BitstreamInfoDAO extends DAOSupport
      * @param itemId
      * @return the list of bitstream ids for this item
      */
-    public List getItemBitstreams(int itemId)
+    public List<Integer> getItemBitstreams(int itemId)
     {
-        List ids = new ArrayList();
+        List<Integer> ids = new ArrayList<Integer>();
 
         Connection conn = null;
         PreparedStatement ps = null;
@@ -559,9 +559,9 @@ public final class BitstreamInfoDAO extends DAOSupport
      * @param collectionId The id of the collection
      * @return the list of bitstream ids for this item
      */
-    public List getCollectionBitstreams(int collectionId)
+    public List<Integer> getCollectionBitstreams(int collectionId)
     {
-        List ids = new ArrayList();
+        List<Integer> ids = new ArrayList<Integer>();
 
         Connection conn = null;
         PreparedStatement ps = null;
@@ -602,9 +602,9 @@ public final class BitstreamInfoDAO extends DAOSupport
      * @param communityId the community id
      * @return the list of bitstream ids for this item
      */
-    public List getCommunityBitstreams(int communityId)
+    public List<Integer> getCommunityBitstreams(int communityId)
     {
-        List ids = new ArrayList();
+        List<Integer> ids = new ArrayList<Integer>();
 
         Connection conn = null;
         PreparedStatement ps = null;

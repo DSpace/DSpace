@@ -105,7 +105,7 @@ public class ItemIteratorTest extends AbstractUnitTest
 
             iitr = Item.findAll(context);
             iitid = new ItemIterator(context, list);
-            iitnone = new ItemIterator(context, new ArrayList());
+            iitnone = new ItemIterator(context, new ArrayList<Integer>());
         }
         catch (AuthorizeException ex)
         {

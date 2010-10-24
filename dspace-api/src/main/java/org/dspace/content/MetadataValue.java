@@ -39,7 +39,8 @@ package org.dspace.content;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.*;
+import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -363,7 +364,7 @@ public class MetadataValue
      * @throws SQLException
      * @throws AuthorizeException
      */
-    public static java.util.Collection findByField(Context context, int fieldId)
+    public static List<MetadataValue> findByField(Context context, int fieldId)
             throws IOException, SQLException, AuthorizeException
     {
         // Grab rows from DB
@@ -372,7 +373,7 @@ public class MetadataValue
                 fieldId);
 
         TableRow row = null;
-        java.util.Collection ret = new ArrayList();
+        List<MetadataValue> ret = new ArrayList<MetadataValue>();
         try
         {
             while (tri.hasNext())

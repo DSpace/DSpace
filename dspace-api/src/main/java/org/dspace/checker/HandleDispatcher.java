@@ -127,7 +127,7 @@ public class HandleDispatcher implements BitstreamDispatcher
                 }
             }
 
-            List ids = new ArrayList();
+            List<Integer> ids = new ArrayList<Integer>();
 
             switch (dsoType)
             {

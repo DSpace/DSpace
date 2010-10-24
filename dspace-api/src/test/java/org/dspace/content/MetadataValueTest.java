@@ -36,6 +36,8 @@ package org.dspace.content;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.List;
+
 import org.dspace.AbstractUnitTest;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -305,7 +307,7 @@ public class MetadataValueTest extends AbstractUnitTest
     {
         mv.create(context);
         int fieldId = mv.getFieldId();
-        Collection found = MetadataValue.findByField(context, fieldId);
+        List<MetadataValue> found = MetadataValue.findByField(context, fieldId);
         assertThat("testFind 0",found, notNullValue());
         assertTrue("testFind 1",found.size() >= 1);        
     }

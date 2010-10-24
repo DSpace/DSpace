@@ -38,6 +38,8 @@ import java.io.IOException;
 import org.databene.contiperf.Required;
 import org.databene.contiperf.PerfTest;
 import java.sql.SQLException;
+import java.util.List;
+
 import org.apache.log4j.Logger;
 import org.dspace.AbstractIntegrationTest;
 import org.dspace.authorize.AuthorizeException;
@@ -137,10 +139,10 @@ public class MetadataIntegrationTest  extends AbstractIntegrationTest
         }
         assertTrue("testCreateSchema 4", exist);
 
-        java.util.Collection col1 = MetadataValue.findByField(context, field1.getFieldID());
+        List<MetadataValue> col1 = MetadataValue.findByField(context, field1.getFieldID());
         assertTrue("testCreateSchema 5", col1.contains(value1));
 
-        java.util.Collection col2 = MetadataValue.findByField(context, field2.getFieldID());
+        List<MetadataValue> col2 = MetadataValue.findByField(context, field2.getFieldID());
         assertTrue("testCreateSchema 6", col2.contains(value2));
 
         //clean database

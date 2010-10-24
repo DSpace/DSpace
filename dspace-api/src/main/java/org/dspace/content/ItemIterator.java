@@ -72,7 +72,7 @@ public class ItemIterator
     private TableRowIterator itemRows;
 
     /** a real iterator which works over the item ids when present */
-    private Iterator iditr;
+    private Iterator<Integer> iditr;
     
     /**
      * Construct an item iterator using a set of TableRow objects from
@@ -97,7 +97,7 @@ public class ItemIterator
      * @param iids
      *            the array list to be iterated over
      */
-    public ItemIterator(Context context, List iids)
+    public ItemIterator(Context context, List<Integer> iids)
     {
     	ourContext = context;
     	iditr = iids.iterator();
@@ -155,7 +155,7 @@ public class ItemIterator
     	if (iditr.hasNext())
         {
     		// get the id
-    		int id = ((Integer) iditr.next()).intValue();
+    		int id = iditr.next().intValue();
     		
             // Check cache
             Item fromCache = (Item) ourContext.fromCache(Item.class, id);
@@ -206,7 +206,7 @@ public class ItemIterator
     	if (iditr.hasNext())
         {
     		// get the id
-    		int id = ((Integer) iditr.next()).intValue();
+    		int id = iditr.next().intValue();
     		
             return id;
         }
