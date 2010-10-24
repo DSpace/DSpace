@@ -74,9 +74,6 @@ import org.jdom.input.SAXBuilder;
 public class METSDisseminationCrosswalk
     implements DisseminationCrosswalk
 {
-    /** log4j category */
-    private static Logger log = Logger.getLogger(METSDisseminationCrosswalk.class);
-
     // Plugin Name of METS packager to use for manifest;
     // maybe make  this configurable.
     private static final String METS_PACKAGER_PLUGIN = "METS";

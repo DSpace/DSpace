@@ -89,10 +89,6 @@ public class RoleCrosswalk
         extends AbstractPackagerWrappingCrosswalk
         implements IngestionCrosswalk, DisseminationCrosswalk
 {
-
-    /** log4j category */
-    private static Logger log = Logger.getLogger(RoleCrosswalk.class);
-
     // Plugin Name of DSPACE-ROLES packager to use for ingest/dissemination
     // (Whatever plugin is defined with this name in 'dspace.cfg' will be used by this Crosswalk)
     private static final String ROLE_PACKAGER_PLUGIN = "DSPACE-ROLES";

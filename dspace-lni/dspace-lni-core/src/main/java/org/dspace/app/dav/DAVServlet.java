@@ -94,12 +94,6 @@ public class DAVServlet extends HttpServlet
     /** The Constant METHOD_MOVE. */
     private static final String METHOD_MOVE = "MOVE";
 
-    /** The Constant METHOD_LOCK. */
-    private static final String METHOD_LOCK = "LOCK";
-
-    /** The Constant METHOD_UNLOCK. */
-    private static final String METHOD_UNLOCK = "UNLOCK";
-
     /** The Constant METHOD_DELETE. */
     private static final String METHOD_DELETE = "DELETE";
 

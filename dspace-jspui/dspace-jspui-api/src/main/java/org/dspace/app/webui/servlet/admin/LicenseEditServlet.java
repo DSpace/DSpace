@@ -62,9 +62,6 @@ import org.dspace.core.I18nUtil;
  */
 public class LicenseEditServlet extends DSpaceServlet
 {
-	/** The logger */
-    private static Logger log = Logger.getLogger(LicenseEditServlet.class);
-
     /**
      * Handle GET requests. This does nothing but forwards
      * the request on to the POST handler. 

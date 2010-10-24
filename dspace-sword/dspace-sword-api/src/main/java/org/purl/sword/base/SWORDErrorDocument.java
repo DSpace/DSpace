@@ -56,11 +56,6 @@ public class SWORDErrorDocument extends SWORDEntry
    @Deprecated
    public static final String ELEMENT_NAME = "error";
    
-   /**
-    * The logger.
-    */
-   private static Logger log = Logger.getLogger(SWORDErrorDocument.class);
-
    private static final XmlName XML_NAME =
            new XmlName(Namespaces.PREFIX_SWORD, "error", Namespaces.NS_SWORD);
 

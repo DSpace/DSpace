@@ -56,17 +56,11 @@ import java.util.List;
  */
 public class MetadataExport
 {
-    /** The Context */
-    private Context c;
-
     /** The items to export */
     private ItemIterator toExport;
 
     /** Whether to export all metadata, or just normally edited metadata */
     private boolean exportAll;
-
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(MetadataExport.class);
 
     /**
      * Set up a new metadata export
@@ -78,7 +72,6 @@ public class MetadataExport
     public MetadataExport(Context c, ItemIterator toExport, boolean exportAll)
     {
         // Store the export settings
-        this.c = c;
         this.toExport = toExport;
         this.exportAll = exportAll;
     }
@@ -95,7 +88,6 @@ public class MetadataExport
         try
         {
             // Try to export the community
-            this.c = c;
             this.toExport = new ItemIterator(c, buildFromCommunity(toExport, new ArrayList<Integer>(), 0));
             this.exportAll = exportAll;
         }

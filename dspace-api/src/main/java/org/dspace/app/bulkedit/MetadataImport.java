@@ -70,9 +70,6 @@ public class MetadataImport
     /** The lines to import */
     List<DSpaceCSVLine> toImport;
 
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(MetadataImport.class);
-
     /**
      * Create an instance of the metadata importer. Requires a context and an array of CSV lines
      * to examine.

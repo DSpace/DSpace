@@ -51,9 +51,6 @@ import java.util.List;
  */
 public class ItemCollectionGenerator extends ATOMCollectionGenerator
 {
-	/** logger */
-	private static Logger log = Logger.getLogger(ItemCollectionGenerator.class);
-
 	public ItemCollectionGenerator(SWORDService service)
 	{
 		super(service);

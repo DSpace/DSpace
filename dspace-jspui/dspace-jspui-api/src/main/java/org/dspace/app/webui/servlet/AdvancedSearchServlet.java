@@ -60,9 +60,6 @@ import org.dspace.core.Context;
  */
 public class AdvancedSearchServlet extends DSpaceServlet
 {
-    /** Logger */
-    private static Logger log = Logger.getLogger(SubscribeServlet.class);
-
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException

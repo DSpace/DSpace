@@ -64,9 +64,6 @@ import org.dspace.eperson.EPersonDeletionException;
  */
 public class EPersonAdminServlet extends DSpaceServlet
 {
-    /** Logger */
-    private static Logger log = Logger.getLogger(EPersonAdminServlet.class);
-
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException

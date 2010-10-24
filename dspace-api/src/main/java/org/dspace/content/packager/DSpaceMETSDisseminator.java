@@ -85,9 +85,6 @@ import edu.harvard.hul.ois.mets.helper.PCData;
 public class DSpaceMETSDisseminator
     extends AbstractMETSDisseminator
 {
-    /** log4j category */
-    private static Logger log = Logger.getLogger(DSpaceMETSDisseminator.class);
-
     /**
      * Identifier for the package we produce, i.e. DSpace METS SIP
      * Profile.  Though not strictly true, there is no DIP standard yet

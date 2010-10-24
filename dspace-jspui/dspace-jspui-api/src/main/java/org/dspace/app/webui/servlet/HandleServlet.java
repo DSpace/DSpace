@@ -708,62 +708,6 @@ public class HandleServlet extends DSpaceServlet
     }
 
     /**
-     * Utility method to obtain the titles for the Items in the given list.
-     * 
-     * @param items List of Items
-     * @return array of corresponding titles
-     */
-    private String[] getItemTitles(List<Item> items)
-    {
-        String[] titles = new String[items.size()];
-
-        for (int i = 0; i < items.size(); i++)
-        {
-            Item item = items.get(i);
-
-            // FIXME: Should probably check for preferred language?
-            DCValue[] titlesForThis = item.getDC("title", null, Item.ANY);
-
-            // Just use the first title, if any
-            if (titlesForThis.length == 0)
-            {
-                // No title at all!
-                titles[i] = null;
-            }
-            else
-            {
-                // Use first title
-                titles[i] = titlesForThis[0].value;
-            }
-        }
-
-        return titles;
-    }
-
-    /**
-     * Utility method obtain URLs for the most recent items
-     * 
-     * @param context
-     *            DSpace context
-     * @param items
-     *            the items to get URLs for
-     * @return an array of URLs (in Strings) corresponding to those items
-     */
-    private String[] getItemURLs(Context context, List<Item> items)
-            throws SQLException
-    {
-        String[] urls = new String[items.size()];
-
-        for (int i = 0; i < items.size(); i++)
-        {
-            Item item = items.get(i);
-            urls[i] = "/handle/" + item.getHandle();
-        }
-
-        return urls;
-    }
-
-    /**
      * Utility method to produce a list of parent communities for a given
      * community, ending with the passed community, if include is true. If
      * commmunity is top-level, the array will be empty, or contain only the

@@ -64,8 +64,6 @@ import org.jdom.Namespace;
 public class OAIDCIngestionCrosswalk
     implements IngestionCrosswalk
 {
-    /** log4j category */
-    private static Logger log = Logger.getLogger(OAIDCIngestionCrosswalk.class);    
     private static Namespace DC_NS = Namespace.getNamespace("http://www.dspace.org/xmlns/dspace/dim");
     private static Namespace OAI_DC_NS = Namespace.getNamespace("http://www.openarchives.org/OAI/2.0/oai_dc/");
     

@@ -108,8 +108,6 @@ import org.xml.sax.SAXException;
 public class OpenSearchGenerator extends AbstractGenerator
                 implements CacheableProcessingComponent, Recyclable
 {
-    private static final Logger log = Logger.getLogger(OpenSearchGenerator.class);
-            
     /** Cache of this object's validity */
     private ExpiresValidity validity = null;
     

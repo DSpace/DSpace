@@ -300,21 +300,4 @@ public class AccountManager
                     + " information to " + email);
         }
     }
-
-    /**
-     * Return the date on which registrations expire.
-     * 
-     * @return - The date on which registrations expire
-     */
-    private static Timestamp getDefaultExpirationDate()
-    {
-        Calendar calendar = Calendar.getInstance();
-
-        calendar.setTime(new java.util.Date());
-
-        // Add 1 year from today
-        calendar.add(Calendar.WEEK_OF_YEAR, 52);
-
-        return new java.sql.Timestamp(calendar.getTime().getTime());
-    }
 }

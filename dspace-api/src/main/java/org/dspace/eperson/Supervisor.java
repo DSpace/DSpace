@@ -61,10 +61,6 @@ import org.dspace.storage.rdbms.DatabaseManager;
  * @version $Revision$
  */
 public class Supervisor {
-    
-    /** log4j category */
-    private static Logger log = Logger.getLogger(Supervisor.class);
-    
     /** value to use for no policy set */
     public static final int POLICY_NONE = 0;
     

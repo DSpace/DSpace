@@ -90,8 +90,6 @@ import org.xml.sax.SAXException;
  */
 public class UploadStep extends AbstractSubmissionStep
 {
-    private static Logger log = Logger.getLogger(UploadStep.class);
-   
 	/** Language Strings for Uploading **/
     protected static final Message T_head = 
         message("xmlui.Submission.submit.UploadStep.head");

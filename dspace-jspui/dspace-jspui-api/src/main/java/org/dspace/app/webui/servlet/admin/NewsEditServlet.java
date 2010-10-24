@@ -61,8 +61,6 @@ import org.dspace.core.Context;
  */
 public class NewsEditServlet extends DSpaceServlet
 {
-    private static Logger log = Logger.getLogger(NewsEditServlet.class);
-
     protected void doDSGet(Context c, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException

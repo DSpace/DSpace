@@ -73,17 +73,10 @@ public class ItemExportArchiveServlet extends DSpaceServlet {
 	private static Logger log = Logger
 			.getLogger(ItemExportArchiveServlet.class);
 
-	/**
-	 * Threshold on export size size before content-disposition will be set.
-	 */
-	private int threshold;
-
 	@Override
 	public void init(ServletConfig arg0) throws ServletException {
 
 		super.init(arg0);
-		threshold = ConfigurationManager
-				.getIntProperty("webui.content_disposition_threshold");
 	}
 
 	@Override

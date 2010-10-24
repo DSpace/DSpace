@@ -68,9 +68,6 @@ import org.jdom.output.XMLOutputter;
 public class DIMDisseminationCrosswalk
     implements DisseminationCrosswalk
 {
-    /** log4j category */ 
-    private static Logger log = Logger.getLogger(OREDisseminationCrosswalk.class);
-
     // Non-existant XSD schema
     public static final String DIM_XSD = "null";
     
@@ -79,10 +76,6 @@ public class DIMDisseminationCrosswalk
         Namespace.getNamespace("dim", "http://www.dspace.org/xmlns/dspace/dim");
 
     private static final Namespace namespaces[] = { DIM_NS };
-
-    private static XMLOutputter outputUgly = new XMLOutputter();
-    private static XMLOutputter outputPretty = new XMLOutputter(Format.getPrettyFormat());
-    private static SAXBuilder builder = new SAXBuilder();
 
     public Namespace[] getNamespaces()
     {

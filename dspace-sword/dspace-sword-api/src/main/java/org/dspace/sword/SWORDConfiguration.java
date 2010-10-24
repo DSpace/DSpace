@@ -71,9 +71,6 @@ import java.sql.SQLException;
  */
 public class SWORDConfiguration
 {
-	/** logger */
-	private static Logger log = Logger.getLogger(SWORDConfiguration.class);
-
 	/** whether we can support noOp */
 	private boolean noOp = true;
 

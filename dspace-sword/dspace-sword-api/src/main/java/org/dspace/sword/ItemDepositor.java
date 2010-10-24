@@ -51,8 +51,6 @@ import java.sql.SQLException;
 
 public class ItemDepositor extends Depositor
 {
-	private static Logger log = Logger.getLogger(ItemDepositor.class);
-
 	private Item item;
 
 	public ItemDepositor(SWORDService swordService, DSpaceObject dso)

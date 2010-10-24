@@ -144,9 +144,6 @@ public class DSpaceFeedGenerator extends AbstractGenerator
         CACHE_AGE = 1000 * 60 * 60 * ageCfg;
     }
     
-        /**     default fields to display in item description */
-    private static String defaultDescriptionFields = "dc.description.abstract, dc.description, dc.title.alternative, dc.title";
-
     /** configuration option to include Item which does not have READ by Anonymous enabled **/
     private static boolean includeRestrictedItems = ConfigurationManager.getBooleanProperty("harvest.includerestricted.rss", true);
 

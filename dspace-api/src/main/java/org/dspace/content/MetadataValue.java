@@ -40,7 +40,6 @@ package org.dspace.content;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;

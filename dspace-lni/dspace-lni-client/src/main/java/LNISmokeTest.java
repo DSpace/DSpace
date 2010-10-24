@@ -99,9 +99,6 @@ public class LNISmokeTest
      * The Constant NS_DSPACE. 
      * DSpace's XML namespace
      */
-    private static final Namespace NS_DSPACE = Namespace.getNamespace("dspace",
-            "http://www.dspace.org/xmlns/dspace");
-
     /** The output pretty. */
     private static XMLOutputter outputPretty = new XMLOutputter(Format
             .getPrettyFormat());

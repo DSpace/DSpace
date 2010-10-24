@@ -225,8 +225,6 @@ public class Data extends AbstractWingElement
         AttributeMap attributes = new AttributeMap();
         attributes.setNamespace(WingConstants.I18N);
 
-        boolean unknownType = false;
-
         if (dictionaryParameter instanceof Date)
         {
             Date date = (Date) dictionaryParameter;
@@ -266,11 +264,6 @@ public class Data extends AbstractWingElement
             Float value = (Float) dictionaryParameter;
             attributes.put(A_TYPE, TYPE_NUMBER);
             attributes.put(A_VALUE, String.valueOf(value));
-        }
-        else
-        {
-            // Unknown types or String
-            unknownType = true;
         }
 
         startElement(contentHandler, namespaces, WingConstants.I18N, E_PARAM, attributes);

@@ -89,10 +89,6 @@ public class SampleStep extends AbstractProcessingStep
      **************************************************************************/
     public static final int STATUS_USER_INPUT_ERROR = 1;
 
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(SampleStep.class);
-
-    
     /**
      * Do any processing of the information input by the user, and/or perform
      * step processing (if no user interaction required)

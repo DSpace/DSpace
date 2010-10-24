@@ -74,9 +74,6 @@ import org.jdom.Namespace;
 public class OREDisseminationCrosswalk
     implements DisseminationCrosswalk
 {
-    /** log4j category */
-    private static Logger log = Logger.getLogger(OREDisseminationCrosswalk.class);
-
     /* Schema for Atom only available in Relax NG format */
     public static final String ATOM_RNG = "http://tweety.lanl.gov/public/schemas/2008-06/atom-tron.sch";
     

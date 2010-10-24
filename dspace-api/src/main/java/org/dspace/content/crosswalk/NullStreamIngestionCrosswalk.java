@@ -65,9 +65,6 @@ import org.dspace.core.Context;
 public class NullStreamIngestionCrosswalk
     implements StreamIngestionCrosswalk
 {
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(NullStreamIngestionCrosswalk.class);
-
     public void ingest(Context context, DSpaceObject dso, InputStream in, String MIMEType)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {

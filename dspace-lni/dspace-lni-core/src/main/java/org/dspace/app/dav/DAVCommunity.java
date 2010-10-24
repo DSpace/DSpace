@@ -65,10 +65,6 @@ import org.jdom.Element;
  */
 class DAVCommunity extends DAVDSpaceObject
 {
-    
-    /** log4j category. */
-    private static Logger log = Logger.getLogger(DAVCommunity.class);
-
     /** The community. */
     private Community community = null;
 

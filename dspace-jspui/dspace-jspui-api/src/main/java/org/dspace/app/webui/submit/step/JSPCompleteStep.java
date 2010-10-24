@@ -73,10 +73,6 @@ import org.dspace.core.Context;
  */
 public class JSPCompleteStep extends JSPStep
 {
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(JSPCompleteStep.class);
-
-    
     /**
      * Do any pre-processing to determine which JSP (if any) is used to generate
      * the UI for this step. This method should include the gathering and

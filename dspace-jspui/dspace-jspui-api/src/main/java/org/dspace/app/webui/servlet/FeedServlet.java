@@ -119,10 +119,6 @@ public class FeedServlet extends DSpaceServlet
     // Whether to include private items or not
     private static boolean includeAll = true;
     
-    //default fields to display in item description
-    private static String defaultDescriptionFields = "dc.title, dc.contributor.author, dc.contributor.editor, dc.description.abstract, dc.description";
-
-    
     static
     {
     	enabled = ConfigurationManager.getBooleanProperty("webui.feed.enable");

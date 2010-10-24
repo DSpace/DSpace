@@ -43,7 +43,6 @@ package org.dspace.content.crosswalk;
 import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import java.sql.SQLException;
 

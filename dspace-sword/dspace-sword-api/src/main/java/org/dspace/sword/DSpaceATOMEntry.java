@@ -62,8 +62,6 @@ import org.apache.log4j.Logger;
  */
 public abstract class DSpaceATOMEntry
 {
-	private static Logger log = Logger.getLogger(DSpaceATOMEntry.class);
-
 	/** the SWORD ATOM entry which this class effectively decorates */
 	protected SWORDEntry entry;
 	

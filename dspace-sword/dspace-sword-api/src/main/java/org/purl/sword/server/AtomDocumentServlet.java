@@ -59,9 +59,6 @@ import org.purl.sword.base.SWORDException;
  */
 public class AtomDocumentServlet extends DepositServlet {
 
-	/** Logger */
-	private static Logger log = Logger.getLogger(AtomDocumentServlet.class);
-
 	/**
 	 * Initialise the servlet.
 	 * 

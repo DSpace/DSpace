@@ -88,9 +88,6 @@ public class DCInputsReader
     /** Keyname for storing dropdown value-pair set name */
     static final String PAIR_TYPE_NAME = "value-pairs-name";
 
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(DCInputsReader.class);
-
     /** The fully qualified pathname of the form definition XML file */
     private String defsFile = ConfigurationManager.getProperty("dspace.dir")
             + File.separator + "config" + File.separator + FORM_DEF_FILE;

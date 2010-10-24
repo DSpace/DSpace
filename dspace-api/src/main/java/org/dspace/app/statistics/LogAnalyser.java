@@ -239,11 +239,7 @@ public class LogAnalyser
         
    /** the end date of the report as obtained from the log files */
    private static Date logEndDate = null;
-   
-   /** are we looking stuff up in the database */
-   private static boolean lookUp = false;
-        
-   
+
     /**
      * main method to be run from command line.  See usage information for
      * details as to how to use the command line flags (-help)
@@ -602,11 +598,6 @@ public class LogAnalyser
         if (myEndDate != null)
         {
             endDate = myEndDate;
-        }
-        
-        if (myLogDir != null)
-        {
-            lookUp = myLookUp;
         }
         
         if (myOutFile != null)

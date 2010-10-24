@@ -46,7 +46,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -152,11 +151,6 @@ public class QDCCrosswalk extends SelfNamedPlugin
     // XML schemaLocation fragment for this crosswalk, from config.
     private String schemaLocation = null;
 
-    private static final Namespace XLINK_NS =
-        Namespace.getNamespace("xlink", "http://www.w3.org/TR/xlink");
-
-    private static XMLOutputter outputUgly = new XMLOutputter();
-    private static XMLOutputter outputPretty = new XMLOutputter(Format.getPrettyFormat());
     private static SAXBuilder builder = new SAXBuilder();
 
     /**

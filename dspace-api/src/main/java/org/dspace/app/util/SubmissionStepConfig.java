@@ -101,9 +101,6 @@ public class SubmissionStepConfig implements Serializable
     /** The number of this step in the current SubmissionConfig */
     private int number = -1;
 
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(SubmissionStepConfig.class);
-
     /**
      * Class constructor for creating an empty SubmissionStepConfig object
      */

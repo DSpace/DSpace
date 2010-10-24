@@ -42,7 +42,6 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -84,9 +83,6 @@ public class PREMISCrosswalk
     // XML schemaLocation fragment for this crosswalk, from config.
     private String schemaLocation =
         PREMIS_NS.getURI()+" http://www.loc.gov/standards/premis/PREMIS-v1-0.xsd";
-
-    private static final Namespace XLINK_NS =
-        Namespace.getNamespace("xlink", "http://www.w3.org/TR/xlink");
 
     private static final Namespace namespaces[] = { PREMIS_NS };
 

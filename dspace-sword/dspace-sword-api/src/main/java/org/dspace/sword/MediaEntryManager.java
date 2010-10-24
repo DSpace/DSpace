@@ -52,9 +52,6 @@ import org.dspace.content.Bitstream;
  */
 public class MediaEntryManager
 {
-	/** logger */
-	private static Logger log = Logger.getLogger(MediaEntryManager.class);
-
 	/** sword service implementation */
 	private SWORDService swordService;
 

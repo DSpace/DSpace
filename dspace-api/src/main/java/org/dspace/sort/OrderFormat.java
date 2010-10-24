@@ -75,8 +75,6 @@ import org.dspace.sort.OrderFormatText;
  */
 public class OrderFormat
 {
-	private final static Logger log = LogManager.getLogger(OrderFormat.class);
-
 	public final static String AUTHOR = "author";
 	public final static String TITLE  = "title";
 	public final static String TEXT   = "text";

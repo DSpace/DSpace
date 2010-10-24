@@ -82,12 +82,6 @@ public class SWORDEntry extends Entry
     * The packaging infomation
     */
    private SwordPackaging swordPackaging;
-
-   /**
-    * The logger.
-    */
-   private static Logger log = Logger.getLogger(SWORDEntry.class);
-
    
    /**
     * Create a new SWORDEntry with the given namespace and element. This method is

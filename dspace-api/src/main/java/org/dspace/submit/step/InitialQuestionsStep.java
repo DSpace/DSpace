@@ -102,9 +102,6 @@ public class InitialQuestionsStep extends AbstractProcessingStep
 
     protected boolean willRemoveFiles = false;
 
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(InitialQuestionsStep.class);
-
     /**
      * Do any processing of the information input by the user, and/or perform
      * step processing (if no user interaction required)

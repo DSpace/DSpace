@@ -98,9 +98,6 @@ import org.xml.sax.SAXException;
  */
 public class DescribeStep extends AbstractSubmissionStep
 {
-        private static Logger log = Logger.getLogger(DescribeStep.class);
-
-        
         /** Language Strings **/
     protected static final Message T_head =
         message("xmlui.Submission.submit.DescribeStep.head");

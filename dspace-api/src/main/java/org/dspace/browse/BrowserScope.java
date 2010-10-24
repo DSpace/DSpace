@@ -51,9 +51,6 @@ import org.apache.log4j.Logger;
  */
 public class BrowserScope
 {
-    /** the logger for this class */
-    private static Logger log = Logger.getLogger(BrowserScope.class);
-
     /** the DSpace context */
     private Context context;
 

@@ -284,27 +284,6 @@ public class Harvest
         }
     }
     
-    
-    /**
-     * check 
-     * @param collectionID
-     * @return
-     */
-    private Collection checkCollection(String collectionID) 
-    {
-    	Collection collection = resolveCollection(collectionID);
-    	try {
-    		HarvestedCollection hc = HarvestedCollection.find(context, collection.getID());
-	        if (!hc.isHarvestable()) {
-	        	System.out.println("Collection '"+ collection.getName() +"' is not set up for harvesting");
-	            System.exit(1);
-	        }
-    	} catch (SQLException se) {
-    		se.printStackTrace();
-    	}
-    	return collection;
-    }
-    
     /*
      * Resolve the ID into a collection and check to see if its harvesting options are set. If so, return
      * the collection, if not, bail out. 

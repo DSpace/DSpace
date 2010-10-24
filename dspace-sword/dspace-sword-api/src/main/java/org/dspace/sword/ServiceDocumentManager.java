@@ -54,8 +54,6 @@ import java.util.List;
 
 public class ServiceDocumentManager
 {
-	private static Logger log = Logger.getLogger(ServiceDocumentManager.class);
-
 	private SWORDService swordService;
 
 	private SWORDAuthenticator swordAuth;

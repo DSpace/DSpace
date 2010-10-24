@@ -61,9 +61,6 @@ import java.net.MalformedURLException;
  */
 public class SWORDUrlManager
 {
-	/** logger */
-	private static Logger log = Logger.getLogger(SWORDUrlManager.class);
-
 	/** the sword configuration */
 	private SWORDConfiguration config;
 

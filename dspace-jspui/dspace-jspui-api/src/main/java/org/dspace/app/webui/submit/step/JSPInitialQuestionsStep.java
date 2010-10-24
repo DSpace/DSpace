@@ -104,9 +104,6 @@ public class JSPInitialQuestionsStep extends JSPStep
 
     /** JSP which displays information to be reviewed during 'verify step' * */
     private static final String REVIEW_JSP = "/submit/review-init.jsp";
-    
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(JSPInitialQuestionsStep.class);
 
     /**
      * Do any pre-processing to determine which JSP (if any) is used to generate

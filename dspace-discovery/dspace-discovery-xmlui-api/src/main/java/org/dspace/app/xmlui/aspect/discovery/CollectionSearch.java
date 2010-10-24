@@ -69,8 +69,6 @@ import org.xml.sax.SAXException;
  */
 public class CollectionSearch extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
-    private static final Logger log = Logger.getLogger(CollectionSearch.class);
-
     /** Language Strings */
     private static final Message T_dspace_home =
         message("xmlui.general.dspace_home");

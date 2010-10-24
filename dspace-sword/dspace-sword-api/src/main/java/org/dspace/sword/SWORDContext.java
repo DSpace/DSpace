@@ -69,9 +69,6 @@ import org.apache.log4j.Logger;
  */
 public class SWORDContext 
 {
-	/** logger */
-	private static Logger log = Logger.getLogger(SWORDContext.class);
-
 	/** The primary authenticated user for the request */
 	private EPerson authenticated = null;
 	

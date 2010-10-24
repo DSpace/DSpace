@@ -114,9 +114,6 @@ import java.net.URLEncoder;
 public class DSpaceAIPDisseminator
     extends AbstractMETSDisseminator
 {
-    /** log4j category */
-    private static Logger log = Logger.getLogger(DSpaceAIPDisseminator.class);
-
     /**
      * Unique identifier for the profile of the METS document.
      * To ensure uniqueness, it is the URL that the XML schema document would

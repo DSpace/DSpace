@@ -79,9 +79,6 @@ import org.jdom.Element;
 public class DSpaceMETSIngester
        extends AbstractMETSIngester
 {
-    /** log4j category */
-    private static Logger log = Logger.getLogger(DSpaceMETSIngester.class);
-
     // first part of required mets@PROFILE value
     private final static String PROFILE_START = "DSpace METS SIP Profile";
 

@@ -38,7 +38,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;

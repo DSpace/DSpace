@@ -73,10 +73,7 @@ import org.xml.sax.SAXException;
  */
 public class StepTransformer extends AbstractDSpaceTransformer
 {
-	private static Logger log = Logger.getLogger(StepTransformer.class);
-
-	
-	/** 
+	/**
      * The id of the currently active workspace or workflow, this contains 
      * the incomplete DSpace item 
      */

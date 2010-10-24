@@ -97,9 +97,6 @@ import org.apache.log4j.Logger;
  */
 public class ChoiceLookupTransformer extends AbstractDSpaceTransformer
 {
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(ChoiceLookupTransformer.class);
-
     private static final String CONFIG_PREFIX = "xmlui.lookup.field.";
 
     /** Language Strings */

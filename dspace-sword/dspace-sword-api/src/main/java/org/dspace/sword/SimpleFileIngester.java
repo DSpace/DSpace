@@ -62,9 +62,6 @@ import java.io.IOException;
  */
 public class SimpleFileIngester implements SWORDIngester
 {
-	/** logger */
-	private static Logger log = Logger.getLogger(SimpleFileIngester.class);
-
 	/** sword service implementation */
 	private SWORDService swordService;
 

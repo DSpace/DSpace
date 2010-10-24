@@ -104,9 +104,6 @@ import org.dspace.submit.step.SampleStep;
  */
 public class JSPSampleStep extends JSPStep
 {
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(JSPSampleStep.class);
-    
     /** JSP which displays the step to the user * */
     private static final String DISPLAY_JSP = "/submit/sample-step.jsp";
 

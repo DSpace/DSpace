@@ -127,10 +127,6 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
 
     private final static Message T_rpp = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.rpp");
 
-    private final static Message T_etal = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.etal");
-
-    private final static Message T_etal_all = message("xmlui.ArtifactBrowser.ConfigurableBrowse.etal.all");
-
     private final static Message T_order_asc = message("xmlui.ArtifactBrowser.ConfigurableBrowse.order.asc");
 
     private final static Message T_order_desc = message("xmlui.ArtifactBrowser.ConfigurableBrowse.order.desc");

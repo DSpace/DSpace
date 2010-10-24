@@ -69,9 +69,6 @@ import org.dspace.submit.AbstractProcessingStep;
  */
 public class VerifyStep extends AbstractProcessingStep
 {
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(VerifyStep.class);
-
     /**
      * Do any processing of the information input by the user, and/or perform
      * step processing (if no user interaction required)

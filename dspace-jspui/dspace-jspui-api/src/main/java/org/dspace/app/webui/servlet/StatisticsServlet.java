@@ -75,10 +75,6 @@ import org.dspace.eperson.Group;
  */
 public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServlet
 {
-
-    /** log4j category */
-    private static Logger log = Logger.getLogger(StatisticsServlet.class);
-    
     protected void doDSGet(Context c, 
         HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException

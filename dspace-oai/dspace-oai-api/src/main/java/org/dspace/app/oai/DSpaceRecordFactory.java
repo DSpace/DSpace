@@ -60,9 +60,6 @@ import ORG.oclc.oai.server.verb.CannotDisseminateFormatException;
  */
 public class DSpaceRecordFactory extends RecordFactory
 {
-    /** log4j category */
-    private static Logger log = Logger.getLogger(DSpaceRecordFactory.class);
-
     public DSpaceRecordFactory(Properties properties)
     {
         // We don't use the OAICat properties; pass on up

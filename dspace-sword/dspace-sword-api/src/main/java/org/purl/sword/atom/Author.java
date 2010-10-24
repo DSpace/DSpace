@@ -101,11 +101,6 @@ public class Author extends XmlElement implements SwordElementInterface
    private Email email;
 
    /**
-    * The logger. 
-    */
-   private static Logger log = Logger.getLogger(Author.class);
-
-   /**
     *
     */
    private static final XmlName XML_NAME =

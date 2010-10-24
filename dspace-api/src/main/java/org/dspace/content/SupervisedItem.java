@@ -60,22 +60,6 @@ import org.dspace.storage.rdbms.TableRow;
  */
 public class SupervisedItem extends WorkspaceItem
 {
-    
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(SupervisedItem.class);
-    
-    /** The item this workspace object pertains to */
-    private Item item;
-    
-    /** Our context */
-    private Context ourContext;
-
-    /** The table row corresponding to this workspace item */
-    private TableRow siRow;
-
-    /** The collection the item is being submitted to */
-    private Collection collection;
-    
     /**
      * Construct a supervised item out of the given row
      *

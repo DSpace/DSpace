@@ -102,8 +102,6 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	private static final Message T_submit_delete = message("xmlui.administrative.collection.EditCollectionMetadataForm.submit_delete");
 	private static final Message T_submit_save = message("xmlui.administrative.collection.EditCollectionMetadataForm.submit_save");
 	
-	private static final Message T_sysadmins_only = message("xmlui.administrative.collection.EditCollectionMetadataForm.sysadmins_only");
-	
 	public void addPageMeta(PageMeta pageMeta) throws WingException
     {
         pageMeta.addMetadata("title").addContent(T_title);

@@ -899,28 +899,6 @@ public class WorkflowManager
         }
     }
 
-    /**
-     * Add all the specified people to the list of email recipients,
-     * and send it
-     * 
-     * @param c
-     *            Context
-     * @param epa
-     *            Eperson[] of recipients
-     * @param email
-     *            Email object containing the message
-     */
-    private static void emailRecipients(Context c, EPerson[] epa, Email email)
-            throws SQLException, MessagingException
-    {
-        for (int i = 0; i < epa.length; i++)
-        {
-            email.addRecipient(epa[i].getEmail());
-        }
-
-        email.send();
-    }
-
     private static String getMyDSpaceLink()
     {
         return ConfigurationManager.getProperty("dspace.url") + "/mydspace";

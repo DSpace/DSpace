@@ -76,9 +76,6 @@ public class CommunitySearch extends AbstractDSpaceTransformer implements Cachea
     private static final Logger log = Logger.getLogger(CommunitySearch.class);
 
     /** Language Strings */
-    private static final Message T_dspace_home =
-        message("xmlui.general.dspace_home");
-
     private static final Message T_full_text_search =
         message("xmlui.ArtifactBrowser.CommunityViewer.full_text_search");
 
@@ -87,24 +84,6 @@ public class CommunitySearch extends AbstractDSpaceTransformer implements Cachea
 
     public static final Message T_untitled =
     	message("xmlui.general.untitled");
-
-    private static final Message T_head_browse =
-        message("xmlui.ArtifactBrowser.CommunityViewer.head_browse");
-
-    private static final Message T_browse_titles =
-        message("xmlui.ArtifactBrowser.CommunityViewer.browse_titles");
-
-    private static final Message T_browse_authors =
-        message("xmlui.ArtifactBrowser.CommunityViewer.browse_authors");
-
-    private static final Message T_browse_dates =
-        message("xmlui.ArtifactBrowser.CommunityViewer.browse_dates");
-
-    private static final Message T_advanced_search_link=
-    	message("xmlui.ArtifactBrowser.CommunityViewer.advanced_search_link");
-
-    private static final Message T_head_sub_communities =
-        message("xmlui.ArtifactBrowser.CommunityViewer.head_sub_communities");
 
     private static final Message T_head_sub_collections =
         message("xmlui.ArtifactBrowser.CommunityViewer.head_sub_collections");

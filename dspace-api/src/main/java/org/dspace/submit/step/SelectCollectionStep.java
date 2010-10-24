@@ -84,9 +84,6 @@ public class SelectCollectionStep extends AbstractProcessingStep
     // invalid collection or error finding collection
     public static final int STATUS_INVALID_COLLECTION = 2;
 
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(SelectCollectionStep.class);
-
     /**
      * Do any processing of the information input by the user, and/or perform
      * step processing (if no user interaction required)

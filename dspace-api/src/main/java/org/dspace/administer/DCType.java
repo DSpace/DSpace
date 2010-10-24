@@ -65,9 +65,6 @@ import org.dspace.core.Context;
  */
 public class DCType
 {
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(DCType.class);
-
     /** Our context */
     private Context ourContext;
 

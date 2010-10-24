@@ -58,8 +58,6 @@ import org.apache.log4j.Logger;
  */
 public class SWORDIngesterFactory
 {
-	private static Logger log = Logger.getLogger(SWORDIngesterFactory.class);
-
 	/**
 	 * Generate an object which conforms to the SWORDIngester interface.
 	 * This Factory method may use the given DSpace context and the given

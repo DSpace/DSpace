@@ -40,8 +40,6 @@ package org.dspace.administer;
  */
 public class RegistryImportException extends Exception
 {
-    private Exception e;
-    
     /**
      * Create an empty authorize exception
      */

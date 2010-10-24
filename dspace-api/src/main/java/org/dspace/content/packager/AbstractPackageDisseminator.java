@@ -72,9 +72,6 @@ import org.dspace.core.Context;
 public abstract class AbstractPackageDisseminator
         implements PackageDisseminator
 {
-    /** log4j category */
-    private static Logger log = Logger.getLogger(AbstractPackageDisseminator.class);
-
     /**  List of all successfully disseminated package files */
     private List<File> packageFileList = new ArrayList<File>();
 

@@ -86,8 +86,6 @@ import org.dspace.app.sfx.SFXFileReader;
  */
 public class ItemViewer extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
-    private static final Logger log = Logger.getLogger(ItemViewer.class);
-
     /** Language strings */
     private static final Message T_dspace_home =
         message("xmlui.general.dspace_home");

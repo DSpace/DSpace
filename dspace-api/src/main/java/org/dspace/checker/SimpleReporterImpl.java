@@ -53,9 +53,6 @@ import org.dspace.core.I18nUtil;
  */
 public class SimpleReporterImpl implements SimpleReporter
 {
-    /** log4j logger. */
-    private static Logger LOG = Logger.getLogger(SimpleReporterImpl.class);
-
     /** Utility date format which includes hours minutes and seconds. */
     private static final DateFormat DATE_FORMAT_MAX = DateFormat
             .getDateInstance(DateFormat.MEDIUM);

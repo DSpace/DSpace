@@ -43,7 +43,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -63,10 +62,6 @@ import org.jdom.Element;
  */
 class DAVSite extends DAVResource
 {
-    
-    /** log4j category. */
-    private static Logger log = Logger.getLogger(DAVSite.class);
-
     /** The Constant news_topProperty. */
     private static final Element news_topProperty = new Element("news_top",
             DAV.NS_DSPACE);

@@ -78,9 +78,6 @@ import org.dspace.eperson.EPerson;
  */
 public class AuthenticationManager
 {
-    /** log4j category */
-    private static Logger log = Logger.getLogger(AuthenticationManager.class);
-
     /** List of authentication methods, highest precedence first. */
     private static AuthenticationMethod methodStack[] =
         (AuthenticationMethod[])PluginManager.getPluginSequence(AuthenticationMethod.class);

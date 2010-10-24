@@ -79,9 +79,6 @@ public class BitstreamFormatRegistry extends DSpaceServlet
     /** User wants to create a new format */
     public static final int CREATE = 4;
 
-    /** Logger */
-    private static Logger log = Logger.getLogger(BitstreamFormatRegistry.class);
-
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
