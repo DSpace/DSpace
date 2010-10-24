@@ -104,9 +104,6 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
     private static final Message T_head2 =
             message("xmlui.ArtifactBrowser.AbstractSearch.head2");
 
-    private static final Message T_head3 =
-            message("xmlui.ArtifactBrowser.AbstractSearch.head3");
-
     private static final Message T_no_results =
             message("xmlui.ArtifactBrowser.AbstractSearch.no_results");
 
@@ -123,11 +120,6 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
     private final static Message T_order_desc = message("xmlui.ArtifactBrowser.AbstractSearch.order.desc");
 
     private final static Message T_rpp = message("xmlui.ArtifactBrowser.AbstractSearch.rpp");
-
-    private final static Message T_group_by = message("xmlui.ArtifactBrowser.AbstractSearch.group_by");
-
-    private static final Message T_group_by_none =
-            message("xmlui.ArtifactBrowser.AbstractSearch.group_by.none");
 
     /**
      * The options for results per page
@@ -329,47 +321,6 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
         }
         //}// Empty query
     }
-
-    private Item getParent(Item item) {
-
-        String value = getSingleValue(item, "dc.relation.ispartof");
-
-        if (value == null)
-        {
-            return null;
-        }
-
-        try {
-            String handlePrefix = ConfigurationManager.getProperty("handle.canonical.prefix");
-            if (handlePrefix == null || handlePrefix.length() == 0)
-            {
-                handlePrefix = "http://hdl.handle.net/";
-            }
-            
-            DSpaceObject obj = HandleManager.resolveToObject(context, value.replaceFirst(handlePrefix, ""));
-
-            if (obj instanceof Item)
-            {
-                return (Item) obj;
-            }
-        }
-        catch (Exception e) {
-
-        }
-
-        return null;
-
-    }
-
-
-    private String getSingleValue(Item item, String field) {
-        DCValue[] type = item.getMetadata(field);
-        if (type != null && type.length > 0 && type[0] != null) {
-            return type[0].value;
-        }
-        return null;
-    }
-
 
     /**
      * Add options to the search scope field. This field determines in what

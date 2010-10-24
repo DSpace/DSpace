@@ -75,22 +75,6 @@ public class RelatedItems extends AbstractFiltersTransformer
 
     private static final Logger log = Logger.getLogger(RelatedItems.class);
     
-    /** Language strings */
-    private static final Message T_dspace_home =
-        message("xmlui.general.dspace_home");
-
-    private static final Message T_trail =
-        message("xmlui.ArtifactBrowser.ItemViewer.trail");
-
-    private static final Message T_show_simple =
-        message("xmlui.ArtifactBrowser.ItemViewer.show_simple");
-
-    private static final Message T_show_full =
-        message("xmlui.ArtifactBrowser.ItemViewer.show_full");
-
-    private static final Message T_head_parent_collections =
-        message("xmlui.ArtifactBrowser.ItemViewer.head_parent_collections");
-
     /**
      * Display a single item
      */

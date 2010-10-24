@@ -88,9 +88,6 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
     private static final Message T_head =
             message("xmlui.ArtifactBrowser.SimpleSearch.head");
 
-    private static final Message T_search_scope =
-            message("xmlui.ArtifactBrowser.SimpleSearch.search_scope");
-
     private static final Message T_full_text_search =
             message("xmlui.ArtifactBrowser.SimpleSearch.full_text_search");
 
