@@ -555,8 +555,7 @@ public class Collection extends DSpaceObject
 
             // now create policy for logo bitstream
             // to match our READ policy
-            List policies = AuthorizeManager.getPoliciesActionFilter(
-                    ourContext, this, Constants.READ);
+            List<ResourcePolicy> policies = AuthorizeManager.getPoliciesActionFilter(ourContext, this, Constants.READ);
             AuthorizeManager.addPolicies(ourContext, policies, newLogo);
 
             log.info(LogManager.getHeader(ourContext, "set_logo",

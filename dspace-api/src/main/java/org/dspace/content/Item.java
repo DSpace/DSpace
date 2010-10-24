@@ -1413,10 +1413,7 @@ public class Item extends DSpaceObject
             }
         }
 
-        Bitstream[] bsArray = new Bitstream[bitstreamList.size()];
-        bsArray = (Bitstream[]) bitstreamList.toArray(bsArray);
-
-        return bsArray;
+        return bitstreamList.toArray(new Bitstream[bitstreamList.size()]);
     }
 
     /**
@@ -2114,7 +2111,7 @@ public class Item extends DSpaceObject
      * @throws SQLException
      * @throws AuthorizeException
      */
-    public void replaceAllItemPolicies(List newpolicies) throws SQLException,
+    public void replaceAllItemPolicies(List<ResourcePolicy> newpolicies) throws SQLException,
             AuthorizeException
     {
         // remove all our policies, add new ones
@@ -2132,7 +2129,7 @@ public class Item extends DSpaceObject
      * @throws SQLException
      * @throws AuthorizeException
      */
-    public void replaceAllBitstreamPolicies(List newpolicies)
+    public void replaceAllBitstreamPolicies(List<ResourcePolicy> newpolicies)
             throws SQLException, AuthorizeException
     {
         // remove all policies from bundles, add new ones
@@ -2196,44 +2193,36 @@ public class Item extends DSpaceObject
     {
         // remove the submit authorization policies
         // and replace them with the collection's default READ policies
-        List policies = AuthorizeManager.getPoliciesActionFilter(ourContext, c,
-                Constants.DEFAULT_ITEM_READ);
-
-        // change the action to just READ
-        // just don't call update on the resourcepolicies!!!
-        Iterator i = policies.iterator();
+        List<ResourcePolicy> policies = AuthorizeManager.getPoliciesActionFilter(ourContext, c, Constants.DEFAULT_ITEM_READ);
 
         // MUST have default policies
-        if (!i.hasNext())
+        if (policies.size() < 1)
         {
             throw new java.sql.SQLException("Collection " + c.getID()
                     + " has no default item READ policies");
         }
 
-        while (i.hasNext())
+        // change the action to just READ
+        // just don't call update on the resourcepolicies!!!
+        for (ResourcePolicy rp : policies)
         {
-            ResourcePolicy rp = (ResourcePolicy) i.next();
             rp.setAction(Constants.READ);
         }
 
         replaceAllItemPolicies(policies);
 
-        policies = AuthorizeManager.getPoliciesActionFilter(ourContext, c,
-                Constants.DEFAULT_BITSTREAM_READ);
+        policies = AuthorizeManager.getPoliciesActionFilter(ourContext, c, Constants.DEFAULT_BITSTREAM_READ);
 
-        // change the action to just READ
-        // just don't call update on the resourcepolicies!!!
-        i = policies.iterator();
-
-        if (!i.hasNext())
+        if (policies.size() < 1)
         {
             throw new java.sql.SQLException("Collection " + c.getID()
                     + " has no default bitstream READ policies");
         }
 
-        while (i.hasNext())
+        // change the action to just READ
+        // just don't call update on the resourcepolicies!!!
+        for (ResourcePolicy rp : policies)
         {
-            ResourcePolicy rp = (ResourcePolicy) i.next();
             rp.setAction(Constants.READ);
         }
 
