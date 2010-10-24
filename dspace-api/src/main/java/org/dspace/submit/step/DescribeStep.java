@@ -255,18 +255,18 @@ public class DescribeStep extends AbstractProcessingStep
             }
             else if (inputType.equals("qualdrop_value"))
             {
-                List quals = getRepeatedParameter(request, schema + "_"
+                List<String> quals = getRepeatedParameter(request, schema + "_"
                         + element, schema + "_" + element + "_qualifier");
-                List vals = getRepeatedParameter(request, schema + "_"
+                List<String> vals = getRepeatedParameter(request, schema + "_"
                         + element, schema + "_" + element + "_value");
                 for (int z = 0; z < vals.size(); z++)
                 {
-                    String thisQual = (String) quals.get(z);
+                    String thisQual = quals.get(z);
                     if ("".equals(thisQual))
                     {
                         thisQual = null;
                     }
-                    String thisVal = (String) vals.get(z);
+                    String thisVal = vals.get(z);
                     if (!buttonPressed.equals("submit_" + schema + "_"
                             + element + "_remove_" + z)
                             && !thisVal.equals(""))
@@ -506,10 +506,10 @@ public class DescribeStep extends AbstractProcessingStep
         boolean isAuthorityControlled = MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey);
 
         // Names to add
-        List firsts = new LinkedList();
-        List lasts = new LinkedList();
-        List auths = new LinkedList();
-        List confs = new LinkedList();
+        List<String> firsts = new LinkedList<String>();
+        List<String> lasts = new LinkedList<String>();
+        List<String> auths = new LinkedList<String>();
+        List<String> confs = new LinkedList<String>();
 
         if (repeated)
         {
@@ -573,8 +573,8 @@ public class DescribeStep extends AbstractProcessingStep
         // Put the names in the correct form
         for (int i = 0; i < lasts.size(); i++)
         {
-            String f = (String) firsts.get(i);
-            String l = (String) lasts.get(i);
+            String f = firsts.get(i);
+            String l = lasts.get(i);
 
             // only add if lastname is non-empty
             if ((l != null) && !((l.trim()).equals("")))
@@ -605,8 +605,8 @@ public class DescribeStep extends AbstractProcessingStep
                 // Add to the database -- unless required authority is missing
                 if (isAuthorityControlled)
                 {
-                    String authKey = auths.size() > i ? (String)auths.get(i) : null;
-                    String sconf = (authKey != null && confs.size() > i) ? (String)confs.get(i) : null;
+                    String authKey = auths.size() > i ? auths.get(i) : null;
+                    String sconf = (authKey != null && confs.size() > i) ? confs.get(i) : null;
                     if (MetadataAuthorityManager.getManager().isAuthorityRequired(fieldKey) &&
                         (authKey == null || authKey.length() == 0))
                     {
@@ -674,9 +674,9 @@ public class DescribeStep extends AbstractProcessingStep
         boolean isAuthorityControlled = MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey);
 
         // Values to add
-        List vals = null;
-        List auths = null;
-        List confs = null;
+        List<String> vals = null;
+        List<String> auths = null;
+        List<String> confs = null;
 
         if (repeated)
         {
@@ -710,7 +710,7 @@ public class DescribeStep extends AbstractProcessingStep
         else
         {
             // Just a single name
-            vals = new LinkedList();
+            vals = new LinkedList<String>();
             String value = request.getParameter(metadataField);
             if (value != null)
             {
@@ -718,8 +718,8 @@ public class DescribeStep extends AbstractProcessingStep
             }
             if (isAuthorityControlled)
             {
-                auths = new LinkedList();
-                confs = new LinkedList();
+                auths = new LinkedList<String>();
+                confs = new LinkedList<String>();
                 String av = request.getParameter(metadataField+"_authority");
                 String cv = request.getParameter(metadataField+"_confidence");
                 auths.add(av == null ? "":av.trim());
@@ -734,13 +734,13 @@ public class DescribeStep extends AbstractProcessingStep
         for (int i = 0; i < vals.size(); i++)
         {
             // Add to the database if non-empty
-            String s = (String) vals.get(i);
+            String s = vals.get(i);
             if ((s != null) && !s.equals(""))
             {
                 if (isAuthorityControlled)
                 {
-                    String authKey = auths.size() > i ? (String)auths.get(i) : null;
-                    String sconf = (authKey != null && confs.size() > i) ? (String)confs.get(i) : null;
+                    String authKey = auths.size() > i ? auths.get(i) : null;
+                    String sconf = (authKey != null && confs.size() > i) ? confs.get(i) : null;
                     if (MetadataAuthorityManager.getManager().isAuthorityRequired(fieldKey) &&
                         (authKey == null || authKey.length() == 0))
                     {
@@ -848,8 +848,8 @@ public class DescribeStep extends AbstractProcessingStep
                 .formKey(schema, element, qualifier);
 
         // Names to add
-        List series = new LinkedList();
-        List numbers = new LinkedList();
+        List<String> series = new LinkedList<String>();
+        List<String> numbers = new LinkedList<String>();
 
         if (repeated)
         {
@@ -897,8 +897,8 @@ public class DescribeStep extends AbstractProcessingStep
         // Put the names in the correct form
         for (int i = 0; i < series.size(); i++)
         {
-            String s = ((String) series.get(i)).trim();
-            String n = ((String) numbers.get(i)).trim();
+            String s = (series.get(i)).trim();
+            String n = (numbers.get(i)).trim();
 
             // Only add non-empty
             if (!s.equals("") || !n.equals(""))
@@ -927,10 +927,10 @@ public class DescribeStep extends AbstractProcessingStep
      *
      * @return a List of Strings
      */
-    protected List getRepeatedParameter(HttpServletRequest request,
+    protected List<String> getRepeatedParameter(HttpServletRequest request,
             String metadataField, String param)
     {
-        List vals = new LinkedList();
+        List<String> vals = new LinkedList<String>();
 
         int i = 1;    //start index at the first of the previously entered values
         boolean foundLast = false;

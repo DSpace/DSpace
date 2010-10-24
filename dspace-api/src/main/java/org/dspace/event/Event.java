@@ -586,13 +586,12 @@ public class Event implements Serializable
      * @return true if this event would be passed through the given filter
      *         list.
      */
-    public boolean pass(List filters)
+    public boolean pass(List<int[]> filters)
     {
         boolean result = false;
 
-        for (Iterator fi = filters.iterator(); fi.hasNext();)
+        for (int filter[] : filters)
         {
-            int filter[] = (int[]) fi.next();
             if ((subjectType & filter[SUBJECT_MASK]) != 0 && (eventType & filter[EVENT_MASK]) != 0)
             {
                 result = true;

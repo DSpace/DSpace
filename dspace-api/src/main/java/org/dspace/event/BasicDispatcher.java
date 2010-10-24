@@ -102,7 +102,7 @@ public class BasicDispatcher extends Dispatcher
     {
         if (!consumers.isEmpty())
         {
-            List events = Collections.synchronizedList(ctx.getEvents());
+            List<Event> events = Collections.synchronizedList(ctx.getEvents());
 
             if (events == null)
             {
@@ -120,9 +120,8 @@ public class BasicDispatcher extends Dispatcher
             // some letters so RDF readers don't mistake it for an integer.
             String tid = "TX" + Utils.generateKey();
 
-            for (Iterator ei = events.iterator(); ei.hasNext();)
+            for (Event event : events)
             {
-                Event event = (Event) ei.next();
                 event.setDispatcher(getIdentifier());
                 event.setTransactionID(tid);
 

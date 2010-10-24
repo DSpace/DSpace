@@ -397,7 +397,7 @@ public class Subscribe
                 boolean includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.subscription", true);
                 
                 // we harvest all the changed item from yesterday until now
-                List itemInfos = Harvest.harvest(context, c, startDate, null, 0, // Limit
+                List<HarvestedItemInfo> itemInfos = Harvest.harvest(context, c, startDate, null, 0, // Limit
                                                                                     // and
                                                                                     // offset
                                                                                     // zero,

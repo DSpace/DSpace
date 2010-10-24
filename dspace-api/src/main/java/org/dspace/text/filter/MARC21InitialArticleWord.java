@@ -267,7 +267,7 @@ public class MARC21InitialArticleWord extends InitialArticleWord
 
                 if (lang != null && lang.IANA.length() > 0)
                 {
-                    List words = langWordMap.get(lang);
+                    List<String> words = langWordMap.get(lang);
                     
                     if (words == null)
                     {
@@ -278,7 +278,7 @@ public class MARC21InitialArticleWord extends InitialArticleWord
                     // Add language to list if we haven't done so already
                     if (!words.contains(articleWordArray[wordIdx][0]))
                     {
-                        words.add(articleWordArray[wordIdx][0]);
+                        words.add((String)articleWordArray[wordIdx][0]);
                     }
                 }
             }

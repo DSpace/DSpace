@@ -1302,7 +1302,7 @@ public abstract class AbstractMETSDisseminator
             PreformedXML pXML = null;
             if (xwalk.preferList())
             {
-                List res = xwalk.disseminateList(dso);
+                List<Element> res = xwalk.disseminateList(dso);
                 if (!(res == null || res.isEmpty()))
                 {
                     pXML = new PreformedXML(outputter.outputString(res));

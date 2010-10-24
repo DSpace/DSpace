@@ -275,7 +275,7 @@ public class HandlePlugin implements HandleStorage
             value.setAnyoneCanRead(true);
             value.setAnyoneCanWrite(false);
 
-            List values = new LinkedList();
+            List<HandleValue> values = new LinkedList<HandleValue>();
 
             values.add(value);
 
@@ -283,7 +283,7 @@ public class HandlePlugin implements HandleStorage
 
             for (int i = 0; i < values.size(); i++)
             {
-                HandleValue hvalue = (HandleValue) values.get(i);
+                HandleValue hvalue = values.get(i);
 
                 rawValues[i] = new byte[Encoder.calcStorageSize(hvalue)];
                 Encoder.encodeHandleValue(rawValues[i], 0, hvalue);
@@ -400,12 +400,12 @@ public class HandlePlugin implements HandleStorage
         {
             context = new Context();
 
-            List handles = HandleManager.getHandlesForPrefix(context, naHandle);
-            List results = new LinkedList();
+            List<String> handles = HandleManager.getHandlesForPrefix(context, naHandle);
+            List<byte[]> results = new LinkedList<byte[]>();
 
-            for (Iterator iterator = handles.iterator(); iterator.hasNext();)
+            for (Iterator<String> iterator = handles.iterator(); iterator.hasNext();)
             {
-                String handle = (String) iterator.next();
+                String handle = iterator.next();
 
                 // Transforms to byte array
                 results.add(Util.encodeString(handle));

@@ -73,7 +73,7 @@ public class HarvestedItemInfo
      * filled out if originally requested when invoking <code>Harvest</code>
      * (N.B. not Collection objects)
      */
-    public List collectionHandles;
+    public List<String> collectionHandles;
 
     /** True if this item has been withdrawn */
     public boolean withdrawn;
