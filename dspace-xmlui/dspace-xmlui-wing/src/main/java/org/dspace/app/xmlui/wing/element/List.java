@@ -547,7 +547,7 @@ public class List extends AbstractWingElement implements WingMergeableElement,
             NamespaceSupport namespaces) throws SAXException
     {
 
-        if (this.merged == false)
+        if (!this.merged)
         {
             AttributeMap attributes = new AttributeMap();
             attributes.put(A_NAME, this.name);
@@ -565,7 +565,7 @@ public class List extends AbstractWingElement implements WingMergeableElement,
             
         }
             
-        if (childMerged == false && head != null)
+        if (!childMerged && head != null)
         {
             head.toSAX(contentHandler, lexicalHandler, namespaces);
         }
@@ -575,7 +575,7 @@ public class List extends AbstractWingElement implements WingMergeableElement,
             content.toSAX(contentHandler, lexicalHandler, namespaces);
         }
 
-        if (this.merged == false)
+        if (!this.merged)
         {
             endElement(contentHandler, namespaces, E_LIST);
         }

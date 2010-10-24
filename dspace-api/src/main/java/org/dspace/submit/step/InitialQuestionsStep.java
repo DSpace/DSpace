@@ -182,43 +182,43 @@ public class InitialQuestionsStep extends AbstractProcessingStep
             // Now check to see if the changes will remove any values
             // (i.e. multiple files, titles or an issue date.)
 
-            // shouldn't need to check if submission is null, but just in case!
-            if ((multipleTitles == false)
-                    && (subInfo.getSubmissionItem() != null))
+            if (subInfo.getSubmissionItem() != null)
             {
-                DCValue[] altTitles = subInfo.getSubmissionItem().getItem()
-                        .getDC("title", "alternative", Item.ANY);
-
-                willRemoveTitles = altTitles.length > 0;
-            }
-
-            if ((publishedBefore == false)
-                    && (subInfo.getSubmissionItem() != null))
-            {
-                DCValue[] dateIssued = subInfo.getSubmissionItem().getItem()
-                        .getDC("date", "issued", Item.ANY);
-                DCValue[] citation = subInfo.getSubmissionItem().getItem()
-                        .getDC("identifier", "citation", Item.ANY);
-                DCValue[] publisher = subInfo.getSubmissionItem().getItem()
-                        .getDC("publisher", null, Item.ANY);
-
-                willRemoveDate = (dateIssued.length > 0)
-                        || (citation.length > 0) || (publisher.length > 0);
-            }
-
-            if ((multipleFiles == false)
-                    && (subInfo.getSubmissionItem() != null))
-            {
-                // see if number of bitstreams in "ORIGINAL" bundle > 1
-                // FIXME: Assumes multiple bundles, clean up someday...
-                Bundle[] bundles = subInfo.getSubmissionItem().getItem()
-                        .getBundles("ORIGINAL");
-
-                if (bundles.length > 0)
+                // shouldn't need to check if submission is null, but just in case!
+                if (!multipleTitles)
                 {
-                    Bitstream[] bitstreams = bundles[0].getBitstreams();
+                    DCValue[] altTitles = subInfo.getSubmissionItem().getItem()
+                            .getDC("title", "alternative", Item.ANY);
 
-                    willRemoveFiles = bitstreams.length > 1;
+                    willRemoveTitles = altTitles.length > 0;
+                }
+
+                if (!publishedBefore)
+                {
+                    DCValue[] dateIssued = subInfo.getSubmissionItem().getItem()
+                            .getDC("date", "issued", Item.ANY);
+                    DCValue[] citation = subInfo.getSubmissionItem().getItem()
+                            .getDC("identifier", "citation", Item.ANY);
+                    DCValue[] publisher = subInfo.getSubmissionItem().getItem()
+                            .getDC("publisher", null, Item.ANY);
+
+                    willRemoveDate = (dateIssued.length > 0)
+                            || (citation.length > 0) || (publisher.length > 0);
+                }
+
+                if (!multipleFiles)
+                {
+                    // see if number of bitstreams in "ORIGINAL" bundle > 1
+                    // FIXME: Assumes multiple bundles, clean up someday...
+                    Bundle[] bundles = subInfo.getSubmissionItem().getItem()
+                            .getBundles("ORIGINAL");
+
+                    if (bundles.length > 0)
+                    {
+                        Bitstream[] bitstreams = bundles[0].getBitstreams();
+
+                        willRemoveFiles = bitstreams.length > 1;
+                    }
                 }
             }
 
@@ -310,22 +310,19 @@ public class InitialQuestionsStep extends AbstractProcessingStep
         // get the item to prune
         Item item = subInfo.getSubmissionItem().getItem();
 
-        if (multipleTitles == false
-                && subInfo.getSubmissionItem().hasMultipleTitles())
+        if (!multipleTitles && subInfo.getSubmissionItem().hasMultipleTitles())
         {
             item.clearDC("title", "alternative", Item.ANY);
         }
 
-        if (publishedBefore == false
-                && subInfo.getSubmissionItem().isPublishedBefore())
+        if (!publishedBefore && subInfo.getSubmissionItem().isPublishedBefore())
         {
             item.clearDC("date", "issued", Item.ANY);
             item.clearDC("identifier", "citation", Item.ANY);
             item.clearDC("publisher", null, Item.ANY);
         }
 
-        if (multipleFiles == false
-                && subInfo.getSubmissionItem().hasMultipleFiles())
+        if (!multipleFiles && subInfo.getSubmissionItem().hasMultipleFiles())
         {
             // remove all but first bitstream from bundle[0]
             // FIXME: Assumes multiple bundles, clean up someday...

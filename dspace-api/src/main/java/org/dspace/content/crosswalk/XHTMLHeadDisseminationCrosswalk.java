@@ -253,7 +253,7 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
                                     : handle) + " field " + originalKey);
                }
             }
-            else if (provenance != true)
+            else if (!provenance)
             {
                 Element e = new Element("meta", XHTML_NAMESPACE);
                 e.setAttribute("name", name);

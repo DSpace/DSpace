@@ -677,7 +677,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         return request.getParameterValues("fq") != null ? request.getParameterValues("fq") : new String[0];
     }
 
-    private class SearchFilterParam {
+    private static class SearchFilterParam {
         private Request request;
 
         /** The always present commond params **/

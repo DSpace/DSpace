@@ -530,7 +530,7 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
         queryArgs = null;
     }
 
-    private class FilterDisplayValue {
+    private static class FilterDisplayValue {
         private String asFilterQuery;
         private String displayedVal;
         private long count;

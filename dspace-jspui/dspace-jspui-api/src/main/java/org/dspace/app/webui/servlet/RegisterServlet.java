@@ -530,7 +530,7 @@ public class RegisterServlet extends DSpaceServlet
 
         // If the user set a password, make sure it's OK
         boolean passwordOK = true;
-        if (eperson.getRequireCertificate() == false && netid==null &&
+        if (!eperson.getRequireCertificate() && netid==null &&
             AuthenticationManager.allowSetPassword(context, request,
                 eperson.getEmail()))
         {

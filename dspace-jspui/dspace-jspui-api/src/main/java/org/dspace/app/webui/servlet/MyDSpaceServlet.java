@@ -292,7 +292,7 @@ public class MyDSpaceServlet extends DSpaceServlet
             }
         }
 
-        if (ok == false)
+        if (!ok)
         {
             log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
                     .getRequestLogInfo(request)));

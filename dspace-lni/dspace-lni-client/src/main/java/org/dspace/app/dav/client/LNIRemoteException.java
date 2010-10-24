@@ -78,10 +78,9 @@ public class LNIRemoteException  extends org.apache.axis.AxisFault  implements j
         }
         __equalsCalc = obj;
         boolean _equals;
-        _equals = true && 
-            ((this.cause1==null && other.getCause1()==null) || 
-             (this.cause1!=null &&
-              this.cause1.equals(other.getCause1()))) &&
+        _equals = ((this.cause1 == null && other.getCause1() == null) ||
+                (this.cause1 != null &&
+                        this.cause1.equals(other.getCause1()))) &&
             ((this.message1==null && other.getMessage1()==null) || 
              (this.message1!=null &&
               this.message1.equals(other.getMessage1())));

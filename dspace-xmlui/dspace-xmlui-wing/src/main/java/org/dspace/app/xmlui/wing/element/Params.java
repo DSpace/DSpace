@@ -410,7 +410,7 @@ public class Params extends AbstractWingElement implements StructuralElement
             attributes.put(A_MAX_LENGTH, this.maxlength);
         }
 
-        if (this.multiple == true)
+        if (this.multiple)
         {
             attributes.put(A_MULTIPLE, this.multiple);
         }

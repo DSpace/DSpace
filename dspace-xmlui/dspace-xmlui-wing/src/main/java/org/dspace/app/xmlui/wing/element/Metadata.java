@@ -139,15 +139,15 @@ public class Metadata extends TextContainer implements MetadataElement
             return false;
         }
 
-        if (stringEqualsWithNulls(this.element, element) == false)
+        if (!stringEqualsWithNulls(this.element, element))
         {
             return false;
         }
-        if (stringEqualsWithNulls(this.qualifier, qualifier) == false)
+        if (!stringEqualsWithNulls(this.qualifier, qualifier))
         {
             return false;
         }
-        if (stringEqualsWithNulls(this.language, language) == false)
+        if (!stringEqualsWithNulls(this.language, language))
         {
             return false;
         }

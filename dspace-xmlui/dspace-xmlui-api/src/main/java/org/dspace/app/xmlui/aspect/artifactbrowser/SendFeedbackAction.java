@@ -116,7 +116,7 @@ public class SendFeedbackAction extends AbstractAction
             basicHost = host.substring(host.substring(0, lastDot).lastIndexOf('.'));
         }
 
-        if ((fromPage == null) || ((fromPage.indexOf(basicHost) == -1) && (validReferral == false)))
+        if ((fromPage == null) || ((fromPage.indexOf(basicHost) == -1) && (!validReferral)))
         {
             // N.B. must use old message catalog because Cocoon i18n is only available to transformed pages.
             throw new AuthorizeException(I18nUtil.getMessage("feedback.error.forbidden"));

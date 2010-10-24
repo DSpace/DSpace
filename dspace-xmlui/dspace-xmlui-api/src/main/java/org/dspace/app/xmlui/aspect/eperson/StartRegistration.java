@@ -162,7 +162,7 @@ public class StartRegistration extends AbstractDSpaceTransformer implements Cach
     public Serializable getKey()
     {
         // Only cache on the first attempt.
-        if (email == null && accountExists == false && errors != null && errors.size() == 0)
+        if (email == null && !accountExists && errors != null && errors.size() == 0)
         {
             // cacheable
             return "1";
@@ -179,7 +179,7 @@ public class StartRegistration extends AbstractDSpaceTransformer implements Cach
      */
     public SourceValidity getValidity()
     {
-        if (email == null && accountExists == false && errors != null && errors.size() == 0)
+        if (email == null && !accountExists && errors != null && errors.size() == 0)
         {
             // Always valid
             return NOPValidity.SHARED_INSTANCE;

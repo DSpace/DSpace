@@ -262,7 +262,7 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 
 		boolean empty = true;
 		for (Content content : contents) {
-			if (empty == false)
+			if (!empty)
             {
                 continue;
             }
@@ -278,7 +278,7 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 			}
 		}
 
-		if (empty == true)
+		if (empty)
         {
             return false;
         }
