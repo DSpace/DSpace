@@ -49,7 +49,7 @@ public class ListDispatcher implements BitstreamDispatcher
     /**
      * List of Integer ids.
      */
-    Stack bitstreams = new Stack();
+    Stack<Integer> bitstreams = new Stack<Integer>();
 
     /**
      * Blanked off, no-op constructor. Do not use.
@@ -62,9 +62,8 @@ public class ListDispatcher implements BitstreamDispatcher
      * Main constructor.
      * 
      * @param bitstreamIds
-     *            List of Integer ids to dispatch.
      */
-    public ListDispatcher(List bitstreamIds)
+    public ListDispatcher(List<Integer> bitstreamIds)
     {
         Collections.reverse(bitstreamIds);
         bitstreams.addAll(bitstreamIds);
@@ -77,7 +76,7 @@ public class ListDispatcher implements BitstreamDispatcher
     {
         try
         {
-            return ((Integer) bitstreams.pop()).intValue();
+            return bitstreams.pop().intValue();
         }
         catch (EmptyStackException e)
         {

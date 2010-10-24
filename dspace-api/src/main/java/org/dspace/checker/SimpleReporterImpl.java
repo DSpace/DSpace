@@ -100,7 +100,7 @@ public class SimpleReporterImpl implements SimpleReporter
             OutputStreamWriter osw) throws IOException
     {
         // get all the bitstreams marked deleted for today
-        List history = reporter.getBitstreamResultTypeReport(startDate,
+        List<ChecksumHistory> history = reporter.getBitstreamResultTypeReport(startDate,
                 endDate, ChecksumCheckResults.BITSTREAM_MARKED_DELETED);
 
         osw.write("\n");
@@ -145,7 +145,7 @@ public class SimpleReporterImpl implements SimpleReporter
             OutputStreamWriter osw) throws IOException
     {
         // get all the bitstreams marked deleted for today
-        List history = reporter.getBitstreamResultTypeReport(startDate,
+        List<ChecksumHistory> history = reporter.getBitstreamResultTypeReport(startDate,
                 endDate, ChecksumCheckResults.CHECKSUM_NO_MATCH);
 
         osw.write("\n");
@@ -192,7 +192,7 @@ public class SimpleReporterImpl implements SimpleReporter
             OutputStreamWriter osw) throws IOException
     {
         // get all the bitstreams marked deleted for today
-        List history = reporter.getBitstreamResultTypeReport(startDate,
+        List<ChecksumHistory> history = reporter.getBitstreamResultTypeReport(startDate,
                 endDate, ChecksumCheckResults.BITSTREAM_NOT_FOUND);
 
         osw.write("\n");
@@ -238,7 +238,7 @@ public class SimpleReporterImpl implements SimpleReporter
             OutputStreamWriter osw) throws IOException
     {
         // get all the bitstreams marked deleted for today
-        List history = reporter.getNotProcessedBitstreamsReport(startDate,
+        List<ChecksumHistory> history = reporter.getNotProcessedBitstreamsReport(startDate,
                 endDate);
 
         osw.write("\n");
@@ -280,7 +280,7 @@ public class SimpleReporterImpl implements SimpleReporter
             throws IOException
     {
         // get all the bitstreams marked deleted for today
-        List bitstreams = reporter.getUnknownBitstreams();
+        List<DSpaceBitstreamInfo> bitstreams = reporter.getUnknownBitstreams();
 
         osw.write("\n");
         osw.write(msg("unchecked-bitstream-report"));
@@ -314,13 +314,13 @@ public class SimpleReporterImpl implements SimpleReporter
      * @throws IOException
      *             if io error occurs
      */
-    private void printHistoryRecords(List history, OutputStreamWriter osw)
+    private void printHistoryRecords(List<ChecksumHistory> history, OutputStreamWriter osw)
             throws IOException
     {
-        Iterator iter = history.iterator();
+        Iterator<ChecksumHistory> iter = history.iterator();
         while (iter.hasNext())
         {
-            ChecksumHistory historyInfo = (ChecksumHistory) iter.next();
+            ChecksumHistory historyInfo = iter.next();
             StringBuffer buf = new StringBuffer(1000);
             buf.append("------------------------------------------------ \n");
             buf.append(msg("bitstream-id")).append(" = ").append(
@@ -353,14 +353,14 @@ public class SimpleReporterImpl implements SimpleReporter
      * @throws IOException
      *             if io error occurs
      */
-    private void printDSpaceInfoRecords(List bitstreams, OutputStreamWriter osw)
+    private void printDSpaceInfoRecords(List<DSpaceBitstreamInfo> bitstreams, OutputStreamWriter osw)
             throws IOException
     {
-        Iterator iter = bitstreams.iterator();
+        Iterator<DSpaceBitstreamInfo> iter = bitstreams.iterator();
 
         while (iter.hasNext())
         {
-            DSpaceBitstreamInfo info = (DSpaceBitstreamInfo) iter.next();
+            DSpaceBitstreamInfo info = iter.next();
             StringBuffer buf = new StringBuffer(1000);
             buf.append("------------------------------------------------ \n");
             buf.append(msg("format-id")).append(" =  ").append(

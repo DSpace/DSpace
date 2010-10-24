@@ -134,10 +134,10 @@ public class ReporterDAO extends DAOSupport
      * 
      * @return a list of BitstreamHistoryInfo objects
      */
-    public List getBitstreamResultTypeReport(Date startDate, Date endDate,
+    public List<ChecksumHistory> getBitstreamResultTypeReport(Date startDate, Date endDate,
             String resultCode)
     {
-        List bitstreamHistory = new LinkedList();
+        List<ChecksumHistory> bitstreamHistory = new LinkedList<ChecksumHistory>();
 
         Connection conn = null;
         PreparedStatement prepStmt = null;
@@ -191,9 +191,9 @@ public class ReporterDAO extends DAOSupport
      *            the end of the date range
      * @return a list of BitstreamHistoryInfo objects
      */
-    public List getNotProcessedBitstreamsReport(Date startDate, Date endDate)
+    public List<ChecksumHistory> getNotProcessedBitstreamsReport(Date startDate, Date endDate)
     {
-        List bitstreamHistory = new LinkedList();
+        List<ChecksumHistory> bitstreamHistory = new LinkedList<ChecksumHistory>();
 
         Connection conn = null;
         PreparedStatement prepStmt = null;
@@ -248,9 +248,9 @@ public class ReporterDAO extends DAOSupport
      * 
      * @return a List of DSpaceBitstreamInfo objects
      */
-    public List getUnknownBitstreams()
+    public List<DSpaceBitstreamInfo> getUnknownBitstreams()
     {
-        List unknownBitstreams = new LinkedList();
+        List<DSpaceBitstreamInfo> unknownBitstreams = new LinkedList<DSpaceBitstreamInfo>();
 
         Connection conn = null;
         PreparedStatement prepStmt = null;

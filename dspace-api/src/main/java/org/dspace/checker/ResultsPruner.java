@@ -146,9 +146,9 @@ public final class ResultsPruner
         ResultsPruner rp = new ResultsPruner();
         Pattern retentionPattern = Pattern
                 .compile("checker\\.retention\\.(.*)");
-        for (Enumeration en = props.propertyNames(); en.hasMoreElements();)
+        for (Enumeration<String> en = (Enumeration<String>)props.propertyNames(); en.hasMoreElements();)
         {
-            String name = (String) en.nextElement();
+            String name = en.nextElement();
             Matcher matcher = retentionPattern.matcher(name);
             if (!matcher.matches())
             {
@@ -259,10 +259,9 @@ public final class ResultsPruner
      */
     public int prune()
     {
-        List codes = checksumResultDAO.listAllCodes();
-        for (Iterator iter = codes.iterator(); iter.hasNext();)
+        List<String> codes = checksumResultDAO.listAllCodes();
+        for (String code : codes)
         {
-            String code = (String) iter.next();
             if (!interests.containsKey(code))
             {
                 interests.put(code, Long.valueOf(defaultDuration));
