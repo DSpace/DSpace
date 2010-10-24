@@ -536,8 +536,8 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         Map<String, String> params = new HashMap<String, String>();
         params.putAll(browseParams.getCommonBrowseParams());
         // Add all the query parameters as hidden fields on the form
-        for(String key : params.keySet()){
-            jump.addHidden(key).setValue(params.get(key));
+        for(Map.Entry<String, String> param : params.entrySet()){
+            jump.addHidden(param.getKey()).setValue(param.getValue());
         }
         String[] filterQueries = getParameterFilterQueries();
         for (String filterQuery : filterQueries) {

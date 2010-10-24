@@ -405,14 +405,9 @@ public class SimpleSearchServlet extends DSpaceServlet
 
             queryHash = qArgs.buildQueryMap(request);
 
-            Iterator<String> i = queryHash.keySet().iterator();
-
-            while (i.hasNext())
+            for (Map.Entry<String, String> entry : queryHash.entrySet())
             {
-                String key = i.next();
-                String value = (String) queryHash.get(key);
-
-                request.setAttribute(key, value);
+                request.setAttribute(entry.getKey(), entry.getValue());
             }
 
             JSPManager.showJSP(request, response, "/search/advanced.jsp");

@@ -85,10 +85,9 @@ public class StatisticsLoggingConsumer implements Consumer
             List<String> storageFieldList = new ArrayList<String>();
             List<List<Object>> storageValuesList = new ArrayList<List<Object>>();
 
-            for (Object storageField : metadataStorageInfo.keySet())
+            for (Map.Entry<String, String> entry : metadataStorageInfo.entrySet())
             {
-                String[] metadataFieldInfo = String.valueOf(
-                        metadataStorageInfo.get(storageField)).split("\\.");
+                String[] metadataFieldInfo = entry.getValue().split("\\.");
 
                 List<Object> values = new ArrayList<Object>();
                 List<Object> valuesLow = new ArrayList<Object>();
@@ -104,7 +103,7 @@ public class StatisticsLoggingConsumer implements Consumer
                             Item.ANY)[i].value.toLowerCase());
                 }
 
-                List<String> indexedVals = indexedValues.get("" + storageField);
+                List<String> indexedVals = indexedValues.get(entry.getKey());
 
                 boolean update = true;
                 if (values.size() == indexedVals.size() && values.containsAll(indexedVals))
@@ -114,8 +113,8 @@ public class StatisticsLoggingConsumer implements Consumer
 
                 if (update)
                 {
-                    storageFieldList.add((String) storageField);
-                    storageFieldList.add(storageField + "_search");
+                    storageFieldList.add(entry.getKey());
+                    storageFieldList.add(entry.getKey() + "_search");
                     storageValuesList.add(values);
                     storageValuesList.add(valuesLow);
                 }

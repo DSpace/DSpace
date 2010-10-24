@@ -372,18 +372,17 @@ public class StatisticsDataGenerator {
 			if (dso instanceof Item) {
 				Item item = (Item) dso;
 				// Store the metadata
-				for (Object storedField : metadataStorageInfo.keySet()) {
-					String dcField = (String) metadataStorageInfo
-							.get(storedField);
+                for (Map.Entry<String, String> entry : metadataStorageInfo.entrySet())
+				{
+					String dcField = entry.getValue();
 
 					DCValue[] vals = item.getMetadata(dcField.split("\\.")[0],
 							dcField.split("\\.")[1], dcField.split("\\.")[2],
 							Item.ANY);
 					for (DCValue val1 : vals) {
 						String val = val1.value;
-						doc1.addField(String.valueOf(storedField), val);
-						doc1.addField(String.valueOf(storedField + "_search"),
-								val.toLowerCase());
+						doc1.addField(entry.getKey(), val);
+						doc1.addField(entry.getKey() + "_search", val.toLowerCase());
 					}
 				}
 			}

@@ -296,21 +296,17 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
 		//get Map of progress bar information
 		//key: entry # (i.e. step & page), 
 		//value: entry name key (i.e. display name)
-		Map progBarInfo = this.submissionInfo.getProgressBarInfo();
+		Map<String, String> progBarInfo = this.submissionInfo.getProgressBarInfo();
 
-		Iterator i = progBarInfo.keySet().iterator();
-		
 		//add each entry to progress bar
-		while(i.hasNext())
+		for (Map.Entry<String, String> progBarEntry : progBarInfo.entrySet())
 		{
-			String entryNum = (String) i.next();
-			
 			//Since we are using XML-UI, we need to prepend the heading key with "xmlui.Submission."
-			String entryNameKey = "xmlui.Submission." + (String) progBarInfo.get(entryNum);
+			String entryNameKey = "xmlui.Submission." + progBarEntry.getValue();
 			
 			//the value of entryNum is current step & page 
 			//(e.g. 1.2 is page 2 of step 1) 
-			StepAndPage currentStepAndPage = new StepAndPage(entryNum);
+			StepAndPage currentStepAndPage = new StepAndPage(progBarEntry.getKey());
 			
             //add a button to progress bar for this step & page
             addJumpButton(progress, message(entryNameKey), currentStepAndPage);
