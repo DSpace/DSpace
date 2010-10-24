@@ -136,7 +136,7 @@ public class WorkflowManager
     };
 
     /* support for 'no notification' */
-    private static Map noEMail = new HashMap();
+    private static Map<Integer, Boolean> noEMail = new HashMap<Integer, Boolean>();
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(WorkflowManager.class);
@@ -229,10 +229,10 @@ public class WorkflowManager
      * @param e
      *            The EPerson we want to fetch owned tasks for.
      */
-    public static List getOwnedTasks(Context c, EPerson e)
+    public static List<WorkflowItem> getOwnedTasks(Context c, EPerson e)
             throws java.sql.SQLException
     {
-        ArrayList mylist = new ArrayList();
+        ArrayList<WorkflowItem> mylist = new ArrayList<WorkflowItem>();
 
         String myquery = "SELECT * FROM WorkflowItem WHERE owner= ? ";
 
@@ -264,9 +264,9 @@ public class WorkflowManager
      * @param e
      *            The Eperson we want to fetch the pooled tasks for.
      */
-    public static List getPooledTasks(Context c, EPerson e) throws SQLException
+    public static List<WorkflowItem> getPooledTasks(Context c, EPerson e) throws SQLException
     {
-        ArrayList mylist = new ArrayList();
+        ArrayList<WorkflowItem> mylist = new ArrayList<WorkflowItem>();
 
         String myquery = "SELECT workflowitem.* FROM workflowitem, TaskListItem" +
         		" WHERE tasklistitem.eperson_id= ? " +

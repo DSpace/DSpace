@@ -119,7 +119,7 @@ public abstract class AbstractProcessingStep
     public static final int STATUS_COMPLETE = 0;
 
     /** Maps each status/error flag to a textual, human understandable message * */
-    private Map errorMessages = null;
+    private Map<Integer, String> errorMessages = null;
 
     /** List of all user interface fields which had errors during processing * */
     private List errorFields = null;
@@ -168,9 +168,9 @@ public abstract class AbstractProcessingStep
      *            current servlet request object
      * @return List of error fields (as Strings)
      */
-    public static final List getErrorFields(HttpServletRequest request)
+    public static final List<String> getErrorFields(HttpServletRequest request)
     {
-        return (List) request.getAttribute(ERROR_FIELDS_ATTRIBUTE);
+        return (List<String>) request.getAttribute(ERROR_FIELDS_ATTRIBUTE);
     }
     
     /**
@@ -187,7 +187,7 @@ public abstract class AbstractProcessingStep
      * @param errorFields
      *            List of all fields (as Strings) which had errors
      */
-    private static final void setErrorFields(HttpServletRequest request, List errorFields)
+    private static final void setErrorFields(HttpServletRequest request, List<String> errorFields)
     {
         if(errorFields==null)
         {
@@ -213,11 +213,11 @@ public abstract class AbstractProcessingStep
     protected static final void addErrorField(HttpServletRequest request, String fieldName)
     {
         //get current list
-        List errorFields = getErrorFields(request);
+        List<String> errorFields = getErrorFields(request);
         
         if (errorFields == null)
         {
-            errorFields = new ArrayList();
+            errorFields = new ArrayList<String>();
         }
 
         //add this field
@@ -238,7 +238,7 @@ public abstract class AbstractProcessingStep
     protected static final void clearErrorFields(HttpServletRequest request)
     {
         //get current list
-        List errorFields = getErrorFields(request);
+        List<String> errorFields = getErrorFields(request);
         
         if (errorFields != null)
         {
@@ -269,7 +269,7 @@ public abstract class AbstractProcessingStep
         }
         else
         {
-            return (String) this.errorMessages.get(Integer.valueOf(errorFlag));
+            return this.errorMessages.get(Integer.valueOf(errorFlag));
         }
     }
 
@@ -291,7 +291,7 @@ public abstract class AbstractProcessingStep
     {
         if (this.errorMessages == null)
         {
-            this.errorMessages = new HashMap();
+            this.errorMessages = new HashMap<Integer, String>();
         }
 
         errorMessages.put(Integer.valueOf(errorFlag), errorMessage);

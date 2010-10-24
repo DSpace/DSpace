@@ -65,9 +65,9 @@ public class TableRow
      * the column name; the value is an Object, either an Integer, Boolean,
      * Date, or String. If the value is NULL_OBJECT, then the column was NULL.
      */
-    private Map data = new HashMap();
+    private Map<String, Object> data = new HashMap<String, Object>();
 
-    private Map changed = new HashMap();
+    private Map<String, Boolean> changed = new HashMap<String, Boolean>();
 
     /**
      * Constructor
@@ -80,7 +80,7 @@ public class TableRow
      *            to access a column not in the list will cause an
      *            IllegalArgumentException to be thrown.
      */
-    public TableRow(String table, List columns)
+    public TableRow(String table, List<String> columns)
     {
         this.table = table;
         nullColumns(columns);
@@ -685,19 +685,19 @@ public class TableRow
      *            A list of the columns to set to null. Each element of the list
      *            is a String.
      */
-    private void nullColumns(List columns)
+    private void nullColumns(List<String> columns)
     {
-        for (Iterator iterator = columns.iterator(); iterator.hasNext();)
+        for (Iterator<String> iterator = columns.iterator(); iterator.hasNext();)
         {
-            setColumnNullInternal((String) iterator.next());
+            setColumnNullInternal(iterator.next());
         }
     }
 
-    private void resetChanged(List columns)
+    private void resetChanged(List<String> columns)
     {
-        for (Iterator iterator = columns.iterator(); iterator.hasNext();)
+        for (Iterator<String> iterator = columns.iterator(); iterator.hasNext();)
         {
-            changed.put(canonicalize((String) iterator.next()), Boolean.FALSE);
+            changed.put(canonicalize(iterator.next()), Boolean.FALSE);
         }
     }
 
@@ -710,9 +710,9 @@ public class TableRow
      */
     void resetChanged()
     {
-        for (Iterator iterator = changed.keySet().iterator(); iterator.hasNext();)
+        for (Iterator<String> iterator = changed.keySet().iterator(); iterator.hasNext();)
         {
-            changed.put(canonicalize((String) iterator.next()), Boolean.FALSE);
+            changed.put(canonicalize(iterator.next()), Boolean.FALSE);
         }
     }
 
