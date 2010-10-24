@@ -189,7 +189,7 @@ public class ChecksumChecker
         {
             // check only specified bitstream(s)
             String[] ids = line.getOptionValues('b');
-            List idList = new ArrayList(ids.length);
+            List<Integer> idList = new ArrayList<Integer>(ids.length);
 
             for (int i = 0; i < ids.length; i++)
             {

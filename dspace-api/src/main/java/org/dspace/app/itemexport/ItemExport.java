@@ -294,7 +294,9 @@ public class ItemExport
             ItemIterator items;
             if (myItem != null)
             {
-                items = new ItemIterator(c, new ArrayList(myItem.getID()));
+                List<Integer> myItems = new ArrayList<Integer>();
+                myItems.add(myItem.getID());
+                items = new ItemIterator(c, myItems);
             }
             else
             {

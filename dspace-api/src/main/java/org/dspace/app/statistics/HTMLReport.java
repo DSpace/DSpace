@@ -61,7 +61,7 @@ public class HTMLReport implements Report
     // outputting anything
     
     /** a list of the statistic blocks being managed by this class */
-    private List blocks = new ArrayList();
+    private List<Statistics> blocks = new ArrayList<Statistics>();
     
     /** the title for the page */
     private String pageTitle = null;
@@ -111,12 +111,12 @@ public class HTMLReport implements Report
         
         // output the report blocks
         // FIXME: perhaps the order of report blocks should be configurable
-        Iterator statSets = blocks.iterator();
+        Iterator<Statistics> statSets = blocks.iterator();
         while (statSets.hasNext())
         {
             frag.append(navigation());
             
-            Statistics stats = (Statistics) statSets.next();
+            Statistics stats = statSets.next();
             frag.append(sectionHeader(stats.getSectionHeader()));
             frag.append(topLink());
             frag.append(blockExplanation(stats.getExplanation()));

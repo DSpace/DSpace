@@ -38,8 +38,6 @@
 
 package org.dspace.app.statistics;
 
-import org.dspace.app.statistics.Stat;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,7 +61,7 @@ public class Statistics
     private String resultName = null;
     
     /** a list to hold all of the stat elements that this object contains */
-    private List stats = new ArrayList();
+    private List<Stat> stats = new ArrayList<Stat>();
     
     /** the floor value for this set of statistics */
     private int floor = 0;

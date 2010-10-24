@@ -96,7 +96,7 @@ public class MetadataExport
         {
             // Try to export the community
             this.c = c;
-            this.toExport = new ItemIterator(c, buildFromCommunity(toExport, new ArrayList(), 0));
+            this.toExport = new ItemIterator(c, buildFromCommunity(toExport, new ArrayList<Integer>(), 0));
             this.exportAll = exportAll;
         }
         catch (SQLException sqle)
@@ -117,7 +117,7 @@ public class MetadataExport
      * @return The list of item ids
      * @throws SQLException
      */
-    private List buildFromCommunity(Community community, List itemIDs, int indent)
+    private List<Integer> buildFromCommunity(Community community, List<Integer> itemIDs, int indent)
                                                                                throws SQLException
     {
         // Add all the collections
@@ -269,7 +269,7 @@ public class MetadataExport
             if (dso.getType() == Constants.ITEM)
             {
                 System.out.println("Exporting item '" + dso.getName() + "' (" + handle + ")");
-                ArrayList item = new ArrayList();
+                List<Integer> item = new ArrayList<Integer>();
                 item.add(dso.getID());
                 exporter = new MetadataExport(c, new ItemIterator(c, item), exportAll);
             }
