@@ -99,7 +99,7 @@ public class SupervisedItem extends WorkspaceItem
     public static SupervisedItem[] getAll(Context context)
         throws SQLException
     {
-        List sItems = new ArrayList();
+        List<SupervisedItem> sItems = new ArrayList<SupervisedItem>();
         
         // The following query pulls out distinct workspace items which have 
         // entries in the supervisory linking database.  We use DISTINCT to
@@ -134,10 +134,7 @@ public class SupervisedItem extends WorkspaceItem
             }
         }
         
-        SupervisedItem[] siArray = new SupervisedItem[sItems.size()];
-        siArray = (SupervisedItem[]) sItems.toArray(siArray);
-
-        return siArray;
+        return sItems.toArray(new SupervisedItem[sItems.size()]);
     }
     
     /**
@@ -151,7 +148,7 @@ public class SupervisedItem extends WorkspaceItem
     public Group[] getSupervisorGroups(Context c, int wi)
         throws SQLException
     {
-        List groupList = new ArrayList();
+        List<Group> groupList = new ArrayList<Group>();
         String query = "SELECT epersongroup.* " +
                        "FROM epersongroup, epersongroup2workspaceitem " +
                        "WHERE epersongroup2workspaceitem.workspace_item_id" +
@@ -181,10 +178,7 @@ public class SupervisedItem extends WorkspaceItem
             }
         }
         
-        Group[] groupArray = new Group[groupList.size()];
-        groupArray = (Group[]) groupList.toArray(groupArray);
-
-        return groupArray;
+        return groupList.toArray(new Group[groupList.size()]);
     }
     
     /**
@@ -200,7 +194,7 @@ public class SupervisedItem extends WorkspaceItem
     {
         Context ourContext = new Context();
         
-        List groupList = new ArrayList();
+        List<Group> groupList = new ArrayList<Group>();
         String query = "SELECT epersongroup.* " +
                        "FROM epersongroup, epersongroup2workspaceitem " +
                        "WHERE epersongroup2workspaceitem.workspace_item_id" +
@@ -233,10 +227,7 @@ public class SupervisedItem extends WorkspaceItem
             }
         }
         
-        Group[] groupArray = new Group[groupList.size()];
-        groupArray = (Group[]) groupList.toArray(groupArray);
-
-        return groupArray;
+        return groupList.toArray(new Group[groupList.size()]);
     }
     
     /**
@@ -250,7 +241,7 @@ public class SupervisedItem extends WorkspaceItem
     public static SupervisedItem[] findbyEPerson(Context context, EPerson ep)
         throws SQLException
     {
-        List sItems = new ArrayList();
+        List<SupervisedItem> sItems = new ArrayList<SupervisedItem>();
         String query = "SELECT DISTINCT workspaceitem.* " +
                         "FROM workspaceitem, epersongroup2workspaceitem, " +
                         "epersongroup2eperson " +
@@ -283,11 +274,7 @@ public class SupervisedItem extends WorkspaceItem
             }
         }
         
-        SupervisedItem[] siArray = new SupervisedItem[sItems.size()];
-        siArray = (SupervisedItem[]) sItems.toArray(siArray);
-
-        return siArray;
-        
+        return sItems.toArray(new SupervisedItem[sItems.size()]);
     }
     
 }

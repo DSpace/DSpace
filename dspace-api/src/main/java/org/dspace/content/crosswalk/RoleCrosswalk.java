@@ -180,7 +180,7 @@ public class RoleCrosswalk
      * @throws AuthorizeException current user not authorized for this operation.
      */
     @Override
-    public List disseminateList(DSpaceObject dso)
+    public List<Element> disseminateList(DSpaceObject dso)
         throws CrosswalkException, IOException, SQLException,
                AuthorizeException
     {

@@ -372,7 +372,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
     /**
      * Returns object's metadata in MODS format, as XML structure node.
      */
-    public List disseminateList(DSpaceObject dso)
+    public List<Element> disseminateList(DSpaceObject dso)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {

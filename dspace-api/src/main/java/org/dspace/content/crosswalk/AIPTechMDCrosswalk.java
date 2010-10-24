@@ -190,7 +190,7 @@ public class AIPTechMDCrosswalk
      * @throws AuthorizeException current user not authorized for this operation.
      */
     @Override
-    public List disseminateList(DSpaceObject dso)
+    public List<Element> disseminateList(DSpaceObject dso)
         throws CrosswalkException, IOException, SQLException,
                AuthorizeException
     {
@@ -218,7 +218,7 @@ public class AIPTechMDCrosswalk
         throws CrosswalkException, IOException, SQLException,
                AuthorizeException
     {
-        List dc = new ArrayList();
+        List<DCValue> dc = new ArrayList<DCValue>();
         if (dso.getType() == Constants.ITEM)
         {
             Item item = (Item)dso;

@@ -151,18 +151,18 @@ public class XSLTDisseminationCrosswalk
         // grovel for namespaces of the form:
         //  crosswalk.diss.{PLUGIN_NAME}.namespace.{PREFIX} = {URI}
         String nsPrefix = prefix + "namespace.";
-        Enumeration pe = ConfigurationManager.propertyNames();
-        List nsList = new ArrayList();
+        Enumeration<String> pe = (Enumeration<String>)ConfigurationManager.propertyNames();
+        List<Namespace> nsList = new ArrayList<Namespace>();
         while (pe.hasMoreElements())
         {
-            String key = (String)pe.nextElement();
+            String key = pe.nextElement();
             if (key.startsWith(nsPrefix))
             {
                 nsList.add(Namespace.getNamespace(key.substring(nsPrefix.length()),
                         ConfigurationManager.getProperty(key)));
             }
         }
-        namespaces = (Namespace[])nsList.toArray(new Namespace[nsList.size()]);
+        namespaces = nsList.toArray(new Namespace[nsList.size()]);
 
         preferList = ConfigurationManager.getBooleanProperty(prefix+"preferList", false);
     }
@@ -248,7 +248,7 @@ public class XSLTDisseminationCrosswalk
      *
      * @see DisseminationCrosswalk
      */
-    public List disseminateList(DSpaceObject dso)
+    public List<Element> disseminateList(DSpaceObject dso)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {

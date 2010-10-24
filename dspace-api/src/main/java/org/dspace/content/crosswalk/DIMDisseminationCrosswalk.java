@@ -128,9 +128,9 @@ public class DIMDisseminationCrosswalk
         return dim;
 	}
    
-    public List disseminateList(DSpaceObject dso) throws CrosswalkException, IOException, SQLException, AuthorizeException
+    public List<Element> disseminateList(DSpaceObject dso) throws CrosswalkException, IOException, SQLException, AuthorizeException
 	{
-	    List result = new ArrayList(1);
+	    List<Element> result = new ArrayList<Element>(1);
 	    result.add(disseminateElement(dso));
 	    return result;
 	}

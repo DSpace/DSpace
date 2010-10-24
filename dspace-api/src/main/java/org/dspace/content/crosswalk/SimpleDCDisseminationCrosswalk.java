@@ -104,14 +104,14 @@ public class SimpleDCDisseminationCrosswalk extends SelfNamedPlugin
      * Simple-minded copying of elements: convert contributor.author to
      * "creator" but otherwise just grab element name without qualifier.
      */
-    public List disseminateList(DSpaceObject dso)
+    public List<Element> disseminateList(DSpaceObject dso)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
         return disseminateListInternal(dso, true);
     }
 
-    public List disseminateListInternal(DSpaceObject dso, boolean addSchema)
+    public List<Element> disseminateListInternal(DSpaceObject dso, boolean addSchema)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
@@ -123,7 +123,7 @@ public class SimpleDCDisseminationCrosswalk extends SelfNamedPlugin
         Item item = (Item)dso;
         DCValue[] allDC = item.getDC(Item.ANY, Item.ANY, Item.ANY);
 
-        List dcl = new ArrayList(allDC.length);
+        List<Element> dcl = new ArrayList<Element>(allDC.length);
 
         for (int i = 0; i < allDC.length; i++)
         {

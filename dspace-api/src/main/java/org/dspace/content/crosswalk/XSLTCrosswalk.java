@@ -136,20 +136,20 @@ public abstract class XSLTCrosswalk extends SelfNamedPlugin
         String prefix = CONFIG_PREFIX+direction+".";
         String suffix = CONFIG_STYLESHEET;
 
-        List aliasList = new ArrayList();
-        Enumeration pe = ConfigurationManager.propertyNames();
+        List<String> aliasList = new ArrayList<String>();
+        Enumeration<String> pe = (Enumeration<String>)ConfigurationManager.propertyNames();
 
         log.debug("XSLTCrosswalk: Looking for config prefix = "+prefix);
         while (pe.hasMoreElements())
         {
-            String key = (String)pe.nextElement();
+            String key = pe.nextElement();
             if (key.startsWith(prefix) && key.endsWith(suffix))
             {
                 log.debug("Getting XSLT plugin name from config line: "+key);
                 aliasList.add(key.substring(prefix.length(), key.length()-suffix.length()));
             }
         }
-        return (String[])aliasList.toArray(new String[aliasList.size()]);
+        return aliasList.toArray(new String[aliasList.size()]);
     }
 
     private XSLTransformer transformer = null;

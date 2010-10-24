@@ -153,7 +153,7 @@ public class AIPDIMCrosswalk
      * @throws SQLException  Database failure in services this calls
      * @throws AuthorizeException current user not authorized for this operation.
      */
-    public List disseminateList(DSpaceObject dso)
+    public List<Element> disseminateList(DSpaceObject dso)
         throws CrosswalkException, IOException, SQLException,
                AuthorizeException
     {

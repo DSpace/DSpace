@@ -189,7 +189,7 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
      * Return &lt;meta&gt; elements that can be put in the &lt;head&gt; element
      * of an XHTML document.
      */
-    public List disseminateList(DSpaceObject dso) throws CrosswalkException,
+    public List<Element> disseminateList(DSpaceObject dso) throws CrosswalkException,
             IOException, SQLException, AuthorizeException
     {
         if (dso.getType() != Constants.ITEM)

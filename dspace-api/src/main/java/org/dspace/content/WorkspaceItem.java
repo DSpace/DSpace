@@ -302,7 +302,7 @@ public class WorkspaceItem implements InProgressSubmission
     public static WorkspaceItem[] findByEPerson(Context context, EPerson ep)
             throws SQLException
     {
-        List wsItems = new ArrayList();
+        List<WorkspaceItem> wsItems = new ArrayList<WorkspaceItem>();
 
         TableRowIterator tri = DatabaseManager.queryTable(context, "workspaceitem",
                 "SELECT workspaceitem.* FROM workspaceitem, item WHERE " +
@@ -338,10 +338,7 @@ public class WorkspaceItem implements InProgressSubmission
             }
         }
 
-        WorkspaceItem[] wsArray = new WorkspaceItem[wsItems.size()];
-        wsArray = (WorkspaceItem[]) wsItems.toArray(wsArray);
-
-        return wsArray;
+        return wsItems.toArray(new WorkspaceItem[wsItems.size()]);
     }
 
     /**
@@ -357,7 +354,7 @@ public class WorkspaceItem implements InProgressSubmission
     public static WorkspaceItem[] findByCollection(Context context, Collection c)
             throws SQLException
     {
-        List wsItems = new ArrayList();
+        List<WorkspaceItem> wsItems = new ArrayList<WorkspaceItem>();
 
         TableRowIterator tri = DatabaseManager.queryTable(context, "workspaceitem",
                 "SELECT workspaceitem.* FROM workspaceitem WHERE " +
@@ -392,10 +389,7 @@ public class WorkspaceItem implements InProgressSubmission
             }
         }
 
-        WorkspaceItem[] wsArray = new WorkspaceItem[wsItems.size()];
-        wsArray = (WorkspaceItem[]) wsItems.toArray(wsArray);
-
-        return wsArray;
+        return wsItems.toArray(new WorkspaceItem[wsItems.size()]);
     }
 
     /**
@@ -408,7 +402,7 @@ public class WorkspaceItem implements InProgressSubmission
     public static WorkspaceItem[] findAll(Context context)
         throws SQLException
     {
-        List wsItems = new ArrayList();
+        List<WorkspaceItem> wsItems = new ArrayList<WorkspaceItem>();
         String query = "SELECT * FROM workspaceitem ORDER BY item_id";
         TableRowIterator tri = DatabaseManager.queryTable(context,
                                     "workspaceitem",
@@ -442,10 +436,7 @@ public class WorkspaceItem implements InProgressSubmission
             }
         }
         
-        WorkspaceItem[] wsArray = new WorkspaceItem[wsItems.size()];
-        wsArray = (WorkspaceItem[]) wsItems.toArray(wsArray);
-
-        return wsArray;
+        return wsItems.toArray(new WorkspaceItem[wsItems.size()]);
     }
     
     /**

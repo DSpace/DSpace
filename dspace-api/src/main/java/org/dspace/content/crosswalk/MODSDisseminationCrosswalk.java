@@ -335,7 +335,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     /**
      * Returns object's metadata in MODS format, as List of XML structure nodes.
      */
-    public List disseminateList(DSpaceObject dso)
+    public List<Element> disseminateList(DSpaceObject dso)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
