@@ -144,7 +144,7 @@ public class MetadataExportReader extends AbstractReader implements Recyclable
             String handle = par.getParameter("handle");
             DSpaceObject dso = HandleManager.resolveToObject(context, handle);
             
-            ArrayList itemmd = new ArrayList();
+            java.util.List<Integer> itemmd = new ArrayList<Integer>();
             if(dso.getType() == Constants.ITEM)
             {
                itemmd.add(dso.getID());

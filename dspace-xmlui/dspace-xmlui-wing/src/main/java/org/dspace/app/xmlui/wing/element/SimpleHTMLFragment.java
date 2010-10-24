@@ -521,8 +521,7 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 						// insist on using \r\n for line breaks.
 						@SuppressWarnings("unchecked")
 						// This cast is correct
-						List<String> parts = new ArrayList(Arrays
-								.asList(rawText.split("\n\\s*\n")));
+						List<String> parts = Arrays.asList(rawText.split("\n\\s*\n"));
 
 						if (parts.size() > 0) {
 							String lastPart = parts.remove(parts.size()-1);
