@@ -87,10 +87,10 @@ public class MetadataSchema
     private String name;
 
     // cache of schema by ID (Integer)
-    private static Map id2schema = null;
+    private static Map<Integer, MetadataSchema> id2schema = null;
 
     // cache of schema by short name
-    private static Map name2schema = null;
+    private static Map<String, MetadataSchema> name2schema = null;
 
 
     /**
@@ -395,7 +395,7 @@ public class MetadataSchema
      */
     public static MetadataSchema[] findAll(Context context) throws SQLException
     {
-        List schemas = new ArrayList();
+        List<MetadataSchema> schemas = new ArrayList<MetadataSchema>();
 
         // Get all the metadataschema rows
         TableRowIterator tri = DatabaseManager.queryTable(context, "MetadataSchemaRegistry",
@@ -553,7 +553,7 @@ public class MetadataSchema
             return null;
         }
 
-        return (MetadataSchema) id2schema.get(iid);
+        return id2schema.get(iid);
     }
 
     /**
@@ -585,7 +585,7 @@ public class MetadataSchema
             return null;
         }
 
-        return (MetadataSchema) name2schema.get(shortName);
+        return name2schema.get(shortName);
     }
 
     // invalidate the cache e.g. after something modifies DB state.
@@ -606,8 +606,8 @@ public class MetadataSchema
         if (!isCacheInitialized())
         {
             log.info("Loading schema cache for fast finds");
-            HashMap new_id2schema = new HashMap();
-            HashMap new_name2schema = new HashMap();
+            Map<Integer, MetadataSchema> new_id2schema = new HashMap<Integer, MetadataSchema>();
+            Map<String, MetadataSchema> new_name2schema = new HashMap<String, MetadataSchema>();
 
             TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataSchemaRegistry",
                     "SELECT * from MetadataSchemaRegistry");

@@ -81,7 +81,7 @@ public class MetadataField
     private TableRow row;
 
     // cache of field by ID (Integer)
-    private static Map id2field = null;
+    private static Map<Integer, MetadataField> id2field = null;
 
 
     /**
@@ -356,7 +356,7 @@ public class MetadataField
      */
     public static MetadataField[] findAll(Context context) throws SQLException
     {
-        List fields = new ArrayList();
+        List<MetadataField> fields = new ArrayList<MetadataField>();
 
         // Get all the metadatafieldregistry rows
         TableRowIterator tri = DatabaseManager.queryTable(context, "MetadataFieldRegistry",
@@ -395,7 +395,7 @@ public class MetadataField
     public static MetadataField[] findAllInSchema(Context context, int schemaID)
             throws SQLException
     {
-        List fields = new ArrayList();
+        List<MetadataField> fields = new ArrayList<MetadataField>();
 
         // Get all the metadatafieldregistry rows
         TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataFieldRegistry",
@@ -639,7 +639,7 @@ public class MetadataField
             return null;
         }
 
-        return (MetadataField) id2field.get(iid);
+        return id2field.get(iid);
     }
 
     // invalidate the cache e.g. after something modifies DB state.
@@ -658,7 +658,7 @@ public class MetadataField
     {
         if (!isCacheInitialized())
         {
-            HashMap new_id2field = new HashMap();
+            Map<Integer, MetadataField> new_id2field = new HashMap<Integer, MetadataField>();
             log.info("Loading MetadataField elements into cache.");
 
             // Grab rows from DB

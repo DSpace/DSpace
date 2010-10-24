@@ -224,7 +224,7 @@ public class ItemComparator implements Comparator
 
         // We want to sort using Strings, but also keep track of
         // which DCValue the value came from.
-        Map values = new HashMap();
+        Map<String, Integer> values = new HashMap<String, Integer>();
 
         for (int i = 0; i < dcvalues.length; i++)
         {
@@ -241,11 +241,11 @@ public class ItemComparator implements Comparator
             return null;
         }
 
-        Set valueSet = values.keySet();
-        String chosen = max ? (String) Collections.max(valueSet)
-                : (String) Collections.min(valueSet);
+        Set<String> valueSet = values.keySet();
+        String chosen = max ? Collections.max(valueSet)
+                : Collections.min(valueSet);
 
-        int index = ((Integer) values.get(chosen)).intValue();
+        int index = (values.get(chosen)).intValue();
 
         return normalizeTitle(dcvalues[index]);
     }
