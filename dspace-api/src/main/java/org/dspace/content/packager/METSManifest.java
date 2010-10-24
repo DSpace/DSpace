@@ -185,7 +185,7 @@ public class METSManifest
     private List mdFiles = null;
 
     /** <file> elements in "original" file group (bundle) */
-    private List contentFiles = null;
+    private List<Element> contentFiles = null;
 
     /** builder to use for mdRef streams, inherited from create() */
     private SAXBuilder parser = null;
@@ -202,7 +202,7 @@ public class METSManifest
         File xsdPath1 = new File(dspace_dir+"/config/schemas/");
         File xsdPath2 = new File(dspace_dir+"/config/");
 
-        Enumeration pe = ConfigurationManager.propertyNames();
+        Enumeration<String> pe = (Enumeration<String>)ConfigurationManager.propertyNames();
         StringBuffer result = new StringBuffer();
         while (pe.hasMoreElements())
         {
@@ -211,7 +211,7 @@ public class METSManifest
             // e.g.
             //  mets.xsd.dc =  http://purl.org/dc/elements/1.1/ dc.xsd
             // (filename is relative to {dspace_dir}/config/schemas/)
-            String key = (String)pe.nextElement();
+            String key = pe.nextElement();
             if (key.startsWith(CONFIG_XSD_PREFIX))
             {
                 String spec  = ConfigurationManager.getProperty(key);
@@ -350,7 +350,7 @@ public class METSManifest
      *   the item's content.
      * @return a List of <code>Element</code>s.
      */
-    public List getContentFiles()
+    public List<Element> getContentFiles()
         throws MetadataValidationException
     {
         if (contentFiles != null)
@@ -364,7 +364,7 @@ public class METSManifest
             throw new MetadataValidationException("Invalid METS Manifest: DSpace requires a fileSec element, but it is missing.");
         }
 
-        contentFiles = new ArrayList();
+        contentFiles = new ArrayList<Element>();
         Iterator fgi = fileSec.getChildren("fileGrp", metsNS).iterator();
         while (fgi.hasNext())
         {
@@ -626,7 +626,7 @@ public class METSManifest
      * @return contents of metadata section, or empty list if no XML content is available.
      * @throws MetadataValidationException if METS is invalid, or there is an error parsing the XML.
      */
-    public List getMdContentAsXml(Element mdSec, Mdref callback)
+    public List<Element> getMdContentAsXml(Element mdSec, Mdref callback)
         throws MetadataValidationException, PackageValidationException,
                IOException, SQLException, AuthorizeException
     {
@@ -671,14 +671,14 @@ public class METSManifest
                         {
                             byte value[] = Base64.decodeBase64(bin.getText().getBytes());
                             Document mdd = parser.build(new ByteArrayInputStream(value));
-                            List result = new ArrayList(1);
+                            List<Element> result = new ArrayList<Element>(1);
                             result.add(mdd.getRootElement());
                             return result;
                         }
                         else
                         {
                             log.warn("Ignoring binData section because MIMETYPE is not XML, but: "+mimeType);
-                            return new ArrayList(0);
+                            return new ArrayList<Element>(0);
                         }
                    }
                 }
@@ -693,14 +693,14 @@ public class METSManifest
                 if (mimeType != null && mimeType.equalsIgnoreCase("text/xml"))
                 {
                     Document mdd = parser.build(callback.getInputStream(mdRef));
-                    List result = new ArrayList(1);
+                    List<Element> result = new ArrayList<Element>(1);
                     result.add(mdd.getRootElement());
                     return result;
                 }
                 else
                 {
                     log.warn("Ignoring mdRef section because MIMETYPE is not XML, but: "+mimeType);
-                    return new ArrayList(0);
+                    return new ArrayList<Element>(0);
                 }
             }
             else
@@ -826,7 +826,7 @@ public class METSManifest
         //get our child object <div>s
         List childObjDivs = getChildObjDivs();
 
-        List childPathList = new ArrayList<String>();
+        List<String> childPathList = new ArrayList<String>();
 
         if(childObjDivs != null && !childObjDivs.isEmpty())
         {
@@ -1020,7 +1020,7 @@ public class METSManifest
             return new Element[0];
         }
         String amdID[] = amds.split("\\s+");
-        List resultList = new ArrayList();
+        List<Element> resultList = new ArrayList<Element>();
         for (int i = 0; i < amdID.length; ++i)
         {
             List rmds = getElementByXPath("mets:amdSec[@ID=\""+amdID[i]+"\"]", false).
@@ -1030,7 +1030,7 @@ public class METSManifest
                 resultList.addAll(rmds);
             }
         }
-        return (Element[])resultList.toArray(new Element[resultList.size()]);
+        return resultList.toArray(new Element[resultList.size()]);
     }
 
     /**

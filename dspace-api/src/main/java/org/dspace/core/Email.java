@@ -142,15 +142,15 @@ public class Email
     private String subject;
 
     /** The arguments to fill out */
-    private List arguments;
+    private List<Object> arguments;
 
     /** The recipients */
-    private List recipients;
+    private List<String> recipients;
 
     /** Reply to field, if any */
     private String replyTo;
 
-    private List attachments;
+    private List<FileAttachment> attachments;
 
     /** The character set this message will be sent in */
     private String charset;
@@ -162,9 +162,9 @@ public class Email
      */
     Email()
     {
-        arguments = new ArrayList(50);
-        recipients = new ArrayList(50);
-        attachments = new ArrayList(10);
+        arguments = new ArrayList<Object>(50);
+        recipients = new ArrayList<String>(50);
+        attachments = new ArrayList<FileAttachment>(10);
         subject = "";
         content = "";
         replyTo = null;
@@ -193,7 +193,7 @@ public class Email
     void setContent(String cnt)
     {
         content = cnt;
-        arguments = new ArrayList();
+        arguments = new ArrayList<Object>();
     }
 
     /**
@@ -245,9 +245,9 @@ public class Email
      */
     public void reset()
     {
-        arguments = new ArrayList(50);
-        recipients = new ArrayList(50);
-        attachments = new ArrayList(10);
+        arguments = new ArrayList<Object>(50);
+        recipients = new ArrayList<String>(50);
+        attachments = new ArrayList<FileAttachment>(10);
         replyTo = null;
         charset = null;
     }
@@ -325,12 +325,12 @@ public class Email
         MimeMessage message = new MimeMessage(session);
 
         // Set the recipients of the message
-        Iterator i = recipients.iterator();
+        Iterator<String> i = recipients.iterator();
 
         while (i.hasNext())
         {
             message.addRecipient(Message.RecipientType.TO, new InternetAddress(
-                    (String) i.next()));
+                    i.next()));
         }
 
         // Format the mail message
@@ -373,9 +373,9 @@ public class Email
             messageBodyPart.setText(fullMessage);
             multipart.addBodyPart(messageBodyPart);
 
-            for (Iterator iter = attachments.iterator(); iter.hasNext();)
+            for (Iterator<FileAttachment> iter = attachments.iterator(); iter.hasNext();)
             {
-                FileAttachment f = (FileAttachment) iter.next();
+                FileAttachment f = iter.next();
                 // add the file
                 messageBodyPart = new MimeBodyPart();
                 messageBodyPart.setDataHandler(new DataHandler(

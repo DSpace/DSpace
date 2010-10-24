@@ -198,9 +198,9 @@ public class QueryArgs
             numFieldStr = "3";
         }
         int numField = Integer.parseInt(numFieldStr);
-        ArrayList query = new ArrayList();
-        ArrayList field = new ArrayList();
-        ArrayList conjunction = new ArrayList();
+        ArrayList<String> query = new ArrayList<String>();
+        ArrayList<String> field = new ArrayList<String>();
+        ArrayList<String> conjunction = new ArrayList<String>();
         
         for (int i = 1; i <= numField; i++)
         {
@@ -234,19 +234,19 @@ public class QueryArgs
             	}
         	}
         }
-        Iterator iquery = query.iterator();
-        Iterator ifield = field.iterator();
-        Iterator iconj = conjunction.iterator();
+        Iterator<String> iquery = query.iterator();
+        Iterator<String> ifield = field.iterator();
+        Iterator<String> iconj = conjunction.iterator();
         
         String conj_curr = "";
         while (iquery.hasNext())
         {	newquery = newquery + conj_curr;
-        	String query_curr = (String) iquery.next();
-        	String field_curr = (String) ifield.next();
+        	String query_curr = iquery.next();
+        	String field_curr = ifield.next();
         	newquery = newquery + buildQueryPart(query_curr,field_curr);
         	if (iconj.hasNext())
         	{
-        		conj_curr = " " + (String)iconj.next() + " ";        	    
+        		conj_curr = " " + iconj.next() + " ";
         	}
         }
         

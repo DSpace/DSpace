@@ -256,7 +256,7 @@ public class SimpleSearchServlet extends DSpaceServlet
         // now instantiate the results and put them in their buckets
         for (int i = 0; i < qResults.getHitTypes().size(); i++)
         {
-            Integer myType = (Integer) qResults.getHitTypes().get(i);
+            Integer myType = qResults.getHitTypes().get(i);
 
             // add the handle to the appropriate lists
             switch (myType.intValue())
@@ -286,9 +286,9 @@ public class SimpleSearchServlet extends DSpaceServlet
 
         for (int i = 0; i < qResults.getHitTypes().size(); i++)
         {
-            Integer myId    = (Integer) qResults.getHitIds().get(i);
-            String myHandle = (String) qResults.getHitHandles().get(i);
-            Integer myType  = (Integer) qResults.getHitTypes().get(i);
+            Integer myId    = qResults.getHitIds().get(i);
+            String myHandle = qResults.getHitHandles().get(i);
+            Integer myType  = qResults.getHitTypes().get(i);
 
             // add the handle to the appropriate lists
             switch (myType.intValue())

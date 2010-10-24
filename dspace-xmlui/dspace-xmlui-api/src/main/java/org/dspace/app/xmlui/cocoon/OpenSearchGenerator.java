@@ -290,7 +290,7 @@ public class OpenSearchGenerator extends AbstractGenerator
                 DSpaceObject[] results = new DSpaceObject[qResults.getHitHandles().size()];
                 for (int i = 0; i < qResults.getHitHandles().size(); i++)
                 {
-                    String myHandle = (String)qResults.getHitHandles().get(i);
+                    String myHandle = qResults.getHitHandles().get(i);
                     DSpaceObject dso = HandleManager.resolveToObject(context, myHandle);
                     if (dso == null)
                     {

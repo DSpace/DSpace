@@ -204,7 +204,7 @@ public class Subscribe
                 "SELECT collection_id FROM subscription WHERE eperson_id= ? ",
                 eperson.getID());
 
-        List collections = new ArrayList();
+        List<Collection> collections = new ArrayList<Collection>();
 
         try
         {
@@ -288,7 +288,7 @@ public class Subscribe
                 "SELECT * FROM subscription ORDER BY eperson_id");
 
         EPerson currentEPerson = null;
-        List collections = null; // List of Collections
+        List<Collection> collections = null; // List of Collections
 
         try
         {
@@ -320,7 +320,7 @@ public class Subscribe
 
                     currentEPerson = EPerson.find(context, row
                             .getIntColumn("eperson_id"));
-                    collections = new ArrayList();
+                    collections = new ArrayList<Collection>();
                 }
 
                 collections.add(Collection.find(context, row
@@ -366,7 +366,7 @@ public class Subscribe
      * @param test 
      */
     public static void sendEmail(Context context, EPerson eperson,
-            List collections, boolean test) throws IOException, MessagingException,
+            List<Collection> collections, boolean test) throws IOException, MessagingException,
             SQLException
     {
         // Get a resource bundle according to the eperson language preferences
@@ -391,7 +391,7 @@ public class Subscribe
 
         for (int i = 0; i < collections.size(); i++)
         {
-            Collection c = (Collection) collections.get(i);
+            Collection c = collections.get(i);
 
             try {
                 boolean includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.subscription", true);
@@ -578,11 +578,11 @@ public class Subscribe
         }
     }
     
-    private static List filterOutToday(List completeList)
+    private static List<HarvestedItemInfo> filterOutToday(List<HarvestedItemInfo> completeList)
     {
         log.debug("Filtering out all today item to leave new items list size="
                 + completeList.size());
-        List filteredList = new ArrayList();
+        List<HarvestedItemInfo> filteredList = new ArrayList<HarvestedItemInfo>();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String today = sdf.format(new Date());
@@ -591,10 +591,8 @@ public class Subscribe
                 - (24 * 60 * 60 * 1000));
         String yesterday = sdf.format(thisTimeYesterday);
 
-        for (Iterator iter = completeList.iterator(); iter.hasNext();)
+        for (HarvestedItemInfo infoObject : completeList)
         {
-            HarvestedItemInfo infoObject = (HarvestedItemInfo) iter.next();
-
             Date lastUpdate = infoObject.item.getLastModified();
             String lastUpdateStr = sdf.format(lastUpdate);
 
@@ -645,10 +643,10 @@ public class Subscribe
         return filteredList;
     }
 
-    private static List filterOutModified(List completeList)
+    private static List<HarvestedItemInfo> filterOutModified(List<HarvestedItemInfo> completeList)
     {
         log.debug("Filtering out all modified to leave new items list size="+completeList.size());
-        List filteredList = new ArrayList();
+        List<HarvestedItemInfo> filteredList = new ArrayList<HarvestedItemInfo>();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         // Get the start and end dates for yesterday
@@ -656,9 +654,8 @@ public class Subscribe
                 - (24 * 60 * 60 * 1000));
         String yesterday = sdf.format(thisTimeYesterday);
         
-        for (Iterator iter = completeList.iterator(); iter.hasNext();)
+        for (HarvestedItemInfo infoObject : completeList)
         {
-            HarvestedItemInfo infoObject = (HarvestedItemInfo) iter.next();
             DCValue[] dateAccArr = infoObject.item.getMetadata("dc", "date", "accessioned", Item.ANY);
             
             if (dateAccArr != null && dateAccArr.length > 0)

@@ -229,8 +229,8 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         // now instantiate the results and put them in their buckets
         for (int i = 0; i < qResults.getHitHandles().size(); i++)
         {
-            String myHandle = (String) qResults.getHitHandles().get(i);
-            Integer myType = (Integer) qResults.getHitTypes().get(i);
+            String myHandle = qResults.getHitHandles().get(i);
+            Integer myType = qResults.getHitTypes().get(i);
 
             // add the handle to the appropriate lists
             switch (myType.intValue())

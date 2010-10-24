@@ -123,9 +123,9 @@ public class DSQuery
     {
         String querystring = args.getQuery();
         QueryResults qr = new QueryResults();
-        List hitHandles = new ArrayList();
-        List hitIds     = new ArrayList();
-        List hitTypes   = new ArrayList();
+        List<String> hitHandles = new ArrayList<String>();
+        List<Integer> hitIds     = new ArrayList<Integer>();
+        List<Integer> hitTypes   = new ArrayList<Integer>();
 
         // set up the QueryResults object
         qr.setHitHandles(hitHandles);

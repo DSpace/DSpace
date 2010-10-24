@@ -39,6 +39,7 @@
  */
 package org.dspace.search;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.ParseException;
@@ -119,7 +120,7 @@ public class Harvest
      * @throws SQLException
      * @throws ParseException If the date is not in a supported format
      */
-    public static List harvest(Context context, DSpaceObject scope,
+    public static List<HarvestedItemInfo> harvest(Context context, DSpaceObject scope,
             String startDate, String endDate, int offset, int limit,
             boolean items, boolean collections, boolean withdrawn,
             boolean nonAnon) throws SQLException, ParseException
@@ -136,7 +137,7 @@ public class Harvest
         // about of input data points. To accommodate this while still 
         // providing type safety we build a list of parameters to be 
         // plugged into the query at the database level.
-        List parameters = new ArrayList();
+        List<Serializable> parameters = new ArrayList<Serializable>();
         
         if (scope != null)
         {
@@ -229,7 +230,7 @@ public class Harvest
         // Execute
         Object[] parametersArray = parameters.toArray();
         TableRowIterator tri = DatabaseManager.query(context, query, parametersArray);
-        List infoObjects = new LinkedList();
+        List<HarvestedItemInfo> infoObjects = new LinkedList<HarvestedItemInfo>();
         int index = 0;
         int itemCounter = 0;
 

@@ -55,11 +55,11 @@ public class QueryResults
 
     private int pageSize; // max number of hits returned
 
-    private List hitHandles; // handles of content (items, collections,
+    private List<String> hitHandles; // handles of content (items, collections,
                              // communities)
 
-    private List hitTypes; // Resource type - from Constants
-    private List hitIds;   // Resource ids 
+    private List<Integer> hitTypes; // Resource type - from Constants
+    private List<Integer> hitIds;   // Resource ids
 
     private String errorMsg; //error string, if there is one
 
@@ -124,37 +124,37 @@ public class QueryResults
     }
 
     /** set the List of handles corresponding to hits */
-    public void setHitHandles(List myHits)
+    public void setHitHandles(List<String> myHits)
     {
         hitHandles = myHits;
     }
 
     /** get the List of handles corresponding to hits */
-    public List getHitHandles()
+    public List<String> getHitHandles()
     {
         return hitHandles;
     }
 
     /** set the List of ids corresponding to hits */
-    public void setHitIds(List myHits)
+    public void setHitIds(List<Integer> myHits)
     {
         hitIds = myHits;
     }
 
     /** get the List of handles corresponding to hits */
-    public List getHitIds()
+    public List<Integer> getHitIds()
     {
         return hitIds;
     }
 
     /** set the List of types corresponding to handles */
-    public void setHitTypes(List newTypes)
+    public void setHitTypes(List<Integer> newTypes)
     {
         hitTypes = newTypes;
     }
 
     /** get the List of types corresponding to handles */
-    public List getHitTypes()
+    public List<Integer> getHitTypes()
     {
         return hitTypes;
     }
