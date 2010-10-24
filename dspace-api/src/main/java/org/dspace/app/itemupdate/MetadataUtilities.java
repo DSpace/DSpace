@@ -59,6 +59,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.xpath.XPathAPI;
 
 import org.w3c.dom.Document;
@@ -282,7 +283,7 @@ public class MetadataUtilities {
 	        {
 	            language = "en";
 	        }
-	        else if (language.equals(""))
+	        else if ("".equals(language))
 	        {
 	            language = ConfigurationManager.getProperty("default.language");
 	        }
@@ -324,7 +325,7 @@ public class MetadataUtilities {
         		mel.setAttribute("qualifier", dtom.qualifier);
         	}
  
-        	if ((dtom.language == null) || (dtom.language.equals("")))
+        	if (StringUtils.isEmpty(dtom.language))
         	{
         		mel.setAttribute("language", "en");
         	}
@@ -545,12 +546,12 @@ public class MetadataUtilities {
 	{
 		String[] ar = compoundForm.split("\\s*\\.\\s*");  //trim ends
 				
-		if (ar[0].equals(""))
+		if ("".equals(ar[0]))
 		{
 			throw new ParseException("schema is empty string: " + compoundForm, 0);
 		}
 		
-		if ((ar.length < 2) || (ar.length > 3) || ar[1].equals(""))
+		if ((ar.length < 2) || (ar.length > 3) || "".equals(ar[1]))
 		{
 			throw new ParseException("element is malformed or empty string: " + compoundForm, 0);
 		}

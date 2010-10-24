@@ -135,7 +135,9 @@ public class PDFFilter extends MediaFilter
                 try
                 {
                     if (pdfDoc != null)
+                    {
                         pdfDoc.close();
+                    }
                 }
                 catch(Exception e)
                 {

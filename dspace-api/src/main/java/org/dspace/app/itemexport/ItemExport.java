@@ -65,6 +65,7 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import org.dspace.content.Bitstream;
@@ -628,7 +629,7 @@ public class ItemExport
                     String oldName = myName;
 
                     String description = b.getDescription();
-                    if ((description != null) && (!description.equals("")))
+                    if (!StringUtils.isEmpty(description))
                     {
                         description = "\tdescription:" + description;
                     } else

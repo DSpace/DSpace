@@ -165,7 +165,9 @@ public class PDFPackager
             setFormatToMIMEType(context, bs, "application/pdf");
             bs.update();
             if (log.isDebugEnabled())
-               log.debug("Created bitstream ID="+String.valueOf(bs.getID())+", parsing...");
+            {
+                log.debug("Created bitstream ID=" + String.valueOf(bs.getID()) + ", parsing...");
+            }
 
             crosswalkPDF(context, myitem, bs.retrieve());
 
@@ -185,9 +187,13 @@ public class PDFPackager
             {
                 // Close bitstream input stream and PDF file.
                 if (bis != null)
+                {
                     bis.close();
+                }
                 if (cos != null)
+                {
                     cos.close();
+                }
             }
             catch (IOException ie)
             { }
@@ -196,9 +202,13 @@ public class PDFPackager
             if (!success)
             {
                 if (original != null && bs != null)
+                {
                     original.removeBitstream(bs);
+                }
                 if (wi != null)
+                {
                     wi.deleteAll();
+                }
             }
             context.commit();
         }
@@ -252,7 +262,9 @@ public class PDFPackager
                AuthorizeException, SQLException, IOException
     {
         if (dso.getType() != Constants.ITEM)
+        {
             throw new PackageValidationException("This disseminator can only handle objects of type ITEM.");
+        }
 
         Item item = (Item)dso;
         try
@@ -260,10 +272,14 @@ public class PDFPackager
             BitstreamFormat pdff = BitstreamFormat.findByShortDescription(context,
                                     BITSTREAM_FORMAT_NAME);
             if (pdff == null)
-                throw new PackageValidationException("Cannot find BitstreamFormat \""+BITSTREAM_FORMAT_NAME+"\"");
+            {
+                throw new PackageValidationException("Cannot find BitstreamFormat \"" + BITSTREAM_FORMAT_NAME + "\"");
+            }
             Bitstream pkgBs = PackageUtils.getBitstreamByFormat(item, pdff, Constants.DEFAULT_BUNDLE_NAME);
             if (pkgBs == null)
-                throw new PackageValidationException("Cannot find Bitstream with format \""+BITSTREAM_FORMAT_NAME+"\"");
+            {
+                throw new PackageValidationException("Cannot find Bitstream with format \"" + BITSTREAM_FORMAT_NAME + "\"");
+            }
 
             //Make sure our package file exists
             if(!pkgFile.exists())
@@ -315,7 +331,9 @@ public class PDFPackager
 
             // sanity check: PDFBox breaks on encrypted documents, so give up.
             if(cos.getEncryptionDictionary() != null)
+            {
                 throw new MetadataValidationException("This packager cannot accept an encrypted PDF document.");
+            }
 
             /* PDF to DC "crosswalk":
              *
@@ -340,42 +358,62 @@ public class PDFPackager
 
             // sanity check: item must have a title.
             if (title == null)
+            {
                 throw new MetadataValidationException("This PDF file is unacceptable, it does not have a value for \"Title\" in its Info dictionary.");
+            }
             if (log.isDebugEnabled())
-               log.debug("PDF Info dict title=\""+title+"\"");
+            {
+                log.debug("PDF Info dict title=\"" + title + "\"");
+            }
             item.addDC("title", null, "en", title);
             String value;
             if ((value = docinfo.getAuthor()) != null)
             {
                 item.addDC("contributor", "author", null, value);
                 if (log.isDebugEnabled())
-                   log.debug("PDF Info dict author=\""+value+"\"");
+                {
+                    log.debug("PDF Info dict author=\"" + value + "\"");
+                }
             }
             if ((value = docinfo.getCreator()) != null)
+            {
                 item.addDC("description", "provenance", "en",
-                              "Application that created the original document: "+value);
+                        "Application that created the original document: " + value);
+            }
             if ((value = docinfo.getProducer()) != null)
+            {
                 item.addDC("description", "provenance", "en",
-                              "Original document converted to PDF by: "+value);
+                        "Original document converted to PDF by: " + value);
+            }
             if ((value = docinfo.getSubject()) != null)
+            {
                 item.addDC("description", "abstract", null, value);
+            }
             if ((value = docinfo.getKeywords()) != null)
+            {
                 item.addDC("subject", "other", null, value);
+            }
 
             // Take either CreationDate or ModDate as "date.created",
             // Too bad there's no place to put "last modified" in the DC.
             Calendar calValue;
             if ((calValue = docinfo.getCreationDate()) == null)
+            {
                 calValue = docinfo.getModificationDate();
+            }
             if (calValue != null)
+            {
                 item.addDC("date", "created", null,
-                             (new DCDate(calValue.getTime())).toString());
+                        (new DCDate(calValue.getTime())).toString());
+            }
             item.update();
         }
         finally
         {
             if (cos != null)
+            {
                 cos.close();
+            }
         }
     }
 
