@@ -79,8 +79,8 @@
 
 <%
     Collection collection = (Collection) request.getAttribute("collection");
-    List policies =
-        (List) request.getAttribute("policies");
+    List<ResourcePolicy> policies =
+        (List<ResourcePolicy>) request.getAttribute("policies");
 %>
 
 <dspace:layout titlekey="jsp.dspace-admin.authorize-collection-edit.title"
@@ -114,11 +114,9 @@
 
 <%
     String row = "even";
-    Iterator i = policies.iterator();
 
-    while( i.hasNext() )
+    for (ResourcePolicy rp : policies)
     {
-        ResourcePolicy rp = (ResourcePolicy) i.next();
 %>
       <form action="<%= request.getContextPath() %>/tools/authorize" method="post">
         <table class="miscTable" align="center" summary="Collection Policy Edit Form">

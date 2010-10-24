@@ -41,6 +41,7 @@ package org.dspace.app.dav;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -101,13 +102,13 @@ class DAVLookup extends DAVResource
 
     // empty property list, this class doesn't implement propfind.
     /** The Constant allProps. */
-    private static final List allProps = new Vector();
+    private static final List<Element> allProps = new ArrayList<Element>();
 
     /* (non-Javadoc)
      * @see org.dspace.app.dav.DAVResource#getAllProperties()
      */
     @Override
-    protected List getAllProperties()
+    protected List<Element> getAllProperties()
     {
         return allProps;
     }

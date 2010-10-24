@@ -41,6 +41,7 @@ package org.dspace.app.dav;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -96,7 +97,7 @@ abstract class DAVInProgressSubmission extends DAVResource
             DAV.NS_DSPACE);
 
     /** Commonly visible properties. */
-    protected static List inProgressProps = new Vector(9);
+    protected static List<Element> inProgressProps = new ArrayList<Element>(9);
     static
     {
         inProgressProps.add(current_user_privilege_setProperty);

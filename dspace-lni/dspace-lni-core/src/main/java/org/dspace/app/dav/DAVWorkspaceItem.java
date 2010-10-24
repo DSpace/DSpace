@@ -41,6 +41,7 @@ package org.dspace.app.dav;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -80,7 +81,7 @@ class DAVWorkspaceItem extends DAVInProgressSubmission
             "stage_reached", DAV.NS_DSPACE);
 
     /** The all props. */
-    private static List allProps = new Vector(inProgressProps);
+    private static List<Element> allProps = new ArrayList<Element>(inProgressProps);
     static
     {
         allProps.add(stage_reachedProperty);
@@ -106,7 +107,7 @@ class DAVWorkspaceItem extends DAVInProgressSubmission
      * @see org.dspace.app.dav.DAVResource#getAllProperties()
      */
     @Override
-    protected List getAllProperties()
+    protected List<Element> getAllProperties()
     {
         return allProps;
     }

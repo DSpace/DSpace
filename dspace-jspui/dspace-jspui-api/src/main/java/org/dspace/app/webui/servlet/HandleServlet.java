@@ -370,14 +370,13 @@ public class HandleServlet extends DSpaceServlet
         // Produce <meta> elements for header from crosswalk
         try
         {
-            List l = xHTMLHeadCrosswalk.disseminateList(item);
+            List<Element> l = xHTMLHeadCrosswalk.disseminateList(item);
             StringWriter sw = new StringWriter();
 
             XMLOutputter xmlo = new XMLOutputter();
             xmlo.output(new Text("\n"), sw);
-            for (int i = 0; i < l.size(); i++)
+            for (Element e : l)
             {
-                Element e = (Element) l.get(i);
                 // FIXME: we unset the Namespace so it's not printed.
                 // This is fairly yucky, but means the same crosswalk should
                 // work for Manakin as well as the JSP-based UI.
@@ -714,13 +713,13 @@ public class HandleServlet extends DSpaceServlet
      * @param items List of Items
      * @return array of corresponding titles
      */
-    private String[] getItemTitles(List items)
+    private String[] getItemTitles(List<Item> items)
     {
         String[] titles = new String[items.size()];
 
         for (int i = 0; i < items.size(); i++)
         {
-            Item item = (Item) items.get(i);
+            Item item = items.get(i);
 
             // FIXME: Should probably check for preferred language?
             DCValue[] titlesForThis = item.getDC("title", null, Item.ANY);
@@ -750,14 +749,14 @@ public class HandleServlet extends DSpaceServlet
      *            the items to get URLs for
      * @return an array of URLs (in Strings) corresponding to those items
      */
-    private String[] getItemURLs(Context context, List items)
+    private String[] getItemURLs(Context context, List<Item> items)
             throws SQLException
     {
         String[] urls = new String[items.size()];
 
         for (int i = 0; i < items.size(); i++)
         {
-            Item item = (Item) items.get(i);
+            Item item = items.get(i);
             urls[i] = "/handle/" + item.getHandle();
         }
 

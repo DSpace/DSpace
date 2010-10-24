@@ -112,7 +112,7 @@ public class BitstreamFormatRegistry extends DSpaceServlet
                     && request.getParameter("internal").equals("true"));
 
             // Separate comma-separated extensions
-            List extensions = new LinkedList();
+            List<String> extensions = new LinkedList<String>();
             String extParam = request.getParameter("extensions");
 
             while (extParam.length() > 0)

@@ -93,8 +93,8 @@
 <%
     // get item and list of policies
     Item item = (Item) request.getAttribute("item");
-    List item_policies =
-        (List) request.getAttribute("item_policies");
+    List<ResourcePolicy> item_policies =
+        (List<ResourcePolicy>) request.getAttribute("item_policies");
 
     // get bitstreams and corresponding policy lists
     Bundle [] bundles      = (Bundle [])request.getAttribute("bundles");
@@ -144,11 +144,8 @@
         </tr>
 <%
     String row = "even";
-    Iterator i = item_policies.iterator();
-
-    while( i.hasNext() )
+    for (ResourcePolicy rp : item_policies)
     {
-        ResourcePolicy rp = (ResourcePolicy) i.next();
 %>
         <tr>
             <td class="<%= row %>RowOddCol"><%= rp.getID() %></td>
@@ -179,7 +176,7 @@
     for( int b = 0; b < bundles.length; b++ )
     {
         Bundle myBun = bundles[b];
-        List myPolicies = (List)bundle_policies.get(new Integer(myBun.getID()));
+        List<ResourcePolicy> myPolicies = (List<ResourcePolicy>)bundle_policies.get(new Integer(myBun.getID()));
 
         // display add policy
         // display bundle header w/ID
@@ -209,11 +206,8 @@
 
 <%
     row = "even";
-    i = myPolicies.iterator();
-
-    while( i.hasNext() )
+    for (ResourcePolicy rp : myPolicies)
     {
-        ResourcePolicy rp = (ResourcePolicy) i.next();
 %>
         <tr>
             <td class="<%= row %>RowOddCol"><%= rp.getID() %></td>
@@ -275,11 +269,9 @@
             </tr>
 <%
     row = "even";
-    i = myPolicies.iterator();
 
-    while( i.hasNext() )
+    for (ResourcePolicy rp : myPolicies)
     {
-        ResourcePolicy rp = (ResourcePolicy) i.next();
 %>
         <tr>
             <td class="<%= row %>RowOddCol"><%= rp.getID() %></td>

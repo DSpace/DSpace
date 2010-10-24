@@ -379,7 +379,7 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
-        java.util.List fqs = Arrays.asList(request.getParameterValues("fq") != null ? request.getParameterValues("fq") : new String[0]);
+        java.util.List<String> fqs = Arrays.asList(request.getParameterValues("fq") != null ? request.getParameterValues("fq") : new String[0]);
 
         if (this.queryResults != null) {
             SearchUtils.SolrFacetConfig[] facets = SearchUtils.getFacetsForType(scope);

@@ -730,14 +730,12 @@ public class MyDSpaceServlet extends DSpaceServlet
         EPerson currentUser = context.getCurrentUser();
 
         // FIXME: WorkflowManager should return arrays
-        List ownedList = WorkflowManager.getOwnedTasks(context, currentUser);
-        WorkflowItem[] owned = new WorkflowItem[ownedList.size()];
-        owned = (WorkflowItem[]) ownedList.toArray(owned);
+        List<WorkflowItem> ownedList = WorkflowManager.getOwnedTasks(context, currentUser);
+        WorkflowItem[] owned = ownedList.toArray(new WorkflowItem[ownedList.size()]);
 
         // Pooled workflow items
-        List pooledList = WorkflowManager.getPooledTasks(context, currentUser);
-        WorkflowItem[] pooled = new WorkflowItem[pooledList.size()];
-        pooled = (WorkflowItem[]) pooledList.toArray(pooled);
+        List<WorkflowItem> pooledList = WorkflowManager.getPooledTasks(context, currentUser);
+        WorkflowItem[] pooled = pooledList.toArray(new WorkflowItem[pooledList.size()]);
 
         // User's WorkflowItems
         WorkflowItem[] workflowItems = WorkflowItem.findByEPerson(context, currentUser);
@@ -794,7 +792,7 @@ public class MyDSpaceServlet extends DSpaceServlet
             AuthorizeException
     {
         // Turn the iterator into a list
-        List subList = new LinkedList();
+        List<Item> subList = new LinkedList<Item>();
         ItemIterator subs = Item.findBySubmitter(context, context
                 .getCurrentUser());
 
@@ -817,7 +815,7 @@ public class MyDSpaceServlet extends DSpaceServlet
 
         for (int i = 0; i < subList.size(); i++)
         {
-            items[i] = (Item) subList.get(i);
+            items[i] = subList.get(i);
         }
 
         log.info(LogManager.getHeader(context, "view_own_submissions", "count="

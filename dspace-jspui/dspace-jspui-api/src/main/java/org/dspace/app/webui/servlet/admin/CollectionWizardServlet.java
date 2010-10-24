@@ -60,6 +60,7 @@ import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Collection;
@@ -650,7 +651,7 @@ public class CollectionWizardServlet extends DSpaceServlet
 
             // Next page is 'permission to read' page iff ITEM_DEFAULT_READ
             // for anonymous group is NOT there
-            List anonReadPols = AuthorizeManager.getPoliciesActionFilter(
+            List<ResourcePolicy> anonReadPols = AuthorizeManager.getPoliciesActionFilter(
                     context, collection, Constants.DEFAULT_ITEM_READ);
 
             // At this stage, if there's any ITEM_DEFAULT_READ, it can only

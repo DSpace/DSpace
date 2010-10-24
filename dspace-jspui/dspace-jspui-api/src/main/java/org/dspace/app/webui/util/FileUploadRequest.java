@@ -64,7 +64,7 @@ public class FileUploadRequest extends HttpServletRequestWrapper
 {
 
     /** Multipart request */
-    private List items = null;
+    private List<FileItem> items = null;
 
     private Map<String, String> parameters = new HashMap<String, String>();
 
@@ -103,9 +103,8 @@ public class FileUploadRequest extends HttpServletRequestWrapper
         {
             upload.setSizeMax(maxSize);
             items = upload.parseRequest(req);
-            for (Iterator i = items.iterator(); i.hasNext();)
+            for (FileItem item : items)
             {
-                FileItem item = (FileItem) i.next();
                 if (item.isFormField())
                 {
                     parameters.put(item.getFieldName(), item.getString("UTF-8"));

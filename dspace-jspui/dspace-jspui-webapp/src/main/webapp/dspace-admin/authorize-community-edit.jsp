@@ -75,8 +75,8 @@
 
 <%
     Community community = (Community) request.getAttribute("community");
-    List policies =
-        (List) request.getAttribute("policies");
+    List<ResourcePolicy> policies =
+        (List<ResourcePolicy>) request.getAttribute("policies");
 %>
 
 <dspace:layout titlekey="jsp.dspace-admin.authorize-community-edit.title"
@@ -119,11 +119,8 @@
 
 <%
     String row = "even";
-    Iterator i = policies.iterator();
-
-    while( i.hasNext() )
+    for (ResourcePolicy rp : policies)
     {
-        ResourcePolicy rp = (ResourcePolicy) i.next();
 %>
         <tr>
             <td headers="t1" class="<%= row %>RowOddCol"><%= rp.getID() %></td>

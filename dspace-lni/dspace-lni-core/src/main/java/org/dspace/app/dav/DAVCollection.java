@@ -45,6 +45,7 @@ import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -120,7 +121,7 @@ class DAVCollection extends DAVDSpaceObject
             DAV.NS_DSPACE);
 
     /** The all props. */
-    private static List allProps = new Vector(commonProps);
+    private static List<Element> allProps = new ArrayList<Element>(commonProps);
     static
     {
         allProps.add(logoProperty);
@@ -155,7 +156,7 @@ class DAVCollection extends DAVDSpaceObject
      * @see org.dspace.app.dav.DAVResource#getAllProperties()
      */
     @Override
-    protected List getAllProperties()
+    protected List<Element> getAllProperties()
     {
         return allProps;
     }

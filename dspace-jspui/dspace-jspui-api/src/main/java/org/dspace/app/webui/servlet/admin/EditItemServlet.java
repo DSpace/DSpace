@@ -551,22 +551,18 @@ public class EditItemServlet extends DSpaceServlet
         Enumeration unsortedParamNames = request.getParameterNames();
 
         // Put them in a list
-        List sortedParamNames = new LinkedList();
+        List<String> sortedParamNames = new LinkedList<String>();
 
         while (unsortedParamNames.hasMoreElements())
         {
-            sortedParamNames.add(unsortedParamNames.nextElement());
+            sortedParamNames.add((String)unsortedParamNames.nextElement());
         }
 
         // Sort the list
         Collections.sort(sortedParamNames);
 
-        Iterator iterator = sortedParamNames.iterator();
-
-        while (iterator.hasNext())
+        for (String p : sortedParamNames)
         {
-            String p = (String) iterator.next();
-
             if (p.startsWith("value"))
             {
                 /*

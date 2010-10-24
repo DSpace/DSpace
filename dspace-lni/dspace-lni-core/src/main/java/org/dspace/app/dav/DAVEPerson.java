@@ -41,6 +41,7 @@ package org.dspace.app.dav;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -74,7 +75,7 @@ class DAVEPerson extends DAVResource
     private static Logger log = Logger.getLogger(DAVEPerson.class);
 
     /** The all props. */
-    private static List allProps = new Vector(commonProps);
+    private static List<Element> allProps = new ArrayList<Element>(commonProps);
 
     /* (non-Javadoc)
      * @see org.dspace.app.dav.DAVResource#typeValue()
@@ -152,7 +153,7 @@ class DAVEPerson extends DAVResource
      * @see org.dspace.app.dav.DAVResource#getAllProperties()
      */
     @Override
-    protected List getAllProperties()
+    protected List<Element> getAllProperties()
     {
         return allProps;
     }

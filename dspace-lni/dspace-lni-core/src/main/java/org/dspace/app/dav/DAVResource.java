@@ -45,6 +45,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
@@ -172,7 +173,7 @@ abstract class DAVResource
             "current-user-privilege-set", DAV.NS_DAV);
 
     /** The common props. */
-    protected static List commonProps = new Vector();
+    protected static List<Element> commonProps = new ArrayList<Element>();
     static
     {
         commonProps.add(displaynameProperty);
@@ -237,7 +238,7 @@ abstract class DAVResource
      * @return list of all properties that resource wants known to a "propname"
      * request.
      */
-    abstract protected List getAllProperties();
+    abstract protected List<Element> getAllProperties();
 
     /**
      * Execute a PROPPATCH method request on this Resource, and insert the
@@ -614,7 +615,7 @@ abstract class DAVResource
     {
         // When there is no document, type defaults to <allprop>.
         int pfType = DAV.PROPFIND_ALLPROP;
-        List pfProps = null;
+        List<Element> pfProps = null;
 
         try
         {
@@ -631,10 +632,10 @@ abstract class DAVResource
 
             // Propfind child is be ONE of: allprop | propname | prop
             // if "prop", also get list of type names.
-            List pfChild = propfind.getChildren();
+            List<Element> pfChild = propfind.getChildren();
             if (pfChild.size() > 0)
             {
-                Element child0 = (Element) pfChild.get(0);
+                Element child0 = pfChild.get(0);
                 String rawType = child0.getName();
                 if (rawType.equalsIgnoreCase("prop"))
                 {
@@ -711,7 +712,7 @@ abstract class DAVResource
      * @throws AuthorizeException the authorize exception
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    private int propfindCrawler(Element multistatus, int pfType, List pfProps,
+    private int propfindCrawler(Element multistatus, int pfType, List<Element> pfProps,
             int depth, int typeMask, int count) throws DAVStatusException,
             SQLException, AuthorizeException, IOException
     {
@@ -728,8 +729,8 @@ abstract class DAVResource
             String uri = hrefURL();
             log.debug("PROPFIND returning (count=" + String.valueOf(count)
                     + ") href=" + uri);
-            Vector notFound = new Vector();
-            Vector forbidden = new Vector();
+            List<Element> notFound = new ArrayList<Element>();
+            List<Element> forbidden = new ArrayList<Element>();
             Element responseElt = new Element("response", DAV.NS_DAV);
             multistatus.addContent(responseElt);
 
@@ -746,8 +747,8 @@ abstract class DAVResource
             }
             else
             {
-                List success = new LinkedList();
-                List props = (pfType == DAV.PROPFIND_ALLPROP) ? getAllProperties()
+                List<Element> success = new LinkedList<Element>();
+                List<Element> props = (pfType == DAV.PROPFIND_ALLPROP) ? getAllProperties()
                         : pfProps;
                 ListIterator pi = props.listIterator();
                 while (pi.hasNext())
@@ -921,8 +922,8 @@ abstract class DAVResource
 
         // result status and accumulation:
         boolean failing = false;
-        List failedDep = new LinkedList();
-        List success = new LinkedList();
+        List<Element> failedDep = new LinkedList<Element>();
+        List<Element> success = new LinkedList<Element>();
 
         // process the SET and REMOVE elements under PROPERTYUPDATE:
         ListIterator ci = pupdate.getChildren().listIterator();
@@ -1414,7 +1415,7 @@ abstract class DAVResource
      * 
      * @return the element
      */
-    private static Element makePropstat(List properties, int status,
+    private static Element makePropstat(List<Element> properties, int status,
             String message)
     {
         Element ps = makePropstatInternal(status, message);
@@ -1527,13 +1528,12 @@ abstract class DAVResource
      * 
      * @return the list
      */
-    private static List copyElementList(List el)
+    private static List<Element> copyElementList(List<Element> el)
     {
-        Vector result = new Vector(el.size());
-        ListIterator li = el.listIterator();
-        while (li.hasNext())
+        List<Element> result = new ArrayList<Element>(el.size());
+        for (Element e : el)
         {
-            result.add(((Element) li.next()).clone());
+            result.add((Element)e.clone());
         }
         return result;
     }
