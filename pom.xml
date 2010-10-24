@@ -487,20 +487,20 @@
             <version>2.0.8</version>
          </dependency>
          <dependency>
-            <groupId>pdfbox</groupId>
+            <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
-            <version>0.7.3</version>
+            <version>1.2.1</version>
          </dependency>
          <dependency>
-            <groupId>org.fontbox</groupId>
-            <artifactId>fontbox</artifactId>
-            <version>0.1.0</version>
-         </dependency>
-         <dependency>
-            <groupId>org.jempbox</groupId>
-            <artifactId>jempbox</artifactId>
-            <version>0.2.0</version>
-         </dependency>
+	        <groupId>org.bouncycastle</groupId>
+	        <artifactId>bcprov-jdk15</artifactId>
+	        <version>1.44</version>
+	    </dependency>
+	    <dependency>
+	        <groupId>org.bouncycastle</groupId>
+	        <artifactId>bcmail-jdk15</artifactId>
+	        <version>1.44</version>
+	    </dependency>
          <dependency>
            <groupId>org.apache.poi</groupId>
            <artifactId>poi</artifactId>
@@ -577,7 +577,7 @@
          <dependency>
             <groupId>com.ibm.icu</groupId>
             <artifactId>icu4j</artifactId>
-            <version>3.4.4</version>
+            <version>3.8</version>
          </dependency>
          <dependency>
             <groupId>postgresql</groupId>

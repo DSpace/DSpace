@@ -8,6 +8,7 @@
 
 (Andrea Bollini)
 - [DS-585] The Content Disposition configuration is ignored by unpublished items
+- [DS-704] Update pdfbox library to improve performance and out-of-box support for pdf extraction
 
 (Reinhard Engels)
 - [DS-637] Browse index bug/fix ONLY for authority index: first "too low" confidence value stop current item metadata to be indexed in the autority index

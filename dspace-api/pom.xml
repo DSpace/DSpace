@@ -150,18 +150,18 @@
          <artifactId>oro</artifactId>
       </dependency>
       <dependency>
-         <groupId>pdfbox</groupId>
+         <groupId>org.apache.pdfbox</groupId>
          <artifactId>pdfbox</artifactId>
       </dependency>
-       <dependency>
-          <groupId>org.fontbox</groupId>
-          <artifactId>fontbox</artifactId>
-       </dependency>
-       <dependency>
-          <groupId>org.jempbox</groupId>
-          <artifactId>jempbox</artifactId>
-       </dependency>
-       <dependency>
+      <dependency>
+         <groupId>org.bouncycastle</groupId>
+         <artifactId>bcprov-jdk15</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.bouncycastle</groupId>
+         <artifactId>bcmail-jdk15</artifactId>
+      </dependency>
+      <dependency>
            <groupId>org.apache.poi</groupId>
            <artifactId>poi</artifactId>
          </dependency>

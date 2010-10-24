@@ -38,17 +38,17 @@
 package org.dspace.app.mediafilter;
 
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.Writer;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.OutputStreamWriter;
 import java.io.FileOutputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 
 import org.apache.log4j.Logger;
-import org.pdfbox.pdmodel.PDDocument;
-import org.pdfbox.util.PDFTextStripper;
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.util.PDFTextStripper;
 import org.dspace.core.ConfigurationManager;
 
 /*
