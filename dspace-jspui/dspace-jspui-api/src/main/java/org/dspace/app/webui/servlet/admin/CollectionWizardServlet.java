@@ -51,6 +51,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.app.webui.servlet.DSpaceServlet;
@@ -519,7 +520,7 @@ public class CollectionWizardServlet extends DSpaceServlet
         // nothing was entered
         String license = wrapper.getParameter("license");
 
-        if ((license != null) || "".equals(license))
+        if (!StringUtils.isEmpty(license))
         {
             collection.setLicense(license);
         }
