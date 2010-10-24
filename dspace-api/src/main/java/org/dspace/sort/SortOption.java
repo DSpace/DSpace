@@ -347,7 +347,9 @@ public class SortOption
         for (SortOption so : SortOption.getSortOptions())
         {
             if (so.getNumber() == number)
+            {
                 return so;
+            }
         }
         
         return null;

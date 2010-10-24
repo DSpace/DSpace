@@ -118,7 +118,9 @@ public class SiteViewer extends AbstractDSpaceTransformer implements CacheablePr
 				// Remove the protocol number, i.e. just list 'rss' or' atom'
 				String[] parts = format.split("_");
 				if (parts.length < 1)
-					continue;
+                {
+                    continue;
+                }
 
 				String feedFormat = parts[0].trim()+"+xml";
 

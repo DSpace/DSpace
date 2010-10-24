@@ -106,7 +106,9 @@ public class RejectTaskStep extends AbstractStep
 		
 		// if the user selected showsimple, remove showfull.
 		if (showfull != null && request.getParameter("showsimple") != null)
-			showfull = null;
+        {
+            showfull = null;
+        }
 		
 		
 
@@ -139,7 +141,9 @@ public class RejectTaskStep extends AbstractStep
         reason.setRequired();
         reason.setSize(15, 50);
         if (this.errorFields.contains("reason"))
-        	reason.addError(T_reason_required);
+        {
+            reason.addError(T_reason_required);
+        }
     	
         org.dspace.app.xmlui.wing.element.Item actions = form.addItem();
         actions.addButton("submit_reject").setValue(T_submit_reject);

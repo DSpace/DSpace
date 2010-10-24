@@ -120,7 +120,9 @@ public class Para extends RichTextContainer implements StructuralElement
             attributes.put(A_ID, context.generateID(E_PARA, name));
         }
         if (rend != null)
+        {
             attributes.put("rend", rend);
+        }
 
         startElement(contentHandler, namespaces, E_PARA, attributes);
         super.toSAX(contentHandler, lexicalHandler, namespaces);

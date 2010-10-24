@@ -105,7 +105,9 @@ public class ViewItem extends AbstractDSpaceTransformer {
         String show = request.getParameter("show");
         boolean showFullItem = false;
         if (show != null && show.length() > 0)
-        	showFullItem =  true;
+        {
+            showFullItem = true;
+        }
         
 		int itemID = parameters.getParameterAsInteger("itemID", -1);
 		Item item = Item.find(context, itemID);

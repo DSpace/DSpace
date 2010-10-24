@@ -107,9 +107,10 @@ public class StatisticsLoggingConsumer implements Consumer
                 List<String> indexedVals = indexedValues.get("" + storageField);
 
                 boolean update = true;
-                if (values.containsAll(indexedVals)
-                        && values.size() == indexedVals.size())
+                if (values.size() == indexedVals.size() && values.containsAll(indexedVals))
+                {
                     update = false;
+                }
 
                 if (update)
                 {
@@ -195,9 +196,13 @@ public class StatisticsLoggingConsumer implements Consumer
             throws SQLException
     {
         if (comm == null)
+        {
             return;
+        }
         if (!parentComms.contains(comm.getID()))
+        {
             parentComms.add(comm.getID());
+        }
         findComms(comm.getParentCommunity(), parentComms);
     }
 

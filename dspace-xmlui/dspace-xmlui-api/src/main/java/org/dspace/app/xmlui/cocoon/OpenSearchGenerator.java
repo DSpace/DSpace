@@ -140,9 +140,15 @@ public class OpenSearchGenerator extends AbstractGenerator
     public Serializable getKey()
     {
         StringBuffer key = new StringBuffer("key:");
-        if (scope != null) key.append(scope);
+        if (scope != null)
+        {
+            key.append(scope);
+        }
         key.append(query);
-        if (format != null) key.append(format);
+        if (format != null)
+        {
+            key.append(format);
+        }
         key.append(sort);
         key.append(start);
         key.append(rpp);
@@ -176,10 +182,16 @@ public class OpenSearchGenerator extends AbstractGenerator
         
         Request request = ObjectModelHelper.getRequest(objectModel);
         this.query = request.getParameter("query");
-        if (query == null) query = "";
+        if (query == null)
+        {
+            query = "";
+        }
         query = URLDecoder.decode(query, "UTF-8");
         this.format = request.getParameter("format");
-        if (format == null || format.length() == 0) format = "atom";
+        if (format == null || format.length() == 0)
+        {
+            format = "atom";
+        }
         this.scope = request.getParameter("scope");
         String srt = request.getParameter("sort_by");
         this.sort = (srt == null || srt.length() == 0) ? 0 : Integer.valueOf(srt);

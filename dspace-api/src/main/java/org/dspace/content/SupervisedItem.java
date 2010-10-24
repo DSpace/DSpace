@@ -129,7 +129,9 @@ public class SupervisedItem extends WorkspaceItem
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
         
         SupervisedItem[] siArray = new SupervisedItem[sItems.size()];
@@ -174,7 +176,9 @@ public class SupervisedItem extends WorkspaceItem
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
         
         Group[] groupArray = new Group[groupList.size()];
@@ -224,7 +228,9 @@ public class SupervisedItem extends WorkspaceItem
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
         
         Group[] groupArray = new Group[groupList.size()];
@@ -272,7 +278,9 @@ public class SupervisedItem extends WorkspaceItem
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
         
         SupervisedItem[] siArray = new SupervisedItem[sItems.size()];

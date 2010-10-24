@@ -104,12 +104,16 @@ public class Reference extends AbstractWingElement implements
         ObjectManager objectManager = context.getObjectManager();
 
         if (objectManager == null)
+        {
             throw new WingException(
                     "Unable to reference object because no object manager has been defined.");
+        }
         
         if (!objectManager.manageObject(object))
+        {
             throw new WingException(
                     "The available object manager is unable to manage the give object.");
+        }
 
         this.url = objectManager.getObjectURL(object);
         this.repository = objectManager.getRepositoryIdentifier(object);
@@ -182,7 +186,9 @@ public class Reference extends AbstractWingElement implements
         attributes.put(A_REPOSITORY_ID, this.repository);
         attributes.put(A_URL, this.url);
         if (type != null)
-        	attributes.put(A_TYPE, type);
+        {
+            attributes.put(A_TYPE, type);
+        }
         
         startElement(contentHandler, namespaces, E_REFERENCE, attributes);
 

@@ -82,7 +82,10 @@ public class SFXFileReader {
     public static String loadSFXFile(String fileName, Item item) throws IOException
     {
         // Parse XML file -> XML document will be build
-        if (doc == null) doc = parseFile(fileName);
+        if (doc == null)
+        {
+            doc = parseFile(fileName);
+        }
 
         // Return final sfx Query String
         return  doNodes(doc, item);

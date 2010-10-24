@@ -128,7 +128,9 @@ public class SimpleSearchServlet extends DSpaceServlet
         SortOption sortOption = null;
 
         if (request.getParameter("etal") != null)
+        {
             qArgs.setEtAl(UIUtil.getIntParameter(request, "etal"));
+        }
 
         try
         {

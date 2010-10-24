@@ -118,7 +118,9 @@ public class ThemeMatcher extends AbstractLogEnabled implements Matcher {
 					String themeIdOverride = request.getParameter("themeid");
 					
 					if (themeNameOverride == null || themeNameOverride.length() == 0)
-						themeNameOverride = "User specified theme";
+                    {
+                        themeNameOverride = "User specified theme";
+                    }
 					
 					getLogger().debug("User as specified to override theme selection with theme "+
 							"(name=\""+themeNameOverride+"\", path=\""+themePathOverride+"\", id=\""+themeIdOverride+"\")");
@@ -138,22 +140,28 @@ public class ThemeMatcher extends AbstractLogEnabled implements Matcher {
 			for (Theme rule : rules) {
 				getLogger().debug("rule=" + rule.getName());
 				if (!(rule.hasRegex() || rule.hasHandle()))
-					// Skip any rule with out a pattern or handle
-					continue;
+                {
+                    // Skip any rule with out a pattern or handle
+                    continue;
+                }
 
 				getLogger().debug("checking for patterns");
 				if (rule.hasRegex()) {
 					// If the rule has a pattern insure that the URL matches it.
 					Pattern pattern = rule.getPattern();
 					if (!pattern.matcher(uri).find())
-						continue;
+                    {
+                        continue;
+                    }
 				}
 
 				getLogger().debug("checking for handles");
 				if (rule.hasHandle()) {
 					// If the rules has a handle insure that the DSO matches it.
 					if (!HandleUtil.inheritsFrom(dso, rule.getHandle()))
-						continue;
+                    {
+                        continue;
+                    }
 
 				}
 

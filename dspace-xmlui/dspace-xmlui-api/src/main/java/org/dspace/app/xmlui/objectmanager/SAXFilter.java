@@ -233,39 +233,51 @@ public class SAXFilter implements ContentHandler, LexicalHandler
 	public void startDocument() throws SAXException
 	{
 		if (allowDocuments)
-			contentHandler.startDocument();
+        {
+            contentHandler.startDocument();
+        }
 	}
 
 	public void endDocument() throws SAXException
 	{	
 		if (allowDocuments)
-			contentHandler.endDocument();
+        {
+            contentHandler.endDocument();
+        }
 	}
 	
 	public void setDocumentLocator(Locator locator)
 	{
 		if (allowDocumentLocators)
-			contentHandler.setDocumentLocator(locator);
+        {
+            contentHandler.setDocumentLocator(locator);
+        }
 	}
 	
 	public void processingInstruction(String target, String data)
 	throws SAXException
 	{
 		if (allowProcessingInstructions)
-			contentHandler.processingInstruction(target, data);
+        {
+            contentHandler.processingInstruction(target, data);
+        }
 	}
 	
 	public void startPrefixMapping(String prefix, String uri)
 	throws SAXException
 	{
 		if (allowPrefixMappings)
-			contentHandler.startPrefixMapping(prefix, uri);
+        {
+            contentHandler.startPrefixMapping(prefix, uri);
+        }
 	}
 	
 	public void endPrefixMapping(String prefix) throws SAXException
 	{
 		if (allowPrefixMappings)
-			contentHandler.endPrefixMapping(prefix);
+        {
+            contentHandler.endPrefixMapping(prefix);
+        }
 	}
 	
 	public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException
@@ -331,20 +343,26 @@ public class SAXFilter implements ContentHandler, LexicalHandler
 	throws SAXException
 	{
 		if (allowIgnorableWhitespace)
-			contentHandler.ignorableWhitespace(ch, start, length);
+        {
+            contentHandler.ignorableWhitespace(ch, start, length);
+        }
 	}
 
 	public void skippedEntity(String name) throws SAXException
 	{
 		if (allowSkippedEntities)
-			contentHandler.skippedEntity(name);
+        {
+            contentHandler.skippedEntity(name);
+        }
 	}
 
 	public void characters(char[] ch, int start, int length)
 	throws SAXException
 	{
 		if (allowCharacters)
-			contentHandler.characters(ch, start, length);
+        {
+            contentHandler.characters(ch, start, length);
+        }
 	}
 	
 	/**
@@ -355,48 +373,62 @@ public class SAXFilter implements ContentHandler, LexicalHandler
 	throws SAXException
 	{
 		if (allowDTDs)
-			lexicalHandler.startDTD(name, publicId, systemId);
+        {
+            lexicalHandler.startDTD(name, publicId, systemId);
+        }
 	}
 
 	public void endDTD() throws SAXException
 	{
 		if (allowDTDs)
-			lexicalHandler.endDTD();
+        {
+            lexicalHandler.endDTD();
+        }
 	}
 
 	public void startEntity(String name)
 	throws SAXException
 	{
 		if (allowEntities)
-			lexicalHandler.startEntity(name);
+        {
+            lexicalHandler.startEntity(name);
+        }
 	}
 
 	public void endEntity(String name)
 	throws SAXException
 	{
 		if (allowEntities)
-			lexicalHandler.endEntity(name);
+        {
+            lexicalHandler.endEntity(name);
+        }
 	}
 
 	public void startCDATA()
 	throws SAXException
 	{
 		if (allowCDATA)
-			lexicalHandler.startCDATA();
+        {
+            lexicalHandler.startCDATA();
+        }
 	}
 
 	public void endCDATA()
 	throws SAXException
 	{
 		if (allowCDATA)
-			lexicalHandler.endCDATA();
+        {
+            lexicalHandler.endCDATA();
+        }
 	}
 
 	public void comment(char[] ch, int start, int length)
 	throws SAXException
 	{
 		if (allowComments)
-			lexicalHandler.comment(ch, start, length);
+        {
+            lexicalHandler.comment(ch, start, length);
+        }
 	}
 }
 

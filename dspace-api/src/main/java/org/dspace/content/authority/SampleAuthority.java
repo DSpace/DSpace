@@ -71,7 +71,9 @@ public class SampleAuthority implements ChoiceAuthority
         {
             v[i] = new Choice(String.valueOf(i), values[i], labels[i]);
             if (values[i].equalsIgnoreCase(query))
+            {
                 dflt = i;
+            }
         }
         return new Choices(v, 0, v.length, Choices.CF_AMBIGUOUS, false, dflt);
     }

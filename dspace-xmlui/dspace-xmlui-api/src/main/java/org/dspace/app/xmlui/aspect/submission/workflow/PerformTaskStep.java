@@ -141,7 +141,9 @@ public class PerformTaskStep extends AbstractStep
 		
 		// if the user selected showsimple, remove showfull.
 		if (showfull != null && request.getParameter("showsimple") != null)
-			showfull = null;
+        {
+            showfull = null;
+        }
 		
 		
         // Generate a from asking the user two questions: multiple 

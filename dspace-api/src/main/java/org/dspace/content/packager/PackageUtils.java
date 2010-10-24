@@ -158,7 +158,9 @@ public class PackageUtils
     {
         DCValue t[] = item.getDC( "title", null, Item.ANY);
         if (t == null || t.length == 0)
+        {
             throw new PackageValidationException("Item cannot be created without the required \"title\" DC metadata.");
+        }
     }
 
     /**
@@ -177,7 +179,9 @@ public class PackageUtils
         throws SQLException, IOException, AuthorizeException
     {
         if (license == null)
+        {
             license = collection.getLicense();
+        }
         InputStream lis = new ByteArrayInputStream(license.getBytes());
 
         Bundle lb;
@@ -197,7 +201,9 @@ public class PackageUtils
         lis.close();
         BitstreamFormat bf = BitstreamFormat.findByShortDescription(context, "License");
         if (bf == null)
+        {
             bf = FormatIdentifier.guessFormat(context, lbs);
+        }
         lbs.setFormat(bf);
         lbs.setName(Constants.LICENSE_BITSTREAM_NAME);
         lbs.setSource(Constants.LICENSE_BITSTREAM_NAME);
@@ -244,7 +250,9 @@ public class PackageUtils
             for (int k = 0; k < bitstreams.length; k++)
             {
                 if (bsName.equals(bitstreams[k].getName()))
+                {
                     return bitstreams[k];
+                }
             }
         }
         return null;
@@ -280,7 +288,9 @@ public class PackageUtils
             for (int k = 0; k < bitstreams.length; k++)
             {
                 if (bitstreams[k].getFormat().getID() == fid)
+                {
                     return bitstreams[k];
+                }
             }
         }
         return null;
@@ -407,7 +417,9 @@ public class PackageUtils
         BitstreamFormat bf = BitstreamFormat.findByShortDescription(context,
                 "License");
         if (bf != null)
+        {
             licenseFormatId = bf.getID();
+        }
 
         Bundle[] bundles = item.getBundles(Constants.LICENSE_BUNDLE_NAME);
         for (int i = 0; i < bundles.length; i++)
@@ -429,7 +441,9 @@ public class PackageUtils
             // we will just assume the first bitstream is the deposit license
             // (usually a safe assumption as it is in the LICENSE bundle)
             if(bitstreams.length>0)
+            {
                 return bitstreams[0];
+            }
         }
 
         // Oops! No license!

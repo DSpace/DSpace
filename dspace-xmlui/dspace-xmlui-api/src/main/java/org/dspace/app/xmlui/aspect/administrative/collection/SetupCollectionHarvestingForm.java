@@ -216,7 +216,9 @@ public class SetupCollectionHarvestingForm extends AbstractDSpaceTransformer
         Text oaiSetId = oaiSetComp.addText("oai_setid");
 	    oaiSetId.setSize(40);
         if(!"all".equals(oaiSetIdValue) && oaiSetIdValue != null)
-	        oaiSetId.setValue(oaiSetIdValue);
+        {
+            oaiSetId.setValue(oaiSetIdValue);
+        }
 	    oaiSetId.setHelp(T_help_oaisetid);
 	    if (errorMap.containsKey(OAIHarvester.OAI_SET_ERROR)) {
 	    	oaiSetId.addError(errorMap.get(OAIHarvester.OAI_SET_ERROR));

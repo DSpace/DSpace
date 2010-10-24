@@ -215,11 +215,17 @@ public class Value extends RichTextContainer
         attributes.put(A_TYPE, this.type);
 
         if (this.option != null)
+        {
             attributes.put(A_OPTION, this.option);
+        }
         if (this.checked)
+        {
             attributes.put(A_CHECKED, this.checked);
+        }
         if (this.type.equals(TYPE_AUTHORITY))
+        {
             attributes.put(A_CONFIDENCE, this.confidence);
+        }
         
         startElement(contentHandler, namespaces, E_VALUE, attributes);
         super.toSAX(contentHandler, lexicalHandler, namespaces);

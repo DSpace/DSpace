@@ -55,18 +55,26 @@ public class XSLUtils {
         targetLength = Math.abs(targetLength);
         maxDeviation = Math.abs(maxDeviation);
         if (string == null || string.length() <= targetLength + maxDeviation)
+        {
             return string;
+        }
 
 
         int currentDeviation = 0;
         while (currentDeviation <= maxDeviation) {
             try {
                 if (string.charAt(targetLength) == ' ')
+                {
                     return string.substring(0, targetLength) + " ...";
+                }
                 if (string.charAt(targetLength + currentDeviation) == ' ')
+                {
                     return string.substring(0, targetLength + currentDeviation) + " ...";
+                }
                 if (string.charAt(targetLength - currentDeviation) == ' ')
+                {
                     return string.substring(0, targetLength - currentDeviation) + " ...";
+                }
             } catch (Exception e) {
                 //just in case
             }

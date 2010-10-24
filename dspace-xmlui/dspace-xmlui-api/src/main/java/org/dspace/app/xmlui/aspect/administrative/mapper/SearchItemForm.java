@@ -131,12 +131,16 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
 			String author = "unkown";
 			DCValue[] dcAuthors = item.getDC("contributor",Item.ANY,Item.ANY);
 			if (dcAuthors != null && dcAuthors.length >= 1)
-				author = dcAuthors[0].value;
+            {
+                author = dcAuthors[0].value;
+            }
 			
 			String title = "untitled";
 			DCValue[] dcTitles = item.getDC("title",null,Item.ANY);
 			if (dcTitles != null && dcTitles.length >= 1)
-				title = dcTitles[0].value;
+            {
+                title = dcTitles[0].value;
+            }
 
 			String url = contextPath+"/handle/"+item.getHandle();
 			
@@ -208,7 +212,9 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
             	Item item = (Item) resultDSO;
             	
             	if (!item.isOwningCollection(collection))
-            		items.add(item);
+                {
+                    items.add(item);
+                }
             }
         }
         

@@ -101,7 +101,9 @@ public class ResumeStep extends AbstractStep
 
 		// if the user selected showsimple, remove showfull.
 		if (showfull != null && request.getParameter("showsimple") != null)
-			showfull = null;
+        {
+            showfull = null;
+        }
 
 		Division div = body.addInteractiveDivision("resume-submission", actionURL, Division.METHOD_POST, "primary submission");
 		div.setHead(T_submission_head);

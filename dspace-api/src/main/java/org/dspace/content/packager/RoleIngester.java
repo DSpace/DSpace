@@ -112,7 +112,9 @@ public class RoleIngester implements PackageIngester
             {
                 email = emails.item(0).getTextContent();
                 if (email.equals(myEmail))
+                {
                     continue; // Cannot operate on my own EPerson!
+                }
                 identity = email;
                 collider = EPerson.findByEmail(context, identity);
                 // collider = EPerson.find(context, userID);
@@ -257,7 +259,9 @@ public class RoleIngester implements PackageIngester
                         // (otherwise remainder of ingest will fail)
                         if(!(collider.equals(Group.find(context, 1)) &&
                              member.equals(context.getCurrentUser())))
+                        {
                             collider.removeMember(member);
+                        }
                     }
                     log.info("Existing Group {} was cleared. Its members will be replaced.", name);
                     groupObj = collider;

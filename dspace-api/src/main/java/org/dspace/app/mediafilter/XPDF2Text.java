@@ -116,7 +116,9 @@ public class XPDF2Text extends MediaFilter
         {
             pdftotextPath = ConfigurationManager.getProperty("xpdf.path.pdftotext");
             if (pdftotextPath == null)
+            {
                 throw new IllegalStateException("No value for key \"xpdf.path.pdftotext\" in DSpace configuration!  Should be path to XPDF pdftotext executable.");
+            }
         }
 
         File sourceTmp = File.createTempFile("DSfilt",".pdf");
@@ -176,7 +178,9 @@ public class XPDF2Text extends MediaFilter
         {
             sourceTmp.delete();
             if (status != 0)
-                log.error("PDF conversion proc failed, returns="+status+", file="+sourceTmp);
+            {
+                log.error("PDF conversion proc failed, returns=" + status + ", file=" + sourceTmp);
+            }
         }
     }
 }

@@ -116,10 +116,14 @@ public class RepositoryMeta extends AbstractWingElement implements WingMergeable
     {
 
         if (!WingConstants.DRI.URI.equals(namespace))
+        {
             return false;
+        }
 
         if (!E_REPOSITORY_META.equals(localName))
+        {
             return false;
+        }
         return true;
     }
 
@@ -146,10 +150,14 @@ public class RepositoryMeta extends AbstractWingElement implements WingMergeable
     {
         // Check if it's in our name space and an options element.
         if (!WingConstants.DRI.URI.equals(namespace))
+        {
             return null;
+        }
         
         if (!E_REPOSITORY.equals(localName))
+        {
             return null;
+        }
         
         // Get the repositoryIdentefier
         String repositoryIdentifier = attributes.getValue(A_REPOSITORY_ID);
@@ -191,7 +199,9 @@ public class RepositoryMeta extends AbstractWingElement implements WingMergeable
             throws SAXException
     {
         if (!merged)
-            startElement(contentHandler, namespaces, E_REPOSITORY_META, null); 
+        {
+            startElement(contentHandler, namespaces, E_REPOSITORY_META, null);
+        }
     
     	for (String identifier : repositories.keySet())
     	{
@@ -206,7 +216,9 @@ public class RepositoryMeta extends AbstractWingElement implements WingMergeable
        
 
         if (!merged)
+        {
             endElement(contentHandler, namespaces, E_REPOSITORY_META);
+        }
     }
 
     /**

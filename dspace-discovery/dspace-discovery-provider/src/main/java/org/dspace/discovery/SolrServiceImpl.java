@@ -269,7 +269,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         try {
             getSolr().deleteById(handle);
             if(commit)
+            {
                 getSolr().commit();
+            }
         } catch (SolrServerException e) {
             log.error(e.getMessage(), e);
         }
@@ -339,7 +341,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 }
             } finally {
                 if (items != null)
+                {
                     items.close();
+                }
             }
 
             Collection[] collections = Collection.findAll(context);
@@ -664,7 +668,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 String value = meta.value;
 
                 if(value == null)
+                {
                     continue;
+                }
 
                 if(meta.qualifier != null && !meta.qualifier.trim().equals("")) {
                     field += "." + meta.qualifier;
@@ -673,7 +679,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
                 //We are not indexing provenance, this is useless
                 if(field.equals("dc.description.provenance"))
+                {
                     continue;
+                }
 
                 //Add the field to all for autocomplete so our autocomplete works for all fields
                 doc.addField("all_ac", value);
@@ -931,7 +939,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             int type = field.equals("location.comm") ? Constants.COMMUNITY : Constants.COLLECTION;
             DSpaceObject commColl = DSpaceObject.find(context, type, Integer.parseInt(value));
             if(commColl != null)
+            {
                 return commColl.getName();
+            }
 
         }
         return value;

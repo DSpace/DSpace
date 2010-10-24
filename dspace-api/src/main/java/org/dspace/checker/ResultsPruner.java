@@ -118,6 +118,7 @@ public final class ResultsPruner
         finally
         {
             if (fin != null)
+            {
                 try
                 {
                     fin.close();
@@ -126,6 +127,7 @@ public final class ResultsPruner
                 {
                     LOG.warn(e);
                 }
+            }
         }
     }
     
@@ -149,7 +151,9 @@ public final class ResultsPruner
             String name = (String) en.nextElement();
             Matcher matcher = retentionPattern.matcher(name);
             if (!matcher.matches())
+            {
                 continue;
+            }
             String resultCode = matcher.group(1);
             long duration;
             try

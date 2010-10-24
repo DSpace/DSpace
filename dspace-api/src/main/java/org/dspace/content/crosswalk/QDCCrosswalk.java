@@ -173,7 +173,9 @@ public class QDCCrosswalk extends SelfNamedPlugin
         {
             String key = (String)pe.nextElement();
             if (key.startsWith(propname))
+            {
                 aliasList.add(key.substring(propname.length()));
+            }
         }
         aliases = (String[])aliasList.toArray(new String[aliasList.size()]);
     }
@@ -191,7 +193,9 @@ public class QDCCrosswalk extends SelfNamedPlugin
         String prefix = "";
         Namespace ns = element.getNamespace();
         if (ns != null)
+        {
             prefix = ns.getPrefix() + ":";
+        }
         
         String tagName;
         String nsQualifier = element.getAttributeValue("type", DisseminationCrosswalk.XSI_NS);
@@ -243,13 +247,17 @@ public class QDCCrosswalk extends SelfNamedPlugin
         throws CrosswalkException, IOException
     {
         if (inited)
+        {
             return;
+        }
         inited = true;
 
         myName = getPluginInstanceName();
         if (myName == null)
-            throw new CrosswalkInternalException("Cannot determine plugin name, "+
-                       "You must use PluginManager to instantiate QDCCrosswalk so the instance knows its name.");
+        {
+            throw new CrosswalkInternalException("Cannot determine plugin name, " +
+                    "You must use PluginManager to instantiate QDCCrosswalk so the instance knows its name.");
+        }
 
         // grovel DSpace configuration for namespaces
         List nsList = new ArrayList();
@@ -259,8 +267,10 @@ public class QDCCrosswalk extends SelfNamedPlugin
         {
             String key = (String)pe.nextElement();
             if (key.startsWith(propname))
+            {
                 nsList.add(Namespace.getNamespace(key.substring(propname.length()),
-                             ConfigurationManager.getProperty(key)));
+                        ConfigurationManager.getProperty(key)));
+            }
         }
         nsList.add(Namespace.XML_NAMESPACE);
         namespaces = (Namespace[])nsList.toArray(new Namespace[nsList.size()]);
@@ -272,8 +282,10 @@ public class QDCCrosswalk extends SelfNamedPlugin
         String cmPropName = CONFIG_PREFIX+".properties."+myName;
         String propsFilename = ConfigurationManager.getProperty(cmPropName);
         if (propsFilename == null)
-            throw new CrosswalkInternalException("Configuration error: "+
-                "No properties file configured for QDC crosswalk named \""+myName+"\"");
+        {
+            throw new CrosswalkInternalException("Configuration error: " +
+                    "No properties file configured for QDC crosswalk named \"" + myName + "\"");
+        }
 
         String parent = ConfigurationManager.getProperty("dspace.dir") +
             File.separator + "config" + File.separator;
@@ -288,7 +300,15 @@ public class QDCCrosswalk extends SelfNamedPlugin
         finally
         {
             if (pfs != null)
-                try { pfs.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    pfs.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
         }
 
         // grovel properties to initialize qdc->element and element->qdc maps.
@@ -364,7 +384,9 @@ public class QDCCrosswalk extends SelfNamedPlugin
                IOException, SQLException, AuthorizeException
     {
         if (dso.getType() != Constants.ITEM)
+        {
             throw new CrosswalkObjectNotSupported("QDCCrosswalk can only crosswalk an Item.");
+        }
         Item item = (Item)dso;
         init();
 
@@ -384,16 +406,22 @@ public class QDCCrosswalk extends SelfNamedPlugin
             if (elt == null)
             {
                 if (dc[i].schema.equals(MetadataSchema.DC_SCHEMA))
-                    log.warn("WARNING: "+myName+": No QDC mapping for \"" + qdc+"\"");
+                {
+                    log.warn("WARNING: " + myName + ": No QDC mapping for \"" + qdc + "\"");
+                }
             }
             else
             {
                 Element qe = (Element)elt.clone();
                 qe.setText(dc[i].value);
                 if (addSchema && schemaLocation != null)
+                {
                     qe.setAttribute("schemaLocation", schemaLocation, XSI_NS);
+                }
                 if (dc[i].language != null)
+                {
                     qe.setAttribute("lang", dc[i].language, Namespace.XML_NAMESPACE);
+                }
                 result.add(qe);
             }
         }
@@ -407,7 +435,9 @@ public class QDCCrosswalk extends SelfNamedPlugin
         init();
         Element root = new Element("qualifieddc", DCTERMS_NS);
         if (schemaLocation != null)
+        {
             root.setAttribute("schemaLocation", schemaLocation, XSI_NS);
+        }
         root.addContent(disseminateListInternal(dso, false));
         return root;
     }
@@ -427,7 +457,9 @@ public class QDCCrosswalk extends SelfNamedPlugin
         // own..  just give up in the face of this madness and accept
         // anything with the right name.
         if (!(root.getName().equals("qualifieddc")))
-            throw new MetadataValidationException("Wrong root element for Qualified DC: "+root.toString());
+        {
+            throw new MetadataValidationException("Wrong root element for Qualified DC: " + root.toString());
+        }
         ingest(context, dso, root.getChildren());
     }
 
@@ -438,7 +470,9 @@ public class QDCCrosswalk extends SelfNamedPlugin
 
         // for now, forget about any targets but item.
         if (dso.getType() != Constants.ITEM)
+        {
             throw new CrosswalkInternalException("Wrong target object type, QDCCrosswalk can only crosswalk to an Item.");
+        }
 
         Item item = (Item)dso;
 
@@ -461,7 +495,9 @@ public class QDCCrosswalk extends SelfNamedPlugin
                 // get language - prefer xml:lang, accept lang.
                 String lang = me.getAttributeValue("lang", Namespace.XML_NAMESPACE);
                 if (lang == null)
+                {
                     lang = me.getAttributeValue("lang");
+                }
 
                 if (qdc.length == 3)
                 {

@@ -296,7 +296,9 @@ public class PolicySet
             finally
             {
                 if (i != null)
+                {
                     i.close();
+                }
             }
         }
     }

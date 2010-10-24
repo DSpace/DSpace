@@ -127,7 +127,9 @@ public class SendFeedbackAction extends AbstractAction
         EPerson loggedin = context.getCurrentUser();
         String eperson = null;
         if (loggedin != null)
+        {
             eperson = loggedin.getEmail();
+        }
 
         if (page == null || page.equals(""))
         {

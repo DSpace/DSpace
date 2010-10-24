@@ -202,7 +202,9 @@ public class SyndicationFeed
             }
             objectURL = resolveURL(request, dso);
             if (logo != null)
+            {
                 logoURL = urlOfBitstream(request, logo);
+            }
         }
         feed.setTitle(labels.containsKey(MSG_FEED_TITLE) ?
                             localize(labels, MSG_FEED_TITLE) : defaultTitle);
@@ -229,7 +231,9 @@ public class SyndicationFeed
             for (DSpaceObject itemDSO : items)
             {
                 if (itemDSO.getType() != Constants.ITEM)
+                {
                     continue;
+                }
                 Item item = (Item)itemDSO;
                 boolean hasDate = false;
                 SyndEntry entry = new SyndEntryImpl();
@@ -258,14 +262,18 @@ public class SyndicationFeed
                     // Special Case: "(date)" in field name means render as date
                     boolean isDate = df.indexOf("(date)") > 0;
                     if (isDate)
+                    {
                         df = df.replaceAll("\\(date\\)", "");
+                    }
              
                     DCValue dcv[] = item.getMetadata(df);
                     if (dcv.length > 0)
                     {
                         String fieldLabel = labels.get(MSG_METADATA + df);
                         if (fieldLabel != null && fieldLabel.length()>0)
+                        {
                             db.append(fieldLabel).append(": ");
+                        }
                         boolean first = true;
                         for (DCValue v : dcv)
                         {
@@ -326,7 +334,9 @@ public class SyndicationFeed
                     {
                         DCValue v[] = item.getMetadata(dcDateField);
                         if (v.length > 0)
+                        {
                             dc.setDate((new DCDate(v[0].value)).toDate());
+                        }
                     }
                     if (dcDescriptionField != null)
                     {
@@ -337,7 +347,9 @@ public class SyndicationFeed
                             for (DCValue d : v)
                             {
                                 if (descs.length() > 0)
+                                {
                                     descs.append("\n\n");
+                                }
                                 descs.append(d.value);
                             }
                             dc.setDescription(descs.toString());
@@ -359,8 +371,10 @@ public class SyndicationFeed
     {
         feed.setFeedType(feedType);
         // XXX FIXME: workaround ROME 1.0 bug, it puts invalid image element in rss1.0
-        if (feedType.equals("rss_1.0"))
+        if ("rss_1.0".equals(feedType))
+        {
             feed.setImage(null);
+        }
     }
 
     /**

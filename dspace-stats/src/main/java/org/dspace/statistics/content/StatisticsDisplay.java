@@ -94,7 +94,9 @@ public abstract class StatisticsDisplay {
     public void addCss(String style){
         if (style != null) {
             if (css == null)
+            {
                 css = new ArrayList<String>();
+            }
             css.add(style.trim());
         }
     }

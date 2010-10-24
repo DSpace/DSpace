@@ -249,7 +249,9 @@ public class WorkflowManager
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         return mylist;
@@ -283,7 +285,9 @@ public class WorkflowManager
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
         
         return mylist;

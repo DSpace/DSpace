@@ -128,7 +128,9 @@ public class XSLTIngestionCrosswalk
         // sanity check: some XSL puts an empty string in qualifier,
         // change it to null so we match the unqualified DC field:
         if (qualifier != null && qualifier.equals(""))
+        {
             qualifier = null;
+        }
         
         if ((authority != null && authority.length() > 0) ||
             (sconf != null && sconf.length() > 0))
@@ -155,7 +157,9 @@ public class XSLTIngestionCrosswalk
     {
         XSLTransformer xform = getTransformer(DIRECTION);
         if (xform == null)
+        {
             throw new CrosswalkInternalException("Failed to initialize transformer, probably error loading stylesheet.");
+        }
         try
         {
             List dimList = xform.transform(metadata);
@@ -178,7 +182,9 @@ public class XSLTIngestionCrosswalk
     {
         XSLTransformer xform = getTransformer(DIRECTION);
         if (xform == null)
+        {
             throw new CrosswalkInternalException("Failed to initialize transformer, probably error loading stylesheet.");
+        }
         try
         {
             Document dimDoc = xform.transform(new Document((Element)root.clone()));
@@ -200,7 +206,9 @@ public class XSLTIngestionCrosswalk
         String qualifier = field.getAttributeValue("qualifier");
         String fname = "dc." + element;
         if (qualifier != null)
+        {
             fname += "." + qualifier;
+        }
         return PackageUtils.dcToContainerMetadata(fname);
     }
 
@@ -314,7 +322,9 @@ public class XSLTIngestionCrosswalk
 
         XSLTransformer xform = ((XSLTIngestionCrosswalk)xwalk).getTransformer(DIRECTION);
         if (xform == null)
+        {
             throw new CrosswalkInternalException("Failed to initialize transformer, probably error loading stylesheet.");
+        }
 
         SAXBuilder builder = new SAXBuilder();
         Document inDoc = builder.build(new FileInputStream(argv[i+1]));
@@ -341,7 +351,9 @@ public class XSLTIngestionCrosswalk
             // skip over comment, text and other trash some XSLs generate..
             Object o = di.next();
             if (!(o instanceof Element))
+            {
                 continue;
+            }
 
             Element elt = (Element)o;
             if (elt.getName().equals("field") && elt.getNamespace().equals(DIM_NS))
@@ -366,8 +378,10 @@ public class XSLTIngestionCrosswalk
                     MetadataField mf = MetadataField.findByElement(context,
                                   ms.getSchemaID(), element, qualifier);
                     if (mf == null)
-                        System.err.println("DIM Error, Cannot find metadata field for: schema=\""+schema+
-                            "\", element=\""+element+"\", qualifier=\""+qualifier+"\"");
+                    {
+                        System.err.println("DIM Error, Cannot find metadata field for: schema=\"" + schema +
+                                "\", element=\"" + element + "\", qualifier=\"" + qualifier + "\"");
+                    }
                 }
             }
             else

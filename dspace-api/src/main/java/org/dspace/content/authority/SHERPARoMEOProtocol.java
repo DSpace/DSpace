@@ -93,7 +93,9 @@ public abstract class SHERPARoMEOProtocol implements ChoiceAuthority
 
             // sanity check
             if (url == null)
+            {
                 throw new IllegalStateException("Missing DSpace configuration keys for SHERPA/RoMEO Query");
+            }
         }
     }
 
@@ -253,7 +255,9 @@ public abstract class SHERPARoMEOProtocol implements ChoiceAuthority
             {
                 // after start of result element, get next hit ready
                 if (++rindex < result.length)
+                {
                     result[rindex] = new Choice();
+                }
             }
             else if (localName.equals(labelElement) && textValue != null)
             {

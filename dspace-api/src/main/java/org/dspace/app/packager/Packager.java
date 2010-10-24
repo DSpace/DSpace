@@ -260,25 +260,43 @@ public class Packager
 
         //look for flag to disable all user interaction
         if(line.hasOption('u'))
+        {
             myPackager.userInteractionEnabled = false;
+        }
         if (line.hasOption('w'))
+        {
             pkgParams.setWorkflowEnabled(false);
+        }
         if (line.hasOption('r'))
+        {
             pkgParams.setRestoreModeEnabled(true);
+        }
         //keep-existing is only valid in restoreMode (-r) -- otherwise ignore -k option.
         if (line.hasOption('k') && pkgParams.restoreModeEnabled())
+        {
             pkgParams.setKeepExistingModeEnabled(true);
+        }
         //force-replace is only valid in restoreMode (-r) -- otherwise ignore -f option.
         if (line.hasOption('f') && pkgParams.restoreModeEnabled())
+        {
             pkgParams.setReplaceModeEnabled(true);
+        }
         if (line.hasOption('e'))
+        {
             eperson = line.getOptionValue('e');
+        }
         if (line.hasOption('p'))
+        {
             parents = line.getOptionValues('p');
+        }
         if (line.hasOption('t'))
+        {
             myPackager.packageType = line.getOptionValue('t');
+        }
         if (line.hasOption('i'))
+        {
             identifier = line.getOptionValue('i');
+        }
         if (line.hasOption('a'))
         {
             //enable 'recursiveMode' param to packager implementations, in case it helps with packaging or ingestion process
@@ -286,9 +304,13 @@ public class Packager
         }
         String files[] = line.getArgs();
         if (files.length > 0)
+        {
             sourceFile = files[0];
+        }
         if (line.hasOption('d'))
+        {
             myPackager.submit = false;
+        }
         if (line.hasOption('o'))
         {
             String popt[] = line.getOptionValues('o');
@@ -327,7 +349,9 @@ public class Packager
         EPerson myEPerson = null;
         myEPerson = EPerson.findByEmail(context, eperson);
         if (myEPerson == null)
+        {
             usageError("Error, eperson cannot be found: " + eperson);
+        }
         context.setCurrentUser(myEPerson);
 
 
@@ -337,7 +361,9 @@ public class Packager
             PackageIngester sip = (PackageIngester) PluginManager
                     .getNamedPlugin(PackageIngester.class, myPackager.packageType);
             if (sip == null)
+            {
                 usageError("Error, Unknown package type: " + myPackager.packageType);
+            }
 
             DSpaceObject objToReplace = null;
 
@@ -346,8 +372,10 @@ public class Packager
             {
                 objToReplace = HandleManager.resolveToObject(context, identifier);
                 if (objToReplace == null)
+                {
                     throw new IllegalArgumentException("Bad identifier/handle -- "
-                            + "Cannot resolve handle \"" + identifier +"\"");
+                            + "Cannot resolve handle \"" + identifier + "\"");
+                }
             }
 
             String choiceString = null;
@@ -396,7 +424,9 @@ public class Packager
             PackageIngester sip = (PackageIngester) PluginManager
                     .getNamedPlugin(PackageIngester.class, myPackager.packageType);
             if (sip == null)
+            {
                 usageError("Error, Unknown package type: " + myPackager.packageType);
+            }
 
             // validate each parent arg (if any)
             DSpaceObject parentObjs[] = null;
@@ -411,10 +441,12 @@ public class Packager
                     parentObjs[i] = HandleManager.resolveToObject(context,
                             parents[i]);
                     if (parentObjs[i] == null)
+                    {
                         throw new IllegalArgumentException(
                                 "Bad parent list -- "
                                         + "Cannot resolve parent handle \""
                                         + parents[i] + "\"");
+                    }
                     System.out.println((i == 0 ? "Owner: " : "Parent: ")
                             + parentObjs[i].getHandle());
                 }
@@ -444,12 +476,16 @@ public class Packager
             PackageDisseminator dip = (PackageDisseminator) PluginManager
                 .getNamedPlugin(PackageDisseminator.class, myPackager.packageType);
             if (dip == null)
+            {
                 usageError("Error, Unknown package type: " + myPackager.packageType);
+            }
 
             DSpaceObject dso = HandleManager.resolveToObject(context, identifier);
             if (dso == null)
+            {
                 throw new IllegalArgumentException("Bad identifier/handle -- "
-                        + "Cannot resolve handle \"" + identifier +"\"");
+                        + "Cannot resolve handle \"" + identifier + "\"");
+            }
 
             //disseminate the requested object
             myPackager.disseminate(context, dip, dso, pkgParams, sourceFile);
@@ -493,7 +529,9 @@ public class Packager
         //find first parent (if specified) -- this will be the "owner" of the object
         DSpaceObject parent = null;
         if(parentObjs!=null && parentObjs.length>0)
+        {
             parent = parentObjs[0];
+        }
         //NOTE: at this point, Parent may be null -- in which case it is up to the PackageIngester
         // to either determine the Parent (from package contents) or throw an error.
 
@@ -664,7 +702,9 @@ public class Packager
             dip.disseminate(context, dso, pkgParams, pkgFile);
 
             if(pkgFile!=null && pkgFile.exists())
-                 System.out.println("\nCREATED package file: " + pkgFile.getCanonicalPath());
+            {
+                System.out.println("\nCREATED package file: " + pkgFile.getCanonicalPath());
+            }
         }
     }
 
@@ -756,8 +796,10 @@ public class Packager
             DSpaceObject dso = sip.replace(context, objToReplace, pkgFile, pkgParams);
 
             if(dso!=null)
-                 System.out.println("REPLACED DSpace " + Constants.typeText[dso.getType()] +
-                                " [ hdl=" + dso.getHandle() + " ] ");
+            {
+                System.out.println("REPLACED DSpace " + Constants.typeText[dso.getType()] +
+                        " [ hdl=" + dso.getHandle() + " ] ");
+            }
         }
     }
 

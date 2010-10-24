@@ -89,17 +89,25 @@ public class UsageEvent extends Event {
 	private static String checkParams(Action action, HttpServletRequest request, Context context, DSpaceObject object)
 	{
 		if(action == null)
-			throw new RuntimeException("action cannot be null");
+        {
+            throw new IllegalStateException("action cannot be null");
+        }
 			
 		if(request == null)
-			throw new RuntimeException("request cannot be null");
+        {
+            throw new IllegalStateException("request cannot be null");
+        }
 		
 
 		if(context == null)
-			throw new RuntimeException("context cannot be null");
+        {
+            throw new IllegalStateException("context cannot be null");
+        }
 		
 		if(object == null)
-			throw new RuntimeException("object cannot be null");
+        {
+            throw new IllegalStateException("object cannot be null");
+        }
 		
 		try
 		{

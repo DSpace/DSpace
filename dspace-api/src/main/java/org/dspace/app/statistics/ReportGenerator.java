@@ -589,10 +589,26 @@ public class ReportGenerator
         finally
         {
             if (br != null)
-                try { br.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    br.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
 
             if (fr != null)
-                try { fr.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    fr.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
         }
     }
     

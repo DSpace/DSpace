@@ -119,7 +119,9 @@ public class XSLTDisseminationCrosswalk
         throws CrosswalkInternalException
     {
         if (namespaces != null || schemaLocation != null)
+        {
             return;
+        }
         String myAlias = getPluginInstanceName();
         if (myAlias == null)
         {
@@ -155,8 +157,10 @@ public class XSLTDisseminationCrosswalk
         {
             String key = (String)pe.nextElement();
             if (key.startsWith(nsPrefix))
+            {
                 nsList.add(Namespace.getNamespace(key.substring(nsPrefix.length()),
-                             ConfigurationManager.getProperty(key)));
+                        ConfigurationManager.getProperty(key)));
+            }
         }
         namespaces = (Namespace[])nsList.toArray(new Namespace[nsList.size()]);
 
@@ -212,13 +216,17 @@ public class XSLTDisseminationCrosswalk
         if (!(type == Constants.ITEM ||
               type == Constants.COLLECTION ||
               type == Constants.COMMUNITY))
+        {
             throw new CrosswalkObjectNotSupported("XSLTDisseminationCrosswalk can only crosswalk items, collections, and communities.");
+        }
 
         init();
 
         XSLTransformer xform = getTransformer(DIRECTION);
         if (xform == null)
+        {
             throw new CrosswalkInternalException("Failed to initialize transformer, probably error loading stylesheet.");
+        }
 
         try
         {
@@ -248,13 +256,17 @@ public class XSLTDisseminationCrosswalk
         if (!(type == Constants.ITEM ||
               type == Constants.COLLECTION ||
               type == Constants.COMMUNITY))
+        {
             throw new CrosswalkObjectNotSupported("XSLTDisseminationCrosswalk can only crosswalk a items, collections, and communities.");
+        }
 
         init();
 
         XSLTransformer xform = getTransformer(DIRECTION);
         if (xform == null)
+        {
             throw new CrosswalkInternalException("Failed to initialize transformer, probably error loading stylesheet.");
+        }
 
         try
         {
@@ -429,9 +441,13 @@ public class XSLTDisseminationCrosswalk
         field.setAttribute("mdschema",schema);
         field.setAttribute("element",element);
         if (qualifier != null)
-            field.setAttribute("qualifier",qualifier);
+        {
+            field.setAttribute("qualifier", qualifier);
+        }
         if (language != null)
-            field.setAttribute("lang",language);
+        {
+            field.setAttribute("lang", language);
+        }
 
         field.setText(checkedString(value));
 
@@ -467,7 +483,9 @@ public class XSLTDisseminationCrosswalk
             {
                 char c = value.charAt(i);
                 if (Verifier.isXMLCharacter((int)c))
+                {
                     result.append(c);
+                }
             }
             return result.toString();
         }

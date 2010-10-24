@@ -110,7 +110,9 @@ public class RecentSubmissionsManager
             for (SortOption so : SortOption.getSortOptions())
             {
                 if (so.getName().equals(source))
+                {
                     bs.setSortBy(so.getNumber());
+                }
             }
 			
 			BrowseInfo results = be.browseMini(bs);

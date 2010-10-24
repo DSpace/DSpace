@@ -94,7 +94,10 @@ public class ShibbolethAction extends AbstractAction
             Context context = AuthenticationUtil.Authenticate(objectModel, null, null, null);
 
             EPerson eperson = null;
-            if(context != null) eperson = context.getCurrentUser();
+            if(context != null)
+            {
+                eperson = context.getCurrentUser();
+            }
 
             if (eperson != null)
             {

@@ -123,7 +123,9 @@ public class OREIngestionCrosswalk
 		Date timeStart = new Date();
 		
 		if (dso.getType() != Constants.ITEM)
+        {
             throw new CrosswalkObjectNotSupported("OREIngestionCrosswalk can only crosswalk an Item.");
+        }
         Item item = (Item)dso;
         
         if (root == null) {

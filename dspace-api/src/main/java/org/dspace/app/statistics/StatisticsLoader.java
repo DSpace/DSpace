@@ -393,16 +393,24 @@ public class StatisticsLoader
         public boolean accept(File dir, String name)
         {
             if (analysisMonthlyPattern.matcher(name).matches())
+            {
                 return true;
+            }
 
             if (analysisGeneralPattern.matcher(name).matches())
+            {
                 return true;
+            }
 
             if (reportMonthlyPattern.matcher(name).matches())
+            {
                 return true;
+            }
             
             if (reportGeneralPattern.matcher(name).matches())
+            {
                 return true;
+            }
 
             return false;
         }

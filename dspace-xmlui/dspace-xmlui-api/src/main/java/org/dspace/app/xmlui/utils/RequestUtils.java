@@ -189,7 +189,9 @@ public class RequestUtils {
 
 			// Only add non blank items to the list
 			if (value.length() == 0)
-				continue valueLoop;
+            {
+                continue valueLoop;
+            }
 			
 			// Finaly add it to the list
 			values.add(value.trim());

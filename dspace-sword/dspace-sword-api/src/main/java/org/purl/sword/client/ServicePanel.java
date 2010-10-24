@@ -409,7 +409,9 @@ implements TreeSelectionListener
                   {
                      showWorkspace((Workspace)data);
                      if( listener != null )
-                     alertListener(null);
+                     {
+                         alertListener(null);
+                     }
                   }
                   else if( data instanceof Collection )
                   {

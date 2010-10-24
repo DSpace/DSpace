@@ -208,7 +208,10 @@ public class StatisticsImporter
                 String data = "";
                 counter++;
                 errors++;
-                if (verbose) System.out.println("Line:" + line);
+                if (verbose)
+                {
+                    System.out.println("Line:" + line);
+                }
                 String[] parts = line.split(",");
 //                uuid = parts[0];
                 action = parts[1];
@@ -246,7 +249,10 @@ public class StatisticsImporter
                     (dns.endsWith(".crawl.yahoo.net.")) ||
                     (dns.endsWith(".search.msn.com.")))
                 {
-                    if (verbose) System.out.println(data + ", IGNORE (search engine)");
+                    if (verbose)
+                    {
+                        System.out.println(data + ", IGNORE (search engine)");
+                    }
                     errors--;
                     searchengines++;
                     continue;
@@ -269,7 +275,10 @@ public class StatisticsImporter
                     try {
                         continent = LocationUtils.getContinentCode(countryCode);
                     } catch (Exception e) {
-                        if (verbose) System.out.println("Unknown country code: " + countryCode);
+                        if (verbose)
+                        {
+                            System.out.println("Unknown country code: " + countryCode);
+                        }
                         continue;
                     }
                 } catch (Exception e) {
@@ -314,14 +323,20 @@ public class StatisticsImporter
                 DSpaceObject dso = DSpaceObject.find(context, type, Integer.parseInt(id));
                 if (dso == null)
                 {
-                    if (verbose) System.err.println(" - DSO with ID '" + id + "' is no longer in the system");
+                    if (verbose)
+                    {
+                        System.err.println(" - DSO with ID '" + id + "' is no longer in the system");
+                    }
                     continue;
                 }
 
                 // Get the eperson details
                 EPerson eperson = EPerson.findByEmail(context, user);
                 int epersonId = 0;
-                if (eperson != null) eperson.getID();
+                if (eperson != null)
+                {
+                    eperson.getID();
+                }
 
                 // Save it in our server
                 SolrInputDocument sid = new SolrInputDocument();
@@ -336,9 +351,13 @@ public class StatisticsImporter
                 sid.addField("latitude", latitude);
                 sid.addField("longitude", longitude);
                 if (epersonId > 0)
+                {
                     sid.addField("epersonid", epersonId);
+                }
                 if (dns != null)
+                {
                     sid.addField("dns", dns.toLowerCase());
+                }
 
                 if (dso instanceof Item) {
                     Item item = (Item) dso;
@@ -468,7 +487,10 @@ public class StatisticsImporter
 
         // Find our solrserver
         String sserver = ConfigurationManager.getProperty("solr.log.server");
-        if (verbose) System.out.println("Writing to solr server at: " + sserver);
+        if (verbose)
+        {
+            System.out.println("Writing to solr server at: " + sserver);
+        }
 		solr = new CommonsHttpSolrServer(sserver);
 
 		metadataStorageInfo = SolrLogger.getMetadataStorageInfo();

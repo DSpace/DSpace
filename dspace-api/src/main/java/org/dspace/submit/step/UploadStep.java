@@ -169,7 +169,9 @@ public class UploadStep extends AbstractProcessingStep
 
             // if error occurred, return immediately
             if (status != STATUS_COMPLETE)
+            {
                 return status;
+            }
         }
             
         // if user pressed jump-to button in process bar,
@@ -252,7 +254,9 @@ public class UploadStep extends AbstractProcessingStep
 
                     // if error occurred, return immediately
                     if (status != STATUS_COMPLETE)
+                    {
                         return status;
+                    }
                 }
 
                 // remove current bitstream from Submission Info
@@ -268,7 +272,9 @@ public class UploadStep extends AbstractProcessingStep
 
             // if error occurred, return immediately
             if (status != STATUS_COMPLETE)
+            {
                 return status;
+            }
 
             // remove current bitstream from Submission Info
             subInfo.setBitstream(null);
@@ -287,7 +293,9 @@ public class UploadStep extends AbstractProcessingStep
 
             // if error occurred, return immediately
             if (status != STATUS_COMPLETE)
+            {
                 return status;
+            }
         }
 
         // ------------------------------------------
@@ -307,7 +315,9 @@ public class UploadStep extends AbstractProcessingStep
 
             // if error occurred, return immediately
             if (status != STATUS_COMPLETE)
+            {
                 return status;
+            }
         }
 
         // ---------------------------------------------------
@@ -477,19 +487,21 @@ public class UploadStep extends AbstractProcessingStep
                 
                 // Load the file's path and input stream and description
                 String filePath = (String) request.getAttribute(param + "-path");
-                InputStream fileInputStream = (InputStream) request
-                                    .getAttribute(param + "-inputstream");
+                InputStream fileInputStream = (InputStream) request.getAttribute(param + "-inputstream");
                 
                 //attempt to get description from attribute first, then direct from a parameter
-                String fileDescription =  (String) request
-                                    .getAttribute(param + "-description");
+                String fileDescription =  (String) request.getAttribute(param + "-description");
                 if(fileDescription==null ||fileDescription.length()==0)
+                {
                     request.getParameter("description");
+                }
                 
                 // if information wasn't passed by User Interface, we had a problem
                 // with the upload
                 if (filePath == null || fileInputStream == null)
+                {
                     return STATUS_UPLOAD_ERROR;
+                }
                 
                 if (subInfo != null)
                 {

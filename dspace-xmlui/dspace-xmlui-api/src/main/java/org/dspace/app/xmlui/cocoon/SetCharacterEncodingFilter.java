@@ -135,7 +135,9 @@ public class SetCharacterEncodingFilter implements Filter
         {
             String currentEncoding = selectEncoding(request);
             if (currentEncoding != null)
+            {
                 request.setCharacterEncoding(currentEncoding);
+            }
         }
 
         // Pass control on to the next filter

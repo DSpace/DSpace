@@ -193,12 +193,16 @@ public class SearchUtils {
         // Check (and add) any default filters which may be configured
         String defaultFilters = getConfig().getString("solr.default.filter");
         if (defaultFilters != null)
+        {
             result.addAll(Arrays.asList(defaultFilters.split(";")));
+        }
 
         if (scope != null) {
             String scopeDefaultFilters = SearchUtils.getConfig().getString("solr." + scope + ".default.filter");
             if (scopeDefaultFilters != null)
+            {
                 result.addAll(Arrays.asList(scopeDefaultFilters.split(";")));
+            }
         }
         return result.toArray(new String[result.size()]);
     }

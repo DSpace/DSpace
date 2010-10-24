@@ -102,7 +102,9 @@ public class SiteRecentSubmissions extends AbstractFiltersTransformer {
             for (SolrDocument doc : queryResults.getResults()) {
                 DSpaceObject obj = SearchUtils.findDSpaceObject(context, doc);
                 if(obj != null)
+                {
                     lastSubmitted.addReference(obj);
+                }
             }
         }
     }
@@ -117,7 +119,9 @@ public class SiteRecentSubmissions extends AbstractFiltersTransformer {
     public void performSearch(DSpaceObject object) throws SearchServiceException, UIException {
 
         if (queryResults != null)
-            return;// queryResults;
+        {
+            return; // queryResults;
+        }
 
         queryArgs = prepareDefaultFilters("site");
 

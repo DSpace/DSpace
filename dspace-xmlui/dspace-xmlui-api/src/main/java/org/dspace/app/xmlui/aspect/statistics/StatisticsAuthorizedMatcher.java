@@ -63,14 +63,18 @@ public class StatisticsAuthorizedMatcher extends AbstractLogEnabled implements M
             {
                 //If we have no user, we cannot be admin
                 if(context.getCurrentUser() == null)
+                {
                     authorized = false;
+                }
 
                 if(authorized){
                     //Check for admin
                     authorized = AuthorizeManager.isAdmin(context);
                     if(!authorized)
+                    {
                         //Check if we have authorization for the owning colls, comms, ...
                         authorized = AuthorizeManager.isAdmin(context, dso);
+                    }
                 }
             }
 

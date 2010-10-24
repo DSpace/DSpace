@@ -231,10 +231,14 @@ public class PageMeta extends AbstractWingElement implements
     {
 
         if (!WingConstants.DRI.URI.equals(namespace))
+        {
             return false;
+        }
 
         if (!E_PAGE_META.equals(localName))
+        {
             return false;
+        }
         return true;
     }
 

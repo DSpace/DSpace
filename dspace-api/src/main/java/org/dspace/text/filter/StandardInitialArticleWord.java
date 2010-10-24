@@ -51,7 +51,9 @@ public class StandardInitialArticleWord extends InitialArticleWord
     protected String[] getArticleWords(String lang)
     {
         if (lang != null && lang.startsWith("en"))
+        {
             return articleWords;
+        }
         
         return null;
     }

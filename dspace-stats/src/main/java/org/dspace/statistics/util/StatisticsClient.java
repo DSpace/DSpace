@@ -144,7 +144,9 @@ public class StatisticsClient
             File spiders = new File(ConfigurationManager.getProperty("dspace.dir"),"config/spiders");
 
             if(!spiders.exists())
+            {
                 spiders.mkdirs();
+            }
 
             String[] values = urls.split(",");
             for (String value : values)

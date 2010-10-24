@@ -109,7 +109,9 @@ public class Supervisor {
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
     }
     

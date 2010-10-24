@@ -137,7 +137,9 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
             if (dso == null)
+            {
                 return "0";
+            }
 
             return HashUtil.hash(dso.getHandle());
         }
@@ -212,7 +214,9 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         Request request = ObjectModelHelper.getRequest(objectModel);
 
         if (queryResults != null)
+        {
             return queryResults;
+        }
 
         queryArgs = new SolrQuery();
 
@@ -242,7 +246,9 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
         int offset = RequestUtils.getIntParameter(request, SearchFilterParam.OFFSET);
         if (offset == -1)
+        {
             offset = 0;
+        }
         if(facetField.endsWith(".year")){
 //            TODO: dates are now handled in another way, throw this away?
             queryArgs.setParam(FacetParams.FACET_OFFSET, "0");
@@ -289,7 +295,9 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
             // We shouldn't go lower then our max bottom year
             // Make sure to substract one so the bottom year is also counted !
             if(startYear < maxEndYear)
+            {
                 startYear = maxEndYear - 1;
+            }
 
             if(0 < offset){
                 //Say that we have an offset of 10 years
@@ -313,7 +321,9 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
         } else {
             if(request.getParameter(SearchFilterParam.STARTS_WITH) != null)
+            {
                 queryArgs.setFacetPrefix(facetField, request.getParameter(SearchFilterParam.STARTS_WITH).toLowerCase());
+            }
 
             queryArgs.addFacetField(facetField);
         }
@@ -398,7 +408,9 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
             java.util.List<FacetField> facetFields = this.queryResults.getFacetFields();
             if (facetFields == null)
+            {
                 facetFields = new ArrayList<FacetField>();
+            }
 
             facetFields.addAll(this.queryResults.getFacetDates());
 
@@ -434,10 +446,14 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
                         offSet = offSet == -1 ? 0 : offSet;
 
                         if ((offSet + DEFAULT_PAGE_SIZE) < values.size())
+                        {
                             nextPageUrl = getNextPageURL(browseParams, request);
+                        }
                     }else{
                         if (values.size() == (DEFAULT_PAGE_SIZE + 1))
+                        {
                             nextPageUrl = getNextPageURL(browseParams, request);
+                        }
                     }
 
 
@@ -467,7 +483,9 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
                     List<String> filterQueries = new ArrayList<String>();
                     if(request.getParameterValues("fq") != null)
+                    {
                         filterQueries = Arrays.asList(request.getParameterValues("fq"));
+                    }
 
                     if(field.getName().endsWith(".year")){
                         int start = (values.size() - 1) - offSet;
@@ -489,7 +507,9 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
                     }else{
                         int end = values.size();
                         if(DEFAULT_PAGE_SIZE < end)
+                        {
                             end = DEFAULT_PAGE_SIZE;
+                        }
 
 
                         for (int i = 0; i < end; i++) {
@@ -588,7 +608,9 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
     private String getNextPageURL(SearchFilterParam browseParams, Request request) {
         int offSet = Util.getIntParameter(request, SearchFilterParam.OFFSET);
         if (offSet == -1)
+        {
             offSet = 0;
+        }
 
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.putAll(browseParams.getCommonBrowseParams());
@@ -606,11 +628,15 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
     private String getPreviousPageURL(SearchFilterParam browseParams, Request request) {
         //If our offset should be 0 then we shouldn't be able to view a previous page url
         if ("0".equals(queryArgs.get(FacetParams.FACET_OFFSET)) && Util.getIntParameter(request, "offset") == -1)
+        {
             return null;
+        }
 
         int offset = Util.getIntParameter(request, SearchFilterParam.OFFSET);
         if(offset == -1 || offset == 0)
+        {
             return null;
+        }
 
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.putAll(browseParams.getCommonBrowseParams());
@@ -681,7 +707,9 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
             paramMap.put(OFFSET, request.getParameter(OFFSET));
             if(request.getParameter(STARTS_WITH) != null)
+            {
                 paramMap.put(STARTS_WITH, request.getParameter(STARTS_WITH));
+            }
 
             return paramMap;
         }

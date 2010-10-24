@@ -213,7 +213,9 @@ public class RoleCrosswalk
             PackageDisseminator dip = (PackageDisseminator)
             PluginManager.getNamedPlugin(PackageDisseminator.class, ROLE_PACKAGER_PLUGIN);
             if (dip == null)
+            {
                 throw new CrosswalkInternalException("Cannot find a PackageDisseminator plugin named " + ROLE_PACKAGER_PLUGIN);
+            }
 
             // Create a temporary file to disseminate into
             String tempDirectory = ConfigurationManager.getProperty("upload.temp.dir");
@@ -238,7 +240,9 @@ public class RoleCrosswalk
             // if we ended up with a Zero-length output file,
             // this means dissemination was successful but had no results
             if(tempFile.exists() && tempFile.length()==0)
+            {
                 return null;
+            }
            
             try
             {
@@ -285,7 +289,9 @@ public class RoleCrosswalk
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
         if(!metadata.isEmpty())
+        {
             ingest(context, dso, ((Element) metadata.get(0)).getParentElement());
+        }
     }
 
 
@@ -309,13 +315,17 @@ public class RoleCrosswalk
         if (dso.getType() != Constants.SITE &&
             dso.getType() != Constants.COMMUNITY &&
             dso.getType() != Constants.COLLECTION)
-                throw new CrosswalkObjectNotSupported("Role crosswalk only valid for Site, Community or Collection");
+        {
+            throw new CrosswalkObjectNotSupported("Role crosswalk only valid for Site, Community or Collection");
+        }
 
         //locate our "DSPACE-ROLES" PackageIngester plugin
         PackageIngester sip = (PackageIngester)
                                 PluginManager.getNamedPlugin(PackageIngester.class, ROLE_PACKAGER_PLUGIN);
         if (sip == null)
+        {
             throw new CrosswalkInternalException("Cannot find a PackageIngester plugin named " + ROLE_PACKAGER_PLUGIN);
+        }
 
         // Initialize our packaging parameters
         PackageParameters pparams;
@@ -330,7 +340,10 @@ public class RoleCrosswalk
         
         // Initialize our license info
         String license = null;
-        if(this.getIngestionLicense()!=null) license = this.getIngestionLicense();
+        if(this.getIngestionLicense()!=null)
+        {
+            license = this.getIngestionLicense();
+        }
         
         // Create a temporary file to ingest from
         String tempDirectory = ConfigurationManager.getProperty("upload.temp.dir");

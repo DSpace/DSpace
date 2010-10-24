@@ -256,17 +256,23 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 	private boolean paragraphWrap(Element parent, int index,
 			List<Content> contents) {
 		if (contents == null || contents.size() <= 0)
-			return false;
+        {
+            return false;
+        }
 
 		boolean empty = true;
 		for (Content content : contents) {
 			if (empty == false)
-				continue;
+            {
+                continue;
+            }
 
 			if (content instanceof Text) {
 				Text text = (Text) content;
 				if (!"".equals(text.getTextNormalize()))
-					empty = false;
+                {
+                    empty = false;
+                }
 			} else {
 				empty = false;
 			}
@@ -309,7 +315,9 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 		for (String name : names) {
 			String value = element.getAttributeValue(name);
 			if (value != null)
-				attributes.put(name, value);
+            {
+                attributes.put(name, value);
+            }
 		}
 
 		element.setAttributes(new ArrayList<Attributes>());
@@ -332,7 +340,9 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 	private void moveAttribute(Element element, String oldName, String newName) {
 		Attribute attribute = element.getAttribute(oldName);
 		if (attribute != null)
-			attribute.setName(newName);
+        {
+            attribute.setName(newName);
+        }
 	}
 
 	/**

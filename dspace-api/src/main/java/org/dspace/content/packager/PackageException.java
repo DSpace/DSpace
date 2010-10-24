@@ -102,7 +102,9 @@ public class PackageException extends Exception
         if (cause != null)
         {
             if (cause.getCause() != null)
+            {
                 cause = cause.getCause();
+            }
             StringWriter sw = new StringWriter();
             cause.printStackTrace(new PrintWriter(sw));
             log.error(sw.toString());

@@ -160,9 +160,13 @@ public class StartForgotPassword extends AbstractDSpaceTransformer
        
        // Prefill with invalid email if this is a retry attempt.
        if (email != null)
+       {
            email.setValue(this.email);
+       }
        if (errors.contains("email"))
+       {
            email.addError(T_error_not_found);
+       }
        
        Item submit = form.addItem();
        submit.addButton("submit").setValue(T_submit);

@@ -166,14 +166,18 @@ public class X509Authentication implements AuthenticationMethod
 
         // backward-compatible kludge
         if (caCertPath == null)
+        {
             caCertPath = ConfigurationManager.getProperty("webui.cert.ca");
+        }
 
         // First look for keystore full of trusted certs.
         if (keystorePath != null)
         {
             FileInputStream fis = null;
             if (keystorePassword == null)
+            {
                 keystorePassword = "";
+            }
             try
             {
                 KeyStore ks = KeyStore.getInstance("JKS");
@@ -196,6 +200,7 @@ public class X509Authentication implements AuthenticationMethod
             finally
             {
                 if (fis != null)
+                {
                     try
                     {
                         fis.close();
@@ -203,6 +208,7 @@ public class X509Authentication implements AuthenticationMethod
                     catch (IOException ioe)
                     {
                     }
+                }
             }
         }
 
@@ -218,7 +224,9 @@ public class X509Authentication implements AuthenticationMethod
                 X509Certificate cert = (X509Certificate) CertificateFactory
                         .getInstance("X.509").generateCertificate(is);
                 if (cert != null)
+                {
                     caPublicKey = cert.getPublicKey();
+                }
             }
             catch (IOException e)
             {
@@ -234,6 +242,7 @@ public class X509Authentication implements AuthenticationMethod
             finally
             {
                 if (is != null)
+                {
                     try
                     {
                         is.close();
@@ -241,8 +250,10 @@ public class X509Authentication implements AuthenticationMethod
                     catch (IOException ioe)
                     {
                     }
+                }
 
                 if (fis != null)
+                {
                     try
                     {
                         fis.close();
@@ -250,6 +261,7 @@ public class X509Authentication implements AuthenticationMethod
                     catch (IOException ioe)
                     {
                     }
+                }
             }
         }
     }
@@ -272,11 +284,15 @@ public class X509Authentication implements AuthenticationMethod
         Principal principal = certificate.getSubjectDN();
 
         if (principal == null)
+        {
             return null;
+        }
 
         String dn = principal.getName();
         if (dn == null)
+        {
             return null;
+        }
 
         StringTokenizer tokenizer = new StringTokenizer(dn, ",");
         String token = null;
@@ -290,7 +306,9 @@ public class X509Authentication implements AuthenticationMethod
             {
                 // Make sure the token actually contains something
                 if (token.length() <= len)
+                {
                     return null;
+                }
 
                 return token.substring(len).toLowerCase();
             }
@@ -313,7 +331,9 @@ public class X509Authentication implements AuthenticationMethod
     private static boolean isValid(Context context, X509Certificate certificate)
     {
         if (certificate == null)
+        {
             return false;
+        }
 
         // This checks that current time is within cert's validity window:
         try
@@ -544,7 +564,9 @@ public class X509Authentication implements AuthenticationMethod
                 for (int i = 0; i < results.length; i++)
                 {
                     if (i > 0)
+                    {
                         gsb.append(",");
+                    }
                     gsb.append(results[i]);
                 }
 
@@ -584,8 +606,10 @@ public class X509Authentication implements AuthenticationMethod
         // Obtain the certificate from the request, if any
         X509Certificate[] certs = null;
         if (request != null)
+        {
             certs = (X509Certificate[]) request
                     .getAttribute("javax.servlet.request.X509Certificate");
+        }
 
         if ((certs == null) || (certs.length == 0))
         {
@@ -609,7 +633,9 @@ public class X509Authentication implements AuthenticationMethod
                 String email = getEmail(certs[0]);
                 EPerson eperson = null;
                 if (email != null)
+                {
                     eperson = EPerson.findByEmail(context, email);
+                }
                 if (eperson == null)
                 {
                     // Cert is valid, but no record.

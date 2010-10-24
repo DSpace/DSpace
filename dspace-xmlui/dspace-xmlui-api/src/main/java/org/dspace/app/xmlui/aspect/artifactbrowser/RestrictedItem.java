@@ -118,7 +118,9 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
                
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         if (dso != null)
-        	HandleUtil.buildHandleTrail(dso,pageMeta,contextPath);
+        {
+            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath);
+        }
         pageMeta.addTrail().addContent(T_trail);
         
     }

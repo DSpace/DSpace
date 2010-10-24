@@ -136,9 +136,13 @@ public class Options extends AbstractWingElement implements
     {
         // Check if it's in our name space and an options element.
         if (!WingConstants.DRI.URI.equals(namespace))
+        {
             return false;
+        }
         if (!E_OPTIONS.equals(localName))
+        {
             return false;
+        }
         return true;
     }
 
@@ -165,9 +169,10 @@ public class Options extends AbstractWingElement implements
             if (content instanceof WingMergeableElement)
             {
                 WingMergeableElement candidate = (WingMergeableElement) content;
-                if (candidate.mergeEqual(namespace, localName, qName,
-                        attributes))
+                if (candidate.mergeEqual(namespace, localName, qName, attributes))
+                {
                     found = candidate;
+                }
             }
         }
         contents.remove(found);

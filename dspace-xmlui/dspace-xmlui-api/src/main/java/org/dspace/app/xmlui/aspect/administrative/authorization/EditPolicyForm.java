@@ -264,7 +264,9 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
             }
     	}
     	if (errors.contains("group_id"))
-    		groupSelect.addError(T_error_no_group);
+        {
+            groupSelect.addError(T_error_no_group);
+        }
     	
         
         // the search function

@@ -126,7 +126,10 @@ public class RegisterServlet extends DSpaceServlet
             if (registering)
             {
                 // Registering a new user
-                if (ldap_enabled) JSPManager.showJSP(request, response, "/register/new-ldap-user.jsp");
+                if (ldap_enabled)
+                {
+                    JSPManager.showJSP(request, response, "/register/new-ldap-user.jsp");
+                }
                 JSPManager.showJSP(request, response, "/register/new-user.jsp");
             }
             else
@@ -250,7 +253,10 @@ public class RegisterServlet extends DSpaceServlet
         String password = request.getParameter("password");
         EPerson eperson = EPerson.findByEmail(context, email);
         EPerson eperson2 = null;
-        if (netid!=null) eperson2 = EPerson.findByNetid(context, netid.toLowerCase());
+        if (netid!=null)
+        {
+            eperson2 = EPerson.findByNetid(context, netid.toLowerCase());
+        }
 
         try
         {
@@ -458,7 +464,10 @@ public class RegisterServlet extends DSpaceServlet
         // Get the email address
         String email = AccountManager.getEmail(context, token);
         String netid = request.getParameter("netid");
-        if ((netid!=null)&&(email==null)) email = request.getParameter("email");
+        if ((netid!=null)&&(email==null))
+        {
+            email = request.getParameter("email");
+        }
         
         // If the token isn't valid, show an error
         if (email == null && netid==null)
@@ -475,10 +484,19 @@ public class RegisterServlet extends DSpaceServlet
 
         // If the token is valid, we create an eperson record if need be
         EPerson eperson = null;
-        if (email!=null) eperson = EPerson.findByEmail(context, email);
+        if (email!=null)
+        {
+            eperson = EPerson.findByEmail(context, email);
+        }
         EPerson eperson2 = null;
-        if (netid!=null) eperson2 = EPerson.findByNetid(context, netid.toLowerCase());
-        if (eperson2 !=null) eperson = eperson2;
+        if (netid!=null)
+        {
+            eperson2 = EPerson.findByNetid(context, netid.toLowerCase());
+        }
+        if (eperson2 !=null)
+        {
+            eperson = eperson2;
+        }
         
         if (eperson == null)
         {
@@ -488,7 +506,10 @@ public class RegisterServlet extends DSpaceServlet
             context.setIgnoreAuthorization(true);
             eperson = EPerson.create(context);
             eperson.setEmail(email);
-            if (netid!=null) eperson.setNetid(netid.toLowerCase());
+            if (netid!=null)
+            {
+                eperson.setNetid(netid.toLowerCase());
+            }
             eperson.update();
             context.setIgnoreAuthorization(false);
         }
@@ -524,7 +545,10 @@ public class RegisterServlet extends DSpaceServlet
                     "email=" + eperson.getEmail()));
 
             // delete the token
-            if (token!=null) AccountManager.deleteToken(context, token);
+            if (token!=null)
+            {
+                AccountManager.deleteToken(context, token);
+            }
             
             // Update user record
             eperson.update();

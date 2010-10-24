@@ -156,14 +156,20 @@ public class WingDocument extends AbstractWingElement implements
             Attributes attributes) throws SAXException, WingException
     {
         if (!WingConstants.DRI.URI.equals(namespace))
+        {
             return false;
+        }
         if (!E_DOCUMENT.equals(localName))
+        {
             return false;
+        }
         
         
         String version = attributes.getValue(A_VERSION);
         if (!(DOCUMENT_VERSION.equals(version)))
-        	throw new WingException("Incompatable DRI versions, "+DOCUMENT_VERSION +" != "+version);
+        {
+            throw new WingException("Incompatable DRI versions, " + DOCUMENT_VERSION + " != " + version);
+        }
         
         return true;
     }
@@ -186,20 +192,25 @@ public class WingDocument extends AbstractWingElement implements
             WingException
     {
         if (this.meta != null)
+        {
             if (this.meta.mergeEqual(namespace, localName, qName, attributes))
             {
                 Meta child = this.meta;
                 this.meta = null;
                 return child;
             }
+        }
         if (this.body != null)
+        {
             if (this.body.mergeEqual(namespace, localName, qName, attributes))
             {
                 Body child = this.body;
                 this.body = null;
                 return child;
             }
+        }
         if (this.options != null)
+        {
             if (this.options
                     .mergeEqual(namespace, localName, qName, attributes))
             {
@@ -207,6 +218,7 @@ public class WingDocument extends AbstractWingElement implements
                 this.options = null;
                 return options;
             }
+        }
         return null;
     }
 
@@ -248,11 +260,17 @@ public class WingDocument extends AbstractWingElement implements
         }
 
         if (this.meta != null)
+        {
             meta.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
         if (this.body != null)
+        {
             body.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
         if (this.options != null)
+        {
             options.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
 
         if (!this.merged)
         {
@@ -266,11 +284,17 @@ public class WingDocument extends AbstractWingElement implements
     public void dispose()
     {
         if (this.meta != null)
+        {
             meta.dispose();
+        }
         if (this.body != null)
+        {
             body.dispose();
+        }
         if (this.options != null)
+        {
             options.dispose();
+        }
         this.meta = null;
         this.body = null;
         this.options = null;

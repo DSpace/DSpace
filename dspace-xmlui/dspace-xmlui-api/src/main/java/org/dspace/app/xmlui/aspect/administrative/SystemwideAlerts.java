@@ -208,7 +208,9 @@ public class SystemwideAlerts extends AbstractDSpaceTransformer implements Cache
 		if (restrictsessions == STATE_ALL_SESSIONS ||
 			restrictsessions == STATE_CURRENT_SESSIONS ||
 			restrictsessions == STATE_ONLY_ADMINISTRATIVE_SESSIONS)
-			SystemwideAlerts.restrictsessions = restrictsessions;
+        {
+            SystemwideAlerts.restrictsessions = restrictsessions;
+        }
 	}
 	
 	

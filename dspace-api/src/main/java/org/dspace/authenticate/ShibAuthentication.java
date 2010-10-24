@@ -105,7 +105,9 @@ public class ShibAuthentication implements AuthenticationMethod
 
             // fail, try lower case
             if (email == null)
+            {
                 email = request.getHeader(emailHeader.toLowerCase());
+            }
         }
 
         // try to pull the "REMOTE_USER" info instead of the header
@@ -120,7 +122,9 @@ public class ShibAuthentication implements AuthenticationMethod
         {
             EPerson p = context.getCurrentUser();
             if (p != null)
+            {
                 email = p.getEmail();
+            }
         }
 
         if (email == null)
@@ -139,7 +143,9 @@ public class ShibAuthentication implements AuthenticationMethod
 
             // fail, try lower case
             if (fname == null)
+            {
                 fname = request.getHeader(fnameHeader.toLowerCase());
+            }
         }
         if (lnameHeader != null)
         {
@@ -148,7 +154,9 @@ public class ShibAuthentication implements AuthenticationMethod
 
             // fail, try lower case
             if (lname == null)
+            {
                 lname = request.getHeader(lnameHeader.toLowerCase());
+            }
         }
 
         // future version can offer auto-update feature, this needs testing
@@ -181,9 +189,13 @@ public class ShibAuthentication implements AuthenticationMethod
                 eperson = EPerson.create(context);
                 eperson.setEmail(email);
                 if (fname != null)
+                {
                     eperson.setFirstName(fname);
+                }
                 if (lname != null)
+                {
                     eperson.setLastName(lname);
+                }
                 eperson.setCanLogIn(true);
                 AuthenticationManager.initEPerson(context, request, eperson);
                 eperson.update();
@@ -242,12 +254,16 @@ public class ShibAuthentication implements AuthenticationMethod
         boolean roleHeader_ignoreScope = ConfigurationManager
                 .getBooleanProperty("authentication.shib.role-header.ignore-scope");
         if (roleHeader == null || roleHeader.trim().length() == 0)
-            roleHeader = "Shib-EP-UnscopedAffiliation"; // fall back to default
+        {
+            roleHeader = "Shib-EP-UnscopedAffiliation";
+        } // fall back to default
         String affiliations = request.getHeader(roleHeader);
 
         // try again with all lower case...maybe has better luck
         if (affiliations == null)
+        {
             affiliations = request.getHeader(roleHeader.toLowerCase());
+        }
 
         // default role when fully authN but not releasing any roles?
         String defaultRoles = ConfigurationManager
@@ -270,16 +286,21 @@ public class ShibAuthentication implements AuthenticationMethod
                 if (roleHeader_ignoreScope) 
                 {
                         int index = affiliation.indexOf('@');
-                        if (index != -1) affiliation = affiliation.substring(0,index);
+                        if (index != -1)
+                        {
+                            affiliation = affiliation.substring(0, index);
+                        }
                 }
 
                 // perform mapping here if necessary
                 String groupLabels = ConfigurationManager
                         .getProperty("authentication.shib.role." + affiliation);
                 if (groupLabels == null || groupLabels.trim().length() == 0)
+                {
                     groupLabels = ConfigurationManager
                             .getProperty("authentication.shib.role."
                                     + affiliation.toLowerCase());
+                }
 
                 // revert back to original entry when no mapping is provided
                 if (groupLabels == null)

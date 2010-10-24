@@ -86,7 +86,9 @@ public class TabFileUsageEventListener extends AbstractUsageEventListener
 
             String logDir = null;
             if (!new File(logPath).isAbsolute())
+            {
                 logDir = ConfigurationManager.getProperty("log.dir");
+            }
 
             File logFile = new File(logDir, logPath);
             appending = logFile.length() > 0;
@@ -119,7 +121,9 @@ public class TabFileUsageEventListener extends AbstractUsageEventListener
 			UsageEvent ue = (UsageEvent)event;
 
 			if (null == log)
-	            return;
+            {
+                return;
+            }
 	
 	        SimpleDateFormat dateFormat = new SimpleDateFormat(
 	                "yyyyMMdd'T'HHmmssSSS");

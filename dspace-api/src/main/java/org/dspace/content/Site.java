@@ -98,8 +98,9 @@ public class Site extends DSpaceObject
     public static String getSiteHandle()
     {
         if (handle == null)
-            handle = HandleManager.getPrefix()+"/"+
-                String.valueOf(SITE_ID);
+        {
+            handle = HandleManager.getPrefix() + "/" + String.valueOf(SITE_ID);
+        }
         return handle;
     }
 
@@ -113,7 +114,9 @@ public class Site extends DSpaceObject
         throws SQLException
     {
         if (theSite == null)
+        {
             theSite = new Site();
+        }
         return theSite;
     }
 

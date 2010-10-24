@@ -72,7 +72,9 @@ public class TestConsumer implements Consumer
     {
         log.info("EVENT: called TestConsumer.initialize();");
         if (out != null)
+        {
             out.println("TestConsumer.initialize();");
+        }
     }
 
     /**
@@ -117,14 +119,18 @@ public class TestConsumer implements Consumer
                 + ctx.toString();
         log.info(msg);
         if (out != null)
+        {
             out.println("TestConsumer.consume(): " + msg);
+        }
     }
 
     public void end(Context ctx) throws Exception
     {
         log.info("EVENT: called TestConsumer.end();");
         if (out != null)
+        {
             out.println("TestConsumer.end();");
+        }
 
     }
 
@@ -132,7 +138,9 @@ public class TestConsumer implements Consumer
     {
         log.info("EVENT: called TestConsumer.finish();");
         if (out != null)
+        {
             out.println("TestConsumer.finish();");
+        }
 
     }
 

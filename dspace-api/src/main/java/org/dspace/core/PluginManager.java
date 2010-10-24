@@ -289,14 +289,18 @@ public class PluginManager
                 while (classMatcher.find())
                 {
                     if (prevClassName != null)
+                    {
                         found += installNamedConfigs(iname, prevClassName,
-                                   namedVal.substring(prevEnd, classMatcher.start()).trim().split("\\s*,\\s*"));
+                                namedVal.substring(prevEnd, classMatcher.start()).trim().split("\\s*,\\s*"));
+                    }
                     prevClassName = classMatcher.group(1);
                     prevEnd = classMatcher.end();
                 }
                 if (prevClassName != null)
+                {
                     found += installNamedConfigs(iname, prevClassName,
-                               namedVal.substring(prevEnd).trim().split("\\s*,\\s*"));
+                            namedVal.substring(prevEnd).trim().split("\\s*,\\s*"));
+                }
             }
 
             // 2. Get Self-named config entries:
@@ -399,7 +403,9 @@ public class PluginManager
                     			  " pluginName=" + name );
                         cached = pluginClass.newInstance();
                         if (cached instanceof SelfNamedPlugin)
-                            ((SelfNamedPlugin)cached).setPluginInstanceName(name);
+                        {
+                            ((SelfNamedPlugin) cached).setPluginInstanceName(name);
+                        }
                         namedInstanceCache.put(nkey, cached);
                     }
                     return cached;
@@ -411,7 +417,9 @@ public class PluginManager
               			  " pluginName=" + name );
                     Object result = pluginClass.newInstance();
                     if (result instanceof SelfNamedPlugin)
-                        ((SelfNamedPlugin)result).setPluginInstanceName(name);
+                    {
+                        ((SelfNamedPlugin) result).setPluginInstanceName(name);
+                    }
                     return result;
                 }
             }
@@ -485,10 +493,14 @@ public class PluginManager
             {
                 String key = (String)ki.next();
                 if (key.startsWith(prefix))
+                {
                     result.add(key.substring(prefix.length()));
+                }
             }
             if (result.size() == 0)
-                log.error("Cannot find any names for named plugin, interface="+iname);
+            {
+                log.error("Cannot find any names for named plugin, interface=" + iname);
+            }
 
             return (String[])result.toArray(new String[result.size()]);
         }
@@ -522,7 +534,9 @@ public class PluginManager
             // Identity comparison is valid for this usage
             Object val = ci.next();
             if (val == plugin)
+            {
                 values.remove(val);
+            }
         }
     }
 
@@ -554,7 +568,9 @@ public class PluginManager
         try
         {
             if (!checkSelfNamed(Class.forName(iname)))
-                log.error("The class \""+iname+"\" is NOT a subclass of SelfNamedPlugin but it should be!");
+            {
+                log.error("The class \"" + iname + "\" is NOT a subclass of SelfNamedPlugin but it should be!");
+            }
         }
         catch (ClassNotFoundException ce)
         {
@@ -696,10 +712,26 @@ public class PluginManager
         finally
         {
             if (cr != null)
-                try { cr.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    cr.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
 
             if (fr != null)
-                try { fr.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    fr.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
         }
 
         // 1.1 Sanity check, make sure keyMap == set of keys from Configuration
@@ -712,7 +744,9 @@ public class PluginManager
             {
                 pn.add(nk);
                 if (!keyMap.containsKey(nk))
-                    log.error("Key is in ConfigurationManager.propertyNames() but NOT text crawl: \""+nk+"\"");
+                {
+                    log.error("Key is in ConfigurationManager.propertyNames() but NOT text crawl: \"" + nk + "\"");
+                }
             }
         }
         Iterator pi = keyMap.keySet().iterator();
@@ -720,7 +754,9 @@ public class PluginManager
         {
             String key = (String)pi.next();
             if (!pn.contains(key))
-                log.error("Key is in text crawl but NOT ConfigurationManager.propertyNames(): \""+key+"\"");
+            {
+                log.error("Key is in text crawl but NOT ConfigurationManager.propertyNames(): \"" + key + "\"");
+            }
         }
 
         // 2. Build up list of all interfaces and test that they are loadable.
@@ -758,7 +794,9 @@ public class PluginManager
             {
                 val = val.trim();
                 if (checkClassname(val, "implementation class"))
+                {
                     allImpls.put(val, val);
+                }
             }
         }
          
@@ -835,7 +873,9 @@ public class PluginManager
                     String classname = classMatcher.group(1);
 
                     if (checkClassname(classname, "implementation class"))
+                    {
                         allImpls.put(classname, classname);
+                    }
                 }
             }
         }

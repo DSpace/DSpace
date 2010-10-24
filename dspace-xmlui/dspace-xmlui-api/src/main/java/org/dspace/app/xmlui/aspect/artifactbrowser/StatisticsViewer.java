@@ -101,7 +101,9 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
         initialise();
 
         if (reportDate != null)
+        {
             return reportDate;
+        }
 
         return "general";
     }
@@ -442,7 +444,9 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
             {
                 int rows = stats.length;
                 if (content.getStatName() != null || content.getResultName() != null)
+                {
                     rows++;
+                }
 
                 Table block = currDiv.addTable("reportBlock", rows, 2);
 
@@ -566,7 +570,9 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
             mainTitle = "Statistics for " + name;
 
             if (ConfigurationManager.getBooleanProperty("report.show.server", true))
+            {
                 mainTitle += " on " + serverName;
+            }
             
             if (pageTitle == null)
             {
@@ -657,7 +663,9 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
     private static String entry(String entry) 
     {
     	if (entry != null && entry.length() > MAX_ENTRY_LENGTH)
-    		entry = entry.substring(0,MAX_ENTRY_LENGTH-3) + "...";
+        {
+            entry = entry.substring(0, MAX_ENTRY_LENGTH - 3) + "...";
+        }
     	return entry;
     }
     
@@ -665,7 +673,9 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
     private static String label(String label) 
     {
     	if (label != null && label.length() > MAX_LABEL_LENGTH)
-    		label = label.substring(0,MAX_LABEL_LENGTH-3) + "...";
+        {
+            label = label.substring(0, MAX_LABEL_LENGTH - 3) + "...";
+        }
     	return label;
     }
 }

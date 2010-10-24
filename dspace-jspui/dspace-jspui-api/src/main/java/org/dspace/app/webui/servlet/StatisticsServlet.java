@@ -257,13 +257,37 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
         finally
         {
             if (br != null)
-                try { br.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    br.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
 
             if (ir != null)
-                try { ir.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    ir.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
 
             if (fir != null)
-                try { fir.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    fir.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
         }
         // set the report to be displayed
         request.setAttribute("report", report.toString());

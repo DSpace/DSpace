@@ -100,7 +100,9 @@ public class RelatedItems extends AbstractFiltersTransformer
 
         DSpaceObject dspaceObject = HandleUtil.obtainHandle(objectModel);
         if (!(dspaceObject instanceof Item))
+        {
             return;
+        }
         Item item = (Item) dspaceObject;
 
         try {
@@ -174,7 +176,9 @@ public class RelatedItems extends AbstractFiltersTransformer
     public void performSearch(DSpaceObject dso) throws SearchServiceException {
 
         if(queryResults != null)
+        {
             return;
+        }
         
 
         this.queryArgs = new SolrQuery();

@@ -182,7 +182,9 @@ public class WorkflowItem implements InProgressSubmission
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         WorkflowItem[] wfArray = new WorkflowItem[wfItems.size()];
@@ -236,7 +238,9 @@ public class WorkflowItem implements InProgressSubmission
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         WorkflowItem[] wfArray = new WorkflowItem[wfItems.size()];
@@ -287,7 +291,9 @@ public class WorkflowItem implements InProgressSubmission
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         WorkflowItem[] wsArray = new WorkflowItem[wsItems.size()];

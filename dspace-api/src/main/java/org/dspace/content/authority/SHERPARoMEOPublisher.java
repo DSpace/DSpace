@@ -67,7 +67,9 @@ public class SHERPARoMEOPublisher extends SHERPARoMEOProtocol
     {
         // punt if there is no query text
         if (text == null || text.trim().length() == 0)
+        {
             return new Choices(true);
+        }
 
         // query args to add to SHERPA/RoMEO request URL
         NameValuePair args[] = new NameValuePair[2];

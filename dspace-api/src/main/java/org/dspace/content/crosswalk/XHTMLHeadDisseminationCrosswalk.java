@@ -126,7 +126,15 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
         finally
         {
             if (fis != null)
-                try { fis.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    fis.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
         }
 
         Enumeration e = crosswalkProps.keys();
@@ -271,7 +279,9 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
                         // Strip any characters that we can, and if the result is valid, output it
                         String simpleText = v.value.replaceAll("\\p{Cntrl}", "");
                         if (Verifier.checkCharacterData(simpleText) == null)
+                        {
                             e.setAttribute("content", simpleText);
+                        }
                     }
                 }
                 if (v.language != null && !v.language.equals(""))

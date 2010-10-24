@@ -223,7 +223,9 @@ public class Submissions extends AbstractDSpaceTransformer
     	
     	if (!(ownedItems.size() > 0 || pooledItems.size() > 0))
     		// No tasks, so don't show the table.
-    		return;
+        {
+            return;
+        }
     	
     	
     	Division workflow = division.addDivision("workflow-tasks");
@@ -418,9 +420,13 @@ public class Submissions extends AbstractDSpaceTransformer
     	// Each list pluss the top header and bottom row for the button.
     	int rows = unfinishedItems.length + supervisedItems.length + 2;
     	if (supervisedItems.length > 0 && unfinishedItems.length > 0)
-    		rows++; // Authoring heading row
+        {
+            rows++; // Authoring heading row
+        }
     	if (supervisedItems.length > 0)
-    		rows++; // Supervising heading row
+        {
+            rows++; // Supervising heading row
+        }
     	
     	
     	Table table = unfinished.addTable("unfinished-submissions",rows,5);
@@ -526,7 +532,9 @@ public class Submissions extends AbstractDSpaceTransformer
         header = table.addRow();
         Cell lastCell = header.addCell(0,5);
         if (unfinishedItems.length > 0 || supervisedItems.length > 0)
-        	lastCell.addButton("submit_submissions_remove").setValue(T_s_submit_remove);
+        {
+            lastCell.addButton("submit_submissions_remove").setValue(T_s_submit_remove);
+        }
     }
     
     
@@ -541,7 +549,9 @@ public class Submissions extends AbstractDSpaceTransformer
 
     	// If there is nothing in progress then don't add anything.
     	if (!(inprogressItems.length > 0))
-    			return;
+        {
+            return;
+        }
     	
     	Division inprogress = division.addDivision("submissions-inprogress");
     	inprogress.setHead(T_p_head1);

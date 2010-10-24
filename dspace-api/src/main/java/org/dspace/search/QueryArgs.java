@@ -193,7 +193,10 @@ public class QueryArgs
         String newquery = "(";
         String numFieldStr = request.getParameter("num_search_field");
         // for backward compatibility
-        if (numFieldStr == null) numFieldStr ="3";
+        if (numFieldStr == null)
+        {
+            numFieldStr = "3";
+        }
         int numField = Integer.parseInt(numFieldStr);
         ArrayList query = new ArrayList();
         ArrayList field = new ArrayList();
@@ -352,7 +355,10 @@ public class QueryArgs
         Map<String, String> queryMap = new HashMap<String, String>();
         String numFieldStr = request.getParameter("num_search_field");
         // for backward compatibility
-        if (numFieldStr == null) numFieldStr = "3"; 
+        if (numFieldStr == null)
+        {
+            numFieldStr = "3";
+        }
         int numField = Integer.parseInt(numFieldStr);
         for (int i = 1; i < numField; i++)
         {

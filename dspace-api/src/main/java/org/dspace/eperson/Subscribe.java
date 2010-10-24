@@ -130,7 +130,9 @@ public class Subscribe
             {
                 // close the TableRowIterator to free up resources
                 if (r != null)
+                {
                     r.close();
+                }
             }
         }
         else
@@ -218,7 +220,9 @@ public class Subscribe
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
         
         Collection[] collArray = new Collection[collections.size()];
@@ -253,7 +257,9 @@ public class Subscribe
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
     }
 
@@ -325,7 +331,9 @@ public class Subscribe
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
         
         // Process the last person
@@ -544,7 +552,9 @@ public class Subscribe
         boolean test = line.hasOption("t");
 
         if(test)
+        {
             log.setLevel(Level.DEBUG);
+        }
         
         Context context = null;
 

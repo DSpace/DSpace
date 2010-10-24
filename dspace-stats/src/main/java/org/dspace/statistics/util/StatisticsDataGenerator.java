@@ -220,7 +220,9 @@ public class StatisticsDataGenerator {
 			for (int j = 0; j < 4; j++) {
 				ipBuilder.append(getRandomNumberInRange(0, 254));
 				if (j != 3)
-					ipBuilder.append(".");
+                {
+                    ipBuilder.append(".");
+                }
 			}
             ip = ipBuilder.toString();
             
@@ -235,7 +237,9 @@ public class StatisticsDataGenerator {
 				// If we haven't got a prev ip this is pretty useless so move on
 				// to the next one
 				if (prevIp == null)
-					continue;
+                {
+                    continue;
+                }
 				ip = prevIp;
 				location = cl.getLocation(ip);
 			}
@@ -264,7 +268,9 @@ public class StatisticsDataGenerator {
 			// we can log but it is used so our item gets move traffic)
 			int type = (int) getRandomNumberInRange(0, 8);
 			if (type == Constants.BUNDLE || type >= 5)
-				type = Constants.ITEM;
+            {
+                type = Constants.ITEM;
+            }
 
 			int dsoId = -1;
 			// Now we need to find a valid id
@@ -296,7 +302,9 @@ public class StatisticsDataGenerator {
 				// If our dsoId gets higher then our maxIdtotal we need to lower
 				// to find a valid id
 				if (dsoId == maxIdTotal)
-					substract = true;
+                {
+                    substract = true;
+                }
 
 				if (substract)
                 {
@@ -317,11 +325,12 @@ public class StatisticsDataGenerator {
 				// System.out.println("REFIND");
 			}
 			// Find the person who is visting us
-			int epersonId = (int) getRandomNumberInRange(epersonStartId,
-					epersonEndId);
+			int epersonId = (int) getRandomNumberInRange(epersonStartId, epersonEndId);
 			EPerson eperson = EPerson.find(context, epersonId);
 			if (eperson == null)
-				epersonId = -1;
+            {
+                epersonId = -1;
+            }
 
 			// System.out.println(ip);
 			// System.out.println(country + " " +
@@ -352,9 +361,13 @@ public class StatisticsDataGenerator {
 			doc1.addField("latitude", latitude);
 			doc1.addField("longitude", longitude);
 			if (epersonId > 0)
-				doc1.addField("epersonid", epersonId);
+            {
+                doc1.addField("epersonid", epersonId);
+            }
 			if (dns != null)
-				doc1.addField("dns", dns.toLowerCase());
+            {
+                doc1.addField("dns", dns.toLowerCase());
+            }
 
 			if (dso instanceof Item) {
 				Item item = (Item) dso;

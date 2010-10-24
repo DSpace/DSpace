@@ -171,7 +171,9 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
             {
                 DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
                 if (dso != null)
+                {
                     key += "-" + dso.getHandle();
+                }
 
                 return HashUtil.hash(key);
             }
@@ -194,7 +196,9 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
                 DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
                 if (dso != null)
+                {
                     newValidity.add(dso);
+                }
 
                 BrowseInfo info = getBrowseInfo();
 
@@ -242,7 +246,9 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
 
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
         if (dso != null)
+        {
             HandleUtil.buildHandleTrail(dso, pageMeta, contextPath);
+        }
 
         pageMeta.addTrail().addContent(getTrailMessage(info));
     }
@@ -541,7 +547,9 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
     {
         // Don't create a previous page link if this is the first page
         if (info.isFirst())
+        {
             return null;
+        }
 
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.putAll(params.getCommonParameters());
@@ -567,7 +575,9 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
     {
         // Don't create a next page link if this is the last page
         if (info.isLast())
+        {
             return null;
+        }
 
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.putAll(params.getCommonParameters());
@@ -591,7 +601,9 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
     private BrowseParams getUserParams() throws SQLException, UIException
     {
         if (this.userParams != null)
+        {
             return this.userParams;
+        }
 
         Context context = ContextUtil.obtainContext(objectModel);
         Request request = ObjectModelHelper.getRequest(objectModel);
@@ -607,9 +619,13 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
         // Are we in a community or collection?
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (dso instanceof Community)
+        {
             params.scope.setCommunity((Community) dso);
+        }
         if (dso instanceof Collection)
+        {
             params.scope.setCollection((Collection) dso);
+        }
 
         try
         {
@@ -653,7 +669,9 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
 
             // Filtering to a value implies this is a second level browse
             if (params.scope.getFilterValue() != null)
+            {
                 params.scope.setBrowseLevel(1);
+            }
 
             // if year and perhaps month have been selected, we translate these
             // into "startsWith"
@@ -709,7 +727,9 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
     private BrowseInfo getBrowseInfo() throws SQLException, UIException
     {
         if (this.browseInfo != null)
+        {
             return this.browseInfo;
+        }
 
         Context context = ContextUtil.obtainContext(objectModel);
 

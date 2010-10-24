@@ -186,10 +186,14 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
                 }
 
                 value = value.replace("\\", "");
-                if(field.equals("*"))
+                if("*".equals(field))
+                {
                     field = "all";
+                }
                 if(name.startsWith("*:"))
+                {
                     name = name.substring(name.indexOf(":") + 1, name.length());
+                }
 
                 Option option = box.addOption(true,name);
                 option.addContent(message("xmlui.ArtifactBrowser.SimpleSearch.filter." + field));
@@ -267,11 +271,15 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         Request request = ObjectModelHelper.getRequest(objectModel);
         java.util.List<String> fqs = new ArrayList<String>();
         if(request.getParameterValues("fq") != null)
+        {
             fqs.addAll(Arrays.asList(request.getParameterValues("fq")));
+        }
 
         //Have we added a filter using the UI
         if(request.getParameter("filter") != null && !"".equals(request.getParameter("filter")) && request.getParameter("submit_search-filter-controls_add") != null)
+        {
             fqs.add((request.getParameter("filtertype").equals("*") ? "" : request.getParameter("filtertype") + ":") + request.getParameter("filter"));
+        }
         return fqs.toArray(new String[fqs.size()]);
     }
 
@@ -287,7 +295,9 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
             java.util.List<String> fqs = new ArrayList<String>();
 
             if(request.getParameterValues("fq") != null)
+            {
                 fqs.addAll(Arrays.asList(request.getParameterValues("fq")));
+            }
 
             String type = request.getParameter("filtertype");
             String value = request.getParameter("filter");
@@ -325,7 +335,9 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         Request request = ObjectModelHelper.getRequest(objectModel);
         String query = URLDecode(request.getParameter("query"));
         if (query == null)
+        {
             return "";
+        }
         return query.trim();
     }
 
@@ -336,26 +348,40 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
             throws UIException {
         String query = getQuery();
         if (!"".equals(query))
+        {
             parameters.put("query", URLEncode(query));
+        }
 
         if (parameters.get("page") == null)
+        {
             parameters.put("page", String.valueOf(getParameterPage()));
+        }
 
         if (parameters.get("rpp") == null)
+        {
             parameters.put("rpp", String.valueOf(getParameterRpp()));
+        }
 
 
         if (parameters.get("group_by") == null)
+        {
             parameters.put("group_by", String.valueOf(this.getParameterGroup()));
+        }
 
         if (parameters.get("sort_by") == null)
+        {
             parameters.put("sort_by", String.valueOf(getParameterSortBy()));
+        }
 
         if (parameters.get("order") == null)
+        {
             parameters.put("order", getParameterOrder());
+        }
 
         if (parameters.get("etal") == null)
+        {
             parameters.put("etal", String.valueOf(getParameterEtAl()));
+        }
 
         return super.generateURL("discover", parameters);
     }

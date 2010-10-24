@@ -471,7 +471,9 @@ public class CurrentActivityAction extends AbstractAction
     		// Generic browser types (lots of things report these names)
     		
     		if (userAgent.contains("KHTML/"))
-    			return "KHTML";
+            {
+                return "KHTML";
+            }
     		
     		if (userAgent.contains("Netscape/"))
             {

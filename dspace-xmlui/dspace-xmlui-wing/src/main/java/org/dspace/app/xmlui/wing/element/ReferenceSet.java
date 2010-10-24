@@ -126,7 +126,9 @@ public class ReferenceSet extends AbstractWingElement implements
         super(context);
         // Names are only required for parent reference sets.
         if (!childreference)
+        {
             require(name, "The 'name' parameter is required for reference sets.");
+        }
         restrict(
                 type,
                 TYPES,
@@ -206,20 +208,30 @@ public class ReferenceSet extends AbstractWingElement implements
     {
         AttributeMap attributes = new AttributeMap();
         if (name != null)
+        {
             attributes.put(A_NAME, name);
+        }
         if (name != null)
+        {
             attributes.put(A_ID, context.generateID(E_REFERENCE_SET, name));
+        }
 
         attributes.put(A_TYPE, type);
         if (orderBy != null)
+        {
             attributes.put(A_ORDER_BY, orderBy);
+        }
         if (rend != null)
+        {
             attributes.put(A_RENDER, rend);
+        }
 
         startElement(contentHandler, namespaces, E_REFERENCE_SET, attributes);
 
         if (head != null)
+        {
             head.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
 
         for (AbstractWingElement content : contents)
         {

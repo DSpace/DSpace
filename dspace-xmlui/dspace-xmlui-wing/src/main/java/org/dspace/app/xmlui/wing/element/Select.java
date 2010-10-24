@@ -160,7 +160,9 @@ public class Select extends Field
             throws WingException
     {
     	if (selected)
-    		setOptionSelected(returnValue);
+        {
+            setOptionSelected(returnValue);
+        }
         return addOption(returnValue);
     }
     
@@ -193,7 +195,9 @@ public class Select extends Field
     public void addOption(boolean selected,String returnValue, String characters) throws WingException
     {
     	if (selected)
-    		setOptionSelected(returnValue);
+        {
+            setOptionSelected(returnValue);
+        }
         addOption(returnValue,characters);
     }
     
@@ -226,7 +230,9 @@ public class Select extends Field
     public void addOption(boolean selected, int returnValue, String characters) throws WingException
     {
     	if (selected)
-    		setOptionSelected(returnValue);
+        {
+            setOptionSelected(returnValue);
+        }
         addOption(returnValue,characters);
     }
     
@@ -259,7 +265,9 @@ public class Select extends Field
     public void addOption(boolean selected, String returnValue, Message message) throws WingException
     {
     	if (selected)
-    		setOptionSelected(returnValue);
+        {
+            setOptionSelected(returnValue);
+        }
         addOption(returnValue,message);
     }
     
@@ -292,7 +300,9 @@ public class Select extends Field
     public void addOption(boolean selected, int returnValue, Message message) throws WingException
     {
     	if (selected)
-    		setOptionSelected(returnValue);
+        {
+            setOptionSelected(returnValue);
+        }
         addOption(returnValue,message);
     }
     

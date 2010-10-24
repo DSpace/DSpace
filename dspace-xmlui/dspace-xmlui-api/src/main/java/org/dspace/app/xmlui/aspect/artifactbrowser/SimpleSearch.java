@@ -155,7 +155,9 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         Request request = ObjectModelHelper.getRequest(objectModel);
         String query = URLDecode(request.getParameter("query"));
         if (query == null)
+        {
             return "";
+        }
         return query;
     }
 
@@ -169,26 +171,40 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         
         String scope = request.getParameter("scope");
         if (scope != null)
-        	parameters.put("scope", scope);
+        {
+            parameters.put("scope", scope);
+        }
 	
         String query = getQuery();
         if (!"".equals(query))
+        {
             parameters.put("query", URLEncode(query));
+        }
         
         if (parameters.get("page") == null)
-        	parameters.put("page", String.valueOf(getParameterPage()));
+        {
+            parameters.put("page", String.valueOf(getParameterPage()));
+        }
         
         if (parameters.get("rpp") == null)
-        	parameters.put("rpp", String.valueOf(getParameterRpp()));
+        {
+            parameters.put("rpp", String.valueOf(getParameterRpp()));
+        }
         
         if (parameters.get("sort_by") == null)
-        	parameters.put("sort_by", String.valueOf(getParameterSortBy()));
+        {
+            parameters.put("sort_by", String.valueOf(getParameterSortBy()));
+        }
         
         if (parameters.get("order") == null)
-        	parameters.put("order",getParameterOrder());
+        {
+            parameters.put("order", getParameterOrder());
+        }
         
         if (parameters.get("etal") == null)
-        	parameters.put("etal",String.valueOf(getParameterEtAl()));
+        {
+            parameters.put("etal", String.valueOf(getParameterEtAl()));
+        }
         
         return super.generateURL("search", parameters);
     }

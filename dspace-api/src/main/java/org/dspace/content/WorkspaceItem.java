@@ -333,7 +333,9 @@ public class WorkspaceItem implements InProgressSubmission
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         WorkspaceItem[] wsArray = new WorkspaceItem[wsItems.size()];
@@ -385,7 +387,9 @@ public class WorkspaceItem implements InProgressSubmission
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         WorkspaceItem[] wsArray = new WorkspaceItem[wsItems.size()];
@@ -433,7 +437,9 @@ public class WorkspaceItem implements InProgressSubmission
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
         
         WorkspaceItem[] wsArray = new WorkspaceItem[wsItems.size()];
@@ -520,11 +526,20 @@ public class WorkspaceItem implements InProgressSubmission
      * @return If they are equal or not
      */
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
 
         final WorkspaceItem that = (WorkspaceItem)o;
-        if (this.getID() != that.getID()) return false;
+        if (this.getID() != that.getID())
+        {
+            return false;
+        }
 
         return true;
     }

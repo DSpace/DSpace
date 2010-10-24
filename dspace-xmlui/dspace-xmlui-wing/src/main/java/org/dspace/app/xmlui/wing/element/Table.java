@@ -236,11 +236,15 @@ public class Table extends AbstractWingElement implements StructuralElement
         attributes.put(A_ROWS, rows);
         attributes.put(A_COLS, cols);
         if (rend != null)
+        {
             attributes.put(A_RENDER, rend);
+        }
 
         startElement(contentHandler, namespaces, E_TABLE, attributes);
         if (head != null)
+        {
             head.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
         for (AbstractWingElement content : contents)
         {
             content.toSAX(contentHandler, lexicalHandler, namespaces);

@@ -241,7 +241,9 @@ public class StartRegistration extends AbstractDSpaceTransformer implements Cach
        email.setHelp(T_email_address_help);
        email.setValue(this.email);
        if (errors.contains("email"))
+       {
            email.addError(T_error_bad_email);
+       }
        
        Item submit = form.addItem();
        submit.addButton("submit").setValue(T_submit_register);

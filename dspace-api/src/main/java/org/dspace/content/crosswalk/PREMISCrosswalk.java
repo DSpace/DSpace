@@ -96,7 +96,9 @@ public class PREMISCrosswalk
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
         if (!(root.getName().equals("premis")))
-            throw new MetadataValidationException("Wrong root element for PREMIS: "+root.toString());
+        {
+            throw new MetadataValidationException("Wrong root element for PREMIS: " + root.toString());
+        }
         ingest(context, dso, root.getChildren());
     }
 
@@ -105,7 +107,9 @@ public class PREMISCrosswalk
     {
         // we only understand how to crosswalk PREMIS to a Bitstream.
         if (dso.getType() != Constants.BITSTREAM)
+        {
             throw new CrosswalkObjectNotSupported("Wrong target object type, PREMISCrosswalk can only crosswalk to a Bitstream.");
+        }
 
         Bitstream bitstream = (Bitstream)dso;
         String MIMEType = null;
@@ -187,7 +191,9 @@ public class PREMISCrosswalk
                     {
                         Element fd = format.getChild("formatDesignation", PREMIS_NS);
                         if (fd != null)
+                        {
                             MIMEType = fd.getChildTextTrim("formatName", PREMIS_NS);
+                        }
                     }
                 }
 
@@ -244,7 +250,9 @@ public class PREMISCrosswalk
                IOException, SQLException, AuthorizeException
     {
         if (dso.getType() != Constants.BITSTREAM)
+        {
             throw new CrosswalkObjectNotSupported("PREMISCrosswalk can only crosswalk a Bitstream.");
+        }
         Bitstream bitstream = (Bitstream)dso;
 
         Element premis = new Element("premis", PREMIS_NS);
@@ -271,7 +279,9 @@ public class PREMISCrosswalk
         {
             Item bi[] = bn[0].getItems();
             if (bi.length > 0)
+            {
                 handle = bi[0].getHandle();
+            }
         }
         // get or make up name for bitstream:
         String bsName = bitstream.getName();
@@ -342,7 +352,9 @@ public class PREMISCrosswalk
         // originalName <- name (or source if none)
         String oname = bitstream.getName();
         if (oname == null)
+        {
             oname = bitstream.getSource();
+        }
         if (oname != null)
         {
             Element on = new Element("originalName", PREMIS_NS);

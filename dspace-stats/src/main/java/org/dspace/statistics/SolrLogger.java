@@ -146,7 +146,9 @@ public class SolrLogger
             EPerson currentUser)
     {
         if (solr == null || locationService == null)
+        {
             return;
+        }
 
         boolean isSpiderBot = SpiderDetector.isSpider(request);
 
@@ -186,10 +188,11 @@ public class SolrLogger
             doc1.addField("id", dspaceObject.getID());
             doc1.addField("type", dspaceObject.getType());
             // Save the current time
-            doc1.addField("time", DateFormatUtils.format(new Date(),
-                    DATE_FORMAT_8601));
+            doc1.addField("time", DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
             if (currentUser != null)
+            {
                 doc1.addField("epersonid", currentUser.getID());
+            }
 
             try
             {
@@ -226,7 +229,9 @@ public class SolrLogger
                 doc1.addField("isBot",isSpiderBot);
 
                 if(request.getHeader("User-Agent") != null)
+                {
                     doc1.addField("userAgent", request.getHeader("User-Agent"));
+                }
             }
             
             if (dspaceObject instanceof Item)
@@ -366,7 +371,9 @@ public class SolrLogger
             QueryResponse response = solr.query(solrParams);
             // Make sure we at least got a document
             if (response.getResults().getNumFound() == 0)
+            {
                 return currentValsStored;
+            }
 
             // We have at least one document good
             SolrDocument document = response.getResults().get(0);
@@ -566,7 +573,9 @@ public class SolrLogger
                 if (action.equals("addOne") || action.equals("replace"))
                 {
                     if (action.equals("replace"))
+                    {
                         solrDocument.removeFields(fieldName);
+                    }
 
                     for (Object fieldValue : fieldValues)
                     {
@@ -627,7 +636,9 @@ public class SolrLogger
         QueryResponse queryResponse = query(query, filterQuery, facetField,
                 max, null, null, null, facetQueries);
         if (queryResponse == null)
+        {
             return new ObjectCount[0];
+        }
 
         FacetField field = queryResponse.getFacetField(facetField);
         // At least make sure we have one value
@@ -690,7 +701,9 @@ public class SolrLogger
         QueryResponse queryResponse = query(query, filterQuery, null, max,
                 dateType, dateStart, dateEnd, null);
         if (queryResponse == null)
+        {
             return new ObjectCount[0];
+        }
 
         FacetField dateFacet = queryResponse.getFacetDate("time");
         // TODO: check if this cannot crash I checked it, it crashed!!!
@@ -787,7 +800,9 @@ public class SolrLogger
             SimpleDateFormat simpleFormat = new SimpleDateFormat(
                     dateformatString);
             if (date != null)
+            {
                 name = simpleFormat.format(date);
+            }
 
         }
         return name;
@@ -799,7 +814,9 @@ public class SolrLogger
             throws SolrServerException
     {
         if (solr == null)
+        {
             return null;
+        }
 
         // System.out.println("QUERY");
         SolrQuery solrQuery = new SolrQuery().setRows(0).setQuery(query)
@@ -828,15 +845,21 @@ public class SolrLogger
                 solrQuery.addFacetQuery(facetQuery);
             }
             if (0 < facetQueries.size())
+            {
                 solrQuery.setFacet(true);
+            }
         }
 
         if (facetField != null)
+        {
             solrQuery.addFacetField(facetField);
+        }
 
         // Set the top x of if present
         if (max != -1)
+        {
             solrQuery.setFacetLimit(max);
+        }
 
         // A filter is used instead of a regular query to improve
         // performance and ensure the search result ordering will
@@ -844,15 +867,21 @@ public class SolrLogger
 
         // Choose to filter by the Legacy spider IP list (may get too long to properly filter all IP's
         if(ConfigurationManager.getBooleanProperty("solr.statistics.query.filter.spiderIp",false))
+        {
             solrQuery.addFilterQuery(getIgnoreSpiderIPs());
+        }
 
         // Choose to filter by isBot field, may be overriden in future
         // to allow views on stats based on bots.
         if(ConfigurationManager.getBooleanProperty("solr.statistics.query.filter.isBot",true))
+        {
             solrQuery.addFilterQuery("-isBot:true");
+        }
 
         if (filterQuery != null)
+        {
             solrQuery.addFilterQuery(filterQuery);
+        }
 
         QueryResponse response = null;
         try

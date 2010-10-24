@@ -51,7 +51,9 @@ public class SpiderDetector {
         Set<String> ips = new HashSet<String>();
 
         if (!spiderIpFile.exists() || !spiderIpFile.isFile())
+        {
             return ips;
+        }
 
         //Read our file & get all them ip's
         BufferedReader in = new BufferedReader(new FileReader(spiderIpFile));
@@ -143,7 +145,9 @@ public class SpiderDetector {
             /* This header is a comma delimited list */
             for (String xfip : request.getHeader("X-Forwarded-For").split(",")) {
                 if (isSpider(xfip))
+                {
                     return true;
+                }
             }
         }
 

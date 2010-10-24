@@ -258,7 +258,9 @@ public class SubmissionConfigReader
             Map stepInfo = stepDefns.get(stepID);
 
             if (stepInfo != null)
+            {
                 return new SubmissionStepConfig(stepInfo);
+            }
         }
 
         return null;

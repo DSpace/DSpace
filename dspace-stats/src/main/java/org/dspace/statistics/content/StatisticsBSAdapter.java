@@ -77,7 +77,9 @@ public class StatisticsBSAdapter {
             out.append(statisticsFilter.toQuery());
 
             if(i != 0 && (i != filters.size() -1))
+            {
                 out.append(" AND ");
+            }
         }
         return out.toString();
     }

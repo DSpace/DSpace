@@ -97,7 +97,9 @@ public final class UUID implements Serializable
     public boolean equals(Object obj)
     {
         if(this == obj) // comparing to myself
+        {
             return true;
+        }
         if(obj instanceof UUID)
         {
             UUID uuid = (UUID)obj;

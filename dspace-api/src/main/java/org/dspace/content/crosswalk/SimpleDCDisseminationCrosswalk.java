@@ -116,7 +116,9 @@ public class SimpleDCDisseminationCrosswalk extends SelfNamedPlugin
                IOException, SQLException, AuthorizeException
     {
         if (dso.getType() != Constants.ITEM)
+        {
             throw new CrosswalkObjectNotSupported("SimpleDCDisseminationCrosswalk can only crosswalk an Item.");
+        }
 
         Item item = (Item)dso;
         DCValue[] allDC = item.getDC(Item.ANY, Item.ANY, Item.ANY);
@@ -145,7 +147,9 @@ public class SimpleDCDisseminationCrosswalk extends SelfNamedPlugin
                 Element field = new Element(element, DC_NS);
                 field.addContent(allDC[i].value);
                 if (addSchema)
+                {
                     field.setAttribute("schemaLocation", schemaLocation, XSI_NS);
+                }
                 dcl.add(field);
             }
         }

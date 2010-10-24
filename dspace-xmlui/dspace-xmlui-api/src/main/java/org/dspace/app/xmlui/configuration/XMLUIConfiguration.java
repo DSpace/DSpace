@@ -85,15 +85,18 @@ public class XMLUIConfiguration
             JDOMException
     {
         if (configPaths == null || configPaths.length == 0)
-            throw new IllegalStateException(
-                    "The xmlui configuration path must be defined.");
+        {
+            throw new IllegalStateException("The xmlui configuration path must be defined.");
+        }
 
         File configFile = null;
         
         for (String configPath : configPaths )
         {
         	if (configPath != null)
-        		configFile = new File(configPath);
+            {
+                configFile = new File(configPath);
+            }
         	
         	if (configFile != null && configFile.exists() && configFile.canRead())
         	{
@@ -141,8 +144,9 @@ public class XMLUIConfiguration
             String name = aspectElement.getAttributeValue("name");
 
             if (path == null || path.length() == 0)
-                throw new IllegalStateException(
-                        "All aspects muth define a path");
+            {
+                throw new IllegalStateException("All aspects muth define a path");
+            }
             aspects.add(new Aspect(name, path));
             log.info("Aspect Installed: name='"+name+"', path='"+path+"'.");
         }
@@ -159,7 +163,9 @@ public class XMLUIConfiguration
             String handle = themeElement.getAttributeValue("handle");
 
             if (path == null || path.length() == 0)
+            {
                 throw new IllegalStateException("All themes muth define a path");
+            }
             themes.add(new Theme(name, path, id, regex, handle));
             log.info("Theme Installed: name='"+name+"', path='"+path+"', id='"+id+"', regex='"+regex+"', handle='"+handle+"'.");
         }

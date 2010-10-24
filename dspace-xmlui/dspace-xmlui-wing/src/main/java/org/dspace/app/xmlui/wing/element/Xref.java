@@ -103,7 +103,9 @@ public class Xref extends TextContainer implements StructuralElement
         //require(target, "The 'target' parameter is required for all xrefs.");
         
         if (target == null)
-        	target = "/";
+        {
+            target = "/";
+        }
         
         this.target = target;
         this.rend = rend;

@@ -112,7 +112,9 @@ public class UIUtil extends Util
         try
         {
             if(request.getCharacterEncoding()==null)
+            {
                 request.setCharacterEncoding(Constants.DEFAULT_ENCODING);
+            }
         }
         catch(Exception e)
         {

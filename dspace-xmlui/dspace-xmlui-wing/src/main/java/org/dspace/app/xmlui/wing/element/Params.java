@@ -389,7 +389,9 @@ public class Params extends AbstractWingElement implements StructuralElement
             }
         }
         if (operations != null)
+        {
             attributes.put(A_OPERATIONS, operations);
+        }
 
         
         

@@ -158,7 +158,10 @@ public class ScriptLauncher
                         // The number of arguments to ignore
                         // If dsrun is the command, ignore the next, as it is the class name not an arg
                         int x = 1;
-                        if ("dsrun".equals(request)) x = 2;
+                        if ("dsrun".equals(request))
+                        {
+                            x = 2;
+                        }
                         String[] argsnew = new String[useargs.length - x];
                         for (int i = x; i < useargs.length; i++)
                         {

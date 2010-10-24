@@ -323,7 +323,9 @@ public class RoleDisseminator implements PackageDisseminator
 
         String groupType = getGroupType(relatedObject, group);
         if(groupType!=null && !groupType.isEmpty())
+        {
             writer.writeAttribute(TYPE, groupType);
+        }
 
         //Add People to Group (if any belong to this group)
         if(group.getMembers().length>0)
@@ -465,13 +467,19 @@ public class RoleDisseminator implements PackageDisseminator
         }
 
         if (eperson.canLogIn())
+        {
             writer.writeEmptyElement(CAN_LOGIN);
+        }
 
         if (eperson.getRequireCertificate())
+        {
             writer.writeEmptyElement(REQUIRE_CERTIFICATE);
+        }
 
         if (eperson.getSelfRegistered())
+        {
             writer.writeEmptyElement(SELF_REGISTERED);
+        }
 
         writer.writeEndElement();
     }
@@ -507,7 +515,9 @@ public class RoleDisseminator implements PackageDisseminator
 
             //check for admin group
             if(community.getAdministrators()!=null)
+            {
                 list.add(community.getAdministrators());
+            }
 
             // FINAL CATCH-ALL -> Find any other groups where name begins with "COMMUNITY_<ID>_"
             // (There should be none, but this code is here just in case)
@@ -515,7 +525,9 @@ public class RoleDisseminator implements PackageDisseminator
             for(Group g : matchingGroups)
             {
                 if(!list.contains(g))
+                {
                     list.add(g);
+                }
             }
 
             if(list.size()>0)
@@ -533,19 +545,29 @@ public class RoleDisseminator implements PackageDisseminator
             
             //check for admin group
             if(collection.getAdministrators()!=null)
+            {
                 list.add(collection.getAdministrators());
+            }
             //check for submitters group
             if(collection.getSubmitters()!=null)
+            {
                 list.add(collection.getSubmitters());
+            }
             //check for workflow step 1 group
             if(collection.getWorkflowGroup(1)!=null)
+            {
                 list.add(collection.getWorkflowGroup(1));
+            }
             //check for workflow step 2 group
             if(collection.getWorkflowGroup(2)!=null)
+            {
                 list.add(collection.getWorkflowGroup(2));
+            }
             //check for workflow step 3 group
             if(collection.getWorkflowGroup(3)!=null)
+            {
                 list.add(collection.getWorkflowGroup(3));
+            }
 
             // FINAL CATCH-ALL -> Find any other groups where name begins with "COLLECTION_<ID>_"
             // (Necessary cause XMLUI allows you to generate a 'COLLECTION_<ID>_DEFAULT_READ' group)
@@ -553,7 +575,9 @@ public class RoleDisseminator implements PackageDisseminator
             for(Group g : matchingGroups)
             {
                 if(!list.contains(g))
+                {
                     list.add(g);
+                }
             }
 
             if(list.size()>0)

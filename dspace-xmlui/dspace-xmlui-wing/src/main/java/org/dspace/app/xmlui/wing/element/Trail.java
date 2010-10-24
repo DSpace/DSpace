@@ -107,9 +107,13 @@ public class Trail extends TextContainer
     {
         AttributeMap attributes = new AttributeMap();
         if (this.target != null)
+        {
             attributes.put(A_TARGET, target);
+        }
         if (this.rend != null)
+        {
             attributes.put(A_RENDER, rend);
+        }
 
         startElement(contentHandler, namespaces, E_TRAIL, attributes);
         super.toSAX(contentHandler, lexicalHandler, namespaces);

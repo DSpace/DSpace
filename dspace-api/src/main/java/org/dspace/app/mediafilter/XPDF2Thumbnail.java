@@ -154,12 +154,18 @@ public class XPDF2Thumbnail extends MediaFilter
             pdftoppmPath = ConfigurationManager.getProperty("xpdf.path.pdftoppm");
             pdfinfoPath = ConfigurationManager.getProperty("xpdf.path.pdfinfo");
             if (pdftoppmPath == null)
+            {
                 throw new IllegalStateException("No value for key \"xpdf.path.pdftoppm\" in DSpace configuration!  Should be path to XPDF pdftoppm executable.");
+            }
             if (pdfinfoPath == null)
+            {
                 throw new IllegalStateException("No value for key \"xpdf.path.pdfinfo\" in DSpace configuration!  Should be path to XPDF pdfinfo executable.");
+            }
             maxwidth = ConfigurationManager.getIntProperty("thumbnail.maxwidth");
             if (maxwidth == 0)
+            {
                 maxwidth = DEFAULT_MAXWIDTH;
+            }
         }
 
         // make local file copy of source PDF since the PDF tools
@@ -202,11 +208,15 @@ public class XPDF2Thumbnail extends MediaFilter
                     // if (line.matches(MEDIABOX_PATT))
                     Matcher mm = MEDIABOX_PATT.matcher(line);
                     if (mm.matches())
+                    {
                         mediaBox = mm.toMatchResult();
+                    }
                 }
                 int istatus = pdfProc.waitFor();
                 if (istatus != 0)
-                    log.error("XPDF pdfinfo proc failed, exit status="+istatus+", file="+sourceTmp);
+                {
+                    log.error("XPDF pdfinfo proc failed, exit status=" + istatus + ", file=" + sourceTmp);
+                }
                 if (mediaBox == null)
                 {
                     log.error("Sanity check: Did not find \"MediaBox\" line in output of XPDF pdfinfo, file="+sourceTmp);
@@ -275,11 +285,15 @@ public class XPDF2Thumbnail extends MediaFilter
         {
             sourceTmp.delete();
             if (status != 0)
-                log.error("PDF conversion proc failed, exit status="+status+", file="+sourceTmp);
+            {
+                log.error("PDF conversion proc failed, exit status=" + status + ", file=" + sourceTmp);
+            }
         }
 
         if (source == null)
+        {
             throw new IOException("Unknown failure while transforming file to preview: no image produced.");
+        }
 
         // Scale image and return in-memory stream
         BufferedImage toenail = scaleImage(source, maxwidth*3/4, maxwidth);

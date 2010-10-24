@@ -255,7 +255,9 @@ public class OREDisseminationCrosswalk
         {
         	// Omit the special "ORE" bitstream
         	if (bundle.getName().equals("ORE"))
-        		continue;
+            {
+                continue;
+            }
         	
         	bitstreams = bundle.getBitstreams();
         	for (Bitstream bs : bitstreams) 

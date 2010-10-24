@@ -122,8 +122,10 @@ public class SearchConsumer implements Consumer
                 et = Event.MODIFY;
                 subject = ((Bundle) subject).getItems()[0];
                 if (log.isDebugEnabled())
+                {
                     log.debug("Transforming Bundle event into MODIFY of Item "
                             + subject.getHandle());
+                }
             }
             else
             {
@@ -230,7 +232,9 @@ public class SearchConsumer implements Consumer
                 {
                     DSIndexer.unIndexContent(ctx, hdl);
                     if (log.isDebugEnabled())
+                    {
                         log.debug("UN-Indexed Item, handle=" + hdl);
+                    }
                 }
                 catch (Exception e)
                 {

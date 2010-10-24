@@ -275,7 +275,9 @@ public class RepositoryAdapter extends AbstractAdapter
         attributes.put("TYPE", "DSpace Repository");
         // add references to the Descriptive metadata
         if (dmdSecIDS != null)
+        {
             attributes.put("DMDID", dmdSecIDS);
+        }
         startElement(METS,"div",attributes);
 
         // Put each root level node into the document.

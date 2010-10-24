@@ -87,7 +87,9 @@ public class StatisticsDataVisits extends StatisticsData
         //Check if we already have one.
         //If we do then give it back.
         if(getDataset() != null)
+        {
             return getDataset();
+        }
 
         ///////////////////////////
         // 1. DETERMINE OUR AXIS //
@@ -125,7 +127,9 @@ public class StatisticsDataVisits extends StatisticsData
                 || (1 < getDatasetGenerators().size()
                         && getDatasetGenerators().get(1) != null && getDatasetGenerators()
                         .get(1).isIncludeTotal()))
+        {
             showTotal = true;
+        }
 
         if (dateFacet != null && dateFacet.getActualStartDate() != null
                 && dateFacet.getActualEndDate() != null)
@@ -150,12 +154,16 @@ public class StatisticsDataVisits extends StatisticsData
         String filterQuery = null;
         for (int i = 0; i < getFilters().size(); i++) {
             if(filterQuery == null)
+            {
                 filterQuery = "";
+            }
             StatisticsFilter filter = getFilters().get(i);
 
             filterQuery += "(" + filter.toQuery() + ")";
             if(i != (getFilters().size() -1))
+            {
                 filterQuery += " AND ";
+            }
         }
 //        System.out.println("FILTERQUERY: " + filterQuery);
 
@@ -196,7 +204,9 @@ public class StatisticsDataVisits extends StatisticsData
 
                             //Make sure we have a dataSet
                             if(dataset == null)
+                            {
                                 dataset = new Dataset(maxObjectCounts.length, maxDateFacetCounts.length);
+                            }
 
                             //TODO: this is a very dirty fix change this ! ! ! ! ! !
                             dataset.setRowLabel(j, getResultName(firstCount.getValue(), dataSetQuery, context));
@@ -206,7 +216,9 @@ public class StatisticsDataVisits extends StatisticsData
                                 ObjectCount objectCount = maxDateFacetCounts[k];
                                 //No need to add this many times
                                 if(j == 0)
+                                {
                                     dataset.setColLabel(k, objectCount.getValue());
+                                }
                                 dataset.addValueToMatrix(j, k, objectCount.getCount());
                             }
                         }
@@ -250,7 +262,9 @@ public class StatisticsDataVisits extends StatisticsData
                     String facetQuery = secondDataSet.getFacetField() + ":" + ClientUtils.escapeQueryChars(count2.getValue());
                     //Check if we also have a type present (if so this should be put into the query
                     if ("id".equals(secondDataSet.getFacetField()) && secondDataSet.getQueries().get(0).getDsoType() != -1)
+                    {
                         facetQuery += " AND type:" + secondDataSet.getQueries().get(0).getDsoType();
+                    }
 
                     facetQueries.add(facetQuery);
                 }
@@ -260,14 +274,18 @@ public class StatisticsDataVisits extends StatisticsData
 
                     //Make sure we have a dataSet
                     if(dataset == null)
+                    {
                         dataset = new Dataset(topCounts2.length, topCounts1.length);
+                    }
                     dataset.setColLabel(i, getResultName(count1.getValue(), firsDataset, context));
                     dataset.setColLabelAttr(i, getAttributes(count1.getValue(), firsDataset, context));
 
                     String query = firsDataset.getFacetField() + ":" + ClientUtils.escapeQueryChars(count1.getValue());
                     //Check if we also have a type present (if so this should be put into the query
                     if("id".equals(firsDataset.getFacetField()) && firsDataset.getQueries().get(0).getDsoType() != -1)
+                    {
                         query += " AND type:" + firsDataset.getQueries().get(0).getDsoType();
+                    }
 
                     Map<String, Integer> facetResult = SolrLogger.queryFacetQuery(query, filterQuery, facetQueries);
                     
@@ -286,7 +304,9 @@ public class StatisticsDataVisits extends StatisticsData
                         String facetQuery = secondDataSet.getFacetField() + ":" + ClientUtils.escapeQueryChars(count2.getValue());
                         //Check if we also have a type present (if so this should be put into the query
                         if ("id".equals(secondDataSet.getFacetField()) && secondDataSet.getQueries().get(0).getDsoType() != -1)
+                        {
                             facetQuery += " AND type:" + secondDataSet.getQueries().get(0).getDsoType();
+                        }
 
                         //We got our query so now get the value
                         dataset.addValueToMatrix(j, i, facetResult.get(facetQuery));
@@ -417,7 +437,9 @@ public class StatisticsDataVisits extends StatisticsData
             //First make sure our query is in order
             Query query = new Query();
             if(currentDso != null)
+            {
                 query.setDso(currentDso.getID(), currentDso.getType());
+            }
             datasetQuery.addQuery(query);
 
             //Then add the rest
@@ -453,7 +475,9 @@ public class StatisticsDataVisits extends StatisticsData
                 dsoId = -1;
             }
             if(dsoId == -1 && query.getDsoId() != -1 && value == null)
+            {
                 dsoId = query.getDsoId();
+            }
 
             if(dsoId != -1 && query.dsoType != -1){
                 DSpaceObject dso = DSpaceObject.find(context, query.getDsoType(), dsoId);
@@ -467,7 +491,9 @@ public class StatisticsDataVisits extends StatisticsData
                             String name = "untitled";
                             DCValue[] vals = item.getMetadata("dc", "title", null, Item.ANY);
                             if(vals != null && 0 < vals.length)
+                            {
                                 name = vals[0].value;
+                            }
                             if(dsoLength != -1 && name.length() > dsoLength){
                                 //Cut it off at the first space
                                 int firstSpace = name.indexOf(' ', dsoLength);
@@ -524,7 +550,9 @@ public class StatisticsDataVisits extends StatisticsData
             dsoId = -1;
         }
         if(dsoId == -1 && query.getDsoId() != -1 && value == null)
+        {
             dsoId = query.getDsoId();
+        }
 
         if(dsoId != -1 && query.dsoType != -1){
             DSpaceObject dso = DSpaceObject.find(context, query.getDsoType(), dsoId);
@@ -537,8 +565,12 @@ public class StatisticsDataVisits extends StatisticsData
                         Item owningItem = null;
                         Bundle[] bunds = bit.getBundles();
                         if(0 < bunds.length)
-                                if(0 < bunds[0].getItems().length)
-                                        owningItem = bunds[0].getItems()[0];
+                        {
+                            if (0 < bunds[0].getItems().length)
+                            {
+                                owningItem = bunds[0].getItems()[0];
+                            }
+                        }
 
                         // If possible reference this bitstream via a handle, however this may
                         // be null if a handle has not yet been assigned. In this case refrence the
@@ -565,7 +597,9 @@ public class StatisticsDataVisits extends StatisticsData
                         try
                         {
                             if (bit.getName() != null)
+                            {
                                 url += Util.encodeBitstreamName(bit.getName(), "UTF-8");
+                            }
                         }
                         catch (UnsupportedEncodingException uee)
                         {
@@ -718,11 +752,15 @@ public class StatisticsDataVisits extends StatisticsData
                 String query = "";
                 //Check (& add if needed) the dsoType
                 if(dsoType != -1)
+                {
                     query += "type: " + dsoType;
+                }
 
                 //Check (& add if needed) the dsoId
                 if(dsoId != -1)
+                {
                     query += (query.equals("") ? "" : " AND ") + " id:" + dsoId;
+                }
 
 
                 if(owningDso != null && currentDso != null){
@@ -745,7 +783,9 @@ public class StatisticsDataVisits extends StatisticsData
                 }
 
                 if(query.equals(""))
+                {
                     query = "*:*";
+                }
 
                 return query;
             }
