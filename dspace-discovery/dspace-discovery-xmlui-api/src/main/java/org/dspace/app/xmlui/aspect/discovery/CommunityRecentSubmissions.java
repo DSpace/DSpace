@@ -124,7 +124,7 @@ public class CommunityRecentSubmissions extends AbstractFiltersTransformer
             return;
         }// queryResults;
 
-        queryArgs = prepareDefaultFilters("community");
+        queryArgs = prepareDefaultFilters(getView());
 
         queryArgs.setQuery("search.resourcetype:" + Constants.ITEM);
 
@@ -147,6 +147,11 @@ public class CommunityRecentSubmissions extends AbstractFiltersTransformer
         }
 
 
+    }
+
+    public String getView()
+    {
+        return "community";
     }
 
 }

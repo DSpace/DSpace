@@ -125,7 +125,7 @@ public class CollectionRecentSubmissions extends AbstractFiltersTransformer {
             return;
         }// queryResults;
 
-        queryArgs = prepareDefaultFilters("collection");
+        queryArgs = prepareDefaultFilters(getView());
 
         queryArgs.setQuery("search.resourcetype:" + Constants.ITEM);
 
@@ -150,4 +150,9 @@ public class CollectionRecentSubmissions extends AbstractFiltersTransformer {
 
     }
 
+
+    public String getView()
+    {
+        return "collection";
+    }
 }

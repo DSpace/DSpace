@@ -179,9 +179,8 @@ public class RelatedItems extends AbstractFiltersTransformer
         {
             return;
         }
-        
 
-        this.queryArgs = new SolrQuery();
+        this.queryArgs = prepareDefaultFilters(getView());
         this.queryArgs.setRows(1);
         this.queryArgs.add("fl","author,handle");
         this.queryArgs.add("mlt","true");
@@ -193,6 +192,12 @@ public class RelatedItems extends AbstractFiltersTransformer
 
         queryResults = getSearchService().search(queryArgs);
 
+    }
+
+
+    public String getView()
+    {
+        return "item";
     }
 
     /**

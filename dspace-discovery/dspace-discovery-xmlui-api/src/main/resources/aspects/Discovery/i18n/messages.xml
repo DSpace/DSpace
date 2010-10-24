@@ -109,6 +109,6 @@
 
     <message key="xmlui.discovery.SearchFacetFilter.no-results">No filter values found</message>
 
-    <message key="xmlui.discovery.AbstractFiltersTransformer.filters.head">Filter By</message>
+    <message key="xmlui.discovery.AbstractFiltersTransformer.filters.head">Discover</message>
     <message key="xmlui.discovery.AbstractFiltersTransformer.filters.view-more">... View More</message>
 </catalogue>

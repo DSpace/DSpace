@@ -63,6 +63,7 @@ import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
 import org.dspace.discovery.SolrServiceImpl;
+import org.dspace.handle.HandleManager;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
@@ -86,8 +87,9 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
 
     private static final Logger log = Logger.getLogger(AbstractFiltersTransformer.class);
 
-    private String scope;
-
+    
+    public abstract String getView();
+    
     /**
      * Cached query results
      */
@@ -194,25 +196,35 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
 
     public abstract void performSearch(DSpaceObject object) throws SearchServiceException, UIException;
 
+        /**
+     * Determine the current scope. This may be derived from the current url
+     * handle if present or the scope parameter is given. If no scope is
+     * specified then null is returned.
+     *
+     * @return The current scope.
+     */
+    protected DSpaceObject getScope() throws SQLException {
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        String scopeString = request.getParameter("scope");
 
-    /** Allowed Query Parameters for Search Enabled View */
-    protected String[] getFacetsList() {
-
-        String[] list = null;
-
-        try {
-            list = ObjectModelHelper.getRequest(objectModel).getParameterValues("fl");
+        // Are we in a community or collection?
+        DSpaceObject dso;
+        if (scopeString == null || "".equals(scopeString))
+        {
+            // get the search scope from the url handle
+            dso = HandleUtil.obtainHandle(objectModel);
         }
-        catch (Exception e) {
-            return new String[0];
+        else
+        {
+            // Get the search scope from the location parameter
+            dso = HandleManager.resolveToObject(context, scopeString);
         }
 
-        return list == null ? new String[0] : list;
+        return dso;
     }
 
     protected SolrQuery prepareDefaultFilters(String scope, String ...filterQueries) {
-        // Save our scope
-        this.scope = scope;
+
         queryArgs = new SolrQuery();
 
         SearchUtils.SolrFacetConfig[] facets = SearchUtils.getFacetsForType(scope);
@@ -240,7 +252,10 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
         /** enable faceting of search results */
         if (facets != null){
             for (SearchUtils.SolrFacetConfig facet : facets) {
+
+
                 if(facet.isDate()){
+
                     String dateFacet = facet.getFacetField();
                     try{
                         //Get a range query so we can create facet queries ranging from out first to our last date
@@ -356,8 +371,11 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
                     }catch (Exception e){
                         log.error(LogManager.getHeader(context, "Error in discovery while setting up date facet range", "date facet: " + dateFacet), e);
                     }
+
                 }else{
+
                     queryArgs.addFacetField(facet.getFacetField());
+
                 }
             }
         }
@@ -370,11 +388,7 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
 
     @Override
     public void addOptions(Options options) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {
-        //Should not happen
-        if(scope == null)
-        {
-            return;
-        }
+
         Request request = ObjectModelHelper.getRequest(objectModel);
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
@@ -382,7 +396,8 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
         java.util.List<String> fqs = Arrays.asList(request.getParameterValues("fq") != null ? request.getParameterValues("fq") : new String[0]);
 
         if (this.queryResults != null) {
-            SearchUtils.SolrFacetConfig[] facets = SearchUtils.getFacetsForType(scope);
+
+            SearchUtils.SolrFacetConfig[] facets = SearchUtils.getFacetsForType(getView());
 
             if (facets != null && 0 < facets.length) {
 

@@ -82,12 +82,18 @@ public class ItemFacets extends org.dspace.app.xmlui.aspect.discovery.AbstractFi
             return;
         }
 
-        this.queryArgs = prepareDefaultFilters("item");
+        this.queryArgs = prepareDefaultFilters(getView());
         
         this.queryArgs.setRows(1);
         this.queryArgs.setQuery("handle:" + dso.getHandle());
 
         queryResults = getSearchService().search(queryArgs);
+    }
+
+
+    public String getView()
+    {
+        return "item";
     }
 
     /**

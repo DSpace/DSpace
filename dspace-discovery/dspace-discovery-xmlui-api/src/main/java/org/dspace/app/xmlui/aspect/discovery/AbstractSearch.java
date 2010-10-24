@@ -584,32 +584,7 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
         this.queryResults = getSearchService().search(queryArgs);
     }
 
-    /**
-     * Determine the current scope. This may be derived from the current url
-     * handle if present or the scope parameter is given. If no scope is
-     * specified then null is returned.
-     *
-     * @return The current scope.
-     */
-    protected DSpaceObject getScope() throws SQLException {
-        Request request = ObjectModelHelper.getRequest(objectModel);
-        String scopeString = request.getParameter("scope");
 
-        // Are we in a community or collection?
-        DSpaceObject dso;
-        if (scopeString == null || "".equals(scopeString))
-        {
-            // get the search scope from the url handle
-            dso = HandleUtil.obtainHandle(objectModel);
-        }
-        else
-        {
-            // Get the search scope from the location parameter
-            dso = HandleManager.resolveToObject(context, scopeString);
-        }
-
-        return dso;
-    }
 
     /**
      * Returns a list of the filter queries for use in rendering pages, creating page more urls, ....

@@ -385,4 +385,10 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
         return super.generateURL("discover", parameters);
     }
+
+
+    public String getView()
+    {
+        return "search";
+    }
 }
