@@ -123,11 +123,11 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     private static String aliases[] = null;
     static
     {
-        List aliasList = new ArrayList();
-        Enumeration pe = ConfigurationManager.propertyNames();
+        List<String> aliasList = new ArrayList<String>();
+        Enumeration<String> pe = (Enumeration<String>)ConfigurationManager.propertyNames();
         while (pe.hasMoreElements())
         {
-            String key = (String)pe.nextElement();
+            String key = pe.nextElement();
             if (key.startsWith(CONFIG_PREFIX))
             {
                 aliasList.add(key.substring(CONFIG_PREFIX.length()));
@@ -162,7 +162,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     private static XMLOutputter outputUgly = new XMLOutputter();
     private static SAXBuilder builder = new SAXBuilder();
 
-    private Map modsMap = null;
+    private Map<String, modsTriple> modsMap = null;
 
     /**
      * Container for crosswalk mapping: expressed as "triple" of:
@@ -292,11 +292,11 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
                 }
             }
 
-            modsMap = new HashMap();
-            Enumeration pe = modsConfig.propertyNames();
+            modsMap = new HashMap<String, modsTriple>();
+            Enumeration<String> pe = (Enumeration<String>)modsConfig.propertyNames();
             while (pe.hasMoreElements())
             {
-                String qdc = (String)pe.nextElement();
+                String qdc = pe.nextElement();
                 String val = modsConfig.getProperty(qdc);
                 String pair[] = val.split("\\s+\\|\\s+", 2);
                 if (pair.length < 2)
@@ -355,7 +355,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
         return root;
     }
 
-    private List disseminateListInternal(DSpaceObject dso, boolean addSchema)
+    private List<Element> disseminateListInternal(DSpaceObject dso, boolean addSchema)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
         DCValue[] dcvs = null;
@@ -382,7 +382,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
         }
         initMap();
 
-        List result = new ArrayList(dcvs.length);
+        List<Element> result = new ArrayList<Element>(dcvs.length);
 
         for(int i=0; i < dcvs.length; i++)
         {
@@ -393,7 +393,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
             }
             String value = dcvs[i].value;
 
-            modsTriple trip = (modsTriple)modsMap.get(qdc);
+            modsTriple trip = modsMap.get(qdc);
             if (trip == null)
             {
                 log.warn("WARNING: " + getPluginInstanceName() + ": No MODS mapping for \"" + qdc + "\"");
@@ -478,7 +478,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      */
     protected DCValue[] site2Metadata(Site site)
     {
-        List metadata = new ArrayList();
+        List<DCValue> metadata = new ArrayList<DCValue>();
 
         String identifier_uri = "http://hdl.handle.net/"
                 + site.getHandle();
@@ -512,7 +512,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      */
     protected DCValue[] community2Metadata(Community community)
     {
-        List metadata = new ArrayList();
+        List<DCValue> metadata = new ArrayList<DCValue>();
 
         String description = community.getMetadata("introductory_text");
         String description_abstract = community
@@ -565,7 +565,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
      */
     protected DCValue[] collection2Metadata(Collection collection)
     {
-        List metadata = new ArrayList();
+        List<DCValue> metadata = new ArrayList<DCValue>();
 
         String description = collection.getMetadata("introductory_text");
         String description_abstract = collection

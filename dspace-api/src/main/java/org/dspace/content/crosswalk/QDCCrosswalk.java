@@ -129,10 +129,10 @@ public class QDCCrosswalk extends SelfNamedPlugin
     private static Logger log = Logger.getLogger(QDCCrosswalk.class);
 
     // map of qdc to JDOM Element
-    private Map qdc2element = new HashMap();
+    private Map<String, Element> qdc2element = new HashMap<String, Element>();
 
     // map of JDOM Element to qdc DCValue
-    private Map element2qdc = new HashMap();
+    private Map<String, String> element2qdc = new HashMap<String, String>();
 
     // the XML namespaces from config file for this name.
     private Namespace namespaces[] = null;
@@ -166,12 +166,12 @@ public class QDCCrosswalk extends SelfNamedPlugin
     private static String aliases[] = null;
     static
     {
-        List aliasList = new ArrayList();
-        Enumeration pe = ConfigurationManager.propertyNames();
+        List<String> aliasList = new ArrayList<String>();
+        Enumeration<String> pe = (Enumeration<String>)ConfigurationManager.propertyNames();
         String propname = CONFIG_PREFIX + ".properties.";
         while (pe.hasMoreElements())
         {
-            String key = (String)pe.nextElement();
+            String key = pe.nextElement();
             if (key.startsWith(propname))
             {
                 aliasList.add(key.substring(propname.length()));
@@ -260,12 +260,12 @@ public class QDCCrosswalk extends SelfNamedPlugin
         }
 
         // grovel DSpace configuration for namespaces
-        List nsList = new ArrayList();
-        Enumeration pe = ConfigurationManager.propertyNames();
+        List<Namespace> nsList = new ArrayList<Namespace>();
+        Enumeration<String> pe = (Enumeration<String>)ConfigurationManager.propertyNames();
         String propname = CONFIG_PREFIX + ".namespace."+ myName +".";
         while (pe.hasMoreElements())
         {
-            String key = (String)pe.nextElement();
+            String key = pe.nextElement();
             if (key.startsWith(propname))
             {
                 nsList.add(Namespace.getNamespace(key.substring(propname.length()),
@@ -325,10 +325,10 @@ public class QDCCrosswalk extends SelfNamedPlugin
         }
         prologb.append(">");
         String prolog = prologb.toString();
-        pe = qdcProps.propertyNames();
+        pe = (Enumeration<String>)qdcProps.propertyNames();
         while (pe.hasMoreElements())
         {
-            String qdc = (String)pe.nextElement();
+            String qdc = pe.nextElement();
             String val = qdcProps.getProperty(qdc);
             try
             {
@@ -379,7 +379,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
         return disseminateListInternal(dso, true);
     }
 
-    private List disseminateListInternal(DSpaceObject dso, boolean addSchema)
+    private List<Element> disseminateListInternal(DSpaceObject dso, boolean addSchema)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
@@ -391,7 +391,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
         init();
 
         DCValue[] dc = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-        List result = new ArrayList(dc.length);
+        List<Element> result = new ArrayList<Element>(dc.length);
         for (int i = 0; i < dc.length; i++)
         {
             // Compose qualified DC name - schema.element[.qualifier]
@@ -400,7 +400,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
                          ((dc[i].qualifier == null) ? dc[i].element
                             : (dc[i].element + "." + dc[i].qualifier));
 
-            Element elt = (Element)qdc2element.get(qdc);
+            Element elt = qdc2element.get(qdc);
 
             // only complain about missing elements in the DC schema:
             if (elt == null)
@@ -490,7 +490,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
 
             else if (element2qdc.containsKey(key))
             {
-                String qdc[] = ((String)element2qdc.get(key)).split("\\.");
+                String qdc[] = (element2qdc.get(key)).split("\\.");
 
                 // get language - prefer xml:lang, accept lang.
                 String lang = me.getAttributeValue("lang", Namespace.XML_NAMESPACE);
@@ -509,7 +509,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
                 }
                 else
                 {
-                    throw new CrosswalkInternalException("Unrecognized format in QDC element identifier for key=\"" + key + "\", qdc=\"" + (String) element2qdc.get(key) + "\"");
+                    throw new CrosswalkInternalException("Unrecognized format in QDC element identifier for key=\"" + key + "\", qdc=\"" + element2qdc.get(key) + "\"");
                 }
             }
             else
