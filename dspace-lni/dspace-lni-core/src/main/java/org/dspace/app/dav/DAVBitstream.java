@@ -86,7 +86,7 @@ class DAVBitstream extends DAVDSpaceObject
      * The longest bitstream that should be rendered "inline" (base64)
      * see makeXmlBitstream
      */
-    private final static int BITSTREAM_INLINE_THRESHOLD = 2000;
+    private static final int BITSTREAM_INLINE_THRESHOLD = 2000;
 
     /** The Constant getcontentlengthProperty. */
     private static final Element getcontentlengthProperty = new Element(

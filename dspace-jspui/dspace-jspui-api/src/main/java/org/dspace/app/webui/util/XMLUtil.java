@@ -36,7 +36,6 @@ package org.dspace.app.webui.util;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Map;
 

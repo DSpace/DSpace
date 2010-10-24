@@ -1417,20 +1417,17 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      * 
      * @param context
      *            the DSpace context
-     * @param item
-     *            the DSpace item
      * @param manifest
-     *            the METSManifest
+ *            the METSManifest
      * @param callback
-     *            the MdrefManager (manages all external metadata files
-     *            referenced by METS <code>mdref</code> elements)
+*            the MdrefManager (manages all external metadata files
+*            referenced by METS <code>mdref</code> elements)
      * @param dmds
-     *            array of Elements, each a METS <code>dmdSec</code> that
-     *            applies to the Item as a whole.
+*            array of Elements, each a METS <code>dmdSec</code> that
+*            applies to the Item as a whole.
      * @param params
-     *            any user parameters passed to the Packager script
      */
-    abstract public void crosswalkObjectDmd(Context context, DSpaceObject dso,
+    public abstract void crosswalkObjectDmd(Context context, DSpaceObject dso,
             METSManifest manifest, MdrefManager callback, Element dmds[],
             PackageParameters params) throws CrosswalkException,
             PackageValidationException, AuthorizeException, SQLException,
@@ -1458,7 +1455,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      * @param license
      *            optional user-supplied Deposit License text (may be null)
      */
-    abstract public void addLicense(Context context, Item item, String license,
+    public abstract void addLicense(Context context, Item item, String license,
             Collection collection, PackageParameters params)
             throws PackageValidationException, AuthorizeException,
             SQLException, IOException;
@@ -1476,7 +1473,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      * @param params
      *            the Packager Parameters
      */
-    abstract public void finishObject(Context context, DSpaceObject dso,
+    public abstract void finishObject(Context context, DSpaceObject dso,
             PackageParameters params) throws PackageValidationException,
             CrosswalkException, AuthorizeException, SQLException, IOException;
 
@@ -1485,14 +1482,14 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      * 
      * @returns one of the object types in Constants.
      */
-    abstract public int getObjectType(METSManifest manifest)
+    public abstract int getObjectType(METSManifest manifest)
             throws PackageValidationException;
 
     /**
      * Subclass-dependent final processing on a Bitstream; could include fixing
      * up the name, bundle, other attributes.
      */
-    abstract public void finishBitstream(Context context, Bitstream bs,
+    public abstract void finishBitstream(Context context, Bitstream bs,
             Element mfile, METSManifest manifest, PackageParameters params)
             throws MetadataValidationException, SQLException,
             AuthorizeException, IOException;
@@ -1502,6 +1499,6 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      * unique, e.g. if it returns NAME, the key would be:
      * "mets.NAME.ingest.preserveManifest = true"
      */
-    abstract public String getConfigurationName();
+    public abstract String getConfigurationName();
 
 }

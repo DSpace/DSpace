@@ -58,7 +58,7 @@ import org.xml.sax.SAXException;
  * 
  * @author Tim Donohue
  */
-abstract public class AbstractSubmissionStep extends AbstractStep
+public abstract class AbstractSubmissionStep extends AbstractStep
 {
     /** 
      * Each submission step must define its own information to be reviewed

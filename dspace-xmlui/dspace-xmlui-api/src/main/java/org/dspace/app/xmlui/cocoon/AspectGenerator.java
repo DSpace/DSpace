@@ -73,13 +73,13 @@ public class AspectGenerator extends FileGenerator implements
 {
 
     /** The URI Prefix of all aspect URIs */
-    public final static String PREFIX = "/DRI/";
+    public static final String PREFIX = "/DRI/";
 
     /** The Protocol to use, in this case an internal cocoon request */
-    public final static String PROTOCOL = "cocoon";
+    public static final String PROTOCOL = "cocoon";
 
     /** The name of the Aspect_ID attribute */
-    public final static String ASPECT_ID = "org.dspace.app.xmlui.AspectGenerator.AspectID";
+    public static final String ASPECT_ID = "org.dspace.app.xmlui.AspectGenerator.AspectID";
 
    /**
     * Setup the AspectGenerator. 

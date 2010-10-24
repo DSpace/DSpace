@@ -259,7 +259,7 @@ public class DailyFileAppender extends FileAppender
      * @param pstrName The name of the new folder based on current system date.
      * @throws IOException
      */
-    static private boolean deletingFiles = false;
+    private static boolean deletingFiles = false;
     private void cleanupOldFiles()
     {
         // If we need to delete log files

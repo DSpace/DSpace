@@ -78,7 +78,7 @@ import java.util.*;
 
 public class ConcatenationReader extends ResourceReader {
 
-    private final static int MINIFY_LINEBREAKPOS = 8000;
+    private static final int MINIFY_LINEBREAKPOS = 8000;
     protected List<Source> inputSources;
     private String key;
     private StreamEnumeration streamEnumeration;

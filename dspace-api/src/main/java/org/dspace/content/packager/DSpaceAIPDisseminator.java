@@ -118,25 +118,25 @@ public class DSpaceAIPDisseminator
      * To ensure uniqueness, it is the URL that the XML schema document would
      * have _if_ there were to be one.  There is no schema at this time.
      */
-    public final static String PROFILE_1_0 =
+    public static final String PROFILE_1_0 =
         "http://www.dspace.org/schema/aip/mets_aip_1_0.xsd";
 
     /** TYPE of the div containing AIP's parent handle in its mptr. */
-    final public static String PARENT_DIV_TYPE = "AIP Parent Link";
+    public static final String PARENT_DIV_TYPE = "AIP Parent Link";
 
     // Default MDTYPE value for deposit license -- "magic string"
     // NOTE: format is  <label-for-METS>:<DSpace-crosswalk-name>
-    private final static String DSPACE_DEPOSIT_LICENSE_MDTYPE =
+    private static final String DSPACE_DEPOSIT_LICENSE_MDTYPE =
         "DSpaceDepositLicense:DSPACE_DEPLICENSE";
 
     // Default MDTYPE value for CC license in RDF -- "magic string"
     // NOTE: format is  <label-for-METS>:<DSpace-crosswalk-name>
-    private final static String CREATIVE_COMMONS_RDF_MDTYPE =
+    private static final String CREATIVE_COMMONS_RDF_MDTYPE =
         "CreativeCommonsRDF:DSPACE_CCRDF";
 
     // Default MDTYPE value for CC license in Text -- "magic string"
     // NOTE: format is  <label-for-METS>:<DSpace-crosswalk-name>
-    private final static String CREATIVE_COMMONS_TEXT_MDTYPE =
+    private static final String CREATIVE_COMMONS_TEXT_MDTYPE =
         "CreativeCommonsText:DSPACE_CCTXT";
 
     /**

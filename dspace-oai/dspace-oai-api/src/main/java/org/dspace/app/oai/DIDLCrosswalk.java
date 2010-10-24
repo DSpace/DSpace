@@ -68,7 +68,7 @@ import ORG.oclc.oai.server.verb.ServerVerb;
 
 public class DIDLCrosswalk extends Crosswalk
 {
-    private final static Logger log = Logger.getLogger(DIDLCrosswalk.class);
+    private static final Logger log = Logger.getLogger(DIDLCrosswalk.class);
     
     /** default value if no oai.didl.maxresponse property is defined */
     public static final int MAXRESPONSE_INLINE_BITSTREAM = 0;

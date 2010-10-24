@@ -764,7 +764,7 @@ public class BitstreamStorageManager
      * @param file
      *            The file with parent directories to delete
      */
-    private synchronized static void deleteParents(GeneralFile file)
+    private static synchronized void deleteParents(GeneralFile file)
     {
         if (file == null )
         {

@@ -111,7 +111,7 @@ public class DAVServlet extends HttpServlet
             .getBooleanProperty("dav.access.anonymous");
 
     /** Guess at longest status text the servlet container will tolerate; Tomcat 5.0 handles this, but dies on longer messages. */
-    private final static int HTTP_STATUS_MESSAGE_MAX = 1000;
+    private static final int HTTP_STATUS_MESSAGE_MAX = 1000;
 
     /** A random secret to embed in cookies, generated fresh at every startup:. */
     private static final String cookieSecret = Utils.generateHexKey();

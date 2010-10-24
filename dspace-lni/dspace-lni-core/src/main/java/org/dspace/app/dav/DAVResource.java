@@ -208,7 +208,7 @@ abstract class DAVResource
      * 
      * @throws SQLException the SQL exception
      */
-    abstract protected DAVResource[] children() throws SQLException;
+    protected abstract DAVResource[] children() throws SQLException;
 
     /**
      * Execute a PROPFIND method request on this Resource, and insert the
@@ -227,7 +227,7 @@ abstract class DAVResource
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws DAVStatusException the DAV status exception
      */
-    abstract protected Element propfindInternal(Element property)
+    protected abstract Element propfindInternal(Element property)
             throws SQLException, AuthorizeException, IOException,
             DAVStatusException;
 
@@ -237,7 +237,7 @@ abstract class DAVResource
      * @return list of all properties that resource wants known to a "propname"
      * request.
      */
-    abstract protected List<Element> getAllProperties();
+    protected abstract List<Element> getAllProperties();
 
     /**
      * Execute a PROPPATCH method request on this Resource, and insert the
@@ -253,7 +253,7 @@ abstract class DAVResource
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws DAVStatusException the DAV status exception
      */
-    abstract protected int proppatchInternal(int action, Element prop)
+    protected abstract int proppatchInternal(int action, Element prop)
             throws SQLException, AuthorizeException, IOException,
             DAVStatusException;
 
@@ -266,7 +266,7 @@ abstract class DAVResource
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws DAVStatusException the DAV status exception
      */
-    abstract protected void get() throws SQLException, AuthorizeException,
+    protected abstract void get() throws SQLException, AuthorizeException,
             IOException, DAVStatusException;
 
     /**
@@ -279,7 +279,7 @@ abstract class DAVResource
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws DAVStatusException the DAV status exception
      */
-    abstract protected void put() throws SQLException, AuthorizeException,
+    protected abstract void put() throws SQLException, AuthorizeException,
             IOException, DAVStatusException;
 
     /**
@@ -301,7 +301,7 @@ abstract class DAVResource
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws DAVStatusException the DAV status exception
      */
-    abstract protected int copyInternal(DAVResource destination, int depth,
+    protected abstract int copyInternal(DAVResource destination, int depth,
             boolean overwrite, boolean keepProperties)
             throws DAVStatusException, SQLException, AuthorizeException,
             IOException;
@@ -325,7 +325,7 @@ abstract class DAVResource
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws DAVStatusException the DAV status exception
      */
-    abstract protected int deleteInternal() throws SQLException,
+    protected abstract int deleteInternal() throws SQLException,
             AuthorizeException, IOException, DAVStatusException;
 
     /**
@@ -342,7 +342,7 @@ abstract class DAVResource
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws DAVStatusException the DAV status exception
      */
-    abstract protected int mkcolInternal(String name) throws SQLException,
+    protected abstract int mkcolInternal(String name) throws SQLException,
             AuthorizeException, IOException, DAVStatusException;
 
     /*----------------- Interpreting Resource URIs -----------------------*/

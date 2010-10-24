@@ -84,37 +84,37 @@ import org.dspace.eperson.Group;
 public class CollectionWizardServlet extends DSpaceServlet
 {
     /** Initial questions page */
-    public final static int INITIAL_QUESTIONS = 1;
+    public static final int INITIAL_QUESTIONS = 1;
 
     /** Basic information page */
-    public final static int BASIC_INFO = 2;
+    public static final int BASIC_INFO = 2;
 
     /** Permissions pages */
-    public final static int PERMISSIONS = 3;
+    public static final int PERMISSIONS = 3;
 
     /** Default item page */
-    public final static int DEFAULT_ITEM = 4;
+    public static final int DEFAULT_ITEM = 4;
 
     /** Summary page */
-    public final static int SUMMARY = 5;
+    public static final int SUMMARY = 5;
 
     /** Permissions page for who gets read permissions on new items */
-    public final static int PERM_READ = 10;
+    public static final int PERM_READ = 10;
 
     /** Permissions page for submitters */
-    public final static int PERM_SUBMIT = 11;
+    public static final int PERM_SUBMIT = 11;
 
     /** Permissions page for workflow step 1 */
-    public final static int PERM_WF1 = 12;
+    public static final int PERM_WF1 = 12;
 
     /** Permissions page for workflow step 2 */
-    public final static int PERM_WF2 = 13;
+    public static final int PERM_WF2 = 13;
 
     /** Permissions page for workflow step 3 */
-    public final static int PERM_WF3 = 14;
+    public static final int PERM_WF3 = 14;
 
     /** Permissions page for collection administrators */
-    public final static int PERM_ADMIN = 15;
+    public static final int PERM_ADMIN = 15;
 
     /** Logger */
     private static Logger log = Logger.getLogger(CollectionWizardServlet.class);

@@ -80,7 +80,7 @@ import org.xml.sax.SAXException;
  * @author Scott Phillips
  * @author Tim Donohue (updated for Configurable Submission)
  */
-abstract public class AbstractStep extends AbstractDSpaceTransformer 
+public abstract class AbstractStep extends AbstractDSpaceTransformer 
 {
 	private static Logger log = Logger.getLogger(AbstractStep.class);
 

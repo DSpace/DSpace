@@ -110,7 +110,7 @@ public class DSpaceMETSIngester
     @Override
     public void crosswalkObjectDmd(Context context, DSpaceObject dso,
                               METSManifest manifest,
-                              AbstractMETSIngester.MdrefManager callback,
+                              MdrefManager callback,
                               Element dmds[], PackageParameters params)
         throws CrosswalkException, PackageValidationException,
                AuthorizeException, SQLException, IOException

@@ -131,16 +131,15 @@ import org.dspace.core.LogManager;
 
 public class BitstreamReader extends AbstractReader implements Recyclable
 {
-
-        private static Logger log = Logger.getLogger(BitstreamReader.class);
+    private static Logger log = Logger.getLogger(BitstreamReader.class);
         
     /**
      * Messages to be sent when the user is not authorized to view
      * a particular bitstream. They will be redirected to the login
      * where this message will be displayed.
      */
-        private final static String AUTH_REQUIRED_HEADER = "xmlui.BitstreamReader.auth_header";
-        private final static String AUTH_REQUIRED_MESSAGE = "xmlui.BitstreamReader.auth_message";
+    private static final String AUTH_REQUIRED_HEADER = "xmlui.BitstreamReader.auth_header";
+    private static final String AUTH_REQUIRED_MESSAGE = "xmlui.BitstreamReader.auth_message";
         
     /**
      * How big of a buffer should we use when reading from the bitstream before

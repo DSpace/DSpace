@@ -68,7 +68,7 @@ public class ContextUtil
     private static final Logger log = Logger.getLogger(ContextUtil.class);
     
     /** Where the context is stored on an HTTP Request object */
-    public final static String DSPACE_CONTEXT = "dspace.context";
+    public static final String DSPACE_CONTEXT = "dspace.context";
 
     
     /**

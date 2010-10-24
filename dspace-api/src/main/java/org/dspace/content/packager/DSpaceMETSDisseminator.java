@@ -89,22 +89,19 @@ public class DSpaceMETSDisseminator
      * Profile.  Though not strictly true, there is no DIP standard yet
      * so it's the most meaningful label we can apply.
      */
-    private final static String PROFILE_LABEL = "DSpace METS SIP Profile 1.0";
+    private static final String PROFILE_LABEL = "DSpace METS SIP Profile 1.0";
 
     // MDTYPE value for deposit license -- "magic string"
     // NOTE: format is  <label-for-METS>:<DSpace-crosswalk-name>
-    private final static String DSPACE_DEPOSIT_LICENSE_MDTYPE =
-        "DSpaceDepositLicense:DSPACE_DEPLICENSE";
+    private static final String DSPACE_DEPOSIT_LICENSE_MDTYPE = "DSpaceDepositLicense:DSPACE_DEPLICENSE";
 
     // MDTYPE value for CC license in RDF -- "magic string"
     // NOTE: format is  <label-for-METS>:<DSpace-crosswalk-name>
-    private final static String CREATIVE_COMMONS_RDF_MDTYPE =
-        "CreativeCommonsRDF:DSPACE_CCRDF";
+    private static final String CREATIVE_COMMONS_RDF_MDTYPE = "CreativeCommonsRDF:DSPACE_CCRDF";
 
     // MDTYPE value for CC license in Text -- "magic string"
     // NOTE: format is  <label-for-METS>:<DSpace-crosswalk-name>
-    private final static String CREATIVE_COMMONS_TEXT_MDTYPE =
-        "CreativeCommonsText:DSPACE_CCTXT";
+    private static final String CREATIVE_COMMONS_TEXT_MDTYPE = "CreativeCommonsText:DSPACE_CCTXT";
 
     /**
      * Return identifier string for the profile this produces.

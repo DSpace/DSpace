@@ -79,7 +79,7 @@ public class DSAnalyzer extends Analyzer
     /*
      * Stop table
      */
-    final static private Set stopSet = StopFilter.makeStopSet(STOP_WORDS);
+    private static final Set stopSet = StopFilter.makeStopSet(STOP_WORDS);
 
     /*
      * Create a token stream for this analyzer.

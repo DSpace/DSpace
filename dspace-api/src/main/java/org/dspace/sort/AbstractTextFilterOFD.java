@@ -75,7 +75,7 @@ import org.dspace.sort.OrderFormatDelegate;
  */
 public abstract class AbstractTextFilterOFD implements OrderFormatDelegate
 {
-	private final static Logger log = Logger.getLogger(AbstractTextFilterOFD.class);
+	private static final Logger log = Logger.getLogger(AbstractTextFilterOFD.class);
 	
 	// Initialised in subclass in an object initializer
 	protected TextFilter[] filters;

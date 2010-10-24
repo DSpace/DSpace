@@ -95,7 +95,7 @@ public class CCLicenseStep extends AbstractSubmissionStep
 	/**
 	 * The creative commons URL, where to send the user off to so that they can select a license.
 	 */
-	public final static String CREATIVE_COMMONS_URL = "http://creativecommons.org/license/";
+	public static final String CREATIVE_COMMONS_URL = "http://creativecommons.org/license/";
 
 	/**
 	 * Establish our required parameters, abstractStep will enforce these.

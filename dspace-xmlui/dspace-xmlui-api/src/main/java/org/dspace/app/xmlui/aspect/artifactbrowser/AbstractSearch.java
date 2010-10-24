@@ -122,13 +122,13 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
     private static final Message T_sort_by_relevance =
         message("xmlui.ArtifactBrowser.AbstractSearch.sort_by.relevance");
 
-    private final static Message T_sort_by = message("xmlui.ArtifactBrowser.AbstractSearch.sort_by");
+    private static final Message T_sort_by = message("xmlui.ArtifactBrowser.AbstractSearch.sort_by");
 
-    private final static Message T_order      = message("xmlui.ArtifactBrowser.AbstractSearch.order");
-    private final static Message T_order_asc  = message("xmlui.ArtifactBrowser.AbstractSearch.order.asc");
-    private final static Message T_order_desc = message("xmlui.ArtifactBrowser.AbstractSearch.order.desc");
+    private static final Message T_order      = message("xmlui.ArtifactBrowser.AbstractSearch.order");
+    private static final Message T_order_asc  = message("xmlui.ArtifactBrowser.AbstractSearch.order.asc");
+    private static final Message T_order_desc = message("xmlui.ArtifactBrowser.AbstractSearch.order.desc");
 
-    private final static Message T_rpp = message("xmlui.ArtifactBrowser.AbstractSearch.rpp");
+    private static final Message T_rpp = message("xmlui.ArtifactBrowser.AbstractSearch.rpp");
     
     /** The options for results per page */
     private static final int[] RESULTS_PER_PAGE_PROGRESSION = {5,10,20,40,60,80,100};
@@ -575,7 +575,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
      * 
      * @return The query string.
      */
-    abstract protected String getQuery() throws UIException;
+    protected abstract String getQuery() throws UIException;
 
     /**
      * Generate a url to the given search implementation with the associated
@@ -584,7 +584,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
      * @param parameters
      * @return The post URL
      */
-    abstract protected String generateURL(Map<String, String> parameters)
+    protected abstract String generateURL(Map<String, String> parameters)
             throws UIException;
 
     

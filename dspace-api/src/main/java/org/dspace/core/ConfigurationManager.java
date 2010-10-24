@@ -90,7 +90,7 @@ public class ConfigurationManager
 
     // limit of recursive depth of property variable interpolation in
     // configuration; anything greater than this is very likely to be a loop.
-    private final static int RECURSION_LIMIT = 9;
+    private static final int RECURSION_LIMIT = 9;
 
     /**
      * Identify if DSpace is properly configured
