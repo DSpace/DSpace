@@ -227,7 +227,7 @@ public class Data extends AbstractWingElement
 
         boolean unknownType = false;
 
-        if (dictionaryParameter.getClass().equals(Date.class.getName()))
+        if (dictionaryParameter instanceof Date)
         {
             Date date = (Date) dictionaryParameter;
             DateFormat dateFormater = DateFormat
@@ -237,31 +237,31 @@ public class Data extends AbstractWingElement
             attributes.put(A_VALUE, dateFormater.format(date));
             // If no pattern is given then the default format is assumed.
         }
-        else if (dictionaryParameter.getClass().equals(Integer.class.getName()))
+        else if (dictionaryParameter instanceof Integer)
         {
             Integer value = (Integer) dictionaryParameter;
             attributes.put(A_TYPE, TYPE_NUMBER);
             attributes.put(A_VALUE, String.valueOf(value));
         }
-        else if (dictionaryParameter.getClass().equals(Double.class.getName()))
+        else if (dictionaryParameter instanceof Double)
         {
             Double value = (Double) dictionaryParameter;
             attributes.put(A_TYPE, TYPE_NUMBER);
             attributes.put(A_VALUE, String.valueOf(value));
         }
-        else if (dictionaryParameter.getClass().equals(Long.class.getName()))
+        else if (dictionaryParameter instanceof Long)
         {
             Long value = (Long) dictionaryParameter;
             attributes.put(A_TYPE, TYPE_NUMBER);
             attributes.put(A_VALUE, String.valueOf(value));
         }
-        else if (dictionaryParameter.getClass().equals(Short.class.getName()))
+        else if (dictionaryParameter instanceof Short)
         {
             Short value = (Short) dictionaryParameter;
             attributes.put(A_TYPE, TYPE_NUMBER);
             attributes.put(A_VALUE, String.valueOf(value));
         }
-        else if (dictionaryParameter.getClass().equals(Float.class.getName()))
+        else if (dictionaryParameter instanceof Float)
         {
             Float value = (Float) dictionaryParameter;
             attributes.put(A_TYPE, TYPE_NUMBER);
@@ -273,15 +273,15 @@ public class Data extends AbstractWingElement
             unknownType = true;
         }
 
-        startElement(contentHandler, namespaces, WingConstants.I18N, E_PARAM,
-                attributes);
+        startElement(contentHandler, namespaces, WingConstants.I18N, E_PARAM, attributes);
 
         // If the type is unknown then the value is not included as an attribute
         // and instead is sent as the contents of the elements.
-        if (unknownType)
-        {
-            sendCharacters(contentHandler, dictionaryParameter.toString());
-        }
+
+        // NOTE: Used to only do this if unknownType was true. However, due to flaw in logic above,
+        // it was always true, and so always called.
+        // In order not to break anything, we will now call sendCharacters regardless of whether we matched a Type
+        sendCharacters(contentHandler, dictionaryParameter.toString());
 
         endElement(contentHandler, namespaces, WingConstants.I18N, E_PARAM);
     }
