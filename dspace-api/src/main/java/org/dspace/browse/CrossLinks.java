@@ -53,7 +53,7 @@ import org.dspace.core.ConfigurationManager;
 public class CrossLinks
 {
 	/** a map of the desired links */
-	private Map links = new HashMap();
+	private Map<String, String> links = new HashMap<String, String>();
 	
 	/**
 	 * Construct a new object which will obtain the configuration for itself
@@ -102,6 +102,6 @@ public class CrossLinks
 	 */
 	public String getLinkType(String metadata)
 	{
-		return (String) links.get(metadata);
+		return links.get(metadata);
 	}
 }

@@ -49,10 +49,10 @@ import org.dspace.core.ConfigurationManager;
 public class ItemListConfig
 {
 	/** a map of column number to metadata value */
-	private Map metadata = new HashMap();
+	private Map<Integer, String[]> metadata = new HashMap<Integer, String[]>();
 	
 	/** a map of column number to data type */
-	private Map types = new HashMap();
+	private Map<Integer, Integer> types = new HashMap<Integer, Integer>();
 	
 	/** constant for a DATE column */
 	private static final int DATE = 1;
@@ -128,7 +128,7 @@ public class ItemListConfig
 	 */
 	public String[] getMetadata(int col)
 	{
-		return (String[]) metadata.get(Integer.valueOf(col));
+		return metadata.get(Integer.valueOf(col));
 	}
 	
 	/**

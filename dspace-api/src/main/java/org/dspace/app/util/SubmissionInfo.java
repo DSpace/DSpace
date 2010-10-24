@@ -85,7 +85,7 @@ public class SubmissionInfo
     * second page of Step 5) Values are the Headings to display for each step
     * (e.g. "Describe")
     **************************************************************************/
-    private Map progressBar = null;
+    private Map<String, String> progressBar = null;
     
     /** The element or element_qualifier to show more input boxes for */
     private String moreBoxesFor;
@@ -336,7 +336,7 @@ public class SubmissionInfo
      * 
      * @return a Hashmap of Progress Bar information.
      */
-    public Map getProgressBarInfo()
+    public Map<String, String> getProgressBarInfo()
     {
         return this.progressBar;
     }
@@ -483,14 +483,14 @@ public class SubmissionInfo
     private static void loadProgressBar(HttpServletRequest request,
             SubmissionInfo subInfo, boolean forceReload)
     {
-        LinkedHashMap progressBarInfo = null;
+        Map<String, String> progressBarInfo = null;
 
         log.debug("Loading Progress Bar Info");
 
         if (!forceReload)
         {
             // first, attempt to load from cache
-            progressBarInfo = (LinkedHashMap) loadProgressBarFromCache(request
+            progressBarInfo = loadProgressBarFromCache(request
                     .getSession());
         }
 
@@ -503,7 +503,7 @@ public class SubmissionInfo
         // if unable to load from cache, must load from scratch
         else
         {
-            progressBarInfo = new LinkedHashMap();
+            progressBarInfo = new LinkedHashMap<String, String>();
 
             // loop through all steps
             for (int i = 0; i < subInfo.submissionConfig.getNumberOfSteps(); i++)
@@ -527,13 +527,11 @@ public class SubmissionInfo
                         // load the processing class for this step
                         ClassLoader loader = subInfo.getClass()
                                 .getClassLoader();
-                        Class stepClass = loader.loadClass(currentStep
-                                .getProcessingClassName());
+                        Class<AbstractProcessingStep> stepClass = (Class<AbstractProcessingStep>)loader.loadClass(currentStep.getProcessingClassName());
 
                         // call the "getNumberOfPages()" method of the class
                         // to get it's number of pages
-                        AbstractProcessingStep step = (AbstractProcessingStep) stepClass
-                                .newInstance();
+                        AbstractProcessingStep step = stepClass.newInstance();
 
                         // get number of pages from servlet
                         numPages = step.getNumberOfPages(request, subInfo);
@@ -582,7 +580,7 @@ public class SubmissionInfo
      * 
      */
     private static void saveProgressBarToCache(HttpSession session,
-            Map progressBarInfo)
+            Map<String, String> progressBarInfo)
     {
         // cache progress bar info to Session
         session.setAttribute("submission.progressbar", progressBarInfo);
@@ -600,9 +598,9 @@ public class SubmissionInfo
      * @return progressBarInfo HashMap (if found), or null (if not)
      * 
      */
-    private static Map loadProgressBarFromCache(HttpSession session)
+    private static Map<String, String> loadProgressBarFromCache(HttpSession session)
     {
-        return (Map) session.getAttribute("submission.progressbar");
+        return (Map<String, String>) session.getAttribute("submission.progressbar");
     }
 
     /**
