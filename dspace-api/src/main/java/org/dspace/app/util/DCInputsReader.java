@@ -108,12 +108,6 @@ public class DCInputsReader
     private Map<String, List<List<Map<String, String>>>> formDefns  = null;
 
     /**
-     * Reference to the forms which allow, disallow or mandate files to be
-     * uploaded.
-     */
-    private Map formFileUploadDefns = null;
-
-    /**
      * Reference to the value-pairs map, computed from the forms definition file
      */
     private Map<String, List<String>> valuePairs = null;    // Holds display/storage pairs

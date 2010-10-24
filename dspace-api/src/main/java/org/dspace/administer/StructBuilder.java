@@ -40,7 +40,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -96,10 +97,10 @@ public class StructBuilder
     private static org.jdom.Document xmlOutput = new org.jdom.Document(new Element("imported_structure"));
     
     /** a hashtable to hold metadata for the collection being worked on */
-    private static Hashtable collectionMap = new Hashtable();
+    private static Map<String, String> collectionMap = new HashMap<String, String>();
     
     /** a hashtable to hold metadata for the community being worked on */
-    private static Hashtable communityMap = new Hashtable();
+    private static Map<String, String> communityMap = new HashMap<String, String>();
     
     /**
      * Main method to be run from the command line to import a structure into
@@ -429,16 +430,12 @@ public class StructBuilder
             
             // now update the metadata
             Node tn = communities.item(i);
-            Enumeration keys = communityMap.keys();
-            while (keys.hasMoreElements())
+            for (Map.Entry<String, String> entry : communityMap.entrySet())
             {
-                Node node = null;
-                String key = (String) keys.nextElement();
-                NodeList nl = XPathAPI.selectNodeList(tn, key);
+                NodeList nl = XPathAPI.selectNodeList(tn, entry.getKey());
                 if (nl.getLength() == 1)
                 {
-                    node = nl.item(0);
-                    community.setMetadata((String) communityMap.get(key), getStringValue(node));
+                    community.setMetadata(entry.getValue(), getStringValue(nl.item(0)));
                 }
             }
             
@@ -544,16 +541,12 @@ public class StructBuilder
             
             // import the rest of the metadata
             Node tn = collections.item(i);
-            Enumeration keys = collectionMap.keys();
-            while (keys.hasMoreElements())
+            for (Map.Entry<String, String> entry : collectionMap.entrySet())
             {
-                Node node = null;
-                String key = (String) keys.nextElement();
-                NodeList nl = XPathAPI.selectNodeList(tn, key);
+                NodeList nl = XPathAPI.selectNodeList(tn, entry.getKey());
                 if (nl.getLength() == 1)
                 {
-                    node = nl.item(0);
-                    collection.setMetadata((String) collectionMap.get(key), getStringValue(node));
+                    collection.setMetadata(entry.getValue(), getStringValue(nl.item(0)));
                 }
             }
             

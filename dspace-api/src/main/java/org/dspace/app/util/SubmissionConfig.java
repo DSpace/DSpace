@@ -100,7 +100,7 @@ public class SubmissionConfig implements Serializable
         // loop through our steps, and create SubmissionStepConfig objects
         for (int stepNum = 0; stepNum < steps.size(); stepNum++)
         {
-            Map stepInfo = steps.get(stepNum);
+            Map<String, String> stepInfo = steps.get(stepNum);
             SubmissionStepConfig step = new SubmissionStepConfig(stepInfo);
 
             // Only add this step to the process if either:

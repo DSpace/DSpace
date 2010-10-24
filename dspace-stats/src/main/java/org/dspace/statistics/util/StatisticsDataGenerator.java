@@ -199,7 +199,7 @@ public class StatisticsDataGenerator {
 		solr.deleteByQuery("*:*");
 		solr.commit();
 
-		Map metadataStorageInfo = SolrLogger.getMetadataStorageInfo();
+		Map<String, String> metadataStorageInfo = SolrLogger.getMetadataStorageInfo();
 
 		String prevIp = null;
 		String dbfile = ConfigurationManager.getProperty("solr.dbfile");

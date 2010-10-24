@@ -691,14 +691,14 @@ public class ItemImport
         System.out.println("Deleting items listed in mapfile: " + mapFile);
 
         // read in the mapfile
-        Map myhash = readMapFile(mapFile);
+        Map<String, String> myhash = readMapFile(mapFile);
 
         // now delete everything that appeared in the mapFile
         Iterator i = myhash.keySet().iterator();
 
         while (i.hasNext())
         {
-            String itemID = (String) myhash.get(i.next());
+            String itemID = myhash.get(i.next());
 
             if (itemID.indexOf('/') != -1)
             {

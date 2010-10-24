@@ -81,7 +81,7 @@ public class StatisticsLoggingConsumer implements Consumer
                     updateQuery, null, null);
 
             // Get all the metadata
-            Map metadataStorageInfo = SolrLogger.getMetadataStorageInfo();
+            Map<String, String> metadataStorageInfo = SolrLogger.getMetadataStorageInfo();
             List<String> storageFieldList = new ArrayList<String>();
             List<List<Object>> storageValuesList = new ArrayList<List<Object>>();
 

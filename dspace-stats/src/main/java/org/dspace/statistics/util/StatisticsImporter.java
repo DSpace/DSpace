@@ -76,7 +76,7 @@ public class StatisticsImporter
     private static LookupService geoipLookup;
 
     /** Metadata storage information */
-    private static Map metadataStorageInfo;
+    private static Map<String, String> metadataStorageInfo;
 
     /** Whether to skip the DNS reverse lookup or not */
     private static boolean skipReverseDNS = false;
@@ -362,9 +362,8 @@ public class StatisticsImporter
                 if (dso instanceof Item) {
                     Item item = (Item) dso;
                     // Store the metadata
-                    for (Object storedField : metadataStorageInfo.keySet()) {
-                        String dcField = (String) metadataStorageInfo
-                                .get(storedField);
+                    for (String storedField : metadataStorageInfo.keySet()) {
+                        String dcField = metadataStorageInfo.get(storedField);
 
                         DCValue[] vals = item.getMetadata(dcField.split("\\.")[0],
                                 dcField.split("\\.")[1], dcField.split("\\.")[2],
