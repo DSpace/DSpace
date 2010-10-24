@@ -102,14 +102,14 @@ public class DSpaceRecordFactory extends RecordFactory
     public Iterator getSetSpecs(Object nativeItem)
     {
         HarvestedItemInfo hii = (HarvestedItemInfo) nativeItem;
-        Iterator i = hii.collectionHandles.iterator();
-        List setSpecs = new LinkedList();
+        Iterator<String> i = hii.collectionHandles.iterator();
+        List<String> setSpecs = new LinkedList<String>();
 
         // Convert the DB Handle string 123.456/789 to the OAI-friendly
         // hdl_123.456/789
         while (i.hasNext())
         {
-            String handle = "hdl_" + (String) i.next();
+            String handle = "hdl_" + i.next();
             setSpecs.add(handle.replace('/', '_'));
         }
 

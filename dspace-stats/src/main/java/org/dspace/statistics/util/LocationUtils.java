@@ -772,9 +772,9 @@ public class LocationUtils {
     };
 
     
-    private static List continentCodeList;
-    private static List countryCodeList;
-    private static List countryNameList;
+    private static List<String> continentCodeList;
+    private static List<String> countryCodeList;
+    private static List<String> countryNameList;
 
     static
     {

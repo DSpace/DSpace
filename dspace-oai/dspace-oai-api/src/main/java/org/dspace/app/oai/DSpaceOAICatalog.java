@@ -245,7 +245,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
             // performance problems as all items will need to have their authorization permissions checked,
             // but because we haven't implemented resumption tokens in ListIdentifiers, ALL items will
             // need checking whenever a ListIdentifiers request is made.
-            List itemInfos = Harvest.harvest(context, scope, from, until, 0, 0, // Everything
+            List<HarvestedItemInfo> itemInfos = Harvest.harvest(context, scope, from, until, 0, 0, // Everything
                                                                                 // for
                                                                                 // now
                     !includeAll, true, true, includeAll);
@@ -260,11 +260,11 @@ public class DSpaceOAICatalog extends AbstractCatalog
             }
 
             // Build up lists of headers and identifiers
-            Iterator i = itemInfos.iterator();
+            Iterator<HarvestedItemInfo> i = itemInfos.iterator();
 
             while (i.hasNext())
             {
-                HarvestedItemInfo itemInfo = (HarvestedItemInfo) i.next();
+                HarvestedItemInfo itemInfo = i.next();
 
                 String[] header = getRecordFactory().createHeader(itemInfo);
 
@@ -585,7 +585,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
         }
 
         // List to put results in
-        List records = new LinkedList();
+        List<String> records = new LinkedList<String>();
 
         try
         {
@@ -594,22 +594,17 @@ public class DSpaceOAICatalog extends AbstractCatalog
             // Get the relevant HarvestedItemInfo objects to make headers
             DSpaceObject scope = resolveSet(context, set);
             boolean includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.oai", true);
-            List itemInfos = Harvest.harvest(context, scope, from, until,
+            List<HarvestedItemInfo> itemInfos = Harvest.harvest(context, scope, from, until,
                     offset, MAX_RECORDS, // Limit amount returned from one
                                          // request
                     true, true, true, includeAll); // Need items, containers + withdrawals
 
             // Build list of XML records from item info objects
-            Iterator i = itemInfos.iterator();
-
-            while (i.hasNext())
+            for (HarvestedItemInfo itemInfo : itemInfos)
             {
-                HarvestedItemInfo itemInfo = (HarvestedItemInfo) i.next();
-
                 try
                 {
-                    String recordXML = getRecordFactory().create(itemInfo,
-                            schemaURL, metadataPrefix);
+                    String recordXML = getRecordFactory().create(itemInfo, schemaURL, metadataPrefix);
                     records.add(recordXML);
                 }
                 catch (CannotDisseminateFormatException cdfe)
@@ -633,8 +628,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
             // Put results in form needed to return
             results.put("records", records.iterator());
 
-            log.info(LogManager.getHeader(context, "oai_harvest", "results="
-                    + records.size()));
+            log.info(LogManager.getHeader(context, "oai_harvest", "results=" + records.size()));
 
             // If we have MAX_RECORDS records, we need to provide a resumption
             // token
