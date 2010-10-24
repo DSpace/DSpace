@@ -79,7 +79,9 @@ public class CreativeCommonsRDFStreamIngestionCrosswalk
         if (dso.getType() == Constants.ITEM)
         {
             if (log.isDebugEnabled())
-                log.debug("Reading a Creative Commons license, MIMEtype="+MIMEType);
+            {
+                log.debug("Reading a Creative Commons license, MIMEtype=" + MIMEType);
+            }
 
             CreativeCommons.setLicense(context, (Item)dso, in, MIMEType);
         }

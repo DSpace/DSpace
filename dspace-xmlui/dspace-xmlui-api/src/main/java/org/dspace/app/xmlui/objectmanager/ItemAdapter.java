@@ -151,7 +151,9 @@ public class ItemAdapter extends AbstractAdapter
     protected String getMETSOBJID()
     {
         if (item.getHandle() != null)
-                return contextPath+"/handle/" + item.getHandle();
+        {
+            return contextPath + "/handle/" + item.getHandle();
+        }
         return null;
     }
 
@@ -280,7 +282,9 @@ public class ItemAdapter extends AbstractAdapter
                         attributes = new AttributeMap();
                         attributes.put("dspaceType", Constants.typeText[item.getType()]);
             if (item.isWithdrawn())
+            {
                 attributes.put("withdrawn", "y");
+            }
             startElement(DIM,"dim",attributes);
                         
                 DCValue[] dcvs = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
@@ -294,9 +298,13 @@ public class ItemAdapter extends AbstractAdapter
                         attributes.put("mdschema",dcv.schema);
                         attributes.put("element", dcv.element);
                         if (dcv.qualifier != null)
-                                attributes.put("qualifier", dcv.qualifier);
+                        {
+                            attributes.put("qualifier", dcv.qualifier);
+                        }
                         if (dcv.language != null)
-                                attributes.put("language", dcv.language);
+                        {
+                            attributes.put("language", dcv.language);
+                        }
                         if (dcv.authority != null || dcv.confidence != Choices.CF_UNSET)
                         {
                                 attributes.put("authority", dcv.authority);
@@ -327,12 +335,16 @@ public class ItemAdapter extends AbstractAdapter
                 // If DIM was requested then it was generated above without using
                 // the crosswalk API. So we can skip this one.
                 if ("DIM".equals(dmdType))
-                        continue;
+                {
+                    continue;
+                }
                 
                 DisseminationCrosswalk crosswalk = getDisseminationCrosswalk(dmdType);
                 
                 if (crosswalk == null)
-                        continue;
+                {
+                    continue;
+                }
                 
                 String dmdID = getGenericID("dmd_");
                  // Add our id to the list.
@@ -415,7 +427,9 @@ public class ItemAdapter extends AbstractAdapter
                         Bitstream bitstream = bundle.getBitstreamByName("MODS.xml");
         
                         if (bitstream == null)
-                                continue;
+                        {
+                            continue;
+                        }
                         
                         
                         String dmdID = getGenericID("dmd_");
@@ -518,7 +532,9 @@ public class ItemAdapter extends AbstractAdapter
 
             //skip, if we cannot find this crosswalk in config file
             if (crosswalk == null)
-              continue;
+            {
+                continue;
+            }
 
             //First, check if this crosswalk can handle disseminating Item-level Administrative metadata
             if(crosswalk.canDisseminate(item))
@@ -731,13 +747,17 @@ public class ItemAdapter extends AbstractAdapter
                 
                 Bitstream originalBitstream = null;
                 if (isDerivedBundle)
-                        originalBitstream = findOriginalBitstream(item, bitstream);
+                {
+                    originalBitstream = findOriginalBitstream(item, bitstream);
+                }
                 String groupID = getGroupFileID((originalBitstream == null) ? bitstream : originalBitstream );
 
                 //Check if there were administrative metadata sections corresponding to this file
                 String admIDs = null;
                 if(fileAmdSecIDs.containsKey(fileID))
-                  admIDs = fileAmdSecIDs.get(fileID).toString();
+                {
+                    admIDs = fileAmdSecIDs.get(fileID).toString();
+                }
   
                 // Render the actual file & flocate elements.
                 renderFile(item, bitstream, fileID, groupID, admIDs);
@@ -748,7 +768,9 @@ public class ItemAdapter extends AbstractAdapter
                 {
                     contentBitstreams.add(bitstream);
                     if (bundle.getPrimaryBitstreamID() == bitstream.getID())
+                    {
                         primaryBitstream = bitstream;
+                    }
                 }
             }
             
@@ -793,10 +815,14 @@ public class ItemAdapter extends AbstractAdapter
         attributes.put("TYPE", "DSpace Item");
         // add references to the Descriptive metadata
         if (dmdSecIDS != null)
-                attributes.put("DMDID", dmdSecIDS.toString());
+        {
+            attributes.put("DMDID", dmdSecIDS.toString());
+        }
         // add references to the Administrative metadata
         if (amdSecIDS != null)
-                attributes.put("AMDID", amdSecIDS.toString());
+        {
+            attributes.put("AMDID", amdSecIDS.toString());
+        }
         startElement(METS,"div",attributes);
         
         // add a fptr pointer to the primary bitstream.
@@ -855,7 +881,9 @@ public class ItemAdapter extends AbstractAdapter
     {
         Boolean include = ConfigurationManager.getBooleanProperty("xmlui.bitstream.mets");
         if (!include)
-                return;
+        {
+            return;
+        }
                 
                 
         Bundle[] bundles = item.getBundles("METADATA");
@@ -865,7 +893,9 @@ public class ItemAdapter extends AbstractAdapter
                 Bitstream bitstream = bundle.getBitstreamByName("METS.xml");
 
                 if (bitstream == null)
-                        continue;
+                {
+                    continue;
+                }
 
                 // ///////////////////////////////
                 // Send the actual XML content

@@ -194,7 +194,9 @@ public class InstallItem
         // add date available if not under embargo, otherwise it will
         // be set when the embargo is lifted.
         if (embargoLiftDate == null)
+        {
             item.addDC("date", "available", null, now.toString());
+        }
 
         // create issue date if not present
         DCValue[] currentDateIssued = item.getDC("date", "issued", Item.ANY);
@@ -249,7 +251,9 @@ public class InstallItem
 
         // set embargo lift date and take away read access if indicated.
         if (embargoLiftDate != null)
+        {
             EmbargoManager.setEmbargo(c, item, embargoLiftDate);
+        }
 
         return item;
     }

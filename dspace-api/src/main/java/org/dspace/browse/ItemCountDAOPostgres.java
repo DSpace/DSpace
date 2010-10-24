@@ -120,7 +120,9 @@ public class ItemCountDAOPostgres implements ItemCountDAO
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
     }
 
@@ -160,7 +162,9 @@ public class ItemCountDAOPostgres implements ItemCountDAO
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
     }
 
@@ -302,7 +306,9 @@ public class ItemCountDAOPostgres implements ItemCountDAO
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
     }
 	
@@ -344,7 +350,9 @@ public class ItemCountDAOPostgres implements ItemCountDAO
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
     }
 }

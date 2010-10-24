@@ -332,7 +332,9 @@ public class MetadataField
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         if (row == null)
@@ -372,7 +374,9 @@ public class MetadataField
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         // Convert list into an array
@@ -410,7 +414,9 @@ public class MetadataField
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         // Convert list into an array
@@ -629,7 +635,9 @@ public class MetadataField
         // 'sanity check' first.
         Integer iid = Integer.valueOf(id);
         if (!id2field.containsKey(iid))
+        {
             return null;
+        }
 
         return (MetadataField) id2field.get(iid);
     }
@@ -670,7 +678,9 @@ public class MetadataField
             {
                 // close the TableRowIterator to free up resources
                 if (tri != null)
+                {
                     tri.close();
+                }
             }
 
             id2field = new_id2field;

@@ -128,7 +128,9 @@ public class HTMLServlet extends DSpaceServlet
             for (int k = 0; k < bitstreams.length; k++)
             {
                 if (bsName.equals(bitstreams[k].getName()))
+                {
                     return bitstreams[k];
+                }
             }
         }
         return null;

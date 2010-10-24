@@ -148,7 +148,9 @@ public class ItemExport extends AbstractDSpaceTransformer implements
 				}
 			}
 			if (errors.size() <= 0)
-				message = T_item_export_success;
+            {
+                message = T_item_export_success;
+            }
 		} else if (request.getParameter("collectionID") != null) {
 			Collection col = null;
 			try {
@@ -169,7 +171,9 @@ public class ItemExport extends AbstractDSpaceTransformer implements
 				}
 			}
 			if (errors.size() <= 0)
-				message = T_col_export_success;
+            {
+                message = T_col_export_success;
+            }
 		} else if (request.getParameter("communityID") != null) {
 			Community com = null;
 			try {
@@ -190,7 +194,9 @@ public class ItemExport extends AbstractDSpaceTransformer implements
 				}
 			}
 			if (errors.size() <= 0)
-				message = T_community_export_success;
+            {
+                message = T_community_export_success;
+            }
 		}
         
         try {

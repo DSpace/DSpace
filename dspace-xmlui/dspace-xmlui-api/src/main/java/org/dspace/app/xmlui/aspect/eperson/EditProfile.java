@@ -334,7 +334,9 @@ public class EditProfile extends AbstractDSpaceTransformer
            firstName.addError(T_error_required);
        }
        if (!registering && !ConfigurationManager.getBooleanProperty("xmlui.user.editmetadata", true))
+       {
            firstName.setDisabled();
+       }
        
        // Last name
        Text lastName = identity.addItem().addText("last_name");
@@ -346,7 +348,9 @@ public class EditProfile extends AbstractDSpaceTransformer
            lastName.addError(T_error_required);
        }
        if (!registering &&!ConfigurationManager.getBooleanProperty("xmlui.user.editmetadata", true))
+       {
            lastName.setDisabled();
+       }
        
        // Phone
        Text phone = identity.addItem().addText("phone");
@@ -357,7 +361,9 @@ public class EditProfile extends AbstractDSpaceTransformer
            phone.addError(T_error_required);
        }
        if (!registering && !ConfigurationManager.getBooleanProperty("xmlui.user.editmetadata", true))
+       {
            phone.setDisabled();
+       }
         
        // Language
        Select lang = identity.addItem().addSelect("language");
@@ -376,7 +382,9 @@ public class EditProfile extends AbstractDSpaceTransformer
        lang.setOptionSelected((defaultLanguage == null || defaultLanguage.equals("")) ?
                               I18nUtil.DEFAULTLOCALE.toString() : defaultLanguage);
        if (!registering && !ConfigurationManager.getBooleanProperty("xmlui.user.editmetadata", true))
+       {
            lang.setDisabled();
+       }
 
        // Subscriptions
        if (!registering)
@@ -431,7 +439,9 @@ public class EditProfile extends AbstractDSpaceTransformer
            Field password = security.addItem().addPassword("password");
            password.setLabel(T_password);
            if (registering)
-                   password.setRequired();
+           {
+               password.setRequired();
+           }
            if (errors.contains("password"))
            {
                password.addError(T_error_invalid_password);
@@ -440,7 +450,9 @@ public class EditProfile extends AbstractDSpaceTransformer
            Field passwordConfirm = security.addItem().addPassword("password_confirm");
            passwordConfirm.setLabel(T_confirm_password);
            if (registering)
-                   passwordConfirm.setRequired();
+           {
+               passwordConfirm.setRequired();
+           }
            if (errors.contains("password_confirm"))
            {
                passwordConfirm.addError(T_error_unconfirmed_password);

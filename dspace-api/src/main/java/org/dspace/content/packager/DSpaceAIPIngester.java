@@ -117,7 +117,9 @@ public class DSpaceAIPIngester
             throw new MetadataValidationException("Cannot accept METS with no PROFILE attribute!");
         }
         else if (!profile.equals(DSpaceAIPDisseminator.PROFILE_1_0))
-            throw new MetadataValidationException("METS has unacceptable PROFILE attribute, profile="+profile);
+        {
+            throw new MetadataValidationException("METS has unacceptable PROFILE attribute, profile=" + profile);
+        }
     }
 
 
@@ -144,7 +146,9 @@ public class DSpaceAIPIngester
         // Check to see what dmdSec the user specified in the 'dmd' parameter
         String userDmd = null;
         if (params != null)
+        {
             userDmd = params.getProperty("dmd");
+        }
         if (userDmd != null && userDmd.length() > 0)
         {
             for (int i = 0; i < dmds.length; ++i)
@@ -197,7 +201,9 @@ public class DSpaceAIPIngester
                 {
                     String g = dmds[i].getAttributeValue("GROUPID");
                     if (g != null && !g.equals(groupID))
+                    {
                         manifest.crosswalkItemDmd(context, params, dso, dmds[i], callback);
+                    }
                 }
             }
         }
@@ -248,7 +254,9 @@ public class DSpaceAIPIngester
         }
 
         if(newLicense)
+        {
             PackageUtils.addDepositLicense(context, license, item, collection);
+        }
     }
 
     /**
@@ -306,12 +314,18 @@ public class DSpaceAIPIngester
         Element mets = manifest.getMets();
         String typeStr = mets.getAttributeValue("TYPE");
         if (typeStr == null || typeStr.length() == 0)
+        {
             throw new PackageValidationException("Manifest is missing the required mets@TYPE attribute.");
+        }
         if (typeStr.startsWith("DSpace "))
+        {
             typeStr = typeStr.substring(7);
+        }
         int type = Constants.getTypeID(typeStr);
         if (type < 0)
-            throw new PackageValidationException("Manifest has unrecognized value in mets@TYPE attribute: "+typeStr);
+        {
+            throw new PackageValidationException("Manifest has unrecognized value in mets@TYPE attribute: " + typeStr);
+        }
         return type;
     }
 

@@ -99,7 +99,9 @@ public class DIMDisseminationCrosswalk
     public Element disseminateElement(DSpaceObject dso)	throws CrosswalkException, IOException, SQLException, AuthorizeException 
 	{
     	if (dso.getType() != Constants.ITEM)
+        {
             throw new CrosswalkObjectNotSupported("DIMDisseminationCrosswalk can only crosswalk an Item.");
+        }
         Item item = (Item)dso;
         
     	DCValue[] dc = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
@@ -110,11 +112,17 @@ public class DIMDisseminationCrosswalk
             field.setAttribute("mdschema", dc[i].schema);
             field.setAttribute("element", dc[i].element);
             if (dc[i].qualifier != null)
+            {
                 field.setAttribute("qualifier", dc[i].qualifier);
+            }
             if (dc[i].language != null)
+            {
                 field.setAttribute("lang", dc[i].language);
+            }
             if (dc[i].value != null)
+            {
                 field.setText(dc[i].value);
+            }
             dim.addContent(field);
         }
         return dim;

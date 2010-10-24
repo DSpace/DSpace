@@ -104,7 +104,9 @@ public class Highlight extends RichTextContainer implements StructuralElement
     {
         AttributeMap attributes = new AttributeMap();
         if (this.rend != null)
+        {
             attributes.put(A_RENDER, this.rend);
+        }
 
         startElement(contentHandler, namespaces, E_HIGHLIGHT, attributes);
         super.toSAX(contentHandler, lexicalHandler, namespaces);

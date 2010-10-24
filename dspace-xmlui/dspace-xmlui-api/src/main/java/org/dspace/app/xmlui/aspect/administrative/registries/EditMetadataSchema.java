@@ -207,11 +207,15 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 			
 			String fieldName = schemaName +"."+ fieldElement;
 			if (fieldQualifier != null && fieldQualifier.length() > 0)
-				fieldName += "."+fieldQualifier;
+            {
+                fieldName += "." + fieldQualifier;
+            }
 				
 			boolean highlight = false;
 			if (field.getFieldID() == highlightID)
-				highlight = true;
+            {
+                highlight = true;
+            }
 			
 			String fieldScopeNote = field.getScopeNote();
 			
@@ -248,7 +252,9 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 			Para actions = main.addPara();
 			actions.addButton("submit_delete").setValue(T_submit_delete);
 			if (MetadataSchema.findAll(context).length > 1)
-				actions.addButton("submit_move").setValue(T_submit_move);	
+            {
+                actions.addButton("submit_move").setValue(T_submit_move);
+            }
 			actions.addButton("submit_return").setValue(T_submit_return);
 		}
 		
@@ -321,11 +327,17 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 		String noteValue = request.getParameter("updateNote");
 		
 		if (elementValue == null)
-			elementValue = field.getElement();
+        {
+            elementValue = field.getElement();
+        }
 		if (qualifierValue == null)
-			qualifierValue = field.getQualifier();
+        {
+            qualifierValue = field.getQualifier();
+        }
 		if (noteValue == null)
-			noteValue = field.getScopeNote();
+        {
+            noteValue = field.getScopeNote();
+        }
 		
 		
 		Division newField = div.addDivision("edit-schema-update-field");

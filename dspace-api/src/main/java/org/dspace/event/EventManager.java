@@ -132,7 +132,9 @@ public class EventManager
         }
 
         if (name == null)
+        {
             name = DEFAULT_DISPATCHER;
+        }
 
         try
         {
@@ -318,7 +320,9 @@ public class EventManager
             {
                 ConsumerProfile cp = (ConsumerProfile) ci.next();
                 if (cp != null)
+                {
                     cp.getConsumer().finish(ctx);
+                }
             }
             return;
 

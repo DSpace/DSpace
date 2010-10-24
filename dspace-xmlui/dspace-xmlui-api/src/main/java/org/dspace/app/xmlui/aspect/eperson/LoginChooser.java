@@ -192,10 +192,14 @@ public class LoginChooser extends AbstractDSpaceTransformer implements
             }
 
 			if (message != null)
-				reason.addPara(message(message));
+            {
+                reason.addPara(message(message));
+            }
 
 			if (characters != null)
-				reason.addPara(characters);
+            {
+                reason.addPara(characters);
+            }
 		}
 
 		Division loginChooser = body.addDivision("login-chooser");

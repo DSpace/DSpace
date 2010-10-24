@@ -187,7 +187,9 @@ public class ItemExportDownloadReader extends AbstractReader implements Recyclab
             ProcessingException
     {
     	if (this.compressedExportInputStream == null)
-	    	return;
+        {
+            return;
+        }
     	
         byte[] buffer = new byte[BUFFER_SIZE];
         int length = -1;

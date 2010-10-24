@@ -160,7 +160,9 @@ public class InitialQuestionsStep extends AbstractSubmissionStep
 	        for (int i=0; i< titles.length; i++)
 	        {
 	        	if (i > 0)
-	        		note.addContent(T_separator);
+                {
+                    note.addContent(T_separator);
+                }
 	        	note.addContent("\"");
 	        	note.addHighlight("bold").addContent(titles[i].value);
 	        	note.addContent("\"");
@@ -193,7 +195,9 @@ public class InitialQuestionsStep extends AbstractSubmissionStep
 	        	for (int i=0; i< dateIssued.length; i++)
 	        	{
 	        		if (i > 0)
-		        		note.addContent(T_separator);
+                    {
+                        note.addContent(T_separator);
+                    }
 	        		note.addContent(dateIssued[i].value);
 	        	}
 	        	note.addContent(T_close);
@@ -201,7 +205,9 @@ public class InitialQuestionsStep extends AbstractSubmissionStep
 	        
 	        // Conjunction
 	        if (dateIssued.length > 0 && (citation.length > 0 || publisher.length > 0))
-	        	note.addContent(T_separator);
+            {
+                note.addContent(T_separator);
+            }
 	        
 	        if (dateIssued.length > 0 && citation.length > 0 && publisher.length == 0)
 	        {
@@ -216,7 +222,9 @@ public class InitialQuestionsStep extends AbstractSubmissionStep
 	        	for (int i=0; i< citation.length; i++)
 	        	{
 	        		if (i > 0)
-		        		note.addContent(T_separator);
+                    {
+                        note.addContent(T_separator);
+                    }
 	        		note.addContent(citation[i].value);
 	        	}
 	        	note.addContent(T_close);
@@ -243,7 +251,9 @@ public class InitialQuestionsStep extends AbstractSubmissionStep
 	        	for (int i=0; i< publisher.length; i++)
 	        	{
 	        		if (i > 0)
-		        		note.addContent(T_separator);
+                    {
+                        note.addContent(T_separator);
+                    }
 	        		note.addContent(publisher[i].value);
 	        	}
 	        	note.addContent(T_close);
@@ -290,11 +300,15 @@ public class InitialQuestionsStep extends AbstractSubmissionStep
         //add information to review
         Message multipleTitles = ReviewStep.T_no;
         if (submission.hasMultipleTitles())
+        {
             multipleTitles = ReviewStep.T_yes;
+        }
     
         Message publishedBefore = ReviewStep.T_no;
         if (submission.isPublishedBefore())
+        {
             publishedBefore = ReviewStep.T_yes;
+        }
         
         initSection.addLabel(T_multiple_titles);
         initSection.addItem(multipleTitles);

@@ -111,7 +111,9 @@ public class MoveItemForm extends AbstractDSpaceTransformer {
         {
             String name = collection.getMetadata("name");
             if (name.length() > 50)
+            {
                 name = name.substring(0, 47) + "...";
+            }
             select.addOption(collection.equals(owningCollection), collection.getID(), name);
         }
         

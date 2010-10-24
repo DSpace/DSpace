@@ -80,7 +80,9 @@ public class DSpaceOREGenerator extends AbstractGenerator
 			
 			Item item = getItem(context);
             if (item == null)
-            	throw new ResourceNotFoundException("Unable to locate object.");
+            {
+                throw new ResourceNotFoundException("Unable to locate object.");
+            }
             
             
             // Instantiate and execute the ORE plugin

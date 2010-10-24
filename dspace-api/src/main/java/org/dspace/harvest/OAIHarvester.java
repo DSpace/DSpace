@@ -156,14 +156,18 @@ public class OAIHarvester {
 	public OAIHarvester(Context c, DSpaceObject dso, HarvestedCollection hc) throws HarvestingException, SQLException 
 	{
 		if (dso.getType() != Constants.COLLECTION)
+        {
             throw new HarvestingException("OAIHarvester can only harvest collections");
+        }
 		
 		ourContext = c;
 		targetCollection = (Collection)dso;
 		
 		harvestRow = hc;
 		if (harvestRow == null || !harvestRow.isHarvestable())
-			throw new HarvestingException("Provided collection is not set up for harvesting");
+        {
+            throw new HarvestingException("Provided collection is not set up for harvesting");
+        }
 		
         // Set the ORE options
 		Namespace ORESerializationNamespace = OAIHarvester.getORENamespace();
@@ -262,12 +266,16 @@ public class OAIHarvester {
 		String oaiSetId = harvestRow.getOaiSetId();
         //If we have all selected then make sure that we do not include a set filter
         if("all".equals(oaiSetId))
+        {
             oaiSetId = null;
+        }
 
 		Date lastHarvestDate = harvestRow.getHarvestDate();
 		String fromDate = null;
 		if (lastHarvestDate != null)
-			fromDate = processDate(harvestRow.getHarvestDate());
+        {
+            fromDate = processDate(harvestRow.getHarvestDate());
+        }
 		
 		Date startTime = new Date();
 		String toDate = processDate(startTime,0); 
@@ -283,7 +291,9 @@ public class OAIHarvester {
 	    	try {
 	    		dateGranularity = OAIGetDateGranularity(oaiSource);
 	    		if (fromDate != null)
-	    			fromDate = fromDate.substring(0, dateGranularity.length());
+                {
+                    fromDate = fromDate.substring(0, dateGranularity.length());
+                }
 	    		toDate = toDate.substring(0, dateGranularity.length());
 	    		
 	    		descMDPrefix = OAIResolveNamespaceToPrefix(oaiSource, metadataNS.getURI());
@@ -318,7 +328,10 @@ public class OAIHarvester {
 			
 			// expiration timer starts
 			int expirationInterval = ConfigurationManager.getIntProperty("harvester.threadTimeout");
-	    	if (expirationInterval == 0) expirationInterval = 24;
+	    	if (expirationInterval == 0)
+            {
+                expirationInterval = 24;
+            }
 			
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(startTime);
@@ -331,8 +344,10 @@ public class OAIHarvester {
 		
 			ListRecords listRecords = new ListRecords(oaiSource, fromDate, toDate, oaiSetId, descMDPrefix);
 			log.debug("Harvesting request parameters: listRecords " + oaiSource + " " + fromDate + " " + toDate + " " + oaiSetId + " " + descMDPrefix);
-			if (listRecords != null) 
-				log.info("HTTP Request: " + listRecords.getRequestURL());
+			if (listRecords != null)
+            {
+                log.info("HTTP Request: " + listRecords.getRequestURL());
+            }
 			while (listRecords != null) 
 			{
 				records = new ArrayList<Element>();
@@ -369,10 +384,14 @@ public class OAIHarvester {
 					for (Element record : records) {
 						// check for STOP interrupt from the scheduler
 						if (HarvestScheduler.interrupt == HarvestScheduler.HARVESTER_INTERRUPT_STOP)
-							throw new HarvestingException("Harvest process for " + targetCollection.getID() + " interrupted by stopping the scheduler.");
+                        {
+                            throw new HarvestingException("Harvest process for " + targetCollection.getID() + " interrupted by stopping the scheduler.");
+                        }
 						// check for timeout
-						if (expirationTime.before(new Date())) 
-							throw new HarvestingException("runHarvest method timed out for collection " + targetCollection.getID());
+						if (expirationTime.before(new Date()))
+                        {
+                            throw new HarvestingException("runHarvest method timed out for collection " + targetCollection.getID());
+                        }
 						
 						processRecord(record,OREPrefix);
 						ourContext.commit();
@@ -448,7 +467,9 @@ public class OAIHarvester {
 		if (header.getAttribute("status") != null && header.getAttribute("status").getValue().equals("deleted")) {
 			log.info("Item " + itemOaiID + " has been marked as deleted on the OAI server.");
 			if (item != null)
-				targetCollection.removeItem(item);
+            {
+                targetCollection.removeItem(item);
+            }
 			
 			ourContext.restoreAuthSystemState();			
 			return;
@@ -544,7 +565,9 @@ public class OAIHarvester {
     		{
     			DSpaceObject dso = HandleManager.resolveToObject(ourContext, handle);
     			if (dso != null)
-    				throw new HarvestingException("Handle collision: attempted to re-assign handle '" + handle + "' to an incoming harvested item '" + hi.getOaiID() + "'.");    			    			
+                {
+                    throw new HarvestingException("Handle collision: attempted to re-assign handle '" + handle + "' to an incoming harvested item '" + hi.getOaiID() + "'.");
+                }
     		}
     		
     		try {
@@ -616,10 +639,16 @@ public class OAIHarvester {
     private String extractHandle(Item item) 
     {
     	String acceptedHandleServersString = ConfigurationManager.getProperty("harvester.acceptedHandleServer");
-    	if (acceptedHandleServersString == null) acceptedHandleServersString = "hdl.handle.net";
+    	if (acceptedHandleServersString == null)
+        {
+            acceptedHandleServersString = "hdl.handle.net";
+        }
     	
     	String rejectedHandlePrefixString = ConfigurationManager.getProperty("harvester.rejectedHandlePrefix");
-    	if (rejectedHandlePrefixString == null) rejectedHandlePrefixString = "123456789";
+    	if (rejectedHandlePrefixString == null)
+        {
+            rejectedHandlePrefixString = "123456789";
+        }
     	
     	DCValue[] values = item.getMetadata("dc", "identifier", Item.ANY, Item.ANY);
     	
@@ -634,13 +663,17 @@ public class OAIHarvester {
     			//   http://hdl.handle.net/1234/12 
     			String[] urlPieces = value.value.split("/");
     			if (urlPieces.length != 5)
-    				continue;
+                {
+                    continue;
+                }
     			
     			for (String server : acceptedHandleServers) {
     				if (urlPieces[2].equals(server)) {
     					for (String prefix : rejectedHandlePrefixes) {
     						if (!urlPieces[3].equals(prefix))
-    							return urlPieces[3] + "/" + urlPieces[4];
+                            {
+                                return urlPieces[3] + "/" + urlPieces[4];
+                            }
     					}
     					
     				}
@@ -661,10 +694,16 @@ public class OAIHarvester {
     {
     	// The two options, with three possibilities each: add, ignore, fail
     	String schemaChoice = ConfigurationManager.getProperty("harvester.unknownSchema");
-    	if (schemaChoice == null) schemaChoice = "fail";
+    	if (schemaChoice == null)
+        {
+            schemaChoice = "fail";
+        }
     	
     	String fieldChoice = ConfigurationManager.getProperty("harvester.unknownField");
-    	if (fieldChoice == null) fieldChoice = "fail";
+    	if (fieldChoice == null)
+        {
+            fieldChoice = "fail";
+        }
     	
     	List<String> clearList = new ArrayList<String>();
     	
@@ -927,9 +966,13 @@ public class OAIHarvester {
     	}
     	
     	if (testORE && OREOAIPrefix == null)
-    		errorSet.add(OAI_ORE_ERROR + ": The OAI server does not support ORE dissemination");
+        {
+            errorSet.add(OAI_ORE_ERROR + ": The OAI server does not support ORE dissemination");
+        }
     	if (DMDOAIPrefix == null)
-    		errorSet.add(OAI_DMD_ERROR + ": The OAI server does not support dissemination in this format");
+        {
+            errorSet.add(OAI_DMD_ERROR + ": The OAI server does not support dissemination in this format");
+        }
     	
     	// Now scan the sets and make sure the one supplied is in the list 
     	boolean foundSet = false;
@@ -1112,16 +1155,27 @@ public class OAIHarvester {
 			String harvestAdminParam = ConfigurationManager.getProperty("harvester.eperson");
 			harvestAdmin = null;
 			if (harvestAdminParam != null && harvestAdminParam.length() > 0)
-			  harvestAdmin = EPerson.findByEmail(mainContext, harvestAdminParam);
+            {
+                harvestAdmin = EPerson.findByEmail(mainContext, harvestAdminParam);
+            }
 			
 			harvestThreads = new Stack<HarvestThread>();
 			
 			maxActiveThreads = ConfigurationManager.getIntProperty("harvester.maxThreads");
-			if (maxActiveThreads == 0) maxActiveThreads = 3;
+			if (maxActiveThreads == 0)
+            {
+                maxActiveThreads = 3;
+            }
 			minHeartbeat = ConfigurationManager.getIntProperty("harvester.minHeartbeat") * 1000;
-			if (minHeartbeat == 0) minHeartbeat = 30000;
+			if (minHeartbeat == 0)
+            {
+                minHeartbeat = 30000;
+            }
 			maxHeartbeat = ConfigurationManager.getIntProperty("harvester.maxHeartbeat") * 1000;
-			if (maxHeartbeat == 0) maxHeartbeat = 3600000;
+			if (maxHeartbeat == 0)
+            {
+                maxHeartbeat = 3600000;
+            }
 		}
 
 		public void run() {
@@ -1153,7 +1207,9 @@ public class OAIHarvester {
 								Thread.sleep(1000);
 							}		
 							if (interrupt != HARVESTER_INTERRUPT_STOP)
-								break;
+                            {
+                                break;
+                            }
 						case HARVESTER_INTERRUPT_STOP:
 							interrupt = HARVESTER_INTERRUPT_NONE;
 							status = HARVESTER_STATUS_STOPPED;
@@ -1221,7 +1277,10 @@ public class OAIHarvester {
 					HarvestedCollection hc = HarvestedCollection.find(tempContext, nextCollectionId);
 
 					int harvestInterval = ConfigurationManager.getIntProperty("harvester.harvestFrequency");
-					if (harvestInterval == 0) harvestInterval = 720;
+					if (harvestInterval == 0)
+                    {
+                        harvestInterval = 720;
+                    }
 
 			    	Date nextTime;
 			    	long nextHarvest = 0;

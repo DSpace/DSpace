@@ -220,7 +220,9 @@ public class METSExport
         finally
         {
             if (items != null)
+            {
                 items.close();
+            }
         }
         
         context.abort();
@@ -261,7 +263,15 @@ public class METSExport
         finally
         {
             if (is != null)
-                try { is.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    is.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
         }
     }
 

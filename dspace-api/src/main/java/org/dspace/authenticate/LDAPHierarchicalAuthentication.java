@@ -194,7 +194,9 @@ public class LDAPHierarchicalAuthentication
 
         // Skip out when no netid or password is given.
         if (netid == null || password == null)
-        	return BAD_ARGS;
+        {
+            return BAD_ARGS;
+        }
 
         // Locate the eperson
         EPerson eperson = null;
@@ -451,25 +453,33 @@ public class LDAPHierarchicalAuthentication
 						if (attlist[0] != null) {
 							att = atts.get(attlist[0]);
 							if (att != null)
-								ldapEmail = (String) att.get();
+                            {
+                                ldapEmail = (String) att.get();
+                            }
 						}
 
 						if (attlist[1] != null) {
 							att = atts.get(attlist[1]);
 							if (att != null)
-								ldapGivenName = (String) att.get();
+                            {
+                                ldapGivenName = (String) att.get();
+                            }
 						}
 
 						if (attlist[2] != null) {
 							att = atts.get(attlist[2]);
 							if (att != null)
-								ldapSurname = (String) att.get();
+                            {
+                                ldapSurname = (String) att.get();
+                            }
 						}
 
 						if (attlist[3] != null) {
 							att = atts.get(attlist[3]);
 							if (att != null)
-								ldapPhone = (String) att.get();
+                            {
+                                ldapPhone = (String) att.get();
+                            }
 						}
 
 						if (answer.hasMoreElements()) {
@@ -502,7 +512,9 @@ public class LDAPHierarchicalAuthentication
 				try
 				{
 					if (ctx != null)
-						ctx.close();
+                    {
+                        ctx.close();
+                    }
 				}
 				catch (NamingException e)
 				{
@@ -544,7 +556,9 @@ public class LDAPHierarchicalAuthentication
 					// Close the context when we're done
 					try {
 						if (ctx != null)
-							ctx.close();
+                        {
+                            ctx.close();
+                        }
 					} catch (NamingException e) {
 					}
 				}

@@ -779,12 +779,18 @@ public class LocationUtils {
     static
     {
         if(countryCodeList == null)
-                            countryCodeList = Arrays.asList(countryCodes);
+        {
+            countryCodeList = Arrays.asList(countryCodes);
+        }
         if(continentCodeList == null)
+        {
             continentCodeList = Arrays.asList(continentCodes);
+        }
 
         if(countryNameList == null)
+        {
             countryNameList = Arrays.asList(countryNames);
+        }
     }
 
     private static String[][] continentCodeToName = new String[][]{
@@ -818,7 +824,9 @@ public class LocationUtils {
 //        String continentCode = getContinentCode(countryCode);
         for (String[] contCodeName : continentCodeToName) {
             if (contCodeName[0].equals(continentCode))
+            {
                 return contCodeName[1];
+            }
         }
         return continentCode;
     }

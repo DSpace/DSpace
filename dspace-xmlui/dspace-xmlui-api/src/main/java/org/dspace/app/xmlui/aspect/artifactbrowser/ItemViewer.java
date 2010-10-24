@@ -124,7 +124,9 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
             if (dso == null)
+            {
                 return "0"; // no item, something is wrong.
+            }
 
             return HashUtil.hash(dso.getHandle() + "full:" + showFullItem(objectModel));
         }
@@ -173,7 +175,10 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
     {
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof Item))
+        {
             return;
+        }
+
         Item item = (Item) dso;
 
         // Set the page title
@@ -253,7 +258,10 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof Item))
+        {
             return;
+        }
+
         Item item = (Item) dso;
 
         // Build the item viewer division.
@@ -328,7 +336,10 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         String show = request.getParameter("show");
 
         if (show != null && show.length() > 0)
+        {
             return true;
+        }
+
         return false;
     }
 

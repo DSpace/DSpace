@@ -136,7 +136,9 @@ public class MetadataAuthorityManager
                 // get minConfidence level for this field if any
                 int mci = readConfidence("authority.minconfidence."+field);
                 if (mci >= Choices.CF_UNSET)
+                {
                     minConfidence.put(fkey, Integer.valueOf(mci));
+                }
                 log.debug("Authority Control: For schema="+schema+", elt="+element+", qual="+qualifier+", controlled="+ctl+", required="+req);
             }
         }
@@ -144,7 +146,9 @@ public class MetadataAuthorityManager
         // get default min confidence if any:
         int dmc = readConfidence("authority.minconfidence");
         if (dmc >= Choices.CF_UNSET)
+        {
             defaultMinConfidence = dmc;
+        }
     }
 
     private int readConfidence(String key)

@@ -808,7 +808,9 @@ public class MyDSpaceServlet extends DSpaceServlet
         finally
         {
             if (subs != null)
+            {
                 subs.close();
+            }
         }
 
         Item[] items = new Item[subList.size()];

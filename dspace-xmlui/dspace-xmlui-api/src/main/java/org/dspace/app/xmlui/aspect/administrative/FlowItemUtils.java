@@ -220,7 +220,9 @@ public class FlowItemUtils
 			
 			// the user selected the remove checkbox.
 			if (remove != null)
-				continue;
+            {
+                continue;
+            }
 			
 			// get the field's name broken up
 			String[] parts = parseName(name);
@@ -228,10 +230,14 @@ public class FlowItemUtils
                         // probe for a confidence value
                         int iconf = Choices.CF_UNSET;
                         if (confidence != null && confidence.length() > 0)
+                        {
                             iconf = Choices.getConfidenceValue(confidence);
+                        }
                         // upgrade to a minimum of NOVALUE if there IS an authority key
                         if (authority != null && authority.length() > 0 && iconf == Choices.CF_UNSET)
+                        {
                             iconf = Choices.CF_NOVALUE;
+                        }
                         item.addMetadata(parts[0], parts[1], parts[2], lang,
                                              value, authority, iconf);
 		}
@@ -390,10 +396,14 @@ public class FlowItemUtils
 
           // Remove item from its owning collection and add to the destination
           if (!alreadyInCollection)
+          {
               destination.addItem(item);
+          }
 
           if (owningCollection != null)
+          {
               owningCollection.removeItem(item);
+          }
 
           item.setOwningCollection(destination);
           item.update();
@@ -465,7 +475,9 @@ public class FlowItemUtils
 		Object object = request.get("file");
 		Part filePart = null;
 		if (object instanceof Part)
-			filePart = (Part) object;
+        {
+            filePart = (Part) object;
+        }
 
 		if (filePart != null && filePart.getSize() > 0)
 		{
@@ -645,7 +657,9 @@ public class FlowItemUtils
 			String[] parts = id.split("/");
 			
 			if (parts.length != 2)
-				throw new UIException("Unable to parse id into bundle and bitstream id: "+id);
+            {
+                throw new UIException("Unable to parse id into bundle and bitstream id: " + id);
+            }
 			
 			int bundleID = Integer.valueOf(parts[0]);
 			int bitstreamID = Integer.valueOf(parts[1]);

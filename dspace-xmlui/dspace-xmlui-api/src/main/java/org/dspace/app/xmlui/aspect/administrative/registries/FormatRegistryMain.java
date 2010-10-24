@@ -139,7 +139,9 @@ public class FormatRegistryMain extends AbstractDSpaceTransformer
 			
 			boolean highlight = false;
 			if (format.getID() == highlightID)
-				highlight = true;
+            {
+                highlight = true;
+            }
 
 			String url = contextPath + "/admin/format-registry?administrative-continue="+knot.getId()+"&submit_edit&formatID="+id;
 

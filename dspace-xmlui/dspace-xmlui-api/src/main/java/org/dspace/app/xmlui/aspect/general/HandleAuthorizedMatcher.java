@@ -111,10 +111,11 @@ public class HandleAuthorizedMatcher extends AbstractLogEnabled implements Match
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
             
             if (dso == null)
-            	return null;
+            {
+                return null;
+            }
             
-            boolean authorized = 
-            	AuthorizeManager.authorizeActionBoolean(context, dso, action);
+            boolean authorized = AuthorizeManager.authorizeActionBoolean(context, dso, action);
 
             // XOR
             if (not ^ authorized)

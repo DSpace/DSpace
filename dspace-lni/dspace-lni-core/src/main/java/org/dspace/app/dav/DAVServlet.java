@@ -142,6 +142,7 @@ public class DAVServlet extends HttpServlet
     {
         Cookie cookies[] = request.getCookies();
         if (cookies != null)
+        {
             for (Cookie element : cookies)
             {
                 if (element.getName().equals(COOKIE_NAME))
@@ -149,6 +150,7 @@ public class DAVServlet extends HttpServlet
                     return element;
                 }
             }
+        }
         return null;
     }
 

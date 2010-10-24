@@ -106,7 +106,9 @@ public class LCNameAuthority implements ChoiceAuthority
 
             // sanity check
             if (url == null)
+            {
                 throw new IllegalStateException("Missing DSpace configuration keys for LCName Query");
+            }
         }
     }
 
@@ -159,7 +161,9 @@ public class LCNameAuthority implements ChoiceAuthority
 
         // XXX arbitrary default limit - should be configurable?
         if (limit == 0)
+        {
             limit = 50;
+        }
 
         NameValuePair args[] = new NameValuePair[6];
         args[0] = new NameValuePair("operation", "searchRetrieve");
@@ -194,8 +198,10 @@ public class LCNameAuthority implements ChoiceAuthority
 
                 // this probably just means more results available..
                 if (handler.hits != handler.result.size())
-                    log.warn("Discrepency in results, result.length="+handler.result.size()+
-                          ", yet expected results="+handler.hits);
+                {
+                    log.warn("Discrepency in results, result.length=" + handler.result.size() +
+                            ", yet expected results=" + handler.hits);
+                }
                 boolean more = handler.hits > (start + handler.result.size());
 
                 // XXX add non-auth option; perhaps the UI should do this?
@@ -311,7 +317,9 @@ public class LCNameAuthority implements ChoiceAuthority
                 {
                     // HACK: many LC name entries end with ',' ...trim it.
                     if (name.endsWith(","))
-                        name = name.substring(0, name.length()-1);
+                    {
+                        name = name.substring(0, name.length() - 1);
+                    }
 
                     // XXX DEBUG
                     // log.debug("Got result, name="+name+", lccn="+lccn);
@@ -341,8 +349,10 @@ public class LCNameAuthority implements ChoiceAuthority
                         name = textValue;
                     }
 
-                        if (lastTag.equals("100") && lastCode.equals("d") && (name != null)) 
-                        name = name+"  "+textValue; 
+                        if (lastTag.equals("100") && lastCode.equals("d") && (name != null))
+                        {
+                            name = name + "  " + textValue;
+                        }
                          
                 }
             }
@@ -360,14 +370,18 @@ public class LCNameAuthority implements ChoiceAuthority
             {
                 lastTag = atts.getValue("tag");
                 if (lastTag == null)
+                {
                     log.warn("MARC datafield without tag attribute!");
+                }
             }
             else if (localName.equals("subfield") &&
                      namespaceURI.equals(NS_MX))
             {
                 lastCode = atts.getValue("code");
                 if (lastCode == null)
+                {
                     log.warn("MARC subfield without code attribute!");
+                }
             }
         }
 

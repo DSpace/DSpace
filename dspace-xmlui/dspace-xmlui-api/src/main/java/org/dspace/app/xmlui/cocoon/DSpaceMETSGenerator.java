@@ -122,7 +122,9 @@ public class DSpaceMETSGenerator extends AbstractGenerator
 			// Determine which adapter to use
 			AbstractAdapter adapter = resolveAdapter(context);
             if (adapter == null)
-            	throw new ResourceNotFoundException("Unable to locate object.");
+            {
+                throw new ResourceNotFoundException("Unable to locate object.");
+            }
             
             // Configure the adapter for this request.
             configureAdapter(adapter);
@@ -195,7 +197,9 @@ public class DSpaceMETSGenerator extends AbstractGenerator
                         if ("repository".equals(type))
                         {
                                 if (HandleManager.getPrefix().equals(strid))
-                                        adapter = new RepositoryAdapter(context,contextPath);
+                                {
+                                    adapter = new RepositoryAdapter(context, contextPath);
+                                }
                         }
                         else
                         {
@@ -204,19 +208,25 @@ public class DSpaceMETSGenerator extends AbstractGenerator
          			{
          				Item item = Item.find(context,id);
          				if (item != null)
-                                       	        adapter = new ItemAdapter(context,item,contextPath);
+                         {
+                             adapter = new ItemAdapter(context, item, contextPath);
+                         }
          			}
          			else if ("collection".equals(type))
          			{
          				Collection collection = Collection.find(context,id);
          				if (collection != null)
-         					adapter = new ContainerAdapter(context, collection,contextPath);
+                         {
+                             adapter = new ContainerAdapter(context, collection, contextPath);
+                         }
          			}
          			else if ("community".equals(type))
          			{
          				Community community = Community.find(context,id);
          				if (community != null)
-         					adapter = new ContainerAdapter(context, community,contextPath);
+                         {
+                             adapter = new ContainerAdapter(context, community, contextPath);
+                         }
          			}
 			}
          	}

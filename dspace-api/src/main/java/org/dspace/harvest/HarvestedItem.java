@@ -129,7 +129,9 @@ public class HarvestedItem
         }
         finally {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         return resolvedItem;

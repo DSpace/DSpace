@@ -362,16 +362,24 @@ public class Include extends AbstractTransformer implements CacheableProcessingC
             String qName, Attributes attributes)
     {
         if (child == null)
+        {
             return false;
+        }
 
         if (uri != null && !uri.equals(child.getNamespaceURI()))
+        {
             return false;
+        }
 
         if (localName != null && !localName.equals(child.getLocalName()))
+        {
             return false;
+        }
 
         if (!mergeableMap.containsKey(localName))
+        {
             return false;
+        }
 
         String[] attributeIdentities = mergeableMap.get(localName);
 
@@ -383,10 +391,14 @@ public class Include extends AbstractTransformer implements CacheableProcessingC
                 String childIdentity = child.getAttribute(attributeIdentity);
 
                 if (childIdentity != null && childIdentity.equals(testIdentity))
+                {
                     continue;
+                }
 
                 if (childIdentity == null && testIdentity == null)
+                {
                     continue;
+                }
 
                 return false;
             }
@@ -405,7 +417,9 @@ public class Include extends AbstractTransformer implements CacheableProcessingC
     private static List<Element> getElementList(Element element)
     {
         if (element == null)
+        {
             return new ArrayList<Element>();
+        }
 
         NodeList nodeList = element.getChildNodes();
 
@@ -413,7 +427,9 @@ public class Include extends AbstractTransformer implements CacheableProcessingC
         for (int i = 0; i < nodeList.getLength(); i++)
         {
             if (nodeList.item(i).getNodeType() == Node.ELEMENT_NODE)
+            {
                 resultList.add((Element) nodeList.item(i));
+            }
         }
 
         return resultList;
@@ -429,7 +445,9 @@ public class Include extends AbstractTransformer implements CacheableProcessingC
     private static List<Node> getNodeList(Element element)
     {
         if (element == null)
+        {
             return new ArrayList<Node>();
+        }
 
         NodeList nodeList = element.getChildNodes();
 

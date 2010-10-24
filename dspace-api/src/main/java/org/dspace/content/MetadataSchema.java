@@ -306,7 +306,9 @@ public class MetadataSchema
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         if (row == null)
@@ -411,7 +413,9 @@ public class MetadataSchema
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         // Convert list into an array
@@ -545,7 +549,9 @@ public class MetadataSchema
 
         // sanity check
         if (!id2schema.containsKey(iid))
+        {
             return null;
+        }
 
         return (MetadataSchema) id2schema.get(iid);
     }
@@ -565,7 +571,9 @@ public class MetadataSchema
     {
         // If we are not passed a valid schema name then return
         if (shortName == null)
+        {
             return null;
+        }
 
         if (!isCacheInitialized())
         {
@@ -573,7 +581,9 @@ public class MetadataSchema
         }
 
         if (!name2schema.containsKey(shortName))
+        {
             return null;
+        }
 
         return (MetadataSchema) name2schema.get(shortName);
     }
@@ -617,7 +627,9 @@ public class MetadataSchema
             {
                 // close the TableRowIterator to free up resources
                 if (tri != null)
+                {
                     tri.close();
+                }
             }
 
             id2schema = new_id2schema;

@@ -171,7 +171,9 @@ public class HarvestedCollection
     public boolean isReady() throws SQLException 
     {
     	if (this.isHarvestable() &&	(this.getHarvestStatus() == HarvestedCollection.STATUS_READY || this.getHarvestStatus() == HarvestedCollection.STATUS_OAI_ERROR))
-    		return true;
+        {
+            return true;
+        }
 
     	return false;   
     }
@@ -205,10 +207,16 @@ public class HarvestedCollection
     public static List<Integer> findReady(Context c) throws SQLException 
     {
     	int harvestInterval = ConfigurationManager.getIntProperty("harvester.harvestFrequency");
-    	if (harvestInterval == 0) harvestInterval = 720;
+    	if (harvestInterval == 0)
+        {
+            harvestInterval = 720;
+        }
     	
     	int expirationInterval = ConfigurationManager.getIntProperty("harvester.threadTimeout");
-    	if (expirationInterval == 0) expirationInterval = 24;
+    	if (expirationInterval == 0)
+        {
+            expirationInterval = 24;
+        }
 
     	Date startTime;
         Date expirationTime;
@@ -267,7 +275,9 @@ public class HarvestedCollection
     	String query = "select collection_id from harvested_collection where harvest_type > ? and harvest_status = ? order by last_harvested asc limit 1"; 
         
     	if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-    	    query = "select collection_id from harvested_collection where harvest_type > ? and harvest_status = ? and rownum <= 1  order by last_harvested asc"; 
+        {
+            query = "select collection_id from harvested_collection where harvest_type > ? and harvest_status = ? and rownum <= 1  order by last_harvested asc";
+        }
     	    
         TableRowIterator tri = DatabaseManager.queryTable(c, "harvested_collection", 
     			query, 0, 0);
@@ -290,7 +300,9 @@ public class HarvestedCollection
         String query = "select collection_id from harvested_collection where harvest_type > ? and harvest_status = ? order by last_harvested desc limit 1"; 
         
         if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        {
             query = "select collection_id from harvested_collection where harvest_type > ? and harvest_status = ? and rownum <= 1 order by last_harvested desc";
+        }
         
     	TableRowIterator tri = DatabaseManager.queryTable(c, "harvested_collection", 
     			query , 0, 0);

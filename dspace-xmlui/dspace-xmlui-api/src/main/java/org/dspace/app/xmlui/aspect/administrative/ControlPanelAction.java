@@ -87,7 +87,9 @@ public class ControlPanelAction extends AbstractAction
         
         // Update the message
         if (message != null)
-        	SystemwideAlerts.setMessage(message);
+        {
+            SystemwideAlerts.setMessage(message);
+        }
         
         if (countdown >= 0)
         {

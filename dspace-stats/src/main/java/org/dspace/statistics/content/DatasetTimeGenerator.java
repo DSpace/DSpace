@@ -69,7 +69,9 @@ public class DatasetTimeGenerator extends DatasetGenerator {
         Calendar endCal1 = Calendar.getInstance();
         endCal1.setTime(end);
         if(endCal1.before(startCal1))
+        {
             throw new IllegalArgumentException();
+        }
 
         // TODO: ensure future dates are tested. Although we normally do not
         // have visits from the future.

@@ -181,7 +181,9 @@ public class ManageGroupsMain extends AbstractDSpaceTransformer
         org.dspace.app.xmlui.wing.element.Item actionItem = actionsList.addItem();
         Text queryField = actionItem.addText("query");
         if (query != null)
-        	queryField.setValue(query);
+        {
+            queryField.setValue(query);
+        }
         queryField.setHelp(T_search_help);
         actionItem.addButton("submit_search").setValue(T_go);
         
@@ -204,9 +206,13 @@ public class ManageGroupsMain extends AbstractDSpaceTransformer
        
         	String nextURL = null, prevURL = null;
         	if (page < (resultCount / PAGE_SIZE))
-        		nextURL = baseURL+"&page="+(page+1);
+            {
+                nextURL = baseURL + "&page=" + (page + 1);
+            }
         	if (page > 0)
-        		prevURL = baseURL+"&page="+(page-1);
+            {
+                prevURL = baseURL + "&page=" + (page - 1);
+            }
         	
 			search.setSimplePagination(resultCount,firstIndex,lastIndex,prevURL, nextURL);
 		}

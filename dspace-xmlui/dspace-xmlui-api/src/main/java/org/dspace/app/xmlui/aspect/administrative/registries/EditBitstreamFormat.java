@@ -134,7 +134,9 @@ public class EditBitstreamFormat extends AbstractDSpaceTransformer
 		BitstreamFormat format = null;
 		
 		if (formatID >= 0)
-			format = BitstreamFormat.find(context,formatID);
+        {
+            format = BitstreamFormat.find(context, formatID);
+        }
 	
 		String errorString = parameters.getParameter("errors",null);
 		ArrayList<String> errors = new ArrayList<String>();
@@ -167,17 +169,29 @@ public class EditBitstreamFormat extends AbstractDSpaceTransformer
         if (format != null)
         {
         	if (mimetypeValue == null)
-        		mimetypeValue = format.getMIMEType();
+            {
+                mimetypeValue = format.getMIMEType();
+            }
         	if (nameValue == null)
-        		nameValue = format.getShortDescription();
+            {
+                nameValue = format.getShortDescription();
+            }
         	if (descriptionValue == null)
-        		descriptionValue = format.getDescription();
+            {
+                descriptionValue = format.getDescription();
+            }
         	if (supportLevelValue == null)
-        		supportLevelValue = String.valueOf(format.getSupportLevel());
+            {
+                supportLevelValue = String.valueOf(format.getSupportLevel());
+            }
         	if (request.getParameter("mimetype") == null)
-        		internalValue = format.isInternal() ? "true" : null;
+            {
+                internalValue = format.isInternal() ? "true" : null;
+            }
         	if (request.getParameter("extensions") == null)
-        		extensionValues = format.getExtensions();
+            {
+                extensionValues = format.getExtensions();
+            }
         }
 		
         

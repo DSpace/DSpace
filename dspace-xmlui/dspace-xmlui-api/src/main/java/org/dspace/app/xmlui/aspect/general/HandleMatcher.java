@@ -83,7 +83,9 @@ public class HandleMatcher extends AbstractLogEnabled implements Matcher
         {
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
             if (dso == null)
+            {
                 return null;
+            }
 
             DSpaceObject parent = dspaceObjectWalk(dso, pattern);
 
@@ -124,7 +126,9 @@ public class HandleMatcher extends AbstractLogEnabled implements Matcher
 
             // Check if the current object has the handle we are looking for.
             if (current.getHandle().equals(handle))
+            {
                 return current;
+            }
 
             if (dso.getType() == Constants.ITEM)
             {

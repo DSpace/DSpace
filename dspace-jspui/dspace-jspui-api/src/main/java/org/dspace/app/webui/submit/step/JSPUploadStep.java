@@ -384,7 +384,9 @@ public class JSPUploadStep extends JSPStep
             // if multipart form, then we just finished a file upload
             if ((contentType != null)
                     && (contentType.indexOf("multipart/form-data") != -1))
+            {
                 fileUpload = true;
+            }
 
             // show the appropriate upload page
             // (based on if a file has just been uploaded or not)

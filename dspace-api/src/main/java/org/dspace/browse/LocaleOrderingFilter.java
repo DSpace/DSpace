@@ -124,7 +124,9 @@ public class LocaleOrderingFilter implements TextFilter
             RuleBasedCollator collator = (RuleBasedCollator)Collator.getInstance(locale);
             
             if (collator != null)
+            {
                 return collator;
+            }
         }
         return null;
     }

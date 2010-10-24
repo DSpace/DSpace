@@ -186,7 +186,9 @@ public class FlowResult {
 	public String getHeader()
 	{
 		if (this.header != null)
-			return this.header.getKey();
+        {
+            return this.header.getKey();
+        }
 		return null;
 	}
 	
@@ -206,7 +208,9 @@ public class FlowResult {
 	public String getMessage()
 	{
 		if (this.message != null)
-			return this.message.getKey();
+        {
+            return this.message.getKey();
+        }
 		return null;
 	}
 	
@@ -244,7 +248,9 @@ public class FlowResult {
 	public void addError(String newError)
 	{
 		if (this.errors == null)
-			this.errors = new ArrayList<String>();
+        {
+            this.errors = new ArrayList<String>();
+        }
 		
 		this.errors.add(newError);
 	}
@@ -294,7 +300,9 @@ public class FlowResult {
 	public void setParameter(String name, Object value)
 	{
 		if (this.parameters == null)
-			this.parameters = new HashMap<String,Object>();
+        {
+            this.parameters = new HashMap<String, Object>();
+        }
 		
 		this.parameters.put(name, value);
 	}
@@ -309,7 +317,9 @@ public class FlowResult {
 	public Object getParameter(String name)
 	{
 		if (this.parameters == null)
-			return null;
+        {
+            return null;
+        }
 		
 		return this.parameters.get(name);
 	}

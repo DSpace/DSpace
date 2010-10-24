@@ -145,7 +145,9 @@ public abstract class AbstractAdapter
     public final void setSections(String sections)
     {
     	if (sections == null)
-    		return;
+        {
+            return;
+        }
 
     	for (String section : sections.split(","))
     	{
@@ -162,7 +164,9 @@ public abstract class AbstractAdapter
     public final void setDmdTypes(String dmdTypes)
     {
     	if (dmdTypes == null)
-    		return;
+        {
+            return;
+        }
 
     	for (String dmdType : dmdTypes.split(","))
     	{
@@ -181,7 +185,9 @@ public abstract class AbstractAdapter
     public final void setAmdTypes(String amdSec, String mdTypes)
     {
     	if (mdTypes == null)
-    		return;
+        {
+            return;
+        }
 
         List<String> mdTypeList = new ArrayList<String>();
     	for (String mdType : mdTypes.split(","))
@@ -245,7 +251,9 @@ public abstract class AbstractAdapter
     public final void setFileGrpTypes(String fileGrpTypes)
     {
     	if (fileGrpTypes == null)
-    		return;
+        {
+            return;
+        }
 
     	for (String fileGrpType : fileGrpTypes.split(","))
     	{
@@ -262,7 +270,9 @@ public abstract class AbstractAdapter
     public final void setStructTypes(String structTypes)
     {
     	if (structTypes == null)
-    		return;
+        {
+            return;
+        }
 
     	for (String structType : structTypes.split(","))
     	{
@@ -341,12 +351,16 @@ public abstract class AbstractAdapter
     		attributes.put("LABEL", getMETSLabel());
     		String objid = getMETSOBJID();
     		if (objid != null)
-    			attributes.put("OBJID", objid);
+            {
+                attributes.put("OBJID", objid);
+            }
 
             // Include the link for editing the item
             objid = getMETSOBJEDIT();
             if (objid != null)
+            {
                 attributes.put("OBJEDIT", objid);
+            }
 
     		startElement(METS,"METS",attributes);
 
@@ -354,23 +368,39 @@ public abstract class AbstractAdapter
     		boolean all = (sections.size() == 0);
     		
     		if (all || sections.contains("metsHdr"))
-    			renderHeader();
+            {
+                renderHeader();
+            }
     		if (all || sections.contains("dmdSec"))
-    			renderDescriptiveSection();
+            {
+                renderDescriptiveSection();
+            }
     		if (all || sections.contains("amdSec"))
-    			renderAdministrativeSection();
+            {
+                renderAdministrativeSection();
+            }
     		if (all || sections.contains("fileSec"))
-    			renderFileSection();
+            {
+                renderFileSection();
+            }
     		if (all || sections.contains("structMap"))
-    			renderStructureMap();
+            {
+                renderStructureMap();
+            }
     		if (all || sections.contains("structLink"))
-    			renderStructuralLink();
+            {
+                renderStructuralLink();
+            }
     		if (all || sections.contains("behaviorSec"))
-    			renderBehavioralSection();
+            {
+                renderBehavioralSection();
+            }
     		
     		// FIXME: this is not a met's section, it should be removed
     		if (all || sections.contains("extraSec"))
-    			renderExtraSections();
+            {
+                renderExtraSections();
+            }
     		
     		endElement(METS,"METS");
     		contentHandler.endPrefixMapping("mets");
@@ -439,7 +469,9 @@ public abstract class AbstractAdapter
         BitstreamFormat format = bitstream.getFormat();
         String mimeType = null;
         if (format != null)
+        {
             mimeType = format.getMIMEType();
+        }
         String checksumType = bitstream.getChecksumAlgorithm();
         String checksum = bitstream.getChecksum();
         long size = bitstream.getSize();
@@ -450,9 +482,13 @@ public abstract class AbstractAdapter
         attributes.put("ID", fileID);
         attributes.put("GROUPID",groupID);
         if (admID != null && admID.length()>0)
+        {
             attributes.put("ADMID", admID);
+        }
         if (mimeType != null && mimeType.length()>0)
-        	attributes.put("MIMETYPE", mimeType);
+        {
+            attributes.put("MIMETYPE", mimeType);
+        }
         if (checksumType != null && checksum != null)
         {
         	attributes.put("CHECKSUM", checksum);
@@ -493,7 +529,9 @@ public abstract class AbstractAdapter
         try
         {
         	if (bitstream.getName() != null)
-        		url += Util.encodeBitstreamName(bitstream.getName(), "UTF-8");
+            {
+                url += Util.encodeBitstreamName(bitstream.getName(), "UTF-8");
+            }
         }
         catch (UnsupportedEncodingException uee)
         {
@@ -515,7 +553,9 @@ public abstract class AbstractAdapter
         attributesXLINK.put("type","locator");
         attributesXLINK.put("title", name);
         if (description != null)
-        	attributesXLINK.put("label",description);
+        {
+            attributesXLINK.put("label", description);
+        }
         attributesXLINK.put("href", url);
         startElement(METS,"FLocat",attributes,attributesXLINK);
         
@@ -557,7 +597,9 @@ public abstract class AbstractAdapter
     	DisseminationCrosswalk crosswalk = (DisseminationCrosswalk) PluginManager.getNamedPlugin(DisseminationCrosswalk.class, crosswalkName);
 
 	    if (crosswalk == null)
-	        throw new WingException("Unable to find named DisseminationCrosswalk: " + crosswalkName);
+        {
+            throw new WingException("Unable to find named DisseminationCrosswalk: " + crosswalkName);
+        }
 	    
 	    return crosswalk;
     }
@@ -582,7 +624,9 @@ public abstract class AbstractAdapter
        for (String definedType : METS_DEFINED_TYPES)
        {
            if (definedType.equals(metadataType))
+           {
                return true;
+           }
        }
        return false;
     }

@@ -389,7 +389,9 @@ public class ItemTag extends TagSupport
         String configLine = styleSelection.getConfigurationForStyle(style);
 
         if (configLine == null)
+        {
             configLine = defaultFields;
+        }
 
         out.println("<center><table class=\"itemDisplayTable\">");
 
@@ -453,7 +455,9 @@ public class ItemTag extends TagSupport
 
             // check for hidden field, even if it's configured..
             if (MetadataExposure.isHidden(context, schema, element, qualifier))
+            {
                 continue;
+            }
 
             // FIXME: Still need to fix for metadata language?
             DCValue[] values = item.getMetadata(schema, element, qualifier, Item.ANY);

@@ -80,7 +80,9 @@ public class OAIDCIngestionCrosswalk
 	public void ingest(Context context, DSpaceObject dso, Element root) throws CrosswalkException, IOException, SQLException, AuthorizeException {
 		
 		if (dso.getType() != Constants.ITEM)
+        {
             throw new CrosswalkObjectNotSupported("DIMIngestionCrosswalk can only crosswalk an Item.");
+        }
         Item item = (Item)dso;
         
         if (root == null) {

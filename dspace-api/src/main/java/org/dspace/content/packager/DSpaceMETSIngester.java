@@ -124,7 +124,9 @@ public class DSpaceMETSIngester
         // Check to see what dmdSec the user specified in the 'dmd' parameter
         String userDmd = null;
         if (params != null)
+        {
             userDmd = params.getProperty("dmd");
+        }
         if (userDmd != null && userDmd.length() > 0)
         {
             for (int i = 0; i < dmds.length; ++i)
@@ -176,17 +178,20 @@ public class DSpaceMETSIngester
                 {
                     String g = dmds[i].getAttributeValue("GROUPID");
                     if (g != null && !g.equals(groupID))
+                    {
                         manifest.crosswalkItemDmd(context, params, dso, dmds[i], callback);
+                    }
                 }
             }
         }
-
-        // otherwise take the first.  Don't xwalk more than one because
-        // each xwalk _adds_ metadata, and could add duplicate fields.
         else
         {
+            // otherwise take the first.  Don't xwalk more than one because
+            // each xwalk _adds_ metadata, and could add duplicate fields.
             if (dmds.length > 0)
+            {
                 manifest.crosswalkItemDmd(context, params, dso, dmds[0], callback);
+            }
         }
     }
 
@@ -204,7 +209,9 @@ public class DSpaceMETSIngester
                AuthorizeException, SQLException, IOException
     {
         if (PackageUtils.findDepositLicense(context, item) == null)
-        PackageUtils.addDepositLicense(context, license, item, collection);
+        {
+            PackageUtils.addDepositLicense(context, license, item, collection);
+        }
     }
 
     @Override
@@ -231,13 +238,16 @@ public class DSpaceMETSIngester
         String mfNames[] = PluginManager.getAllPluginNames(MediaFilter.class);
 
         for (int i = 0; i < mfNames.length; ++i)
-                        {
+        {
             MediaFilter mf = (MediaFilter)PluginManager.getNamedPlugin(MediaFilter.class, mfNames[i]);
             if (bundleName.equals(mf.getBundleName()))
+            {
                 return mf.getFilteredName(origName);
-                        }
+            }
+        }
+
         return null;
-                    }
+    }
 
     /**
      * Take a second pass over files to correct names of derived files

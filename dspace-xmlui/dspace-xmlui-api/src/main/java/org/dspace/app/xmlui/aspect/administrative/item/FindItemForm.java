@@ -101,9 +101,13 @@ public class FindItemForm extends AbstractDSpaceTransformer {
 		Text id = form.addItem().addText("identifier");
 		id.setLabel(T_identifier_label);
 		if (identifier != null)
-			id.setValue(identifier);
+        {
+            id.setValue(identifier);
+        }
 		if (errors.contains("identifier"))
-			id.addError(T_identifier_error);
+        {
+            id.addError(T_identifier_error);
+        }
 		
 		form.addItem().addButton("submit_find").setValue(T_find);
 		

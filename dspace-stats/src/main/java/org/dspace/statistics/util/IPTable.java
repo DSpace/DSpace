@@ -46,7 +46,9 @@ public class IPTable {
             end = range[1].trim().split("/")[0].split("\\.");
 
             if (start.length != 4 || end.length != 4)
+            {
                 throw new IPFormatException(ip + " - Ranges need to be full IPv4 Addresses");
+            }
 
             if (!(start[0].equals(end[0]) && start[1].equals(end[1]) && start[2].equals(end[2]))) {
                 throw new IPFormatException(ip + " - Ranges can only be across the last subnet x.y.z.0 - x.y.z.254");
@@ -123,19 +125,30 @@ public class IPTable {
         String[] subnets = ip.split("\\.");
 
         if (subnets.length != 4)
+        {
             throw new IPFormatException("needs to be single IP Address");
+        }
 
         Map<String, Map<String, Set<String>>> first = map.get(subnets[0]);
 
-        if (first == null) return false;
+        if (first == null)
+        {
+            return false;
+        }
 
         Map<String, Set<String>> second = first.get(subnets[1]);
 
-        if (second == null) return false;
+        if (second == null)
+        {
+            return false;
+        }
 
         Set<String> third = second.get(subnets[2]);
 
-        if (third == null) return false;
+        if (third == null)
+        {
+            return false;
+        }
 
         return third.contains(subnets[3]) || third.contains("*");
 

@@ -556,9 +556,13 @@ public class DescribeStep extends AbstractProcessingStep
             String confidence = request.getParameter(metadataField + "_confidence");
 
             if (lastName != null)
+            {
                 lasts.add(lastName);
+            }
             if (firstNames != null)
+            {
                 firsts.add(firstNames);
+            }
             auths.add(authority == null ? "" : authority);
             confs.add(confidence == null ? "" : confidence);
         }
@@ -709,7 +713,9 @@ public class DescribeStep extends AbstractProcessingStep
             vals = new LinkedList();
             String value = request.getParameter(metadataField);
             if (value != null)
+            {
                 vals.add(value.trim());
+            }
             if (isAuthorityControlled)
             {
                 auths = new LinkedList();
@@ -876,7 +882,9 @@ public class DescribeStep extends AbstractProcessingStep
             {
                 // if number is null, just set to a nullstring
                 if (n == null)
+                {
                     n = "";
+                }
 
                 series.add(s);
                 numbers.add(n);
@@ -969,7 +977,9 @@ public class DescribeStep extends AbstractProcessingStep
                 }
 
                 if (addValue)
-                  vals.add(s.trim());
+                {
+                    vals.add(s.trim());
+                }
             }
 
             i++;

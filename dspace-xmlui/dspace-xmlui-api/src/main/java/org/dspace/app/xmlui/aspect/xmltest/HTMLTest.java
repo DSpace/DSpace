@@ -95,11 +95,15 @@ public class HTMLTest extends AbstractDSpaceTransformer
     	
     	// If none present set the default HTML string
     	if (fragment == null || fragment.length() <= 0)
-    		fragment = DEFAULT_HTML_STRING;
+        {
+            fragment = DEFAULT_HTML_STRING;
+        }
     	
     	boolean blankLines = false;
     	if (options != null && options[0].equals("blankLines"))
-    		blankLines = true;
+        {
+            blankLines = true;
+        }
     	
         Division div = body.addInteractiveDivision("html-test", "", Division.METHOD_GET, "primary");
      
@@ -118,7 +122,9 @@ public class HTMLTest extends AbstractDSpaceTransformer
         optionsField.setLabel("Options");
         optionsField.addOption("blankLines", "Treat blank lines as paragraph breaks.");
         if (blankLines)
-        	optionsField.setOptionSelected("blankLines");
+        {
+            optionsField.setOptionSelected("blankLines");
+        }
         
         
         Button submit = form.addItem().addButton("submit");

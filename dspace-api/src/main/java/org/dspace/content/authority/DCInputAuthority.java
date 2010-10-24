@@ -89,7 +89,9 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
             try
             {
                 if (dci == null)
+                {
                     dci = new DCInputsReader();
+                }
             }
             catch (DCInputsReaderException e)
             {
@@ -144,7 +146,9 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
         {
             v[i] = new Choice(values[i], values[i], labels[i]);
             if (values[i].equalsIgnoreCase(query))
+            {
                 dflt = i;
+            }
         }
         return new Choices(v, 0, v.length, Choices.CF_AMBIGUOUS, false, dflt);
     }

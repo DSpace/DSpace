@@ -754,10 +754,14 @@ public class Division extends AbstractWingElement implements StructuralElement, 
     {
 
         if (!WingConstants.DRI.URI.equals(namespace))
+        {
             return false;
+        }
 
         if (!E_DIVISION.equals(localName))
+        {
             return false;
+        }
 
         context.getLogger().debug("Merding a division");
         
@@ -773,13 +777,17 @@ public class Division extends AbstractWingElement implements StructuralElement, 
         
         // The name must be identical (but id's can differ)
         if (!this.name.equals(name))
+        {
             return false;
+        }
 
         // Insure the render attributes are identical.
         if (this.rend == null)
         {
             if (render != null)
+            {
                 return false;
+            }
         }
         else if (!this.rend.equals(render))
         {
@@ -790,20 +798,30 @@ public class Division extends AbstractWingElement implements StructuralElement, 
         {
             // Insure all the interactive fields are identical.
             if (!"yes".equals(interactive))
+            {
                 return false;
+            }
             if (!this.action.equals(action))
+            {
                 return false;
+            }
             if (!this.method.equals(method))
+            {
                 return false;
+            }
             
             // For now lets just not merge divs that have behavior.
             if (!(behavior == null || behavior.equals("")))
+            {
                 return false;
+            }
             
         } else {
             // Else, insure that it is also not interactive.
             if (!(interactive == null || "no".equals(interactive)))
+            {
                 return false;
+            }
         }
 
         return true;
@@ -834,7 +852,9 @@ public class Division extends AbstractWingElement implements StructuralElement, 
                 WingMergeableElement candidate = (WingMergeableElement) content;
                 if (candidate.mergeEqual(namespace, localName, qName,
                         attributes))
+                {
                     found = candidate;
+                }
             }
         }
         contents.remove(found);
@@ -896,9 +916,13 @@ public class Division extends AbstractWingElement implements StructuralElement, 
 
                 divAttributes.put(A_PAGINATION, paginationType);
                 if (previousPage != null)
+                {
                     divAttributes.put(A_PREVIOUS_PAGE, previousPage);
+                }
                 if (nextPage != null)
+                {
                     divAttributes.put(A_NEXT_PAGE, nextPage);
+                }
                 divAttributes.put(A_ITEMS_TOTAL, itemsTotal);
                 divAttributes.put(A_FIRST_ITEM_INDEX, firstItemIndex);
                 divAttributes.put(A_LAST_ITEM_INDEX, lastItemIndex);
@@ -916,12 +940,16 @@ public class Division extends AbstractWingElement implements StructuralElement, 
             }
 
             if (rend != null)
+            {
                 divAttributes.put(A_RENDER, rend);
+            }
 
             startElement(contentHandler, namespaces, E_DIVISION, divAttributes);
 
             if (head != null)
+            {
                 head.toSAX(contentHandler, lexicalHandler, namespaces);
+            }
         }
         
         for (AbstractWingElement content : contents)

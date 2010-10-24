@@ -115,8 +115,10 @@ public class FrontPageSearch extends AbstractDSpaceTransformer implements Cachea
 			{
 				// Remove the protocol number, i.e. just list 'rss' or' atom'
 				String[] parts = format.split("_");
-				if (parts.length < 1) 
-					continue;
+				if (parts.length < 1)
+                {
+                    continue;
+                }
 				
 				String feedFormat = parts[0].trim()+"+xml";
 					

@@ -131,10 +131,14 @@ public class Meta extends AbstractWingElement implements WingMergeableElement
             Attributes attributes) throws SAXException, WingException
     {
         if (!WingConstants.DRI.URI.equals(namespace))
+        {
             return false;
+        }
 
         if (!E_META.equals(localName))
+        {
             return false;
+        }
         
         return true;
     }
@@ -218,17 +222,27 @@ public class Meta extends AbstractWingElement implements WingMergeableElement
             NamespaceSupport namespaces) throws SAXException
     {
         if (!merged)
+        {
             startElement(contentHandler, namespaces, E_META, null);
+        }
 
         if (this.userMeta != null)
+        {
             this.userMeta.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
         if (this.pageMeta != null)
+        {
             this.pageMeta.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
         if (this.repositoryMeta != null)
+        {
             this.repositoryMeta.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
            
         if (!merged)
+        {
             endElement(contentHandler, namespaces, E_META);
+        }
     }
 
     /**
@@ -237,11 +251,17 @@ public class Meta extends AbstractWingElement implements WingMergeableElement
     public void dispose()
     {
         if (this.userMeta != null)
+        {
             this.userMeta.dispose();
+        }
         if (this.pageMeta != null)
+        {
             this.pageMeta.dispose();
+        }
         if (this.repositoryMeta != null)
+        {
             this.repositoryMeta.dispose();
+        }
         
         this.userMeta = null;
         this.pageMeta = null;

@@ -90,10 +90,14 @@ public class DSpaceLocaleAction extends ServiceableAction implements Configurabl
 	 public void configure(Configuration config)
 	 {
 		 if (localeValidator == null)
-			 localeValidator = new DSpaceLocaleValidator();
+         {
+             localeValidator = new DSpaceLocaleValidator();
+         }
 		 
 		 if (defaultLocale == null)
-			 defaultLocale = I18nUtil.getDefaultLocale();
+         {
+             defaultLocale = I18nUtil.getDefaultLocale();
+         }
 	 }
 	
 	
@@ -184,7 +188,9 @@ public class DSpaceLocaleAction extends ServiceableAction implements Configurabl
 		{
 			// If there are no configured locales the accept them all.
 			if (supportedLocales == null)
-				return true;
+            {
+                return true;
+            }
 			
 			// Otherwise check if they are listed
 			for (Locale locale : supportedLocales)

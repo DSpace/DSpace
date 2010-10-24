@@ -96,7 +96,9 @@ public abstract class InitialArticleWord implements TextFilter
                             // Only need to do so if we haven't already got one
                             // of the right length
                             if (initialArticleWord.length() != articleWordArr[idx].length())
+                            {
                                 initialArticleWord = extractText(str, curPos, articleWordArr[idx].length());
+                            }
                         }
                         else
                         {
@@ -213,7 +215,9 @@ public abstract class InitialArticleWord implements TextFilter
         }
         
         if (testPos < str.length())
+        {
             return str.substring(pos, pos + len);
+        }
         
         return null;
     }

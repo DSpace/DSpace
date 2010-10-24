@@ -312,7 +312,9 @@ public class JSPStepManager
         // first, do any pre-processing and get the JSP to display
         // (assuming that this step has an interface)
         if(stepJSPUI!=null)
-        	stepJSPUI.doPreProcessing(context, request, response, subInfo);
+        {
+            stepJSPUI.doPreProcessing(context, request, response, subInfo);
+        }
 
         // Complete this step, if this response has not already
         // been committed.

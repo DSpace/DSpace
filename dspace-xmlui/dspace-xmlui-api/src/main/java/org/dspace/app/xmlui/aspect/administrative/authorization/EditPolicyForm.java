@@ -170,7 +170,9 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
         
         // Same for the current action; it can either blank (-1), manually set, or inherited from the current policy
         if (policy != null && actionID == -1)
-        	actionID = policy.getAction();
+        {
+            actionID = policy.getAction();
+        }
                 
         String errorString = parameters.getParameter("errors",null);
 		ArrayList<String> errors = new ArrayList<String>();
@@ -241,7 +243,9 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
             }
         }
         if (errors.contains("action_id"))
-        	actionSelect.addError(T_error_no_action);        
+        {
+            actionSelect.addError(T_error_no_action);
+        }
         
         
         // currently set group
@@ -268,7 +272,9 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
         Item searchItem = actionsList.addItem();
         Text searchText = searchItem.addText("query");
         if (!query.equals("-1"))
-        	searchText.setValue(query);
+        {
+            searchText.setValue(query);
+        }
         searchItem.addButton("submit_search_groups").setValue(T_submit_search_groups);
         
         
@@ -307,9 +313,13 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
 			
 			String nextURL = null, prevURL = null;
         	if (page < ((totalResults - 1) / RESULTS_PER_PAGE))
-        		nextURL = baseURL+"&page="+(page+1);
+            {
+                nextURL = baseURL + "&page=" + (page + 1);
+            }
         	if (page > 0)
-        		prevURL = baseURL+"&page="+(page-1);
+            {
+                prevURL = baseURL + "&page=" + (page - 1);
+            }
         	
         	div.setSimplePagination(totalResults,firstIndex,lastIndex,prevURL, nextURL);
 		}

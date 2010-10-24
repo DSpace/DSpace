@@ -102,7 +102,9 @@ public class NoticeTransformer extends AbstractDSpaceTransformer
 			    
 		if ((message    == null || message.length() <= 0) && 
 			(characters == null || characters.length() <= 0))
-			throw new WingException("No message found.");
+        {
+            throw new WingException("No message found.");
+        }
 		
 		String rend = "notice";
 		if ("netural".equals(outcome))

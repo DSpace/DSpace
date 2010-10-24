@@ -129,7 +129,9 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
         {
             String key = (String)pe.nextElement();
             if (key.startsWith(CONFIG_PREFIX))
+            {
                 aliasList.add(key.substring(CONFIG_PREFIX.length()));
+            }
         }
         aliases = (String[])aliasList.toArray(new String[aliasList.size()]);
     }
@@ -240,7 +242,9 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
         throws CrosswalkInternalException
     {
         if (modsMap != null)
+        {
             return;
+        }
         String myAlias = getPluginInstanceName();
         if (myAlias == null)
         {
@@ -277,7 +281,15 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
             finally
             {
                 if (pfs != null)
-                    try { pfs.close(); } catch (IOException ioe) { }
+                {
+                    try
+                    {
+                        pfs.close();
+                    }
+                    catch (IOException ioe)
+                    {
+                    }
+                }
             }
 
             modsMap = new HashMap();
@@ -296,7 +308,9 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
                 {
                     modsTriple trip = modsTriple.create(qdc, pair[0], pair[1]);
                     if (trip != null)
+                    {
                         modsMap.put(qdc, trip);
+                    }
                 }
             }
         }
@@ -390,13 +404,17 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
                 {
                     Element me = (Element)trip.xml.clone();
                     if (addSchema)
+                    {
                         me.setAttribute("schemaLocation", schemaLocation, XSI_NS);
+                    }
                     Iterator ni = trip.xpath.selectNodes(me).iterator();
                     if (!ni.hasNext())
-                        log.warn("XPath \""+trip.xpath.getXPath()+
-                          "\" found no elements in \""+
-                          outputUgly.outputString(me)+
-                          "\", qdc="+qdc);
+                    {
+                        log.warn("XPath \"" + trip.xpath.getXPath() +
+                                "\" found no elements in \"" +
+                                outputUgly.outputString(me) +
+                                "\", qdc=" + qdc);
+                    }
                     while (ni.hasNext())
                     {
                         Object what = ni.next();
@@ -468,14 +486,20 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
         String url = site.getURL();
 
         if (identifier_uri != null)
+        {
             metadata.add(createDCValue("identifier.uri", null, identifier_uri));
+        }
 
         //FIXME: adding two URIs for now (site handle and URL), in case site isn't using handles
         if (url != null)
+        {
             metadata.add(createDCValue("identifier.uri", null, url));
+        }
 
         if (title != null)
+        {
             metadata.add(createDCValue("title", null, title));
+        }
 
         return (DCValue[]) metadata.toArray(new DCValue[metadata.size()]);
     }
@@ -500,22 +524,34 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
         String title = community.getMetadata("name");
 
         if (description != null)
+        {
             metadata.add(createDCValue("description", null, description));
+        }
 
         if (description_abstract != null)
+        {
             metadata.add(createDCValue("description", "abstract", description_abstract));
+        }
 
         if (description_table != null)
+        {
             metadata.add(createDCValue("description", "tableofcontents", description_table));
+        }
 
         if (identifier_uri != null)
+        {
             metadata.add(createDCValue("identifier.uri", null, identifier_uri));
+        }
 
         if (rights != null)
+        {
             metadata.add(createDCValue("rights", null, rights));
+        }
 
         if (title != null)
+        {
             metadata.add(createDCValue("title", null, title));
+        }
 
         return (DCValue[]) metadata.toArray(new DCValue[metadata.size()]);
     }
@@ -543,28 +579,44 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
         String title = collection.getMetadata("name");
 
         if (description != null)
-            metadata.add(createDCValue("description",null, description));
+        {
+            metadata.add(createDCValue("description", null, description));
+        }
 
         if (description_abstract != null)
-            metadata.add(createDCValue("description","abstract",description_abstract));
+        {
+            metadata.add(createDCValue("description", "abstract", description_abstract));
+        }
 
         if (description_table != null)
-            metadata.add(createDCValue("description","tableofcontents",description_table));
+        {
+            metadata.add(createDCValue("description", "tableofcontents", description_table));
+        }
 
         if (identifier_uri != null)
-            metadata.add(createDCValue("identifier","uri", identifier_uri));
+        {
+            metadata.add(createDCValue("identifier", "uri", identifier_uri));
+        }
 
         if (provenance != null)
+        {
             metadata.add(createDCValue("provenance", null, provenance));
+        }
 
         if (rights != null)
+        {
             metadata.add(createDCValue("rights", null, rights));
+        }
 
         if (rights_license != null)
+        {
             metadata.add(createDCValue("rights.license", null, rights_license));
+        }
 
         if (title != null)
+        {
             metadata.add(createDCValue("title", null, title));
+        }
 
         return (DCValue[]) metadata.toArray(new DCValue[metadata.size()]);
     }
@@ -615,7 +667,9 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
             {
                 char c = value.charAt(i);
                 if (Verifier.isXMLCharacter((int)c))
+                {
                     result.append(c);
+                }
             }
             return result.toString();
         }

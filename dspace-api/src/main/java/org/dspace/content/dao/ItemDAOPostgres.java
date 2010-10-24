@@ -100,7 +100,9 @@ public class ItemDAOPostgres extends ItemDAO
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         return null;
@@ -123,7 +125,9 @@ public class ItemDAOPostgres extends ItemDAO
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         return null;
@@ -146,7 +150,9 @@ public class ItemDAOPostgres extends ItemDAO
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         return null;

@@ -194,7 +194,9 @@ public class DSpaceAIPDisseminator
 
         // Add a LASTMODDATE for items
         if (dso.getType() == Constants.ITEM)
-            metsHdr.setLASTMODDATE(((Item)dso).getLastModified());
+        {
+            metsHdr.setLASTMODDATE(((Item) dso).getLastModified());
+        }
 
         // Agent Custodian - name custodian, the DSpace Archive, by handle.
         Agent agent = new Agent();
@@ -387,14 +389,18 @@ public class DSpaceAIPDisseminator
                 //By default, disseminate Deposit License, and any CC Licenses
                 // to an item's rightsMD section
                 if (PackageUtils.findDepositLicense(context, (Item)dso) != null)
+                {
                     result.add(DSPACE_DEPOSIT_LICENSE_MDTYPE);
+                }
 
                 if (CreativeCommons.getLicenseRdfBitstream((Item)dso) != null)
                 {
                     result.add(CREATIVE_COMMONS_RDF_MDTYPE);
                 }
                 else if (CreativeCommons.getLicenseTextBitstream((Item)dso) != null)
+                {
                     result.add(CREATIVE_COMMONS_TEXT_MDTYPE);
+                }
             }
             
             //By default, also add METSRights info to the rightsMD
@@ -440,7 +446,9 @@ public class DSpaceAIPDisseminator
                 {
                     Item bi[] = bn[0].getItems();
                     if (bi.length > 0)
+                    {
                         handle = bi[0].getHandle();
+                    }
                 }
                 if (handle != null)
                 {

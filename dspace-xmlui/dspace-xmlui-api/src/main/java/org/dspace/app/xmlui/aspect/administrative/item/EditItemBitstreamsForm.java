@@ -174,7 +174,9 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
 				String format = null;
 				BitstreamFormat bitstreamFormat = bitstream.getFormat();
 				if (bitstreamFormat != null)
-					format = bitstreamFormat.getShortDescription();
+                {
+                    format = bitstreamFormat.getShortDescription();
+                }
 				String editURL = contextPath + "/admin/item?administrative-continue="+knot.getId()+"&bitstreamID="+bitstream.getID()+"&submit_edit";
 				String viewURL = contextPath + "/bitstream/id/"+bitstream.getID()+"/"+bitstream.getName();
 
@@ -194,7 +196,9 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
 					Cell cell = row.addCell();
 					cell.addXref(editURL,name);
 					if (primary)
-						cell.addXref(editURL,T_primary_label);
+                    {
+                        cell.addXref(editURL, T_primary_label);
+                    }
 					
 					row.addCell().addXref(editURL,description);
 					row.addCell().addXref(editURL,format);
@@ -205,7 +209,9 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
 					Cell cell = row.addCell();
 					cell.addContent(name);
 					if (primary)
-						cell.addContent(T_primary_label);
+                    {
+                        cell.addContent(T_primary_label);
+                    }
 					
 					row.addCell().addContent(description);
 					row.addCell().addContent(format);

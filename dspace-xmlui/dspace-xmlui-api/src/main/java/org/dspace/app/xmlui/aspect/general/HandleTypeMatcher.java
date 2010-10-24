@@ -111,7 +111,9 @@ public class HandleTypeMatcher extends AbstractLogEnabled implements Matcher
         }
 
         if (dso == null)
+        {
             return null;
+        }
 
         Map<String, String> result = new HashMap<String, String>();
         for (String expression : expressions)

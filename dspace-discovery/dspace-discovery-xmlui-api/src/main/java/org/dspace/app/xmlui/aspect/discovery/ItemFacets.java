@@ -60,7 +60,9 @@ public class ItemFacets extends org.dspace.app.xmlui.aspect.discovery.AbstractFi
 
         org.dspace.content.DSpaceObject dso = org.dspace.app.xmlui.utils.HandleUtil.obtainHandle(objectModel);
         if (!(dso instanceof org.dspace.content.Item))
+        {
             return;
+        }
         org.dspace.content.Item item = (org.dspace.content.Item) dso;
 
         try {
@@ -76,7 +78,9 @@ public class ItemFacets extends org.dspace.app.xmlui.aspect.discovery.AbstractFi
     public void performSearch(org.dspace.content.DSpaceObject dso) throws org.dspace.discovery.SearchServiceException {
 
         if(queryResults != null)
+        {
             return;
+        }
 
         this.queryArgs = prepareDefaultFilters("item");
         

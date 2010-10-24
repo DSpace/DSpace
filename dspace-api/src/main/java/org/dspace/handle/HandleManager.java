@@ -275,7 +275,9 @@ public class HandleManager
             DatabaseManager.update(context, row);
 
             if(log.isDebugEnabled())
+            {
                 log.debug("Unbound Handle " + row.getStringColumn("handle") + " from object " + Constants.typeText[dso.getType()] + " id=" + dso.getID());
+            }
 
         }
         else
@@ -308,7 +310,9 @@ public class HandleManager
         {
             //If this is the Site-wide Handle, return Site object
             if (handle.equals(Site.getSiteHandle()))
+            {
                 return Site.find(context, 0);
+            }
             //Otherwise, return null (i.e. handle not found in DB)
             return null;
         }
@@ -431,7 +435,9 @@ public class HandleManager
         {
             // close the TableRowIterator to free up resources
             if (iterator != null)
+            {
                 iterator.close();
+            }
         }
 
         return results;

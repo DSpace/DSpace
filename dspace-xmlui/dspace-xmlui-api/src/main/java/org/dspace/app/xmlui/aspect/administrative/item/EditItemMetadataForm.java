@@ -151,37 +151,38 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
         {
             Item templateItem = templateCollection.getTemplateItem();
             if (templateItem != null && templateItem.getID() == itemID)
+            {
                 editingTemplateItem = true;
+            }
         }
 
-                // DIVISION: main
-                Division main = body.addInteractiveDivision("edit-item-status", contextPath+"/admin/item", Division.METHOD_POST,"primary administrative item");
-                if (editingTemplateItem)
+        // DIVISION: main
+        Division main = body.addInteractiveDivision("edit-item-status", contextPath+"/admin/item", Division.METHOD_POST,"primary administrative item");
+        if (editingTemplateItem)
         {
-                    main.setHead(T_template_head.parameterize(templateCollection.getName()));
-                }
+            main.setHead(T_template_head.parameterize(templateCollection.getName()));
+        }
         else
         {
-                main.setHead(T_option_head);
-                }
+            main.setHead(T_option_head);
+        }
 
-                Collection owner = item.getOwningCollection();
-                int collectionID = (owner == null) ? -1 : owner.getID();
+        Collection owner = item.getOwningCollection();
+        int collectionID = (owner == null) ? -1 : owner.getID();
                 
-                
-                // LIST: options
-                if (!editingTemplateItem)
+        // LIST: options
+        if (!editingTemplateItem)
         {
-                  List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
-                  options.addItem().addXref(baseURL+"&submit_status",T_option_status);
-                  options.addItem().addXref(baseURL+"&submit_bitstreams",T_option_bitstreams);
-                  options.addItem().addHighlight("bold").addXref(baseURL+"&submit_metadata",T_option_metadata);
-                  options.addItem().addXref(baseURL + "&view_item", T_option_view);
-                }
+          List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
+          options.addItem().addXref(baseURL+"&submit_status",T_option_status);
+          options.addItem().addXref(baseURL+"&submit_bitstreams",T_option_bitstreams);
+          options.addItem().addHighlight("bold").addXref(baseURL+"&submit_metadata",T_option_metadata);
+          options.addItem().addXref(baseURL + "&view_item", T_option_view);
+        }
 
-                // LIST: add new metadata
-                List addForm = main.addList("addItemMetadata",List.TYPE_FORM);
-                addForm.setHead(T_head1);
+        // LIST: add new metadata
+        List addForm = main.addList("addItemMetadata",List.TYPE_FORM);
+        addForm.setHead(T_head1);
 
                 Select addName = addForm.addItem().addSelect("field");
                 addName.setLabel(T_name_label);
@@ -192,12 +193,16 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
                         MetadataSchema schema = MetadataSchema.find(context, field.getSchemaID());
                         String name = schema.getName() +"."+field.getElement();
                         if (field.getQualifier() != null)
-                                name += "."+field.getQualifier();
+                        {
+                            name += "." + field.getQualifier();
+                        }
 
                         addName.addOption(fieldID, name);
                 }
                 if (previousFieldID != null)
-                        addName.setOptionSelected(previousFieldID);
+                {
+                    addName.setOptionSelected(previousFieldID);
+                }
 
 
                 Composite addComposite = addForm.addItem().addComposite("value");
@@ -241,7 +246,9 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
                 {
                         String name = value.schema + "_" + value.element;
                         if (value.qualifier != null)
-                                name += "_" + value.qualifier;
+                        {
+                            name += "_" + value.qualifier;
+                        }
 
                         Row row = table.addRow(name,Row.ROLE_DATA,"metadata-value");
 
@@ -265,7 +272,9 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
                             mdSelect.setSize(1);
                             Choices cs = cmgr.getMatches(fieldKey, value.value, collectionID, 0, 0, null);
                             if (cs.defaultSelected < 0)
+                            {
                                 mdSelect.addOption(true, value.value, value.value);
+                            }
                             for (int i = 0; i < cs.values.length; ++i)
                             {
                                 mdSelect.addOption(i == cs.defaultSelected, cs.values[i].value, cs.values[i].label);

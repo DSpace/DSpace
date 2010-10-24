@@ -108,7 +108,9 @@ public class DSpaceValidity implements SourceValidity
         this.validityKey = new StringBuffer();
 
         if (initialValidityKey != null)
-           this.validityKey.append(initialValidityKey);
+        {
+            this.validityKey.append(initialValidityKey);
+        }
     }
 
     public DSpaceValidity()
@@ -129,7 +131,9 @@ public class DSpaceValidity implements SourceValidity
         
         // Set the forced validity time.
         if (assumedValidityDelay > 0)
-        	resetAssumedValidityTime();
+        {
+            resetAssumedValidityTime();
+        }
         
         return this;
     }
@@ -171,12 +175,16 @@ public class DSpaceValidity implements SourceValidity
     public void setAssumedValidityDelay(String delay)
     {
     	if (delay == null || delay.length() == 0)
-    		return;
+        {
+            return;
+        }
     	
     	String[] parts = delay.split(" ");
     	
     	if (parts == null || parts.length != 2)
-    		throw new IllegalArgumentException("Error unable to parse the assumed validity delay time: \""+delay+"\". All delays must be of the form \"<integer> <scale>\" where scale is either seconds, minutes, hours, or days.");
+        {
+            throw new IllegalArgumentException("Error unable to parse the assumed validity delay time: \"" + delay + "\". All delays must be of the form \"<integer> <scale>\" where scale is either seconds, minutes, hours, or days.");
+        }
 
     	long milliseconds = 0;
     	
@@ -499,10 +507,14 @@ public class DSpaceValidity implements SourceValidity
                 	// now we reset their assumed validity timers for both cache
                 	// objects.
                 	if (this.assumedValidityDelay > 0)
-                		this.resetAssumedValidityTime();
+                    {
+                        this.resetAssumedValidityTime();
+                    }
                 	
                 	if (otherSSV.assumedValidityDelay > 0)
-                		otherSSV.resetAssumedValidityTime();
+                    {
+                        otherSSV.resetAssumedValidityTime();
+                    }
                 	
                     return SourceValidity.VALID;
                 }

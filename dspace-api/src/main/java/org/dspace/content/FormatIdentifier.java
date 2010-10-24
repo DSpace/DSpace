@@ -121,7 +121,9 @@ public class FormatIdentifier
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
         return retFormat;
     }

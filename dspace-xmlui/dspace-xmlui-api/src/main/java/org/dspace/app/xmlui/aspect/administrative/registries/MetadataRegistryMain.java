@@ -190,18 +190,26 @@ public class MetadataRegistryMain extends AbstractDSpaceTransformer
 		namespace.setRequired();
 		namespace.setHelp(T_namespace_help);
 		if (namespaceValue != null)
-			namespace.setValue(namespaceValue);
+        {
+            namespace.setValue(namespaceValue);
+        }
 		if (errors.contains("namespace"))
-			namespace.addError(T_namespace_error);
+        {
+            namespace.addError(T_namespace_error);
+        }
 		
 		Text name = form.addItem().addText("name");
 		name.setLabel(T_name);
 		name.setRequired();
 		name.setHelp(T_name_help);
 		if (nameValue != null)
-			name.setValue(nameValue);
+        {
+            name.setValue(nameValue);
+        }
 		if (errors.contains("name"))
-			name.addError(T_name_error);
+        {
+            name.addError(T_name_error);
+        }
 		
 		form.addItem().addButton("submit_add").setValue(T_submit_add);
    

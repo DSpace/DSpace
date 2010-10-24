@@ -137,12 +137,16 @@ public class InitializeDatabase
         {
             myFile = new File("etc/" + dbName + "/" + name);
             if (myFile.exists())
+            {
                 return new FileReader(myFile.getCanonicalPath());
+            }
         }
         
         myFile = new File("etc/" + name);
         if (myFile.exists())
+        {
             return new FileReader(myFile.getCanonicalPath());
+        }
         
         return new FileReader(name);
     }

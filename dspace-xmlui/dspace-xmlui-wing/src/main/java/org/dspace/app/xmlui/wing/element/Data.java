@@ -199,7 +199,9 @@ public class Data extends AbstractWingElement
                 for (Object dictionaryParameter : dictionaryParameters)
                 {
                     if (dictionaryParameter != null)
-                	toSAX(contentHandler, namespaces, dictionaryParameter);
+                    {
+                        toSAX(contentHandler, namespaces, dictionaryParameter);
+                    }
                 }
 
                 endElement(contentHandler, namespaces, WingConstants.I18N,
@@ -277,7 +279,9 @@ public class Data extends AbstractWingElement
         // If the type is unknown then the value is not included as an attribute
         // and instead is sent as the contents of the elements.
         if (unknownType)
+        {
             sendCharacters(contentHandler, dictionaryParameter.toString());
+        }
 
         endElement(contentHandler, namespaces, WingConstants.I18N, E_PARAM);
     }

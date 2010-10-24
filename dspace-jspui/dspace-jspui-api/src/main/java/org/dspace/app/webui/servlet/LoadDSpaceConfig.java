@@ -72,7 +72,9 @@ public class LoadDSpaceConfig extends HttpServlet
         {
             String osName = System.getProperty("os.name");
             if (osName != null)
+            {
                 osName = osName.toLowerCase();
+            }
 
             if (osName != null && osName.contains("windows"))
             {

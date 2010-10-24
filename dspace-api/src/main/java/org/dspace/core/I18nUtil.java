@@ -466,7 +466,9 @@ public class I18nUtil
         {
             Locale lc = makeLocale(ls);
             if (lc != null)
+            {
                 resultList.add(lc);
+            }
         }
         return resultList.toArray(new Locale[resultList.size()]);
     }

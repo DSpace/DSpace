@@ -246,10 +246,11 @@ public class EPerson extends DSpaceObject
             throws SQLException
     {
         if (netid == null)
+        {
             return null;
+        }
 
-        TableRow row = DatabaseManager.findByUnique(context, "eperson",
-                "netid", netid);
+        TableRow row = DatabaseManager.findByUnique(context, "eperson", "netid", netid);
 
         if (row == null)
         {
@@ -327,7 +328,9 @@ public class EPerson extends DSpaceObject
                 queryBuf.append("rec WHERE rownum<=? ");
                 // If we also have an offset, then convert the limit into the maximum row number
                 if (offset > 0)
+                {
                     limit += offset;
+                }
             }
 
             // Return only the records after the specified offset (row number)
@@ -340,10 +343,14 @@ public class EPerson extends DSpaceObject
         else
         {
             if (limit > 0)
+            {
                 queryBuf.append(" LIMIT ? ");
+            }
 
             if (offset > 0)
+            {
                 queryBuf.append(" OFFSET ? ");
+            }
         }
 
         String dbquery = queryBuf.toString();
@@ -403,7 +410,9 @@ public class EPerson extends DSpaceObject
         finally
         {
             if (rows != null)
+            {
                 rows.close();
+            }
         }
     }
 
@@ -525,7 +534,9 @@ public class EPerson extends DSpaceObject
         finally
         {
             if (rows != null)
+            {
                 rows.close();
+            }
         }
     }
 
@@ -1008,7 +1019,9 @@ public class EPerson extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         // check for eperson in workflowitem table
@@ -1027,7 +1040,9 @@ public class EPerson extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         // check for eperson in tasklistitem table
@@ -1046,7 +1061,9 @@ public class EPerson extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
         
         // the list of tables can be used to construct an error message

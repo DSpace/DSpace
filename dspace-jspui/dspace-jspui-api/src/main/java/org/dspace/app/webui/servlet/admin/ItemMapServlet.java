@@ -173,7 +173,9 @@ public class ItemMapServlet extends DSpaceServlet
             finally
             {
                 if (i != null)
+                {
                     i.close();
+                }
             }
             
             // remove this collection's entry because we already have a native
@@ -353,7 +355,9 @@ public class ItemMapServlet extends DSpaceServlet
                 finally
                 {
                     if (itr != null)
+                    {
                         itr.close();
+                    }
                 }
             }
     		catch (BrowseException e)
@@ -397,7 +401,9 @@ public class ItemMapServlet extends DSpaceServlet
             finally
             {
                 if (i != null)
+                {
                     i.close();
+                }
             }
     		
             request.setAttribute("collection", myCollection);

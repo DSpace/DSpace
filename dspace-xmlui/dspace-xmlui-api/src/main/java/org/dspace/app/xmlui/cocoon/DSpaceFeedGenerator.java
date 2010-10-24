@@ -187,7 +187,9 @@ public class DSpaceFeedGenerator extends AbstractGenerator
                 DSpaceObject dso = null;
                 
                 if (handle != null && !handle.contains("site"))
+                {
                     dso = HandleManager.resolveToObject(context, handle);
+                }
                 
                 validity.add(dso);
                 
@@ -289,7 +291,9 @@ public class DSpaceFeedGenerator extends AbstractGenerator
             throws SQLException
     {
         if (recentSubmissionItems != null)
-                return recentSubmissionItems;
+        {
+            return recentSubmissionItems;
+        }
 
         String source = ConfigurationManager.getProperty("recent.submissions.sort-option");
         BrowserScope scope = new BrowserScope(context);
@@ -298,7 +302,9 @@ public class DSpaceFeedGenerator extends AbstractGenerator
             scope.setCollection((Collection) dso);
         }
         else if (dso instanceof Community)
-                scope.setCommunity((Community) dso);
+        {
+            scope.setCommunity((Community) dso);
+        }
         scope.setResultsPerPage(itemCount);
 
         // FIXME Exception handling

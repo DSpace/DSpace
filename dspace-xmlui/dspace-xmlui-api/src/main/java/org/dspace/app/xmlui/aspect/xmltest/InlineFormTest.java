@@ -92,9 +92,13 @@ public class InlineFormTest extends AbstractDSpaceTransformer
     	Request request = ObjectModelHelper.getRequest(objectModel);
 		boolean help = false, error = false;
 		if (request.getParameter("help") != null)
-			help = true;
+        {
+            help = true;
+        }
 		if (request.getParameter("error") != null)
-			error = true;
+        {
+            error = true;
+        }
 		
         Division div = body.addInteractiveDivision("test", "", "post", "primary");
         div.setHead("Inline form test");
@@ -130,9 +134,13 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         Text text = p.addText("text");
         text.setLabel("Text");
         if (help)
-        	text.setHelp("This is helpfull text.");
+        {
+            text.setHelp("This is helpfull text.");
+        }
         if (error)
-        	text.addError("This field is in error.");
+        {
+            text.addError("This field is in error.");
+        }
         text.setValue("Current raw value");
         p.addContent(", embedded in a paragraph.");
         
@@ -141,9 +149,13 @@ public class InlineFormTest extends AbstractDSpaceTransformer
 		p.addContent("This is a singe 'CheckBox' field, ");
         CheckBox checkBox = p.addCheckBox("yes-or-no");
         if (help)
-        	checkBox.setHelp("Select either yes or no.");
+        {
+            checkBox.setHelp("Select either yes or no.");
+        }
         if (error)
-        	checkBox.addError("You are incorrect, try again.");
+        {
+            checkBox.addError("You are incorrect, try again.");
+        }
         checkBox.setLabel("Yes or no");
         checkBox.addOption("yes");
         p.addContent(", embedded in a paragraph.");
@@ -154,9 +166,13 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         File file = p.addFile("file");
         file.setLabel("File");
         if (help)
-        	file.setHelp("Upload a file.");
+        {
+            file.setHelp("Upload a file.");
+        }
         if (error)
-        	file.addError("This field is in error.");
+        {
+            file.addError("This field is in error.");
+        }
         p.addContent(", embedded in a paragraph.");
         
         // Select (single)
@@ -165,9 +181,13 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         Select select = p.addSelect("select");
         select.setLabel("Select (single)");
         if (help)
-        	select.setHelp("Select one of the options");
+        {
+            select.setHelp("Select one of the options");
+        }
         if (error)
-        	select.addError("This field is in error.");
+        {
+            select.addError("This field is in error.");
+        }
         select.addOption("one","uno");
         select.addOption("two","dos");
         select.addOption("three","tres");
@@ -183,9 +203,13 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         button.setLabel("Button");
         button.setValue("When you touch me I do things, lots of things");
         if (help)
-        	button.setHelp("Submit buttons allow the user to submit the form.");
+        {
+            button.setHelp("Submit buttons allow the user to submit the form.");
+        }
         if (error)
-        	button.addError("This button is in error.");
+        {
+            button.addError("This button is in error.");
+        }
         p.addContent(", embedded in a paragraph.");
         
         
@@ -202,9 +226,13 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         TextArea textArea = p.addTextArea("textarea");
         textArea.setLabel("Text Area");
         if (help)
-        	textArea.setHelp("This is helpfull text.");
+        {
+            textArea.setHelp("This is helpfull text.");
+        }
         if (error)
-        	textArea.addError("This field is in error.");
+        {
+            textArea.addError("This field is in error.");
+        }
         textArea.setValue("This is the raw value");
         p.addContent(", embedded in a paragraph.");
         
@@ -213,9 +241,13 @@ public class InlineFormTest extends AbstractDSpaceTransformer
 		p.addContent("This is a multi-option 'CheckBox' field, ");
         checkBox = p.addCheckBox("fruit");
         if (help)
-        	checkBox.setHelp("Select all the fruits that you like to eat");
+        {
+            checkBox.setHelp("Select all the fruits that you like to eat");
+        }
         if (error)
-        	checkBox.addError("You are incorrect you actualy do like Tootse Rolls.");
+        {
+            checkBox.addError("You are incorrect you actualy do like Tootse Rolls.");
+        }
         checkBox.setLabel("fruits");
         checkBox.addOption("apple","Apples");
         checkBox.addOption(true,"orange","Oranges");
@@ -230,9 +262,13 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         Radio radio = p.addRadio("sex");
         radio.setLabel("Football colors");         
         if (help)
-        	radio.setHelp("Select the colors of the best (college) football team.");
+        {
+            radio.setHelp("Select the colors of the best (college) football team.");
+        }
         if (error)
-        	radio.addError("Error, Maroon & White is the only acceptable answer.");
+        {
+            radio.addError("Error, Maroon & White is the only acceptable answer.");
+        }
         radio.addOption("ut","Burnt Orange & White");
         radio.addOption(true,"tamu","Maroon & White");
         radio.addOption("ttu","Tech Red & Black");
@@ -249,9 +285,13 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         select.setMultiple();
         select.setSize(4);
         if (help)
-        	select.setHelp("Select one or more options");
+        {
+            select.setHelp("Select one or more options");
+        }
         if (error)
-        	select.addError("This field is in error.");
+        {
+            select.addError("This field is in error.");
+        }
         select.addOption("one","uno");
         select.addOption("two","dos");
         select.addOption("three","tres");
@@ -268,19 +308,27 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         Composite composite = p.addComposite("composite-2text");
         composite.setLabel("Composite (two text fields)");
         if (help)
-        	composite.setHelp("I am the help for the entire composite");
+        {
+            composite.setHelp("I am the help for the entire composite");
+        }
         if (error)
-        	composite.addError("Just the composite is in error");
+        {
+            composite.addError("Just the composite is in error");
+        }
         text = composite.addText("partA");
         text.setLabel("Part A");
         text.setValue("Value for part A");
         if (help)
-        	text.setHelp("Part A");
+        {
+            text.setHelp("Part A");
+        }
         text = composite.addText("partB");
         text.setLabel("Part B");
         text.setValue("Value for part B");
         if (help)
-        	text.setHelp("Part B");
+        {
+            text.setHelp("Part B");
+        }
         p.addContent(", embedded in a paragraph.");
         
         
@@ -294,13 +342,19 @@ public class InlineFormTest extends AbstractDSpaceTransformer
     private String makeURL(boolean help, boolean error)
 	{
 		if (help && error)
-			return "?help&error";
+        {
+            return "?help&error";
+        }
 		
 		if (help)
-			return "?help";
+        {
+            return "?help";
+        }
 		
 		if (error)
-			return "?error";
+        {
+            return "?error";
+        }
 		
 		return "?neither";
 	}

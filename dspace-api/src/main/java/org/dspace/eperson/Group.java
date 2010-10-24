@@ -164,7 +164,9 @@ public class Group extends DSpaceObject
                 {
                     // close the TableRowIterator to free up resources
                     if (tri != null)
+                    {
                         tri.close();
+                    }
                 }
 
                 // now get Group objects
@@ -198,7 +200,9 @@ public class Group extends DSpaceObject
                 {
                     // close the TableRowIterator to free up resources
                     if (tri != null)
+                    {
                         tri.close();
+                    }
                 }
 
             }
@@ -469,7 +473,9 @@ public class Group extends DSpaceObject
             {
                 // close the TableRowIterator to free up resources
                 if (tri != null)
+                {
                     tri.close();
+                }
             }
         }
         // Also need to get all "Special Groups" user is a member of!
@@ -509,7 +515,9 @@ public class Group extends DSpaceObject
             
             groupQuery.append("child_id= ? ");
             if (i.hasNext())
+            {
                 groupQuery.append(" OR ");
+            }
         }
 
         // was member of at least one group
@@ -534,7 +542,9 @@ public class Group extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         return groupIDs;
@@ -610,7 +620,9 @@ public class Group extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         // now we have all the groups (including this one)
@@ -629,7 +641,9 @@ public class Group extends DSpaceObject
         epersonQuery.append("eperson_group_id= ? ");
 
         if (i.hasNext())
+        {
             epersonQuery.append(" OR ");
+        }
         
         while (i.hasNext())
         {
@@ -638,7 +652,9 @@ public class Group extends DSpaceObject
             
             epersonQuery.append("eperson_group_id= ? ");
             if (i.hasNext())
+            {
                 epersonQuery.append(" OR ");
+            }
         }
 
         //get all the EPerson IDs
@@ -663,7 +679,9 @@ public class Group extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         return epeopleIDs;
@@ -806,7 +824,9 @@ public class Group extends DSpaceObject
         finally
         {
             if (rows != null)
+            {
                 rows.close();
+            }
         }
     }
     
@@ -864,7 +884,9 @@ public class Group extends DSpaceObject
                 queryBuf.append("rec WHERE rownum<=? ");
                 // If we also have an offset, then convert the limit into the maximum row number
                 if (offset > 0)
+                {
                     limit += offset;
+                }
             }
 
             // Return only the records after the specified offset (row number)
@@ -877,10 +899,14 @@ public class Group extends DSpaceObject
         else
         {
             if (limit > 0)
+            {
                 queryBuf.append(" LIMIT ? ");
+            }
 
             if (offset > 0)
+            {
                 queryBuf.append(" OFFSET ? ");
+            }
         }
 
         String dbquery = queryBuf.toString();
@@ -939,7 +965,9 @@ public class Group extends DSpaceObject
         finally
         {
             if (rows != null)
+            {
                 rows.close();
+            }
         }
 	}
 
@@ -1189,7 +1217,10 @@ public class Group extends DSpaceObject
              return false;
          }
          final Group other = (Group) obj;
-         if(this.getID() != other.getID()) return false;
+         if(this.getID() != other.getID())
+         {
+             return false;
+         }
          return true;
      }
 
@@ -1257,7 +1288,9 @@ public class Group extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         // now parents is a hash of all of the IDs of groups that are parents
@@ -1311,7 +1344,9 @@ public class Group extends DSpaceObject
 
         // degenerate case, this parent has no children
         if (!parents.containsKey(parent))
+        {
             return myChildren;
+        }
 
         // got this far, so we must have children
         Set<Integer> children =  parents.get(parent);

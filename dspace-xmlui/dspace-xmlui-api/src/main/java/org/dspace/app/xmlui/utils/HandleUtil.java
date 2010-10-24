@@ -91,21 +91,27 @@ public class HandleUtil
             String uri = request.getSitemapURI();
 
             if (!uri.startsWith(HANDLE_PREFIX))
+            {
                 // Dosn't start with the prefix then no match
                 return null;
+            }
 
             String handle = uri.substring(HANDLE_PREFIX.length());
 
             int firstSlash = handle.indexOf('/');
             if (firstSlash < 0)
+            {
                 // If there is no first slash then no match
                 return null;
+            }
 
             int secondSlash = handle.indexOf('/', firstSlash + 1);
             if (secondSlash < 0)
+            {
                 // A trailing slash is not nesssary if there is nothing after
                 // the handle.
                 secondSlash = handle.length();
+            }
 
             handle = handle.substring(0, secondSlash);
 
@@ -138,7 +144,9 @@ public class HandleUtil
 
             // Check if the current object has the handle we are looking for.
             if (current.getHandle().equals(parent))
+            {
                 return true;
+            }
 
             if (current.getType() == Constants.ITEM)
             {

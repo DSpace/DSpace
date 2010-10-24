@@ -111,11 +111,17 @@ public class Item extends RichTextContainer implements StructuralElement
     {
         AttributeMap attributes = new AttributeMap();
         if (name != null)
+        {
             attributes.put(A_NAME, name);
+        }
         if (name != null)
+        {
             attributes.put(A_ID, context.generateID(E_ITEM, name));
+        }
         if (rend != null)
+        {
             attributes.put(A_RENDER, rend);
+        }
 
         startElement(contentHandler, namespaces, E_ITEM, attributes);
         super.toSAX(contentHandler, lexicalHandler, namespaces);

@@ -179,7 +179,9 @@ public class MapperMain extends AbstractDSpaceTransformer {
         finally
         {
             if (iterator != null)
+            {
                 iterator.close();
+            }
         }
         
         int[] counts = new int[2];

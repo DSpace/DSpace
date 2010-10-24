@@ -118,8 +118,10 @@ public class IndexEventConsumer implements Consumer {
                 et = Event.MODIFY;
                 subject = ((Bundle) subject).getItems()[0];
                 if (log.isDebugEnabled())
+                {
                     log.debug("Transforming Bundle event into MODIFY of Item "
                             + subject.getHandle());
+                }
             } else
             {
                 return;
@@ -213,7 +215,9 @@ public class IndexEventConsumer implements Consumer {
                 try {
                     indexer.unIndexContent(ctx, hdl, true);
                     if (log.isDebugEnabled())
+                    {
                         log.debug("UN-Indexed Item, handle=" + hdl);
+                    }
                 }
                 catch (Exception e) {
                     log.error("Failed while UN-indexing object: " + hdl, e);

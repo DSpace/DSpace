@@ -130,7 +130,9 @@ public class FlowUtils {
 	{
 		InProgressSubmission submission = findSubmission(context, inProgressSubmissionID);
 		if (submission instanceof WorkspaceItem)
-			return (WorkspaceItem) submission;
+        {
+            return (WorkspaceItem) submission;
+        }
 		return null;
 	}
 	
@@ -147,7 +149,9 @@ public class FlowUtils {
 	{
 		InProgressSubmission submission = findSubmission(context, inProgressSubmissionID);
 		if (submission instanceof WorkflowItem)
-			return (WorkflowItem) submission;
+        {
+            return (WorkflowItem) submission;
+        }
 		return null;
 	}
 	
@@ -284,7 +288,9 @@ public class FlowUtils {
 			WorkspaceItem workspaceItem = (WorkspaceItem) submission;
 			int stage = workspaceItem.getStageReached();
 			if (stage < 0)
-				stage = 0;
+            {
+                stage = 0;
+            }
 			return stage;
 		}
 		
@@ -309,7 +315,9 @@ public class FlowUtils {
 			WorkspaceItem workspaceItem = (WorkspaceItem) submission;
 			int page = workspaceItem.getPageReached();
 			if (page < 0)
-				page = 0;
+            {
+                page = 0;
+            }
 			return page;
 		}
 		

@@ -275,6 +275,8 @@ public class ItemIterator
     public void close()
     {
         if (itemRows != null)
+        {
             itemRows.close();
+        }
     }
 }

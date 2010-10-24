@@ -100,7 +100,9 @@ public class DSAnalyzer extends Analyzer
     {
         // If it is the default field, or bounded fields is turned off in the config, return the default value
         if ("default".equalsIgnoreCase(fieldName) || !ConfigurationManager.getBooleanProperty("search.boundedfields", false))
+        {
             return super.getPositionIncrementGap(fieldName);
+        }
 
         // Not the default field, and we want bounded fields, so return an large gap increment
         return 10;

@@ -532,22 +532,34 @@ public abstract class Field extends AbstractWingElement implements
         attributes.put(A_ID, this.context.generateID(E_FIELD, this.name));
         attributes.put(A_FIELD_TYPE, this.type);
         if (this.disabled)
+        {
             attributes.put(A_DISABLED, this.disabled);
+        }
         if (this.required)
+        {
             attributes.put(A_REQUIRED, this.required);
+        }
         if (this.rend != null)
+        {
             attributes.put(A_RENDER, this.rend);
+        }
 
         startElement(contentHandler, namespaces, E_FIELD, attributes);
 
         if (params != null)
+        {
             params.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
 
         if (label != null)
-                label.toSAX(contentHandler, lexicalHandler, namespaces);
+        {
+            label.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
         
         if (help != null)
+        {
             help.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
 
         for (Error error : errors)
         {

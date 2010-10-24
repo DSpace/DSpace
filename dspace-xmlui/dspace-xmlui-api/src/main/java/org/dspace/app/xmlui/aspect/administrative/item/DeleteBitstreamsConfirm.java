@@ -99,7 +99,9 @@ public class DeleteBitstreamsConfirm extends AbstractDSpaceTransformer
 			String[] parts = id.split("/");
 
 			if (parts.length != 2)
-				throw new UIException("Unable to parse id into bundle and bitstream id: "+id);
+            {
+                throw new UIException("Unable to parse id into bundle and bitstream id: " + id);
+            }
 
 			int bitstreamID = Integer.valueOf(parts[1]);
 
@@ -125,7 +127,9 @@ public class DeleteBitstreamsConfirm extends AbstractDSpaceTransformer
 			String format = null;
 			BitstreamFormat bitstreamFormat = bitstream.getFormat();
 			if (bitstreamFormat != null)
-				format = bitstreamFormat.getShortDescription();
+            {
+                format = bitstreamFormat.getShortDescription();
+            }
 
 			Row row = table.addRow();
 			row.addCell().addContent(bitstream.getName());

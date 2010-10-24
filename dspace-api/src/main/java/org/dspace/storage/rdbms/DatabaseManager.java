@@ -243,7 +243,15 @@ public class DatabaseManager
         catch (SQLException sqle)
         {
             if (statement != null)
-                try { statement.close(); } catch (SQLException s) { }
+            {
+                try
+                {
+                    statement.close();
+                }
+                catch (SQLException s)
+                {
+                }
+            }
 
             throw sqle;
         }
@@ -294,7 +302,15 @@ public class DatabaseManager
         catch (SQLException sqle)
         {
             if (statement != null)
-                try { statement.close(); } catch (SQLException s) { }
+            {
+                try
+                {
+                    statement.close();
+                }
+                catch (SQLException s)
+                {
+                }
+            }
 
             throw sqle;
         }
@@ -373,7 +389,9 @@ public class DatabaseManager
         finally
         {
             if (iterator != null)
+            {
                 iterator.close();
+            }
         }
 
         return (retRow);
@@ -410,7 +428,9 @@ public class DatabaseManager
         finally
         {
             if (iterator != null)
+            {
                 iterator.close();
+            }
         }
         return (retRow);
     }
@@ -538,10 +558,14 @@ public class DatabaseManager
         String ctable = canonicalize(table);
 
         if ( ! DB_SAFE_NAME.matcher(ctable).matches())
-        	throw new SQLException("Unable to execute select query because table name ("+ctable+") contains non alphanumeric characters.");
+        {
+            throw new SQLException("Unable to execute select query because table name (" + ctable + ") contains non alphanumeric characters.");
+        }
 
         if ( ! DB_SAFE_NAME.matcher(column).matches())
-        	throw new SQLException("Unable to execute select query because column name ("+column+") contains non alphanumeric characters.");
+        {
+            throw new SQLException("Unable to execute select query because column name (" + column + ") contains non alphanumeric characters.");
+        }
         
         String sql = "select * from " + ctable + " where "+ column +" = ? ";
 
@@ -593,10 +617,14 @@ public class DatabaseManager
         String ctable = canonicalize(table);
 
         if ( ! DB_SAFE_NAME.matcher(ctable).matches())
-        	throw new SQLException("Unable to execute delete query because table name ("+ctable+") contains non alphanumeric characters.");
+        {
+            throw new SQLException("Unable to execute delete query because table name (" + ctable + ") contains non alphanumeric characters.");
+        }
 
         if ( ! DB_SAFE_NAME.matcher(column).matches())
-        	throw new SQLException("Unable to execute delete query because column name ("+column+") contains non alphanumeric characters.");
+        {
+            throw new SQLException("Unable to execute delete query because column name (" + column + ") contains non alphanumeric characters.");
+        }
         
         String sql = "delete from "+ctable+" where "+column+" = ? ";
 
@@ -627,7 +655,9 @@ public class DatabaseManager
 	        	finally
 	        	{
 	        		if (pstmt != null)
-	        			pstmt.close();
+                    {
+                        pstmt.close();
+                    }
 	        	}
         	}
 
@@ -726,7 +756,9 @@ public class DatabaseManager
         }
 
         if (newID < 0)
+        {
             throw new SQLException("Unable to retrieve sequence ID");
+        }
 
         // Set the ID in the table row object
         row.setColumn(getPrimaryKeyColumn(table), newID);
@@ -817,7 +849,9 @@ public class DatabaseManager
     public static int delete(Context context, TableRow row) throws SQLException
     {
         if (null == row.getTable())
+        {
             throw new IllegalArgumentException("Row not associated with a table");
+        }
 
         String pk = getPrimaryKeyColumn(row);
 

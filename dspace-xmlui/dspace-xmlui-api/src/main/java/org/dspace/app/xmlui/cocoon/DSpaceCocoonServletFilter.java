@@ -101,7 +101,9 @@ public class DSpaceCocoonServletFilter implements Filter
         {
             String osName = System.getProperty("os.name");
             if (osName != null)
+            {
                 osName = osName.toLowerCase();
+            }
 
             if (osName != null && osName.contains("windows"))
             {
@@ -130,7 +132,9 @@ public class DSpaceCocoonServletFilter implements Filter
         // first check the local per webapp parameter, then check the global parameter.
         dspaceConfig = arg0.getInitParameter(DSPACE_CONFIG_PARAMETER);
         if (dspaceConfig == null)
+        {
             dspaceConfig = arg0.getServletContext().getInitParameter(DSPACE_CONFIG_PARAMETER);
+        }
         
         // Finaly, if no config parameter found throw an error
         if (dspaceConfig == null || "".equals(dspaceConfig))

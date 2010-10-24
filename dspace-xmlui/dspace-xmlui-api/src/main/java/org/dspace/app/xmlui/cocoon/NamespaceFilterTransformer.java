@@ -128,7 +128,9 @@ public class NamespaceFilterTransformer extends AbstractTransformer implements C
 	private boolean filterPrefix(String test)
 	{
 		if (filterPrefixes.isEmpty())
-			return false;
+        {
+            return false;
+        }
 		String peek = filterPrefixes.peek();
 		return (peek != null && peek.equals(test));
 	}
@@ -182,8 +184,10 @@ public class NamespaceFilterTransformer extends AbstractTransformer implements C
     		for (int i = 0; i < a.getLength(); i++)
     		{
     			if (filter(a.getURI(i)))
-    				// Add it to the list of filtered indexes.
-    				filterAttributeIndexs.add(i);
+                {
+                    // Add it to the list of filtered indexes.
+                    filterAttributeIndexs.add(i);
+                }
     		}
     		
     		// Check if any of the attributes are to be filtered if so, filter them out.
@@ -195,8 +199,10 @@ public class NamespaceFilterTransformer extends AbstractTransformer implements C
     			for (int i = 0; i < a.getLength(); i++)
     			{
     				if (filterAttributeIndexs.contains(i))
-    					// This index is to be filtered.
-    					continue;
+                    {
+                        // This index is to be filtered.
+                        continue;
+                    }
     				
 	    			String a_uri = a.getURI(i);
 	    			String a_localName = a.getLocalName(i);

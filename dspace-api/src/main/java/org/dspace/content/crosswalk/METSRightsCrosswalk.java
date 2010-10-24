@@ -385,7 +385,9 @@ public class METSRightsCrosswalk
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
         if (!(root.getName().equals("RightsDeclarationMD")))
-            throw new MetadataValidationException("Wrong root element for METSRights: "+root.toString());
+        {
+            throw new MetadataValidationException("Wrong root element for METSRights: " + root.toString());
+        }
         ingest(context, dso, root.getChildren());
     }
 
@@ -416,12 +418,16 @@ public class METSRightsCrosswalk
     {
         // we cannot crosswalk METSRights to a SITE object
         if (dso.getType() == Constants.SITE)
+        {
             throw new CrosswalkObjectNotSupported("Wrong target object type, METSRightsCrosswalk cannot crosswalk a SITE object.");
+        }
 
         //First, clear all existing Policies on this DSpace Object
         // as we don't want them to conflict with policies we will be adding
         if(!ml.isEmpty())
+        {
             AuthorizeManager.removeAllPolicies(context, dso);
+        }
 
         // Loop through each Element in the List
         Iterator mi = ml.iterator();
@@ -449,7 +455,9 @@ public class METSRightsCrosswalk
                     //get DSpace Anonymous group, ID=0
                     Group anonGroup = Group.find(context, 0);
                     if(anonGroup==null)
+                    {
                         throw new CrosswalkInternalException("The DSpace database has not been properly initialized.  The Anonymous Group is missing from the database.");
+                    }
 
                     assignPermissions(context, dso, anonGroup, permsElement);
                 } // else if this permission declaration pertains to Administrators
@@ -458,7 +466,9 @@ public class METSRightsCrosswalk
                     //get DSpace Administrator group, ID=1
                     Group adminGroup = Group.find(context, 1);
                     if(adminGroup==null)
+                    {
                         throw new CrosswalkInternalException("The DSpace database has not been properly initialized.  The Administrator Group is missing from the database.");
+                    }
 
                     assignPermissions(context, dso, adminGroup, permsElement);
                 } // else if this permission pertains to another DSpace group
@@ -512,7 +522,9 @@ public class METSRightsCrosswalk
                     //If cannot find by email, try by netID
                     //(though METSRights should contain email if it was exported by DSpace)
                     if(person==null)
+                    {
                         person = EPerson.findByNetid(context, personEmail);
+                    }
 
                     //if not found, throw an error -- user should restore person from the SITE AIP
                     if(person==null)
@@ -621,7 +633,9 @@ public class METSRightsCrosswalk
                 {
                     //if found, this is the Action ID corresponding to this permission
                     if(otherTypesMapping.get(actionType).equals(otherPermitType))
+                    {
                         return actionType;
+                    }
                 }
             }
             else

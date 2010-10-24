@@ -138,7 +138,9 @@ public class DescribeStep extends AbstractSubmissionStep
     private static void initializeInputsReader() throws DCInputsReaderException
     {
         if (INPUTS_READER == null)
+        {
             INPUTS_READER = new DCInputsReader();
+        }
     }
     
     /**
@@ -181,7 +183,9 @@ public class DescribeStep extends AbstractSubmissionStep
 
             String jumpTo = submissionInfo.getJumpToField();
             if (jumpTo != null)
-                pageMeta.addMetadata("page","jumpTo").addContent(jumpTo);
+            {
+                pageMeta.addMetadata("page", "jumpTo").addContent(jumpTo);
+            }
         }
 
         public void addBody(Body body) throws SAXException, WingException,
@@ -221,7 +225,9 @@ public class DescribeStep extends AbstractSubmissionStep
                     
                     // If the input is invisible in this scope, then skip it.
                         if (!dcInput.isVisible(scope) && !readonly)
-                                continue;
+                        {
+                            continue;
+                        }
                         
                         String schema = dcInput.getSchema();
                         String element = dcInput.getElement();
@@ -351,7 +357,9 @@ public class DescribeStep extends AbstractSubmissionStep
             // If the input is invisible in this scope, then skip it.
             String scope = submissionInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE;
             if (!input.isVisible(scope) && !input.isReadOnly(scope))
+            {
                 continue;
+            }
 
             String inputType = input.getInputType();
             String pairsName = input.getPairsType();
@@ -448,17 +456,28 @@ public class DescribeStep extends AbstractSubmissionStep
                 fullName.setLabel(dcInput.getLabel());
                 fullName.setHelp(cleanHints(dcInput.getHints()));
                 if (dcInput.isRequired())
-                        fullName.setRequired();
+                {
+                    fullName.setRequired();
+                }
                 if (isFieldInError(fieldName))
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                {
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
+                    {
                         fullName.addError(dcInput.getWarning());
-                    } else {
+                    }
+                    else
+                    {
                         fullName.addError(T_required_field);
                     }
+                }
                 if (dcInput.isRepeatable() && !readonly)
-                        fullName.enableAddOperation();
+                {
+                    fullName.enableAddOperation();
+                }
                 if ((dcInput.isRepeatable() || dcValues.length > 1)  && !readonly)
-                        fullName.enableDeleteOperation();
+                {
+                    fullName.enableDeleteOperation();
+                }
                 String fieldKey = MetadataAuthorityManager.makeFieldKey(dcInput.getSchema(), dcInput.getElement(), dcInput.getQualifier());
                 boolean isAuthorityControlled = MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey);
                 if (isAuthorityControlled)
@@ -556,17 +575,28 @@ public class DescribeStep extends AbstractSubmissionStep
                 fullDate.setLabel(dcInput.getLabel());
                 fullDate.setHelp(cleanHints(dcInput.getHints()));
                 if (dcInput.isRequired())
-                        fullDate.setRequired();
+                {
+                    fullDate.setRequired();
+                }
                 if (isFieldInError(fieldName))
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                {
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
+                    {
                         fullDate.addError(dcInput.getWarning());
-                    } else {
+                    }
+                    else
+                    {
                         fullDate.addError(T_required_field);
                     }
+                }
                 if (dcInput.isRepeatable() && !readonly)
-                        fullDate.enableAddOperation();
+                {
+                    fullDate.enableAddOperation();
+                }
                 if ((dcInput.isRepeatable() || dcValues.length > 1) && !readonly)
-                        fullDate.enableDeleteOperation();
+                {
+                    fullDate.enableDeleteOperation();
+                }
 
                 if (readonly)
                 {
@@ -653,17 +683,28 @@ public class DescribeStep extends AbstractSubmissionStep
                 fullSeries.setLabel(dcInput.getLabel());
                 fullSeries.setHelp(cleanHints(dcInput.getHints()));
                 if (dcInput.isRequired())
-                        fullSeries.setRequired();
+                {
+                    fullSeries.setRequired();
+                }
                 if (isFieldInError(fieldName))
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                {
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
+                    {
                         fullSeries.addError(dcInput.getWarning());
-                    } else {
+                    }
+                    else
+                    {
                         fullSeries.addError(T_required_field);
                     }
+                }
                 if (dcInput.isRepeatable() && !readonly)
-                        fullSeries.enableAddOperation();
+                {
+                    fullSeries.enableAddOperation();
+                }
                 if ((dcInput.isRepeatable() || dcValues.length > 1) && !readonly)
-                        fullSeries.enableDeleteOperation();
+                {
+                    fullSeries.enableDeleteOperation();
+                }
 
                 series.setLabel(T_series_name);
                 number.setLabel(T_report_no);
@@ -723,18 +764,29 @@ public class DescribeStep extends AbstractSubmissionStep
                 qualdrop.setLabel(dcInput.getLabel());
                 qualdrop.setHelp(cleanHints(dcInput.getHints()));
                 if (dcInput.isRequired())
-                        qualdrop.setRequired();
+                {
+                    qualdrop.setRequired();
+                }
                 if (isFieldInError(fieldName))
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                {
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
+                    {
                         qualdrop.addError(dcInput.getWarning());
-                    } else {
+                    }
+                    else
+                    {
                         qualdrop.addError(T_required_field);
                     }
+                }
                 if (dcInput.isRepeatable() && !readonly)
-                        qualdrop.enableAddOperation();
+                {
+                    qualdrop.enableAddOperation();
+                }
                 // Update delete based upon the filtered values.
                 if ((dcInput.isRepeatable() || dcValues.length > 1) && !readonly)
-                        qualdrop.enableDeleteOperation();
+                {
+                    qualdrop.enableDeleteOperation();
+                }
                 
                 if (readonly)
                 {
@@ -805,17 +857,28 @@ public class DescribeStep extends AbstractSubmissionStep
                     textArea.setChoicesClosed(ChoiceAuthorityManager.getManager().isClosed(fieldKey));
                 }
                 if (dcInput.isRequired())
-                        textArea.setRequired();
+                {
+                    textArea.setRequired();
+                }
                 if (isFieldInError(fieldName))
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                {
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
+                    {
                         textArea.addError(dcInput.getWarning());
-                    } else {
+                    }
+                    else
+                    {
                         textArea.addError(T_required_field);
                     }
+                }
                 if (dcInput.isRepeatable() && !readonly)
-                        textArea.enableAddOperation();
+                {
+                    textArea.enableAddOperation();
+                }
                 if ((dcInput.isRepeatable() || dcValues.length > 1) && !readonly)
-                        textArea.enableDeleteOperation();
+                {
+                    textArea.enableDeleteOperation();
+                }
 
                 if (readonly)
                 {
@@ -877,7 +940,9 @@ public class DescribeStep extends AbstractSubmissionStep
         {
                 String fieldKey = MetadataAuthorityManager.makeFieldKey(dcInput.getSchema(), dcInput.getElement(), dcInput.getQualifier());
                 if (MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey))
-                    throw new WingException("Field "+fieldKey+" has choice presentation of type \""+Params.PRESENTATION_SELECT+"\", it may NOT be authority-controlled.");
+                {
+                    throw new WingException("Field " + fieldKey + " has choice presentation of type \"" + Params.PRESENTATION_SELECT + "\", it may NOT be authority-controlled.");
+                }
 
                 // Plain old select list.
                 Select select = form.addItem().addSelect(fieldName,"submit-select");
@@ -886,13 +951,20 @@ public class DescribeStep extends AbstractSubmissionStep
                 select.setLabel(dcInput.getLabel());
                 select.setHelp(cleanHints(dcInput.getHints()));
                 if (dcInput.isRequired())
-                        select.setRequired();
+                {
+                    select.setRequired();
+                }
                 if (isFieldInError(fieldName))
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                {
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
+                    {
                         select.addError(dcInput.getWarning());
-                    } else {
+                    }
+                    else
+                    {
                         select.addError(T_required_field);
                     }
+                }
                 if (dcInput.isRepeatable() || dcValues.length > 1)
                 {
                         // Use the multiple functionality from the HTML
@@ -912,7 +984,9 @@ public class DescribeStep extends AbstractSubmissionStep
 
                 Choices cs = ChoiceAuthorityManager.getManager().getMatches(fieldKey, "", coll.getID(), 0, 0, null);
                 if (dcValues.length == 0)
+                {
                     select.addOption(true, "", "");
+                }
                 for (Choice c : cs.values)
                 {
                     select.addOption(c.value, c.label);
@@ -947,13 +1021,20 @@ public class DescribeStep extends AbstractSubmissionStep
                 select.setLabel(dcInput.getLabel());
                 select.setHelp(cleanHints(dcInput.getHints()));
                 if (dcInput.isRequired())
-                        select.setRequired();
+                {
+                    select.setRequired();
+                }
                 if (isFieldInError(fieldName))
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                {
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
+                    {
                         select.addError(dcInput.getWarning());
-                    } else {
+                    }
+                    else
+                    {
                         select.addError(T_required_field);
                     }
+                }
                 if (dcInput.isRepeatable() || dcValues.length > 1)
                 {
                         // Use the multiple functionality from the HTML
@@ -1025,13 +1106,20 @@ public class DescribeStep extends AbstractSubmissionStep
                 listField.setLabel(dcInput.getLabel());
                 listField.setHelp(cleanHints(dcInput.getHints()));
                 if (dcInput.isRequired())
-                        listField.setRequired();
+                {
+                    listField.setRequired();
+                }
                 if (isFieldInError(fieldName))
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                {
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
+                    {
                         listField.addError(dcInput.getWarning());
-                    } else {
+                    }
+                    else
+                    {
                         listField.addError(T_required_field);
                     }
+                }
 
         
                 //Setup each of the possible options
@@ -1105,17 +1193,28 @@ public class DescribeStep extends AbstractSubmissionStep
                 }
 
                 if (dcInput.isRequired())
-                        text.setRequired();
+                {
+                    text.setRequired();
+                }
                 if (isFieldInError(fieldName))
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                {
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
+                    {
                         text.addError(dcInput.getWarning());
-                    } else {
+                    }
+                    else
+                    {
                         text.addError(T_required_field);
                     }
+                }
                 if (dcInput.isRepeatable() && !readonly)
-                        text.enableAddOperation();
+                {
+                    text.enableAddOperation();
+                }
                 if ((dcInput.isRepeatable() || dcValues.length > 1) && !readonly)
-                        text.enableDeleteOperation();
+                {
+                    text.enableDeleteOperation();
+                }
 
                 if (readonly)
                 {

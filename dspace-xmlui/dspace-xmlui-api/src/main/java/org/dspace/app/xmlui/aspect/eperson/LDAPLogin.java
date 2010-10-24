@@ -195,10 +195,14 @@ public class LDAPLogin extends AbstractDSpaceTransformer implements
             }
 
 			if (message != null)
-				reason.addPara(message(message));
+            {
+                reason.addPara(message(message));
+            }
 
 			if (characters != null)
-				reason.addPara(characters);
+            {
+                reason.addPara(characters);
+            }
 		}
 
 		Division login = body.addInteractiveDivision("login", contextPath

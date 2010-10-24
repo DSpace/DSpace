@@ -338,7 +338,9 @@ public class MetadataValue
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         if (row == null)
@@ -383,7 +385,9 @@ public class MetadataValue
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         return ret;

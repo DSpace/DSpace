@@ -122,9 +122,13 @@ public class DSpaceI18NTransformer extends I18nTransformer {
         		String baseCatalogueLocationPath = DEFAULT_BASE_LOCATION;
         		Configuration baseCatalogueLocationConf = catalogueConf.getChild("location");
         		if (baseCatalogueLocationConf != null)
-        			baseCatalogueLocationPath = baseCatalogueLocationConf.getValue();
+                {
+                    baseCatalogueLocationPath = baseCatalogueLocationConf.getValue();
+                }
         		if (!baseCatalogueLocationPath.endsWith("/"))
-        			baseCatalogueLocationPath += "/"; // Add a trailing slash if one dosn't exist
+                {
+                    baseCatalogueLocationPath += "/";
+                } // Add a trailing slash if one dosn't exist
         			
         		String catalogueId = catalogueConf.getAttribute("id","unknown");
         		
@@ -138,8 +142,10 @@ public class DSpaceI18NTransformer extends I18nTransformer {
             		String baseLocationPath = aspect.getPath();
             		int idx = baseLocationPath.indexOf("://");
             		if (idx > 0)
-            			// remove the module directive from the aspect's path so it's just a normal path
-            			baseLocationPath = baseLocationPath.substring(idx+3, baseLocationPath.length());
+                    {
+                        // remove the module directive from the aspect's path so it's just a normal path
+                        baseLocationPath = baseLocationPath.substring(idx + 3, baseLocationPath.length());
+                    }
             		
             		// Now that the module directive has been removed from the path, add in the base i18npath
             		baseLocationPath = baseCatalogueLocationPath + baseLocationPath;
@@ -155,7 +161,9 @@ public class DSpaceI18NTransformer extends I18nTransformer {
             		// "resource://aspects/ArtifactBrowser/i18n/"
             		String aspectLocationPath = aspect.getPath();
             		if (!aspectLocationPath.endsWith("/"))
-            			aspectLocationPath += "/"; // Add a trailing slash if one dosn't exist
+                    {
+                        aspectLocationPath += "/"; // Add a trailing slash if one dosn't exist
+                    }
             		aspectLocationPath += "i18n/";
             		MutableConfiguration aspectLocation = new DefaultConfiguration("location");
             		aspectLocation.setValue(aspectLocationPath);

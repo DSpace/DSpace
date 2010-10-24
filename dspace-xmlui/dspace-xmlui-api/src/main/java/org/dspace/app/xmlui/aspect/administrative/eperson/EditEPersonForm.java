@@ -208,7 +208,9 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 		EPerson eperson = EPerson.find(context, epersonID);
 		
 		if (eperson == null)
-			throw new UIException("Unable to find eperson for id:"+epersonID);
+        {
+            throw new UIException("Unable to find eperson for id:" + epersonID);
+        }
 		
 		String emailValue = eperson.getEmail();
 		String firstValue = eperson.getFirstName();
@@ -219,13 +221,21 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 		java.util.List<String> deleteConstraints = eperson.getDeleteConstraints();
 		
 		if (request.getParameter("email_address") != null)
-			emailValue = request.getParameter("email_address");
+        {
+            emailValue = request.getParameter("email_address");
+        }
 		if (request.getParameter("first_name") != null)
-			firstValue = request.getParameter("first_name");
+        {
+            firstValue = request.getParameter("first_name");
+        }
 		if (request.getParameter("last_name") != null)
-			lastValue = request.getParameter("last_name");
+        {
+            lastValue = request.getParameter("last_name");
+        }
 		if (request.getParameter("phone") != null)
-			phoneValue = request.getParameter("phone");
+        {
+            phoneValue = request.getParameter("phone");
+        }
 		
 		
 		
@@ -271,7 +281,9 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 	        firstName.setLabel(T_first_name);
 	        firstName.setValue(firstValue);
 	        if (errors.contains("first_name"))
-	        	firstName.addError(T_error_fname);
+            {
+                firstName.addError(T_error_fname);
+            }
         }
         else
         {
@@ -286,7 +298,9 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 	        lastName.setLabel(T_last_name);
 	        lastName.setValue(lastValue);
 	        if (errors.contains("last_name"))
-	        	lastName.addError(T_error_lname);
+            {
+                lastName.addError(T_error_lname);
+            }
         }
         else
         {
@@ -329,7 +343,9 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 	        Button submitLoginAs = special.addButton("submit_login_as");
 	        submitLoginAs.setValue(T_submit_login_as);
 	        if (!ConfigurationManager.getBooleanProperty("xmlui.user.assumelogin", false))
-	        	submitLoginAs.setDisabled();
+            {
+                submitLoginAs.setDisabled();
+            }
 	       
 	        if (deleteConstraints != null && deleteConstraints.size() > 0)
 	        {
@@ -349,7 +365,9 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 	        			hi.addContent(" ");
 	        		}
 	        		else if (idx > 0)
-	        			hi.addContent(", ");
+                    {
+                        hi.addContent(", ");
+                    }
 	        		
 	        		if ("item".equals(constraint))
                     {
@@ -376,7 +394,9 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
         
         Item buttons = identity.addItem();
         if (admin)
-        	buttons.addButton("submit_save").setValue(T_submit_save);
+        {
+            buttons.addButton("submit_save").setValue(T_submit_save);
+        }
         buttons.addButton("submit_cancel").setValue(T_submit_cancel);
         
         
@@ -397,13 +417,15 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 	        	// Check if this membership is via another group or not, if so then add a note.
         		Group via = findViaGroup(eperson, group);
         		if (via != null)
-        			item.addHighlight("fade").addContent(T_indirect_member.parameterize(via.getName()));
-	        	
+                {
+                    item.addHighlight("fade").addContent(T_indirect_member.parameterize(via.getName()));
+                }
 	        }
 	        
 	        if (groups.length <= 0)
-	        	member.addItem().addHighlight("italic").addContent(T_member_none);
-	        
+            {
+                member.addItem().addHighlight("italic").addContent(T_member_none);
+            }
         }
         
 	    edit.addHidden("administrative-continue").setValue(knot.getId());
@@ -427,8 +449,10 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 		for (EPerson direct : group.getMembers())
 		{
 			if (direct.getID() == eperson.getID())
-				// Direct membership
-				return null;
+            {
+                // Direct membership
+                return null;
+            }
 		}
 			
 		// Otherwise check what group this eperson is a member through
@@ -440,7 +464,9 @@ public class EditEPersonForm extends AbstractDSpaceTransformer
 			for (Group target : targets)
 			{
 				if (member.getID() == target.getID())
-					return member;
+                {
+                    return member;
+                }
 			}
 		}
 		

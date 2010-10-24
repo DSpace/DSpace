@@ -225,13 +225,16 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 		int groupID = parameters.getParameterAsInteger("groupID",-1);
 		String currentName = URLDecode(parameters.getParameter("groupName",null));
 		if (currentName == null || currentName.length() == 0)
-			currentName = FlowGroupUtils.getName(context, groupID);
+        {
+            currentName = FlowGroupUtils.getName(context, groupID);
+        }
 		
 		Group group = null;
 		if (groupID >= 0)
-			group = Group.find(context,groupID);
-			
-		
+        {
+            group = Group.find(context, groupID);
+        }
+
 		// Find the collection or community if applicable
 		Collection collection = null;
 		Community community = null;
@@ -260,7 +263,9 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 			for (String id : memberGroupIDsString.split(","))
 			{
 				if (id.length() > 0)
-					memberGroupIDs.add(Integer.valueOf(id));
+                {
+                    memberGroupIDs.add(Integer.valueOf(id));
+                }
 			}
 		}
 	    
@@ -337,7 +342,9 @@ public class EditGroupForm extends AbstractDSpaceTransformer
         	groupText.setHelp(T_label_instructions);
         }
         else if (errors.contains("group_name") || errors.contains("group_name_duplicate"))
-        	groupText.addError("");
+        {
+            groupText.addError("");
+        }
         
 
         Para searchBoxes = actions.addPara();
@@ -365,7 +372,9 @@ public class EditGroupForm extends AbstractDSpaceTransformer
                      
         boolean changes = false;
         if (group != null)
-        	changes = addMemberList(main,group,memberGroupIDs,memberEPeopleIDs,highlightEPersonID,highlightGroupID);
+        {
+            changes = addMemberList(main, group, memberGroupIDs, memberEPeopleIDs, highlightEPersonID, highlightGroupID);
+        }
         
                
     	Para buttons = main.addPara();
@@ -373,7 +382,9 @@ public class EditGroupForm extends AbstractDSpaceTransformer
     	buttons.addButton("submit_cancel").setValue(T_submit_cancel);
        
     	if (changes)
-    		main.addPara().addHighlight("warn").addContent(T_pending_warn);
+        {
+            main.addPara().addHighlight("warn").addContent(T_pending_warn);
+        }
     	
         
         main.addHidden("administrative-continue").setValue(knot.getId());
@@ -400,9 +411,13 @@ public class EditGroupForm extends AbstractDSpaceTransformer
        
         	String nextURL = null, prevURL = null;
         	if (page < (resultCount / RESULTS_PER_PAGE))
-        		nextURL = baseURL+"&page="+(page+1);
+            {
+                nextURL = baseURL + "&page=" + (page + 1);
+            }
         	if (page > 0)
-        		prevURL = baseURL+"&page="+(page-1);
+            {
+                prevURL = baseURL + "&page=" + (page - 1);
+            }
         	
 			results.setSimplePagination(resultCount,firstIndex,lastIndex,prevURL, nextURL);
 		}
@@ -477,9 +492,13 @@ public class EditGroupForm extends AbstractDSpaceTransformer
        
         	String nextURL = null, prevURL = null;
         	if (page < (resultCount / RESULTS_PER_PAGE))
-        		nextURL = baseURL+"&page="+(page+1);
+            {
+                nextURL = baseURL + "&page=" + (page + 1);
+            }
         	if (page > 0)
-        		prevURL = baseURL+"&page="+(page-1);
+            {
+                prevURL = baseURL + "&page=" + (page - 1);
+            }
         	
 			results.setSimplePagination(resultCount,firstIndex,lastIndex,prevURL, nextURL);
 		}
@@ -643,7 +662,9 @@ public class EditGroupForm extends AbstractDSpaceTransformer
         for (Group group : parent.getMemberGroups())
         {
         	if (!allMemberGroupIDs.contains(group.getID()))
-        		allMemberGroupIDs.add(group.getID());
+            {
+                allMemberGroupIDs.add(group.getID());
+            }
         }
         // Sort them to a consistent ordering
         Collections.sort(allMemberGroupIDs);
@@ -658,7 +679,9 @@ public class EditGroupForm extends AbstractDSpaceTransformer
         	addMemberRow(table, group, highlight,pendingAddition,pendingRemoval);   
         	
         	if (pendingAddition || pendingRemoval)
-        		changes = true;
+            {
+                changes = true;
+            }
         }
         
         
@@ -668,7 +691,9 @@ public class EditGroupForm extends AbstractDSpaceTransformer
         for (EPerson eperson : parent.getMembers())
         {
         	if (!allMemberEPeopleIDs.contains(eperson.getID()))
-        		allMemberEPeopleIDs.add(eperson.getID());
+            {
+                allMemberEPeopleIDs.add(eperson.getID());
+            }
         }
         // Sort them to a consistent ordering
         Collections.sort(allMemberEPeopleIDs);
@@ -682,7 +707,9 @@ public class EditGroupForm extends AbstractDSpaceTransformer
         	addMemberRow(table,eperson,highlight,pendingAddition,pendingRemoval);
         	
         	if (pendingAddition || pendingRemoval)
-        		changes = true;
+            {
+                changes = true;
+            }
         }
     
         if (allMemberGroupIDs.size() <= 0 && allMemberEPeopleIDs.size() <= 0)

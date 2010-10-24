@@ -73,7 +73,9 @@ public class MARC21InitialArticleWord extends InitialArticleWord
     {
         // No language - no words
         if (StringUtils.isEmpty(lang))
+        {
             return defaultWords;
+        }
 
         Language l = Language.getLanguage(lang);
         
@@ -81,17 +83,19 @@ public class MARC21InitialArticleWord extends InitialArticleWord
         if (l != null && ianaArticleMap.containsKey(l.IANA))
         {
             // Get the list of words for this language
-            ArticlesForLang articles = (ArticlesForLang)ianaArticleMap.get(l.IANA);
+            ArticlesForLang articles = ianaArticleMap.get(l.IANA);
             
             if (articles != null)
+            {
                 return articles.words;
+            }
         }
         
         return null;
     }
     
     // Mapping of IANA codes to article word lists
-    private static Map ianaArticleMap = new HashMap();
+    private static Map<String, ArticlesForLang> ianaArticleMap = new HashMap<String, ArticlesForLang>();
 
     private static String[] defaultWords = null;
 
@@ -247,7 +251,7 @@ public class MARC21InitialArticleWord extends InitialArticleWord
         };
 
         // Initialize the lang -> article map
-        ianaArticleMap = new HashMap();
+        ianaArticleMap = new HashMap<String, ArticlesForLang>();
 
         int wordIdx = 0;
         int langIdx = 0;
@@ -273,7 +277,9 @@ public class MARC21InitialArticleWord extends InitialArticleWord
                     
                     // Add language to list if we haven't done so already
                     if (!words.contains(articleWordArray[wordIdx][0]))
+                    {
                         words.add(articleWordArray[wordIdx][0]);
+                    }
                 }
             }
         }
@@ -315,7 +321,7 @@ public class MARC21InitialArticleWord extends InitialArticleWord
                     Language l = Language.getLanguage(langArr[idx]);
                     if (l != null && ianaArticleMap.containsKey(l.IANA))
                     {
-                        afl[idx] = (ArticlesForLang)ianaArticleMap.get(l.IANA);
+                        afl[idx] = ianaArticleMap.get(l.IANA);
                         if (afl[idx] != null)
                         {
                             wordCount += afl[idx].words.length;

@@ -331,12 +331,16 @@ public class FeedServlet extends DSpaceServlet
     		BrowserScope scope = new BrowserScope(context);
     		scope.setBrowseIndex(bix);
                 if (dso != null)
+                {
                     scope.setBrowseContainer(dso);
+                }
 
             for (SortOption so : SortOption.getSortOptions())
             {
                 if (so.getName().equals(idx))
+                {
                     scope.setSortBy(so.getNumber());
+                }
             }
             scope.setOrder(SortOption.DESCENDING);
     		scope.setResultsPerPage(itemCount);

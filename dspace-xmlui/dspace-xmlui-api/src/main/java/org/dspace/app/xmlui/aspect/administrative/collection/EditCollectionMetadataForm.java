@@ -150,32 +150,40 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	    Text short_description = metadataList.addItem().addText("short_description");
 	    short_description.setValue(thisCollection.getMetadata("short_description"));
 	    short_description.setSize(40);
-	    if (short_description_error != null) 
-	    	short_description.addError(short_description_error);
+	    if (short_description_error != null)
+        {
+            short_description.addError(short_description_error);
+        }
 	    
 	    // introductory text
 	    metadataList.addLabel(T_label_introductory_text);
 	    TextArea introductory_text = metadataList.addItem().addTextArea("introductory_text");
 	    introductory_text.setValue(thisCollection.getMetadata("introductory_text"));
 	    introductory_text.setSize(6, 40);
-	    if (introductory_text_error != null) 
-	    	introductory_text.addError(introductory_text_error);
+	    if (introductory_text_error != null)
+        {
+            introductory_text.addError(introductory_text_error);
+        }
 	    
 	    // copyright text
 	    metadataList.addLabel(T_label_copyright_text);
 	    TextArea copyright_text = metadataList.addItem().addTextArea("copyright_text");
 	    copyright_text.setValue(thisCollection.getMetadata("copyright_text"));
 	    copyright_text.setSize(6, 40);
-	    if (copyright_text_error != null) 
-	    	copyright_text.addError(copyright_text_error);
+	    if (copyright_text_error != null)
+        {
+            copyright_text.addError(copyright_text_error);
+        }
 	    
 	    // legacy sidebar text; may or may not be used for news 
 	    metadataList.addLabel(T_label_side_bar_text);
 	    TextArea side_bar_text = metadataList.addItem().addTextArea("side_bar_text");
 	    side_bar_text.setValue(thisCollection.getMetadata("side_bar_text"));
 	    side_bar_text.setSize(6, 40);
-	    if (side_bar_text_error != null) 
-	    	side_bar_text.addError(side_bar_text_error);
+	    if (side_bar_text_error != null)
+        {
+            side_bar_text.addError(side_bar_text_error);
+        }
 	    
 	    // license text
 	    metadataList.addLabel(T_label_license);

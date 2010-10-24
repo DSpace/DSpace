@@ -449,7 +449,9 @@ public class Event implements Serializable
         {
             int id = Constants.getTypeID(s.toUpperCase());
             if (id >= 0)
+            {
                 return 1 << id;
+            }
         }
         return 0;
     }
@@ -591,16 +593,19 @@ public class Event implements Serializable
         for (Iterator fi = filters.iterator(); fi.hasNext();)
         {
             int filter[] = (int[]) fi.next();
-            if ((subjectType & filter[SUBJECT_MASK]) != 0
-                    && (eventType & filter[EVENT_MASK]) != 0)
+            if ((subjectType & filter[SUBJECT_MASK]) != 0 && (eventType & filter[EVENT_MASK]) != 0)
+            {
                 result = true;
+            }
         }
 
         if (log.isDebugEnabled())
+        {
             log.debug("Filtering event: " + "eventType="
                     + String.valueOf(eventType) + ", subjectType="
                     + String.valueOf(subjectType) + ", result="
                     + String.valueOf(result));
+        }
 
         return result;
     }

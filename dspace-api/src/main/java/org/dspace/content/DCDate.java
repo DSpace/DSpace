@@ -230,11 +230,17 @@ public class DCDate
         granularity = DateGran.TIME;
         Date date = tryParse(fullIso, fromDC);
         if (date == null)
+        {
             date = tryParse(fullIso2, fromDC);
+        }
         if (date == null)
+        {
             date = tryParse(fullIso3, fromDC);
+        }
         if (date == null)
+        {
             date = tryParse(fullIso4, fromDC);
+        }
         if (date == null)
         {
             // Seems there is no time component to the date.
@@ -442,7 +448,9 @@ public class DCDate
     public String toString()
     {
         if (calendar == null)
+        {
             return "null";
+        }
         return toStringInternal();
     }
 

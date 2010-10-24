@@ -170,7 +170,9 @@ public class LDAPAuthentication
 
         // Skip out when no netid or password is given.
         if (netid == null || password == null)
-        	return BAD_ARGS;
+        {
+            return BAD_ARGS;
+        }
 
         // Locate the eperson
         EPerson eperson = null;
@@ -379,25 +381,37 @@ public class LDAPAuthentication
                             if (attlist[0]!=null)
                             {
                                     att = atts.get(attlist[0]);
-                                    if (att != null) ldapEmail = (String)att.get();
+                                    if (att != null)
+                                    {
+                                        ldapEmail = (String) att.get();
+                                    }
                             }
 
                             if (attlist[1]!=null)
                             {
                                     att = atts.get(attlist[1]);
-                                    if (att != null) ldapGivenName = (String)att.get();
+                                    if (att != null)
+                                    {
+                                        ldapGivenName = (String) att.get();
+                                    }
                             }
 
                             if (attlist[2]!=null)
                             {
                                     att = atts.get(attlist[2]);
-                                    if (att != null) ldapSurname = (String)att.get();
+                                    if (att != null)
+                                    {
+                                        ldapSurname = (String) att.get();
+                                    }
                             }
 
                             if (attlist[3]!=null)
                             {
                                     att = atts.get(attlist[3]);
-                                    if (att != null) ldapPhone = (String)att.get();
+                                    if (att != null)
+                                    {
+                                        ldapPhone = (String) att.get();
+                                    }
                             }
                         }
                     }
@@ -422,7 +436,9 @@ public class LDAPAuthentication
                     try
                     {
                         if (ctx != null)
+                        {
                             ctx.close();
+                        }
                     }
                     catch (NamingException e)
                     {

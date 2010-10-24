@@ -62,7 +62,9 @@ public class Dataset {
         this.matrix = (float[][]) ArrayUtils.clone(matrix);
         nbRows = matrix.length;
         if(0 < matrix.length && 0 < matrix[0].length)
+        {
             nbCols = matrix[0].length;
+        }
         initColumnLabels(nbCols);
         initRowLabels(nbRows);
     }
@@ -201,7 +203,9 @@ public class Dataset {
             for (float[] vector : matrix) {
                 for (float v : vector) {
                     if (v != 0)
+                    {
                         return true;
+                    }
                 }
             }
         }

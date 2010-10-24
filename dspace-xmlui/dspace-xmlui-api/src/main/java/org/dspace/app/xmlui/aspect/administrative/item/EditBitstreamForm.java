@@ -165,8 +165,10 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
 		format.addOption(-1,T_format_default);
 		for (BitstreamFormat bitstreamFormat : bitstreamFormats)
 		{
-                        if (bitstreamFormat.getID() == unknownFormatID)
-                            continue;
+            if (bitstreamFormat.getID() == unknownFormatID)
+            {
+                continue;
+            }
 			String supportLevel = "Unknown";
 			if (bitstreamFormat.getSupportLevel() == BitstreamFormat.KNOWN)
             {
@@ -177,8 +179,10 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
                 supportLevel = "Supported";
             }
 			String name = bitstreamFormat.getShortDescription()+" ("+supportLevel+")";
-                        if (bitstreamFormat.isInternal())
-                            name += " (Internal)";
+            if (bitstreamFormat.isInternal())
+            {
+                name += " (Internal)";
+            }
 			int id = bitstreamFormat.getID();
 
 			format.addOption(id,name);

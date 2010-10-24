@@ -124,43 +124,51 @@ public class Language
     
     private static class LanguageMaps
     {
-        private static final Map langMapIANA     = new HashMap();
-        private static final Map langMapISO639_1 = new HashMap();
-        private static final Map langMapISO639_2 = new HashMap();
+        private static final Map<String, Language> langMapIANA     = new HashMap<String, Language>();
+        private static final Map<String, Language> langMapISO639_1 = new HashMap<String, Language>();
+        private static final Map<String, Language> langMapISO639_2 = new HashMap<String, Language>();
 
         static void add(Language l)
         {
             if (l.IANA != null && l.IANA.length() > 0 && !langMapIANA.containsKey(l.IANA))
+            {
                 langMapIANA.put(l.IANA, l);
+            }
             
             if (l.ISO639_1 != null && l.ISO639_1.length() > 0 && !langMapISO639_1.containsKey(l.ISO639_1))
+            {
                 langMapISO639_1.put(l.ISO639_1, l);
+            }
 
             if (l.ISO639_2 != null && l.ISO639_2.length() > 0 && !langMapISO639_2.containsKey(l.ISO639_2))
+            {
                 langMapISO639_2.put(l.ISO639_2, l);
+            }
         }
 
         public static Language getLanguage(String lang)
         {
             if (langMapIANA.containsKey(lang))
-                return (Language)langMapIANA.get(lang);
+            {
+                return langMapIANA.get(lang);
+            }
 
-            return (Language)langMapISO639_2.get(lang);
+            return langMapISO639_2.get(lang);
         }
 
         public static Language getLanguageForIANA(String iana)
         {
-            return (Language)langMapIANA.get(iana);
+            return langMapIANA.get(iana);
         }
         
         public static Language getLanguageForISO639_1(String iso)
         {
-            return (Language)langMapISO639_1.get(iso);
+            return langMapISO639_1.get(iso);
         }
 
         public static Language getLanguageForISO639_2(String iso)
         {
-            return (Language)langMapISO639_2.get(iso);
+            return langMapISO639_2.get(iso);
         }
     }
     

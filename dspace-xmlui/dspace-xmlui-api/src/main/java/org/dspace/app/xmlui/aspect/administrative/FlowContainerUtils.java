@@ -117,21 +117,35 @@ public class FlowContainerUtils
 		
 		// If they don't have a name then make it untitled.
 		if (name == null || name.length() == 0)
-			name = "Untitled";
+        {
+            name = "Untitled";
+        }
 
 		// If empty, make it null.
 		if (shortDescription != null && shortDescription.length() == 0)
-			shortDescription = null;
+        {
+            shortDescription = null;
+        }
 		if (introductoryText != null && introductoryText.length() == 0)
-			introductoryText = null;
+        {
+            introductoryText = null;
+        }
 		if (copyrightText != null && copyrightText.length() == 0)
-			copyrightText = null;
+        {
+            copyrightText = null;
+        }
 		if (sideBarText != null && sideBarText.length() == 0)
-			sideBarText = null;
+        {
+            sideBarText = null;
+        }
 		if (license != null && license.length() == 0)
-			license = null;
+        {
+            license = null;
+        }
 		if (provenanceDescription != null && provenanceDescription.length() == 0)
-			provenanceDescription = null;
+        {
+            provenanceDescription = null;
+        }
 		
 		// Save the metadata
 		collection.setMetadata("name", name);
@@ -155,7 +169,9 @@ public class FlowContainerUtils
     		Object object = request.get("logo");
     		Part filePart = null;
     		if (object instanceof Part)
-    			filePart = (Part) object;
+            {
+                filePart = (Part) object;
+            }
 
     		if (filePart != null && filePart.getSize() > 0)
     		{
@@ -194,8 +210,10 @@ public class FlowContainerUtils
 		// First, if this is not a harvested collection (anymore), set the harvest type to 0; possibly also wipe harvest settings  
 		if (contentSource.equals("source_normal")) 
 		{
-			if (hc != null) 
-				hc.delete();
+			if (hc != null)
+            {
+                hc.delete();
+            }
 			
 			result.setContinue(true);
 		}
@@ -350,7 +368,9 @@ public class FlowContainerUtils
 		String oaiSetId = request.getParameter("oai_setid");
         oaiSetId = request.getParameter("oai-set-setting");
         if(!"all".equals(oaiSetId))
+        {
             oaiSetId = request.getParameter("oai_setid");
+        }
 		String metadataKey = request.getParameter("metadata_format");
 		String harvestType = request.getParameter("harvest_level");
 		int harvestTypeInt = 0;
@@ -446,32 +466,42 @@ public class FlowContainerUtils
 		{
 			role = collection.getAdministrators();
 			if (role == null)
-				role = collection.createAdministrators();
+            {
+                role = collection.createAdministrators();
+            }
 		} 
 		else if (ROLE_SUBMIT.equals(roleName))
 		{
 			role = collection.getSubmitters();
 			if (role == null)
-				role = collection.createSubmitters();
+            {
+                role = collection.createSubmitters();
+            }
 		}
 		else if (ROLE_WF_STEP1.equals(roleName))
 		{	
 			role = collection.getWorkflowGroup(1);
 			if (role == null)
-				role = collection.createWorkflowGroup(1);
+            {
+                role = collection.createWorkflowGroup(1);
+            }
 			
 		}
 		else if (ROLE_WF_STEP2.equals(roleName))
 		{
 			role = collection.getWorkflowGroup(2);
 			if (role == null)
-				role = collection.createWorkflowGroup(2);
+            {
+                role = collection.createWorkflowGroup(2);
+            }
 		}
 		else if (ROLE_WF_STEP3.equals(roleName))
 		{
 			role = collection.getWorkflowGroup(3);
 			if (role == null)
-				role = collection.createWorkflowGroup(3);
+            {
+                role = collection.createWorkflowGroup(3);
+            }
 			
 		}
 		
@@ -481,7 +511,9 @@ public class FlowContainerUtils
 		
 		// If the role name was valid then role should be non null,
 		if (role != null)
-			return role.getID();
+        {
+            return role.getID();
+        }
 		
 		return -1;
 	}
@@ -534,7 +566,9 @@ public class FlowContainerUtils
 		for (ResourcePolicy policy : policies)
 		{
 			if (policy.getGroupID() == groupID)
-				policy.delete();
+            {
+                policy.delete();
+            }
 		}
 		
 		// Finally, Delete the role's actual group.
@@ -605,7 +639,9 @@ public class FlowContainerUtils
 		int roleID = getCollectionDefaultRead(context, collectionID);
 		
 		if (roleID != 0)
-			throw new UIException("Unable to create a new default read group because either the group allready exists or multiple groups are assigned the default privleges.");
+        {
+            throw new UIException("Unable to create a new default read group because either the group allready exists or multiple groups are assigned the default privleges.");
+        }
 		
 		Collection collection = Collection.find(context,collectionID);
 		Group role = Group.create(context);
@@ -723,21 +759,35 @@ public class FlowContainerUtils
 		
 		// If they don't have a name then make it untitled.
 		if (name == null || name.length() == 0)
-			name = "Untitled";
+        {
+            name = "Untitled";
+        }
 
 		// If empty, make it null.
 		if (shortDescription != null && shortDescription.length() == 0)
-			shortDescription = null;
+        {
+            shortDescription = null;
+        }
 		if (introductoryText != null && introductoryText.length() == 0)
-			introductoryText = null;
+        {
+            introductoryText = null;
+        }
 		if (copyrightText != null && copyrightText.length() == 0)
-			copyrightText = null;
+        {
+            copyrightText = null;
+        }
 		if (sideBarText != null && sideBarText.length() == 0)
-			sideBarText = null;
+        {
+            sideBarText = null;
+        }
 		if (license != null && license.length() == 0)
-			license = null;
+        {
+            license = null;
+        }
 		if (provenanceDescription != null && provenanceDescription.length() == 0)
-			provenanceDescription = null;
+        {
+            provenanceDescription = null;
+        }
 		
 		// Save the metadata
 		newCollection.setMetadata("name", name);
@@ -753,7 +803,9 @@ public class FlowContainerUtils
     	Object object = request.get("logo");
     	Part filePart = null;
 		if (object instanceof Part)
-			filePart = (Part) object;
+        {
+            filePart = (Part) object;
+        }
 
 		if (filePart != null && filePart.getSize() > 0)
 		{
@@ -811,17 +863,27 @@ public class FlowContainerUtils
 
 		// If they don't have a name then make it untitled.
 		if (name == null || name.length() == 0)
-			name = "Untitled";
+        {
+            name = "Untitled";
+        }
 
 		// If empty, make it null.
 		if (shortDescription != null && shortDescription.length() == 0)
-			shortDescription = null;
+        {
+            shortDescription = null;
+        }
 		if (introductoryText != null && introductoryText.length() == 0)
-			introductoryText = null;
+        {
+            introductoryText = null;
+        }
 		if (copyrightText != null && copyrightText.length() == 0)
-			copyrightText = null;
+        {
+            copyrightText = null;
+        }
 		if (sideBarText != null && sideBarText.length() == 0)
-			sideBarText = null;
+        {
+            sideBarText = null;
+        }
 		
 		newCommunity.setMetadata("name", name);
 		newCommunity.setMetadata("short_description", shortDescription);
@@ -833,7 +895,9 @@ public class FlowContainerUtils
 		Object object = request.get("logo");
 		Part filePart = null;
 		if (object instanceof Part)
-			filePart = (Part) object;
+        {
+            filePart = (Part) object;
+        }
 
 		if (filePart != null && filePart.getSize() > 0)
 		{
@@ -878,17 +942,27 @@ public class FlowContainerUtils
 
 		// If they don't have a name then make it untitled.
 		if (name == null || name.length() == 0)
-			name = "Untitled";
+        {
+            name = "Untitled";
+        }
 
 		// If empty, make it null.
 		if (shortDescription != null && shortDescription.length() == 0)
-			shortDescription = null;
+        {
+            shortDescription = null;
+        }
 		if (introductoryText != null && introductoryText.length() == 0)
-			introductoryText = null;
+        {
+            introductoryText = null;
+        }
 		if (copyrightText != null && copyrightText.length() == 0)
-			copyrightText = null;
+        {
+            copyrightText = null;
+        }
 		if (sideBarText != null && sideBarText.length() == 0)
-			sideBarText = null;
+        {
+            sideBarText = null;
+        }
 		
 		// Save the data
 		community.setMetadata("name", name);
@@ -908,7 +982,9 @@ public class FlowContainerUtils
     		Object object = request.get("logo");
     		Part filePart = null;
     		if (object instanceof Part)
-    			filePart = (Part) object;
+            {
+                filePart = (Part) object;
+            }
 
     		if (filePart != null && filePart.getSize() > 0)
     		{
@@ -971,7 +1047,9 @@ public class FlowContainerUtils
         {
             role = community.getAdministrators();
             if (role == null)
+            {
                 role = community.createAdministrators();
+            }
         } 
 	
         // In case we needed to create a group, save our changes
@@ -980,7 +1058,9 @@ public class FlowContainerUtils
         
         // If the role name was valid then role should be non null,
         if (role != null)
+        {
             return role.getID();
+        }
         
         return -1;
     }
@@ -1015,7 +1095,9 @@ public class FlowContainerUtils
         for (ResourcePolicy policy : policies)
         {
             if (policy.getGroupID() == groupID)
+            {
                 policy.delete();
+            }
         }
         
         // Finally, delete the role's actual group.
@@ -1111,7 +1193,9 @@ public class FlowContainerUtils
 	public static String escapeXMLEntities(String value)
 	{
 		if (value == null)
-			return null;
+        {
+            return null;
+        }
 		
 		// Escape any XML entities
     	int amp = -1;
@@ -1119,27 +1203,39 @@ public class FlowContainerUtils
     	{
     		// Is it an xml entity named by number?
     		if (substringCompare(value,amp+1,'#'))
-    			continue;
+            {
+                continue;
+            }
     		
     		// &amp;
     		if (substringCompare(value,amp+1,'a','m','p',';'))
-    			continue;
+            {
+                continue;
+            }
     		
     		// &apos;
     		if (substringCompare(value,amp+1,'a','p','o','s',';'))
-    			continue;
+            {
+                continue;
+            }
     		
     		// &quot;
     		if (substringCompare(value,amp+1,'q','u','o','t',';'))
-    			continue;
+            {
+                continue;
+            }
     			
     		// &lt;
     		if (substringCompare(value,amp+1,'l','t',';'))
-    			continue;
+            {
+                continue;
+            }
     		
     		// &gt;
     		if (substringCompare(value,amp+1,'g','t',';'))
-    			continue;
+            {
+                continue;
+            }
     		
     		// Replace the ampersand with an XML entity.
     		value = value.substring(0,amp) + "&amp;" + value.substring(amp+1);
@@ -1161,13 +1257,17 @@ public class FlowContainerUtils
     {
     	// Is the string long enough?
     	if (string.length() <= index + characters.length)
-    		return false;
+        {
+            return false;
+        }
     	
     	// Do all the characters match?
     	for (char character : characters)
     	{
     		if (string.charAt(index) != character)
-    			return false;
+            {
+                return false;
+            }
     		index++;
     	}
     	

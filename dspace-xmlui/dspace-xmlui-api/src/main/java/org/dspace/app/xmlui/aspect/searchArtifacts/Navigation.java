@@ -76,7 +76,9 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
             if (dso != null)
+            {
                 key += "-" + dso.getHandle();
+            }
 
             return HashUtil.hash(key);
         }

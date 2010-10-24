@@ -219,7 +219,9 @@ public class ItemListTag extends TagSupport
                         if (listTok != null)
                         {
                             if (newLLine.length() > 0)
+                            {
                                 newLLine.append(",");
+                            }
 
                             newLLine.append(listTok);
                         }
@@ -227,7 +229,9 @@ public class ItemListTag extends TagSupport
                         if (widthTok != null)
                         {
                             if (newWLine.length() > 0)
+                            {
                                 newWLine.append(",");
+                            }
 
                             newWLine.append(widthTok);
                         }

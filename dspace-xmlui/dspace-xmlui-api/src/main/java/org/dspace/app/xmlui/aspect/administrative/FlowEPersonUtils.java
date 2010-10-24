@@ -51,6 +51,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.http.HttpEnvironment;
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
@@ -108,12 +109,18 @@ public class FlowEPersonUtils {
 		boolean certificate = (request.getParameter("certificate") != null) ? true : false;
 		
 		// If we have errors, the form needs to be resubmitted to fix those problems
-	    if (email.length() == 0) 
-			result.addError("email_address"); 
-		if (first.length() == 0) 
-			result.addError("first_name");
-		if (last.length() == 0) 
-			result.addError("last_name");
+	    if (StringUtils.isEmpty(email))
+        {
+            result.addError("email_address");
+        }
+		if (StringUtils.isEmpty(first))
+        {
+            result.addError("first_name");
+        }
+		if (StringUtils.isEmpty(last))
+        {
+            result.addError("last_name");
+        }
 	    
 	    
 		// Check if the email address is all ready being used.	        		
@@ -178,12 +185,18 @@ public class FlowEPersonUtils {
 		
 		
 		// If we have errors, the form needs to be resubmitted to fix those problems
-	    if (email.length() == 0) 
-			result.addError("email_address"); 
-		if (first.length() == 0) 
-			result.addError("first_name");
-		if (last.length() == 0) 
-			result.addError("last_name");
+	    if (StringUtils.isEmpty(email))
+        {
+            result.addError("email_address");
+        }
+		if (StringUtils.isEmpty(first))
+        {
+            result.addError("first_name");
+        }
+		if (StringUtils.isEmpty(last))
+        {
+            result.addError("last_name");
+        }
 		
 		
 	    // No errors, so we edit the EPerson with the data provided

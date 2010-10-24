@@ -704,7 +704,9 @@ public class Item extends DSpaceObject
                 // authority sanity check: if authority is required, was it supplied?
                 // XXX FIXME? can't throw a "real" exception here without changing all the callers to expect it, so use a runtime exception
                 if (authorityRequired && (dcv.authority == null || dcv.authority.length() == 0))
-                    throw new IllegalArgumentException("The metadata field \""+fieldName+"\" requires an authority key but none was provided. Vaue=\""+dcv.value+"\"");
+                {
+                    throw new IllegalArgumentException("The metadata field \"" + fieldName + "\" requires an authority key but none was provided. Vaue=\"" + dcv.value + "\"");
+                }
             }
             if (values[i] != null)
             {
@@ -1045,7 +1047,9 @@ public class Item extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         Collection[] collectionArray = new Collection[collections.size()];
@@ -1099,7 +1103,9 @@ public class Item extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         Community[] communityArray = new Community[communities.size()];
@@ -1149,7 +1155,9 @@ public class Item extends DSpaceObject
             {
                 // close the TableRowIterator to free up resources
                 if (tri != null)
+                {
                     tri.close();
+                }
             }
         }
         
@@ -1328,7 +1336,9 @@ public class Item extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
     }
 
@@ -1623,11 +1633,15 @@ public class Item extends DSpaceObject
 
                                 // Check the metadata field is the same
                                 if (matched && dcFields[dcIdx].getFieldID() != tr.getIntColumn("metadata_field_id"))
+                                {
                                     matched = false;
+                                }
 
                                 // Check the place is the same
                                 if (matched && placeNum[dcIdx] != tr.getIntColumn("place"))
+                                {
                                     matched = false;
+                                }
 
                                 // Check the text is the same
                                 if (matched)
@@ -1673,7 +1687,9 @@ public class Item extends DSpaceObject
                                     if (!((dcv.authority == null && auth == null) ||
                                       (dcv.authority != null && auth != null && dcv.authority.equals(auth))
                                      && dcv.confidence == conf))
+                                    {
                                         matched = false;
+                                    }
                                 }
 
                                 // If the db record is identical to the in memory values
@@ -2022,8 +2038,14 @@ public class Item extends DSpaceObject
              return false;
          }
          final Item other = (Item) obj;
-         if (this.getType() != other.getType()) return false;
-         if (this.getID() != other.getID()) return false;
+         if (this.getType() != other.getType())
+         {
+             return false;
+         }
+         if (this.getID() != other.getID())
+         {
+             return false;
+         }
 
          return true;
      }
@@ -2384,11 +2406,15 @@ public class Item extends DSpaceObject
     {
         MetadataSchema mds = MetadataSchema.find(context, schema);
         if (mds == null)
-            throw new IllegalArgumentException("No such metadata schema: "+schema);
+        {
+            throw new IllegalArgumentException("No such metadata schema: " + schema);
+        }
         MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), element, qualifier);
         if (mdf == null)
+        {
             throw new IllegalArgumentException(
-            "No such metadata field: schema="+schema+", element="+element+", qualifier="+qualifier);
+                    "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
+        }
         
         String query = "SELECT item.* FROM metadatavalue,item WHERE item.in_archive='1' "+
                        "AND item.item_id = metadatavalue.item_id AND metadata_field_id = ?";
@@ -2558,10 +2584,14 @@ public class Item extends DSpaceObject
     {
         MetadataSchema mds = MetadataSchema.find(context, schema);
         if (mds == null)
-            throw new IllegalArgumentException("No such metadata schema: "+schema);
+        {
+            throw new IllegalArgumentException("No such metadata schema: " + schema);
+        }
         MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), element, qualifier);
         if (mdf == null)
-            throw new IllegalArgumentException("No such metadata field: schema="+schema+", element="+element+", qualifier="+qualifier);
+        {
+            throw new IllegalArgumentException("No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
+        }
 
         TableRowIterator rows = DatabaseManager.queryTable(context, "item",
             "SELECT item.* FROM metadatavalue,item WHERE item.in_archive='1' "+
@@ -2650,7 +2680,9 @@ public class Item extends DSpaceObject
                     {
                         // close the TableRowIterator to free up resources
                         if (tri != null)
+                        {
                             tri.close();
+                        }
                     }
                 }
             }

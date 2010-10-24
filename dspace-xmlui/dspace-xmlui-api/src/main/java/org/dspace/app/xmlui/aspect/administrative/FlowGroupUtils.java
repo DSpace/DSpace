@@ -80,12 +80,16 @@ public class FlowGroupUtils {
 	public static String getName(Context context, int groupID) throws SQLException
 	{
 		if (groupID < 0)
-			return "New Group";	
+        {
+            return "New Group";
+        }
 		
 		Group group = Group.find(context,groupID);
 		
 		if (group == null)
-			return "New Group";
+        {
+            return "New Group";
+        }
 		
 		return group.getName();
 	}
@@ -101,12 +105,16 @@ public class FlowGroupUtils {
 	{
 		// New group, just return an empty list
 		if (groupID < 0)
-			return new String[0];
+        {
+            return new String[0];
+        }
 		
 		Group group = Group.find(context,groupID);
 		
 		if (group == null)
-			return new String[0];
+        {
+            return new String[0];
+        }
 		
 		EPerson[] epeople = group.getMembers();
 		
@@ -129,12 +137,16 @@ public class FlowGroupUtils {
 	public static String[] getGroupMembers(Context context, int groupID) throws SQLException
 	{
 		if (groupID < 0)
-			return new String[0];
+        {
+            return new String[0];
+        }
 		
 		Group group = Group.find(context,groupID);
 		
 		if (group == null)
-			return new String[0];
+        {
+            return new String[0];
+        }
 		
 		Group[] groups = group.getMemberGroups();
 		

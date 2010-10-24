@@ -586,7 +586,9 @@ public class DSIndexer
                 finally
                 {
                     if (items != null)
+                    {
                         items.close();
+                    }
                 }
 
                 Collection[] collections = Collection.findAll(context);

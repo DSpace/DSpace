@@ -450,14 +450,22 @@ public class List extends AbstractWingElement implements WingMergeableElement,
     {
         // Check if it's in our name space and an options element.
         if (!WingConstants.DRI.URI.equals(namespace))
+        {
             return false;
+        }
         if (!E_LIST.equals(localName))
+        {
             return false;
+        }
         String name = attributes.getValue(A_NAME);
         if (name == null)
+        {
             return false;
+        }
         if (!name.equals(this.name))
+        {
             return false;
+        }
         return true;
     }
 
@@ -492,7 +500,9 @@ public class List extends AbstractWingElement implements WingMergeableElement,
                 WingMergeableElement candidate = (WingMergeableElement) content;
                 if (candidate.mergeEqual(namespace, localName, qName,
                         attributes))
+                {
                     found = candidate;
+                }
             }
         }
         contents.remove(found);
@@ -543,9 +553,13 @@ public class List extends AbstractWingElement implements WingMergeableElement,
             attributes.put(A_NAME, this.name);
             attributes.put(A_ID, this.context.generateID(E_LIST, this.name));
             if (this.type != null)
+            {
                 attributes.put(A_TYPE, this.type);
+            }
             if (this.rend != null)
+            {
                 attributes.put(A_RENDER, this.rend);
+            }
 
             startElement(contentHandler, namespaces, E_LIST, attributes);
             

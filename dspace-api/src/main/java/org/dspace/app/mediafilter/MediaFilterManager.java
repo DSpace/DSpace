@@ -389,7 +389,9 @@ public class MediaFilterManager
             if (updateIndex)
             {
                 if (!isQuiet)
-                System.out.println("Updating search index:");
+                {
+                    System.out.println("Updating search index:");
+                }
                 DSIndexer.updateIndex(c);
             }
 
@@ -437,7 +439,9 @@ public class MediaFilterManager
             finally
             {
                 if (i != null)
+                {
                     i.close();
+                }
             }
         }
     }
@@ -478,7 +482,9 @@ public class MediaFilterManager
             finally
             {
                 if (i != null)
+                {
                     i.close();
+                }
             }
         }
     }
@@ -708,7 +714,9 @@ public class MediaFilterManager
     {
         //do pre-processing of this bitstream, and if it fails, skip this bitstream!
     	if(!formatFilter.preProcessBitstream(c, item, source))
-        	return false;
+        {
+            return false;
+        }
         	
     	boolean overWrite = MediaFilterManager.isForce;
         
@@ -743,8 +751,10 @@ public class MediaFilterManager
         if (!overWrite && (existingBitstream != null))
         {
             if (!isQuiet)
-            System.out.println("SKIPPED: bitstream " + source.getID()
-                    + " (item: " + item.getHandle() + ") because '" + newName + "' already exists");
+            {
+                System.out.println("SKIPPED: bitstream " + source.getID()
+                        + " (item: " + item.getHandle() + ") because '" + newName + "' already exists");
+            }
 
             return false;
         }
@@ -753,8 +763,10 @@ public class MediaFilterManager
         if (destStream == null)
         {
             if (!isQuiet)
-            System.out.println("SKIPPED: bitstream " + source.getID()
-                    + " (item: " + item.getHandle() + ") because filtering was unsuccessful");
+            {
+                System.out.println("SKIPPED: bitstream " + source.getID()
+                        + " (item: " + item.getHandle() + ") because filtering was unsuccessful");
+            }
 
             return false;
         }
@@ -797,8 +809,10 @@ public class MediaFilterManager
         }
 
         if (!isQuiet)
-        System.out.println("FILTERED: bitstream " + source.getID()
-                + " (item: " + item.getHandle() + ") and created '" + newName + "'");
+        {
+            System.out.println("FILTERED: bitstream " + source.getID()
+                    + " (item: " + item.getHandle() + ") and created '" + newName + "'");
+        }
 
         //do post-processing of the generated bitstream
         formatFilter.postProcessBitstream(c, item, b);
@@ -835,7 +849,9 @@ public class MediaFilterManager
         if(skipList!=null && skipList.contains(identifier))
         {
             if (!isQuiet)
-            System.out.println("SKIP-LIST: skipped bitstreams within identifier " + identifier);
+            {
+                System.out.println("SKIP-LIST: skipped bitstreams within identifier " + identifier);
+            }
             return true;
         }    
         else

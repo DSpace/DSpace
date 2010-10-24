@@ -285,7 +285,9 @@ public class EmbargoManager
                     else
                     {
                         if (processOneItem(context, (Item)dso, line, now))
+                        {
                             status = 1;
+                        }
                     }
                 }
             }
@@ -295,7 +297,9 @@ public class EmbargoManager
                 while (ii.hasNext())
                 {
                     if (processOneItem(context, ii.next(), line, now))
+                    {
                         status = 1;
+                    }
                 }
             }
             log.debug("Cache size at end = "+context.getCacheSize());
@@ -342,19 +346,27 @@ public class EmbargoManager
                 if (liftDate.toDate().before(now))
                 {
                     if (line.hasOption('v'))
-                        System.err.println("Lifting embargo from Item handle="+item.getHandle()+", lift date="+lift[0].value);
+                    {
+                        System.err.println("Lifting embargo from Item handle=" + item.getHandle() + ", lift date=" + lift[0].value);
+                    }
                     if (line.hasOption('n'))
                     {
                         if (!line.hasOption('q'))
-                            System.err.println("DRY RUN: would have lifted embargo from Item handle="+item.getHandle()+", lift date="+lift[0].value);
+                        {
+                            System.err.println("DRY RUN: would have lifted embargo from Item handle=" + item.getHandle() + ", lift date=" + lift[0].value);
+                        }
                     }
                     else if (!line.hasOption('c'))
+                    {
                         liftEmbargo(context, item);
+                    }
                 }
                 else if (!line.hasOption('l'))
                 {
                     if (line.hasOption('v'))
-                        System.err.println("Checking current embargo on Item handle="+item.getHandle()+", lift date="+lift[0].value);
+                    {
+                        System.err.println("Checking current embargo on Item handle=" + item.getHandle() + ", lift date=" + lift[0].value);
+                    }
                     setter.checkEmbargo(context, item);
                 }
             }
@@ -377,7 +389,9 @@ public class EmbargoManager
             String terms = ConfigurationManager.getProperty("embargo.field.terms");
             String lift = ConfigurationManager.getProperty("embargo.field.lift");
             if (terms == null || lift == null)
+            {
                 throw new IllegalStateException("Missing one or more of the required DSpace configuration properties for EmbargoManager, check your configuration file.");
+            }
             terms_schema = getSchemaOf(terms);
             terms_element = getElementOf(terms);
             terms_qualifier = getQualifierOf(terms);
@@ -387,11 +401,14 @@ public class EmbargoManager
 
             setter = (EmbargoSetter)PluginManager.getSinglePlugin(EmbargoSetter.class);
             if (setter == null)
+            {
                 throw new IllegalStateException("The EmbargoSetter plugin was not defined in DSpace configuration.");
+            }
             lifter = (EmbargoLifter)PluginManager.getSinglePlugin(EmbargoLifter.class);
             if (lifter == null)
+            {
                 throw new IllegalStateException("The EmbargoLifter plugin was not defined in DSpace configuration.");
-
+            }
         }
     }
 

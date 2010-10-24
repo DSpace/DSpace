@@ -184,7 +184,9 @@ public class DSpaceMETSDisseminator
 
         String result[] = null;
         if (params != null)
+        {
             result = params.getProperties("dmd");
+        }
         if (result == null || result.length == 0)
         {
             result = new String[1];

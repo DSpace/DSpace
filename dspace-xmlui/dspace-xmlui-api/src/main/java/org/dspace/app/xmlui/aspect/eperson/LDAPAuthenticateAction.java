@@ -94,7 +94,9 @@ public class LDAPAuthenticateAction extends AbstractAction {
 
 		// Skip out of no name or password given.
 		if (username == null || password == null)
-			return null;
+        {
+            return null;
+        }
 		
 		try {
 			Context context = AuthenticationUtil.Authenticate(objectModel,username, password, realm);

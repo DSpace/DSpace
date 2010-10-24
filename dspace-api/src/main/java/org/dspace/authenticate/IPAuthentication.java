@@ -308,8 +308,10 @@ public class IPAuthentication implements AuthenticationMethod
             for (int i = 0; i < results.length; i++)
             {
                 if (i > 0)
+                {
                     gsb.append(",");
-                    gsb.append(results[i]);
+                }
+                gsb.append(results[i]);
             }
 
             log.debug(LogManager.getHeader(context, "authenticated",

@@ -180,7 +180,9 @@ class DAVCollection extends DAVDSpaceObject
         finally
         {
             if (ii != null)
+            {
                 ii.close();
+            }
         }
         
         return (DAVResource[]) result.toArray(new DAVResource[result.size()]);
@@ -625,10 +627,12 @@ class DAVCollection extends DAVDSpaceObject
     {
         Community[] ca = this.collection.getCommunities();
         if (ca != null)
+        {
             for (Community element : ca)
             {
                 element.removeCollection(this.collection);
             }
+        }
         // collection.delete();
         return HttpServletResponse.SC_OK; // HTTP OK
     }

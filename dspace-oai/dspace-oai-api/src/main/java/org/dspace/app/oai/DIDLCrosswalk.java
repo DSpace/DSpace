@@ -199,10 +199,26 @@ public class DIDLCrosswalk extends Crosswalk
                                     finally
                                     {
                                         if (bis != null)
-                                            try { bis.close(); } catch (IOException ioe) { }
+                                        {
+                                            try
+                                            {
+                                                bis.close();
+                                            }
+                                            catch (IOException ioe)
+                                            {
+                                            }
+                                        }
 
                                         if (is != null)
-                                            try { is.close(); } catch (IOException ioe) { }
+                                        {
+                                            try
+                                            {
+                                                is.close();
+                                            }
+                                            catch (IOException ioe)
+                                            {
+                                            }
+                                        }
                                     }
 
                                     contextl.complete();

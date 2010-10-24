@@ -322,7 +322,9 @@ public class ItemExport
                 finally
                 {
                     if (i != null)
+                    {
                         i.close();
+                    }
                 }
             }
         }
@@ -882,7 +884,9 @@ public class ItemExport
                     finally
                     {
                         if (iitems != null)
+                        {
                             iitems.close();
+                        }
                     }
                 }
             }
@@ -914,7 +918,9 @@ public class ItemExport
                 finally
                 {
                     if (iitems != null)
+                    {
                         iitems.close();
+                    }
                 }
             }
             else if (dso.getType() == Constants.ITEM)
@@ -1030,7 +1036,9 @@ public class ItemExport
                     finally
                     {
                         if (iitems != null)
+                        {
                             iitems.close();
+                        }
                         
                         // Make sure the database connection gets closed in all conditions.
                     	try {

@@ -233,7 +233,9 @@ public class METSManifest
                         {
                             String u = xsd.toURL().toString();
                             if (result.length() > 0)
+                            {
                                 result.append(" ");
+                            }
                             result.append(val[0]).append(" ").append(u);
                         }
                         catch (java.net.MalformedURLException e)
@@ -288,15 +290,16 @@ public class METSManifest
 
         // Set validation feature
         if (validate)
-            builder.setFeature("http://apache.org/xml/features/validation/schema",
-                    true);
+        {
+            builder.setFeature("http://apache.org/xml/features/validation/schema", true);
+        }
 
         // Tell the parser where local copies of schemas are, to speed up
         // validation.  Local XSDs are identified in the configuration file.
         if (localSchemas.length() > 0)
-            builder.setProperty(
-                    "http://apache.org/xml/properties/schema/external-schemaLocation",
-                    localSchemas);
+        {
+            builder.setProperty("http://apache.org/xml/properties/schema/external-schemaLocation", localSchemas);
+        }
 
         // Parse the METS file
         Document metsDocument;
@@ -351,11 +354,15 @@ public class METSManifest
         throws MetadataValidationException
     {
         if (contentFiles != null)
+        {
             return contentFiles;
+        }
 
         Element fileSec = mets.getChild("fileSec", metsNS);
         if (fileSec == null)
+        {
             throw new MetadataValidationException("Invalid METS Manifest: DSpace requires a fileSec element, but it is missing.");
+        }
 
         contentFiles = new ArrayList();
         Iterator fgi = fileSec.getChildren("fileGrp", metsNS).iterator();
@@ -415,7 +422,9 @@ public class METSManifest
     {
         String groupID = file.getAttributeValue("GROUPID");
         if (groupID == null || groupID.equals(""))
+        {
             return null;
+        }
 
         try
         {
@@ -426,10 +435,14 @@ public class METSManifest
             if (oFiles.size() > 0)
             {
                 if (log.isDebugEnabled())
-                   log.debug("Got ORIGINAL file for derived="+file.toString());
+                {
+                    log.debug("Got ORIGINAL file for derived=" + file.toString());
+                }
                 Element flocat = ((Element)oFiles.get(0)).getChild("FLocat", metsNS);
                 if (flocat != null)
+                {
                     return flocat.getAttributeValue("href", xlinkNS);
+                }
             }
                 return null;
         }
@@ -537,13 +550,19 @@ public class METSManifest
         Element objDiv = getObjStructDiv();
         Element fptr = objDiv.getChild("fptr", metsNS);
         if (fptr == null)
+        {
             return null;
+        }
         String id = fptr.getAttributeValue("FILEID");
         if (id == null)
+        {
             throw new MetadataValidationException("fptr for Primary Bitstream is missing the required FILEID attribute.");
+        }
         Element result = getElementByXPath("descendant::mets:file[@ID=\""+id+"\"]", false);
         if (result == null)
-            throw new MetadataValidationException("Cannot find file element for Primary Bitstream: looking for ID="+id);
+        {
+            throw new MetadataValidationException("Cannot find file element for Primary Bitstream: looking for ID=" + id);
+        }
         return result;
     }
 
@@ -556,14 +575,22 @@ public class METSManifest
     {
         Element md = mdSec.getChild("mdRef", metsNS);
         if (md == null)
+        {
             md = mdSec.getChild("mdWrap", metsNS);
+        }
         if (md == null)
+        {
             throw new MetadataValidationException("Invalid METS Manifest: ?mdSec element has neither mdRef nor mdWrap child.");
+        }
         String result = md.getAttributeValue("MDTYPE");
         if (result != null && result.equals("OTHER"))
+        {
             result = md.getAttributeValue("OTHERMDTYPE");
+        }
         if (result == null)
-            throw new MetadataValidationException("Invalid METS Manifest: "+md.getName()+" has no MDTYPE or OTHERMDTYPE attribute.");
+        {
+            throw new MetadataValidationException("Invalid METS Manifest: " + md.getName() + " has no MDTYPE or OTHERMDTYPE attribute.");
+        }
         return result;
     }
 
@@ -579,12 +606,16 @@ public class METSManifest
         {
             String mimeType = mdWrap.getAttributeValue("MIMETYPE");
             if (mimeType == null && mdWrap.getChild("xmlData", metsNS) != null)
-            mimeType = "text/xml";
+            {
+                mimeType = "text/xml";
+            }
             return mimeType;
         }
         Element mdRef = mdSec.getChild("mdRef", metsNS);
         if (mdRef != null)
+        {
             return mdRef.getAttributeValue("MIMETYPE");
+        }
         return null;
     }
 
@@ -746,15 +777,21 @@ public class METSManifest
         //get first <structMap>
         Element sm = mets.getChild("structMap", metsNS);
         if (sm == null)
+        {
             throw new MetadataValidationException("METS document is missing the required structMap element.");
+        }
 
         //get first <div>
         Element result = sm.getChild("div", metsNS);
         if (result == null)
+        {
             throw new MetadataValidationException("METS document is missing the required first div element in first structMap.");
+        }
 
         if (log.isDebugEnabled())
-           log.debug("Got getObjStructDiv result="+result.toString());
+        {
+            log.debug("Got getObjStructDiv result=" + result.toString());
+        }
         
         return (Element)result;
     }
@@ -814,7 +851,9 @@ public class METSManifest
                          {
                             String filePath = mptr.getAttributeValue("href", xlinkNS);
                             if(filePath!=null && filePath.length()>0)
+                            {
                                 childPathList.add(filePath);
+                            }
                          }
                      }//end <mptr> loop
                 }//end if <mptr>'s exist
@@ -856,17 +895,23 @@ public class METSManifest
         }
 
         if (parentStructMap == null)
+        {
             throw new MetadataValidationException("METS document is missing the required structMap[@LABEL='Parent'] element.");
+        }
 
         //get first <div>
         Element linkDiv = parentStructMap.getChild("div", metsNS);
         if (linkDiv == null)
+        {
             throw new MetadataValidationException("METS document is missing the required first div element in structMap[@LABEL='Parent'].");
+        }
 
         //the link is in the <mptr> in the @xlink:href attribute
         Element mptr = linkDiv.getChild("mptr", metsNS);
         if (mptr != null)
+        {
             return mptr.getAttributeValue("href", xlinkNS);
+        }
         
         //return null if we couldn't find the link
         return null;
@@ -921,7 +966,9 @@ public class METSManifest
             xwalkName = ConfigurationManager.getProperty(
               CONFIG_METS_PREFIX+"default.ingest.crosswalk."+type);
             if (xwalkName == null)
-               xwalkName = type;
+            {
+                xwalkName = type;
+            }
         }
         return PluginManager.getNamedPlugin(clazz, xwalkName);
     }
@@ -940,7 +987,9 @@ public class METSManifest
         Element objDiv = getObjStructDiv();
         String dmds = objDiv.getAttributeValue("DMDID");
         if (dmds == null)
+        {
             throw new MetadataValidationException("Invalid METS: Missing reference to Item descriptive metadata, first div on first structmap must have a DMDID attribute.");
+        }
         String dmdID[] = dmds.split("\\s+");
         Element result[] = new Element[dmdID.length];
 
@@ -965,7 +1014,9 @@ public class METSManifest
         if (amds == null)
         {
             if (log.isDebugEnabled())
-               log.debug("getItemRightsMD: No ADMID references found.");
+            {
+                log.debug("getItemRightsMD: No ADMID references found.");
+            }
             return new Element[0];
         }
         String amdID[] = amds.split("\\s+");
@@ -975,7 +1026,9 @@ public class METSManifest
             List rmds = getElementByXPath("mets:amdSec[@ID=\""+amdID[i]+"\"]", false).
                             getChildren("rightsMD", metsNS);
             if (rmds.size() > 0)
+            {
                 resultList.addAll(rmds);
+            }
         }
         return (Element[])resultList.toArray(new Element[resultList.size()]);
     }
@@ -1058,7 +1111,9 @@ public class METSManifest
         if (amds == null)
         {
             if (log.isDebugEnabled())
+            {
                 log.debug("crosswalkObjectTechMD: No ADMID references found.");
+            }
             return new String[0];
         }
         return amds.split("\\s+");
@@ -1128,7 +1183,9 @@ public class METSManifest
                         finally
                         {
                             if (in != null)
+                            {
                                 in.close();
+                            }
                         }
                     } // If we couldn't find an <mdRef>, then we'll try an <mdWrap> 
                       // with a <binData> element instead.
@@ -1189,7 +1246,9 @@ public class METSManifest
     {
         Element file = getElementByXPath("descendant::mets:file[@ID=\""+fileId+"\"]", false);
         if (file == null)
-            throw new MetadataValidationException("Failed in Bitstream crosswalk, Could not find file element with ID="+fileId);
+        {
+            throw new MetadataValidationException("Failed in Bitstream crosswalk, Could not find file element with ID=" + fileId);
+        }
 
         // In DSpace METS SIP spec, admin metadata is only "highly
         // recommended", not "required", so it is OK if there is no ADMID.

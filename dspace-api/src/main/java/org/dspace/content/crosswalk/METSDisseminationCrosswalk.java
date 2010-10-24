@@ -127,13 +127,17 @@ public class METSDisseminationCrosswalk
                IOException, SQLException, AuthorizeException
     {
         if (dso.getType() != Constants.ITEM)
+        {
             throw new CrosswalkObjectNotSupported("METSDisseminationCrosswalk can only crosswalk an Item.");
+        }
         Item item = (Item)dso;
 
         PackageDisseminator dip = (PackageDisseminator)
           PluginManager.getNamedPlugin(PackageDisseminator.class, METS_PACKAGER_PLUGIN);
         if (dip == null)
-            throw new CrosswalkInternalException("Cannot find a disseminate plugin for package="+METS_PACKAGER_PLUGIN);
+        {
+            throw new CrosswalkInternalException("Cannot find a disseminate plugin for package=" + METS_PACKAGER_PLUGIN);
+        }
 
         try
         {

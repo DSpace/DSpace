@@ -99,7 +99,9 @@ public class MetadataExposure
     {
         // the administrator's override
         if (context != null && AuthorizeManager.isAdmin(context))
+        {
             return false;
+        }
 
         // for schema.element, just check schema->elementSet
         if (!isInitialized())
@@ -118,7 +120,9 @@ public class MetadataExposure
         {
             Map<String,Set<String>> elts = hiddenElementMaps.get(schema);
             if (elts == null)
+            {
                 return false;
+            }
             Set<String> quals = elts.get(element);
             return quals == null ? false : quals.contains(qualifier);
         }

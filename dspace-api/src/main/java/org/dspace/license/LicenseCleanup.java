@@ -110,7 +110,9 @@ public class LicenseCleanup
         File processed = new File("license.processed");
 
         if (processed.exists())
+        {
             props.load(new FileInputStream(processed));
+        }
 
         int i = 0;
 
@@ -162,7 +164,9 @@ public class LicenseCleanup
         Bundle[] bundles = item.getBundles("CC-LICENSE");
 
         if (bundles == null || bundles.length == 0)
+        {
             return;
+        }
 
         Bundle bundle = bundles[0];
 

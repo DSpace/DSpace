@@ -120,9 +120,13 @@ public class Figure extends TextContainer implements StructuralElement
         AttributeMap attributes = new AttributeMap();
         attributes.put(A_SOURCE, this.source);
         if (this.target != null)
+        {
             attributes.put(A_TARGET, this.target);
+        }
         if (this.rend != null)
+        {
             attributes.put(A_RENDER, this.rend);
+        }
 
         startElement(contentHandler, namespaces, E_FIGURE, attributes);
         super.toSAX(contentHandler, lexicalHandler, namespaces);

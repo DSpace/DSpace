@@ -220,7 +220,9 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         {
             account.addItemXref(contextPath+"/login",T_login);
             if (ConfigurationManager.getBooleanProperty("xmlui.user.registration", true))
-            	account.addItemXref(contextPath+"/register",T_register);
+            {
+                account.addItemXref(contextPath + "/register", T_register);
+            }
         }
     }
 

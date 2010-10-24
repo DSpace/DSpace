@@ -110,16 +110,19 @@ public class FlowRegistryUtils
             throw new UIException(uee);
         }
 		
-		if (namespace == null || 
-			namespace.length() <= 0)
-			result.addError("namespace");
+		if (namespace == null || namespace.length() <= 0)
+        {
+            result.addError("namespace");
+        }
 		if (name == null || 
 			name.length() <= 0 ||
 			name.indexOf('.') != -1 ||
 			name.indexOf('_') != -1 ||
 			name.indexOf(' ') != -1)
-			// The name must not be empty nor contain dot, underscore or spaces.
-			result.addError("name");
+        {
+            // The name must not be empty nor contain dot, underscore or spaces.
+            result.addError("name");
+        }
 		
 		
 		if (result.getErrors() == null)
@@ -213,7 +216,9 @@ public class FlowRegistryUtils
 		
 		// Make sure qualifier is null if blank.
 		if ("".equals(qualifier))
-			qualifier = null;
+        {
+            qualifier = null;
+        }
 		
 		if (result.getErrors() == null)
 		{
@@ -277,12 +282,16 @@ public class FlowRegistryUtils
 		
 		// Make sure qualifier is null if blank.
 		if ("".equals(qualifier))
-			qualifier = null;
+        {
+            qualifier = null;
+        }
 		
 		// Check to make sure the field is unique, sometimes the NonUniqueMetadataException is not thrown.
 		MetadataField possibleDuplicate = MetadataField.findByElement(context, schemaID, element, qualifier);
 		if (possibleDuplicate != null && possibleDuplicate.getFieldID() != fieldID)
-			result.addError("duplicate_field");
+        {
+            result.addError("duplicate_field");
+        }
 		
 		if (result.getErrors() == null)
 		{	
@@ -334,28 +343,38 @@ public class FlowRegistryUtils
 		if (element.indexOf('.') != -1 ||
 			element.indexOf('_') != -1 ||
 			element.indexOf(' ') != -1)
-			errors.add("element_badchar");
+        {
+            errors.add("element_badchar");
+        }
 		
 		// Is the element too long?
 		if (element.length() > 64)
-			errors.add("element_tolong");
+        {
+            errors.add("element_tolong");
+        }
 		
 
 		// The qualifier can be empty.
 		if (qualifier != null && qualifier.length() > 0)
 		{
 			if (qualifier.length() > 64)
-				errors.add("qualifier_tolong");
+            {
+                errors.add("qualifier_tolong");
+            }
 			
 			if (qualifier.indexOf('.') != -1 ||
 				qualifier.indexOf('_') != -1 ||
 				qualifier.indexOf(' ') != -1)
-				errors.add("qualifier_badchar");
+            {
+                errors.add("qualifier_badchar");
+            }
 		}
 		
 		// If there were no errors then just return null.
 		if (errors.size() == 0)
-			return null;
+        {
+            return null;
+        }
 		
 		return errors;
 	}

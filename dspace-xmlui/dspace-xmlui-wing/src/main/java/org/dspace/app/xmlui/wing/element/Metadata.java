@@ -135,14 +135,22 @@ public class Metadata extends TextContainer implements MetadataElement
     {
         // Element should never be null.
         if (this.element == null || element == null)
+        {
             return false;
+        }
 
         if (stringEqualsWithNulls(this.element, element) == false)
+        {
             return false;
+        }
         if (stringEqualsWithNulls(this.qualifier, qualifier) == false)
+        {
             return false;
+        }
         if (stringEqualsWithNulls(this.language, language) == false)
+        {
             return false;
+        }
 
         // Element, qualifier, and language are equal.
         return true;
@@ -194,9 +202,13 @@ public class Metadata extends TextContainer implements MetadataElement
         AttributeMap attributes = new AttributeMap();
         attributes.put(A_ELEMENT, element);
         if (this.qualifier != null)
+        {
             attributes.put(A_QUALIFIER, qualifier);
+        }
         if (this.language != null)
+        {
             attributes.put(A_LANGUAGE, language);
+        }
 
         startElement(contentHandler, namespaces, E_METADATA, attributes);
         super.toSAX(contentHandler, lexicalHandler, namespaces);

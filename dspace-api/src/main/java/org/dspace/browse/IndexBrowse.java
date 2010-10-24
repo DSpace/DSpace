@@ -543,7 +543,9 @@ public class IndexBrowse
                 DCValue value = null;
 
                 if (itemMDMap != null)
+                {
                     value = (DCValue) itemMDMap.get(metadata);
+                }
 
                 // We haven't used this metadata before, so grab it from the item
                 if (value == null)
@@ -564,7 +566,9 @@ public class IndexBrowse
                         value = dcv[0];
 
                         if (itemMDMap != null)
+                        {
                             itemMDMap.put(metadata, dcv[0]);
+                        }
                     }
                 }
 

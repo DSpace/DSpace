@@ -214,7 +214,9 @@ public class CurrentActivityAction extends AbstractAction
     		{
     			EPerson eperson = context.getCurrentUser();
     			if (eperson != null)
-    				epersonID = eperson.getID();
+                {
+                    epersonID = eperson.getID();
+                }
     		}
     		
     		if (request != null)
@@ -222,13 +224,17 @@ public class CurrentActivityAction extends AbstractAction
     			url = request.getSitemapURI();
     			HttpSession session = request.getSession(true);
     			if (session != null)
-    				sessionID = session.getId();
+                {
+                    sessionID = session.getId();
+                }
     			
     			userAgent = request.getHeader("User-Agent");
     			
     			ip = request.getHeader(IP_HEADER);
     			if (ip == null)
-    				ip = request.getRemoteAddr();
+                {
+                    ip = request.getRemoteAddr();
+                }
     		}
     		
     		// The current time
@@ -282,7 +288,9 @@ public class CurrentActivityAction extends AbstractAction
     	public boolean isBot()
     	{
     		if (userAgent == null)
-    			return false;
+            {
+                return false;
+            }
     		String ua = userAgent.toLowerCase();
     		
     		return (ua.contains("google/") ||
@@ -302,61 +310,97 @@ public class CurrentActivityAction extends AbstractAction
     	public String getDectectedBrowser()
     	{
     		if (userAgent == null)
-    			return "No browser provided";
+            {
+                return "No browser provided";
+            }
+
+            String userAgentLower = userAgent.toLowerCase();
     		
     		// BOTS
-    		if (userAgent.toLowerCase().contains("google/"))
-    			return "Google (bot)";
+    		if (userAgentLower.contains("google/"))
+            {
+                return "Google (bot)";
+            }
     		
-    		if (userAgent.toLowerCase().contains("msnbot/"))
-    			return "MSN (bot)";
+    		if (userAgentLower.contains("msnbot/"))
+            {
+                return "MSN (bot)";
+            }
     		   
-    	    if (userAgent.toLowerCase().contains("googlebot/"))
-    	    	return "Google (bot)";
+    	    if (userAgentLower.contains("googlebot/"))
+            {
+                return "Google (bot)";
+            }
     		
-    		if (userAgent.toLowerCase().contains("webcrawler/"))
-    			return "WebCrawler (bot)";
+    		if (userAgentLower.contains("webcrawler/"))
+            {
+                return "WebCrawler (bot)";
+            }
     		
-    		if (userAgent.toLowerCase().contains("inktomi"))
-    			return "Inktomi (bot)";
+    		if (userAgentLower.contains("inktomi"))
+            {
+                return "Inktomi (bot)";
+            }
     		
-    		if (userAgent.toLowerCase().contains("teoma"))
-    			return "Teoma (bot)";
+    		if (userAgentLower.contains("teoma"))
+            {
+                return "Teoma (bot)";
+            }
     		
-    		if (userAgent.toLowerCase().contains("bot"))
-    			return "Unknown (bot)";
+    		if (userAgentLower.contains("bot"))
+            {
+                return "Unknown (bot)";
+            }
     		
     		// Normal Browsers
     		if (userAgent.contains("Lotus-Notes/"))
-    			return "Lotus-Notes";
+            {
+                return "Lotus-Notes";
+            }
     		
     		if (userAgent.contains("Opera"))
-    			return "Opera";
+            {
+                return "Opera";
+            }
     		
     		if (userAgent.contains("Safari/"))
     		{
     		    if (userAgent.contains("Chrome"))
-    		    	    return "Chrome";
+                {
+                    return "Chrome";
+                }
     		
     			return "Safari";
     		}
     		
     		if (userAgent.contains("Konqueror/"))
-    			return "Konqueror";
+            {
+                return "Konqueror";
+            }
     		
     		// Internet explorer browsers
     		if (userAgent.contains("MSIE"))
     		{
     		    if (userAgent.contains("MSIE 9"))
-    		    	return "MSIE 9";
+                {
+                    return "MSIE 9";
+                }
     		    if (userAgent.contains("MSIE 8"))
-    		    	return "MSIE 8";
+                {
+                    return "MSIE 8";
+                }
     		    if (userAgent.contains("MSIE 7"))
-    		    	return "MSIE 7";
+                {
+                    return "MSIE 7";
+                }
     		    if (userAgent.contains("MSIE 6"))
-    		    	return "MSIE 6";
+                {
+                    return "MSIE 6";
+                }
     		    if (userAgent.contains("MSIE 5"))
-    		    	return "MSIE 5";
+                {
+                    return "MSIE 5";
+                }
     		    
     		    // Can't fine the version number
     			return "MSIE";
@@ -366,37 +410,59 @@ public class CurrentActivityAction extends AbstractAction
     		if (userAgent.contains("Gecko/"))
     		{
     		    if (userAgent.contains("Camio/"))
-    		    	return "Gecko/Camino";
+                {
+                    return "Gecko/Camino";
+                }
     		    
     		    if (userAgent.contains("Chimera/"))
-    		    	return "Gecko/Chimera";
+                {
+                    return "Gecko/Chimera";
+                }
     		    
     		    if (userAgent.contains("Firebird/"))
-    		    	return "Gecko/Firebird";
+                {
+                    return "Gecko/Firebird";
+                }
     		    
     		    if (userAgent.contains("Phoenix/"))
-    		    	return "Gecko/Phoenix";
+                {
+                    return "Gecko/Phoenix";
+                }
     		    
     		    if (userAgent.contains("Galeon"))
-    		    	return "Gecko/Galeon";
+                {
+                    return "Gecko/Galeon";
+                }
     		    
     		    if (userAgent.contains("Firefox/1"))
-    		    	return "Firefox 1.x";
+                {
+                    return "Firefox 1.x";
+                }
     		    
     		    if (userAgent.contains("Firefox/2"))
-    		    	return "Firefox 2.x";
+                {
+                    return "Firefox 2.x";
+                }
     		    
     		    if (userAgent.contains("Firefox/3"))
-    		    	return "Firefox 3.x";
+                {
+                    return "Firefox 3.x";
+                }
     		    
     		    if (userAgent.contains("Firefox/4"))
-    		    	return "Firefox 4.x";
+                {
+                    return "Firefox 4.x";
+                }
     		   
     		    if (userAgent.contains("Firefox/"))
-    		    	return "Firefox"; // can't find the exact version
+                {
+                    return "Firefox"; // can't find the exact version
+                }
     		    
     		    if (userAgent.contains("Netscape/"))
-    		    	return "Netscape";
+                {
+                    return "Netscape";
+                }
     		    
     		    // Can't find the exact distribution
     			return "Gecko";
@@ -408,10 +474,14 @@ public class CurrentActivityAction extends AbstractAction
     			return "KHTML";
     		
     		if (userAgent.contains("Netscape/"))
-    			return "Netscape";
+            {
+                return "Netscape";
+            }
     		
     		if (userAgent.contains("Mozilla/"))
-    			return "Mozilla"; // Almost everything says they are mozilla.
+            {
+                return "Mozilla"; // Almost everything says they are mozilla.
+            }
     		
     		// if you get all the way to the end and still nothing, return unknown.
     		return "Unknown";

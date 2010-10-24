@@ -81,7 +81,9 @@ public class LicenseStreamIngestionCrosswalk
         if (dso.getType() == Constants.ITEM)
         {
             if (log.isDebugEnabled())
-                log.debug("Reading a DSpace Deposit license, MIMEtype="+MIMEType);
+            {
+                log.debug("Reading a DSpace Deposit license, MIMEtype=" + MIMEType);
+            }
 
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             Utils.copy(in, baos);

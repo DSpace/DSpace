@@ -276,8 +276,10 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             	context.setHead(T_context_head);
             	context.addItemXref(contextPath+"/admin/community?communityID=" + community.getID(), T_context_edit_community); 
             	if (AuthorizeManager.isAdmin(this.context, dso))
-                    context.addItem().addXref(contextPath+"/admin/export?communityID="+community.getID(), T_context_export_community );
-                    context.addItem().addXref(contextPath+ "/csv/handle/"+dso.getHandle(),T_context_export_metadata );
+                {
+                    context.addItem().addXref(contextPath + "/admin/export?communityID=" + community.getID(), T_context_export_community);
+                }
+                context.addItem().addXref(contextPath+ "/csv/handle/"+dso.getHandle(),T_context_export_metadata );
             }
             
             // can they add to this community?

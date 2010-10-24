@@ -213,9 +213,13 @@ public class GenerateSitemaps
             String url = handleURLStem + comms[i].getHandle();
 
             if (makeHTMLMap)
+            {
                 html.addURL(url, null);
+            }
             if (makeSitemapOrg)
+            {
                 sitemapsOrg.addURL(url, null);
+            }
         }
 
         Collection[] colls = Collection.findAll(c);
@@ -225,9 +229,13 @@ public class GenerateSitemaps
             String url = handleURLStem + colls[i].getHandle();
 
             if (makeHTMLMap)
+            {
                 html.addURL(url, null);
+            }
             if (makeSitemapOrg)
+            {
                 sitemapsOrg.addURL(url, null);
+            }
         }
 
         ItemIterator allItems = Item.findAll(c);
@@ -242,9 +250,13 @@ public class GenerateSitemaps
                 Date lastMod = i.getLastModified();
 
                 if (makeHTMLMap)
+                {
                     html.addURL(url, lastMod);
+                }
                 if (makeSitemapOrg)
+                {
                     sitemapsOrg.addURL(url, lastMod);
+                }
                 i.decache();
 
                 itemCount++;
@@ -271,7 +283,9 @@ public class GenerateSitemaps
         finally
         {
             if (allItems != null)
+            {
                 allItems.close();
+            }
         }
         
         c.abort();

@@ -80,7 +80,10 @@ public class GroupListServlet extends DSpaceServlet
 		
 		// What's the index of the first group to show?  Default is 0
 		int first = UIUtil.getIntParameter(request, "first");
-		if (first == -1) first = 0;
+		if (first == -1)
+        {
+            first = 0;
+        }
 
 		// Retrieve the e-people in the specified order
 		Group[] groups = Group.findAll(context, sortBy);

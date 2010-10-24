@@ -100,7 +100,9 @@ public class JSONSolrSearcher extends AbstractReader implements Recyclable {
 
         query = request.getParameter(CommonParams.Q);
         if(query == null)
+        {
             query = "*:*";
+        }
 
         //Retrieve all our filter queries
         filterQueries = request.getParameterValues(CommonParams.FQ);
@@ -126,7 +128,9 @@ public class JSONSolrSearcher extends AbstractReader implements Recyclable {
         facetSort = request.getParameter(FacetParams.FACET_SORT);
         //Make sure we have a valid sorting value
         if(!FacetParams.FACET_SORT_INDEX.equals(facetSort) && !FacetParams.FACET_SORT_COUNT.equals(facetSort))
+        {
             facetSort = null;
+        }
 
         //Retrieve our facet min count
         facetMinCount = 1;
@@ -163,13 +167,17 @@ public class JSONSolrSearcher extends AbstractReader implements Recyclable {
         }
 
         if(props.getProperty("solr.search.server") != null)
+        {
             this.solrServerUrl = props.getProperty("solr.search.server").toString();
+        }
 
     }
 
     public void generate() throws IOException, SAXException, ProcessingException {
         if(solrServerUrl == null)
+        {
             return;
+        }
 
         Map<String, String> params = new HashMap<String, String>();
 
@@ -196,7 +204,9 @@ public class JSONSolrSearcher extends AbstractReader implements Recyclable {
 
         params.put(FacetParams.FACET_LIMIT, String.valueOf(facetLimit));
         if(facetSort != null)
+        {
             params.put(FacetParams.FACET_SORT, facetSort);
+        }
         params.put(FacetParams.FACET_MINCOUNT, String.valueOf(facetMinCount));
 
         solrRequestUrl = AbstractDSpaceTransformer.generateURL(solrRequestUrl, params);
@@ -205,7 +215,9 @@ public class JSONSolrSearcher extends AbstractReader implements Recyclable {
             for (String facetField : facetFields) {
                 //This class can only be used for autocomplete facet fields
                 if(!facetField.endsWith(".year") && !facetField.endsWith("_ac"))
+                {
                     facetField += "_ac";
+                }
                 solrRequestUrl += "&" + FacetParams.FACET_FIELD + "=" + URLEncoder.encode(facetField, Constants.DEFAULT_ENCODING);
             }
         }

@@ -57,20 +57,26 @@ public class ItemService
         if (primaryBitstream != null)
         {
             if (primaryBitstream.getFormat().getMIMEType().equals("text/html"))
+            {
                 return null;
+            }
 
             thumbBitstream = dao.getNamedBitstream(itemId, "THUMBNAIL", primaryBitstream.getName() + ".jpg");
         }
         else
         {
             if (requireOriginal)
+            {
                 primaryBitstream = dao.getFirstBitstream(itemId, "ORIGINAL");
+            }
             
             thumbBitstream   = dao.getFirstBitstream(itemId, "THUMBNAIL");
         }
 
         if (thumbBitstream != null)
+        {
             return new Thumbnail(thumbBitstream, primaryBitstream);
+        }
 
         return null;
     }

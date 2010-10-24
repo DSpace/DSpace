@@ -64,9 +64,15 @@ public class LNIRemoteException  extends org.apache.axis.AxisFault  implements j
 
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof LNIRemoteException)) return false;
+        if (!(obj instanceof LNIRemoteException))
+        {
+            return false;
+        }
         LNIRemoteException other = (LNIRemoteException) obj;
-        if (this == obj) return true;
+        if (this == obj)
+        {
+            return true;
+        }
         if (__equalsCalc != null) {
             return (__equalsCalc.equals(obj));
         }

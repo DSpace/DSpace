@@ -111,7 +111,9 @@ public class Label extends TextContainer implements StructuralElement
             attributes.put(A_ID, context.generateID(E_LABEL, name));
         }
         if (this.rend != null)
+        {
             attributes.put(A_RENDER, this.rend);
+        }
 
         startElement(contentHandler, namespaces, E_LABEL, attributes);
         super.toSAX(contentHandler, lexicalHandler, namespaces);

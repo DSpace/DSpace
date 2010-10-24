@@ -716,8 +716,10 @@ public class EditCommunitiesServlet extends DSpaceServlet
 		// First, if this is not a harvested collection (anymore), set the harvest type to 0; wipe harvest settings  
 		if (contentSource.equals("source_normal")) 
 		{
-			if (hc != null) 
-				hc.delete();
+			if (hc != null)
+            {
+                hc.delete();
+            }
 		}
 		else 
 		{
