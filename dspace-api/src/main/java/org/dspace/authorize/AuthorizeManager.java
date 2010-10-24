@@ -542,7 +542,7 @@ public class AuthorizeManager
                 "SELECT * FROM resourcepolicy WHERE resource_type_id= ? AND resource_id= ? ",
                 o.getType(),o.getID());
 
-        List<ResourcePolicy> policies = new ArrayList();
+        List<ResourcePolicy> policies = new ArrayList<ResourcePolicy>();
 
         try
         {

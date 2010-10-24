@@ -42,6 +42,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
@@ -303,7 +304,7 @@ public class AuthenticationManager
                                          HttpServletRequest request)
         throws SQLException
     {
-        ArrayList gll = new ArrayList();
+        List<int[]> gll = new ArrayList<int[]>();
         int totalLen = 0;
 
         for (int i = 0; i < methodStack.length; ++i)
@@ -325,7 +326,7 @@ public class AuthenticationManager
         }
         else if (gll.size() == 1)
         {
-            return (int[]) gll.get(0);
+            return gll.get(0);
         }
         else
         {
@@ -335,7 +336,7 @@ public class AuthenticationManager
             int k = 0;
             for (int i = 0; i < gll.size(); ++i)
             {
-                int gl[] = (int [])gll.get(i);
+                int gl[] = gll.get(i);
                 for (int aGl : gl)
                 {
                     result[k++] = aGl;
@@ -352,7 +353,7 @@ public class AuthenticationManager
      *
      * @return Iterator object.
      */
-    public static Iterator authenticationMethodIterator()
+    public static Iterator<AuthenticationMethod> authenticationMethodIterator()
     {
         return Arrays.asList(methodStack).iterator();
     }

@@ -57,17 +57,17 @@ public class DCInputSet
 	private DCInput[][] inputPages = null;
 	
 	/** constructor */
-	public DCInputSet(String formName, List pages, Map listMap)
+	public DCInputSet(String formName, List<List<Map<String, String>>> pages, Map<String, List<String>> listMap)
 	{
 		this.formName = formName;
 		inputPages = new DCInput[pages.size()][];
 		for ( int i = 0; i < inputPages.length; i++ )
 		{
-			List page = (List)pages.get(i);
+			List<Map<String, String>> page = pages.get(i);
 			inputPages[i] = new DCInput[page.size()];
 			for ( int j = 0; j < inputPages[i].length; j++ )
 			{
-				inputPages[i][j] = new DCInput((Map)page.get(j), listMap);
+				inputPages[i][j] = new DCInput(page.get(j), listMap);
 			}
 		}
 	}
@@ -103,7 +103,7 @@ public class DCInputSet
 	public DCInput[] getPageRows(int pageNum, boolean addTitleAlternative,
 		      					 boolean addPublishedBefore)
 	{
-		List filteredInputs = new ArrayList();
+		List<DCInput> filteredInputs = new ArrayList<DCInput>();
 		if ( pageNum < inputPages.length )
 		{
 			for (int i = 0; i < inputPages[pageNum].length; i++ )
@@ -118,7 +118,7 @@ public class DCInputSet
 
 		// Convert list into an array
 		DCInput[] inputArray = new DCInput[filteredInputs.size()];
-		return (DCInput[])filteredInputs.toArray(inputArray);
+		return filteredInputs.toArray(inputArray);
 	}
 	
     /**

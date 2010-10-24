@@ -68,7 +68,7 @@ public class AuthenticationCountSelector implements Selector{
      */
 	public boolean select(String expression, Map objectModel, Parameters parameters) {
 		// get an iterator of all the AuthenticationMethods defined
-		final Iterator<AuthenticationMethod> authMethods = (Iterator<AuthenticationMethod>) AuthenticationManager
+		final Iterator<AuthenticationMethod> authMethods = AuthenticationManager
 		    .authenticationMethodIterator();
 		
 		  final HttpServletResponse httpResponse = (HttpServletResponse) objectModel

@@ -74,7 +74,7 @@ public class LoginRedirect extends AbstractAction {
 				.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
 		final HttpServletRequest httpRequest = (HttpServletRequest) objectModel
 				.get(HttpEnvironment.HTTP_REQUEST_OBJECT);
-		final Iterator<AuthenticationMethod> authMethods = (Iterator<AuthenticationMethod>) AuthenticationManager
+		final Iterator<AuthenticationMethod> authMethods = AuthenticationManager
 				    .authenticationMethodIterator();
 
         if (authMethods == null)
