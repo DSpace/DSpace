@@ -114,7 +114,7 @@ public class DatabaseManager
      * A map of database column information. The key is the table name, a
      * String; the value is an array of ColumnInfo objects.
      */
-    private static Map info = new HashMap();
+    private static Map<String, Map<String, ColumnInfo>> info = new HashMap<String, Map<String, ColumnInfo>>();
 
     /**
      * Protected Constructor to prevent instantiation except by derived classes.
@@ -807,7 +807,7 @@ public class DatabaseManager
         StringBuffer sql = new StringBuffer().append("update ").append(table)
                 .append(" set ");
 
-        List columns = new ArrayList();
+        List<ColumnInfo> columns = new ArrayList<ColumnInfo>();
         ColumnInfo pk = getPrimaryKeyColumnInfo(table);
         ColumnInfo[] info = getNonPrimaryKeyColumns(table);
 
@@ -874,14 +874,14 @@ public class DatabaseManager
      */
     static ColumnInfo[] getColumnInfo(String table) throws SQLException
     {
-        Map cinfo = getColumnInfoInternal(table);
+        Map<String, ColumnInfo> cinfo = getColumnInfoInternal(table);
 
         if (cinfo == null)
         {
             return null;
         }
 
-        Collection info = cinfo.values();
+        Collection<ColumnInfo> info = cinfo.values();
 
         return (ColumnInfo[]) info.toArray(new ColumnInfo[info.size()]);
     }
@@ -900,9 +900,9 @@ public class DatabaseManager
     static ColumnInfo getColumnInfo(String table, String column)
             throws SQLException
     {
-        Map info = getColumnInfoInternal(table);
+        Map<String, ColumnInfo> info = getColumnInfoInternal(table);
 
-        return (info == null) ? null : (ColumnInfo) info.get(column);
+        return (info == null) ? null : info.get(column);
     }
 
     /**
@@ -944,9 +944,9 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    protected static List getColumnNames(String table) throws SQLException
+    protected static List<String> getColumnNames(String table) throws SQLException
     {
-        List results = new ArrayList();
+        List<String> results = new ArrayList<String>();
         ColumnInfo[] info = getColumnInfo(table);
 
         for (int i = 0; i < info.length; i++)
@@ -967,10 +967,10 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    protected static List getColumnNames(ResultSetMetaData meta)
+    protected static List<String> getColumnNames(ResultSetMetaData meta)
             throws SQLException
     {
-        List results = new ArrayList();
+        List<String> results = new ArrayList<String>();
         int columns = meta.getColumnCount();
 
         for (int i = 0; i < columns; i++)
@@ -1208,7 +1208,7 @@ public class DatabaseManager
         ResultSetMetaData meta = results.getMetaData();
         int columns = meta.getColumnCount() + 1;
 
-        List columnNames = (table == null) ? getColumnNames(meta)
+        List<String> columnNames = (table == null) ? getColumnNames(meta)
                 : getColumnNames(table);
 
         TableRow row = new TableRow(canonicalize(table), columnNames);
@@ -1401,7 +1401,7 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    private static int execute(Connection connection, String sql, List columns,
+    private static int execute(Connection connection, String sql, List<ColumnInfo> columns,
             TableRow row) throws SQLException
     {
         String dbName =ConfigurationManager.getProperty("db.name");
@@ -1418,11 +1418,11 @@ public class DatabaseManager
         	
             int count = 0;
 
-            for (Iterator iterator = columns.iterator(); iterator.hasNext();)
+            for (Iterator<ColumnInfo> iterator = columns.iterator(); iterator.hasNext();)
             {
                 count++;
 
-                ColumnInfo info = (ColumnInfo) iterator.next();
+                ColumnInfo info = iterator.next();
                 String column = info.getName();
                 int jdbctype = info.getType();
 
@@ -1534,10 +1534,10 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    private static Map getColumnInfoInternal(String table) throws SQLException
+    private static Map<String, ColumnInfo> getColumnInfoInternal(String table) throws SQLException
     {
         String ctable = canonicalize(table);
-        Map results = (Map) info.get(ctable);
+        Map<String, ColumnInfo> results = info.get(ctable);
 
         if (results != null)
         {
@@ -1561,7 +1561,7 @@ public class DatabaseManager
      *                If there is a problem retrieving information from the
      *                RDBMS.
      */
-    private static Map retrieveColumnInfo(String table) throws SQLException
+    private static Map<String, ColumnInfo> retrieveColumnInfo(String table) throws SQLException
     {
         Connection connection = null;
         ResultSet pkcolumns = null;
@@ -1584,7 +1584,7 @@ public class DatabaseManager
             connection = getConnection();
 
             DatabaseMetaData metadata = connection.getMetaData();
-            HashMap results = new HashMap();
+            Map<String, ColumnInfo> results = new HashMap<String, ColumnInfo>();
 
             int max = metadata.getMaxTableNameLength();
             String tname = (table.length() >= max) ? table
@@ -1592,7 +1592,7 @@ public class DatabaseManager
             
             pkcolumns = metadata.getPrimaryKeys(catalog, schema, tname);
             
-            Set pks = new HashSet();
+            Set<String> pks = new HashSet<String>();
 
             while (pkcolumns.next())
             {
@@ -1833,7 +1833,6 @@ public class DatabaseManager
 
         System.out.println("Connected successfully!\n");
     }
-
 }
 
 /**
@@ -1869,7 +1868,7 @@ class ColumnInfo
 
     /**
      * Return the column name.
-     * 
+     *
      * @return - The column name
      */
     public String getName()
@@ -1879,7 +1878,7 @@ class ColumnInfo
 
     /**
      * Set the column name
-     * 
+     *
      * @param v -
      *            The column name
      */
@@ -1890,7 +1889,7 @@ class ColumnInfo
 
     /**
      * Return the JDBC type. This is one of the constants from java.sql.Types.
-     * 
+     *
      * @return - The JDBC type
      * @see java.sql.Types
      */
@@ -1902,7 +1901,7 @@ class ColumnInfo
     /**
      * Set the JDBC type. This should be one of the constants from
      * java.sql.Types.
-     * 
+     *
      * @param v -
      *            The JDBC type
      * @see java.sql.Types
@@ -1914,7 +1913,7 @@ class ColumnInfo
 
     /**
      * Return true if this column is a primary key.
-     * 
+     *
      * @return True if this column is a primary key, false otherwise.
      */
     public boolean isPrimaryKey()
@@ -1924,7 +1923,7 @@ class ColumnInfo
 
     /**
      * Set whether this column is a primary key.
-     * 
+     *
      * @param v
      *            True if this column is a primary key.
      */
@@ -1935,7 +1934,7 @@ class ColumnInfo
 
     /*
      * Return true if this object is equal to other, false otherwise.
-     * 
+     *
      * @return True if this object is equal to other, false otherwise.
      */
     public boolean equals(Object other)
@@ -1955,7 +1954,7 @@ class ColumnInfo
 
     /*
      * Return a hashCode for this object.
-     * 
+     *
      * @return A hashcode for this object.
      */
     public int hashCode()

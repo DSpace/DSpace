@@ -116,7 +116,7 @@ public class MockDatabaseManager
      * A map of database column information. The key is the table name, a
      * String; the value is an array of ColumnInfo objects.
      */
-    private static Map info = new HashMap();
+    private static Map<String, Map<String, ColumnInfo>> info = new HashMap<String, Map<String, ColumnInfo>>();
 
     /**
      * It allows us to print information on the pool, for debugging purposes
@@ -805,7 +805,7 @@ public class MockDatabaseManager
         StringBuffer sql = new StringBuffer().append("update ").append(table)
                 .append(" set ");
 
-        List columns = new ArrayList();
+        List<ColumnInfo> columns = new ArrayList<ColumnInfo>();
         ColumnInfo pk = getPrimaryKeyColumnInfo(table);
         ColumnInfo[] cinfo = getNonPrimaryKeyColumns(table);
 
@@ -869,14 +869,14 @@ public class MockDatabaseManager
     @Mock
     static ColumnInfo[] getColumnInfo(String table) throws SQLException
     {
-        Map cinfo = getColumnInfoInternal(table);
+        Map<String, ColumnInfo> cinfo = getColumnInfoInternal(table);
 
         if (cinfo == null)
         {
             return null;
         }
 
-        Collection vinfo = cinfo.values();
+        Collection<ColumnInfo> vinfo = cinfo.values();
 
         return (ColumnInfo[]) vinfo.toArray(new ColumnInfo[vinfo.size()]);
     }
@@ -896,9 +896,9 @@ public class MockDatabaseManager
     static ColumnInfo getColumnInfo(String table, String column)
             throws SQLException
     {
-        Map cinfo = getColumnInfoInternal(table);
+        Map<String, ColumnInfo> cinfo = getColumnInfoInternal(table);
 
-        return (cinfo == null) ? null : (ColumnInfo) cinfo.get(column);
+        return (cinfo == null) ? null : cinfo.get(column);
     }
 
     /**
@@ -942,9 +942,9 @@ public class MockDatabaseManager
      *                If a database error occurs
      */
     @Mock
-    protected static List getColumnNames(String table) throws SQLException
+    protected static List<String> getColumnNames(String table) throws SQLException
     {
-        List results = new ArrayList();
+        List<String> results = new ArrayList<String>();
         ColumnInfo[] cinfo = getColumnInfo(table);
 
         for (int i = 0; i < cinfo.length; i++)
@@ -966,10 +966,10 @@ public class MockDatabaseManager
      *                If a database error occurs
      */
     @Mock
-    protected static List getColumnNames(ResultSetMetaData meta)
+    protected static List<String> getColumnNames(ResultSetMetaData meta)
             throws SQLException
     {
-        List results = new ArrayList();
+        List<String> results = new ArrayList<String>();
         int columns = meta.getColumnCount();
 
         for (int i = 0; i < columns; i++)
@@ -1211,7 +1211,7 @@ public class MockDatabaseManager
         ResultSetMetaData meta = results.getMetaData();
         int columns = meta.getColumnCount() + 1;
 
-        List columnNames = (table == null) ? getColumnNames(meta)
+        List<String> columnNames = (table == null) ? getColumnNames(meta)
                 : getColumnNames(table);
 
         TableRow row = new TableRow(canonicalize(table), columnNames);
@@ -1397,7 +1397,7 @@ public class MockDatabaseManager
      *                If a database error occurs
      */
     @Mock
-    private static int execute(Connection connection, String sql, List columns,
+    private static int execute(Connection connection, String sql, List<ColumnInfo> columns,
             TableRow row) throws SQLException
     {
         String dbName =ConfigurationManager.getProperty("db.name");
@@ -1414,11 +1414,11 @@ public class MockDatabaseManager
 
             int count = 0;
 
-            for (Iterator iterator = columns.iterator(); iterator.hasNext();)
+            for (Iterator<ColumnInfo> iterator = columns.iterator(); iterator.hasNext();)
             {
                 count++;
 
-                ColumnInfo cinfo = (ColumnInfo) iterator.next();
+                ColumnInfo cinfo = iterator.next();
                 String column = cinfo.getName();
                 int jdbctype = cinfo.getType();
 
@@ -1519,10 +1519,10 @@ public class MockDatabaseManager
      *                If a database error occurs
      */
     @Mock
-    private static Map getColumnInfoInternal(String table) throws SQLException
+    private static Map<String, ColumnInfo> getColumnInfoInternal(String table) throws SQLException
     {
         String ctable = canonicalize(table);
-        Map results = (Map) info.get(ctable);
+        Map<String, ColumnInfo> results = info.get(ctable);
 
         if (results != null)
         {
@@ -1547,7 +1547,7 @@ public class MockDatabaseManager
      *                RDBMS.
      */
     @Mock
-    private static Map retrieveColumnInfo(String table) throws SQLException
+    private static Map<String, ColumnInfo> retrieveColumnInfo(String table) throws SQLException
     {
         Connection connection = null;
         ResultSet pkcolumns = null;
@@ -1570,7 +1570,7 @@ public class MockDatabaseManager
             connection = getConnection();
 
             DatabaseMetaData metadata = connection.getMetaData();
-            HashMap results = new HashMap();
+            Map<String, ColumnInfo> results = new HashMap<String, ColumnInfo>();
 
             //H2 database has no limit or is unknown, so the result is 0. We
             //have to comment to avoid errors
@@ -1579,7 +1579,7 @@ public class MockDatabaseManager
             //        .substring(0, max - 1) : table;
             pkcolumns = metadata.getPrimaryKeys(catalog, schema, table);
 
-            Set pks = new HashSet();
+            Set<String> pks = new HashSet<String>();
 
             while (pkcolumns.next())
                 pks.add(pkcolumns.getString(4));
@@ -1901,7 +1901,6 @@ public class MockDatabaseManager
             }
         }
     }
-
 }
 
 /**
