@@ -1,5 +1,8 @@
 1.7.0
 =====
+(Oleksandr Sytnyk)
+- [DS-561] On login screen, keyboard input focus should be set to the first field (E-mail Address) so you don't have to use the mouse (JSPUI)
+
 (Yin Yin Latt)
 - [DS-588] Patch for SFX (OpenURL resolver)
 
