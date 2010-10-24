@@ -134,19 +134,19 @@ public class DatasetTimeGenerator extends DatasetGenerator {
     }
 
     public Date getActualStartDate() {
-        return actualStartDate;
+        return actualStartDate == null ? null : (Date)actualStartDate.clone();
     }
 
     public void setActualStartDate(Date actualStartDate) {
-        this.actualStartDate = actualStartDate;
+        this.actualStartDate = actualStartDate == null ? null : (Date)actualStartDate.clone();
     }
 
     public Date getActualEndDate() {
-        return actualEndDate;
+        return actualEndDate == null ? null : (Date)actualEndDate.clone();
     }
 
     public void setActualEndDate(Date actualEndDate) {
-        this.actualEndDate = actualEndDate;
+        this.actualEndDate = actualEndDate == null ? null : (Date)actualEndDate.clone();
     }
 
     public void setDateType(String dateType) {

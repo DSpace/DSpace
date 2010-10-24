@@ -39,10 +39,11 @@
 package org.dspace.app.bulkedit;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Utility class to store a line from a CSV file
@@ -55,7 +56,7 @@ public class DSpaceCSVLine
     private int id;
 
     /** The elements in this line in a hashtable, keyed by the metadata type */
-    private Hashtable<String, ArrayList> items;
+    private Map<String, ArrayList> items;
 
     /**
      * Create a new CSV line
@@ -66,7 +67,7 @@ public class DSpaceCSVLine
     {
         // Store the ID + separator, and initialise the hashtable
         this.id = id;
-        items = new Hashtable<String, ArrayList>();
+        items = new HashMap<String, ArrayList>();
     }
 
     /**
@@ -76,7 +77,7 @@ public class DSpaceCSVLine
     {
         // Set the ID to be -1, and initialise the hashtable
         this.id = -1;
-        this.items = new Hashtable<String, ArrayList>();
+        this.items = new HashMap<String, ArrayList>();
     }
 
     /**
@@ -128,10 +129,10 @@ public class DSpaceCSVLine
      *
      * @return An enumeration of all the keys
      */
-    public Enumeration<String> keys()
+    public Set<String> keys()
     {
         // Return the keys
-        return items.keys();
+        return items.keySet();
     }
 
     /**

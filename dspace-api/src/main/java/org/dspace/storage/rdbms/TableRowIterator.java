@@ -39,6 +39,8 @@
  */
 package org.dspace.storage.rdbms;
 
+import org.apache.log4j.Logger;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -53,6 +55,7 @@ import java.util.List;
  */
 public class TableRowIterator
 {
+    private final static Logger log = Logger.getLogger(TableRowIterator.class);
     /**
      * Results from a query
      */
@@ -111,6 +114,15 @@ public class TableRowIterator
     protected void finalize()
     {
         close();
+
+        try
+        {
+            super.finalize();
+        }
+        catch (Throwable t)
+        {
+            log.error("Unable to finalize object", t);
+        }
     }
 
     /**

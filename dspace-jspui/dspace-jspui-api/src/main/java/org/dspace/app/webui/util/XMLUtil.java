@@ -38,6 +38,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -109,8 +110,7 @@ public class XMLUtil
      * @return the transformed xml document
      * @throws Exception
      */
-    public static Document transformDocument(Document xmlDocument,
-            Hashtable parameters, String xsltFilename) throws Exception
+    public static Document transformDocument(Document xmlDocument, Map<String, String> parameters, String xsltFilename) throws Exception
     {
 
         // Generate a Transformer.
@@ -120,12 +120,9 @@ public class XMLUtil
         // set transformation parameters
         if (parameters != null)
         {
-            Enumeration keys = parameters.keys();
-            while (keys.hasMoreElements())
+            for (Map.Entry<String, String> param : parameters.entrySet())
             {
-                String key = (String) keys.nextElement();
-                String value = (String) parameters.get(key);
-                transformer.setParameter(key, value);
+                transformer.setParameter(param.getKey(), param.getValue());
             }
 
         }
@@ -158,8 +155,7 @@ public class XMLUtil
      * @return the transformed xml document as a string
      * @throws Exception
      */
-    public static String transformDocumentAsString(Document xmlDocument,
-            Hashtable parameters, String xsltFilename) throws Exception
+    public static String transformDocumentAsString(Document xmlDocument, Map<String, String> parameters, String xsltFilename) throws Exception
     {
 
         // Generate a Transformer.
@@ -169,14 +165,10 @@ public class XMLUtil
         // set transformation parameters
         if (parameters != null)
         {
-            Enumeration keys = parameters.keys();
-            while (keys.hasMoreElements())
+            for (Map.Entry<String, String> param : parameters.entrySet())
             {
-                String key = (String) keys.nextElement();
-                String value = (String) parameters.get(key);
-                transformer.setParameter(key, value);
+                transformer.setParameter(param.getKey(), param.getValue());
             }
-
         }
 
         StringWriter stringWriter = new StringWriter();

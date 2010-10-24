@@ -48,6 +48,7 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.dspace.eperson.Group;
 
 /**
@@ -114,7 +115,7 @@ public class SelectGroupTag extends TagSupport
 		}
 		else if(g instanceof Group[])
 		{
-			groups = (Group[]) g;
+			groups = (Group[])ArrayUtils.clone((Group[]) g);
 		}
 	}
 

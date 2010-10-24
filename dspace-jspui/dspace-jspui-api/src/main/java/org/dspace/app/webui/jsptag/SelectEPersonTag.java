@@ -47,6 +47,7 @@ import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.dspace.eperson.EPerson;
 
 /**
@@ -119,7 +120,7 @@ public class SelectEPersonTag extends TagSupport
         }
         else if (e instanceof EPerson[])
         {
-            epeople = (EPerson[]) e;
+            epeople = (EPerson[])ArrayUtils.clone((EPerson[])e);
         }
     }
 

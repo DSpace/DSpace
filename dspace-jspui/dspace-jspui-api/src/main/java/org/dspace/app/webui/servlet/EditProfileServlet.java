@@ -88,7 +88,7 @@ public class EditProfileServlet extends DSpaceServlet
         // Find out if they're trying to set a new password
         boolean settingPassword = false;
 
-        if (eperson.getRequireCertificate() == false && !StringUtils.isEmpty(request.getParameter("password")))
+        if (!eperson.getRequireCertificate() && !StringUtils.isEmpty(request.getParameter("password")))
         {
             settingPassword = true;
         }

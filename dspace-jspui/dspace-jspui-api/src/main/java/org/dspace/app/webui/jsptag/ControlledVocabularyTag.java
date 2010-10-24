@@ -35,9 +35,9 @@ package org.dspace.app.webui.jsptag;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;
@@ -73,7 +73,7 @@ public class ControlledVocabularyTag extends TagSupport
     private String vocabulary;
 
     // an hashtable containing all the loaded vocabularies
-    public Hashtable controlledVocabularies;
+    public Map<String, Document> controlledVocabularies;
 
     /**
      * Process tag
@@ -95,27 +95,23 @@ public class ControlledVocabularyTag extends TagSupport
                 + "vocabulary2html.xsl";
 
         // Load vocabularies on startup
-        controlledVocabularies = (Hashtable) pageContext.getServletContext()
-                .getAttribute("controlledvocabulary.controlledVocabularies");
+        controlledVocabularies = (Map<String, Document>) pageContext.getServletContext().getAttribute("controlledvocabulary.controlledVocabularies");
         if (controlledVocabularies == null)
         {
             controlledVocabularies = loadControlledVocabularies(vocabulariesPath);
-            pageContext.getServletContext().setAttribute(
-                    "controlledvocabulary.controlledVocabularies",
-                    controlledVocabularies);
+            pageContext.getServletContext().setAttribute("controlledvocabulary.controlledVocabularies", controlledVocabularies);
         }
 
         try
         {
-            Hashtable prunnedVocabularies = needsFiltering() ? filterVocabularies(
-                    controlledVocabularies, vocabularyPrunningXSLT)
+            Map<String, Document> prunnedVocabularies = needsFiltering() ?
+                    filterVocabularies(controlledVocabularies, vocabularyPrunningXSLT)
                     : controlledVocabularies;
 
             String html = "";
             if (vocabulary != null && !vocabulary.equals(""))
             {
-                html = renderVocabularyAsHTML((Document) prunnedVocabularies
-                        .get(vocabulary + ".xml"),
+                html = renderVocabularyAsHTML(prunnedVocabularies.get(vocabulary + ".xml"),
                         controlledVocabulary2HtmlXSLT,
                         isAllowMultipleSelection(), request.getContextPath());
             }
@@ -171,14 +167,14 @@ public class ControlledVocabularyTag extends TagSupport
      *            The context path
      * @return the HTML that represents the vocabularies
      */
-    private String renderVocabulariesAsHTML(Hashtable vocabularies,
+    private String renderVocabulariesAsHTML(Map<String, Document> vocabularies,
             String xslt, boolean allowMultipleSelection, String contextPath)
     {
         StringBuilder result = new StringBuilder();
-        Iterator iter = vocabularies.values().iterator();
+        Iterator<Document> iter = vocabularies.values().iterator();
         while (iter.hasNext())
         {
-            Document controlledVocabularyXML = (Document) iter.next();
+            Document controlledVocabularyXML = iter.next();
             result.append(renderVocabularyAsHTML(controlledVocabularyXML, xslt,
                     allowMultipleSelection, contextPath));
         }
@@ -196,18 +192,12 @@ public class ControlledVocabularyTag extends TagSupport
      *            the filename of the stylesheet that trimms the taxonomies
      * @return An hashtable with all the filtered vocabularies
      */
-    private Hashtable filterVocabularies(Hashtable vocabularies,
-            String vocabularyPrunningXSLT)
+    private Map<String, Document> filterVocabularies(Map<String, Document> vocabularies, String vocabularyPrunningXSLT)
     {
-        Hashtable prunnedVocabularies = new Hashtable();
-        Enumeration enumeration = vocabularies.keys();
-        while (enumeration.hasMoreElements())
+        Map<String, Document> prunnedVocabularies = new HashMap<String, Document>();
+        for (Map.Entry<String, Document> entry : vocabularies.entrySet())
         {
-            String controlledVocabularyKey = (String) enumeration.nextElement();
-            Document controlledVocabulary = (Document) vocabularies
-                    .get(controlledVocabularyKey);
-            prunnedVocabularies.put(controlledVocabularyKey, filterVocabulary(
-                    controlledVocabulary, vocabularyPrunningXSLT, getFilter()));
+            prunnedVocabularies.put(entry.getKey(), filterVocabulary(entry.getValue(), vocabularyPrunningXSLT, getFilter()));
         }
         return prunnedVocabularies;
     }
@@ -239,12 +229,10 @@ public class ControlledVocabularyTag extends TagSupport
         try
         {
 
-            Hashtable parameters = new Hashtable();
-            parameters.put("allowMultipleSelection",
-                    allowMultipleSelection ? "yes" : "no");
+            Map<String, String> parameters = new HashMap<String, String>();
+            parameters.put("allowMultipleSelection", allowMultipleSelection ? "yes" : "no");
             parameters.put("contextPath", contextPath);
-            result = XMLUtil.transformDocumentAsString(vocabulary, parameters,
-                    controlledVocabulary2HtmlXSLT);
+            result = XMLUtil.transformDocumentAsString(vocabulary, parameters, controlledVocabulary2HtmlXSLT);
         }
         catch (Exception e)
         {
@@ -265,8 +253,7 @@ public class ControlledVocabularyTag extends TagSupport
      *            The filter to be applied
      * @return The trimmed vocabulary.
      */
-    public Document filterVocabulary(Document vocabulary,
-            String vocabularyPrunningXSLT, String filter)
+    public Document filterVocabulary(Document vocabulary, String vocabularyPrunningXSLT, String filter)
     {
         if (vocabulary == null)
         {
@@ -275,10 +262,9 @@ public class ControlledVocabularyTag extends TagSupport
 
         try
         {
-            Hashtable parameters = new Hashtable();
+            Map<String, String> parameters = new HashMap<String, String>();
             parameters.put("filter", filter);
-            Document prunnedVocabulary = XMLUtil.transformDocument(vocabulary,
-                    parameters, vocabularyPrunningXSLT);
+            Document prunnedVocabulary = XMLUtil.transformDocument(vocabulary, parameters, vocabularyPrunningXSLT);
             return prunnedVocabulary;
         }
         catch (Exception e)
@@ -298,9 +284,9 @@ public class ControlledVocabularyTag extends TagSupport
      * @return an hashtable with the filenames of the vocabularies as keys and
      *         the XML documents representing the vocabularies as values.
      */
-    private static Hashtable loadControlledVocabularies(String directory)
+    private static Map<String, Document> loadControlledVocabularies(String directory)
     {
-        Hashtable controlledVocabularies = new Hashtable();
+        Map<String, Document> controlledVocabularies = new HashMap<String, Document>();
         File dir = new File(directory);
 
         FilenameFilter filter = new FilenameFilter()
@@ -320,8 +306,7 @@ public class ControlledVocabularyTag extends TagSupport
 
                 try
                 {
-                    Document controlledVocabulary = XMLUtil.loadXML(directory
-                            + filename);
+                    Document controlledVocabulary = XMLUtil.loadXML(directory + filename);
                     controlledVocabularies.put(filename, controlledVocabulary);
                     log.warn("Loaded vocabulary: " + filename);
                 }

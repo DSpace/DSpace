@@ -610,5 +610,14 @@ public class Context
         {
             abort();
         }
+
+        try
+        {
+            super.finalize();
+        }
+        catch (Throwable t)
+        {
+            log.error("Unable to finalize object", t);
+        }
     }
 }

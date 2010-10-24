@@ -148,9 +148,9 @@ public final class BitstreamInfo
                 nm, "");
 
         this.deleted = del;
-        this.processEndDate = procEndDate;
+        this.processEndDate = processEndDate == null ? null : (Date)procEndDate.clone();
         this.toBeProcessed = toBeProc;
-        this.processStartDate = procStartDate;
+        this.processStartDate = processStartDate == null ? null : (Date)procStartDate.clone();
         this.infoFound = true;
     }
 
@@ -529,7 +529,7 @@ public final class BitstreamInfo
      */
     public Date getProcessStartDate()
     {
-        return this.processStartDate;
+        return this.processStartDate == null ? null : (Date)this.processStartDate.clone();
     }
 
     /**
@@ -540,7 +540,7 @@ public final class BitstreamInfo
      */
     public void setProcessStartDate(Date startDate)
     {
-        this.processStartDate = startDate;
+        this.processStartDate = startDate == null ? null : (Date)startDate.clone();
     }
 
     /**
@@ -550,7 +550,7 @@ public final class BitstreamInfo
      */
     public Date getProcessEndDate()
     {
-        return this.processEndDate;
+        return this.processEndDate == null ? null : (Date)this.processEndDate.clone();
     }
 
     /**
@@ -561,6 +561,6 @@ public final class BitstreamInfo
      */
     public void setProcessEndDate(Date endDate)
     {
-        this.processEndDate = endDate;
+        this.processEndDate = endDate == null ? null : (Date)endDate.clone();
     }
 }

@@ -48,7 +48,6 @@ import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowManager;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
@@ -137,11 +136,9 @@ public class MetadataImport
                     }
 
                     // Iterate through each metadata element in the csv line
-                    Enumeration<String> e = line.keys();
-                    while (e.hasMoreElements())
+                    for (String md : line.keys())
                     {
                         // Get the values we already have
-                        String md = e.nextElement();
                         if (!"id".equals(md))
                         {
                             // Get the values from the CSV
@@ -169,12 +166,10 @@ public class MetadataImport
                     }
 
                     // Iterate through each metadata element in the csv line
-                    Enumeration<String> e = line.keys();
                     BulkEditChange whatHasChanged = new BulkEditChange();
-                    while (e.hasMoreElements())
+                    for (String md : line.keys())
                     {
                         // Get the values we already have
-                        String md = e.nextElement();
                         if (!"id".equals(md))
                         {
                             // Get the values from the CSV

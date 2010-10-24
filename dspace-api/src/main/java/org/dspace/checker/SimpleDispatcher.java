@@ -69,11 +69,10 @@ public class SimpleDispatcher implements BitstreamDispatcher
      *            indicates whether checker should loop infinitely through
      *            most_recent_checksum table
      */
-    public SimpleDispatcher(BitstreamInfoDAO bitstreamInfoDAO, Date startTime,
-            boolean looping)
+    public SimpleDispatcher(BitstreamInfoDAO bitstreamInfoDAO, Date startTime, boolean looping)
     {
         this.bitstreamInfoDAO = bitstreamInfoDAO;
-        this.processStartTime = startTime;
+        this.processStartTime = startTime == null ? null : (Date)startTime.clone();
         this.loopContinuously = looping;
     }
 
