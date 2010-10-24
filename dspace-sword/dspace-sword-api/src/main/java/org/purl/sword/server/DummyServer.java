@@ -252,17 +252,30 @@ public class DummyServer implements SWORDServer {
 		if (deposit.getSlug() != null) {
 			filenames.append("(slug = " + deposit.getSlug() + ") ");
 		}
+
+        ZipInputStream zip = null;
 		try {
-                        File depositFile = deposit.getFile();
-                        FileInputStream fileStream = new FileInputStream(depositFile);
-			ZipInputStream zip = new ZipInputStream(fileStream);
-			ZipEntry ze;
-			while ((ze = zip.getNextEntry()) != null) {
+            File depositFile = deposit.getFile();
+			zip = new ZipInputStream(new FileInputStream(depositFile));
+            ZipEntry ze;
+            while ((ze = zip.getNextEntry()) != null) {
                 filenames.append(" ").append(ze.toString());
-			}
+            }
 		} catch (IOException ioe) {
 			throw new SWORDException("Failed to open deposited zip file", ioe, ErrorCodes.ERROR_CONTENT);
-		}
+		} finally {
+            if (zip != null)
+            {
+                try
+                {
+                    zip.close();
+                }
+                catch (IOException e)
+                {
+                    log.error("Unable to close zip stream", e);
+                }
+            }
+        }
 		
 		// Handle the deposit
 		if (!deposit.isNoOp()) {

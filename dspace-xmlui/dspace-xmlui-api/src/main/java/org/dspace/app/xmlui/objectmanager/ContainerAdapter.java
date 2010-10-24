@@ -44,6 +44,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.wing.AttributeMap;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.authorize.AuthorizeException;
@@ -85,6 +86,7 @@ import org.xml.sax.SAXException;
  */
 public class ContainerAdapter extends AbstractAdapter
 {
+    private static final Logger log = Logger.getLogger(ContainerAdapter.class);
 
     /** The community or collection this adapter represents. */
     private DSpaceObject dso;
@@ -770,7 +772,7 @@ public class ContainerAdapter extends AbstractAdapter
 	        	} 
 	        	catch (Exception e) 
 				{
-	        		// ignore any errors we get, and just add the string literaly.
+                    log.trace("Caught exception", e);
 				}
 	        }		
 					

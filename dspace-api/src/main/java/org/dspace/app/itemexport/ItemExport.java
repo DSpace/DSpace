@@ -1473,7 +1473,7 @@ public class ItemExport
     {
         int byteCount;
         final int DATA_BLOCK_SIZE = 2048;
-        FileInputStream cpFileInputStream;
+        FileInputStream cpFileInputStream = null;
         if (cpFile.isDirectory())
         {
             File[] fList = cpFile.listFiles();
@@ -1496,7 +1496,8 @@ public class ItemExport
 
                 // byte[] b = new byte[ (int)(cpFile.length()) ];
 
-                cpFileInputStream = new FileInputStream(cpFile);
+                cpFileInputStream = new FileInputStream(cpFile);                
+
                 ZipEntry cpZipEntry = new ZipEntry(strZipEntryName);
                 cpZipOutputStream.putNextEntry(cpZipEntry);
 
@@ -1512,6 +1513,10 @@ public class ItemExport
             finally
             {
                 cpZipOutputStream.closeEntry();
+                if (cpFileInputStream != null)
+                {
+                    cpFileInputStream.close();
+                }
             }
         }
     }

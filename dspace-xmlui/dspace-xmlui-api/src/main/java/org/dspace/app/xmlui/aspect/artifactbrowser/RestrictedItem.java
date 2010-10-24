@@ -44,6 +44,7 @@ import java.sql.SQLException;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.utils.HandleUtil;
@@ -67,6 +68,8 @@ import org.xml.sax.SAXException;
  */
 public class RestrictedItem extends AbstractDSpaceTransformer //implements CacheableProcessingComponent
 {
+    private static final Logger log = Logger.getLogger(RestrictedItem.class);
+    
     /** language strings */
     private static final Message T_title =
         message("xmlui.ArtifactBrowser.RestrictedItem.title");
@@ -165,6 +168,7 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
         		}
         		catch(Exception e) {
         			// just forget it - and display the restricted message.
+                    log.trace("Caught exception", e);
         		}
         		unauthorized.setHead(T_head_bitstream);
                 unauthorized.addPara(T_para_bitstream.parameterize(identifier));
