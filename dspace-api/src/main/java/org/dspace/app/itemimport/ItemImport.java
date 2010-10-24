@@ -267,7 +267,7 @@ public class ItemImport
                     .println("Error - must run with either add, replace, or remove (run with -h flag for details)");
             System.exit(1);
         }
-        else if (command.equals("add") || command.equals("replace"))
+        else if ("add".equals(command) || "replace".equals(command))
         {
             if (sourcedir == null)
             {
@@ -301,7 +301,7 @@ public class ItemImport
                 System.exit(1);
             }
         }
-        else if (command.equals("delete"))
+        else if ("delete".equals(command))
         {
             if (eperson == null)
             {
@@ -318,7 +318,7 @@ public class ItemImport
         }
 
         // can only resume for adds
-        if (isResume && !command.equals("add"))
+        if (isResume && !"add".equals(command))
         {
             System.out
                     .println("Error - resume option only works with --add command");
@@ -329,7 +329,7 @@ public class ItemImport
         // resume must be chosen
         File myFile = new File(mapfile);
 
-        if (myFile.exists() && command.equals("add") && !isResume)
+        if (!isResume && "add".equals(command) && myFile.exists())
         {
             System.out.println("Error - the mapfile " + mapfile
                     + " already exists.");
@@ -398,7 +398,7 @@ public class ItemImport
         Collection[] mycollections = null;
 
         // don't need to validate collections set if command is "delete"
-        if (!command.equals("delete"))
+        if (!"delete".equals(command))
         {
             System.out.println("Destination collections:");
 
@@ -496,15 +496,15 @@ public class ItemImport
 
             c.setIgnoreAuthorization(true);
 
-            if (command.equals("add"))
+            if ("add".equals(command))
             {
                 myloader.addItems(c, mycollections, sourcedir, mapfile, template);
             }
-            else if (command.equals("replace"))
+            else if ("replace".equals(command))
             {
                 myloader.replaceItems(c, mycollections, sourcedir, mapfile, template);
             }
-            else if (command.equals("delete"))
+            else if ("delete".equals(command))
             {
                 myloader.deleteItems(c, mapfile);
             }
@@ -970,7 +970,7 @@ public class ItemImport
         System.out.println("\tSchema: " + schema + " Element: " + element + " Qualifier: " + qualifier
                 + " Value: " + value);
 
-        if (qualifier.equals("none") || "".equals(qualifier))
+        if ("none".equals(qualifier) || "".equals(qualifier))
         {
             qualifier = null;
         }
@@ -1104,11 +1104,11 @@ public class ItemImport
                     while (tokenizer.hasMoreTokens())
                     {
                         String sToken = tokenizer.nextToken(); 
-                        if (sToken.equals("-r"))
+                        if ("-r".equals(sToken))
                         {
                             continue;
                         }
-                        else if (sToken.equals("-s") && tokenizer.hasMoreTokens())
+                        else if ("-s".equals(sToken) && tokenizer.hasMoreTokens())
                         {
                             try
                             {
@@ -1120,7 +1120,7 @@ public class ItemImport
                                 // ignore - iAssetstore remains -1
                             }
                         }
-                        else if (sToken.equals("-f") && tokenizer.hasMoreTokens())
+                        else if ("-f".equals(sToken) && tokenizer.hasMoreTokens())
                         {
                             sFilePath = tokenizer.nextToken();
                         }
@@ -1291,7 +1291,7 @@ public class ItemImport
         if (bundleName == null)
         {
             // is it license.txt?
-            if (fileName.equals("license.txt"))
+            if ("license.txt".equals(fileName))
             {
                 newBundleName = "LICENSE";
             }

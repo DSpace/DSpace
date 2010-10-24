@@ -125,19 +125,17 @@ public class CommunityFiliator
             System.exit(1);
         }
 
-        if (command.equals("set") || command.equals("remove"))
+        if ("set".equals(command) || "remove".equals(command))
         {
             if (parentID == null)
             {
-                System.out
-                        .println("Error - a parentID must be specified (run with -h flag for details)");
+                System.out.println("Error - a parentID must be specified (run with -h flag for details)");
                 System.exit(1);
             }
 
             if (childID == null)
             {
-                System.out
-                        .println("Error - a childID must be specified (run with -h flag for details)");
+                System.out.println("Error - a childID must be specified (run with -h flag for details)");
                 System.exit(1);
             }
         }
@@ -168,7 +166,7 @@ public class CommunityFiliator
                 System.exit(1);
             }
 
-            if (command.equals("set"))
+            if ("set".equals(command))
             {
                 filiator.filiate(c, parent, child);
             }

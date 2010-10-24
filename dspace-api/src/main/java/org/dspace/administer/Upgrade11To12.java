@@ -145,7 +145,7 @@ public class Upgrade11To12
                 // is this the license? check the format
                 BitstreamFormat bf = bitstreams[0].getFormat();
 
-                if (bf.getShortDescription().equals("License"))
+                if ("License".equals(bf.getShortDescription()))
                 {
                     System.out.println("Found license!");
 

@@ -192,7 +192,7 @@ public class Harvest
             System.exit(1);
         }
         // Run a single harvest cycle on a collection using saved settings.
-        else if (command.equals("run"))
+        else if ("run".equals(command))
         {
             if (collection == null || eperson == null)
             {
@@ -205,17 +205,17 @@ public class Harvest
             harvester.runHarvest(collection, eperson);
         }
         // start the harvest loop
-        else if (command.equals("start")) 
+        else if ("start".equals(command))
         {
         	startHarvester();
         }
         // reset harvesting status
-        else if (command.equals("reset")) 
+        else if ("reset".equals(command))
         {
         	resetHarvesting();
         }
         // purge all collections that are set up for harvesting (obviously for testing purposes only)
-        else if (command.equals("purgeAll")) 
+        else if ("purgeAll".equals(command))
         {
         	if (eperson == null)
             {
@@ -234,7 +234,7 @@ public class Harvest
 	    	context.complete();
         }
         // Delete all items in a collection. Useful for testing fresh harvests.
-        else if (command.equals("purge"))
+        else if ("purge".equals(command))
         {
             if (collection == null || eperson == null)
             {
@@ -250,7 +250,7 @@ public class Harvest
             //TODO: implement this... remove all items and remember to unset "last-harvested" settings
         }
         // Configure a collection with the three main settings 
-        else if (command.equals("config"))
+        else if ("config".equals(command))
         {
             if (collection == null)
             {
@@ -273,7 +273,7 @@ public class Harvest
             
             harvester.configureCollection(collection, harvestType, oaiSource, oaiSetID, metadataKey);
         }
-        else if (command.equals("ping"))
+        else if ("ping".equals(command))
         {
             if (oaiSource == null || oaiSetID == null)
             {

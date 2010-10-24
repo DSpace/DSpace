@@ -167,11 +167,11 @@ public class ItemExport
         {
             typeString = line.getOptionValue('t');
 
-            if (typeString.equals("ITEM"))
+            if ("ITEM".equals(typeString))
             {
                 myType = Constants.ITEM;
             }
-            else if (typeString.equals("COLLECTION"))
+            else if ("COLLECTION".equals(typeString))
             {
                 myType = Constants.COLLECTION;
             }
@@ -511,26 +511,26 @@ public class ItemExport
 
                 if ((!migrate) ||
                     (migrate && !(
-                     (dcv.element.equals("date") && qualifier.equals("issued")) ||
-                     (dcv.element.equals("date") && qualifier.equals("accessioned")) ||
-                     (dcv.element.equals("date") && qualifier.equals("available")) ||
-                     (dcv.element.equals("identifier") && qualifier.equals("uri") &&
-                      (dcv.value.startsWith("http://hdl.handle.net/" +
+                     ("date".equals(dcv.element) && "issued".equals(qualifier)) ||
+                     ("date".equals(dcv.element) && "accessioned".equals(qualifier)) ||
+                     ("date".equals(dcv.element) && "available".equals(qualifier)) ||
+                     ("identifier".equals(dcv.element) && "uri".equals(qualifier) &&
+                      (dcv.value != null && dcv.value.startsWith("http://hdl.handle.net/" +
                        HandleManager.getPrefix() + "/"))) ||
-                     (dcv.element.equals("description") && qualifier.equals("provenance")) ||
-                     (dcv.element.equals("format") && qualifier.equals("extent")) ||
-                     (dcv.element.equals("format") && qualifier.equals("mimetype")))))
+                     ("description".equals(dcv.element) && "provenance".equals(qualifier)) ||
+                     ("format".equals(dcv.element) && "extent".equals(qualifier)) ||
+                     ("format".equals(dcv.element) && "mimetype".equals(qualifier)))))
                 {
                     out.write(utf8, 0, utf8.length);
                 }
 
                 // Store the date issued and accession to see if they are different
                 // because we need to keep date.issued if they are, when migrating
-                if ((dcv.element.equals("date") && qualifier.equals("issued")))
+                if (("date".equals(dcv.element) && "issued".equals(qualifier)))
                 {
                     dateIssued = dcv.value;
                 }
-                if ((dcv.element.equals("date") && qualifier.equals("accessioned")))
+                if (("date".equals(dcv.element) && "accessioned".equals(qualifier)))
                 {
                     dateAccessioned = dcv.value;
                 }
