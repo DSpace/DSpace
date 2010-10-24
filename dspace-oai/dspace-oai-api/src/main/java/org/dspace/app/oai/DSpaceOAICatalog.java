@@ -231,8 +231,8 @@ public class DSpaceOAICatalog extends AbstractCatalog
         Context context = null;
 
         // Lists to put results in
-        List headers = new LinkedList();
-        List identifiers = new LinkedList();
+        List<String> headers = new LinkedList<String>();
+        List<String> identifiers = new LinkedList<String>();
 
         try
         {
@@ -294,7 +294,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
         }
 
         // Put results in form needed to return
-        Map results = new HashMap();
+        Map<String, Iterator<String>> results = new HashMap<String, Iterator<String>>();
         results.put("headers", headers.iterator());
         results.put("identifiers", identifiers.iterator());
 
@@ -697,7 +697,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
         Context context = null;
 
         // List to put results in
-        List sets = new LinkedList();
+        List<String> sets = new LinkedList<String>();
 
         try
         {
@@ -769,7 +769,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
         }
 
         // Put results in form needed to return
-        Map results = new HashMap();
+        Map<String, Iterator<String>> results = new HashMap<String, Iterator<String>>();
         results.put("sets", sets.iterator());
 
         return results;

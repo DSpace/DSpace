@@ -62,7 +62,7 @@ public class SolrLogger
 
     private static final boolean useProxies;
 
-    private static Map metadataStorageInfo;
+    private static Map<String, String> metadataStorageInfo;
 
     static
     {
@@ -121,7 +121,7 @@ public class SolrLogger
 
         log.info("useProxies=" + useProxies);
 
-        metadataStorageInfo = new HashMap();
+        metadataStorageInfo = new HashMap<String, String>();
         int count = 1;
         String metadataVal;
         while ((metadataVal = ConfigurationManager.getProperty("solr.metadata.item." + count)) != null)
@@ -240,7 +240,7 @@ public class SolrLogger
                 // Store the metadata
                 for (Object storedField : metadataStorageInfo.keySet())
                 {
-                    String dcField = (String) metadataStorageInfo
+                    String dcField = metadataStorageInfo
                             .get(storedField);
 
                     DCValue[] vals = item.getMetadata(dcField.split("\\.")[0],
@@ -268,7 +268,7 @@ public class SolrLogger
         }
     }
 
-    public static Map getMetadataStorageInfo()
+    public static Map<String, String> getMetadataStorageInfo()
     {
         return metadataStorageInfo;
     }

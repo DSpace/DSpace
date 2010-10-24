@@ -135,7 +135,7 @@ public class DSpaceLocaleAction extends ServiceableAction implements Configurabl
                               false);
 
         // Set up a map for sitemap parameters
-        Map map = new HashMap();
+        Map<String, String> map = new HashMap<String, String>();
         map.put("language", locale.getLanguage());
         map.put("country", locale.getCountry());
         map.put("variant", locale.getVariant());
