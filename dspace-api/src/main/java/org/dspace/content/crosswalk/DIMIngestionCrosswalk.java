@@ -63,7 +63,7 @@ import org.jdom.Namespace;
 public class DIMIngestionCrosswalk
     implements IngestionCrosswalk
 {
-    private static Namespace DIM_NS = Namespace.getNamespace("http://www.dspace.org/xmlns/dspace/dim");
+    private static final Namespace DIM_NS = Namespace.getNamespace("http://www.dspace.org/xmlns/dspace/dim");
 
 	public void ingest(Context context, DSpaceObject dso, List<Element> metadata) throws CrosswalkException, IOException, SQLException, AuthorizeException {
         Element first = metadata.get(0);

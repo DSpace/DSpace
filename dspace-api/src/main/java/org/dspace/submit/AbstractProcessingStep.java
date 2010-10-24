@@ -121,7 +121,7 @@ public abstract class AbstractProcessingStep
     /** Maps each status/error flag to a textual, human understandable message * */
     private Map<Integer, String> errorMessages = null;
 
-    private static String ERROR_FIELDS_ATTRIBUTE = "dspace.submit.error_fields";
+    private static final String ERROR_FIELDS_ATTRIBUTE = "dspace.submit.error_fields";
     
 
     /**

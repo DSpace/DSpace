@@ -63,8 +63,8 @@ import org.jdom.Namespace;
 public class OAIDCIngestionCrosswalk
     implements IngestionCrosswalk
 {
-    private static Namespace DC_NS = Namespace.getNamespace("http://www.dspace.org/xmlns/dspace/dim");
-    private static Namespace OAI_DC_NS = Namespace.getNamespace("http://www.openarchives.org/OAI/2.0/oai_dc/");
+    private static final Namespace DC_NS = Namespace.getNamespace("http://www.dspace.org/xmlns/dspace/dim");
+    private static final Namespace OAI_DC_NS = Namespace.getNamespace("http://www.openarchives.org/OAI/2.0/oai_dc/");
     
 	public void ingest(Context context, DSpaceObject dso, List<Element> metadata) throws CrosswalkException, IOException, SQLException, AuthorizeException {
         Element wrapper = new Element("wrap", metadata.get(0).getNamespace());

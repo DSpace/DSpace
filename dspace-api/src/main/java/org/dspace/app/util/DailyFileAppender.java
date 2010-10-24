@@ -71,7 +71,7 @@ public class DailyFileAppender extends FileAppender
     /**
      * The fixed date pattern to be used if one is not specified.
      */
-    private static String DATE_PATTERN = "yyyy-MM-dd";
+    private static final String DATE_PATTERN = "yyyy-MM-dd";
 
     /**
      * The folder under which daily folders are created. This can be a absolute path

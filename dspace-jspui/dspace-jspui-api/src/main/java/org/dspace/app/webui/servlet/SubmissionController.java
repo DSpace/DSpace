@@ -131,7 +131,7 @@ public class SubmissionController extends DSpaceServlet
     public static final int WORKFLOW_FIRST_STEP = 0;
     
     /** path to the JSP shown once the submission is completed */
-    private static String COMPLETE_JSP = "/submit/complete.jsp";
+    private static final String COMPLETE_JSP = "/submit/complete.jsp";
 
     /** log4j logger */
     private static Logger log = Logger

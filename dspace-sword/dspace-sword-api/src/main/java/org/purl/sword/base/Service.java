@@ -93,7 +93,7 @@ public class Service extends XmlElement implements SwordElementInterface
    /**
     * The XML NAME (prefix, local name and namespace) for this element.
     */
-   private static XmlName XML_NAME =
+   private static final XmlName XML_NAME =
            new XmlName(Namespaces.PREFIX_APP, "service", Namespaces.NS_APP);
 
 
