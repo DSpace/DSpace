@@ -38,7 +38,6 @@
 package org.dspace.app.bulkedit;
 
 import org.apache.commons.cli.*;
-import org.apache.log4j.Logger;
 
 import org.dspace.content.*;
 import org.dspace.core.Constants;

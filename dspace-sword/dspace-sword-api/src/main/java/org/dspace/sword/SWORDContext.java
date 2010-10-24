@@ -42,7 +42,6 @@ import java.sql.SQLException;
 
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.apache.log4j.Logger;
 
 /**
  * This class holds information about authenticated users (both the

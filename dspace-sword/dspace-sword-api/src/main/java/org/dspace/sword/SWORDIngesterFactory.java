@@ -47,7 +47,6 @@ import org.dspace.content.Item;
 import org.purl.sword.base.Deposit;
 import org.purl.sword.base.SWORDErrorException;
 import org.purl.sword.base.ErrorCodes;
-import org.apache.log4j.Logger;
 
 /**
  * Factory class which will mint objects conforming to the

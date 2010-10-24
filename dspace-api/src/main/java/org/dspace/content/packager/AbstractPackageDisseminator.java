@@ -37,13 +37,6 @@
  */
 package org.dspace.content.packager;
 
-import org.apache.log4j.Logger;
-
-import java.io.File;
-import java.io.IOException;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
@@ -53,6 +46,12 @@ import org.dspace.content.ItemIterator;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+
+import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * An abstract implementation of a DSpace Package Disseminator, which

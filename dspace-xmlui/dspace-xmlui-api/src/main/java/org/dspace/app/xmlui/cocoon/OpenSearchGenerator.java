@@ -60,7 +60,6 @@ import org.apache.cocoon.util.HashUtil;
 import org.apache.cocoon.xml.dom.DOMStreamer;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.ExpiresValidity;
-import org.apache.log4j.Logger;
 
 import org.dspace.app.util.OpenSearch;
 import org.dspace.app.xmlui.utils.ContextUtil;

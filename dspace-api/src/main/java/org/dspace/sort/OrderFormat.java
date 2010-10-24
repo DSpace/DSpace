@@ -40,13 +40,7 @@
 
 package org.dspace.sort;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.dspace.core.PluginManager;
-import org.dspace.sort.OrderFormatDelegate;
-import org.dspace.sort.OrderFormatAuthor;
-import org.dspace.sort.OrderFormatTitle;
-import org.dspace.sort.OrderFormatText;
 
 /**
  * Class implementing static helpers for anywhere that interacts with the sort columns

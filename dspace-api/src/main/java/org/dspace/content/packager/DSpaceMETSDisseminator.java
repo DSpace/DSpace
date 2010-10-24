@@ -44,7 +44,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;

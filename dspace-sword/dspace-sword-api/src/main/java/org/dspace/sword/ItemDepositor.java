@@ -44,7 +44,6 @@ import org.dspace.authorize.AuthorizeException;
 import org.purl.sword.base.Deposit;
 import org.purl.sword.base.SWORDErrorException;
 import org.purl.sword.base.ErrorCodes;
-import org.apache.log4j.Logger;
 
 import java.io.*;
 import java.sql.SQLException;

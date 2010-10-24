@@ -61,8 +61,6 @@ import org.dspace.app.xmlui.wing.element.Button;
 import org.dspace.authorize.AuthorizeException;
 import org.xml.sax.SAXException;
 
-import org.apache.log4j.Logger;
-
 /**
  * Create the "lookup" popup window for Choice Control.  It loads a selector
  * via AJAX request, and transfers values (both text and authority/confidence)

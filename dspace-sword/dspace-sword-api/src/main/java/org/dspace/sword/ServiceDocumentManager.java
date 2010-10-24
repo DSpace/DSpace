@@ -48,7 +48,6 @@ import org.dspace.content.Community;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.apache.log4j.Logger;
 
 import java.util.List;
 

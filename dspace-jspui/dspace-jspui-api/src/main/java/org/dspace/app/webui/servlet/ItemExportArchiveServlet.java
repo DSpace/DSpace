@@ -52,7 +52,6 @@ import org.apache.log4j.Logger;
 import org.dspace.app.itemexport.ItemExport;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;

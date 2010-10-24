@@ -44,8 +44,6 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;

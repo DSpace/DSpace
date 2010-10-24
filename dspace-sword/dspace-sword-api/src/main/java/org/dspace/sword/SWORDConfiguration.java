@@ -44,7 +44,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.BitstreamFormat;
 import org.purl.sword.base.SWORDErrorException;
-import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;

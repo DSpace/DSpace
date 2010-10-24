@@ -49,7 +49,6 @@ import org.purl.sword.base.Deposit;
 import org.purl.sword.atom.Author;
 import org.purl.sword.atom.Contributor;
 import org.purl.sword.atom.Generator;
-import org.apache.log4j.Logger;
 
 /**
  * Class to represent a DSpace Item as an ATOM Entry.  This

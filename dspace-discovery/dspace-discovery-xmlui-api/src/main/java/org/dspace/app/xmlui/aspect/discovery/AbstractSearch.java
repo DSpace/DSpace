@@ -40,7 +40,6 @@
 package org.dspace.app.xmlui.aspect.discovery;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
-import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
@@ -57,10 +56,8 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.LogManager;
 import org.dspace.discovery.*;
-import org.dspace.handle.HandleManager;
 import org.dspace.sort.SortOption;
 import org.xml.sax.SAXException;
 

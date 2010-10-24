@@ -46,7 +46,6 @@ import org.purl.sword.base.Namespaces;
 import org.purl.sword.base.SwordElementInterface;
 import org.purl.sword.base.UnmarshallException;
 import org.purl.sword.base.XmlElement;
-import org.apache.log4j.Logger;
 import org.purl.sword.base.SwordValidationInfo;
 import org.purl.sword.base.SwordValidationInfoType;
 import org.purl.sword.base.XmlName;

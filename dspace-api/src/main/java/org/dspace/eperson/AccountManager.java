@@ -39,8 +39,6 @@ package org.dspace.eperson;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.Calendar;
 import java.util.Locale;
 
 import javax.mail.MessagingException;

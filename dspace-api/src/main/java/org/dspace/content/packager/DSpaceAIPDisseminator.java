@@ -45,7 +45,6 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
 
-import org.apache.log4j.Logger;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;

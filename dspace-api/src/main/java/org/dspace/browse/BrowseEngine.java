@@ -39,7 +39,6 @@
 package org.dspace.browse;
 
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 

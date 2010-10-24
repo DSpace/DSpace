@@ -40,8 +40,6 @@ package org.dspace.eperson;
 
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
-
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.content.Item;

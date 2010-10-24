@@ -41,8 +41,6 @@ package org.dspace.app.util;
 import java.util.Map;
 import java.io.Serializable;
 
-import org.apache.log4j.Logger;
-
 /**
  * Class representing configuration for a single step within an Item Submission
  * Process. In other words, this is a single step in the SubmissionConfig class.

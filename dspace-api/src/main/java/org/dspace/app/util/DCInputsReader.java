@@ -47,8 +47,6 @@ import org.xml.sax.SAXException;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
 
-import org.apache.log4j.Logger;
-
 import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
 

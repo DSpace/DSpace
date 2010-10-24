@@ -48,7 +48,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.authorize.AuthorizeException;
-import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
 import java.io.IOException;

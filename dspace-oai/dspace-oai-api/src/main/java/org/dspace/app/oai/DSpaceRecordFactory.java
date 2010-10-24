@@ -45,7 +45,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.log4j.Logger;
 import org.dspace.content.DCDate;
 import org.dspace.search.HarvestedItemInfo;
 

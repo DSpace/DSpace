@@ -40,8 +40,6 @@ import java.util.Properties;
 import nu.xom.Attribute;
 import nu.xom.Element;
 
-import org.apache.log4j.Logger;
-
 /**
  * Extension of the SWORD Entry class, specialized for Error Documents. 
  * 

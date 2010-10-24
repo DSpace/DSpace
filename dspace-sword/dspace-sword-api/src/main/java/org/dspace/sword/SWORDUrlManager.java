@@ -47,7 +47,6 @@ import org.dspace.handle.HandleManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.purl.sword.base.SWORDErrorException;
-import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
 import java.net.URL;

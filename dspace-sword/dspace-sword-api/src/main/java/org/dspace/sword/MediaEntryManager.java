@@ -40,7 +40,6 @@ package org.dspace.sword;
 import org.purl.sword.base.AtomDocumentResponse;
 import org.purl.sword.base.SWORDErrorException;
 import org.purl.sword.base.SWORDEntry;
-import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Bitstream;
 

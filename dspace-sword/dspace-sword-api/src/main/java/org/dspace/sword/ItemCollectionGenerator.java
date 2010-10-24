@@ -40,7 +40,6 @@ package org.dspace.sword;
 import org.purl.sword.base.Collection;
 import org.dspace.content.*;
 import org.dspace.core.Context;
-import org.apache.log4j.Logger;
 
 import java.util.List;
 
