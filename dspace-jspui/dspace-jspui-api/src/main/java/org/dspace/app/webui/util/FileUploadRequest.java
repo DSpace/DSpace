@@ -62,10 +62,6 @@ import org.dspace.core.ConfigurationManager;
  */
 public class FileUploadRequest extends HttpServletRequestWrapper
 {
-
-    /** Multipart request */
-    private List<FileItem> items = null;
-
     private Map<String, String> parameters = new HashMap<String, String>();
 
     private Map<String, FileItem> fileitems = new HashMap<String, FileItem>();
@@ -102,7 +98,7 @@ public class FileUploadRequest extends HttpServletRequestWrapper
         try
         {
             upload.setSizeMax(maxSize);
-            items = upload.parseRequest(req);
+            List<FileItem> items = upload.parseRequest(req);
             for (FileItem item : items)
             {
                 if (item.isFormField())

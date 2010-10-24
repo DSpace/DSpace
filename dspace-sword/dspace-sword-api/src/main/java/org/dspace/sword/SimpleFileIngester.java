@@ -61,10 +61,8 @@ import java.io.IOException;
  */
 public class SimpleFileIngester implements SWORDIngester
 {
-	/** sword service implementation */
-	private SWORDService swordService;
 
-	/**
+    /**
 	 * perform the ingest using the given deposit object onto the specified
 	 * target dspace object, using the sword service implementation
 	 *
@@ -87,7 +85,7 @@ public class SimpleFileIngester implements SWORDIngester
 			Item item = (Item) target;
 
 			// now set the sword service
-			swordService = service;
+            SWORDService swordService = service;
 
 			// get the things out of the service that we need
 			Context context = swordService.getContext();

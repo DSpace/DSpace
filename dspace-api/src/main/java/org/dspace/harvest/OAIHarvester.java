@@ -150,9 +150,8 @@ public class OAIHarvester {
     private static DOMBuilder db = new DOMBuilder();
     
     // The point at which this thread should terminate itself
-	private Date expirationTime;
-	
-	/* Initialize the harvester with a collection object */
+
+    /* Initialize the harvester with a collection object */
 	public OAIHarvester(Context c, DSpaceObject dso, HarvestedCollection hc) throws HarvestingException, SQLException 
 	{
 		if (dso.getType() != Constants.COLLECTION)
@@ -336,7 +335,7 @@ public class OAIHarvester {
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTime(startTime);
 			calendar.add(Calendar.HOUR, expirationInterval);
-			expirationTime = calendar.getTime();
+            Date expirationTime = calendar.getTime();
 			
 			// main loop to keep requesting more objects until we're done
 			List<Element> records;

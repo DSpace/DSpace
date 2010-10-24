@@ -82,9 +82,6 @@ public class BrowseItem extends DSpaceObject
 
     /** item handle */
 	private String handle = null;
-    
-	/** inner item, if we really absolutely have to instantiate it */
-	private Item item;
 
     /**
 	 * Construct a new browse item with the given context and the database id
@@ -336,7 +333,7 @@ public class BrowseItem extends DSpaceObject
     	throws SQLException
     {
     	// instantiate an item for this one.  Not nice.
-    	item = Item.find(context, id);
+        Item item = Item.find(context, id);
     	
     	if (item == null)
     	{
