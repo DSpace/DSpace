@@ -242,7 +242,10 @@ public class MetadataImportServlet extends DSpaceServlet
         session.setAttribute("csv", csv);
 
         // Remove temp file
-        f.delete();
+        if (!f.delete())
+        {
+            log.error("Unable to delete upload file");
+        }
 
         // Return the changes
         return changes;

@@ -69,7 +69,6 @@ import org.apache.log4j.spi.LoggingEvent;
  */
 public class DailyFileAppender extends FileAppender
 {
-	private static Logger log = Logger.getLogger(DailyFileAppender.class);
     /**
      * The fixed date pattern to be used if one is not specified.
      */
@@ -294,7 +293,7 @@ public class DailyFileAppender extends FileAppender
 		        	File[] logArr = logDir.listFiles();
 		        	for (File curLog : logArr)
 		        	{
-        				log.info("Comparing '" + curLog.getAbsolutePath() + "' to '" + mstrFileName + "'");
+        				LogLog.debug("Comparing '" + curLog.getAbsolutePath() + "' to '" + mstrFileName + "'");
 		        		String name = curLog.getAbsolutePath();
 
 		        		// First, see if we are not using hostname, or the log file ends with this host
@@ -326,8 +325,11 @@ public class DailyFileAppender extends FileAppender
 			        			// If we have a 'current' entry at this point, it's a log we don't want
 			        			if (curLog != null)
 			        			{
-			        				log.info("Deleting log " + curLog.getName());
-		        					curLog.delete();
+			        				LogLog.debug("Deleting log " + curLog.getName());
+		        					if (curLog.delete())
+                                    {
+                                        LogLog.error("Unable to delete log file");
+                                    }
 			        			}
 			        		}
 		                }

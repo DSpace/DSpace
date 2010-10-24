@@ -54,6 +54,7 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.apache.xpath.XPathAPI;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -99,6 +100,8 @@ import org.xml.sax.SAXException;
  */
 public class ItemImport
 {
+    private static final Logger log = Logger.getLogger(ItemImport.class);
+
     static boolean useWorkflow = false;
 
     static boolean useWorkflowSendEmail = false;
@@ -362,7 +365,10 @@ public class ItemImport
                 System.exit(1);
             }
             File tempdir = new File(ziptempdir);
-            tempdir.mkdirs();
+            if (!tempdir.exists() && !tempdir.mkdirs())
+            {
+                log.error("Unable to create temporary directory");
+            }
             sourcedir = ziptempdir + System.getProperty("file.separator") + line.getOptionValue("z");
             ziptempdir = ziptempdir + System.getProperty("file.separator") +
                          line.getOptionValue("z") + System.getProperty("file.separator");
@@ -463,7 +469,10 @@ public class ItemImport
                     entry = (ZipEntry)entries.nextElement();
                     if (entry.isDirectory())
                     {
-                        new File(ziptempdir + entry.getName()).mkdir();
+                        if (!new File(ziptempdir + entry.getName()).mkdir())
+                        {
+                            log.error("Unable to create contents directory");
+                        }
                     }
                     else
                     {
@@ -1703,7 +1712,10 @@ public class ItemImport
                 }
                 else
                 {
-                    files[i].delete();
+                    if (!files[i].delete())
+                    {
+                        log.error("Unable to delete file: " + files[i].getName());
+                    }
                 }
             }
         }

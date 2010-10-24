@@ -256,7 +256,10 @@ public class XPDF2Thumbnail extends MediaFilter
             // this will get "-000001.ppm" appended to it by pdftoppm
             File outPrefixF = File.createTempFile("prevu","out");
             String outPrefix = outPrefixF.toString();
-            outPrefixF.delete();
+            if (!outPrefixF.delete())
+            {
+                log.error("Unable to delete output file");
+            }
             String pdfCmd[] = XPDF_PDFTOPPM_COMMAND.clone();
             pdfCmd[0] = pdftoppmPath;
             pdfCmd[pdfCmd.length-3] = String.valueOf(dpi);

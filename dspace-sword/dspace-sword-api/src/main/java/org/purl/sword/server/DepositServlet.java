@@ -379,7 +379,10 @@ public class DepositServlet extends HttpServlet {
 			// Try deleting the temp file
 			if (filename != null) {
 				File f = new File(filename);
-				f.delete();
+				if (f != null && !f.delete())
+                {
+                    log.error("Unable to delete file: " + filename);
+                }
 			}
 		}
 	}

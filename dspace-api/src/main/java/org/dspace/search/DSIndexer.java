@@ -233,7 +233,10 @@ public class DSIndexer
         if(!IndexReader.indexExists(index_directory))
     	{
     		try {
-    			new File(index_directory).mkdirs();
+    			if (!new File(index_directory).mkdirs())
+                {
+                    log.error("Unable to create index directory: " + index_directory);   
+                }
 				openIndex(true).close();
 			} catch (IOException e) {
                 throw new RuntimeException(

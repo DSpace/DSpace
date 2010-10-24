@@ -372,7 +372,10 @@ public class DailyReportEmailer
             {
                 if (report.exists())
                 {
-                    report.delete();
+                    if (!report.delete())
+                    {
+                        log.error("Unable to delete report file");
+                    }
                 }
             }
         }

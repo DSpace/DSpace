@@ -657,7 +657,10 @@ public class ItemExport
                                     .lastIndexOf(File.separator));
                             File fdirs = new File(destDir + File.separator
                                     + dirs);
-                            fdirs.mkdirs();
+                            if (!fdirs.exists() && !fdirs.mkdirs())
+                            {
+                                log.error("Unable to create destination directory");
+                            }
                         }
 
                         File fout = new File(destDir, myName);
@@ -728,15 +731,15 @@ public class ItemExport
                          zipFileName;
 
         File wkDir = new File(workDir);
-        if (!wkDir.exists())
+        if (!wkDir.exists() && !wkDir.mkdirs())
         {
-            wkDir.mkdirs();
+            log.error("Unable to create working direcory");
         }
 
         File dnDir = new File(destDirName);
-        if (!dnDir.exists())
+        if (!dnDir.exists() && !dnDir.mkdirs())
         {
-            dnDir.mkdirs();
+            log.error("Unable to create destination directory");
         }
 
         // export the items using normal export method
@@ -999,15 +1002,15 @@ public class ItemExport
                                 .getID());
 
                         File wkDir = new File(workDir);
-                        if (!wkDir.exists())
+                        if (!wkDir.exists() && !wkDir.mkdirs())
                         {
-                            wkDir.mkdirs();
+                            log.error("Unable to create working directory");
                         }
 
                         File dnDir = new File(downloadDir);
-                        if (!dnDir.exists())
+                        if (!dnDir.exists() && !dnDir.mkdirs())
                         {
-                            dnDir.mkdirs();
+                            log.error("Unable to create download directory");
                         }
 
                         // export the items using normal export method
@@ -1298,7 +1301,10 @@ public class ItemExport
             {
                 if (file.lastModified() < now.getTimeInMillis())
                 {
-                    file.delete();
+                    if (!file.delete())
+                    {
+                        log.error("Unable to delete export file");
+                    }
                 }
             }
         }
@@ -1332,7 +1338,10 @@ public class ItemExport
                 {
                     if (file.lastModified() < now.getTimeInMillis())
                     {
-                        file.delete();
+                        if (!file.delete())
+                        {
+                            log.error("Unable to delete old files");
+                        }
                     }
                 }
 
@@ -1427,7 +1436,10 @@ public class ItemExport
             File targetFile = new File(tempFileName);
             if (!targetFile.exists())
             {
-                targetFile.createNewFile();
+                if (!targetFile.createNewFile())
+                {
+                    log.error("Unable to create target file");
+                }
             }
             FileOutputStream fos = new FileOutputStream(tempFileName);
             cpZipOutputStream = new ZipOutputStream(fos);
@@ -1441,7 +1453,10 @@ public class ItemExport
             System.gc();
 
             deleteDirectory(cpFile);
-            targetFile.renameTo(new File(target));
+            if (!targetFile.renameTo(new File(target)))
+            {
+                log.error("Unable to rename file");
+            }
         }
         finally
         {
@@ -1514,7 +1529,10 @@ public class ItemExport
                 }
                 else
                 {
-                    files[i].delete();
+                    if (!files[i].delete())
+                    {
+                        log.error("Unable to delete file: " + files[i].getName());
+                    }
                 }
             }
         }

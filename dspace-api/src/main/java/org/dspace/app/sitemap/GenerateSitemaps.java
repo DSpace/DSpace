@@ -186,7 +186,10 @@ public class GenerateSitemaps
 
         File outputDir = new File(ConfigurationManager.getProperty("sitemap.dir"));
         if (!outputDir.exists()) {
-        	outputDir.mkdir();
+        	if (!outputDir.mkdir())
+            {
+                log.error("Unable to create output directory");
+            }
         }
         
         AbstractGenerator html = null;

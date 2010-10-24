@@ -174,7 +174,10 @@ public class FlowMetadataImportUtils
 
                         // Process CSV without import
                         DSpaceCSV csv = new DSpaceCSV(file, context);
-                        file.delete();
+                        if (!file.delete())
+                        {
+                            log.error("Unable to delete CSV file");
+                        }
 
                         MetadataImport mImport = new MetadataImport(context, csv.getCSVLines());
                         List<BulkEditChange> changes = mImport.runImport(false, false, false, false);

@@ -677,7 +677,10 @@ public class PackageUtils
             if((null != parentFile) && !parentFile.exists())
             {
                 //create the parent directory structure
-                parentFile.mkdirs();
+                if (!parentFile.mkdirs())
+                {
+                    log.error("Unable to create parent directory");
+                }
             }
             //create actual file
             success = file.createNewFile();

@@ -59,6 +59,7 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerConfigurationException;
 
+import org.apache.log4j.Logger;
 import org.dspace.content.ItemIterator;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
@@ -74,8 +75,9 @@ import org.w3c.dom.Document;
  *
  */
 public class ItemArchive {
+    private static final Logger log = Logger.getLogger(ItemArchive.class); 
 
-	static public final String DUBLIN_CORE_XML = "dublin_core.xml"; 
+	public static final String DUBLIN_CORE_XML = "dublin_core.xml";
 	
     private static DocumentBuilder builder = null;
     private static Transformer transformer = null;
@@ -321,7 +323,10 @@ public class ItemArchive {
 	{
 		// create directory for item
 		File dir = new File(undoDir, dirname);
-		dir.mkdir();
+		if (!dir.exists() && !dir.mkdir())
+        {
+            log.error("Unable to create undo directory");
+        }
 		
 		OutputStream out = new FileOutputStream(new File(dir, "dublin_core.xml"));
         Document doc = MetadataUtilities.writeDublinCore(getDocumentBuilder(), undoDtomList);

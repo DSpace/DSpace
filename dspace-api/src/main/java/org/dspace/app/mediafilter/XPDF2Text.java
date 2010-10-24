@@ -176,7 +176,10 @@ public class XPDF2Text extends MediaFilter
         }
         finally
         {
-            sourceTmp.delete();
+            if (!sourceTmp.delete())
+            {
+                log.error("Unable to delete temporary file");
+            }
             if (status != 0)
             {
                 log.error("PDF conversion proc failed, returns=" + status + ", file=" + sourceTmp);

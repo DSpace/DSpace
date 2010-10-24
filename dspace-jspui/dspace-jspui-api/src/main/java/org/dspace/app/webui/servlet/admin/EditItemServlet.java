@@ -861,7 +861,10 @@ public class EditItemServlet extends DSpaceServlet
         showEditForm(context, request, response, item);
 
         // Remove temp file
-        temp.delete();
+        if (!temp.delete())
+        {
+            log.error("Unable to delete temporary file");
+        }
 
         // Update DB
         context.complete();

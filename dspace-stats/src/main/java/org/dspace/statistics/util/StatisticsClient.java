@@ -39,6 +39,7 @@
 package org.dspace.statistics.util;
 
 import org.apache.commons.cli.*;
+import org.apache.log4j.Logger;
 import org.apache.tools.ant.taskdefs.Get;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.statistics.SolrLogger;
@@ -53,6 +54,8 @@ import java.net.URL;
  */
 public class StatisticsClient
 {
+    private static final Logger log = Logger.getLogger(StatisticsClient.class);
+
     /**
      * Print the help message
      *
@@ -145,7 +148,10 @@ public class StatisticsClient
 
             if(!spiders.exists())
             {
-                spiders.mkdirs();
+                if(!spiders.mkdirs())
+                {
+                    log.error("Unable to create spiders directory");
+                }
             }
 
             String[] values = urls.split(",");

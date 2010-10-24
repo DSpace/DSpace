@@ -558,7 +558,10 @@ public class CollectionWizardServlet extends DSpaceServlet
             logoBS.update();
 
             // Remove temp file
-            temp.delete();
+            if (!temp.delete())
+            {
+                log.trace("Unable to delete temporary file");
+            }
         }
 
         collection.update();

@@ -1005,7 +1005,10 @@ public class EditCommunitiesServlet extends DSpaceServlet
         JSPManager.showJSP(request, response, jsp);
 
         // Remove temp file
-        temp.delete();
+        if (!temp.delete())
+        {
+            log.error("Unable to delete temporary file");
+        }
 
         // Update DB
         context.complete();

@@ -1456,7 +1456,10 @@ public class SubmissionController extends DSpaceServlet
                     filePath = wrapper.getFilesystemName(fileName);
                 
                     // cleanup our temp file
-                    temp.delete();
+                    if (!temp.delete())
+                    {
+                        log.error("Unable to delete temporary file");
+                    }
                     
                     //save this file's info to request (for UploadStep class)
                     request.setAttribute(fileName + "-path", filePath);
