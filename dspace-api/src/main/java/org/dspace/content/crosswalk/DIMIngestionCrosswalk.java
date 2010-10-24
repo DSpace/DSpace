@@ -68,25 +68,22 @@ public class DIMIngestionCrosswalk
     private static Logger log = Logger.getLogger(DIMIngestionCrosswalk.class);    
     private static Namespace DIM_NS = Namespace.getNamespace("http://www.dspace.org/xmlns/dspace/dim");
 
-	public void ingest(Context context, DSpaceObject dso, List metadata) throws CrosswalkException, IOException, SQLException, AuthorizeException {
-	    List<Element> elements = metadata;
-
-	    Element first = elements.get(0);
-	    if (first.getName().equals("dim") && elements.size() == 1) {
-		ingest(context,dso,first);
+	public void ingest(Context context, DSpaceObject dso, List<Element> metadata) throws CrosswalkException, IOException, SQLException, AuthorizeException {
+        Element first = metadata.get(0);
+	    if (first.getName().equals("dim") && metadata.size() == 1) {
+            ingest(context,dso,first);
 	    }
 	    else if (first.getName().equals("field") && first.getParentElement() != null) {
-		ingest(context,dso,first.getParentElement());
+            ingest(context,dso,first.getParentElement());
 	    }
 	    else {
-		Element wrapper = new Element("wrap",elements.get(0).getNamespace());
-		wrapper.addContent(elements);
-		ingest(context,dso,wrapper);
+            Element wrapper = new Element("wrap", metadata.get(0).getNamespace());
+            wrapper.addContent(metadata);
+            ingest(context,dso,wrapper);
 	    }
 	}
 
 	public void ingest(Context context, DSpaceObject dso, Element root) throws CrosswalkException, IOException, SQLException, AuthorizeException {
-		
 		if (dso.getType() != Constants.ITEM)
         {
             throw new CrosswalkObjectNotSupported("DIMIngestionCrosswalk can only crosswalk an Item.");

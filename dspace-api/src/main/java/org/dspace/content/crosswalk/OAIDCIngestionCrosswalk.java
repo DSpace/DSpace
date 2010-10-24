@@ -69,10 +69,9 @@ public class OAIDCIngestionCrosswalk
     private static Namespace DC_NS = Namespace.getNamespace("http://www.dspace.org/xmlns/dspace/dim");
     private static Namespace OAI_DC_NS = Namespace.getNamespace("http://www.openarchives.org/OAI/2.0/oai_dc/");
     
-	public void ingest(Context context, DSpaceObject dso, List metadata) throws CrosswalkException, IOException, SQLException, AuthorizeException {
-		List<Element> elements = metadata;
-		Element wrapper = new Element("wrap",elements.get(0).getNamespace());
-		wrapper.addContent(elements);
+	public void ingest(Context context, DSpaceObject dso, List<Element> metadata) throws CrosswalkException, IOException, SQLException, AuthorizeException {
+        Element wrapper = new Element("wrap", metadata.get(0).getNamespace());
+		wrapper.addContent(metadata);
 		
 		ingest(context,dso,wrapper);
 	}

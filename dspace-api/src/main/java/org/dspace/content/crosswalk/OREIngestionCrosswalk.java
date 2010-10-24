@@ -100,17 +100,16 @@ public class OREIngestionCrosswalk
 
     
 
-	public void ingest(Context context, DSpaceObject dso, List metadata) throws CrosswalkException, IOException, SQLException, AuthorizeException {
+	public void ingest(Context context, DSpaceObject dso, List<Element> metadata) throws CrosswalkException, IOException, SQLException, AuthorizeException {
 
 		// If this list contains only the root already, just pass it on
-		List<Element> elements = metadata;
-		if (elements.size() == 1) {
-			ingest(context, dso, elements.get(0));
+        if (metadata.size() == 1) {
+			ingest(context, dso, metadata.get(0));
 		}
 		// Otherwise, wrap them up 
 		else {
-			Element wrapper = new Element("wrap",elements.get(0).getNamespace());
-			wrapper.addContent(elements);
+			Element wrapper = new Element("wrap", metadata.get(0).getNamespace());
+			wrapper.addContent(metadata);
 
 			ingest(context,dso,wrapper);
 		}

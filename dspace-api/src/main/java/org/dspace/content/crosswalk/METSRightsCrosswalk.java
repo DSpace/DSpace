@@ -405,7 +405,6 @@ public class METSRightsCrosswalk
      *
      * @param context
      * @param dso
-     * @param metadata
      * @throws CrosswalkException
      * @throws IOException
      * @throws SQLException
@@ -413,7 +412,7 @@ public class METSRightsCrosswalk
      * @see RoleCrosswalk
      */
     @Override
-    public void ingest(Context context, DSpaceObject dso, List ml)
+    public void ingest(Context context, DSpaceObject dso, List<Element> ml)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
         // we cannot crosswalk METSRights to a SITE object
@@ -430,11 +429,8 @@ public class METSRightsCrosswalk
         }
 
         // Loop through each Element in the List
-        Iterator mi = ml.iterator();
-        while (mi.hasNext())
+        for (Element element : ml)
         {
-            Element element = (Element)mi.next();
-
             // if we're fed a <RightsDeclarationMD> wrapper object, recurse on its guts:
             if (element.getName().equals("RightsDeclarationMD"))
             {

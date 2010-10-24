@@ -102,7 +102,7 @@ public class PREMISCrosswalk
         ingest(context, dso, root.getChildren());
     }
 
-    public void ingest(Context context, DSpaceObject dso, List ml)
+    public void ingest(Context context, DSpaceObject dso, List<Element> ml)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
         // we only understand how to crosswalk PREMIS to a Bitstream.
@@ -114,11 +114,8 @@ public class PREMISCrosswalk
         Bitstream bitstream = (Bitstream)dso;
         String MIMEType = null;
         String bsName = null;
-        Iterator mi = ml.iterator();
-        while (mi.hasNext())
+        for (Element me : ml)
         {
-            Element me = (Element)mi.next();
-
             if (me.getName().equals("premis"))
             {
                 // if we're fed a <premis> wrapper object, recurse on its guts:

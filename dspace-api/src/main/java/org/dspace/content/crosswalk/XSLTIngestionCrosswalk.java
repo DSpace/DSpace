@@ -91,13 +91,11 @@ public class XSLTIngestionCrosswalk
     }
 
     // apply metadata values returned in DIM to the target item.
-    private static void applyDim(List dimList, Item item)
+    private static void applyDim(List<Element> dimList, Item item)
         throws MetadataValidationException
     {
-        Iterator di = dimList.iterator();
-        while (di.hasNext())
+        for (Element elt : dimList)
         {
-            Element elt = (Element)di.next();
             if ("field".equals(elt.getName()) && DIM_NS.equals(elt.getNamespace()))
             {
                 applyDimField(elt, item);
@@ -151,7 +149,7 @@ public class XSLTIngestionCrosswalk
      * these correspond directly to Item.addMetadata() calls so
      * they are simply executed.
      */
-    public void ingest(Context context, DSpaceObject dso, List metadata)
+    public void ingest(Context context, DSpaceObject dso, List<Element> metadata)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
@@ -233,7 +231,7 @@ public class XSLTIngestionCrosswalk
         ingestDIM(context, dso, dim.getChildren());
     }
 
-    public static void ingestDIM(Context context, DSpaceObject dso, List fields)
+    public static void ingestDIM(Context context, DSpaceObject dso, List<Element> fields)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
@@ -246,10 +244,8 @@ public class XSLTIngestionCrosswalk
         else if (type == Constants.COLLECTION ||
                  type == Constants.COMMUNITY)
         {
-            Iterator di = fields.iterator();
-            while (di.hasNext())
+            for (Element field : fields)
             {
-                Element field = (Element)di.next();
                 String schema = field.getAttributeValue("mdschema");
                 if ("dim".equals(field.getName()) && DIM_NS.equals(field.getNamespace()))
                 {

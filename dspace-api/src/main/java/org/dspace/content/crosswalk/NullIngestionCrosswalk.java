@@ -84,7 +84,7 @@ public class NullIngestionCrosswalk
                 outputPretty.outputString(root));
     }
 
-    public void ingest(Context context, DSpaceObject dso, List ml)
+    public void ingest(Context context, DSpaceObject dso, List<Element> ml)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
         // drop xml on the floor but mention what we're missing for debugging:

@@ -362,7 +362,7 @@ public class AIPTechMDCrosswalk
      * they are simply executed.
      */
     @Override
-    public void ingest(Context context, DSpaceObject dso, List dimList)
+    public void ingest(Context context, DSpaceObject dso, List<Element> dimList)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
@@ -374,10 +374,8 @@ public class AIPTechMDCrosswalk
         int bsfSupport = BitstreamFormat.KNOWN;
         boolean bsfInternal = false;
 
-        Iterator di = dimList.iterator();
-        while (di.hasNext())
+        for (Element field : dimList)
         {
-            Element field = (Element)di.next();
 
             // if we get <dim> in a list, recurse.
             if (field.getName().equals("dim") && field.getNamespace().equals(XSLTCrosswalk.DIM_NS))

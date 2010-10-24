@@ -198,7 +198,7 @@ public class AIPDIMCrosswalk
      * Fields correspond directly to Item.addMetadata() calls so
      * they are simply executed.
      */
-    public void ingest(Context context, DSpaceObject dso, List dimList)
+    public void ingest(Context context, DSpaceObject dso, List<Element> dimList)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {

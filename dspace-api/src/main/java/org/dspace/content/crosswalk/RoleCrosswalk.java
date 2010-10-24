@@ -285,7 +285,7 @@ public class RoleCrosswalk
      * @throws AuthorizeException
      */
     @Override
-    public void ingest(Context context, DSpaceObject dso, List metadata)
+    public void ingest(Context context, DSpaceObject dso, List<Element> metadata)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
         if(!metadata.isEmpty())

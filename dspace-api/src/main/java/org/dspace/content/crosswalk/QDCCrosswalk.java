@@ -463,7 +463,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
         ingest(context, dso, root.getChildren());
     }
 
-    public void ingest(Context context, DSpaceObject dso, List ml)
+    public void ingest(Context context, DSpaceObject dso, List<Element> ml)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
         init();
@@ -476,10 +476,8 @@ public class QDCCrosswalk extends SelfNamedPlugin
 
         Item item = (Item)dso;
 
-        Iterator mi = ml.iterator();
-        while (mi.hasNext())
+        for (Element me : ml)
         {
-            Element me = (Element)mi.next();
             String key = makeQualifiedTagName(me);
 
             // if the root element gets passed here, recurse:
