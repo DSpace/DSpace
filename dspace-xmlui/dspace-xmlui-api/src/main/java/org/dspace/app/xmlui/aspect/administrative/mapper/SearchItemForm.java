@@ -103,7 +103,7 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
 		Collection collection = Collection.find(context,collectionID);	
 		
 		String query = URLDecode(parameters.getParameter("query",null));
-		ArrayList<Item> items = preformSearch(collection,query);
+		java.util.List<Item> items = preformSearch(collection,query);
 		
 		
 		
@@ -189,7 +189,7 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
 	 * @param collection The collection to mapp into
 	 * @param query The search query.
 	 */
-	private ArrayList<Item> preformSearch(Collection collection, String query) throws SQLException, IOException
+	private java.util.List<Item> preformSearch(Collection collection, String query) throws SQLException, IOException
 	{
 		
 		// Search the repository

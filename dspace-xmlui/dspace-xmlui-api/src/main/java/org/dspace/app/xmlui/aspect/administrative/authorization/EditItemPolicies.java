@@ -196,7 +196,7 @@ public class EditItemPolicies extends AbstractDSpaceTransformer
    }
 	
 	
-	private void rowBuilder(String baseURL, Table table, ArrayList<ResourcePolicy> policies, int objectID, int objectType, int highlightID) throws WingException, SQLException 
+	private void rowBuilder(String baseURL, Table table, java.util.List<ResourcePolicy> policies, int objectID, int objectType, int highlightID) throws WingException, SQLException 
 	{
 		// If the list of policies is empty, say so
 		if (policies == null || policies.size() == 0) {

@@ -486,7 +486,10 @@ public class ItemImport
                         if (index > 0)
                         {
                             File dir = new File(ziptempdir + entry.getName().substring(0, index));
-                            dir.mkdirs();
+                            if (!dir.mkdirs())
+                            {
+                                log.error("Unable to create directory");
+                            }
                         }
                         byte[] buffer = new byte[1024];
                         int len;

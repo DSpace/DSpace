@@ -270,7 +270,7 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 	 * @param schemaName The schemaName currently being operated on.
 	 * @param errors A list of errors from previous attempts at adding new fields.
 	 */
-	public void addNewFieldForm(Division div, String schemaName, ArrayList<String> errors) throws WingException
+	public void addNewFieldForm(Division div, String schemaName, java.util.List<String> errors) throws WingException
 	{
 		Request request = ObjectModelHelper.getRequest(objectModel);
 		String elementValue = request.getParameter("newElement");
@@ -316,7 +316,7 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 	 * @param fieldID The id of the field being updated.
 	 * @param errors A list of errors from previous attempts at updaating the field.
 	 */
-	public void addUpdateFieldForm(Division div, String schemaName, int fieldID, ArrayList<String> errors) throws WingException, SQLException
+	public void addUpdateFieldForm(Division div, String schemaName, int fieldID, java.util.List<String> errors) throws WingException, SQLException
 	{
 		
 		MetadataField field = MetadataField.find(context, fieldID);
@@ -385,7 +385,7 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 	 * @param errors A list of errors.
 	 */
 	
-	public void addFieldErrors(List form, ArrayList<String> errors) throws WingException 
+	public void addFieldErrors(List form, java.util.List<String> errors) throws WingException 
 	{
 		if (errors.contains("duplicate_field"))
 		{

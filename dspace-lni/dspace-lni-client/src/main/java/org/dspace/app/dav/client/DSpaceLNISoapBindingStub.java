@@ -7,11 +7,13 @@
 
 package org.dspace.app.dav.client;
 
+import javax.xml.namespace.QName;
+
 public class DSpaceLNISoapBindingStub extends org.apache.axis.client.Stub implements org.dspace.app.dav.client.LNISoapServlet {
-    private java.util.Vector cachedSerClasses = new java.util.Vector();
-    private java.util.Vector cachedSerQNames = new java.util.Vector();
-    private java.util.Vector cachedSerFactories = new java.util.Vector();
-    private java.util.Vector cachedDeserFactories = new java.util.Vector();
+    private java.util.List<Class<LNIRemoteException>> cachedSerClasses = new java.util.ArrayList<Class<LNIRemoteException>>();
+    private java.util.List<QName> cachedSerQNames = new java.util.ArrayList<QName>();
+    private java.util.List cachedSerFactories = new java.util.ArrayList();
+    private java.util.List cachedDeserFactories = new java.util.ArrayList();
 
     static org.apache.axis.description.OperationDesc [] _operations;
 
@@ -127,7 +129,7 @@ public class DSpaceLNISoapBindingStub extends org.apache.axis.client.Stub implem
             super.service = service;
         }
         ((org.apache.axis.client.Service)super.service).setTypeMappingVersion("1.2");
-            java.lang.Class cls;
+            Class<LNIRemoteException> cls;
             javax.xml.namespace.QName qName;
             java.lang.Class beansf = org.apache.axis.encoding.ser.BeanSerializerFactory.class;
             java.lang.Class beandf = org.apache.axis.encoding.ser.BeanDeserializerFactory.class;
@@ -177,9 +179,9 @@ public class DSpaceLNISoapBindingStub extends org.apache.axis.client.Stub implem
                     _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
                     _call.setEncodingStyle(org.apache.axis.Constants.URI_SOAP11_ENC);
                     for (int i = 0; i < cachedSerFactories.size(); ++i) {
-                        java.lang.Class cls = (java.lang.Class) cachedSerClasses.get(i);
+                        Class<LNIRemoteException> cls = cachedSerClasses.get(i);
                         javax.xml.namespace.QName qName =
-                                (javax.xml.namespace.QName) cachedSerQNames.get(i);
+                                cachedSerQNames.get(i);
                         java.lang.Object x = cachedSerFactories.get(i);
                         if (x instanceof Class) {
                             java.lang.Class sf = (java.lang.Class)

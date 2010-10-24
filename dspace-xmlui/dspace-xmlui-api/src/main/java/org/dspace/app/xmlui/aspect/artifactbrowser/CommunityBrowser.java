@@ -226,7 +226,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 	        ReferenceSet referenceSet = division.addReferenceSet("community-browser",
 	                ReferenceSet.TYPE_SUMMARY_LIST,null,"hierarchy");
 	        
-	        ArrayList<TreeNode> rootNodes = root.getChildrenOfType(Constants.COMMUNITY);
+	        java.util.List<TreeNode> rootNodes = root.getChildrenOfType(Constants.COMMUNITY);
 	        
 	        for (TreeNode node : rootNodes)
 	        {
@@ -237,7 +237,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         {
         	List list = division.addList("comunity-browser");
         	
-        	ArrayList<TreeNode> rootNodes = root.getChildrenOfType(Constants.COMMUNITY);
+        	java.util.List<TreeNode> rootNodes = root.getChildrenOfType(Constants.COMMUNITY);
  	        
  	        for (TreeNode node : rootNodes)
  	        {
@@ -261,7 +261,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         Reference objectInclude = referenceSet.addReference(dso);
         
         // Add all the sub-collections;
-        ArrayList<TreeNode> collectionNodes = node.getChildrenOfType(Constants.COLLECTION);
+        java.util.List<TreeNode> collectionNodes = node.getChildrenOfType(Constants.COLLECTION);
         if (collectionNodes != null && collectionNodes.size() > 0)
         {
             ReferenceSet collectionSet = objectInclude.addReferenceSet(ReferenceSet.TYPE_SUMMARY_LIST);
@@ -273,7 +273,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         }
         
         // Add all the sub-communities
-        ArrayList<TreeNode> communityNodes = node.getChildrenOfType(Constants.COMMUNITY);
+        java.util.List<TreeNode> communityNodes = node.getChildrenOfType(Constants.COMMUNITY);
         if (communityNodes != null && communityNodes.size() > 0)
         {
             ReferenceSet communitySet = objectInclude.addReferenceSet(ReferenceSet.TYPE_SUMMARY_LIST);
@@ -312,7 +312,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         List subList = null;
         
         // Add all the sub-collections;
-        ArrayList<TreeNode> collectionNodes = node.getChildrenOfType(Constants.COLLECTION);
+        java.util.List<TreeNode> collectionNodes = node.getChildrenOfType(Constants.COLLECTION);
         if (collectionNodes != null && collectionNodes.size() > 0)
         {
         	subList = list.addList("sub-list-"+dso.getID());
@@ -327,7 +327,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         
         
         // Add all the sub-communities
-        ArrayList<TreeNode> communityNodes = node.getChildrenOfType(Constants.COMMUNITY);
+        java.util.List<TreeNode> communityNodes = node.getChildrenOfType(Constants.COMMUNITY);
         if (communityNodes != null && communityNodes.size() > 0)
         {
         	if (subList == null)
@@ -420,7 +420,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         private int level;
 
         /** All children of this node */
-        private ArrayList<TreeNode> children = new ArrayList<TreeNode>();
+        private java.util.List<TreeNode> children = new ArrayList<TreeNode>();
 
         /** 
          * Construct a new root level node 
@@ -465,7 +465,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         /**
          * @return All children
          */
-        public ArrayList<TreeNode> getChildren()
+        public java.util.List<TreeNode> getChildren()
         {
             return children;
         }
@@ -473,9 +473,9 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         /**
          * @return All children of the given @type.
          */
-        public ArrayList<TreeNode> getChildrenOfType(int type)
+        public java.util.List<TreeNode> getChildrenOfType(int type)
         {
-            ArrayList<TreeNode> results = new ArrayList<TreeNode>();
+            java.util.List<TreeNode> results = new ArrayList<TreeNode>();
             for (TreeNode node : children)
             {
                 if (node.dso.getType() == type)

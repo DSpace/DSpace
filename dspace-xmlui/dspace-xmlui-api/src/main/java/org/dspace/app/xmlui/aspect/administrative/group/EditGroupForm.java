@@ -43,6 +43,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 import org.dspace.app.xmlui.aspect.administrative.FlowGroupUtils;
@@ -257,7 +258,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 		
 		// Get list of member groups
 		String memberGroupIDsString = parameters.getParameter("memberGroupIDs",null);
-		ArrayList<Integer> memberGroupIDs = new ArrayList<Integer>();
+		List<Integer> memberGroupIDs = new ArrayList<Integer>();
 		if (memberGroupIDsString != null)
 		{
 			for (String id : memberGroupIDsString.split(","))
@@ -271,7 +272,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	    
 		// Get list of member epeople
 		String memberEPeopleIDsString = parameters.getParameter("memberEPeopleIDs",null);
-		ArrayList<Integer> memberEPeopleIDs = new ArrayList<Integer>();
+		List<Integer> memberEPeopleIDs = new ArrayList<Integer>();
 		if (memberEPeopleIDsString != null)
 		{
 			for (String id : memberEPeopleIDsString.split(","))
@@ -294,7 +295,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	    
 	    // Get any errors
 	    String errorString = parameters.getParameter("errors",null);
-		ArrayList<String> errors = new ArrayList<String>();
+		List<String> errors = new ArrayList<String>();
 		if (errorString != null)
         {
 			for (String error : errorString.split(","))
@@ -395,7 +396,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	/**
 	 * Search for epeople to add to this group.
 	 */
-	private void addEPeopleSearch(Division div, String query, int page, Group group, ArrayList<Integer> memberEPeopleIDs) throws SQLException, WingException
+	private void addEPeopleSearch(Division div, String query, int page, Group group, List<Integer> memberEPeopleIDs) throws SQLException, WingException
 	{
 		int resultCount = EPerson.searchResultCount(context, query);
         EPerson[] epeople = EPerson.search(context, query, page*RESULTS_PER_PAGE, RESULTS_PER_PAGE);
@@ -476,7 +477,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	/**
 	 * Search for groups to add to this group.
 	 */
-	private void addGroupSearch(Division div, Group sourceGroup, String query, int page, Group parent, ArrayList<Integer> memberGroupIDs) throws WingException, SQLException
+	private void addGroupSearch(Division div, Group sourceGroup, String query, int page, Group parent, List<Integer> memberGroupIDs) throws WingException, SQLException
 	{
 		int resultCount = Group.searchResultCount(context, query);
         Group[] groups = Group.search(context, query, page*RESULTS_PER_PAGE, RESULTS_PER_PAGE);
@@ -600,7 +601,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	 * parent. This is used to avoid creating cycles like A->B, B->C, C->D, D->A which leads 
 	 * all the groups involved to essentially include themselves.  
 	 */
-	private boolean isDescendant(Group descendant, Group ancestor, ArrayList<Integer> memberGroupIDs) throws SQLException 
+	private boolean isDescendant(Group descendant, Group ancestor, List<Integer> memberGroupIDs) throws SQLException
 	{
 		Queue<Group> toVisit = new LinkedList<Group>();
 		Group currentGroup;
@@ -640,7 +641,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	 * Add a table with all the current group's members to the specified division.
 	 * @throws SQLException 
 	 */
-	private boolean addMemberList(Division div, Group parent, ArrayList<Integer> memberGroupIDs, ArrayList<Integer> memberEPeopleIDs, int highlightEPersonID, int highlightGroupID) throws WingException, SQLException
+	private boolean addMemberList(Division div, Group parent, List<Integer> memberGroupIDs, List<Integer> memberEPeopleIDs, int highlightEPersonID, int highlightGroupID) throws WingException, SQLException
 	{
 		// Flag to remember if there are any pending changes.
         boolean changes = false;
@@ -658,7 +659,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
         
         // get all group members, pend or actual
         @SuppressWarnings("unchecked") // the cast is correct
-        ArrayList<Integer> allMemberGroupIDs = (ArrayList<Integer>) memberGroupIDs.clone();
+        List<Integer> allMemberGroupIDs = new ArrayList<Integer>(memberGroupIDs);
         for (Group group : parent.getMemberGroups())
         {
         	if (!allMemberGroupIDs.contains(group.getID()))
@@ -687,7 +688,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
         
         // get all members, pend or actual
         @SuppressWarnings("unchecked") // the cast is correct
-        ArrayList<Integer> allMemberEPeopleIDs = (ArrayList<Integer>) memberEPeopleIDs.clone();
+        List<Integer> allMemberEPeopleIDs = new ArrayList<Integer>(memberEPeopleIDs);
         for (EPerson eperson : parent.getMembers())
         {
         	if (!allMemberEPeopleIDs.contains(eperson.getID()))

@@ -310,7 +310,7 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
      */
     static class XMLUIReport implements Report
     {
-        private ArrayList<Statistics> blocks = new ArrayList<Statistics>();
+        private java.util.List<Statistics> blocks = new ArrayList<Statistics>();
 
         private String mainTitle = null;
         private String pageTitle = null;

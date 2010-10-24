@@ -281,7 +281,10 @@ public class XPDF2Thumbnail extends MediaFilter
             }
             finally
             {
-                outf.delete();
+                if (!outf.delete())
+                {
+                    log.error("Unable to delete file");
+                }
             }
         }
         finally

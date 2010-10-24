@@ -133,7 +133,7 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
     private static final int FIELD_MAX_COUNT = 12;
     
     /** A cache of extracted search fields */
-    private ArrayList<SearchField> fields;
+    private java.util.List<SearchField> fields;
     
     /**
      * Add Page metadata.
@@ -408,7 +408,7 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
      * @param fields The search fields
      * @return A string
      */
-    private String buildQuery(ArrayList<SearchField> fields)
+    private String buildQuery(java.util.List<SearchField> fields)
     {
     	Perl5Util util = new Perl5Util();
     	
@@ -476,7 +476,7 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
      * @return Array of search fields
      * @throws UIException 
      */
-    public ArrayList<SearchField> getSearchFields(Request request) throws UIException
+    public java.util.List<SearchField> getSearchFields(Request request) throws UIException
 	{
     	if (this.fields != null)
         {
