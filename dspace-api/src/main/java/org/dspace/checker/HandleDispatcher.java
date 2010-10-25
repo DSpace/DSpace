@@ -57,13 +57,13 @@ public class HandleDispatcher implements BitstreamDispatcher
     private static final Logger LOG = Logger.getLogger(HandleDispatcher.class);
 
     /** Handle to retrieve bitstreams from. */
-    String handle = null;
+    private String handle = null;
 
     /** Has the type of object the handle refers to been determined. */
-    Boolean init = Boolean.FALSE;
+    private boolean init = false;
 
     /** the delegate to dispatch to. */
-    ListDispatcher delegate = null;
+    private ListDispatcher delegate = null;
 
     /**
      * Database access for retrieving bitstreams
@@ -97,7 +97,7 @@ public class HandleDispatcher implements BitstreamDispatcher
      */
     private synchronized void init()
     {
-        if (init == Boolean.FALSE)
+        if (!init)
         {
             Context context = null;
             int dsoType = -1;
@@ -149,7 +149,7 @@ public class HandleDispatcher implements BitstreamDispatcher
             }
 
             delegate = new ListDispatcher(ids);
-            init = Boolean.TRUE;
+            init = true;
         }
     }
 
@@ -160,7 +160,7 @@ public class HandleDispatcher implements BitstreamDispatcher
      */
     public int next()
     {
-        if (init == Boolean.FALSE)
+        if (!init)
         {
             init();
         }

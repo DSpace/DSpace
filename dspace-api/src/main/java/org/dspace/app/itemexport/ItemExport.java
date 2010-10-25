@@ -1346,7 +1346,10 @@ public class ItemExport
                 // If the directory is now empty then we delete it too.
                 if (dir.listFiles().length == 0)
                 {
-                    dir.delete();
+                    if (!dir.delete())
+                    {
+                        log.error("Unable to delete directory");
+                    }
                 }
             }
         }

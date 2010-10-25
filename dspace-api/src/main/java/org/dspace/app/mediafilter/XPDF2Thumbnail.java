@@ -289,7 +289,11 @@ public class XPDF2Thumbnail extends MediaFilter
         }
         finally
         {
-            sourceTmp.delete();
+            if (!sourceTmp.delete())
+            {
+                log.error("Unable to delete temporary source");
+            }
+            
             if (status != 0)
             {
                 log.error("PDF conversion proc failed, exit status=" + status + ", file=" + sourceTmp);
