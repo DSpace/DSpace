@@ -108,7 +108,7 @@ public class Workspace extends XmlElement implements SwordElementInterface
    /**
     * Initialise the object, ready for use.
     */
-   protected void initialise()
+   protected final void initialise()
    {
        collections = new ArrayList<Collection>();
        title = null; 
@@ -120,7 +120,7 @@ public class Workspace extends XmlElement implements SwordElementInterface
     * 
     * @param title The title. 
     */
-   public void setTitle( String title )
+   public final void setTitle( String title )
    {
       if( this.title == null)
       {
@@ -136,7 +136,7 @@ public class Workspace extends XmlElement implements SwordElementInterface
     * 
     * @return The title. 
     */
-   public String getTitle( )
+   public final String getTitle( )
    {
       if( title == null ) 
       {

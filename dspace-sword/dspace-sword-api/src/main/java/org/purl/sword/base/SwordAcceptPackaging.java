@@ -101,7 +101,7 @@ implements SwordElementInterface
         return XML_NAME;
     }
 
-    protected void initialise()
+    protected final void initialise()
     {
         qualityValue = null;
         content = null; 
@@ -280,7 +280,7 @@ implements SwordElementInterface
     * 
     * @return The content, expressed as a string. 
     */
-   public String getContent() {
+   public final String getContent() {
 	   return content;
    }
 
@@ -289,7 +289,7 @@ implements SwordElementInterface
     *  
     * @param content The content. 
     */
-   public void setContent(String content) 
+   public final void setContent(String content)
    {
 	   this.content = content;
 	}
@@ -299,7 +299,7 @@ implements SwordElementInterface
     * 
     * @return The type. 
     */
-   public QualityValue getQualityValue()
+   public final QualityValue getQualityValue()
    {
       return qualityValue;
    }
@@ -309,7 +309,7 @@ implements SwordElementInterface
     * 
     * @param value The type.
     */
-   public void setQualityValue(QualityValue value)
+   public final void setQualityValue(QualityValue value)
    {
       this.qualityValue = value;
    }

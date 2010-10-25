@@ -248,7 +248,7 @@ implements ActionListener, ChangeListener
     * 
     * @return The panel. 
     */
-   protected JPanel createControls( )
+   protected final JPanel createControls( )
    {
 	   file = new SWORDComboBox();
       JPanel filePanel = new JPanel(new BorderLayout());

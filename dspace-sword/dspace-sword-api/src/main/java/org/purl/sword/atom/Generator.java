@@ -116,7 +116,7 @@ public class Generator extends XmlElement implements SwordElementInterface
        return XML_NAME;
    }
 
-   protected void initialise()
+   protected final void initialise()
    {
        content = null;
        version = null;

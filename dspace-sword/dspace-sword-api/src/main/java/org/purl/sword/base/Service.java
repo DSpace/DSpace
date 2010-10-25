@@ -156,7 +156,7 @@ public class Service extends XmlElement implements SwordElementInterface
     * 
     * @return The version. 
     */
-   public String getVersion()
+   public final String getVersion()
    {
       if( swordVersion == null )
       {
@@ -170,7 +170,7 @@ public class Service extends XmlElement implements SwordElementInterface
     * 
     * @param version The version. 
     */
-   public void setVersion(String version)
+   public final void setVersion(String version)
    {
       if( version == null )
       {
@@ -187,7 +187,7 @@ public class Service extends XmlElement implements SwordElementInterface
     * 
     * @return The value. 
     */
-   public boolean isNoOp()
+   public final boolean isNoOp()
    {
        if( swordNoOp == null  )
        {
@@ -202,7 +202,7 @@ public class Service extends XmlElement implements SwordElementInterface
     * 
     * @param noOp The value. 
     */
-   public void setNoOp(boolean noOp)
+   public final void setNoOp(boolean noOp)
    {
       swordNoOp = new SwordNoOp(noOp);
    }
@@ -214,7 +214,7 @@ public class Service extends XmlElement implements SwordElementInterface
     * 
     * @return True if it has been set programmatically. Otherwise, false. 
     */
-   public boolean isNoOpSet()
+   public final boolean isNoOpSet()
    {
       if( swordNoOp == null )
       {
@@ -229,7 +229,7 @@ public class Service extends XmlElement implements SwordElementInterface
     * 
     * @return The value. 
     */
-   public boolean isVerbose()
+   public final boolean isVerbose()
    {
       if( swordVerbose == null  )
        {
@@ -244,7 +244,7 @@ public class Service extends XmlElement implements SwordElementInterface
     * 
     * @param verbose The value. 
     */
-   public void setVerbose(boolean verbose)
+   public final void setVerbose(boolean verbose)
    {
       swordVerbose = new SwordVerbose(verbose);
    }
@@ -256,7 +256,7 @@ public class Service extends XmlElement implements SwordElementInterface
     * 
     * @return True if it has been set programmatically. Otherwise, false. 
     */
-   public boolean isVerboseSet()
+   public final boolean isVerboseSet()
    {
       if( swordVerbose == null )
       {
@@ -271,7 +271,7 @@ public class Service extends XmlElement implements SwordElementInterface
     * 
     * @param maxUploadSize Max upload file size in kB
     */
-   public void setMaxUploadSize(int maxUploadSize)
+   public final void setMaxUploadSize(int maxUploadSize)
    {
       swordMaxUploadSize = new SwordMaxUploadSize(maxUploadSize);
    }
@@ -282,7 +282,7 @@ public class Service extends XmlElement implements SwordElementInterface
     * @return the maximum file upload size. If no value has been set, this will
     * be equal to Integer.MIN_VALUE. 
     */
-   public int getMaxUploadSize()
+   public final int getMaxUploadSize()
    {
 	   if( swordMaxUploadSize == null )
        {
@@ -291,12 +291,12 @@ public class Service extends XmlElement implements SwordElementInterface
        return swordMaxUploadSize.getContent();
    }
 
-   public Generator getGenerator()
+   public final Generator getGenerator()
    {
        return generator;
    }
    
-   public void setGenerator(Generator generator)
+   public final void setGenerator(Generator generator)
    {
        this.generator = generator; 
    }
@@ -306,7 +306,7 @@ public class Service extends XmlElement implements SwordElementInterface
     * 
     * @return The workspace. 
     */
-   public Iterator<Workspace> getWorkspaces()
+   public final Iterator<Workspace> getWorkspaces()
    {
       return workspaces.iterator();
    }
@@ -316,7 +316,7 @@ public class Service extends XmlElement implements SwordElementInterface
     * 
     * @return The workspaces in a List
     */
-   public List<Workspace> getWorkspacesList()
+   public final List<Workspace> getWorkspacesList()
    {
 	   return workspaces;
    }
@@ -326,7 +326,7 @@ public class Service extends XmlElement implements SwordElementInterface
     * 
     * @param workspace The workspace. 
     */
-   public void addWorkspace(Workspace workspace)
+   public final void addWorkspace(Workspace workspace)
    {
       this.workspaces.add(workspace);
    }
@@ -334,7 +334,7 @@ public class Service extends XmlElement implements SwordElementInterface
    /**
     * Clear the list of workspaces. 
     */
-   public void clearWorkspaces()
+   public final void clearWorkspaces()
    {
 	   this.workspaces.clear();
    }
@@ -344,7 +344,7 @@ public class Service extends XmlElement implements SwordElementInterface
     * 
     * @return A XOM Element that holds the data for this Content element. 
     */
-   public Element marshall( )
+   public final Element marshall( )
    {
       Element service = new Element(getQualifiedName(), Namespaces.NS_APP);
       service.addNamespaceDeclaration(Namespaces.PREFIX_ATOM, Namespaces.NS_ATOM);
@@ -391,7 +391,7 @@ public class Service extends XmlElement implements SwordElementInterface
     *                             content element or if there are problems
     *                             accessing the data. 
     */
-   public void unmarshall( Element service )
+   public final void unmarshall( Element service )
    throws UnmarshallException
    {
       unmarshall(service, null);
@@ -404,7 +404,7 @@ public class Service extends XmlElement implements SwordElementInterface
     * @return
     * @throws org.purl.sword.base.UnmarshallException
     */
-   public SwordValidationInfo unmarshall( Element service, Properties validationProperties)
+   public final SwordValidationInfo unmarshall( Element service, Properties validationProperties)
    throws UnmarshallException
    {
       if (!isInstanceOf(service, xmlName))

@@ -589,18 +589,15 @@ public class Context
     public Group[] getSpecialGroups() throws SQLException
     {
         List<Group> myGroups = new ArrayList<Group>();
-
-        Iterator<Integer> i = specialGroups.iterator();
-
-        while (i.hasNext())
+        for (Integer groupId : specialGroups)
         {
-            myGroups.add(Group.find(this, ((Integer) i.next()).intValue()));
+            myGroups.add(Group.find(this, groupId.intValue()));
         }
 
         return myGroups.toArray(new Group[myGroups.size()]);
     }
 
-    protected void finalize()
+    protected void finalize() throws Throwable
     {
         /*
          * If a context is garbage-collected, we roll back and free up the
@@ -611,13 +608,6 @@ public class Context
             abort();
         }
 
-        try
-        {
-            super.finalize();
-        }
-        catch (Throwable t)
-        {
-            log.error("Unable to finalize object", t);
-        }
+        super.finalize();
     }
 }

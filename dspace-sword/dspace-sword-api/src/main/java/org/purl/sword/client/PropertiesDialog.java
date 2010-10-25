@@ -99,7 +99,7 @@ public class PropertiesDialog
     * 
     * @return A panel that contains the controls. 
     */
-   protected JPanel createControls( )
+   protected final JPanel createControls( )
    {
       JPanel panel = new JPanel(new BorderLayout());
       propertiesTable = new JTable(new PropertiesModel());

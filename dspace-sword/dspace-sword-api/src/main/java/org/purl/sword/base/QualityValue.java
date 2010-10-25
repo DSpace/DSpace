@@ -78,7 +78,7 @@ public class QualityValue {
 	 * @param q The quality value
 	 * @throws NumberFormatException thrown if the quality value is invalid according to the SWORD specification
 	 */
-	public void setQualityValue(float q) throws NumberFormatException
+	public final void setQualityValue(float q) throws NumberFormatException
 	{
 		// Check the float is in range
 		if ((q < 0) || (q > 1))
@@ -101,7 +101,7 @@ public class QualityValue {
 	 * 
 	 * @return the quality value
 	 */
-	public float getQualityValue()
+	public final float getQualityValue()
 	{
 		return quality;
 	}

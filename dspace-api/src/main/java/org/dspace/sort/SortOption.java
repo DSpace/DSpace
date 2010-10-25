@@ -246,7 +246,7 @@ public class SortOption
 	 * 
 	 * @throws SortException
 	 */
-    public void generateMdBits()
+    private void generateMdBits()
     	throws SortException
     {
     	try

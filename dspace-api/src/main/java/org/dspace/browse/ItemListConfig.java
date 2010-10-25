@@ -141,7 +141,7 @@ public class ItemListConfig
      * @param init	the default value of the array elements
      * @return	a three element array with schema, element and qualifier respectively
      */
-    public String[] interpretField(String mfield, String init)
+    public final String[] interpretField(String mfield, String init)
     	throws IOException
     {
     	StringTokenizer sta = new StringTokenizer(mfield, ".");

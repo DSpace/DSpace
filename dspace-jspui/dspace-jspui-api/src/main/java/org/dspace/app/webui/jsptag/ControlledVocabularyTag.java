@@ -264,8 +264,7 @@ public class ControlledVocabularyTag extends TagSupport
         {
             Map<String, String> parameters = new HashMap<String, String>();
             parameters.put("filter", filter);
-            Document prunnedVocabulary = XMLUtil.transformDocument(vocabulary, parameters, vocabularyPrunningXSLT);
-            return prunnedVocabulary;
+            return XMLUtil.transformDocument(vocabulary, parameters, vocabularyPrunningXSLT);
         }
         catch (Exception e)
         {

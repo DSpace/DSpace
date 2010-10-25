@@ -44,44 +44,44 @@ public class DSORepresentation {
         this.separate = separate;
     }
 
-    public Integer getType() {
+    public final Integer getType() {
         return type;
     }
 
     /**
      * @param type Object type, e.g. Constants.COLLECTION
      */
-    public void setType(Integer type) {
+    public final void setType(Integer type) {
         this.type = type;
     }
 
-    public Integer getMax() {
+    public final Integer getMax() {
         return (max == null) ? -1 : max;
     }
 
     /**
      * @param max Maximum number of children to display
      */
-    public void setMax(Integer max) {
+    public final void setMax(Integer max) {
         this.max = max;
     }
 
-    public Integer getNameLength() {
+    public final Integer getNameLength() {
         return nameLength;
     }
 
-    public void setNameLength(Integer nameLength) {
+    public final void setNameLength(Integer nameLength) {
         this.nameLength = nameLength;
     }
 
-    public Boolean getSeparate() {
+    public final Boolean getSeparate() {
         return (separate != null) && separate;
     }
 
     /**
      * @param separate true for distinct child statistics; false to sum them
      */
-    public void setSeparate(Boolean separate) {
+    public final void setSeparate(Boolean separate) {
         this.separate = separate;
     }
 }

@@ -83,13 +83,12 @@ public abstract class AbstractWingElement implements WingElement
      * 
      * @param context
      *            (Required) The context this element is contained in.
-     * @throws WingException
      */
     protected AbstractWingElement(WingContext context)
     {
         if (context == null)
         {
-            throw new NullPointerException("Context may not be null.");
+            throw new IllegalArgumentException("Context may not be null.");
         }
         this.context = context;
     }

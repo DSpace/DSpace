@@ -313,7 +313,7 @@ public class DSpaceCSV implements Serializable
      *
      * @throws Exception if something goes wrong with adding the Item
      */
-    public void addItem(Item i) throws Exception
+    public final void addItem(Item i) throws Exception
     {
         // Create the CSV line
         DSpaceCSVLine line = new DSpaceCSVLine(i.getID());
@@ -373,7 +373,7 @@ public class DSpaceCSV implements Serializable
      * @param line The line of elements
      * @throws Exception Thrown if an error occurs when adding the item
      */
-    public void addItem(String line) throws Exception
+    public final void addItem(String line) throws Exception
     {
         // Check to see if the last character is a field separator, which hides the last empy column
         boolean last = false;
@@ -494,7 +494,7 @@ public class DSpaceCSV implements Serializable
      *
      * @return The lines
      */
-    public List<DSpaceCSVLine> getCSVLines()
+    public final List<DSpaceCSVLine> getCSVLines()
     {
         // Return the lines
         return lines;
@@ -505,7 +505,7 @@ public class DSpaceCSV implements Serializable
      *
      * @return the array of CSV formatted Strings
      */
-    public String[] getCSVLinesAsStringArray()
+    public final String[] getCSVLinesAsStringArray()
     {
         // Create the headings line
         String[] csvLines = new String[counter + 1];
@@ -533,7 +533,7 @@ public class DSpaceCSV implements Serializable
      *
      * @throws IOException Thrown if an error occurs when writing the file
      */
-    public void save(String filename) throws IOException
+    public final void save(String filename) throws IOException
     {
         // Save the file
         BufferedWriter out = new BufferedWriter(
@@ -555,7 +555,7 @@ public class DSpaceCSV implements Serializable
      * @param md The DCValue to examine
      * @return Whether or not it is OK to export this element
      */
-    private boolean okToExport(DCValue md)
+    private final boolean okToExport(DCValue md)
     {
         // First check the metadata format, and K all non DC elements
         if (!"dc".equals(md.schema))
@@ -582,7 +582,7 @@ public class DSpaceCSV implements Serializable
      *
      * @return The formatted String as a csv
      */
-    public String toString()
+    public final String toString()
     {
         // Return the csv as one long string
         StringBuffer csvLines = new StringBuffer();

@@ -127,7 +127,7 @@ implements SwordElementInterface
     /**
      * 
      */
-    protected void initialise()
+    protected final void initialise()
     {
         this.type = ContentType.TEXT;
         this.content = null; 

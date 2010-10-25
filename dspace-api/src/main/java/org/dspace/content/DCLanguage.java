@@ -91,7 +91,7 @@ public class DCLanguage
      * @param l
      *            The language and country code, e.g. "en_US" or "fr"
      */
-    public void setLanguage(String l)
+    public final void setLanguage(String l)
     {
         if(l == null)
         {

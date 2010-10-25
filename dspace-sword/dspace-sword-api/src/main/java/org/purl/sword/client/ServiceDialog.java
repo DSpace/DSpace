@@ -166,7 +166,7 @@ public class ServiceDialog
     * 
     * @return The panel that contains the controls. 
     */
-   protected JPanel createControls( )
+   protected final JPanel createControls( )
    {
       username = new SWORDComboBox();
       username.setEditable(true);

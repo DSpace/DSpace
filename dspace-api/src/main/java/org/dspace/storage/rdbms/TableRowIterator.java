@@ -111,18 +111,10 @@ public class TableRowIterator
     /**
      * Finalize -- this method is called when this object is GC-ed.
      */
-    protected void finalize()
+    protected void finalize() throws Throwable
     {
         close();
-
-        try
-        {
-            super.finalize();
-        }
-        catch (Throwable t)
-        {
-            log.error("Unable to finalize object", t);
-        }
+        super.finalize();
     }
 
     /**

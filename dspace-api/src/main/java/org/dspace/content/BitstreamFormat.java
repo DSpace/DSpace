@@ -445,7 +445,7 @@ public class BitstreamFormat
      * 
      * @return the internal identifier
      */
-    public int getID()
+    public final int getID()
     {
         return bfRow.getIntColumn("bitstream_format_id");
     }
@@ -455,7 +455,7 @@ public class BitstreamFormat
      * 
      * @return the short description
      */
-    public String getShortDescription()
+    public final String getShortDescription()
     {
         return bfRow.getStringColumn("short_description");
     }
@@ -466,7 +466,7 @@ public class BitstreamFormat
      * @param s
      *            the new short description
      */
-    public void setShortDescription(String s)
+    public final void setShortDescription(String s)
        throws SQLException
     {
         // You can not reset the unknown's registry's name
@@ -494,7 +494,7 @@ public class BitstreamFormat
      * 
      * @return the description
      */
-    public String getDescription()
+    public final String getDescription()
     {
         return bfRow.getStringColumn("description");
     }
@@ -505,7 +505,7 @@ public class BitstreamFormat
      * @param s
      *            the new description
      */
-    public void setDescription(String s)
+    public final void setDescription(String s)
     {
         bfRow.setColumn("description", s);
     }
@@ -516,7 +516,7 @@ public class BitstreamFormat
      * 
      * @return the MIME type
      */
-    public String getMIMEType()
+    public final String getMIMEType()
     {
         return bfRow.getStringColumn("mimetype");
     }
@@ -527,7 +527,7 @@ public class BitstreamFormat
      * @param s
      *            the new MIME type
      */
-    public void setMIMEType(String s)
+    public final void setMIMEType(String s)
     {
         bfRow.setColumn("mimetype", s);
     }
@@ -538,7 +538,7 @@ public class BitstreamFormat
      * 
      * @return the support level
      */
-    public int getSupportLevel()
+    public final int getSupportLevel()
     {
         return bfRow.getIntColumn("support_level");
     }
@@ -550,7 +550,7 @@ public class BitstreamFormat
      * @param sl
      *            the new support level
      */
-    public void setSupportLevel(int sl)
+    public final void setSupportLevel(int sl)
     {
         // Sanity check
         if ((sl < 0) || (sl > 2))
@@ -568,7 +568,7 @@ public class BitstreamFormat
      * 
      * @return <code>true</code> if the bitstream format is an internal type
      */
-    public boolean isInternal()
+    public final boolean isInternal()
     {
         return bfRow.getBooleanColumn("internal");
     }
@@ -580,7 +580,7 @@ public class BitstreamFormat
      *            pass in <code>true</code> if the bitstream format is an
      *            internal type
      */
-    public void setInternal(boolean b)
+    public final void setInternal(boolean b)
     {
         bfRow.setColumn("internal", b);
     }
@@ -700,7 +700,7 @@ public class BitstreamFormat
      * If you know the support level string, look up the corresponding type ID
      * constant.
      *
-     * @param action
+     * @param slevel
      *            String with the name of the action (must be exact match)
      *
      * @return the corresponding action ID, or <code>-1</code> if the action

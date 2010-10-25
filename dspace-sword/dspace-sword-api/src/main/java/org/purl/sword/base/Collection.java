@@ -130,7 +130,7 @@ public class Collection extends XmlElement implements SwordElementInterface
        return XML_NAME;
    }
 
-   protected void initialise()
+   protected final void initialise()
    {
       location = null;
       title = null;
