@@ -53,6 +53,7 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
@@ -98,6 +99,8 @@ import org.xml.sax.SAXException;
 public class WithdrawnItems extends AbstractDSpaceTransformer implements
         CacheableProcessingComponent
 {
+    private final static Logger log = Logger.getLogger(WithdrawnItems.class);
+
     /**
      * Static Messages for common text
      */
@@ -174,9 +177,13 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
                 return HashUtil.hash(key);
             }
         }
-        catch (Exception e)
+        catch (SQLException e)
         {
-            // Ignore all errors and just don't cache.
+            log.error("Database error", e);
+        }
+        catch (UIException e)
+        {
+            log.error("UI error", e);
         }
 
         return "0";
@@ -218,9 +225,13 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
 
                 validity = newValidity;
             }
-            catch (Exception e)
+            catch (SQLException e)
             {
-                // Just ignore all errors and return an invalid cache.
+                log.error("Database error", e);
+            }
+            catch (UIException e)
+            {
+                log.error("UI error", e);
             }
 
         }
@@ -979,7 +990,7 @@ class BrowseParams
 
             return key;
         }
-        catch (Exception e)
+        catch (BrowseException e)
         {
             return null; // ignore exception and return no key
         }

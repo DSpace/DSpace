@@ -44,6 +44,7 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
@@ -87,7 +88,7 @@ public class XSLTIngestionCrosswalk
 
     public static String[] getPluginNames()
     {
-        return aliases;
+        return (String[]) ArrayUtils.clone(aliases);
     }
 
     // apply metadata values returned in DIM to the target item.

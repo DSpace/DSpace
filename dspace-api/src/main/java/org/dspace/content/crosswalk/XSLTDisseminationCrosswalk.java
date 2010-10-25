@@ -104,7 +104,7 @@ public class XSLTDisseminationCrosswalk
 
     public static String[] getPluginNames()
     {
-        return aliases;
+        return (String[]) ArrayUtils.clone(aliases);
     }
 
     // namespace and schema; don't worry about initializing these

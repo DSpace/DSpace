@@ -599,34 +599,33 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 response.setHeader("Content-Disposition", "attachment;filename=" + name);
         }
 
+        ByteRange byteRange = null;
+
         // Turn off partial downloads, they cause problems
         // and are only rarely used. Specifically some windows pdf
-        // viewers are incapable of handling this request. By
-        // uncommenting the following two lines you will turn this feature back on.
-        // response.setHeader("Accept-Ranges", "bytes");
-        // String ranges = request.getHeader("Range");
-        String ranges = null;
-        
+        // viewers are incapable of handling this request. You can
+        // uncomment the following lines to turn this feature back on.
 
-        ByteRange byteRange = null;
-        if (ranges != null)
-        {
-            try
-            {
-                ranges = ranges.substring(ranges.indexOf('=') + 1);
-                byteRange = new ByteRange(ranges);
-            }
-            catch (NumberFormatException e)
-            {
-                byteRange = null;
-                if (response instanceof HttpResponse)
-                {
-                    // Respond with status 416 (Request range not
-                    // satisfiable)
-                    ((HttpResponse) response).setStatus(416);
-                }
-            }
-        }
+//        response.setHeader("Accept-Ranges", "bytes");
+//        String ranges = request.getHeader("Range");
+//        if (ranges != null)
+//        {
+//            try
+//            {
+//                ranges = ranges.substring(ranges.indexOf('=') + 1);
+//                byteRange = new ByteRange(ranges);
+//            }
+//            catch (NumberFormatException e)
+//            {
+//                byteRange = null;
+//                if (response instanceof HttpResponse)
+//                {
+//                    // Respond with status 416 (Request range not
+//                    // satisfiable)
+//                    response.setStatus(416);
+//                }
+//            }
+//        }
 
         if (byteRange != null)
         {
@@ -644,12 +643,11 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 entityRange = byteRange.toString();
             }
 
-            response.setHeader("Content-Range", entityRange + "/"
-                    + entityLength);
+            response.setHeader("Content-Range", entityRange + "/" + entityLength);
             if (response instanceof HttpResponse)
             {
                 // Response with status 206 (Partial content)
-                ((HttpResponse) response).setStatus(206);
+                response.setStatus(206);
             }
 
             int pos = 0;
@@ -657,20 +655,17 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             while ((length = this.bitstreamInputStream.read(buffer)) > -1)
             {
                 posEnd = pos + length - 1;
-                ByteRange intersection = byteRange
-                        .intersection(new ByteRange(pos, posEnd));
+                ByteRange intersection = byteRange.intersection(new ByteRange(pos, posEnd));
                 if (intersection != null)
                 {
-                    out.write(buffer, (int) intersection.getStart()
-                            - pos, (int) intersection.length());
+                    out.write(buffer, (int) intersection.getStart() - pos, (int) intersection.length());
                 }
                 pos += length;
             }
         }
         else
         {
-            response.setHeader("Content-Length", String
-                    .valueOf(this.bitstreamSize));
+            response.setHeader("Content-Length", String.valueOf(this.bitstreamSize));
 
             while ((length = this.bitstreamInputStream.read(buffer)) > -1)
             {

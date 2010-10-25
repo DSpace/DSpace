@@ -45,6 +45,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.w3c.dom.Document;
 
 import org.dspace.content.Bitstream;
@@ -161,7 +162,7 @@ public class SyndicationFeed
      */
     public static String[] getDescriptionSelectors()
     {
-        return descriptionFields;
+        return (String[]) ArrayUtils.clone(descriptionFields);
     }
 
 

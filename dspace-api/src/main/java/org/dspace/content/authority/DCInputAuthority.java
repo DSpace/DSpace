@@ -41,6 +41,8 @@ import java.util.Iterator;
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 
 import org.dspace.app.util.DCInputsReader;
@@ -107,7 +109,7 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
             pluginNames = names.toArray(new String[names.size()]);
             log.debug("Got plugin names = "+Arrays.deepToString(pluginNames));
         }
-        return pluginNames;
+        return (String[]) ArrayUtils.clone(pluginNames);
     }
 
     // once-only load of values and labels

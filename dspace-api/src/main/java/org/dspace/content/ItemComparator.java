@@ -125,19 +125,19 @@ public class ItemComparator implements Comparator
         String firstValue = getValue((Item) first);
         String secondValue = getValue((Item) second);
 
-        if ((firstValue == null) && (secondValue == null))
+        if (firstValue == null && secondValue == null)
         {
             return 0;
         }
 
-        if ((firstValue != null) && (secondValue == null))
-        {
-            return 1;
-        }
-
-        if ((firstValue == null) && (secondValue != null))
+        if (firstValue == null)
         {
             return -1;
+        }
+
+        if (secondValue == null)
+        {
+            return 1;
         }
 
         // See the javadoc for java.lang.String for an explanation
@@ -179,17 +179,12 @@ public class ItemComparator implements Comparator
      */
     private boolean _equals(String first, String second)
     {
-        if ((first == null) && (second == null))
+        if (first == null && second == null)
         {
             return true;
         }
 
-        if ((first != null) && (second == null))
-        {
-            return false;
-        }
-
-        if ((first == null) && (second != null))
+        if (first == null || second == null)
         {
             return false;
         }

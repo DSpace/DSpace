@@ -94,19 +94,19 @@ public class MediaFilterManager
     //suffix (in dspace.cfg) for input formats supported by each filter
     public static final String INPUT_FORMATS_SUFFIX = "inputFormats";
     
-    public static boolean updateIndex = true; // default to updating index
+    static boolean updateIndex = true; // default to updating index
 
-    public static boolean isVerbose = false; // default to not verbose
+    static boolean isVerbose = false; // default to not verbose
 
-    public static boolean isQuiet = false; // default is noisy
+    static boolean isQuiet = false; // default is noisy
 
-    public static boolean isForce = false; // default to not forced
+    static boolean isForce = false; // default to not forced
     
-    public static String identifier = null; // object scope limiter
+    static String identifier = null; // object scope limiter
     
-    public static int max2Process = Integer.MAX_VALUE;  // maximum number items to process
+    static int max2Process = Integer.MAX_VALUE;  // maximum number items to process
     
-    public static int processed = 0;   // number items processed
+    static int processed = 0;   // number items processed
     
     private static Item currentItem = null;   // current item being processed
     

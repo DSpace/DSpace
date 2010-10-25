@@ -1045,11 +1045,15 @@ public class ItemImport
             System.out.println("read handle: '" + result + "'");
 
         }
-        catch (Exception e)
+        catch (FileNotFoundException e)
         {
             // probably no handle file, just return null
-            System.out
-                    .println("It appears there is no handle file -- generating one");
+            System.out.println("It appears there is no handle file -- generating one");
+        }
+        catch (IOException e)
+        {
+            // probably no handle file, just return null
+            System.out.println("It appears there is no handle file -- generating one");
         }
         finally
         {

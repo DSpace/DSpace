@@ -175,7 +175,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
 
     public static String[] getPluginNames()
     {
-        return aliases;
+        return (String[]) ArrayUtils.clone(aliases);
     }
 
     // utility: return "fully qualified" name of XML element, for a

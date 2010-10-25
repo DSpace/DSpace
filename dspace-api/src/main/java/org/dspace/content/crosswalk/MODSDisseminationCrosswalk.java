@@ -139,7 +139,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
 
     public static String[] getPluginNames()
     {
-        return aliases;
+        return (String[]) ArrayUtils.clone(aliases);
     }
 
     /**

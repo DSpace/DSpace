@@ -592,12 +592,12 @@ public class LogAnalyser
         
         if (myStartDate != null)
         {
-            startDate = myStartDate;
+            startDate = new Date(myStartDate.getTime());
         }
         
         if (myEndDate != null)
         {
-            endDate = myEndDate;
+            endDate = new Date(myEndDate.getTime());
         }
         
         if (myOutFile != null)

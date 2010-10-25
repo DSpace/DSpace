@@ -45,6 +45,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.io.File;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import javax.xml.xpath.XPath;
@@ -124,7 +125,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
         	pluginNames = names.toArray(new String[names.size()]);
             log.info("Got plugin names = "+Arrays.deepToString(pluginNames));
         }
-        return pluginNames;
+        return (String[]) ArrayUtils.clone(pluginNames);
     }
 
     private void init()

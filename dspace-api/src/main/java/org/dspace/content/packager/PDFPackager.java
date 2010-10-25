@@ -47,6 +47,7 @@ import java.sql.SQLException;
 import java.util.Calendar;
 import java.util.List;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.apache.pdfbox.cos.COSDocument;
 import org.apache.pdfbox.pdfparser.PDFParser;
@@ -99,7 +100,7 @@ public class PDFPackager
 
     public static String[] getPluginNames()
     {
-        return aliases;
+        return (String[]) ArrayUtils.clone(aliases);
     }
 
     // utility to grovel bitstream formats..
@@ -128,7 +129,7 @@ public class PDFPackager
      * metadata available, it is rejected.
      * <p>
      * @param context  DSpace context.
-     * @param collection  collection under which to create new item.
+     * @param parent  collection under which to create new item.
      * @param pkgFile  The package file to ingest
      * @param params  package parameters (none recognized)
      * @param license  may be null, which takes default license.
@@ -142,8 +143,6 @@ public class PDFPackager
         throws PackageValidationException, CrosswalkException,
                AuthorizeException, SQLException, IOException
     {
-        InputStream bis = null;
-        COSDocument cos = null;
         boolean success = false;
         Bundle original = null;
         Bitstream bs = null;
@@ -183,21 +182,6 @@ public class PDFPackager
         }
         finally
         {
-            try
-            {
-                // Close bitstream input stream and PDF file.
-                if (bis != null)
-                {
-                    bis.close();
-                }
-                if (cos != null)
-                {
-                    cos.close();
-                }
-            }
-            catch (IOException ie)
-            { }
-
             // get rid of bitstream and item if ingest fails
             if (!success)
             {
