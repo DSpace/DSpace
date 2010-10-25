@@ -39,6 +39,7 @@
  */
 package org.dspace.app.harvest;
 
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -47,6 +48,7 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.IndexBrowse;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
@@ -438,10 +440,11 @@ public class Harvest
     	catch (HarvestingException hex) {
     		System.out.print("failed. ");
     		System.out.println(hex.getMessage());
-    		System.exit(1);
+    		throw new IllegalStateException("Unable to harvest", hex);
     	} catch (SQLException se) {
-			// TODO Auto-generated catch block
-			se.printStackTrace();
+            System.out.print("failed. ");
+            System.out.println(se.getMessage());
+            throw new IllegalStateException("Unable to access database", se);
 		}
     	    	
     	try {
@@ -452,12 +455,17 @@ public class Harvest
     		harvester.runHarvest();
     		context.complete();
     	}
-    	catch (Exception e) {
-			// Not much else we can do at this point
-			e.printStackTrace();
-			System.exit(1);
-		}
-    	System.out.println("Harvest complete. ");
+        catch (SQLException e) {
+            throw new IllegalStateException("Failed to run harvester", e);
+        }
+        catch (AuthorizeException e) {
+            throw new IllegalStateException("Failed to run harvester", e);
+        }
+        catch (IOException e) {
+            throw new IllegalStateException("Failed to run harvester", e);
+        }
+
+        System.out.println("Harvest complete. ");
     }
     
     

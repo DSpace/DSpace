@@ -282,6 +282,10 @@ public class OpenSearchGenerator extends AbstractGenerator
                 {
                     qResults = DSQuery.doQuery(context, qArgs, (Community)container);
                 }
+                else
+                {
+                    throw new IllegalStateException("Invalid container for search context");
+                }
                 
                 // now instantiate the results
                 DSpaceObject[] results = new DSpaceObject[qResults.getHitHandles().size()];

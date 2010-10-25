@@ -230,23 +230,26 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
 
             request.setAttribute("months", months);
 
-            try
+            if (reportFile != null)
             {
-                fir = new FileInputStream(reportFile.getPath());
-                ir = new InputStreamReader(fir, "UTF-8");
-                br = new BufferedReader(ir);
-            }
-            catch (IOException e)
-            {
-                // FIXME: no error handing yet
-                throw new RuntimeException(e.getMessage(),e);
-            }
+                try
+                {
+                    fir = new FileInputStream(reportFile.getPath());
+                    ir = new InputStreamReader(fir, "UTF-8");
+                    br = new BufferedReader(ir);
+                }
+                catch (IOException e)
+                {
+                    // FIXME: no error handing yet
+                    throw new RuntimeException(e.getMessage(),e);
+                }
 
-            // FIXME: there's got to be a better way of doing this
-            String line = null;
-            while ((line = br.readLine()) != null)
-            {
-                report.append(line);
+                // FIXME: there's got to be a better way of doing this
+                String line = null;
+                while ((line = br.readLine()) != null)
+                {
+                    report.append(line);
+                }
             }
         }
         finally

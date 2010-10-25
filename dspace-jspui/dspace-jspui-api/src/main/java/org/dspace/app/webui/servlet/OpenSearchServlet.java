@@ -207,6 +207,10 @@ public class OpenSearchServlet extends DSpaceServlet
             logInfo = "community_id=" + container.getID() + ",";
             qResults = DSQuery.doQuery(context, qArgs, (Community)container);
         }
+        else
+        {
+            throw new IllegalStateException("Invalid container for search context");
+        }
         
         // now instantiate the results
         DSpaceObject[] results = new DSpaceObject[qResults.getHitHandles().size()];
@@ -223,18 +227,17 @@ public class OpenSearchServlet extends DSpaceServlet
         }
 
         // Log
-        log.info(LogManager.getHeader(context, "search", logInfo + "query=\""
-                + query + "\",results=(" + results.length + ")"));
-        
+        log.info(LogManager.getHeader(context, "search", logInfo + "query=\"" + query + "\",results=(" + results.length + ")"));
+
         // format and return results
         Map<String, String> labelMap = getLabels(request);
         Document resultsDoc = OpenSearch.getResultsDoc(format, query, qResults, container, results, labelMap);
         try
         {
             Transformer xf = TransformerFactory.newInstance().newTransformer();
-        response.setContentType(OpenSearch.getContentType(format));
+            response.setContentType(OpenSearch.getContentType(format));
             xf.transform(new DOMSource(resultsDoc), new StreamResult(response.getWriter()));
-    }
+        }
         catch (TransformerException e)
         {
             log.error(e);

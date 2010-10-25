@@ -111,19 +111,22 @@ public class MetadataExportServlet extends DSpaceServlet
                     exporter = new MetadataExport(context, (Community)thing, false);
                 }
 
-                // Perform the export
-                DSpaceCSV csv = exporter.export();
+                if (exporter != null)
+                {
+                    // Perform the export
+                    DSpaceCSV csv = exporter.export();
 
-                // Return the csv file
-                response.setContentType("text/csv; charset=UTF-8");
-                String filename = handle.replaceAll("/", "-") + ".csv";
-                response.setHeader("Content-Disposition", "attachment; filename=" + filename);
-                PrintWriter out = response.getWriter();
-                out.write(csv.toString());
-                out.flush();
-                out.close();
-                log.info(LogManager.getHeader(context, "metadataexport", "exported_file:" + filename));                
-                return;
+                    // Return the csv file
+                    response.setContentType("text/csv; charset=UTF-8");
+                    String filename = handle.replaceAll("/", "-") + ".csv";
+                    response.setHeader("Content-Disposition", "attachment; filename=" + filename);
+                    PrintWriter out = response.getWriter();
+                    out.write(csv.toString());
+                    out.flush();
+                    out.close();
+                    log.info(LogManager.getHeader(context, "metadataexport", "exported_file:" + filename));
+                    return;
+                }
             }
         }
 

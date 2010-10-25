@@ -115,6 +115,11 @@ public class MetadataImportConfirm extends AbstractDSpaceTransformer {
             changes = ((ArrayList<BulkEditChange>)request.getAttribute("changes"));
         }
 
+        if (changes == null)
+        {
+            changes = new ArrayList<BulkEditChange>();
+        }
+
 		// DIVISION: metadata-import
 		Division div = body.addInteractiveDivision("metadata-import",contextPath + "/admin/metadataimport", Division.METHOD_MULTIPART,"primary administrative");
 		div.setHead(T_head1);
@@ -125,7 +130,6 @@ public class MetadataImportConfirm extends AbstractDSpaceTransformer {
 
                 if(changes.size() > 0) {
                     Table mdchanges = div.addTable("metadata-changes", changes.size(), 2);
-
 
                     // Display the changes
                     for (BulkEditChange change : changes)
