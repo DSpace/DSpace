@@ -76,7 +76,7 @@ public class HTMLReport implements Report
     private Date end = null;
 
     /** the output file to which to write aggregation data */
-   private static String output = ConfigurationManager.getProperty("dspace.dir") +
+   private String output = ConfigurationManager.getProperty("dspace.dir") +
                             File.separator + "log" + File.separator + "report";
     
     /**

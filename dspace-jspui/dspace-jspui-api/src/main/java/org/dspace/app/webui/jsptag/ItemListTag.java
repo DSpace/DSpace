@@ -119,10 +119,10 @@ public class ItemListTag extends TagSupport
     private boolean disableCrossLinks = false;
 
     /** The default fields to be displayed when listing items */
-    private static String listFields;
+    private static final String DEFAULT_LIST_FIELDS;
 
     /** The default widths for the columns */
-    private static String listWidths;
+    private static final String DEFAULT_LIST_WIDTHS;
 
     /** The default field which is bound to the browse by date */
     private static String dateField = "dc.date.issued";
@@ -132,7 +132,7 @@ public class ItemListTag extends TagSupport
 
     private static String authorField = "dc.contributor.*";
 
-    private static int authorLimit = -1;
+    private int authorLimit = -1;
 
     private transient SortOption sortOption = null;
 
@@ -144,13 +144,32 @@ public class ItemListTag extends TagSupport
 
         if (showThumbs)
         {
-            listFields = "thumbnail, dc.date.issued(date), dc.title, dc.contributor.*";
-            listWidths = "*, 130, 60%, 40%";
+            DEFAULT_LIST_FIELDS = "thumbnail, dc.date.issued(date), dc.title, dc.contributor.*";
+            DEFAULT_LIST_WIDTHS = "*, 130, 60%, 40%";
         }
         else
         {
-            listFields = "dc.date.issued(date), dc.title, dc.contributor.*";
-            listWidths = "130, 60%, 40%";
+            DEFAULT_LIST_FIELDS = "dc.date.issued(date), dc.title, dc.contributor.*";
+            DEFAULT_LIST_WIDTHS = "130, 60%, 40%";
+        }
+
+        // get the date and title fields
+        String dateLine = ConfigurationManager.getProperty("webui.browse.index.date");
+        if (dateLine != null)
+        {
+            dateField = dateLine;
+        }
+
+        String titleLine = ConfigurationManager.getProperty("webui.browse.index.title");
+        if (titleLine != null)
+        {
+            titleField = titleLine;
+        }
+
+        String authorLine = ConfigurationManager.getProperty("webui.browse.author-field");
+        if (authorLine != null)
+        {
+            authorField = authorLine;
         }
     }
 
@@ -248,33 +267,16 @@ public class ItemListTag extends TagSupport
                 configLine  = newLLine.toString();
                 widthLine = newWLine.toString();
             }
-
-            listFields = configLine;
-            listWidths = widthLine;
         }
-
-        // get the date and title fields
-        String dateLine = ConfigurationManager.getProperty("webui.browse.index.date");
-        if (dateLine != null)
+        else
         {
-            dateField = dateLine;
-        }
-
-        String titleLine = ConfigurationManager.getProperty("webui.browse.index.title");
-        if (titleLine != null)
-        {
-            titleField = titleLine;
-        }
-
-        String authorLine = ConfigurationManager.getProperty("webui.browse.author-field");
-        if (authorLine != null)
-        {
-            authorField = authorLine;
+            configLine = DEFAULT_LIST_FIELDS;
+            widthLine = DEFAULT_LIST_WIDTHS;
         }
 
         // Arrays used to hold the information we will require when outputting each row
-        String[] fieldArr  = listFields.split("\\s*,\\s*");
-        String[] widthArr  = listWidths == null ? new String[0] : listWidths.split("\\s*,\\s*");
+        String[] fieldArr  = configLine == null ? new String[0] : configLine.split("\\s*,\\s*");
+        String[] widthArr  = widthLine  == null ? new String[0] : widthLine.split("\\s*,\\s*");
         boolean isDate[]   = new boolean[fieldArr.length];
         boolean emph[]     = new boolean[fieldArr.length];
         boolean isAuthor[] = new boolean[fieldArr.length];
