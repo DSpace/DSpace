@@ -39,6 +39,7 @@
  */
 package org.dspace.search;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.dspace.core.ConfigurationManager;
@@ -55,11 +56,10 @@ public class QueryResults
 
     private int pageSize; // max number of hits returned
 
-    private List<String> hitHandles; // handles of content (items, collections,
-                             // communities)
+    private List<String> hitHandles = new ArrayList<String>(); // handles of content (items, collections, communities)
 
-    private List<Integer> hitTypes; // Resource type - from Constants
-    private List<Integer> hitIds;   // Resource ids
+    private List<Integer> hitTypes = new ArrayList<Integer>(); // Resource type - from Constants
+    private List<Integer> hitIds   = new ArrayList<Integer>(); // Resource ids
 
     private String errorMsg; //error string, if there is one
 
@@ -126,7 +126,7 @@ public class QueryResults
     /** set the List of handles corresponding to hits */
     public void setHitHandles(List<String> myHits)
     {
-        hitHandles = myHits;
+        hitHandles = myHits != null ? myHits : new ArrayList<String>();
     }
 
     /** get the List of handles corresponding to hits */
@@ -138,7 +138,7 @@ public class QueryResults
     /** set the List of ids corresponding to hits */
     public void setHitIds(List<Integer> myHits)
     {
-        hitIds = myHits;
+        hitIds = myHits != null ? myHits : new ArrayList<Integer>();
     }
 
     /** get the List of handles corresponding to hits */
@@ -150,7 +150,7 @@ public class QueryResults
     /** set the List of types corresponding to handles */
     public void setHitTypes(List<Integer> newTypes)
     {
-        hitTypes = newTypes;
+        hitTypes = newTypes != null ? newTypes : new ArrayList<Integer>();
     }
 
     /** get the List of types corresponding to handles */

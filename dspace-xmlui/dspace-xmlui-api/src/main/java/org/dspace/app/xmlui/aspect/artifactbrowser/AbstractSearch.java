@@ -665,16 +665,13 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
         int countCollections = 0;
         int countItems       = 0;
 
-        for (Object type : queryResults.getHitTypes())
+        for (Integer type : queryResults.getHitTypes())
         {
-            if (type instanceof Integer)
+            switch (type.intValue())
             {
-                switch (((Integer)type).intValue())
-                {
-                case Constants.ITEM:       countItems++;        break;
-                case Constants.COLLECTION: countCollections++;  break;
-                case Constants.COMMUNITY:  countCommunities++;  break;
-                }
+            case Constants.ITEM:       countItems++;        break;
+            case Constants.COLLECTION: countCollections++;  break;
+            case Constants.COMMUNITY:  countCommunities++;  break;
             }
         }
 
