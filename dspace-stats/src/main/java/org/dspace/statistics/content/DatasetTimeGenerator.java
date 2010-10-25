@@ -64,9 +64,14 @@ public class DatasetTimeGenerator extends DatasetGenerator {
 
         //Check if end comes before start
         Calendar startCal1 = Calendar.getInstance();
-        startCal1.setTime(start);
-
         Calendar endCal1 = Calendar.getInstance();
+
+        if (startCal1 == null || endCal1 == null)
+        {
+            throw new IllegalStateException("Unable to create calendar instances");    
+        }
+
+        startCal1.setTime(start);
         endCal1.setTime(end);
         if(endCal1.before(startCal1))
         {
