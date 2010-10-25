@@ -264,29 +264,30 @@ public class CreateStatReport {
 		Calendar reportEndDate = new GregorianCalendar( calendar.get(Calendar.YEAR),
 				  										calendar.get(Calendar.MONTH),
 				  										calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
-		
-		while(reportStartDate.before(reportEndDate)) {
+
+        Calendar currentMonth = (Calendar)reportStartDate.clone();
+		while(currentMonth.before(reportEndDate)) {
 									
-			Calendar start = new GregorianCalendar( reportStartDate.get(Calendar.YEAR),
-													reportStartDate.get(Calendar.MONTH),
-													reportStartDate.getActualMinimum(Calendar.DAY_OF_MONTH));
+			Calendar start = new GregorianCalendar( currentMonth.get(Calendar.YEAR),
+													currentMonth.get(Calendar.MONTH),
+													currentMonth.getActualMinimum(Calendar.DAY_OF_MONTH));
 			myStartDate = start.getTime();
 
-			Calendar end = new GregorianCalendar( reportStartDate.get(Calendar.YEAR),
-												  reportStartDate.get(Calendar.MONTH),
-												  reportStartDate.getActualMaximum(Calendar.DAY_OF_MONTH));
+			Calendar end = new GregorianCalendar( currentMonth.get(Calendar.YEAR),
+												  currentMonth.get(Calendar.MONTH),
+												  currentMonth.getActualMaximum(Calendar.DAY_OF_MONTH));
 			myEndDate = end.getTime();
 			
 			myOutFile = new StringBuffer(outputLogDirectory);
 	        myOutFile.append(outputPrefix);
-	        myOutFile.append(reportStartDate.get(Calendar.YEAR));
+	        myOutFile.append(currentMonth.get(Calendar.YEAR));
 	        myOutFile.append("-");
-	        myOutFile.append(reportStartDate.get(Calendar.MONTH)+1);
+	        myOutFile.append(currentMonth.get(Calendar.MONTH)+1);
 	        myOutFile.append(outputSuffix); 
 	        	        
 	        LogAnalyser.processLogs(context, myLogDir, myFileTemplate, myConfigFile, myOutFile.toString(), myStartDate, myEndDate, myLookUp);
 	        
-			reportStartDate.add(Calendar.MONTH, 1);	
+			currentMonth.add(Calendar.MONTH, 1);
 		}
 	}
 	
@@ -349,26 +350,28 @@ public class CreateStatReport {
 				  										calendar.get(Calendar.MONTH),
 				  										calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
 		
-		while(reportStartDate.before(reportEndDate)) {
+        Calendar currentMonth = (Calendar)reportStartDate.clone();
+
+		while(currentMonth.before(reportEndDate)) {
 			
 			myInput = new StringBuffer(outputLogDirectory);
 	        myInput.append(inputPrefix);
-	        myInput.append(reportStartDate.get(Calendar.YEAR));
+	        myInput.append(currentMonth.get(Calendar.YEAR));
 	        myInput.append("-");
-	        myInput.append(reportStartDate.get(Calendar.MONTH)+1);
+	        myInput.append(currentMonth.get(Calendar.MONTH)+1);
 	        myInput.append(outputSuffix); 
 	        
 	        myOutput = new StringBuffer(outputReportDirectory);
 	        myOutput.append(outputPrefix);
-	        myOutput.append(reportStartDate.get(Calendar.YEAR));
+	        myOutput.append(currentMonth.get(Calendar.YEAR));
 	        myOutput.append("-");
-	        myOutput.append(reportStartDate.get(Calendar.MONTH)+1);
+	        myOutput.append(currentMonth.get(Calendar.MONTH)+1);
 	        myOutput.append(".");
 	        myOutput.append(myFormat);			
 			
 			ReportGenerator.processReport(context, myFormat, myInput.toString(), myOutput.toString(), myMap);
 			
-			reportStartDate.add(Calendar.MONTH, 1);
+			currentMonth.add(Calendar.MONTH, 1);
 		}	
 	}
 	

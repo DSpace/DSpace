@@ -41,6 +41,7 @@ package org.dspace.app.dav;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import org.jdom.Namespace;
 
@@ -98,7 +99,9 @@ abstract class DAV
     /** The Constant PROPPATCH_REMOVE. */
     protected static final int PROPPATCH_REMOVE = 2;
 
-    /** HTTP standard date format. */
-    protected static final DateFormat HttpDateFormat = new SimpleDateFormat(
-            "EEE, dd MMM yyyy HH:mm:ss 'GMT'");
+    protected static String applyHttpDateFormat(Date thisDate)
+    {
+        return new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss 'GMT'").format(thisDate);
+    }
+
 }

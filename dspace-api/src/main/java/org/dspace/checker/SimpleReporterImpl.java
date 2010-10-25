@@ -52,14 +52,6 @@ import org.dspace.core.I18nUtil;
  */
 public class SimpleReporterImpl implements SimpleReporter
 {
-    /** Utility date format which includes hours minutes and seconds. */
-    private static final DateFormat DATE_FORMAT_MAX = DateFormat
-            .getDateInstance(DateFormat.MEDIUM);
-
-    /** Utility date format which only includes Month/day/year. */
-    private static final DateFormat DATE_FORMAT_MIN = DateFormat
-            .getDateInstance(DateFormat.SHORT);
-
     /** The reporter access object to be used. */
     private ReporterDAO reporter = null;
 
@@ -101,11 +93,11 @@ public class SimpleReporterImpl implements SimpleReporter
 
         osw.write("\n");
         osw.write(msg("deleted-bitstream-intro"));
-        osw.write(DATE_FORMAT_MIN.format(startDate));
+        osw.write(applyDateFormatShort(startDate));
         osw.write(" ");
         osw.write(msg("date-range-to"));
         osw.write(" ");
-        osw.write(DATE_FORMAT_MIN.format(endDate));
+        osw.write(applyDateFormatShort(endDate));
         osw.write("\n\n\n");
 
         if (history.size() == 0)
@@ -148,11 +140,11 @@ public class SimpleReporterImpl implements SimpleReporter
         osw.write(msg("checksum-did-not-match"));
         osw.write(" ");
         osw.write("\n");
-        osw.write(DATE_FORMAT_MIN.format(startDate));
+        osw.write(applyDateFormatShort(startDate));
         osw.write(" ");
         osw.write(msg("date-range-to"));
         osw.write(" ");
-        osw.write(DATE_FORMAT_MIN.format(endDate));
+        osw.write(applyDateFormatShort(endDate));
         osw.write("\n\n\n");
 
         if (history.size() == 0)
@@ -193,11 +185,11 @@ public class SimpleReporterImpl implements SimpleReporter
 
         osw.write("\n");
         osw.write(msg("bitstream-not-found-report"));
-        osw.write(DATE_FORMAT_MIN.format(startDate));
+        osw.write(applyDateFormatShort(startDate));
         osw.write(" ");
         osw.write(msg("date-range-to"));
         osw.write(" ");
-        osw.write(DATE_FORMAT_MIN.format(endDate));
+        osw.write(applyDateFormatShort(endDate));
         osw.write("\n\n\n");
 
         if (history.size() == 0)
@@ -240,11 +232,11 @@ public class SimpleReporterImpl implements SimpleReporter
         osw.write("\n");
         osw.write(msg("bitstream-will-no-longer-be-processed"));
         osw.write(" ");
-        osw.write(DATE_FORMAT_MIN.format(startDate));
+        osw.write(applyDateFormatShort(startDate));
         osw.write(" ");
         osw.write(msg("date-range-to"));
         osw.write(" ");
-        osw.write(DATE_FORMAT_MIN.format(endDate));
+        osw.write(applyDateFormatShort(endDate));
         osw.write("\n\n\n");
 
         if (history.size() == 0)
@@ -280,7 +272,7 @@ public class SimpleReporterImpl implements SimpleReporter
 
         osw.write("\n");
         osw.write(msg("unchecked-bitstream-report"));
-        osw.write(DATE_FORMAT_MIN.format(new Date()));
+        osw.write(applyDateFormatShort(new Date()));
         osw.write("\n\n\n");
 
         if (bitstreams.size() == 0)
@@ -322,10 +314,10 @@ public class SimpleReporterImpl implements SimpleReporter
             buf.append(msg("bitstream-id")).append(" = ").append(
                     historyInfo.getBitstreamId()).append("\n");
             buf.append(msg("process-start-date")).append(" = ").append(
-                    DATE_FORMAT_MAX.format(historyInfo.getProcessStartDate()))
+                    applyDateFormatLong(historyInfo.getProcessStartDate()))
                     .append("\n");
             buf.append(msg("process-end-date")).append(" = ").append(
-                    DATE_FORMAT_MAX.format(historyInfo.getProcessEndDate()))
+                    applyDateFormatLong(historyInfo.getProcessEndDate()))
                     .append("\n");
             buf.append(msg("checksum-expected")).append(" = ").append(
                     historyInfo.getChecksumExpected()).append("\n");
@@ -384,5 +376,15 @@ public class SimpleReporterImpl implements SimpleReporter
             buf.append("----------------------------------------------- \n\n");
             osw.write(buf.toString());
         }
+    }
+
+    private String applyDateFormatLong(Date thisDate)
+    {
+        return DateFormat.getDateInstance(DateFormat.MEDIUM).format(thisDate);
+    }
+
+    private String applyDateFormatShort(Date thisDate)
+    {
+        return DateFormat.getDateInstance(DateFormat.SHORT).format(thisDate); 
     }
 }

@@ -360,7 +360,7 @@ class DAVItem extends DAVDSpaceObject
         }
         else if (elementsEqualIsh(property, getlastmodifiedProperty))
         {
-            value = DAV.HttpDateFormat.format(this.item.getLastModified());
+            value = DAV.applyHttpDateFormat(this.item.getLastModified());
         }
         else if (elementsEqualIsh(property, licenseProperty))
         {

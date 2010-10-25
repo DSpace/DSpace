@@ -65,9 +65,6 @@ public class TestConsumer implements Consumer
     private static PrintStream out = ConfigurationManager
             .getBooleanProperty("testConsumer.verbose") ? System.out : null;
 
-    static final DateFormat df = new SimpleDateFormat(
-            "dd-MMM-yyyy HH:mm:ss.SSS Z");
-
     public void initialize() throws Exception
     {
         log.info("EVENT: called TestConsumer.initialize();");
@@ -102,7 +99,7 @@ public class TestConsumer implements Consumer
                 + ", ObjectID="
                 + String.valueOf(event.getObjectID())
                 + ", TimeStamp="
-                + df.format(new Date(event.getTimeStamp()))
+                + applyDateFormat(new Date(event.getTimeStamp()))
                 + ", user=\""
                 + user
                 + "\""
@@ -143,5 +140,11 @@ public class TestConsumer implements Consumer
         }
 
     }
+
+    private String applyDateFormat(Date thisDate)
+    {
+        return new SimpleDateFormat("dd-MMM-yyyy HH:mm:ss.SSS Z").format(thisDate);
+    }
+
 
 }
