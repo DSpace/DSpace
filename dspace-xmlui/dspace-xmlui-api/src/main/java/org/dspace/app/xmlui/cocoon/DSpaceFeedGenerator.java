@@ -129,7 +129,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     private String handle = null;
     
     /** number of DSpace items per feed */
-    private static int itemCount = 0;
+    private static final int ITEM_COUNT = ConfigurationManager.getIntProperty("webui.feed.items");
     
     /**
      * How long should RSS feed cache entries be valid? milliseconds * seconds *
@@ -213,7 +213,6 @@ public class DSpaceFeedGenerator extends AbstractGenerator
      */
     public void configure(Configuration conf) throws ConfigurationException
     {
-        itemCount = ConfigurationManager.getIntProperty("webui.feed.items");
     }
     
     
@@ -302,7 +301,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
         {
             scope.setCommunity((Community) dso);
         }
-        scope.setResultsPerPage(itemCount);
+        scope.setResultsPerPage(ITEM_COUNT);
 
         // FIXME Exception handling
         try

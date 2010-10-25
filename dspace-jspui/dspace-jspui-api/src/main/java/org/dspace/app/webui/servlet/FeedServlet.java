@@ -122,33 +122,31 @@ public class FeedServlet extends DSpaceServlet
     static
     {
     	enabled = ConfigurationManager.getBooleanProperty("webui.feed.enable");
+
+        // read rest of config info if enabled
+        if (enabled)
+        {
+            String fmtsStr = ConfigurationManager.getProperty("webui.feed.formats");
+            if ( fmtsStr != null )
+            {
+                formats = new ArrayList<String>();
+                String[] fmts = fmtsStr.split(",");
+                for (int i = 0; i < fmts.length; i++)
+                {
+                    formats.add(fmts[i]);
+                }
+            }
+
+            itemCount = ConfigurationManager.getIntProperty("webui.feed.items");
+            cacheSize = ConfigurationManager.getIntProperty("webui.feed.cache.size");
+            if (cacheSize > 0)
+            {
+                feedCache = new HashMap<String, CacheFeed>();
+                cacheAge = ConfigurationManager.getIntProperty("webui.feed.cache.age");
+            }
+        }
     }
     
-    public void init()
-    {
-    	// read rest of config info if enabled
-    	if (enabled)
-    	{
-    		String fmtsStr = ConfigurationManager.getProperty("webui.feed.formats");
-    		if ( fmtsStr != null )
-    		{
-    			formats = new ArrayList<String>();
-    			String[] fmts = fmtsStr.split(",");
-    			for (int i = 0; i < fmts.length; i++)
-    			{
-    				formats.add(fmts[i]);
-    			}
-    		}
-    		itemCount = ConfigurationManager.getIntProperty("webui.feed.items");
-    		cacheSize = ConfigurationManager.getIntProperty("webui.feed.cache.size");
-    		if (cacheSize > 0)
-    		{
-    			feedCache = new HashMap<String, CacheFeed>();
-    	   		cacheAge = ConfigurationManager.getIntProperty("webui.feed.cache.age");
-    		}
-    	}
-    }
-
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException

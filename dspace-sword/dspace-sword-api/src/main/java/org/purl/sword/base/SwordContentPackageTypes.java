@@ -53,15 +53,14 @@ public class SwordContentPackageTypes {
 
     private static Properties types;
 
-    public SwordContentPackageTypes()
+    static
     {
         // static constructor to attempt to load the properties file
         try
         {
-
             types = new Properties();
             InputStream stream = SwordContentPackageTypes.class.getClassLoader().getResourceAsStream("swordContentPackageTypes.properties");
-            if( stream != null ) 
+            if( stream != null )
             {
                 types.loadFromXML(stream);
             }
@@ -70,6 +69,10 @@ public class SwordContentPackageTypes {
         {
             log.error("Unable to load sword types property file: " + ex.getMessage());
         }
+    }
+
+    public SwordContentPackageTypes()
+    {
     }
 
     private static SwordContentPackageTypes instance;

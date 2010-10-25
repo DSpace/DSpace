@@ -102,15 +102,15 @@ public class ItemListTag extends TagSupport
     private String emphColumn;
 
     /** Config value of thumbnail view toggle */
-    private boolean showThumbs;
+    private static boolean showThumbs;
 
     /** Config browse/search width and height */
-    private int thumbItemListMaxWidth;
+    private static int thumbItemListMaxWidth;
 
-    private int thumbItemListMaxHeight;
+    private static int thumbItemListMaxHeight;
 
     /** Config browse/search thumbnail link behaviour */
-    private boolean linkToBitstream = false;
+    private static boolean linkToBitstream = false;
 
     /** Config to include an edit link */
     private boolean linkToEdit = false;
@@ -138,9 +138,8 @@ public class ItemListTag extends TagSupport
 
     private static final long serialVersionUID = 348762897199116432L;
 
-    public ItemListTag()
+    static
     {
-        super();
         getThumbSettings();
 
         if (showThumbs)
@@ -153,6 +152,11 @@ public class ItemListTag extends TagSupport
             listFields = "dc.date.issued(date), dc.title, dc.contributor.*";
             listWidths = "130, 60%, 40%";
         }
+    }
+
+    public ItemListTag()
+    {
+        super();
     }
 
     public int doStartTag() throws JspException
@@ -732,7 +736,7 @@ public class ItemListTag extends TagSupport
     }
 
     /* get the required thumbnail config items */
-    private void getThumbSettings()
+    private static void getThumbSettings()
     {
         showThumbs = ConfigurationManager
                 .getBooleanProperty("webui.browse.thumbnail.show");
