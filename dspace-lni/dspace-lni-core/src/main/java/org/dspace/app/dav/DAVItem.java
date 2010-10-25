@@ -470,7 +470,6 @@ class DAVItem extends DAVDSpaceObject
      * 
      * @throws SQLException the SQL exception
      * @throws AuthorizeException the authorize exception
-     * @throws ServletException the servlet exception
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws DAVStatusException the DAV status exception
      */
@@ -482,7 +481,6 @@ class DAVItem extends DAVDSpaceObject
         AuthorizeManager.authorizeAction(this.context, this.item, Constants.READ);
 
         String packageType = this.request.getParameter("package");
-        Bundle[] original = this.item.getBundles("ORIGINAL");
 
         if (packageType == null)
         {

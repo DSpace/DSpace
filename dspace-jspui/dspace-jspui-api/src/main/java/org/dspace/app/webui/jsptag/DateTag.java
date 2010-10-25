@@ -58,10 +58,12 @@ import org.dspace.content.DCDate;
 public class DateTag extends TagSupport
 {
     /** The date to display */
-    private DCDate date;
+    private transient DCDate date;
 
     /** Display the time? */
     private boolean displayTime = true;
+
+    private static final long serialVersionUID = 6665825578727713535L;
 
     /**
      * Get the date

@@ -78,11 +78,11 @@ public class UsageEvent extends Event {
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private HttpServletRequest request;
+	private transient HttpServletRequest request;
 	
-	private Context context;
+	private transient Context context;
 	
-	private DSpaceObject object;
+	private transient DSpaceObject object;
 
 	private Action action;
 			

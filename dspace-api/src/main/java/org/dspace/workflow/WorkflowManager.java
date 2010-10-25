@@ -1018,9 +1018,6 @@ public class WorkflowManager
     private static void recordStart(Context c, Item myitem)
             throws SQLException, IOException, AuthorizeException
     {
-        // Get non-internal format bitstreams
-        Bitstream[] bitstreams = myitem.getNonInternalBitstreams();
-
         // get date
         DCDate now = DCDate.getCurrent();
 

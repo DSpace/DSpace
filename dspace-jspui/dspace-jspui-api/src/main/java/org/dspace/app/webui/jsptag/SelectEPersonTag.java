@@ -79,7 +79,9 @@ public class SelectEPersonTag extends TagSupport
     private boolean multiple;
 
     /** Which eperson/epeople are initially in the list? */
-    private EPerson[] epeople;
+    private transient EPerson[] epeople;
+
+    private static final long serialVersionUID = -7323789442034590853L;
 
     public SelectEPersonTag()
     {

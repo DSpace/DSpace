@@ -804,7 +804,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         } catch (Exception e) {
                             // this will never happen, but compiler is now
                             // happy.
-//                            log.error(e.getMessage(), e);
+                            log.trace(e.getMessage(), e);
                         }
                     }
                 }

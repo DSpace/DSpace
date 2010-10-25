@@ -69,7 +69,9 @@ import javax.servlet.jsp.tagext.TagSupport;
 public class ItemPreviewTag extends TagSupport
 {
     /** Item to display */
-    private Item item;
+    private transient Item item;
+
+    private static final long serialVersionUID = -5535762797556685631L;
 
     public ItemPreviewTag()
     {

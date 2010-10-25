@@ -40,6 +40,8 @@
 
 package org.dspace.app.xmlui.wing;
 
+import java.io.Serializable;
+
 /**
  * This simple class just provides the Namespace datatype. It stores a URI that
  * is publicly accessible. The actually definitions of namespaces is found in
@@ -48,7 +50,7 @@ package org.dspace.app.xmlui.wing;
  * @author Scott Phillips
  */
 
-public class Namespace
+public class Namespace implements Serializable
 {
     /** The URI for this namespace */
     public final String URI;

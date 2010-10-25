@@ -204,6 +204,7 @@ public class DSIndexer
                 {
                 case 3:
                     indexConfigArr[i].qualifier = parts[2];
+                    // Fall through for other parts of the array
                 case 2:
                     indexConfigArr[i].schema  = parts[0];
                     indexConfigArr[i].element = parts[1];

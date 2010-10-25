@@ -528,25 +528,26 @@ public class X509Authentication implements AuthenticationMethod
 
         if (authenticated)
         {
-            List<String> groupNames = new ArrayList<String>();
+            List<String> groupNames = getX509Groups();
             List<Integer> groupIDs = new ArrayList<Integer>();
 
-            groupNames = getX509Groups();
-
-            for (String groupName : groupNames)
+            if (groupNames != null)
             {
-                if (groupName != null)
+                for (String groupName : groupNames)
                 {
-                    Group group = Group.findByName(context, groupName);
-                    if (group != null)
+                    if (groupName != null)
                     {
-                        groupIDs.add(Integer.valueOf(group.getID()));
-                    }
-                    else
-                    {
-                        log.warn(LogManager.getHeader(context,
-                                "configuration_error", "unknown_group="
-                                        + groupName));
+                        Group group = Group.findByName(context, groupName);
+                        if (group != null)
+                        {
+                            groupIDs.add(Integer.valueOf(group.getID()));
+                        }
+                        else
+                        {
+                            log.warn(LogManager.getHeader(context,
+                                    "configuration_error", "unknown_group="
+                                            + groupName));
+                        }
                     }
                 }
             }

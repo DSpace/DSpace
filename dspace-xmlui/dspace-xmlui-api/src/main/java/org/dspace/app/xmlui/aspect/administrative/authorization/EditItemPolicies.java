@@ -141,9 +141,6 @@ public class EditItemPolicies extends AbstractDSpaceTransformer
 		
 		ArrayList<ResourcePolicy> itemPolicies = (ArrayList<ResourcePolicy>)AuthorizeManager.getPolicies(context, item);
 		
-		ArrayList<ResourcePolicy> bundlePolicies = new ArrayList<ResourcePolicy>();
-		ArrayList<ResourcePolicy> bitstreamPolicies = new ArrayList<ResourcePolicy>();
-
 		// DIVISION: main
 		Division main = body.addInteractiveDivision("edit-item-policies",contextPath+"/admin/authorize",Division.METHOD_POST,"primary administrative authorization");
 		main.setHead(T_main_head.parameterize(item.getHandle(),item.getID()));
@@ -172,7 +169,7 @@ public class EditItemPolicies extends AbstractDSpaceTransformer
     		subheader.addCell(null, null, 1, 4, "indent").addHighlight("bold").addContent(T_subhead_bundle.parameterize(bundle.getName(),bundle.getID()));
     		subheader.addCell().addHighlight("bold").addXref(baseURL + "&submit_add_bundle_" + bundle.getID(), T_add_bundlePolicy_link);
 
-    		bundlePolicies = (ArrayList<ResourcePolicy>)AuthorizeManager.getPolicies(context, bundle);
+    		ArrayList<ResourcePolicy> bundlePolicies = (ArrayList<ResourcePolicy>)AuthorizeManager.getPolicies(context, bundle);
     		this.rowBuilder(baseURL, table, bundlePolicies, bundle.getID(), Constants.BUNDLE, highlightID);
     		
     		// And eventually to the bundle's bitstreams
@@ -182,7 +179,7 @@ public class EditItemPolicies extends AbstractDSpaceTransformer
         		subheader.addCell(null, null, 1, 4, "doubleIndent").addContent(T_subhead_bitstream.parameterize(bitstream.getName(),bitstream.getID()));
         		subheader.addCell().addXref(baseURL + "&submit_add_bitstream_" + bitstream.getID(), T_add_bitstreamPolicy_link);
 
-        		bitstreamPolicies = (ArrayList<ResourcePolicy>)AuthorizeManager.getPolicies(context, bitstream);
+        		ArrayList<ResourcePolicy> bitstreamPolicies = (ArrayList<ResourcePolicy>)AuthorizeManager.getPolicies(context, bitstream);
         		this.rowBuilder(baseURL, table, bitstreamPolicies, bitstream.getID(), Constants.BITSTREAM, highlightID);    			
     		}
     	}

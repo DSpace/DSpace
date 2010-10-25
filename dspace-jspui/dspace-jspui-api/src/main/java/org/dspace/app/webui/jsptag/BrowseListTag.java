@@ -84,7 +84,7 @@ public class BrowseListTag extends TagSupport
     private static Logger log = Logger.getLogger(BrowseListTag.class);
 
     /** Items to display */
-    private BrowseItem[] items;
+    private transient BrowseItem[] items;
 
     /** Row to highlight, -1 for no row */
     private int highlightRow = -1;
@@ -125,7 +125,9 @@ public class BrowseListTag extends TagSupport
 
     private static int authorLimit = -1;
 
-    private BrowseInfo browseInfo;
+    private transient BrowseInfo browseInfo;
+
+    private static final long serialVersionUID = 8091584920304256107L;
 
     public BrowseListTag()
     {

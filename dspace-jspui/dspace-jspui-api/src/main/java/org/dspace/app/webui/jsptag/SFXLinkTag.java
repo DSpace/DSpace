@@ -62,11 +62,13 @@ public class SFXLinkTag extends TagSupport
 {
     /** Item to display SFX link for */
 
-    private Item item;
+    private transient Item item;
 
     /** The fully qualified pathname of the SFX  XML file */
     private String sfxFile = ConfigurationManager.getProperty("dspace.dir") + File.separator
     				+ "config" + File.separator + "sfx.xml";
+
+    private static final long serialVersionUID = 7028793612957710128L;
 
     public SFXLinkTag()
     {

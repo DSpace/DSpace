@@ -117,7 +117,7 @@ public class EditContainerPolicies extends AbstractDSpaceTransformer
         int highlightID = parameters.getParameterAsInteger("highlightID",-1);
         String baseURL = contextPath+"/admin/epeople?administrative-continue="+knot.getId();
         
-        ArrayList<ResourcePolicy> policies = new ArrayList<ResourcePolicy>();
+        ArrayList<ResourcePolicy> policies;
 
         // DIVISION: edit-container-policies
         Division main = body.addInteractiveDivision("edit-container-policies",contextPath+"/admin/authorize",Division.METHOD_POST,"primary administrative authorization");
@@ -144,40 +144,44 @@ public class EditContainerPolicies extends AbstractDSpaceTransformer
         header.addCell().addContent(T_head_id);
         header.addCell().addContent(T_head_action);
         header.addCell().addContent(T_head_group);
-    	
-    	for (ResourcePolicy policy : policies) 
-    	{
-    		Row row;
-			if (policy.getID() == highlightID)
+
+        if (policies != null)
+        {
+            for (ResourcePolicy policy : policies)
             {
-                row = table.addRow(null, null, "highlight");
+                Row row;
+                if (policy.getID() == highlightID)
+                {
+                    row = table.addRow(null, null, "highlight");
+                }
+                else
+                {
+                    row = table.addRow();
+                }
+
+                CheckBox select = row.addCell().addCheckBox("select_policy");
+                select.setLabel(String.valueOf(policy.getID()));
+                select.addOption(String.valueOf(policy.getID()));
+
+                // Accounting for the funky case of an empty policy
+                Group policyGroup = policy.getGroup();
+
+                row.addCell().addXref(baseURL + "&submit_edit&policy_id=" + policy.getID(), String.valueOf(policy.getID()));
+                row.addCell().addXref(baseURL + "&submit_edit&policy_id=" + policy.getID(), policy.getActionText());
+                if (policyGroup != null) {
+                    Cell groupCell = row.addCell();
+                    groupCell.addContent(policyGroup.getName());
+                    Highlight groupHigh = groupCell.addHighlight("fade");
+                    groupHigh.addContent(" [");
+                    groupHigh.addXref(baseURL + "&submit_edit_group&group_id=" + policyGroup.getID(), T_group_edit);
+                    groupHigh.addContent("]");
+                }
+                else {
+                    row.addCell().addContent("...");
+                }
             }
-			else
-            {
-                row = table.addRow();
-            }
-    		
-    		CheckBox select = row.addCell().addCheckBox("select_policy");
-        	select.setLabel(String.valueOf(policy.getID()));
-        	select.addOption(String.valueOf(policy.getID()));
-        	
-        	// Accounting for the funky case of an empty policy
-        	Group policyGroup = policy.getGroup();
-        	
-        	row.addCell().addXref(baseURL + "&submit_edit&policy_id=" + policy.getID(), String.valueOf(policy.getID()));
-        	row.addCell().addXref(baseURL + "&submit_edit&policy_id=" + policy.getID(), policy.getActionText());
-        	if (policyGroup != null) {
-        		Cell groupCell = row.addCell();
-        		groupCell.addContent(policyGroup.getName());
-        		Highlight groupHigh = groupCell.addHighlight("fade");
-        		groupHigh.addContent(" [");
-        		groupHigh.addXref(baseURL + "&submit_edit_group&group_id=" + policyGroup.getID(), T_group_edit);
-        		groupHigh.addContent("]");
-        	}
-        	else {
-            	row.addCell().addContent("...");
-        	}
-	    }
+        }
+        
     	Para buttons = main.addPara();
     	buttons.addButton("submit_delete").setValue(T_submit_delete);
     	buttons.addButton("submit_return").setValue(T_submit_return);

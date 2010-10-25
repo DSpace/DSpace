@@ -59,7 +59,9 @@ import org.dspace.content.Collection;
 public class CollectionListTag extends TagSupport
 {
     /** Collections to display */
-    private Collection[] collections;
+    private transient Collection[] collections;
+
+    private static final long serialVersionUID = -9040013543196580904L;
 
     public CollectionListTag()
     {

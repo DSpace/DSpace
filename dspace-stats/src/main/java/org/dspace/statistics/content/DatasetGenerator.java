@@ -23,16 +23,16 @@ package org.dspace.statistics.content;
 public abstract class DatasetGenerator {
     
     /** The type of generator can either be CATEGORY or SERIE **/
-    public int DatasetType;
+    protected int datasetType;
 
-    public boolean includeTotal = false;
+    protected boolean includeTotal = false;
 
     public int getDatasetType(){
-        return DatasetType;
+        return datasetType;
     }
 
     public void setDatasetType(int datasetType){
-        DatasetType = datasetType;
+        this.datasetType = datasetType;
     }
     
     public boolean isIncludeTotal() {

@@ -93,7 +93,7 @@ public class ItemListTag extends TagSupport
     private static Logger log = Logger.getLogger(ItemListTag.class);
 
     /** Items to display */
-    private Item[] items;
+    private transient Item[] items;
 
     /** Row to highlight, -1 for no row */
     private int highlightRow = -1;
@@ -134,7 +134,9 @@ public class ItemListTag extends TagSupport
 
     private static int authorLimit = -1;
 
-    private SortOption sortOption = null;
+    private transient SortOption sortOption = null;
+
+    private static final long serialVersionUID = 348762897199116432L;
 
     public ItemListTag()
     {

@@ -190,8 +190,8 @@ public class DescribeStep extends AbstractSubmissionStep
                 Collection collection = submission.getCollection();
                 String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
 
-                DCInputSet inputSet = null;
-                DCInput[] inputs = {};
+                DCInputSet inputSet;
+                DCInput[] inputs;
                 try
                 {
                         inputSet = getInputsReader().getInputs(submission.getCollection().getHandle());
@@ -201,8 +201,6 @@ public class DescribeStep extends AbstractSubmissionStep
                 {
                         throw new UIException(se);
                 }
-                
-                
 
                 Division div = body.addInteractiveDivision("submit-describe",actionURL,Division.METHOD_POST,"primary submission");
                 div.setHead(T_submission_head);
@@ -357,7 +355,7 @@ public class DescribeStep extends AbstractSubmissionStep
 
             String inputType = input.getInputType();
             String pairsName = input.getPairsType();
-            DCValue[] values = new DCValue[0];
+            DCValue[] values;
 
             if (inputType.equals("qualdrop_value"))
             {
@@ -368,7 +366,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 values = submission.getItem().getMetadata(input.getSchema(), input.getElement(), input.getQualifier(), Item.ANY);
             }
 
-            if (values.length > 0)
+            if (values != null && values.length > 0)
             {
                 for (DCValue value : values)
                 {

@@ -75,7 +75,9 @@ public class SelectGroupTag extends TagSupport
 	private boolean multiple;
 	
 	/** Which groups are initially in the list? */
-	private Group[] groups; 
+	private transient Group[] groups;
+
+    private static final long serialVersionUID = -3330389128849427302L; 
 
 
 	public SelectGroupTag()

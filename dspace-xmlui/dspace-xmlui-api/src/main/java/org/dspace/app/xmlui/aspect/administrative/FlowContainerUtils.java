@@ -330,7 +330,6 @@ public class FlowContainerUtils
 	 */
 	public static FlowResult processReimportCollection(Context context, int collectionID, Request request) throws SQLException, IOException, AuthorizeException, CrosswalkException, ParserConfigurationException, SAXException, TransformerException, BrowseException 
 	{
-		FlowResult result = new FlowResult();
 		Collection collection = Collection.find(context, collectionID);
 		HarvestedCollection hc = HarvestedCollection.find(context, collectionID);
 		
@@ -347,9 +346,7 @@ public class FlowContainerUtils
 		collection.update();
 		context.commit();
 		
-		result = processRunCollectionHarvest(context, collectionID, request);		
-		
-		return result;		
+		return processRunCollectionHarvest(context, collectionID, request);
 	}
 	
 	

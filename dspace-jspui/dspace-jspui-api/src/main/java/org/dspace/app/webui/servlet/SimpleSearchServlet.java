@@ -107,7 +107,6 @@ public class SimpleSearchServlet extends DSpaceServlet
         String order = request.getParameter("order");
         int rpp = UIUtil.getIntParameter(request, "rpp");
         String advancedQuery = "";
-        Map<String, String> queryHash = new HashMap<String, String>();
 
         // can't start earlier than 0 in the results!
         if (start < 0)
@@ -402,11 +401,14 @@ public class SimpleSearchServlet extends DSpaceServlet
             request.setAttribute("communities", communities);
             request.setAttribute("no_results", "yes");
 
-            queryHash = qArgs.buildQueryMap(request);
+            Map<String, String> queryHash = qArgs.buildQueryMap(request);
 
-            for (Map.Entry<String, String> entry : queryHash.entrySet())
+            if (queryHash != null)
             {
-                request.setAttribute(entry.getKey(), entry.getValue());
+                for (Map.Entry<String, String> entry : queryHash.entrySet())
+                {
+                    request.setAttribute(entry.getKey(), entry.getValue());
+                }
             }
 
             JSPManager.showJSP(request, response, "/search/advanced.jsp");

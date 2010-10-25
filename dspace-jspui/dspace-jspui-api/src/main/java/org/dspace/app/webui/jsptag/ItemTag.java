@@ -213,10 +213,10 @@ public class ItemTag extends TagSupport
     private static final String DOI_DEFAULT_BASEURL = "http://dx.doi.org/";
 
     /** Item to display */
-    private Item item;
+    private transient Item item;
 
     /** Collections this item appears in */
-    private Collection[] collections;
+    private transient Collection[] collections;
 
     /** The style to use - "default" or "full" */
     private String style;
@@ -240,6 +240,8 @@ public class ItemTag extends TagSupport
     
     /** regex pattern to capture the style of a field, ie <code>schema.element.qualifier(style)</code> */
     private Pattern fieldStylePatter = Pattern.compile(".*\\((.*)\\)");
+
+    private static final long serialVersionUID = -3841266490729417240L;
     
     public ItemTag()
     {

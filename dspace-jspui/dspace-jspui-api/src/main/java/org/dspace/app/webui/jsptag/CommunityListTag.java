@@ -60,7 +60,9 @@ import org.dspace.content.Community;
 public class CommunityListTag extends TagSupport
 {
     /** Communities to display */
-    private Community[] communities;
+    private transient Community[] communities;
+
+    private static final long serialVersionUID = 5788338729470292501L;
 
     public CommunityListTag()
     {
