@@ -68,9 +68,6 @@ public class LogLine
     
     /**
      * constructor to create new statistic
-     *
-     * @param   key     the key for the statistic
-     * @param   value   the value for the statistic
      */
     LogLine(Date date, String level, String user, String action, String params)
     {
@@ -88,7 +85,7 @@ public class LogLine
      */
     public Date getDate()
     {
-        return this.date;
+        return this.date == null ? null : new Date(this.date.getTime());
     }
     
     
@@ -147,7 +144,7 @@ public class LogLine
     {
         if (date != null)
         {
-            return (date.compareTo(this.getDate()) >= 0);
+            return (date.compareTo(this.date) >= 0);
         }
         return false;
     }
@@ -164,7 +161,7 @@ public class LogLine
     {
         if (date != null)
         {
-            return (date.compareTo(this.getDate()) <= 0);
+            return (date.compareTo(this.date) <= 0);
         }
         return false;
     }

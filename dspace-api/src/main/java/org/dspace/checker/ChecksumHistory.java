@@ -99,8 +99,8 @@ public class ChecksumHistory
             String checksumExpted, String checksumCalc, String inResult)
     {
         this.bitstreamId = bitstrmId;
-        this.processStartDate = startDate == null ? null : (Date)startDate.clone();
-        this.processEndDate = endDate == null ? null : (Date)endDate.clone();
+        this.processStartDate = (startDate == null ? null : new Date(startDate.getTime()));
+        this.processEndDate = (endDate == null ? null : new Date(endDate.getTime()));
         this.checksumExpected = checksumExpted;
         this.checksumCalculated = checksumCalc;
         this.result = inResult;
@@ -161,7 +161,7 @@ public class ChecksumHistory
      */
     public Date getProcessEndDate()
     {
-        return processEndDate == null ? null : (Date)processEndDate.clone();
+        return processEndDate == null ? null : new Date(processEndDate.getTime());
     }
 
     /**
@@ -172,7 +172,7 @@ public class ChecksumHistory
      */
     public void setProcessEndDate(Date processEndDate)
     {
-        this.processEndDate = processEndDate == null ? null : (Date)processEndDate.clone();
+        this.processEndDate = (processEndDate == null ? null : new Date(processEndDate.getTime()));
     }
 
     /**
@@ -183,7 +183,7 @@ public class ChecksumHistory
      */
     public Date getProcessStartDate()
     {
-        return processStartDate == null ? null : (Date)processStartDate.clone();
+        return processStartDate == null ? null : new Date(processStartDate.getTime());
     }
 
     /**
@@ -195,7 +195,7 @@ public class ChecksumHistory
      */
     public void setProcessStartDate(Date processStartDate)
     {
-        this.processStartDate = processStartDate == null ? null : (Date)processStartDate.clone();
+        this.processStartDate = (processStartDate == null ? null : new Date(processStartDate.getTime()));
     }
 
     /**

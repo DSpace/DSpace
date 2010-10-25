@@ -423,7 +423,7 @@ public final class CheckerCommand
      */
     public Date getProcessStartDate()
     {
-        return processStartDate == null ? null : (Date)processStartDate.clone();
+        return processStartDate == null ? null : new Date(processStartDate.getTime());
     }
 
     /**
@@ -434,7 +434,7 @@ public final class CheckerCommand
      */
     public void setProcessStartDate(Date startDate)
     {
-        processStartDate = startDate == null ? null : (Date)startDate.clone();
+        processStartDate = startDate == null ? null : new Date(startDate.getTime());
     }
 
     /**

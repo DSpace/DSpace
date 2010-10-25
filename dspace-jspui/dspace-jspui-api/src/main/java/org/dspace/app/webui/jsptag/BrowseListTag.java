@@ -683,7 +683,7 @@ public class BrowseListTag extends TagSupport
      */
     public BrowseItem[] getItems()
     {
-        return items;
+        return (BrowseItem[]) ArrayUtils.clone(items);
     }
 
     /**

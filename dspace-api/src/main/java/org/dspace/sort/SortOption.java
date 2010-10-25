@@ -42,6 +42,7 @@ import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 
@@ -237,7 +238,7 @@ public class SortOption
 	 */
 	public String[] getMdBits()
     {
-    	return mdBits;
+    	return (String[]) ArrayUtils.clone(mdBits);
     }
     
 	/**

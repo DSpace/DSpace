@@ -487,7 +487,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      */
     public String[] getCountValues()
     {
-        return this.countValues;
+        return (String[]) ArrayUtils.clone(this.countValues);
     }
 
     /* (non-Javadoc)
@@ -535,7 +535,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      */
     public String[] getSelectValues()
     {
-        return selectValues;
+        return (String[]) ArrayUtils.clone(selectValues);
     }
 
     /* (non-Javadoc)

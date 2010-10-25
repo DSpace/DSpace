@@ -150,7 +150,7 @@ public class Dataset {
     }
 
     public float[][] getMatrix() {
-        return matrix;
+        return (float[][]) ArrayUtils.clone(matrix);
     }
 
     public int getNbRows() {

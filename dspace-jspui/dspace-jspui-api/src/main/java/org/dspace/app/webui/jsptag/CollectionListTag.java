@@ -122,7 +122,7 @@ public class CollectionListTag extends TagSupport
      */
     public Collection[] getCollections()
     {
-        return collections;
+        return (Collection[]) ArrayUtils.clone(collections);
     }
 
     /**

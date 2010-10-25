@@ -44,6 +44,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -224,7 +225,7 @@ public class PREMISCrosswalk
 
     public Namespace[] getNamespaces()
     {
-        return namespaces;
+        return (Namespace[]) ArrayUtils.clone(namespaces);
     }
 
     public String getSchemaLocation()

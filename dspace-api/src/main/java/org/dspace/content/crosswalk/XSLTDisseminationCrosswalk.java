@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCValue;
@@ -182,7 +183,7 @@ public class XSLTDisseminationCrosswalk
         {
             log.error(e.toString());
         }
-        return namespaces;
+        return (Namespace[]) ArrayUtils.clone(namespaces);
     }
 
     /**

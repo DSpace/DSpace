@@ -210,7 +210,7 @@ public class HTMLReport implements Report
      */
     public void setStartDate(Date start)
     {
-        this.start = start == null ? null : (Date)start.clone();
+        this.start = (start == null ? null : new Date(start.getTime()));
     }
     
     
@@ -221,7 +221,7 @@ public class HTMLReport implements Report
      */
     public void setEndDate(Date end)
     {
-        this.end = end == null ? null : (Date)end.clone();
+        this.end = (end == null ? null : new Date(end.getTime()));
     }
     
     

@@ -83,7 +83,7 @@ public class RecentSubmissions
 	 */
 	public Item[] getRecentSubmissions()
 	{
-		return items;
+		return (Item[])ArrayUtils.clone(items);
 	}
 	
 	/**

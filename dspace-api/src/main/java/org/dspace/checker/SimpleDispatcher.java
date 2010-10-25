@@ -72,7 +72,7 @@ public class SimpleDispatcher implements BitstreamDispatcher
     public SimpleDispatcher(BitstreamInfoDAO bitstreamInfoDAO, Date startTime, boolean looping)
     {
         this.bitstreamInfoDAO = bitstreamInfoDAO;
-        this.processStartTime = startTime == null ? null : (Date)startTime.clone();
+        this.processStartTime = (startTime == null ? null : new Date(startTime.getTime()));
         this.loopContinuously = looping;
     }
 

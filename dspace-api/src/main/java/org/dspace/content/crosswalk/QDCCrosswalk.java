@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCValue;
@@ -346,7 +347,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
         catch (Exception e)
         {
         }
-        return namespaces;
+        return (Namespace[]) ArrayUtils.clone(namespaces);
     }
 
     public String getSchemaLocation()

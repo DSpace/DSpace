@@ -65,7 +65,7 @@ public class StatisticsBean implements java.io.Serializable
     }
     public String[][] getMatrix()
     {
-        return this.matrix;
+        return (String[][]) ArrayUtils.clone(this.matrix);
     }
     public void setMatrix(final String[][] matrix)
     {

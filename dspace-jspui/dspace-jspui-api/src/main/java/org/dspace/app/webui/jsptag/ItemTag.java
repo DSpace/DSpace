@@ -335,7 +335,7 @@ public class ItemTag extends TagSupport
      */
     public Collection[] getCollections()
     {
-        return collections;
+        return (Collection[]) ArrayUtils.clone(collections);
     }
 
     /**

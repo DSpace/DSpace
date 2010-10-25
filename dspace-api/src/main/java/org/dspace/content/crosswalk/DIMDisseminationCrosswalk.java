@@ -45,6 +45,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
@@ -75,7 +76,7 @@ public class DIMDisseminationCrosswalk
 
     public Namespace[] getNamespaces()
     {
-        return namespaces;
+        return (Namespace[]) ArrayUtils.clone(namespaces);
     }
 
     /* No schema for DIM */ 

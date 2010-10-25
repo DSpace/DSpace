@@ -47,14 +47,14 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
      * Must be paired with {@link #setEndDate(Date)}.
      */
     public void setStartDate(Date startDate) {
-        this.startDate = startDate == null ? null : (Date)startDate.clone();
+        this.startDate = (startDate == null ? null : new Date(startDate.getTime()));
     }
 
     /** Set the end date as a Date object.
      * Must be paired with {@link #setStartDate(Date)}.
      */
     public void setEndDate(Date endDate) {
-        this.endDate = endDate == null ? null : (Date)endDate.clone();
+        this.endDate = (endDate == null ? null : new Date(endDate.getTime()));
     }
 
     /** Convert the date range to a filter expression.

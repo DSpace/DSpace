@@ -57,8 +57,8 @@ public class DatasetTimeGenerator extends DatasetGenerator {
     public void setDateInterval(String dateType, Date start, Date end)
             throws IllegalArgumentException
     {
-        actualStartDate = (Date) start.clone();
-        actualEndDate = (Date) end.clone();
+        actualStartDate = (start == null ? null : new Date(start.getTime()));
+        actualEndDate = (end == null ? null : new Date(end.getTime()));
         
         this.dateType = dateType;
 
@@ -134,19 +134,19 @@ public class DatasetTimeGenerator extends DatasetGenerator {
     }
 
     public Date getActualStartDate() {
-        return actualStartDate == null ? null : (Date)actualStartDate.clone();
+        return actualStartDate == null ? null : new Date(actualStartDate.getTime());
     }
 
     public void setActualStartDate(Date actualStartDate) {
-        this.actualStartDate = actualStartDate == null ? null : (Date)actualStartDate.clone();
+        this.actualStartDate = (actualStartDate == null ? null : new Date(actualStartDate.getTime()));
     }
 
     public Date getActualEndDate() {
-        return actualEndDate == null ? null : (Date)actualEndDate.clone();
+        return actualEndDate == null ? null : new Date(actualEndDate.getTime());
     }
 
     public void setActualEndDate(Date actualEndDate) {
-        this.actualEndDate = actualEndDate == null ? null : (Date)actualEndDate.clone();
+        this.actualEndDate = (actualEndDate == null ? null : new Date(actualEndDate.getTime()));
     }
 
     public void setDateType(String dateType) {

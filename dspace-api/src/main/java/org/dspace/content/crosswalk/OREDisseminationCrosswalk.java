@@ -49,6 +49,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -95,7 +96,7 @@ public class OREDisseminationCrosswalk
     
     public Namespace[] getNamespaces()
     {
-        return namespaces;
+        return (Namespace[]) ArrayUtils.clone(namespaces);
     }
 
     /* There is (and currently can be) no XSD schema that validates Atom feeds, only RNG */ 

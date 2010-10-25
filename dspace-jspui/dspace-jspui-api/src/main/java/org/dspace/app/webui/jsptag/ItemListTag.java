@@ -652,7 +652,7 @@ public class ItemListTag extends TagSupport
      */
     public Item[] getItems()
     {
-        return items;
+        return (Item[]) ArrayUtils.clone(items);
     }
 
     /**

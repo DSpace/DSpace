@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -124,7 +125,7 @@ public class METSRightsCrosswalk
     @Override
     public Namespace[] getNamespaces()
     {
-        return namespaces;
+        return (Namespace[]) ArrayUtils.clone(namespaces);
     }
 
     @Override
