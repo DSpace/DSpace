@@ -509,9 +509,19 @@ class DAVItem extends DAVDSpaceObject
                 dip.disseminate(this.context, this.item, pparams, tempFile);
 
                 // Copy temporary file contents to response stream
-                FileInputStream fileIn = new FileInputStream(tempFile);
-                Utils.copy(fileIn, this.response.getOutputStream());
-                fileIn.close();
+                FileInputStream fileIn = null;
+                try
+                {
+                    fileIn = new FileInputStream(tempFile);
+                    Utils.copy(fileIn, this.response.getOutputStream());
+                }
+                finally
+                {
+                    if (fileIn != null)
+                    {
+                        fileIn.close();
+                    }
+                }
             }
             catch (CrosswalkException pe)
             {

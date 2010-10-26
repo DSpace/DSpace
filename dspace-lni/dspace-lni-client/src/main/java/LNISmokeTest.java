@@ -58,6 +58,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
 import org.dspace.app.dav.client.LNIClientUtils;
 import org.dspace.app.dav.client.LNISoapServlet;
 import org.dspace.app.dav.client.LNISoapServletServiceLocator;
@@ -88,6 +89,7 @@ import org.jdom.output.XMLOutputter;
  */
 public class LNISmokeTest
 {
+    private static final Logger log = Logger.getLogger(LNISmokeTest.class);
 
     /** 
      * The Constant NS_DAV. 
@@ -547,13 +549,36 @@ public class LNISmokeTest
         fixBasicAuth(url, conn);
         conn.connect();
 
-        InputStream in = new FileInputStream(source);
-        OutputStream out = conn.getOutputStream();
+        InputStream in = null;
+        OutputStream out = null;
         try {
+            in = new FileInputStream(source);
+            out = conn.getOutputStream();
             copyStream(in, out);
         } finally {
-            in.close();
-            out.close();
+            if (in != null)
+            {
+                try
+                {
+                    in.close();
+                }
+                catch (IOException e)
+                {
+                    log.error("Unable to close input stream", e);
+                }
+            }
+            
+            if (out!= null)
+            {
+                try
+                {
+                    out.close();
+                }
+                catch (IOException e)
+                {
+                    log.error("Unable to close output stream", e);
+                }
+            }
         }
 
         int status = conn.getResponseCode();
