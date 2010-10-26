@@ -241,7 +241,7 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
                 catch (IOException e)
                 {
                     // FIXME: no error handing yet
-                    throw new RuntimeException(e.getMessage(),e);
+                    throw new IllegalStateException(e.getMessage(),e);
                 }
 
                 // FIXME: there's got to be a better way of doing this

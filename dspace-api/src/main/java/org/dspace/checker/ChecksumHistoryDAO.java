@@ -156,8 +156,7 @@ public class ChecksumHistoryDAO extends DAOSupport
         catch (SQLException e)
         {
             LOG.error("Problem updating checksum row. " + e.getMessage(), e);
-            throw new RuntimeException("Problem updating checksum row. "
-                    + e.getMessage(), e);
+            throw new IllegalStateException("Problem updating checksum row. " + e.getMessage(), e);
         }
         finally
         {
@@ -190,10 +189,8 @@ public class ChecksumHistoryDAO extends DAOSupport
         }
         catch (SQLException e)
         {
-            LOG.error("Problem with inserting missing bitstream. "
-                    + e.getMessage(), e);
-            throw new RuntimeException("Problem inserting missing bitstream. "
-                    + e.getMessage(), e);
+            LOG.error("Problem with inserting missing bitstream. " + e.getMessage(), e);
+            throw new IllegalStateException("Problem inserting missing bitstream. " + e.getMessage(), e);
         }
         finally
         {
@@ -224,8 +221,7 @@ public class ChecksumHistoryDAO extends DAOSupport
         catch (SQLException e)
         {
             LOG.error("Problem updating missing history. " + e.getMessage(), e);
-            throw new RuntimeException("Problem updating missing history. "
-                    + e.getMessage(), e);
+            throw new IllegalStateException("Problem updating missing history. " + e.getMessage(), e);
         }
         finally
         {
@@ -293,8 +289,7 @@ public class ChecksumHistoryDAO extends DAOSupport
         catch (SQLException e)
         {
             LOG.error("Problem pruning results: " + e.getMessage(), e);
-            throw new RuntimeException("Problem pruning results: "
-                    + e.getMessage(), e);
+            throw new IllegalStateException("Problem pruning results: " + e.getMessage(), e);
         }
         finally
         {

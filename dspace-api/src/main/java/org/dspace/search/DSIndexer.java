@@ -212,8 +212,7 @@ public class DSIndexer
                 default:
                     log.warn("Malformed configuration line: search.index." + i);
                     // FIXME: Can't proceed here, no suitable exception to throw
-                    throw new RuntimeException(
-                            "Malformed configuration line: search.index." + i);
+                    throw new IllegalStateException("Malformed configuration line: search.index." + i);
                 }
 
                 if (configLine.length > 2)
@@ -240,8 +239,7 @@ public class DSIndexer
                 }
 				openIndex(true).close();
 			} catch (IOException e) {
-                throw new RuntimeException(
-                        "Could not create search index: " + e.getMessage(),e);
+                throw new IllegalStateException("Could not create search index: " + e.getMessage(),e);
                }
     	}
     }

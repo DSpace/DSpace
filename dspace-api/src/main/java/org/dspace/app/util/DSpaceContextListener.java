@@ -112,7 +112,7 @@ public class DSpaceContextListener implements ServletContextListener
         // Finally, if no config parameter found throw an error
         if (dspaceConfig == null || "".equals(dspaceConfig))
         {
-            throw new RuntimeException(
+            throw new IllegalStateException(
                     "\n\nDSpace has failed to initialize. This has occurred because it was unable to determine \n" +
                     "where the dspace.cfg file is located. The path to the configuration file should be stored \n" +
                     "in a context variable, '"+DSPACE_CONFIG_PARAMETER+"', in the global context. \n" +
@@ -136,7 +136,7 @@ public class DSpaceContextListener implements ServletContextListener
         }
         catch (Exception e)
         {
-            throw new RuntimeException(
+            throw new IllegalStateException(
                     "\n\nDSpace has failed to initialize, during stage 2. Error while attempting to read the \n" +
                     "DSpace configuration file (Path: '"+dspaceConfig+"'). \n" +
                     "This has likely occurred because either the file does not exist, or it's permissions \n" +

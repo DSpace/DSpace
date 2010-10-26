@@ -115,7 +115,7 @@ public class HandleDispatcher implements BitstreamDispatcher
             catch (SQLException e)
             {
                 LOG.error("init error " + e.getMessage(), e);
-                throw new RuntimeException("init error" + e.getMessage(), e);
+                throw new IllegalStateException("init error" + e.getMessage(), e);
 
             }
             finally

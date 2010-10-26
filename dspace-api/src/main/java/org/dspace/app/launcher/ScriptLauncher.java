@@ -94,7 +94,7 @@ public class ScriptLauncher
             }
             String message = "Failure during filter init: " + e.getMessage();
             System.err.println(message + ":" + e);
-            throw new RuntimeException(message, e);
+            throw new IllegalStateException(message, e);
         }
 
         // Parse the configuration file looking for the command entered

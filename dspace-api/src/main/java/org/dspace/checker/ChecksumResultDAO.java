@@ -101,10 +101,8 @@ public final class ChecksumResultDAO extends DAOSupport
         }
         catch (SQLException e)
         {
-            LOG.error("Problem selecting checker result description. "
-                    + e.getMessage(), e);
-            throw new RuntimeException("selecting checker result description. "
-                    + e.getMessage(), e);
+            LOG.error("Problem selecting checker result description. " + e.getMessage(), e);
+            throw new IllegalStateException("selecting checker result description. " + e.getMessage(), e);
         }
         finally
         {
@@ -140,11 +138,8 @@ public final class ChecksumResultDAO extends DAOSupport
         }
         catch (SQLException e)
         {
-            LOG.error("Problem listing checksum results codes: "
-                    + e.getMessage(), e);
-            throw new RuntimeException(
-                    "Problem listing checksum results codes: " + e.getMessage(),
-                    e);
+            LOG.error("Problem listing checksum results codes: " + e.getMessage(), e);
+            throw new IllegalStateException("Problem listing checksum results codes: " + e.getMessage(), e);
         }
         finally
         {

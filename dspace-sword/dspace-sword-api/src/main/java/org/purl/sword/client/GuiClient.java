@@ -194,7 +194,7 @@ public class GuiClient extends JFrame implements ClientType,
 					"Unable to load properties file " + ioe.getMessage(),
 					"Properties", JOptionPane.ERROR_MESSAGE);
 		} catch (URISyntaxException e) {
-			throw new RuntimeException(
+			throw new IllegalStateException(
 					"Most unexpectedly, a file URL is not a URI.", e);
 		} finally {
 			IOUtils.closeQuietly(stream);
@@ -1102,7 +1102,7 @@ public class GuiClient extends JFrame implements ClientType,
 					}
 				}
 			} else {
-				throw new RuntimeException(
+				throw new IllegalStateException(
 						"Don't know how to unpack help files from " + help);
 			}
 		}

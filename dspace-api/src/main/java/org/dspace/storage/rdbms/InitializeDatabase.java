@@ -88,7 +88,7 @@ public class InitializeDatabase
                 catch (BrowseException e)
                 {
                     log.error(e.getMessage(),e);
-                    throw new RuntimeException(e.getMessage(),e);
+                    throw new IllegalStateException(e.getMessage(),e);
                 }
                 
                 DatabaseManager.loadSql(getScript(argv[0]));
@@ -109,7 +109,7 @@ public class InitializeDatabase
                 catch (BrowseException e)
                 {
                     log.error(e.getMessage(),e);
-                    throw new RuntimeException(e.getMessage(),e);
+                    throw new IllegalStateException(e.getMessage(),e);
                 }
             }
             

@@ -1033,7 +1033,7 @@ public class ItemExport
                         {
                             // wont throw here
                         }
-                        throw new RuntimeException(e1);
+                        throw new IllegalStateException(e1);
                     }
                     finally
                     {

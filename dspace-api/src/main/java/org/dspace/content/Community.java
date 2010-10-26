@@ -1136,7 +1136,7 @@ public class Community extends DSpaceObject
         {
             // FIXME: upside down exception handling due to lack of good
             // exception framework
-            throw new RuntimeException(e.getMessage(),e);
+            throw new IllegalStateException(e.getMessage(),e);
         }
 
         // Remove any Handle

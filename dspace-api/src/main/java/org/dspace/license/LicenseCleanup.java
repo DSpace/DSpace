@@ -87,7 +87,7 @@ public class LicenseCleanup
         catch (TransformerConfigurationException e)
         {
             log.error(e.getMessage(), e);
-            throw new RuntimeException(e.getMessage(), e);
+            throw new IllegalStateException(e.getMessage(), e);
         }
     }
 
@@ -188,7 +188,7 @@ public class LicenseCleanup
         }
         catch (TransformerException e)
         {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new IllegalStateException(e.getMessage(), e);
         }
 
         StringBuffer buffer = result.getBuffer();

@@ -265,7 +265,7 @@ public class CreateAdministrator
     	
     	if (admins == null)
     	{
-    		throw new Exception("Error, no admin group (group 1) found");
+    		throw new IllegalStateException("Error, no admin group (group 1) found");
     	}
     	
     	// Create the administrator e-person

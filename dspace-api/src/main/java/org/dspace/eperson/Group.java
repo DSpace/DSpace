@@ -208,7 +208,7 @@ public class Group extends DSpaceObject
             }
             catch (Exception e)
             {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
             isDataLoaded = true;
         }

@@ -115,7 +115,7 @@ public class CreativeCommons
         }
         catch (TransformerConfigurationException e)
         {
-            throw new RuntimeException(e.getMessage(),e);
+            throw new IllegalStateException(e.getMessage(),e);
         }
        
         
@@ -311,7 +311,7 @@ public class CreativeCommons
         }
         catch (TransformerException e)
         {
-            throw new RuntimeException(e.getMessage(),e);
+            throw new IllegalStateException(e.getMessage(),e);
         }
 
         return result.getBuffer().toString();

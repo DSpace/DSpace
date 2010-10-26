@@ -81,7 +81,7 @@ public final class ResultsPruner
         }
         catch (FileNotFoundException e)
         {
-            throw new RuntimeException(
+            throw new IllegalStateException(
                     "VeryExceptionalException - config file not there! ", e);
         }
 
@@ -111,7 +111,7 @@ public final class ResultsPruner
         }
         catch (IOException e)
         {
-            throw new RuntimeException("Problem loading properties file: "
+            throw new IllegalStateException("Problem loading properties file: "
                     + e.getMessage(), e);
         }
         finally
@@ -161,7 +161,7 @@ public final class ResultsPruner
             }
             catch (ParseException e)
             {
-                throw new RuntimeException("Problem parsing duration: "
+                throw new IllegalStateException("Problem parsing duration: "
                         + e.getMessage(), e);
             }
             if ("default".equals(resultCode))

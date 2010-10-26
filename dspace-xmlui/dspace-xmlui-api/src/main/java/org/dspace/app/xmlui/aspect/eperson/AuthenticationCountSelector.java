@@ -92,7 +92,7 @@ public class AuthenticationCountSelector implements Selector{
             catch (SQLException e)
             {
                 // mmm... we should not never go here, anyway we convert it in an unchecked exception 
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
 		}
 		

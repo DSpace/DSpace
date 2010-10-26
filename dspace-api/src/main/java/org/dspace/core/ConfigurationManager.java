@@ -306,7 +306,7 @@ public class ConfigurationManager
 
             // FIXME: Maybe something more graceful here, but with the
             // configuration we can't do anything
-            throw new RuntimeException("Failed to read default license.", e);
+            throw new IllegalStateException("Failed to read default license.", e);
         }
         finally
         {
@@ -695,7 +695,7 @@ public class ConfigurationManager
             if (url == null)
             {
                 fatal("Cannot find dspace.cfg");
-                throw new RuntimeException("Cannot find dspace.cfg");
+                throw new IllegalStateException("Cannot find dspace.cfg");
             }
             else
             {
@@ -722,7 +722,7 @@ public class ConfigurationManager
 
             // FIXME: Maybe something more graceful here, but with the
             // configuration we can't do anything
-            throw new RuntimeException("Cannot load configuration: " + url, e);
+            throw new IllegalStateException("Cannot load configuration: " + url, e);
         }
         finally
         {
@@ -768,7 +768,7 @@ public class ConfigurationManager
 
             // FIXME: Maybe something more graceful here, but with the
             // configuration we can't do anything
-            throw new RuntimeException("Cannot load license: " + licenseFile.toString(),e);
+            throw new IllegalStateException("Cannot load license: " + licenseFile.toString(),e);
         }
         finally
         {
@@ -866,7 +866,7 @@ public class ConfigurationManager
         catch (MalformedURLException e)
         {
             fatal("Can't load dspace provided log4j configuration", e);
-            throw new RuntimeException("Cannot load dspace provided log4j configuration",e);
+            throw new IllegalStateException("Cannot load dspace provided log4j configuration",e);
         }
         
     }

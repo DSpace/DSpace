@@ -142,8 +142,7 @@ public class EventManager
         }
         catch (Exception e)
         {
-            throw new RuntimeException("Unable to aquire dispatcher named "
-                    + name, e);
+            throw new IllegalStateException("Unable to aquire dispatcher named " + name, e);
         }
 
     }
@@ -232,7 +231,7 @@ public class EventManager
                             .getProperty(consumerKey);
                     if (consumerList == null)
                     {
-                        throw new RuntimeException(
+                        throw new IllegalStateException(
                                 "No Configuration entry found for consumer list of event Dispatcher: \""
                                         + consumerKey + "\"");
                     }
@@ -245,7 +244,7 @@ public class EventManager
                     // I think this should be a fatal error.. --lcs
                     if (consumerStanza.length < 1)
                     {
-                        throw new RuntimeException(
+                        throw new IllegalStateException(
                                 "Cannot initialize Dispatcher, malformed Configuration value for "
                                         + consumerKey);
                     }
@@ -264,38 +263,38 @@ public class EventManager
                 }
                 catch (NoSuchMethodException e)
                 {
-                    throw new RuntimeException(
+                    throw new IllegalStateException(
                             "Constructor not found for event dispatcher="
                                     + dispatcherName, e);
                 }
                 catch (InvocationTargetException e)
                 {
-                    throw new RuntimeException(
+                    throw new IllegalStateException(
                             "Error creating event dispatcher=" + dispatcherName,
                             e);
                 }
                 catch (ClassNotFoundException e)
                 {
-                    throw new RuntimeException(
+                    throw new IllegalStateException(
                             "Dispatcher/Consumer class not found for event dispatcher="
                                     + dispatcherName, e);
                 }
                 catch (InstantiationException e)
                 {
-                    throw new RuntimeException(
+                    throw new IllegalStateException(
                             "Dispatcher/Consumer instantiation failure for event dispatcher="
                                     + dispatcherName, e);
                 }
                 catch (IllegalAccessException e)
                 {
-                    throw new RuntimeException(
+                    throw new IllegalStateException(
                             "Dispatcher/Consumer access failure for event dispatcher="
                                     + dispatcherName, e);
                 }
             }
             else
             {
-                throw new RuntimeException(
+                throw new IllegalStateException(
                         "Requested Dispatcher Does Not Exist In DSpace Configuration!");
             }
 

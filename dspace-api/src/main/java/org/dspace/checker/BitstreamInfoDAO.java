@@ -233,8 +233,7 @@ public final class BitstreamInfoDAO extends DAOSupport
         catch (SQLException e)
         {
             LOG.error("Problem updating checksum row. " + e.getMessage(), e);
-            throw new RuntimeException("Problem updating checksum row. "
-                    + e.getMessage(), e);
+            throw new IllegalStateException("Problem updating checksum row. " + e.getMessage(), e);
         }
         finally
         {
@@ -327,11 +326,8 @@ public final class BitstreamInfoDAO extends DAOSupport
         }
         catch (SQLException e)
         {
-            LOG.error(
-                    "Problem inserting missing bitstreams. " + e.getMessage(),
-                    e);
-            throw new RuntimeException("Problem inserting missing bitstreams. "
-                    + e.getMessage(), e);
+            LOG.error("Problem inserting missing bitstreams. " + e.getMessage(), e);
+            throw new IllegalStateException("Problem inserting missing bitstreams. " + e.getMessage(), e);
         }
         finally
         {
@@ -373,8 +369,7 @@ public final class BitstreamInfoDAO extends DAOSupport
         catch (SQLException e)
         {
             LOG.error("Problem deleting bitstream. " + e.getMessage(), e);
-            throw new RuntimeException("Problem deleting bitstream. "
-                    + e.getMessage(), e);
+            throw new IllegalStateException("Problem deleting bitstream. " + e.getMessage(), e);
         }
         finally
         {
@@ -399,8 +394,7 @@ public final class BitstreamInfoDAO extends DAOSupport
         catch (SQLException e)
         {
             LOG.error("Problem deleting bitstream. " + e.getMessage(), e);
-            throw new RuntimeException("Problem deleting bitstream. "
-                    + e.getMessage(), e);
+            throw new IllegalStateException("Problem deleting bitstream. " + e.getMessage(), e);
         }
         finally
         {
@@ -449,8 +443,7 @@ public final class BitstreamInfoDAO extends DAOSupport
         catch (SQLException e)
         {
             LOG.error("Problem with get oldest bitstream " + e.getMessage(), e);
-            throw new RuntimeException("Oldest bitstream error. "
-                    + e.getMessage(), e);
+            throw new IllegalStateException("Oldest bitstream error. " + e.getMessage(), e);
 
         }
         finally
@@ -499,8 +492,7 @@ public final class BitstreamInfoDAO extends DAOSupport
         {
             LOG.error("get oldest bitstream less than date " + e.getMessage(),
                     e);
-            throw new RuntimeException("get oldest bitstream less than date. "
-                    + e.getMessage(), e);
+            throw new IllegalStateException("get oldest bitstream less than date. " + e.getMessage(), e);
 
         }
         finally
@@ -541,8 +533,7 @@ public final class BitstreamInfoDAO extends DAOSupport
         catch (SQLException e)
         {
             LOG.error("get item bitstreams " + e.getMessage(), e);
-            throw new RuntimeException(
-                    "get item bitstreams. " + e.getMessage(), e);
+            throw new IllegalStateException("get item bitstreams. " + e.getMessage(), e);
 
         }
         finally
@@ -583,7 +574,7 @@ public final class BitstreamInfoDAO extends DAOSupport
         catch (SQLException e)
         {
             LOG.error("get item bitstreams " + e.getMessage(), e);
-            throw new RuntimeException("get item bitstreams. " + e.getMessage(), e);
+            throw new IllegalStateException("get item bitstreams. " + e.getMessage(), e);
 
         }
         finally
@@ -625,8 +616,7 @@ public final class BitstreamInfoDAO extends DAOSupport
         catch (SQLException e)
         {
             LOG.error("get item bitstreams " + e.getMessage(), e);
-            throw new RuntimeException(
-                    "get item bitstreams. " + e.getMessage(), e);
+            throw new IllegalStateException("get item bitstreams. " + e.getMessage(), e);
 
         }
         finally
