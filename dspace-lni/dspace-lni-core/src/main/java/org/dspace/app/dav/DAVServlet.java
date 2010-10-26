@@ -45,7 +45,6 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.StringTokenizer;
 
-import javax.servlet.GenericServlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
@@ -345,8 +344,8 @@ public class DAVServlet extends HttpServlet
                 int colon = dcrud.indexOf(':');
                 if (colon > 0)
                 {
-                    username = URLDecode(dcrud.substring(0, colon));
-                    password = URLDecode(dcrud.substring(colon + 1));
+                    username = decodeFromURL(dcrud.substring(0, colon));
+                    password = decodeFromURL(dcrud.substring(colon + 1));
                     log
                             .info(LogManager.getHeader(context, "auth",
                                     "Got username=\"" + username
@@ -664,7 +663,7 @@ public class DAVServlet extends HttpServlet
      * 
      * @return the string
      */
-    protected static String URLDecode(String in)
+    protected static String decodeFromURL(String in)
     {
         try
         {

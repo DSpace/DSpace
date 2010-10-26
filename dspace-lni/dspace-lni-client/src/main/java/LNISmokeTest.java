@@ -128,13 +128,13 @@ public class LNISmokeTest
     private static final String specificPropSuffix = "/></prop></propfind>";
 
     /**
-     * Usage. prints usage info to System.out & dies.
+     * usage. prints usage info to System.out & dies.
      * 
      * @param options the options
      * @param status the status
      * @param msg the msg
      */
-    private static void Usage(Options options, int status, String msg)
+    private static void usage(Options options, int status, String msg)
     {
         HelpFormatter hf = new HelpFormatter();
         if (msg != null)
@@ -204,14 +204,14 @@ public class LNISmokeTest
             CommandLine line = (new PosixParser()).parse(options, argv);
             if (line.hasOption("h"))
             {
-                Usage(options, 0, null);
+                usage(options, 0, null);
             }
 
             // get SOAP client connection, using the endpoint URL
             String endpoint = line.getOptionValue("e");
             if (endpoint == null)
             {
-                Usage(options, 2, "Missing the required -e endpoint argument");
+                usage(options, 2, "Missing the required -e endpoint argument");
             }
             LNISoapServletServiceLocator loc = new LNISoapServletServiceLocator();
             LNISoapServlet lni = loc.getDSpaceLNI(new URL(endpoint));
@@ -244,7 +244,7 @@ public class LNISmokeTest
                 }
                 else
                 {
-                    Usage(options, 13,
+                    usage(options, 13,
                             "Missing required args: -N <name> -V <value>n");
                 }
             }
@@ -260,7 +260,7 @@ public class LNISmokeTest
                 }
                 else
                 {
-                    Usage(options, 13,
+                    usage(options, 13,
                             "Missing required args after -s: -P <packager> -i <file>");
                 }
             }
@@ -276,7 +276,7 @@ public class LNISmokeTest
                 }
                 else
                 {
-                    Usage(options, 13,
+                    usage(options, 13,
                             "Missing required args after -d: -P <packager> -o <file>");
                 }
             }
@@ -291,19 +291,19 @@ public class LNISmokeTest
                 }
                 else
                 {
-                    Usage(options, 13,
+                    usage(options, 13,
                             "Missing required args after -c: -C <collection>\n");
                 }
             }
             else
             {
-                Usage(options, 14, "Missing command option.\n");
+                usage(options, 14, "Missing command option.\n");
             }
 
         }
         catch (ParseException pe)
         {
-            Usage(options, 1, "Error in arguments: " + pe.toString());
+            usage(options, 1, "Error in arguments: " + pe.toString());
             
         }
         catch (java.rmi.RemoteException de)

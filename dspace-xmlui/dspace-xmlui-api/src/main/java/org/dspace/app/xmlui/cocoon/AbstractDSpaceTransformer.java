@@ -201,7 +201,7 @@ public abstract class AbstractDSpaceTransformer extends AbstractWingTransformer
      *            The unencoded string.
      * @return The encoded string
      */
-    public static String URLEncode(String unencodedString) throws UIException
+    public static String encodeForURL(String unencodedString) throws UIException
     {
     	if (unencodedString == null)
         {
@@ -226,7 +226,7 @@ public abstract class AbstractDSpaceTransformer extends AbstractWingTransformer
      *            The encoded string.
      * @return The unencoded string
      */
-    public static String URLDecode(String encodedString) throws UIException
+    public static String decodeFromURL(String encodedString) throws UIException
     {
     	if (encodedString == null)
         {

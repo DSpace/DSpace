@@ -164,9 +164,9 @@ public class ItemComparator implements Comparator, Serializable
 
         ItemComparator other = (ItemComparator) obj;
 
-        return _equals(element, other.element)
-                && _equals(qualifier, other.qualifier)
-                && _equals(language, other.language) && (max == other.max);
+        return equalsWithNull(element, other.element)
+                && equalsWithNull(qualifier, other.qualifier)
+                && equalsWithNull(language, other.language) && (max == other.max);
     }
 
     public int hashCode()
@@ -178,7 +178,7 @@ public class ItemComparator implements Comparator, Serializable
      * Return true if the first string is equal to the second. Either or both
      * may be null.
      */
-    private boolean _equals(String first, String second)
+    private boolean equalsWithNull(String first, String second)
     {
         if (first == null && second == null)
         {

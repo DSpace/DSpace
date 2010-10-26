@@ -102,7 +102,7 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
 		int collectionID = parameters.getParameterAsInteger("collectionID",-1);
 		Collection collection = Collection.find(context,collectionID);	
 		
-		String query = URLDecode(parameters.getParameter("query",null));
+		String query = decodeFromURL(parameters.getParameter("query",null));
 		java.util.List<Item> items = preformSearch(collection,query);
 		
 		

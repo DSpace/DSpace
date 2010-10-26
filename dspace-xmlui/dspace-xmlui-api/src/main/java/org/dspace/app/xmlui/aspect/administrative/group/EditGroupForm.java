@@ -224,7 +224,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	{		
 		// Find the group in question
 		int groupID = parameters.getParameterAsInteger("groupID",-1);
-		String currentName = URLDecode(parameters.getParameter("groupName",null));
+		String currentName = decodeFromURL(parameters.getParameter("groupName",null));
 		if (currentName == null || currentName.length() == 0)
         {
             currentName = FlowGroupUtils.getName(context, groupID);
@@ -289,7 +289,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 		int highlightGroupID = parameters.getParameterAsInteger("highlightGroupID",-1);
 		
 		// Get search parameters
-	    String query = URLDecode(parameters.getParameter("query",null));
+	    String query = decodeFromURL(parameters.getParameter("query",null));
 	    int page     = parameters.getParameterAsInteger("page",0);
 	    String type  = parameters.getParameter("type",null);
 	    

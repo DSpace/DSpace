@@ -331,15 +331,15 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                 {
                     // Create a Map of the query parameters for the link
                     Map<String, String> queryParams = new HashMap<String, String>();
-                    queryParams.put(BrowseParams.TYPE, URLEncode(type));
+                    queryParams.put(BrowseParams.TYPE, encodeForURL(type));
                     if (singleEntry[1] != null)
                     {
-                        queryParams.put(BrowseParams.FILTER_VALUE[1], URLEncode(
+                        queryParams.put(BrowseParams.FILTER_VALUE[1], encodeForURL(
                             singleEntry[1]));
                     }
                     else
                     {
-                        queryParams.put(BrowseParams.FILTER_VALUE[0], URLEncode(
+                        queryParams.put(BrowseParams.FILTER_VALUE[0], encodeForURL(
                             singleEntry[0]));
                     }
 
@@ -595,7 +595,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
         if (info.hasPrevPage())
         {
-            parameters.put(BrowseParams.OFFSET, URLEncode(String.valueOf(info.getPrevOffset())));
+            parameters.put(BrowseParams.OFFSET, encodeForURL(String.valueOf(info.getPrevOffset())));
         }
 
         return super.generateURL(BROWSE_URL_BASE, parameters);
@@ -623,7 +623,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
         if (info.hasNextPage())
         {
-            parameters.put(BrowseParams.OFFSET, URLEncode(String.valueOf(info.getNextOffset())));
+            parameters.put(BrowseParams.OFFSET, encodeForURL(String.valueOf(info.getNextOffset())));
         }
 
         return super.generateURL(BROWSE_URL_BASE, parameters);
@@ -720,7 +720,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             int offset = RequestUtils.getIntParameter(request, BrowseParams.OFFSET);
             params.scope.setOffset(offset > 0 ? offset : 0);
             params.scope.setResultsPerPage(RequestUtils.getIntParameter(request, BrowseParams.RESULTS_PER_PAGE));
-            params.scope.setStartsWith(URLDecode(request.getParameter(BrowseParams.STARTS_WITH)));
+            params.scope.setStartsWith(decodeFromURL(request.getParameter(BrowseParams.STARTS_WITH)));
             String filterValue = request.getParameter(BrowseParams.FILTER_VALUE[0]);
             if (filterValue == null)
             {
@@ -729,9 +729,9 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             }
             
             params.scope.setFilterValue(filterValue);
-            params.scope.setJumpToValue(URLDecode(request.getParameter(BrowseParams.JUMPTO_VALUE)));
-            params.scope.setJumpToValueLang(URLDecode(request.getParameter(BrowseParams.JUMPTO_VALUE_LANG)));
-            params.scope.setFilterValueLang(URLDecode(request.getParameter(BrowseParams.FILTER_VALUE_LANG)));
+            params.scope.setJumpToValue(decodeFromURL(request.getParameter(BrowseParams.JUMPTO_VALUE)));
+            params.scope.setJumpToValueLang(decodeFromURL(request.getParameter(BrowseParams.JUMPTO_VALUE_LANG)));
+            params.scope.setFilterValueLang(decodeFromURL(request.getParameter(BrowseParams.FILTER_VALUE_LANG)));
 
             // Filtering to a value implies this is a second level browse
             if (params.scope.getFilterValue() != null)
@@ -1027,7 +1027,7 @@ class BrowseParams
 
         for (Map.Entry<String, String> param : paramMap.entrySet())
         {
-            encodedParamMap.put(param.getKey(), AbstractDSpaceTransformer.URLEncode(param.getValue()));
+            encodedParamMap.put(param.getKey(), AbstractDSpaceTransformer.encodeForURL(param.getValue()));
         }
 
         return encodedParamMap;
@@ -1044,7 +1044,7 @@ class BrowseParams
 
         paramMap.put(BrowseParams.SORT_BY, Integer.toString(this.scope.getSortBy()));
         paramMap
-                .put(BrowseParams.ORDER, AbstractDSpaceTransformer.URLEncode(this.scope.getOrder()));
+                .put(BrowseParams.ORDER, AbstractDSpaceTransformer.encodeForURL(this.scope.getOrder()));
         paramMap.put(BrowseParams.RESULTS_PER_PAGE, Integer
                 .toString(this.scope.getResultsPerPage()));
         paramMap.put(BrowseParams.ETAL, Integer.toString(this.etAl));

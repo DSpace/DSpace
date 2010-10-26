@@ -44,7 +44,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import javax.servlet.GenericServlet;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -153,11 +152,11 @@ public class LNISoapServlet extends AxisServlet
 
         if (mc.getUsername() != null)
         {
-            username = DAVServlet.URLDecode(mc.getUsername());
+            username = DAVServlet.decodeFromURL(mc.getUsername());
         }
         if (mc.getPassword() != null)
         {
-            password = DAVServlet.URLDecode(mc.getPassword());
+            password = DAVServlet.decodeFromURL(mc.getPassword());
         }
 
         /***********************************************************************

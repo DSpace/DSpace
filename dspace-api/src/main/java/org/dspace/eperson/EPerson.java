@@ -962,26 +962,6 @@ public class EPerson extends DSpaceObject
     }
 
     /**
-     * Return <code>true</code> if <code>other</code> is the same EPerson as
-     * this object, <code>false</code> otherwise
-     * 
-     * @param other
-     *            object to compare to
-     * 
-     * @return <code>true</code> if object passed in represents the same
-     *         eperson as this object
-     */
-    public boolean obsolete_equals(Object other)
-    {
-        if (!(other instanceof EPerson))
-        {
-            return false;
-        }
-
-        return (getID() == ((EPerson) other).getID());
-    }
-
-    /**
      * return type found in Constants
      */
     public int getType()

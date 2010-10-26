@@ -107,7 +107,7 @@ public class AuthorizationMain extends AbstractDSpaceTransformer
 	public void addBody(Body body) throws WingException, SQLException 
 	{
 		/* Get and setup our parameters */
-        String query = URLDecode(parameters.getParameter("query",null));
+        String query = decodeFromURL(parameters.getParameter("query",null));
         String baseURL = contextPath+"/admin/epeople?administrative-continue="+knot.getId();
         
         String errorString = parameters.getParameter("errors",null);

@@ -288,15 +288,15 @@ public class OAIHarvester {
 			String descMDPrefix = null;
 			String OREPrefix;
 	    	try {
-	    		dateGranularity = OAIGetDateGranularity(oaiSource);
+	    		dateGranularity = oaiGetDateGranularity(oaiSource);
 	    		if (fromDate != null)
                 {
                     fromDate = fromDate.substring(0, dateGranularity.length());
                 }
 	    		toDate = toDate.substring(0, dateGranularity.length());
 	    		
-	    		descMDPrefix = OAIResolveNamespaceToPrefix(oaiSource, metadataNS.getURI());
-	    		OREPrefix = OAIResolveNamespaceToPrefix(oaiSource, ORESerialNS.getURI());
+	    		descMDPrefix = oaiResolveNamespaceToPrefix(oaiSource, metadataNS.getURI());
+	    		OREPrefix = oaiResolveNamespaceToPrefix(oaiSource, ORESerialNS.getURI());
 	    	}
 	    	catch (FileNotFoundException fe) {
 	    		log.error("The OAI server did not respond.");
@@ -811,7 +811,7 @@ public class OAIHarvester {
      * @throws ParserConfigurationException 
      * @throws IOException 
      */
-    private String OAIGetDateGranularity(String oaiSource) throws IOException, ParserConfigurationException, SAXException, TransformerException 
+    private String oaiGetDateGranularity(String oaiSource) throws IOException, ParserConfigurationException, SAXException, TransformerException 
     {
     	Identify iden = new Identify(oaiSource);
     	return iden.getDocument().getElementsByTagNameNS(OAI_NS.getURI(), "granularity").item(0).getTextContent();
@@ -824,7 +824,7 @@ public class OAIHarvester {
      * @param MDNamespace the namespace that we are trying to resove to the metadataPrefix
      * @return metadataPrefix the OAI-PMH provider has assigned to the supplied namespace
      */
-    public static String OAIResolveNamespaceToPrefix(String oaiSource, String MDNamespace) throws IOException, ParserConfigurationException, SAXException, TransformerException, ConnectException 
+    public static String oaiResolveNamespaceToPrefix(String oaiSource, String MDNamespace) throws IOException, ParserConfigurationException, SAXException, TransformerException, ConnectException 
     {
     	String metaPrefix = null;
 
@@ -955,8 +955,8 @@ public class OAIHarvester {
     	}
     	
     	try {
-    		OREOAIPrefix = OAIHarvester.OAIResolveNamespaceToPrefix(oaiSource, ORE_NS.getURI());
-    		DMDOAIPrefix = OAIHarvester.OAIResolveNamespaceToPrefix(oaiSource, DMD_NS.getURI());
+    		OREOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, ORE_NS.getURI());
+    		DMDOAIPrefix = OAIHarvester.oaiResolveNamespaceToPrefix(oaiSource, DMD_NS.getURI());
     	}
     	catch (Exception ex) {
     		errorSet.add(OAI_ADDRESS_ERROR + ": OAI did not respond to ListMetadataFormats query  (" + ORE_NS.getPrefix() + ":" + OREOAIPrefix + " ; " +

@@ -261,7 +261,7 @@ public class OREDisseminationCrosswalk
         	{
         		arLink = new Element("link",ATOM_NS);
         		arLink.setAttribute("rel", ORE_NS.getURI()+"aggregates");
-        		arLink.setAttribute("href",dsUrl + "/bitstream/handle/" + item.getHandle() + "/" + URLencode(bs.getName()) + "?sequence=" + bs.getSequenceID());
+        		arLink.setAttribute("href",dsUrl + "/bitstream/handle/" + item.getHandle() + "/" + encodeForURL(bs.getName()) + "?sequence=" + bs.getSequenceID());
         		arLink.setAttribute("title",bs.getName());
         		arLink.setAttribute("type",bs.getFormat().getMIMEType());
         		arLink.setAttribute("length",Long.toString(bs.getSize()));
@@ -270,7 +270,7 @@ public class OREDisseminationCrosswalk
         		
         		// metadata about the bitstream
                 rdfDescription = new Element("Description", RDF_NS);
-                rdfDescription.setAttribute("about", dsUrl + "/bitstream/handle/" + item.getHandle() + "/" + URLencode(bs.getName()) + "?sequence=" + bs.getSequenceID(), RDF_NS);
+                rdfDescription.setAttribute("about", dsUrl + "/bitstream/handle/" + item.getHandle() + "/" + encodeForURL(bs.getName()) + "?sequence=" + bs.getSequenceID(), RDF_NS);
                 
                 rdfType = new Element("type", RDF_NS);
                 rdfType.setAttribute("resource", DS_NS.getURI()+"DSpaceBitstream", RDF_NS);
@@ -344,7 +344,7 @@ public class OREDisseminationCrosswalk
      * Helper method to escape all chaacters that are not part of the canon set 
      * @param sourceString source unescaped string
      */
-    private String URLencode(String sourceString) {
+    private String encodeForURL(String sourceString) {
     	Character lowalpha[] = {'a' , 'b' , 'c' , 'd' , 'e' , 'f' , 'g' , 'h' , 'i' ,
 				'j' , 'k' , 'l' , 'm' , 'n' , 'o' , 'p' , 'q' , 'r' ,
 				's' , 't' , 'u' , 'v' , 'w' , 'x' , 'y' , 'z'};

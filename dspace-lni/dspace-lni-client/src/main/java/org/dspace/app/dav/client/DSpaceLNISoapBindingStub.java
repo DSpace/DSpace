@@ -19,10 +19,10 @@ public class DSpaceLNISoapBindingStub extends org.apache.axis.client.Stub implem
 
     static {
         _operations = new org.apache.axis.description.OperationDesc[4];
-        _initOperationDesc1();
+        initOperationDesc1();
     }
 
-    private static void _initOperationDesc1(){
+    private static void initOperationDesc1(){
         org.apache.axis.description.OperationDesc oper;
         org.apache.axis.description.ParameterDesc param;
         oper = new org.apache.axis.description.OperationDesc();

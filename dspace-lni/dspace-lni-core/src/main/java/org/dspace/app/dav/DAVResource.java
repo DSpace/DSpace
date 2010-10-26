@@ -360,7 +360,7 @@ abstract class DAVResource
      * @throws DAVStatusException the DAV status exception
      * @throws AuthorizeException the authorize exception
      */
-    protected DAVResource URIToResource(String uri) throws IOException,
+    protected DAVResource uriToResource(String uri) throws IOException,
             SQLException, DAVStatusException, AuthorizeException
     {
         String dest = uri;
@@ -1298,7 +1298,7 @@ abstract class DAVResource
             boolean keepProperties) throws IOException, SQLException,
             AuthorizeException, DAVStatusException
     {
-        DAVResource destResource = URIToResource(destination);
+        DAVResource destResource = uriToResource(destination);
         if (destResource == null)
         {
             throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,

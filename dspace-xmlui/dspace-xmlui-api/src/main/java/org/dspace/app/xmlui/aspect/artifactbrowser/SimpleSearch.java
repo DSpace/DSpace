@@ -153,7 +153,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
     protected String getQuery() throws UIException
     {
         Request request = ObjectModelHelper.getRequest(objectModel);
-        String query = URLDecode(request.getParameter("query"));
+        String query = decodeFromURL(request.getParameter("query"));
         if (query == null)
         {
             return "";
@@ -178,7 +178,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         String query = getQuery();
         if (!"".equals(query))
         {
-            parameters.put("query", URLEncode(query));
+            parameters.put("query", encodeForURL(query));
         }
         
         if (parameters.get("page") == null)

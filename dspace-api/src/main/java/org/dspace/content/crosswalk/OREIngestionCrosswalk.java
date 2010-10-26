@@ -164,7 +164,7 @@ public class OREIngestionCrosswalk
         	String bundleName;
         	Element desc = null;
         	try {
-        		xpathDesc = XPath.newInstance("/atom:entry/oreatom:triples/rdf:Description[@rdf:about=\"" + this.URLencode(href) + "\"][1]");
+        		xpathDesc = XPath.newInstance("/atom:entry/oreatom:triples/rdf:Description[@rdf:about=\"" + this.encodeForURL(href) + "\"][1]");
         		xpathDesc.addNamespace(ATOM_NS);
         		xpathDesc.addNamespace(ORE_ATOM);
         		xpathDesc.addNamespace(RDF_NS);
@@ -201,7 +201,7 @@ public class OREIngestionCrosswalk
         	if (href != null) {
         		try {
 		        	// Make sure the url string escapes all the oddball characters
-        			String processedURL = URLencode(href);
+        			String processedURL = encodeForURL(href);
         			// Generate a requeset for the aggregated resource
         			ARurl = new URL(processedURL);
 		        	in = ARurl.openStream();
@@ -249,7 +249,7 @@ public class OREIngestionCrosswalk
      * Helper method to escape all chaacters that are not part of the canon set 
      * @param sourceString source unescaped string
      */
-    private String URLencode(String sourceString) {
+    private String encodeForURL(String sourceString) {
     	Character lowalpha[] = {'a' , 'b' , 'c' , 'd' , 'e' , 'f' , 'g' , 'h' , 'i' ,
 				'j' , 'k' , 'l' , 'm' , 'n' , 'o' , 'p' , 'q' , 'r' ,
 				's' , 't' , 'u' , 'v' , 'w' , 'x' , 'y' , 'z'};

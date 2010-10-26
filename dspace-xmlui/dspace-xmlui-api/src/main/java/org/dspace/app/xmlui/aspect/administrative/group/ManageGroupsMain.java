@@ -151,7 +151,7 @@ public class ManageGroupsMain extends AbstractDSpaceTransformer
 	{
 		// Get all our parameters
 		String baseURL  = contextPath +"/admin/groups?administrative-continue="+knot.getId();
-		String query    = URLDecode(parameters.getParameter("query",""));
+		String query    = decodeFromURL(parameters.getParameter("query",""));
 		int page        = parameters.getParameterAsInteger("page",0);
 		int highlightID = parameters.getParameterAsInteger("highlightID",-1);
         int resultCount = Group.searchResultCount(context, query);

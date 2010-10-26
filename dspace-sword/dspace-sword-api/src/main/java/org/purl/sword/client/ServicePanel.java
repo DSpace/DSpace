@@ -474,7 +474,7 @@ implements TreeSelectionListener
       buffer.append("<tr bgcolor=\"#ffffff;\"><td>");
       buffer.append(label);
       buffer.append("</td><td>");
-      buffer.append(DisplayableValue(value));
+      buffer.append(displayableValue(value));
       buffer.append("</td></tr>");
    }
    
@@ -543,7 +543,7 @@ implements TreeSelectionListener
     * @param s
     * @return s or ClientConstants.NOT_DEFINED_TEXT
     */
-   private Object DisplayableValue(Object s)
+   private Object displayableValue(Object s)
    {
        if (null == s)
        {

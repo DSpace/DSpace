@@ -326,15 +326,15 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
             {
                 // Create a Map of the query parameters for the link
                 Map<String, String> queryParams = new HashMap<String, String>();
-                queryParams.put(BrowseParams.TYPE, URLEncode(type));
+                queryParams.put(BrowseParams.TYPE, encodeForURL(type));
                 if (singleEntry[1] != null)
                 {
-                    queryParams.put(BrowseParams.FILTER_VALUE[1], URLEncode(
+                    queryParams.put(BrowseParams.FILTER_VALUE[1], encodeForURL(
                         singleEntry[1]));
                 }
                 else
                 {
-                    queryParams.put(BrowseParams.FILTER_VALUE[0], URLEncode(
+                    queryParams.put(BrowseParams.FILTER_VALUE[0], encodeForURL(
                         singleEntry[0]));
                 }
                 // Create an entry in the table, and a linked entry
@@ -564,7 +564,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
 
         if (info.hasPrevPage())
         {
-            parameters.put(BrowseParams.OFFSET, URLEncode(String.valueOf(info.getPrevOffset())));
+            parameters.put(BrowseParams.OFFSET, encodeForURL(String.valueOf(info.getPrevOffset())));
         }
 
         return super.generateURL(WITHDRAWN_URL_BASE, parameters);
@@ -592,7 +592,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
 
         if (info.hasNextPage())
         {
-            parameters.put(BrowseParams.OFFSET, URLEncode(String.valueOf(info.getNextOffset())));
+            parameters.put(BrowseParams.OFFSET, encodeForURL(String.valueOf(info.getNextOffset())));
         }
 
         return super.generateURL(WITHDRAWN_URL_BASE, parameters);
@@ -937,13 +937,13 @@ class BrowseParams
         {
             paramMap.put(scope.getAuthorityValue() != null?
                     BrowseParams.FILTER_VALUE[1]:BrowseParams.FILTER_VALUE[0],
-                    AbstractDSpaceTransformer.URLEncode(
+                    AbstractDSpaceTransformer.encodeForURL(
                     scope.getFilterValue()));
         }
 
         if (scope.getFilterValueLang() != null)
         {
-            paramMap.put(BrowseParams.FILTER_VALUE_LANG, AbstractDSpaceTransformer.URLEncode(
+            paramMap.put(BrowseParams.FILTER_VALUE_LANG, AbstractDSpaceTransformer.encodeForURL(
                     scope.getFilterValueLang()));
         }
 
@@ -959,7 +959,7 @@ class BrowseParams
         Map<String, String> paramMap = new HashMap<String, String>();
 
         paramMap.put(BrowseParams.SORT_BY, Integer.toString(this.scope.getSortBy()));
-        paramMap.put(BrowseParams.ORDER, AbstractDSpaceTransformer.URLEncode(this.scope.getOrder()));
+        paramMap.put(BrowseParams.ORDER, AbstractDSpaceTransformer.encodeForURL(this.scope.getOrder()));
         paramMap.put(BrowseParams.RESULTS_PER_PAGE, Integer
                 .toString(this.scope.getResultsPerPage()));
         paramMap.put(BrowseParams.ETAL, Integer.toString(this.etAl));
