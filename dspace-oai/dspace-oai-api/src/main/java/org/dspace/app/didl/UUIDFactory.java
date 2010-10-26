@@ -69,7 +69,7 @@ public final class UUIDFactory
      * @return a new UUID object
      * 
      **/
-    public synchronized static UUID generateUUID()
+    public static synchronized UUID generateUUID()
     {
         return new UUID(generator.rand.nextLong(),generator.rand.nextLong());
     }

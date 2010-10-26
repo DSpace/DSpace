@@ -115,7 +115,7 @@ public class MODSDisseminationCrosswalk extends SelfNamedPlugin
     /** log4j category */
     private static Logger log = Logger.getLogger(MODSDisseminationCrosswalk.class);
 
-    private final static String CONFIG_PREFIX = "crosswalk.mods.properties.";
+    private static final String CONFIG_PREFIX = "crosswalk.mods.properties.";
 
     /**
      * Fill in the plugin alias table from DSpace configuration entries

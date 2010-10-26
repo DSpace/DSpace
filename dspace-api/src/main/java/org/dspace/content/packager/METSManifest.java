@@ -149,33 +149,33 @@ public class METSManifest
     }
 
     /** log4j category */
-    private static Logger log = Logger.getLogger(METSManifest.class);
+    private static final Logger log = Logger.getLogger(METSManifest.class);
 
     /** Canonical filename of METS manifest within a package or as a bitstream. */
-    public final static String MANIFEST_FILE = "mets.xml";
+    public static final String MANIFEST_FILE = "mets.xml";
 
     /** Prefix of DSpace configuration lines that map METS metadata type to
      * crosswalk plugin names.
      */
-    public final static String CONFIG_METS_PREFIX = "mets.";
+    public static final String CONFIG_METS_PREFIX = "mets.";
 
     /** prefix of config lines identifying local XML Schema (XSD) files */
-    private final static String CONFIG_XSD_PREFIX = CONFIG_METS_PREFIX+"xsd.";
+    private static final String CONFIG_XSD_PREFIX = CONFIG_METS_PREFIX+"xsd.";
 
     /** Dublin core element namespace */
-    private final static Namespace dcNS = Namespace
+    private static final Namespace dcNS = Namespace
             .getNamespace("http://purl.org/dc/elements/1.1/");
 
     /** Dublin core term namespace (for qualified DC) */
-    private final static Namespace dcTermNS = Namespace
+    private static final Namespace dcTermNS = Namespace
             .getNamespace("http://purl.org/dc/terms/");
 
     /** METS namespace -- includes "mets" prefix for use in XPaths */
-    public final static Namespace metsNS = Namespace
+    public static final Namespace metsNS = Namespace
             .getNamespace("mets", "http://www.loc.gov/METS/");
 
     /** XLink namespace -- includes "xlink" prefix prefix for use in XPaths */
-    public final static Namespace xlinkNS = Namespace
+    public static final Namespace xlinkNS = Namespace
             .getNamespace("xlink", "http://www.w3.org/1999/xlink");
 
     /** root element of the current METS manifest. */

@@ -55,7 +55,7 @@ import java.util.List;
  */
 public class TableRowIterator
 {
-    private final static Logger log = Logger.getLogger(TableRowIterator.class);
+    private static final Logger log = Logger.getLogger(TableRowIterator.class);
     /**
      * Results from a query
      */

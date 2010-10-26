@@ -68,37 +68,37 @@ import org.xml.sax.SAXException;
 public class ResetPassword extends AbstractDSpaceTransformer
 {
     /** Language strings */
-    private final static Message T_title =
+    private static final Message T_title =
         message("xmlui.EPerson.ResetPassword.title");
     
-    private final static Message T_dspace_home =
+    private static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
     
-    private final static Message T_trail_forgot_password =
+    private static final Message T_trail_forgot_password =
         message("xmlui.EPerson.trail_forgot_password");
     
-    private final static Message T_head = 
+    private static final Message T_head =
         message("xmlui.EPerson.ResetPassword.head");
     
-    private final static Message T_para1 =
+    private static final Message T_para1 =
         message("xmlui.EPerson.ResetPassword.para1");
     
-    private final static Message T_email_address =
+    private static final Message T_email_address =
         message("xmlui.EPerson.ResetPassword.email_address");
     
-    private final static Message T_new_password =
+    private static final Message T_new_password =
         message("xmlui.EPerson.ResetPassword.new_password");
     
-    private final static Message T_error_invalid_password =
+    private static final Message T_error_invalid_password =
         message("xmlui.EPerson.ResetPassword.error_invalid_password");
     
-    private final static Message T_confirm_password =
+    private static final Message T_confirm_password =
         message("xmlui.EPerson.ResetPassword.confirm_password");
     
-    private final static Message T_error_unconfirmed_password =
+    private static final Message T_error_unconfirmed_password =
         message("xmlui.EPerson.ResetPassword.error_unconfirmed_password");
     
-    private final static Message T_submit = 
+    private static final Message T_submit = 
         message("xmlui.EPerson.ResetPassword.submit");
     
     

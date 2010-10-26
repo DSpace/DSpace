@@ -92,8 +92,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
     private static Logger log = Logger.getLogger(DSpaceOAICatalog.class);
 
     /** Prefix that all our OAI identifiers have */
-    public final static String OAI_ID_PREFIX = "oai:"
-            + ConfigurationManager.getProperty("dspace.hostname") + ":";
+    public static final String OAI_ID_PREFIX = "oai:" + ConfigurationManager.getProperty("dspace.hostname") + ":";
 
     /** Maximum number of records returned by one request */
     private final int MAX_RECORDS = ConfigurationManager.getIntProperty("oai.response.max-records", 100);

@@ -75,31 +75,31 @@ import org.xml.sax.SAXException;
 public class StartForgotPassword extends AbstractDSpaceTransformer
 {
     /** Language strings */
-    private final static Message T_title =
+    private static final Message T_title =
         message("xmlui.EPerson.StartForgotPassword.title");
     
-    private final static Message T_dspace_home =
+    private static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
     
-    private final static Message T_trail_forgot_password =
+    private static final Message T_trail_forgot_password =
         message("xmlui.EPerson.trail_forgot_password");
     
-    private final static Message T_head = 
+    private static final Message T_head =
         message("xmlui.EPerson.StartForgotPassword.head");
     
-    private final static Message T_para1 =
+    private static final Message T_para1 =
         message("xmlui.EPerson.StartForgotPassword.para1");
     
-    private final static Message T_email_address =
+    private static final Message T_email_address =
         message("xmlui.EPerson.StartForgotPassword.email_address");
 
-    private final static Message T_email_address_help =
+    private static final Message T_email_address_help =
         message("xmlui.EPerson.StartForgotPassword.email_address_help");
     
-    private final static Message T_error_not_found =
+    private static final Message T_error_not_found =
         message("xmlui.EPerson.StartForgotPassword.error_not_found");
     
-    private final static Message T_submit = 
+    private static final Message T_submit = 
         message("xmlui.EPerson.StartForgotPassword.submit");
     
     

@@ -69,20 +69,20 @@ import org.dspace.core.PluginManager;
  */
 public class OrderFormat
 {
-	public final static String AUTHOR = "author";
-	public final static String TITLE  = "title";
-	public final static String TEXT   = "text";
-	public final static String DATE   = "date";
-        public final static String AUTHORITY = "authority";
+	public static final String AUTHOR = "author";
+	public static final String TITLE  = "title";
+	public static final String TEXT   = "text";
+	public static final String DATE   = "date";
+    public static final String AUTHORITY = "authority";
 	
 	// Array of all available order delegates - avoids excessive calls to plugin manager
-	private final static String[] delegates = PluginManager.getAllPluginNames(OrderFormatDelegate.class);
+	private static final String[] delegates = PluginManager.getAllPluginNames(OrderFormatDelegate.class);
 
-    private final static OrderFormatDelegate authorDelegate = new OrderFormatAuthor();
-    private final static OrderFormatDelegate titleDelegate  = new OrderFormatTitle();
-    private final static OrderFormatDelegate textDelegate   = new OrderFormatText();
-    private final static OrderFormatDelegate dateDelegate   = new OrderFormatDate();
-    private final static OrderFormatDelegate authorityDelegate = new OrderFormatText();
+    private static final OrderFormatDelegate authorDelegate = new OrderFormatAuthor();
+    private static final OrderFormatDelegate titleDelegate  = new OrderFormatTitle();
+    private static final OrderFormatDelegate textDelegate   = new OrderFormatText();
+    private static final OrderFormatDelegate dateDelegate   = new OrderFormatDate();
+    private static final OrderFormatDelegate authorityDelegate = new OrderFormatText();
     
     /**
      * Generate a sort string for the given DC metadata

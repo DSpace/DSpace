@@ -70,22 +70,22 @@ import org.xml.sax.SAXException;
 public class VerifyEmail extends AbstractDSpaceTransformer
 {
     /** language strings */
-    private final static Message T_title =
+    private static final Message T_title =
         message("xmlui.EPerson.VerifyEmail.title");
     
-    private final static Message T_dspace_home =
+    private static final Message T_dspace_home =
         message("xmlui.general.dspace_home");
     
-    private final static Message T_trail_forgot_password =
+    private static final Message T_trail_forgot_password =
         message("xmlui.EPerson.trail_forgot_password");
     
-    private final static Message T_trail_new_registration =
+    private static final Message T_trail_new_registration =
         message("xmlui.EPerson.trail_new_registration");
     
-    private final static Message T_head =
+    private static final Message T_head =
         message("xmlui.EPerson.VerifyEmail.head");
     
-    private final static Message T_para =
+    private static final Message T_para =
         message("xmlui.EPerson.VerifyEmail.para");
     
 

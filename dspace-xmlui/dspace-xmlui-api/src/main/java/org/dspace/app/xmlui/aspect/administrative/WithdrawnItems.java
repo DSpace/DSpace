@@ -99,42 +99,42 @@ import org.xml.sax.SAXException;
 public class WithdrawnItems extends AbstractDSpaceTransformer implements
         CacheableProcessingComponent
 {
-    private final static Logger log = Logger.getLogger(WithdrawnItems.class);
+    private static final Logger log = Logger.getLogger(WithdrawnItems.class);
 
     /**
      * Static Messages for common text
      */
-    private final static Message T_dspace_home = message("xmlui.general.dspace_home");
+    private static final Message T_dspace_home = message("xmlui.general.dspace_home");
 
-    private final static Message T_go = message("xmlui.general.go");
+    private static final Message T_go = message("xmlui.general.go");
 
-    private final static Message T_update = message("xmlui.general.update");
+    private static final Message T_update = message("xmlui.general.update");
 
-    private final static Message T_choose_month = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.choose_month");
+    private static final Message T_choose_month = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.choose_month");
 
-    private final static Message T_choose_year = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.choose_year");
+    private static final Message T_choose_year = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.choose_year");
 
-    private final static Message T_jump_year = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_year");
+    private static final Message T_jump_year = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_year");
 
-    private final static Message T_jump_year_help = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_year_help");
+    private static final Message T_jump_year_help = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_year_help");
 
-    private final static Message T_jump_select = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_select");
+    private static final Message T_jump_select = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_select");
 
-    private final static Message T_starts_with = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.starts_with");
+    private static final Message T_starts_with = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.starts_with");
 
-    private final static Message T_starts_with_help = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.starts_with_help");
+    private static final Message T_starts_with_help = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.starts_with_help");
 
-    private final static Message T_sort_by = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.sort_by");
+    private static final Message T_sort_by = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.sort_by");
 
-    private final static Message T_order = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.order");
+    private static final Message T_order = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.order");
 
-    private final static Message T_rpp = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.rpp");
+    private static final Message T_rpp = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.rpp");
 
-    private final static Message T_order_asc = message("xmlui.ArtifactBrowser.ConfigurableBrowse.order.asc");
+    private static final Message T_order_asc = message("xmlui.ArtifactBrowser.ConfigurableBrowse.order.asc");
 
-    private final static Message T_order_desc = message("xmlui.ArtifactBrowser.ConfigurableBrowse.order.desc");
+    private static final Message T_order_desc = message("xmlui.ArtifactBrowser.ConfigurableBrowse.order.desc");
 
-    private final static String WITHDRAWN_URL_BASE = "withdrawn";
+    private static final String WITHDRAWN_URL_BASE = "withdrawn";
 
     /**
      * These variables dictate when the drop down list of years is to break from
@@ -897,33 +897,33 @@ class BrowseParams
 
     BrowserScope scope;
 
-    final static String MONTH = "month";
+    static final String MONTH = "month";
 
-    final static String YEAR = "year";
+    static final String YEAR = "year";
 
-    final static String ETAL = "etal";
+    static final String ETAL = "etal";
 
-    final static String TYPE = "type";
+    static final String TYPE = "type";
 
-    final static String JUMPTO_ITEM = "focus";
+    static final String JUMPTO_ITEM = "focus";
 
-    final static String JUMPTO_VALUE = "vfocus";
+    static final String JUMPTO_VALUE = "vfocus";
 
-    final static String JUMPTO_VALUE_LANG = "vfocus_lang";
+    static final String JUMPTO_VALUE_LANG = "vfocus_lang";
 
-    final static String ORDER = "order";
+    static final String ORDER = "order";
 
-    final static String OFFSET = "offset";
+    static final String OFFSET = "offset";
 
-    final static String RESULTS_PER_PAGE = "rpp";
+    static final String RESULTS_PER_PAGE = "rpp";
 
-    final static String SORT_BY = "sort_by";
+    static final String SORT_BY = "sort_by";
 
-    final static String STARTS_WITH = "starts_with";
+    static final String STARTS_WITH = "starts_with";
 
-    final static String[] FILTER_VALUE = new String[]{"value","authority"};
+    static final String[] FILTER_VALUE = new String[]{"value","authority"};
 
-    final static String FILTER_VALUE_LANG = "value_lang";
+    static final String FILTER_VALUE_LANG = "value_lang";
 
     /*
      * Creates a map of the browse options common to all pages (type / value /

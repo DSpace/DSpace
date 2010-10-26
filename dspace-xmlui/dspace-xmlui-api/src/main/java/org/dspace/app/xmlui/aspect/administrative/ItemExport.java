@@ -79,7 +79,7 @@ import org.xml.sax.SAXException;
  */
 public class ItemExport extends AbstractDSpaceTransformer implements
 		CacheableProcessingComponent {
-	private final static Message T_dspace_home = message("xmlui.general.dspace_home");
+	private static final Message T_dspace_home = message("xmlui.general.dspace_home");
 
 	private static final Message T_main_head = message("xmlui.administrative.ItemExport.head");
 

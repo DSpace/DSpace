@@ -117,7 +117,7 @@ public abstract class DSpaceObject
      * @return Name for the object, or <code>null</code> if it doesn't have
      *         one
      */
-    abstract public String getName();
+    public abstract String getName();
 
     /**
      * Generic find for when the precise type of a DSO is not known, just the

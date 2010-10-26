@@ -83,7 +83,7 @@ public class SimpleDCDisseminationCrosswalk extends SelfNamedPlugin
     private static final Namespace namespaces[] =
         { DC_NS, XSI_NS };
 
-    private final static String aliases[] = { "SimpleDC", "DC" };
+    private static final String aliases[] = { "SimpleDC", "DC" };
 
     public static String[] getPluginNames()
     {

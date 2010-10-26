@@ -444,7 +444,7 @@ public class FeedServlet extends DSpaceServlet
     /**
      * Class to instrument accesses & currency of a given feed in cache
      */  
-    static private class CacheFeed
+    private static class CacheFeed
 	{
     	// currency timestamp
     	public long timeStamp = 0L;

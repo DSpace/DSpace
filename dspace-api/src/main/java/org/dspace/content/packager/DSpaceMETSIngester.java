@@ -79,7 +79,7 @@ public class DSpaceMETSIngester
        extends AbstractMETSIngester
 {
     // first part of required mets@PROFILE value
-    private final static String PROFILE_START = "DSpace METS SIP Profile";
+    private static final String PROFILE_START = "DSpace METS SIP Profile";
 
     // just check the profile name.
     @Override

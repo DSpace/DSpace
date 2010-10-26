@@ -89,10 +89,10 @@ public class Item extends DSpaceObject
     /**
      * Wild card for Dublin Core metadata qualifiers/languages
      */
-    public final static String ANY = "*";
+    public static final String ANY = "*";
 
     /** log4j category */
-    private static Logger log = Logger.getLogger(Item.class);
+    private static final Logger log = Logger.getLogger(Item.class);
 
     /** Our context */
     private Context ourContext;

@@ -1118,7 +1118,7 @@ public class OAIHarvester {
 		
 		private static Stack<HarvestThread> harvestThreads;
 		private static Integer maxActiveThreads;
-		protected volatile static Integer activeThreads = 0;
+		protected static volatile Integer activeThreads = 0;
 		
 		public static final int HARVESTER_STATUS_RUNNING = 1;
 		public static final int HARVESTER_STATUS_SLEEPING = 2;

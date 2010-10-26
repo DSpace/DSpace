@@ -75,18 +75,18 @@ import java.text.SimpleDateFormat;
  */
 public class StatisticsViewer extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
-    private final static Logger log = Logger.getLogger(StatisticsViewer.class);
+    private static final Logger log = Logger.getLogger(StatisticsViewer.class);
 
-    private final static Message T_dspace_home = message("xmlui.general.dspace_home");
+    private static final Message T_dspace_home = message("xmlui.general.dspace_home");
 
-    private final static Message T_choose_report = message("xmlui.ArtifactBrowser.StatisticsViewer.choose_month");
-    private final static Message T_page_title    = message("xmlui.ArtifactBrowser.StatisticsViewer.report.title");
+    private static final Message T_choose_report = message("xmlui.ArtifactBrowser.StatisticsViewer.choose_month");
+    private static final Message T_page_title    = message("xmlui.ArtifactBrowser.StatisticsViewer.report.title");
 
-    private final static Message T_empty_title   = message("xmlui.ArtifactBrowser.StatisticsViewer.no_report.title");
-    private final static Message T_empty_text    = message("xmlui.ArtifactBrowser.StatisticsViewer.no_report.text");
+    private static final Message T_empty_title   = message("xmlui.ArtifactBrowser.StatisticsViewer.no_report.title");
+    private static final Message T_empty_text    = message("xmlui.ArtifactBrowser.StatisticsViewer.no_report.text");
 
-    private final static SimpleDateFormat sdfDisplay = new SimpleDateFormat("MM'/'yyyy");
-    private final static SimpleDateFormat sdfLink    = new SimpleDateFormat("yyyy'-'M");
+    private static final SimpleDateFormat sdfDisplay = new SimpleDateFormat("MM'/'yyyy");
+    private static final SimpleDateFormat sdfLink    = new SimpleDateFormat("yyyy'-'M");
 
     private boolean initialised = false;
     private String reportDate = null;

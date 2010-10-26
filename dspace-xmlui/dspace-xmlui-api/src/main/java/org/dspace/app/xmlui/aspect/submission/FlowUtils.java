@@ -85,10 +85,10 @@ import org.dspace.workflow.WorkflowManager;
 
 public class FlowUtils {
 
-    private static Logger log = Logger.getLogger(FlowUtils.class);
+    private static final Logger log = Logger.getLogger(FlowUtils.class);
     
     /** Where the submissionInfo is stored on an HTTP Request object */
-    private final static String DSPACE_SUBMISSION_INFO = "dspace.submission.info";
+    private static final String DSPACE_SUBMISSION_INFO = "dspace.submission.info";
 
 	/**
 	 * Return the InProgressSubmission, either workspaceItem or workflowItem, 

@@ -62,7 +62,7 @@ public class PageMeta extends AbstractWingElement implements
         WingMergeableElement, MetadataElement
 {
     /** Name of the pageMeta element */
-    public final static String E_PAGE_META = "pageMeta";
+    public static final String E_PAGE_META = "pageMeta";
 
     /** Has this PageMeta element been merged? */
     private boolean merged = false;

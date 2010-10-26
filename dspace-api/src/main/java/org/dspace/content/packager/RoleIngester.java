@@ -405,7 +405,7 @@ public class RoleIngester implements PackageIngester
      * @throws SQLException
      * @throws AuthorizeException
      */
-    static public void ingestStream(Context context, DSpaceObject parent,
+    public static void ingestStream(Context context, DSpaceObject parent,
             PackageParameters params, InputStream stream)
             throws PackageException, SQLException, AuthorizeException
     {

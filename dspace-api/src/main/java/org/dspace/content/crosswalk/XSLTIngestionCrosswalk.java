@@ -80,9 +80,9 @@ public class XSLTIngestionCrosswalk
     implements IngestionCrosswalk
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(XSLTIngestionCrosswalk.class);
+    private static final Logger log = Logger.getLogger(XSLTIngestionCrosswalk.class);
 
-    private final static String DIRECTION = "submission";
+    private static final String DIRECTION = "submission";
 
     private static String aliases[] = makeAliases(DIRECTION);
 

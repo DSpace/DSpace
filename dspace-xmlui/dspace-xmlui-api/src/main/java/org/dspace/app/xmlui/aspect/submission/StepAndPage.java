@@ -21,7 +21,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 public class StepAndPage implements Comparable<StepAndPage>
 {
     /** Magic value meaning "no value" */
-    final static private int UNSET = -1;
+    private static final int UNSET = -1;
 
     /** Step number */
     private int step;

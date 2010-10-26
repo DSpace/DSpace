@@ -96,7 +96,7 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
             + "crosswalks"
             + File.separator + "xhtml-head-item.properties";
 
-    private final static String XHTML_NAMESPACE = "http://www.w3.org/1999/xhtml";
+    private static final String XHTML_NAMESPACE = "http://www.w3.org/1999/xhtml";
 
     /**
      * Maps DSpace metadata field to name to use in XHTML head element, e.g.

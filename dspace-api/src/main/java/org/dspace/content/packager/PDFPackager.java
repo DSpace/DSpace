@@ -92,9 +92,9 @@ public class PDFPackager
        implements PackageIngester, PackageDisseminator
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(PDFPackager.class);
+    private static final Logger log = Logger.getLogger(PDFPackager.class);
 
-    private final static String BITSTREAM_FORMAT_NAME = "Adobe PDF";
+    private static final String BITSTREAM_FORMAT_NAME = "Adobe PDF";
 
     private static String aliases[] = { "PDF", "Adobe PDF", "pdf", "application/pdf" };
 

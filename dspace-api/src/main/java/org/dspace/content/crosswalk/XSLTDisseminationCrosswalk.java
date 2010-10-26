@@ -98,7 +98,7 @@ public class XSLTDisseminationCrosswalk
     /** log4j category */
     private static Logger log = Logger.getLogger(XSLTDisseminationCrosswalk.class);
 
-    private final static String DIRECTION = "dissemination";
+    private static final String DIRECTION = "dissemination";
 
     private static String aliases[] = makeAliases(DIRECTION);
 

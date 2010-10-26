@@ -60,7 +60,7 @@ public interface Report
      *
      * @return      a string containing the header for the report
      */
-    abstract public String header();
+    public abstract String header();
     
     /**
      * output any top headers that this page needs
@@ -70,7 +70,7 @@ public interface Report
      *
      * @return      a string containing the header for the report
      */
-    abstract public String header(String title);
+    public abstract String header(String title);
     
     /**
      * output the title in the relevant format.  This requires that the title
@@ -78,7 +78,7 @@ public interface Report
      *
      * @return      a string containing the title of the report
      */
-    abstract public String mainTitle();
+    public abstract String mainTitle();
     
     /**
      * output the date range in the relevant format.  This requires that the
@@ -86,7 +86,7 @@ public interface Report
      *
      * @return      a string containing date range information
      */
-    abstract public String dateRange();
+    public abstract String dateRange();
     
     /**
      * output the section header in the relevant format
@@ -95,7 +95,7 @@ public interface Report
      *
      * @return      a string containing the formatted section header
      */
-    abstract public String sectionHeader(String title);
+    public abstract String sectionHeader(String title);
     
     /**
      * output the report block based on the passed statistics object array
@@ -105,7 +105,7 @@ public interface Report
      *
      * @return      a string containing the formatted statistics block
      */
-    abstract public String statBlock(Statistics content);
+    public abstract String statBlock(Statistics content);
     
     /**
      * output the floor information in the relevant format
@@ -114,7 +114,7 @@ public interface Report
      *
      * @return      a string containing the formatted floor information
      */
-    abstract public String floorInfo(int floor);
+    public abstract String floorInfo(int floor);
     
     /**
      * output the explanation of the stat block in the relevant format
@@ -123,14 +123,14 @@ public interface Report
      *
      * @return      a string containing the formatted explanation
      */
-    abstract public String blockExplanation(String explanation);
+    public abstract String blockExplanation(String explanation);
     
     /**
      * output the final footers for this file
      *
      * @return      a string containing the report footer
      */
-    abstract public String footer();
+    public abstract String footer();
     
     /**
      * set the main title for the report
@@ -138,33 +138,33 @@ public interface Report
      * @param   name    the name of the service
      * @param   serverName  the name of the server
      */
-    abstract public void setMainTitle (String name, String serverName);
+    public abstract void setMainTitle (String name, String serverName);
     
     /**
      * add a statistics block to the report to the class register
      *
      * @param   stat    the statistics object to be added to the report
      */
-    abstract public void addBlock(Statistics stat);
+    public abstract void addBlock(Statistics stat);
     
     /**
      * render the report
      *
      * @return      a string containing the full content of the report
      */
-    abstract public String render();
+    public abstract String render();
     
     /**
      * set the starting date for the report
      *
      * @param   start   the start date for the report
      */
-    abstract public void setStartDate(Date start);
+    public abstract void setStartDate(Date start);
     
     /**
      * set the end date for the report
      *
      * @param   end     the end date for the report
      */
-    abstract public void setEndDate(Date end);
+    public abstract void setEndDate(Date end);
 }

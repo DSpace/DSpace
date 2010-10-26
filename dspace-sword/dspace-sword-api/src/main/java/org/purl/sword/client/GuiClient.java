@@ -104,12 +104,12 @@ public class GuiClient extends JFrame implements ClientType,
 	 * The property file that contains the main properties that can be used to
 	 * configure the application.
 	 */
-	private final static String PROPERTY_FILE = "SwordClient.properties";
+	private static final String PROPERTY_FILE = "SwordClient.properties";
 
 	/**
 	 * Label for the onBehalfOf property file label.
 	 */
-	private final static String ON_BEHALF_OF = "onBehalfOf";
+	private static final String ON_BEHALF_OF = "onBehalfOf";
 
 	/**
 	 * The dialog to get details for the service location.

@@ -93,7 +93,7 @@ public class METSRightsCrosswalk
 
     private static final Namespace namespaces[] = { METSRights_NS };
 
-    private final static Map<Integer,String> otherTypesMapping = new HashMap<Integer,String>();
+    private static final Map<Integer,String> otherTypesMapping = new HashMap<Integer,String>();
     static
     {
         //Mapping of DSpace Policy Actions to METSRights PermissionType values

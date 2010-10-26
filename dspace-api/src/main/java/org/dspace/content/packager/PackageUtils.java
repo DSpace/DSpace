@@ -80,12 +80,12 @@ public class PackageUtils
 {
 
     /** log4j category */
-    private static Logger log = Logger.getLogger(DSpaceAIPDisseminator.class);
+    private static final Logger log = Logger.getLogger(DSpaceAIPDisseminator.class);
 
     // Map of metadata elements for Communities and Collections
     // Format is alternating key/value in a straight array; use this
     // to initialize hash tables that convert to and from.
-    private final static String ccMetadataMap[] =
+    private static final String ccMetadataMap[] =
     {
         // getMetadata()  ->  DC element.term
         "name",                    "dc.title",
@@ -99,8 +99,8 @@ public class PackageUtils
 
     // HashMaps to convert Community/Collection metadata to/from Dublin Core
     // (useful when crosswalking Communities/Collections)
-    private final static Map<String,String> ccMetadataToDC = new HashMap<String,String>();
-    private final static Map<String,String> ccDCToMetadata = new HashMap<String,String>();
+    private static final Map<String,String> ccMetadataToDC = new HashMap<String,String>();
+    private static final Map<String,String> ccDCToMetadata = new HashMap<String,String>();
     static
     {
         for (int i = 0; i < ccMetadataMap.length; i += 2)

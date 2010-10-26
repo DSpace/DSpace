@@ -121,9 +121,9 @@ public abstract class XSLTCrosswalk extends SelfNamedPlugin
         Namespace.getNamespace("dim", "http://www.dspace.org/xmlns/dspace/dim");
 
     /** Prefix for all lines in the config file for XSLT plugins. */
-    protected final static String CONFIG_PREFIX = "crosswalk.";
+    protected static final String CONFIG_PREFIX = "crosswalk.";
 
-    private final static String CONFIG_STYLESHEET = ".stylesheet";
+    private static final String CONFIG_STYLESHEET = ".stylesheet";
 
     /**
      * Derive list of plugin name from DSpace configuration entries

@@ -90,7 +90,7 @@ public class Include extends AbstractTransformer implements CacheableProcessingC
      * the value is a list of all attributes that the element must match on to
      * be considered the same element.
      */
-    private final static Map<String, String[]> mergeableMap;
+    private static final Map<String, String[]> mergeableMap;
 
     /** Construct the mergeableMap from constant data */
     static
