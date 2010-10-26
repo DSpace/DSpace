@@ -175,16 +175,48 @@ public class DSpaceCSV implements Serializable
             }
 
             // Read each subsequent line
-            String line;
-            while ((line = input.readLine()) != null){
-                // Are there an odd number of quotes?
-                while (((" " + line + " ").split("\"").length)%2 == 0)
-                {
-                    line = line + "\n" + input.readLine();
-                }
+            StringBuilder lineBuilder = new StringBuilder();
+            String lineRead;
 
-                // Parse the item metadata
-                addItem(line);
+            while ((lineRead = input.readLine()) != null)
+            {
+                if (lineBuilder.length() > 0) {
+                    // Already have a previously read value - add this line
+                    lineBuilder.append("\n").append(lineRead);
+
+                    // Count the number of quotes in the buffer
+                    int quoteCount = 0;
+                    for (int pos = 0; pos < lineBuilder.length(); pos++) {
+                        if (lineBuilder.charAt(pos) == '"') {
+                            quoteCount++;
+                        }
+                    }
+
+                    if (quoteCount % 2 == 0) {
+                        // Number of quotes is a multiple of 2, add the item
+                        addItem(lineBuilder.toString());
+                        lineBuilder = new StringBuilder();
+                    }
+                } else if (lineRead.indexOf('"') > -1) {
+                    // Get the number of quotes in the line
+                    int quoteCount = 0;
+                    for (int pos = 0; pos < lineRead.length(); pos++) {
+                        if (lineRead.charAt(pos) == '"') {
+                            quoteCount++;
+                        }
+                    }
+
+                    if (quoteCount % 2 == 0) {
+                        // Number of quotes is a multiple of 2, add the item
+                        addItem(lineRead);
+                    } else {
+                        // Uneven quotes - add to the buffer and leave for later
+                        lineBuilder.append(lineRead);
+                    }
+                } else {
+                    // No previously read line, and no quotes in the line - add item
+                    addItem(lineRead);
+                }
             }
         }
         finally
