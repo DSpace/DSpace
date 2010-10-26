@@ -221,7 +221,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         queryArgs = new SolrQuery();
 
         //Make sure we add our default filters
-        queryArgs.addFilterQuery(SearchUtils.getDefaultFilters("browse"));
+        queryArgs.addFilterQuery(SearchUtils.getDefaultFilters("search"));
 
 
         queryArgs.setQuery("search.resourcetype: " + Constants.ITEM + ((request.getParameter("query") != null && !"".equals(request.getParameter("query"))) ? " AND (" + request.getParameter("query") + ")" : ""));
@@ -475,7 +475,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
                     }
 
                     // We put our total results to -1 so this doesn't get shown in the results (will be hidden by the xsl)
-                    // The reason why we do this is because solr 1.4 can't retrieve the total number of facets found 
+                    // The reason why we do this is because solr 1.4 can't retrieve the total number of facets found
                     results.setSimplePagination(-1, offSet + 1,
                                                     shownItemsMax, getPreviousPageURL(browseParams, request), nextPageUrl);
 
@@ -671,7 +671,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
             return urlBuilder.toString();
         }
-        
+
         return url;
     }
 
