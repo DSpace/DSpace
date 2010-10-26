@@ -200,9 +200,9 @@ public class LDAPAuthentication
 
             if (ldap.ldapAuthenticate(netid, password, context))
             {
-                context.setCurrentUser(eperson = EPerson.findByNetid(context, netid.toLowerCase()));
-                log.info(LogManager
-                    .getHeader(context, "authenticate", "type=ldap"));
+                eperson = EPerson.findByNetid(context, netid.toLowerCase());
+                context.setCurrentUser(eperson);
+                log.info(LogManager.getHeader(context, "authenticate", "type=ldap"));
                 return SUCCESS;
             }
             else

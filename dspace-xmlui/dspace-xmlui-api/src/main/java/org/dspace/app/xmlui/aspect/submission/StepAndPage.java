@@ -32,7 +32,8 @@ public class StepAndPage implements Comparable<StepAndPage>
     /** Default constructor returns an unset instance */
     public StepAndPage()
     {
-        step = page = UNSET;
+        step = UNSET; 
+        page = UNSET;
     }
 
     /**

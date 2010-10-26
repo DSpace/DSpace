@@ -397,29 +397,47 @@ abstract class DAVResource
             String pathElt[]) throws IOException, SQLException,
             DAVStatusException, AuthorizeException
     {
-        DAVResource result = null;
-
-        if ((result = DAVSite.matchResourceURI(context, request, response,
-                pathElt)) == null
-                && (result = DAVLookup.matchResourceURI(context, request,
-                        response, pathElt)) == null
-                && (result = DAVWorkspace.matchResourceURI(context, request,
-                        response, pathElt)) == null
-                && (result = DAVWorkflow.matchResourceURI(context, request,
-                        response, pathElt)) == null
-                && (result = DAVEPerson.matchResourceURI(context, request,
-                        response, pathElt)) == null
-                && (result = DAVItem.matchResourceURI(context, request,
-                        response, pathElt)) == null
-                && (result = DAVBitstream.matchResourceURI(context, request,
-                        response, pathElt)) == null
-                && (result = DAVDSpaceObject.matchResourceURI(context, request,
-                        response, pathElt)) == null)
-        {
-            throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,
-                    "Unrecognized DSpace resource URI");
+        DAVResource result = DAVSite.matchResourceURI(context, request, response, pathElt);
+        if (result != null) {
+            return result;
         }
-        return result;
+
+        result = DAVLookup.matchResourceURI(context, request, response, pathElt);
+        if (result != null) {
+            return result;
+        }
+
+        result = DAVWorkspace.matchResourceURI(context, request, response, pathElt);
+        if (result != null) {
+            return result;
+        }
+
+        result = DAVWorkflow.matchResourceURI(context, request, response, pathElt);
+        if (result != null) {
+            return result;
+        }
+
+        result = DAVEPerson.matchResourceURI(context, request, response, pathElt);
+        if (result != null) {
+            return result;
+        }
+
+        result = DAVItem.matchResourceURI(context, request, response, pathElt);
+        if (result != null) {
+            return result;
+        }
+
+        result = DAVBitstream.matchResourceURI(context, request, response, pathElt);
+        if (result != null) {
+            return result;
+        }
+
+        result = DAVDSpaceObject.matchResourceURI(context, request, response, pathElt);
+        if (result != null) {
+            return result;
+        }
+
+        throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST, "Unrecognized DSpace resource URI");
     }
 
     /*----------------- Generating Resource URIs -----------------------*/

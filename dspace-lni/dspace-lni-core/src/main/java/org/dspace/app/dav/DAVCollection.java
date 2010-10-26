@@ -225,13 +225,15 @@ class DAVCollection extends DAVDSpaceObject
         else if (elementsEqualIsh(property, logoProperty))
         {
             Bitstream lbs = this.collection.getLogo();
-            Element le;
-            if (lbs != null
-                    && (le = DAVBitstream.makeXmlBitstream(lbs, this)) != null)
+            if (lbs != null)
             {
-                Element p = new Element("logo", DAV.NS_DSPACE);
-                p.addContent(le);
-                return p;
+                Element le = DAVBitstream.makeXmlBitstream(lbs, this);
+                if (le != null)
+                {
+                    Element p = new Element("logo", DAV.NS_DSPACE);
+                    p.addContent(le);
+                    return p;
+                }
             }
         }
 

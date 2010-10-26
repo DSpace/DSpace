@@ -120,7 +120,8 @@ public class Bitstream extends DSpaceObject
         // Cache ourselves
         context.cache(this, row.getIntColumn("bitstream_id"));
 
-        modified = modifiedMetadata = false;
+        modified = false;
+        modifiedMetadata = false;
         clearDetails();
     }
 

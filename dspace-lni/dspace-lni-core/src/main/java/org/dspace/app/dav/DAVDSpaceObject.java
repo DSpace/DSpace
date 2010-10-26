@@ -119,11 +119,9 @@ abstract class DAVDSpaceObject extends DAVResource
     protected static String getPathElt(String handle)
     {
         int hs;
-        if (handleSeparator != '/' && (hs = handle.indexOf('/')) >= 0)
+        if (handleSeparator != '/')
         {
-            char hc[] = handle.toCharArray();
-            hc[hs] = handleSeparator;
-            handle = String.copyValueOf(hc);
+            handle = handle.replaceFirst("/", String.valueOf(handleSeparator));
         }
         return "dso_" + encodeHandle(handle);
     }

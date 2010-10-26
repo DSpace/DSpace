@@ -424,7 +424,8 @@ public class FeedServlet extends DSpaceServlet
 	    		else
 	    		{
 	    			minKey = key;
-	    			minFeed = maxFeed = feed;
+	    			minFeed = feed;
+                    maxFeed = feed;
 	    		}
 	    		total += feed.hits;
 	    	}

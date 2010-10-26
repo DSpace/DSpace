@@ -156,7 +156,8 @@ public class Brand
 		bWidth = fm.stringWidth(brandText.getText()) + xOffset * 2 + 1;
 		bHeight = fm.getHeight();
 
-		bx = by = 0;
+		bx = 0;
+        by = 0;
 
 		if (brandText.getLocation().equals(BrandText.TL))
 		{

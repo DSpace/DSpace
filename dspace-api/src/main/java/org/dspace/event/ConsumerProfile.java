@@ -134,7 +134,8 @@ public class ConsumerProfile
             else
             {
                 int filter[] = new int[2];
-                filter[0] = filter[1] = 0;
+                filter[0] = 0;
+                filter[1] = 0;
                 String objectNames[] = fpart[0].split("\\|");
                 for (int k = 0; k < objectNames.length; ++k)
                 {

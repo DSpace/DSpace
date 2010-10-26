@@ -108,7 +108,8 @@ public class EPerson extends DSpaceObject
 
         // Cache ourselves
         context.cache(this, row.getIntColumn("eperson_id"));
-        modified = modifiedMetadata = false;
+        modified = false;
+        modifiedMetadata = false;
         clearDetails();
     }
 

@@ -366,8 +366,8 @@ public class PDFPackager
                 log.debug("PDF Info dict title=\"" + title + "\"");
             }
             item.addDC("title", null, "en", title);
-            String value;
-            if ((value = docinfo.getAuthor()) != null)
+            String value = docinfo.getAuthor();
+            if (value != null)
             {
                 item.addDC("contributor", "author", null, value);
                 if (log.isDebugEnabled())
@@ -375,32 +375,41 @@ public class PDFPackager
                     log.debug("PDF Info dict author=\"" + value + "\"");
                 }
             }
-            if ((value = docinfo.getCreator()) != null)
+
+            value = docinfo.getCreator();
+            if (value != null)
             {
                 item.addDC("description", "provenance", "en",
                         "Application that created the original document: " + value);
             }
-            if ((value = docinfo.getProducer()) != null)
+
+            value = docinfo.getProducer();
+            if (value != null)
             {
                 item.addDC("description", "provenance", "en",
                         "Original document converted to PDF by: " + value);
             }
-            if ((value = docinfo.getSubject()) != null)
+
+            value = docinfo.getSubject();
+            if (value != null)
             {
                 item.addDC("description", "abstract", null, value);
             }
-            if ((value = docinfo.getKeywords()) != null)
+
+            value = docinfo.getKeywords();
+            if (value != null)
             {
                 item.addDC("subject", "other", null, value);
             }
 
             // Take either CreationDate or ModDate as "date.created",
             // Too bad there's no place to put "last modified" in the DC.
-            Calendar calValue;
-            if ((calValue = docinfo.getCreationDate()) == null)
+            Calendar calValue = docinfo.getCreationDate();
+            if (calValue == null)
             {
                 calValue = docinfo.getModificationDate();
             }
+
             if (calValue != null)
             {
                 item.addDC("date", "created", null,

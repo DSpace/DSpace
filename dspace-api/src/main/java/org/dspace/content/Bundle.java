@@ -153,7 +153,8 @@ public class Bundle extends DSpaceObject
         // Cache ourselves
         context.cache(this, row.getIntColumn("bundle_id"));
 
-        modified = modifiedMetadata = false;
+        modified = false;
+        modifiedMetadata = false;
     }
 
     /**

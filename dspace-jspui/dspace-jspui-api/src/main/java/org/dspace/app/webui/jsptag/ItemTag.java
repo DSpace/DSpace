@@ -233,50 +233,67 @@ public class ItemTag extends TagSupport
     private StyleSelection styleSelection = (StyleSelection) PluginManager.getSinglePlugin(StyleSelection.class);
     
     /** Hashmap of linked metadata to browse, from dspace.cfg */
-    private Map<String,String> linkedMetadata;
+    private static Map<String,String> linkedMetadata;
     
     /** Hashmap of urn base url resolver, from dspace.cfg */
-    private Map<String,String> urn2baseurl;
+    private static Map<String,String> urn2baseurl;
     
     /** regex pattern to capture the style of a field, ie <code>schema.element.qualifier(style)</code> */
     private Pattern fieldStylePatter = Pattern.compile(".*\\((.*)\\)");
 
     private static final long serialVersionUID = -3841266490729417240L;
+
+    static {
+        int i;
+
+        linkedMetadata = new HashMap<String, String>();
+        String linkMetadata;
+
+        i = 1;
+        do {
+            linkMetadata = ConfigurationManager.getProperty("webui.browse.link."+i);
+            if (linkMetadata != null) {
+                String[] linkedMetadataSplit = linkMetadata.split(":");
+                String indexName = linkedMetadataSplit[0].trim();
+                String metadataName = linkedMetadataSplit[1].trim();
+                linkedMetadata.put(indexName, metadataName);
+            }
+
+            i++;
+        } while (linkMetadata != null);
+
+        urn2baseurl = new HashMap<String, String>();
+
+        String urn;
+        i = 1;
+        do {
+            urn = ConfigurationManager.getProperty("webui.resolver."+i+".urn");
+            if (urn != null) {
+                String baseurl = ConfigurationManager.getProperty("webui.resolver."+i+".baseurl");
+                if (baseurl != null){
+                    urn2baseurl.put(urn, baseurl);
+                } else {
+                    log.warn("Wrong webui.resolver configuration, you need to specify both webui.resolver.<n>.urn and webui.resolver.<n>.baseurl: missing baseurl for n = "+i);
+                }
+            }
+
+            i++;
+        } while (urn != null);
+
+        // Set sensible default if no config is found for doi & handle
+        if (!urn2baseurl.containsKey("doi")){
+            urn2baseurl.put("doi",DOI_DEFAULT_BASEURL);
+        }
+
+        if (!urn2baseurl.containsKey("hdl")){
+            urn2baseurl.put("hdl",HANDLE_DEFAULT_BASEURL);
+        }
+    }
     
     public ItemTag()
     {
         super();
         getThumbSettings();
-        linkedMetadata = new HashMap<String, String>();
-        String linkMetadata;
-        for (int i = 1; null != (linkMetadata = ConfigurationManager.getProperty("webui.browse.link."+i)); i++)
-        {            
-            String[] linkedMetadataSplit = linkMetadata.split(":");
-            String indexName = linkedMetadataSplit[0].trim();
-            String metadataName = linkedMetadataSplit[1].trim();
-            linkedMetadata.put(indexName, metadataName);
-        }
-        
-        urn2baseurl = new HashMap<String, String>();
-
-        String urn;
-        for (int i = 1; null != (urn = ConfigurationManager.getProperty("webui.resolver."+i+".urn")); i++){
-            String baseurl = ConfigurationManager.getProperty("webui.resolver."+i+".baseurl");
-            if (baseurl != null){
-                urn2baseurl.put(urn, baseurl);
-            } else {
-                log.warn("Wrong webui.resolver configuration, you need to specify both webui.resolver.<n>.urn and webui.resolver.<n>.baseurl: missing baseurl for n = "+i);
-            }
-        }
-        
-        // Set sensible default if no config is found for doi & handle
-        if (!urn2baseurl.containsKey("doi")){
-            urn2baseurl.put("doi",DOI_DEFAULT_BASEURL);
-        }
-        
-        if (!urn2baseurl.containsKey("hdl")){
-            urn2baseurl.put("hdl",HANDLE_DEFAULT_BASEURL);
-        }
     }
 
     public int doStartTag() throws JspException

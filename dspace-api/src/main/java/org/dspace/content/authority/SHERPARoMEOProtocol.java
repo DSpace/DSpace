@@ -262,7 +262,8 @@ public abstract class SHERPARoMEOProtocol implements ChoiceAuthority
             else if (localName.equals(labelElement) && textValue != null)
             {
                 // plug in label value
-                result[rindex].value = result[rindex].label = textValue.trim();
+                result[rindex].value = textValue.trim();
+                result[rindex].label = result[rindex].value; 
             }
             else if (authorityElement != null && localName.equals(authorityElement) && textValue != null)
             {

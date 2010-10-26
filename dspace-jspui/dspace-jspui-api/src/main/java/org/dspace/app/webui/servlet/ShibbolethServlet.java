@@ -84,7 +84,8 @@ public class ShibbolethServlet extends DSpaceServlet {
         String name;
         while(names.hasMoreElements())
         {
-            log.info("header:" + (name = names.nextElement().toString()) + "=" + request.getHeader(name));
+            name = names.nextElement().toString();
+            log.info("header:" + name + "=" + request.getHeader(name));
         }
         
         String jsp = null;

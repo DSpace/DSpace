@@ -397,9 +397,9 @@ public class DSpaceOAICatalog extends AbstractCatalog
                 }
             }
 
-            String schemaURL;
+            String schemaURL = getCrosswalks().getSchemaURL(metadataPrefix);
 
-            if ((schemaURL = getCrosswalks().getSchemaURL(metadataPrefix)) == null)
+            if (schemaURL == null)
             {
                 log.info(LogManager.getHeader(null, "oai_error",
                         "cannot_disseminate_format"));

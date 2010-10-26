@@ -98,7 +98,8 @@ public class ShibbolethFilter implements Filter
 				String name;
 				while(names.hasMoreElements())
                 {
-                    log.debug("header:" + (name = names.nextElement().toString()) + "=" + ((HttpServletRequest) request).getHeader(name));
+                    name = names.nextElement().toString();
+                    log.debug("header:" + name + "=" + ((HttpServletRequest) request).getHeader(name));
                 }
 
                 // No current user, prompt authentication

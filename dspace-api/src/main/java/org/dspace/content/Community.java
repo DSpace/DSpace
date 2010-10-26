@@ -130,7 +130,8 @@ public class Community extends DSpaceObject
         // Cache ourselves
         context.cache(this, row.getIntColumn("community_id"));
 
-        modified = modifiedMetadata = false;
+        modified = false;
+        modifiedMetadata = false;
 
         admins = groupFromColumn("admin");
 

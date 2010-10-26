@@ -226,7 +226,8 @@ public class Authenticate
             {
                 String s;
                 am = (AuthenticationMethod)ai.next();
-                if ((s = am.loginPageURL(context, request, response)) != null)
+                s = am.loginPageURL(context, request, response);
+                if (s != null)
                 {
                     url = s;
                     ++count;

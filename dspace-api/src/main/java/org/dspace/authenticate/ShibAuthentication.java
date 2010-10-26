@@ -81,18 +81,14 @@ public class ShibAuthentication implements AuthenticationMethod
         String name;
         while (names.hasMoreElements())
         {
-            log.debug("header:" + (name = names.nextElement().toString()) + "="
-                    + request.getHeader(name));
+            name = names.nextElement().toString();
+            log.debug("header:" + name + "=" + request.getHeader(name));
         }
 
-        boolean isUsingTomcatUser = ConfigurationManager
-                .getBooleanProperty("authentication.shib.email-use-tomcat-remote-user");
-        String emailHeader = ConfigurationManager
-                .getProperty("authentication.shib.email-header");
-        String fnameHeader = ConfigurationManager
-                .getProperty("authentication.shib.firstname-header");
-        String lnameHeader = ConfigurationManager
-                .getProperty("authentication.shib.lastname-header");
+        boolean isUsingTomcatUser = ConfigurationManager.getBooleanProperty("authentication.shib.email-use-tomcat-remote-user");
+        String emailHeader = ConfigurationManager.getProperty("authentication.shib.email-header");
+        String fnameHeader = ConfigurationManager.getProperty("authentication.shib.firstname-header");
+        String lnameHeader = ConfigurationManager.getProperty("authentication.shib.lastname-header");
 
         String email = null;
         String fname = null;

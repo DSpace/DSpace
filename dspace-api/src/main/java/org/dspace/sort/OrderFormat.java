@@ -101,7 +101,8 @@ public class OrderFormat
     	if (type != null && type.length() > 0)
     	{
     		// Use a delegate if one is configured
-        	if ((delegate = OrderFormat.getDelegate(type)) != null)
+            delegate = OrderFormat.getDelegate(type);
+        	if (delegate != null)
         	{
         		return delegate.makeSortString(value, language);
         	}

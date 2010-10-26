@@ -315,14 +315,18 @@ class DAVWorkflowItem extends DAVInProgressSubmission
                 WorkflowManager.unclaim(this.context, (WorkflowItem) this.inProgressItem,
                         this.context.getCurrentUser());
             }
-            else if ((newState = WorkflowManager.getWorkflowID(key)) >= 0)
-            {
-                ((WorkflowItem) this.inProgressItem).setState(newState);
-            }
             else
             {
-                throw new DAVStatusException(DAV.SC_CONFLICT,
-                        "Unrecognized verb or state-name in value for state property.");
+                newState = WorkflowManager.getWorkflowID(key);
+                if (newState >= 0)
+                {
+                    ((WorkflowItem) this.inProgressItem).setState(newState);
+                }
+                else
+                {
+                    throw new DAVStatusException(DAV.SC_CONFLICT,
+                            "Unrecognized verb or state-name in value for state property.");
+                }
             }
 
             this.inProgressItem.update();

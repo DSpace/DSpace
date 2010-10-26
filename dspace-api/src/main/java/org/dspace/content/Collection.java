@@ -174,7 +174,8 @@ public class Collection extends DSpaceObject
         // Cache ourselves
         context.cache(this, row.getIntColumn("collection_id"));
 
-        modified = modifiedMetadata = false;
+        modified = false;
+        modifiedMetadata = false;
         clearDetails();
     }
 

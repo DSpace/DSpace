@@ -687,25 +687,30 @@ public class METSManifest
                     return xmlData.getChildren();
                 }
             }
-            else if ((mdRef = mdSec.getChild("mdRef", metsNS)) != null)
+            else
             {
-                String mimeType = mdRef.getAttributeValue("MIMETYPE");
-                if (mimeType != null && mimeType.equalsIgnoreCase("text/xml"))
+                mdRef = mdSec.getChild("mdRef", metsNS);
+                if (mdRef != null)
                 {
-                    Document mdd = parser.build(callback.getInputStream(mdRef));
-                    List<Element> result = new ArrayList<Element>(1);
-                    result.add(mdd.getRootElement());
-                    return result;
+                    String mimeType = mdRef.getAttributeValue("MIMETYPE");
+                    if (mimeType != null && mimeType.equalsIgnoreCase("text/xml"))
+                    {
+                        Document mdd = parser.build(callback.getInputStream(mdRef));
+                        List<Element> result = new ArrayList<Element>(1);
+                        result.add(mdd.getRootElement());
+                        return result;
+                    }
+                    else
+                    {
+                        log.warn("Ignoring mdRef section because MIMETYPE is not XML, but: "+mimeType);
+                        return new ArrayList<Element>(0);
+                    }
+
                 }
                 else
                 {
-                    log.warn("Ignoring mdRef section because MIMETYPE is not XML, but: "+mimeType);
-                    return new ArrayList<Element>(0);
+                    throw new MetadataValidationException("Invalid METS Manifest: ?mdSec element with neither mdRef nor mdWrap child.");
                 }
-            }
-            else
-            {
-                throw new MetadataValidationException("Invalid METS Manifest: ?mdSec element with neither mdRef nor mdWrap child.");
             }
         }
         catch (JDOMException je)
@@ -752,13 +757,17 @@ public class METSManifest
                         outputPretty.outputString(xmlData.getChildren()).getBytes());
             }
         }
-        else if ((mdRef = mdSec.getChild("mdRef", metsNS)) != null)
-        {
-            return callback.getInputStream(mdRef);
-        }
         else
         {
-            throw new MetadataValidationException("Invalid METS Manifest: ?mdSec element with neither mdRef nor mdWrap child.");
+            mdRef = mdSec.getChild("mdRef", metsNS);
+            if (mdRef != null)
+            {
+                return callback.getInputStream(mdRef);
+            }
+            else
+            {
+                throw new MetadataValidationException("Invalid METS Manifest: ?mdSec element with neither mdRef nor mdWrap child.");
+            }
         }
     }
 

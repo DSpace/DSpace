@@ -574,7 +574,8 @@ public abstract class AbstractMETSDisseminator
             }
             else
             {
-                xwalkName = metsName = typeSpec;
+                metsName = typeSpec;
+                xwalkName = typeSpec; 
             }
 
             // First, check to see if the crosswalk we are using is a normal DisseminationCrosswalk
