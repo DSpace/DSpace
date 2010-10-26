@@ -1107,8 +1107,8 @@ public class OAIHarvester {
 	 */
 	public static class HarvestScheduler implements Runnable 
 	{
-		static EPerson harvestAdmin;
-		static Context mainContext;
+		private EPerson harvestAdmin;
+		private Context mainContext;
 		
 		public static final Object lock = new Object();
 		
