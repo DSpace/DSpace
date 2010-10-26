@@ -80,7 +80,7 @@ public class PackageUtils
 {
 
     /** log4j category */
-    private static Logger log = Logger.getLogger(PackageUtils.class);
+    private static final Logger log = Logger.getLogger(PackageUtils.class);
 
     // Map of metadata elements for Communities and Collections
     // Format is alternating key/value in a straight array; use this
