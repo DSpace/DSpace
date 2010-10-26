@@ -74,7 +74,7 @@ public class RoleDisseminator implements PackageDisseminator
 {
 
     /** log4j category */
-    private static Logger log = Logger.getLogger(RoleDisseminator.class);
+    private static final Logger log = Logger.getLogger(RoleDisseminator.class);
 
     /**
      * DSpace Roles XML Namespace in JDOM form.
@@ -377,7 +377,7 @@ public class RoleDisseminator implements PackageDisseminator
                 {
                     writer.writeEmptyElement(MEMBER_GROUP);
                     writer.writeAttribute(ID, String.valueOf(member.getID()));
-                    writer.writeAttribute(NAME, PackageUtils.translateGroupNameForExport(context, member.getName()));
+                    writer.writeAttribute(NAME, exportMemberName);
                 }
             }
             writer.writeEndElement();
