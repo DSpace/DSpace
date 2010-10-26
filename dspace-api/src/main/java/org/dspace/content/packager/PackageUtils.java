@@ -80,7 +80,7 @@ public class PackageUtils
 {
 
     /** log4j category */
-    private static final Logger log = Logger.getLogger(DSpaceAIPDisseminator.class);
+    private static Logger log = Logger.getLogger(PackageUtils.class);
 
     // Map of metadata elements for Communities and Collections
     // Format is alternating key/value in a straight array; use this
@@ -334,6 +334,7 @@ public class PackageUtils
         /**
          * Do nothing, to prevent wrapped stream from being closed prematurely.
          */
+        @Override
         public void close()
         {
         }
@@ -809,8 +810,10 @@ public class PackageUtils
      * <p>
      * This method prepares group names for export by replacing any found
      * internal IDs with the appropriate external Handle identifier.  If
-     * the group name either doesn't have an embedded internal ID, or the
-     * corresponding Handle cannot be determined, then it is returned as is.
+     * the group name doesn't have an embedded internal ID, it is returned
+     * as is. If the group name contains an embedded internal ID, but the
+     * corresponding Handle cannot be determined, then null is returned (as
+     * the group name could not be translated).
      * <p>
      * This method may be useful to any Crosswalks/Packagers which deal with
      * import/export of DSpace Groups.
@@ -851,8 +854,8 @@ public class PackageUtils
             {
                 // Just log a warning -- it's possible this Group was not cleaned up when the associated DSpace Object was removed.
                 // So, we don't want to throw an error and stop all other processing.
-                log.warn("Unable to translate Internal ID to Handle in group named '" + groupName + "' as DSpace Object (ID='" + objID + "', type ='" + objType + "') no longer exists.  Group will just be exported using its existing name.");
-                return groupName;
+                log.warn("Unable to translate Internal ID to Handle in group named '" + groupName + "' as DSpace Object (ID='" + objID + "', type ='" + objType + "') no longer exists.");
+                return null;
             }
 
             //Create an updated group name, using the Handle to replace the InternalID

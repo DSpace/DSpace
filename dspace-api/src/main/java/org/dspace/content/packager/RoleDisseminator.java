@@ -51,6 +51,7 @@ import java.util.List;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import org.apache.log4j.Logger;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
@@ -71,6 +72,9 @@ import org.jdom.Namespace;
  */
 public class RoleDisseminator implements PackageDisseminator
 {
+
+    /** log4j category */
+    private static Logger log = Logger.getLogger(RoleDisseminator.class);
 
     /**
      * DSpace Roles XML Namespace in JDOM form.
@@ -194,6 +198,7 @@ public class RoleDisseminator implements PackageDisseminator
             this.emitPasswords = emitPasswords;
         }
 
+        @Override
         public void run()
         {
             try
@@ -203,13 +208,11 @@ public class RoleDisseminator implements PackageDisseminator
             }
             catch (IOException e)
             {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                log.error(e);
             }
             catch (PackageException e)
             {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
+                log.error(e);
             }
         }
     }
@@ -326,9 +329,21 @@ public class RoleDisseminator implements PackageDisseminator
     private void writeGroup(Context context, DSpaceObject relatedObject, Group group, XMLStreamWriter writer)
             throws XMLStreamException, PackageException
     {
+        //Translate the Group name for export.  This ensures that groups with Internal IDs in their names
+        // (e.g. COLLECTION_1_ADMIN) are properly translated using the corresponding Handle or external identifier.
+        String exportGroupName = PackageUtils.translateGroupNameForExport(context, group.getName());
+
+        //If translated group name is returned as "null", this means the Group name 
+        // had an Internal Collection/Community ID embedded, which could not be
+        // translated properly to a Handle.  We will NOT export these groups,
+        // as they could cause conflicts or data integrity problems if they are
+        // imported into another DSpace system.
+        if(exportGroupName==null)
+            return;
+
         writer.writeStartElement(GROUP);
         writer.writeAttribute(ID, String.valueOf(group.getID()));
-        writer.writeAttribute(NAME, PackageUtils.translateGroupNameForExport(context, group.getName()));
+        writer.writeAttribute(NAME, exportGroupName);
 
         String groupType = getGroupType(relatedObject, group);
         if(groupType!=null && !groupType.isEmpty())
@@ -355,9 +370,15 @@ public class RoleDisseminator implements PackageDisseminator
             writer.writeStartElement(MEMBER_GROUPS);
             for (Group member : group.getMemberGroups())
             {
-                writer.writeEmptyElement(MEMBER_GROUP);
-                writer.writeAttribute(ID, String.valueOf(member.getID()));
-                writer.writeAttribute(NAME, PackageUtils.translateGroupNameForExport(context, member.getName()));
+                String exportMemberName = PackageUtils.translateGroupNameForExport(context, member.getName());
+                //Only export member group if its name can be properly translated for export.  As noted above,
+                // we don't want groups that are *unable* to be accurately translated causing issues on import.
+                if(exportMemberName!=null)
+                {
+                    writer.writeEmptyElement(MEMBER_GROUP);
+                    writer.writeAttribute(ID, String.valueOf(member.getID()));
+                    writer.writeAttribute(NAME, PackageUtils.translateGroupNameForExport(context, member.getName()));
+                }
             }
             writer.writeEndElement();
         }
