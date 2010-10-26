@@ -257,16 +257,6 @@ public class SWORDEntry extends Entry
        this.swordPackaging = new SwordPackaging(packaging);
    }
    
-   /**
-    * Overrides the marshall method in the parent Entry. This will 
-    * call the parent marshall method and then add the additional 
-    * elements that have been added in this subclass.  
-    */
-   public Element marshall()
-   {
-       return super.marshall();
-   }
-   
    protected void marshallElements(Element entry)
    {
 	   super.marshallElements(entry);

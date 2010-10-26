@@ -90,13 +90,4 @@ public class Error extends TextContainer implements StructuralElement
         super.toSAX(contentHandler, lexicalHandler, namespaces);
         endElement(contentHandler, namespaces, E_ERROR);
     }
-
-    /**
-     * dispose
-     */
-    public void dispose()
-    {
-        super.dispose();
-    }
-
 }

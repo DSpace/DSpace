@@ -231,13 +231,4 @@ public class Value extends RichTextContainer
         super.toSAX(contentHandler, lexicalHandler, namespaces);
         endElement(contentHandler, namespaces, E_VALUE);
     }
-
-    /**
-     * dispose
-     */
-    public void dispose()
-    {
-        super.dispose();
-    }
-
 }

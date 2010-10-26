@@ -279,14 +279,6 @@ public class Instance extends Container
         super.toSAX(contentHandler, lexicalHandler, namespaces);
         endElement(contentHandler, namespaces, E_INSTANCE);
     }
-
-    /**
-     * dispose
-     */
-    public void dispose()
-    {
-        super.dispose();
-    }
     
     /**
      * Private function to remove all values of a particular type.

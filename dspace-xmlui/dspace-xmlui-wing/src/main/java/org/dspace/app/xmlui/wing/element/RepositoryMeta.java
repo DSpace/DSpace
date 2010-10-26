@@ -220,13 +220,4 @@ public class RepositoryMeta extends AbstractWingElement implements WingMergeable
             endElement(contentHandler, namespaces, E_REPOSITORY_META);
         }
     }
-
-    /**
-     * dispose
-     */
-    public void dispose()
-    {
-        // Nothing to clean up.
-        super.dispose();
-    }
 }

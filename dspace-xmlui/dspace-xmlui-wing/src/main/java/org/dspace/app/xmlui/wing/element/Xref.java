@@ -176,12 +176,4 @@ public class Xref extends TextContainer implements StructuralElement
         super.toSAX(contentHandler, lexicalHandler, namespaces);
         endElement(contentHandler, namespaces, E_XREF);
     }
-
-    /**
-     * dispose
-     */
-    public void dispose()
-    {
-        super.dispose();
-    }
 }

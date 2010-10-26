@@ -96,14 +96,6 @@ public class SWORDErrorDocument extends SWORDEntry
    }
 
    /**
-    * 
-    */
-   protected void initialise()
-   {
-       super.initialise();
-   }
-   
-   /**
     * Overrides the marshal method in the parent SWORDEntry. This will 
     * call the parent marshal method and then add the additional 
     * elements that have been added in this subclass.  
@@ -189,16 +181,6 @@ public class SWORDErrorDocument extends SWORDEntry
                info.addUnmarshallAttributeInfo(item);
             }
        }
-   }
-
-   /**
-    *
-    * @param elementName
-    * @return
-    */
-   protected boolean isElementChecked(XmlName elementName)
-   {
-       return super.isElementChecked(elementName);
    }
 
    /**

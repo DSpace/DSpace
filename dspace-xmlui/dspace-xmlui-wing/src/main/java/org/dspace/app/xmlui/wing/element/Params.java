@@ -449,12 +449,4 @@ public class Params extends AbstractWingElement implements StructuralElement
         startElement(contentHandler, namespaces, E_PARAMS, attributes);
         endElement(contentHandler, namespaces, E_PARAMS);
     }
-
-    /**
-     * Dispose
-     */
-    public void dispose()
-    {
-        super.dispose();
-    }
 }

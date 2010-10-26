@@ -90,13 +90,4 @@ public class Help extends TextContainer implements StructuralElement
         super.toSAX(contentHandler, lexicalHandler, namespaces);
         endElement(contentHandler, namespaces, E_HELP);
     }
-
-    /**
-     * dispose
-     */
-    public void dispose()
-    {
-        super.dispose();
-    }
-
 }

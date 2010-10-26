@@ -119,12 +119,4 @@ public class Trail extends TextContainer
         super.toSAX(contentHandler, lexicalHandler, namespaces);
         endElement(contentHandler, namespaces, E_TRAIL);
     }
-
-    /**
-     * dispose()
-     */
-    public void dispose()
-    {
-        super.dispose();
-    }
 }

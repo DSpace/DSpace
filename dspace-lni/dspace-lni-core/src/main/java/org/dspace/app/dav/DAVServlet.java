@@ -674,13 +674,4 @@ public class DAVServlet extends HttpServlet
             return "";
         }
     }
-
-    /* (non-Javadoc)
-     * @see javax.servlet.GenericServlet#init(javax.servlet.ServletConfig)
-     */
-    @Override
-    public void init(ServletConfig sc) throws ServletException
-    {
-        super.init(sc);
-    }
 }

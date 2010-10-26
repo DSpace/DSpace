@@ -214,12 +214,4 @@ public class Metadata extends TextContainer implements MetadataElement
         super.toSAX(contentHandler, lexicalHandler, namespaces);
         endElement(contentHandler, namespaces, E_METADATA);
     }
-
-    /**
-     * dispose()
-     */
-    public void dispose()
-    {
-        super.dispose();
-    }
 }

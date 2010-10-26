@@ -127,12 +127,4 @@ public class Item extends RichTextContainer implements StructuralElement
         super.toSAX(contentHandler, lexicalHandler, namespaces);
         endElement(contentHandler, namespaces, E_ITEM);
     }
-    
-    /**
-     * dispose
-     */
-    public void dispose() {
-        super.dispose();
-    }
-
 }

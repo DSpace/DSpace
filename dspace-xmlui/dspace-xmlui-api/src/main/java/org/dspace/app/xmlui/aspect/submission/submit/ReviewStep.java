@@ -245,16 +245,6 @@ public class ReviewStep extends AbstractSubmissionStep
         return null;
     }
     
-
-	/**
-	 * Recycle
-	 */
-	public void recycle() 
-	{
-		super.recycle();
-	}
-    
-    
     /** 
      * Loads the specified XML-UI class
      * which will generate the review information

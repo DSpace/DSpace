@@ -213,13 +213,4 @@ public class CCLicenseStep extends AbstractSubmissionStep
         //nothing to review for CC License step
         return null;
     }
-    
-    
-	/**
-	 * Recycle
-	 */
-	public void recycle() 
-	{
-		super.recycle();
-	}
 }

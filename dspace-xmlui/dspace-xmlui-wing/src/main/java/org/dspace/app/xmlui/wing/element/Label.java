@@ -119,12 +119,4 @@ public class Label extends TextContainer implements StructuralElement
         super.toSAX(contentHandler, lexicalHandler, namespaces);
         endElement(contentHandler, namespaces, E_LABEL);
     }
-
-    /**
-     * dispose()
-     */
-    public void dispose()
-    {
-        super.dispose();
-    }
 }

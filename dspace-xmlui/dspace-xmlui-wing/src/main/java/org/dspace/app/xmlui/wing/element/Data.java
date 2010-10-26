@@ -278,12 +278,4 @@ public class Data extends AbstractWingElement
 
         endElement(contentHandler, namespaces, WingConstants.I18N, E_PARAM);
     }
-
-    /**
-     * dispose
-     */
-    public void dispose()
-    {
-        super.dispose();
-    }
 }

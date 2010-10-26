@@ -173,13 +173,6 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 	}
 
 	/**
-	 * dispose
-	 */
-	public void dispose() {
-		super.dispose();
-	}
-
-	/**
 	 * Remove the given content from the Element.
 	 * 
 	 * If the content is an element then render it as text and include it's

@@ -93,15 +93,6 @@ public class LNISoapServlet extends AxisServlet
     /** The response. */
     private HttpServletResponse response = null;
 
-    /* (non-Javadoc)
-     * @see javax.servlet.GenericServlet#init(javax.servlet.ServletConfig)
-     */
-    @Override
-    public void init(ServletConfig sc) throws ServletException
-    {
-        super.init(sc);
-    }
-
     /**
      * Pass a GET request directly to the WebDAV implementation. It handles
      * authentication.
