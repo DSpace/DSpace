@@ -452,7 +452,7 @@ public class PluginManager
      * @param name under which the plugin implementation is configured.
      * @return true if plugin was found to be configured, false otherwise
      */
-    public static boolean hasNamedPlugin(Class<DisseminationCrosswalk> intfc, String name)
+    public static boolean hasNamedPlugin(Class intfc, String name)
          throws PluginInstantiationException
     {
         try
@@ -490,10 +490,8 @@ public class PluginManager
             String prefix = iname + SEP;
             ArrayList<String> result = new ArrayList<String>();
 
-            Iterator<String> ki = namedPluginClasses.keySet().iterator();
-            while (ki.hasNext())
+            for (String key : namedPluginClasses.keySet())
             {
-                String key = ki.next();
                 if (key.startsWith(prefix))
                 {
                     result.add(key.substring(prefix.length()));
@@ -504,7 +502,7 @@ public class PluginManager
                 log.error("Cannot find any names for named plugin, interface=" + iname);
             }
 
-            return (String[])result.toArray(new String[result.size()]);
+            return result.toArray(new String[result.size()]);
         }
         catch (ClassNotFoundException e)
         {
