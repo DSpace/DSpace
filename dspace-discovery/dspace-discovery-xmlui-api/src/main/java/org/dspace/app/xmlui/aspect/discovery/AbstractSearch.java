@@ -227,8 +227,12 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
                 this.performSearch(scope);
             }
         }
-        catch (Throwable t) {
-            log.error(t.getMessage(), t);
+        catch (RuntimeException e) {
+            log.error(e.getMessage(), e);
+            queryResults = null;
+        }
+        catch (Exception e) {
+            log.error(e.getMessage(), e);
             queryResults = null;
         }
 

@@ -1383,28 +1383,32 @@ public class OAIHarvester {
 				dso = Collection.find(context, hc.getCollectionId());
 				OAIHarvester harvester = new OAIHarvester(context, dso, hc);
 				harvester.runHarvest();
-			} catch (Exception ex) {
+			}
+            catch (RuntimeException e) {
+                log.error("Runtime exception in thread: " + this.toString());
+                log.error(e.getMessage() + " " + e.getCause());
+                hc.setHarvestMessage("Runtime error occured while generating an OAI response");
+                hc.setHarvestStatus(HarvestedCollection.STATUS_UNKNOWN_ERROR);
+            }
+            catch (Exception ex) {
 				log.error("General exception in thread: " + this.toString());
 				log.error(ex.getMessage() + " " + ex.getCause());
 				hc.setHarvestMessage("Error occured while generating an OAI response");
 				hc.setHarvestStatus(HarvestedCollection.STATUS_UNKNOWN_ERROR);			
 			}
-			catch (Throwable t) {
-				log.error("Runtime exception in thread: " + this.toString());
-				log.error(t.getMessage() + " " + t.getCause());
-				hc.setHarvestMessage("Runtime error occured while generating an OAI response");
-				hc.setHarvestStatus(HarvestedCollection.STATUS_UNKNOWN_ERROR);	
-			}
-			finally 
+			finally
 			{
 				try {
 					hc.update();
 					context.restoreAuthSystemState();
 					context.complete();
 				}
-				catch (Throwable t) {
-					log.error("Unexpected exception while recovering from a harvesting error: " + t.getMessage());
-					t.printStackTrace();
+                catch (RuntimeException e) {
+                    log.error("Unexpected exception while recovering from a harvesting error: " + e.getMessage(), e);
+                    context.abort();
+                }
+				catch (Exception e) {
+					log.error("Unexpected exception while recovering from a harvesting error: " + e.getMessage(), e);
 					context.abort();
 				}
 				

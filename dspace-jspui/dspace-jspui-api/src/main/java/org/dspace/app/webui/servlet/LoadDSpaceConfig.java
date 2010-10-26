@@ -39,6 +39,7 @@
  */
 package org.dspace.app.webui.servlet;
 
+import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 
 import javax.servlet.http.HttpServlet;
@@ -63,7 +64,9 @@ import java.net.URLConnection;
  * @version $Revision$
  */
 public class LoadDSpaceConfig extends HttpServlet
-{	
+{
+    private static final Logger LOG = Logger.getLogger(LoadDSpaceConfig.class);
+
     public void init()
     {
         // On Windows, URL caches can cause problems, particularly with undeployment
@@ -83,10 +86,15 @@ public class LoadDSpaceConfig extends HttpServlet
                 urlConn.setDefaultUseCaches(false);
             }
         }
-        catch (Throwable t)
+        // Any errors thrown in disabling the caches aren't significant to
+        // the normal execution of the application, so we ignore them
+        catch (RuntimeException e)
         {
-            // Any errors thrown in disabling the caches aren't significant to
-            // the normal execution of the application, so we ignore them
+            LOG.error(e.getMessage(), e);
+        }
+        catch (Exception e)
+        {
+            LOG.error(e.getMessage(), e);
         }
 
         if(!ConfigurationManager.isConfigured())

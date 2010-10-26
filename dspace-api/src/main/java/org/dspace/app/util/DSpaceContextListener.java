@@ -86,11 +86,15 @@ public class DSpaceContextListener implements ServletContextListener
                 urlConn.setDefaultUseCaches(false);
             }
         }
-        catch (Throwable t)
+        // Any errors thrown in disabling the caches aren't significant to
+        // the normal execution of the application, so we ignore them
+        catch (RuntimeException e)
         {
-            log.error(t.getMessage(), t);
-            // Any errors thrown in disabling the caches aren't significant to
-            // the normal execution of the application, so we ignore them
+            log.error(e.getMessage(), e);
+        }
+        catch (Exception e)
+        {
+            log.error(e.getMessage(), e);
         }
 
         // Paths to the various config files
@@ -126,7 +130,11 @@ public class DSpaceContextListener implements ServletContextListener
         {
             ConfigurationManager.loadConfig(dspaceConfig);
         }
-        catch (Throwable t)
+        catch (RuntimeException e)
+        {
+            throw e;
+        }
+        catch (Exception e)
         {
             throw new RuntimeException(
                     "\n\nDSpace has failed to initialize, during stage 2. Error while attempting to read the \n" +
@@ -134,7 +142,7 @@ public class DSpaceContextListener implements ServletContextListener
                     "This has likely occurred because either the file does not exist, or it's permissions \n" +
                     "are set incorrectly, or the path to the configuration file is incorrect. The path to \n" +
                     "the DSpace configuration file is stored in a context variable, 'dspace-config', in \n" +
-                    "either the local servlet or global context.\n\n",t);
+                    "either the local servlet or global context.\n\n",e);
         }
 
     }
@@ -164,7 +172,11 @@ public class DSpaceContextListener implements ServletContextListener
                 }
             }
         }
-        catch (Throwable e)
+        catch (RuntimeException e)
+        {
+            log.error("Failed to cleanup ClassLoader for webapp", e);
+        }
+        catch (Exception e)
         {
             log.error("Failed to cleanup ClassLoader for webapp", e);
         }

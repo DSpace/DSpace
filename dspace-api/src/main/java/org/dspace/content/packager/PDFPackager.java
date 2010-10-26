@@ -261,33 +261,39 @@ public class PDFPackager
         }
 
         Item item = (Item)dso;
+        BitstreamFormat pdff = BitstreamFormat.findByShortDescription(context,
+                                BITSTREAM_FORMAT_NAME);
+        if (pdff == null)
+        {
+            throw new PackageValidationException("Cannot find BitstreamFormat \"" + BITSTREAM_FORMAT_NAME + "\"");
+        }
+        Bitstream pkgBs = PackageUtils.getBitstreamByFormat(item, pdff, Constants.DEFAULT_BUNDLE_NAME);
+        if (pkgBs == null)
+        {
+            throw new PackageValidationException("Cannot find Bitstream with format \"" + BITSTREAM_FORMAT_NAME + "\"");
+        }
+
+        //Make sure our package file exists
+        if(!pkgFile.exists())
+        {
+            PackageUtils.createFile(pkgFile);
+        }
+
+        //open up output stream to copy bistream to file
+        FileOutputStream out = null;
         try
         {
-            BitstreamFormat pdff = BitstreamFormat.findByShortDescription(context,
-                                    BITSTREAM_FORMAT_NAME);
-            if (pdff == null)
-            {
-                throw new PackageValidationException("Cannot find BitstreamFormat \"" + BITSTREAM_FORMAT_NAME + "\"");
-            }
-            Bitstream pkgBs = PackageUtils.getBitstreamByFormat(item, pdff, Constants.DEFAULT_BUNDLE_NAME);
-            if (pkgBs == null)
-            {
-                throw new PackageValidationException("Cannot find Bitstream with format \"" + BITSTREAM_FORMAT_NAME + "\"");
-            }
-
-            //Make sure our package file exists
-            if(!pkgFile.exists())
-            {
-                PackageUtils.createFile(pkgFile);
-            }
-
             //open up output stream to copy bistream to file
-            FileOutputStream out = new FileOutputStream(pkgFile);
+            out = new FileOutputStream(pkgFile);
             Utils.copy(pkgBs.retrieve(), out);
-            //close output stream & save to file
-            out.close();
         }
-            finally {}
+        finally
+        {
+            if (out != null)
+            {
+                out.close();
+            }
+        }
     }
 
     /**

@@ -142,7 +142,9 @@ public class CommunityRecentSubmissions extends AbstractFiltersTransformer
 
         try {
             queryResults =  getSearchService().search(queryArgs);
-        } catch (Throwable e) {
+        } catch (RuntimeException e) {
+            log.error(e.getMessage(),e);
+        } catch (Exception e) {
             log.error(e.getMessage(),e);
         }
 

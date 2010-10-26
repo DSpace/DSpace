@@ -139,9 +139,11 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 
 			try {
 				translate(document.getRootElement());
-			} catch (Throwable t) {
+			} catch (RuntimeException e) {
+                throw e;
+            } catch (Exception e) {
 				throw new JDOMException(
-						"Error translating HTML fragment into DRI", t);
+						"Error translating HTML fragment into DRI", e);
 			}
 
 			SAXFilter filter = new SAXFilter(contentHandler, lexicalHandler,

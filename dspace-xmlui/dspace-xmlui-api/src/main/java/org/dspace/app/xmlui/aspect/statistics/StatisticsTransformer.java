@@ -82,8 +82,10 @@ public class StatisticsTransformer extends AbstractDSpaceTransformer {
 				renderHome(body);
 			}
 
-		} catch (Throwable t) {
-			log.error(t.getMessage(), t);
+        } catch (RuntimeException e) {
+            throw e;
+		} catch (Exception e) {
+			log.error(e.getMessage(), e);
 		}
 
 	}

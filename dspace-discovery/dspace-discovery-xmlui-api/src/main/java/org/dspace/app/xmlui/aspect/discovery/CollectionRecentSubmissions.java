@@ -118,8 +118,6 @@ public class CollectionRecentSubmissions extends AbstractFiltersTransformer {
      * @return the response of the query
      */
     public void performSearch(DSpaceObject scope) {
-
-
         if(queryResults != null)
         {
             return;
@@ -143,13 +141,12 @@ public class CollectionRecentSubmissions extends AbstractFiltersTransformer {
 
         try {
             queryResults =  getSearchService().search(queryArgs);
-        } catch (Throwable e) {
+        } catch (RuntimeException e) {
+            log.error(e.getMessage(),e);
+        } catch (Exception e) {
             log.error(e.getMessage(),e);
         }
-
-
     }
-
 
     public String getView()
     {

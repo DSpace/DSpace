@@ -54,6 +54,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.configuration.XMLUIConfiguration;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
@@ -69,6 +70,7 @@ import org.dspace.harvest.OAIHarvester;
  */
 public class DSpaceCocoonServletFilter implements Filter 
 {
+    private static final Logger LOG = Logger.getLogger(DSpaceCocoonServletFilter.class);
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -112,10 +114,15 @@ public class DSpaceCocoonServletFilter implements Filter
                 urlConn.setDefaultUseCaches(false);
             }
         }
-        catch (Throwable t)
+        // Any errors thrown in disabling the caches aren't significant to
+        // the normal execution of the application, so we ignore them
+        catch (RuntimeException e)
         {
-            // Any errors thrown in disabling the caches aren't significant to
-            // the normal execution of the application, so we ignore them
+            LOG.error(e.getMessage(), e);
+        }
+        catch (Exception e)
+        {
+            LOG.error(e.getMessage(), e);
         }
         
         /**
@@ -163,7 +170,11 @@ public class DSpaceCocoonServletFilter implements Filter
             
             
         }
-        catch (Throwable t)
+        catch (RuntimeException e)
+        {
+            throw e;
+        }
+        catch (Exception e)
         {
             throw new ServletException(
                     "\n\nDSpace has failed to initialize, during stage 2. Error while attempting to read the \n" +
@@ -171,7 +182,7 @@ public class DSpaceCocoonServletFilter implements Filter
                     "This has likely occurred because either the file does not exist, or it's permissions \n" +
                     "are set incorrectly, or the path to the configuration file is incorrect. The path to \n" +
                     "the DSpace configuration file is stored in a context variable, 'dspace-config', in \n" +
-                    "either the local servlet or global context.\n\n",t);
+                    "either the local servlet or global context.\n\n",e);
         }
     }
     
@@ -205,7 +216,11 @@ public class DSpaceCocoonServletFilter implements Filter
     		
 	        XMLUIConfiguration.loadConfig(webappConfigPath,installedConfigPath);
     	}   
-    	catch (Throwable t)
+    	catch (RuntimeException e)
+        {
+            throw e;
+        }
+        catch (Exception e)
     	{
     		throw new ServletException(
     				"\n\nDSpace has failed to initialize, during stage 3. Error while attempting to read \n" +
@@ -213,7 +228,7 @@ public class DSpaceCocoonServletFilter implements Filter
     				"This has likely occurred because either the file does not exist, or it's permissions \n" +
     				"are set incorrectly, or the path to the configuration file is incorrect. The XML UI \n" +
     				"configuration file should be named \"xmlui.xconf\" and located inside the standard \n" +
-    				"DSpace configuration directory. \n\n",t);
+    				"DSpace configuration directory. \n\n",e);
     	}
    
 		if (ConfigurationManager.getBooleanProperty("harvester.autoStart")) 
@@ -221,9 +236,13 @@ public class DSpaceCocoonServletFilter implements Filter
     		try {
     			OAIHarvester.startNewScheduler();
     		}
-    		catch (Throwable t)
+            catch (RuntimeException e)
+            {
+                LOG.error(e.getMessage(), e);
+            }
+    		catch (Exception e)
     		{
-    			//ignore
+                LOG.error(e.getMessage(), e);
     		}
     	}
     	
@@ -258,7 +277,10 @@ public class DSpaceCocoonServletFilter implements Filter
 	        }
 	
 	        arg2.doFilter(realRequest, realResponse);
-		} catch (Throwable t) {
+        } catch (RuntimeException e) {
+            ContextUtil.abortContext(realRequest);
+            throw e;
+		} catch (Exception e) {
 	        ContextUtil.abortContext(realRequest);
 		} finally {
 	        // Close out the DSpace context no matter what.
