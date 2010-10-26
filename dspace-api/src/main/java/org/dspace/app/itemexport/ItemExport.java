@@ -1513,11 +1513,11 @@ public class ItemExport
             }
             finally
             {
-                cpZipOutputStream.closeEntry();
                 if (cpFileInputStream != null)
                 {
                     cpFileInputStream.close();
                 }
+                cpZipOutputStream.closeEntry();
             }
         }
     }

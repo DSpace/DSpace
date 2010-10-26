@@ -328,28 +328,40 @@ public class ItemArchive {
             log.error("Unable to create undo directory");
         }
 		
-		OutputStream out = new FileOutputStream(new File(dir, "dublin_core.xml"));
-        Document doc = MetadataUtilities.writeDublinCore(getDocumentBuilder(), undoDtomList);
-        MetadataUtilities.writeDocument(doc, getTransformer(), out);
-		
-		// if undo has delete bitstream
-        if (undoAddContents.size() > 0)
+		OutputStream out = null;
+
+        try
         {
-        	PrintWriter pw = null;
-        	try
-        	{
-	        	File f = new File(dir, ItemUpdate.DELETE_CONTENTS_FILE);
-	        	pw = new PrintWriter(new BufferedWriter(new FileWriter(f)));
-	        	for (Integer i : undoAddContents)
-	        	{
-	        		pw.println(i);
-	        	}
-        	}
-        	finally
-        	{
-        		pw.close();
-        	}
-        }        
+            out = new FileOutputStream(new File(dir, "dublin_core.xml"));
+            Document doc = MetadataUtilities.writeDublinCore(getDocumentBuilder(), undoDtomList);
+            MetadataUtilities.writeDocument(doc, getTransformer(), out);
+
+            // if undo has delete bitstream
+            if (undoAddContents.size() > 0)
+            {
+                PrintWriter pw = null;
+                try
+                {
+                    File f = new File(dir, ItemUpdate.DELETE_CONTENTS_FILE);
+                    pw = new PrintWriter(new BufferedWriter(new FileWriter(f)));
+                    for (Integer i : undoAddContents)
+                    {
+                        pw.println(i);
+                    }
+                }
+                finally
+                {
+                    pw.close();
+                }
+            }
+        }
+        finally
+        {
+            if (out != null)
+            {
+                out.close();
+            }
+        }
 	}
 	
 } //end class

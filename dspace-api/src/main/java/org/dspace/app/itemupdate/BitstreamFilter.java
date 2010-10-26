@@ -72,9 +72,20 @@ public abstract class BitstreamFilter {
 	{
 		props = new Properties();
 		
-		InputStream in = new FileInputStream(filepath);
-		props.load(in);
-		in.close();		
+		InputStream in = null;
+
+        try
+        {
+            in = new FileInputStream(filepath);
+            props.load(in);
+        }
+        finally
+        {
+            if (in != null)
+            {
+                in.close();
+            }
+        }
 	}
 	
 }
