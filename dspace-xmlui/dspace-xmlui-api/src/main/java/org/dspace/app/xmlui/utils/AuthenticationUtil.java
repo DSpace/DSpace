@@ -116,7 +116,7 @@ public class AuthenticationUtil
      *         authentication was successful or or no eperson attached if the
      *         attempt failed.
      */
-    public static Context Authenticate(Map objectModel, String email, String password, String realm) 
+    public static Context authenticate(Map objectModel, String email, String password, String realm)
     throws SQLException
     {
         // Get the real HttpRequest
@@ -169,7 +169,7 @@ public class AuthenticationUtil
      *            Cocoon's object model.
      * @return This requests DSpace context.
      */
-    public static Context AuthenticateImplicit(Map objectModel)
+    public static Context authenticateImplicit(Map objectModel)
             throws SQLException
     {
         // Get the real HttpRequest

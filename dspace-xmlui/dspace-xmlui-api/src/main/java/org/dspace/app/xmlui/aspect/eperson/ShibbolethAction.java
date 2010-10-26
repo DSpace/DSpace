@@ -91,7 +91,7 @@ public class ShibbolethAction extends AbstractAction
         try
         {
             //rely on implicit authN of Shib
-            Context context = AuthenticationUtil.Authenticate(objectModel, null, null, null);
+            Context context = AuthenticationUtil.authenticate(objectModel, null, null, null);
 
             EPerson eperson = null;
             if(context != null)

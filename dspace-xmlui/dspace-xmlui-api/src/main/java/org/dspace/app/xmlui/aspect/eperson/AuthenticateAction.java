@@ -106,7 +106,7 @@ public class AuthenticateAction extends AbstractAction
         
         try
         {
-            Context context = AuthenticationUtil.Authenticate(objectModel, email,password, realm);
+            Context context = AuthenticationUtil.authenticate(objectModel, email,password, realm);
 
             EPerson eperson = context.getCurrentUser();
 

@@ -99,7 +99,7 @@ public class LDAPAuthenticateAction extends AbstractAction {
         }
 		
 		try {
-			Context context = AuthenticationUtil.Authenticate(objectModel,username, password, realm);
+			Context context = AuthenticationUtil.authenticate(objectModel,username, password, realm);
 
 			EPerson eperson = context.getCurrentUser();
 
