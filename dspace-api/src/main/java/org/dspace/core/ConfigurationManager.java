@@ -233,7 +233,9 @@ public class ConfigurationManager
                                 String key = (String)pe.nextElement();
                                 String ival = interpolate(key, modProps.getProperty(key), 1);
                                 if (ival != null)
+                                {
                                     modProps.setProperty(key, ival);
+                                }
                             }
                             moduleProps.put(module, modProps);
                             value = modProps.getProperty(property);
@@ -709,7 +711,9 @@ public class ConfigurationManager
         email.setContent(contentBuffer.toString());
 
         if (charset != null)
+        {
             email.setCharset(charset);
+        }
 
         return email;
     }
