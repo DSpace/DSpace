@@ -315,7 +315,7 @@ public class DatabaseManager
             throw sqle;
         }
     }
-    
+
     /**
      * Return an iterator with the results of executing statement. The table
      * parameter indicates the type of result. If table is null, the column
@@ -1036,8 +1036,8 @@ public class DatabaseManager
     public static void loadSql(Reader r) throws SQLException, IOException
     {
         BufferedReader reader = new BufferedReader(r);
-        StringBuffer sql = new StringBuffer();
-        String SQL = null;
+        StringBuilder sqlBuilder = new StringBuilder();
+        String sql = null;
 
         String line = null;
 
@@ -1057,8 +1057,7 @@ public class DatabaseManager
                 // Look for comments
                 int commentStart = line.indexOf("--");
 
-                String input = (commentStart != -1) ? line.substring(0,
-                        commentStart) : line;
+                String input = (commentStart != -1) ? line.substring(0, commentStart) : line;
 
                 // Empty line, skip
                 if (input.trim().equals(""))
@@ -1067,11 +1066,11 @@ public class DatabaseManager
                 }
 
                 // Put it on the SQL buffer
-                sql.append(input.replace(';', ' ')); // remove all semicolons
+                sqlBuilder.append(input.replace(';', ' ')); // remove all semicolons
                                                      // from sql file!
 
                 // Add a space
-                sql.append(" ");
+                sqlBuilder.append(" ");
 
                 // More to come?
                 // Look for quotes
@@ -1109,18 +1108,17 @@ public class DatabaseManager
                     continue;
                 }
 
+                sql = sqlBuilder.toString();
                 if (log.isDebugEnabled())
                 {
                     log.debug("Running database query \"" + sql + "\"");
                 }
 
-                SQL = sql.toString();
-
                 try
                 {
                     // Use execute, not executeQuery (which expects results) or
                     // executeUpdate
-                    statement.execute(SQL);
+                    statement.execute(sql);
                 }
                 catch (SQLWarning sqlw)
                 {
@@ -1137,17 +1135,16 @@ public class DatabaseManager
                     // These are Postgres-isms:
                     // There's no easy way to check if a table exists before
                     // creating it, so we always drop tables, then create them
-                    boolean isDrop = ((SQL != null) && (sqlmessage != null)
-                            && (SQL.toUpperCase().startsWith("DROP")) && (sqlmessage
-                            .indexOf("does not exist") != -1));
+                    boolean isDrop = ((sql != null) && (sqlmessage != null)
+                            && (sql.toUpperCase().startsWith("DROP"))
+                            && (sqlmessage.indexOf("does not exist") != -1));
 
                     // Creating a view causes a bogus warning
-                    boolean isNoResults = ((SQL != null)
+                    boolean isNoResults = ((sql != null)
                             && (sqlmessage != null)
-                            && ((SQL.toUpperCase().startsWith("CREATE VIEW")) || (SQL
-                                    .toUpperCase()
-                                    .startsWith("CREATE FUNCTION"))) && (sqlmessage
-                            .indexOf("No results were returned") != -1));
+                            && (sql.toUpperCase().startsWith("CREATE VIEW")
+                                    || sql.toUpperCase().startsWith("CREATE FUNCTION"))
+                            && (sqlmessage.indexOf("No results were returned") != -1));
 
                     // If the messages are bogus, give them a low priority
                     if (isDrop || isNoResults)
@@ -1168,8 +1165,8 @@ public class DatabaseManager
                 }
 
                 // Reset SQL buffer
-                sql = new StringBuffer();
-                SQL = null;
+                sqlBuilder = new StringBuilder();
+                sql = null;
             }
         }
         finally

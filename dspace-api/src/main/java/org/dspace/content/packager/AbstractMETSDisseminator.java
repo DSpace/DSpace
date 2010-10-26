@@ -238,6 +238,7 @@ public abstract class AbstractMETSDisseminator
                             PackageParameters params, File pkgFile)
         throws PackageValidationException, CrosswalkException, AuthorizeException, SQLException, IOException
     {
+        FileOutputStream outStream = null;
         try
         {
             //Make sure our package file exists
@@ -247,7 +248,7 @@ public abstract class AbstractMETSDisseminator
             }
 
             //Open up an output stream to write to package file
-            FileOutputStream outStream = new FileOutputStream(pkgFile);
+            outStream = new FileOutputStream(pkgFile);
 
             // Generate a true manifest-only "package", no external files/data & no need to zip up
             if (params != null && params.getBooleanProperty("manifestOnly", false))
@@ -261,9 +262,6 @@ public abstract class AbstractMETSDisseminator
                 // make a Zip-based package
                 writeZipPackage(context, dso, params, outStream);
             }//end if/else
-
-            //Close stream / stop writing to file
-            outStream.close();
         }//end try
         catch (MetsException e)
         {
@@ -271,6 +269,14 @@ public abstract class AbstractMETSDisseminator
             // know the details of the METS toolkit
             log.error("METS error: ",e);
             throw new PackageValidationException(e);
+        }
+        finally
+        {
+            //Close stream / stop writing to file
+            if (outStream != null)
+            {
+                outStream.close();
+            }
         }
     }
 

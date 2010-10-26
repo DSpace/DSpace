@@ -303,10 +303,19 @@ public class METSExport
         }
 
         // Write the METS file
-        FileOutputStream out = new FileOutputStream(aipDir.toString()
-                + java.io.File.separator + "mets.xml");
-        writeMETS(context, item, out, false);
-        out.close();
+        FileOutputStream out = null;
+        try
+        {
+            out = new FileOutputStream(aipDir.toString() + java.io.File.separator + "mets.xml");
+            writeMETS(context, item, out, false);
+        }
+        finally
+        {
+            if (out != null)
+            {
+                out.close();
+            }
+        }
 
         // Write bitstreams
         Bundle[] bundles = item.getBundles();

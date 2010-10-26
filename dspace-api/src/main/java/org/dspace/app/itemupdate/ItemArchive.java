@@ -115,8 +115,19 @@ public class ItemArchive {
 		ItemArchive itarch = new ItemArchive(); 
 		itarch.dir = dir;
 		itarch.dirname = dir.getName();
-		InputStream is = new FileInputStream(new File(dir, DUBLIN_CORE_XML));
-		itarch.dtomList = MetadataUtilities.loadDublinCore(getDocumentBuilder(), is);  
+        InputStream is = null;
+        try
+        {
+            is = new FileInputStream(new File(dir, DUBLIN_CORE_XML));
+            itarch.dtomList = MetadataUtilities.loadDublinCore(getDocumentBuilder(), is);
+        }
+        finally
+        {
+            if (is != null)
+            {
+                is.close();
+            }
+        }
 		ItemUpdate.pr("Loaded metadata with " + itarch.dtomList.size() + " fields");
 		
 		if (itemField == null)

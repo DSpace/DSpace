@@ -175,20 +175,34 @@ public class CollectionDepositor extends Depositor
 
 				String fn = swordService.getFilename(context, deposit, true);
 
-				FileInputStream fis = new FileInputStream(deposit.getFile());
-				Bitstream bitstream = swordBundle.createBitstream(fis);
-				bitstream.setName(fn);
-				bitstream.setDescription("SWORD deposit package");
+                Bitstream bitstream;
+				FileInputStream fis = null;
+                try
+                {
+                    fis = new FileInputStream(deposit.getFile());
+                    bitstream = swordBundle.createBitstream(fis);
+                }
+                finally
+                {
+                    if (fis != null)
+                    {
+                        fis.close();
+                    }
+                }
 
-				BitstreamFormat bf = BitstreamFormat.findByMIMEType(context, deposit.getContentType());
-				if (bf != null)
-				{
-					bitstream.setFormat(bf);
-				}
+                bitstream.setName(fn);
+                bitstream.setDescription("SWORD deposit package");
 
-				bitstream.update();
-				swordBundle.update();
-				item.update();
+                BitstreamFormat bf = BitstreamFormat.findByMIMEType(context, deposit.getContentType());
+                if (bf != null)
+                {
+                    bitstream.setFormat(bf);
+                }
+
+                bitstream.update();
+
+                swordBundle.update();
+                item.update();
 
 				swordService.message("Original package stored as " + fn + ", in item bundle " + swordBundle);
 

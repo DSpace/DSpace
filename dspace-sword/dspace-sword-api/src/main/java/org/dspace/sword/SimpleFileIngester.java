@@ -102,9 +102,21 @@ public class SimpleFileIngester implements SWORDIngester
 				original = item.createBundle("ORIGINAL");
 			}
 
-                        File depositFile = deposit.getFile();
-			FileInputStream fis = new FileInputStream(depositFile);
-			Bitstream bs = original.createBitstream(fis);
+            Bitstream bs;
+			FileInputStream fis = null;
+
+            try
+            {
+                fis = new FileInputStream(deposit.getFile());
+                bs = original.createBitstream(fis);
+            }
+            finally
+            {
+                if (fis != null)
+                {
+                    fis.close();
+                }
+            }
 
 			String fn = swordService.getFilename(context, deposit, false);
 			bs.setName(fn);

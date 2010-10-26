@@ -156,9 +156,19 @@ public class PDFPackager
             Item myitem = wi.getItem();
             original = myitem.createBundle("ORIGINAL");
 
-            InputStream fileStream = new FileInputStream(pkgFile);
-            bs = original.createBitstream(fileStream);
-            fileStream.close();
+            InputStream fileStream = null;
+            try
+            {
+                fileStream = new FileInputStream(pkgFile);
+                bs = original.createBitstream(fileStream);
+            }
+            finally
+            {
+                if (fileStream != null)
+                {
+                    fileStream.close();
+                }
+            }
 
             bs.setName("package.pdf");
             setFormatToMIMEType(context, bs, "application/pdf");

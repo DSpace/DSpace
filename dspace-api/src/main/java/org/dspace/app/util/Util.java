@@ -37,6 +37,7 @@
  */
 package org.dspace.app.util;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -350,16 +351,29 @@ public class Util {
         {
             Properties constants = new Properties();
 
+            InputStream cis = null;
             try
             {
-                InputStream cis = Util.class.getResourceAsStream
-                    ("/META-INF/maven/org.dspace/dspace-api/pom.properties");
-
+                cis = Util.class.getResourceAsStream("/META-INF/maven/org.dspace/dspace-api/pom.properties");
                 constants.load(cis);
             }
             catch(Exception e)
             {
                 log.error(e.getMessage(),e);
+            }
+            finally
+            {
+                if (cis != null)
+                {
+                    try
+                    {
+                        cis.close();
+                    }
+                    catch (IOException e)
+                    {
+                        log.error("Unable to close input stream", e);
+                    }
+                }
             }
 
             sourceVersion = constants.getProperty("version", "none");

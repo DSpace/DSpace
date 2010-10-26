@@ -123,12 +123,21 @@ public class RoleDisseminator implements PackageDisseminator
     {
         boolean emitPasswords = params.containsKey("passwords");
 
-        //open file stream for writing
-        FileOutputStream fileOut = new FileOutputStream(pkgFile);
-        writeToStream(context, object, fileOut, emitPasswords);
-
-        //close file stream & save
-        fileOut.close();
+        FileOutputStream fileOut = null;
+        try
+        {
+            //open file stream for writing
+            fileOut = new FileOutputStream(pkgFile);
+            writeToStream(context, object, fileOut, emitPasswords);
+        }
+        finally
+        {
+            //close file stream & save
+            if (fileOut != null)
+            {
+                fileOut.close();
+            }
+        }
     }
 
     /**

@@ -253,8 +253,7 @@ public class ChecksumHistoryDAO extends DAOSupport
 
         try
         {
-            update = conn
-                    .prepareStatement("DELETE FROM checksum_history WHERE process_end_date<? AND result=?");
+            update = conn.prepareStatement("DELETE FROM checksum_history WHERE process_end_date<? AND result=?");
             update.setTimestamp(1, new Timestamp(retentionDate.getTime()));
             update.setString(2, result);
             return update.executeUpdate();
@@ -285,8 +284,8 @@ public class ChecksumHistoryDAO extends DAOSupport
             int count = 0;
             for (Map.Entry<String, Long> interest : interests.entrySet())
             {
-                count += deleteHistoryByDateAndCode(new Date(now
-                        - interest.getValue().longValue()), interest.getKey(), conn);
+                count += deleteHistoryByDateAndCode(new Date(now - interest.getValue().longValue()),
+                                                    interest.getKey(), conn);
                 conn.commit();
             }
             return count;

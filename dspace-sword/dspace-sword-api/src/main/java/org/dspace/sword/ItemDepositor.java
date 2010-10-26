@@ -132,8 +132,20 @@ public class ItemDepositor extends Depositor
 
 				String fn = swordService.getFilename(context, deposit, true);
 
-				FileInputStream fis = new FileInputStream(deposit.getFile());
-				Bitstream bitstream = swordBundle.createBitstream(fis);
+                Bitstream bitstream;
+				FileInputStream fis = null;
+                try
+                {
+                    fis = new FileInputStream(deposit.getFile());
+                    bitstream = swordBundle.createBitstream(fis);
+                }
+                finally
+                {
+                    if (fis != null)
+                    {
+                        fis.close();
+                    }
+                }
 				bitstream.setName(fn);
 				bitstream.setDescription("Original file deposited via SWORD");
 

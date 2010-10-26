@@ -48,6 +48,8 @@ import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -83,22 +85,25 @@ public class SearchUtils {
                 .convertProperties(ConfigurationManager.getProperties());
 
         try {
-            File config = new File(props.getProperty("dspace.dir")
-                    + "/config/dspace-solr-search.cfg");
+            File config = new File(props.getProperty("dspace.dir") + "/config/dspace-solr-search.cfg");
             if (config.exists()) {
                 props.combine(new ExtendedProperties(config.getAbsolutePath()));
             } else {
-                ExtendedProperties defaults = new ExtendedProperties();
-                defaults
-                        .load(SolrServiceImpl.class
-                                .getResourceAsStream("dspace-solr-search.cfg"));
-                props.combine(defaults);
+                InputStream is = null;
+                try {
+                    is = SolrServiceImpl.class.getResourceAsStream("dspace-solr-search.cfg");
+                    ExtendedProperties defaults = new ExtendedProperties();
+                    defaults.load(is);
+                    props.combine(defaults);
+                } finally {
+                    if (is != null) {
+                        is.close();
+                    }
+                }
             }
 
             log.debug("combined configuration");
-
-        }
-        catch (Exception e) {
+        } catch (IOException e) {
             log.error(e.getMessage(), e);
         }
 

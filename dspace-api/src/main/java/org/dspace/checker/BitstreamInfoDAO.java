@@ -579,13 +579,11 @@ public final class BitstreamInfoDAO extends DAOSupport
             {
                 ids.add(Integer.valueOf(rs.getInt(1)));
             }
-
         }
         catch (SQLException e)
         {
             LOG.error("get item bitstreams " + e.getMessage(), e);
-            throw new RuntimeException(
-                    "get item bitstreams. " + e.getMessage(), e);
+            throw new RuntimeException("get item bitstreams. " + e.getMessage(), e);
 
         }
         finally

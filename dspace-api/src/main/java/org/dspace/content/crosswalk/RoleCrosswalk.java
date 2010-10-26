@@ -343,11 +343,20 @@ public class RoleCrosswalk
         String tempDirectory = ConfigurationManager.getProperty("upload.temp.dir");
         File tempFile = File.createTempFile("RoleCrosswalkIngest" + dso.hashCode(), null, new File(tempDirectory));
         tempFile.deleteOnExit();
-        FileOutputStream fileOutStream = new FileOutputStream(tempFile);
-        
-        XMLOutputter writer = new XMLOutputter();
-        writer.output(root, fileOutStream);
-        fileOutStream.close();
+        FileOutputStream fileOutStream = null;
+        try
+        {
+            fileOutStream = new FileOutputStream(tempFile);
+            XMLOutputter writer = new XMLOutputter();
+            writer.output(root, fileOutStream);
+        }
+        finally
+        {
+            if (fileOutStream != null)
+            {
+                fileOutStream.close();
+            }
+        }
 
         //Actually call the ingester
         try
