@@ -55,7 +55,6 @@ import java.io.File;
 import java.io.IOException;
  
 import org.apache.log4j.Logger;
-import org.dspace.content.crosswalk.DisseminationCrosswalk;
 
 /**
  * The Plugin Manager is a very simple component container.  It creates and
@@ -116,7 +115,7 @@ public class PluginManager
 
     // Predicate -- whether or not to cache this class.  Ironically,
     // the cacheability information is itself cached.
-    private static boolean cacheMe(Class implClass)
+    private static boolean cacheMe(String module, Class implClass)
     {
         if (cacheMeCache.containsKey(implClass))
         {
@@ -124,8 +123,10 @@ public class PluginManager
         }
         else
         {
-        	String key = REUSABLE_PREFIX+implClass.getName();
-            boolean reusable = ConfigurationManager.getBooleanProperty(key, true);
+            String key = REUSABLE_PREFIX+implClass.getName();
+            boolean reusable = (module != null) ?
+                ConfigurationManager.getBooleanProperty(module, key, true) :
+                ConfigurationManager.getBooleanProperty(key, true);
             cacheMeCache.put(implClass, Boolean.valueOf(reusable));
             return reusable;
         }
@@ -148,21 +149,38 @@ public class PluginManager
     public static Object getSinglePlugin(Class interfaceClass)
         throws PluginConfigurationError, PluginInstantiationException
     {
+        return getSinglePlugin(null, interfaceClass);
+    }
+    
+    /**
+     * Returns an instance of the singleton (single) plugin implementing
+     * the given interface.  There must be exactly one single plugin
+     * configured for this interface, otherwise the
+     * <code>PluginConfigurationError</code> is thrown.
+     * <p>
+     * Note that this is the only "get plugin" method which throws an
+     * exception.  It is typically used at initialization time to set up
+     * a permanent part of the system so any failure is fatal.
+     *
+     * @param name of config module, or <code>null</code> for standard location
+     * @param interfaceClass interface Class object
+     * @return instance of plugin
+     * @throws PluginConfigurationError
+     */
+    public static Object getSinglePlugin(String module, Class interfaceClass) 
+        throws PluginConfigurationError, PluginInstantiationException
+    {
         String iname = interfaceClass.getName();
 
         // configuration format is  prefix.<interface> = <classname>
-        String classname = ConfigurationManager.getProperty(SINGLE_PREFIX+iname);
+        String classname = getConfigProperty(module, SINGLE_PREFIX+iname);
+        
         if (classname != null)
-        {
-            return getAnonymousPlugin(classname.trim());
-        }
+            return getAnonymousPlugin(module, classname.trim());
         else
-        {
-            throw new PluginConfigurationError("No Single Plugin configured for interface \"" + iname + "\"");
-        }
+            throw new PluginConfigurationError("No Single Plugin configured for interface \""+iname+"\"");
     }
-
-
+        
     // cache of config data for Sequence Plugins; format its
     // <interface-name> -> [ <classname>.. ]  (value is Array)
     private static Map<String, String[]> sequenceConfig = new HashMap<String, String[]>();
@@ -182,13 +200,32 @@ public class PluginManager
     public static Object[] getPluginSequence(Class intfc)
         throws PluginInstantiationException
     {
+        return getPluginSequence(null, intfc);
+    }
+    
+    /**
+     * Returns instances of all plugins that implement the interface
+     * intface, in an Array.  Returns an empty array if no there are no
+     * matching plugins.
+     * <p>
+     * The order of the plugins in the array is the same as their class
+     * names in the configuration's value field.
+     *
+     * @param module name of config module, or <code>null</code> for standard
+     * @param intfc interface for which to find plugins.
+     * @return an array of plugin instances; if none are
+     *   available an empty array is returned.
+     */
+    public static Object[] getPluginSequence(String module, Class intfc)
+        throws PluginInstantiationException
+    {
         // cache the configuration for this interface after grovelling it once:
         // format is  prefix.<interface> = <classname>
         String iname = intfc.getName();
         String classname[] = null;
         if (!sequenceConfig.containsKey(iname))
         {
-            String val = ConfigurationManager.getProperty(SEQUENCE_PREFIX+iname);
+            String val = getConfigProperty(module, SEQUENCE_PREFIX+iname);
             if (val == null)
             {
                 log.warn("No Configuration entry found for Sequence Plugin interface="+iname);
@@ -206,23 +243,24 @@ public class PluginManager
         for (int i = 0; i < classname.length; ++i)
         {
             log.debug("Adding Sequence plugin for interface= "+iname+", class="+classname[i]);
-            result[i] = getAnonymousPlugin(classname[i]);
+            result[i] = getAnonymousPlugin(module, classname[i]);
         }
         return result;
     }
+        
 
     // Map of cached (reusable) single plugin instances - class -> instance.
     private static Map<Serializable, Object> anonymousInstanceCache = new HashMap<Serializable, Object>();
 
     // Get possibly-cached plugin instance for un-named plugin,
     // this is shared by Single and Sequence plugins.
-    private static Object getAnonymousPlugin(String classname)
+    private static Object getAnonymousPlugin(String module, String classname)
         throws PluginInstantiationException
     {
         try
         {
             Class pluginClass = Class.forName(classname);
-            if (cacheMe(pluginClass))
+            if (cacheMe(module, pluginClass))
             {
                 Object cached = anonymousInstanceCache.get(pluginClass);
                 if (cached == null)
@@ -260,7 +298,7 @@ public class PluginManager
     private static Map<Serializable, Object> namedInstanceCache = new HashMap<Serializable, Object>();
 
     // load and cache configuration data for the given interface.
-    private static void configureNamedPlugin(String iname)
+    private static void configureNamedPlugin(String module, String iname)
         throws ClassNotFoundException
     {
         int found = 0;
@@ -276,7 +314,7 @@ public class PluginManager
             // 1. Get classes named by the configuration. format is:
             //    plugin.named.<INTF> = <CLASS> = <name>, <name> [,] \
             //                        <CLASS> = <name>, <name> [ ... ]
-            String namedVal = ConfigurationManager.getProperty(NAMED_PREFIX+iname);
+            String namedVal = getConfigProperty(module, NAMED_PREFIX+iname);
             if (namedVal != null)
             {
                 namedVal = namedVal.trim();
@@ -307,7 +345,7 @@ public class PluginManager
 
             // 2. Get Self-named config entries:
             // format is plugin.selfnamed.<INTF> = <CLASS> , <CLASS> ..
-            String selfNamedVal = ConfigurationManager.getProperty(SELFNAMED_PREFIX+iname);
+            String selfNamedVal = getConfigProperty(module, SELFNAMED_PREFIX+iname);
             if (selfNamedVal != null)
             {
                 String classnames[] = selfNamedVal.trim().split("\\s*,\\s*");
@@ -381,10 +419,27 @@ public class PluginManager
     public static Object getNamedPlugin(Class intfc, String name)
          throws PluginInstantiationException
     {
+        return getNamedPlugin(null, intfc, name);
+    }
+    
+    /**
+     * Returns an instance of a plugin that implements the interface
+     * intface and is bound to a name matching name.  If there is no
+     * matching plugin, it returns null.  The names are matched by
+     * String.equals().
+     *
+     * @param module config module, or <code>null</code> for standard location
+     * @param intfc the interface class of the plugin
+     * @param name under which the plugin implementation is configured.
+     * @return instance of plugin implementation, or null if there is no match or an error.
+     */
+    public static Object getNamedPlugin(String module, Class intfc, String name)
+         throws PluginInstantiationException
+    {
         try
         {
             String iname = intfc.getName();
-            configureNamedPlugin(iname);
+            configureNamedPlugin(module, iname);
             String key = iname + SEP + name;
             String cname = namedPluginClasses.get(key);
             if (cname == null)
@@ -394,7 +449,7 @@ public class PluginManager
             else
             {
                 Class pluginClass = Class.forName(cname);
-                if (cacheMe(pluginClass))
+                if (cacheMe(module, pluginClass))
                 {
                     String nkey = pluginClass.getName() + SEP + name;
                     Object cached = namedInstanceCache.get(nkey);
@@ -455,10 +510,26 @@ public class PluginManager
     public static boolean hasNamedPlugin(Class intfc, String name)
          throws PluginInstantiationException
     {
+        return hasNamedPlugin(null, intfc, name);
+    }
+    
+   /**
+     * Returns whether a plugin exists which implements the specified interface
+     * and has a specified name.  If a matching plugin is found to be configured,
+     * return true. If there is no matching plugin, return false.
+     *
+     * @param module the config module or <code>null</code> for regular location
+     * @param intfc the interface class of the plugin
+     * @param name under which the plugin implementation is configured.
+     * @return true if plugin was found to be configured, false otherwise
+     */
+    public static boolean hasNamedPlugin(String module, Class intfc, String name)
+         throws PluginInstantiationException
+    {
         try
         {
             String iname = intfc.getName();
-            configureNamedPlugin(iname);
+            configureNamedPlugin(module, iname);
             String key = iname + SEP + name;
             return namedPluginClasses.get(key) != null;
         }
@@ -468,6 +539,7 @@ public class PluginManager
             		                               e.toString(), e);
         }
     }
+    
     /**
      * Returns all of the names under which a named plugin implementing
      * the interface intface can be requested (with getNamedPlugin()).
@@ -483,10 +555,29 @@ public class PluginManager
      */
     public static String[] getAllPluginNames(Class intfc)
     {
+            return getAllPluginNames(null, intfc);
+    }
+    
+    /**
+     * Returns all of the names under which a named plugin implementing
+     * the interface intface can be requested (with getNamedPlugin()).
+     * The array is empty if there are no matches.  Use this to populate
+     * a menu of plugins for interactive selection, or to document what
+     * the possible choices are.
+     * <p>
+     * NOTE: The names are NOT returned in any deterministic order.
+     *
+     * @param module the module name
+     * @param intfc plugin interface for which to return names.
+     * @return an array of strings with every name; if none are
+     *   available an empty array is returned.
+     */
+    public static String[] getAllPluginNames(String module, Class intfc)
+    {
         try
         {
             String iname = intfc.getName();
-            configureNamedPlugin(iname);
+            configureNamedPlugin(module, iname);
             String prefix = iname + SEP;
             ArrayList<String> result = new ArrayList<String>();
 
@@ -603,12 +694,21 @@ public class PluginManager
     {
         try
         {
-            configureNamedPlugin(iname);
+            configureNamedPlugin(null, iname);
         }
         catch (ClassNotFoundException ce)
         {
             // bogus classname should be old news by now.
         }
+    }
+    
+    // get module-specific, or generic configuration property
+    private static String getConfigProperty(String module, String property)
+    {
+        if (module != null) {
+            return ConfigurationManager.getProperty(module, property);
+        }
+        return ConfigurationManager.getProperty(property);      
     }
 
     /**
