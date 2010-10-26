@@ -1020,7 +1020,7 @@ public class OAIHarvester {
 	/**
 	 * Start harvest scheduler.   
 	 */
-	public static void startNewScheduler() throws SQLException, AuthorizeException {
+	public static synchronized void startNewScheduler() throws SQLException, AuthorizeException {
 		Context c = new Context();
 		HarvestedCollection.exists(c);
 		c.complete();
@@ -1037,7 +1037,7 @@ public class OAIHarvester {
 	/**
 	 * Stop an active harvest scheduler.   
 	 */
-	public static void stopScheduler() throws SQLException, AuthorizeException {
+	public static synchronized void stopScheduler() throws SQLException, AuthorizeException {
 		synchronized(HarvestScheduler.lock) {
 			HarvestScheduler.interrupt = HarvestScheduler.HARVESTER_INTERRUPT_STOP;
 			HarvestScheduler.lock.notify();
@@ -1187,34 +1187,35 @@ public class OAIHarvester {
 			{
 				try 
 				{
-					synchronized(interrupt) {
-						switch (interrupt) 
-						{
-						case HARVESTER_INTERRUPT_NONE: 
-							break;
-						case HARVESTER_INTERRUPT_INSERT_THREAD:
-							interrupt = HARVESTER_INTERRUPT_NONE;	
-							addThread(interruptValue);
-							interruptValue = 0;
-							break;
-						case HARVESTER_INTERRUPT_PAUSE:
-							interrupt = HARVESTER_INTERRUPT_NONE;
-							synchronized(status) { 
-								status = HARVESTER_STATUS_PAUSED;
-							}
-							while(interrupt != HARVESTER_INTERRUPT_RESUME && interrupt != HARVESTER_INTERRUPT_STOP) {
-								Thread.sleep(1000);
-							}		
-							if (interrupt != HARVESTER_INTERRUPT_STOP)
-                            {
-                                break;
-                            }
-						case HARVESTER_INTERRUPT_STOP:
-							interrupt = HARVESTER_INTERRUPT_NONE;
-							status = HARVESTER_STATUS_STOPPED;
-							return;
-						}
-					}
+                    synchronized (HarvestScheduler.class) {
+                        switch (interrupt)
+                        {
+                        case HARVESTER_INTERRUPT_NONE:
+                            break;
+                        case HARVESTER_INTERRUPT_INSERT_THREAD:
+                            interrupt = HARVESTER_INTERRUPT_NONE;
+                            addThread(interruptValue);
+                            interruptValue = 0;
+                            break;
+                        case HARVESTER_INTERRUPT_PAUSE:
+                            interrupt = HARVESTER_INTERRUPT_NONE;
+                            status = HARVESTER_STATUS_PAUSED;
+                        case HARVESTER_INTERRUPT_STOP:
+                            interrupt = HARVESTER_INTERRUPT_NONE;
+                            status = HARVESTER_STATUS_STOPPED;
+                            return;
+                        }
+                    }
+
+                    if (status == HARVESTER_STATUS_PAUSED) {
+                        while(interrupt != HARVESTER_INTERRUPT_RESUME && interrupt != HARVESTER_INTERRUPT_STOP) {
+                            Thread.sleep(1000);
+                        }
+                        if (interrupt != HARVESTER_INTERRUPT_STOP)
+                        {
+                            break;
+                        }
+                    }
 
 					status = HARVESTER_STATUS_RUNNING;
 										
@@ -1229,7 +1230,7 @@ public class OAIHarvester {
 					
 					// Stage #2: start up all the threads currently in the queue up to the maximum number 
 					while (!harvestThreads.isEmpty()) {
-						synchronized(activeThreads) {
+						synchronized(HarvestScheduler.class) {
 							activeThreads++;
 						}
 						Thread activeThread = new Thread(harvestThreads.pop());
@@ -1390,7 +1391,7 @@ public class OAIHarvester {
 					context.abort();
 				}
 				
-				synchronized (HarvestScheduler.activeThreads) {
+				synchronized (HarvestScheduler.class) {
 					HarvestScheduler.activeThreads--;
 				}								
 			}			

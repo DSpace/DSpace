@@ -88,6 +88,16 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
     {
         if (pluginNames == null)
         {
+            initPluginNames();
+        }
+        
+        return (String[]) ArrayUtils.clone(pluginNames);
+    }
+
+    private static synchronized void initPluginNames()
+    {
+        if (pluginNames == null)
+        {
             try
             {
                 if (dci == null)
@@ -109,7 +119,6 @@ public class DCInputAuthority extends SelfNamedPlugin implements ChoiceAuthority
             pluginNames = names.toArray(new String[names.size()]);
             log.debug("Got plugin names = "+Arrays.deepToString(pluginNames));
         }
-        return (String[]) ArrayUtils.clone(pluginNames);
     }
 
     // once-only load of values and labels

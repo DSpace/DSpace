@@ -108,6 +108,16 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
     {
         if (pluginNames == null)
         {
+            initPluginNames();
+        }
+        
+        return (String[]) ArrayUtils.clone(pluginNames);
+    }
+
+    private static synchronized void initPluginNames()
+    {
+        if (pluginNames == null)
+        {
         	class xmlFilter implements java.io.FilenameFilter
             {
         		public boolean accept(File dir, String name)
@@ -125,7 +135,6 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
         	pluginNames = names.toArray(new String[names.size()]);
             log.info("Got plugin names = "+Arrays.deepToString(pluginNames));
         }
-        return (String[]) ArrayUtils.clone(pluginNames);
     }
 
     private void init()
