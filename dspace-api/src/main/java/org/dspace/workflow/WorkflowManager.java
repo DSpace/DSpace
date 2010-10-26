@@ -123,7 +123,7 @@ public class WorkflowManager
                                                  // either
 
     /** Symbolic names of workflow steps. */
-    public static final String workflowText[] =
+    private static final String workflowText[] =
     {
         "SUBMIT",           // 0
         "STEP1POOL",        // 1
@@ -632,6 +632,20 @@ public class WorkflowManager
         }
 
         return archived;
+    }
+
+    /**
+     * Get the text representing the given workflow state
+     *
+     * @param state the workflow state
+     * @return the text representation
+     */
+    public static String getWorkflowText(int state) {
+        if (state > -1 && state < workflowText.length) {
+            return workflowText[state];
+        }
+
+        throw new IllegalArgumentException("Invalid workflow state passed");
     }
 
     /**

@@ -276,7 +276,7 @@ public class AIPTechMDCrosswalk
             BitstreamFormat bsf = bitstream.getFormat();
             dc.add(makeDC("format", "medium", bsf.getShortDescription()));
             dc.add(makeDC("format", "mimetype", bsf.getMIMEType()));
-            dc.add(makeDC("format", "supportlevel", BitstreamFormat.supportLevelText[bsf.getSupportLevel()]));
+            dc.add(makeDC("format", "supportlevel", bsf.getSupportLevelText()));
             dc.add(makeDC("format", "internal", Boolean.toString(bsf.isInternal())));
         }
         else if (dso.getType() == Constants.COLLECTION)

@@ -246,8 +246,7 @@ class DAVWorkflowItem extends DAVInProgressSubmission
 
         else if (elementsEqualIsh(property, stateProperty))
         {
-            value = WorkflowManager.workflowText[((WorkflowItem) this.inProgressItem)
-                    .getState()];
+            value = WorkflowManager.getWorkflowText(((WorkflowItem) this.inProgressItem).getState());
         }
         else
         {

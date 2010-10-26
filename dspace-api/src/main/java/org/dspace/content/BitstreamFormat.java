@@ -86,7 +86,7 @@ public class BitstreamFormat
     /** translate support-level ID to string.  MUST keep this table in sync
      *  with support level definitions above.
      */
-    public static final String supportLevelText[] =
+    private static final String supportLevelText[] =
         { "UNKNOWN", "KNOWN", "SUPPORTED" };
 
     /** Our context */
@@ -541,6 +541,16 @@ public class BitstreamFormat
     public final int getSupportLevel()
     {
         return bfRow.getIntColumn("support_level");
+    }
+
+    /**
+     * Get the support level text for this bitstream format - one of
+     * <code>UNKNOWN</code>,<code>KNOWN</code> or <code>SUPPORTED</code>.
+     *
+     * @return the support level
+     */
+    public String getSupportLevelText() {
+        return supportLevelText[getSupportLevel()];
     }
 
     /**
