@@ -42,6 +42,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.SQLException;
@@ -437,7 +438,11 @@ public class CreativeCommons
 
             return bytes;
         }
-        catch (Exception exc)
+        catch (MalformedURLException e)
+        {
+            return null;
+        }
+        catch (IOException e)
         {
             return null;
         }

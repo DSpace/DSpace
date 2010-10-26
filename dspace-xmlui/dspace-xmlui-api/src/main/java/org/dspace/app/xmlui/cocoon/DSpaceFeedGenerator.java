@@ -198,9 +198,13 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 
                 this.validity = validity.complete();
             }
+            catch (RuntimeException e)
+            {
+                throw e;
+            }
             catch (Exception e)
             {
-                // Just ignore all errors and return an invalid cache.
+                return null;
             }
         }
         return this.validity;

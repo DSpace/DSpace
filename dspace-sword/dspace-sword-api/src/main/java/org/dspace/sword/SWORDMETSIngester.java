@@ -39,16 +39,21 @@
 package org.dspace.sword;
 
 import java.io.File;
+import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Date;
 import java.util.StringTokenizer;
 
 import org.apache.log4j.Logger;
 
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.crosswalk.CrosswalkException;
+import org.dspace.content.packager.PackageException;
 import org.dspace.content.packager.PackageIngester;
 import org.dspace.content.packager.PackageParameters;
 import org.dspace.core.ConfigurationManager;
@@ -171,12 +176,17 @@ public class SWORDMETSIngester implements SWORDIngester
 			
 			return dr;
 		}
-		catch (Exception e)
-		{
-			log.error("caught exception: ", e);
-			throw new DSpaceSWORDException(e);
-		}
-	}
+        catch (RuntimeException re)
+        {
+            log.error("caught exception: ", re);
+            throw re;
+        }
+        catch (Exception e)
+        {
+            log.error("caught exception: ", e);
+            throw new DSpaceSWORDException(e);
+        }
+    }
 
 	/**
 	 * Add the current date to the item metadata.  This looks up

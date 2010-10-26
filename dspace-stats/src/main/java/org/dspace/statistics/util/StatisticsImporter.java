@@ -40,9 +40,11 @@ package org.dspace.statistics.util;
 
 import org.apache.commons.cli.*;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
@@ -51,8 +53,8 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.statistics.SolrLogger;
 
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
+import java.sql.SQLException;
+import java.text.*;
 import java.io.*;
 import java.util.*;
 
@@ -66,6 +68,8 @@ import com.maxmind.geoip.Location;
  */
 public class StatisticsImporter
 {
+    private static final Logger log = Logger.getLogger(StatisticsImporter.class);
+
     /** Date format (for solr) */
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
@@ -382,10 +386,15 @@ public class StatisticsImporter
                 errors--;
             }
 
-        } catch (Exception e)
+        }
+        catch (RuntimeException re)
+        {
+            throw re;
+        }
+        catch (Exception e)
         {
             System.err.println(e.getMessage());
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
 
         DecimalFormat percentage = new DecimalFormat("##.###");

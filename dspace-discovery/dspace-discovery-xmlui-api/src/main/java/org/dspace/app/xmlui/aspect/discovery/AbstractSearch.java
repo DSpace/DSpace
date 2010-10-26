@@ -154,8 +154,9 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
             key += "-" + getQuery();
 
             return HashUtil.hash(key);
-        }
-        catch (Exception e) {
+        } catch (RuntimeException re) {
+            throw re;
+        } catch (Exception e) {
             // Ignore all errors and just don't cache.
             return "0";
         }
@@ -189,9 +190,11 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
                 }
 
                 this.validity = validity.complete();
+            } catch (RuntimeException re) {
+                throw re;
             }
             catch (Exception e) {
-                // Just ignore all errors and return an invalid cache.
+                this.validity = null;
             }
 
             // add log message that we are viewing the item

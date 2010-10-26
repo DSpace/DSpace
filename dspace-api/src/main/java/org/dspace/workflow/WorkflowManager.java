@@ -929,6 +929,16 @@ public class WorkflowManager
 
             email.send();
         }
+        catch (RuntimeException re)
+        {
+            // log this email error
+            log.warn(LogManager.getHeader(c, "notify_of_reject",
+                    "cannot email user" + " eperson_id" + e.getID()
+                            + " eperson_email" + e.getEmail()
+                            + " workflow_item_id" + wi.getID()));
+
+            throw re;
+        }
         catch (Exception ex)
         {
             // log this email error

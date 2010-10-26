@@ -171,6 +171,10 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
 
             return HashUtil.hash(key);
         }
+        catch (RuntimeException re)
+        {
+            throw re;
+        }
         catch (Exception e)
         {
             // Ignore all errors and just don't cache.
@@ -208,9 +212,13 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
 	            
 	            this.validity = validity.complete();
             }
+            catch (RuntimeException re)
+            {
+                throw re;
+            }
 	        catch (Exception e)
 	        {
-	            // Just ignore all errors and return an invalid cache.
+	            this.validity = null;
 	        }
 
             // add log message that we are viewing the item

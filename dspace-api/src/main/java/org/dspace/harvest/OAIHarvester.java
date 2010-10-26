@@ -1008,12 +1008,16 @@ public class OAIHarvester {
                 }
             }
     	}
-    	catch (Exception ex) {
-    		errorSet.add(OAI_ADDRESS_ERROR + ": OAI server could not be reached");
-    		return errorSet;
-    	}
+        catch (RuntimeException re) {
+            throw re;
+        }
+        catch (Exception e)
+        {
+            errorSet.add(OAI_ADDRESS_ERROR + ": OAI server could not be reached");
+            return errorSet;
+        }
 
-    	return errorSet;
+        return errorSet;
     }
     
 	

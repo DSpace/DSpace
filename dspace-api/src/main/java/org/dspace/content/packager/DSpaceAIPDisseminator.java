@@ -41,10 +41,12 @@
 package org.dspace.content.packager;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.ArrayList;
 
+import org.apache.log4j.Logger;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -110,9 +112,10 @@ import java.net.URLEncoder;
  * @see AbstractMETSDisseminator
  * @see AbstractPackageDisseminator
  */
-public class DSpaceAIPDisseminator
-    extends AbstractMETSDisseminator
+public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
 {
+    private static final Logger log = Logger.getLogger(DSpaceAIPDisseminator.class);
+    
     /**
      * Unique identifier for the profile of the METS document.
      * To ensure uniqueness, it is the URL that the XML schema document would
@@ -458,9 +461,13 @@ public class DSpaceAIPDisseminator
                             + URLEncoder.encode(bitstream.getName(), "UTF-8");
                 }
             }
-            catch (Exception e)
+            catch (SQLException e)
             {
-                //do nothing -- we just fail to build a nice bitstream url
+                log.error("Database problem", e);
+            }
+            catch (UnsupportedEncodingException e)
+            {
+                log.error("Unknown character set", e);
             }
 
             // We should only get here if we failed to build a nice URL above

@@ -193,6 +193,10 @@ public class MetadataExportReader extends AbstractReader implements Recyclable
             }
             
         }
+        catch (RuntimeException e)
+        {
+            throw e;    
+        }
         catch (Exception e)
         {
             throw new ProcessingException("Unable to read bitstream.",e);

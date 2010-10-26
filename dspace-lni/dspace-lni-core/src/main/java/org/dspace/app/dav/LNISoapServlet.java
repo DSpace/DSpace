@@ -94,10 +94,6 @@ public class LNISoapServlet extends AxisServlet
     /** The response. */
     private HttpServletResponse response = null;
 
-    // last servlet instance when put into service, set by init()
-    /** The servlet instance. */
-    private static GenericServlet servletInstance = null;
-
     /* (non-Javadoc)
      * @see javax.servlet.GenericServlet#init(javax.servlet.ServletConfig)
      */
@@ -105,17 +101,6 @@ public class LNISoapServlet extends AxisServlet
     public void init(ServletConfig sc) throws ServletException
     {
         super.init(sc);
-        servletInstance = this;
-    }
-
-    /**
-     * Gets the servlet instance.
-     * 
-     * @return the servlet instance
-     */
-    public static GenericServlet getServletInstance()
-    {
-        return servletInstance;
     }
 
     /**

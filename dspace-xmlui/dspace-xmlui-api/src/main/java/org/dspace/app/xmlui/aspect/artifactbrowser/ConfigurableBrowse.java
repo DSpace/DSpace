@@ -182,9 +182,13 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                 return HashUtil.hash(key);
             }
         }
+        catch (RuntimeException re)
+        {
+            throw re;    
+        }
         catch (Exception e)
         {
-            // Ignore all errors and just don't cache.
+            return "0";
         }
         
         return "0";
@@ -226,9 +230,13 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
                 this.validity =  validity.complete();
             }
+            catch (RuntimeException re)
+            {
+                throw re;
+            }
             catch (Exception e)
             {
-                // Just ignore all errors and return an invalid cache.
+                return null;
             }
 
             if (this.validity != null)
@@ -1066,6 +1074,10 @@ class BrowseParams
             key += "-" + etAl;
     
             return key;
+        }
+        catch (RuntimeException re)
+        {
+            throw re;
         }
         catch (Exception e)
         {

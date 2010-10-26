@@ -318,7 +318,9 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
             return allFilterQueries.toArray(new String[allFilterQueries.size()]);
         }
-        catch (Exception e) {
+        catch (RuntimeException re) {
+            throw re;
+        } catch (Exception e) {
             return null;
         }
     }

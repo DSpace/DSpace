@@ -809,15 +809,15 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     }
                 }
             }
-        } catch (Exception e) {
-//            log.error(e.getMessage(), e);
+        } catch (RuntimeException e) {
+            log.error(e.getMessage(), e);
         }
 
         // write the index and close the inputstreamreaders
         try {
             writeDocument(doc);
             log.info("Wrote Item: " + handle + " to Index");
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             log.error("Error while writing item to discovery index: " + handle + " message:"+ e.getMessage(), e);
         } finally {
             Iterator<InputStreamReader> itr = readers.iterator();

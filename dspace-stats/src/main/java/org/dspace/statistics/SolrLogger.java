@@ -263,7 +263,13 @@ public class SolrLogger
             //commits are executed automatically using the solr autocommit
 //            solr.commit(false, false);
    
-        } catch (Exception e) {
+        }
+        catch (RuntimeException re)
+        {
+            throw re;
+        }
+        catch (Exception e)
+        {
         	log.error(e.getMessage(), e);
         }
     }
