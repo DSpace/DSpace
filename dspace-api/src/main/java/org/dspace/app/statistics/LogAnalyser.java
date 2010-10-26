@@ -221,7 +221,7 @@ public class LogAnalyser
    private static String fileTemplate = "dspace\\.log.*";
         
    /** the config file from which to configure the analyser */
-   public static String configFile = ConfigurationManager.getProperty("dspace.dir") + 
+   private static String configFile = ConfigurationManager.getProperty("dspace.dir") + 
                             File.separator + "config" + File.separator +
                             "dstat.cfg";
    
@@ -875,15 +875,32 @@ public class LogAnalyser
         
         return;
     }
-    
-    
+
+    /**
+     * get the current config file name
+     * @return The name of the config file
+     */
+    public static String getConfigFile()
+    {
+        return configFile;
+    }
+
     /**
      * read in the given config file and populate the class globals
      *
      * @param   configFile  the config file to read in
      */
-    public static void readConfig(String configFile)
-        throws IOException
+    public static void readConfig() throws IOException
+    {
+        readConfig(configFile);
+    }
+
+    /**
+     * read in the given config file and populate the class globals
+     *
+     * @param   configFile  the config file to read in
+     */
+    public static void readConfig(String configFile) throws IOException
     {
         //instantiate aggregators
         actionAggregator = new HashMap<String, Integer>();

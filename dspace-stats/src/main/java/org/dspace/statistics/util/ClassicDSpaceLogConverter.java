@@ -363,11 +363,11 @@ public class ClassicDSpaceLogConverter {
         // Set up the log analyser
         try
         {
-            LogAnalyser.readConfig(LogAnalyser.configFile);
+            LogAnalyser.readConfig();
         }
         catch (IOException ioe)
         {
-            System.err.println("Unable to read config file: " + LogAnalyser.configFile);
+            System.err.println("Unable to read config file: " + LogAnalyser.getConfigFile());
             System.exit(1);
         }
 
