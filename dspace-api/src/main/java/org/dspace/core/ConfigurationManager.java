@@ -214,7 +214,20 @@ public class ConfigurationManager
                         if (modFile.exists())
                         {
                             modProps = new Properties();
-                            modProps.load(new FileInputStream(modFile));
+                            InputStream modIS = null;
+                            try
+                            {
+                                modIS = new FileInputStream(modFile);
+                                modProps.load(modIS);
+                            }
+                            finally
+                            {
+                                if (modIS != null)
+                                {
+                                    modIS.close();
+                                }
+                            }
+                            
                             for (Enumeration pe = modProps.propertyNames(); pe.hasMoreElements(); )
                             {
                                 String key = (String)pe.nextElement();
