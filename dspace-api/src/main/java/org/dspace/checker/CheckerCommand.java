@@ -223,10 +223,10 @@ public final class CheckerCommand
         byte[] bytes = new byte[BYTE_ARRAY_SIZE];
 
         // make sure all the data is read by the digester
-        while (dStream.read(bytes, 0, BYTE_ARRAY_SIZE) != -1)
-        {
-            // no-op
-        }
+        int bytesRead = -1;
+        do {
+            bytesRead = dStream.read(bytes, 0, BYTE_ARRAY_SIZE);
+        } while (bytesRead != -1);
 
         return Utils.toHex(dStream.getMessageDigest().digest());
     }
