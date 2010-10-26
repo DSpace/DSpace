@@ -39,6 +39,7 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.item;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -171,7 +172,7 @@ public class ConfirmItemForm extends AbstractDSpaceTransformer {
 	/**
 	 * Compare two metadata element's name so that they may be sorted.
 	 */
-	static class DCValueComparator implements Comparator{
+	static class DCValueComparator implements Comparator, Serializable {
 		public int compare(Object arg0, Object arg1) {
 			final DCValue o1 = (DCValue)arg0;
 			final DCValue o2 = (DCValue)arg1;

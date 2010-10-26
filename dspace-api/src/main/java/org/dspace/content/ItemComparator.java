@@ -37,6 +37,7 @@
  */
 package org.dspace.content;
 
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -57,7 +58,7 @@ import org.dspace.sort.OrderFormat;
  * @author Peter Breton
  * @version $Revision$
  */
-public class ItemComparator implements Comparator
+public class ItemComparator implements Comparator, Serializable
 {
     /** Dublin Core element */
     private String element;

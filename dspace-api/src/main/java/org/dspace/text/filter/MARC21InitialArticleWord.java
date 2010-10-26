@@ -38,6 +38,7 @@
 
 package org.dspace.text.filter;
 
+import java.io.Serializable;
 import java.util.*;
 
 import org.apache.commons.lang.ArrayUtils;
@@ -360,7 +361,7 @@ public class MARC21InitialArticleWord extends InitialArticleWord
     }
     
     // Compare strings according to their length - longest to shortest
-    private static class InverseLengthComparator implements Comparator
+    private static class InverseLengthComparator implements Comparator, Serializable
     {
         public int compare(Object arg0, Object arg1)
         {

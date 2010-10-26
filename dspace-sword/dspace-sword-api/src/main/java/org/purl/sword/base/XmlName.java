@@ -38,6 +38,8 @@ package org.purl.sword.base;
 
 import nu.xom.Attribute;
 import nu.xom.Element;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.builder.HashCodeBuilder;
 
 /**
  *
@@ -153,19 +155,16 @@ public class XmlName {
         if( other instanceof XmlName )
         {
             XmlName otherName = (XmlName) other;
-            try
-            {
-               return (this.namespace.equals(otherName.namespace) &&
-                       this.localName.equals(otherName.localName));
-
-            }
-            catch(Exception ex) 
-            {
-                // fall through to the default return case
-            }
+            return StringUtils.equals(this.namespace, otherName.namespace) &&
+                   StringUtils.equals(this.localName, otherName.localName);
         }
 
         return false;
     }
 
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder().append(namespace).append(localName).hashCode();
+    }
 }

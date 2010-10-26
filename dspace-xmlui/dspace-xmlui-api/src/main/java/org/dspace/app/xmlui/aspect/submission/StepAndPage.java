@@ -11,6 +11,8 @@
 
 package org.dspace.app.xmlui.aspect.submission;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
+
 /**
  * Holds a step number and a page number within that step.
  * 
@@ -107,6 +109,12 @@ public class StepAndPage implements Comparable<StepAndPage>
         }
 
         return false;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return new HashCodeBuilder().append(step).append(page).hashCode();
     }
 
     @Override

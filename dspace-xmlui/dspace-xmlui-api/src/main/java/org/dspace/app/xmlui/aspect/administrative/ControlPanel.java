@@ -40,6 +40,7 @@
 package org.dspace.app.xmlui.aspect.administrative;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Collections;
 import java.util.Comparator;
@@ -683,7 +684,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 	/**
 	 * Comparator to sort activity events by their access times.
 	 */
-	public static class ActivitySort<E extends CurrentActivityAction.Event> implements Comparator<E>
+	public static class ActivitySort<E extends CurrentActivityAction.Event> implements Comparator<E>, Serializable
 	{
 		// Sort parameter
 		private EventSort sortBy;
