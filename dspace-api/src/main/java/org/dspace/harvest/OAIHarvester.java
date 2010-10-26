@@ -1128,13 +1128,26 @@ public class OAIHarvester {
 		public static final int HARVESTER_INTERRUPT_INSERT_THREAD = 4;
 		public static final int HARVESTER_INTERRUPT_KILL_THREAD = 5;
 		
-		public static Integer status = HARVESTER_STATUS_STOPPED;
-		public static Integer interrupt = HARVESTER_INTERRUPT_NONE;
-		public static Integer interruptValue = 0;
+		private static int status = HARVESTER_STATUS_STOPPED;
+		private static int interrupt = HARVESTER_INTERRUPT_NONE;
+		private static Integer interruptValue = 0;
 		 		
 		private static long minHeartbeat;
 		private static long maxHeartbeat;
-				
+
+        public static boolean hasStatus(int statusToCheck) {
+            return status == statusToCheck;
+        }
+
+        public static synchronized void setInterrupt(int newInterrupt) {
+            interrupt = newInterrupt;
+        }
+
+        public static synchronized void setInterrupt(int newInterrupt, int newInterruptValue) {
+            interrupt = newInterrupt;
+            interruptValue = newInterruptValue;
+        }
+
 		public static String getStatus() {
 			switch(status) {
 			case HARVESTER_STATUS_RUNNING:
@@ -1398,7 +1411,6 @@ public class OAIHarvester {
 		
 			log.info("Thread for collection " + hc.getCollectionId() + " completes.");
 		}
-			
 	}
 
 }

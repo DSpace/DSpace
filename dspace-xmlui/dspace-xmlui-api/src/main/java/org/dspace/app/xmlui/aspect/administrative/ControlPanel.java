@@ -801,20 +801,20 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 		
 		harvesterControls.addLabel(T_harvest_label_actions);
 		Item actionsItem = harvesterControls.addItem();
-		if (HarvestScheduler.status == HarvestScheduler.HARVESTER_STATUS_STOPPED) {
+		if (HarvestScheduler.hasStatus(HarvestScheduler.HARVESTER_STATUS_STOPPED)) {
 			actionsItem.addButton("submit_harvest_start").setValue(T_harvest_submit_start);
 			actionsItem.addButton("submit_harvest_reset").setValue(T_harvest_submit_reset);
 		}
-		if (HarvestScheduler.status == HarvestScheduler.HARVESTER_STATUS_PAUSED)
+		if (HarvestScheduler.hasStatus(HarvestScheduler.HARVESTER_STATUS_PAUSED))
         {
             actionsItem.addButton("submit_harvest_resume").setValue(T_harvest_submit_resume);
         }
-		if (HarvestScheduler.status == HarvestScheduler.HARVESTER_STATUS_RUNNING || 
-				HarvestScheduler.status == HarvestScheduler.HARVESTER_STATUS_SLEEPING)
+		if (HarvestScheduler.hasStatus(HarvestScheduler.HARVESTER_STATUS_RUNNING) ||
+				HarvestScheduler.hasStatus(HarvestScheduler.HARVESTER_STATUS_SLEEPING))
         {
             actionsItem.addButton("submit_harvest_pause").setValue(T_harvest_submit_pause);
         }
-		if (HarvestScheduler.status != HarvestScheduler.HARVESTER_STATUS_STOPPED)
+		if (!HarvestScheduler.hasStatus(HarvestScheduler.HARVESTER_STATUS_STOPPED))
         {
             actionsItem.addButton("submit_harvest_stop").setValue(T_harvest_submit_stop);
         }

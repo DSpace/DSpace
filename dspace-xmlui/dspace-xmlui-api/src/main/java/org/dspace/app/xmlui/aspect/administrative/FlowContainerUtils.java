@@ -290,10 +290,9 @@ public class FlowContainerUtils
 
 		//TODO: is there a cleaner way to do this?
 		try {
-			if (HarvestScheduler.status != HarvestScheduler.HARVESTER_STATUS_STOPPED) {
+			if (!HarvestScheduler.hasStatus(HarvestScheduler.HARVESTER_STATUS_STOPPED)) {
 				synchronized(HarvestScheduler.lock) {
-					HarvestScheduler.interrupt = HarvestScheduler.HARVESTER_INTERRUPT_INSERT_THREAD;
-					HarvestScheduler.interruptValue = collection.getID();
+					HarvestScheduler.setInterrupt(HarvestScheduler.HARVESTER_INTERRUPT_INSERT_THREAD, collectionID);
 					HarvestScheduler.lock.notify();
 				}
 			}
