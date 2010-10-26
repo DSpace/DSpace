@@ -210,21 +210,33 @@ public class JSONSolrSearcher extends AbstractReader implements Recyclable {
         params.put(FacetParams.FACET_MINCOUNT, String.valueOf(facetMinCount));
 
         solrRequestUrl = AbstractDSpaceTransformer.generateURL(solrRequestUrl, params);
-        if(facetFields != null){
-            //Add our facet fields
-            for (String facetField : facetFields) {
-                //This class can only be used for autocomplete facet fields
-                if(!facetField.endsWith(".year") && !facetField.endsWith("_ac"))
-                {
-                    facetField += "_ac";
+        if (facetFields != null || filterQueries != null) {
+            StringBuilder urlBuilder = new StringBuilder(solrRequestUrl);
+            if(facetFields != null){
+
+                //Add our facet fields
+                for (String facetField : facetFields) {
+                    urlBuilder.append("&").append(FacetParams.FACET_FIELD).append("=");
+
+                    //This class can only be used for autocomplete facet fields
+                    if(!facetField.endsWith(".year") && !facetField.endsWith("_ac"))
+                    {
+                        urlBuilder.append(URLEncoder.encode(facetField + "_ac", Constants.DEFAULT_ENCODING));
+                    }
+                    else
+                    {
+                        urlBuilder.append(URLEncoder.encode(facetField, Constants.DEFAULT_ENCODING));
+                    }
                 }
-                solrRequestUrl += "&" + FacetParams.FACET_FIELD + "=" + URLEncoder.encode(facetField, Constants.DEFAULT_ENCODING);
+
             }
-        }
-        if(filterQueries != null){
-            for (String filterQuery : filterQueries) {
-                solrRequestUrl += "&" + CommonParams.FQ + "=" + URLEncoder.encode(filterQuery, Constants.DEFAULT_ENCODING);
+            if(filterQueries != null){
+                for (String filterQuery : filterQueries) {
+                    urlBuilder.append("&").append(CommonParams.FQ).append("=").append(URLEncoder.encode(filterQuery, Constants.DEFAULT_ENCODING));
+                }
             }
+
+            solrRequestUrl = urlBuilder.toString();
         }
 
         try {

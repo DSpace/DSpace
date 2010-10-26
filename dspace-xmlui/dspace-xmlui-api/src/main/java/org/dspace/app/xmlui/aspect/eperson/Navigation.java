@@ -134,14 +134,14 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         	return null;
         }
         
-    	String key;
+    	StringBuilder key;
         if (context.getCurrentUser() != null)
         {
-            key = context.getCurrentUser().getEmail();
+            key = new StringBuilder(context.getCurrentUser().getEmail());
         }
         else
         {
-            key = "anonymous";
+            key = new StringBuilder("anonymous");
         }
         
         // Add the user's language
@@ -149,10 +149,10 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         while (locales.hasMoreElements())
         {
             Locale locale = (Locale) locales.nextElement();
-            key += "-" + locale.toString();    
+            key.append("-").append(locale.toString());
         }
         
-        return HashUtil.hash(key);
+        return HashUtil.hash(key.toString());
     }
 
     /**

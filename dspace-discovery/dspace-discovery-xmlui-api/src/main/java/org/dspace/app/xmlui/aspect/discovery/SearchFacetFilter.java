@@ -664,10 +664,14 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
     public String addFilterQueriesToUrl(String url){
         String[] fqs = getParameterFilterQueries();
         if (fqs != null) {
+            StringBuilder urlBuilder = new StringBuilder(url);
             for (String fq : fqs) {
-                url += "&fq=" + fq;
+                urlBuilder.append("&fq=").append(fq);
             }
+
+            return urlBuilder.toString();
         }
+        
         return url;
     }
 

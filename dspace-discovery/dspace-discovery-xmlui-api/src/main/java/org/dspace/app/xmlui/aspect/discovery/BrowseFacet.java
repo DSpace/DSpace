@@ -509,9 +509,12 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
         String url = generateURL("browse-discovery", parameters);
         String[] fqs = getParameterFacetQueries();
         if (fqs != null) {
+            StringBuilder urlBuilder = new StringBuilder(url);
             for (String fq : fqs) {
-                url += "&fq=" + fq;
+                urlBuilder.append("&fq=").append(fq);
             }
+
+            url = urlBuilder.toString();
         }
 
         return url;
@@ -535,9 +538,12 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
         String url = generateURL("browse-discovery", parameters);
         String[] fqs = getParameterFacetQueries();
         if (fqs != null) {
+            StringBuilder urlBuilder = new StringBuilder(url);
             for (String fq : fqs) {
-                url += "&fq=" + fq;
+                urlBuilder.append("&fq=").append(fq);
             }
+
+            url = urlBuilder.toString();
         }
 
         return url;

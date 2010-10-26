@@ -209,16 +209,16 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 				parent.setContent(index, new Text(replacement.toString()));
 			} else {
 				// The element contains data
-				String prepend = "<" + element.getName();
+				StringBuilder prepend = new StringBuilder();
+                prepend.append("<").append(element.getName());
 
 				@SuppressWarnings("unchecked")
 				// This cast is correct
 				List<Attribute> attributes = element.getAttributes();
 				for (Attribute attribute : attributes) {
-					prepend += " " + attribute.getName() + "=\""
-							+ attribute.getValue() + "\"";
+					prepend.append(" ").append(attribute.getName()).append("=\"").append(attribute.getValue()).append("\"");
 				}
-				prepend += ">";
+				prepend.append(">");
 
 				String postpend = "</" + element.getName() + ">";
 
@@ -227,7 +227,7 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 
 				parent.addContent(index, new Text(postpend));
 				parent.addContent(index, element.removeContent());
-				parent.addContent(index, new Text(prepend));
+				parent.addContent(index, new Text(prepend.toString()));
 				parent.removeContent(element);
 			}
 		} else {

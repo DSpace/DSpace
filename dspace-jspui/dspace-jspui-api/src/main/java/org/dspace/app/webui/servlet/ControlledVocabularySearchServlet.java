@@ -355,17 +355,18 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
      */
     public static String join(List<String> list, String separator)
     {
-        String result = "";
-        Iterator<String> iterator = list.listIterator();
-        while (iterator.hasNext())
+        StringBuilder result = new StringBuilder();
+        for (String entry : list)
         {
-            result += iterator.next().toString();
-            if (iterator.hasNext())
+            if (result.length() > 0)
             {
-                result += separator;
+                result.append(separator);
             }
+
+            result.append(entry);
         }
-        return result;
+
+        return result.toString();
     }
 
     /**

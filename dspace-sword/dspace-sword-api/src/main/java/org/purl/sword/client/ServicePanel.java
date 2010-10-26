@@ -608,18 +608,18 @@ implements TreeSelectionListener
 
          List<SwordAcceptPackaging> acceptsPackaging = collection.getAcceptPackaging();
 
-         String acceptPackagingList = "";
+         StringBuilder acceptPackagingList = new StringBuilder();
          for (Iterator i = acceptsPackaging.iterator(); i.hasNext();) {
              SwordAcceptPackaging accept = (SwordAcceptPackaging) i.next();
-             acceptPackagingList += accept.getContent() + " (" + accept.getQualityValue() + ")";
+             acceptPackagingList.append(accept.getContent()).append(" (").append(accept.getQualityValue()).append(")");
              
              // add a , separator if there are any more items in the list 
              if( i.hasNext() ) {
-                acceptPackagingList += ", ";
+                acceptPackagingList.append(", ");
              }
          }
 
-         addTableRow(buffer, "Accepts Packaging", acceptPackagingList);
+         addTableRow(buffer, "Accepts Packaging", acceptPackagingList.toString());
 
          buffer.append("</table>");
       }

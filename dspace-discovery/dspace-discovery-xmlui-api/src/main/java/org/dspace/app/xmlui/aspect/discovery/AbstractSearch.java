@@ -269,10 +269,13 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
             String pageURLMask = generateURL(parameters);
             //Check for facet queries ? If we have any add them
             String[] fqs = getParameterFilterQueries();
-            if(fqs != null){
+            if(fqs != null) {
+                StringBuilder maskBuilder = new StringBuilder(pageURLMask);
                 for (String fq : fqs) {
-                    pageURLMask += "&fq=" + fq;
+                    maskBuilder.append("&fq=").append(fq);
                 }
+
+                pageURLMask = maskBuilder.toString();
             }
 
             results.setMaskedPagination(itemsTotal, firstItemIndex,

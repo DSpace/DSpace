@@ -908,17 +908,17 @@ public class SolrLogger
      */
     public static String getIgnoreSpiderIPs() {
         if (filterQuery == null) {
-            String query = "";
+            StringBuilder query = new StringBuilder();
             boolean first = true;
             for (String ip : SpiderDetector.getSpiderIpAddresses()) {
                 if (first) {
-                    query += " AND ";
+                    query.append(" AND ");
                     first = false;
                 }
 
-                query += " NOT(ip: " + ip + ")";
+                query.append(" NOT(ip: ").append(ip).append(")");
             }
-            filterQuery = query;
+            filterQuery = query.toString();
         }
 
         return filterQuery;
