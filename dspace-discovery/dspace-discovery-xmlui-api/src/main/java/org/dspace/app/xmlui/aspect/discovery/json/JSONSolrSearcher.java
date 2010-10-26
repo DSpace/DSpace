@@ -62,6 +62,7 @@ import org.xml.sax.SAXException;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -145,25 +146,28 @@ public class JSONSolrSearcher extends AbstractReader implements Recyclable {
         ExtendedProperties props = null;
         //Method that will retrieve all the possible configs we have
 
-        props = ExtendedProperties
-                .convertProperties(ConfigurationManager.getProperties());
+        props = ExtendedProperties.convertProperties(ConfigurationManager.getProperties());
 
+        InputStream is = null;
         try {
-            File config = new File(props.getProperty("dspace.dir")
-                    + "/config/dspace-solr-search.cfg");
+            File config = new File(props.getProperty("dspace.dir") + "/config/dspace-solr-search.cfg");
             if (config.exists()) {
                 props.combine(new ExtendedProperties(config.getAbsolutePath()));
             } else {
+                is = SolrServiceImpl.class.getResourceAsStream("dspace-solr-search.cfg");
                 ExtendedProperties defaults = new ExtendedProperties();
-                defaults
-                        .load(SolrServiceImpl.class
-                                .getResourceAsStream("dspace-solr-search.cfg"));
+                defaults.load(is);
                 props.combine(defaults);
             }
         }
         catch (Exception e) {
             log.error("Error while retrieving solr url", e);
             e.printStackTrace();
+        }
+        finally {
+            if (is != null) {
+                is.close();
+            }
         }
 
         if(props.getProperty("solr.search.server") != null)
