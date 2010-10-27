@@ -97,6 +97,11 @@ public class ConfigurationManager
     // configuration; anything greater than this is very likely to be a loop.
     private static final int RECURSION_LIMIT = 9;
 
+    protected ConfigurationManager()
+    {
+        
+    }
+
     /**
      * Identify if DSpace is properly configured
      * @return boolean true if configured, false otherwise
@@ -106,25 +111,36 @@ public class ConfigurationManager
         return properties != null;
     }
     
+    public static boolean isConfigured(String module)
+    {
+        return moduleProps.get(module) != null;
+    }
+
     /**
+     * REMOVED - Flushing the properties could be dangerous in the current DSpace state
+     * Need to consider how it will affect in-flight processes
+     *
      * Discard all current properties - will force a reload from disk when
      * any properties are requested.
      */
-    public static void flush()
-    {
-        properties = null;
-    }
+//    public static void flush()
+//    {
+//        properties = null;
+//    }
     
     /**
+     * REMOVED - Flushing the properties could be dangerous in the current DSpace state
+     * Need to consider how it will affect in-flight processes
+     *
      * Discard properties for a module -  will force a reload from disk
      * when any of module's properties are requested
      * 
      * @param module the module name
      */
-    public static void flush(String module)
-    {
-        moduleProps.remove(module);
-    }
+//    public static void flush(String module)
+//    {
+//        moduleProps.remove(module);
+//    }
     
     /**
      * Returns all properties in main configuration
@@ -133,8 +149,20 @@ public class ConfigurationManager
      */
     public static Properties getProperties()
     {
-        return getProperties(null);
+        Properties props = getMutableProperties();
+        return props == null ? null : (Properties)props.clone();
     }
+
+    private static Properties getMutableProperties()
+    {
+        if (properties == null)
+        {
+            loadConfig(null);
+        }
+
+        return properties;
+    }
+
     /**
      * Returns all properties for a given module
      * 
@@ -144,15 +172,22 @@ public class ConfigurationManager
      */
     public static Properties getProperties(String module)
     {
-        if (properties == null)
-        {
-            loadConfig(null);
-        }
-        Properties retProps = 
-                (module != null) ? moduleProps.get(module) : properties;
-        return (Properties)retProps.clone();
+        Properties props = getMutableProperties(module);
+        return props == null ? null : (Properties)props.clone();
     }
-    
+
+    private static Properties getMutableProperties(String module)
+    {
+        Properties retProps = (module != null) ? moduleProps.get(module) : properties;
+        if (retProps == null)
+        {
+            loadModuleConfig(module);
+            retProps = moduleProps.get(module);
+        }
+
+        return retProps;
+    }
+
     /**
      * Get a configuration property
      * 
@@ -164,7 +199,9 @@ public class ConfigurationManager
      */
     public static String getProperty(String property)
     {
-        return getProperty(null, property);
+        Properties props = getMutableProperties();
+        String value = props == null ? null : props.getProperty(property);
+        return (value != null) ? value.trim() : null;
     }
     
     /**
@@ -181,79 +218,25 @@ public class ConfigurationManager
      */
     public static String getProperty(String module, String property)
     {
-        if (properties == null)
-        {
-            loadConfig(null);
-        }
-        String value = null;
         if (module == null)
         {
-            value = properties.getProperty(property);
+            return getProperty(property);
         }
-        else
+        
+        String value = null;
+        Properties modProps = getMutableProperties(module);
+
+        if (modProps != null)
         {
-            Properties modProps = moduleProps.get(module);
-            if (modProps != null)
-            {
-                value = modProps.getProperty(property);
-            } 
-            else
-            {
-                // look in regular properties with module name prepended
-                value = properties.getProperty(module + "." + property);
-                
-                if (value == null) {
-                    // try to find it in modules
-                    File modFile = null;
-                    try
-                    {
-                        modFile = new File(getProperty("dspace.dir") +
-                                            File.separator + "config" +
-                                            File.separator + "modules" +
-                                            File.separator + module + ".cfg");
-                        if (modFile.exists())
-                        {
-                            modProps = new Properties();
-                            InputStream modIS = null;
-                            try
-                            {
-                                modIS = new FileInputStream(modFile);
-                                modProps.load(modIS);
-                            }
-                            finally
-                            {
-                                if (modIS != null)
-                                {
-                                    modIS.close();
-                                }
-                            }
-                            
-                            for (Enumeration pe = modProps.propertyNames(); pe.hasMoreElements(); )
-                            {
-                                String key = (String)pe.nextElement();
-                                String ival = interpolate(key, modProps.getProperty(key), 1);
-                                if (ival != null)
-                                {
-                                    modProps.setProperty(key, ival);
-                                }
-                            }
-                            moduleProps.put(module, modProps);
-                            value = modProps.getProperty(property);
-                        }
-                        else
-                        {
-                            // log invalid request
-                            warn("Requested configuration module: " + module + " not found");
-                        }
-                    }
-                    catch (IOException ioE)
-                    {
-                        fatal("Can't load configuration: " + modFile.getAbsolutePath(), ioE);
-                    }
-                }
-                
-            }
+            value = modProps.getProperty(property);
         }
+
+        if (value == null)
+        {
+            // look in regular properties with module name prepended
+            value = getProperty(module + "." + property);
+        }
+
         return (value != null) ? value.trim() : null;
     }
 
@@ -328,12 +311,7 @@ public class ConfigurationManager
      */
     public static int getIntProperty(String module, String property, int defaultValue)
     {
-       if (properties == null)
-       {
-           loadConfig(null);
-       }
-       
-       String stringValue = getProperty(module, property);        
+       String stringValue = getProperty(module, property);
        int intValue = defaultValue;
 
        if (stringValue != null)
@@ -406,7 +384,7 @@ public class ConfigurationManager
     /**
      * Get a configuration property as an long, with default
      * 
-     * @param the module, or <code>null</code> for regular property
+     * @param module  the module, or <code>null</code> for regular property
      *
      * @param property
      *            the name of the property
@@ -421,12 +399,7 @@ public class ConfigurationManager
      */
     public static long getLongProperty(String module, String property, int defaultValue)
     {
-        if (properties == null)
-        {
-            loadConfig(null);
-        }
-
-        String stringValue = properties.getProperty(module, property);
+        String stringValue = getProperty(module, property);
         long longValue = defaultValue;
 
         if (stringValue != null)
@@ -448,7 +421,7 @@ public class ConfigurationManager
      * Get the License
      * 
      * @param
-     *         license file name
+     *         licenseFile   file name
      *  
      *  @return
      *         license text
@@ -531,7 +504,7 @@ public class ConfigurationManager
      * the value of the property is <code>TRUE</code> or <code>YES</code> (case
      * insensitive.)
      * 
-     * @param the module, or <code>null</code> for regular property   
+     * @param module the module, or <code>null</code> for regular property   
      * 
      * @param property
      *            the name of the property
@@ -574,7 +547,7 @@ public class ConfigurationManager
      * of the property is <code>TRUE</code> or <code>YES</code> (case
      * insensitive.)
      * 
-     * @param the module, or <code>null</code> for regular property   
+     * @param module     module, or <code>null</code> for regular property   
      *
      * @param property
      *            the name of the property
@@ -589,11 +562,6 @@ public class ConfigurationManager
      */
     public static boolean getBooleanProperty(String module, String property, boolean defaultValue)
     {
-        if (properties == null)
-        {
-            loadConfig(null);
-        }
-
         String stringValue = getProperty(module, property);
 
         if (stringValue != null)
@@ -621,26 +589,15 @@ public class ConfigurationManager
     /**
      * Returns an enumeration of all the keys in a module configuration
      * 
-     * @param the module, or <code>null</code> for regular property  
+     * @param  module    module, or <code>null</code> for regular property  
      * 
      * @return an enumeration of all the keys in the module configuration,
      *         or <code>null</code> if the module does not exist.
      */
     public static Enumeration<?> propertyNames(String module)
     {
-        if (properties == null)
-        {
-            loadConfig(null);
-        }
-        if (module == null)
-        {
-            return properties.propertyNames();
-        }
-        if (moduleProps.containsKey(module))
-        {
-            return moduleProps.get(module).propertyNames();
-        }
-        return null;
+        Properties props = getProperties(module);
+        return props == null ? null : props.propertyNames();
     }
 
     /**
@@ -860,6 +817,59 @@ public class ConfigurationManager
         return loadedFile;
     }
 
+    private static synchronized void loadModuleConfig(String module)
+    {
+        // try to find it in modules
+        File modFile = null;
+        try
+        {
+            modFile = new File(getProperty("dspace.dir") +
+                                File.separator + "config" +
+                                File.separator + "modules" +
+                                File.separator + module + ".cfg");
+
+            if (modFile.exists())
+            {
+                Properties modProps = new Properties();
+                InputStream modIS = null;
+                try
+                {
+                    modIS = new FileInputStream(modFile);
+                    modProps.load(modIS);
+                }
+                finally
+                {
+                    if (modIS != null)
+                    {
+                        modIS.close();
+                    }
+                }
+
+                for (Enumeration pe = modProps.propertyNames(); pe.hasMoreElements(); )
+                {
+                    String key = (String)pe.nextElement();
+                    String ival = interpolate(key, modProps.getProperty(key), 1);
+                    if (ival != null)
+                    {
+                        modProps.setProperty(key, ival);
+                    }
+                }
+                moduleProps.put(module, modProps);
+            }
+            else
+            {
+                // log invalid request
+                warn("Requested configuration module: " + module + " not found");
+            }
+        }
+        catch (IOException ioE)
+        {
+            fatal("Can't load configuration: " + (modFile == null ? "<unknown>" : modFile.getAbsolutePath()), ioE);
+        }
+
+        return;
+    }
+
     /**
      * Load the DSpace configuration properties. Only does anything if
      * properties are not already loaded. Properties are loaded in from the
@@ -871,12 +881,10 @@ public class ConfigurationManager
      */
     public static synchronized void loadConfig(String configFile)
     {
-        
         if (properties != null)
         {
             return;
         }
-
 
         URL url = null;
         
