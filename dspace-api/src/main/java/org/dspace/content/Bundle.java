@@ -103,8 +103,18 @@ public class Bundle extends DSpaceObject
         ourContext = context;
         bundleRow = row;
         bitstreams = new ArrayList<Bitstream>();
-        String bitstreamOrderingField  = ConfigurationManager.getProperty("webui.bitstream.order.field", "sequence_id");
-        String bitstreamOrderingDirection   = ConfigurationManager.getProperty("webui.bitstream.order.direction", "ASC");
+        String bitstreamOrderingField  = ConfigurationManager.getProperty("webui.bitstream.order.field");
+        String bitstreamOrderingDirection   = ConfigurationManager.getProperty("webui.bitstream.order.direction");
+
+        if (bitstreamOrderingField == null)
+        {
+            bitstreamOrderingField = "sequence_id";
+        }
+
+        if (bitstreamOrderingDirection == null)
+        {
+            bitstreamOrderingDirection = "ASC";
+        }
         
         StringBuilder query = new StringBuilder();
         query.append("SELECT bitstream.* FROM bitstream, bundle2bitstream WHERE");
