@@ -376,6 +376,7 @@
 
                                 /bitstream/[handlePrefix]/[handlePostfix]/[sequence]/[name]
                                 /html/[handlePrefix]/[handePostfix]/[name]
+                                /retrieve/[bitstreamID]
                         -->
                         <map:match pattern="bitstream/*/*/*/**">
                                 <map:redirect-to uri="{request:contextPath}/bitstream/handle/{1}/{2}/{4}?sequence={3}" permanent="yes"/>
@@ -383,8 +384,11 @@
                         <map:match pattern="html/*/*/**">
                                 <map:redirect-to uri="{request:contextPath}/bitstream/handle/{1}/{2}/{3}" permanent="yes"/>
                         </map:match>
-      <!--Redirect /handle/[handleprefix]/[handlePostfix]/ to the same path but without a trailing slash-->
-      <map:match pattern="handle/*/*/">
+                        <map:match pattern="retrieve/**">
+                                <map:redirect-to uri="{request:contextPath}/bitstream/id/{1}/" permanent="yes"/>
+                        </map:match>
+                        <!--Redirect /handle/[handleprefix]/[handlePostfix]/ to the same path but without a trailing slash-->
+                        <map:match pattern="handle/*/*/">
                                 <map:redirect-to uri="{request:contextPath}/handle/{1}/{2}" permanent="yes"/>
                         </map:match>
                         <!--
