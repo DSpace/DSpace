@@ -133,16 +133,17 @@ public class RetrieveServlet extends DSpaceServlet
         // Did we get a bitstream?
         if (bitstream != null)
         {
-            
+
             // Check whether we got a License and if it should be displayed
-            Bundle bundle = bitstream.getBundles()[0];
+            // (Note: list of bundles may be empty array, if a bitstream is a Community/Collection logo)
+            Bundle bundle = bitstream.getBundles().length>0 ? bitstream.getBundles()[0] : null;
             
-            if (bundle.getName().equals(Constants.LICENSE_BUNDLE_NAME) && 
+            if (bundle!=null && 
+                bundle.getName().equals(Constants.LICENSE_BUNDLE_NAME) &&
                 bitstream.getName().equals(Constants.LICENSE_BITSTREAM_NAME))
             {
                     isLicense = true;
             }
-            
             
             if (isLicense && !displayLicense && !AuthorizeManager.isAdmin(context))
             {
