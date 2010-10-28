@@ -76,8 +76,7 @@ public class MapCache implements Cache {
      * @see org.dspace.services.model.Cache#getKeys()
      */
     public List<String> getKeys() {
-        ArrayList<String> keys = new ArrayList<String>(this.cache.keySet());
-        return keys;
+        return new ArrayList<String>(this.cache.keySet());
     }
 
     /* (non-Javadoc)

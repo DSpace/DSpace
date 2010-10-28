@@ -14,8 +14,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.dspace.activators.FakeActivator;
-import org.dspace.activators.FakeActivator2;
 import org.dspace.kernel.mixins.InitializedService;
 import org.dspace.kernel.mixins.ShutdownService;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
@@ -289,35 +287,10 @@ public class DSpaceServiceManagerTest {
         assertEquals("config:THING", service.getSomething());
         assertEquals(2, service.getTriggers());
 
-        // now we do a service registration
-        dsm.registerService("fake2", new FakeService2());
-        assertEquals("registered:fake2", service.getSomething());
-        assertEquals(3, service.getTriggers());
-
-        // now we unregister
-        dsm.unregisterService("fake2");
-        assertEquals("unregistered:fake2", service.getSomething());
-        assertEquals(4, service.getTriggers());
-
         // now we unregister
         dsm.unregisterService(serviceName);
         assertEquals("shutdown", service.getSomething());
-        assertEquals(5, service.getTriggers());
-    }
-
-    @Test
-    public void testActivator(){
-        dsm.startup();
-
-        {
-            FakeActivator activator = dsm.getServiceByName(FakeActivator.class.getName(),FakeActivator.class);
-            assertEquals("Started", activator.status);
-        }
-
-        {
-            FakeActivator2 activator2 = dsm.getServiceByName(FakeActivator2.class.getName(),FakeActivator2.class);
-            assertEquals("Started", activator2.status);
-        }
+        assertEquals(3, service.getTriggers());
     }
 
     public static class TestService implements InitializedService, ShutdownService {

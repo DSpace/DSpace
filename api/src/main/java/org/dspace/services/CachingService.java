@@ -26,36 +26,6 @@ public interface CachingService {
      * This is here to ensure we use the right name.
      */
     public static final String REQUEST_CACHE = "dsRequestCache";
-    /**
-     * This is the key in the request cache which holds the current http 
-     * request (if there is one).
-     */
-    public static final String HTTP_REQUEST_KEY = "httpRequest";
-    /**
-     * This is the key in the request cache which holds the current http 
-     * response (if there is one).
-     */
-    public static final String HTTP_RESPONSE_KEY = "httpResponse";
-    /**
-     * This is the key in the request cache which holds the current request.
-     */
-    public static final String REQUEST_KEY = "request";
-    /**
-     * This is the key in the request cache which holds the current response.
-     */
-    public static final String RESPONSE_KEY = "response";
-    /**
-     * This is the key in the request cache which holds the current locale.
-     */
-    public static final String LOCALE_KEY = "locale";
-    /**
-     * This is the key in the request cache which holds the current session ID.
-     */
-    public static final String SESSION_ID_KEY = "session";
-    /**
-     * This is the key in the request cache which holds the current request ID.
-     */
-    public static final String REQUEST_ID_KEY = "requestId";
 
     /**
      * Gets all the caches that the service knows about.

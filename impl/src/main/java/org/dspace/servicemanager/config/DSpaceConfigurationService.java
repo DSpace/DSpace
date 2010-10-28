@@ -14,21 +14,22 @@ import java.io.IOException;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
 
-import org.azeckoski.reflectutils.ReflectUtils;
-import org.azeckoski.reflectutils.map.ArrayOrderedMap;
-import org.azeckoski.reflectutils.map.ConcurrentOrderedMap;
 import org.dspace.constants.Constants;
 import org.dspace.servicemanager.ServiceConfig;
 import org.dspace.services.ConfigurationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.SimpleTypeConverter;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.util.ClassUtils;
 
 /**
  * The central DSpace configuration service.
@@ -68,7 +69,11 @@ public class DSpaceConfigurationService implements ConfigurationService {
      * @see org.dspace.services.ConfigurationService#getAllProperties()
      */
     public Map<String, String> getAllProperties() {
-        Map<String, String> props = new ArrayOrderedMap<String, String>();
+        Map<String, String> props = new LinkedHashMap<String, String>();
+//        for (Entry<String, DSpaceConfig> config : configuration.entrySet()) {
+//            props.put(config.getKey(), config.getValue().getValue());
+//        }
+
         for (DSpaceConfig config : configuration.values()) {
             props.put(config.getKey(), config.getValue());
         }
@@ -103,8 +108,7 @@ public class DSpaceConfigurationService implements ConfigurationService {
      */
     public <T> T getPropertyAsType(String name, Class<T> type) {
         String value = getProperty(name);
-        T property = ReflectUtils.getInstance().convert(value, type);
-        return property;
+        return convert(value, type);
     }
 
     /* (non-Javadoc)
@@ -131,7 +135,7 @@ public class DSpaceConfigurationService implements ConfigurationService {
             }
         } else {
             // something is already set so we convert the stored value to match the type
-            property = (T) ReflectUtils.getInstance().convert(value, defaultValue.getClass());
+            property = (T)convert(value, defaultValue.getClass());
         }
         return property;
     }
@@ -150,7 +154,8 @@ public class DSpaceConfigurationService implements ConfigurationService {
             changed = this.configuration.remove(name) != null;
             log.info("Cleared the configuration setting for name ("+name+")");
         } else {
-            String sVal = ReflectUtils.getInstance().convert(value, String.class);
+            SimpleTypeConverter converter = new SimpleTypeConverter();
+            String sVal = (String)converter.convertIfNecessary(value, String.class);
             changed = loadConfig(name, sVal);
         }
         return changed;
@@ -178,7 +183,8 @@ public class DSpaceConfigurationService implements ConfigurationService {
         return configs;
     }
 
-    protected Map<String, DSpaceConfig> configuration = new ConcurrentOrderedMap<String, DSpaceConfig>();
+    protected Map<String, DSpaceConfig> configuration = Collections.synchronizedMap(new LinkedHashMap<String, DSpaceConfig>());
+
     /**
      * @return a map of the service name configurations that are known for fast resolution
      */
@@ -302,7 +308,7 @@ public class DSpaceConfigurationService implements ConfigurationService {
      * files in the file home and on the classpath.
      */
     public void loadInitialConfig(String providedHome) {
-        Map<String, String> configMap = new ArrayOrderedMap<String, String>();
+        Map<String, String> configMap = new LinkedHashMap<String, String>();
         // load default settings
         try {
             String defaultServerId = InetAddress.getLocalHost().getHostName();
@@ -457,7 +463,7 @@ public class DSpaceConfigurationService implements ConfigurationService {
                         }
                         String newVal = dsc.getValue();
                         value = value.replace("${"+newKey+"}", newVal);
-                        entry.setValue( new DSpaceConfig(newKey, value) );
+                        entry.setValue( new DSpaceConfig(entry.getValue().getKey(), value) );
                     } else {
                         log.warn("Found '${' but could not find a closing '}' in the value: " + value);
                         break;
@@ -557,4 +563,26 @@ public class DSpaceConfigurationService implements ConfigurationService {
         return serviceNameConfigs;
     }
 
+    private <T> T convert(String value, Class<T> type) {
+        SimpleTypeConverter converter = new SimpleTypeConverter();
+
+        if (value != null) {
+            if (type.isArray()) {
+                String[] values = value.split(",");
+                return (T)converter.convertIfNecessary(values, type);
+            }
+
+            if (type.isAssignableFrom(String.class)) {
+                return (T)value;
+            }
+        } else {
+            if (boolean.class.equals(type)) {
+                return (T)Boolean.FALSE;
+            } else if (int.class.equals(type) || long.class.equals(type)) {
+                return (T)converter.convertIfNecessary(0, type);
+            }
+        }
+
+        return (T)converter.convertIfNecessary(value, type);
+    }
 }

@@ -172,6 +172,8 @@ public class TestSpringServiceManager {
         assertNotNull(service);
         assertEquals("AZ", service);
 
+        List<String> names = ssm.getServicesNames();
+        
         try {
             ssm.registerService("fakey", (Object)null);
             fail("should have thrown exception");

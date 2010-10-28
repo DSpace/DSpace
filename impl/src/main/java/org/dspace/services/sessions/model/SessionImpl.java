@@ -270,8 +270,7 @@ public class SessionImpl implements Session {
      * @see org.dspace.services.model.Session#getAttribute(java.lang.String)
      */
     public String getAttribute(String key) {
-        String attribute = getKeyAtribute(key);
-        return attribute;
+        return getKeyAtribute(key);
     }
 
     /* (non-Javadoc)

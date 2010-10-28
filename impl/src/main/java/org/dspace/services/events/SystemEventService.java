@@ -7,13 +7,10 @@
  */
 package org.dspace.services.events;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
-import org.azeckoski.reflectutils.ArrayUtils;
-import org.azeckoski.reflectutils.refmap.ReferenceMap;
-import org.azeckoski.reflectutils.refmap.ReferenceType;
+import org.apache.commons.lang.ArrayUtils;
 import org.dspace.kernel.mixins.ShutdownService;
 import org.dspace.services.CachingService;
 import org.dspace.services.EventService;
@@ -47,13 +44,12 @@ public class SystemEventService implements EventService, ShutdownService {
     /**
      * Map for holding onto the listeners which is ClassLoader safe.
      */
-    private ReferenceMap<String, EventListener> listenersMap = new ReferenceMap<String, EventListener>(ReferenceType.STRONG, ReferenceType.WEAK);
+    private Map<String, EventListener> listenersMap = new ConcurrentHashMap<String, EventListener>();
 
     private final RequestService requestService;
     private final SessionService sessionService;
     private final CachingService cachingService;
     private EventRequestInterceptor requestInterceptor;
-    private Cache queueCache;
 
     @Autowired(required=true)
     public SystemEventService(RequestService requestService, SessionService sessionService, CachingService cachingService) {
@@ -63,9 +59,6 @@ public class SystemEventService implements EventService, ShutdownService {
         this.requestService = requestService;
         this.sessionService = sessionService;
         this.cachingService = cachingService;
-
-        // create the cache
-        this.queueCache = this.cachingService.getCache(QUEUE_CACHE_NAME, new CacheConfig(CacheScope.REQUEST));
 
         // register interceptor
         this.requestInterceptor = new EventRequestInterceptor();
@@ -78,7 +71,6 @@ public class SystemEventService implements EventService, ShutdownService {
     public void shutdown() {
         this.requestInterceptor = null; // clear the interceptor
         this.listenersMap.clear();
-        this.queueCache.clear();
     }
 
 
@@ -108,11 +100,15 @@ public class SystemEventService implements EventService, ShutdownService {
      */
     public void queueEvent(Event event) {
         validateEvent(event);
+
+        // get the cache
+        Cache queueCache = this.cachingService.getCache(QUEUE_CACHE_NAME, new CacheConfig(CacheScope.REQUEST));
+
         // put the event in the queue if this is in a request
         if (requestService.getCurrentRequestId() != null) {
             // create a key which is orderable and unique
-            String key = System.currentTimeMillis() + ":" + this.queueCache.size() + ":" + event.getId();
-            this.queueCache.put(key, event);
+            String key = System.currentTimeMillis() + ":" + queueCache.size() + ":" + event.getId();
+            queueCache.put(key, event);
         } else {
             // no request so fire the event immediately
             log.info("No request to queue this event ("+event+") so firing immediately");
@@ -124,9 +120,6 @@ public class SystemEventService implements EventService, ShutdownService {
      * @see org.dspace.services.EventService#registerEventListener(org.dspace.services.model.EventListener)
      */
     public void registerEventListener(EventListener listener) {
-        if (listener == null) {
-            throw new IllegalArgumentException("event listener cannot be null");
-        }
         if (listener == null) {
             throw new IllegalArgumentException("Cannot register a listener that is null");
         }
@@ -185,16 +178,18 @@ public class SystemEventService implements EventService, ShutdownService {
      */
     protected int fireQueuedEvents() {
         int fired = 0;
-        List<String> eventIds = this.queueCache.getKeys();
+        Cache queueCache = this.cachingService.getCache(QUEUE_CACHE_NAME, new CacheConfig(CacheScope.REQUEST));
+
+        List<String> eventIds = queueCache.getKeys();
         Collections.sort(eventIds); // put it in the order they were added (hopefully)
         if (eventIds.size() > 0) {
             for (String eventId : eventIds) {
-                Event event = (Event) this.queueCache.get(eventId);
+                Event event = (Event) queueCache.get(eventId);
                 fireEvent(event);
                 fired++;
             }
         }
-        this.queueCache.clear();
+        queueCache.clear();
         return fired;
     }
 
@@ -204,8 +199,9 @@ public class SystemEventService implements EventService, ShutdownService {
      * @return the number of events that were cleared
      */
     protected int clearQueuedEvents() {
-        int cleared = this.queueCache.size();
-        this.queueCache.clear();
+        Cache queueCache = this.cachingService.getCache(QUEUE_CACHE_NAME, new CacheConfig(CacheScope.REQUEST));
+        int cleared = queueCache.size();
+        queueCache.clear();
         return cleared;
     }
 
@@ -255,8 +251,7 @@ public class SystemEventService implements EventService, ShutdownService {
             String[] namePrefixes = listener.getEventNamePrefixes();
             if (namePrefixes != null && namePrefixes.length > 0) {
                 allowName = false;
-                for (int i = 0; i < namePrefixes.length; i++) {
-                    String namePrefix = namePrefixes[i];
+                for (String namePrefix : namePrefixes) {
                     String eventName = event.getName();
                     if (namePrefix != null && namePrefix.length() > 0) {
                         if (eventName.startsWith(namePrefix)) {
@@ -287,8 +282,8 @@ public class SystemEventService implements EventService, ShutdownService {
         } catch (Exception e1) {
             log.warn("Listener ("+listener+")["+listener.getClass().getName()+"] failure calling getResourcePrefix: " + e1.getMessage() + ":" + e1.getCause());
         }
-        boolean allowed = allowName && allowResource;
-        return allowed;
+
+        return allowName && allowResource;
     }
 
     private Random random = new Random();

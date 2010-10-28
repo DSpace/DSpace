@@ -30,53 +30,6 @@ public interface SessionService {
      * needed when there is a requirement to create a session operating
      * outside a servlet container or manually handling sessions.
      * 
-     * @param sessionId (optional) if null this is generated automatically, 
-     * otherwise the given session ID will be used if it is not already taken or assigned
-     * @return the session object
-     */
-    public Session startSession(String sessionId);
-
-    /**
-     * Bind the session for the given user (or anonymous).
-     * This is useful for associating an authenticated user with a session.
-     * 
-     * @param sessionId the unique ID for a session
-     * @param userId (optional) the internal user ID (not the username).
-     * Set this to null for an anonymous user or to remove the user
-     * binding from a session.
-     * @param userEid (optional) the external user ID (typically the username).
-     * Ignored if userId is null.  Must be set if userId is set.
-     * @return the session with the given id
-     * @throws IllegalArgumentException if the sessionId is null or the 
-     * session with that id cannot be found OR the userId is set and
-     * userEid is not set
-     */
-    public Session bindSession(String sessionId, String userId, String userEid);
-
-    /**
-     * Retrieves a session by the sessionId if it is active.
-     * <p>
-     * WARNING: there is normally no need to call this method; use
-     * {@link #getCurrentSession()}.
-     * 
-     * @param sessionId the unique id for a session (not {@link Session#getId()}, this is {@link Session#getSessionId()})
-     * @return a session if one is available OR null if none found
-     * @throws IllegalArgumentException if the sessionId is null
-     */
-    public Session getSession(String sessionId);
-
-    /**
-     * Get the list of sessions.
-     * This will automatically purge out any sessions which have expired.
-     *
-     * @return the list of all active sessions ordered by last time accessed
-     */
-    public List<Session> getAllActiveSessions();
-
-    /**
-     * Access the current session for the current thread.
-     * This contains information about the current user as well.
-     * 
      * @return the Session object associated with the current request or processing thread OR null if there is not one
      */
     public Session getCurrentSession();

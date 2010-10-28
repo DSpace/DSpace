@@ -72,13 +72,6 @@ public class DSpaceTest {
         assertEquals(o, kernel.getServiceManager());
 
         kernelImpl.destroy(); // cleanup the kernel
-
-        try {
-            new DSpace();
-            fail("should have thrown exception");
-        } catch (IllegalStateException e) {
-            assertNotNull(e.getMessage());
-        }
     }
     
 /*********

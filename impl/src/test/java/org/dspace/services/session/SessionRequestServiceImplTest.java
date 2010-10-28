@@ -54,9 +54,6 @@ public class SessionRequestServiceImplTest extends DSpaceAbstractKernelTest {
     public void testStartRequest() {
         String requestId = sessionRequestService.startRequest();
         assertNotNull(requestId);
-        String cacheRID = (String) getRequestCache().get(CachingService.REQUEST_ID_KEY);
-        assertNotNull(cacheRID);
-        assertEquals(cacheRID, requestId);
 
         sessionRequestService.endRequest(null);
     }
@@ -70,8 +67,7 @@ public class SessionRequestServiceImplTest extends DSpaceAbstractKernelTest {
         assertNotNull(requestId);
 
         sessionRequestService.endRequest(null);
-        String cacheRID = (String) getRequestCache().get(CachingService.REQUEST_ID_KEY);
-        assertNull(cacheRID);
+        assertNull( getRequestCache() );
     }
 
     /**
@@ -115,125 +111,12 @@ public class SessionRequestServiceImplTest extends DSpaceAbstractKernelTest {
     }
 
     /**
-     * Test method for {@link org.dspace.services.sessions.SessionRequestServiceImpl#makeSession(java.lang.String)}.
-     */
-    @Test
-    public void testMakeSession() {
-        Session session = sessionRequestService.makeSession("AZ-session");
-        assertNotNull(session);
-        assertEquals("AZ-session", session.getId());
-    }
-
-    /**
-     * Test method for {@link org.dspace.services.sessions.SessionRequestServiceImpl#getSession(java.lang.String)}.
-     */
-    @Test
-    public void testGetSession() {
-        Session s = sessionRequestService.getSession("aaronz");
-        assertNull(s);
- 
-        Session newOne = sessionRequestService.makeSession("aaronz");
-
-        s = sessionRequestService.getSession("aaronz");
-        assertNotNull(s);
-        assertEquals(newOne, s);
-    }
-
-    /**
-     * Test method for {@link org.dspace.services.sessions.SessionRequestServiceImpl#getAllActiveSessions()}.
-     */
-    @Test
-    public void testGetAllActiveSessions() {
-        List<Session> l = sessionRequestService.getAllActiveSessions();
-        assertNotNull(l);
-        assertEquals(0, l.size());
-
-        Session newOne = sessionRequestService.makeSession("aaronz");
-        Session newTwo = sessionRequestService.makeSession("beckyz");
-
-        l = sessionRequestService.getAllActiveSessions();
-        assertNotNull(l);
-        assertEquals(2, l.size());
-
-        newOne.invalidate();
-
-        l = sessionRequestService.getAllActiveSessions();
-        assertNotNull(l);
-        assertEquals(1, l.size());
-
-        newTwo.clear();
-        
-        l = sessionRequestService.getAllActiveSessions();
-        assertNotNull(l);
-        assertEquals(1, l.size());
-
-        newTwo.invalidate();
-
-        l = sessionRequestService.getAllActiveSessions();
-        assertNotNull(l);
-        assertEquals(0, l.size());
-    }
-
-    /**
-     * Test method for {@link org.dspace.services.sessions.SessionRequestServiceImpl#bindSession(java.lang.String, java.lang.String)}.
-     */
-    @Test
-    public void testBindSession() {
-        Session session = null;
-
-        try {
-            sessionRequestService.bindSession("AZ1", "/user/aaronz", "aaronz");
-            fail("should have thrown exception");
-        } catch (IllegalArgumentException e) {
-            assertNotNull(e.getMessage());
-        }
-
-        sessionRequestService.makeSession("AZ1");
-        
-        session = sessionRequestService.bindSession("AZ1", "/user/aaronz", "aaronz");
-        assertNotNull(session);
-        assertEquals("AZ1", session.getId());
-        assertEquals("/user/aaronz", session.getUserId());
-
-        session = sessionRequestService.bindSession("AZ1", null, null);
-        assertNotNull(session);
-        assertEquals("AZ1", session.getId());
-        assertEquals(null, session.getUserId());
-    }
-
-    /**
-     * Test method for {@link org.dspace.services.sessions.SessionRequestServiceImpl#startSession(java.lang.String)}.
-     */
-    @Test
-    public void testStartSession() {
-        Session session = sessionRequestService.startSession("aaronz");
-        assertNotNull(session);
-        assertEquals("aaronz", session.getId());
-        session.invalidate();
-
-        // try making one with null
-        Session s2 = sessionRequestService.startSession(null);
-        assertNotNull(s2);
-        assertNotNull(s2.getId());
-        s2.invalidate();
-    }
-
-    /**
      * Test method for {@link org.dspace.services.sessions.SessionRequestServiceImpl#getCurrentSession()}.
      */
     @Test
     public void testGetCurrentSession() {
         Session current = sessionRequestService.getCurrentSession();
         assertNull(current);
-
-        Session session = sessionRequestService.startSession("aaronz");
-        assertNotNull(session);
-        assertEquals("aaronz", session.getId());
-
-        current = sessionRequestService.getCurrentSession();
-        assertNotNull(current);
-        assertEquals("aaronz", current.getId());
-        assertEquals(current, session);
     }
 
     /**
@@ -243,15 +126,6 @@ public class SessionRequestServiceImplTest extends DSpaceAbstractKernelTest {
     public void testGetCurrentSessionId() {
         String current = sessionRequestService.getCurrentSessionId();
         assertNull(current);
-
-        Session session = sessionRequestService.startSession("aaronz");
-        assertNotNull(session);
-        assertEquals("aaronz", session.getId());
-
-        current = sessionRequestService.getCurrentSessionId();
-        assertNotNull(current);
-        assertEquals("aaronz", current);
-        assertEquals(current, session.getId());
     }
 
     /**
@@ -261,20 +135,6 @@ public class SessionRequestServiceImplTest extends DSpaceAbstractKernelTest {
     public void testGetCurrentUserId() {
         String current = sessionRequestService.getCurrentUserId();
         assertNull(current);
-
-        Session session = sessionRequestService.startSession("aaronz");
-        assertNotNull(session);
-        assertEquals("aaronz", session.getId());
-        assertEquals(null, session.getUserId());
-
-        current = sessionRequestService.getCurrentUserId();
-        assertNull(current);
-
-        sessionRequestService.bindSession(session.getId(), "/user/aaronz", "aaronz");
-
-        current = sessionRequestService.getCurrentUserId();
-        assertNotNull(current);
-        assertEquals("/user/aaronz", current);
     }
 
     /**
@@ -302,8 +162,7 @@ public class SessionRequestServiceImplTest extends DSpaceAbstractKernelTest {
      * @return the request storage cache
      */
     private Cache getRequestCache() {
-        Cache cache = cachingService.getCache(CachingService.REQUEST_CACHE, new CacheConfig(CacheScope.REQUEST));
-        return cache;
+        return cachingService.getCache(CachingService.REQUEST_CACHE, new CacheConfig(CacheScope.REQUEST));
     }
 
 }

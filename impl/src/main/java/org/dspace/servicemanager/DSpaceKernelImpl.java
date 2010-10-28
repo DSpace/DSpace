@@ -7,7 +7,6 @@
  */
 package org.dspace.servicemanager;
 
-import java.lang.management.ManagementFactory;
 import java.util.Date;
 
 import javax.management.Attribute;
@@ -18,8 +17,6 @@ import javax.management.DynamicMBean;
 import javax.management.InvalidAttributeValueException;
 import javax.management.MBeanException;
 import javax.management.MBeanInfo;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 import javax.management.ReflectionException;
 import javax.management.modelmbean.DescriptorSupport;
 import javax.management.modelmbean.ModelMBeanAttributeInfo;
@@ -162,8 +159,8 @@ public class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, CommonLifec
             running = true;
             // add in the shutdown hook
             registerShutdownHook();
-            log.info("DSpace kernel startup completed in "+loadTime+" ms and registered as MBean: " + mBeanName);
         }
+        log.info("DSpace kernel startup completed in "+loadTime+" ms and registered as MBean: " + mBeanName);
     }
 
     /* (non-Javadoc)
@@ -185,9 +182,9 @@ public class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, CommonLifec
             }
             serviceManagerSystem = null;
             configurationService = null;
-            // log completion (logger may be gone at this point so we cannot really use it)
-            log.info("DSpace kernel shutdown completed and unregistered MBean: " + mBeanName);
         }
+        // log completion (logger may be gone at this point so we cannot really use it)
+        log.info("DSpace kernel shutdown completed and unregistered MBean: " + mBeanName);
     }
 
     /* (non-Javadoc)
@@ -204,26 +201,27 @@ public class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, CommonLifec
             } catch (Exception e) {
                 // oh well
             }
-            // remove the mbean
-            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+
+            // If this was the default kernel, clear it
+            if (DSpaceKernelManager.getDefaultKernel() == this) {
+                DSpaceKernelManager.setDefaultKernel(null);
+            }
+
             try {
-                ObjectName name = new ObjectName(mBeanName);
-                if (mbs.isRegistered(name)) {
-                    mbs.unregisterMBean(name);
-                }
-            } catch (Exception e) {
-                // cannot use the logger here as it is already gone at this point
-                log.error("INFO: Failed to unregister the MBean: " + mBeanName, e);
-            }
-            // trash the shutdown hook as we do not need it anymore
-            if (this.shutdownHook != null) {
-                try {
-                    Runtime.getRuntime().removeShutdownHook(this.shutdownHook);
-                    this.shutdownHook = null;
-                } catch (Exception e) {
-                    // ok, keep going
+                // remove the mbean
+                DSpaceKernelManager.unregisterMBean(mBeanName);
+            } finally {
+                // trash the shutdown hook as we do not need it anymore
+                if (this.shutdownHook != null) {
+                    try {
+                        Runtime.getRuntime().removeShutdownHook(this.shutdownHook);
+                        this.shutdownHook = null;
+                    } catch (Exception e) {
+                        // ok, keep going
+                    }
                 }
             }
+
             this.destroyed = true;
         }
     }

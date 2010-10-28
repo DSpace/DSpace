@@ -7,6 +7,7 @@
  */
 package org.dspace.services.caching;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.lang.management.ManagementFactory;
@@ -14,11 +15,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.management.MBeanServer;
 
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
@@ -33,10 +33,10 @@ import org.dspace.kernel.mixins.ShutdownService;
 import org.dspace.providers.CacheProvider;
 import org.dspace.services.CachingService;
 import org.dspace.services.ConfigurationService;
+import org.dspace.services.RequestService;
 import org.dspace.services.caching.model.EhcacheCache;
 import org.dspace.services.caching.model.MapCache;
-import org.dspace.services.model.Cache;
-import org.dspace.services.model.CacheConfig;
+import org.dspace.services.model.*;
 import org.dspace.services.model.CacheConfig.CacheScope;
 import org.dspace.utils.servicemanager.ProviderHolder;
 import org.slf4j.Logger;
@@ -68,28 +68,38 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
      * Mostly used for tracking purposes.
      */
     private Map<String, EhcacheCache> cacheRecord = new ConcurrentHashMap<String, EhcacheCache>();
+
     /**
      * All the request caches.  This is bound to the thread.
      * The initial value of this TL is set automatically when it is
      * created.
      */
-    private ThreadLocal<Map<String, MapCache>> requestMap = new ThreadLocalMap();
+    private Map<String, Map<String, MapCache>> requestCachesMap = new ConcurrentHashMap<String, Map<String, MapCache>>();
+
     /**
      * @return the current request map which is bound to the current thread
      */
-    protected Map<String, MapCache> getRequestMap() {
-        return requestMap.get();
+    protected Map<String, MapCache> getRequestCaches() {
+        if (requestService == null || requestService.getCurrentRequestId() == null ) {
+            return null;
+        }
+
+        Map<String, MapCache> requestCaches = requestCachesMap.get(requestService.getCurrentRequestId());
+        if (requestCaches == null) {
+            requestCaches = new HashMap<String, MapCache>();
+            requestCachesMap.put(requestService.getCurrentRequestId(), requestCaches);
+        }
+
+        return requestCaches;
     }
 
     /**
      * Unbinds all request caches.  Destroys the caches completely.
      */
     public void unbindRequestCaches() {
-        // not sure if I really need to clear these first, it should be sufficient to just wipe the request map -AZ
-        for (MapCache mc : requestMap.get().values()) {
-            mc.clear();
+        if (requestService != null) {
+            requestCachesMap.remove(requestService.getCurrentRequestId());
         }
-        requestMap.remove(); // clear the TL entirely
     }
 
     private ConfigurationService configurationService;
@@ -97,6 +107,12 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
     @Required
     public void setConfigurationService(ConfigurationService configurationService) {
         this.configurationService = configurationService;
+    }
+
+    private RequestService requestService;
+    @Autowired
+    public void setRequestService(RequestService requestService) {
+        this.requestService = requestService;
     }
 
     private ServiceManager serviceManager;
@@ -117,11 +133,11 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
         return cacheManager;
     }
 
-    public boolean useClustering = false;
-    public boolean useDiskStore = true;
-    public int maxElementsInMemory = 2000;
-    public int timeToLiveSecs = 3600;
-    public int timeToIdleSecs = 600;
+    private boolean useClustering = false;
+    private boolean useDiskStore = true;
+    private int maxElementsInMemory = 2000;
+    private int timeToLiveSecs = 3600;
+    private int timeToIdleSecs = 600;
 
     /**
      * Reloads the config settings from the configuration service.
@@ -209,27 +225,42 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
         log.info("init()");
         // get settings
         reloadConfig();
+
         // make sure we have a cache manager
         if (cacheManager == null) {
             // not injected so we need to create one
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             InputStream is = cl.getResourceAsStream(DEFAULT_CONFIG);
-            if (is == null) {
-                throw new IllegalStateException("Could not init the cache manager, no config file found as a resource in the classloader: " + DEFAULT_CONFIG);
+            try {
+                if (is == null) {
+                    throw new IllegalStateException("Could not init the cache manager, no config file found as a resource in the classloader: " + DEFAULT_CONFIG);
+                }
+                cacheManager = new CacheManager(is);
+            } finally {
+                if (is != null) {
+                    try {
+                        is.close();
+                    } catch (IOException e) {
+                        log.debug("Error closing config stream", e);
+                    }
+                }
             }
-            cacheManager = new CacheManager(is);
         }
-        // register the cache manager as an MBean
-        MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-        ManagementService.registerMBeans(cacheManager, mbs, true, true, false, false);
+
         // get all caches out of the cachemanager and load them into the cache list
         List<Ehcache> ehcaches = getAllEhCaches(false);
         for (Ehcache ehcache : ehcaches) {
             EhcacheCache cache = new EhcacheCache(ehcache, null);
             cacheRecord.put(cache.getName(), cache);
         }
+
         // load provider
         reloadProvider();
+
+        if (requestService != null) {
+            requestService.registerRequestInterceptor(new CachingServiceRequestInterceptor());
+        }
+
         log.info("Caching service initialized:\n" + getStatus(null));
     }
 
@@ -241,12 +272,14 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
         // for some reason this causes lots of errors so not using it for now -AZ
         //ehCacheManagementService.dispose();
         try {
-            cacheRecord.clear();
+            if (cacheRecord != null) {
+                cacheRecord.clear();
+            }
         } catch (RuntimeException e) {
             // whatever
         }
         try {
-            getRequestMap().clear();
+            requestCachesMap.clear();
         } catch (RuntimeException e) {
             // whatever
         }
@@ -255,7 +288,11 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
         } catch (RuntimeException e) {
             // whatever
         }
-        cacheManager.shutdown();
+        try {
+            cacheManager.shutdown();
+        } catch (RuntimeException e) {
+            // whatever
+        }
     }
 
     /* (non-Javadoc)
@@ -280,7 +317,10 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
             cacheManager.removeCache(cacheName);
             cacheRecord.remove(cacheName);
         } else {
-            getRequestMap().remove(cacheName);
+            Map<String, MapCache> caches = getRequestCaches();
+            if (caches != null) {
+                caches.remove(cacheName);
+            }
         }
     }
 
@@ -288,39 +328,41 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
      * @see org.dspace.services.CachingService#getCache(java.lang.String, org.dspace.services.model.CacheConfig)
      */
     public Cache getCache(String cacheName, CacheConfig cacheConfig) {
+        Cache cache = null;
+
         if (cacheName == null || "".equals(cacheName)) {
             throw new IllegalArgumentException("cacheName cannot be null or empty string");
         }
 
-        // find the cache in the records if possible
-        Cache cache = this.cacheRecord.get(cacheName);
-        if (cache == null) {
-            cache = this.getRequestMap().get(cacheName);
-        }
+        if (cacheConfig != null && CacheScope.REQUEST.equals(cacheConfig.getCacheScope()) ) {
+            Map<String, MapCache> caches = getRequestCaches();
+            if (caches != null) {
+                cache = caches.get(cacheName);
+            }
 
-        // handle provider
-        if (getCacheProvider() != null) {
-            if (cache == null 
-                    && cacheConfig != null 
-                    && ! CacheScope.REQUEST.equals(cacheConfig.getCacheScope()) ) {
-                try {
-                    cache = getCacheProvider().getCache(cacheName, cacheConfig);
-                } catch (Exception e) {
-                    log.warn("Failure in provider ("+getCacheProvider()+"): " + e.getMessage());
+            if (cache == null) {
+                cache = instantiateMapCache(cacheName, cacheConfig);
+            }
+        } else {
+            // find the cache in the records if possible
+            cache = this.cacheRecord.get(cacheName);
+
+            if (cache == null) {
+                // handle provider
+                if (getCacheProvider() != null) {
+                    try {
+                        cache = getCacheProvider().getCache(cacheName, cacheConfig);
+                    } catch (Exception e) {
+                        log.warn("Failure in provider ("+getCacheProvider()+"): " + e.getMessage());
+                    }
                 }
             }
-        }
 
-        // no cache found so make one
-        if (cache == null) {
-            // create the cache type based on the cache config
-            if (cacheConfig != null 
-                    && CacheScope.REQUEST.equals(cacheConfig.getCacheScope()) ) {
-                cache = instantiateMapCache(cacheName, cacheConfig);
-            } else {
+            if (cache == null) {
                 cache = instantiateEhCache(cacheName, cacheConfig);
             }
         }
+
         return cache;
     }
 
@@ -336,7 +378,8 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
                 log.warn("Failure in provider ("+getCacheProvider()+"): " + e.getMessage());
             }
         }
-        caches.addAll(this.getRequestMap().values());
+//        TODO implement reporting on request caches?        
+//        caches.addAll(this.requestMap.values());
         Collections.sort(caches, new NameComparator());
         return caches;
     }
@@ -350,16 +393,16 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
         if (cacheName == null || "".equals(cacheName)) {
             // add in overall memory stats
             sb.append("** Memory report\n");
-            sb.append(" freeMemory: " + Runtime.getRuntime().freeMemory());
+            sb.append(" freeMemory: ").append(Runtime.getRuntime().freeMemory());
             sb.append("\n");
-            sb.append(" totalMemory: " + Runtime.getRuntime().totalMemory());
+            sb.append(" totalMemory: ").append(Runtime.getRuntime().totalMemory());
             sb.append("\n");
-            sb.append(" maxMemory: " + Runtime.getRuntime().maxMemory());
+            sb.append(" maxMemory: ").append(Runtime.getRuntime().maxMemory());
             sb.append("\n");
 
             // caches summary report
             List<Cache> allCaches = getCaches();
-            sb.append("\n** Full report of all known caches ("+allCaches.size()+"):\n");
+            sb.append("\n** Full report of all known caches (").append(allCaches.size()).append("):\n");
             for (Cache cache : allCaches) {
                 sb.append(" * ");
                 sb.append(cache.toString());
@@ -372,13 +415,16 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
             }
         } else {
             // report for a single cache
-            sb.append("\n** Report for cache ("+cacheName+"):\n");
+            sb.append("\n** Report for cache (").append(cacheName).append("):\n");
             Cache cache = this.cacheRecord.get(cacheName);
             if (cache == null) {
-                cache = this.getRequestMap().get(cacheName);
+                Map<String, MapCache> caches = getRequestCaches();
+                if (caches != null) {
+                    cache = caches.get(cacheName);
+                }
             }
             if (cache == null) {
-                sb.append(" * Could not find cache by this name: " + cacheName);
+                sb.append(" * Could not find cache by this name: ").append(cacheName);
             } else {
                 sb.append(" * ");
                 sb.append(cache.toString());
@@ -391,8 +437,7 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
             }
         }
 
-        final String rv = sb.toString();
-        return rv;
+        return sb.toString();
     }
 
     /* (non-Javadoc)
@@ -522,17 +567,22 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
         if (cacheConfig != null) {
             scope = cacheConfig.getCacheScope();
         }
-        if (CacheScope.REQUEST.equals(scope)) {
-            cache = getRequestMap().get(cacheName);
-        }
 
-        if (cache == null) {
-            cache = new MapCache(cacheName, cacheConfig);
-            // place cache into the right TL
+        Map<String, MapCache> caches = getRequestCaches();
+        if (caches != null) {
             if (CacheScope.REQUEST.equals(scope)) {
-                getRequestMap().put(cacheName, cache);
+                cache = caches.get(cacheName);
+            }
+
+            if (cache == null) {
+                cache = new MapCache(cacheName, cacheConfig);
+                // place cache into the right TL
+                if (CacheScope.REQUEST.equals(scope)) {
+                    caches.put(cacheName, cache);
+                }
             }
         }
+
         return cache;
     }
 
@@ -545,7 +595,7 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
      */
     protected static String generateCacheStats(Ehcache cache) {
         StringBuilder sb = new StringBuilder();
-        sb.append(cache.getName() + ":");
+        sb.append(cache.getName()).append(":");
         // this will make this costly but it is important to get accurate settings
         cache.setStatisticsAccuracy(Statistics.STATISTICS_ACCURACY_GUARANTEED);
         Statistics stats = cache.getStatistics();
@@ -556,10 +606,9 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
         final long misses = stats.getCacheMisses();
         final String hitPercentage = ((hits+misses) > 0) ? ((100l * hits) / (hits + misses)) + "%" : "N/A";
         final String missPercentage = ((hits+misses) > 0) ? ((100l * misses) / (hits + misses)) + "%" : "N/A";
-        sb.append("  Size: " + size + " [memory:" + memSize + ", disk:" + diskSize + "]");
-        sb.append(",  Hits: " + hits + " [memory:" + stats.getInMemoryHits() + 
-                ", disk:" + stats.getOnDiskHits() + "] (" + hitPercentage + ")");
-        sb.append(",  Misses: " + misses + " (" + missPercentage + ")");
+        sb.append("  Size: ").append(size).append(" [memory:").append(memSize).append(", disk:").append(diskSize).append("]");
+        sb.append(",  Hits: ").append(hits).append(" [memory:").append(stats.getInMemoryHits()).append(", disk:").append(stats.getOnDiskHits()).append("] (").append(hitPercentage).append(")");
+        sb.append(",  Misses: ").append(misses).append(" (").append(missPercentage).append(")");
         return sb.toString();
     }
 
@@ -573,4 +622,26 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
         }
     }
 
+    private class CachingServiceRequestInterceptor implements RequestInterceptor {
+
+        public void onStart(String requestId, Session session) {
+            if (requestId != null) {
+                Map<String, MapCache> requestCaches = requestCachesMap.get(requestId);
+                if (requestCaches == null) {
+                    requestCaches = new HashMap<String, MapCache>();
+                    requestCachesMap.put(requestId, requestCaches);
+                }
+            }
+        }
+
+        public void onEnd(String requestId, Session session, boolean succeeded, Exception failure) {
+            if (requestId != null) {
+                requestCachesMap.remove(requestId);
+            }
+        }
+
+        public int getOrder() {
+            return 1;
+        }
+    }
 }

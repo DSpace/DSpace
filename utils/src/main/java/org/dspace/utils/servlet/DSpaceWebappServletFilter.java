@@ -80,32 +80,15 @@ public class DSpaceWebappServletFilter implements Filter {
         // now do some DSpace stuff
         //try {
             DSpaceKernel kernel = getKernel();
-            // place the incoming request into the request cache
-            CachingService cachingService = kernel.getServiceManager().getServiceByName(CachingService.class.getName(), CachingService.class);
-            if (cachingService == null) {
-                throw new IllegalStateException("No caching service is available to hold the request state");
-            }
-            Cache reqCache = cachingService.getCache(CachingService.REQUEST_CACHE, new CacheConfig(CacheScope.REQUEST));
-            // store the servlet req/resp
-            reqCache.put("request", request);
-            reqCache.put("response", response);
-            // store the http servlet req/resp
-            if (req != null && res != null) {
-                reqCache.put(CachingService.HTTP_REQUEST_KEY, req);
-                reqCache.put(CachingService.HTTP_RESPONSE_KEY, res);
-                reqCache.put("locale", req.getLocale());
-            } else {
-                // store the locale
-                reqCache.put("locale", Locale.getDefault());
-            }
 
             // establish the request service startup
             RequestService requestService = kernel.getServiceManager().getServiceByName(RequestService.class.getName(), RequestService.class);
             if (requestService == null) {
                 throw new IllegalStateException("Could not get the DSpace RequestService to start the request transaction");
             }
+
             // establish a request related to the current session
-            requestService.startRequest(); // will trigger the various request listeners
+            requestService.startRequest(request, response); // will trigger the various request listeners
             try {
                 // invoke the next filter
                 chain.doFilter(request, response);

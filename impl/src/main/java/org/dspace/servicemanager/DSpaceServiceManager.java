@@ -7,31 +7,24 @@
  */
 package org.dspace.servicemanager;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.lang.reflect.InvocationTargetException;
+import java.util.*;
 import java.util.Map.Entry;
 
-import org.azeckoski.reflectutils.ArrayUtils;
-import org.azeckoski.reflectutils.ReflectUtils;
-import org.azeckoski.reflectutils.map.ArrayOrderedMap;
+import org.apache.commons.lang.ArrayUtils;
 import org.dspace.kernel.Activator;
 import org.dspace.kernel.mixins.ConfigChangeListener;
 import org.dspace.kernel.mixins.InitializedService;
-import org.dspace.kernel.mixins.OrderedService;
 import org.dspace.kernel.mixins.ServiceChangeListener;
 import org.dspace.kernel.mixins.ServiceManagerReadyAware;
 import org.dspace.kernel.mixins.ShutdownService;
-import org.dspace.servicemanager.ServiceMixinManager.ServiceHolder;
 import org.dspace.servicemanager.config.DSpaceConfig;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.servicemanager.spring.SpringServiceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanWrapper;
+import org.springframework.beans.PropertyAccessorFactory;
 
 /**
  * This is the core service manager which ties together the other
@@ -63,27 +56,6 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
         }
     }
 
-    /**
-     * This will track all the service movement in the system and will maintain an accurate indication
-     * of the implemented apis and mixins for all services.
-     * NOTE: Spring interceptor is handling the {@link InitializedService}
-     * and {@link ShutdownService} mixins.
-     * {@link ServiceChangeListener} and {@link ConfigChangeListener} 
-     * mixins are handled here.
-     * The {@link OrderedService} mixin will be handled by the util
-     * class to assist with easily getting providers.
-     * All other mixins will be handled in the services that use them
-     * exclusively by accessing the {@link ServiceMixinManager}
-     * from this class directly.
-     */
-    private final ServiceMixinManager serviceMixinManager;
-    /**
-     * @return the current service mixin manager
-     */
-    public ServiceMixinManager getServiceMixinManager() {
-        return serviceMixinManager;
-    }
-
     private List<ServiceManagerSystem> serviceManagers = new Vector<ServiceManagerSystem>();
     private SpringServiceManager primaryServiceManager = null;
     /**
@@ -101,7 +73,6 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
         }
         this.configurationService = configurationService;
         this.developing = configurationService.getPropertyAsType("service.manager.developing", boolean.class);
-        this.serviceMixinManager = new ServiceMixinManager();
     }
 
     protected boolean testing = false;
@@ -115,7 +86,6 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
         this.springXmlConfigFiles = springXmlConfigFiles;
         this.testing = true;
         this.developing = true;
-        this.serviceMixinManager = new ServiceMixinManager();
     }
 
     /**
@@ -126,13 +96,13 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
         for (Activator activator : this.getServicesByType(Activator.class))
         {
              // succeeded creating the activator
-                try {
-                    activator.start(this);
-                    activators.add(activator);
-                    log.info("Started and registered activator: " + activator.getClass().getName());
-                } catch (Exception e1) {
-                    log.error("ERROR: Failed to start activator ("+ activator.getClass().getName() +"): " + e1, e1);
-                }
+            try {
+                activator.start(this);
+                activators.add(activator);
+                log.info("Started and registered activator: " + activator.getClass().getName());
+            } catch (Exception e1) {
+                log.error("ERROR: Failed to start activator ("+ activator.getClass().getName() +"): " + e1, e1);
+            }
         }
     }
 
@@ -156,72 +126,23 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
     }
 
     /**
-     * Checks for service mixins and registers them in our keys set.
-     * Finds out all the interfaces that are implemented by this service
-     * for future lookup.  Handles the service change listener.
-     * 
-     * @param serviceName the name of the service
-     * @param service the service object
-     */
-    public void registerServiceAPIs(String serviceName, Object service) {
-        checkRunning();
-        List<Class<?>> implementedTypes = serviceMixinManager.registerService(serviceName, service);
-        // handle the service registration listener
-        List<ServiceChangeListener> serviceChangeListeners = 
-            getServiceMixinManager().getServicesByMixin(ServiceChangeListener.class);
-        for (ServiceChangeListener serviceChangeListener : serviceChangeListeners) {
-            // filter out this service so it does not get notified about its own registration
-            if (! service.equals(serviceChangeListener)) {
-                boolean notify = checkNotifyServiceChange(implementedTypes, serviceChangeListener);
-                if (notify) {
-                    // only do the notification if filter allows
-                    serviceChangeListener.serviceRegistered(serviceName, service, implementedTypes);
-                }
-            }
-        }
-    }
-
-    /**
-     * Clears out any existing mixin registration and handles the 
-     * service change listener.
-     * @param serviceName the name of the service
-     */
-    public void unregisterServiceAPIs(String serviceName) {
-        checkRunning();
-        Object service = serviceMixinManager.getServiceByName(serviceName);
-        List<Class<?>> implementedTypes = serviceMixinManager.unregisterServiceByName(serviceName);
-        if (service != null) {
-            // handle the service registration listener (after so the service leaving is gone already)
-            List<ServiceChangeListener> serviceChangeListeners = 
-                getServiceMixinManager().getServicesByMixin(ServiceChangeListener.class);
-            for (ServiceChangeListener serviceChangeListener : serviceChangeListeners) {
-                boolean notify = checkNotifyServiceChange(implementedTypes, serviceChangeListener);
-                if (notify) {
-                    // only do the notification if filter allows
-                    serviceChangeListener.serviceUnregistered(serviceName, service);
-                }
-            }
-        }
-    }
-
-    /**
-     * This will call all the services which want to be notified when 
-     * the service manager is ready.
+     * This will call all the services which want to be notified when the service manager is ready
      */
     public void notifyServiceManagerReady() {
-        List<ServiceManagerReadyAware> services = serviceMixinManager.getServicesByMixin(ServiceManagerReadyAware.class);
-        for (ServiceManagerReadyAware serviceManagerReadyAware : services) {
-            try {
-                serviceManagerReadyAware.serviceManagerReady(this);
-            } catch (Exception e) {
-                System.err.println("ERROR: Failure in service when calling serviceManagerReady: " + e);
+        for (ServiceManagerSystem sms : serviceManagers) {
+            List<ServiceManagerReadyAware> services = sms.getServicesByType(ServiceManagerReadyAware.class);
+            for (ServiceManagerReadyAware serviceManagerReadyAware : services) {
+                try {
+                    serviceManagerReadyAware.serviceManagerReady(this);
+                } catch (Exception e) {
+                    System.err.println("ERROR: Failure in service when calling serviceManagerReady: " + e);
+                }
             }
         }
     }
 
     /**
-     * Checks to see if a listener should be notified.
-     *
+     * Checks to see if a listener should be notified
      * @param implementedTypes the types implemented by the service changing
      * @param serviceChangeListener the listener
      * @return true if it should be notified, false otherwise
@@ -233,9 +154,9 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
         if (notifyTypes == null || notifyTypes.length == 0) {
             notify = true;
         } else {
-            for (int i = 0; i < notifyTypes.length; i++) {
+            for (Class<?> notifyType : notifyTypes) {
                 for (Class<?> implementedType : implementedTypes) {
-                    if (notifyTypes[i].equals(implementedType)) {
+                    if (notifyType.equals(implementedType)) {
                         notify = true;
                         break;
                     }
@@ -260,7 +181,6 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
         }
         this.running = false; // wait til the end
         this.serviceManagers.clear();
-        this.serviceMixinManager.clear();
         this.primaryServiceManager = null;
         log.info("Shutdown DSpace core service manager");
     }
@@ -273,7 +193,7 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
                 if (springXmlConfigFiles == null) {
                     springXmlConfigFiles = extraConfigs;
                 } else {
-                    springXmlConfigFiles = ArrayUtils.appendArrays(springXmlConfigFiles, extraConfigs);
+                    springXmlConfigFiles = (String[])ArrayUtils.addAll(springXmlConfigFiles, extraConfigs);
                 }
             }
         }
@@ -291,36 +211,6 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
             // add it to the list of service managers
             this.serviceManagers.add(springSMS);
             this.primaryServiceManager = springSMS;
-            // register all the spring beans with the service mixin manager
-            Map<String, Object> springServices = primaryServiceManager.getServices();
-            for (Entry<String, Object> entry : springServices.entrySet()) {
-                String key = entry.getKey();
-                if (key != null && ! key.startsWith("org.springframework") ) {
-                    this.serviceMixinManager.registerService(entry.getKey(), entry.getValue());
-                }
-            }
-            log.info("Registered "+this.serviceMixinManager.size()+" service's mixins from loaded core services");
-
-            // this kind of thing will be handled by DI utils -AZ
-//            // now start the secondary SMS using the spring bean factory
-//            String[] serviceManagerClasses = configurationService.getPropertyAsType("service.manager.external.classes", String[].class);
-//            if (serviceManagerClasses != null) {
-//                for (String serviceManagerClassName : serviceManagerClasses) {
-//                    try {
-//                        Class<ExternalServiceManagerSystem> smClass = (Class<ExternalServiceManagerSystem>)Class.forName(serviceManagerClassName);
-//                        ExternalServiceManagerSystem eSMS = smClass.newInstance();
-//                        eSMS.init(this, configurationService, testing, developing, serviceManagers);
-//                        eSMS.startup();
-//
-//                        // add it to the list of service managers
-//                        serviceManagers.add(eSMS);
-//                        log.info("Started up DSpace external service manager: " + serviceManagerClassName);
-//                    } catch (Exception e) {
-//                        // startup failures are deadly
-//                        throw new IllegalStateException("failure starting up service manager " + serviceManagerClassName + ": " + e.getMessage(), e);
-//                    }
-//                }
-//            }
 
             // now startup the activators
             registerActivators();
@@ -345,8 +235,6 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
         for (ServiceManagerSystem sms : serviceManagers) {
             sms.registerService(name, service);
         }
-        // find the mixins
-        registerServiceAPIs(name, service);
     }
 
     public <T> T registerServiceClass(String name, Class<T> type) {
@@ -355,9 +243,7 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
             throw new IllegalArgumentException("name and type cannot be null");
         }
         // we only register with the primary
-        T service = primaryServiceManager.registerServiceClass(name, type);
-        registerServiceAPIs(name, service);
-        return service;
+        return primaryServiceManager.registerServiceClass(name, type);
     }
 
     public void unregisterService(String name) {
@@ -367,7 +253,6 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
         }
         // only unregister with the primary
         primaryServiceManager.unregisterService(name);
-        unregisterServiceAPIs(name);
     }
 
     public <T> T getServiceByName(String name, Class<T> type) {
@@ -389,7 +274,11 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
         // need to check the service mixin manager if not found
         if (service == null 
                 && name != null) {
-            service = this.serviceMixinManager.getServiceByNameAndMixin(name, type);
+            for (ServiceManagerSystem sms : serviceManagers) {
+                if (service == null) {
+                    service = sms.getServiceByName(name, type);
+                }
+            }
         }
         return service;
     }
@@ -407,11 +296,9 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
                 // keep going
             }
         }
-        // need to check the service mixin manager as well - NOTE: I think we might be able to avoid asking the SMSs at all and just use this -AZ
-        set.addAll( this.serviceMixinManager.getServicesByMixin(type) );
         // put the set into a list for easier access and sort it
         List<T> services = new ArrayList<T>(set);
-        Collections.sort(services, new ServiceMixinManager.ServiceComparator());
+        Collections.sort(services, new ServiceManagerUtils.ServiceComparator());
         return services;
     }
 
@@ -478,53 +365,50 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
                 // some configs changed so push the changes to the listeners in all known services and providers
                 // make the list of changed setting names and map of changed settings
                 ArrayList<String> changedSettingNames = new ArrayList<String>();
-                ArrayOrderedMap<String, String> changedSettings = new ArrayOrderedMap<String, String>();
-                for (int i = 0; i < changedNames.length; i++) {
-                    String configName = changedNames[i];
+                Map<String, String> changedSettings = new LinkedHashMap<String, String>();
+                for (String configName : changedNames) {
                     changedSettingNames.add(configName);
                     changedSettings.put( getSimplerName(configName), configurationService.getProperty(configName) );
                 }
                 // notify the services that implement the mixin
-                List<ServiceHolder<ConfigChangeListener>> configChangeListeners = 
-                    getServiceMixinManager().getServiceHoldersByMixin(ConfigChangeListener.class);
-                for (ServiceHolder<ConfigChangeListener> serviceHolder : configChangeListeners) {
-                    String serviceName = serviceHolder.getServiceName();
-                    ConfigChangeListener configChangeListener = serviceHolder.getService();
-                    String serviceImplName = configChangeListener.getClass().getName();
-                    // notify this service
-                    try {
-                        boolean notify = false;
-                        String[] notifyNames = configChangeListener.notifyForConfigNames();
-                        if (notifyNames == null || notifyNames.length == 0) {
-                            notify = true;
-                        } else {
-                            for (int i = 0; i < notifyNames.length; i++) {
-                                // check to see if the change was one of the bean properties for our service
-                                String notifyName = getSimplerName(notifyNames[i]);
-                                String notifyBeanName = DSpaceConfig.getBeanName(notifyNames[i]);
-                                if (notifyBeanName != null) {
-                                    // this is a bean key
-                                    if (notifyBeanName.equals(serviceName) ||
-                                            notifyBeanName.equals(serviceImplName)) {
-                                        notify = true;
-                                        break;
+                for (ServiceManagerSystem sms : serviceManagers) {
+                    List<ConfigChangeListener> configChangeListeners = sms.getServicesByType(ConfigChangeListener.class);
+                    for (ConfigChangeListener configChangeListener : configChangeListeners) {
+                        String serviceImplName = configChangeListener.getClass().getName();
+                        // notify this service
+                        try {
+                            boolean notify = false;
+                            String[] notifyNames = configChangeListener.notifyForConfigNames();
+                            if (notifyNames == null || notifyNames.length == 0) {
+                                notify = true;
+                            } else {
+                                for (String notifyName : notifyNames) {
+                                    // check to see if the change was one of the bean properties for our service
+                                    String simplerName = getSimplerName(notifyName);
+                                    String notifyBeanName = DSpaceConfig.getBeanName(notifyName);
+                                    if (notifyBeanName != null) {
+                                        // this is a bean key
+                                        if (notifyBeanName.equals(serviceImplName)) {
+                                            notify = true;
+                                            break;
+                                        }
                                     }
-                                }
-                                // check to see if the name matches one of those the listener cares about
-                                for (int j = 0; j < changedNames.length; j++) {
-                                    if (notifyName != null && notifyName.equals(changedNames[j])) {
-                                        notify = true;
-                                        break;
+                                    // check to see if the name matches one of those the listener cares about
+                                    for (String changedName : changedNames) {
+                                        if (simplerName != null && simplerName.equals(changedName)) {
+                                            notify = true;
+                                            break;
+                                        }
                                     }
                                 }
                             }
+                            // do the notify if we should at this point
+                            if (notify) {
+                                configChangeListener.configurationChanged(changedSettingNames, changedSettings);
+                            }
+                        } catch (Exception e) {
+                            System.err.println("Failure occurred while trying to notify service of config change: " + e.getMessage());
                         }
-                        // do the notify if we should at this point
-                        if (notify) {
-                            configChangeListener.configurationChanged(changedSettingNames, changedSettings);
-                        }
-                    } catch (Exception e) {
-                        System.err.println("Failure occurred while trying to notify service ("+serviceName+") of config change: " + e.getMessage());
                     }
                 }
             }
@@ -559,11 +443,13 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
     public static void configureService(String serviceName, Object service, Map<String, Map<String, ServiceConfig>> serviceNameConfigs) {
         // stuff the config settings into the bean if there are any
         if (serviceNameConfigs.containsKey(serviceName)) {
-            ReflectUtils reflectUtils = ReflectUtils.getInstance();
+            BeanWrapper beanWrapper = PropertyAccessorFactory.forBeanPropertyAccess(service);
+
             Map<String, ServiceConfig> configs = serviceNameConfigs.get(serviceName);
             for (ServiceConfig config : configs.values()) {
                 try {
-                    reflectUtils.setFieldValue(service, config.getParamName(), config.getValue());
+                    beanWrapper.setPropertyValue(config.getParamName(), config.getValue());
+
                     log.info("Set param ("+config.getParamName()+") on service bean ("+serviceName+") to: " + config.getValue());
                 } catch (RuntimeException e) {
                     log.error("Unable to set param ("+config.getParamName()+") on service bean ("+serviceName+"): " + e.getMessage(), e);

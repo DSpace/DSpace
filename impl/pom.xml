@@ -59,18 +59,6 @@
         <url>http://scm.dspace.org/svn/repo/modules/dspace-services/trunk/impl</url>
     </scm>
 
-    <repositories>
-        <repository>
-            <id>sakai-maven</id>
-            <name>Sakai Maven Repo</name>
-            <layout>default</layout>
-            <url>http://source.sakaiproject.org/maven2</url>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-
     <dependencies>
         <!-- common modules -->
         <dependency>
@@ -83,32 +71,30 @@
             <artifactId>dspace-services-utils</artifactId>
             <version>2.0.2-SNAPSHOT</version>
         </dependency>
+        <!-- logging -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>1.5.6</version>
+        </dependency>
         <!-- spring service manager -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context-support</artifactId>
             <version>2.5.6</version>
-            <type>jar</type>
+            <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-core</artifactId>
-            <version>2.5.6</version>
-            <type>jar</type>
-        </dependency>
-        <!-- reflection -->
-        <dependency>
-            <groupId>org.azeckoski</groupId>
-            <artifactId>reflectutils</artifactId>
-            <version>0.9.10</version>
-            <type>jar</type>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>2.4</version>
         </dependency>
         <!-- this needs to eventually go into common/lib for tomcat 5 -->
         <dependency>
             <groupId>net.sf.ehcache</groupId>
-            <artifactId>ehcache</artifactId>
-            <version>1.5.0</version>
-            <type>jar</type>
+            <artifactId>ehcache-core</artifactId>
+            <version>1.7.2</version>
+            <scope>compile</scope>
         </dependency>
         <!-- for filters -->
         <dependency>
@@ -116,7 +102,6 @@
             <artifactId>servlet-api</artifactId>
             <version>2.4</version>
             <scope>provided</scope>
-            <type>jar</type>
         </dependency>
         <!-- SPECIAL CASE - need JUNIT at build time and testing time -->
         <dependency>
@@ -137,22 +122,6 @@
             <artifactId>jetty-servlet-tester</artifactId>
             <version>6.1.14</version>
             <scope>test</scope>
-        </dependency>
-        <!-- logging -->
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.5.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <version>1.5.6</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-simple</artifactId>
-            <version>1.5.6</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>

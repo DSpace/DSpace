@@ -83,8 +83,8 @@ public class EhcacheCache implements Cache {
         if (key == null) {
             throw new IllegalArgumentException("key cannot be null");
         }
-        Serializable payload = (Serializable) getCachePayload(key, false);
-        return payload;
+
+        return (Serializable) getCachePayload(key, false);
     }
 
     /* (non-Javadoc)
@@ -108,8 +108,8 @@ public class EhcacheCache implements Cache {
         if (key == null) {
             throw new IllegalArgumentException("key cannot be null");
         }
-        Serializable payload = (Serializable) getCachePayload(key, true);
-        return payload;
+
+        return (Serializable) getCachePayload(key, true);
     }
 
     /* (non-Javadoc)

@@ -102,7 +102,7 @@ public class ResourceFinder {
      * @return an array of Spring Resource objects
      */
     public static Resource[] getResources(List<String> paths) {
-        return makeResources(paths).toArray(new Resource[] {});
+        return makeResources(paths).toArray(new Resource[paths.size()]);
     }
 
     public static File[] getFiles(List<String> paths) {
@@ -145,8 +145,8 @@ public class ResourceFinder {
         if (path == null) {
             throw new IllegalArgumentException("Invalid null path");
         }
-        Resource r = makeResource(path);
-        return r;
+
+        return makeResource(path);
     }
 
     /**
@@ -161,9 +161,9 @@ public class ResourceFinder {
             throw new IllegalArgumentException("Invalid null paths");
         }
         Resource r = null;
-        for (int i = 0; i < paths.length; i++) {
+        for (String path : paths) {
             try {
-                r = makeResource(paths[i]);
+                r = makeResource(path);
             } catch (IllegalArgumentException e) {
                 continue;
             }

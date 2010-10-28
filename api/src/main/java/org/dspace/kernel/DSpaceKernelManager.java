@@ -8,14 +8,15 @@
 package org.dspace.kernel;
 
 import java.lang.management.ManagementFactory;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanException;
-import javax.management.MBeanServer;
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
-import javax.management.ReflectionException;
+import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.management.*;
 
 
 /**
@@ -24,13 +25,21 @@ import javax.management.ReflectionException;
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class DSpaceKernelManager {
+    private static Logger log = LoggerFactory.getLogger(DSpaceKernelManager.class);
 
-    /**
-     * The current kernel.
-     */
-    private DSpaceKernel kernel;
+    static private DSpaceKernel defaultKernel = null;
 
+    static private Map<String, DSpaceKernel> namedKernelMap = new HashMap<String, DSpaceKernel>();
+
+
+    static public DSpaceKernel getDefaultKernel() {
+        return defaultKernel;
+    }
     
+    static public void setDefaultKernel(DSpaceKernel kernel) {
+        defaultKernel = kernel;
+    }
+
     /**
      * A lock on the kernel to handle multiple threads getting the first item.
      */
@@ -45,7 +54,12 @@ public class DSpaceKernelManager {
      * @throws IllegalStateException if the kernel is not available
      */
     public DSpaceKernel getKernel() {
-        return getKernel(null);
+        DSpaceKernel kernel = getKernel(null);
+        if (kernel == null) {
+            throw new IllegalStateException("The DSpace kernel is not started yet, please start it before attempting to use it");
+        }
+
+        return kernel;
     }
 
     /**
@@ -59,16 +73,30 @@ public class DSpaceKernelManager {
      * @throws IllegalStateException if the kernel is not available or not running
      */
     public DSpaceKernel getKernel(String name) {
-        if (kernel == null) {
+
+        // Are we getting a named kernel?
+        if (!StringUtils.isEmpty(name)) {
             name = checkName(name);
+
+            if (namedKernelMap.containsKey(name)) {
+                return namedKernelMap.get(name);
+            }
+
+            if (defaultKernel != null && name.equals(defaultKernel.getMBeanName())) {
+                return defaultKernel;
+            }
+
             synchronized (lock) {
                 MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
                 try {
                     ObjectName kernelName = new ObjectName(name);
-                    kernel = (DSpaceKernel) mbs.invoke(kernelName, "getManagedBean", null, null);
-                    if (! kernel.isRunning()) {
+                    DSpaceKernel namedKernel = (DSpaceKernel) mbs.invoke(kernelName, "getManagedBean", null, null);
+                    if ( namedKernel == null || ! namedKernel.isRunning()) {
                         throw new IllegalStateException("The DSpace kernel is not started yet, please start it before attempting to use it");
                     }
+
+                    namedKernelMap.put(name, namedKernel);
+                    return namedKernel;
                 } catch (InstanceNotFoundException e) {
                     throw new IllegalStateException(e);
                 } catch (MBeanException e) {
@@ -82,7 +110,8 @@ public class DSpaceKernelManager {
                 }
             }
         }
-        return kernel;
+
+        return defaultKernel;
     }
 
     /**
@@ -107,4 +136,54 @@ public class DSpaceKernelManager {
         return mbeanName;
     }
 
+    /**
+     * Register a new kernel MBean with the given name or fail
+     * @param mBeanName the bean name to use
+     * @param kernel the kernel bean to register
+     * @throws IllegalStateException if the MBean cannot be registered
+     */
+    public static void registerMBean(String mBeanName, DSpaceKernel kernel) {
+        mBeanName = DSpaceKernelManager.checkName(mBeanName);
+        synchronized (mBeanName) {
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            try {
+                ObjectName name = new ObjectName(mBeanName);
+                if (! mbs.isRegistered(name)) {
+                    // register the MBean
+                    mbs.registerMBean(kernel, name);
+                    log.info("Registered new Kernel MBEAN: " + mBeanName + " ["+kernel+"]");
+                }
+            } catch (MalformedObjectNameException e) {
+                throw new IllegalStateException(e);
+            } catch (InstanceAlreadyExistsException e) {
+                throw new IllegalStateException(e);
+            } catch (MBeanRegistrationException e) {
+                throw new IllegalStateException(e);
+            } catch (NotCompliantMBeanException e) {
+                throw new IllegalStateException(e);
+            } catch (NullPointerException e) {
+                throw new IllegalStateException(e);
+            }
+        }
+    }
+
+    /**
+     * Unregister an MBean if possible
+     * @param mBeanName the bean name to use
+     * @return true if the MBean was unregistered, false otherwise
+     */
+    public static boolean unregisterMBean(String mBeanName) {
+        mBeanName = DSpaceKernelManager.checkName(mBeanName);
+        synchronized (mBeanName) {
+            MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
+            try {
+                ObjectName name = new ObjectName(mBeanName);
+                mbs.unregisterMBean(name);
+                return true;
+            } catch (Exception e) {
+                log.error("WARN Failed to unregister the MBean: " + mBeanName);
+                return false;
+            }
+        }
+    }
 }

@@ -1,19 +1,22 @@
 /**
- * Copyright (c) 2002-2010, DuraSpace.  All rights reserved
+ * $Id$
+ * $URL$
+ * *************************************************************************
+ * Copyright (c) 2002-2009, DuraSpace.  All rights reserved
  * Licensed under the DuraSpace License.
  *
  * A copy of the DuraSpace License has been included in this
- * distribution and is available at: http://www.dspace.org/license
+ * distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
  */
 package org.dspace.servicemanager.spring;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Vector;
 
 import org.dspace.servicemanager.DSpaceServiceManager;
 import org.dspace.servicemanager.ServiceManagerSystem;
@@ -29,7 +32,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 /**
  * This is the Spring implementation of the service manager.
- *
+ * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 public class SpringServiceManager implements ServiceManagerSystem {
@@ -37,7 +40,7 @@ public class SpringServiceManager implements ServiceManagerSystem {
     private static Logger log = LoggerFactory.getLogger(SpringServiceManager.class);
 
     private ClassPathXmlApplicationContext applicationContext;
-
+    
     /**
      * @return the parent core Spring {@link ApplicationContext}
      */
@@ -84,18 +87,11 @@ public class SpringServiceManager implements ServiceManagerSystem {
     public static final String corePath = "classpath*:spring/spring-dspace-core-services.xml";
     public static final String pluginPath = "classpath*:spring/spring-dspace-plugin-*-services.xml";
 
-    /**
-     * Spring does not actually allow us to add in new singletons which
-     * have bean definitions so we have to track the added singleton
-     * names ourselves manually.
-     */
-    private Vector<String> singletonNames = new Vector<String>();
-
     @SuppressWarnings("unchecked")
     public <T> T getServiceByName(String name, Class<T> type) {
         T bean = null;
         // handle special case to return the core AC
-        if (ApplicationContext.class.getName().equals(name)
+        if (ApplicationContext.class.getName().equals(name) 
                 && ApplicationContext.class.isAssignableFrom(type)) {
             bean = (T) getApplicationContext();
         } else {
@@ -117,7 +113,7 @@ public class SpringServiceManager implements ServiceManagerSystem {
                 }
             }
             // if still no luck then try by type only
-            if (name == null
+            if (name == null 
                     && bean == null) {
                 try {
                     Map<String, Object> map = applicationContext.getBeansOfType(type);
@@ -179,9 +175,7 @@ public class SpringServiceManager implements ServiceManagerSystem {
             pathList.add(corePath);
         }
         if (configPaths != null) {
-            for (int i = 0; i < configPaths.length; i++) {
-                pathList.add(configPaths[i]);
-            }
+            pathList.addAll(Arrays.asList(configPaths));
         }
         String[] allPaths = pathList.toArray(new String[pathList.size()]);
         applicationContext = new ClassPathXmlApplicationContext(allPaths, false);
@@ -231,7 +225,7 @@ public class SpringServiceManager implements ServiceManagerSystem {
     }
 
     /**
-     * This handles the common part of the 2 types of service
+     * This handles the common part of the 2 types of service 
      * registrations.
      *
      * @param name
@@ -244,53 +238,49 @@ public class SpringServiceManager implements ServiceManagerSystem {
         } catch (BeansException e) {
             throw new IllegalArgumentException("Invalid service ("+service+") with name ("+name+") registration: " + e.getMessage(), e);
         }
-        singletonNames.add(name);
     }
 
     public void unregisterService(String name) {
-        singletonNames.remove(name);
-            if (applicationContext.containsBean(name)) {
+        if (applicationContext.containsBean(name)) {
+            try {
+                Object beanInstance = applicationContext.getBean(name);
                 try {
-                    Object beanInstance = applicationContext.getBean(name);
-                    try {
-                        applicationContext.getBeanFactory().destroyBean(name, beanInstance);
-                    } catch (NoSuchBeanDefinitionException e) {
-                        // this happens if the bean was registered manually (annoyingly)
-                        DSpaceServiceManager.shutdownService(beanInstance);
-                    }
-                } catch (BeansException e) {
-                    // nothing to do here, could not find the bean
+                    applicationContext.getBeanFactory().destroyBean(name, beanInstance);
+                } catch (NoSuchBeanDefinitionException e) {
+                    // this happens if the bean was registered manually (annoyingly)
+                    DSpaceServiceManager.shutdownService(beanInstance);
                 }
+            } catch (BeansException e) {
+                // nothing to do here, could not find the bean
             }
+        }
     }
 
     public List<String> getServicesNames() {
         ArrayList<String> beanNames = new ArrayList<String>();
-        beanNames.addAll(singletonNames);
         String[] singletons = applicationContext.getBeanFactory().getSingletonNames();
-        for (int i = 0; i < singletons.length; i++) {
-            if (singletons[i].startsWith("org.springframework.context")) {
+        for (String singleton : singletons) {
+            if (singleton.startsWith("org.springframework.context")) {
                 continue; // skip the spring standard ones
             }
-            beanNames.add(singletons[i]);
+            beanNames.add(singleton);
         }
         Collections.sort(beanNames);
         return beanNames;
     }
 
     public boolean isServiceExists(String name) {
-        boolean exists = applicationContext.containsBean(name);
-        return exists;
+        return applicationContext.containsBean(name);
     }
 
     public Map<String, Object> getServices() {
         Map<String, Object> services = new HashMap<String, Object>();
         String[] singletons = applicationContext.getBeanFactory().getSingletonNames();
-        for (int i = 0; i < singletons.length; i++) {
-            if (singletons[i].startsWith("org.springframework.context")) {
+        for (String singleton : singletons) {
+            if (singleton.startsWith("org.springframework.context")) {
                 continue; // skip the spring standard ones
             }
-            String beanName = singletons[i];
+            String beanName = singleton;
             Object service = applicationContext.getBeanFactory().getSingleton(beanName);
             if (service == null) {
                 continue;

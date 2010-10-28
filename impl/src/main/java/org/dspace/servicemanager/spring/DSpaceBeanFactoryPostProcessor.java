@@ -11,16 +11,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.dspace.servicemanager.ServiceManagerSystem;
-import org.dspace.servicemanager.ServiceMixinManager;
-import org.dspace.servicemanager.config.DSpaceConfig;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.services.ConfigurationService;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanFactoryPostProcessor;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
-import org.springframework.beans.factory.support.AbstractBeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.beans.factory.support.RootBeanDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,48 +52,6 @@ public class DSpaceBeanFactoryPostProcessor implements BeanFactoryPostProcessor 
         // force config service to be registered first
         beanFactory.registerSingleton(ConfigurationService.class.getName(), configurationService);
         beanFactory.registerSingleton(ServiceManagerSystem.class.getName(), parent);
-
-        // register any beans which need to be registered now
-        BeanDefinitionRegistry registry = (BeanDefinitionRegistry) beanFactory;
-        // get out the list of all activator classes
-        List<DSpaceConfig> allConfigs = configurationService.getConfiguration();
-        List<DSpaceConfig> configs = new ArrayList<DSpaceConfig>();
-        for (DSpaceConfig config : allConfigs) {
-            if (config.isActivatorClass()) {
-                configs.add(config);
-            }
-        }
-
-        // now register all autowire configured beans
-        for (DSpaceConfig config : configs) {
-            try {
-                Class<?> c = ServiceMixinManager.getClassByName(config.getActivatorClassName());
-
-                String autowire = config.getActivatorAutowire();
-                int autowireSpring = AbstractBeanDefinition.AUTOWIRE_AUTODETECT;
-                if ("none".equals(autowire)) {
-                    autowireSpring = AbstractBeanDefinition.AUTOWIRE_NO;
-                } else if ("constructor".equals(autowire)) {
-                    autowireSpring = AbstractBeanDefinition.AUTOWIRE_CONSTRUCTOR;
-                } else if ("setter".equals(autowire)) {
-                    autowireSpring = AbstractBeanDefinition.AUTOWIRE_BY_TYPE;
-                }
-
-                RootBeanDefinition beanDef = new RootBeanDefinition(c, autowireSpring);
-                beanDef.setScope(AbstractBeanDefinition.SCOPE_SINGLETON);
-                registry.registerBeanDefinition(config.getActivatorName(), beanDef);
-
-            } catch (Exception e) {
-                log.error("Failed to register activator class from config: " + config + " :" + e, e);
-            }
-        }
-
-//        System.out.println("Registered beans: " + registry.getBeanDefinitionCount());
-//        String[] bns = registry.getBeanDefinitionNames();
-//        for (String bn : bns) {
-//            BeanDefinition bd = registry.getBeanDefinition(bn);
-//            System.out.println(" - " + bd.getBeanClassName() + ":" + bd.getDescription() );
-//        }
     }
 
 }
