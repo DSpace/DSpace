@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 @Service // for Spring
-public class ServiceExampleImpl implements ServiceExample {
+public final class ServiceExampleImpl implements ServiceExample {
 
     private ConcreteExample concreteExample;
     @Autowired // Spring

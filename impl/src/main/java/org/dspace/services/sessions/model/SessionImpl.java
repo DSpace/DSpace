@@ -33,7 +33,7 @@ import org.dspace.services.model.Session;
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 @SuppressWarnings("deprecation")
-public class SessionImpl implements Session {
+public final class SessionImpl implements Session {
 
     // keys for things stored in the session
     public static final String SESSION_ID = "dspaceSessionId";
@@ -87,9 +87,10 @@ public class SessionImpl implements Session {
         if (! isAttributeSet(SESSION_ID)) {
             if (isBlank(sessionId)) {
                 // just use the http session id
-                sessionId = this.httpSession.getId();
+                setKeyAttribute(SESSION_ID, this.httpSession.getId());
+            } else {
+                setKeyAttribute(SESSION_ID, sessionId);
             }
-            setKeyAttribute(SESSION_ID, sessionId);
         }
     }
 
@@ -230,11 +231,12 @@ public class SessionImpl implements Session {
     @Override
     public boolean equals(Object obj) {
         // sessions are equal if the ids are the same, allows comparison across reloaded items
-        if (null == obj)
+        if (null == obj) {
             return false;
-        if (!(obj instanceof SessionImpl))
+        }
+        if (!(obj instanceof SessionImpl)) {
             return false;
-        else {
+        } else {
             SessionImpl castObj = (SessionImpl) obj;
             boolean eq;
             try {
@@ -470,8 +472,8 @@ public class SessionImpl implements Session {
      * Compares sessions by the last time they were accessed, with more 
      * recent first.
      */
-    public static class SessionLastAccessedComparator implements Comparator<Session>, Serializable {
-        public final static long serialVersionUID = 1l;
+    public static final class SessionLastAccessedComparator implements Comparator<Session>, Serializable {
+        public static final long serialVersionUID = 1l;
         public int compare(Session o1, Session o2) {
             try {
                 Long lat1 = Long.valueOf(o1.getLastAccessedTime());

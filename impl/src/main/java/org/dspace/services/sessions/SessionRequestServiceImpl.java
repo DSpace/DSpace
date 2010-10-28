@@ -40,7 +40,7 @@ import java.util.*;
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-public class SessionRequestServiceImpl implements SessionService, RequestService, InitializedService, ShutdownService {
+public final class SessionRequestServiceImpl implements SessionService, RequestService, InitializedService, ShutdownService {
 
     private static Logger log = LoggerFactory.getLogger(SessionRequestServiceImpl.class);
 
@@ -206,15 +206,6 @@ public class SessionRequestServiceImpl implements SessionService, RequestService
         return null;
     }
 
-    private Session getSessionForRequestId(String requestId) {
-        Request req = requests.get(requestId);
-        if (req != null) {
-            return req.getSession();
-        }
-
-        return null;
-    }
-
     /* (non-Javadoc)
      * @see org.dspace.services.SessionService#getCurrentSessionId()
      */
@@ -304,8 +295,10 @@ public class SessionRequestServiceImpl implements SessionService, RequestService
             for (Request request : requestMap.values()) {
                 try {
                     endRequest(request.getRequestId(), null);
-                } catch (Throwable t) {
-                    // Ignore error in removing requests
+                } catch (RuntimeException e) {
+                    log.error("Runtime exception ending request", e);
+                } catch (Exception e) {
+                    log.error("Exception ending request", e);
                 }
             }
 

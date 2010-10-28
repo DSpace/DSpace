@@ -8,7 +8,6 @@
 package org.dspace.utils.servlet;
 
 import java.io.IOException;
-import java.util.Locale;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -16,16 +15,10 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.kernel.DSpaceKernel;
 import org.dspace.kernel.DSpaceKernelManager;
-import org.dspace.services.CachingService;
 import org.dspace.services.RequestService;
-import org.dspace.services.model.Cache;
-import org.dspace.services.model.CacheConfig;
-import org.dspace.services.model.CacheConfig.CacheScope;
 
 
 /**
@@ -38,7 +31,7 @@ import org.dspace.services.model.CacheConfig.CacheScope;
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-public class DSpaceWebappServletFilter implements Filter {
+public final class DSpaceWebappServletFilter implements Filter {
 
     /* (non-Javadoc)
      * @see javax.servlet.Filter#init(javax.servlet.FilterConfig)
@@ -68,15 +61,6 @@ public class DSpaceWebappServletFilter implements Filter {
      * @see javax.servlet.Filter#doFilter(javax.servlet.ServletRequest, javax.servlet.ServletResponse, javax.servlet.FilterChain)
      */
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-        // make these into useful http request/response objects
-        HttpServletRequest req = null;
-        HttpServletResponse res = null;
-        if (request instanceof HttpServletRequest) {
-            req = (HttpServletRequest) request;
-        }
-        if (response instanceof HttpServletResponse) {
-            res = (HttpServletResponse) response;
-        }
         // now do some DSpace stuff
         //try {
             DSpaceKernel kernel = getKernel();

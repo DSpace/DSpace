@@ -21,7 +21,7 @@ import java.lang.ref.WeakReference;
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-public class ProviderHolder<T> {
+public final class ProviderHolder<T> {
 
     private WeakReference<T> providerReference = null;
 

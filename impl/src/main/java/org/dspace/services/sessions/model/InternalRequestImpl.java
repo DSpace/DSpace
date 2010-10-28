@@ -9,9 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
-public class InternalRequestImpl extends AbstractRequestImpl implements Request {
+public final class InternalRequestImpl extends AbstractRequestImpl implements Request {
 
     private Map<String, Object> attributes = new HashMap<String, Object>();
 

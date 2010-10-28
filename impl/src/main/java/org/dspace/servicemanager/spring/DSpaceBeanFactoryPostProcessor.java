@@ -7,9 +7,6 @@
  */
 package org.dspace.servicemanager.spring;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.dspace.servicemanager.ServiceManagerSystem;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.services.ConfigurationService;
@@ -26,7 +23,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-public class DSpaceBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
+public final class DSpaceBeanFactoryPostProcessor implements BeanFactoryPostProcessor {
 
     private static Logger log = LoggerFactory.getLogger(DSpaceBeanFactoryPostProcessor.class);
 

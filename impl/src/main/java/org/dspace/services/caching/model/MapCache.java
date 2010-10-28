@@ -10,6 +10,7 @@ package org.dspace.services.caching.model;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.dspace.services.model.Cache;
 import org.dspace.services.model.CacheConfig;
@@ -22,10 +23,10 @@ import org.dspace.services.model.CacheConfig.CacheScope;
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-public class MapCache implements Cache {
+public final class MapCache implements Cache {
 
-    private HashMap<String, Object> cache;
-    public HashMap<String, Object> getCache() {
+    private Map<String, Object> cache;
+    public Map<String, Object> getCache() {
         return cache;
     }
 

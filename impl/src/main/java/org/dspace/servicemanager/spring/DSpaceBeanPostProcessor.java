@@ -20,7 +20,7 @@ import org.springframework.beans.factory.config.DestructionAwareBeanPostProcesso
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-public class DSpaceBeanPostProcessor implements BeanPostProcessor, DestructionAwareBeanPostProcessor {
+public final class DSpaceBeanPostProcessor implements BeanPostProcessor, DestructionAwareBeanPostProcessor {
 
     private DSpaceConfigurationService configurationService;
     @Autowired

@@ -18,7 +18,7 @@ import org.dspace.services.model.EventListener;
  * @author Mark Diggory (mdiggory at atmire.com)
  * @version $Revision$
  */
-public class EventListenerExample implements EventListener{
+public final class EventListenerExample implements EventListener{
 
 	/** log4j category */
     private static Logger log = Logger

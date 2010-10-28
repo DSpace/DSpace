@@ -14,7 +14,7 @@ package org.dspace.servicemanager.example;
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-public class ConcreteExample {
+public final class ConcreteExample {
 
     private String name = "azeckoski";
     public String getName() {

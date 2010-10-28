@@ -7,8 +7,6 @@
  */
 package org.dspace.services;
 
-import java.util.List;
-
 import org.dspace.services.model.Session;
 
 /**

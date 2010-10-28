@@ -18,8 +18,8 @@ import java.io.Serializable;
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-public class ProviderStackComparator implements Comparator<ProviderHolder<?>>, Serializable {
-    public final static long serialVersionUID = 1l;
+public final class ProviderStackComparator implements Comparator<ProviderHolder<?>>, Serializable {
+    public static final long serialVersionUID = 1l;
     public int compare(ProviderHolder<?> ph0, ProviderHolder<?> ph1) {
         /* a negative integer, zero, or a positive integer as the first argument 
          * is less than, equal to, or greater than the second.

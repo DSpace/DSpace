@@ -35,7 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * 
  * @author Aaron Zeckoski (azeckoski@gmail.com) - azeckoski - 4:02:31 PM Nov 19, 2008
  */
-public class SystemEventService implements EventService, ShutdownService {
+public final class SystemEventService implements EventService, ShutdownService {
 
     private final Logger log = LoggerFactory.getLogger(SystemEventService.class);
 
@@ -137,15 +137,13 @@ public class SystemEventService implements EventService, ShutdownService {
     private void fireLocalEvent(Event event) {
         // send event to all interested listeners
         for (EventListener listener : listenersMap.values()) {
-            if (listener != null) {
-                // filter the event if the listener has filter rules
-                if ( filterEvent(listener, event) ) {
-                    // passed filters so send the event to this listener
-                    try {
-                        listener.receiveEvent(event);
-                    } catch (Exception e) {
-                        log.warn("Listener ("+listener+")["+listener.getClass().getName()+"] failed to recieve event ("+event+"): " + e.getMessage() + ":" + e.getCause());
-                    }
+            // filter the event if the listener has filter rules
+            if (listener != null && filterEvent(listener, event) ) {
+                // passed filters so send the event to this listener
+                try {
+                    listener.receiveEvent(event);
+                } catch (Exception e) {
+                    log.warn("Listener ("+listener+")["+listener.getClass().getName()+"] failed to recieve event ("+event+"): " + e.getMessage() + ":" + e.getCause());
                 }
             }
         }
@@ -253,11 +251,9 @@ public class SystemEventService implements EventService, ShutdownService {
                 allowName = false;
                 for (String namePrefix : namePrefixes) {
                     String eventName = event.getName();
-                    if (namePrefix != null && namePrefix.length() > 0) {
-                        if (eventName.startsWith(namePrefix)) {
-                            allowName = true;
-                            break;
-                        }
+                    if (namePrefix != null && namePrefix.length() > 0 && eventName.startsWith(namePrefix)) {
+                        allowName = true;
+                        break;
                     }
                 }
             }
@@ -302,7 +298,7 @@ public class SystemEventService implements EventService, ShutdownService {
      * 
      * @author Aaron Zeckoski (azeckoski@gmail.com) - azeckoski - 10:24:58 AM Nov 20, 2008
      */
-    public class EventRequestInterceptor implements RequestInterceptor {
+    public final class EventRequestInterceptor implements RequestInterceptor {
 
         /* (non-Javadoc)
          * @see org.dspace.services.model.RequestInterceptor#onStart(java.lang.String, org.dspace.services.model.Session)

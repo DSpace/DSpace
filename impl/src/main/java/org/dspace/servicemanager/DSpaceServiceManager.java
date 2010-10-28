@@ -7,7 +7,6 @@
  */
 package org.dspace.servicemanager;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.Map.Entry;
 
@@ -33,7 +32,7 @@ import org.springframework.beans.PropertyAccessorFactory;
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-public class DSpaceServiceManager implements ServiceManagerSystem {
+public final class DSpaceServiceManager implements ServiceManagerSystem {
 
     private static Logger log = LoggerFactory.getLogger(DSpaceServiceManager.class);
 
@@ -56,12 +55,12 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
         }
     }
 
-    private List<ServiceManagerSystem> serviceManagers = new Vector<ServiceManagerSystem>();
+    private List<ServiceManagerSystem> serviceManagers = Collections.synchronizedList(new ArrayList<ServiceManagerSystem>());
     private SpringServiceManager primaryServiceManager = null;
     /**
      * This holds the stack of activators.  It is randomly ordered.
      */
-    private Vector<Activator> activators = new Vector<Activator>();
+    private List<Activator> activators = Collections.synchronizedList(new ArrayList<Activator>());
 
     protected boolean developing = false;
     /**
@@ -325,7 +324,9 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
         for (ServiceManagerSystem sms : serviceManagers) {
             try {
                 exists = sms.isServiceExists(name);
-                if (exists) break;
+                if (exists) {
+                    break;
+                }
             } catch (Exception e) {
                 // keep going
             }
@@ -386,12 +387,10 @@ public class DSpaceServiceManager implements ServiceManagerSystem {
                                     // check to see if the change was one of the bean properties for our service
                                     String simplerName = getSimplerName(notifyName);
                                     String notifyBeanName = DSpaceConfig.getBeanName(notifyName);
-                                    if (notifyBeanName != null) {
+                                    if (notifyBeanName != null && notifyBeanName.equals(serviceImplName)) {
                                         // this is a bean key
-                                        if (notifyBeanName.equals(serviceImplName)) {
-                                            notify = true;
-                                            break;
-                                        }
+                                        notify = true;
+                                        break;
                                     }
                                     // check to see if the name matches one of those the listener cares about
                                     for (String changedName : changedNames) {

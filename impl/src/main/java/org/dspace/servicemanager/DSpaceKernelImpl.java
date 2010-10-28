@@ -29,13 +29,12 @@ import org.dspace.kernel.DSpaceKernelManager;
 import org.dspace.kernel.ServiceManager;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
 import org.dspace.services.ConfigurationService;
-import org.dspace.utils.DSpace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * This is the kernel implementation which starts up the core of DSpace,
- * registers the mbean, and initializes the {@link DSpace} object.
+ * registers the mbean, and initializes the DSpace object.
  * It also loads up the configuration.  Sets a JRE shutdown hook.
  * <p>
  * Note that this does not start itself and calling the constuctor does 
@@ -48,7 +47,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-public class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, CommonLifecycle<DSpaceKernel> {
+public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, CommonLifecycle<DSpaceKernel> {
 
     private static Logger log = LoggerFactory.getLogger(DSpaceKernelImpl.class);
 
@@ -237,12 +236,12 @@ public class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, CommonLifec
 
     @Override
     protected void finalize() throws Throwable {
-        super.finalize();
         try {
             doDestroy();
         } catch (Exception e) {
             log.error("WARN Failure attempting to cleanup the DSpace kernel: " + e.getMessage(), e);
         }
+        super.finalize();
     }
 
     @Override

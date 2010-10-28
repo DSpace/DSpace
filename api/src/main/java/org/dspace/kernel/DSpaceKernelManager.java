@@ -24,19 +24,19 @@ import javax.management.*;
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-public class DSpaceKernelManager {
+public final class DSpaceKernelManager {
     private static Logger log = LoggerFactory.getLogger(DSpaceKernelManager.class);
 
-    static private DSpaceKernel defaultKernel = null;
+    private static DSpaceKernel defaultKernel = null;
 
-    static private Map<String, DSpaceKernel> namedKernelMap = new HashMap<String, DSpaceKernel>();
+    private static Map<String, DSpaceKernel> namedKernelMap = new HashMap<String, DSpaceKernel>();
 
 
-    static public DSpaceKernel getDefaultKernel() {
+    public static DSpaceKernel getDefaultKernel() {
         return defaultKernel;
     }
     
-    static public void setDefaultKernel(DSpaceKernel kernel) {
+    public static void setDefaultKernel(DSpaceKernel kernel) {
         defaultKernel = kernel;
     }
 
@@ -76,26 +76,26 @@ public class DSpaceKernelManager {
 
         // Are we getting a named kernel?
         if (!StringUtils.isEmpty(name)) {
-            name = checkName(name);
+            String checkedName = checkName(name);
 
-            if (namedKernelMap.containsKey(name)) {
-                return namedKernelMap.get(name);
+            if (namedKernelMap.containsKey(checkedName)) {
+                return namedKernelMap.get(checkedName);
             }
 
-            if (defaultKernel != null && name.equals(defaultKernel.getMBeanName())) {
+            if (defaultKernel != null && checkedName.equals(defaultKernel.getMBeanName())) {
                 return defaultKernel;
             }
 
             synchronized (lock) {
                 MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
                 try {
-                    ObjectName kernelName = new ObjectName(name);
+                    ObjectName kernelName = new ObjectName(checkedName);
                     DSpaceKernel namedKernel = (DSpaceKernel) mbs.invoke(kernelName, "getManagedBean", null, null);
                     if ( namedKernel == null || ! namedKernel.isRunning()) {
                         throw new IllegalStateException("The DSpace kernel is not started yet, please start it before attempting to use it");
                     }
 
-                    namedKernelMap.put(name, namedKernel);
+                    namedKernelMap.put(checkedName, namedKernel);
                     return namedKernel;
                 } catch (InstanceNotFoundException e) {
                     throw new IllegalStateException(e);
@@ -143,15 +143,15 @@ public class DSpaceKernelManager {
      * @throws IllegalStateException if the MBean cannot be registered
      */
     public static void registerMBean(String mBeanName, DSpaceKernel kernel) {
-        mBeanName = DSpaceKernelManager.checkName(mBeanName);
+        String checkedMBeanName = DSpaceKernelManager.checkName(mBeanName);
         synchronized (mBeanName) {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             try {
-                ObjectName name = new ObjectName(mBeanName);
+                ObjectName name = new ObjectName(checkedMBeanName);
                 if (! mbs.isRegistered(name)) {
                     // register the MBean
                     mbs.registerMBean(kernel, name);
-                    log.info("Registered new Kernel MBEAN: " + mBeanName + " ["+kernel+"]");
+                    log.info("Registered new Kernel MBEAN: " + checkedMBeanName + " ["+kernel+"]");
                 }
             } catch (MalformedObjectNameException e) {
                 throw new IllegalStateException(e);
@@ -173,15 +173,14 @@ public class DSpaceKernelManager {
      * @return true if the MBean was unregistered, false otherwise
      */
     public static boolean unregisterMBean(String mBeanName) {
-        mBeanName = DSpaceKernelManager.checkName(mBeanName);
+        String checkedMBeanName = DSpaceKernelManager.checkName(mBeanName);
         synchronized (mBeanName) {
             MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
             try {
-                ObjectName name = new ObjectName(mBeanName);
-                mbs.unregisterMBean(name);
+                mbs.unregisterMBean(new ObjectName(checkedMBeanName));
                 return true;
             } catch (Exception e) {
-                log.error("WARN Failed to unregister the MBean: " + mBeanName);
+                log.error("WARN Failed to unregister the MBean: " + checkedMBeanName);
                 return false;
             }
         }

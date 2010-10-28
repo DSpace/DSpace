@@ -24,7 +24,7 @@ import javax.servlet.http.HttpSessionContext;
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
 @SuppressWarnings("deprecation")
-public class InternalHttpSession implements HttpSession {
+public final class InternalHttpSession implements HttpSession {
 
     private final String id;
     private long lastAccessedTime = System.currentTimeMillis();

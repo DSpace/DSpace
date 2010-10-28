@@ -24,7 +24,7 @@ import org.dspace.services.model.RequestInterceptor;
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-public class RequestExecutor implements Runnable {
+public final class RequestExecutor implements Runnable {
 
     private final WeakReference<RequestService> requestServiceRef;
     private final Runnable toExecute;

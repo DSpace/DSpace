@@ -7,13 +7,8 @@
  */
 package org.dspace.services.model;
 
-import org.dspace.services.CachingService;
-
-
 /**
  * Encodes the configuration for a cache into an object.
- * <p>
- * Part of the {@link CachingService}.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
@@ -54,7 +49,7 @@ public class CacheConfig {
     /**
      * @return the scope of the associated cache
      */
-    public CacheScope getCacheScope() {
+    public final CacheScope getCacheScope() {
         return cacheScope;
     }
     /**

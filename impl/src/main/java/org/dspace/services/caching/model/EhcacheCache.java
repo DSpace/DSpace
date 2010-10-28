@@ -25,7 +25,7 @@ import org.dspace.services.model.CacheConfig.CacheScope;
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-public class EhcacheCache implements Cache {
+public final class EhcacheCache implements Cache {
 
     protected Ehcache cache;
     public Ehcache getCache() {
@@ -177,23 +177,26 @@ public class EhcacheCache implements Cache {
 
     @Override
     public boolean equals(Object obj) {
-        if (null == obj)
+        if (null == obj) {
             return false;
-        if (!(obj instanceof EhcacheCache))
+        }
+        if (!(obj instanceof EhcacheCache)) {
             return false;
-        else {
+        } else {
             EhcacheCache castObj = (EhcacheCache) obj;
-            if (null == this.getName() || null == castObj.getName())
+            if (null == this.getName() || null == castObj.getName()) {
                 return false;
-            else
+            } else {
                 return (this.getName().equals(castObj.getName()));
+            }
         }
     }
 
     @Override
     public int hashCode() {
-        if (null == this.getName())
+        if (null == this.getName()) {
             return super.hashCode();
+        }
         String hashStr = this.getClass().getName() + ":" + this.getName().hashCode();
         return hashStr.hashCode();
     }

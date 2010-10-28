@@ -7,14 +7,8 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.net.Inet4Address;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
 
-public class HttpRequestImpl extends AbstractRequestImpl implements Request {
+public final class HttpRequestImpl extends AbstractRequestImpl implements Request {
 
     private transient ServletRequest  servletRequest  = null;
     private transient ServletResponse servletResponse = null;

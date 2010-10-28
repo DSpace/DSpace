@@ -30,7 +30,7 @@ import org.dspace.services.SessionService;
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-public class DSpace {
+public final class DSpace {
 
     private DSpaceKernel kernel;
     public DSpaceKernel getKernel() {

@@ -29,7 +29,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.SimpleTypeConverter;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.util.ClassUtils;
 
 /**
  * The central DSpace configuration service.
@@ -37,7 +36,7 @@ import org.springframework.util.ClassUtils;
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-public class DSpaceConfigurationService implements ConfigurationService {
+public final class DSpaceConfigurationService implements ConfigurationService {
 
     private static final Logger log = LoggerFactory.getLogger(DSpaceConfigurationService.class);
 
@@ -397,6 +396,7 @@ public class DSpaceConfigurationService implements ConfigurationService {
      * @return true if the config changed or is new
      */
     protected boolean replaceAndAddConfig(DSpaceConfig dsConfig) {
+        DSpaceConfig newConfig = null;
         String key = dsConfig.getKey();
         if (dsConfig.getValue().contains("${")) {
             String value = dsConfig.getValue();
@@ -416,22 +416,21 @@ public class DSpaceConfigurationService implements ConfigurationService {
                     }
                     String newVal = dsc.getValue();
                     value = value.replace("${"+newKey+"}", newVal);
-                    dsConfig = new DSpaceConfig(key, value);
+                    newConfig = new DSpaceConfig(key, value);
                 } else {
                     log.warn("Found '${' but could not find a closing '}' in the value: " + value);
                     break;
                 }
             }
         }
+
         // add the config
-        if (this.configuration.containsKey(key)) {
-            if (this.configuration.get(key).equals(dsConfig)) {
-                return false; // SHORT CIRCUIT
-            }
+        if (this.configuration.containsKey(key) && this.configuration.get(key).equals(dsConfig)) {
+            return false; // SHORT CIRCUIT
         }
 
         // config changed or new
-        this.configuration.put(key, dsConfig);
+        this.configuration.put(key, newConfig != null ? newConfig : dsConfig);
         // update replacements
         replaceVariables(this.configuration);
         return true;

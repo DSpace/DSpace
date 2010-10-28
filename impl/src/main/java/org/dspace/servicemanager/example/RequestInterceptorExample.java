@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
  * @author Mark Diggory (mdiggory at atmire.com)
  * @version $Revision$
  */
-public class RequestInterceptorExample implements RequestInterceptor {
+public final class RequestInterceptorExample implements RequestInterceptor {
 
 	private static Logger log = LoggerFactory.getLogger(RequestInterceptorExample.class);
 	

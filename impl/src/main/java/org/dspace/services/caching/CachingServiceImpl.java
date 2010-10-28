@@ -10,7 +10,6 @@ package org.dspace.services.caching;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
-import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,7 +22,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import net.sf.ehcache.CacheManager;
 import net.sf.ehcache.Ehcache;
 import net.sf.ehcache.Statistics;
-import net.sf.ehcache.management.ManagementService;
 
 import org.dspace.kernel.ServiceManager;
 import org.dspace.kernel.mixins.ConfigChangeListener;
@@ -50,7 +48,7 @@ import org.springframework.beans.factory.annotation.Required;
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-public class CachingServiceImpl implements CachingService, InitializedService, ShutdownService, ConfigChangeListener, ServiceChangeListener {
+public final class CachingServiceImpl implements CachingService, InitializedService, ShutdownService, ConfigChangeListener, ServiceChangeListener {
 
     private static Logger log = LoggerFactory.getLogger(CachingServiceImpl.class);
 
@@ -347,14 +345,12 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
             // find the cache in the records if possible
             cache = this.cacheRecord.get(cacheName);
 
-            if (cache == null) {
-                // handle provider
-                if (getCacheProvider() != null) {
-                    try {
-                        cache = getCacheProvider().getCache(cacheName, cacheConfig);
-                    } catch (Exception e) {
-                        log.warn("Failure in provider ("+getCacheProvider()+"): " + e.getMessage());
-                    }
+            // handle provider
+            if (cache == null && getCacheProvider() != null) {
+                try {
+                    cache = getCacheProvider().getCache(cacheName, cacheConfig);
+                } catch (Exception e) {
+                    log.warn("Failure in provider ("+getCacheProvider()+"): " + e.getMessage());
                 }
             }
 
@@ -506,8 +502,9 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
      * @return a cache instance
      */
     protected EhcacheCache instantiateEhCache(String cacheName, CacheConfig cacheConfig) {
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("instantiateEhCache(String " + cacheName + ")");
+        }
 
         if (cacheName == null || "".equals(cacheName)) {
             throw new IllegalArgumentException("String cacheName must not be null or empty!");
@@ -554,8 +551,9 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
      * @return a cache instance
      */
     protected MapCache instantiateMapCache(String cacheName, CacheConfig cacheConfig) {
-        if (log.isDebugEnabled())
+        if (log.isDebugEnabled()) {
             log.debug("instantiateMapCache(String " + cacheName + ")");
+        }
 
         if (cacheName == null || "".equals(cacheName)) {
             throw new IllegalArgumentException("String cacheName must not be null or empty!");
@@ -615,8 +613,8 @@ public class CachingServiceImpl implements CachingService, InitializedService, S
     /**
      * Compare two Cache objects by name.
      */
-    public static class NameComparator implements Comparator<Cache>, Serializable {
-        public final static long serialVersionUID = 1l;
+    public static final class NameComparator implements Comparator<Cache>, Serializable {
+        public static final long serialVersionUID = 1l;
         public int compare(Cache o1, Cache o2) {
             return o1.getName().compareTo(o2.getName());
         }

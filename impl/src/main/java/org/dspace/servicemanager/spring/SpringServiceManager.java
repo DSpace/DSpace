@@ -35,7 +35,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-public class SpringServiceManager implements ServiceManagerSystem {
+public final class SpringServiceManager implements ServiceManagerSystem {
 
     private static Logger log = LoggerFactory.getLogger(SpringServiceManager.class);
 

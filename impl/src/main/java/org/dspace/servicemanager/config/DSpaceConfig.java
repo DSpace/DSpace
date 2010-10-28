@@ -7,17 +7,15 @@
  */
 package org.dspace.servicemanager.config;
 
-import org.dspace.kernel.Activator;
-
 /**
  * This represents a single config setting for a DSpace instance.
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-public class DSpaceConfig {
+public final class DSpaceConfig {
 
-    public final static String ACTIVATOR_PREFIX = "activator.";
-    public final static String ACTIVATOR_CLASS_PREFIX = ACTIVATOR_PREFIX + "class.";
+    public static final String ACTIVATOR_PREFIX = "activator.";
+    public static final String ACTIVATOR_CLASS_PREFIX = ACTIVATOR_PREFIX + "class.";
 
     private String key;
     private String value;
@@ -102,7 +100,7 @@ public class DSpaceConfig {
 
     /**
      * Indicates that this configuration is for an activator (a class 
-     * that implements {@link Activator}).
+     * that implements Activator).
      * @return true if this config is for an activator OR false if not
      */
     public boolean isActivator() {
@@ -173,11 +171,12 @@ public class DSpaceConfig {
 
     @Override
     public boolean equals(Object obj) {
-       if (null == obj)
+       if (null == obj) {
           return false;
-       if (!(obj instanceof DSpaceConfig))
+       }
+       if (!(obj instanceof DSpaceConfig)) {
           return false;
-       else {
+       } else {
            DSpaceConfig castObj = (DSpaceConfig) obj;
            if (this.key == null || this.value == null) {
                return false;
@@ -190,8 +189,9 @@ public class DSpaceConfig {
 
     @Override
     public int hashCode() {
-       if (null == key)
+       if (null == key) {
           return super.hashCode();
+       }
        return key.hashCode() + value.hashCode();
     }
 

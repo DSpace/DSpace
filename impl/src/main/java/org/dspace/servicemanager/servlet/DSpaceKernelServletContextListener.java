@@ -39,7 +39,7 @@ import org.dspace.servicemanager.config.DSpaceConfigurationService;
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  * @author Mark Diggory (mdiggory @ gmail.com)
  */
-public class DSpaceKernelServletContextListener implements ServletContextListener {
+public final class DSpaceKernelServletContextListener implements ServletContextListener {
 
     private transient DSpaceKernelImpl kernelImpl;
 
@@ -63,8 +63,9 @@ public class DSpaceKernelServletContextListener implements ServletContextListene
 			if(dspaceHome != null && !dspaceHome.equals("") && 
 					!dspaceHome.equals("${" + DSpaceConfigurationService.DSPACE_HOME + "}")){
 				File test = new File(dspaceHome);
-				if(test.exists() && new File(test,DSpaceConfigurationService.LEGACY_DSPACE_CONFIG_PATH).exists())
+				if(test.exists() && new File(test,DSpaceConfigurationService.LEGACY_DSPACE_CONFIG_PATH).exists()) {
 					providedHome = dspaceHome;
+                }
 			}
 		}
 		return providedHome;

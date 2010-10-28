@@ -13,7 +13,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.NoSuchElementException;
-import java.util.Vector;
 
 import org.dspace.kernel.ServiceManager;
 import org.dspace.kernel.mixins.OrderedService;
@@ -28,9 +27,9 @@ import org.dspace.kernel.mixins.OrderedService;
  * 
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  */
-public class ProviderStack<T> {
+public final class ProviderStack<T> {
 
-    protected final Vector<ProviderHolder<T>> providers;
+    protected final List<ProviderHolder<T>> providers;
 
     /**
      * Default empty constructor.
@@ -39,7 +38,7 @@ public class ProviderStack<T> {
      * providers later.  You should probably use the other contructors.
      */
     public ProviderStack() {
-        providers = new Vector<ProviderHolder<T>>();
+        providers = Collections.synchronizedList(new ArrayList<ProviderHolder<T>>());
     }
 
     /**
@@ -50,7 +49,7 @@ public class ProviderStack<T> {
      * @param providerType the interface type of the providers we care about
      */
     public ProviderStack(ServiceManager serviceManager, Class<T> providerType) {
-        providers = new Vector<ProviderHolder<T>>();
+        providers = Collections.synchronizedList(new ArrayList<ProviderHolder<T>>());
         List<T> foundProviders = serviceManager.getServicesByType(providerType);
         // filter out the NotProviders first
         for (Iterator<T> iterator = foundProviders.iterator(); iterator.hasNext();) {
@@ -73,7 +72,7 @@ public class ProviderStack<T> {
      * @param currentProviders the current set of providers to register in this stack
      */
     public ProviderStack(T[] currentProviders) {
-        providers = new Vector<ProviderHolder<T>>();
+        providers = Collections.synchronizedList(new ArrayList<ProviderHolder<T>>());
         ArrayList<T> tList = new ArrayList<T>();
         // first add in the ordered ones
         for (int i = 0; i < currentProviders.length; i++) {
@@ -145,7 +144,7 @@ public class ProviderStack<T> {
         try {
             this.providers.remove(position);
             removed = true;
-        } catch (ArrayIndexOutOfBoundsException e) {
+        } catch (IndexOutOfBoundsException e) {
             removed = false;
         }
         refresh();
@@ -274,8 +273,8 @@ public class ProviderStack<T> {
         refresh();
         ProviderHolder<T> holder;
         try {
-            holder = providers.elementAt(position);
-        } catch (ArrayIndexOutOfBoundsException e) {
+            holder = providers.get(position);
+        } catch (IndexOutOfBoundsException e) {
             // no provider at that position
             holder = null;
         }
