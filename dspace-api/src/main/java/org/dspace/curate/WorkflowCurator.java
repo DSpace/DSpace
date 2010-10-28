@@ -307,10 +307,9 @@ public class WorkflowCurator {
             }
             reader.close();
             // stitch maps together
-            for (String key: collMap.keySet()) {
-                String value = collMap.get(key);
-                if (! "none".equals(value) && setMap.containsKey(value)) {
-                    tsMap.put(key, setMap.get(value));
+            for (Map.Entry<String, String> collEntry : collMap.entrySet()) {
+                if (! "none".equals(collEntry.getValue()) && setMap.containsKey(collEntry.getValue())) {
+                    tsMap.put(collEntry.getKey(), setMap.get(collEntry.getValue()));
                 }
             }
         } catch (XMLStreamException xsE) {
