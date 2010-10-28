@@ -473,22 +473,34 @@ public class RoleDisseminator implements PackageDisseminator
         writer.writeCharacters(eperson.getEmail());
         writer.writeEndElement();
 
-        writer.writeStartElement(NETID);
-        writer.writeCharacters(eperson.getNetid());
-        writer.writeEndElement();
+        if(eperson.getNetid()!=null)
+        {
+            writer.writeStartElement(NETID);
+            writer.writeCharacters(eperson.getNetid());
+            writer.writeEndElement();
+        }
 
-        writer.writeStartElement(FIRST_NAME);
-        writer.writeCharacters(eperson.getFirstName());
-        writer.writeEndElement();
+        if(eperson.getFirstName()!=null)
+        {
+            writer.writeStartElement(FIRST_NAME);
+            writer.writeCharacters(eperson.getFirstName());
+            writer.writeEndElement();
+        }
 
-        writer.writeStartElement(LAST_NAME);
-        writer.writeCharacters(eperson.getLastName());
-        writer.writeEndElement();
+        if(eperson.getLastName()!=null)
+        {
+            writer.writeStartElement(LAST_NAME);
+            writer.writeCharacters(eperson.getLastName());
+            writer.writeEndElement();
+        }
 
-        writer.writeStartElement(LANGUAGE);
-        writer.writeCharacters(eperson.getLanguage());
-        writer.writeEndElement();
-
+        if(eperson.getLanguage()!=null)
+        {
+            writer.writeStartElement(LANGUAGE);
+            writer.writeCharacters(eperson.getLanguage());
+            writer.writeEndElement();
+        }
+        
         if (emitPassword)
         {
             writer.writeStartElement(PASSWORD_HASH);
