@@ -50,6 +50,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import org.dspace.app.webui.util.JSPManager;
@@ -202,13 +203,10 @@ public class SuggestServlet extends DSpaceServlet
             	}
             }
             String senderAddr = request.getParameter("sender_email");
-            if (senderAddr == null || "".equals(senderAddr) )
+            if (StringUtils.isEmpty(senderAddr) && authEmail != null)
             {
             	// use authEmail if available
-            	if (authEmail != null)
-            	{
-            		senderAddr = authEmail;
-            	}
+                senderAddr = authEmail;
             }
             String itemUri = HandleManager.getCanonicalForm(handle);
             String itemUrl = HandleManager.resolveToURL(context,handle);

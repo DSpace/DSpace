@@ -413,23 +413,17 @@ public class ResourcePolicy
         Date now = new Date();
 
         // check start date first
-        if (sd != null)
+        if (sd != null && now.before(sd))
         {
             // start date is set, return false if we're before it
-            if (now.before(sd))
-            {
-                return false;
-            }
+            return false;
         }
 
         // now expiration date
-        if (ed != null)
+        if (ed != null && now.after(ed))
         {
             // end date is set, return false if we're after it
-            if (now.after(ed))
-            {
-                return false;
-            }
+            return false;
         }
 
         // if we made it this far, start < now < end

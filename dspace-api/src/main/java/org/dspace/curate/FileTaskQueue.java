@@ -193,12 +193,9 @@ public class FileTaskQueue implements TaskQueue
     {
         // create directory structures as needed
         File baseDir = new File(tqDir, queueName);
-        if (! baseDir.exists())
+        if (!baseDir.exists() && !baseDir.mkdirs())
         {
-            if (!baseDir.mkdirs())
-            {
-                throw new IllegalStateException("Unable to create directories");
-            }
+            throw new IllegalStateException("Unable to create directories");
         }
 
         return baseDir;

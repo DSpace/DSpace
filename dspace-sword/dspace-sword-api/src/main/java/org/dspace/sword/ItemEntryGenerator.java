@@ -264,13 +264,10 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 	protected void addPublishDate()
 	{
 		DCValue[] dcv = item.getMetadata("dc.date.issued");
-		if (dcv != null)
-		{
-			if (dcv.length == 1)
-			{
-				entry.setPublished(dcv[0].value);
-			}
-		}
+		if (dcv != null && dcv.length == 1)
+        {
+            entry.setPublished(dcv[0].value);
+        }
 	}
 
 
@@ -371,13 +368,10 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 	{
 		String config = ConfigurationManager.getProperty("sword.updated.field");
 		DCValue[] dcv = item.getMetadata(config);
-		if (dcv != null)
-		{
-			if (dcv.length == 1)
-			{
-				DCDate dcd = new DCDate(dcv[0].value);
-				entry.setUpdated(dcd.toString());
-			}
-		}
+		if (dcv != null && dcv.length == 1)
+        {
+            DCDate dcd = new DCDate(dcv[0].value);
+            entry.setUpdated(dcd.toString());
+        }
 	}
 }

@@ -191,34 +191,27 @@ public class WingDocument extends AbstractWingElement implements
             String qName, Attributes attributes) throws SAXException,
             WingException
     {
-        if (this.meta != null)
+        if (this.meta != null && this.meta.mergeEqual(namespace, localName, qName, attributes))
         {
-            if (this.meta.mergeEqual(namespace, localName, qName, attributes))
-            {
-                Meta child = this.meta;
-                this.meta = null;
-                return child;
-            }
+            Meta child = this.meta;
+            this.meta = null;
+            return child;
         }
-        if (this.body != null)
+
+        if (this.body != null && this.body.mergeEqual(namespace, localName, qName, attributes))
         {
-            if (this.body.mergeEqual(namespace, localName, qName, attributes))
-            {
-                Body child = this.body;
-                this.body = null;
-                return child;
-            }
+            Body child = this.body;
+            this.body = null;
+            return child;
         }
-        if (this.options != null)
+
+        if (this.options != null && this.options.mergeEqual(namespace, localName, qName, attributes))
         {
-            if (this.options
-                    .mergeEqual(namespace, localName, qName, attributes))
-            {
-                Options options = this.options;
-                this.options = null;
-                return options;
-            }
+            Options options = this.options;
+            this.options = null;
+            return options;
         }
+
         return null;
     }
 

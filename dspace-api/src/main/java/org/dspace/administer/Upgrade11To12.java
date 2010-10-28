@@ -195,32 +195,28 @@ public class Upgrade11To12
 
                     // now we can safely assume no bundles with multiple
                     // bitstreams
-                    if (bitstreams.length > 0)
+                    if (bitstreams.length > 0 && (i != primaryBundleIndex) && (i != licenseBundleIndex))
                     {
-                        if ((i != primaryBundleIndex)
-                                && (i != licenseBundleIndex))
+                        // only option left is a bitstream to be combined
+                        // with primary bundle
+                        // and remove now-redundant bundle
+                        myBundles[primaryBundleIndex]
+                                .addBitstream(bitstreams[0]); // add to
+                                                              // primary
+                        myItem.removeBundle(myBundles[i]); // remove this
+                                                           // bundle
+
+                        System.out.println("Bitstream from bundle " + i
+                                + " moved to primary bundle");
+
+                        // flag if HTML bitstream
+                        if (bitstreams[0].getFormat().getMIMEType().equals(
+                                "text/html"))
                         {
-                            // only option left is a bitstream to be combined
-                            // with primary bundle
-                            // and remove now-redundant bundle
-                            myBundles[primaryBundleIndex]
-                                    .addBitstream(bitstreams[0]); // add to
-                                                                  // primary
-                            myItem.removeBundle(myBundles[i]); // remove this
-                                                               // bundle
-
-                            System.out.println("Bitstream from bundle " + i
-                                    + " moved to primary bundle");
-
-                            // flag if HTML bitstream
-                            if (bitstreams[0].getFormat().getMIMEType().equals(
-                                    "text/html"))
-                            {
-                                System.out
-                                        .println("Set primary bitstream to HTML file in item #"
-                                                + myItem.getID()
-                                                + " for HTML support.");
-                            }
+                            System.out
+                                    .println("Set primary bitstream to HTML file in item #"
+                                            + myItem.getID()
+                                            + " for HTML support.");
                         }
                     }
                 }

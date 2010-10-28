@@ -430,47 +430,43 @@ public class BrowserScope
     {
         try
         {
-            // If a sortOption hasn't been set, work out the default
-            if (sortOption == null)
+            // If a sortOption hasn't been set, work out the default, providing we have an index
+            if (sortOption == null && browseIndex != null)
             {
-                // We need a browse index first though
-                if (browseIndex != null)
+                // If a sorting hasn't been specified, and it's a metadata browse
+                if (sortBy <= 0 && browseIndex.isMetadataIndex())
                 {
-                    // If a sorting hasn't been specified, and it's a metadata browse
-                    if (sortBy <= 0 && browseIndex.isMetadataIndex())
+                    // Create a dummy sortOption for the metadata sort
+                    String dataType = browseIndex.getDataType();
+                    String type = ("date".equals(dataType) ? "date" : "text");
+                    sortOption = new SortOption(0, browseIndex.getName(), browseIndex.getMetadata(0), type);
+                }
+                else
+                {
+                    // If a sorting hasn't been specified
+                    if (sortBy <= 0)
                     {
-                        // Create a dummy sortOption for the metadata sort
-                        String dataType = browseIndex.getDataType();
-                        String type = ("date".equals(dataType) ? "date" : "text");
-                        sortOption = new SortOption(0, browseIndex.getName(), browseIndex.getMetadata(0), type);
+                        // Get the sort option from the index
+                        sortOption = browseIndex.getSortOption();
+
+                        if (sortOption == null)
+                        {
+                            // No sort option, so default to the first one defined in the config
+                            for (SortOption so : SortOption.getSortOptions())
+                            {
+                                sortOption = so;
+                                break;
+                            }
+                        }
                     }
                     else
                     {
-                        // If a sorting hasn't been specified
-                        if (sortBy <= 0)
+                        // A sorting has been specified, so get it from the configured sort columns
+                        for (SortOption so : SortOption.getSortOptions())
                         {
-                            // Get the sort option from the index
-                            sortOption = browseIndex.getSortOption();
-
-                            if (sortOption == null)
+                            if (so.getNumber() == sortBy)
                             {
-                                // No sort option, so default to the first one defined in the config
-                                for (SortOption so : SortOption.getSortOptions())
-                                {
-                                    sortOption = so;
-                                    break;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            // A sorting has been specified, so get it from the configured sort columns
-                            for (SortOption so : SortOption.getSortOptions())
-                            {
-                                if (so.getNumber() == sortBy)
-                                {
-                                    sortOption = so;
-                                }
+                                sortOption = so;
                             }
                         }
                     }

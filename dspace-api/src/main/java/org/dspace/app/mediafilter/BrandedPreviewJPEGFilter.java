@@ -122,19 +122,19 @@ public class BrandedPreviewJPEGFilter extends MediaFilter
         if (xsize > xmax)
         {
             // calculate scaling factor so that xsize * scale = new size (max)
-            float scale_factor = xmax / xsize;
+            float scaleFactor = xmax / xsize;
 
             // if verbose flag is set, print out extracted text
             // to STDOUT
             if (MediaFilterManager.isVerbose)
             {
-                System.out.println("x scale factor: " + scale_factor);
+                System.out.println("x scale factor: " + scaleFactor);
             }
 
             // now reduce x size
             // and y size
-            xsize = xsize * scale_factor;
-            ysize = ysize * scale_factor;
+            xsize = xsize * scaleFactor;
+            ysize = ysize * scaleFactor;
 
             // if verbose flag is set, print out extracted text
             // to STDOUT
@@ -147,12 +147,12 @@ public class BrandedPreviewJPEGFilter extends MediaFilter
         // scale by y if needed
         if (ysize > ymax)
         {
-            float scale_factor = ymax / ysize;
+            float scaleFactor = ymax / ysize;
 
             // now reduce x size
             // and y size
-            xsize = xsize * scale_factor;
-            ysize = ysize * scale_factor;
+            xsize = xsize * scaleFactor;
+            ysize = ysize * scaleFactor;
         }
 
         // if verbose flag is set, print details to STDOUT

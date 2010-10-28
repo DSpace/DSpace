@@ -496,28 +496,25 @@ public class DSpaceValidity implements SourceValidity
      */
     public int isValid(SourceValidity otherObject)
     {
-        if (this.completed)
+        if (this.completed && otherObject instanceof DSpaceValidity)
         {
-            if (otherObject instanceof DSpaceValidity)
+            DSpaceValidity otherSSV = (DSpaceValidity) otherObject;
+            if (hash == otherSSV.hash)
             {
-                DSpaceValidity otherSSV = (DSpaceValidity) otherObject;
-                if (hash == otherSSV.hash)
-                {	
-                	// Both caches have been checked are are considered valid, 
-                	// now we reset their assumed validity timers for both cache
-                	// objects.
-                	if (this.assumedValidityDelay > 0)
-                    {
-                        this.resetAssumedValidityTime();
-                    }
-                	
-                	if (otherSSV.assumedValidityDelay > 0)
-                    {
-                        otherSSV.resetAssumedValidityTime();
-                    }
-                	
-                    return SourceValidity.VALID;
+                // Both caches have been checked are are considered valid,
+                // now we reset their assumed validity timers for both cache
+                // objects.
+                if (this.assumedValidityDelay > 0)
+                {
+                    this.resetAssumedValidityTime();
                 }
+
+                if (otherSSV.assumedValidityDelay > 0)
+                {
+                    otherSSV.resetAssumedValidityTime();
+                }
+
+                return SourceValidity.VALID;
             }
         }
 

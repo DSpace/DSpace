@@ -39,7 +39,6 @@
 package org.dspace.event;
 
 import java.io.PrintStream;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 

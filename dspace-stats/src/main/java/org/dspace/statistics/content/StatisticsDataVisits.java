@@ -564,12 +564,9 @@ public class StatisticsDataVisits extends StatisticsData
                         //Get our owning item
                         Item owningItem = null;
                         Bundle[] bunds = bit.getBundles();
-                        if(0 < bunds.length)
+                        if(0 < bunds.length && 0 < bunds[0].getItems().length)
                         {
-                            if (0 < bunds[0].getItems().length)
-                            {
-                                owningItem = bunds[0].getItems()[0];
-                            }
+                            owningItem = bunds[0].getItems()[0];
                         }
 
                         // If possible reference this bitstream via a handle, however this may

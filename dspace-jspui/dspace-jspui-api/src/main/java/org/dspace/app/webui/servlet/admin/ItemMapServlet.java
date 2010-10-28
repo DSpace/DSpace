@@ -268,8 +268,7 @@ public class ItemMapServlet extends DSpaceServlet
     				
     				Item myItem = Item.find(context, i);
     				
-    				if (AuthorizeManager.authorizeActionBoolean(context,
-    						myItem, Constants.READ))
+    				if (AuthorizeManager.authorizeActionBoolean(context, myItem, Constants.READ))
     				{
     					// make sure item doesn't belong to this collection
     					if (!myItem.isOwningCollection(myCollection))

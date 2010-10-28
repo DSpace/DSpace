@@ -798,12 +798,9 @@ public class BrowseListTag extends TagSupport
         String linkBehaviour = ConfigurationManager
                 .getProperty("webui.browse.thumbnail.linkbehaviour");
 
-        if (linkBehaviour != null)
+        if (linkBehaviour != null && linkBehaviour.equals("bitstream"))
         {
-            if (linkBehaviour.equals("bitstream"))
-            {
-                linkToBitstream = true;
-            }
+            linkToBitstream = true;
         }
     }
 
@@ -848,22 +845,22 @@ public class BrowseListTag extends TagSupport
         if (xsize > (float) thumbItemListMaxWidth)
         {
             // calculate scaling factor so that xsize * scale = new size (max)
-            float scale_factor = (float) thumbItemListMaxWidth / xsize;
+            float scaleFactor = (float) thumbItemListMaxWidth / xsize;
 
             // now reduce x size and y size
-            xsize = xsize * scale_factor;
-            ysize = ysize * scale_factor;
+            xsize = xsize * scaleFactor;
+            ysize = ysize * scaleFactor;
         }
 
         // scale by y if needed
         if (ysize > (float) thumbItemListMaxHeight)
         {
-            float scale_factor = (float) thumbItemListMaxHeight / ysize;
+            float scaleFactor = (float) thumbItemListMaxHeight / ysize;
 
             // now reduce x size
             // and y size
-            xsize = xsize * scale_factor;
-            ysize = ysize * scale_factor;
+            xsize = xsize * scaleFactor;
+            ysize = ysize * scaleFactor;
         }
 
         StringBuffer sb = new StringBuffer("width=\"").append(xsize).append(

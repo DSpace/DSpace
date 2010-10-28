@@ -55,7 +55,7 @@ import org.dspace.sort.SortException;
  * 
  * @author Richard Jones
  */
-public class BrowseIndex
+public final class BrowseIndex
 {
 	/** the configuration number, as specified in the config */
     /** used for single metadata browse tables for generating the table name */

@@ -238,9 +238,18 @@ public class WorkflowCurator {
     }
     
     private static int state2step(int state) {
-        if (state <= WorkflowManager.WFSTATE_STEP1POOL) return 1;
-        if (state <= WorkflowManager.WFSTATE_STEP2POOL) return 2;
-        if (state <= WorkflowManager.WFSTATE_STEP3POOL) return 3;
+        if (state <= WorkflowManager.WFSTATE_STEP1POOL)
+        {
+            return 1;
+        }
+        if (state <= WorkflowManager.WFSTATE_STEP2POOL)
+        {
+            return 2;
+        }
+        if (state <= WorkflowManager.WFSTATE_STEP3POOL)
+        {
+            return 3;
+        }
         return 4;
     }
     
@@ -313,7 +322,7 @@ public class WorkflowCurator {
                 }
             }
         } catch (XMLStreamException xsE) {
-            throw new IOException(xsE.getMessage());
+            throw new IOException(xsE.getMessage(), xsE);
         }
     }
     

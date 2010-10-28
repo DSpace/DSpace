@@ -93,7 +93,7 @@ public class Utils
             }
             return toHex(din.getMessageDigest().digest());
         } catch (NoSuchAlgorithmException nsaE) {
-            throw new IOException(nsaE.getMessage());
+            throw new IOException(nsaE.getMessage(), nsaE);
         }
     }
 

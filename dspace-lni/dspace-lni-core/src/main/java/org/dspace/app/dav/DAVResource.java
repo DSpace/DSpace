@@ -1829,9 +1829,8 @@ abstract class DAVResource
         }
 
         Element pupdate = reqdoc.getRootElement();
-        String newNodeName = null;
-        if (!pupdate.getName().equals("mkcol")
-                || (newNodeName = pupdate.getValue()) == null)
+        String newNodeName = pupdate.getValue();
+        if (!"mkcol".equals(pupdate.getName()) || newNodeName == null)
         {
             log.warn(LogManager.getHeader(this.context, "mkcol",
                     "Got bad root element, XML=" + pupdate.toString()));

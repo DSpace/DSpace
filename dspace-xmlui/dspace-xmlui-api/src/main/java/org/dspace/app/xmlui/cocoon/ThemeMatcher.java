@@ -156,14 +156,10 @@ public class ThemeMatcher extends AbstractLogEnabled implements Matcher {
 				}
 
 				getLogger().debug("checking for handles");
-				if (rule.hasHandle()) {
-					// If the rules has a handle insure that the DSO matches it.
-					if (!HandleUtil.inheritsFrom(dso, rule.getHandle()))
-                    {
-                        continue;
-                    }
-
-				}
+				if (rule.hasHandle() && !HandleUtil.inheritsFrom(dso, rule.getHandle()))
+                {
+                    continue;
+                }
 
 				getLogger().debug("rule selected!!");
 				Map<String, String> result = new HashMap<String, String>();

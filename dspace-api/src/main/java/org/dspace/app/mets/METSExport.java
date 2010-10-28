@@ -606,13 +606,10 @@ public class METSExport
             // Assume license will be in its own bundle
             Bitstream[] bitstreams = bundles[i].getBitstreams();
 
-            if (bitstreams.length > 0)
+            if (bitstreams.length > 0 && bitstreams[0].getFormat().getID() == licenseFormat)
             {
-                if (bitstreams[0].getFormat().getID() == licenseFormat)
-                {
-                    // Read the license into a string
-                    return bitstreams[0].retrieve();
-                }
+                // Read the license into a string
+                return bitstreams[0].retrieve();
             }
         }
 

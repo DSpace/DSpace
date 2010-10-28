@@ -367,7 +367,7 @@ public class Curator
         }
         catch (SQLException sqlE)
         {
-            throw new IOException(sqlE.getMessage());
+            throw new IOException(sqlE.getMessage(), sqlE);
         }
         return true;
     }

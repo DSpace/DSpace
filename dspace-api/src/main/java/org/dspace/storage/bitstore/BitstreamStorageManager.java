@@ -362,15 +362,15 @@ public class BitstreamStorageManager
         bitstream.setColumn("deleted", false);
         DatabaseManager.update(context, bitstream);
 
-        int bitstream_id = bitstream.getIntColumn("bitstream_id");
+        int bitstreamId = bitstream.getIntColumn("bitstream_id");
 
         if (log.isDebugEnabled())
         {
-            log.debug("Stored bitstream " + bitstream_id + " in file "
+            log.debug("Stored bitstream " + bitstreamId + " in file "
                     + file.getAbsolutePath());
         }
 
-        return bitstream_id;
+        return bitstreamId;
     }
 
 	/**
@@ -507,13 +507,13 @@ public class BitstreamStorageManager
 		bitstream.setColumn("deleted", false);
 		DatabaseManager.update(context, bitstream);
 
-		int bitstream_id = bitstream.getIntColumn("bitstream_id");
+		int bitstreamId = bitstream.getIntColumn("bitstream_id");
 		if (log.isDebugEnabled()) 
 		{
-			log.debug("Stored bitstream " + bitstream_id + " in file "
+			log.debug("Stored bitstream " + bitstreamId + " in file "
 					+ file.getAbsolutePath());
 		}
-		return bitstream_id;
+		return bitstreamId;
 	}
 
 	/**
@@ -603,7 +603,7 @@ public class BitstreamStorageManager
     {
         Context context = null;
         BitstreamInfoDAO bitstreamInfoDAO = new BitstreamInfoDAO();
-        int commit_counter = 0;
+        int commitCounter = 0;
 
         try
         {
@@ -699,8 +699,8 @@ public class BitstreamStorageManager
                 // iterations. Otherwise you risk losing the entire transaction
                 // if we hit an exception, which isn't useful at all for large
                 // amounts of bitstreams.
-                commit_counter++;
-                if (commit_counter % 100 == 0)
+                commitCounter++;
+                if (commitCounter % 100 == 0)
                 {
                 	System.out.print("Committing changes to the database...");
                     context.commit();

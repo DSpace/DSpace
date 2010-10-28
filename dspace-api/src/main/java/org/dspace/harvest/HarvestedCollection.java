@@ -62,8 +62,7 @@ public class HarvestedCollection
 {
 	private Context context;
 	private TableRow harvestRow;
-	boolean modified;
-	
+
 	public static final int TYPE_NONE = 0;
 	public static final int TYPE_DMD = 1;
 	public static final int TYPE_DMDREF = 2;
@@ -95,7 +94,6 @@ public class HarvestedCollection
     {
         context = c;
         harvestRow = row;
-        modified = false;
     }
     
     
@@ -332,7 +330,6 @@ public class HarvestedCollection
     /* Setters for the appropriate harvesting-related columns */
     public void setHarvestType(int type) {
     	harvestRow.setColumn("harvest_type",type);
-    	modified = true;
     }
     
     /** 
@@ -342,7 +339,6 @@ public class HarvestedCollection
      */
     public void setHarvestStatus(int status) {
     	harvestRow.setColumn("harvest_status",status);
-    	modified = true;
     }
 
     public void setOaiSource(String oaiSource) {
@@ -352,7 +348,6 @@ public class HarvestedCollection
     	else {
     		harvestRow.setColumn("oai_source",oaiSource);
     	}
-    	modified = true;
     }
 
     public void setOaiSetId(String oaiSetId) {
@@ -362,7 +357,6 @@ public class HarvestedCollection
     	else {
     		harvestRow.setColumn("oai_set_id",oaiSetId);
     	}
-    	modified = true;
     }
 
     public void setHarvestMetadataConfig(String mdConfigId) {
@@ -372,7 +366,6 @@ public class HarvestedCollection
     	else {
     		harvestRow.setColumn("metadata_config_id",mdConfigId);
     	}
-    	modified = true;    	 
     }
 
     public void setHarvestResult(Date date, String message) {
@@ -387,7 +380,6 @@ public class HarvestedCollection
     	} else {
     		harvestRow.setColumn("harvest_message", message);
     	}
-    	modified = true;
     }
 
     public void setHarvestMessage(String message) {
@@ -396,7 +388,6 @@ public class HarvestedCollection
     	} else {
     		harvestRow.setColumn("harvest_message", message);
     	}
-    	modified = true;
     }
     
     public void setHarvestStartTime(Date date) {
@@ -405,7 +396,6 @@ public class HarvestedCollection
     	} else {
     		harvestRow.setColumn("harvest_start_time", date);
     	}
-    	modified = true;
     }
     
 

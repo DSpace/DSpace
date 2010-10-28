@@ -675,13 +675,11 @@ public class PackageUtils
         {
             //file doesn't exist yet, does its parent directory exist?
             File parentFile = file.getCanonicalFile().getParentFile();
-            if((null != parentFile) && !parentFile.exists())
+
+            //create the parent directory structure
+            if ((null != parentFile) && !parentFile.exists() && !parentFile.mkdirs())
             {
-                //create the parent directory structure
-                if (!parentFile.mkdirs())
-                {
-                    log.error("Unable to create parent directory");
-                }
+                log.error("Unable to create parent directory");
             }
             //create actual file
             success = file.createNewFile();

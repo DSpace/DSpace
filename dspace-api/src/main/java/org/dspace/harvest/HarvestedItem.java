@@ -57,14 +57,12 @@ public class HarvestedItem
 {
 	private Context context;
 	private TableRow harvestRow;
-	boolean modified;
-	
+
 	
 	HarvestedItem(Context c, TableRow row)
     {
         context = c;
         harvestRow = row;
-        modified = false;
     }
     
     
@@ -183,7 +181,6 @@ public class HarvestedItem
     		date = new Date();
     	}
     	harvestRow.setColumn("last_harvested", date);
-    	modified = true;
     }
     
     public Date getHarvestDate() {

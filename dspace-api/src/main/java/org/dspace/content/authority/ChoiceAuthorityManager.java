@@ -67,7 +67,7 @@ import org.dspace.core.PluginManager;
  * @author Larry Stone
  * @see ChoiceAuthority
  */
-public class ChoiceAuthorityManager
+public final class ChoiceAuthorityManager
 {
     private static Logger log = Logger.getLogger(ChoiceAuthorityManager.class);
 

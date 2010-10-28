@@ -40,7 +40,6 @@
 package org.dspace.app.webui.jsptag;
 
 import java.io.IOException;
-import java.util.Arrays;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.jsp.JspException;

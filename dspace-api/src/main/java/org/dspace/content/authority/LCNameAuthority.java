@@ -333,8 +333,7 @@ public class LCNameAuthority implements ChoiceAuthority
                 lccn = null;
             }
 
-            else if (localName.equals("subfield") &&
-                     namespaceURI.equals(NS_MX))
+            else if (localName.equals("subfield") && namespaceURI.equals(NS_MX))
             {
                 if (lastTag != null && lastCode != null)
                 {
@@ -349,11 +348,10 @@ public class LCNameAuthority implements ChoiceAuthority
                         name = textValue;
                     }
 
-                        if (lastTag.equals("100") && lastCode.equals("d") && (name != null))
-                        {
-                            name = name + "  " + textValue;
-                        }
-                         
+                    if (lastTag.equals("100") && lastCode.equals("d") && (name != null))
+                    {
+                        name = name + "  " + textValue;
+                    }
                 }
             }
         }

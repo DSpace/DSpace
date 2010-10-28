@@ -430,17 +430,17 @@ public abstract class AbstractWingElement implements WingElement
         {
             // Figure out the namespace issue
             Namespace namespace = attributeMap.getNamespace();
-            String URI;
+            String uri;
             if (namespace != null)
             {
-                URI = namespace.URI;
+                uri = namespace.URI;
             }
             else
             {
-                URI = WingConstants.DRI.URI;
+                uri = WingConstants.DRI.URI;
             }
 
-            String prefix = namespaces.getPrefix(URI);
+            String prefix = namespaces.getPrefix(uri);
 
             // copy each one over.
             for (Map.Entry<String, String> attr : attributeMap.entrySet())
@@ -454,13 +454,13 @@ public abstract class AbstractWingElement implements WingElement
                 // leave
                 // off the namespace declaration because w3c say's its redundent
                 // and breaks lots of xsl stuff.
-                if (elementNamespace.URI.equals(URI))
+                if (elementNamespace.URI.equals(uri))
                 {
                     attributes.addAttribute("", attr.getKey(), attr.getKey(), "CDATA", attr.getValue());
                 }
                 else
                 {
-                    attributes.addAttribute(URI, attr.getKey(), qName(prefix, attr.getKey()),
+                    attributes.addAttribute(uri, attr.getKey(), qName(prefix, attr.getKey()),
                             "CDATA", attr.getValue());
                 }
             }

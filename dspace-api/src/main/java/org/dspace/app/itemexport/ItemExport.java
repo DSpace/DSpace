@@ -964,13 +964,10 @@ public class ItemExport
                 // ignore...configuration entry may not be present
             }
 
-            if (maxSize > 0)
-            {
-                if (maxSize < (size / 1048576.00))
-                { // a megabyte
-                    throw new ItemExportException(ItemExportException.EXPORT_TOO_LARGE,
-                                                  "The overall size of this export is too large.  Please contact your administrator for more information.");
-                }
+            if (maxSize > 0 && maxSize < (size / 1048576.00))
+            { // a megabyte
+                throw new ItemExportException(ItemExportException.EXPORT_TOO_LARGE,
+                                              "The overall size of this export is too large.  Please contact your administrator for more information.");
             }
         }
 
@@ -1435,13 +1432,11 @@ public class ItemExport
                 return;
             }
             File targetFile = new File(tempFileName);
-            if (!targetFile.exists())
+            if (!targetFile.createNewFile())
             {
-                if (!targetFile.createNewFile())
-                {
-                    log.error("Unable to create target file");
-                }
+                log.warn("Target file already exists: " + targetFile.getName());
             }
+
             FileOutputStream fos = new FileOutputStream(tempFileName);
             cpZipOutputStream = new ZipOutputStream(fos);
             cpZipOutputStream.setLevel(9);

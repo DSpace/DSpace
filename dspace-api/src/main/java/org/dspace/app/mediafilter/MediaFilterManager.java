@@ -655,12 +655,9 @@ public class MediaFilterManager
                         for (String ext : extensions)
                         {
                             String[] formatExtensions = myBitstream.getFormat().getExtensions();
-                            if (formatExtensions != null)
+                            if (formatExtensions != null && ArrayUtils.contains(formatExtensions, ext))
                             {
-                                if (ArrayUtils.contains(formatExtensions, ext))
-                                {
-                                    applyFilter = true;
-                                }
+                                applyFilter = true;
                             }
                         }
                     }

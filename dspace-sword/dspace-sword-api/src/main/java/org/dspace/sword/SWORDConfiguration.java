@@ -352,22 +352,20 @@ public class SWORDConfiguration
                     qs.put(bits[0], value);
                 }
             }
-            if (bits.length == 3)
+
+            // collection settings
+            if (bits.length == 3 && bits[0].equals(handle))
             {
-                // collection settings
-				if (bits[0].equals(handle))
-				{
-					// this is configuration for our collection
-					String value = props.getProperty(key);
-					if (bits[2].equals("identifier"))
-					{
-						identifiers.put(bits[1], value);
-					}
-					else if (bits[2].equals("q"))
-					{
-						qs.put(bits[1], value);
-					}
-				}
+                // this is configuration for our collection
+                String value = props.getProperty(key);
+                if (bits[2].equals("identifier"))
+                {
+                    identifiers.put(bits[1], value);
+                }
+                else if (bits[2].equals("q"))
+                {
+                    qs.put(bits[1], value);
+                }
             }
         }
 

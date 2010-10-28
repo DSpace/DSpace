@@ -339,7 +339,9 @@ public class RoleDisseminator implements PackageDisseminator
         // as they could cause conflicts or data integrity problems if they are
         // imported into another DSpace system.
         if(exportGroupName==null)
+        {
             return;
+        }
 
         writer.writeStartElement(GROUP);
         writer.writeAttribute(ID, String.valueOf(group.getID()));

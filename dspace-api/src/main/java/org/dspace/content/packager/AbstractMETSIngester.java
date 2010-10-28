@@ -138,7 +138,7 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      * metadata bitstreams. Match an mdRef by finding the bitstream with the
      * same name.
      */
-    protected static class MdrefManager implements METSManifest.Mdref
+    protected static final class MdrefManager implements METSManifest.Mdref
     {
         private File packageFile = null;
 

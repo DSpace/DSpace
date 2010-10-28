@@ -466,13 +466,10 @@ public class ItemUpdate {
 	    		{
 	    			pr("action: " + action.getClass().getName());
 	    			action.execute(context, itarch, isTest, suppressUndo);
-	    			if (!isTest)
-	    			{
-		    			if (!suppressUndo)
-		    	        {
-		    				itarch.writeUndo(undoDir);
-		    	        }
-	    			}
+	    			if (!isTest && !suppressUndo)
+                    {
+                        itarch.writeUndo(undoDir);
+                    }
 	    		}
 	    		if (!isTest)
 	    		{

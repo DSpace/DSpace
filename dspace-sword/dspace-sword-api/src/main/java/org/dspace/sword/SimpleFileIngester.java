@@ -37,7 +37,6 @@
  */
 package org.dspace.sword;
 
-import java.io.File;
 import java.io.FileInputStream;
 import org.purl.sword.base.Deposit;
 import org.purl.sword.base.SWORDErrorException;

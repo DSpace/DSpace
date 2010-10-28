@@ -176,9 +176,13 @@ public class PluginManager
         String classname = getConfigProperty(module, SINGLE_PREFIX+iname);
         
         if (classname != null)
+        {
             return getAnonymousPlugin(module, classname.trim());
+        }
         else
+        {
             throw new PluginConfigurationError("No Single Plugin configured for interface \""+iname+"\"");
+        }
     }
         
     // cache of config data for Sequence Plugins; format its

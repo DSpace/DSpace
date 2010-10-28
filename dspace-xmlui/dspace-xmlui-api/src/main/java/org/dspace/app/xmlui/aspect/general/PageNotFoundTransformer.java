@@ -145,14 +145,11 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
             this.bodyEvent = null;
         }
         
-        if (WingConstants.DRI.URI.equals(namespaceURI))
+        if (WingConstants.DRI.URI.equals(namespaceURI) && Body.E_BODY.equals(localName))
         {
-            if (Body.E_BODY.equals(localName))
-            {
-                // Save the element and see if there is anything inside the body.
-                this.bodyEvent = SAXEvent.startElement(namespaceURI,localName,qName,attributes);
-                return;
-            }
+            // Save the element and see if there is anything inside the body.
+            this.bodyEvent = SAXEvent.startElement(namespaceURI,localName,qName,attributes);
+            return;
         }
 
        super.startElement(namespaceURI, localName, qName, attributes);
@@ -165,27 +162,21 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
     public void endElement(String namespaceURI, String localName, String qName)
             throws SAXException
     {
-        if (WingConstants.DRI.URI.equals(namespaceURI))
+        if (this.bodyEvent != null && WingConstants.DRI.URI.equals(namespaceURI) && Body.E_BODY.equals(localName))
         {
-            if (Body.E_BODY.equals(localName))
-            {
-                if (this.bodyEvent != null)
-                {
-                    // If we are recieving an endElement event for body while we
-                    // still have a startElement body event recorded then
-                    // the body element must have been empty. In this case, record
-                    // that the body is empty, and send both the start and end body events.
-                    
-                    this.bodyEmpty = true;
-                    // Sending the body will trigger the Wing framework to ask 
-                    // us if we want to add a body to the page.
-                    sendEvent(this.bodyEvent);
-                    this.bodyEvent = null;
-                }
-            }
-        } 
-        
-      super.endElement(namespaceURI, localName, qName);
+            // If we are recieving an endElement event for body while we
+            // still have a startElement body event recorded then
+            // the body element must have been empty. In this case, record
+            // that the body is empty, and send both the start and end body events.
+
+            this.bodyEmpty = true;
+            // Sending the body will trigger the Wing framework to ask
+            // us if we want to add a body to the page.
+            sendEvent(this.bodyEvent);
+            this.bodyEvent = null;
+        }
+
+        super.endElement(namespaceURI, localName, qName);
     } 
   
     

@@ -72,7 +72,7 @@ import org.dspace.eperson.Group;
  * 
  * @version $Revision$
  */
-public class CreateAdministrator
+public final class CreateAdministrator
 {
 	/** DSpace Context object */
 	private Context context;

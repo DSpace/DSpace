@@ -152,13 +152,11 @@ public class DepositServlet extends HttpServlet {
         }
 		File tempDir = new File(tempDirectory);
 		log.info("Upload temporary directory set to: " + tempDir);
-		if (!tempDir.exists()) {
-			if (!tempDir.mkdirs()) {
-				throw new ServletException(
-						"Upload directory did not exist and I can't create it. "
-								+ tempDir);
-			}
-		}
+		if (!tempDir.exists() && !tempDir.mkdirs()) {
+            throw new ServletException(
+                    "Upload directory did not exist and I can't create it. "
+                            + tempDir);
+        }
 		if (!tempDir.isDirectory()) {
 			log.fatal("Upload temporary directory is not a directory: "
 					+ tempDir);

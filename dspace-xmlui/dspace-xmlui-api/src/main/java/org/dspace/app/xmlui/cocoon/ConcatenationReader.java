@@ -282,7 +282,7 @@ public class ConcatenationReader extends ResourceReader {
         }
     }
 
-    private class StreamEnumeration implements Enumeration {
+    private final class StreamEnumeration implements Enumeration {
         private int index;
 
         private StreamEnumeration() {

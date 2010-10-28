@@ -435,14 +435,14 @@ public class CollectionWizardServlet extends DSpaceServlet
         }
 
         // Add people and groups from the form to the group
-        int[] eperson_ids = UIUtil.getIntParameters(request, "eperson_id");
-        int[] group_ids = UIUtil.getIntParameters(request, "group_ids");
+        int[] epersonIds = UIUtil.getIntParameters(request, "eperson_id");
+        int[] groupIds = UIUtil.getIntParameters(request, "group_ids");
         
-        if (eperson_ids != null)
+        if (epersonIds != null)
         {
-            for (int i = 0; i < eperson_ids.length; i++)
+            for (int i = 0; i < epersonIds.length; i++)
             {
-                EPerson eperson = EPerson.find(context, eperson_ids[i]);
+                EPerson eperson = EPerson.find(context, epersonIds[i]);
 
                 if (eperson != null)
                 {
@@ -451,11 +451,11 @@ public class CollectionWizardServlet extends DSpaceServlet
             }
         }
         
-        if (group_ids != null)
+        if (groupIds != null)
         {
-            for (int i = 0; i < group_ids.length; i++)
+            for (int i = 0; i < groupIds.length; i++)
             {
-                Group group = Group.find(context, group_ids[i]);
+                Group group = Group.find(context, groupIds[i]);
             
                 if (group != null)
                 {

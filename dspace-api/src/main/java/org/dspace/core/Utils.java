@@ -65,7 +65,7 @@ import org.apache.log4j.Logger;
  * @author Peter Breton
  * @version $Revision$
  */
-public class Utils
+public final class Utils
 {
     /** log4j logger */
     private static Logger log = Logger.getLogger(Utils.class);

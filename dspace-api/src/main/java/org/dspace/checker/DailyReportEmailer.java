@@ -373,14 +373,11 @@ public class DailyReportEmailer
                 }
             }
 
-            if (report != null)
+            if (report != null && report.exists())
             {
-                if (report.exists())
+                if (!report.delete())
                 {
-                    if (!report.delete())
-                    {
-                        log.error("Unable to delete report file");
-                    }
+                    log.error("Unable to delete report file");
                 }
             }
         }

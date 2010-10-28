@@ -549,14 +549,10 @@ public class MetadataImport
                 }
                 else
                 {
-                    if (!first)
+                    // Is it there?
+                    if (!first && collection.getHandle().equals(csvcollection))
                     {
-                        // Is it there?
-                        if (collection.getHandle().equals(csvcollection))
-                        {
-                            found = true;
-                        }
-
+                        found = true;
                     }
                 }
                 first = false;

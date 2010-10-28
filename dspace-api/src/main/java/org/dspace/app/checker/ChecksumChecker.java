@@ -66,7 +66,7 @@ import org.dspace.core.Utils;
  * @author Grace Carpenter
  * @author Nathan Sarr
  */
-public class ChecksumChecker
+public final class ChecksumChecker
 {
     private static final Logger LOG = Logger.getLogger(ChecksumChecker.class);
 

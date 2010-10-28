@@ -321,12 +321,9 @@ public class SwordValidationInfo {
         while( iterator.hasNext() )
         {
             item = iterator.next();
-            if( item != null )
+            if( item != null && type.compareTo(item.getType()) < 0 )
             {
-                if( type.compareTo(item.getType()) < 0 )
-                {
-                    type = item.getType(); 
-                }
+                type = item.getType();
             }
         }
     }

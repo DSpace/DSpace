@@ -146,12 +146,9 @@ public class StatisticsClient
             // Get the location of spiders directory
             File spiders = new File(ConfigurationManager.getProperty("dspace.dir"),"config/spiders");
 
-            if(!spiders.exists())
+            if (!spiders.exists() && !spiders.mkdirs())
             {
-                if(!spiders.mkdirs())
-                {
-                    log.error("Unable to create spiders directory");
-                }
+                log.error("Unable to create spiders directory");
             }
 
             String[] values = urls.split(",");

@@ -767,12 +767,9 @@ public class ItemListTag extends TagSupport
         String linkBehaviour = ConfigurationManager
                 .getProperty("webui.browse.thumbnail.linkbehaviour");
 
-        if (linkBehaviour != null)
+        if ("bitstream".equals(linkBehaviour))
         {
-            if (linkBehaviour.equals("bitstream"))
-            {
-                linkToBitstream = true;
-            }
+            linkToBitstream = true;
         }
     }
 

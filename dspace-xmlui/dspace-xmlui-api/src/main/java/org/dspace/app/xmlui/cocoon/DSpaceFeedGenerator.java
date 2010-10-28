@@ -430,19 +430,16 @@ public class DSpaceFeedGenerator extends AbstractGenerator
          */
         public int isValid(SourceValidity otherValidity)
         {
-            if (this.completed)
+            if (this.completed && otherValidity instanceof FeedValidity)
             {
-                if (otherValidity instanceof FeedValidity)
+                FeedValidity other = (FeedValidity) otherValidity;
+                if (hash == other.hash)
                 {
-                    FeedValidity other = (FeedValidity) otherValidity;
-                    if (hash == other.hash)
-                    {
-                        // Update both cache's expiration time.
-                        this.expires = System.currentTimeMillis() + CACHE_AGE;
-                        other.expires = System.currentTimeMillis() + CACHE_AGE;
-                        
-                        return SourceValidity.VALID;
-                    }
+                    // Update both cache's expiration time.
+                    this.expires = System.currentTimeMillis() + CACHE_AGE;
+                    other.expires = System.currentTimeMillis() + CACHE_AGE;
+
+                    return SourceValidity.VALID;
                 }
             }
 
