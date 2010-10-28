@@ -40,6 +40,14 @@
             <class>org.dspace.administer.CreateAdministrator</class>
         </step>
     </command>
+    
+    <command>
+        <name>curate</name>
+        <description>Perform curation tasks on DSpace objects</description>
+        <step>
+            <class>org.dspace.curate.CurationCli</class>
+        </step>
+    </command>
 
     <command>
         <name>dsprop</name>
