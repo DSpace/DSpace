@@ -102,7 +102,6 @@ DROP SEQUENCE item_seq;
 DROP SEQUENCE bundle_seq;
 DROP SEQUENCE item2bundle_seq;
 DROP SEQUENCE bundle2bitstream_seq;
-DROP SEQUENCE dctyperegistry_seq;
 DROP SEQUENCE dcvalue_seq;
 DROP SEQUENCE community_seq;
 DROP SEQUENCE community2community_seq;

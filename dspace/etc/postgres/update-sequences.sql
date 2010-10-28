@@ -64,7 +64,6 @@ SELECT setval('item_seq', max(item_id)) FROM item;
 SELECT setval('bundle_seq', max(bundle_id)) FROM bundle;
 SELECT setval('item2bundle_seq', max(id)) FROM item2bundle;
 SELECT setval('bundle2bitstream_seq', max(id)) FROM bundle2bitstream;
-SELECT setval('dctyperegistry_seq', max(dc_type_id)) FROM dctyperegistry;
 SELECT setval('dcvalue_seq', max(dc_value_id)) FROM dcvalue;
 SELECT setval('community_seq', max(community_id)) FROM community;
 SELECT setval('community2community_seq', max(id)) FROM community2community;

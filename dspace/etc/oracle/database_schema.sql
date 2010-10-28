@@ -46,7 +46,6 @@ CREATE SEQUENCE item_seq;
 CREATE SEQUENCE bundle_seq;
 CREATE SEQUENCE item2bundle_seq;
 CREATE SEQUENCE bundle2bitstream_seq;
-CREATE SEQUENCE dctyperegistry_seq;
 CREATE SEQUENCE dcvalue_seq;
 CREATE SEQUENCE community_seq;
 CREATE SEQUENCE collection_seq;

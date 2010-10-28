@@ -66,7 +66,6 @@
 @updateseq.sql bundle_seq bundle bundle_id
 @updateseq.sql item2bundle_seq item2bundle id
 @updateseq.sql bundle2bitstream_seq bundle2bitstream id
-@updateseq.sql dctyperegistry_seq dctyperegistry dc_type_id
 @updateseq.sql dcvalue_seq dcvalue dc_value_id
 @updateseq.sql community_seq community community_id
 @updateseq.sql community2community_seq community2community id
