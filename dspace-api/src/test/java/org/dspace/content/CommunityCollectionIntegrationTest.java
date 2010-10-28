@@ -95,7 +95,7 @@ public class CommunityCollectionIntegrationTest extends AbstractIntegrationTest
      */
     @Test
     @PerfTest(invocations = 25, threads = 1)
-    @Required(percentile95 = 1000, average = 400, throughput = 3)
+    @Required(percentile95 = 1200, average = 700, throughput = 2)
     public void testCreateTree() throws SQLException, AuthorizeException
     {
         //we create the structure
@@ -124,7 +124,7 @@ public class CommunityCollectionIntegrationTest extends AbstractIntegrationTest
       */
     @Test
     @PerfTest(invocations = 50, threads = 1)
-    @Required(percentile95 = 500, average= 333)
+    @Required(percentile95 = 900, average= 600)
     public void testCountItems() throws SQLException, AuthorizeException
     {
         //make it an even number, not to high to reduce time during testing
