@@ -70,38 +70,37 @@ public class FileTaskQueue implements TaskQueue
         while (true)
         {
             File lock = new File(qDir, "lock" + Integer.toString(queueIdx));
-            if (! lock.exists())
+
+            // Check for lock, and create one if it doesn't exist.
+            // If the lock file already exists, this will return false
+            if (lock.createNewFile())
             {
-                // no lock - create one
-                if (lock.createNewFile())
+                // append set contents to queue
+                BufferedWriter writer = null;
+                try
                 {
-                    // append set contents to queue
-                    BufferedWriter writer = null;
-                    try
+                    File queue = new File(qDir, "queue" + Integer.toString(queueIdx));
+                    writer = new BufferedWriter(new FileWriter(queue, true));
+                    Iterator<TaskQueueEntry> iter = entrySet.iterator();
+                    while (iter.hasNext())
                     {
-                        File queue = new File(qDir, "queue" + Integer.toString(queueIdx));
-                        writer = new BufferedWriter(new FileWriter(queue, true));
-                        Iterator<TaskQueueEntry> iter = entrySet.iterator();
-                        while (iter.hasNext())
-                        {
-                            writer.write(iter.next().toString());
-                            writer.newLine();
-                        }
+                        writer.write(iter.next().toString());
+                        writer.newLine();
                     }
-                    finally
-                    {
-                        if (writer != null)
-                        {
-                            writer.close();
-                        }
-                    }
-                    // remove lock
-                    if (!lock.delete())
-                    {
-                        log.error("Unable to remove lock: " + lock.getName());
-                    }
-                    break;
                 }
+                finally
+                {
+                    if (writer != null)
+                    {
+                        writer.close();
+                    }
+                }
+                // remove lock
+                if (!lock.delete())
+                {
+                    log.error("Unable to remove lock: " + lock.getName());
+                }
+                break;
             }
             queueIdx++;
         }
@@ -123,14 +122,10 @@ public class FileTaskQueue implements TaskQueue
             {
                 File queue = new File(qDir, "queue" + Integer.toString(queueIdx));
                 File lock = new File(qDir, "lock" + Integer.toString(queueIdx));
-                if (queue.exists() && ! lock.exists())
-                {
-                    // no lock - create one
-                    if (!lock.createNewFile())
-                    {
-                        throw new IOException("Unable to obtain the necessary lock: " + lock.getName());
-                    }
 
+                // If the queue file exists, atomically check for a lock file and create one if it doesn't exist
+                // If the lock file exists already, then this simply returns false
+                if (queue.exists() && lock.createNewFile()) {
                     // read contents from file
                     BufferedReader reader = null;
                     try
@@ -205,6 +200,7 @@ public class FileTaskQueue implements TaskQueue
                 throw new IllegalStateException("Unable to create directories");
             }
         }
+
         return baseDir;
     }
 }
