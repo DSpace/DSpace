@@ -460,6 +460,13 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
                             + "/"
                             + URLEncoder.encode(bitstream.getName(), "UTF-8");
                 }
+                else
+                {
+                    return ConfigurationManager
+                                    .getProperty("dspace.url")
+                            + "/retrieve/"
+                            + String.valueOf(bitstream.getID());
+                }
             }
             catch (SQLException e)
             {
