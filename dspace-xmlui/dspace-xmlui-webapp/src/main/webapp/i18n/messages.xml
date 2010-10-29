@@ -65,7 +65,8 @@
 	<message key="xmlui.general.delete">Delete</message>
 	<message key="xmlui.general.next">Next</message>
 	<message key="xmlui.general.untitled">Untitled</message>
-
+        <message key="xmlui.general.perform">Perform</message>
+        <message key="xmlui.general.queue">Queue</message>
 
 	<!--
 		Page not found keys
@@ -1238,6 +1239,8 @@
 	<message key="xmlui.administrative.item.general.option_bitstreams">Item Bitstreams</message>
 	<message key="xmlui.administrative.item.general.option_metadata">Item Metadata</message>
 	<message key="xmlui.administrative.item.general.option_view">View Item</message>
+        <message key="xmlui.administrative.item.general.option_curate">Curate</message>
+        <message key="xmlui.administrative.item.general.option_queue">Queue</message>
 
 	<!-- org.dspace.app.xmlui.administrative.item.AddBitstreamForm -->
 	<message key="xmlui.administrative.item.AddBitstreamForm.title">Upload Bitstream</message>
@@ -1363,6 +1366,11 @@
 	<!-- org.dspace.app.xmlui.administrative.item.ViewItem -->
 	<message key="xmlui.administrative.item.ViewItem.title">View Item</message>
 	<message key="xmlui.administrative.item.ViewItem.trail">View Item</message>
+        <!-- org.dspace.app.xmlui.administrative.item.CurateItemForm.java -->
+        <message key="xmlui.administrative.item.CurateItemForm.main_head">Curate Item: {0}</message>
+        <message key="xmlui.administrative.item.CurateItemForm.title">Curate Item</message>
+        <message key="xmlui.administrative.item.CurateItemForm.trail">Curator</message>
+        <message key="xmlui.administrative.item.CurateItemForm.label_name">Task</message>
 
 	<!-- org.dspace.app.xmlui.administrative.item.FindItemForm -->
 	<message key="xmlui.administrative.item.FindItemForm.title">Find Item</message>
@@ -1450,7 +1458,8 @@
 	<message key="xmlui.administrative.collection.general.collection_trail">Collections</message>
 	<message key="xmlui.administrative.collection.general.options_metadata">Edit Metadata</message>
 	<message key="xmlui.administrative.collection.general.options_roles">Assign Roles</message>
-
+        <message key="xmlui.administrative.collection.general.options_curate">Curate</message>
+        <message key="xmlui.administrative.collection.general.options_queue">Queue</message>
 
 	<!-- org.dspace.app.xmlui.administrative.collection.AssignCollectionRoles.java -->
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.title">Edit Collection Roles</message>
@@ -1480,6 +1489,12 @@
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.label_default_read">Default read access</message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.sysadmins_only"><nobr>(system administrators only)</nobr></message>
 	<message key="xmlui.administrative.collection.AssignCollectionRoles.not_allowed"><nobr>(you are not allowed to configure this)</nobr></message>
+
+        <!-- org.dspace.app.xmlui.administrative.collection.CurateCollectionForm.java -->
+        <message key="xmlui.administrative.collection.CurateCollectionForm.main_head">Curate Collection: {0}</message>
+        <message key="xmlui.administrative.collection.CurateCollectionForm.title">Curate Collection</message>
+        <message key="xmlui.administrative.collection.CurateCollectionForm.trail">Curator</message>
+        <message key="xmlui.administrative.collection.CurateCollectionForm.label_name">Task</message>
 
 	<!-- org.dspace.app.xmlui.administrative.collection.DeleteCollectionConfirm.java -->
 	<message key="xmlui.administrative.collection.DeleteCollectionConfirm.title">Confirm Deletion</message>
@@ -1594,6 +1609,8 @@
 	<message key="xmlui.administrative.community.general.community_trail">Communities</message>
 	<message key="xmlui.administrative.community.general.options_metadata">Edit Metadata</message>
 	<message key="xmlui.administrative.community.general.options_roles">Assign Roles</message>
+        <message key="xmlui.administrative.community.general.options_curate">Curate</message>
+        <message key="xmlui.administrative.community.general.options_queue">Queue</message>
 
 	<!-- org.dspace.app.xmlui.administrative.community.AssignCommunityRoles.java -->
 	<message key="xmlui.administrative.community.AssignCommunityRoles.title">Edit Community Roles</message>
@@ -1610,6 +1627,12 @@
 	<message key="xmlui.administrative.community.AssignCommunityRoles.role_buttons">  </message>
 	<message key="xmlui.administrative.community.AssignCommunityRoles.label_admins">Administrators</message>
 	<message key="xmlui.administrative.community.AssignCommunityRoles.sysadmins_only"><nobr>(system administrators only)</nobr></message>
+
+        <!-- org.dspace.app.xmlui.administrative.community.CurateCommunityForm.java -->
+        <message key="xmlui.administrative.community.CurateCommunityForm.main_head">Curate Community: {0}</message>
+        <message key="xmlui.administrative.community.CurateCommunityForm.title">Curate Community</message>
+        <message key="xmlui.administrative.community.CurateCommunityForm.trail">Curator</message>
+        <message key="xmlui.administrative.community.CurateCommunityForm.label_name">Task</message>
 
 	<!-- org.dspace.app.xmlui.administrative.community.DeleteCommunityConfirm.java -->
 	<message key="xmlui.administrative.community.DeleteCommunityConfirm.title">Confirm Deletion</message>
