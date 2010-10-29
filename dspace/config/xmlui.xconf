@@ -119,6 +119,9 @@
         <!-- Default theme -->
         <theme name="Default Reference Theme" regex=".*" path="Reference/" />
 
+        <!-- Mirage theme, @mire contribution of new theme to support easier development and branding -->
+        <!-- <theme name="Atmire Mirage Theme" regex=".*" path="Mirage/" /> -->
+
         <!-- Classic theme, inspired by the JSP UI -->
         <!-- <theme name="Classic" regex=".*" path="Classic/" /> -->
 
