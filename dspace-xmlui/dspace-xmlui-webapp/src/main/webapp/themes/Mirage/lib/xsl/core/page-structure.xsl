@@ -86,67 +86,64 @@
             <!-- First of all, build the HTML head element -->
             <xsl:call-template name="buildHead"/>
             <!-- Then proceed to the body -->
+
+            <!--paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/-->
+            <xsl:text disable-output-escaping="yes">&lt;!--[if lt IE 7 ]&gt; &lt;body class="ie6"&gt; &lt;![endif]--&gt;
+                &lt;!--[if IE 7 ]&gt;    &lt;body class="ie7"&gt; &lt;![endif]--&gt;
+                &lt;!--[if IE 8 ]&gt;    &lt;body class="ie8"&gt; &lt;![endif]--&gt;
+                &lt;!--[if IE 9 ]&gt;    &lt;body class="ie9"&gt; &lt;![endif]--&gt;
+                &lt;!--[if (gt IE 9)|!(IE)]&gt;&lt;!--&gt;&lt;body&gt;&lt;!--&lt;![endif]--&gt;</xsl:text>
+
             <xsl:choose>
               <xsl:when test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='framing'][@qualifier='popup']">
                 <xsl:apply-templates select="dri:body/*"/>
-                <!-- add setup JS code if this is a choices lookup page -->
-                <xsl:if test="dri:body/dri:div[@n='lookup']">
-                  <xsl:call-template name="choiceLookupPopUpSetup"/>
-                </xsl:if>
               </xsl:when>
-              <xsl:otherwise>
-                  <!--paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/-->
-                  <xsl:text disable-output-escaping="yes">&lt;!--[if lt IE 7 ]&gt; &lt;body class="ie6"&gt; &lt;![endif]--&gt;
-                      &lt;!--[if IE 7 ]&gt;    &lt;body class="ie7"&gt; &lt;![endif]--&gt;
-                      &lt;!--[if IE 8 ]&gt;    &lt;body class="ie8"&gt; &lt;![endif]--&gt;
-                      &lt;!--[if IE 9 ]&gt;    &lt;body class="ie9"&gt; &lt;![endif]--&gt;
-                      &lt;!--[if (gt IE 9)|!(IE)]&gt;&lt;!--&gt;&lt;body&gt;&lt;!--&lt;![endif]--&gt;</xsl:text>
+                  <xsl:otherwise>
+                    <div id="ds-main">
+                        <!--The header div, complete with title, subtitle and other junk-->
+                        <xsl:call-template name="buildHeader"/>
 
-                <div id="ds-main">
-                    <!--The header div, complete with title, subtitle and other junk-->
-                    <xsl:call-template name="buildHeader"/>
+                        <!--The trail is built by applying a template over pageMeta's trail children. -->
+                        <xsl:call-template name="buildTrail"/>
 
-                    <!--The trail is built by applying a template over pageMeta's trail children. -->
-                    <xsl:call-template name="buildTrail"/>
-
-                    <!--javascript-disabled warning, will be invisible if javascript is enabled-->
-                    <div id="no-js-warning-wrapper" class="hidden">
-                        <div id="no-js-warning">
-                            <div class="notice failure">
-                                <xsl:text>JavaScript is disabled for your browser. Some features of this site may not work without it.</xsl:text>
+                        <!--javascript-disabled warning, will be invisible if javascript is enabled-->
+                        <div id="no-js-warning-wrapper" class="hidden">
+                            <div id="no-js-warning">
+                                <div class="notice failure">
+                                    <xsl:text>JavaScript is disabled for your browser. Some features of this site may not work without it.</xsl:text>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
 
-                    <!--ds-content is a groups ds-body and the navigation together and used to put the clearfix on, center, etc.
-                        ds-content-wrapper is necessary for IE6 to allow it to center the page content-->
-                    <div id="ds-content-wrapper">
-                        <div id="ds-content" class="clearfix">
-                            <!--
-                           Goes over the document tag's children elements: body, options, meta. The body template
-                           generates the ds-body div that contains all the content. The options template generates
-                           the ds-options div that contains the navigation and action options available to the
-                           user. The meta element is ignored since its contents are not processed directly, but
-                           instead referenced from the different points in the document. -->
-                            <xsl:apply-templates/>
+                        <!--ds-content is a groups ds-body and the navigation together and used to put the clearfix on, center, etc.
+                            ds-content-wrapper is necessary for IE6 to allow it to center the page content-->
+                        <div id="ds-content-wrapper">
+                            <div id="ds-content" class="clearfix">
+                                <!--
+                               Goes over the document tag's children elements: body, options, meta. The body template
+                               generates the ds-body div that contains all the content. The options template generates
+                               the ds-options div that contains the navigation and action options available to the
+                               user. The meta element is ignored since its contents are not processed directly, but
+                               instead referenced from the different points in the document. -->
+                                <xsl:apply-templates/>
+                            </div>
                         </div>
+
+
+                        <!--
+                            The footer div, dropping whatever extra information is needed on the page. It will
+                            most likely be something similar in structure to the currently given example. -->
+                        <xsl:call-template name="buildFooter"/>
+
                     </div>
 
-
-                    <!--
-                        The footer div, dropping whatever extra information is needed on the page. It will
-                        most likely be something similar in structure to the currently given example. -->
-                    <xsl:call-template name="buildFooter"/>
-
-                </div>
-
-                  <!-- Javascript at the bottom for fast page loading -->
-                <xsl:call-template name="addJavascript"/>
-
-                  <xsl:text disable-output-escaping="yes">&lt;/body&gt;</xsl:text>
-            </xsl:otherwise>
+                </xsl:otherwise>
             </xsl:choose>
+                <!-- Javascript at the bottom for fast page loading -->
+              <xsl:call-template name="addJavascript"/>
+
+            <xsl:text disable-output-escaping="yes">&lt;/body&gt;</xsl:text>
         </html>
     </xsl:template>
 
@@ -553,13 +550,36 @@
 
         <!-- add "shared" javascript from static, path is relative to webapp root-->
         <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][@qualifier='static']">
-            <script type="text/javascript">
-                <xsl:attribute name="src">
-                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                    <xsl:text>/</xsl:text>
-                    <xsl:value-of select="."/>
-                </xsl:attribute>&#160;</script>
+            <!--This is a dirty way of keeping the scriptaculous stuff from choice-support
+            out of our theme without modifying the administrative and submission sitemaps.
+            This is obviously not ideal, but adding those scripts in those sitemaps is far
+            from ideal as well-->
+            <xsl:choose>
+                <xsl:when test="text() = 'static/js/choice-support.js'">
+                    <script type="text/javascript">
+                        <xsl:attribute name="src">
+                            <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                            <xsl:text>/themes/</xsl:text>
+                            <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+                            <xsl:text>/lib/js/choice-support.js</xsl:text>
+                        </xsl:attribute>&#160;</script>
+                </xsl:when>
+                <xsl:when test="not(starts-with(text(), 'static/js/scriptaculous'))">
+                    <script type="text/javascript">
+                        <xsl:attribute name="src">
+                            <xsl:value-of
+                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                            <xsl:text>/</xsl:text>
+                            <xsl:value-of select="."/>
+                        </xsl:attribute>&#160;</script>
+                </xsl:when>
+            </xsl:choose>
         </xsl:for-each>
+
+        <!-- add setup JS code if this is a choices lookup page -->
+        <xsl:if test="dri:body/dri:div[@n='lookup']">
+          <xsl:call-template name="choiceLookupPopUpSetup"/>
+        </xsl:if>
 
         <!--PNG Fix for IE6-->
         <xsl:text disable-output-escaping="yes">&lt;!--[if lt IE 7 ]&gt;</xsl:text>

@@ -66,6 +66,7 @@
     <xsl:import href="lib/xsl/core/forms.xsl"/>
     <xsl:import href="lib/xsl/core/attribute-handlers.xsl"/>
     <xsl:import href="lib/xsl/core/utils.xsl"/>
+    <xsl:import href="lib/xsl/aspect/general/choice-authority-control.xsl"/>
     <xsl:import href="lib/xsl/aspect/administrative/administrative.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/item-list.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/item-view.xsl"/>

@@ -158,6 +158,7 @@
                     <map:parameter name="stylesheet.screen#2" value="lib/css/base.css"/>
                     <map:parameter name="stylesheet.screen#3" value="lib/css/helper.css"/>
                     <map:parameter name="stylesheet.screen#4" value="lib/css/style.css"/>
+                    <map:parameter name="stylesheet.screen#5" value="lib/css/authority-control.css"/>
                 </map:transform>
 
                 <map:transform type="IncludePageMeta">
