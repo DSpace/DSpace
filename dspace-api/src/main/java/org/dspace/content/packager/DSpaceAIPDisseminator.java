@@ -40,6 +40,7 @@
 
 package org.dspace.content.packager;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
@@ -56,6 +57,7 @@ import org.dspace.content.Item;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Site;
+import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.core.Constants;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -141,6 +143,21 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
     // NOTE: format is  <label-for-METS>:<DSpace-crosswalk-name>
     private static final String CREATIVE_COMMONS_TEXT_MDTYPE =
         "CreativeCommonsText:DSPACE_CCTXT";
+
+    // dissemination parameters passed to the AIP Disseminator
+    private PackageParameters disseminateParams = null;
+
+    @Override
+    public void disseminate(Context context, DSpaceObject dso,
+                            PackageParameters params, File pkgFile)
+        throws PackageValidationException, CrosswalkException, AuthorizeException, SQLException, IOException
+    {
+        //Before disseminating anything, save the passed in PackageParameters, so they can be used by all methods
+        disseminateParams = params;
+
+        //just do a normal dissemination as specified by AbstractMETSDisseminator
+        super.disseminate(context, dso, params, pkgFile);
+    }
 
     /**
      * Return identifier string for the METS profile this produces.
@@ -570,13 +587,35 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
     }
 
     /**
-     * Include all bundles in AIP as content.
+     * By default, include all bundles in AIP as content.
+     * <P>
+     * However, if the user specified a comma separated list of bundle names
+     * via the "includeBundles" option, then check if this bundle is in that
+     * list.  If it is, return true.  If it is not, return false.
+     *
      * @param bundle Bundle to check for
-     * @return true always
+     * @return true if bundle should be disseminated when disseminating Item AIPs
      */
     @Override
     public boolean includeBundle(Bundle bundle)
     {
-        return true;
+        //Check the 'includeBundles' option to see if a list of bundles was provided (default = "all")
+        String bundleList = this.disseminateParams.getProperty("includeBundles", "all");
+
+        if(bundleList.equalsIgnoreCase("all"))
+            return true; //all bundles should be disseminated
+        else
+        {
+            //Check if this bundle is in our list of bundles to include
+            String[] bundleNames = bundleList.split(",");
+            for(String bundleName : bundleNames)
+            {
+                if(bundle.getName().equals(bundleName))
+                    return true;
+            }
+
+            //if not in the 'includeBundles' list, then return false
+            return false;
+        }
     }
 }
