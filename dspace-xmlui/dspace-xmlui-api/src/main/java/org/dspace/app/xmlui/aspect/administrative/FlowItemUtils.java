@@ -59,8 +59,10 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.authority.Choices;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.curate.Curator;
 import org.dspace.handle.HandleManager;
 
 /**
@@ -78,8 +80,8 @@ public class FlowItemUtils
 	private static final Message T_metadata_added = new Message("default","New metadata was added.");
 	private static final Message T_item_withdrawn = new Message("default","The item has been withdrawn.");
 	private static final Message T_item_reinstated = new Message("default","The item has been reinstated.");
-    private static final Message T_item_moved = new Message("default","The item has been moved.");
-    private static final Message T_item_move_destination_not_found = new Message("default","The selected destination collection could not be found.");
+        private static final Message T_item_moved = new Message("default","The item has been moved.");
+        private static final Message T_item_move_destination_not_found = new Message("default","The selected destination collection could not be found.");
 	private static final Message T_bitstream_added = new Message("default","The new bitstream was successfully uploaded.");
 	private static final Message T_bitstream_failed = new Message("default","Error while uploading file.");
 	private static final Message T_bitstream_updated = new Message("default","The bitstream has been updated.");
@@ -220,9 +222,9 @@ public class FlowItemUtils
 			
 			// the user selected the remove checkbox.
 			if (remove != null)
-            {
-                continue;
-            }
+                        {
+				continue;
+                        }
 			
 			// get the field's name broken up
 			String[] parts = parseName(name);
@@ -475,9 +477,9 @@ public class FlowItemUtils
 		Object object = request.get("file");
 		Part filePart = null;
 		if (object instanceof Part)
-        {
-            filePart = (Part) object;
-        }
+                {
+			filePart = (Part) object;
+                }
 
 		if (filePart != null && filePart.getSize() > 0)
 		{
@@ -657,9 +659,9 @@ public class FlowItemUtils
 			String[] parts = id.split("/");
 			
 			if (parts.length != 2)
-            {
-                throw new UIException("Unable to parse id into bundle and bitstream id: " + id);
-            }
+                        {
+				throw new UIException("Unable to parse id into bundle and bitstream id: "+id);
+                        }
 			
 			int bundleID = Integer.valueOf(parts[0]);
 			int bitstreamID = Integer.valueOf(parts[1]);
@@ -685,7 +687,84 @@ public class FlowItemUtils
 		
 		return result;
 	}
-	
+
+        /**
+         * processCurateDSO
+         *
+         * Utility method to process curation tasks
+         * submitted via the DSpace GUI
+         *
+         * @param context
+         * @param itemID
+         * @param request
+         *
+         */
+        public static FlowResult processCurateItem(Context context, int itemID, Request request)
+                                                                throws AuthorizeException, IOException, SQLException, Exception
+	{
+                FlowResult result = new FlowResult();
+                String task = request.getParameter("curate_task");
+		if (task != null && task.length() == 0)
+                {
+			task = null;
+                }
+		Curator curator = new Curator();
+                // curator.setReporter(reporterName);
+                curator.addTask(task);
+                curator.setInvoked(Curator.Invoked.INTERACTIVE);
+                Item item = Item.find(context, itemID);
+                if (item != null)
+                {
+                    curator.curate(item);
+                }
+                result.setOutcome(true);
+		result.setMessage(new Message("default","The task, " + task +
+                        " was completed with the status: " + curator.getStatus(task) + 
+                        "." + "\n" + "Results: " +  "\n" +
+                        ((curator.getResult(task) != null) ? curator.getResult(task) : "Nothing to do for this DSpace object.")));
+                result.setContinue(true);
+		return result;
+	}
+
+      /**
+       * queues curation tasks
+       */
+        public static FlowResult processQueueItem(Context context, int itemID, Request request)
+                                                                throws AuthorizeException, IOException, SQLException, Exception
+	{
+                FlowResult result = new FlowResult();
+                String task = request.getParameter("curate_task");
+                String handle = new String("");
+                Curator curator = new Curator();
+                String taskQueueName = ConfigurationManager.getProperty("curate", "ui.queuename");
+                boolean status = true;
+                Item item = Item.find(context, itemID);
+                if (item != null)
+                {
+                    handle = item.getHandle();
+                }
+		if (task != null && task.length() == 0)
+                {
+                    task = null;
+                }
+                curator.addTask(task);
+                try {
+                    curator.queue(context, handle, taskQueueName);
+                }
+                catch (IOException ioe)
+                {
+                    status = false;
+                }
+                finally
+                {
+                    result.setOutcome(true);
+                    result.setMessage(new Message("default", " The task, " + task + ", has " +
+                              ((status) ? "been queued with id, " + handle + " in the " + taskQueueName + " queue.": "has not been queued with id, " + handle + ". An error occurred.")));
+                    result.setContinue(true);
+                    return result;
+                }
+	}
+
 	
 	/**
 	 * Parse the given name into three parts, divided by an _. Each part should represent the 

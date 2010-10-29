@@ -79,6 +79,7 @@ to administer DSpace.
 			<map:transformer name="EditBitstreamForm" src="org.dspace.app.xmlui.aspect.administrative.item.EditBitstreamForm"/>
 			<map:transformer name="DeleteBitstreamsConfirm" src="org.dspace.app.xmlui.aspect.administrative.item.DeleteBitstreamsConfirm"/>
 			<map:transformer name="MoveItemForm" src="org.dspace.app.xmlui.aspect.administrative.item.MoveItemForm"/>
+                        <map:transformer name="CurateItemForm" src="org.dspace.app.xmlui.aspect.administrative.item.CurateItemForm"/>
 			
 			<map:transformer name="MapperMain" src="org.dspace.app.xmlui.aspect.administrative.mapper.MapperMain"/>
 			<map:transformer name="BrowseItemForm" src="org.dspace.app.xmlui.aspect.administrative.mapper.BrowseItemForm"/>
@@ -96,13 +97,15 @@ to administer DSpace.
 			<map:transformer name="DeleteCollectionRoleConfirm" src="org.dspace.app.xmlui.aspect.administrative.collection.DeleteCollectionRoleConfirm"/>
 			<map:transformer name="DeleteCollectionConfirm" src="org.dspace.app.xmlui.aspect.administrative.collection.DeleteCollectionConfirm"/>
 			<map:transformer name="CreateCollectionForm" src="org.dspace.app.xmlui.aspect.administrative.collection.CreateCollectionForm"/>
-			
+                        <map:transformer name="CurateCollectionForm" src="org.dspace.app.xmlui.aspect.administrative.collection.CurateCollectionForm"/>
+
 			<map:transformer name="EditCommunityMetadataForm" src="org.dspace.app.xmlui.aspect.administrative.community.EditCommunityMetadataForm"/>
-	    <map:transformer name="AssignCommunityRoles" src="org.dspace.app.xmlui.aspect.administrative.community.AssignCommunityRoles"/>
+                        <map:transformer name="AssignCommunityRoles" src="org.dspace.app.xmlui.aspect.administrative.community.AssignCommunityRoles"/>
 			<map:transformer name="DeleteCommunityRoleConfirm" src="org.dspace.app.xmlui.aspect.administrative.community.DeleteCommunityRoleConfirm"/>
 			<map:transformer name="DeleteCommunityConfirm" src="org.dspace.app.xmlui.aspect.administrative.community.DeleteCommunityConfirm"/>
 			<map:transformer name="CreateCommunityForm" src="org.dspace.app.xmlui.aspect.administrative.community.CreateCommunityForm"/>
-			
+			<map:transformer name="CurateCommunityForm" src="org.dspace.app.xmlui.aspect.administrative.community.CurateCommunityForm"/>
+
 			<map:transformer name="AuthorizationMain" src="org.dspace.app.xmlui.aspect.administrative.authorization.AuthorizationMain"/>
 			<map:transformer name="EditContainerPolicies" src="org.dspace.app.xmlui.aspect.administrative.authorization.EditContainerPolicies"/>
 			<map:transformer name="EditItemPolicies" src="org.dspace.app.xmlui.aspect.administrative.authorization.EditItemPolicies"/>
@@ -318,22 +321,22 @@ to administer DSpace.
 		        			describe the notice, if they are present then we add them to the DRI document 
 		        			before all other flow pages.
 		        			-->
-                        <map:match pattern="admin/**">
-                            <map:match type="WildcardParameterMatcher" pattern="true">
-                                <map:parameter name="parameter-name" value="notice"/>
-                                <map:parameter name="notice" value="{flow-attribute:notice}"/>
-                                <map:transform type="notice">
-                                    <map:parameter name="outcome" value="{flow-attribute:outcome}"/>
-                                    <map:parameter name="header" value="{flow-attribute:header}"/>
-                                    <map:parameter name="message" value="{flow-attribute:message}"/>
-                                    <map:parameter name="characters" value="{flow-attribute:characters}"/>
-                                </map:transform>
-                            </map:match>
-                        </map:match>
+                                        <map:match pattern="admin/**">
+                                            <map:match type="WildcardParameterMatcher" pattern="true">
+                                                    <map:parameter name="parameter-name" value="notice"/>
+                                                    <map:parameter name="notice" value="{flow-attribute:notice}"/>
+                                                    <map:transform type="notice">
+                                                            <map:parameter name="outcome" value="{flow-attribute:outcome}"/>
+                                                            <map:parameter name="header" value="{flow-attribute:header}"/>
+                                                            <map:parameter name="message" value="{flow-attribute:message}"/>
+                                                            <map:parameter name="characters" value="{flow-attribute:characters}"/>
+                                                    </map:transform>
+                                            </map:match>
+		        		</map:match>
 		        		
 		        		<map:match pattern="admin/not-authorized">
 		        			<map:transform type="NotAuthorized"/>
-		        		</map:match>
+		        	</map:match>
 		        		
 		        		
 		        	<!-- EPeople management pages -->
@@ -554,6 +557,13 @@ to administer DSpace.
 		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
 		        			</map:transform>
 		        		</map:match>
+
+                                        <!-- Curation options -->
+		        		<map:match pattern="admin/item/curateItem">
+                                            <map:transform type="CurateItemForm">
+                                                <map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+                                            </map:transform>
+                                        </map:match>
 		        		
 		        		<!--
 		        			Upload a new bitstream
@@ -731,7 +741,13 @@ to administer DSpace.
 		        				<map:parameter name="communityID" value="{flow-attribute:communityID}"/>
 		        			</map:transform>
 		        		</map:match> 		
-		        		
+
+                                        <!-- Curation options -->
+		        		<map:match pattern="admin/collection/curateCollection">
+                                            <map:transform type="CurateCollectionForm">
+                                                <map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
+                                            </map:transform>
+                                        </map:match>
 		        		
 		        		
 		        		
@@ -739,18 +755,18 @@ to administer DSpace.
 					<!-- Community edit pages -->
 						
 						<!-- Main metadata edit form, accessible by the community admin -->
-                <map:match pattern="admin/community/editMetadata">
+                                        <map:match pattern="admin/community/editMetadata">
 		        			<map:transform type="EditCommunityMetadataForm">
 		        				<map:parameter name="communityID" value="{flow-attribute:communityID}"/>
 		        			</map:transform>
 		        		</map:match>
 		        		
 		        		<!-- Community Authorization options -->
-                <map:match pattern="admin/community/assignRoles">
-                    <map:transform type="AssignCommunityRoles">
-                        <map:parameter name="communityID" value="{flow-attribute:communityID}"/>
-                    </map:transform>
-                </map:match>
+                                        <map:match pattern="admin/community/assignRoles">
+                                            <map:transform type="AssignCommunityRoles">
+                                                <map:parameter name="communityID" value="{flow-attribute:communityID}"/>
+                                            </map:transform>
+                                        </map:match>
 
 		        		<!-- Confirmation screen for deleting one of the standard authorization groups -->
 		        		<map:match pattern="admin/community/deleteRole">
@@ -775,8 +791,12 @@ to administer DSpace.
 		        			</map:transform>
 		        		</map:match>
       		
-      		
-		        		
+                                        <!-- Curation options -->
+		        		<map:match pattern="admin/community/curateCommunity">
+                                            <map:transform type="CurateCommunityForm">
+                                                <map:parameter name="communityID" value="{flow-attribute:communityID}"/>
+                                            </map:transform>
+                                        </map:match>
 		        	<!-- Authorization pages -->
 		        		
 		        		

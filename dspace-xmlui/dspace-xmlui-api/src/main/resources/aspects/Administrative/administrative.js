@@ -97,12 +97,14 @@ function sendPageAndWait(uri,bizData,result)
     if (bizData == null)
         bizData = {};
 
+
     if (result != null)
     {
         var outcome = result.getOutcome();
         var header = result.getHeader();
         var message = result.getMessage();
         var characters = result.getCharacters();
+
         
         if (message != null || characters != null)
         {
@@ -126,14 +128,14 @@ function sendPageAndWait(uri,bizData,result)
 }
 
 /**
- * Send the given page and DO NOT wait for the flow to be continued. Excution will 
- * proccede as normal. This method will preform two usefull actions: set the flow 
+ * Send the given page and DO NOT wait for the flow to be continued. Execution will
+ * proceed as normal. This method will perform two useful actions: set the flow
  * parameter & add result information.
  *
- * The flow parameter is used by the sitemap to seperate requests comming from a
+ * The flow parameter is used by the sitemap to separate requests coming from a
  * flow script from just normal urls.
  *
- * The result object could potentialy contain a notice message and a list of 
+ * The result object could potentially contain a notice message and a list of
  * errors. If either of these are present then they are added to the sitemap's
  * parameters.
  */
@@ -1399,14 +1401,14 @@ function doManageItems()
 
 
 /**
- * Edit a single item. This method allows the user too switch between the
+ * Edit a single item. This method allows the user to switch between the
  * three sections of editing an item: status, bitstreams, and metadata.
  */
 function doEditItem(itemID)
 {	
 	// Always go to the status page first
 	doEditItemStatus(itemID);	
-
+        
 	do {
 	    if (cocoon.request.get("submit_return"))
 		{
@@ -1429,7 +1431,10 @@ function doEditItem(itemID)
 		{
 			doViewItem(itemID);
 		}
-		else
+	        else if (cocoon.request.get("submit_curate"))  {
+                        doCurateItem(itemID, cocoon.request.get("curate_task"));
+                }
+                else
 		{
 			// This case should never happen but to prevent an infinite loop
 			// from occuring let's just return null.
@@ -1466,7 +1471,7 @@ function doEditItemStatus(itemID)
 		assertEditItem(itemID);
 		result = null;
 		
-		if (cocoon.request.get("submit_return") || cocoon.request.get("submit_status") || cocoon.request.get("submit_bitstreams") || cocoon.request.get("submit_metadata") || cocoon.request.get("view_item"))
+		if (cocoon.request.get("submit_return")  || cocoon.request.get("submit_bitstreams") || cocoon.request.get("submit_metadata") || cocoon.request.get("view_item") || cocoon.request.get("submit_curate") )
 		{
 			// go back to where ever we came from.
 			return null;
@@ -1519,11 +1524,11 @@ function doEditItemBitstreams(itemID)
 	
 	var result;
 	do {
-		sendPageAndWait("admin/item/bitstreams",{"itemID":itemID},result);
+		sendPageAndWait("admin/item/bitstreams",{"itemID":itemID}, result);
 		assertEditItem(itemID);
 		result = null;
 		
-		if (cocoon.request.get("submit_return") || cocoon.request.get("submit_status") || cocoon.request.get("submit_bitstreams") || cocoon.request.get("submit_metadata") || cocoon.request.get("view_item"))
+		if (cocoon.request.get("submit_return") || cocoon.request.get("submit_status") || cocoon.request.get("submit_bitstreams") || cocoon.request.get("submit_metadata") || cocoon.request.get("view_item") || cocoon.request.get("submit_curate"))
 		{
 			// go back to where ever we came from.
 			return null;
@@ -1531,8 +1536,7 @@ function doEditItemBitstreams(itemID)
 		else if (cocoon.request.get("submit_add"))
 		{
 		    // Upload a new bitstream
-		    assertAuthorized(Constants.ITEM,itemID,Constants.ADD)
-		    
+		    assertAuthorized(Constants.ITEM,itemID,Constants.ADD)   
 		    result = doAddBitstream(itemID);
 		}
 		else if (cocoon.request.get("submit_edit") && cocoon.request.get("bitstreamID"))
@@ -1567,7 +1571,9 @@ function doEditItemMetadata(itemID, templateCollectionID)
 		assertEditItem(itemID);
 		result = null;
 		
-		if (cocoon.request.get("submit_return") || cocoon.request.get("submit_status") || cocoon.request.get("submit_bitstreams") || cocoon.request.get("submit_metadata") || cocoon.request.get("view_item"))
+		if (cocoon.request.get("submit_return") || cocoon.request.get("submit_status") ||
+                    cocoon.request.get("submit_bitstreams") || cocoon.request.get("submit_metadata") ||
+                    cocoon.request.get("view_item") || cocoon.request.get("submit_curate"))
 		{
 			// go back to where ever we came from.
 			return null;
@@ -1585,8 +1591,35 @@ function doEditItemMetadata(itemID, templateCollectionID)
 	} while (true)
 }
 
+
+  /** Curate
+ *
+ *
+ */
+        function doCurateItem(itemID, task) {
+            var result;
+
+            do {
+                           sendPageAndWait("admin/item/curateItem",{"itemID":itemID}, result);
+                           assertEditCommunity(itemID);
+                           result = null;
+                           if (!cocoon.request.get("submit_curate_task") && !cocoon.request.get("submit_queue_task"))
+                           {
+                                  return null;
+                           }  
+                           else if (cocoon.request.get("submit_curate_task"))
+                           {
+                                   result = FlowItemUtils.processCurateItem(getDSContext(), itemID, cocoon.request);
+                           }
+                           else if (cocoon.request.get("submit_queue_task"))
+                           {
+                                   result = FlowItemUtils.processQueueItem(getDSContext(), itemID, cocoon.request);
+                           }
+            } while (true);
+        }
+
 /**
- * Confrim the deletition of this item.
+ * Confirm the deletition of this item.
  */
 function doDeleteItem(itemID)
 {
@@ -2290,7 +2323,7 @@ function doEditCollection(collectionID,newCollectionP)
 		}
 		else if (cocoon.request.get("submit_roles"))
 		{
-			// go assign colection roles
+			// go assign collection roles
 			doAssignCollectionRoles(collectionID);
 		}
 		else if (cocoon.request.get("submit_harvesting"))
@@ -2298,7 +2331,11 @@ function doEditCollection(collectionID,newCollectionP)
 			// edit collection harvesting settings
 			doEditCollectionHarvesting(collectionID);
 		}
-		else
+		else  if (cocoon.request.get("submit_curate"))
+                {
+                        doCurateCollection(collectionID, cocoon.request.get("curate_task"));
+                }
+                else
 		{
 			// This case should never happen but to prevent an infinite loop
 			// from occuring let's just return null.
@@ -2325,7 +2362,8 @@ function doEditCollectionMetadata(collectionID)
 		result=null;
 		
 		if (cocoon.request.get("submit_return") || cocoon.request.get("submit_metadata") || 
-			cocoon.request.get("submit_roles") || cocoon.request.get("submit_harvesting"))
+			cocoon.request.get("submit_roles") || cocoon.request.get("submit_harvesting") ||
+                        cocoon.request.get("submit_curate"))
 		{
 			// return to the editCollection function which will determine where to go next.
 			return null;	
@@ -2368,6 +2406,8 @@ function doEditCollectionMetadata(collectionID)
 
 /**
  * Edit the set roles for a collection: admin, workflows, submitters, and default read.
+ * Returns to the EditCollection page and selected tab if this is a simple navigation,
+ * not a submit.
  */
 function doAssignCollectionRoles(collectionID) 
 {
@@ -2382,9 +2422,9 @@ function doAssignCollectionRoles(collectionID)
 		
 		
 		if (cocoon.request.get("submit_return") || cocoon.request.get("submit_metadata") || 
-			cocoon.request.get("submit_roles") || cocoon.request.get("submit_harvesting"))
+			cocoon.request.get("submit_roles") || cocoon.request.get("submit_harvesting") ||
+                        cocoon.request.get("submit_curate"))
 		{
-			// return to the editCollection function which will determine where to go next.
 			return null;	
 		}
 		
@@ -2474,6 +2514,41 @@ function doAssignCollectionRoles(collectionID)
 	}while(true);
 }
 
+/**
+ * Curate Collection
+ *
+ */
+/** Curate
+ *
+ *
+ */
+function doCurateCollection(collectionID, task) {
+    var result;
+
+    do {
+		   sendPageAndWait("admin/collection/curateCollection",{"collectionID":collectionID},result);
+		   assertEditCollection(collectionID);
+		   result = null;
+		   if (cocoon.request.get("submit_return") || cocoon.request.get("submit_metadata") ||
+			cocoon.request.get("submit_roles") || cocoon.request.get("submit_harvesting") ||
+                        cocoon.request.get("submit_curate"))
+                   {
+			   //return to the editCollection function which will determine where to go next.
+			  return null;
+		   }
+
+                  if (cocoon.request.get("submit_curate_task"))
+		   {
+			   result = FlowContainerUtils.processCurateCollection(getDSContext(), collectionID, cocoon.request);
+		   }
+                   else if (cocoon.request.get("submit_queue_task"))
+                   {
+                           result = FlowContainerUtils.processQueueCollection(getDSContext(), collectionID, cocoon.request);
+                   }
+    }
+    while (true);
+}
+
 
 
 /**
@@ -2550,7 +2625,8 @@ function doEditCollectionHarvesting(collectionID)
 		assertAdminCollection(collectionID);
 				
 		if (cocoon.request.get("submit_return") || cocoon.request.get("submit_metadata") || 
-			cocoon.request.get("submit_roles") || cocoon.request.get("submit_harvesting"))
+			cocoon.request.get("submit_roles") || cocoon.request.get("submit_harvesting") ||
+                        cocoon.request.get("submit_curate"))
 		{
 			// return to the editCollection function which will determine where to go next.
 			return null;	
@@ -2719,11 +2795,59 @@ function doCreateCommunity(parentCommunityID)
 	} while (true);
 }
 
+
+/**
+ * Edit a community.
+ */
+function doEditCommunity(itemID)
+{
+	// Always go to the status page first
+	doEditCommunityMetadata(itemID);
+
+	do {
+	    if (cocoon.request.get("submit_return"))
+		{
+			return null;
+		}
+                else if (cocoon.request.get("submit_metadata")) {
+                    doEditCommunityMetadata(itemID);
+                }
+		else if (cocoon.request.get("submit_status"))
+		{
+			doEditItemStatus(itemID);
+		}
+		else if (cocoon.request.get("submit_bitstreams"))
+		{
+			doEditItemBitstreams(itemID);
+		}
+		else if (cocoon.request.get("submit_save") || cocoon.request.get("submit_delete") || cocoon.request.get("submit_delete_logo"))
+		{
+			doEditCommunityMetadata(itemID, -1);
+		}
+                else if (cocoon.request.get("submit_authorizations")) {
+			result = doAuthorizeCommunity(communityID);
+		}
+		else if (cocoon.request.get("submit_roles"))
+		{
+			doAssignCommunityRoles(itemID);
+		}
+	        else if (cocoon.request.get("submit_curate"))  {
+                        doCurateCommunity(itemID, cocoon.request.get("curate_task"));
+                }
+                else
+		{
+			// This case should never happen but to prevent an infinite loop
+			// from occuring let's just return null.
+			return null;
+		}
+	} while (true)
+}
+
 /**
  * Edit metadata of a community; presenting the user with a form of standard community metadata,
  * an option add/remove a logo and a link to the authorizations screen 
  */
-function doEditCommunity(communityID)
+function doEditCommunityMetadata(communityID)
 {
 	assertEditCommunity(communityID);
 	var result;
@@ -2733,37 +2857,22 @@ function doEditCommunity(communityID)
 		assertEditCommunity(communityID);
 		result=null;
 		
-		if (cocoon.request.get("submit_return"))
-		{
+		if (cocoon.request.get("submit_return") || cocoon.request.get("submit_metadata") ||  cocoon.request.get("submit_roles") || cocoon.request.get("submit_curate")){
 			return null;	
 		}
-		if (cocoon.request.get("submit_save")) 
-		{
+		if (cocoon.request.get("submit_save")) {
 			result = FlowContainerUtils.processEditCommunity(getDSContext(), communityID, false, cocoon.request);
-      if (result.getContinue())
-          return null;
-		}
-		else if (cocoon.request.get("submit_delete")) 
-		{
+                        if (result.getContinue())
+                            return null;
+		} else if (cocoon.request.get("submit_delete"))  {
 			assertAuthorized(Constants.COMMUNITY, communityID, Constants.DELETE);
 			result = doDeleteCommunity(communityID);
 		}
-		else if (cocoon.request.get("submit_delete_logo")) 
-		{
+		else if (cocoon.request.get("submit_delete_logo")) {
 			result = FlowContainerUtils.processEditCommunity(getDSContext(), communityID, true, cocoon.request);
 		}
-		if (cocoon.request.get("submit_authorizations")) 
-		{
-			// authorization check moved to FlowAuthorizationUtils
-		    // assertAdministrator();
-			result = doAuthorizeCommunity(communityID);
-		}
-
-    if (cocoon.request.get("submit_roles"))
-    {
-      doAssignCommunityRoles(communityID);
-    }
-	}while (true);
+	}
+        while (true);
 }
 
 /**
@@ -2801,12 +2910,10 @@ function doAssignCommunityRoles(communityID)
 		   result = null;
 		
 		
-		   if (cocoon.request.get("submit_return") || cocoon.request.get("submit_metadata") || cocoon.request.get("submit_roles"))
+		   if (cocoon.request.get("submit_return") || cocoon.request.get("submit_metadata") || cocoon.request.get("submit_roles") || cocoon.request.get("submit_curate") )
 		   {
-			   // return to the editCommunity function which will determine where to go next.
 			   return null;
 		   }
-		
 		   else if (cocoon.request.get("submit_authorizations"))
 		   {
 			   // authorization check moved to FlowAuthorizationUtils
@@ -2825,6 +2932,33 @@ function doAssignCommunityRoles(communityID)
 		   }
 		
     }while (true);
+}
+
+/** Curate
+ *
+ *
+ */
+function doCurateCommunity(communityID, task) {
+    var result;
+
+    do {
+		   sendPageAndWait("admin/community/curateCommunity",{"communityID":communityID},result);
+		   assertEditCommunity(communityID);
+		   result = null;
+		   if (cocoon.request.get("submit_return") || cocoon.request.get("submit_metadata") || cocoon.request.get("submit_roles") || cocoon.request.get("submit_curate") )
+		   {
+			return null;
+		   }
+		   else if (cocoon.request.get("submit_curate_task"))
+		   {
+                        result = FlowContainerUtils.processCurateCommunity(getDSContext(), communityID, cocoon.request);
+		   }
+                   else if (cocoon.request.get("submit_queue_task"))
+                    {
+                      result = FlowContainerUtils.processQueueCommunity(getDSContext(), communityID, cocoon.request);
+                    }
+
+    } while (true);
 }
 
 /**

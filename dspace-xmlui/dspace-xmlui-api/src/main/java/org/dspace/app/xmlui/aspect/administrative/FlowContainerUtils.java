@@ -65,8 +65,10 @@ import org.dspace.content.ItemIterator;
 import org.dspace.harvest.OAIHarvester;
 import org.dspace.harvest.OAIHarvester.HarvestScheduler;
 import org.dspace.content.crosswalk.CrosswalkException;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.curate.Curator;
 import org.dspace.eperson.Group;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
@@ -1131,6 +1133,161 @@ public class FlowContainerUtils
         return result;
     }
 	
+    
+        /**
+     * processCurateCollection
+     *
+     * Utility method to process curation tasks
+     * submitted via the DSpace GUI
+     *
+     * @param context
+     * @param dsoID
+     * @param request
+     *
+     */
+        public static FlowResult processCurateCollection(Context context, int dsoID, Request request)
+                                                                throws AuthorizeException, IOException, SQLException, Exception
+	{
+                FlowResult result = new FlowResult();
+                String task = request.getParameter("curate_task");
+		if (task != null && task.length() == 0)
+			task = null;
+		Curator curator = new Curator();
+                curator.addTask(task);
+                curator.setInvoked(Curator.Invoked.INTERACTIVE);
+                if (Collection.find(context, dsoID) != null)
+                {
+                    Collection collection = Collection.find(context, dsoID);
+                    curator.curate(collection);
+                }
+                result.setOutcome(true);
+		result.setMessage(new Message("default","The task, " + task + " was completed with the status: " +
+                        curator.getStatus(task) + "." + "\n" +  "Results: " + "\n" +
+                        ((curator.getResult(task) != null) ? curator.getResult(task) : "Nothing to do for this DSpace object.")));
+                result.setContinue(true);
+		return result;
+	}
+
+        /**
+         * queues curation tasks
+         */
+        public static FlowResult processQueueCollection(Context context, int dsoID, Request request)
+                                                                throws AuthorizeException, IOException, SQLException, Exception
+	{
+                FlowResult result = new FlowResult();
+                String task = request.getParameter("curate_task");
+                String handle = "";
+                Curator curator = new Curator();
+                String taskQueueName = ConfigurationManager.getProperty("curate", "ui.queuename");
+                boolean status = true;
+                Collection collection = Collection.find(context, dsoID);
+                if (collection != null)
+                {
+                    handle = collection.getHandle();
+                }
+		if (task != null && task.length() == 0)
+                {
+                    task = null;
+                }
+                curator.addTask(task);
+                try
+                {
+                    curator.queue(context, handle, taskQueueName);
+                }
+                catch (IOException ioe)
+                {
+                    status = false;
+                }
+                finally
+                {
+                    result.setOutcome(true);
+                    result.setMessage(new Message("default"," The task, " + task + ", has " +
+                              ((status) ? "been queued with id, " + handle + " in the " + taskQueueName +
+                              " queue.": "has not been queued with id, " + handle + ". An error occurred.")));
+                    result.setContinue(true);
+                    return result;
+                }
+	}
+
+    /** 
+     * processCurateCommunity
+     *
+     * Utility method to process curation tasks
+     * submitted via the DSpace GUI
+     *
+     * @param context
+     * @param dsoID
+     * @param request
+     *
+     */
+        public static FlowResult processCurateCommunity(Context context, int dsoID, Request request)
+                                                                throws AuthorizeException, IOException, SQLException, Exception
+	{
+                FlowResult result = new FlowResult();
+                String task = request.getParameter("curate_task");
+		if (task != null && task.length() == 0)
+                {
+                    task = null;
+                }
+		Curator curator = new Curator();
+                // curator.setReporter(reporterName);
+                curator.addTask(task);
+                curator.setInvoked(Curator.Invoked.INTERACTIVE);
+                Community community = Community.find(context, dsoID);
+                if (community != null)
+                {
+                    curator.curate(context, community.getHandle());
+                }
+                result.setOutcome(true);
+		result.setMessage(new Message("default","The task, " + task + " was completed with the status: " + 
+                        curator.getStatus(task) + "." + "\n" +  "Results: " + "\n" +
+                        ((curator.getResult(task) != null) ? curator.getResult(task) : "Nothing to do for this DSpace object.")));
+                result.setContinue(true);
+		return result;
+	}
+
+        /**
+         * queues curation tasks
+         */
+        public static FlowResult processQueueCommunity(Context context, int dsoID, Request request)
+                                                                throws AuthorizeException, IOException, SQLException, Exception
+	{
+                FlowResult result = new FlowResult();
+                String task = request.getParameter("curate_task");
+                String handle = "";
+                Curator curator = new Curator();
+                String taskQueueName = ConfigurationManager.getProperty("curate", "ui.queuename");
+                boolean status = true;
+                Community community = Community.find(context, dsoID);
+                if (community != null)
+                {
+                    handle = community.getHandle();
+                }
+		if (task != null && task.length() == 0)
+                {
+                    task = null;
+                }
+                curator.addTask(task);
+                try
+                {
+                    curator.queue(context, handle, taskQueueName);
+                }
+                catch (IOException ioe)
+                {
+                    status = false;
+                }
+                finally
+                {
+                    result.setOutcome(true);
+                    result.setMessage(new Message("default"," The task, " + task + ", has " +
+                              ((status) ? "been queued with id, " + handle + " in the " + taskQueueName +
+                              " queue.": "has not been queued with id, " + handle + ". An error occurred.")));
+                    result.setContinue(true);
+                    return result;
+                }
+	}
+	
+    
 	/**
 	 * Check whether this metadata value is a proper XML fragment. If the value is not 
 	 * then an error message will be returned that might (sometimes not) tell the user how

@@ -75,7 +75,8 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 	private static final Message T_options_metadata = message("xmlui.administrative.collection.general.options_metadata");	
 	private static final Message T_options_roles = message("xmlui.administrative.collection.general.options_roles");
 	private static final Message T_options_harvest = message("xmlui.administrative.collection.GeneralCollectionHarvestingForm.options_harvest");
-	
+	private static final Message T_options_curate = message("xmlui.administrative.collection.general.options_curate");
+        
 	private static final Message T_submit_return = message("xmlui.general.return");
 	
 	private static final Message T_title = message("xmlui.administrative.collection.AssignCollectionRoles.title");
@@ -152,6 +153,7 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 	    options.addItem().addXref(baseURL+"&submit_metadata",T_options_metadata);
 	    options.addItem().addHighlight("bold").addXref(baseURL+"&submit_roles",T_options_roles);
 	    options.addItem().addXref(baseURL+"&submit_harvesting",T_options_harvest);
+            options.addItem().addXref(baseURL+"&submit_curate",T_options_curate);
 	    	    
 	    // The table of admin roles
 	    Table rolesTable = main.addTable("roles-table", 6, 5);

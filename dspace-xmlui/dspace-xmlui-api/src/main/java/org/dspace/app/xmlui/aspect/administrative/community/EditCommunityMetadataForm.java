@@ -71,6 +71,7 @@ public class EditCommunityMetadataForm extends AbstractDSpaceTransformer
     private static final Message T_community_trail = message("xmlui.administrative.community.general.community_trail");
     private static final Message T_options_metadata = message("xmlui.administrative.community.general.options_metadata");  
     private static final Message T_options_roles = message("xmlui.administrative.community.general.options_roles");
+    private static final Message T_options_curate = message("xmlui.administrative.community.general.options_curate");
 
 	private static final Message T_title = message("xmlui.administrative.community.EditCommunityMetadataForm.title");
 	private static final Message T_trail = message("xmlui.administrative.community.EditCommunityMetadataForm.trail");
@@ -119,6 +120,7 @@ public class EditCommunityMetadataForm extends AbstractDSpaceTransformer
         List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
         options.addItem().addHighlight("bold").addXref(baseURL+"&submit_metadata",T_options_metadata);
         options.addItem().addXref(baseURL+"&submit_roles",T_options_roles);
+        options.addItem().addXref(baseURL+"&submit_curate",T_options_curate);
 	    
 	    // The grand list of metadata options
 	    List metadataList = main.addList("metadataList", "form");

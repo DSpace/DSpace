@@ -73,7 +73,7 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	private static final Message T_options_metadata = message("xmlui.administrative.collection.general.options_metadata");	
 	private static final Message T_options_roles = message("xmlui.administrative.collection.general.options_roles");
 	private static final Message T_options_harvest = message("xmlui.administrative.collection.GeneralCollectionHarvestingForm.options_harvest");
-	
+        private static final Message T_options_curate = message("xmlui.administrative.collection.general.options_curate");	
 	private static final Message T_submit_return = message("xmlui.general.return");
 	
 	private static final Message T_title = message("xmlui.administrative.collection.EditCollectionMetadataForm.title");
@@ -132,6 +132,7 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	    options.addItem().addHighlight("bold").addXref(baseURL+"&submit_metadata",T_options_metadata);
 	    options.addItem().addXref(baseURL+"&submit_roles",T_options_roles);
 	    options.addItem().addXref(baseURL+"&submit_harvesting",T_options_harvest);
+            options.addItem().addXref(baseURL+"&submit_curate",T_options_curate);
 	    
 	    
 	    // The grand list of metadata options

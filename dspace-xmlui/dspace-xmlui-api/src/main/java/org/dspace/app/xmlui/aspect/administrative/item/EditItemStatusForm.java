@@ -76,6 +76,7 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 	private static final Message T_option_bitstreams = message("xmlui.administrative.item.general.option_bitstreams");
 	private static final Message T_option_metadata = message("xmlui.administrative.item.general.option_metadata");
 	private static final Message T_option_view = message("xmlui.administrative.item.general.option_view");
+        private static final Message T_option_curate = message("xmlui.administrative.item.general.option_curate");
 
 	
 	private static final Message T_title = message("xmlui.administrative.item.EditItemStatusForm.title");
@@ -132,7 +133,7 @@ public class EditItemStatusForm extends AbstractDSpaceTransformer {
 		options.addItem().addXref(baseURL+"&submit_bitstreams",T_option_bitstreams);
 		options.addItem().addXref(baseURL+"&submit_metadata",T_option_metadata);
 		options.addItem().addXref(baseURL + "&view_item", T_option_view);
-		
+		options.addItem().addXref(baseURL + "&submit_curate", T_option_curate);
 		
 		
 		
