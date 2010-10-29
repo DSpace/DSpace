@@ -72,7 +72,6 @@ SELECT setval('community2collection_seq', max(id)) FROM community2collection;
 SELECT setval('collection2item_seq', max(id)) FROM collection2item;
 SELECT setval('resourcepolicy_seq', max(policy_id)) FROM resourcepolicy;
 SELECT setval('epersongroup2eperson_seq', max(id)) FROM epersongroup2eperson;
-SELECT setval('handle_seq', max(handle_id)) FROM handle;
 SELECT setval('workspaceitem_seq', max(workspace_item_id)) FROM workspaceitem;
 SELECT setval('workflowitem_seq', max(workflow_id)) FROM workflowitem;
 SELECT setval('tasklistitem_seq', max(tasklist_id)) FROM tasklistitem;
@@ -85,3 +84,19 @@ SELECT setval('metadatavalue_seq', max(metadata_value_id)) FROM metadatavalue;
 SELECT setval('metadataschemaregistry_seq', max(metadata_schema_id)) FROM metadataschemaregistry;
 SELECT setval('harvested_collection_seq', max(id)) FROM harvested_collection;
 SELECT setval('harvested_item_seq', max(id)) FROM harvested_item;
+
+-- Handle Sequence is a special case.  Since Handles minted by DSpace use the 'handle_seq',
+-- we need to ensure the next assigned handle will *always* be unique.  So, 'handle_seq'
+-- always needs to be set to the value of the *largest* handle suffix.  That way when the
+-- next handle is assigned, it will use the next largest number. This query does the following:
+--  For all 'handle' values which have a number in their suffix (after '/'), find the maximum
+--  suffix value, convert it to a 'bigint' type, and set the 'handle_seq' to that max value.
+SELECT setval('handle_seq',
+              CAST (
+                    max(
+                        to_number(regexp_replace(handle, '.*/', ''), '999999999999')
+                       )
+                    AS BIGINT)
+             )
+    FROM handle
+    WHERE handle SIMILAR TO '%/[0123456789]*';
