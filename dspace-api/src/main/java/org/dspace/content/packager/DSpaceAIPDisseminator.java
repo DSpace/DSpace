@@ -76,6 +76,9 @@ import edu.harvard.hul.ois.mets.Type;
 import edu.harvard.hul.ois.mets.helper.MetsException;
 import edu.harvard.hul.ois.mets.helper.PCData;
 import java.net.URLEncoder;
+import java.text.ParseException;
+import java.util.Date;
+import org.dspace.core.Utils;
 
 /**
  * Subclass of the METS packager framework to disseminate a DSpace
@@ -155,8 +158,32 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
         //Before disseminating anything, save the passed in PackageParameters, so they can be used by all methods
         disseminateParams = params;
 
-        //just do a normal dissemination as specified by AbstractMETSDisseminator
-        super.disseminate(context, dso, params, pkgFile);
+        boolean disseminate = true; //by default, always disseminate
+
+        //if user specified to only disseminate objects updated *after* a specific date
+        // (Note: this only works for Items right now, as DSpace doesn't store a
+        //  last modified date for Collections or Communities)
+        if(disseminateParams.containsKey("updatedAfter") && dso.getType()==Constants.ITEM)
+        {
+            Date afterDate = Utils.parseISO8601Date(disseminateParams.getProperty("updatedAfter"));
+
+            //if null is returned, we couldn't parse the date!
+            if(afterDate==null)
+                 throw new IOException("Invalid date passed in via 'updatedAfter' option. Date must be in ISO-8601 format, and include both a day and time (e.g. 2010-01-01T00:00:00).");
+
+            //check when this item was last modified.
+            Item i = (Item) dso;
+            if(i.getLastModified().after(afterDate))
+                disseminate = true;
+            else
+                disseminate = false;
+        }
+
+        if(disseminate)
+        {
+            //just do a normal dissemination as specified by AbstractMETSDisseminator
+            super.disseminate(context, dso, params, pkgFile);
+        }
     }
 
     /**

@@ -114,73 +114,77 @@ public abstract class AbstractPackageDisseminator
         //try to disseminate the first object using provided PackageDisseminator
         disseminate(context, dso, params, pkgFile);
 
-        //add to list of successfully disseminated packages
-        addToPackageList(pkgFile);
-
-        //We can only recursively disseminate non-Items
-        //(NOTE: Items have no children, as Bitstreams/Bundles are created from Item packages)
-        if(dso.getType()!=Constants.ITEM)
+        //check if package was disseminated
+        if(pkgFile.exists())
         {
-            //Determine where first file package was disseminated to, as all
-            //others will be written to same directory
-            String pkgDirectory = pkgFile.getCanonicalFile().getParent();
-            if(!pkgDirectory.endsWith(File.separator))
+            //add to list of successfully disseminated packages
+            addToPackageList(pkgFile);
+
+            //We can only recursively disseminate non-Items
+            //(NOTE: Items have no children, as Bitstreams/Bundles are created from Item packages)
+            if(dso.getType()!=Constants.ITEM)
             {
-                pkgDirectory += File.separator;
-            }
-            String fileExtension = PackageUtils.getFileExtension(pkgFile.getName());
+                //Determine where first file package was disseminated to, as all
+                //others will be written to same directory
+                String pkgDirectory = pkgFile.getCanonicalFile().getParent();
+                if(!pkgDirectory.endsWith(File.separator))
+                {
+                    pkgDirectory += File.separator;
+                }
+                String fileExtension = PackageUtils.getFileExtension(pkgFile.getName());
 
-            //recursively disseminate content, based on object type
-            switch (dso.getType())
-            {
-                case Constants.COLLECTION :
-                    //Also find all Items in this Collection and disseminate
-                    Collection collection = (Collection) dso;
-                    ItemIterator iterator = collection.getAllItems();
-                    while(iterator.hasNext())
-                    {
-                        Item item = iterator.next();
+                //recursively disseminate content, based on object type
+                switch (dso.getType())
+                {
+                    case Constants.COLLECTION :
+                        //Also find all Items in this Collection and disseminate
+                        Collection collection = (Collection) dso;
+                        ItemIterator iterator = collection.getAllItems();
+                        while(iterator.hasNext())
+                        {
+                            Item item = iterator.next();
 
-                        //disseminate all items (recursively!)
-                        String childFileName = pkgDirectory + PackageUtils.getPackageName(item, fileExtension);
-                        disseminateAll(context, item, params, new File(childFileName));
-                    }
+                            //disseminate all items (recursively!)
+                            String childFileName = pkgDirectory + PackageUtils.getPackageName(item, fileExtension);
+                            disseminateAll(context, item, params, new File(childFileName));
+                        }
 
-                    break;
-                case Constants.COMMUNITY :
-                    //Also find all SubCommunities in this Community and disseminate
-                    Community community = (Community) dso;
-                    Community[] subcommunities = community.getSubcommunities();
-                    for(int i=0; i<subcommunities.length; i++)
-                    {
-                        //disseminate all sub-communities (recursively!)
-                        String childFileName = pkgDirectory + PackageUtils.getPackageName(subcommunities[i], fileExtension);
-                        disseminateAll(context, subcommunities[i], params, new File(childFileName));
-                    }
+                        break;
+                    case Constants.COMMUNITY :
+                        //Also find all SubCommunities in this Community and disseminate
+                        Community community = (Community) dso;
+                        Community[] subcommunities = community.getSubcommunities();
+                        for(int i=0; i<subcommunities.length; i++)
+                        {
+                            //disseminate all sub-communities (recursively!)
+                            String childFileName = pkgDirectory + PackageUtils.getPackageName(subcommunities[i], fileExtension);
+                            disseminateAll(context, subcommunities[i], params, new File(childFileName));
+                        }
 
-                    //Also find all Collections in this Community and disseminate
-                    Collection[] collections = community.getCollections();
-                    for(int i=0; i<collections.length; i++)
-                    {
-                        //disseminate all collections (recursively!)
-                        String childFileName = pkgDirectory + PackageUtils.getPackageName(collections[i], fileExtension);
-                        disseminateAll(context, collections[i], params, new File(childFileName));
-                    }
+                        //Also find all Collections in this Community and disseminate
+                        Collection[] collections = community.getCollections();
+                        for(int i=0; i<collections.length; i++)
+                        {
+                            //disseminate all collections (recursively!)
+                            String childFileName = pkgDirectory + PackageUtils.getPackageName(collections[i], fileExtension);
+                            disseminateAll(context, collections[i], params, new File(childFileName));
+                        }
 
-                    break;
-                case Constants.SITE :
-                    //Also find all top-level Communities and disseminate
-                    Community[] topCommunities = Community.findAllTop(context);
-                    for(int i=0; i<topCommunities.length; i++)
-                    {
-                        //disseminate all top-level communities (recursively!)
-                        String childFileName = pkgDirectory + PackageUtils.getPackageName(topCommunities[i], fileExtension);
-                        disseminateAll(context, topCommunities[i], params, new File(childFileName));
-                    }
+                        break;
+                    case Constants.SITE :
+                        //Also find all top-level Communities and disseminate
+                        Community[] topCommunities = Community.findAllTop(context);
+                        for(int i=0; i<topCommunities.length; i++)
+                        {
+                            //disseminate all top-level communities (recursively!)
+                            String childFileName = pkgDirectory + PackageUtils.getPackageName(topCommunities[i], fileExtension);
+                            disseminateAll(context, topCommunities[i], params, new File(childFileName));
+                        }
 
-                    break;
-            }//end switch
-        }//end if not an Item
+                        break;
+                }//end switch
+            }//end if not an Item
+        }//end if pkgFile exists
 
         //return list of all successfully disseminated packages
         return getPackageList();
