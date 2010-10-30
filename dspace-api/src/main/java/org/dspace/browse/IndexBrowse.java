@@ -312,13 +312,13 @@ public class IndexBrowse
             if (bis[i].isMetadataIndex())
             {
                 log.debug("Pruning metadata index: " + bis[i].getTableName());
-                dao.pruneExcess(bis[i].getTableName(), bis[i].getMapTableName(), false);
+                dao.pruneMapExcess(bis[i].getMapTableName(), false);
                 dao.pruneDistinct(bis[i].getDistinctTableName(), bis[i].getMapTableName());
             }
         }
 
-        dao.pruneExcess(BrowseIndex.getItemBrowseIndex().getTableName(), null, false);
-        dao.pruneExcess(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), null, true);
+        dao.pruneExcess(BrowseIndex.getItemBrowseIndex().getTableName(), false);
+        dao.pruneExcess(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), true);
     }
 
     /**
@@ -409,10 +409,9 @@ public class IndexBrowse
             // Now update the metadata indexes
             for (int i = 0; i < bis.length; i++)
             {
-                log.debug("Indexing for item " + item.getID() + ", for index: " + bis[i].getTableName());
-                
                 if (bis[i].isMetadataIndex())
                 {
+                    log.debug("Indexing for item " + item.getID() + ", for index: " + bis[i].getTableName());
                     Set<Integer> distIDSet = new HashSet<Integer>();
 
                     // now index the new details - but only if it's archived and not withdrawn
@@ -481,14 +480,14 @@ public class IndexBrowse
                                         }
                                         else // put it in the browse index as if it hasn't have an authority key
                                         {
-                                        // get the normalised version of the value
-                                        String nVal = OrderFormat.makeSortString(values[x].value, values[x].language, bis[i].getDataType());
-                                            distIDSet.add(dao.getDistinctID(bis[i].getDistinctTableName(), values[x].value, null, nVal));
+                                            // get the normalised version of the value
+                                            String nVal = OrderFormat.makeSortString(values[x].value, values[x].language, bis[i].getDataType());
+                                                distIDSet.add(dao.getDistinctID(bis[i].getDistinctTableName(), values[x].value, null, nVal));
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
                     }
 
                     // Do we have any mappings?
@@ -506,7 +505,7 @@ public class IndexBrowse
                         {
                             distIDarr[didx++] = distID;
                         }
-                        dao.updateDistinctMappings(bis[i].getMapTableName(), item.getID(), distIDarr);
+                        MappingResults results = dao.updateDistinctMappings(bis[i].getMapTableName(), item.getID(), distIDarr);
                     }
                 }
             }

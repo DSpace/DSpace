@@ -624,6 +624,20 @@ public class DatabaseManager
         return null;
     }
 
+    public static DataSource getDataSource()
+    {
+        try
+        {
+            initialize();
+        }
+        catch (SQLException e)
+        {
+            throw new IllegalStateException(e.getMessage(), e);
+        }
+
+        return dataSource;
+    }
+
     /**
      * Release resources associated with this connection.
      * 

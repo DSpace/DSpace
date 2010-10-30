@@ -39,6 +39,7 @@ package org.dspace.browse;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -244,8 +245,9 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#updateDistinctMapping(java.lang.String, int, int)
      */
-    public boolean updateDistinctMappings(String table, int itemID, int[] distinctIDs) throws BrowseException
+    public MappingResults updateDistinctMappings(String table, int itemID, int[] distinctIDs) throws BrowseException
     {
+        BrowseMappingResults results = new BrowseMappingResults();
         try
         {
             // Remove (set to -1) any duplicate distinctIDs
@@ -275,6 +277,7 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
                             // Found this mapping
                             if (distinctIDs[i] == trDistinctID)
                             {
+                                results.addRetainedDistinctId(trDistinctID);
                                 // Flag it, and remove (-1) from the item mappings
                                 itemIsMapped = true;
                                 distinctIDs[i] = -1;
@@ -284,6 +287,7 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
                         // The item is no longer mapped to this community, so remove the database record
                         if (!itemIsMapped)
                         {
+                            results.addRemovedDistinctId(trDistinctID);
                             DatabaseManager.delete(context, tr);
                         }
                     }
@@ -295,14 +299,15 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
             }
 
             // Any remaining mappings need to be added to the database
-            for (int i = 0; i < distinctIDs.length; i++)
+            for (int distinctID : distinctIDs)
             {
-                if (distinctIDs[i] > -1)
+                if (distinctID > -1)
                 {
                     TableRow row = DatabaseManager.create(context, table);
                     row.setColumn("item_id", itemID);
-                    row.setColumn("distinct_id", distinctIDs[i]);
+                    row.setColumn("distinct_id", distinctID);
                     DatabaseManager.update(context, row);
+                    results.addAddedDistinctId(distinctID);
                 }
             }
         }
@@ -313,7 +318,7 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
             throw new BrowseException(msg, e);
         }
 
-        return false;
+        return results;
     }
 
     /* (non-Javadoc)
@@ -329,9 +334,11 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
                             "distinct_id integer UNIQUE, " +
                             "authority VARCHAR(100), " +
                             "value " + getValueColumnDefinition() + ", " +
-                            "sort_value " + getSortColumnDefinition() +
+                            "sort_value " + getSortColumnDefinition() + 
                             ");";
-            
+
+            //                            "item_count integer DEFAULT 0" +
+
             if (execute)
             {
                 DatabaseManager.updateQuery(context, create);
@@ -817,9 +824,9 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
     }
     
     /* (non-Javadoc)
-     * @see org.dspace.browse.BrowseCreateDAO#pruneExcess(java.lang.String, java.lang.String)
+     * @see org.dspace.browse.BrowseCreateDAO#pruneExcess(java.lang.String, boolean)
      */
-    public void pruneExcess(String table, String map, boolean withdrawn)
+    public void pruneExcess(String table, boolean withdrawn)
         throws BrowseException
     {
         try
@@ -828,12 +835,6 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
 
             String delete = "DELETE FROM " + table + " WHERE NOT EXISTS (SELECT 1 FROM item WHERE item.item_id=" + table + ".item_id AND " + itemCriteria + ")";
             DatabaseManager.updateQuery(context, delete);
-
-            if (map != null)
-            {
-                String deleteDistinct = "DELETE FROM " + map + " WHERE NOT EXISTS (SELECT 1 FROM item WHERE item.item_id=" + map + ".item_id AND " + itemCriteria + ")";
-                DatabaseManager.updateQuery(context, deleteDistinct);
-            }
         }
         catch (SQLException e)
         {
@@ -842,6 +843,26 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
         }
     }
     
+    /* (non-Javadoc)
+     * @see org.dspace.browse.BrowseCreateDAO#pruneMapExcess(java.lang.String, boolean)
+     */
+    public void pruneMapExcess(String map, boolean withdrawn)
+        throws BrowseException
+    {
+        try
+        {
+            String itemCriteria = withdrawn ? "item.withdrawn = true" : "item.in_archive = true AND item.withdrawn = false";
+
+            String deleteDistinct = "DELETE FROM " + map + " WHERE NOT EXISTS (SELECT 1 FROM item WHERE item.item_id=" + map + ".item_id AND " + itemCriteria + ")";
+            DatabaseManager.updateQuery(context, deleteDistinct);
+        }
+        catch (SQLException e)
+        {
+            log.error("caught exception: ", e);
+            throw new BrowseException(e);
+        }
+    }
+
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#testTableExistence(java.lang.String)
      */
@@ -1022,5 +1043,42 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
         }
 
         return true;
+    }
+
+    private static class BrowseMappingResults implements MappingResults
+    {
+        private List<Integer> addedDistinctIds    = new ArrayList<Integer>();
+        private List<Integer> retainedDistinctIds = new ArrayList<Integer>();
+        private List<Integer> removedDistinctIds  = new ArrayList<Integer>();
+
+        private void addAddedDistinctId(int id)
+        {
+            addedDistinctIds.add(id);
+        }
+
+        private void addRetainedDistinctId(int id)
+        {
+            retainedDistinctIds.add(id);
+        }
+
+        private void addRemovedDistinctId(int id)
+        {
+            removedDistinctIds.add(id);
+        }
+
+        public List<Integer> getAddedDistinctIds()
+        {
+            return addedDistinctIds;
+        }
+
+        public List<Integer> getRetainedDistinctIds()
+        {
+            return retainedDistinctIds;
+        }
+
+        public List<Integer> getRemovedDistinctIds()
+        {
+            return Collections.unmodifiableList(removedDistinctIds);
+        }
     }
 }

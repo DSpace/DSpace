@@ -37,6 +37,7 @@
  */
 package org.dspace.browse;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -184,9 +185,10 @@ public interface BrowseCreateDAO
      * @param table		 	the mapping table
      * @param itemID		the item id
      * @param distinctIDs	the id of the distinct record
+     * @return the ids of any distinct records that have been unmapped
      * @throws BrowseException
      */
-    public boolean updateDistinctMappings(String table, int itemID, int[] distinctIDs) throws BrowseException;
+    public MappingResults updateDistinctMappings(String table, int itemID, int[] distinctIDs) throws BrowseException;
 
 	/**
 	 * Find out of a given table exists.
@@ -369,12 +371,22 @@ public interface BrowseCreateDAO
 	 * If it finds an index which does not have an associated item it removes it.
 	 * 
 	 * @param table		the index table to check
-	 * @param map		the name of the associated distinct mapping table
 	 * @param withdrawn TODO
 	 * @throws BrowseException
 	 */
-	public void pruneExcess(String table, String map, boolean withdrawn) throws BrowseException;
-	
+	public void pruneExcess(String table, boolean withdrawn) throws BrowseException;
+
+    /**
+     * So that any left over indices for items which have been deleted can be assured to have
+     * been removed, this method checks for indices for items which are not in the item table.
+     * If it finds an index which does not have an associated item it removes it.
+     *
+     * @param map		the name of the associated distinct mapping table
+     * @param withdrawn TODO
+     * @throws BrowseException
+     */
+    public void pruneMapExcess(String map, boolean withdrawn) throws BrowseException;
+
 	/**
 	 * So that there are no distinct values indexed which are no longer referenced from the
 	 * map table, this method checks for values which are not referenced from the map,
