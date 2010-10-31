@@ -285,8 +285,10 @@ public class WorkflowCurator {
                     } else if ("taskset".equals(eName)) {
                         taskSet = new TaskSet(reader.getAttributeValue(0));
                     } else if ("flowstep".equals(eName)) {
-                        flowStep = new FlowStep(reader.getAttributeValue(0),                    
-                                                reader.getAttributeValue(1));
+                        int count = reader.getAttributeCount();
+                        String queue = (count == 2) ?
+                                       reader.getAttributeValue(1) : null;
+                        flowStep = new FlowStep(reader.getAttributeValue(0), queue);       
                     } else if ("task".equals(eName)) {
                         task = new Task(reader.getAttributeValue(0));
                     } else if ("workflow".equals(eName)) {
