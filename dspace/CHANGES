@@ -74,6 +74,7 @@
 - [DS-695] Convert DatabaseManager to use DataSource, allow for JNDI
 - [DS-697] Allow media filter plugins to register their input formats directly
 - [DS-732] Browse performance improvements
+- [DS-733] Load testing utilities
 
 (Graham Triggs, Mark Wood)
 - [DS-707] General improvements to performance, bug fixes and style
