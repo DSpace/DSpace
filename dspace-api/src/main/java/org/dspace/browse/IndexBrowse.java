@@ -301,6 +301,16 @@ public class IndexBrowse
         dao.deleteByItemID(table, itemID);
     }
 
+    private void removeDistinctIndex(int itemID, String distinctTable, String mapTable)
+        throws BrowseException
+    {
+        List<Integer> distinctIds = dao.deleteMappingsByItemID(mapTable, itemID);
+        if (distinctIds != null && distinctIds.size() > 0)
+        {
+            dao.pruneDistinct(distinctTable, mapTable, distinctIds);
+        }
+    }
+
     /**
      * Prune indexes - called from the public interfaces or at the end of a batch indexing process
      */
@@ -312,13 +322,18 @@ public class IndexBrowse
             if (bis[i].isMetadataIndex())
             {
                 log.debug("Pruning metadata index: " + bis[i].getTableName());
-                dao.pruneMapExcess(bis[i].getMapTableName(), false);
-                dao.pruneDistinct(bis[i].getDistinctTableName(), bis[i].getMapTableName());
+                pruneDistinctIndex(bis[i], null);
             }
         }
 
         dao.pruneExcess(BrowseIndex.getItemBrowseIndex().getTableName(), false);
         dao.pruneExcess(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), true);
+    }
+
+    private void pruneDistinctIndex(BrowseIndex bi, List<Integer> removedIds) throws BrowseException
+    {
+        dao.pruneMapExcess(bi.getMapTableName(), false, removedIds);
+        dao.pruneDistinct(bi.getDistinctTableName(), bi.getMapTableName(), removedIds);
     }
 
     /**
@@ -344,7 +359,7 @@ public class IndexBrowse
             indexItem(new ItemMetadataProxy(item));
 
             // Ensure that we remove any invalid entries
-            pruneIndexes();
+            //pruneIndexes();
         }
     }
     
@@ -494,7 +509,7 @@ public class IndexBrowse
                     if (distIDSet.isEmpty())
                     {
                         // remove any old mappings
-                        removeIndex(item.getID(), bis[i].getMapTableName());
+                        removeDistinctIndex(item.getID(), bis[i].getDistinctTableName(), bis[i].getMapTableName());
                     }
                     else
                     {
@@ -506,6 +521,10 @@ public class IndexBrowse
                             distIDarr[didx++] = distID;
                         }
                         MappingResults results = dao.updateDistinctMappings(bis[i].getMapTableName(), item.getID(), distIDarr);
+                        if (results.getRemovedDistinctIds() != null && results.getRemovedDistinctIds().size() > 0)
+                        {
+                            pruneDistinctIndex(bis[i], results.getRemovedDistinctIds());
+                        }
                     }
                 }
             }
@@ -645,7 +664,7 @@ public class IndexBrowse
         dao.deleteCommunityMappings(itemID);
 
         // Ensure that we remove any invalid entries
-        pruneIndexes();
+        //pruneIndexes();
 
         return true;
 	}
@@ -1158,7 +1177,7 @@ public class IndexBrowse
     		
     		// penultimately we have to delete any items that couldn't be located in the
     		// index list
-            pruneIndexes();
+            //pruneIndexes();
             
             // Make sure the deletes are written back
             context.commit();

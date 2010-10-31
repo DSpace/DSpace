@@ -36,6 +36,7 @@ package org.dspace.browse;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -286,12 +287,10 @@ public class MockBrowseCreateDAOOracle
         }
     }
 
-    /* (non-Javadoc)
-     * @see org.dspace.browse.BrowseCreateDAO#updateDistinctMapping(java.lang.String, int, int)
-     */
     @Mock
-    public boolean updateDistinctMappings(String table, int itemID, int[] distinctIDs) throws BrowseException
+    public MappingResults updateDistinctMappings(String table, int itemID, int[] distinctIDs) throws BrowseException
     {
+        BrowseMappingResults results = new BrowseMappingResults();
         try
         {
             checkContext();
@@ -299,7 +298,9 @@ public class MockBrowseCreateDAOOracle
             for (int i = 0; i < distinctIDs.length; i++)
             {
                 if (!isFirstOccurrence(distinctIDs, i))
+                {
                     distinctIDs[i] = -1;
+                }
             }
 
             // Find all existing mappings for this item
@@ -320,6 +321,7 @@ public class MockBrowseCreateDAOOracle
                             // Found this mapping
                             if (distinctIDs[i] == trDistinctID)
                             {
+                                results.addRetainedDistinctId(trDistinctID);
                                 // Flag it, and remove (-1) from the item mappings
                                 itemIsMapped = true;
                                 distinctIDs[i] = -1;
@@ -328,7 +330,10 @@ public class MockBrowseCreateDAOOracle
 
                         // The item is no longer mapped to this community, so remove the database record
                         if (!itemIsMapped)
+                        {
+                            results.addRemovedDistinctId(trDistinctID);
                             DatabaseManager.delete(internalContext, tr);
+                        }
                     }
                 }
                 finally
@@ -338,14 +343,15 @@ public class MockBrowseCreateDAOOracle
             }
 
             // Any remaining mappings need to be added to the database
-            for (int i = 0; i < distinctIDs.length; i++)
+            for (int distinctID : distinctIDs)
             {
-                if (distinctIDs[i] > -1)
+                if (distinctID > -1)
                 {
                     TableRow row = DatabaseManager.create(internalContext, table);
                     row.setColumn("item_id", itemID);
-                    row.setColumn("distinct_id", distinctIDs[i]);
+                    row.setColumn("distinct_id", distinctID);
                     DatabaseManager.update(internalContext, row);
+                    results.addAddedDistinctId(distinctID);
                 }
             }
         }
@@ -360,7 +366,7 @@ public class MockBrowseCreateDAOOracle
             cleanContext();
         }
 
-        return false;
+        return results;
     }
 
     /* (non-Javadoc)
@@ -904,20 +910,84 @@ public class MockBrowseCreateDAOOracle
         return true;
     }
 
+    @Mock
+    public List<Integer> deleteMappingsByItemID(String mapTable, int itemID) throws BrowseException
+    {
+        System.out.println("Map: " + mapTable + ", item: " + itemID);
+        List<Integer> distinctIds = new ArrayList<Integer>();
+        TableRowIterator tri = null;
+        try
+        {
+            checkContext();
+            try
+            {
+                tri = DatabaseManager.queryTable(internalContext, mapTable, "SELECT * FROM " + mapTable + " WHERE item_id=?", itemID);
+                if (tri != null)
+                {
+                    while (tri.hasNext())
+                    {
+                        TableRow tr = tri.next();
+                        distinctIds.add(tr.getIntColumn("distinct_id"));
+                        DatabaseManager.delete(internalContext, tr);
+                    }
+                }
+            }
+            catch (SQLException e)
+            {
+                log.error("caught exception: ", e);
+                throw new BrowseException(e);
+            }
+            finally
+            {
+                if (tri != null)
+                {
+                    tri.close();
+                }
+            }
+        }
+        finally
+        {
+            cleanContext();
+        }
+
+        return distinctIds;
+    }
+
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#pruneDistinct(java.lang.String, java.lang.String)
      */
     @Mock
-    public void pruneDistinct(String table, String map) throws BrowseException
+    public void pruneDistinct(String table, String map, List<Integer> distinctIds) throws BrowseException
     {
         try
         {
             checkContext();
-            String query = "DELETE FROM " + table +
-                            " WHERE id IN (SELECT id FROM " + table +
-                            " MINUS SELECT distinct_id AS id FROM " + map + ")";
+            StringBuilder query = new StringBuilder();
+            query.append("DELETE FROM ").append(table).append(" WHERE NOT EXISTS (SELECT 1 FROM ");
+            query.append(map).append(" WHERE ").append(map).append(".distinct_id = ").append(table).append(".id)");
 
-            DatabaseManager.updateQuery(internalContext, query);
+            if (distinctIds != null && distinctIds.size() > 0)
+            {
+                query.append(" AND ").append(table).append(".id IN (");
+                for (int i = 0; i < distinctIds.size(); i++)
+                {
+                    if (i > 0)
+                    {
+                        query.append(", ?");
+                    }
+                    else
+                    {
+                        query.append("?");
+                    }
+                }
+                query.append(")");
+
+                DatabaseManager.updateQuery(internalContext, query.toString(), distinctIds.toArray(new Integer[distinctIds.size()]));
+            }
+            else
+            {
+                DatabaseManager.updateQuery(internalContext, query.toString());
+            }
         }
         catch (SQLException e)
         {
@@ -934,26 +1004,77 @@ public class MockBrowseCreateDAOOracle
      * @see org.dspace.browse.BrowseCreateDAO#pruneExcess(java.lang.String, java.lang.String)
      */
     @Mock
-    public void pruneExcess(String table, String map, boolean withdrawn) throws BrowseException
+    public void pruneExcess(String table, boolean withdrawn) throws BrowseException
     {
         try
         {
             checkContext();
-            String itemQuery = "SELECT item_id FROM item WHERE ";
+            StringBuilder query = new StringBuilder();
+
+            query.append("DELETE FROM ").append(table).append(" WHERE NOT EXISTS (SELECT 1 FROM item WHERE item.item_id=");
+            query.append(table).append(".item_id AND ");
             if (withdrawn)
-                itemQuery += "withdrawn = 1";
-            else
-                itemQuery += "in_archive = 1 AND withdrawn = 0";
-
-            String delete = "DELETE FROM " + table + " WHERE item_id IN ( SELECT item_id FROM " + table + " MINUS " + itemQuery + ")";
-
-            DatabaseManager.updateQuery(internalContext, delete);
-
-            if (map != null)
             {
-                String deleteDistinct = "DELETE FROM " + map   + " WHERE item_id IN ( SELECT item_id FROM " + map   + " MINUS " + itemQuery + ")";
-                DatabaseManager.updateQuery(internalContext, deleteDistinct);
-                internalContext.commit();
+                query.append("item.withdrawn = 1");
+            }
+            else
+            {
+                query.append("item.in_archive = 1 AND item.withdrawn = 0");
+            }
+            query.append(")");
+            DatabaseManager.updateQuery(internalContext, query.toString());
+        }
+        catch (SQLException e)
+        {
+            log.error("caught exception: ", e);
+            throw new BrowseException(e);
+        }
+        finally
+        {
+            cleanContext();
+        }
+    }
+
+    @Mock
+    public void pruneMapExcess(String map, boolean withdrawn, List<Integer> distinctIds) throws BrowseException
+    {
+        try
+        {
+            checkContext();
+            StringBuilder query = new StringBuilder();
+
+            query.append("DELETE FROM ").append(map).append(" WHERE NOT EXISTS (SELECT 1 FROM item WHERE item.item_id=");
+            query.append(map).append(".item_id AND ");
+            if (withdrawn)
+            {
+                query.append("item.withdrawn = 1");
+            }
+            else
+            {
+                query.append("item.in_archive = 1 AND item.withdrawn = 0");
+            }
+            query.append(")");
+            if (distinctIds != null && distinctIds.size() > 0)
+            {
+                query.append(" AND ").append(map).append(".distinct_id IN (");
+                for (int i = 0; i < distinctIds.size(); i++)
+                {
+                    if (i > 0)
+                    {
+                        query.append(", ?");
+                    }
+                    else
+                    {
+                        query.append("?");
+                    }
+                }
+                query.append(")");
+
+                DatabaseManager.updateQuery(internalContext, query.toString(), distinctIds.toArray(new Integer[distinctIds.size()]));
+            }
+            else
+            {
+                DatabaseManager.updateQuery(internalContext, query.toString());
             }
         }
         catch (SQLException e)
@@ -1202,5 +1323,42 @@ public class MockBrowseCreateDAOOracle
         }
 
         return true;
+    }
+
+    private static class BrowseMappingResults implements MappingResults
+    {
+        private List<Integer> addedDistinctIds    = new ArrayList<Integer>();
+        private List<Integer> retainedDistinctIds = new ArrayList<Integer>();
+        private List<Integer> removedDistinctIds  = new ArrayList<Integer>();
+
+        private void addAddedDistinctId(int id)
+        {
+            addedDistinctIds.add(id);
+        }
+
+        private void addRetainedDistinctId(int id)
+        {
+            retainedDistinctIds.add(id);
+        }
+
+        private void addRemovedDistinctId(int id)
+        {
+            removedDistinctIds.add(id);
+        }
+
+        public List<Integer> getAddedDistinctIds()
+        {
+            return addedDistinctIds;
+        }
+
+        public List<Integer> getRetainedDistinctIds()
+        {
+            return retainedDistinctIds;
+        }
+
+        public List<Integer> getRemovedDistinctIds()
+        {
+            return Collections.unmodifiableList(removedDistinctIds);
+        }
     }
 }

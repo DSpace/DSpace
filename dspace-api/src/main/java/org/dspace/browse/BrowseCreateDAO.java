@@ -336,6 +336,8 @@ public interface BrowseCreateDAO
 	 * @throws BrowseException
 	 */
 	public String createCommunityView(String table, String view, boolean execute) throws BrowseException;
+
+    public List<Integer> deleteMappingsByItemID(String mapTable, int itemID) throws BrowseException;
 	
 	/**
 	 * Create the table which will hold the distinct metadata values that appear in multiple
@@ -385,7 +387,7 @@ public interface BrowseCreateDAO
      * @param withdrawn TODO
      * @throws BrowseException
      */
-    public void pruneMapExcess(String map, boolean withdrawn) throws BrowseException;
+    public void pruneMapExcess(String map, boolean withdrawn, List<Integer> distinctIds) throws BrowseException;
 
 	/**
 	 * So that there are no distinct values indexed which are no longer referenced from the
@@ -396,5 +398,5 @@ public interface BrowseCreateDAO
 	 * @param map		the name of the associated distinct mapping table.
 	 * @throws BrowseException
 	 */
-	public void pruneDistinct(String table, String map) throws BrowseException;
+	public void pruneDistinct(String table, String map, List<Integer> distinctIds) throws BrowseException;
 }

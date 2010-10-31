@@ -805,18 +805,72 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
         return true;
     }
 
+    public List<Integer> deleteMappingsByItemID(String mapTable, int itemID) throws BrowseException
+    {
+        List<Integer> distinctIds = new ArrayList<Integer>();
+        TableRowIterator tri = null;
+        try
+        {
+            tri = DatabaseManager.queryTable(context, mapTable, "SELECT * FROM " + mapTable + " WHERE item_id=?", itemID);
+            if (tri != null)
+            {
+                while (tri.hasNext())
+                {
+                    TableRow tr = tri.next();
+                    distinctIds.add(tr.getIntColumn("distinct_id"));
+                    DatabaseManager.delete(context, tr);
+                }
+            }
+        }
+        catch (SQLException e)
+        {
+            log.error("caught exception: ", e);
+            throw new BrowseException(e);
+        }
+        finally
+        {
+            if (tri != null)
+            {
+                tri.close();
+            }
+        }
+
+        return distinctIds;
+    }
+
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#pruneDistinct(java.lang.String, java.lang.String)
      */
-    public void pruneDistinct(String table, String map) throws BrowseException
+    public void pruneDistinct(String table, String map, List<Integer> distinctIds) throws BrowseException
     {
         try
         {
-            String query = "DELETE FROM " + table +
-                            " WHERE NOT EXISTS (SELECT 1 FROM " + map +
-                            " WHERE " + map + ".distinct_id = " + table +".id)";
+            StringBuilder query = new StringBuilder();
+            query.append("DELETE FROM ").append(table).append(" WHERE NOT EXISTS (SELECT 1 FROM ");
+            query.append(map).append(" WHERE ").append(map).append(".distinct_id = ").append(table).append(".id)");
 
-            DatabaseManager.updateQuery(context, query);
+            if (distinctIds != null && distinctIds.size() > 0)
+            {
+                query.append(" AND ").append(table).append(".id IN (");
+                for (int i = 0; i < distinctIds.size(); i++)
+                {
+                    if (i > 0)
+                    {
+                        query.append(", ?");
+                    }
+                    else
+                    {
+                        query.append("?");
+                    }
+                }
+                query.append(")");
+
+                DatabaseManager.updateQuery(context, query.toString(), distinctIds.toArray(new Integer[distinctIds.size()]));
+            }
+            else
+            {
+                DatabaseManager.updateQuery(context, query.toString());
+            }
         }
         catch (SQLException e)
         {
@@ -832,10 +886,20 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
     {
         try
         {
-            String itemCriteria = withdrawn ? "item.withdrawn = 1" : "item.in_archive = 1 AND item.withdrawn = 0";
+            StringBuilder query = new StringBuilder();
 
-            String delete = "DELETE FROM " + table + " WHERE NOT EXISTS (SELECT 1 FROM item WHERE item.item_id=" + table + ".item_id AND " + itemCriteria + ")";
-            DatabaseManager.updateQuery(context, delete);
+            query.append("DELETE FROM ").append(table).append(" WHERE NOT EXISTS (SELECT 1 FROM item WHERE item.item_id=");
+            query.append(table).append(".item_id AND ");
+            if (withdrawn)
+            {
+                query.append("item.withdrawn = 1");
+            }
+            else
+            {
+                query.append("item.in_archive = 1 AND item.withdrawn = 0");
+            }
+            query.append(")");
+            DatabaseManager.updateQuery(context, query.toString());
         }
         catch (SQLException e)
         {
@@ -847,14 +911,45 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#pruneMapExcess(java.lang.String, boolean)
      */
-    public void pruneMapExcess(String map, boolean withdrawn) throws BrowseException
+    public void pruneMapExcess(String map, boolean withdrawn, List<Integer> distinctIds) throws BrowseException
     {
         try
         {
-            String itemCriteria = withdrawn ? "item.withdrawn = 1" : "item.in_archive = 1 AND item.withdrawn = 0";
+            StringBuilder query = new StringBuilder();
 
-            String deleteDistinct = "DELETE FROM " + map + " WHERE NOT EXISTS (SELECT 1 FROM item WHERE item.item_id=" + map + ".item_id AND " + itemCriteria + ")";
-            DatabaseManager.updateQuery(context, deleteDistinct);
+            query.append("DELETE FROM ").append(map).append(" WHERE NOT EXISTS (SELECT 1 FROM item WHERE item.item_id=");
+            query.append(map).append(".item_id AND ");
+            if (withdrawn)
+            {
+                query.append("item.withdrawn = 1");
+            }
+            else
+            {
+                query.append("item.in_archive = 1 AND item.withdrawn = 0");
+            }
+            query.append(")");
+            if (distinctIds != null && distinctIds.size() > 0)
+            {
+                query.append(" AND ").append(map).append(".distinct_id IN (");
+                for (int i = 0; i < distinctIds.size(); i++)
+                {
+                    if (i > 0)
+                    {
+                        query.append(", ?");
+                    }
+                    else
+                    {
+                        query.append("?");
+                    }
+                }
+                query.append(")");
+
+                DatabaseManager.updateQuery(context, query.toString(), distinctIds.toArray(new Integer[distinctIds.size()]));
+            }
+            else
+            {
+                DatabaseManager.updateQuery(context, query.toString());
+            }
         }
         catch (SQLException e)
         {
