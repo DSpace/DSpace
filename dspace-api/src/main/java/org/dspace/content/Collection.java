@@ -909,16 +909,20 @@ public class Collection extends DSpaceObject
 
         collectionRow.setColumnNull("template_item_id");
         DatabaseManager.update(ourContext, collectionRow);
-
+        
         if (template != null)
         {
             log.info(LogManager.getHeader(ourContext, "remove_template_item",
                     "collection_id=" + getID() + ",template_item_id="
                             + template.getID()));
-
+            // temporary turn off auth system, we have already checked the permission on the top of the method
+            // check it again will fail because we have already broken the relation between the collection and the item
+            ourContext.turnOffAuthorisationSystem();
             template.delete();
+            ourContext.restoreAuthSystemState();
             template = null;
         }
+        
         ourContext.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, getID(), "remove_template_item"));
     }
 

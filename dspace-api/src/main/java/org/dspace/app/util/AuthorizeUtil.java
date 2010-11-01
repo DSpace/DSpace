@@ -307,7 +307,7 @@ public class AuthorizeUtil
                     : null;
             AuthorizeManager.authorizeAction(context, parent, Constants.ADMIN);
         }
-        else if (!AuthorizeManager.isAdmin(context))
+        else if (!isAuthorized && !AuthorizeManager.isAdmin(context)) 
         {
             throw new AuthorizeException(
                     "You are not authorized to create a template item for the collection");
