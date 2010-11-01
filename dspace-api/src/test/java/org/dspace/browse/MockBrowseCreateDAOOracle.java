@@ -34,6 +34,7 @@
 
 package org.dspace.browse;
 
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -965,21 +966,25 @@ public class MockBrowseCreateDAOOracle
 
             if (distinctIds != null && distinctIds.size() > 0)
             {
-                query.append(" AND ").append(table).append(".id IN (");
-                for (int i = 0; i < distinctIds.size(); i++)
+                query.append(" AND ").append(table).append(".id=?");
+                PreparedStatement stmt = null;
+                try
                 {
-                    if (i > 0)
+                    stmt = internalContext.getDBConnection().prepareStatement(query.toString());
+                    for (Integer distinctId : distinctIds)
                     {
-                        query.append(", ?");
-                    }
-                    else
-                    {
-                        query.append("?");
+                        stmt.setInt(1, distinctId);
+                        stmt.execute();
+                        stmt.clearParameters();
                     }
                 }
-                query.append(")");
-
-                DatabaseManager.updateQuery(internalContext, query.toString(), distinctIds.toArray(new Integer[distinctIds.size()]));
+                finally
+                {
+                    if (stmt != null)
+                    {
+                        stmt.close();
+                    }
+                }
             }
             else
             {
