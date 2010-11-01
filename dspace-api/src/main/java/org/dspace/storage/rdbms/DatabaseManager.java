@@ -217,7 +217,7 @@ public class DatabaseManager
     {
         if (log.isDebugEnabled())
         {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder("Running query \"").append(query).append("\"  with parameters: ");
             for (int i = 0; i < parameters.length; i++)
             {
                 if (i > 0)
@@ -226,7 +226,7 @@ public class DatabaseManager
                }
                 sb.append(parameters[i].toString());
             }
-            log.debug("Running query \"" + query + "\"  with parameters: " + sb.toString());
+            log.debug(sb.toString());
         }
         
         PreparedStatement statement = context.getDBConnection().prepareStatement(query);
@@ -415,7 +415,7 @@ public class DatabaseManager
 
         if (log.isDebugEnabled())
         {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder("Running query \"").append(query).append("\"  with parameters: ");
             for (int i = 0; i < parameters.length; i++)
             {
                 if (i > 0)
@@ -424,7 +424,7 @@ public class DatabaseManager
                }
                 sb.append(parameters[i].toString());
             }
-            log.debug("Running query \"" + query + "\"  with parameters: " + sb.toString());
+            log.debug(sb.toString());
         }
 
         try
@@ -688,29 +688,26 @@ public class DatabaseManager
     {
         int newID = -1;
         String table = canonicalize(row.getTable());
-        Statement statement = null;
+        PreparedStatement statement = null;
         ResultSet rs = null;
 
         try
         {
             // Get an ID (primary key) for this row by using the "getnextid"
             // SQL function in Postgres, or directly with sequences in Oracle
-            String myQuery;
-
             if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
             {
-                myQuery = "SELECT " + table + "_seq" + ".nextval FROM dual";
+                statement = context.getDBConnection().prepareStatement("SELECT " + table + "_seq" + ".nextval FROM dual");
             }
             else
             {
-                myQuery = "SELECT getnextid('" + table + "') AS result";
+                statement = context.getDBConnection().prepareStatement("SELECT getnextid(?) AS result");
+                loadParameters(statement, new Object[] { table });
             }
 
-            statement = context.getDBConnection().createStatement();
-            rs = statement.executeQuery(myQuery);
+            rs = statement.executeQuery();
 
             rs.next();
-
             newID = rs.getInt(1);
         }
         finally
@@ -734,7 +731,7 @@ public class DatabaseManager
         // Set the ID in the table row object
         row.setColumn(getPrimaryKeyColumn(table), newID);
 
-        StringBuffer sql = new StringBuffer().append("INSERT INTO ").append(
+        StringBuilder sql = new StringBuilder().append("INSERT INTO ").append(
                 table).append(" ( ");
 
         ColumnInfo[] info = getColumnInfo(table);
@@ -775,7 +772,7 @@ public class DatabaseManager
     {
         String table = canonicalize(row.getTable());
 
-        StringBuffer sql = new StringBuffer().append("update ").append(table)
+        StringBuilder sql = new StringBuilder().append("update ").append(table)
                 .append(" set ");
 
         List<ColumnInfo> columns = new ArrayList<ColumnInfo>();
