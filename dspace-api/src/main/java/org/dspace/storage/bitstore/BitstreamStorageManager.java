@@ -292,7 +292,7 @@ public class BitstreamStorageManager
         {
             tempContext = new Context();
 
-            bitstream = DatabaseManager.create(tempContext, "Bitstream");
+            bitstream = DatabaseManager.row("Bitstream");
             bitstream.setColumn("deleted", true);
             bitstream.setColumn("internal_id", id);
 
@@ -303,7 +303,7 @@ public class BitstreamStorageManager
              */
             bitstream.setColumn("store_number", incoming);
 
-            DatabaseManager.update(tempContext, bitstream);
+            DatabaseManager.insert(tempContext, bitstream);
 
             tempContext.complete();
         }
@@ -400,11 +400,11 @@ public class BitstreamStorageManager
 		try {
 			tempContext = new Context();
 
-			bitstream = DatabaseManager.create(tempContext, "Bitstream");
+			bitstream = DatabaseManager.row("Bitstream");
 			bitstream.setColumn("deleted", true);
 			bitstream.setColumn("internal_id", sInternalId);
 			bitstream.setColumn("store_number", assetstore);
-			DatabaseManager.update(tempContext, bitstream);
+			DatabaseManager.insert(tempContext, bitstream);
 
 			tempContext.complete();
 		} catch (SQLException sqle) {

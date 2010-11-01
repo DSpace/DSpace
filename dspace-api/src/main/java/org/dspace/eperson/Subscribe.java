@@ -115,10 +115,10 @@ public class Subscribe
                 if (!r.hasNext())
                 {
                     // Not subscribed, so add them
-                    TableRow row = DatabaseManager.create(context, "subscription");
+                    TableRow row = DatabaseManager.row("subscription");
                     row.setColumn("eperson_id", eperson.getID());
                     row.setColumn("collection_id", collection.getID());
-                    DatabaseManager.update(context, row);
+                    DatabaseManager.insert(context, row);
 
                     log.info(LogManager.getHeader(context, "subscribe",
                             "eperson_id=" + eperson.getID() + ",collection_id="

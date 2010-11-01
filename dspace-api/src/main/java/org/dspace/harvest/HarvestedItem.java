@@ -140,10 +140,10 @@ public class HarvestedItem
      * @return a new HarvestedItem object
      */
     public static HarvestedItem create(Context c, int itemId, String itemOAIid) throws SQLException {
-    	TableRow row = DatabaseManager.create(c, "harvested_item");
+    	TableRow row = DatabaseManager.row("harvested_item");
     	row.setColumn("item_id", itemId);
     	row.setColumn("oai_id", itemOAIid);
-    	DatabaseManager.update(c, row);
+    	DatabaseManager.insert(c, row);
     	
     	return new HarvestedItem(c, row);    	
     }

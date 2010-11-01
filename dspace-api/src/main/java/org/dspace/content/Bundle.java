@@ -480,11 +480,10 @@ public class Bundle extends DSpaceObject
         AuthorizeManager.inheritPolicies(ourContext, this, b);
 
         // Add the mapping row to the database
-        TableRow mappingRow = DatabaseManager.create(ourContext,
-                "bundle2bitstream");
+        TableRow mappingRow = DatabaseManager.row("bundle2bitstream");
         mappingRow.setColumn("bundle_id", getID());
         mappingRow.setColumn("bitstream_id", b.getID());
-        DatabaseManager.update(ourContext, mappingRow);
+        DatabaseManager.insert(ourContext, mappingRow);
     }
 
     /**

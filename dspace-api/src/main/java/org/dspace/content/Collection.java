@@ -946,12 +946,12 @@ public class Collection extends DSpaceObject
                 + getID() + ",item_id=" + item.getID()));
 
         // Create mapping
-        TableRow row = DatabaseManager.create(ourContext, "collection2item");
+        TableRow row = DatabaseManager.row("collection2item");
 
         row.setColumn("collection_id", getID());
         row.setColumn("item_id", item.getID());
 
-        DatabaseManager.update(ourContext, row);
+        DatabaseManager.insert(ourContext, row);
 
         ourContext.addEvent(new Event(Event.ADD, Constants.COLLECTION, getID(), Constants.ITEM, item.getID(), item.getHandle()));
     }

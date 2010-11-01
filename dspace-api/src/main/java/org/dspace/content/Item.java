@@ -1258,10 +1258,10 @@ public class Item extends DSpaceObject
         bundles.add(b);
 
         // Insert the mapping
-        TableRow mappingRow = DatabaseManager.create(ourContext, "item2bundle");
+        TableRow mappingRow = DatabaseManager.row("item2bundle");
         mappingRow.setColumn("item_id", getID());
         mappingRow.setColumn("bundle_id", b.getID());
-        DatabaseManager.update(ourContext, mappingRow);
+        DatabaseManager.insert(ourContext, mappingRow);
 
         ourContext.addEvent(new Event(Event.ADD, Constants.ITEM, getID(), Constants.BUNDLE, b.getID(), b.getName()));
     }

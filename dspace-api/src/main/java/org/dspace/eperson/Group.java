@@ -1153,11 +1153,10 @@ public class Group extends DSpaceObject
             {
                 EPerson e = i.next();
 
-                TableRow mappingRow = DatabaseManager.create(myContext,
-                        "epersongroup2eperson");
+                TableRow mappingRow = DatabaseManager.row("epersongroup2eperson");
                 mappingRow.setColumn("eperson_id", e.getID());
                 mappingRow.setColumn("eperson_group_id", getID());
-                DatabaseManager.update(myContext, mappingRow);
+                DatabaseManager.insert(myContext, mappingRow);
             }
 
             epeopleChanged = false;
@@ -1178,11 +1177,10 @@ public class Group extends DSpaceObject
             {
                 Group g = i.next();
 
-                TableRow mappingRow = DatabaseManager.create(myContext,
-                        "group2group");
+                TableRow mappingRow = DatabaseManager.row("group2group");
                 mappingRow.setColumn("parent_id", getID());
                 mappingRow.setColumn("child_id", g.getID());
-                DatabaseManager.update(myContext, mappingRow);
+                DatabaseManager.insert(myContext, mappingRow);
             }
 
             // groups changed, now change group cache
@@ -1315,15 +1313,12 @@ public class Group extends DSpaceObject
 
             for (Integer child : parent.getValue())
             {
-                TableRow row = DatabaseManager.create(myContext,
-                        "group2groupcache");
-
-                int childID = child.intValue();
+                TableRow row = DatabaseManager.row("group2groupcache");
 
                 row.setColumn("parent_id", parentID);
-                row.setColumn("child_id", childID);
+                row.setColumn("child_id", child);
 
-                DatabaseManager.update(myContext, row);
+                DatabaseManager.insert(myContext, row);
             }
         }
     }

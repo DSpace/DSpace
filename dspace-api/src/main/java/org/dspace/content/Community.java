@@ -880,15 +880,14 @@ public class Community extends DSpaceObject
             if (!tri.hasNext())
             {
                 // No existing mapping, so add one
-                TableRow mappingRow = DatabaseManager.create(ourContext,
-                        "community2collection");
+                TableRow mappingRow = DatabaseManager.row("community2collection");
 
                 mappingRow.setColumn("community_id", getID());
                 mappingRow.setColumn("collection_id", c.getID());
 
                 ourContext.addEvent(new Event(Event.ADD, Constants.COMMUNITY, getID(), Constants.COLLECTION, c.getID(), c.getHandle()));
 
-                DatabaseManager.update(ourContext, mappingRow);
+                DatabaseManager.insert(ourContext, mappingRow);
             }
         }
         finally
@@ -956,15 +955,14 @@ public class Community extends DSpaceObject
             if (!tri.hasNext())
             {
                 // No existing mapping, so add one
-                TableRow mappingRow = DatabaseManager.create(ourContext,
-                        "community2community");
+                TableRow mappingRow = DatabaseManager.row("community2community");
 
                 mappingRow.setColumn("parent_comm_id", getID());
                 mappingRow.setColumn("child_comm_id", c.getID());
 
                 ourContext.addEvent(new Event(Event.ADD, Constants.COMMUNITY, getID(), Constants.COMMUNITY, c.getID(), c.getHandle()));
 
-                DatabaseManager.update(ourContext, mappingRow);
+                DatabaseManager.insert(ourContext, mappingRow);
             }
         }
         finally

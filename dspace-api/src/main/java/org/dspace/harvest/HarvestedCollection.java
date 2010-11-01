@@ -122,10 +122,10 @@ public class HarvestedCollection
      * @return a new HarvestInstance object
      */
     public static HarvestedCollection create(Context c, int collectionId) throws SQLException {
-    	TableRow row = DatabaseManager.create(c, "harvested_collection");
+    	TableRow row = DatabaseManager.row("harvested_collection");
     	row.setColumn("collection_id", collectionId);
     	row.setColumn("harvest_type", 0);
-    	DatabaseManager.update(c, row);
+    	DatabaseManager.insert(c, row);
     	
     	return new HarvestedCollection(c, row);    	
     }

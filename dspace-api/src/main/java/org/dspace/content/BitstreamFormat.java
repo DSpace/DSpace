@@ -621,11 +621,11 @@ public class BitstreamFormat
         // Rewrite extensions
         for (int i = 0; i < extensions.size(); i++)
         {
-            String s = (String) extensions.get(i);
-            TableRow r = DatabaseManager.create(bfContext, "fileextension");
+            String s = extensions.get(i);
+            TableRow r = DatabaseManager.row("fileextension");
             r.setColumn("bitstream_format_id", getID());
             r.setColumn("extension", s);
-            DatabaseManager.update(bfContext, r);
+            DatabaseManager.insert(bfContext, r);
         }
 
         DatabaseManager.update(bfContext, bfRow);

@@ -174,11 +174,10 @@ public class Supervisor {
     {
         // make a table row in the database table, and update with the relevant
         // details
-        TableRow row = DatabaseManager.create(context, 
-                            "epersongroup2workspaceitem");
+        TableRow row = DatabaseManager.row("epersongroup2workspaceitem");
         row.setColumn("workspace_item_id", wsItemID);
         row.setColumn("eperson_group_id", groupID);
-        DatabaseManager.update(context,row);
+        DatabaseManager.insert(context,row);
         
         // If a default policy type has been requested, apply the policies using
         // the DSpace API for doing so

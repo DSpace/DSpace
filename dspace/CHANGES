@@ -76,6 +76,7 @@
 - [DS-697] Allow media filter plugins to register their input formats directly
 - [DS-732] Browse performance improvements
 - [DS-733] Load testing utilities
+- [DS-734] Improve database efficiency
 
 (Graham Triggs, Mark Wood)
 - [DS-707] General improvements to performance, bug fixes and style

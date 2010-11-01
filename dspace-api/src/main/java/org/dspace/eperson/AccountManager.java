@@ -227,13 +227,13 @@ public class AccountManager
         // If it already exists, just re-issue it
         if (rd == null)
         {
-            rd = DatabaseManager.create(context, "RegistrationData");
+            rd = DatabaseManager.row("RegistrationData");
             rd.setColumn("token", Utils.generateHexKey());
 
             // don't set expiration date any more
             //            rd.setColumn("expires", getDefaultExpirationDate());
             rd.setColumn("email", email);
-            DatabaseManager.update(context, rd);
+            DatabaseManager.insert(context, rd);
 
             // This is a potential problem -- if we create the callback
             // and then crash, registration will get SNAFU-ed.

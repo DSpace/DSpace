@@ -270,7 +270,7 @@ public class WorkspaceItem implements InProgressSubmission
         i.update();
 
         // Create the workspace item row
-        TableRow row = DatabaseManager.create(c, "workspaceitem");
+        TableRow row = DatabaseManager.row("workspaceitem");
 
         row.setColumn("item_id", i.getID());
         row.setColumn("collection_id", coll.getID());
@@ -280,7 +280,7 @@ public class WorkspaceItem implements InProgressSubmission
                         + "item_id=" + i.getID() + "collection_id="
                         + coll.getID()));
 
-        DatabaseManager.update(c, row);
+        DatabaseManager.insert(c, row);
 
         WorkspaceItem wi = new WorkspaceItem(c, row);
 

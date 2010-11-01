@@ -261,10 +261,10 @@ public class MetadataSchema
 
 
         // Create a table row and update it with the values
-        row = DatabaseManager.create(context, "MetadataSchemaRegistry");
+        row = DatabaseManager.row("MetadataSchemaRegistry");
         row.setColumn("namespace", namespace);
         row.setColumn("short_id", name);
-        DatabaseManager.update(context, row);
+        DatabaseManager.insert(context, row);
 
         // invalidate our fast-find cache.
         decache();

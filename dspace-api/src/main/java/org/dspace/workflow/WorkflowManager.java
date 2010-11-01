@@ -188,9 +188,10 @@ public class WorkflowManager
         recordStart(c, myitem);
 
         // create the WorkflowItem
-        TableRow row = DatabaseManager.create(c, "workflowitem");
+        TableRow row = DatabaseManager.row("workflowitem");
         row.setColumn("item_id", myitem.getID());
         row.setColumn("collection_id", wsi.getCollection().getID());
+        DatabaseManager.insert(c, row);
 
         WorkflowItem wfi = new WorkflowItem(c, row);
 
@@ -803,10 +804,10 @@ public class WorkflowManager
         // FIXME: Remove license
         // FIXME: Provenance statement?
         // Create the new workspace item row
-        TableRow row = DatabaseManager.create(c, "workspaceitem");
+        TableRow row = DatabaseManager.row("workspaceitem");
         row.setColumn("item_id", myitem.getID());
         row.setColumn("collection_id", mycollection.getID());
-        DatabaseManager.update(c, row);
+        DatabaseManager.insert(c, row);
 
         int wsi_id = row.getIntColumn("workspace_item_id");
         WorkspaceItem wi = WorkspaceItem.find(c, wsi_id);
@@ -890,10 +891,10 @@ public class WorkflowManager
         {
             // can we get away without creating a tasklistitem class?
             // do we want to?
-            TableRow tr = DatabaseManager.create(c, "tasklistitem");
+            TableRow tr = DatabaseManager.row("tasklistitem");
             tr.setColumn("eperson_id", epa[i].getID());
             tr.setColumn("workflow_id", wi.getID());
-            DatabaseManager.update(c, tr);
+            DatabaseManager.insert(c, tr);
         }
     }
 
