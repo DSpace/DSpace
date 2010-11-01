@@ -347,10 +347,10 @@ public class MockBrowseCreateDAOOracle
             {
                 if (distinctID > -1)
                 {
-                    TableRow row = DatabaseManager.create(internalContext, table);
+                    TableRow row = DatabaseManager.row(table);
                     row.setColumn("item_id", itemID);
                     row.setColumn("distinct_id", distinctID);
-                    DatabaseManager.update(internalContext, row);
+                    DatabaseManager.insert(internalContext, row);
                     results.addAddedDistinctId(distinctID);
                 }
             }
@@ -379,7 +379,6 @@ public class MockBrowseCreateDAOOracle
         {            
             String create = "CREATE TABLE " + table + " (" +
                             "id INTEGER PRIMARY KEY, " +
-                            "distinct_id INTEGER UNIQUE, " +
                             "authority VARCHAR2(100), " +
                             "value " + getValueColumnDefinition() + ", " +
                             "sort_value " + getSortColumnDefinition() +
@@ -627,7 +626,7 @@ public class MockBrowseCreateDAOOracle
         {
             checkContext();
             Object[] params;
-            String select = "SELECT distinct_id FROM " + table;
+            String select = "SELECT id FROM " + table;
 
             if (ConfigurationManager.getBooleanProperty("webui.browse.metadata.case-insensitive", false))
             {
@@ -663,7 +662,7 @@ public class MockBrowseCreateDAOOracle
             }
             else
             {
-                distinctID = tri.next().getIntColumn("distinct_id");
+                distinctID = tri.next().getIntColumn("id");
             }
 
             if (log.isDebugEnabled())
@@ -746,10 +745,10 @@ public class MockBrowseCreateDAOOracle
             {
                 if (commID[i] > -1)
                 {
-                    TableRow row = DatabaseManager.create(internalContext, "Communities2Item");
+                    TableRow row = DatabaseManager.row("Communities2Item");
                     row.setColumn("item_id", itemID);
                     row.setColumn("community_id", commID[i]);
-                    DatabaseManager.update(internalContext, row);
+                    DatabaseManager.insert(internalContext, row);
                 }
             }
         }
@@ -778,17 +777,15 @@ public class MockBrowseCreateDAOOracle
         try
         {
             checkContext();
-            TableRow dr = DatabaseManager.create(internalContext, table);
+            TableRow dr = DatabaseManager.row(table);
             dr.setColumn("value", utils.truncateValue(value));
             dr.setColumn("sort_value", utils.truncateSortValue(sortValue));
             if (authority != null)
             {
                 dr.setColumn("authority", utils.truncateValue(authority,100));
             }
+            DatabaseManager.insert(internalContext, dr);
             int distinctID = dr.getIntColumn("id");
-            dr.setColumn("distinct_id", distinctID);
-            DatabaseManager.update(internalContext, dr);
-
 
             if (log.isDebugEnabled())
             {
@@ -816,7 +813,7 @@ public class MockBrowseCreateDAOOracle
         {
             checkContext();
             // create us a row in the index
-            TableRow row = DatabaseManager.create(internalContext, table);
+            TableRow row = DatabaseManager.row(table);
 
             // set the primary information for the index
             row.setColumn("item_id", itemID);
@@ -830,7 +827,7 @@ public class MockBrowseCreateDAOOracle
                 row.setColumn("sort_" + key.toString(), utils.truncateSortValue(nValue));
             }
 
-            DatabaseManager.update(internalContext, row);
+            DatabaseManager.insert(internalContext, row);
         }
         catch (SQLException e)
         {

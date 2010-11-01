@@ -357,9 +357,6 @@ public class IndexBrowse
         if (item.isArchived() || item.isWithdrawn())
         {
             indexItem(new ItemMetadataProxy(item));
-
-            // Ensure that we remove any invalid entries
-            //pruneIndexes();
         }
     }
     
@@ -662,9 +659,6 @@ public class IndexBrowse
         removeIndex(itemID, BrowseIndex.getItemBrowseIndex().getTableName());
         removeIndex(itemID, BrowseIndex.getWithdrawnBrowseIndex().getTableName());
         dao.deleteCommunityMappings(itemID);
-
-        // Ensure that we remove any invalid entries
-        //pruneIndexes();
 
         return true;
 	}
@@ -1174,10 +1168,6 @@ public class IndexBrowse
     			context.commit();
     			context.clearCache();
     		}
-    		
-    		// penultimately we have to delete any items that couldn't be located in the
-    		// index list
-            //pruneIndexes();
             
             // Make sure the deletes are written back
             context.commit();

@@ -306,10 +306,10 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
             {
                 if (distinctID > -1)
                 {
-                    TableRow row = DatabaseManager.create(context, table);
+                    TableRow row = DatabaseManager.row(table);
                     row.setColumn("item_id", itemID);
                     row.setColumn("distinct_id", distinctID);
-                    DatabaseManager.update(context, row);
+                    DatabaseManager.insert(context, row);
                     results.addAddedDistinctId(distinctID);
                 }
             }
@@ -333,13 +333,10 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
         {
             String create = "CREATE TABLE " + table + " (" +
                             "id INTEGER PRIMARY KEY, " + 
-                            "distinct_id INTEGER UNIQUE, " +
                             "authority VARCHAR2(100), " +
                             "value " + getValueColumnDefinition() + ", " +
                             "sort_value " + getSortColumnDefinition() +
                             ")";
-            
-//                            "item_count INTEGER DEFAULT 0" +
 
             if (execute)
             {
@@ -534,7 +531,7 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
         try
         {
             Object[] params;
-            String select = "SELECT distinct_id FROM " + table;
+            String select = "SELECT id FROM " + table;
             
             if (ConfigurationManager.getBooleanProperty("webui.browse.metadata.case-insensitive", false))
             {
@@ -578,7 +575,7 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
             }
             else
             {
-                distinctID = tri.next().getIntColumn("distinct_id");
+                distinctID = tri.next().getIntColumn("id");
             }
 
             if (log.isDebugEnabled())
@@ -663,10 +660,10 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
             {
                 if (commID[i] > -1)
                 {
-                    TableRow row = DatabaseManager.create(context, "Communities2Item");
+                    TableRow row = DatabaseManager.row("Communities2Item");
                     row.setColumn("item_id", itemID);
                     row.setColumn("community_id", commID[i]);
-                    DatabaseManager.update(context, row);
+                    DatabaseManager.insert(context, row);
                 }
             }
         }
@@ -689,23 +686,17 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
         
         try
         {
-            TableRow dr = DatabaseManager.create(context, table);
+            TableRow dr = DatabaseManager.row(table);
             dr.setColumn("value", utils.truncateValue(value));
             dr.setColumn("sort_value", utils.truncateSortValue(sortValue));
             if (authority != null)
             {
                 dr.setColumn("authority", utils.truncateValue(authority,100));
             }
+            DatabaseManager.insert(context, dr);
             int distinctID = dr.getIntColumn("id");
-            dr.setColumn("distinct_id", distinctID);
-            DatabaseManager.update(context, dr);
             
-            
-            if (log.isDebugEnabled())
-            {
-                log.debug("insertDistinctRecord: return=" + distinctID);
-            }
-            
+            log.debug("insertDistinctRecord: return=" + distinctID);
             return distinctID;
         }
         catch (SQLException e)
@@ -721,7 +712,7 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
         try
         {
             // create us a row in the index
-            TableRow row = DatabaseManager.create(context, table);
+            TableRow row = DatabaseManager.row(table);
             
             // set the primary information for the index
             row.setColumn("item_id", itemID);
@@ -732,7 +723,7 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
                 row.setColumn("sort_" + sortCol.getKey().toString(), utils.truncateSortValue(sortCol.getValue()));
             }
             
-            DatabaseManager.update(context, row);
+            DatabaseManager.insert(context, row);
         }
         catch (SQLException e)
         {

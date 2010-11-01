@@ -226,7 +226,7 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
             String create = "CREATE TABLE " + map + " (" +
                             "map_id integer primary key, " +
                             "item_id integer references item(item_id), " +
-                            "distinct_id integer references " + table + "(distinct_id)" +
+                            "distinct_id integer references " + table + "(id)" +
                             ");";
             
             if (execute)
@@ -303,10 +303,10 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
             {
                 if (distinctID > -1)
                 {
-                    TableRow row = DatabaseManager.create(context, table);
+                    TableRow row = DatabaseManager.row(table);
                     row.setColumn("item_id", itemID);
                     row.setColumn("distinct_id", distinctID);
-                    DatabaseManager.update(context, row);
+                    DatabaseManager.insert(context, row);
                     results.addAddedDistinctId(distinctID);
                 }
             }
@@ -331,13 +331,10 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
         {
             String create = "CREATE TABLE " + table + " (" +
                             "id integer primary key, " + 
-                            "distinct_id integer UNIQUE, " +
                             "authority VARCHAR(100), " +
                             "value " + getValueColumnDefinition() + ", " +
                             "sort_value " + getSortColumnDefinition() + 
                             ");";
-
-            //                            "item_count integer DEFAULT 0" +
 
             if (execute)
             {
@@ -552,23 +549,22 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
             {
 				if (authority != null)
 	            {	             
-	                select = "SELECT distinct_id FROM " + table + " WHERE UPPER(value) = UPPER(?) and authority = ?";
+	                select = "SELECT id FROM " + table + " WHERE UPPER(value) = UPPER(?) and authority = ?";
 	            }
 	            else
 	            {	                
-	                select = "SELECT distinct_id FROM " + table + " WHERE UPPER(value) = UPPER(?) and authority IS NULL";
+	                select = "SELECT id FROM " + table + " WHERE UPPER(value) = UPPER(?) and authority IS NULL";
 	            }
             }
             else
             {
-                select = "SELECT id FROM " + table + " WHERE value = ?";
 				if (authority != null)
 	            {	             
-	                select = "SELECT distinct_id FROM " + table + " WHERE value = ? and authority = ?";
+	                select = "SELECT id FROM " + table + " WHERE value = ? and authority = ?";
 	            }
 	            else
 	            {	                
-	                select = "SELECT distinct_id FROM " + table + " WHERE value = ? and authority IS NULL";
+	                select = "SELECT id FROM " + table + " WHERE value = ? and authority IS NULL";
 	            }
             }
 
@@ -580,7 +576,7 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
             }
             else
             {
-                distinctID = tri.next().getIntColumn("distinct_id");
+                distinctID = tri.next().getIntColumn("id");
             }
 
             if (log.isDebugEnabled())
@@ -665,10 +661,10 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
             {
                 if (commID[i] > -1)
                 {
-                    TableRow row = DatabaseManager.create(context, "Communities2Item");
+                    TableRow row = DatabaseManager.row("Communities2Item");
                     row.setColumn("item_id", itemID);
                     row.setColumn("community_id", commID[i]);
-                    DatabaseManager.update(context, row);
+                    DatabaseManager.insert(context, row);
                 }
             }
         }
@@ -688,16 +684,15 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
         log.debug("insertDistinctRecord: table=" + table + ",value=" + value+ ",authority=" + authority+",sortValue=" + sortValue);
         try
         {
-            TableRow dr = DatabaseManager.create(context, table);
+            TableRow dr = DatabaseManager.row(table);
             if (authority != null)
             {
                 dr.setColumn("authority", utils.truncateValue(authority,100));
             }
             dr.setColumn("value", utils.truncateValue(value));
             dr.setColumn("sort_value", utils.truncateSortValue(sortValue));
+            DatabaseManager.insert(context, dr);
             int distinctID = dr.getIntColumn("id");
-            dr.setColumn("distinct_id", distinctID);
-            DatabaseManager.update(context, dr);
             
             log.debug("insertDistinctRecord: return=" + distinctID);
             return distinctID;
@@ -718,7 +713,7 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
         try
         {
             // create us a row in the index
-            TableRow row = DatabaseManager.create(context, table);
+            TableRow row = DatabaseManager.row(table);
             
             // set the primary information for the index
             row.setColumn("item_id", itemID);
@@ -729,7 +724,7 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
                 row.setColumn("sort_" + sortCol.getKey().toString(), utils.truncateSortValue(sortCol.getValue()));
             }
             
-            DatabaseManager.update(context, row);
+            DatabaseManager.insert(context, row);
         }
         catch (SQLException e)
         {

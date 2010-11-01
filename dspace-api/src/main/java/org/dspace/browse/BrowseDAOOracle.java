@@ -917,7 +917,7 @@ public class BrowseDAOOracle implements BrowseDAO
     {
         if (tableMap != null && tableDis != null)
         {
-            queryBuf.append(tableMap).append(".distinct_id=").append(tableDis).append(".distinct_id");
+            queryBuf.append(tableMap).append(".distinct_id=").append(tableDis).append(".id");
             queryBuf.append(" AND ");
             if (authority == null)
             {
