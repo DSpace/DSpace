@@ -77,12 +77,16 @@ public class IPAuthentication implements AuthenticationMethod
     /** Our logger */
     private static Logger log = Logger.getLogger(IPAuthentication.class);
 
+    /** Whether to look for x-forwarded headers for logging IP addresses */
+    private static Boolean useProxies;
+
     /** All the IP matchers */
     private List<IPMatcher> ipMatchers;
 
     /** All the negative IP matchers */
     private List<IPMatcher> ipNegativeMatchers;
 
+    
     /**
      * Maps IPMatchers to group names when we don't know group DB ID yet. When
      * the DB ID is known, the IPMatcher is moved to ipMatcherGroupIDs and then
@@ -201,7 +205,22 @@ public class IPAuthentication implements AuthenticationMethod
         }
         List<Integer> groupIDs = new ArrayList<Integer>();
 
+        // Get the user's IP address
         String addr = request.getRemoteAddr();
+        if (useProxies == null) {
+            useProxies = ConfigurationManager.getBooleanProperty("useProxies", false);
+        }
+        if (useProxies && request.getHeader("X-Forwarded-For") != null)
+        {
+            /* This header is a comma delimited list */
+            for(String xfip : request.getHeader("X-Forwarded-For").split(","))
+            {
+                if(!request.getHeader("X-Forwarded-For").contains(addr))
+                {
+                    addr = xfip.trim();
+                }
+            }
+        }
 
         for (IPMatcher ipm : ipMatchers)
         {
