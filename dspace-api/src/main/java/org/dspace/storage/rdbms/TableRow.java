@@ -481,7 +481,7 @@ public class TableRow
             throw new IllegalArgumentException("No such column " + column);
         }
 
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        if (DatabaseManager.isOracle())
         {
             // if oracle, use 1 or 0 for true/false
             Integer value = b ? Integer.valueOf(1) : Integer.valueOf(0);
@@ -725,7 +725,7 @@ public class TableRow
      */
     static String canonicalize(String column)
     {
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        if (DatabaseManager.isOracle())
         {
             // oracle requires uppercase
             return column.toUpperCase();

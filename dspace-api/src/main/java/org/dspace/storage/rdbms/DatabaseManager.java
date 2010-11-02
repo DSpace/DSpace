@@ -94,6 +94,20 @@ public class DatabaseManager
     private static boolean isOracle = false;
     private static boolean isPostgres = false;
 
+    static
+    {
+        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        {
+            isOracle = true;
+            isPostgres = false;
+        }
+        else
+        {
+            isOracle = false;
+            isPostgres = true;
+        }
+    }
+
     /** DataSource (retrieved from jndi */
     private static DataSource dataSource = null;
     private static String sqlOnBorrow = null;
@@ -125,6 +139,11 @@ public class DatabaseManager
     protected DatabaseManager()
     {
     }
+
+    public static boolean isOracle()
+    {
+        return isOracle;
+    }
     
     /**
      * Set the constraint check to deferred (commit time)
@@ -142,8 +161,7 @@ public class DatabaseManager
         try
         {
             statement = context.getDBConnection().createStatement();
-            statement
-                    .execute("SET CONSTRAINTS " + constraintName + " DEFERRED");
+            statement.execute("SET CONSTRAINTS " + constraintName + " DEFERRED");
             statement.close();
         }
         finally
@@ -177,8 +195,7 @@ public class DatabaseManager
         try
         {
             statement = context.getDBConnection().createStatement();
-            statement.execute("SET CONSTRAINTS " + constraintName
-                    + " IMMEDIATE");
+            statement.execute("SET CONSTRAINTS " + constraintName + " IMMEDIATE");
             statement.close();
         }
         finally
@@ -215,8 +232,7 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    public static TableRowIterator queryTable(Context context, String table,
-            String query, Object... parameters ) throws SQLException
+    public static TableRowIterator queryTable(Context context, String table, String query, Object... parameters ) throws SQLException
     {
         if (log.isDebugEnabled())
         {
@@ -235,10 +251,9 @@ public class DatabaseManager
         PreparedStatement statement = context.getDBConnection().prepareStatement(query);
         try
         {
-            loadParameters(statement,parameters);
+            loadParameters(statement, parameters);
 
-            TableRowIterator retTRI = new TableRowIterator(statement.executeQuery(),
-                    canonicalize(table));
+            TableRowIterator retTRI = new TableRowIterator(statement.executeQuery(), canonicalize(table));
 
             retTRI.setStatement(statement);
             return retTRI;
@@ -411,8 +426,7 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    public static int updateQuery(Context context, String query,
-            Object... parameters) throws SQLException
+    public static int updateQuery(Context context, String query, Object... parameters) throws SQLException
     {
         PreparedStatement statement = null;
 
@@ -433,7 +447,7 @@ public class DatabaseManager
         try
         {        	
         	statement = context.getDBConnection().prepareStatement(query);
-        	loadParameters(statement,parameters);
+        	loadParameters(statement, parameters);
         	
         	return statement.executeUpdate();
         }
@@ -686,8 +700,7 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    public static void insert(Context context, TableRow row)
-            throws SQLException
+    public static void insert(Context context, TableRow row) throws SQLException
     {
         int newID = -1;
         String table = canonicalize(row.getTable());
@@ -734,8 +747,7 @@ public class DatabaseManager
         // Set the ID in the table row object
         row.setColumn(getPrimaryKeyColumn(table), newID);
 
-        StringBuilder sql = new StringBuilder().append("INSERT INTO ").append(
-                table).append(" ( ");
+        StringBuilder sql = new StringBuilder().append("INSERT INTO ").append(table).append(" ( ");
 
         ColumnInfo[] info = getColumnInfo(table);
 
@@ -755,8 +767,7 @@ public class DatabaseManager
         // Watch the syntax
         sql.append(")");
 
-        execute(context.getDBConnection(), sql.toString(), Arrays.asList(info),
-                row);
+        execute(context.getDBConnection(), sql.toString(), Arrays.asList(info), row);
     }
 
     /**
@@ -800,7 +811,7 @@ public class DatabaseManager
             sql.append(" where ").append(pk.getName()).append(" = ?");
             columns.add(pk);
 
-            return execute(context.getDBConnection(), sql.toString(), columns, row);
+            return executeUpdate(context.getDBConnection(), sql.toString(), columns, row);
         }
 
         return 1;
@@ -1169,15 +1180,12 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    static TableRow process(ResultSet results, String table)
-            throws SQLException
+    static TableRow process(ResultSet results, String table) throws SQLException
     {
-        String dbName =ConfigurationManager.getProperty("db.name");
         ResultSetMetaData meta = results.getMetaData();
         int columns = meta.getColumnCount() + 1;
 
-        List<String> columnNames = (table == null) ? getColumnNames(meta)
-                : getColumnNames(table);
+        List<String> columnNames = (table == null) ? getColumnNames(meta) : getColumnNames(table);
 
         TableRow row = new TableRow(canonicalize(table), columnNames);
 
@@ -1189,97 +1197,94 @@ public class DatabaseManager
             String name = meta.getColumnName(i);
             int jdbctype = meta.getColumnType(i);
 
-            if (jdbctype == Types.BIT)
-            {
-                row.setColumn(name, results.getBoolean(i));
-            }
-            else if ((jdbctype == Types.INTEGER) || (jdbctype == Types.NUMERIC)
-                    || (jdbctype == Types.DECIMAL))
-            {
-                // If we are using oracle
-                if (isOracle)
-                {
-                    // Test the value from the record set. If it can be represented using an int, do so.
-                    // Otherwise, store it as long
-                    long longValue = results.getLong(i);
-                    if (longValue <= (long)Integer.MAX_VALUE)
-                    {
-                        row.setColumn(name, (int) longValue);
-                    }
-                    else
-                    {
-                        row.setColumn(name, longValue);
-                    }
-                }
-                else
-                { // Not Oracle
-                	if (jdbctype == Types.INTEGER)
-                	{
-                		row.setColumn(name, results.getInt(i));
-                	}
-                	else // NUMERIC or DECIMAL
-                	{
-                		row.setColumn(name, results.getLong(i));
-                		// FIXME should be BigDecimal if TableRow supported that
-                	}
-                }
-            }
-            else if (jdbctype == Types.BIGINT)
-            {
-                row.setColumn(name, results.getLong(i));
-            }
-            else if (jdbctype == Types.DOUBLE)
-            {
-                row.setColumn(name, results.getDouble(i));
-            }
-            else if (jdbctype == Types.CLOB && isOracle)
-            {
-                // Support CLOBs in place of TEXT columns in Oracle
-                row.setColumn(name, results.getString(i));
-            }
-            else if (jdbctype == Types.VARCHAR)
-            {
-                try
-                {
-                    byte[] bytes = results.getBytes(i);
-
-                    if (bytes != null)
-                    {
-                        String mystring = new String(results.getBytes(i),
-                                "UTF-8");
-                        row.setColumn(name, mystring);
-                    }
-                    else
-                    {
-                        row.setColumn(name, results.getString(i));
-                    }
-                }
-                catch (UnsupportedEncodingException e)
-                {
-                    // do nothing, UTF-8 is built in!
-                }
-            }
-            else if (jdbctype == Types.DATE)
-            {
-                row.setColumn(name, results.getDate(i));
-            }
-            else if (jdbctype == Types.TIME)
-            {
-                row.setColumn(name, results.getTime(i));
-            }
-            else if (jdbctype == Types.TIMESTAMP)
-            {
-                row.setColumn(name, results.getTimestamp(i));
-            }
-            else
-            {
-                throw new IllegalArgumentException("Unsupported JDBC type: "
-                        + jdbctype);
-            }
-
             if (results.wasNull())
             {
                 row.setColumnNull(name);
+            }
+            else
+            {
+                switch (jdbctype)
+                {
+                    case Types.BIT:
+                        row.setColumn(name, results.getBoolean(i));
+                        break;
+
+                    case Types.INTEGER:
+                        if (isOracle)
+                        {
+                            long longValue = results.getLong(i);
+                            if (longValue <= (long)Integer.MAX_VALUE)
+                            {
+                                row.setColumn(name, (int) longValue);
+                            }
+                            else
+                            {
+                                row.setColumn(name, longValue);
+                            }
+                        }
+                        else
+                        {
+                            row.setColumn(name, results.getInt(i));
+                        }
+                        break;
+
+                    case Types.NUMERIC:
+                    case Types.DECIMAL:
+                    case Types.BIGINT:
+                        row.setColumn(name, results.getLong(i));
+                        break;
+
+                    case Types.DOUBLE:
+                        row.setColumn(name, results.getDouble(i));
+                        break;
+
+                    case Types.CLOB:
+                        if (isOracle)
+                        {
+                            row.setColumn(name, results.getString(i));
+                        }
+                        else
+                        {
+                            throw new IllegalArgumentException("Unsupported JDBC type: " + jdbctype);
+                        }
+                        break;
+
+                    case Types.VARCHAR:
+                        try
+                        {
+                            byte[] bytes = results.getBytes(i);
+
+                            if (bytes != null)
+                            {
+                                String mystring = new String(results.getBytes(i), "UTF-8");
+                                row.setColumn(name, mystring);
+                            }
+                            else
+                            {
+                                row.setColumn(name, results.getString(i));
+                            }
+                        }
+                        catch (UnsupportedEncodingException e)
+                        {
+                            log.error("Unable to parse text from database", e);
+                        }
+                        break;
+
+                    case Types.DATE:
+                        row.setColumn(name, results.getDate(i));
+                        break;
+
+                    case Types.TIME:
+                        row.setColumn(name, results.getTime(i));
+                        break;
+
+                    case Types.TIMESTAMP:
+                        row.setColumn(name, results.getTimestamp(i));
+                        break;
+
+                    default:
+                        throw new IllegalArgumentException("Unsupported JDBC type: " + jdbctype);
+                }
             }
         }
 
@@ -1369,8 +1374,7 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    private static int execute(Connection connection, String sql, List<ColumnInfo> columns,
-            TableRow row) throws SQLException
+    private static void execute(Connection connection, String sql, List<ColumnInfo> columns, TableRow row) throws SQLException
     {
         PreparedStatement statement = null;
 
@@ -1382,81 +1386,37 @@ public class DatabaseManager
         try
         {
             statement = connection.prepareStatement(sql);
-        	
-            int count = 0;
-            for (ColumnInfo info : columns)
+        	loadParameters(statement, columns, row);
+            statement.execute();
+        }
+        finally
+        {
+            if (statement != null)
             {
-                count++;
-                String column = info.getName();
-                int jdbctype = info.getType();
-
-                if (row.isColumnNull(column))
+                try
                 {
-                    statement.setNull(count, jdbctype);
+                    statement.close();
                 }
-                else
+                catch (SQLException sqle)
                 {
-                    switch (jdbctype)
-                    {
-                        case Types.BIT:
-                            statement.setBoolean(count, row.getBooleanColumn(column));
-                            break;
-
-                        case Types.INTEGER:
-                            if (isOracle)
-                            {
-                                statement.setLong(count, row.getLongColumn(column));
-                            }
-                            else
-                            {
-                                statement.setInt(count, row.getIntColumn(column));
-                            }
-                            break;
-
-                        case Types.NUMERIC:
-                        case Types.DECIMAL:
-                            statement.setLong(count, row.getLongColumn(column));
-                            // FIXME should be BigDecimal if TableRow supported that
-                            break;
-
-                        case Types.BIGINT:
-                            statement.setLong(count, row.getLongColumn(column));
-                            break;
-
-                        case Types.CLOB:
-                            if (isOracle)
-                            {
-                                // Support CLOBs in place of TEXT columns in Oracle
-                                statement.setString(count, row.getStringColumn(column));
-                            }
-                            else
-                            {
-                                throw new IllegalArgumentException("Unsupported JDBC type: " + jdbctype);
-                            }
-                            break;
-                        
-                        case Types.VARCHAR:
-                            statement.setString(count, row.getStringColumn(column));
-                            break;
-
-                        case Types.DATE:
-                            statement.setDate(count, new java.sql.Date(row.getDateColumn(column).getTime()));
-                            break;
-
-                        case Types.TIME:
-                            statement.setTime(count, new Time(row.getDateColumn(column).getTime()));
-                            break;
-
-                        case Types.TIMESTAMP:
-                            statement.setTimestamp(count, new Timestamp(row.getDateColumn(column).getTime()));
-                            break;
-
-                        default:
-                            throw new IllegalArgumentException("Unsupported JDBC type: " + jdbctype);
-                    }
                 }
             }
+        }
+    }
 
+    private static int executeUpdate(Connection connection, String sql, List<ColumnInfo> columns, TableRow row) throws SQLException
+    {
+        PreparedStatement statement = null;
+
+        if (log.isDebugEnabled())
+        {
+            log.debug("Running query \"" + sql + "\"");
+        }
+
+        try
+        {
+            statement = connection.prepareStatement(sql);
+        	loadParameters(statement, columns, row);
             return statement.executeUpdate();
         }
         finally
@@ -1596,8 +1556,6 @@ public class DatabaseManager
         {
             dataSource = null;
             initialized = false;
-            isOracle = false;
-            isPostgres = false;
         }
     }
 
@@ -1613,17 +1571,6 @@ public class DatabaseManager
 
         try
         {
-            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-            {
-                isOracle = true;
-                isPostgres = false;
-            }
-            else
-            {
-                isOracle = false;
-                isPostgres = true;
-            }
-
             String jndiName = ConfigurationManager.getProperty("db.jndi");
             if (!StringUtils.isEmpty(jndiName))
             {
@@ -1696,71 +1643,138 @@ public class DatabaseManager
 	 * @param parameters
 	 * 			The parameters to be set on the statement.
 	 */
-	protected static void loadParameters(PreparedStatement statement, Object[] parameters) 
-	throws SQLException{
-		
+	protected static void loadParameters(PreparedStatement statement, Object[] parameters) throws SQLException
+    {
 		statement.clearParameters();
-		
-	    for(int i=0; i < parameters.length; i++)
-	    {	
-	    	// Select the object we are setting.
-	    	Object parameter = parameters[i];
-	    	int idx = i+1; // JDBC starts counting at 1.
-	    	
-	    	if (parameter == null)
-	    	{
-	    		throw new SQLException("Attempting to insert null value into SQL query.");
-	    	}
+
+        int idx = 1;
+        for (Object parameter : parameters)
+	    {
 	    	if (parameter instanceof String)
 	    	{
-	    		statement.setString(idx,(String) parameters[i]);
+	    		statement.setString(idx,(String) parameter);
 	    	}
+            else if (parameter instanceof Long)
+            {
+                statement.setLong(idx,((Long) parameter).longValue());
+            }
 	    	else if (parameter instanceof Integer)
 	    	{
-	    		int ii = ((Integer) parameter).intValue();
-	    		statement.setInt(idx,ii);
+	    		statement.setInt(idx,((Integer) parameter).intValue());
 	    	}
+            else if (parameter instanceof Short)
+            {
+                statement.setShort(idx,((Short) parameter).shortValue());
+            }
+            else if (parameter instanceof Date)
+            {
+                statement.setDate(idx,(Date) parameter);
+            }
+            else if (parameter instanceof Time)
+            {
+                statement.setTime(idx,(Time) parameter);
+            }
+            else if (parameter instanceof Timestamp)
+            {
+                statement.setTimestamp(idx,(Timestamp) parameter);
+            }
 	    	else if (parameter instanceof Double)
 	    	{
-	    		double d = ((Double) parameter).doubleValue();
-	    		statement.setDouble(idx,d);
+	    		statement.setDouble(idx,((Double) parameter).doubleValue());
 	    	}
 	    	else if (parameter instanceof Float)
 	    	{
-	    		float f = ((Float) parameter).floatValue();
-	    		statement.setFloat(idx,f);
+	    		statement.setFloat(idx,((Float) parameter).floatValue());
 	    	}
-	    	else if (parameter instanceof Short)
-	    	{
-	    		short s = ((Short) parameter).shortValue();
-	    		statement.setShort(idx,s);
-	    	}
-	    	else if (parameter instanceof Long)
-	    	{
-	    		long l = ((Long) parameter).longValue();
-	    		statement.setLong(idx,l);
-	    	}
-	    	else if (parameter instanceof Date)
-	    	{
-	    		Date date = (Date) parameter;
-	    		statement.setDate(idx,date);
-	    	}
-	    	else if (parameter instanceof Time)
-	    	{
-	    		Time time = (Time) parameter;
-	    		statement.setTime(idx,time);
-	    	}
-	    	else if (parameter instanceof Timestamp)
-	    	{
-	    		Timestamp timestamp = (Timestamp) parameter;
-	    		statement.setTimestamp(idx,timestamp);
-	    	}
+            else if (parameter == null)
+            {
+                throw new SQLException("Attempting to insert null value into SQL query.");
+            }
 	    	else
 	    	{
 	    		throw new SQLException("Attempting to insert unknown datatype ("+parameter.getClass().getName()+") into SQL statement.");
-	    	}        	
+	    	}
+
+            idx++;
 	    }
 	}
+
+    private static void loadParameters(PreparedStatement statement, List<ColumnInfo> columns, TableRow row) throws SQLException
+    {
+        int count = 0;
+        for (ColumnInfo info : columns)
+        {
+            count++;
+            String column = info.getName();
+            int jdbctype = info.getType();
+
+            if (row.isColumnNull(column))
+            {
+                statement.setNull(count, jdbctype);
+            }
+            else
+            {
+                switch (jdbctype)
+                {
+                    case Types.BIT:
+                        statement.setBoolean(count, row.getBooleanColumn(column));
+                        break;
+
+                    case Types.INTEGER:
+                        if (isOracle)
+                        {
+                            statement.setLong(count, row.getLongColumn(column));
+                        }
+                        else
+                        {
+                            statement.setInt(count, row.getIntColumn(column));
+                        }
+                        break;
+
+                    case Types.NUMERIC:
+                    case Types.DECIMAL:
+                        statement.setLong(count, row.getLongColumn(column));
+                        // FIXME should be BigDecimal if TableRow supported that
+                        break;
+
+                    case Types.BIGINT:
+                        statement.setLong(count, row.getLongColumn(column));
+                        break;
+
+                    case Types.CLOB:
+                        if (isOracle)
+                        {
+                            // Support CLOBs in place of TEXT columns in Oracle
+                            statement.setString(count, row.getStringColumn(column));
+                        }
+                        else
+                        {
+                            throw new IllegalArgumentException("Unsupported JDBC type: " + jdbctype);
+                        }
+                        break;
+
+                    case Types.VARCHAR:
+                        statement.setString(count, row.getStringColumn(column));
+                        break;
+
+                    case Types.DATE:
+                        statement.setDate(count, new java.sql.Date(row.getDateColumn(column).getTime()));
+                        break;
+
+                    case Types.TIME:
+                        statement.setTime(count, new Time(row.getDateColumn(column).getTime()));
+                        break;
+
+                    case Types.TIMESTAMP:
+                        statement.setTimestamp(count, new Timestamp(row.getDateColumn(column).getTime()));
+                        break;
+
+                    default:
+                        throw new IllegalArgumentException("Unsupported JDBC type: " + jdbctype);
+                }
+            }
+        }
+    }
 
     /**
      * Main method used to perform tests on the database
