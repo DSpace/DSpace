@@ -320,7 +320,7 @@ public class TableRow
             throw new IllegalArgumentException("No such column " + column);
         }
 
-        if (isColumnNull(column))
+        if (isColumnNullCanonicalized(column))
         {
             return null;
         }

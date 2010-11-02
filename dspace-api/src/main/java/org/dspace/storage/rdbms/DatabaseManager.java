@@ -1197,94 +1197,93 @@ public class DatabaseManager
             String name = meta.getColumnName(i);
             int jdbctype = meta.getColumnType(i);
 
-            if (results.wasNull())
+            switch (jdbctype)
             {
-                row.setColumnNull(name);
-            }
-            else
-            {
-                switch (jdbctype)
-                {
-                    case Types.BIT:
-                        row.setColumn(name, results.getBoolean(i));
-                        break;
+                case Types.BIT:
+                    row.setColumn(name, results.getBoolean(i));
+                    break;
 
-                    case Types.INTEGER:
-                        if (isOracle)
+                case Types.INTEGER:
+                    if (isOracle)
+                    {
+                        long longValue = results.getLong(i);
+                        if (longValue <= (long)Integer.MAX_VALUE)
                         {
-                            long longValue = results.getLong(i);
-                            if (longValue <= (long)Integer.MAX_VALUE)
-                            {
-                                row.setColumn(name, (int) longValue);
-                            }
-                            else
-                            {
-                                row.setColumn(name, longValue);
-                            }
+                            row.setColumn(name, (int) longValue);
                         }
                         else
                         {
-                            row.setColumn(name, results.getInt(i));
+                            row.setColumn(name, longValue);
                         }
-                        break;
+                    }
+                    else
+                    {
+                        row.setColumn(name, results.getInt(i));
+                    }
+                    break;
 
-                    case Types.NUMERIC:
-                    case Types.DECIMAL:
-                    case Types.BIGINT:
-                        row.setColumn(name, results.getLong(i));
-                        break;
+                case Types.NUMERIC:
+                case Types.DECIMAL:
+                case Types.BIGINT:
+                    row.setColumn(name, results.getLong(i));
+                    break;
 
-                    case Types.DOUBLE:
-                        row.setColumn(name, results.getDouble(i));
-                        break;
+                case Types.DOUBLE:
+                    row.setColumn(name, results.getDouble(i));
+                    break;
 
-                    case Types.CLOB:
-                        if (isOracle)
+                case Types.CLOB:
+                    if (isOracle)
+                    {
+                        row.setColumn(name, results.getString(i));
+                    }
+                    else
+                    {
+                        throw new IllegalArgumentException("Unsupported JDBC type: " + jdbctype);
+                    }
+                    break;
+
+                case Types.VARCHAR:
+                    try
+                    {
+                        byte[] bytes = results.getBytes(i);
+
+                        if (bytes != null)
+                        {
+                            String mystring = new String(results.getBytes(i), "UTF-8");
+                            row.setColumn(name, mystring);
+                        }
+                        else
                         {
                             row.setColumn(name, results.getString(i));
                         }
-                        else
-                        {
-                            throw new IllegalArgumentException("Unsupported JDBC type: " + jdbctype);
-                        }
-                        break;
+                    }
+                    catch (UnsupportedEncodingException e)
+                    {
+                        log.error("Unable to parse text from database", e);
+                    }
+                    break;
 
-                    case Types.VARCHAR:
-                        try
-                        {
-                            byte[] bytes = results.getBytes(i);
+                case Types.DATE:
+                    row.setColumn(name, results.getDate(i));
+                    break;
 
-                            if (bytes != null)
-                            {
-                                String mystring = new String(results.getBytes(i), "UTF-8");
-                                row.setColumn(name, mystring);
-                            }
-                            else
-                            {
-                                row.setColumn(name, results.getString(i));
-                            }
-                        }
-                        catch (UnsupportedEncodingException e)
-                        {
-                            log.error("Unable to parse text from database", e);
-                        }
-                        break;
+                case Types.TIME:
+                    row.setColumn(name, results.getTime(i));
+                    break;
 
-                    case Types.DATE:
-                        row.setColumn(name, results.getDate(i));
-                        break;
+                case Types.TIMESTAMP:
+                    row.setColumn(name, results.getTimestamp(i));
+                    break;
 
-                    case Types.TIME:
-                        row.setColumn(name, results.getTime(i));
-                        break;
+                default:
+                    throw new IllegalArgumentException("Unsupported JDBC type: " + jdbctype);
+            }
 
-                    case Types.TIMESTAMP:
-                        row.setColumn(name, results.getTimestamp(i));
-                        break;
-
-                    default:
-                        throw new IllegalArgumentException("Unsupported JDBC type: " + jdbctype);
-                }
+            // Determines if the last column was null, and sets the tablerow accordingly
+            if (results.wasNull())
+            {
+                row.setColumnNull(name);
             }
         }
 
