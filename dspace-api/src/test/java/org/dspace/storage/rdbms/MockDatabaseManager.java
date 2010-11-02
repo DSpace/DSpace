@@ -97,6 +97,23 @@ public class MockDatabaseManager
     /** True if initialization has been done */
     private static boolean initialized = false;
 
+    private static boolean isOracle = false;
+    private static boolean isPostgres = false;
+
+    static
+    {
+        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        {
+            isOracle = true;
+            isPostgres = false;
+        }
+        else
+        {
+            isOracle = false;
+            isPostgres = true;
+        }
+    }
+    
     /** Name to use for the pool */
     private static String poolName = "dspacepool";
 
@@ -782,7 +799,7 @@ public class MockDatabaseManager
             sql.append(" where ").append(pk.getName()).append(" = ?");
             columns.add(pk);
 
-            return execute(context.getDBConnection(), sql.toString(), columns, row);
+            return executeUpdate(context.getDBConnection(), sql.toString(), columns, row);
         }
 
         return 1;
@@ -1352,10 +1369,8 @@ public class MockDatabaseManager
      *                If a database error occurs
      */
     @Mock
-    private static int execute(Connection connection, String sql, List<ColumnInfo> columns,
-            TableRow row) throws SQLException
+    private static void execute(Connection connection, String sql, List<ColumnInfo> columns, TableRow row) throws SQLException
     {
-        String dbName =ConfigurationManager.getProperty("db.name");
         PreparedStatement statement = null;
 
         if (log.isDebugEnabled())
@@ -1366,87 +1381,38 @@ public class MockDatabaseManager
         try
         {
             statement = connection.prepareStatement(sql);
-
-            int count = 0;
-
-            for (Iterator<ColumnInfo> iterator = columns.iterator(); iterator.hasNext();)
+        	loadParameters(statement, columns, row);
+            statement.execute();
+        }
+        finally
+        {
+            if (statement != null)
             {
-                count++;
-
-                ColumnInfo cinfo = iterator.next();
-                String column = cinfo.getName();
-                int jdbctype = cinfo.getType();
-
-                if (row.isColumnNull(column))
+                try
                 {
-                    statement.setNull(count, jdbctype);
-
-                    continue;
+                    statement.close();
                 }
-                else if (jdbctype == Types.BIT || jdbctype == Types.BOOLEAN)
+                catch (SQLException sqle)
                 {
-                    statement.setBoolean(count, row.getBooleanColumn(column));
-
-                    continue;
-                }
-                else if ((jdbctype == Types.INTEGER) || (jdbctype == Types.NUMERIC)
-                        || (jdbctype == Types.DECIMAL))
-                {
-                    // If we are using Oracle, we can pass in long values, so always do so.
-                    if ("oracle".equals(dbName))
-                        statement.setLong(count, row.getLongColumn(column));
-                    else
-                    statement.setInt(count, row.getIntColumn(column));
-
-                    continue;
-                }
-                else if (jdbctype == Types.BIGINT)
-                {
-                    statement.setLong(count, row.getLongColumn(column));
-                }
-                else if (jdbctype == Types.CLOB && "oracle".equals(dbName))
-                {
-                    // Support CLOBs in place of TEXT columns in Oracle
-                    statement.setString(count, row.getStringColumn(column));
-
-                    continue;
-                }
-                else if (jdbctype == Types.VARCHAR)
-                {
-                    statement.setString(count, row.getStringColumn(column));
-
-                    continue;
-                }
-                else if (jdbctype == Types.DATE)
-                {
-                    java.sql.Date d = new java.sql.Date(row.getDateColumn(
-                            column).getTime());
-                    statement.setDate(count, d);
-
-                    continue;
-                }
-                else if (jdbctype == Types.TIME)
-                {
-                    Time t = new Time(row.getDateColumn(column).getTime());
-                    statement.setTime(count, t);
-
-                    continue;
-                }
-                else if (jdbctype == Types.TIMESTAMP)
-                {
-                    Timestamp t = new Timestamp(row.getDateColumn(column)
-                            .getTime());
-                    statement.setTimestamp(count, t);
-
-                    continue;
-                }
-                else
-                {
-                    throw new IllegalArgumentException(
-                            "Unsupported JDBC type: " + jdbctype);
                 }
             }
+        }
+    }
 
+    @Mock
+    private static int executeUpdate(Connection connection, String sql, List<ColumnInfo> columns, TableRow row) throws SQLException
+    {
+        PreparedStatement statement = null;
+
+        if (log.isDebugEnabled())
+        {
+            log.debug("Running query \"" + sql + "\"");
+        }
+
+        try
+        {
+            statement = connection.prepareStatement(sql);
+        	loadParameters(statement, columns, row);
             return statement.executeUpdate();
         }
         finally
@@ -1853,6 +1819,85 @@ public class MockDatabaseManager
             else
             {
                     throw new SQLException("Attempting to insert unknown datatype ("+parameter.getClass().getName()+") into SQL statement.");
+            }
+        }
+    }
+
+    @Mock
+    private static void loadParameters(PreparedStatement statement, List<ColumnInfo> columns, TableRow row) throws SQLException
+    {
+        int count = 0;
+        for (ColumnInfo info : columns)
+        {
+            count++;
+            String column = info.getName();
+            int jdbctype = info.getType();
+
+            if (row.isColumnNull(column))
+            {
+                statement.setNull(count, jdbctype);
+            }
+            else
+            {
+                switch (jdbctype)
+                {
+                    case Types.BIT:
+                    case Types.BOOLEAN:
+                        statement.setBoolean(count, row.getBooleanColumn(column));
+                        break;
+
+                    case Types.INTEGER:
+                        if (isOracle)
+                        {
+                            statement.setLong(count, row.getLongColumn(column));
+                        }
+                        else
+                        {
+                            statement.setInt(count, row.getIntColumn(column));
+                        }
+                        break;
+
+                    case Types.NUMERIC:
+                    case Types.DECIMAL:
+                        statement.setLong(count, row.getLongColumn(column));
+                        // FIXME should be BigDecimal if TableRow supported that
+                        break;
+
+                    case Types.BIGINT:
+                        statement.setLong(count, row.getLongColumn(column));
+                        break;
+
+                    case Types.CLOB:
+                        if (isOracle)
+                        {
+                            // Support CLOBs in place of TEXT columns in Oracle
+                            statement.setString(count, row.getStringColumn(column));
+                        }
+                        else
+                        {
+                            throw new IllegalArgumentException("Unsupported JDBC type: " + jdbctype);
+                        }
+                        break;
+
+                    case Types.VARCHAR:
+                        statement.setString(count, row.getStringColumn(column));
+                        break;
+
+                    case Types.DATE:
+                        statement.setDate(count, new java.sql.Date(row.getDateColumn(column).getTime()));
+                        break;
+
+                    case Types.TIME:
+                        statement.setTime(count, new Time(row.getDateColumn(column).getTime()));
+                        break;
+
+                    case Types.TIMESTAMP:
+                        statement.setTimestamp(count, new Timestamp(row.getDateColumn(column).getTime()));
+                        break;
+
+                    default:
+                        throw new IllegalArgumentException("Unsupported JDBC type: " + jdbctype);
+                }
             }
         }
     }
