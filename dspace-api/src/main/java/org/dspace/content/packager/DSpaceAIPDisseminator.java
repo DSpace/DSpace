@@ -76,7 +76,6 @@ import edu.harvard.hul.ois.mets.Type;
 import edu.harvard.hul.ois.mets.helper.MetsException;
 import edu.harvard.hul.ois.mets.helper.PCData;
 import java.net.URLEncoder;
-import java.text.ParseException;
 import java.util.Date;
 import org.dspace.core.Utils;
 
@@ -169,14 +168,20 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
 
             //if null is returned, we couldn't parse the date!
             if(afterDate==null)
+            {
                  throw new IOException("Invalid date passed in via 'updatedAfter' option. Date must be in ISO-8601 format, and include both a day and time (e.g. 2010-01-01T00:00:00).");
+            }
 
             //check when this item was last modified.
             Item i = (Item) dso;
             if(i.getLastModified().after(afterDate))
+            {
                 disseminate = true;
+            }
             else
+            {
                 disseminate = false;
+            }
         }
 
         if(disseminate)
@@ -630,7 +635,9 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
         String bundleList = this.disseminateParams.getProperty("includeBundles", "all");
 
         if(bundleList.equalsIgnoreCase("all"))
+        {
             return true; //all bundles should be disseminated
+        }
         else
         {
             //Check if this bundle is in our list of bundles to include
@@ -638,7 +645,9 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
             for(String bundleName : bundleNames)
             {
                 if(bundle.getName().equals(bundleName))
+                {
                     return true;
+                }
             }
 
             //if not in the 'includeBundles' list, then return false

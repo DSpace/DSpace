@@ -11,7 +11,6 @@ package org.dspace.app.xmlui.aspect.administrative.item;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.SQLException;
-import java.util.Arrays;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 
 

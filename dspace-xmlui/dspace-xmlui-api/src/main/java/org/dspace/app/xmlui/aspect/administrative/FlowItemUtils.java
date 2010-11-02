@@ -734,7 +734,7 @@ public class FlowItemUtils
 	{
                 FlowResult result = new FlowResult();
                 String task = request.getParameter("curate_task");
-                String handle = new String("");
+                String handle = "";
                 Curator curator = new Curator();
                 String taskQueueName = ConfigurationManager.getProperty("curate", "ui.queuename");
                 boolean status = true;

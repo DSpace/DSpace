@@ -1151,16 +1151,18 @@ public class FlowContainerUtils
                 FlowResult result = new FlowResult();
                 String task = request.getParameter("curate_task");
 		if (task != null && task.length() == 0)
+        {
 			task = null;
+        }
 		Curator curator = new Curator();
-                curator.addTask(task);
-                curator.setInvoked(Curator.Invoked.INTERACTIVE);
-                if (Collection.find(context, dsoID) != null)
-                {
-                    Collection collection = Collection.find(context, dsoID);
-                    curator.curate(collection);
-                }
-                result.setOutcome(true);
+        curator.addTask(task);
+        curator.setInvoked(Curator.Invoked.INTERACTIVE);
+        if (Collection.find(context, dsoID) != null)
+        {
+            Collection collection = Collection.find(context, dsoID);
+            curator.curate(collection);
+        }
+        result.setOutcome(true);
 		result.setMessage(new Message("default","The task, " + task + " was completed with the status: " +
                         curator.getStatus(task) + "." + "\n" +  "Results: " + "\n" +
                         ((curator.getResult(task) != null) ? curator.getResult(task) : "Nothing to do for this DSpace object.")));

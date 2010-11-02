@@ -715,12 +715,9 @@ public abstract class AbstractAdapter
         {
             boolean diffrentNamespaces = false;
             Namespace attributeNamespace = attributeMap.getNamespace();
-            if (attributeNamespace != null)
+            if (attributeNamespace != null && !(attributeNamespace.URI.equals(elementNamespace.URI)))
             {
-            	if (!(attributeNamespace.URI.equals(elementNamespace.URI)))
-            	{
-            		diffrentNamespaces = true;
-            	}
+                diffrentNamespaces = true;
             }
 
             // copy each one over.
