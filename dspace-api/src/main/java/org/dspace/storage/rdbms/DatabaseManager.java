@@ -91,6 +91,9 @@ public class DatabaseManager
     /** True if initialization has been done */
     private static boolean initialized = false;
 
+    private static boolean isOracle = false;
+    private static boolean isPostgres = false;
+
     /** DataSource (retrieved from jndi */
     private static DataSource dataSource = null;
     private static String sqlOnBorrow = null;
@@ -695,7 +698,7 @@ public class DatabaseManager
         {
             // Get an ID (primary key) for this row by using the "getnextid"
             // SQL function in Postgres, or directly with sequences in Oracle
-            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+            if (isOracle)
             {
                 statement = context.getDBConnection().prepareStatement("SELECT " + table + "_seq" + ".nextval FROM dual");
             }
@@ -959,7 +962,7 @@ public class DatabaseManager
     static String canonicalize(String table)
     {
         // Oracle expects upper-case table names
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        if (isOracle)
         {
             return (table == null) ? null : table.toUpperCase();
         }
@@ -1194,7 +1197,7 @@ public class DatabaseManager
                     || (jdbctype == Types.DECIMAL))
             {
                 // If we are using oracle
-                if ("oracle".equals(dbName))
+                if (isOracle)
                 {
                     // Test the value from the record set. If it can be represented using an int, do so.
                     // Otherwise, store it as long
@@ -1229,7 +1232,7 @@ public class DatabaseManager
             {
                 row.setColumn(name, results.getDouble(i));
             }
-            else if (jdbctype == Types.CLOB && "oracle".equals(dbName))
+            else if (jdbctype == Types.CLOB && isOracle)
             {
                 // Support CLOBs in place of TEXT columns in Oracle
                 row.setColumn(name, results.getString(i));
@@ -1369,7 +1372,6 @@ public class DatabaseManager
     private static int execute(Connection connection, String sql, List<ColumnInfo> columns,
             TableRow row) throws SQLException
     {
-        String dbName =ConfigurationManager.getProperty("db.name");
         PreparedStatement statement = null;
 
         if (log.isDebugEnabled())
@@ -1382,94 +1384,76 @@ public class DatabaseManager
             statement = connection.prepareStatement(sql);
         	
             int count = 0;
-
-            for (Iterator<ColumnInfo> iterator = columns.iterator(); iterator.hasNext();)
+            for (ColumnInfo info : columns)
             {
                 count++;
-
-                ColumnInfo info = iterator.next();
                 String column = info.getName();
                 int jdbctype = info.getType();
 
                 if (row.isColumnNull(column))
                 {
                     statement.setNull(count, jdbctype);
-
-                    continue;
-                }
-                else if (jdbctype == Types.BIT)
-                {
-                    statement.setBoolean(count, row.getBooleanColumn(column));
-
-                    continue;
-                }
-                else if ((jdbctype == Types.INTEGER) || (jdbctype == Types.NUMERIC)
-                        || (jdbctype == Types.DECIMAL))
-                {
-                    // If we are using Oracle, we can pass in long values, so always do so.
-                    if ("oracle".equals(dbName))
-                    {
-                        statement.setLong(count, row.getLongColumn(column));
-                    }
-                    else
-                    { // not Oracle
-                        if (jdbctype == Types.INTEGER)
-                        {
-                            statement.setInt(count, row.getIntColumn(column));
-                        }
-                        else // NUMERIC or DECIMAL
-                        {
-                            statement.setLong(count, row.getLongColumn(column));
-                            // FIXME should be BigDecimal if TableRow supported that
-                        }
-                    }
-
-                    continue;
-                }
-                else if (jdbctype == Types.BIGINT)
-                {
-                    statement.setLong(count, row.getLongColumn(column));
-                }
-                else if (jdbctype == Types.CLOB && "oracle".equals(dbName))
-                {
-                    // Support CLOBs in place of TEXT columns in Oracle
-                    statement.setString(count, row.getStringColumn(column));
-
-                    continue;
-                }
-                else if (jdbctype == Types.VARCHAR)
-                {
-                    statement.setString(count, row.getStringColumn(column));
-
-                    continue;
-                }
-                else if (jdbctype == Types.DATE)
-                {
-                    java.sql.Date d = new java.sql.Date(row.getDateColumn(
-                            column).getTime());
-                    statement.setDate(count, d);
-
-                    continue;
-                }
-                else if (jdbctype == Types.TIME)
-                {
-                    Time t = new Time(row.getDateColumn(column).getTime());
-                    statement.setTime(count, t);
-
-                    continue;
-                }
-                else if (jdbctype == Types.TIMESTAMP)
-                {
-                    Timestamp t = new Timestamp(row.getDateColumn(column)
-                            .getTime());
-                    statement.setTimestamp(count, t);
-
-                    continue;
                 }
                 else
                 {
-                    throw new IllegalArgumentException(
-                            "Unsupported JDBC type: " + jdbctype);
+                    switch (jdbctype)
+                    {
+                        case Types.BIT:
+                            statement.setBoolean(count, row.getBooleanColumn(column));
+                            break;
+
+                        case Types.INTEGER:
+                            if (isOracle)
+                            {
+                                statement.setLong(count, row.getLongColumn(column));
+                            }
+                            else
+                            {
+                                statement.setInt(count, row.getIntColumn(column));
+                            }
+                            break;
+
+                        case Types.NUMERIC:
+                        case Types.DECIMAL:
+                            statement.setLong(count, row.getLongColumn(column));
+                            // FIXME should be BigDecimal if TableRow supported that
+                            break;
+
+                        case Types.BIGINT:
+                            statement.setLong(count, row.getLongColumn(column));
+                            break;
+
+                        case Types.CLOB:
+                            if (isOracle)
+                            {
+                                // Support CLOBs in place of TEXT columns in Oracle
+                                statement.setString(count, row.getStringColumn(column));
+                            }
+                            else
+                            {
+                                throw new IllegalArgumentException("Unsupported JDBC type: " + jdbctype);
+                            }
+                            break;
+                        
+                        case Types.VARCHAR:
+                            statement.setString(count, row.getStringColumn(column));
+                            break;
+
+                        case Types.DATE:
+                            statement.setDate(count, new java.sql.Date(row.getDateColumn(column).getTime()));
+                            break;
+
+                        case Types.TIME:
+                            statement.setTime(count, new Time(row.getDateColumn(column).getTime()));
+                            break;
+
+                        case Types.TIMESTAMP:
+                            statement.setTimestamp(count, new Timestamp(row.getDateColumn(column).getTime()));
+                            break;
+
+                        default:
+                            throw new IllegalArgumentException("Unsupported JDBC type: " + jdbctype);
+                    }
                 }
             }
 
@@ -1612,6 +1596,8 @@ public class DatabaseManager
         {
             dataSource = null;
             initialized = false;
+            isOracle = false;
+            isPostgres = false;
         }
     }
 
@@ -1627,6 +1613,17 @@ public class DatabaseManager
 
         try
         {
+            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+            {
+                isOracle = true;
+                isPostgres = false;
+            }
+            else
+            {
+                isOracle = false;
+                isPostgres = true;
+            }
+
             String jndiName = ConfigurationManager.getProperty("db.jndi");
             if (!StringUtils.isEmpty(jndiName))
             {
@@ -1643,7 +1640,7 @@ public class DatabaseManager
 
                 if (dataSource != null)
                 {
-                    if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+                    if (isOracle)
                     {
                         sqlOnBorrow = "ALTER SESSION SET current_schema=" + ConfigurationManager.getProperty("db.username").trim().toUpperCase();
                     }
@@ -1656,7 +1653,7 @@ public class DatabaseManager
                 }
             }
 
-            if (!"oracle".equals(ConfigurationManager.getProperty("db.name")))
+            if (isOracle)
             {
                 if (!StringUtils.isEmpty(ConfigurationManager.getProperty("db.postgres.schema")))
                 {
