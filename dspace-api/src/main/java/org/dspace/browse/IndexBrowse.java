@@ -295,22 +295,6 @@ public class IndexBrowse
     	return this.outFile;
     }
     
-    private void removeIndex(int itemID, String table)
-        throws BrowseException
-    {
-        dao.deleteByItemID(table, itemID);
-    }
-
-    private void removeDistinctIndex(int itemID, String distinctTable, String mapTable)
-        throws BrowseException
-    {
-        List<Integer> distinctIds = dao.deleteMappingsByItemID(mapTable, itemID);
-        if (distinctIds != null && distinctIds.size() > 0)
-        {
-            dao.pruneDistinct(distinctTable, mapTable, distinctIds);
-        }
-    }
-
     /**
      * Prune indexes - called from the public interfaces or at the end of a batch indexing process
      */
@@ -342,8 +326,12 @@ public class IndexBrowse
      * @param item	the item to index
      * @throws BrowseException
      */
-    public void indexItem(Item item)
-    	throws BrowseException
+    public void indexItem(Item item) throws BrowseException
+    {
+        indexItem(item, false);
+    }
+
+    void indexItem(Item item, boolean addingNewItem) throws BrowseException
     {
         // If the item is not archived AND has not been withdrawn
         // we can assume that it has *never* been archived - in that case,
@@ -354,9 +342,13 @@ public class IndexBrowse
         // isWithdrawn() as FALSE, may result in stale data in the browse tables.
         // Such an update should never occur though, and if it does, probably indicates a major
         // problem with the code updating the Item.
-        if (item.isArchived() || item.isWithdrawn())
+        if (item.isArchived())
         {
-            indexItem(new ItemMetadataProxy(item));
+            indexItem(new ItemMetadataProxy(item), addingNewItem);
+        }
+        else if (item.isWithdrawn())
+        {
+            indexItem(new ItemMetadataProxy(item), false);
         }
     }
     
@@ -366,7 +358,7 @@ public class IndexBrowse
          * @param item  the item to index
          * @throws BrowseException
          */
-    private void indexItem(ItemMetadataProxy item)
+    private void indexItem(ItemMetadataProxy item, boolean addingNewItem)
         throws BrowseException
     {
         // Map to store the metadata from the Item
@@ -384,7 +376,7 @@ public class IndexBrowse
                 {
                     // Record doesn't exist - ensure that it doesn't exist in the withdrawn index,
                     // and add it to the archived item index
-                    removeIndex(item.getID(), BrowseIndex.getWithdrawnBrowseIndex().getTableName());
+                    dao.deleteByItemID(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), item.getID());
                     dao.insertIndex(BrowseIndex.getItemBrowseIndex().getTableName(), item.getID(), sortMap);
                 }
 
@@ -397,15 +389,15 @@ public class IndexBrowse
                 {
                     // Record doesn't exist - ensure that it doesn't exist in the item index,
                     // and add it to the withdrawn item index
-                    removeIndex(item.getID(), BrowseIndex.getItemBrowseIndex().getTableName());
+                    dao.deleteByItemID(BrowseIndex.getItemBrowseIndex().getTableName(), item.getID());
                     dao.insertIndex(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), item.getID(), sortMap);
                 }
             }
             else
             {
                 // This item shouldn't exist in either index - ensure that it is removed
-                removeIndex(item.getID(), BrowseIndex.getItemBrowseIndex().getTableName());
-                removeIndex(item.getID(), BrowseIndex.getWithdrawnBrowseIndex().getTableName());
+                dao.deleteByItemID(BrowseIndex.getItemBrowseIndex().getTableName(), item.getID());
+                dao.deleteByItemID(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), item.getID());
             }
 
             // Update the community mappings if they are required, or remove them if they aren't
@@ -441,60 +433,65 @@ public class IndexBrowse
                                 int minConfidence = MetadataAuthorityManager.getManager()
                                         .getMinConfidence(values[0].schema, values[0].element, values[0].qualifier);
 
-                                for (int x = 0; x < values.length; x++)
+                                for (DCValue value : values)
                                 {
                                     // Ensure that there is a value to index before inserting it
-                                    if (StringUtils.isEmpty(values[x].value))
+                                    if (StringUtils.isEmpty(value.value))
                                     {
                                         log.error("Null metadata value for item " + item.getID() + ", field: " +
-                                                values[x].schema + "." +
-                                                values[x].element +
-                                                (values[x].qualifier == null ? "" : "." + values[x].qualifier));
+                                                value.schema + "." +
+                                                value.element +
+                                                (value.qualifier == null ? "" : "." + value.qualifier));
                                     }
                                     else
-                                    {                                        
-                                        if (bis[i].isAuthorityIndex() && 
-                                                (values[x].authority == null || values[x].confidence < minConfidence))
+                                    {
+                                        if (bis[i].isAuthorityIndex() &&
+                                                (value.authority == null || value.confidence < minConfidence))
                                         {
-                                        	// skip to next value in this authority field if value is not authoritative
-                                            log.debug("Skipping non-authoritative value: "+item.getID()+", field="+values[x].schema+"."+values[x].element+"."+values[x].qualifier+", value="+values[x].value+", authority="+values[x].authority+", confidence="+values[x].confidence+" (BAD AUTHORITY)");
+                                            // skip to next value in this authority field if value is not authoritative
+                                            log.debug("Skipping non-authoritative value: " + item.getID() + ", field=" + value.schema + "." + value.element + "." + value.qualifier + ", value=" + value.value + ", authority=" + value.authority + ", confidence=" + value.confidence + " (BAD AUTHORITY)");
                                             continue;
 
                                         }
-                                        
+
                                         // is there any valid (with appropriate confidence) authority key?
-                                        if (values[x].authority != null
-                                                && values[x].confidence >= minConfidence)
+                                        if (value.authority != null
+                                                && value.confidence >= minConfidence)
                                         {
-                                            boolean isValueVariants = false;
+                                            boolean isValueInVariants = false;
+
+                                            // Are there variants of this value
                                             List<String> variants = ChoiceAuthorityManager.getManager()
-                                                                        .getVariants(values[x].schema, values[x].element, values[x].qualifier,
-                                                                                        values[x].authority, values[x].language);
+                                                    .getVariants(value.schema, value.element, value.qualifier,
+                                                            value.authority, value.language);
+
+                                            // If we have variants, index them
                                             if (variants != null)
                                             {
                                                 for (String var : variants)
                                                 {
-                                                    String nVal = OrderFormat.makeSortString(var, values[x].language, bis[i].getDataType());
-                                                    distIDSet.add(dao.getDistinctID(bis[i].getDistinctTableName(), var, values[x].authority, nVal));
-                                                    if (var.equals(values[x].value))
+                                                    String nVal = OrderFormat.makeSortString(var, value.language, bis[i].getDataType());
+                                                    distIDSet.add(dao.getDistinctID(bis[i].getDistinctTableName(), var, value.authority, nVal));
+                                                    if (var.equals(value.value))
                                                     {
-                                                        isValueVariants = true;
+                                                        isValueInVariants = true;
                                                     }
                                                 }
                                             }
 
-                                            if (!isValueVariants)
+                                            // If we didn't index the value as one of the variants, add it now
+                                            if (!isValueInVariants)
                                             {
                                                 // get the normalised version of the value
-                                                String nVal = OrderFormat.makeSortString(values[x].value, values[x].language, bis[i].getDataType());
-                                                distIDSet.add(dao.getDistinctID(bis[i].getDistinctTableName(), values[x].value, values[x].authority, nVal));
+                                                String nVal = OrderFormat.makeSortString(value.value, value.language, bis[i].getDataType());
+                                                distIDSet.add(dao.getDistinctID(bis[i].getDistinctTableName(), value.value, value.authority, nVal));
                                             }
                                         }
                                         else // put it in the browse index as if it hasn't have an authority key
                                         {
                                             // get the normalised version of the value
-                                            String nVal = OrderFormat.makeSortString(values[x].value, values[x].language, bis[i].getDataType());
-                                                distIDSet.add(dao.getDistinctID(bis[i].getDistinctTableName(), values[x].value, null, nVal));
+                                            String nVal = OrderFormat.makeSortString(value.value, value.language, bis[i].getDataType());
+                                            distIDSet.add(dao.getDistinctID(bis[i].getDistinctTableName(), value.value, null, nVal));
                                         }
                                     }
                                 }
@@ -505,19 +502,20 @@ public class IndexBrowse
                     // Do we have any mappings?
                     if (distIDSet.isEmpty())
                     {
-                        // remove any old mappings
-                        removeDistinctIndex(item.getID(), bis[i].getDistinctTableName(), bis[i].getMapTableName());
+                        if (!addingNewItem)
+                        {
+                            // remove any old mappings
+                            List<Integer> distinctIds = dao.deleteMappingsByItemID(bis[i].getMapTableName(), item.getID());
+                            if (distinctIds != null && distinctIds.size() > 0)
+                            {
+                                dao.pruneDistinct(bis[i].getDistinctTableName(), bis[i].getMapTableName(), distinctIds);
+                            }
+                        }
                     }
                     else
                     {
                         // Update the existing mappings
-                        int[] distIDarr = new int[distIDSet.size()];
-                        int didx = 0;
-                        for (Integer distID : distIDSet)
-                        {
-                            distIDarr[didx++] = distID;
-                        }
-                        MappingResults results = dao.updateDistinctMappings(bis[i].getMapTableName(), item.getID(), distIDarr);
+                        MappingResults results = dao.updateDistinctMappings(bis[i].getMapTableName(), item.getID(), distIDSet);
                         if (results.getRemovedDistinctIds() != null && results.getRemovedDistinctIds().size() > 0)
                         {
                             pruneDistinctIndex(bis[i], results.getRemovedDistinctIds());
@@ -603,32 +601,6 @@ public class IndexBrowse
         }
     }
     
-    /**
-     * @deprecated
-     * @param item
-     * @return
-     * @throws BrowseException
-     */
-    public boolean itemAdded(Item item)
-		throws BrowseException
-	{
-		indexItem(item);
-	    return true;
-	}
-
-    /**
-     * @deprecated
-     * @param item
-     * @return
-     * @throws BrowseException
-     */
-	public boolean itemChanged(Item item)
-		throws BrowseException
-	{
-		indexItem(item);
-	    return true;
-	}
-
 	/**
 	 * remove all the indices for the given item
 	 * 
@@ -651,13 +623,13 @@ public class IndexBrowse
 		    if (bis[i].isMetadataIndex())
 		    {
     			log.debug("Removing indexing for removed item " + itemID + ", for index: " + bis[i].getTableName());
-    			removeIndex(itemID, bis[i].getMapTableName());
+    			dao.deleteByItemID(bis[i].getMapTableName(), itemID);
 		    }
 	    }
 
         // Remove from the item indexes (archive and withdrawn)
-        removeIndex(itemID, BrowseIndex.getItemBrowseIndex().getTableName());
-        removeIndex(itemID, BrowseIndex.getWithdrawnBrowseIndex().getTableName());
+        dao.deleteByItemID(BrowseIndex.getItemBrowseIndex().getTableName(), itemID);
+        dao.deleteByItemID(BrowseIndex.getWithdrawnBrowseIndex().getTableName(), itemID);
         dao.deleteCommunityMappings(itemID);
 
         return true;
@@ -672,103 +644,115 @@ public class IndexBrowse
 	public static void main(String[] argv)
 		throws SQLException, BrowseException, ParseException
 	{
-        Context context = new Context();
-        context.turnOffAuthorisationSystem();
-        IndexBrowse indexer = new IndexBrowse(context);
-	    
-	    // create an options object and populate it
-	    CommandLineParser parser = new PosixParser();
-	    Options options = new Options();
-	   
-	    // these are mutually exclusive, and represent the primary actions
-	    options.addOption("t", "tables", false, "create the tables only, do not attempt to index.  Mutually exclusive with -f and -i");
-	    options.addOption("i", "index", false, "actually do the indexing.  Mutually exclusive with -t and -f");
-	    options.addOption("f", "full", false, "make the tables, and do the indexing.  This forces -x.  Mutually exclusive with -t and -i");
-	    
-	    // these options can be specified only with the -f option
-	    options.addOption("r", "rebuild", false, "should we rebuild all the indices, which removes old index tables and creates new ones.  For use with -f. Mutually exclusive with -d");
-	    options.addOption("d", "delete", false, "delete all the indices, but don't create new ones.  For use with -f. This is mutually exclusive with -r");
-	    
-	    // these options can be specified only with the -t and -f options
-	    options.addOption("o", "out", true, "[-o <filename>] write the remove and create SQL to the given file. For use with -t and -f");  // FIXME: not currently working
-	    options.addOption("p", "print", false, "write the remove and create SQL to the stdout. For use with -t and -f");
-	    options.addOption("x", "execute", false, "execute all the remove and create SQL against the database. For use with -t and -f");
-	    options.addOption("s", "start", true, "[-s <int>] start from this index number and work upward (mostly only useful for debugging). For use with -t and -f");
-	    
-	    // this option can be used with any argument
-	    options.addOption("v", "verbose", false, "print extra information to the stdout.  If used in conjunction with -p, you cannot use the stdout to generate your database structure");
-	    
-	    // display the help.  If this is spefified, it trumps all other arguments
-	    options.addOption("h", "help", false, "show this help documentation.  Overrides all other arguments");
-	    
-	    CommandLine line = parser.parse(options, argv);
-	    
-	    // display the help
-	    if (line.hasOption("h"))
-	    {
-	    	indexer.usage(options);
-	    	return;
-	    }
-	    
-	    if (line.hasOption("v"))
-	    {
-	    	indexer.setVerbose(true);
-	    }
-	    
-	    if (line.hasOption("i"))
-	    {
-	    	indexer.createIndex();
-	    	return;
-	    }
-	    
-	    if (line.hasOption("f"))
-	    {
-	    	if (line.hasOption('r'))
-		    {
-		        indexer.setRebuild(true);
-		    }
-	    	else if (line.hasOption("d"))
-		    {
-		    	indexer.setDelete(true);
-		    }
-	    }
-	    
-	    if (line.hasOption("f") || line.hasOption("t"))
-	    {
-	    	if (line.hasOption("s"))
-		    {
-		    	indexer.setStart(Integer.parseInt(line.getOptionValue("s")));
-		    }
-	    	if (line.hasOption("x"))
-		    {
-		    	indexer.setExecute(true);
-		    }
-	    	if (line.hasOption("p"))
-	    	{
-	    		indexer.setStdOut(true);
-	    	}
-	    	if (line.hasOption("o"))
-	    	{
-	    		indexer.setFileOut(true);
-	    		indexer.setOutFile(line.getOptionValue("o"));
-	    	}
-	    }
-	    
-	    if (line.hasOption("t"))
-	    {
-	    	indexer.prepTables();
-	    	return;
-	    }
-	    
-	    if (line.hasOption("f"))
-	    {
-	    	indexer.setExecute(true);
-	    	indexer.initBrowse();
-	    	return;
-	    }
-	    
-	    indexer.usage(options);
-        context.complete();
+        Date startTime = new Date();
+        try
+        {
+            Context context = new Context();
+            context.turnOffAuthorisationSystem();
+            IndexBrowse indexer = new IndexBrowse(context);
+
+            // create an options object and populate it
+            CommandLineParser parser = new PosixParser();
+            Options options = new Options();
+
+            // these are mutually exclusive, and represent the primary actions
+            options.addOption("t", "tables", false, "create the tables only, do not attempt to index.  Mutually exclusive with -f and -i");
+            options.addOption("i", "index", false, "actually do the indexing.  Mutually exclusive with -t and -f");
+            options.addOption("f", "full", false, "make the tables, and do the indexing.  This forces -x.  Mutually exclusive with -t and -i");
+
+            // these options can be specified only with the -f option
+            options.addOption("r", "rebuild", false, "should we rebuild all the indices, which removes old index tables and creates new ones.  For use with -f. Mutually exclusive with -d");
+            options.addOption("d", "delete", false, "delete all the indices, but don't create new ones.  For use with -f. This is mutually exclusive with -r");
+
+            // these options can be specified only with the -t and -f options
+            options.addOption("o", "out", true, "[-o <filename>] write the remove and create SQL to the given file. For use with -t and -f");  // FIXME: not currently working
+            options.addOption("p", "print", false, "write the remove and create SQL to the stdout. For use with -t and -f");
+            options.addOption("x", "execute", false, "execute all the remove and create SQL against the database. For use with -t and -f");
+            options.addOption("s", "start", true, "[-s <int>] start from this index number and work upward (mostly only useful for debugging). For use with -t and -f");
+
+            // this option can be used with any argument
+            options.addOption("v", "verbose", false, "print extra information to the stdout.  If used in conjunction with -p, you cannot use the stdout to generate your database structure");
+
+            // display the help.  If this is spefified, it trumps all other arguments
+            options.addOption("h", "help", false, "show this help documentation.  Overrides all other arguments");
+
+            CommandLine line = parser.parse(options, argv);
+
+            // display the help
+            if (line.hasOption("h"))
+            {
+                indexer.usage(options);
+                return;
+            }
+
+            if (line.hasOption("v"))
+            {
+                indexer.setVerbose(true);
+            }
+
+            if (line.hasOption("i"))
+            {
+                indexer.createIndex();
+                return;
+            }
+
+            if (line.hasOption("f"))
+            {
+                if (line.hasOption('r'))
+                {
+                    indexer.setRebuild(true);
+                }
+                else if (line.hasOption("d"))
+                {
+                    indexer.setDelete(true);
+                }
+            }
+
+            if (line.hasOption("f") || line.hasOption("t"))
+            {
+                if (line.hasOption("s"))
+                {
+                    indexer.setStart(Integer.parseInt(line.getOptionValue("s")));
+                }
+                if (line.hasOption("x"))
+                {
+                    indexer.setExecute(true);
+                }
+                if (line.hasOption("p"))
+                {
+                    indexer.setStdOut(true);
+                }
+                if (line.hasOption("o"))
+                {
+                    indexer.setFileOut(true);
+                    indexer.setOutFile(line.getOptionValue("o"));
+                }
+            }
+
+            if (line.hasOption("t"))
+            {
+                indexer.prepTables();
+                return;
+            }
+
+            if (line.hasOption("f"))
+            {
+                indexer.setExecute(true);
+                indexer.initBrowse();
+                return;
+            }
+
+            indexer.usage(options);
+            context.complete();
+        }
+        finally
+        {
+            Date endTime = new Date();
+            System.out.println("Started: " + startTime.getTime());
+            System.out.println("Ended: " + endTime.getTime());
+            System.out.println("Elapsed time: " + ((endTime.getTime() - startTime.getTime()) / 1000) + " secs (" + (endTime.getTime() - startTime.getTime()) + " msecs)");
+
+        }
 	}
 
 	/**
@@ -1162,7 +1146,8 @@ public class IndexBrowse
     		
     		for (int j = 0; j < items.length; j++)
     		{
-                indexItem(new ItemMetadataProxy(items[j].getID(), items[j]));
+                // Creating the indexes from scracth, so treat each item as if it's new
+                indexItem(new ItemMetadataProxy(items[j].getID(), items[j]), true);
     			
     			// after each item we commit the context and clear the cache
     			context.commit();

@@ -227,7 +227,7 @@ public class ItemMapServlet extends DSpaceServlet
     					try
     					{
     						IndexBrowse ib = new IndexBrowse(context);
-    						ib.itemChanged(myItem);
+                            ib.indexItem(myItem);
     					}
     					catch (BrowseException e)
     					{
@@ -277,7 +277,7 @@ public class ItemMapServlet extends DSpaceServlet
     						try
     	    				{
     	    					IndexBrowse ib = new IndexBrowse(context);
-    	    					ib.itemChanged(myItem);
+    	    					ib.indexItem(myItem);
     	    				}
     	    				catch (BrowseException e)
     	    				{

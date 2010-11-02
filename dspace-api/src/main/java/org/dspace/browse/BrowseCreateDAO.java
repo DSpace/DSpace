@@ -39,6 +39,7 @@ package org.dspace.browse;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Interface for any class wishing to provide a browse storage later.  This particular
@@ -187,7 +188,7 @@ public interface BrowseCreateDAO
      * @return the ids of any distinct records that have been unmapped
      * @throws BrowseException
      */
-    public MappingResults updateDistinctMappings(String table, int itemID, int[] distinctIDs) throws BrowseException;
+    public MappingResults updateDistinctMappings(String table, int itemID, Set<Integer> distinctIDs) throws BrowseException;
 
 	/**
 	 * Find out of a given table exists.

@@ -38,7 +38,9 @@
 
 package org.dspace.browse;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -75,7 +77,7 @@ public class BrowseConsumer implements Consumer
     private static Logger log = Logger.getLogger(BrowseConsumer.class);
 
     // items to be updated in browse index
-    private Set<Item> toUpdate = null;
+    private Map<Integer, ItemHolder> toUpdate = null;
 
     public void initialize()
         throws Exception
@@ -88,7 +90,7 @@ public class BrowseConsumer implements Consumer
     {
         if(toUpdate == null)
         {
-            toUpdate = new HashSet<Item>();
+            toUpdate = new HashMap<Integer, ItemHolder>();
         }
         
         log.debug("consume() evaluating event: " + event.toString());
@@ -102,26 +104,31 @@ public class BrowseConsumer implements Consumer
 
         // If an Item is created or its metadata is modified..
         case Constants.ITEM:
-            if(et == Event.MODIFY_METADATA || et == Event.CREATE)
+            if (et == Event.MODIFY_METADATA || et == Event.CREATE)
             {
-                DSpaceObject subj = event.getSubject(ctx);
+                Item subj = (Item)event.getSubject(ctx);
                 if (subj != null)
                 {
                     log.debug("consume() adding event to update queue: " + event.toString());
-                    toUpdate.add((Item)subj);
+                    if (et == Event.CREATE || !toUpdate.containsKey(subj.getID()))
+                    {
+                        toUpdate.put(subj.getID(), new ItemHolder(subj, et == Event.CREATE));
+                    }
                 }
             }
             break;
         // track ADD and REMOVE from collections, that changes browse index.
         case Constants.COLLECTION:
-            if (event.getObjectType() == Constants.ITEM
-                    && (et == Event.ADD || et == Event.REMOVE))
+            if (event.getObjectType() == Constants.ITEM && (et == Event.ADD || et == Event.REMOVE))
             {
                 Item obj = (Item)event.getObject(ctx);
                 if (obj != null)
                 {
                     log.debug("consume() adding event to update queue: " + event.toString());
-                    toUpdate.add(obj);
+                    if (!toUpdate.containsKey(obj.getID()))
+                    {
+                        toUpdate.put(obj.getID(), new ItemHolder(obj, false));
+                    }
                 }
             }
             break;
@@ -139,7 +146,7 @@ public class BrowseConsumer implements Consumer
         {
 
             // Update/Add items
-            for (Item i : toUpdate)
+            for (ItemHolder i : toUpdate.values())
             {
                 // FIXME: there is an exception handling problem here
                 try
@@ -147,7 +154,7 @@ public class BrowseConsumer implements Consumer
                     // Update browse indices
                     ctx.turnOffAuthorisationSystem();
                     IndexBrowse ib = new IndexBrowse(ctx);
-                    ib.indexItem(i);
+                    ib.indexItem(i.item, i.createEvent);
                     ctx.restoreAuthSystemState();
                 }
                 catch (BrowseException e)
@@ -159,8 +166,8 @@ public class BrowseConsumer implements Consumer
                 if (log.isDebugEnabled())
                 {
                     log.debug("Updated browse indices for Item id="
-                            + String.valueOf(i.getID()) + ", hdl="
-                            + i.getHandle());
+                            + String.valueOf(i.item.getID()) + ", hdl="
+                            + i.item.getHandle());
                 }
             }
 
@@ -177,5 +184,16 @@ public class BrowseConsumer implements Consumer
     
     public void finish(Context ctx) {
     	
+    }
+
+    private final class ItemHolder {
+        private Item item;
+        private boolean createEvent;
+
+        ItemHolder(Item pItem, boolean pCreateEvent)
+        {
+            item = pItem;
+            createEvent = pCreateEvent;
+        }
     }
 }

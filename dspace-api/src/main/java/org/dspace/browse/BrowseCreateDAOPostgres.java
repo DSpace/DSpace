@@ -41,9 +41,11 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
@@ -246,24 +248,18 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#updateDistinctMapping(java.lang.String, int, int)
      */
-    public MappingResults updateDistinctMappings(String table, int itemID, int[] distinctIDs) throws BrowseException
+    public MappingResults updateDistinctMappings(String table, int itemID, Set<Integer> distinctIDs) throws BrowseException
     {
         BrowseMappingResults results = new BrowseMappingResults();
         try
         {
-            // Remove (set to -1) any duplicate distinctIDs
-            for (int i = 0; i < distinctIDs.length; i++)
-            {
-                if (!isFirstOccurrence(distinctIDs, i))
-                {
-                    distinctIDs[i] = -1;
-                }
-            }
+            Set<Integer> addDistinctIDs = null;
 
             // Find all existing mappings for this item
             TableRowIterator tri = DatabaseManager.queryTable(context, table, "SELECT * FROM " + table + " WHERE item_id=?", itemID);
             if (tri != null)
             {
+                addDistinctIDs = (Set<Integer>)((HashSet<Integer>)distinctIDs).clone();
                 try
                 {
                     while (tri.hasNext())
@@ -273,16 +269,13 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
                         // Check the item mappings to see if it contains this mapping
                         boolean itemIsMapped = false;
                         int trDistinctID = tr.getIntColumn("distinct_id");
-                        for (int i = 0; i < distinctIDs.length; i++)
+                        if (distinctIDs.contains(trDistinctID))
                         {
                             // Found this mapping
-                            if (distinctIDs[i] == trDistinctID)
-                            {
-                                results.addRetainedDistinctId(trDistinctID);
-                                // Flag it, and remove (-1) from the item mappings
-                                itemIsMapped = true;
-                                distinctIDs[i] = -1;
-                            }
+                            results.addRetainedDistinctId(trDistinctID);
+                            // Flag it, and remove (-1) from the item mappings
+                            itemIsMapped = true;
+                            addDistinctIDs.remove(trDistinctID);
                         }
 
                         // The item is no longer mapped to this community, so remove the database record
@@ -298,9 +291,13 @@ public class BrowseCreateDAOPostgres implements BrowseCreateDAO
                     tri.close();
                 }
             }
+            else
+            {
+                addDistinctIDs = distinctIDs;
+            }
 
             // Any remaining mappings need to be added to the database
-            for (int distinctID : distinctIDs)
+            for (int distinctID : addDistinctIDs)
             {
                 if (distinctID > -1)
                 {
