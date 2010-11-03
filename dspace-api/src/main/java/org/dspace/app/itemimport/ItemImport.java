@@ -1027,47 +1027,54 @@ public class ItemImport
     /**
      * Read in the handle file or return null if empty or doesn't exist
      */
-    private String processHandleFile(Context c, Item i, String path,
-            String filename)
+    private String processHandleFile(Context c, Item i, String path, String filename)
     {
-        String filePath = path + File.separatorChar + filename;
+        File file = new File(path + File.separatorChar + filename);
         String result = null;
 
         System.out.println("Processing handle file: " + filename);
-        BufferedReader is = null;
-        try
+        if (file.exists())
         {
-            is = new BufferedReader(new FileReader(filePath));
-
-            // result gets contents of file, or null
-            result = is.readLine();
-
-            System.out.println("read handle: '" + result + "'");
-
-        }
-        catch (FileNotFoundException e)
-        {
-            // probably no handle file, just return null
-            System.out.println("It appears there is no handle file -- generating one");
-        }
-        catch (IOException e)
-        {
-            // probably no handle file, just return null
-            System.out.println("It appears there is no handle file -- generating one");
-        }
-        finally
-        {
-            if (is != null)
+            BufferedReader is = null;
+            try
             {
-                try
+                is = new BufferedReader(new FileReader(file));
+
+                // result gets contents of file, or null
+                result = is.readLine();
+
+                System.out.println("read handle: '" + result + "'");
+
+            }
+            catch (FileNotFoundException e)
+            {
+                // probably no handle file, just return null
+                System.out.println("It appears there is no handle file -- generating one");
+            }
+            catch (IOException e)
+            {
+                // probably no handle file, just return null
+                System.out.println("It appears there is no handle file -- generating one");
+            }
+            finally
+            {
+                if (is != null)
                 {
-                    is.close();
-                }
-                catch (IOException e1)
-                {
-                    System.err.println("Non-critical problem releasing resources.");
+                    try
+                    {
+                        is.close();
+                    }
+                    catch (IOException e1)
+                    {
+                        System.err.println("Non-critical problem releasing resources.");
+                    }
                 }
             }
+        }
+        else
+        {
+            // probably no handle file, just return null
+            System.out.println("It appears there is no handle file -- generating one");
         }
 
         return result;
@@ -1082,200 +1089,217 @@ public class ItemImport
             String filename) throws SQLException, IOException,
             AuthorizeException
     {
-        String contentspath = path + File.separatorChar + filename;
+        File contentsFile = new File(path + File.separatorChar + filename);
         String line = "";
         List<String> options = new ArrayList<String>();
 
-        System.out.println("\tProcessing contents file: " + contentspath);
+        System.out.println("\tProcessing contents file: " + contentsFile);
 
-        BufferedReader is = null;
-        try
+        if (contentsFile.exists())
         {
-            is = new BufferedReader(new FileReader(contentspath));
-
-            while ((line = is.readLine()) != null)
+            BufferedReader is = null;
+            try
             {
-                if ("".equals(line.trim()))
-                {
-                    continue;
-                }
+                is = new BufferedReader(new FileReader(contentsFile));
 
-            	//	1) registered into dspace (leading -r)
-            	//  2) imported conventionally into dspace (no -r)
-            	if (line.trim().startsWith("-r "))
-            	{
-            	    // line should be one of these two:
-            	    // -r -s n -f filepath
-            	    // -r -s n -f filepath\tbundle:bundlename
-            	    // where 
-            	    //		n is the assetstore number
-            	    //  	filepath is the path of the file to be registered
-            	    //  	bundlename is an optional bundle name
-            	    String sRegistrationLine = line.trim();
-            	    int iAssetstore = -1;
-            	    String sFilePath = null;
-                    String sBundle = null;
-                    StringTokenizer tokenizer = new StringTokenizer(sRegistrationLine);
-                    while (tokenizer.hasMoreTokens())
+                while ((line = is.readLine()) != null)
+                {
+                    if ("".equals(line.trim()))
                     {
-                        String sToken = tokenizer.nextToken(); 
-                        if ("-r".equals(sToken))
-                        {
-                            continue;
-                        }
-                        else if ("-s".equals(sToken) && tokenizer.hasMoreTokens())
-                        {
-                            try
-                            {
-                                iAssetstore = 
-                                    Integer.parseInt(tokenizer.nextToken());
-                            } 
-                            catch (NumberFormatException e)
-                            {
-                                // ignore - iAssetstore remains -1
-                            }
-                        }
-                        else if ("-f".equals(sToken) && tokenizer.hasMoreTokens())
-                        {
-                            sFilePath = tokenizer.nextToken();
-                        }
-                        else if (sToken.startsWith("bundle:"))
-                        {
-                            sBundle = sToken.substring(7);
-                        }
-                        else
-                        {
-                            // unrecognized token - should be no problem
-                        }
-                    } // while
-                    if (iAssetstore == -1 || sFilePath == null) 
-                    {
-                        System.out.println("\tERROR: invalid contents file line");
-                        System.out.println("\t\tSkipping line: "
-                                + sRegistrationLine);
                         continue;
                     }
-                    registerBitstream(c, i, iAssetstore, sFilePath, sBundle);
-                    System.out.println("\tRegistering Bitstream: " + sFilePath
-                            + "\tAssetstore: " + iAssetstore
-                            + "\tBundle: " + sBundle
-                            + "\tDescription: " + sBundle);
-                    continue;				// process next line in contents file
-            	}
 
-                int bitstreamEndIndex = line.indexOf('\t');
-
-                if (bitstreamEndIndex == -1)
-                {
-                    // no extra info
-                    processContentFileEntry(c, i, path, line, null, false);
-                    System.out.println("\tBitstream: " + line);
-                }
-                else
-                {
-
-                    String bitstreamName = line.substring(0, bitstreamEndIndex);
-
-                    boolean bundleExists = false;
-                    boolean permissionsExist = false;
-                    boolean descriptionExists = false;
-
-                    // look for a bundle name
-                    String bundleMarker = "\tbundle:";
-                    int bMarkerIndex = line.indexOf(bundleMarker);
-                    int bEndIndex = 0;
-                    if (bMarkerIndex > 0)
+                    //	1) registered into dspace (leading -r)
+                    //  2) imported conventionally into dspace (no -r)
+                    if (line.trim().startsWith("-r "))
                     {
-                        bEndIndex = line.indexOf("\t", bMarkerIndex + 1);
-                        if (bEndIndex == -1)
+                        // line should be one of these two:
+                        // -r -s n -f filepath
+                        // -r -s n -f filepath\tbundle:bundlename
+                        // where
+                        //		n is the assetstore number
+                        //  	filepath is the path of the file to be registered
+                        //  	bundlename is an optional bundle name
+                        String sRegistrationLine = line.trim();
+                        int iAssetstore = -1;
+                        String sFilePath = null;
+                        String sBundle = null;
+                        StringTokenizer tokenizer = new StringTokenizer(sRegistrationLine);
+                        while (tokenizer.hasMoreTokens())
                         {
-                            bEndIndex = line.length();
-                        }
-                        bundleExists = true;
-                    }
-
-                    // look for permissions
-                    String permissionsMarker = "\tpermissions:";
-                    int pMarkerIndex = line.indexOf(permissionsMarker);
-                    int pEndIndex = 0;
-                    if (pMarkerIndex > 0)
-                    {
-                        pEndIndex = line.indexOf("\t", pMarkerIndex + 1);
-                        if (pEndIndex == -1)
+                            String sToken = tokenizer.nextToken();
+                            if ("-r".equals(sToken))
+                            {
+                                continue;
+                            }
+                            else if ("-s".equals(sToken) && tokenizer.hasMoreTokens())
+                            {
+                                try
+                                {
+                                    iAssetstore =
+                                        Integer.parseInt(tokenizer.nextToken());
+                                }
+                                catch (NumberFormatException e)
+                                {
+                                    // ignore - iAssetstore remains -1
+                                }
+                            }
+                            else if ("-f".equals(sToken) && tokenizer.hasMoreTokens())
+                            {
+                                sFilePath = tokenizer.nextToken();
+                            }
+                            else if (sToken.startsWith("bundle:"))
+                            {
+                                sBundle = sToken.substring(7);
+                            }
+                            else
+                            {
+                                // unrecognized token - should be no problem
+                            }
+                        } // while
+                        if (iAssetstore == -1 || sFilePath == null)
                         {
-                            pEndIndex = line.length();
+                            System.out.println("\tERROR: invalid contents file line");
+                            System.out.println("\t\tSkipping line: "
+                                    + sRegistrationLine);
+                            continue;
                         }
-                        permissionsExist = true;
+                        registerBitstream(c, i, iAssetstore, sFilePath, sBundle);
+                        System.out.println("\tRegistering Bitstream: " + sFilePath
+                                + "\tAssetstore: " + iAssetstore
+                                + "\tBundle: " + sBundle
+                                + "\tDescription: " + sBundle);
+                        continue;				// process next line in contents file
                     }
 
-                    // look for descriptions
-                    String descriptionMarker = "\tdescription:";
-                    int dMarkerIndex = line.indexOf(descriptionMarker);
-                    int dEndIndex = 0;
-                    if (dMarkerIndex > 0)
-                    {
-                        dEndIndex = line.indexOf("\t", dMarkerIndex + 1);
-                        if (dEndIndex == -1)
-                        {
-                            dEndIndex = line.length();
-                        }
-                        descriptionExists = true;
-                    }
+                    int bitstreamEndIndex = line.indexOf('\t');
 
-                    // is this the primary bitstream?
-                    String primaryBitstreamMarker = "\tprimary:true";
-                    boolean primary = false;
-                    String primaryStr = "";
-                    if (line.contains(primaryBitstreamMarker))
+                    if (bitstreamEndIndex == -1)
                     {
-                        primary = true;
-                        primaryStr = "\t **Setting as primary bitstream**";
-                    }
-
-                    if (bundleExists)
-                    {
-                        String bundleName = line.substring(bMarkerIndex
-                                + bundleMarker.length(), bEndIndex).trim();
-
-                        processContentFileEntry(c, i, path, bitstreamName, bundleName, primary);
-                        System.out.println("\tBitstream: " + bitstreamName +
-                                           "\tBundle: " + bundleName +
-                                           primaryStr);
+                        // no extra info
+                        processContentFileEntry(c, i, path, line, null, false);
+                        System.out.println("\tBitstream: " + line);
                     }
                     else
                     {
-                        processContentFileEntry(c, i, path, bitstreamName, null, primary);
-                        System.out.println("\tBitstream: " + bitstreamName + primaryStr);
-                    }
 
-                    if (permissionsExist || descriptionExists)
-                    {
-                        String extraInfo = bitstreamName;
+                        String bitstreamName = line.substring(0, bitstreamEndIndex);
 
-                        if (permissionsExist)
+                        boolean bundleExists = false;
+                        boolean permissionsExist = false;
+                        boolean descriptionExists = false;
+
+                        // look for a bundle name
+                        String bundleMarker = "\tbundle:";
+                        int bMarkerIndex = line.indexOf(bundleMarker);
+                        int bEndIndex = 0;
+                        if (bMarkerIndex > 0)
                         {
-                            extraInfo = extraInfo
-                                    + line.substring(pMarkerIndex, pEndIndex);
+                            bEndIndex = line.indexOf("\t", bMarkerIndex + 1);
+                            if (bEndIndex == -1)
+                            {
+                                bEndIndex = line.length();
+                            }
+                            bundleExists = true;
                         }
 
-                        if (descriptionExists)
+                        // look for permissions
+                        String permissionsMarker = "\tpermissions:";
+                        int pMarkerIndex = line.indexOf(permissionsMarker);
+                        int pEndIndex = 0;
+                        if (pMarkerIndex > 0)
                         {
-                            extraInfo = extraInfo
-                                    + line.substring(dMarkerIndex, dEndIndex);
+                            pEndIndex = line.indexOf("\t", pMarkerIndex + 1);
+                            if (pEndIndex == -1)
+                            {
+                                pEndIndex = line.length();
+                            }
+                            permissionsExist = true;
                         }
 
-                        options.add(extraInfo);
+                        // look for descriptions
+                        String descriptionMarker = "\tdescription:";
+                        int dMarkerIndex = line.indexOf(descriptionMarker);
+                        int dEndIndex = 0;
+                        if (dMarkerIndex > 0)
+                        {
+                            dEndIndex = line.indexOf("\t", dMarkerIndex + 1);
+                            if (dEndIndex == -1)
+                            {
+                                dEndIndex = line.length();
+                            }
+                            descriptionExists = true;
+                        }
+
+                        // is this the primary bitstream?
+                        String primaryBitstreamMarker = "\tprimary:true";
+                        boolean primary = false;
+                        String primaryStr = "";
+                        if (line.contains(primaryBitstreamMarker))
+                        {
+                            primary = true;
+                            primaryStr = "\t **Setting as primary bitstream**";
+                        }
+
+                        if (bundleExists)
+                        {
+                            String bundleName = line.substring(bMarkerIndex
+                                    + bundleMarker.length(), bEndIndex).trim();
+
+                            processContentFileEntry(c, i, path, bitstreamName, bundleName, primary);
+                            System.out.println("\tBitstream: " + bitstreamName +
+                                               "\tBundle: " + bundleName +
+                                               primaryStr);
+                        }
+                        else
+                        {
+                            processContentFileEntry(c, i, path, bitstreamName, null, primary);
+                            System.out.println("\tBitstream: " + bitstreamName + primaryStr);
+                        }
+
+                        if (permissionsExist || descriptionExists)
+                        {
+                            String extraInfo = bitstreamName;
+
+                            if (permissionsExist)
+                            {
+                                extraInfo = extraInfo
+                                        + line.substring(pMarkerIndex, pEndIndex);
+                            }
+
+                            if (descriptionExists)
+                            {
+                                extraInfo = extraInfo
+                                        + line.substring(dMarkerIndex, dEndIndex);
+                            }
+
+                            options.add(extraInfo);
+                        }
                     }
                 }
             }
-        }
-        finally
-        {
-            if (is != null)
+            finally
             {
-                is.close();
+                if (is != null)
+                {
+                    is.close();
+                }
             }
         }
+        else
+        {
+            String[] dirListing = new File(path).list();
+            for (String fileName : dirListing)
+            {
+                if (!"dublin_core.xml".equals(fileName) && !filename.equals("handle") && !filename.startsWith("metadata_"))
+                {
+                    throw new FileNotFoundException("No contents file found");
+                }
+            }
+
+            System.out.println("No contents file found - but only metadata files found. Assuming metadata only.");
+        }
+        
         return options;
     }
 
