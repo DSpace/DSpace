@@ -915,7 +915,7 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    protected static List<String> getColumnNames(String table) throws SQLException
+    static List<String> getColumnNames(String table) throws SQLException
     {
         List<String> results = new ArrayList<String>();
         Collection<ColumnInfo> info = getColumnInfo(table);
@@ -938,8 +938,7 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    protected static List<String> getColumnNames(ResultSetMetaData meta)
-            throws SQLException
+    static List<String> getColumnNames(ResultSetMetaData meta) throws SQLException
     {
         List<String> results = new ArrayList<String>();
         int columns = meta.getColumnCount();
@@ -1171,10 +1170,30 @@ public class DatabaseManager
      */
     static TableRow process(ResultSet results, String table) throws SQLException
     {
+        return process(results, table, null);
+    }
+
+    /**
+     * Convert the current row in a ResultSet into a TableRow object.
+     *
+     * @param results
+     *            A ResultSet to process
+     * @param table
+     *            The name of the table
+     * @param pColumnNames
+     *            The name of the columns in this resultset
+     * @return A TableRow object with the data from the ResultSet
+     * @exception SQLException
+     *                If a database error occurs
+     */
+    static TableRow process(ResultSet results, String table, List<String> pColumnNames) throws SQLException
+    {
         ResultSetMetaData meta = results.getMetaData();
         int columns = meta.getColumnCount() + 1;
 
-        List<String> columnNames = (table == null) ? getColumnNames(meta) : getColumnNames(table);
+        // If we haven't been passed the column names try to generate them from the metadata / table
+        List<String> columnNames = pColumnNames != null ? pColumnNames :
+                                        ((table == null) ? getColumnNames(meta) : getColumnNames(table));
 
         TableRow row = new TableRow(canonicalize(table), columnNames);
 

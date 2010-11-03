@@ -48,6 +48,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
@@ -1770,10 +1771,29 @@ public class Item extends DSpaceObject
         }
     }
 
+    private transient MetadataField[] allMetadataFields = null;
     private MetadataField getMetadataField(DCValue dcv) throws SQLException, AuthorizeException
     {
-        return MetadataField.findByElement(ourContext,
-                        getMetadataSchemaID(dcv), dcv.element, dcv.qualifier);
+        if (allMetadataFields == null)
+        {
+            allMetadataFields = MetadataField.findAll(ourContext);
+        }
+
+        if (allMetadataFields != null)
+        {
+            int schemaID = getMetadataSchemaID(dcv);
+            for (MetadataField field : allMetadataFields)
+            {
+                if (field.getSchemaID() == schemaID &&
+                        StringUtils.equals(field.getElement(), dcv.element) &&
+                        StringUtils.equals(field.getQualifier(), dcv.qualifier))
+                {
+                    return field;
+                }
+            }
+        }
+
+        return null;
     }
 
     private int getMetadataSchemaID(DCValue dcv) throws SQLException

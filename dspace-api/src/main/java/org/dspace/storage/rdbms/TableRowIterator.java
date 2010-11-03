@@ -45,6 +45,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -82,6 +83,11 @@ public class TableRowIterator
     private boolean hasAdvanced = false;
 
     /**
+     * Column names for the results in this table
+     */
+    List<String> columnNames = null;
+
+    /**
      * Constructor
      * 
      * @param results -
@@ -103,8 +109,30 @@ public class TableRowIterator
      */
     TableRowIterator(ResultSet results, String table)
     {
+        this(results, table, null);
+        statemt = null;
+    }
+
+    TableRowIterator(ResultSet results, String table, List<String> columnNames)
+    {
         this.results = results;
         this.table = table;
+        if (columnNames == null)
+        {
+            try
+            {
+                this.columnNames = (table == null) ? DatabaseManager.getColumnNames(results.getMetaData()) : DatabaseManager.getColumnNames(table);
+            }
+            catch (SQLException e)
+            {
+                this.columnNames = null;
+            }
+        }
+        else
+        {
+            this.columnNames = Collections.unmodifiableList(columnNames);
+        }
+        
         statemt = null;
     }
 
@@ -152,7 +180,7 @@ public class TableRowIterator
 
         hasAdvanced = false;
 
-        return DatabaseManager.process(results, table);
+        return DatabaseManager.process(results, table, columnNames);
     }
 
     /**
