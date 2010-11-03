@@ -55,13 +55,7 @@ import org.dspace.app.util.DCInput;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Collection;
-import org.dspace.content.DCDate;
-import org.dspace.content.DCPersonName;
-import org.dspace.content.DCSeriesNumber;
-import org.dspace.content.DCValue;
-import org.dspace.content.Item;
-import org.dspace.content.MetadataField;
+import org.dspace.content.*;
 import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
@@ -793,9 +787,7 @@ public class DescribeStep extends AbstractProcessingStep
         int month = Util.getIntParameter(request, metadataField + "_month");
         int day = Util.getIntParameter(request, metadataField + "_day");
 
-        // FIXME: Probably should be some more validation
-        // Make a standard format date
-        DCDate d = new DCDate(year, month, day, -1, -1, -1);
+
 
         // already done in doProcessing see also bug DS-203
         // item.clearMetadata(schema, element, qualifier, Item.ANY);
@@ -803,7 +795,17 @@ public class DescribeStep extends AbstractProcessingStep
         if (year > 0)
         {
             // Only put in date if there is one!
-            item.addMetadata(schema, element, qualifier, null, d.toString());
+
+            try
+            {
+                DCDate d = new DCDate(year, month, day, -1, -1, -1);
+                item.addMetadata(schema, element, qualifier, null, d.toString());
+            }
+            catch (DCDateIllegalArgumentException e)
+            {
+                // One or more of the DCDate parameters was invalid so don't add it to the metadata.
+            }
+
         }
     }
 
