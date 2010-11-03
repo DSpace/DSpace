@@ -97,6 +97,8 @@ public class MockDatabaseManager
     /** True if initialization has been done */
     private static boolean initialized = false;
 
+    private static Map<String, String> insertSQL = new HashMap<String, String>();
+    
     private static boolean isOracle = false;
     private static boolean isPostgres = false;
 
@@ -248,12 +250,11 @@ public class MockDatabaseManager
      *                If a database error occurs
      */
     @Mock
-    public static TableRowIterator queryTable(Context context, String table,
-            String query, Object... parameters ) throws SQLException
+    public static TableRowIterator queryTable(Context context, String table, String query, Object... parameters ) throws SQLException
     {
         if (log.isDebugEnabled())
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder("Running query \"").append(query).append("\"  with parameters: ");
             for (int i = 0; i < parameters.length; i++)
             {
                 if (i > 0)
@@ -262,16 +263,15 @@ public class MockDatabaseManager
                }
                 sb.append(parameters[i].toString());
             }
-            log.debug("Running query \"" + query + "\"  with parameters: " + sb.toString());
+            log.debug(sb.toString());
         }
 
         PreparedStatement statement = context.getDBConnection().prepareStatement(query);
         try
         {
-            loadParameters(statement,parameters);
+            loadParameters(statement, parameters);
 
-            TableRowIterator retTRI = new TableRowIterator(statement.executeQuery(),
-                    canonicalize(table));
+            TableRowIterator retTRI = new TableRowIterator(statement.executeQuery(), canonicalize(table));
 
             retTRI.setStatement(statement);
             return retTRI;
@@ -279,7 +279,15 @@ public class MockDatabaseManager
         catch (SQLException sqle)
         {
             if (statement != null)
-                try { statement.close(); } catch (SQLException s) { }
+            {
+                try
+                {
+                    statement.close();
+                }
+                catch (SQLException s)
+                {
+                }
+            }
 
             throw sqle;
         }
@@ -428,14 +436,13 @@ public class MockDatabaseManager
      *                If a database error occurs
      */
     @Mock
-    public static int updateQuery(Context context, String query,
-            Object... parameters) throws SQLException
+    public static int updateQuery(Context context, String query, Object... parameters) throws SQLException
     {
         PreparedStatement statement = null;
 
         if (log.isDebugEnabled())
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new StringBuilder("Running query \"").append(query).append("\"  with parameters: ");
             for (int i = 0; i < parameters.length; i++)
             {
                 if (i > 0)
@@ -444,7 +451,7 @@ public class MockDatabaseManager
                }
                 sb.append(parameters[i].toString());
             }
-            log.debug("Running query \"" + query + "\"  with parameters: " + sb.toString());
+            log.debug(sb.toString());
         }
 
         try
@@ -543,9 +550,8 @@ public class MockDatabaseManager
         if ( ! DB_SAFE_NAME.matcher(column).matches())
         	throw new SQLException("Unable to execute select query because column name ("+column+") contains non alphanumeric characters.");
 
-        String sql = "select * from " + ctable + " where "+ column +" = ? ";
-
-        return querySingleTable(context, ctable, sql, value);
+        StringBuilder sql = new StringBuilder("select * from ").append(ctable).append(" where ").append(column).append(" = ? ");
+        return querySingleTable(context, ctable, sql.toString(), value);
     }
 
     /**
@@ -600,9 +606,8 @@ public class MockDatabaseManager
         if ( ! DB_SAFE_NAME.matcher(column).matches())
         	throw new SQLException("Unable to execute delete query because column name ("+column+") contains non alphanumeric characters.");
 
-        String sql = "delete from "+ctable+" where "+column+" = ? ";
-
-        return updateQuery(context, sql, value);
+        StringBuilder sql = new StringBuilder("delete from ").append(ctable).append(" where ").append(column).append(" = ? ");
+        return updateQuery(context, sql.toString(), value);
     }
 
     /**
@@ -692,11 +697,10 @@ public class MockDatabaseManager
      *                If a database error occurs
      */
     @Mock
-    public static void insert(Context context, TableRow row)
-            throws SQLException
+    public static void insert(Context context, TableRow row) throws SQLException
     {
         int newID = -1;
-        String table = canonicalize(row.getTable());
+        String table = row.getTable();
         Statement statement = null;
         ResultSet rs = null;
 
@@ -731,30 +735,51 @@ public class MockDatabaseManager
 
         // Set the ID in the table row object
         row.setColumn(getPrimaryKeyColumn(table), newID);
+        Collection<ColumnInfo> info = getColumnInfo(table);
 
-        StringBuffer sql = new StringBuffer().append("INSERT INTO ").append(
-                table).append(" ( ");
-
-        ColumnInfo[] cinfo = getColumnInfo(table);
-
-        for (int i = 0; i < cinfo.length; i++)
+        String sql = insertSQL.get(table);
+        if (sql == null)
         {
-            sql.append((i == 0) ? "" : ",").append(cinfo[i].getName());
+            StringBuilder sqlBuilder = new StringBuilder().append("INSERT INTO ").append(table).append(" ( ");
+
+            boolean firstColumn = true;
+            for (ColumnInfo col : info)
+            {
+                if (firstColumn)
+                {
+                    sqlBuilder.append(col.getName());
+                    firstColumn = false;
+                }
+                else
+                {
+                    sqlBuilder.append(",").append(col.getName());
+                }
+            }
+
+            sqlBuilder.append(") VALUES ( ");
+
+            // Values to insert
+            firstColumn = true;
+            for (int i = 0; i < info.size(); i++)
+            {
+                if (firstColumn)
+                {
+                    sqlBuilder.append("?");
+                    firstColumn = false;
+                }
+                else
+                {
+                    sqlBuilder.append(",").append("?");
+                }
+            }
+
+            // Watch the syntax
+            sqlBuilder.append(")");
+            sql = sqlBuilder.toString();
+            insertSQL.put(table, sql);
         }
 
-        sql.append(") VALUES ( ");
-
-        // Values to insert
-        for (int i = 0; i < cinfo.length; i++)
-        {
-            sql.append((i == 0) ? "" : ",").append("?");
-        }
-
-        // Watch the syntax
-        sql.append(")");
-
-        execute(context.getDBConnection(), sql.toString(), Arrays.asList(cinfo),
-                row);
+        execute(context.getDBConnection(), sql.toString(), info, row);
     }
 
     /**
@@ -772,24 +797,27 @@ public class MockDatabaseManager
     @Mock
     public static int update(Context context, TableRow row) throws SQLException
     {
-        String table = canonicalize(row.getTable());
+        String table = row.getTable();
 
-        StringBuffer sql = new StringBuffer().append("update ").append(table)
+        StringBuilder sql = new StringBuilder().append("update ").append(table)
                 .append(" set ");
 
         List<ColumnInfo> columns = new ArrayList<ColumnInfo>();
         ColumnInfo pk = getPrimaryKeyColumnInfo(table);
-        ColumnInfo[] cinfo = getNonPrimaryKeyColumns(table);
+        Collection<ColumnInfo> info = getColumnInfo(table);
 
-        String seperator = "";
-        for (int i = 0; i < cinfo.length; i++)
+        String separator = "";
+        for (ColumnInfo col : info)
         {
             // Only update this column if it has changed
-            if (row.hasColumnChanged(cinfo[i].getName()))
+            if (!col.isPrimaryKey())
             {
-                sql.append(seperator).append(cinfo[i].getName()).append(" = ?");
-                columns.add(cinfo[i]);
-                seperator = ", ";
+                if (row.hasColumnChanged(col.getName()))
+                {
+                    sql.append(separator).append(col.getName()).append(" = ?");
+                    columns.add(col);
+                    separator = ", ";
+                }
             }
         }
 
@@ -839,18 +867,11 @@ public class MockDatabaseManager
      *                If a database error occurs
      */
     @Mock
-    static ColumnInfo[] getColumnInfo(String table) throws SQLException
+    static Collection<ColumnInfo> getColumnInfo(String table) throws SQLException
     {
         Map<String, ColumnInfo> cinfo = getColumnInfoInternal(table);
 
-        if (cinfo == null)
-        {
-            return null;
-        }
-
-        Collection<ColumnInfo> vinfo = cinfo.values();
-
-        return (ColumnInfo[]) vinfo.toArray(new ColumnInfo[vinfo.size()]);
+        return (cinfo == null) ? null : cinfo.values();
     }
 
     /**
@@ -868,39 +889,9 @@ public class MockDatabaseManager
     static ColumnInfo getColumnInfo(String table, String column)
             throws SQLException
     {
-        Map<String, ColumnInfo> cinfo = getColumnInfoInternal(table);
+        Map<String, ColumnInfo> info = getColumnInfoInternal(table);
 
-        return (cinfo == null) ? null : cinfo.get(column);
-    }
-
-    /**
-     * Return all the columns which are not primary keys.
-     *
-     * @param table
-     *            The name of the table
-     * @return All the columns which are not primary keys, as an array of
-     *         ColumnInfo objects
-     * @exception SQLException
-     *                If a database error occurs
-     */
-    @Mock
-    static ColumnInfo[] getNonPrimaryKeyColumns(String table)
-            throws SQLException
-    {
-        String pk = getPrimaryKeyColumn(table);
-        ColumnInfo[] cinfo = getColumnInfo(table);
-        ColumnInfo[] results = new ColumnInfo[cinfo.length - 1];
-        int rcount = 0;
-
-        for (int i = 0; i < cinfo.length; i++)
-        {
-            if (!pk.equals(cinfo[i].getName()))
-            {
-                results[rcount++] = cinfo[i];
-            }
-        }
-
-        return results;
+        return (info == null) ? null : info.get(column);
     }
 
     /**
@@ -917,11 +908,11 @@ public class MockDatabaseManager
     protected static List<String> getColumnNames(String table) throws SQLException
     {
         List<String> results = new ArrayList<String>();
-        ColumnInfo[] cinfo = getColumnInfo(table);
+        Collection<ColumnInfo> info = getColumnInfo(table);
 
-        for (int i = 0; i < cinfo.length; i++)
+        for (ColumnInfo col : info)
         {
-            results.add(cinfo[i].getName());
+            results.add(col.getName());
         }
 
         return results;
@@ -963,12 +954,12 @@ public class MockDatabaseManager
     static String canonicalize(String table)
     {
         // Oracle expects upper-case table names
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        if (isOracle)
         {
             return (table == null) ? null : table.toUpperCase();
         }
 
-        //default database postgres wants lower-case table names
+        // default database postgres wants lower-case table names
         return (table == null) ? null : table.toLowerCase();
     }
 
@@ -1183,8 +1174,7 @@ public class MockDatabaseManager
         ResultSetMetaData meta = results.getMetaData();
         int columns = meta.getColumnCount() + 1;
 
-        List<String> columnNames = (table == null) ? getColumnNames(meta)
-                : getColumnNames(table);
+        List<String> columnNames = (table == null) ? getColumnNames(meta) : getColumnNames(table);
 
         TableRow row = new TableRow(canonicalize(table), columnNames);
 
@@ -1337,15 +1327,13 @@ public class MockDatabaseManager
     @Mock
     static ColumnInfo getPrimaryKeyColumnInfo(String table) throws SQLException
     {
-        ColumnInfo[] cinfo = getColumnInfo(canonicalize(table));
+        Collection<ColumnInfo> cinfo = getColumnInfo(canonicalize(table));
 
-        for (int i = 0; i < cinfo.length; i++)
+        for (ColumnInfo info : cinfo)
         {
-            ColumnInfo inf = cinfo[i];
-
-            if (inf.isPrimaryKey())
+            if (info.isPrimaryKey())
             {
-                return inf;
+                return info;
             }
         }
 
@@ -1369,7 +1357,7 @@ public class MockDatabaseManager
      *                If a database error occurs
      */
     @Mock
-    private static void execute(Connection connection, String sql, List<ColumnInfo> columns, TableRow row) throws SQLException
+    private static void execute(Connection connection, String sql, Collection<ColumnInfo> columns, TableRow row) throws SQLException
     {
         PreparedStatement statement = null;
 
@@ -1400,7 +1388,7 @@ public class MockDatabaseManager
     }
 
     @Mock
-    private static int executeUpdate(Connection connection, String sql, List<ColumnInfo> columns, TableRow row) throws SQLException
+    private static int executeUpdate(Connection connection, String sql, Collection<ColumnInfo> columns, TableRow row) throws SQLException
     {
         PreparedStatement statement = null;
 
@@ -1824,7 +1812,7 @@ public class MockDatabaseManager
     }
 
     @Mock
-    private static void loadParameters(PreparedStatement statement, List<ColumnInfo> columns, TableRow row) throws SQLException
+    private static void loadParameters(PreparedStatement statement, Collection<ColumnInfo> columns, TableRow row) throws SQLException
     {
         int count = 0;
         for (ColumnInfo info : columns)

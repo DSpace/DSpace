@@ -48,6 +48,8 @@ public class ColumnInfo
     /** The name of the column */
     private String name;
 
+    private String canonicalizedName;
+
     /** The JDBC type of the column */
     private int type;
 
@@ -68,6 +70,7 @@ public class ColumnInfo
     {
         this.name = name;
         this.type = type;
+        this.canonicalizedName = canonicalize(name);
     }
 
     /**
@@ -81,6 +84,16 @@ public class ColumnInfo
     }
 
     /**
+     * Return the column name.
+     *
+     * @return - The column name
+     */
+    public String getCanonicalizedName()
+    {
+        return canonicalizedName;
+    }
+
+    /**
      * Set the column name
      *
      * @param v -
@@ -89,6 +102,7 @@ public class ColumnInfo
     void setName(String v)
     {
         name = v;
+        canonicalizedName = canonicalize(name);
     }
 
     /**
@@ -165,5 +179,10 @@ public class ColumnInfo
     {
         return new StringBuffer().append(name).append(type)
                 .append(isPrimaryKey).toString().hashCode();
+    }
+
+    static String canonicalize(String column)
+    {
+        return column.toLowerCase();
     }
 }

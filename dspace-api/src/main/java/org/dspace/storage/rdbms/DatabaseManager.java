@@ -57,11 +57,10 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -90,6 +89,8 @@ public class DatabaseManager
 
     /** True if initialization has been done */
     private static boolean initialized = false;
+
+    private static Map<String, String> insertSQL = new HashMap<String, String>();
 
     private static boolean isOracle = false;
     private static boolean isPostgres = false;
@@ -540,10 +541,9 @@ public class DatabaseManager
         {
             throw new SQLException("Unable to execute select query because column name (" + column + ") contains non alphanumeric characters.");
         }
-        
-        String sql = "select * from " + ctable + " where "+ column +" = ? ";
 
-        return querySingleTable(context, ctable, sql, value);
+        StringBuilder sql = new StringBuilder("select * from ").append(ctable).append(" where ").append(column).append(" = ? ");
+        return querySingleTable(context, ctable, sql.toString(), value);
     }
 
     /**
@@ -599,10 +599,9 @@ public class DatabaseManager
         {
             throw new SQLException("Unable to execute delete query because column name (" + column + ") contains non alphanumeric characters.");
         }
-        
-        String sql = "delete from "+ctable+" where "+column+" = ? ";
 
-        return updateQuery(context, sql, value);
+        StringBuilder sql = new StringBuilder("delete from ").append(ctable).append(" where ").append(column).append(" = ? ");
+        return updateQuery(context, sql.toString(), value);
     }
 
     /**
@@ -703,7 +702,7 @@ public class DatabaseManager
     public static void insert(Context context, TableRow row) throws SQLException
     {
         int newID = -1;
-        String table = canonicalize(row.getTable());
+        String table = row.getTable();
         PreparedStatement statement = null;
         ResultSet rs = null;
 
@@ -746,28 +745,51 @@ public class DatabaseManager
 
         // Set the ID in the table row object
         row.setColumn(getPrimaryKeyColumn(table), newID);
+        Collection<ColumnInfo> info = getColumnInfo(table);
 
-        StringBuilder sql = new StringBuilder().append("INSERT INTO ").append(table).append(" ( ");
-
-        ColumnInfo[] info = getColumnInfo(table);
-
-        for (int i = 0; i < info.length; i++)
+        String sql = insertSQL.get(table);
+        if (sql == null)
         {
-            sql.append((i == 0) ? "" : ",").append(info[i].getName());
+            StringBuilder sqlBuilder = new StringBuilder().append("INSERT INTO ").append(table).append(" ( ");
+
+            boolean firstColumn = true;
+            for (ColumnInfo col : info)
+            {
+                if (firstColumn)
+                {
+                    sqlBuilder.append(col.getName());
+                    firstColumn = false;
+                }
+                else
+                {
+                    sqlBuilder.append(",").append(col.getName());
+                }
+            }
+
+            sqlBuilder.append(") VALUES ( ");
+
+            // Values to insert
+            firstColumn = true;
+            for (int i = 0; i < info.size(); i++)
+            {
+                if (firstColumn)
+                {
+                    sqlBuilder.append("?");
+                    firstColumn = false;
+                }
+                else
+                {
+                    sqlBuilder.append(",").append("?");
+                }
+            }
+
+            // Watch the syntax
+            sqlBuilder.append(")");
+            sql = sqlBuilder.toString();
+            insertSQL.put(table, sql);
         }
 
-        sql.append(") VALUES ( ");
-
-        // Values to insert
-        for (int i = 0; i < info.length; i++)
-        {
-            sql.append((i == 0) ? "" : ",").append("?");
-        }
-
-        // Watch the syntax
-        sql.append(")");
-
-        execute(context.getDBConnection(), sql.toString(), Arrays.asList(info), row);
+        execute(context.getDBConnection(), sql, info, row);
     }
 
     /**
@@ -784,24 +806,27 @@ public class DatabaseManager
      */
     public static int update(Context context, TableRow row) throws SQLException
     {
-        String table = canonicalize(row.getTable());
+        String table = row.getTable();
 
         StringBuilder sql = new StringBuilder().append("update ").append(table)
                 .append(" set ");
 
         List<ColumnInfo> columns = new ArrayList<ColumnInfo>();
         ColumnInfo pk = getPrimaryKeyColumnInfo(table);
-        ColumnInfo[] info = getNonPrimaryKeyColumns(table);
+        Collection<ColumnInfo> info = getColumnInfo(table);
 
         String separator = "";
-        for (int i = 0; i < info.length; i++)
+        for (ColumnInfo col : info)
         {
             // Only update this column if it has changed
-            if (row.hasColumnChanged(info[i].getName()))
+            if (!col.isPrimaryKey())
             {
-                sql.append(separator).append(info[i].getName()).append(" = ?");
-                columns.add(info[i]);
-                separator = ", ";
+                if (row.hasColumnChanged(col.getName()))
+                {
+                    sql.append(separator).append(col.getName()).append(" = ?");
+                    columns.add(col);
+                    separator = ", ";
+                }
             }
         }
 
@@ -854,18 +879,11 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    static ColumnInfo[] getColumnInfo(String table) throws SQLException
+    static Collection<ColumnInfo> getColumnInfo(String table) throws SQLException
     {
         Map<String, ColumnInfo> cinfo = getColumnInfoInternal(table);
 
-        if (cinfo == null)
-        {
-            return null;
-        }
-
-        Collection<ColumnInfo> info = cinfo.values();
-
-        return (ColumnInfo[]) info.toArray(new ColumnInfo[info.size()]);
+        return (cinfo == null) ? null : cinfo.values();
     }
 
     /**
@@ -888,35 +906,6 @@ public class DatabaseManager
     }
 
     /**
-     * Return all the columns which are not primary keys.
-     * 
-     * @param table
-     *            The name of the table
-     * @return All the columns which are not primary keys, as an array of
-     *         ColumnInfo objects
-     * @exception SQLException
-     *                If a database error occurs
-     */
-    static ColumnInfo[] getNonPrimaryKeyColumns(String table)
-            throws SQLException
-    {
-        String pk = getPrimaryKeyColumn(table);
-        ColumnInfo[] info = getColumnInfo(table);
-        ColumnInfo[] results = new ColumnInfo[info.length - 1];
-        int rcount = 0;
-
-        for (int i = 0; i < info.length; i++)
-        {
-            if (!pk.equals(info[i].getName()))
-            {
-                results[rcount++] = info[i];
-            }
-        }
-
-        return results;
-    }
-
-    /**
      * Return the names of all the columns of the given table.
      * 
      * @param table
@@ -929,11 +918,11 @@ public class DatabaseManager
     protected static List<String> getColumnNames(String table) throws SQLException
     {
         List<String> results = new ArrayList<String>();
-        ColumnInfo[] info = getColumnInfo(table);
+        Collection<ColumnInfo> info = getColumnInfo(table);
 
-        for (int i = 0; i < info.length; i++)
+        for (ColumnInfo col : info)
         {
-            results.add(info[i].getName());
+            results.add(col.getName());
         }
 
         return results;
@@ -1342,12 +1331,10 @@ public class DatabaseManager
      */
     static ColumnInfo getPrimaryKeyColumnInfo(String table) throws SQLException
     {
-        ColumnInfo[] cinfo = getColumnInfo(canonicalize(table));
+        Collection<ColumnInfo> cinfo = getColumnInfo(canonicalize(table));
 
-        for (int i = 0; i < cinfo.length; i++)
+        for (ColumnInfo info : cinfo)
         {
-            ColumnInfo info = cinfo[i];
-
             if (info.isPrimaryKey())
             {
                 return info;
@@ -1373,7 +1360,7 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    private static void execute(Connection connection, String sql, List<ColumnInfo> columns, TableRow row) throws SQLException
+    private static void execute(Connection connection, String sql, Collection<ColumnInfo> columns, TableRow row) throws SQLException
     {
         PreparedStatement statement = null;
 
@@ -1403,7 +1390,7 @@ public class DatabaseManager
         }
     }
 
-    private static int executeUpdate(Connection connection, String sql, List<ColumnInfo> columns, TableRow row) throws SQLException
+    private static int executeUpdate(Connection connection, String sql, Collection<ColumnInfo> columns, TableRow row) throws SQLException
     {
         PreparedStatement statement = null;
 
@@ -1524,7 +1511,7 @@ public class DatabaseManager
                 results.put(column, cinfo);
             }
 
-            return results;
+            return Collections.unmodifiableMap(results);
         }
         finally
         {
@@ -1698,13 +1685,13 @@ public class DatabaseManager
 	    }
 	}
 
-    private static void loadParameters(PreparedStatement statement, List<ColumnInfo> columns, TableRow row) throws SQLException
+    private static void loadParameters(PreparedStatement statement, Collection<ColumnInfo> columns, TableRow row) throws SQLException
     {
         int count = 0;
         for (ColumnInfo info : columns)
         {
             count++;
-            String column = info.getName();
+            String column = info.getCanonicalizedName();
             int jdbctype = info.getType();
 
             if (row.isColumnNull(column))
