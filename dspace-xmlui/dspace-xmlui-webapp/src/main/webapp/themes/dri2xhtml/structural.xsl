@@ -2918,7 +2918,7 @@
       <xsl:param name="confidence" select="'blank'"/>
       <xsl:param name="id" select="''"/>
       <xsl:variable name="lcConfidence" select="translate($confidence,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')"/>
-      <img i18n:attr="title">
+      <img>
         <xsl:if test="string-length($id) > 0">
           <xsl:attribute name="id">
              <xsl:value-of select="$id"/>
