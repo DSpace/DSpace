@@ -75,6 +75,7 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
+import org.dspace.search.DSIndexer;
 import org.dspace.workflow.WorkflowManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
@@ -136,435 +137,444 @@ public class ItemImport
 
     public static void main(String[] argv) throws Exception
     {
-        // create an options object and populate it
-        CommandLineParser parser = new PosixParser();
-
-        Options options = new Options();
-
-        options.addOption("a", "add", false, "add items to DSpace");
-        options.addOption("r", "replace", false, "replace items in mapfile");
-        options.addOption("d", "delete", false,
-                "delete items listed in mapfile");
-        options.addOption("s", "source", true, "source of items (directory)");
-        options.addOption("z", "zip", true, "name of zip file");
-        options.addOption("c", "collection", true,
-                "destination collection(s) Handle or database ID");
-        options.addOption("m", "mapfile", true, "mapfile items in mapfile");
-        options.addOption("e", "eperson", true,
-                "email of eperson doing importing");
-        options.addOption("w", "workflow", false,
-                "send submission through collection's workflow");
-        options.addOption("n", "notify", false,
-                        "if sending submissions through the workflow, send notification emails");
-        options.addOption("t", "test", false,
-                "test run - do not actually import items");
-        options.addOption("p", "template", false, "apply template");
-        options.addOption("R", "resume", false,
-                "resume a failed import (add only)");
-
-        options.addOption("h", "help", false, "help");
-
-        CommandLine line = parser.parse(options, argv);
-
-        String command = null; // add replace remove, etc
-        String sourcedir = null;
-        String mapfile = null;
-        String eperson = null; // db ID or email
-        String[] collections = null; // db ID or handles
-        int status = 0;
-
-        if (line.hasOption('h'))
-        {
-            HelpFormatter myhelp = new HelpFormatter();
-            myhelp.printHelp("ItemImport\n", options);
-            System.out
-                   .println("\nadding items:    ItemImport -a -e eperson -c collection -s sourcedir -m mapfile");
-            System.out
-                    .println("\nadding items from zip file:    ItemImport -a -e eperson -c collection -s sourcedir -z filename.zip -m mapfile");
-            System.out
-                    .println("replacing items: ItemImport -r -e eperson -c collection -s sourcedir -m mapfile");
-            System.out
-                    .println("deleting items:  ItemImport -d -e eperson -m mapfile");
-            System.out
-                    .println("If multiple collections are specified, the first collection will be the one that owns the item.");
-
-            System.exit(0);
-        }
-
-        if (line.hasOption('a'))
-        {
-            command = "add";
-        }
-
-        if (line.hasOption('r'))
-        {
-            command = "replace";
-        }
-
-        if (line.hasOption('d'))
-        {
-            command = "delete";
-        }
-
-        if (line.hasOption('w'))
-        {
-            useWorkflow = true;
-            if (line.hasOption('n'))
-            {
-                useWorkflowSendEmail = true;
-            }
-        }
-
-        if (line.hasOption('t'))
-        {
-            isTest = true;
-            System.out.println("**Test Run** - not actually importing items.");
-        }
-        
-        if (line.hasOption('p'))
-        {
-            template = true;
-        }
-
-        if (line.hasOption('s')) // source
-        {
-            sourcedir = line.getOptionValue('s');
-        }
-
-        if (line.hasOption('m')) // mapfile
-        {
-            mapfile = line.getOptionValue('m');
-        }
-
-        if (line.hasOption('e')) // eperson
-        {
-            eperson = line.getOptionValue('e');
-        }
-
-        if (line.hasOption('c')) // collections
-        {
-            collections = line.getOptionValues('c');
-        }
-
-        if (line.hasOption('R'))
-        {
-            isResume = true;
-            System.out
-                    .println("**Resume import** - attempting to import items not already imported");
-        }
-
-        boolean zip = false;
-        String zipfilename = "";
-        String ziptempdir = ConfigurationManager.getProperty("org.dspace.app.itemexport.work.dir");
-        if (line.hasOption('z'))
-        {
-            zip = true;
-            zipfilename = sourcedir + System.getProperty("file.separator") + line.getOptionValue('z');
-        }
-
-        // now validate
-        // must have a command set
-        if (command == null)
-        {
-            System.out
-                    .println("Error - must run with either add, replace, or remove (run with -h flag for details)");
-            System.exit(1);
-        }
-        else if ("add".equals(command) || "replace".equals(command))
-        {
-            if (sourcedir == null)
-            {
-                System.out
-                        .println("Error - a source directory containing items must be set");
-                System.out.println(" (run with -h flag for details)");
-                System.exit(1);
-            }
-
-            if (mapfile == null)
-            {
-                System.out
-                        .println("Error - a map file to hold importing results must be specified");
-                System.out.println(" (run with -h flag for details)");
-                System.exit(1);
-            }
-
-            if (eperson == null)
-            {
-                System.out
-                        .println("Error - an eperson to do the importing must be specified");
-                System.out.println(" (run with -h flag for details)");
-                System.exit(1);
-            }
-
-            if (collections == null)
-            {
-                System.out
-                        .println("Error - at least one destination collection must be specified");
-                System.out.println(" (run with -h flag for details)");
-                System.exit(1);
-            }
-        }
-        else if ("delete".equals(command))
-        {
-            if (eperson == null)
-            {
-                System.out
-                        .println("Error - an eperson to do the importing must be specified");
-                System.exit(1);
-            }
-
-            if (mapfile == null)
-            {
-                System.out.println("Error - a map file must be specified");
-                System.exit(1);
-            }
-        }
-
-        // can only resume for adds
-        if (isResume && !"add".equals(command))
-        {
-            System.out
-                    .println("Error - resume option only works with --add command");
-            System.exit(1);
-        }
-
-        // do checks around mapfile - if mapfile exists and 'add' is selected,
-        // resume must be chosen
-        File myFile = new File(mapfile);
-
-        if (!isResume && "add".equals(command) && myFile.exists())
-        {
-            System.out.println("Error - the mapfile " + mapfile
-                    + " already exists.");
-            System.out
-                    .println("Either delete it or use --resume if attempting to resume an aborted import.");
-            System.exit(1);
-        }
-
-        // does the zip file exist and can we write to the temp directory
-        if (zip)
-        {
-            File zipfile = new File(sourcedir);
-            if (!zipfile.canRead())
-            {
-                System.out.println("Zip file '" + sourcedir + "' does not exist, or is not readable.");
-                System.exit(1);
-            }
-
-            if (ziptempdir == null)
-            {
-                System.out.println("Unable to unzip import file as the key 'org.dspace.app.itemexport.work.dir' is not set in dspace.cfg");
-                System.exit(1);
-            }
-            zipfile = new File(ziptempdir);
-            if (!zipfile.isDirectory())
-            {
-                System.out.println("'" + ConfigurationManager.getProperty("org.dspace.app.itemexport.work.dir") +
-                                   "' as defined by the key 'org.dspace.app.itemexport.work.dir' in dspace.cfg " +
-                                   "is not a valid directory");
-                System.exit(1);
-            }
-            File tempdir = new File(ziptempdir);
-            if (!tempdir.exists() && !tempdir.mkdirs())
-            {
-                log.error("Unable to create temporary directory");
-            }
-            sourcedir = ziptempdir + System.getProperty("file.separator") + line.getOptionValue("z");
-            ziptempdir = ziptempdir + System.getProperty("file.separator") +
-                         line.getOptionValue("z") + System.getProperty("file.separator");
-        }
-
-        ItemImport myloader = new ItemImport();
-
-        // create a context
-        Context c = new Context();
-
-        // find the EPerson, assign to context
-        EPerson myEPerson = null;
-
-        if (eperson.indexOf('@') != -1)
-        {
-            // @ sign, must be an email
-            myEPerson = EPerson.findByEmail(c, eperson);
-        }
-        else
-        {
-            myEPerson = EPerson.find(c, Integer.parseInt(eperson));
-        }
-
-        if (myEPerson == null)
-        {
-            System.out.println("Error, eperson cannot be found: " + eperson);
-            System.exit(1);
-        }
-
-        c.setCurrentUser(myEPerson);
-
-        // find collections
-        Collection[] mycollections = null;
-
-        // don't need to validate collections set if command is "delete"
-        if (!"delete".equals(command))
-        {
-            System.out.println("Destination collections:");
-
-            mycollections = new Collection[collections.length];
-
-            // validate each collection arg to see if it's a real collection
-            for (int i = 0; i < collections.length; i++)
-            {
-                // is the ID a handle?
-                if (collections[i].indexOf('/') != -1)
-                {
-                    // string has a / so it must be a handle - try and resolve
-                    // it
-                    mycollections[i] = (Collection) HandleManager
-                            .resolveToObject(c, collections[i]);
-
-                    // resolved, now make sure it's a collection
-                    if ((mycollections[i] == null)
-                            || (mycollections[i].getType() != Constants.COLLECTION))
-                    {
-                        mycollections[i] = null;
-                    }
-                }
-                // not a handle, try and treat it as an integer collection
-                // database ID
-                else if (collections[i] != null)
-                {
-                    mycollections[i] = Collection.find(c, Integer
-                            .parseInt(collections[i]));
-                }
-
-                // was the collection valid?
-                if (mycollections[i] == null)
-                {
-                    throw new IllegalArgumentException("Cannot resolve "
-                            + collections[i] + " to collection");
-                }
-
-                // print progress info
-                String owningPrefix = "";
-
-                if (i == 0)
-                {
-                    owningPrefix = "Owning ";
-                }
-
-                System.out.println(owningPrefix + " Collection: "
-                        + mycollections[i].getMetadata("name"));
-            }
-        } // end of validating collections
+        DSIndexer.setBatchProcessingMode(true);
 
         try
         {
-            // If this is a zip archive, unzip it first
-            if (zip)
+            // create an options object and populate it
+            CommandLineParser parser = new PosixParser();
+
+            Options options = new Options();
+
+            options.addOption("a", "add", false, "add items to DSpace");
+            options.addOption("r", "replace", false, "replace items in mapfile");
+            options.addOption("d", "delete", false,
+                    "delete items listed in mapfile");
+            options.addOption("s", "source", true, "source of items (directory)");
+            options.addOption("z", "zip", true, "name of zip file");
+            options.addOption("c", "collection", true,
+                    "destination collection(s) Handle or database ID");
+            options.addOption("m", "mapfile", true, "mapfile items in mapfile");
+            options.addOption("e", "eperson", true,
+                    "email of eperson doing importing");
+            options.addOption("w", "workflow", false,
+                    "send submission through collection's workflow");
+            options.addOption("n", "notify", false,
+                            "if sending submissions through the workflow, send notification emails");
+            options.addOption("t", "test", false,
+                    "test run - do not actually import items");
+            options.addOption("p", "template", false, "apply template");
+            options.addOption("R", "resume", false,
+                    "resume a failed import (add only)");
+
+            options.addOption("h", "help", false, "help");
+
+            CommandLine line = parser.parse(options, argv);
+
+            String command = null; // add replace remove, etc
+            String sourcedir = null;
+            String mapfile = null;
+            String eperson = null; // db ID or email
+            String[] collections = null; // db ID or handles
+            int status = 0;
+
+            if (line.hasOption('h'))
             {
-                ZipFile zf = new ZipFile(zipfilename);
-                ZipEntry entry;
-                Enumeration entries = zf.entries();
-                while (entries.hasMoreElements())
+                HelpFormatter myhelp = new HelpFormatter();
+                myhelp.printHelp("ItemImport\n", options);
+                System.out
+                       .println("\nadding items:    ItemImport -a -e eperson -c collection -s sourcedir -m mapfile");
+                System.out
+                        .println("\nadding items from zip file:    ItemImport -a -e eperson -c collection -s sourcedir -z filename.zip -m mapfile");
+                System.out
+                        .println("replacing items: ItemImport -r -e eperson -c collection -s sourcedir -m mapfile");
+                System.out
+                        .println("deleting items:  ItemImport -d -e eperson -m mapfile");
+                System.out
+                        .println("If multiple collections are specified, the first collection will be the one that owns the item.");
+
+                System.exit(0);
+            }
+
+            if (line.hasOption('a'))
+            {
+                command = "add";
+            }
+
+            if (line.hasOption('r'))
+            {
+                command = "replace";
+            }
+
+            if (line.hasOption('d'))
+            {
+                command = "delete";
+            }
+
+            if (line.hasOption('w'))
+            {
+                useWorkflow = true;
+                if (line.hasOption('n'))
                 {
-                    entry = (ZipEntry)entries.nextElement();
-                    if (entry.isDirectory())
-                    {
-                        if (!new File(ziptempdir + entry.getName()).mkdir())
-                        {
-                            log.error("Unable to create contents directory");
-                        }
-                    }
-                    else
-                    {
-                        System.out.println("Extracting file: " + entry.getName());
-                        int index = entry.getName().lastIndexOf('/');
-                        if (index == -1)
-                        {
-                            // Was it created on Windows instead?
-                            index = entry.getName().lastIndexOf('\\');
-                        }
-                        if (index > 0)
-                        {
-                            File dir = new File(ziptempdir + entry.getName().substring(0, index));
-                            if (!dir.mkdirs())
-                            {
-                                log.error("Unable to create directory");
-                            }
-                        }
-                        byte[] buffer = new byte[1024];
-                        int len;
-                        InputStream in = zf.getInputStream(entry);
-                        BufferedOutputStream out = new BufferedOutputStream(
-                            new FileOutputStream(ziptempdir + entry.getName()));
-                        while((len = in.read(buffer)) >= 0)
-                        {
-                            out.write(buffer, 0, len);
-                        }
-                        in.close();
-                        out.close();
-                    }
+                    useWorkflowSendEmail = true;
                 }
             }
 
-            c.setIgnoreAuthorization(true);
-
-            if ("add".equals(command))
+            if (line.hasOption('t'))
             {
-                myloader.addItems(c, mycollections, sourcedir, mapfile, template);
+                isTest = true;
+                System.out.println("**Test Run** - not actually importing items.");
             }
-            else if ("replace".equals(command))
+
+            if (line.hasOption('p'))
             {
-                myloader.replaceItems(c, mycollections, sourcedir, mapfile, template);
+                template = true;
+            }
+
+            if (line.hasOption('s')) // source
+            {
+                sourcedir = line.getOptionValue('s');
+            }
+
+            if (line.hasOption('m')) // mapfile
+            {
+                mapfile = line.getOptionValue('m');
+            }
+
+            if (line.hasOption('e')) // eperson
+            {
+                eperson = line.getOptionValue('e');
+            }
+
+            if (line.hasOption('c')) // collections
+            {
+                collections = line.getOptionValues('c');
+            }
+
+            if (line.hasOption('R'))
+            {
+                isResume = true;
+                System.out
+                        .println("**Resume import** - attempting to import items not already imported");
+            }
+
+            boolean zip = false;
+            String zipfilename = "";
+            String ziptempdir = ConfigurationManager.getProperty("org.dspace.app.itemexport.work.dir");
+            if (line.hasOption('z'))
+            {
+                zip = true;
+                zipfilename = sourcedir + System.getProperty("file.separator") + line.getOptionValue('z');
+            }
+
+            // now validate
+            // must have a command set
+            if (command == null)
+            {
+                System.out
+                        .println("Error - must run with either add, replace, or remove (run with -h flag for details)");
+                System.exit(1);
+            }
+            else if ("add".equals(command) || "replace".equals(command))
+            {
+                if (sourcedir == null)
+                {
+                    System.out
+                            .println("Error - a source directory containing items must be set");
+                    System.out.println(" (run with -h flag for details)");
+                    System.exit(1);
+                }
+
+                if (mapfile == null)
+                {
+                    System.out
+                            .println("Error - a map file to hold importing results must be specified");
+                    System.out.println(" (run with -h flag for details)");
+                    System.exit(1);
+                }
+
+                if (eperson == null)
+                {
+                    System.out
+                            .println("Error - an eperson to do the importing must be specified");
+                    System.out.println(" (run with -h flag for details)");
+                    System.exit(1);
+                }
+
+                if (collections == null)
+                {
+                    System.out
+                            .println("Error - at least one destination collection must be specified");
+                    System.out.println(" (run with -h flag for details)");
+                    System.exit(1);
+                }
             }
             else if ("delete".equals(command))
             {
-                myloader.deleteItems(c, mapfile);
+                if (eperson == null)
+                {
+                    System.out
+                            .println("Error - an eperson to do the importing must be specified");
+                    System.exit(1);
+                }
+
+                if (mapfile == null)
+                {
+                    System.out.println("Error - a map file must be specified");
+                    System.exit(1);
+                }
             }
 
-            // complete all transactions
-            c.complete();
-        }
-        catch (Exception e)
-        {
-            // abort all operations
+            // can only resume for adds
+            if (isResume && !"add".equals(command))
+            {
+                System.out
+                        .println("Error - resume option only works with --add command");
+                System.exit(1);
+            }
+
+            // do checks around mapfile - if mapfile exists and 'add' is selected,
+            // resume must be chosen
+            File myFile = new File(mapfile);
+
+            if (!isResume && "add".equals(command) && myFile.exists())
+            {
+                System.out.println("Error - the mapfile " + mapfile
+                        + " already exists.");
+                System.out
+                        .println("Either delete it or use --resume if attempting to resume an aborted import.");
+                System.exit(1);
+            }
+
+            // does the zip file exist and can we write to the temp directory
+            if (zip)
+            {
+                File zipfile = new File(sourcedir);
+                if (!zipfile.canRead())
+                {
+                    System.out.println("Zip file '" + sourcedir + "' does not exist, or is not readable.");
+                    System.exit(1);
+                }
+
+                if (ziptempdir == null)
+                {
+                    System.out.println("Unable to unzip import file as the key 'org.dspace.app.itemexport.work.dir' is not set in dspace.cfg");
+                    System.exit(1);
+                }
+                zipfile = new File(ziptempdir);
+                if (!zipfile.isDirectory())
+                {
+                    System.out.println("'" + ConfigurationManager.getProperty("org.dspace.app.itemexport.work.dir") +
+                                       "' as defined by the key 'org.dspace.app.itemexport.work.dir' in dspace.cfg " +
+                                       "is not a valid directory");
+                    System.exit(1);
+                }
+                File tempdir = new File(ziptempdir);
+                if (!tempdir.exists() && !tempdir.mkdirs())
+                {
+                    log.error("Unable to create temporary directory");
+                }
+                sourcedir = ziptempdir + System.getProperty("file.separator") + line.getOptionValue("z");
+                ziptempdir = ziptempdir + System.getProperty("file.separator") +
+                             line.getOptionValue("z") + System.getProperty("file.separator");
+            }
+
+            ItemImport myloader = new ItemImport();
+
+            // create a context
+            Context c = new Context();
+
+            // find the EPerson, assign to context
+            EPerson myEPerson = null;
+
+            if (eperson.indexOf('@') != -1)
+            {
+                // @ sign, must be an email
+                myEPerson = EPerson.findByEmail(c, eperson);
+            }
+            else
+            {
+                myEPerson = EPerson.find(c, Integer.parseInt(eperson));
+            }
+
+            if (myEPerson == null)
+            {
+                System.out.println("Error, eperson cannot be found: " + eperson);
+                System.exit(1);
+            }
+
+            c.setCurrentUser(myEPerson);
+
+            // find collections
+            Collection[] mycollections = null;
+
+            // don't need to validate collections set if command is "delete"
+            if (!"delete".equals(command))
+            {
+                System.out.println("Destination collections:");
+
+                mycollections = new Collection[collections.length];
+
+                // validate each collection arg to see if it's a real collection
+                for (int i = 0; i < collections.length; i++)
+                {
+                    // is the ID a handle?
+                    if (collections[i].indexOf('/') != -1)
+                    {
+                        // string has a / so it must be a handle - try and resolve
+                        // it
+                        mycollections[i] = (Collection) HandleManager
+                                .resolveToObject(c, collections[i]);
+
+                        // resolved, now make sure it's a collection
+                        if ((mycollections[i] == null)
+                                || (mycollections[i].getType() != Constants.COLLECTION))
+                        {
+                            mycollections[i] = null;
+                        }
+                    }
+                    // not a handle, try and treat it as an integer collection
+                    // database ID
+                    else if (collections[i] != null)
+                    {
+                        mycollections[i] = Collection.find(c, Integer
+                                .parseInt(collections[i]));
+                    }
+
+                    // was the collection valid?
+                    if (mycollections[i] == null)
+                    {
+                        throw new IllegalArgumentException("Cannot resolve "
+                                + collections[i] + " to collection");
+                    }
+
+                    // print progress info
+                    String owningPrefix = "";
+
+                    if (i == 0)
+                    {
+                        owningPrefix = "Owning ";
+                    }
+
+                    System.out.println(owningPrefix + " Collection: "
+                            + mycollections[i].getMetadata("name"));
+                }
+            } // end of validating collections
+
+            try
+            {
+                // If this is a zip archive, unzip it first
+                if (zip)
+                {
+                    ZipFile zf = new ZipFile(zipfilename);
+                    ZipEntry entry;
+                    Enumeration entries = zf.entries();
+                    while (entries.hasMoreElements())
+                    {
+                        entry = (ZipEntry)entries.nextElement();
+                        if (entry.isDirectory())
+                        {
+                            if (!new File(ziptempdir + entry.getName()).mkdir())
+                            {
+                                log.error("Unable to create contents directory");
+                            }
+                        }
+                        else
+                        {
+                            System.out.println("Extracting file: " + entry.getName());
+                            int index = entry.getName().lastIndexOf('/');
+                            if (index == -1)
+                            {
+                                // Was it created on Windows instead?
+                                index = entry.getName().lastIndexOf('\\');
+                            }
+                            if (index > 0)
+                            {
+                                File dir = new File(ziptempdir + entry.getName().substring(0, index));
+                                if (!dir.mkdirs())
+                                {
+                                    log.error("Unable to create directory");
+                                }
+                            }
+                            byte[] buffer = new byte[1024];
+                            int len;
+                            InputStream in = zf.getInputStream(entry);
+                            BufferedOutputStream out = new BufferedOutputStream(
+                                new FileOutputStream(ziptempdir + entry.getName()));
+                            while((len = in.read(buffer)) >= 0)
+                            {
+                                out.write(buffer, 0, len);
+                            }
+                            in.close();
+                            out.close();
+                        }
+                    }
+                }
+
+                c.setIgnoreAuthorization(true);
+
+                if ("add".equals(command))
+                {
+                    myloader.addItems(c, mycollections, sourcedir, mapfile, template);
+                }
+                else if ("replace".equals(command))
+                {
+                    myloader.replaceItems(c, mycollections, sourcedir, mapfile, template);
+                }
+                else if ("delete".equals(command))
+                {
+                    myloader.deleteItems(c, mapfile);
+                }
+
+                // complete all transactions
+                c.complete();
+            }
+            catch (Exception e)
+            {
+                // abort all operations
+                if (mapOut != null)
+                {
+                    mapOut.close();
+                }
+
+                mapOut = null;
+
+                c.abort();
+                e.printStackTrace();
+                System.out.println(e);
+                status = 1;
+            }
+
+            // Delete the unzipped file
+            try
+            {
+                if (zip)
+                {
+                    System.gc();
+                    System.out.println("Deleting temporary zip directory: " + ziptempdir);
+                    ItemImport.deleteDirectory(new File(ziptempdir));
+                }
+            }
+            catch (Exception ex)
+            {
+                System.out.println("Unable to delete temporary zip archive location: " + ziptempdir);
+            }
+
             if (mapOut != null)
             {
                 mapOut.close();
             }
 
-            mapOut = null;
-
-            c.abort();
-            e.printStackTrace();
-            System.out.println(e);
-            status = 1;
-        }
-
-        // Delete the unzipped file
-        try
-        {
-            if (zip)
+            if (isTest)
             {
-                System.gc();
-                System.out.println("Deleting temporary zip directory: " + ziptempdir);
-                ItemImport.deleteDirectory(new File(ziptempdir));
+                System.out.println("***End of Test Run***");
             }
+            System.exit(status);
         }
-        catch (Exception ex)
+        finally
         {
-            System.out.println("Unable to delete temporary zip archive location: " + ziptempdir);
+            DSIndexer.setBatchProcessingMode(false);
         }
-
-        if (mapOut != null)
-        {
-            mapOut.close();
-        }
-
-        if (isTest)
-        {
-            System.out.println("***End of Test Run***");
-        }
-        System.exit(status);
     }
 
     private void addItems(Context c, Collection[] mycollections,

@@ -393,7 +393,15 @@ public class MediaFilterManager
                 {
                     System.out.println("Updating search index:");
                 }
-                DSIndexer.updateIndex(c);
+                DSIndexer.setBatchProcessingMode(true);
+                try
+                {
+                    DSIndexer.updateIndex(c);
+                }
+                finally
+                {
+                    DSIndexer.setBatchProcessingMode(false);
+                }
             }
 
             c.complete();

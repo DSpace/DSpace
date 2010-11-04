@@ -79,6 +79,7 @@
 - [DS-733] Load testing utilities
 - [DS-734] Improve database efficiency
 - [DS-736] ItemImport usage and efficiency improvements
+- [DS-739] Lucene indexing efficiency improvements
 
 (Graham Triggs, Mark Wood)
 - [DS-707] General improvements to performance, bug fixes and style
