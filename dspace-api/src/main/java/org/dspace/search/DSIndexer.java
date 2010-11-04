@@ -115,8 +115,9 @@ public class DSIndexer
 {
     private static final Logger log = Logger.getLogger(DSIndexer.class);
 
-    private static final String LAST_INDEXED_FIELD = "DSIndexer.lastIndexed";
-    
+    private static final String LAST_INDEXED_FIELD    = "DSIndexer.lastIndexed";
+    private static final String DOCUMENT_STATUS_FIELD = "DSIndexer.status";
+
     private static final long WRITE_LOCK_TIMEOUT = 30000 /* 30 sec */;
 
     private static int batchFlushAfterDocuments = ConfigurationManager.getIntProperty("search.batch.documents", 20);
@@ -368,7 +369,7 @@ public class DSIndexer
     {
         if (handle != null)
         {
-            IndexingTask task = new IndexingTask(IndexingTask.Action.DELETE, new Term("handle", handle), null);
+            IndexingTask task = new IndexingTask(IndexingTask.Action.DELETE, new Term("handle", handle), buildDocumentForDeletedHandle(handle));
             if (task != null)
             {
                 if (batchProcessingMode)
@@ -731,7 +732,7 @@ public class DSIndexer
             }
             else
             {
-                action = new IndexingTask(IndexingTask.Action.DELETE, term, null);
+                action = new IndexingTask(IndexingTask.Action.DELETE, term, buildDocumentForWithdrawnItem((Item)dso));
             }
             break;
 
@@ -757,7 +758,14 @@ public class DSIndexer
         {
             if (action.isDelete())
             {
-                writer.deleteDocuments(action.getTerm());
+                if (action.getDocument() != null)
+                {
+                    writer.updateDocument(action.getTerm(), action.getDocument());
+                }
+                else
+                {
+                    writer.deleteDocuments(action.getTerm());
+                }
             }
             else
             {
@@ -1246,6 +1254,7 @@ public class DSIndexer
         // want to be able to check when last updated
         // (not tokenized, but it is indexed)
         doc.add(new Field(LAST_INDEXED_FIELD, Long.toString(System.currentTimeMillis()), Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(DOCUMENT_STATUS_FIELD, "archived", Field.Store.YES, Field.Index.UN_TOKENIZED));
 
         // KEPT FOR BACKWARDS COMPATIBILITY
         // do location, type, handle first
@@ -1275,6 +1284,34 @@ public class DSIndexer
             doc.add(new Field("location", location, Field.Store.NO, Field.Index.TOKENIZED));
     	    doc.add(new Field("default", location, Field.Store.NO, Field.Index.TOKENIZED));
         }
+
+        return doc;
+    }
+
+    private static Document buildDocumentForDeletedHandle(String handle)
+    {
+        Document doc = new Document();
+
+        // want to be able to check when last updated
+        // (not tokenized, but it is indexed)
+        doc.add(new Field(LAST_INDEXED_FIELD,    Long.toString(System.currentTimeMillis()), Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(DOCUMENT_STATUS_FIELD, "deleted", Field.Store.YES, Field.Index.UN_TOKENIZED));
+
+        // Do not add any other fields, as we don't want to be able to find it - just check the last indexed time
+
+        return doc;
+    }
+
+    private static Document buildDocumentForWithdrawnItem(Item item)
+    {
+        Document doc = new Document();
+
+        // want to be able to check when last updated
+        // (not tokenized, but it is indexed)
+        doc.add(new Field(LAST_INDEXED_FIELD,    Long.toString(System.currentTimeMillis()), Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(DOCUMENT_STATUS_FIELD, "withdrawn", Field.Store.YES, Field.Index.UN_TOKENIZED));
+
+        // Do not add any other fields, as we don't want to be able to find it - just check the last indexed time
 
         return doc;
     }
