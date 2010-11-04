@@ -50,7 +50,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
@@ -774,14 +776,14 @@ public class DSIndexer
         }
     }
 
-    private static List<IndexingTask> actionQueue = new ArrayList<IndexingTask>();
+    private static Map<String, IndexingTask> queuedTaskMap = new HashMap<String, IndexingTask>();
 
     static synchronized void addToIndexingTaskQueue(IndexingTask action)
     {
         if (action != null)
         {
-            actionQueue.add(action);
-            if (actionQueue.size() >= batchFlushAfterDocuments)
+            queuedTaskMap.put(action.getTerm().text(), action);
+            if (queuedTaskMap.size() >= batchFlushAfterDocuments)
             {
                 flushIndexingTaskQueue();
             }
@@ -790,7 +792,7 @@ public class DSIndexer
 
     static void flushIndexingTaskQueue()
     {
-        if (actionQueue.size() > 0)
+        if (queuedTaskMap.size() > 0)
         {
             IndexWriter writer = null;
 
@@ -822,7 +824,7 @@ public class DSIndexer
 
     private static synchronized void flushIndexingTaskQueue(IndexWriter writer)
     {
-        for (IndexingTask action : actionQueue)
+        for (IndexingTask action : queuedTaskMap.values())
         {
             try
             {
@@ -841,7 +843,7 @@ public class DSIndexer
             }
         }
 
-        actionQueue.clear();
+        queuedTaskMap.clear();
     }
 
     ////////////////////////////////////
