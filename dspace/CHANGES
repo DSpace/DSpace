@@ -91,6 +91,9 @@
 - [DS-710] New Base Theme For DSpace 1.7.0
 - [DS-711] Discovery release for XMLUI
 
+(Bill Hayes, Stuart Lewis)
+- [DS-738] sword.cfg seems no longer used after 1.5
+
 1.6.2
 =====
 
