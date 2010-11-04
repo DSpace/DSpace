@@ -122,6 +122,9 @@ public class DSIndexer
 
     private static final long WRITE_LOCK_TIMEOUT = 30000 /* 30 sec */;
 
+    private static Thread delayedIndexFlusher = null;
+    private static int indexFlushDelay = ConfigurationManager.getIntProperty("search.index.delay", -1);
+
     private static int batchFlushAfterDocuments = ConfigurationManager.getIntProperty("search.batch.documents", 20);
     private static boolean batchProcessingMode = false;
     
@@ -297,38 +300,7 @@ public class DSIndexer
             IndexingTask task = prepareIndexingTask(dso, force);
             if (task != null)
             {
-                if (batchProcessingMode)
-                {
-                    addToIndexingTaskQueue(task);
-                }
-                else
-                {
-                    IndexWriter writer = null;
-                    try
-                    {
-                        writer = openIndex(false);
-                        processIndexingTask(writer, task);
-                    }
-                    finally
-                    {
-                        if (task.getDocument() != null)
-                        {
-                            closeAllReaders(task.getDocument());
-                        }
-
-                        if (writer != null)
-                        {
-                            try
-                            {
-                                writer.close();
-                            }
-                            catch (IOException e)
-                            {
-                                log.error("Unable to close IndexWriter", e);
-                            }
-                        }
-                    }
-                }
+                processIndexingTask(task);
             }
         }
         catch (IOException e)
@@ -374,22 +346,7 @@ public class DSIndexer
             IndexingTask task = new IndexingTask(IndexingTask.Action.DELETE, new Term("handle", handle), buildDocumentForDeletedHandle(handle));
             if (task != null)
             {
-                if (batchProcessingMode)
-                {
-                    addToIndexingTaskQueue(task);
-                }
-                else
-                {
-                    IndexWriter writer = openIndex(false);
-                    try
-                    {
-                        processIndexingTask(writer, task);
-                    }
-                    finally
-                    {
-                        writer.close();
-                    }
-                }
+                processIndexingTask(task);
             }
         }
         else
@@ -754,7 +711,48 @@ public class DSIndexer
         return action;
     }
 
-    static void processIndexingTask(IndexWriter writer, IndexingTask action) throws IOException
+    static void processIndexingTask(IndexingTask task) throws IOException
+    {
+        if (batchProcessingMode)
+        {
+            addToIndexingTaskQueue(task);
+        }
+        else if (indexFlushDelay > 0)
+        {
+            addToIndexingTaskQueue(task);
+            startDelayedIndexFlusher();
+        }
+        else
+        {
+            IndexWriter writer = null;
+            try
+            {
+                writer = openIndex(false);
+                executeIndexingTask(writer, task);
+            }
+            finally
+            {
+                if (task.getDocument() != null)
+                {
+                    closeAllReaders(task.getDocument());
+                }
+
+                if (writer != null)
+                {
+                    try
+                    {
+                        writer.close();
+                    }
+                    catch (IOException e)
+                    {
+                        log.error("Unable to close IndexWriter", e);
+                    }
+                }
+            }
+        }
+    }
+
+    private static void executeIndexingTask(IndexWriter writer, IndexingTask action) throws IOException
     {
         if (action != null)
         {
@@ -828,7 +826,7 @@ public class DSIndexer
         {
             try
             {
-                processIndexingTask(writer, action);
+                executeIndexingTask(writer, action);
             }
             catch (IOException e)
             {
@@ -844,6 +842,13 @@ public class DSIndexer
         }
 
         queuedTaskMap.clear();
+
+        // We've flushed, so we don't need this thread
+        if (delayedIndexFlusher != null)
+        {
+            delayedIndexFlusher.interrupt();
+            delayedIndexFlusher = null;
+        }
     }
 
     ////////////////////////////////////
@@ -1409,4 +1414,34 @@ public class DSIndexer
         return null;
     }
 
+    private static synchronized void startDelayedIndexFlusher()
+    {
+        if (delayedIndexFlusher != null && !delayedIndexFlusher.isAlive())
+        {
+            delayedIndexFlusher = null;
+        }
+
+        if (delayedIndexFlusher == null && queuedTaskMap.size() > 0)
+        {
+            delayedIndexFlusher = new Thread(new DelayedIndexFlushThread());
+            delayedIndexFlusher.start();
+        }
+    }
+
+    private static class DelayedIndexFlushThread implements Runnable
+    {
+        @Override
+        public void run()
+        {
+            try
+            {
+                Thread.sleep(indexFlushDelay);
+                DSIndexer.flushIndexingTaskQueue();
+            }
+            catch (InterruptedException e)
+            {
+                log.debug(e);
+            }
+        }
+    }
 }
