@@ -688,7 +688,7 @@ public class DatabaseManager
     {
         return new TableRow(canonicalize(table), getColumnNames(table));
     }
-    
+
     /**
      * Insert a table row into the RDBMS.
      * 
@@ -701,95 +701,17 @@ public class DatabaseManager
      */
     public static void insert(Context context, TableRow row) throws SQLException
     {
-        int newID = -1;
-        String table = row.getTable();
-        PreparedStatement statement = null;
-        ResultSet rs = null;
-
-        try
+        int newID;
+        if (isPostgres)
         {
-            // Get an ID (primary key) for this row by using the "getnextid"
-            // SQL function in Postgres, or directly with sequences in Oracle
-            if (isOracle)
-            {
-                statement = context.getDBConnection().prepareStatement("SELECT " + table + "_seq" + ".nextval FROM dual");
-            }
-            else
-            {
-                statement = context.getDBConnection().prepareStatement("SELECT getnextid(?) AS result");
-                loadParameters(statement, new Object[] { table });
-            }
-
-            rs = statement.executeQuery();
-
-            rs.next();
-            newID = rs.getInt(1);
+            newID = doInsertPostgres(context, row);
         }
-        finally
+        else
         {
-            if (rs != null)
-            {
-                try { rs.close(); } catch (SQLException sqle) { }
-            }
-
-            if (statement != null)
-            {
-                try { statement.close(); } catch (SQLException sqle) { }
-            }
+            newID = doInsertGeneric(context, row);
         }
 
-        if (newID < 0)
-        {
-            throw new SQLException("Unable to retrieve sequence ID");
-        }
-
-        // Set the ID in the table row object
-        row.setColumn(getPrimaryKeyColumn(table), newID);
-        Collection<ColumnInfo> info = getColumnInfo(table);
-
-        String sql = insertSQL.get(table);
-        if (sql == null)
-        {
-            StringBuilder sqlBuilder = new StringBuilder().append("INSERT INTO ").append(table).append(" ( ");
-
-            boolean firstColumn = true;
-            for (ColumnInfo col : info)
-            {
-                if (firstColumn)
-                {
-                    sqlBuilder.append(col.getName());
-                    firstColumn = false;
-                }
-                else
-                {
-                    sqlBuilder.append(",").append(col.getName());
-                }
-            }
-
-            sqlBuilder.append(") VALUES ( ");
-
-            // Values to insert
-            firstColumn = true;
-            for (int i = 0; i < info.size(); i++)
-            {
-                if (firstColumn)
-                {
-                    sqlBuilder.append("?");
-                    firstColumn = false;
-                }
-                else
-                {
-                    sqlBuilder.append(",").append("?");
-                }
-            }
-
-            // Watch the syntax
-            sqlBuilder.append(")");
-            sql = sqlBuilder.toString();
-            insertSQL.put(table, sql);
-        }
-
-        execute(context.getDBConnection(), sql, info, row);
+        row.setColumn(getPrimaryKeyColumn(row), newID);
     }
 
     /**
@@ -1779,6 +1701,216 @@ public class DatabaseManager
                 }
             }
         }
+    }
+
+    /**
+     * Postgres-specific row insert, combining getnextid() and insert into single statement for efficiency
+     * @param context
+     * @param row
+     * @return
+     * @throws SQLException
+     */
+    private static int doInsertPostgres(Context context, TableRow row) throws SQLException
+    {
+        String table = row.getTable();
+
+        Collection<ColumnInfo> info = getColumnInfo(table);
+        Collection<ColumnInfo> params = new ArrayList<ColumnInfo>();
+
+        String primaryKey = getPrimaryKeyColumn(table);
+        String sql = insertSQL.get(table);
+
+        boolean firstColumn = true;
+        boolean foundPrimaryKey = false;
+        if (sql == null)
+        {
+            // Generate SQL and filter parameter columns
+            StringBuilder insertBuilder = new StringBuilder("INSERT INTO ").append(table).append(" ( ");
+            StringBuilder valuesBuilder = new StringBuilder(") VALUES ( ");
+            for (ColumnInfo col : info)
+            {
+                if (firstColumn)
+                {
+                    firstColumn = false;
+                }
+                else
+                {
+                    insertBuilder.append(",");
+                    valuesBuilder.append(",");
+                }
+
+                insertBuilder.append(col.getName());
+
+                if (!foundPrimaryKey && primaryKey.equals(col.getName()))
+                {
+                    valuesBuilder.append("getnextid('").append(table).append("')");
+                    foundPrimaryKey = true;
+                }
+                else
+                {
+                    valuesBuilder.append('?');
+                    params.add(col);
+                }
+            }
+
+            sql = insertBuilder.append(valuesBuilder.toString()).append(") RETURNING ").append(getPrimaryKeyColumn(table)).toString();
+            insertSQL.put(table, sql);
+        }
+        else
+        {
+            // Already have SQL, just filter parameter columns
+            for (ColumnInfo col : info)
+            {
+                if (!foundPrimaryKey && primaryKey.equals(col.getName()))
+                {
+                    foundPrimaryKey = true;
+                }
+                else
+                {
+                    params.add(col);
+                }
+            }            
+        }
+
+        PreparedStatement statement = null;
+
+        if (log.isDebugEnabled())
+        {
+            log.debug("Running query \"" + sql + "\"");
+        }
+
+        ResultSet rs = null;
+        try
+        {
+            statement = context.getDBConnection().prepareStatement(sql);
+        	loadParameters(statement, params, row);
+            rs = statement.executeQuery();
+            rs.next();
+            return rs.getInt(1);
+        }
+        finally
+        {
+            if (rs != null)
+            {
+                try
+                {
+                    rs.close();
+                }
+                catch (SQLException sqle)
+                {
+                }
+            }
+
+            if (statement != null)
+            {
+                try
+                {
+                    statement.close();
+                }
+                catch (SQLException sqle)
+                {
+                }
+            }
+        }
+    }
+
+    /**
+     * Generic version of row insertion with separate id get / insert
+     * @param context
+     * @param row
+     * @return
+     * @throws SQLException
+     */
+    private static int doInsertGeneric(Context context, TableRow row) throws SQLException
+    {
+        int newID = -1;
+        String table = row.getTable();
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        try
+        {
+            // Get an ID (primary key) for this row by using the "getnextid"
+            // SQL function in Postgres, or directly with sequences in Oracle
+            if (isOracle)
+            {
+                statement = context.getDBConnection().prepareStatement("SELECT " + table + "_seq" + ".nextval FROM dual");
+            }
+            else
+            {
+                statement = context.getDBConnection().prepareStatement("SELECT getnextid(?) AS result");
+                loadParameters(statement, new Object[] { table });
+            }
+            rs = statement.executeQuery();
+            rs.next();
+            newID = rs.getInt(1);
+        }
+        finally
+        {
+            if (rs != null)
+            {
+                try { rs.close(); } catch (SQLException sqle) { }
+            }
+
+            if (statement != null)
+            {
+                try { statement.close(); } catch (SQLException sqle) { }
+            }
+        }
+
+        if (newID < 0)
+        {
+            throw new SQLException("Unable to retrieve sequence ID");
+        }
+
+        // Set the ID in the table row object
+        row.setColumn(getPrimaryKeyColumn(table), newID);
+        Collection<ColumnInfo> info = getColumnInfo(table);
+
+        String sql = insertSQL.get(table);
+        if (sql == null)
+        {
+            StringBuilder sqlBuilder = new StringBuilder().append("INSERT INTO ").append(table).append(" ( ");
+
+            boolean firstColumn = true;
+            for (ColumnInfo col : info)
+            {
+                if (firstColumn)
+                {
+                    sqlBuilder.append(col.getName());
+                    firstColumn = false;
+                }
+                else
+                {
+                    sqlBuilder.append(",").append(col.getName());
+                }
+            }
+
+            sqlBuilder.append(") VALUES ( ");
+
+            // Values to insert
+            firstColumn = true;
+            for (int i = 0; i < info.size(); i++)
+            {
+                if (firstColumn)
+                {
+                    sqlBuilder.append("?");
+                    firstColumn = false;
+                }
+                else
+                {
+                    sqlBuilder.append(",").append("?");
+                }
+            }
+
+            // Watch the syntax
+            sqlBuilder.append(")");
+            sql = sqlBuilder.toString();
+            insertSQL.put(table, sql);
+        }
+
+        execute(context.getDBConnection(), sql, info, row);
+        return newID;
     }
 
     /**
