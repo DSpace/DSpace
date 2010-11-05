@@ -1741,7 +1741,7 @@ public class DatabaseManager
 
                 insertBuilder.append(col.getName());
 
-                if (!foundPrimaryKey && primaryKey.equals(col.getName()))
+                if (!foundPrimaryKey && col.isPrimaryKey())
                 {
                     valuesBuilder.append("getnextid('").append(table).append("')");
                     foundPrimaryKey = true;
@@ -1761,7 +1761,7 @@ public class DatabaseManager
             // Already have SQL, just filter parameter columns
             for (ColumnInfo col : info)
             {
-                if (!foundPrimaryKey && primaryKey.equals(col.getName()))
+                if (!foundPrimaryKey && col.isPrimaryKey())
                 {
                     foundPrimaryKey = true;
                 }
