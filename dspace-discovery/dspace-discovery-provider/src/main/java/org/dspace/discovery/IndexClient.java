@@ -109,6 +109,9 @@ public class IndexClient {
         options.addOption(OptionBuilder.isRequired(false).withDescription(
                 "print this help message").create("h"));
 
+        options.addOption(OptionBuilder.isRequired(false).withDescription(
+                "optimize search solr core").create("o"));
+
         try {
             line = new PosixParser().parse(options, args);
         } catch (Exception e) {
@@ -141,6 +144,9 @@ public class IndexClient {
         } else if (line.hasOption("b")) {
             log.info("(Re)building index from scratch.");
             indexer.createIndex(context);
+        } else if (line.hasOption("o")) {
+            log.info("Optimizing search core.");
+            indexer.optimize();
         } else {
             log.info("Updating and Cleaning Index");
             indexer.cleanIndex(line.hasOption("f"));

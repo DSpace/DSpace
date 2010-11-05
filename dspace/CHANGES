@@ -57,6 +57,7 @@
 (Peter Dietz)
 - [DS-192] Bitstreams should be returned ordered
 - [DS-549] Added <a name> anchors in XMLUI
+- [DS-615] Added ability to perform Solr optimize on the search/discovery core.
 
 (Stuart Lewis, Christophe Dupriez)
 - [DS-686] Incorrect use of UTF8 in DSpaceCSV

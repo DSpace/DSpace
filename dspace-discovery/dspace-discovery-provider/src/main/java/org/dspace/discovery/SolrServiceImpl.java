@@ -425,6 +425,25 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
     }
 
+    /**
+     * Maintenance to keep a SOLR index efficient.
+     * Note: This might take a long time.
+     */
+    public void optimize() {
+        try {
+            long start = System.currentTimeMillis();
+            System.out.println("SOLR Search Optimize -- Process Started:"+start);
+            getSolr().optimize();
+            long finish = System.currentTimeMillis();
+            System.out.println("SOLR Search Optimize -- Process Finished:"+finish);
+            System.out.println("SOLR Search Optimize -- Total time taken:"+(finish-start) + " (ms).");
+        } catch (SolrServerException sse) {
+            System.err.println(sse.getMessage());
+        } catch (IOException ioe) {
+            System.err.println(ioe.getMessage());
+        }
+    }
+
     // //////////////////////////////////
     // Private
     // //////////////////////////////////

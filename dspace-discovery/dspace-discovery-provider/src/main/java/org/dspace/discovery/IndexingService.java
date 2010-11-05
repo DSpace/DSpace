@@ -80,4 +80,6 @@ public interface IndexingService {
 
     void cleanIndex(boolean force) throws IOException,
             SQLException, SearchServiceException;
+
+    void optimize();
 }
