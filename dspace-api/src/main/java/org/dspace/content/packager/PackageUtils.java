@@ -46,6 +46,8 @@ import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 
@@ -788,6 +790,8 @@ public class PackageUtils
     }
 
 
+    private static final Pattern groupAnalyzer
+        = Pattern.compile("^(COMMUNITY|COLLECTION)_([0-9]+)_(.+)");
     /**
      * When DSpace creates Default Group Names they are of a very specific format,
      * for example:
@@ -826,20 +830,15 @@ public class PackageUtils
     public static String translateGroupNameForExport(Context context, String groupName)
             throws PackageException
     {
-        // Check if this looks like a default Group name -- must have at LEAST two underscores surrounded by other characters
-        if(!groupName.matches("^.+_.+_.+$"))
-        {
-            //if this is not a valid default group name, just return group name as-is (no crosswalking necessary)
+        // See if this resembles a default Group name
+        Matcher matched = groupAnalyzer.matcher(groupName);
+        if (!matched.matches())
             return groupName;
-        }
 
-        //Pull apart default group name into its three main parts
-        // Format: <DSpace-Obj-Type>_<DSpace-Obj-ID>_<Group-Type>
-        // (e.g. COLLECTION_123_ADMIN)
-        String objType = groupName.substring(0, groupName.indexOf('_'));
-        String tmpEndString = groupName.substring(groupName.indexOf('_')+1);
-        String objID = tmpEndString.substring(0, tmpEndString.indexOf('_'));
-        String groupType = tmpEndString.substring(tmpEndString.indexOf('_')+1);
+        // It does!  Pick out the components
+        String objType = matched.group(1);
+        String objID = matched.group(2);
+        String groupType = matched.group(3);
 
         try
         {
