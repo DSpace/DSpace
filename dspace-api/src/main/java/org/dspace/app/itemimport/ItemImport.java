@@ -631,6 +631,7 @@ public class ItemImport
             {
                 addItem(c, mycollections, sourceDir, dircontents[i], mapOut, template);
                 System.out.println(i + " " + dircontents[i]);
+                c.clearCache();
             }
         }
     }
@@ -696,6 +697,7 @@ public class ItemImport
 
             deleteItem(c, oldItem);
             addItem(c, mycollections, sourceDir, newItemName, null, template);
+            c.clearCache();
         }
     }
 
@@ -726,6 +728,7 @@ public class ItemImport
                 System.out.println("Deleting item " + itemID);
                 deleteItem(c, myitem);
             }
+            c.clearCache();
         }
     }
 
