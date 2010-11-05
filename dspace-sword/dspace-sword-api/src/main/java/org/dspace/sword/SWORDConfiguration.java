@@ -53,6 +53,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.sql.SQLException;
 
+import org.apache.log4j.Logger;
+
 /**
  * @author Richard Jones
  *
@@ -70,6 +72,10 @@ import java.sql.SQLException;
  */
 public class SWORDConfiguration
 {
+
+    /** logger */
+ 	public static final Logger log = Logger.getLogger(SWORDConfiguration.class);
+
 	/** whether we can support noOp */
 	private boolean noOp = true;
 
@@ -82,11 +88,17 @@ public class SWORDConfiguration
 	/** do we support mediation */
 	private boolean mediated = false;
 
-	/** should we keep the original package */
+	/** should we keep the original package as bitstream */
 	private boolean keepOriginal = false;
 
 	/** item bundle in which sword deposits are stored */
 	private String swordBundle = "SWORD";
+	
+ 	/** should we keep the original package as a file on ingest error */
+ 	private boolean keepPackageOnFailedIngest = false;
+ 	
+ 	/** location of directory to store packages on ingest error */
+ 	private String failedPackageDir = null;
 
     /** Accepted formats */
     private List<String> swordaccepts;
@@ -107,7 +119,7 @@ public class SWORDConfiguration
 		// set the mediation value
 		this.mediated = ConfigurationManager.getBooleanProperty("sword.on-behalf-of.enable");
 
-		// find out if we keep the original
+		// find out if we keep the original as bitstream
 		this.keepOriginal = ConfigurationManager.getBooleanProperty("sword.keep-original-package");
 
 		// get the sword bundle
@@ -116,6 +128,12 @@ public class SWORDConfiguration
 		{
 			this.swordBundle = bundle;
 		}
+
+        // find out if we keep the package as a file in specified directory
+        this.keepPackageOnFailedIngest = ConfigurationManager.getBooleanProperty("sword.keep-package-on-fail", false);
+ 
+        // get directory path and name
+        this.failedPackageDir = ConfigurationManager.getProperty("sword.failed-package.dir");
 
         // Get the accepted formats
         String acceptsProperty = ConfigurationManager.getProperty("sword.accepts");
@@ -240,6 +258,43 @@ public class SWORDConfiguration
 	{
 		this.keepOriginal = keepOriginal;
 	}
+
+ 	/**
+ 	 * set whether the repository should write file of the original package if ingest fails
+ 	 * @param keepOriginalOnFail
+ 	 */
+ 	public void setKeepPackageOnFailedIngest(boolean keepOriginalOnFail)
+ 	{
+ 		keepPackageOnFailedIngest = keepOriginalOnFail;
+ 	}
+
+    /**
+ 	 * should the repository write file of the original package if ingest fails
+ 	 * @return keepPackageOnFailedIngest
+ 	 */
+ 	public boolean isKeepPackageOnFailedIngest()
+ 	{
+ 		return keepPackageOnFailedIngest;
+ 	}
+ 
+ 	/**
+ 	 * set the directory to write file of the original package
+ 	 * @param dir
+ 	 */
+ 	public void setFailedPackageDir(String dir)
+ 	{
+ 		failedPackageDir = dir;
+ 	}
+ 
+ 	/**
+ 	 * directory location of the files with original packages
+     * for failed ingests
+ 	 * @return failedPackageDir
+ 	 */
+ 	public String getFailedPackageDir()
+ 	{
+ 		return failedPackageDir;
+ 	}
 
 	/**
 	 * Get the list of mime types that the given dspace object will

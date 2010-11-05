@@ -38,6 +38,7 @@
 
 package org.dspace.sword;
 
+import java.io.*;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
@@ -47,6 +48,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.core.Utils;
 
 import org.purl.sword.base.Deposit;
 import org.purl.sword.base.DepositResponse;
@@ -109,7 +111,7 @@ public class DepositManager
 	/**
 	 * Once this object is fully prepared, this method will execute
 	 * the deposit process.  The returned DepositRequest can be
-	 * used then to assembel the SWORD response.
+	 * used then to assemble the SWORD response.
 	 * 
 	 * @return	the response to the deposit request
 	 * @throws DSpaceSWORDException
@@ -170,7 +172,42 @@ public class DepositManager
 			throw new DSpaceSWORDException("Deposit target is not a collection or an item");
 		}
 
-		DepositResult result = dep.doDeposit(deposit);
+        DepositResult result = null;
+
+        try
+        {
+            result = dep.doDeposit(deposit);
+        }
+        catch(DSpaceSWORDException e)
+        {
+            if (swordService.getSwordConfig().isKeepPackageOnFailedIngest())
+            {
+                try
+                {
+                    storePackageAsFile(deposit);
+                }
+                catch(IOException e2)
+                {
+                    log.warn("Unable to store SWORD package as file: " + e);
+                }
+            }
+            throw e;
+        }
+        catch(SWORDErrorException e)
+        {
+            if (swordService.getSwordConfig().isKeepPackageOnFailedIngest())
+            {
+                try
+                {
+                    storePackageAsFile(deposit);
+                }
+                catch(IOException e2)
+                {
+                    log.warn("Unable to store SWORD package as file: " + e);
+                }
+            }
+            throw e;
+        }
 
 		// now construct the deposit response.  The response will be
 		// CREATED if the deposit is in the archive, or ACCEPTED if
@@ -224,4 +261,44 @@ public class DepositManager
 		
 		return response;
 	}
+
+    /**
+     *   Store original package on disk and companion file containing SWORD headers as found in the deposit object
+     *   Also write companion file with header info from the deposit object.
+     *
+     * @param deposit
+     */
+    private void storePackageAsFile(Deposit deposit) throws IOException
+    {
+        String path = swordService.getSwordConfig().getFailedPackageDir();
+
+        File dir = new File(path);
+        if (!dir.exists() || !dir.isDirectory())
+        {
+            throw new IOException("Directory does not exist for writing packages on ingest error.");
+        }
+
+        String filenameBase =  "sword-" + deposit.getUsername() + "-" + (new Date()).getTime();
+
+        File packageFile = new File(path, filenameBase);
+        File headersFile = new File(path, filenameBase + "-headers");
+
+        InputStream is = deposit.getFile();
+        FileOutputStream fos = new FileOutputStream(packageFile);
+        Utils.copy(is, fos);
+        fos.close();
+        is.close();
+
+        //write companion file with headers
+        PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(headersFile)));
+
+        pw.println("Content-Disposition=" + deposit.getContentDisposition());
+        pw.println("Content-Type=" + deposit.getContentType());
+        pw.println("Packaging=" + deposit.getPackaging());
+        pw.println("Location=" + deposit.getLocation());
+        pw.println("On Behalf of=" + deposit.getOnBehalfOf());
+        pw.println("Slug=" + deposit.getSlug());
+        pw.println("User name=" + deposit.getUsername());
+        pw.close();
+    }
 }

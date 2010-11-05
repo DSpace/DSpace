@@ -51,4 +51,22 @@ public interface DSpaceSWORDErrorCodes
 
 	/** if the media requested is unavailable */
 	public static final String MEDIA_UNAVAILABLE = SWORDProperties.SOFTWARE_URI + "/errors/MediaUnavailable";
+
+    /* additional codes */
+    
+    /** Invalid package */
+	public static final String PACKAGE_ERROR = SWORDProperties.SOFTWARE_URI + "/errors/PackageError";
+    
+    /** Missing resources in package */
+	public static final String PACKAGE_VALIDATION_ERROR = SWORDProperties.SOFTWARE_URI + "/errors/PackageValidationError";
+    
+    /** Crosswalk error */
+	public static final String CROSSWALK_ERROR = SWORDProperties.SOFTWARE_URI + "/errors/CrosswalkError";
+    
+    /** Invalid collection for linking */
+	public static final String COLLECTION_LINK_ERROR = SWORDProperties.SOFTWARE_URI + "/errors/CollectionLinkError";
+    
+    /** Database or IO Error when installing new item */
+	public static final String REPOSITORY_ERROR = SWORDProperties.SOFTWARE_URI + "/errors/RepositoryError";
+
 }
