@@ -141,6 +141,7 @@ public class ItemImport
     {
         DSIndexer.setBatchProcessingMode(true);
         Date startTime = new Date();
+        int status = 0;
 
         try
         {
@@ -180,7 +181,6 @@ public class ItemImport
             String mapfile = null;
             String eperson = null; // db ID or email
             String[] collections = null; // db ID or handles
-            int status = 0;
 
             if (line.hasOption('h'))
             {
@@ -578,7 +578,6 @@ public class ItemImport
             {
                 System.out.println("***End of Test Run***");
             }
-            System.exit(status);
         }
         finally
         {
@@ -588,6 +587,8 @@ public class ItemImport
             System.out.println("Ended: " + endTime.getTime());
             System.out.println("Elapsed time: " + ((endTime.getTime() - startTime.getTime()) / 1000) + " secs (" + (endTime.getTime() - startTime.getTime()) + " msecs)");
         }
+
+        System.exit(status);
     }
 
     private void addItems(Context c, Collection[] mycollections,
