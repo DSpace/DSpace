@@ -283,8 +283,8 @@ public class DepositManager
         File packageFile = new File(path, filenameBase);
         File headersFile = new File(path, filenameBase + "-headers");
 
-        InputStream is = deposit.getFile();
-        FileOutputStream fos = new FileOutputStream(packageFile);
+        InputStream is = new BufferedInputStream(new FileInputStream(deposit.getFile()));
+        OutputStream fos = new BufferedOutputStream(new FileOutputStream(packageFile));
         Utils.copy(is, fos);
         fos.close();
         is.close();
