@@ -138,6 +138,7 @@ public class ItemImport
     public static void main(String[] argv) throws Exception
     {
         DSIndexer.setBatchProcessingMode(true);
+        Date startTime = new Date();
 
         try
         {
@@ -574,6 +575,10 @@ public class ItemImport
         finally
         {
             DSIndexer.setBatchProcessingMode(false);
+            Date endTime = new Date();
+            System.out.println("Started: " + startTime.getTime());
+            System.out.println("Ended: " + endTime.getTime());
+            System.out.println("Elapsed time: " + ((endTime.getTime() - startTime.getTime()) / 1000) + " secs (" + (endTime.getTime() - startTime.getTime()) + " msecs)");
         }
     }
 
