@@ -155,7 +155,14 @@ public class EmbargoManager
     {
         init();
         DCValue terms[] = item.getMetadata(terms_schema, terms_element, terms_qualifier, Item.ANY);
-        DCDate result = setter.parseTerms(context, item, terms.length > 0 ? terms[0].value : null);
+
+        DCDate result = null;
+
+        // Its poor form to blindly use an object that could be null...
+        if(terms != null && terms[0] != null)
+        {
+        	result = setter.parseTerms(context, item, terms.length > 0 ? terms[0].value : null);
+        }
 
         // sanity check: do not allow an embargo lift date in the past.
         if (result != null && result.toDate().before(new Date()))
