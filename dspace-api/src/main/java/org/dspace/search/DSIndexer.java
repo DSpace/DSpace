@@ -157,7 +157,7 @@ public class DSIndexer
     	
     // TODO: Support for analyzers per language, or multiple indices
     /** The analyzer for this DSpace instance */
-    private static Analyzer analyzer = null;
+    private static volatile Analyzer analyzer = null;
 
     /** Static initialisation of index configuration */
     /** Includes backwards compatible default configuration */
