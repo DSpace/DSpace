@@ -110,6 +110,8 @@ public class ItemImport
     static boolean isTest = false;
 
     static boolean isResume = false;
+
+    static boolean isQuiet = false;
     
     static boolean template = false;
 
@@ -167,6 +169,7 @@ public class ItemImport
             options.addOption("p", "template", false, "apply template");
             options.addOption("R", "resume", false,
                     "resume a failed import (add only)");
+            options.addOption("q", "quiet", false, "don't display metadata");
 
             options.addOption("h", "help", false, "help");
 
@@ -257,6 +260,11 @@ public class ItemImport
                 isResume = true;
                 System.out
                         .println("**Resume import** - attempting to import items not already imported");
+            }
+
+            if (line.hasOption('q'))
+            {
+                isQuiet = true;
             }
 
             boolean zip = false;
@@ -967,7 +975,10 @@ public class ItemImport
         NodeList dcNodes = XPathAPI.selectNodeList(document,
                 "/dublin_core/dcvalue");
 
-        System.out.println("\tLoading dublin core from " + filename);
+        if (!isQuiet)
+        {
+            System.out.println("\tLoading dublin core from " + filename);
+        }
 
         // Add each one as a new format to the registry
         for (int i = 0; i < dcNodes.getLength(); i++)
@@ -996,8 +1007,11 @@ public class ItemImport
             language = language.trim();
         }
 
-        System.out.println("\tSchema: " + schema + " Element: " + element + " Qualifier: " + qualifier
-                + " Value: " + value);
+        if (!isQuiet)
+        {
+            System.out.println("\tSchema: " + schema + " Element: " + element + " Qualifier: " + qualifier
+                    + " Value: " + value);
+        }
 
         if ("none".equals(qualifier) || "".equals(qualifier))
         {
