@@ -191,7 +191,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         /**
                          * Make sure the item is not in the index if it is not in
                          * archive. TODO: Someday DSIndexer should block withdrawn
-                         * content on search/retrieval and allow admins the ablitity
+                         * content on search/retrieval and allow admins the ability
                          * to still search for withdrawn Items.
                          */
                         unIndexContent(context, handle);
@@ -216,13 +216,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-        }
-        try {
-            getSolr().commit();
-        } catch (SolrServerException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
         }
     }
 
@@ -257,7 +250,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
     /**
-     * Unindex a Docment in the Lucene Index.
+     * Unindex a Document in the Lucene Index.
      * @param context the dspace context
      * @param handle the handle of the object to be deleted
      * @throws SQLException
@@ -309,7 +302,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     /**
      * Iterates over all Items, Collections and Communities. And updates them in
      * the index. Uses decaching to control memory footprint. Uses indexContent
-     * and isStale ot check state of item in index.
+     * and isStale to check state of item in index.
      *
      * @param context
      */
@@ -320,7 +313,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     /**
      * Iterates over all Items, Collections and Communities. And updates them in
      * the index. Uses decaching to control memory footprint. Uses indexContent
-     * and isStale ot check state of item in index.
+     * and isStale to check state of item in index.
      * <p/>
      * At first it may appear counterintuitive to have an IndexWriter/Reader
      * opened and closed on each DSO. But this allows the UI processes to step
@@ -359,6 +352,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 context.removeCached(communities[i], communities[i].getID());
             }
 
+            getSolr().commit();
 
         } catch (Exception e) {
             log.error(e.getMessage(), e);
