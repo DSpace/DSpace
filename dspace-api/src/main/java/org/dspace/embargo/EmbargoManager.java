@@ -159,7 +159,7 @@ public class EmbargoManager
         DCDate result = null;
 
         // Its poor form to blindly use an object that could be null...
-        if(terms != null && terms[0] != null)
+        if(terms != null && terms.length > 0)
         {
         	result = setter.parseTerms(context, item, terms.length > 0 ? terms[0].value : null);
         }
