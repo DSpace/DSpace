@@ -534,6 +534,11 @@
     <!-- used by the DSpace Discovery Solr Indexer to track the last time a document was indexed -->
    <field name="SolrIndexer.lastIndexed" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" />
 
+   <!-- Custom Mapping to assure ds.creator is placed into dc.contributor.author by defualt -->
+   <copyField source="dc.creator" dest="dc.contributor.author"/>
+   <copyField source="dc.creator" dest="dc.contributor.author_ac"/>
+   <copyField source="dc.creator" dest="dc.contributor.author_filter"/>
+   <copyField source="dc.creator" dest="dc.contributor.author_sort"/>
 
 
      <!--Dynamic field used for search autocompletion-->
