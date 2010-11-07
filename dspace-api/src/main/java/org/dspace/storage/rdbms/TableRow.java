@@ -151,7 +151,7 @@ public class TableRow
 
     boolean isColumnNullCanonicalized(String column)
     {
-        return data.get(canonicalizeAndCheck(column)) == NULL_OBJECT;
+        return data.get(column) == NULL_OBJECT;
     }
 
     /**
