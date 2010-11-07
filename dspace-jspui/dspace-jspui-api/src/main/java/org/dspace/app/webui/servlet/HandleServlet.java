@@ -44,6 +44,7 @@ import java.io.StringWriter;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map.Entry;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -51,6 +52,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
+import org.dspace.app.util.GoogleMetadata;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
@@ -76,6 +78,7 @@ import org.dspace.plugin.CommunityHomeProcessor;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 import org.jdom.Element;
+import org.jdom.Namespace;
 import org.jdom.Text;
 import org.jdom.output.XMLOutputter;
 
@@ -93,6 +96,7 @@ import org.jdom.output.XMLOutputter;
  * @author Robert Tansley
  * @version $Revision$
  */
+@SuppressWarnings("deprecation")
 public class HandleServlet extends DSpaceServlet
 {
     /** log4j category */
@@ -369,6 +373,30 @@ public class HandleServlet extends DSpaceServlet
         // Produce <meta> elements for header from crosswalk
         try
         {
+            boolean googleEnabled = ConfigurationManager.getBooleanProperty(
+            "google-metadata.enable", false);
+
+            if (googleEnabled)
+            {
+                // Add Google metadata field names & values to DRI
+                GoogleMetadata gmd = new GoogleMetadata(context, item);
+                StringWriter swg = new StringWriter();
+                XMLOutputter xmlog = new XMLOutputter();
+                xmlog.output(new Text("\n"), swg);
+                for (Entry<String, String> m : gmd.getMappings())
+                {
+                    Element e = new Element("meta", Namespace.NO_NAMESPACE);
+                    e.setAttribute("name", m.getKey());
+                    e.setAttribute("content", m.getValue());
+                    xmlog.output(e, swg);
+                    xmlog.output(new Text("\n"), swg);
+
+                    //pageMeta.addMetadata(m.getKey()).addContent(m.getValue());
+
+                }
+            }
+
+
             List<Element> l = xHTMLHeadCrosswalk.disseminateList(item);
             StringWriter sw = new StringWriter();
 

@@ -46,6 +46,7 @@ import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -68,6 +69,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.app.util.GoogleMetadata;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.core.PluginManager;
@@ -210,6 +212,20 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             }
             sfxserverUrl = sfxserverUrl.trim() +"&" + sfxQuery.trim();
             pageMeta.addMetadata("sfx","server").addContent(sfxserverUrl);
+        }
+
+        boolean googleEnabled = ConfigurationManager.getBooleanProperty(
+            "google-metadata.enable", false);
+
+        if (googleEnabled)
+        {
+            // Add Google metadata field names & values to DRI
+            GoogleMetadata gmd = new GoogleMetadata(context, item);
+
+            for (Entry<String, String> m : gmd.getMappings())
+            {
+                pageMeta.addMetadata(m.getKey()).addContent(m.getValue());
+            }
         }
 
         // Metadata for <head> element
