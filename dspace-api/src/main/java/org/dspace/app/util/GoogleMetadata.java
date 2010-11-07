@@ -15,11 +15,13 @@ import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 
@@ -239,6 +241,19 @@ public class GoogleMetadata
                 return true;
             }
             else
+            {
+                return false;
+            }
+        }
+
+        if (config.equals("$simple-pdf"))
+        {
+            String pdf_url = getPDFSimpleUrl(item);
+            if(pdf_url.length() > 0)
+            {
+                metadataMappings.put(fieldName, pdf_url);
+                return true;
+            } else
             {
                 return false;
             }
@@ -964,6 +979,50 @@ public class GoogleMetadata
     public String getTechnicalReportInstitution()
     {
         return metadataMappings.get(TECH_REPORT_INSTITUTION);
+    }
+
+    /**
+     * Gets the URL to a PDF using a very basic strategy by assuming that the PDF
+     * is in the default content bundle, and that the item only has one public bitstream
+     * and it is a PDF.
+     *
+     * @param item
+     * @return URL that the PDF can be directly downloaded from
+     */
+    private String getPDFSimpleUrl(Item item)
+    {
+        try {
+            Bundle[] contentBundles = item.getBundles("ORIGINAL");
+            if (contentBundles.length > 0) {
+                Bitstream[] bitstreams = contentBundles[0].getBitstreams();
+                if (bitstreams.length == 1) {
+                    if (bitstreams[0].getFormat().getMIMEType().equals("application/pdf")) {
+                        StringBuilder path = new StringBuilder();
+                        path.append(ConfigurationManager.getProperty("dspace.url"));
+
+                        if (item.getHandle() != null) {
+                            path.append("/bitstream/");
+                            path.append(item.getHandle());
+                            path.append("/");
+                            path.append(bitstreams[0].getSequenceID());
+                        } else {
+                            path.append("/retrieve/");
+                            path.append(bitstreams[0].getID());
+                        }
+
+                        path.append("/");
+                        path.append(Util.encodeBitstreamName(bitstreams[0].getName(), Constants.DEFAULT_ENCODING));
+                        return path.toString();
+                    }
+                }
+            }
+        } catch (UnsupportedEncodingException ex) {
+            log.debug(ex.getMessage());
+        } catch (SQLException ex) {
+            log.debug(ex.getMessage());
+        }
+
+        return "";
     }
 
     /**

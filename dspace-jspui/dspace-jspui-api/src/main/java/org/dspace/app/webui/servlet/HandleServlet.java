@@ -44,7 +44,6 @@ import java.io.StringWriter;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.Map.Entry;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -78,7 +77,6 @@ import org.dspace.plugin.CommunityHomeProcessor;
 import org.dspace.usage.UsageEvent;
 import org.dspace.utils.DSpace;
 import org.jdom.Element;
-import org.jdom.Namespace;
 import org.jdom.Text;
 import org.jdom.output.XMLOutputter;
 
@@ -373,30 +371,6 @@ public class HandleServlet extends DSpaceServlet
         // Produce <meta> elements for header from crosswalk
         try
         {
-            boolean googleEnabled = ConfigurationManager.getBooleanProperty(
-            "google-metadata.enable", false);
-
-            if (googleEnabled)
-            {
-                // Add Google metadata field names & values to DRI
-                GoogleMetadata gmd = new GoogleMetadata(context, item);
-                StringWriter swg = new StringWriter();
-                XMLOutputter xmlog = new XMLOutputter();
-                xmlog.output(new Text("\n"), swg);
-                for (Entry<String, String> m : gmd.getMappings())
-                {
-                    Element e = new Element("meta", Namespace.NO_NAMESPACE);
-                    e.setAttribute("name", m.getKey());
-                    e.setAttribute("content", m.getValue());
-                    xmlog.output(e, swg);
-                    xmlog.output(new Text("\n"), swg);
-
-                    //pageMeta.addMetadata(m.getKey()).addContent(m.getValue());
-
-                }
-            }
-
-
             List<Element> l = xHTMLHeadCrosswalk.disseminateList(item);
             StringWriter sw = new StringWriter();
 
@@ -410,6 +384,19 @@ public class HandleServlet extends DSpaceServlet
                 e.setNamespace(null);
                 xmlo.output(e, sw);
                 xmlo.output(new Text("\n"), sw);
+            }
+            boolean googleEnabled = ConfigurationManager.getBooleanProperty("google-metadata.enable", false);
+            if (googleEnabled)
+            {
+                // Add Google metadata field names & values
+                GoogleMetadata gmd = new GoogleMetadata(context, item);
+                xmlo.output(new Text("\n"), sw);
+
+                for (Element e: gmd.disseminateList())
+                {
+                    xmlo.output(e, sw);
+                    xmlo.output(new Text("\n"), sw);
+                }
             }
             headMetadata = sw.toString();
         }
