@@ -84,8 +84,8 @@ public final class SpringServiceManager implements ServiceManagerSystem {
     }
 
     public static final String configPath = "spring/spring-dspace-applicationContext.xml";
-    public static final String corePath = "classpath*:spring/spring-dspace-core-services.xml";
-    public static final String pluginPath = "classpath*:spring/spring-dspace-plugin-*-services.xml";
+    public static final String coreResourcePath = "classpath*:spring/spring-dspace-core-services.xml";
+    public static final String addonResourcePath = "classpath*:spring/spring-dspace-addon-*-services.xml";
 
     @SuppressWarnings("unchecked")
     public <T> T getServiceByName(String name, Class<T> type) {
@@ -167,12 +167,12 @@ public final class SpringServiceManager implements ServiceManagerSystem {
         // get all spring config paths
         ArrayList<String> pathList = new ArrayList<String>();
         pathList.add(configPath);
-        pathList.add(pluginPath);
+        pathList.add(addonResourcePath);
         if (testMode) {
             log.warn("TEST Spring Service Manager running in test mode, no core beans will be started");
         } else {
             // only load the core beans when not testing the service manager
-            pathList.add(corePath);
+            pathList.add(coreResourcePath);
         }
         if (configPaths != null) {
             pathList.addAll(Arrays.asList(configPaths));
