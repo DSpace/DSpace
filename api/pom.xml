@@ -16,7 +16,7 @@
     <parent>
         <artifactId>dspace-pom</artifactId>
         <groupId>org.dspace</groupId>
-        <version>3</version>
+        <version>6</version>
     </parent>
 
     <!--
