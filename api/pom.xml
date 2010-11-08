@@ -11,7 +11,7 @@
         <url>http://www.dspace.org</url>
     </organization>
     <packaging>jar</packaging>
-    <version>2.0.2</version>
+    <version>2.0.3-SNAPSHOT</version>
     
     <parent>
         <artifactId>dspace-pom</artifactId>
@@ -26,9 +26,9 @@
         below.
     -->
     <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/modules/dspace-services/tags/dspace-services-2.0.2/api</connection>
-        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-services/tags/dspace-services-2.0.2/api</developerConnection>
-        <url>http://scm.dspace.org/svn/repo/modules/dspace-services/tags/dspace-services-2.0.2/api</url>
+        <connection>scm:svn:http://scm.dspace.org/svn/repo/modules/dspace-services/trunk/api</connection>
+        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-services/trunk/api</developerConnection>
+        <url>http://scm.dspace.org/svn/repo/modules/dspace-services/trunk/api</url>
     </scm>
 
     <dependencies>
