@@ -18,7 +18,7 @@
         <version>6</version>
     </parent>
     
-    <version>2.0.2</version>
+    <version>2.0.3-SNAPSHOT</version>
 
     <modules>
         <module>api</module>
@@ -77,9 +77,9 @@
         below.
     -->
     <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/modules/dspace-services/tags/dspace-services-2.0.2</connection>
-        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-services/tags/dspace-services-2.0.2</developerConnection>
-        <url>http://scm.dspace.org/svn/repo/modules/dspace-services/tags/dspace-services-2.0.2</url>
+        <connection>scm:svn:http://scm.dspace.org/svn/repo/modules/dspace-services/trunk</connection>
+        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-services/trunk</developerConnection>
+        <url>http://scm.dspace.org/svn/repo/modules/dspace-services/trunk</url>
     </scm>
 
 </project>
