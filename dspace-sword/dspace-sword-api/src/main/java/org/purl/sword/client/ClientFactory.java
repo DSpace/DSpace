@@ -164,11 +164,7 @@ public class ClientFactory {
 	 * @return A new client.
 	 */
 	public ClientType createClient(ClientOptions options) {
-		if (options.isGuiMode()) {
-			return new GuiClient();
-		} else {
-			return new CmdClient();
-		}
+        return new CmdClient();
 	}
 
 	/**
