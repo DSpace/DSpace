@@ -87,7 +87,7 @@
 	            <exclude>**/Abstract*</exclude>
 	        </excludes>
                 <!-- required when running JMockit under Java 1.5 -->
-                <argLine>-javaagent:"${settings.localRepository}"/mockit/jmockit/0.998/jmockit-0.998.jar</argLine>
+                <argLine>-javaagent:"${settings.localRepository}"/org/dspace/dependencies/jmockit/dspace-jmockit/0.998.3/dspace-jmockit-0.998.3.jar</argLine>
             </configuration>
          </plugin>
       </plugins>
@@ -580,9 +580,9 @@
             <scope>test</scope>
          </dependency>
          <dependency>
-            <groupId>mockit</groupId>
-            <artifactId>jmockit</artifactId>
-            <version>0.998</version>
+            <groupId>org.dspace.dependencies.jmockit</groupId>
+            <artifactId>dspace-jmockit</artifactId>
+            <version>0.998.3</version>
             <scope>test</scope>
          </dependency>         
          <dependency>

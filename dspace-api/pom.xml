@@ -211,8 +211,8 @@
             <scope>test</scope>
         </dependency>
      <dependency>
-        <groupId>mockit</groupId>
-        <artifactId>jmockit</artifactId>
+        <groupId>org.dspace.dependencies.jmockit</groupId>
+        <artifactId>dspace-jmockit</artifactId>
         <scope>test</scope>
      </dependency>
      <dependency>
