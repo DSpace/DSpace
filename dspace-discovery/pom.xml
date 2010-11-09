@@ -98,65 +98,22 @@
         </plugins>
     </build>
 
-    <repositories>
-        <repository>
-            <id>maven.dspace.org-snapshot</id>
-            <name>DSpace Maven Snapshot Repository</name>
-            <url>http://maven.dspace.org/snapshot</url>
-            <releases>
-                <enabled>false</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            </snapshots>
-        </repository>
-    </repositories>
-
     <!--
        The Subversion repository location is used by Continuum to update
        against when changes have occured, this spawns a new build cycle
        and releases snapshots into the snapshot repository below.
     -->
     <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/modules/dspace-discovery/trunk</connection>
+        <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-discovery</connection>
         <developerConnection>
-            scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-discovery/trunk
+            scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-discovery
         </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/modules/dspace-discovery/trunk</url>
+        <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-discovery</url>
     </scm>
 
     <issueManagement>
       <system>JIRA</system>
       <url>http://jira.dspace.org/jira/browse/DISCOVERY</url>
    </issueManagement>
-
-   <!--
-        Distribution Management is currently used by the Continuum
-        server to update snapshots it generates. This will also be used
-        on release to deploy release versions to the repository by the
-        release manager.
-    -->
-    <distributionManagement>
-        <repository>
-            <id>maven.dspace.org/release</id>
-            <name>DSpace Maven Repository</name>
-            <url>scp://maven.dspace.org/var/maven/release
-            </url>
-        </repository>
-        <snapshotRepository>
-            <id>maven.dspace.org/snapshot</id>
-            <name>DSpace Maven Repository</name>
-            <url>scp://maven.dspace.org/var/maven/snapshot
-            </url>
-            <uniqueVersion>false</uniqueVersion>
-        </snapshotRepository>
-        <site>
-            <id>website</id>
-            <url>scp://projects.dspace.org/var/www/projects.dspace.org/htdocs/${artifactId}</url>
-        </site>
-    </distributionManagement>
-
     
 </project>

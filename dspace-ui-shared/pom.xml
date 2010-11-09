@@ -28,10 +28,4 @@
       <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-ui-shared</url>
    </scm>
 
-   <!--
-      Runtime and Compile Time dependencies for DSpace.
-   -->
-   <dependencies>
-   </dependencies>
-
 </project>

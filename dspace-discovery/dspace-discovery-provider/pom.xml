@@ -118,32 +118,16 @@
 		</plugins>
 	</build>
 
-    <repositories>
-        <repository>
-            <id>maven.dspace.org-snapshot</id>
-            <name>DSpace Maven Snapshot Repository</name>
-            <url>http://maven.dspace.org/snapshot</url>
-            <releases>
-                <enabled>false</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-                <checksumPolicy>fail</checksumPolicy>
-            </snapshots>
-        </repository>
-    </repositories>
-
     <!--
        The Subversion repository location is used by Continuum to update
        against when changes have occured, this spawns a new build cycle
        and releases snapshots into the snapshot repository below.
     -->
     <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/modules/dspace-discovery/trunk/provider</connection>
+        <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-discovery/dspace-discovery-provider</connection>
         <developerConnection>
-            scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-discovery/trunk/provider
+            scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-discovery/dspace-discovery-provider
         </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/modules/dspace-discovery/trunk/provider</url>
+        <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-discovery/dspace-discovery-provider</url>
     </scm>
 </project>

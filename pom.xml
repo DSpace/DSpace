@@ -873,32 +873,6 @@
       <url>http://scm.dspace.org/svn/repo/dspace/trunk</url>
    </scm>
 
-   <!--
-      Distribution Management is currently used by the Continuum server
-      to update snapshots it generates. This will also be used on
-      release to deploy release versions to the repository by the
-      release manager.
-   -->
-   <distributionManagement>
-      <repository>
-         <id>maven.dspace.org/release</id>
-         <name>DSpace Maven Repository</name>
-         <url>scp://maven.dspace.org/var/maven/release</url>
-      </repository>
-      <snapshotRepository>
-         <id>maven.dspace.org-snapshot</id>
-         <name>DSpace Maven Repository</name>
-         <url>scp://maven.dspace.org/var/maven/snapshot</url>
-         <uniqueVersion>false</uniqueVersion>
-      </snapshotRepository>
-      <site>
-         <id>website</id>
-         <url>
-            scp://projects.dspace.org/var/www/projects.dspace.org/htdocs
-         </url>
-      </site>
-   </distributionManagement>
-
    <reporting>
       <excludeDefaults>true</excludeDefaults>
       <plugins>

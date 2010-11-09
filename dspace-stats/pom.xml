@@ -13,23 +13,6 @@
 	<version>1.7.0-SNAPSHOT</version>
 	<description>Library of Shared UsageEvent and EventConsumer Tools for Logging to Solr.</description>
 
-	<repositories>
-		<repository>
-			<id>dspace-snapshot</id>
-			<name>DSpace Snapshot Repository</name>
-			<url>http://maven.dspace.org/snapshot</url>
-			<releases>
-				<enabled>false</enabled>
-				<checksumPolicy>fail</checksumPolicy>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<updatePolicy>daily</updatePolicy>
-				<checksumPolicy>fail</checksumPolicy>
-			</snapshots>
-		</repository>
-	</repositories>
-
 	<!--
 		The Subversion repository location is used by Continuum to update
 		against when changes have occured, this spawns a new build cycle and
@@ -40,26 +23,6 @@
 		<developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-stats</developerConnection>
 		<url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-stats</url>
 	</scm>
-
-	<distributionManagement>
-		<repository>
-			<id>maven.dspace.org/release</id>
-			<name>DSpace Maven Repository</name>
-			<url>scp://maven.dspace.org/var/maven/release
-            </url>
-		</repository>
-		<snapshotRepository>
-			<id>maven.dspace.org/snapshot</id>
-			<name>DSpace Maven Repository</name>
-			<url>scp://maven.dspace.org/var/maven/snapshot
-            </url>
-			<uniqueVersion>false</uniqueVersion>
-		</snapshotRepository>
-		<site>
-			<id>website</id>
-			<url> scp://projects.dspace.org/var/www/projects.dspace.org/htdocs/${artifactId}</url>
-		</site>
-	</distributionManagement>
 
 	<developers>
 		<developer>
