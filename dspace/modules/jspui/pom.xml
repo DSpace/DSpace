@@ -72,22 +72,6 @@
 
 	</profiles>
 
-	<repositories>
-		<repository>
-			<id>maven.dspace.org-snapshot</id>
-			<name>DSpace Maven Snapshot Repository</name>
-			<url>http://maven.dspace.org/snapshot</url>
-			<releases>
-				<enabled>false</enabled>
-				<checksumPolicy>fail</checksumPolicy>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<checksumPolicy>fail</checksumPolicy>
-			</snapshots>
-		</repository>
-	</repositories>
-
 	<scm>
 		<connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/jspui</connection>
 		<developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/jspui</developerConnection>

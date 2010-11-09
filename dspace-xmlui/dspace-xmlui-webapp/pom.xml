@@ -16,23 +16,6 @@
       <version>1.7.0-SNAPSHOT</version>
    </parent>
 
-   <repositories>
-      <repository>
-         <id>maven.dspace.org-snapshot</id>
-         <name>DSpace Maven Snapshot Repository</name>
-         <url>http://maven.dspace.org/snapshot</url>
-         <releases>
-            <enabled>false</enabled>
-            <checksumPolicy>fail</checksumPolicy>
-         </releases>
-         <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-            <checksumPolicy>fail</checksumPolicy>
-         </snapshots>
-      </repository>
-   </repositories>
-
    <scm>
       <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui/dspace-xmlui-webapp</connection>
       <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui/dspace-xmlui-webapp</developerConnection>

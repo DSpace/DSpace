@@ -17,23 +17,6 @@
       <version>1.7.0-SNAPSHOT</version>
    </parent>
 
-   <repositories>
-      <repository>
-         <id>maven.dspace.org-snapshot</id>
-         <name>DSpace Maven Snapshot Repository</name>
-         <url>http://maven.dspace.org/snapshot</url>
-         <releases>
-            <enabled>false</enabled>
-            <checksumPolicy>fail</checksumPolicy>
-         </releases>
-         <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-            <checksumPolicy>fail</checksumPolicy>
-         </snapshots>
-      </repository>
-   </repositories>
-
    <!--
       The Subversion repository location is used by Continuum to update against
       when changes have occured, this spawns a new build cycle and releases snapshots
