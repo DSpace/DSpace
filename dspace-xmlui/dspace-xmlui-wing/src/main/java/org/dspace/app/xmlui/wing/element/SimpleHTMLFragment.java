@@ -515,23 +515,19 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 						// FIXME: This may not work for windows people who
 						// insist on using \r\n for line breaks.
 						@SuppressWarnings("unchecked")
-						// This cast is correct
-						List<String> parts = Arrays.asList(rawText.split("\n\\s*\n"));
+                        String[] parts = rawText.split("\n\\s*\n");
+                        if (parts.length > 0) {
+                            for (int partIdx = 0; partIdx < parts.length - 1; partIdx++) {
+                                removed.add(new Text(parts[partIdx]));
 
-						if (parts.size() > 0) {
-							String lastPart = parts.remove(parts.size()-1);
+                                if (paragraphWrap(parent, i+1, removed)) {
+                                    removed.clear();
+                                    i++;// account for the field added
+                                }
+                            }
 
-							for (String part : parts) {
-								removed.add(new Text(part));
-
-								if (paragraphWrap(parent, i+1, removed)) {
-									removed.clear();
-									i++;// account for the field added
-								}
-							}
-
-							removed.add(new Text(lastPart));
-						}
+                            removed.add(new Text(parts[parts.length - 1]));
+                        }
 					} else {
 						removed.add(current);
 						parent.removeContent(current);
