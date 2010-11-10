@@ -96,6 +96,9 @@
 (Bill Hayes, Stuart Lewis)
 - [DS-738] sword.cfg seems no longer used after 1.5
 
+(Andrea Schweer)
+- [DS-268] XMLUI Item Mapper cannot handle multiple words in search box
+
 1.6.2
 =====
 
