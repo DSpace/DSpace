@@ -96,7 +96,7 @@ public class WorkflowCurator {
                 wfi.update();
                 return false;
             } else {
-                return curate(c, wfi);
+                return curate(curator, c, wfi);
             }
         }
         return true;
@@ -111,11 +111,11 @@ public class WorkflowCurator {
      * @throws IOException
      * @throws SQLException
      */
-    public static boolean curate(Context c, String wfId)
+    public static boolean curate(Curator curator, Context c, String wfId)
             throws AuthorizeException, IOException, SQLException {
         WorkflowItem wfi = WorkflowItem.find(c, Integer.parseInt(wfId));
         if (wfi != null) {
-            if (curate(c, wfi)) {
+            if (curate(curator, c, wfi)) {
                 WorkflowManager.advance(c, wfi, c.getCurrentUser(), false, true);
                 return true;
             }
@@ -125,14 +125,13 @@ public class WorkflowCurator {
         return false;
     }
     
-    public static boolean curate(Context c, WorkflowItem wfi) 
+    public static boolean curate(Curator curator, Context c, WorkflowItem wfi) 
             throws AuthorizeException, IOException, SQLException {
         FlowStep step = getFlowStep(wfi);
         if (step != null) {
             // assign collection to item in case task needs it
             Item item = wfi.getItem();
             item.setOwningCollection(wfi.getCollection());
-            Curator curator = new Curator();
             for (Task task : step.tasks) {
                 curator.addTask(task.name);
                 curator.curate(item);

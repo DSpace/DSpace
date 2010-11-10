@@ -232,10 +232,10 @@ public class CurationCli
                 {
                     System.out.println("Curating id: " + entry.getObjectId());
                 }
+                curator.clear();
                 // does entry relate to a DSO or workflow object?
                 if (entry.getObjectId().indexOf("/") > 0)
                 {
-                    curator.clear();
                     for (String task : entry.getTaskNames())
                     {
                         curator.addTask(task);
@@ -250,7 +250,7 @@ public class CurationCli
                     {
                         c.setCurrentUser(agent);
                     }
-                    WorkflowCurator.curate(c, entry.getObjectId());
+                    WorkflowCurator.curate(curator, c, entry.getObjectId());
                 }
             }
             queue.release(taskQueueName, ticket, true);
