@@ -203,18 +203,7 @@ public class InstallItem
 
         if (currentDateIssued.length == 0)
         {
-            DCDate issued = null;
-            try
-            {
-                issued = new DCDate(now.getYear(),now.getMonth(),now.getDay(),-1,-1,-1);
-            }
-            catch (DCDateIllegalArgumentException e)
-            {
-                // The parameters should never be invalid since they are generated from the current date,
-                //  but we still have to deal with the exception anyway.
-                throw new RuntimeException(e);
-            }
-
+            DCDate issued = new DCDate(now.getYear(),now.getMonth(),now.getDay(),-1,-1,-1);
             item.addDC("date", "issued", null, issued.toString());
         }
 

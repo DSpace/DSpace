@@ -161,9 +161,8 @@ public class DCDateTest extends AbstractUnitTest
      * Test of DCDate constructor, of class DCDate.
      */
     @Test
-    public void testDCDateIntBits() throws DCDateIllegalArgumentException
+    public void testDCDateIntBits()
     {
-
         dc = new DCDate(2010,1,1,-1,-1,-1);
 
         assertThat("testDCDateIntBits 1", dc.getYear(), equalTo(2010));
@@ -195,17 +194,7 @@ public class DCDateTest extends AbstractUnitTest
         assertThat("testDCDateIntBits 22", dc.getHourUTC(), equalTo(2));
         assertThat("testDCDateIntBits 23", dc.getMinuteUTC(), equalTo(30));
         assertThat("testDCDateIntBits 24", dc.getSecondUTC(), equalTo(5));
-
-    }
-
-    /**
-     * Additional tests of DCDate constructor checking for dodgy parameters.
-     */
-    @Test (expected=DCDateIllegalArgumentException.class)
-    public void testDCDateIntBits1() throws DCDateIllegalArgumentException
-    {
-        dc = new DCDate(2010,2,29,18,30,5);
-               
+        
     }
 
     /**

@@ -150,7 +150,7 @@ public class DCDate
      * @param ss
      *            the seconds
      */
-    public DCDate(int yyyy, int mm, int dd, int hh, int mn, int ss) throws  DCDateIllegalArgumentException
+    public DCDate(int yyyy, int mm, int dd, int hh, int mn, int ss)
     {
         setUTCForFormatting();
 
@@ -194,20 +194,8 @@ public class DCDate
         }
 
         // Set the local calendar.
-        localCalendar = new GregorianCalendar();
-        localCalendar.setLenient(false);
-        localCalendar.set(lyear, lmonth - 1, lday, lhours, lminutes, lseconds);
-        try
-        {
-            // Unfortunately GregorianCalendar doesn't throw an exception when you 'set' an invalid value so
-            // we have to call a method that causes all the values to be inspected in order to check that they are valid.
-            localCalendar.get(Calendar.YEAR);
-        }
-        catch (IllegalArgumentException e)
-        {
-            // Re-throw exception as a checked exception so that the calling classes have to deal with it.
-            throw new DCDateIllegalArgumentException("Invalid parameter", e);
-        }
+        localCalendar = new GregorianCalendar(lyear, lmonth - 1, lday,
+                                                 lhours, lminutes, lseconds);
 
         if (granularity == DateGran.TIME)
         {

@@ -81,7 +81,7 @@
          <hint>Please give the date of previous publication or public distribution
                         below.  You can leave out the day and/or month if they aren't
                         applicable.</hint>
-         <required>You must enter a valid complete or partial date.</required>
+         <required>You must enter at least the year.</required>
        </field>
 
        <field>
