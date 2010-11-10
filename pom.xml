@@ -582,7 +582,7 @@
          <dependency>
             <groupId>org.dspace.dependencies.jmockit</groupId>
             <artifactId>dspace-jmockit</artifactId>
-            <version>0.999.3</version>
+            <version>0.999.4</version>
             <scope>test</scope>
          </dependency>         
          <dependency>
