@@ -107,6 +107,10 @@
 				</select>
 			</td>
          </tr>
+         <tr>
+            <td class="standard"><small><strong><fmt:message key="jsp.tools.move-item.inheritpolicies"/></strong></small></td>
+            <td class="standard"><input type="checkbox" name="inheritpolicies" /></td>
+         </tr>
 		 <tr>
        		<td class="standard"></td>
        		<td class="standard">

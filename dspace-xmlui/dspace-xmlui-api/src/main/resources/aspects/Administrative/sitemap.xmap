@@ -630,6 +630,7 @@ to administer DSpace.
 		        			<map:transform type="MoveItemForm">
 		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
 		        				<map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
+                                <map:parameter name="inheritPolicies" value="{flow-attribute:inheritPolicies}"/>                                
 		        			</map:transform>
 		        		</map:match>
 

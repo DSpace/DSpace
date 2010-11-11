@@ -324,13 +324,19 @@ public class EditItemServlet extends DSpaceServlet
                 {
                         Collection fromCollection = Collection.find(context, UIUtil.getIntParameter(request, "collection_from_id"));
                         Collection toCollection = Collection.find(context, UIUtil.getIntParameter(request, "collection_to_id"));
-                                    
+
+                        Boolean inheritPolicies = false;
+                        if (request.getParameter("inheritpolicies") != null)
+                        {
+                            inheritPolicies = true;
+                        }
+
                         if (fromCollection == null || toCollection == null)
                         {
                                 throw new ServletException("Missing or incorrect collection IDs for moving item");
                         }
                                     
-                        item.move(fromCollection, toCollection);
+                        item.move(fromCollection, toCollection, inheritPolicies);
                     
                     showEditForm(context, request, response, item);
         
@@ -354,7 +360,7 @@ public class EditItemServlet extends DSpaceServlet
     /**
      * Throw an exception if user isn't authorized to edit this item
      *
-     * @param context
+     * @param c
      * @param item
      */
     private void checkEditAuthorization(Context c, Item item)

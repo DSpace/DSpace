@@ -64,6 +64,7 @@
 
 (Stuart Lewis)
 - [DS-467] Consider making the JSPUI styles.css.jsp a static file
+- [DS-525] Move item - inherit default policies of destination collection
 - [DS-550] Upgrade to latest Google Analytics tracking code
 - [DS-632] Batch Metadata Import needs to validate metadata fields specified in CSVs
 - [DS-646] Remove /bin scripts (replaced by 'dspace' command)

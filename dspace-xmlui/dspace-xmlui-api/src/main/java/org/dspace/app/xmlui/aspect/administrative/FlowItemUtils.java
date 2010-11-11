@@ -80,8 +80,8 @@ public class FlowItemUtils
 	private static final Message T_metadata_added = new Message("default","New metadata was added.");
 	private static final Message T_item_withdrawn = new Message("default","The item has been withdrawn.");
 	private static final Message T_item_reinstated = new Message("default","The item has been reinstated.");
-        private static final Message T_item_moved = new Message("default","The item has been moved.");
-        private static final Message T_item_move_destination_not_found = new Message("default","The selected destination collection could not be found.");
+    private static final Message T_item_moved = new Message("default","The item has been moved.");
+    private static final Message T_item_move_destination_not_found = new Message("default","The selected destination collection could not be found.");
 	private static final Message T_bitstream_added = new Message("default","The new bitstream was successfully uploaded.");
 	private static final Message T_bitstream_failed = new Message("default","Error while uploading file.");
 	private static final Message T_bitstream_updated = new Message("default","The bitstream has been updated.");
@@ -346,9 +346,10 @@ public class FlowItemUtils
      * @param context The DSpace context
      * @param itemID The id of the to-be-moved item.
      * @param collectionID The id of the destination collection.
+     * @param inherit Whether to inherit the policies of the destination collection
      * @return A result object
      */
-    public static FlowResult processMoveItem(Context context, int itemID, int collectionID) throws SQLException, AuthorizeException, IOException
+    public static FlowResult processMoveItem(Context context, int itemID, int collectionID, boolean inherit) throws SQLException, AuthorizeException, IOException
     {
         FlowResult result = new FlowResult();
         result.setContinue(false);
@@ -357,10 +358,13 @@ public class FlowItemUtils
 
         if(AuthorizeManager.isAdmin(context, item))
         {
-          //Add a policy giving this user *explicit* admin permissions on the item itself.
+          //Add an action giving this user *explicit* admin permissions on the item itself.
           //This ensures that the user will be able to call item.update() even if he/she
           // moves it to a Collection that he/she doesn't administer.
-          AuthorizeManager.addPolicy(context, item, Constants.ADMIN, context.getCurrentUser());
+          if (item.canEdit())
+          {
+              AuthorizeManager.authorizeAction(context, item, Constants.WRITE);
+          }
 
           Collection destination = Collection.find(context, collectionID);
           if (destination == null)
@@ -408,6 +412,13 @@ public class FlowItemUtils
           }
 
           item.setOwningCollection(destination);
+
+          // Inherit policies of destination collection if required
+          if (inherit)
+          {
+              item.inheritCollectionDefaultPolicies(destination);
+          }
+
           item.update();
           context.commit();
 

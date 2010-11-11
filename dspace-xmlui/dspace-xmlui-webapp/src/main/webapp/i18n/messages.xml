@@ -1289,6 +1289,8 @@
 	<message key="xmlui.administrative.item.MoveItemForm.collection_help">Select the collection you wish to move this item to.</message>
 	<message key="xmlui.administrative.item.MoveItemForm.collection_default">Select a collection...</message>
 	<message key="xmlui.administrative.item.MoveItemForm.submit_move">Move</message>
+    <message key="xmlui.administrative.item.MoveItemForm.inherit_policies">Inherit policies</message>
+    <message key="xmlui.administrative.item.MoveItemForm.inherit_policies_help">Inherit the default policies of the destination collection</message>
 
 	<!-- org.dspace.app.xmlui.administrative.item.EditBitstreamForm -->
 	<message key="xmlui.administrative.item.EditBitstreamForm.title">Edit Bitstream</message>

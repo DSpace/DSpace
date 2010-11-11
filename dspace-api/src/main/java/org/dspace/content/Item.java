@@ -659,9 +659,9 @@ public class Item extends DSpaceObject
      *            value has no language (for example, a date).
      * @param values
      *            the values to add.
-     * @param authority
+     * @param authorities
      *            the external authority key for this value (or null)
-     * @param confidence
+     * @param confidences
      *            the authority confidence (default 0)
      */
     public void addMetadata(String schema, String element, String qualifier, String lang,
@@ -2037,7 +2037,7 @@ public class Item extends DSpaceObject
      * Return <code>true</code> if <code>other</code> is the same Item as
      * this object, <code>false</code> otherwise
      *
-     * @param other
+     * @param obj
      *            object to compare to
      * @return <code>true</code> if object passed in represents the same item
      *         as this object
@@ -2218,7 +2218,7 @@ public class Item extends DSpaceObject
         if (policies.size() < 1)
         {
             throw new java.sql.SQLException("Collection " + c.getID()
-                    + " has no default item READ policies");
+                   + " has no default item READ policies");
         }
 
         // change the action to just READ
@@ -2246,8 +2246,11 @@ public class Item extends DSpaceObject
         }
 
         replaceAllBitstreamPolicies(policies);
+
+        log.debug(LogManager.getHeader(ourContext, "item_inheritCollectionDefaultPolicies",
+                                                   "item_id=" + getID()));
     }
-    
+
     /**
      * Moves the item from one collection to another one
      *
@@ -2256,6 +2259,19 @@ public class Item extends DSpaceObject
      * @throws IOException
      */
     public void move (Collection from, Collection to) throws SQLException, AuthorizeException, IOException
+    {
+        // Use the normal move method, and default to not inherit permissions
+        this.move(from, to, false);
+    }
+
+    /**
+     * Moves the item from one collection to another one
+     *
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
+     */
+    public void move (Collection from, Collection to, boolean inheritDefaultPolicies) throws SQLException, AuthorizeException, IOException
     {
         // Check authorisation on the item before that the move occur
         // otherwise we will need edit permission on the "target collection" to archive our goal
@@ -2272,10 +2288,25 @@ public class Item extends DSpaceObject
         // If we are moving from the owning collection, update that too
         if (isOwningCollection(from))
         {
-                setOwningCollection(to);
-                ourContext.turnOffAuthorisationSystem();
-                update();
-                ourContext.restoreAuthSystemState();
+            // Update the owning collection
+            log.info(LogManager.getHeader(ourContext, "move_item",
+                                          "item_id=" + getID() + ", from " +
+                                          "collection_id=" + from.getID() + " to " +
+                                          "collection_id=" + to.getID()));
+            setOwningCollection(to);
+
+            // If applicable, update the item policies
+            if (inheritDefaultPolicies)
+            {
+                log.info(LogManager.getHeader(ourContext, "move_item",
+                         "Updating item with inherited policies"));
+                inheritCollectionDefaultPolicies(to);
+            }
+
+            // Update the item
+            ourContext.turnOffAuthorisationSystem();
+            update();
+            ourContext.restoreAuthSystemState();
         }
         else
         {

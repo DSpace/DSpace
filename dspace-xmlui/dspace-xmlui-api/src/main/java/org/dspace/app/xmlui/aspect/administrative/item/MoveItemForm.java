@@ -45,6 +45,7 @@ import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
+import org.dspace.app.xmlui.wing.element.CheckBox;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
@@ -73,6 +74,8 @@ public class MoveItemForm extends AbstractDSpaceTransformer {
 	private static final Message T_collection_help = message("xmlui.administrative.item.MoveItemForm.collection_help");
 	private static final Message T_collection_default = message("xmlui.administrative.item.MoveItemForm.collection_default");
 	private static final Message T_submit_move = message("xmlui.administrative.item.MoveItemForm.submit_move");
+    private static final Message T_submit_inherit = message("xmlui.administrative.item.MoveItemForm.inherit_policies");
+    private static final Message T_submit_inherit_help = message("xmlui.administrative.item.MoveItemForm.inherit_policies_help");
 
 
 	public void addPageMeta(PageMeta pageMeta) throws WingException
@@ -114,10 +117,19 @@ public class MoveItemForm extends AbstractDSpaceTransformer {
             {
                 name = name.substring(0, 47) + "...";
             }
-            select.addOption(collection.equals(owningCollection), collection.getID(), name);
+
+            // Only add the item if it isn't already the owner
+            if (!item.isOwningCollection(collection))
+            {
+                select.addOption(collection.equals(owningCollection), collection.getID(), name);
+            }
         }
         
         org.dspace.app.xmlui.wing.element.Item actions = list.addItem();
+        CheckBox inheritPolicies = actions.addCheckBox("inheritPolicies");
+        inheritPolicies.setLabel(T_submit_inherit);
+        inheritPolicies.setHelp(T_submit_inherit_help);
+        inheritPolicies.addOption("inheritPolicies");
         actions.addButton("submit_move").setValue(T_submit_move);
 		actions.addButton("submit_cancel").setValue(T_submit_cancel);
 

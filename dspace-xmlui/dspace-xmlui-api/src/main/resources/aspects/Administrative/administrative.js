@@ -1707,12 +1707,20 @@ function doMoveItem(itemID)
         {
             var collectionID = cocoon.request.get("collectionID");
             if (!collectionID)
+            {
                 continue;
+            }
+
+            var inherit = false;
+            if (cocoon.request.get("inheritPolicies"))
+            {
+                inherit = true;
+            }
 
             // Actually move the item
             assertEditItem(itemID);
 
-            result = FlowItemUtils.processMoveItem(getDSContext(),itemID,collectionID);
+            result = FlowItemUtils.processMoveItem(getDSContext(), itemID, collectionID, inherit);
         }
     } while (result == null || !result.getContinue());
 
