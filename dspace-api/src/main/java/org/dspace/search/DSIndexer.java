@@ -343,7 +343,7 @@ public class DSIndexer
     {
         if (handle != null)
         {
-            IndexingTask task = new IndexingTask(IndexingTask.Action.DELETE, new Term("handle", handle), buildDocumentForDeletedHandle(handle));
+            IndexingTask task = new IndexingTask(IndexingTask.Action.DELETE, new Term("handle", handle), null);
             if (task != null)
             {
                 processIndexingTask(task);
@@ -609,19 +609,21 @@ public class DSIndexer
     		{
     			Document doc = reader.document(i);
         		String handle = doc.get("handle");
-        		
-        		DSpaceObject o = HandleManager.resolveToObject(context, handle);
+                if (!StringUtils.isEmpty(handle))
+                {
+                    DSpaceObject o = HandleManager.resolveToObject(context, handle);
 
-                if (o == null)
-                {
-                	log.info("Deleting: " + handle);
-                	/* Use IndexWriter to delete, its easier to manage write.lock */
-                	DSIndexer.unIndexContent(context, handle);
-                }
-                else
-                {
-                	context.removeCached(o, o.getID());
-                	log.debug("Keeping: " + handle);
+                    if (o == null)
+                    {
+                        log.info("Deleting: " + handle);
+                        /* Use IndexWriter to delete, its easier to manage write.lock */
+                        DSIndexer.unIndexContent(context, handle);
+                    }
+                    else
+                    {
+                        context.removeCached(o, o.getID());
+                        log.debug("Keeping: " + handle);
+                    }
                 }
     		}
     		else
@@ -691,7 +693,7 @@ public class DSIndexer
             }
             else
             {
-                action = new IndexingTask(IndexingTask.Action.DELETE, term, buildDocumentForWithdrawnItem((Item)dso));
+                action = new IndexingTask(IndexingTask.Action.DELETE, term, null);
             }
             break;
 
