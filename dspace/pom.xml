@@ -155,18 +155,6 @@
             </modules>
         </profile>
 
-        <profile>
-            <id>dspace-ui-shared</id>
-            <activation>
-                <file>
-                    <exists>../dspace-ui-shared/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-ui-shared</module>
-            </modules>
-        </profile>
-
         <!--
            Builds JSPUI WAR for DSpace
         -->

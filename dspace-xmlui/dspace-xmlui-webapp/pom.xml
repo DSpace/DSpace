@@ -113,12 +113,6 @@
             <artifactId>dspace-xmlui-api</artifactId>
         </dependency>
 
-        <!-- Shared JS code for Choice/Authority control -->
-        <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-ui-shared</artifactId>
-            <type>war</type>
-        </dependency>
     </dependencies>
     <properties>
         <netbeans.hint.deploy.server>Tomcat60</netbeans.hint.deploy.server>

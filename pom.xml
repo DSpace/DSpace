@@ -16,14 +16,7 @@
      <artifactId>dspace-pom</artifactId>
      <groupId>org.dspace</groupId>
      <version>6</version>
-   </parent> 
-
-   <properties>
-      <!--Force UTF-8 encoding during build on all platforms-->
-      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-      <!--Java 1.6 is our officially endorsed build target platform.-->
-      <dspace.java.target>1.6</dspace.java.target>
-   </properties>
+   </parent>
 
    <build>
       <plugins>
@@ -34,48 +27,6 @@
                 <!-- During release:perform, enable the "addons" profile -->
                 <releaseProfiles>addons</releaseProfiles>
                 <goals>deploy</goals>
-            </configuration>
-         </plugin>
-         <plugin>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <configuration>
-               <source>${dspace.java.target}</source>
-               <target>${dspace.java.target}</target>
-               <showDeprecation>true</showDeprecation>
-            </configuration>
-         </plugin>
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jar-plugin</artifactId>
-            <configuration>
-               <archive>
-                  <manifest>
-                     <addDefaultImplementationEntries>
-                        true
-                     </addDefaultImplementationEntries>
-                     <addDefaultSpecificationEntries>
-                        true
-                     </addDefaultSpecificationEntries>
-                  </manifest>
-               </archive>
-            </configuration>
-         </plugin>
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-war-plugin</artifactId>
-            <version>2.1-beta-1</version>
-            <configuration>
-               <failOnMissingWebXml>false</failOnMissingWebXml>
-               <archive>
-                  <manifest>
-                     <addDefaultImplementationEntries>
-                        true
-                     </addDefaultImplementationEntries>
-                     <addDefaultSpecificationEntries>
-                        true
-                     </addDefaultSpecificationEntries>
-                  </manifest>
-               </archive>
             </configuration>
          </plugin>
          <plugin>
@@ -112,7 +63,6 @@
             <module>dspace-api</module>
             <module>dspace-stats</module>
             <module>dspace-discovery</module>
-            <module>dspace-ui-shared</module>
             <module>dspace-jspui</module>
             <module>dspace-xmlui</module>
             <module>dspace-lni</module>
@@ -136,7 +86,6 @@
             <module>dspace-api</module>
             <module>dspace-stats</module>
             <module>dspace-discovery</module>
-            <module>dspace-ui-shared</module>
             <module>dspace-jspui</module>
             <module>dspace-xmlui</module>
             <module>dspace-lni</module>
