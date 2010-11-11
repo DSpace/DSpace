@@ -259,8 +259,8 @@ createdb -U dspace -E UNICODE dspace</pre>
 	   <li>
             <p>Setting up oracle is a bit different now. You will need still need to get a Copy of the oracle JDBC driver, but instead of copying it into a lib directory you will need to install it into your local Maven repository. You'll need to download it first from this location: <a href="http://www.oracle.com/technology/software/tech/java/sqlj_jdbc/htdocs/jdbc_10201.html">http://www.oracle.com/technology/software/tech/java/sqlj_jdbc/htdocs/jdbc_10201.html</a><br>
               <br>
-                <code>$ mvn install:install-file -Dfile=ojdbc14.jar -DgroupId=com.oracle \<br>
--DartifactId=ojdbc14 -Dversion=10.2.0.2.0 -Dpackaging=jar -DgeneratePom=true</code><br>
+                <code>$ mvn install:install-file -Dfile=ojdbc5.jar -DgroupId=com.oracle \<br>
+-DartifactId=ojdbc5 -Dversion=11.2.0.2.0 -Dpackaging=jar -DgeneratePom=true</code><br>
             </p>
       </li>
       <li>

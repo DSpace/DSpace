@@ -317,7 +317,7 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
 							<para> Setting up oracle is a bit different now. You will need still need to get a Copy of the oracle JDBC driver, but instead of copying it into a lib directory you will need to install it into your local Maven repository. You&apos;ll need to download it first from this location: <ulink url="http://www.oracle.com/technology/software/tech/java/sqlj_jdbc/htdocs/jdbc_10201.html"
 								>http://www.oracle.com/technology/software/tech/java/sqlj_jdbc/htdocs/jdbc_10201.html</ulink></para>
 							<para>
-								<literal>$ mvn install:install-file -Dfile=ojdbc14.jar -DgroupId=com.oracle \ -DartifactId=ojdbc14 -Dversion=10.2.0.2.0 -Dpackaging=jar -DgeneratePom=true</literal>
+								<literal>$ mvn install:install-file -Dfile=ojdbc5.jar -DgroupId=com.oracle \ -DartifactId=ojdbc5 -Dversion=11.2.0.2.0 -Dpackaging=jar -DgeneratePom=true</literal>
 							</para>
 						</listitem>
 						<listitem>
