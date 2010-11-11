@@ -30,7 +30,6 @@
         <dependency>
             <groupId>commons-httpclient</groupId>
             <artifactId>commons-httpclient</artifactId>
-            <version>3.1</version>
         </dependency>
 
         <dependency>
@@ -48,7 +47,6 @@
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>
-            <version>1.4</version>
             <scope>provided</scope>
         </dependency>
 
@@ -56,13 +54,6 @@
 
 	<build>
 		<plugins>
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<source>1.5</source>
-					<target>1.5</target>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.apache.cocoon</groupId>
 				<artifactId>cocoon-maven-plugin</artifactId>

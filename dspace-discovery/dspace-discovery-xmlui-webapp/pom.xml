@@ -63,13 +63,6 @@
     <build>
         <plugins>
             <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.cocoon</groupId>
                 <artifactId>cocoon-maven-plugin</artifactId>
                 <executions>
@@ -143,31 +136,6 @@
                 </configuration>
             </plugin>
             -->
-
-            <plugin>
-                <groupId>com.google.code.maven-license-plugin</groupId>
-                <artifactId>maven-license-plugin</artifactId>
-                <version>1.4.0</version>
-                <configuration>
-                    <header>http://scm.dspace.org/svn/repo/licenses/LICENSE_HEADER</header>
-                    <excludes>
-                        <exclude>target/**</exclude>
-                        <exclude>m2-target/**</exclude>
-                        <exclude>**/*.properties</exclude>
-                        <exclude>src/main/webapp/static/**</exclude>
-                    </excludes>
-                    <properties />
-                    <encoding>UTF-8</encoding>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
         </plugins>
     </build>
 
