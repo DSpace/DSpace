@@ -7,7 +7,7 @@
    <description>
       DSpace SOLR Service Provider Web Application
    </description>
-   <version>1.7.0-rc1</version>
+   <version>1.7.0-rc2-SNAPSHOT</version>
 
    <!--
       The Subversion repository location is used by Continuum to update
@@ -15,9 +15,9 @@
       and releases snapshots into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.7.0-rc1</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.7.0-rc1</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.7.0-rc1</url>
+      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/solr</connection>
+      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/solr</developerConnection>
+      <url>http://dspace.svn.sourceforge.net/svnroot/dspace/trunk/dspace/modules/solr</url>
    </scm>
 
    <build>
