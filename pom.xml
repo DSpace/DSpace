@@ -255,12 +255,12 @@
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api-lang</artifactId>
-            <version>[1.7.0.0,1.7.9.9)</version>
+            <version>[1.7.0.1,1.7.9.9)</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-lang</artifactId>
-            <version>[1.7.0.0,1.7.9.9)</version>
+            <version>[1.7.0.1,1.7.9.9)</version>
             <type>war</type>
          </dependency>
           <dependency>
