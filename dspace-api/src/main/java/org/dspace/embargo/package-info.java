@@ -1,4 +1,11 @@
 /**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+/**
  * <p>
  * Embargo allows the deposit of Items whose content should not be made visible
  * until later.  Some journals, for example, permit self-publication after a
