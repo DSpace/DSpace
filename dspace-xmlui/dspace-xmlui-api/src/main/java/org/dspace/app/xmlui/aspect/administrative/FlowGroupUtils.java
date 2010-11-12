@@ -5,6 +5,31 @@
  *
  * http://www.dspace.org/license/
  */
+package org.dspace.app.xmlui.aspect.administrative;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.wing.Message;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.content.Collection;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.eperson.Group;
+
+/**
+ * Utility methods to processes actions on Groups. These methods are used
+ * exclusivly from the administrative flow scripts.
+ *
+ * @author scott phillips
+ */
 public class FlowGroupUtils {
 
 	/** Language Strings */
