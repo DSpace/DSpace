@@ -1,3 +1,10 @@
+====
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+====
 16x16 Free Application Icons
 
 This icon set is free for use in personal and commercial projects.
@@ -43,4 +50,4 @@ Web-site small-icons.com belongs to Aha-Soft.
 
 Support page: http://www.aha-soft.com/support.htm
 
-Copyright © 2009 Aha-Soft. All rights reserved. 
+Copyright ï¿½ 2009 Aha-Soft. All rights reserved. 

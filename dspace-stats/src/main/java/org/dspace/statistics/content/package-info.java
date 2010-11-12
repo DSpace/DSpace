@@ -1,4 +1,11 @@
 /**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+/**
  * Build queries to the statistical subsystem and create UI elements from the
  * results.  The underlying SOLR engine uses a text-based query language.  The
  * classes here map a structure of constraint objects into that language.

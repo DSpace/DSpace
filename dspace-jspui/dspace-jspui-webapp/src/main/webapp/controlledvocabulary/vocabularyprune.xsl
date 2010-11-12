@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
 <!-- 
 This stylesheet prunnes out all the branches of
 the taxonomy that don't instanciate with the param "filter", i.e. tha term
