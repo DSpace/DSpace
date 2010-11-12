@@ -5,6 +5,49 @@
  *
  * http://www.dspace.org/license/
  */
+package org.dspace.app.xmlui.aspect.administrative;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
+
+import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.servlet.multipart.Part;
+import org.dspace.app.xmlui.utils.UIException;
+import org.dspace.app.xmlui.wing.Message;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.authorize.ResourcePolicy;
+import org.dspace.browse.BrowseException;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.harvest.HarvestedCollection;
+import org.dspace.content.Item;
+import org.dspace.content.ItemIterator;
+import org.dspace.harvest.OAIHarvester;
+import org.dspace.harvest.OAIHarvester.HarvestScheduler;
+import org.dspace.content.crosswalk.CrosswalkException;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.curate.Curator;
+import org.dspace.eperson.Group;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+import org.xml.sax.SAXException;
+
+/**
+ * Utility methods to processes actions on Communities and Collections.
+ *
+ * @author scott phillips
+ */
 public class FlowContainerUtils 
 {
 
