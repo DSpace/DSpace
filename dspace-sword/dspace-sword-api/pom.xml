@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-sword-api</artifactId>
@@ -17,7 +16,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-sword</artifactId>
-        <version>1.7.0-SNAPSHOT</version>
+        <version>1.7.0-rc1</version>
     </parent>
 
 
@@ -27,10 +26,10 @@
        into the snapshot repository below.
     -->
     <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword/dspace-sword-api</connection>
-        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword/dspace-sword-api
+        <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.0-rc1/dspace-sword/dspace-sword-api</connection>
+        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.0-rc1/dspace-sword/dspace-sword-api
         </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword/dspace-sword-api</url>
+        <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.0-rc1/dspace-sword/dspace-sword-api</url>
     </scm>
 
     <dependencies>
