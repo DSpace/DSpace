@@ -234,10 +234,15 @@ public abstract class AbstractMETSDisseminator
         }//end try
         catch (MetsException e)
         {
+            String errorMsg = "Error exporting METS for DSpace Object, type="
+                            + Constants.typeText[dso.getType()] + ", handle="
+                            + dso.getHandle() + ", dbID="
+                            + String.valueOf(dso.getID());
+
             // We don't pass up a MetsException, so callers don't need to
             // know the details of the METS toolkit
-            log.error("METS error: ",e);
-            throw new PackageValidationException(e);
+            log.error(errorMsg,e);
+            throw new PackageValidationException(errorMsg, e);
         }
         finally
         {
@@ -1412,6 +1417,7 @@ public abstract class AbstractMETSDisseminator
      * @return a string describing additional command-line options available
      * with this packager
      */
+    @Override
     public String getParameterHelp()
     {
         return  "* manifestOnly=[boolean]      " +
