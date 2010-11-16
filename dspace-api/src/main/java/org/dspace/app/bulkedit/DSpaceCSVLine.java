@@ -9,7 +9,6 @@ package org.dspace.app.bulkedit;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -32,10 +31,10 @@ public class DSpaceCSVLine
      *
      * @param id The item ID of the line
      */
-    public DSpaceCSVLine(int id)
+    public DSpaceCSVLine(int itemId)
     {
         // Store the ID + separator, and initialise the hashtable
-        this.id = id;
+        this.id = itemId;
         items = new HashMap<String, ArrayList>();
     }
 
@@ -116,24 +115,19 @@ public class DSpaceCSVLine
 
         // Add the id
         bits.append("\"").append(id).append("\"").append(DSpaceCSV.fieldSeparator);
-        bits.append(valueToCSV(items.get("collection"))).append(DSpaceCSV.fieldSeparator);
+        bits.append(valueToCSV(items.get("collection")));
 
         // Add the rest of the elements
-        Iterator<String> i = headings.iterator();
-        String key;
-        while (i.hasNext())
+        for (String heading : headings)
         {
-            key = i.next();
-            if ((items.get(key) != null) && (!"collection".equals(key)))
+            bits.append(DSpaceCSV.fieldSeparator);
+            List<String> values = items.get(heading);
+            if (values != null && !"collection".equals(heading))
             {
-                bits.append(valueToCSV(items.get(key)));
-            }
-
-            if (i.hasNext())
-            {
-                bits.append(DSpaceCSV.fieldSeparator);
+                bits.append(valueToCSV(values));
             }
         }
+
         return bits.toString();
     }
 
@@ -152,7 +146,7 @@ public class DSpaceCSVLine
         }
 
         // Get on with the work
-        String s = "";
+        String s;
         if (values.size() == 1)
         {
             s = values.get(0);
@@ -162,15 +156,16 @@ public class DSpaceCSVLine
             // Concatenate any fields together
             StringBuilder str = new StringBuilder();
 
-            Iterator i = values.iterator();
-            while (i.hasNext())
+            for (String value : values)
             {
-                str.append(i.next());
-                if (i.hasNext())
+                if (str.length() > 0)
                 {
                     str.append(DSpaceCSV.valueSeparator);
                 }
+
+                str.append(value);
             }
+
             s = str.toString();
         }
 
