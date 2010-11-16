@@ -1517,8 +1517,6 @@ public class Item extends DSpaceObject
         // element/qualifier
         Map<String,Integer> elementCount = new HashMap<String,Integer>();
 
-        DatabaseManager.update(ourContext, itemRow);
-
         // Redo Dublin Core if it's changed
         if (dublinCoreChanged)
         {
