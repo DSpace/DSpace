@@ -18,6 +18,7 @@
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.content.DCValue" %>
 <%@ page import="org.dspace.content.Collection" %>
+<%@ page import="java.util.List" %>
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
@@ -71,10 +72,10 @@
             for (BulkEditChange change : changes)
             {
                 // Get the changes
-                ArrayList<DCValue> adds = change.getAdds();
-                ArrayList<DCValue> removes = change.getRemoves();
-                ArrayList<Collection> newCollections = change.getNewMappedCollections();
-                ArrayList<Collection> oldCollections = change.getOldMappedCollections();
+                List<DCValue> adds = change.getAdds();
+                List<DCValue> removes = change.getRemoves();
+                List<Collection> newCollections = change.getNewMappedCollections();
+                List<Collection> oldCollections = change.getOldMappedCollections();
                 boolean first = false;
                 if ((adds.size() > 0) || (removes.size() > 0) ||
                     (newCollections.size() > 0) || (oldCollections.size() > 0) ||
