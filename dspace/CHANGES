@@ -70,6 +70,7 @@
 - [DS-646] Remove /bin scripts (replaced by 'dspace' command)
 - [DS-713] dspace.log only logs remoteAddr, needs extending to include X-Forwarded-For
 - [DS-735] Allow IPAuthentication to work with proxies (examine X-Forwarded-For header)
+- [DS-753] Fix CSV parsing that got broken by refactoring
 
 (Graham Triggs)
 - [DS-698] Clear primary_bitstream_id references when deleting a bitstream

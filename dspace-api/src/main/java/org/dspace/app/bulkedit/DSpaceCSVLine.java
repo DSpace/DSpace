@@ -143,7 +143,7 @@ public class DSpaceCSVLine
      * @param values The values to create the string from
      * @return The line as a CSV formatted String
      */
-    private String valueToCSV(List<String> values)
+    protected String valueToCSV(List<String> values)
     {
         // Check there is some content
         if (values == null)
@@ -152,26 +152,30 @@ public class DSpaceCSVLine
         }
 
         // Get on with the work
+        String s = "";
         if (values.size() == 1)
         {
-            return values.get(0);
+            s = values.get(0);
         }
-
-        // Concatenate any fields together
-        StringBuilder str = new StringBuilder();
-
-        Iterator i = values.iterator();
-        while (i.hasNext())
+        else
         {
-            str.append(i.next());
-            if (i.hasNext())
+            // Concatenate any fields together
+            StringBuilder str = new StringBuilder();
+
+            Iterator i = values.iterator();
+            while (i.hasNext())
             {
-                str.append(DSpaceCSV.valueSeparator);
+                str.append(i.next());
+                if (i.hasNext())
+                {
+                    str.append(DSpaceCSV.valueSeparator);
+                }
             }
+            s = str.toString();
         }
 
         // Replace internal quotes with two sets of quotes
-        return "\"" + str.toString().replaceAll("\"", "\"\"") + "\"";
+        return "\"" + s.replaceAll("\"", "\"\"") + "\"";
     }
 }
 

@@ -8,6 +8,8 @@
 package org.dspace.app.bulkedit;
 
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.dspace.AbstractUnitTest;
 import org.dspace.core.Context;
@@ -88,7 +90,14 @@ public class DSpaceCSVTest extends AbstractUnitTest
             DSpaceCSV dcsv = new DSpaceCSV(new File(filename), c);
             String[] lines = dcsv.getCSVLinesAsStringArray();
             assertThat("testDSpaceCSV Good CSV", lines.length, equalTo(7));
-            
+
+            // Check the new lines are OK
+            List<DSpaceCSVLine> csvLines = dcsv.getCSVLines();
+            DSpaceCSVLine line = csvLines.get(5);
+            List<String> value = new ArrayList<String>();
+            value.add("Abstract with\ntwo\nnew lines");    
+            assertThat("testDSpaceCSV New lines", line.valueToCSV(value),
+                                                  equalTo("\"Abstract with\ntwo\nnew lines\""));
 
             // Test the CSV parsing with a bad heading element value
             csv[0] = "id,collection,\"dc.title[en]\",dc.contributor.foobar[en-US],dc.description.abstract";

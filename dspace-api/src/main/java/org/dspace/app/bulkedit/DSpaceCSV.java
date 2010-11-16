@@ -579,6 +579,16 @@ public class DSpaceCSV implements Serializable
     }
 
     /**
+     * Get the headings used in this CSV file
+     *
+     * @return The headings
+     */
+    public List<String> getHeadings()
+    {
+        return headings;
+    }
+
+    /**
      * Return the csv file as one long formatted string
      *
      * @return The formatted String as a csv
