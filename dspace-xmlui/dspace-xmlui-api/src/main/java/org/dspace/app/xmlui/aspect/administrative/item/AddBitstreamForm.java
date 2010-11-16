@@ -46,7 +46,7 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
 	private static final Message T_submit_cancel = message("xmlui.general.cancel");
 	private static final Message T_item_trail = message("xmlui.administrative.item.general.item_trail");
 
-	private static final Message T_title = message("xmlui.administrative.item.AddBitstreamForm.title.");
+	private static final Message T_title = message("xmlui.administrative.item.AddBitstreamForm.title");
 	private static final Message T_trail = message("xmlui.administrative.item.AddBitstreamForm.trail");
 	private static final Message T_head1 = message("xmlui.administrative.item.AddBitstreamForm.head1");
 	private static final Message T_bundle_label = message("xmlui.administrative.item.AddBitstreamForm.bundle_label");
