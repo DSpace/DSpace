@@ -1048,10 +1048,13 @@ public abstract class AbstractMETSDisseminator
                 }
             }
         }
-        if (fileSec != null)
+
+        //Only add the <fileSec> to the METS file if it has content.  A <fileSec> must have content.
+        if (fileSec != null && fileSec.getContent()!=null && !fileSec.getContent().isEmpty())
         {
             mets.getContent().add(fileSec);
         }
+        
         mets.getContent().add(structMap);
 
         // set links to metadata for object -- after type-specific
