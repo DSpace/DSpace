@@ -2806,9 +2806,41 @@
     
     <!-- This does it for all the DRI elements. The only thing left to do is to handle Cocoon's i18n
         transformer tags that are used for text translation. The templates below simply push through
-        the i18n elements so that they can translated after the XSL step. -->
+        the i18n elements so that they can translated after the XSL step. -->   
     <xsl:template match="i18n:text">
-        <xsl:copy-of select="."/>
+       <xsl:param name="text" select="."/>
+       <xsl:choose>
+         <xsl:when test="contains($text, '&#xa;')">
+           <xsl:value-of select="substring-before($text, '&#xa;')"/>
+           <ul>
+                <xsl:attribute name="style">float:left; list-style-type:none; text-align:left;</xsl:attribute>
+                <xsl:call-template name="linebreak">
+                  <xsl:with-param name="text" select="substring-after($text,'&#xa;')"/>
+                </xsl:call-template>
+           </ul>
+         </xsl:when>
+         <xsl:otherwise>
+           <xsl:copy-of select="$text"/>
+         </xsl:otherwise>
+       </xsl:choose>
+    </xsl:template>
+
+    <!-- Function to replace \n -->
+    <xsl:template name="linebreak">
+       <xsl:param name="text" select="."/>
+       <xsl:choose>
+         <xsl:when test="contains($text, '&#xa;')">
+           <li>
+           <xsl:value-of select="substring-before($text, '&#xa;')"/>
+           </li>
+           <xsl:call-template name="linebreak">
+             <xsl:with-param name="text" select="substring-after($text,'&#xa;')"/>
+           </xsl:call-template>
+         </xsl:when>
+         <xsl:otherwise>
+           <xsl:value-of select="$text"/>
+         </xsl:otherwise>
+       </xsl:choose>
     </xsl:template>
     
     <xsl:template match="i18n:translate">
