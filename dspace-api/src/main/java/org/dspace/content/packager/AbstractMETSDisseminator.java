@@ -223,7 +223,11 @@ public abstract class AbstractMETSDisseminator
             if (params != null && params.getBooleanProperty("manifestOnly", false))
             {
                 Mets manifest = makeManifest(context, dso, params, null);
-                manifest.validate(new MetsValidator());
+                //only validate METS if specified (default = true)
+                if(params.getBooleanProperty("validate", true))
+                {
+                    manifest.validate(new MetsValidator());
+                }
                 manifest.write(new MetsWriter(outStream));
             }
             else
@@ -345,7 +349,11 @@ public abstract class AbstractMETSDisseminator
         zip.putNextEntry(me);
 
         // can only validate now after fixing up extraStreams
-        manifest.validate(new MetsValidator());
+        // note: only validate METS if specified (default = true)
+        if(params.getBooleanProperty("validate", true))
+        {
+            manifest.validate(new MetsValidator());
+        }
         manifest.write(new MetsWriter(zip));
         zip.closeEntry();
 
