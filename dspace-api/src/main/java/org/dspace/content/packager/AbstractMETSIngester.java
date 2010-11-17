@@ -1004,7 +1004,9 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                         throw new UnsupportedOperationException(
                                 "Could not find a parent DSpaceObject referenced as '"
                                         + parentLink
-                                        + "' in the METS Manifest. A valid parent DSpaceObject must be specified in the METS Manifest itself.");
+                                        + "' in the METS Manifest of package "
+                                        + pkgFile.getPath()
+                                        + ". A valid parent DSpaceObject must be specified in the METS Manifest itself.");
                     }
                 }
                 else
