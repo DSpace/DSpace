@@ -174,7 +174,7 @@ public class Curator
             {
                 for (String taskName : perfList)
                 {
-                    trMap.get(taskName).run(dso);
+                    trMap.get(taskName).run(c, id);
                 }
             }
         }

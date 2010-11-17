@@ -39,7 +39,8 @@ public class RequiredMetadata extends AbstractCurationTask
     // map of required fields
     private Map<String, List<String>> reqMap = new HashMap<String, List<String>>();
     
-    @Override public void init(Curator curator, String taskId) throws IOException
+    @Override 
+    public void init(Curator curator, String taskId) throws IOException
     {
         super.init(curator, taskId);
         try
@@ -84,6 +85,10 @@ public class RequiredMetadata extends AbstractCurationTask
                         count++;
                     }
                 }
+                if (count == 0)
+                {
+                    sb.append(" has all required fields");
+                }
                 report(sb.toString());
                 setResult(sb.toString());
             }
@@ -99,7 +104,7 @@ public class RequiredMetadata extends AbstractCurationTask
         }
         else
         {
-           setResult("OK");
+           setResult("Object skipped");
            return Curator.CURATE_SKIP;
         }
     }

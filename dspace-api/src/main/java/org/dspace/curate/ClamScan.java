@@ -52,7 +52,7 @@ public class ClamScan extends AbstractCurationTask
     private static final String CLEAN_MESSAGE = "had no viruses detected.";
     private static final String CONNECT_FAIL_MESSAGE = "Unable to connect to virus service - check setup";
     private static final String SCAN_FAIL_MESSAGE = "Error encountered using virus service - check setup";
-    private static final String NEW_ITEM_HANDLE = "New";
+    private static final String NEW_ITEM_HANDLE = "in workflow";
 
     private static Logger log = Logger.getLogger(ClamScan.class);
     
@@ -305,8 +305,8 @@ public class ClamScan extends AbstractCurationTask
             logDebugMessage("Response: " + response);
             if (response.indexOf("FOUND") != -1)
             {
-                String itemMsg = "item - " + itemHandle;
-                String bsMsg = ": bitstream - " + bitstream.getName() +
+                String itemMsg = "item - " + itemHandle + ": ";
+                String bsMsg = "bitstream - " + bitstream.getName() +
                                ": SequenceId - " +  bitstream.getSequenceID() + ": infected";
                 report(itemMsg + bsMsg);
                 results.add(bsMsg);
