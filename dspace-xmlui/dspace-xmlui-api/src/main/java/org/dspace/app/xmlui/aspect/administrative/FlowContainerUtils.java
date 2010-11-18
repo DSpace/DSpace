@@ -1117,26 +1117,14 @@ public class FlowContainerUtils
         public static FlowResult processCurateCollection(Context context, int dsoID, Request request)
                                                                 throws AuthorizeException, IOException, SQLException, Exception
 	{
-                FlowResult result = new FlowResult();
                 String task = request.getParameter("curate_task");
-		if (task != null && task.length() == 0)
-        {
-			task = null;
-        }
-		Curator curator = new Curator();
-        curator.addTask(task);
-        curator.setInvoked(Curator.Invoked.INTERACTIVE);
-        if (Collection.find(context, dsoID) != null)
-        {
-            Collection collection = Collection.find(context, dsoID);
-            curator.curate(collection);
-        }
-        result.setOutcome(true);
-		result.setMessage(new Message("default","The task, " + task + " was completed with the status: " +
-                        curator.getStatus(task) + "." + "\n" +  "Results: " + "\n" +
-                        ((curator.getResult(task) != null) ? curator.getResult(task) : "Nothing to do for this DSpace object.")));
-                result.setContinue(true);
-		return result;
+                Curator curator = FlowCurationUtils.getCurator(task);
+                Collection collection = Collection.find(context, dsoID);
+                if (collection != null)
+                {
+                    curator.curate(collection);
+                }
+                return FlowCurationUtils.getRunFlowResult(task, curator);
 	}
 
         /**
@@ -1145,39 +1133,26 @@ public class FlowContainerUtils
         public static FlowResult processQueueCollection(Context context, int dsoID, Request request)
                                                                 throws AuthorizeException, IOException, SQLException, Exception
 	{
-                FlowResult result = new FlowResult();
                 String task = request.getParameter("curate_task");
-                String handle = "";
-                Curator curator = new Curator();
+                Curator curator = FlowCurationUtils.getCurator(task);
+                String objId = String.valueOf(dsoID);
                 String taskQueueName = ConfigurationManager.getProperty("curate", "ui.queuename");
-                boolean status = true;
+                boolean status = false;
                 Collection collection = Collection.find(context, dsoID);
                 if (collection != null)
                 {
-                    handle = collection.getHandle();
+                    objId = collection.getHandle();
+                    try
+                    {
+                        curator.queue(context, objId, taskQueueName);
+                        status = true;
+                    }
+                    catch (IOException ioe)
+                    {
+                        // no-op
+                    }
                 }
-		if (task != null && task.length() == 0)
-                {
-                    task = null;
-                }
-                curator.addTask(task);
-                try
-                {
-                    curator.queue(context, handle, taskQueueName);
-                }
-                catch (IOException ioe)
-                {
-                    status = false;
-                }
-                finally
-                {
-                    result.setOutcome(true);
-                    result.setMessage(new Message("default"," The task, " + task + ", has " +
-                              ((status) ? "been queued with id, " + handle + " in the " + taskQueueName +
-                              " queue.": "has not been queued with id, " + handle + ". An error occurred.")));
-                    result.setContinue(true);
-                    return result;
-                }
+                return FlowCurationUtils.getQueueFlowResult(task, status, objId, taskQueueName);
 	}
 
     /** 
@@ -1194,27 +1169,14 @@ public class FlowContainerUtils
         public static FlowResult processCurateCommunity(Context context, int dsoID, Request request)
                                                                 throws AuthorizeException, IOException, SQLException, Exception
 	{
-                FlowResult result = new FlowResult();
                 String task = request.getParameter("curate_task");
-		if (task != null && task.length() == 0)
-                {
-                    task = null;
-                }
-		Curator curator = new Curator();
-                // curator.setReporter(reporterName);
-                curator.addTask(task);
-                curator.setInvoked(Curator.Invoked.INTERACTIVE);
+		Curator curator = FlowCurationUtils.getCurator(task);
                 Community community = Community.find(context, dsoID);
                 if (community != null)
                 {
-                    curator.curate(context, community.getHandle());
+                    curator.curate(community);
                 }
-                result.setOutcome(true);
-		result.setMessage(new Message("default","The task, " + task + " was completed with the status: " + 
-                        curator.getStatus(task) + "." + "\n" +  "Results: " + "\n" +
-                        ((curator.getResult(task) != null) ? curator.getResult(task) : "Nothing to do for this DSpace object.")));
-                result.setContinue(true);
-		return result;
+                return FlowCurationUtils.getRunFlowResult(task, curator);
 	}
 
         /**
@@ -1223,39 +1185,26 @@ public class FlowContainerUtils
         public static FlowResult processQueueCommunity(Context context, int dsoID, Request request)
                                                                 throws AuthorizeException, IOException, SQLException, Exception
 	{
-                FlowResult result = new FlowResult();
                 String task = request.getParameter("curate_task");
-                String handle = "";
-                Curator curator = new Curator();
+                Curator curator = FlowCurationUtils.getCurator(task);
+                String objId = String.valueOf(dsoID);
                 String taskQueueName = ConfigurationManager.getProperty("curate", "ui.queuename");
-                boolean status = true;
+                boolean status = false;
                 Community community = Community.find(context, dsoID);
                 if (community != null)
                 {
-                    handle = community.getHandle();
+                    objId = community.getHandle();
+                    try
+                    {
+                        curator.queue(context, objId, taskQueueName);
+                        status = true;
+                    }
+                    catch (IOException ioe)
+                    {
+                        // no-op
+                    }
                 }
-		if (task != null && task.length() == 0)
-                {
-                    task = null;
-                }
-                curator.addTask(task);
-                try
-                {
-                    curator.queue(context, handle, taskQueueName);
-                }
-                catch (IOException ioe)
-                {
-                    status = false;
-                }
-                finally
-                {
-                    result.setOutcome(true);
-                    result.setMessage(new Message("default"," The task, " + task + ", has " +
-                              ((status) ? "been queued with id, " + handle + " in the " + taskQueueName +
-                              " queue.": "has not been queued with id, " + handle + ". An error occurred.")));
-                    result.setContinue(true);
-                    return result;
-                }
+                return FlowCurationUtils.getQueueFlowResult(task, status, objId, taskQueueName);
 	}
 	
     

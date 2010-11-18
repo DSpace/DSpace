@@ -683,28 +683,14 @@ public class FlowItemUtils
         public static FlowResult processCurateItem(Context context, int itemID, Request request)
                                                                 throws AuthorizeException, IOException, SQLException, Exception
 	{
-                FlowResult result = new FlowResult();
                 String task = request.getParameter("curate_task");
-		if (task != null && task.length() == 0)
-                {
-			task = null;
-                }
-		Curator curator = new Curator();
-                // curator.setReporter(reporterName);
-                curator.addTask(task);
-                curator.setInvoked(Curator.Invoked.INTERACTIVE);
+		Curator curator = FlowCurationUtils.getCurator(task);
                 Item item = Item.find(context, itemID);
                 if (item != null)
                 {
                     curator.curate(item);
                 }
-                result.setOutcome(true);
-		result.setMessage(new Message("default","The task, " + task +
-                        " was completed with the status: " + curator.getStatus(task) + 
-                        "." + "\n" + "Results: " +  "\n" +
-                        ((curator.getResult(task) != null) ? curator.getResult(task) : "Nothing to do for this DSpace object.")));
-                result.setContinue(true);
-		return result;
+                return FlowCurationUtils.getRunFlowResult(task, curator);
 	}
 
       /**
@@ -713,37 +699,26 @@ public class FlowItemUtils
         public static FlowResult processQueueItem(Context context, int itemID, Request request)
                                                                 throws AuthorizeException, IOException, SQLException, Exception
 	{
-                FlowResult result = new FlowResult();
                 String task = request.getParameter("curate_task");
-                String handle = "";
-                Curator curator = new Curator();
+                Curator curator = FlowCurationUtils.getCurator(task);
+                String objId = String.valueOf(itemID);
                 String taskQueueName = ConfigurationManager.getProperty("curate", "ui.queuename");
-                boolean status = true;
+                boolean status = false;
                 Item item = Item.find(context, itemID);
                 if (item != null)
                 {
-                    handle = item.getHandle();
+                    objId = item.getHandle();
+                    try
+                    {
+                        curator.queue(context, objId, taskQueueName);
+                        status = true;
+                    }
+                    catch (IOException ioe)
+                    {
+                        // no-op
+                    }
                 }
-		if (task != null && task.length() == 0)
-                {
-                    task = null;
-                }
-                curator.addTask(task);
-                try {
-                    curator.queue(context, handle, taskQueueName);
-                }
-                catch (IOException ioe)
-                {
-                    status = false;
-                }
-                finally
-                {
-                    result.setOutcome(true);
-                    result.setMessage(new Message("default", " The task, " + task + ", has " +
-                              ((status) ? "been queued with id, " + handle + " in the " + taskQueueName + " queue.": "has not been queued with id, " + handle + ". An error occurred.")));
-                    result.setContinue(true);
-                    return result;
-                }
+                return FlowCurationUtils.getQueueFlowResult(task, status, objId, taskQueueName);
 	}
 
 	
