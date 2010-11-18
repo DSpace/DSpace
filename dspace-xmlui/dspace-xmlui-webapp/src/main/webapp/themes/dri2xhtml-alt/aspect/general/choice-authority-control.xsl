@@ -110,7 +110,7 @@
           </xsl:attribute>
         </xsl:if>
         <xsl:attribute name="src">
-           <xsl:value-of select="concat($theme-path,'/images/invisible.gif')"/>
+           <xsl:value-of select="concat($theme-path,'/images/authority_control/invisible.gif')"/>
         </xsl:attribute>
         <xsl:attribute name="class">
           <xsl:text>ds-authority-confidence </xsl:text>
@@ -158,7 +158,7 @@
         </xsl:attribute>
         <img alt="Loading...">
           <xsl:attribute name="src">
-           <xsl:value-of select="concat($theme-path,'/images/suggest-indicator.gif')"/>
+           <xsl:value-of select="concat($theme-path,'/images/authority_control/suggest-indicator.gif')"/>
           </xsl:attribute>
         </img>
       </span>
@@ -294,7 +294,7 @@
             <xsl:text>');</xsl:text>
           </xsl:attribute>
           <xsl:attribute name="src">
-             <xsl:value-of select="concat($theme-path,'/images/invisible.gif')"/>
+             <xsl:value-of select="concat($theme-path,'/images/authority_control/invisible.gif')"/>
           </xsl:attribute>
           <xsl:attribute name="i18n:attr">title</xsl:attribute>
           <xsl:attribute name="title">
@@ -327,7 +327,7 @@
     <xsl:template match="dri:item[@id='aspect.general.ChoiceLookupTransformer.item.select']/dri:figure">
       <img id="lookup_indicator_id" alt="Loading..." style="display:none;">
         <xsl:attribute name="src">
-         <xsl:value-of select="concat($theme-path,'/images/lookup-indicator.gif')"/>
+         <xsl:value-of select="concat($theme-path,'/images/authority_control/lookup-indicator.gif')"/>
         </xsl:attribute>
       </img>
     </xsl:template>
@@ -350,7 +350,7 @@
         </select>
         <img class="choices-lookup" id="lookup_indicator_id" alt="Loading..." style="display:none;">
           <xsl:attribute name="src">
-           <xsl:value-of select="concat($theme-path,'/images/lookup-indicator.gif')"/>
+           <xsl:value-of select="concat($theme-path,'/images/authority_control/lookup-indicator.gif')"/>
           </xsl:attribute>
         </img>
       </div>
