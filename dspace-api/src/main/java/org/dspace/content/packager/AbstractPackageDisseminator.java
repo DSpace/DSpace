@@ -109,7 +109,7 @@ public abstract class AbstractPackageDisseminator
                     case Constants.COLLECTION :
                         //Also find all Items in this Collection and disseminate
                         Collection collection = (Collection) dso;
-                        ItemIterator iterator = collection.getAllItems();
+                        ItemIterator iterator = collection.getItems();
                         while(iterator.hasNext())
                         {
                             Item item = iterator.next();
