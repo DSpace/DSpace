@@ -327,22 +327,21 @@ public class METSManifest
             return contentFiles;
         }
 
-        Element fileSec = mets.getChild("fileSec", metsNS);
-        if (fileSec == null)
-        {
-            throw new MetadataValidationException("Invalid METS Manifest: DSpace requires a fileSec element, but it is missing.");
-        }
-
         contentFiles = new ArrayList<Element>();
-        Iterator fgi = fileSec.getChildren("fileGrp", metsNS).iterator();
-        while (fgi.hasNext())
-        {
-            Element fg = (Element)fgi.next();
-            Iterator fi = fg.getChildren("file", metsNS).iterator();
-            while (fi.hasNext())
+        Element fileSec = mets.getChild("fileSec", metsNS);
+
+        if (fileSec != null)
+        {   
+            Iterator fgi = fileSec.getChildren("fileGrp", metsNS).iterator();
+            while (fgi.hasNext())
             {
-                Element f = (Element)fi.next();
-                contentFiles.add(f);
+                Element fg = (Element)fgi.next();
+                Iterator fi = fg.getChildren("file", metsNS).iterator();
+                while (fi.hasNext())
+                {
+                    Element f = (Element)fi.next();
+                    contentFiles.add(f);
+                }
             }
         }
         return contentFiles;
