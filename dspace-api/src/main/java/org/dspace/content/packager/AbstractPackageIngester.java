@@ -97,6 +97,7 @@ public abstract class AbstractPackageIngester
      * @throws UnsupportedOperationException if this packager does not
      *  implement <code>ingestAll</code>
      */
+    @Override
     public List<DSpaceObject> ingestAll(Context context, DSpaceObject parent, File pkgFile,
                                 PackageParameters params, String license)
         throws PackageException, UnsupportedOperationException,
@@ -166,8 +167,11 @@ public abstract class AbstractPackageIngester
                         // A Collection can map to Items that it does not "own".
                         // If a Collection package has an Item as a child, it
                         // should be mapped regardless of ownership.
-                        if (Constants.COLLECTION == dso.getType())
+                        // Note: Only perform this mapping if new items were ingested to this collection
+                        if (Constants.COLLECTION == dso.getType() && dsoIngestedList.size()>oldSize)
                         {
+                            // Since running 'ingestAll' on an item, will only ingest one Item at most,
+                            // Just make sure that item is mapped to this collection.
                             Item childItem = (Item)dsoIngestedList.get(oldSize);
                             Collection collection = (Collection)dso;
                             if (!childItem.isIn(collection))
@@ -218,6 +222,7 @@ public abstract class AbstractPackageIngester
      * @throws UnsupportedOperationException if this packager does not
      *  implement <code>replaceAll</code>
      */
+    @Override
     public List<DSpaceObject> replaceAll(Context context, DSpaceObject dso,
                                 File pkgFile, PackageParameters params)
         throws PackageException, UnsupportedOperationException,
