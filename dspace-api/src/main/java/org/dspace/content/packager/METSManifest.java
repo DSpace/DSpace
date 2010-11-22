@@ -968,15 +968,39 @@ public class METSManifest
         {
             throw new MetadataValidationException("Invalid METS: Missing reference to Item descriptive metadata, first div on first structmap must have a DMDID attribute.");
         }
-        String dmdID[] = dmds.split("\\s+");
-        Element result[] = new Element[dmdID.length];
-
-        for (int i = 0; i < dmdID.length; ++i)
-        {
-            result[i] = getElementByXPath("mets:dmdSec[@ID=\""+dmdID[i]+"\"]", false);
-        }
-        return result;
+        
+        return getDmdElements(dmds);
     }
+
+
+    /**
+     * Gets all dmdSec elements from a space separated list
+     *
+     * @param dmdList space-separated list of DMDIDs
+     * @return array of Elements, each a dmdSec.  May be empty but NOT null.
+     * @throws MetadataValidationException if the METS is missing a reference to item-wide
+     *          DMDs in the correct place.
+     */
+    public Element[] getDmdElements(String dmdList)
+        throws MetadataValidationException
+    {
+        if(dmdList!=null && !dmdList.isEmpty())
+        {
+            String dmdID[] = dmdList.split("\\s+");
+            Element result[] = new Element[dmdID.length];
+
+            for (int i = 0; i < dmdID.length; ++i)
+            {
+                result[i] = getElementByXPath("mets:dmdSec[@ID=\""+dmdID[i]+"\"]", false);
+            }
+            return result;
+        }
+        else
+        {
+            return new Element[0];
+        }
+    }
+
 
     /**
      * Return rights metadata section(s) relevant to item as a whole.

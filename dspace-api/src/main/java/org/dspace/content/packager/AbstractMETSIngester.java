@@ -468,6 +468,12 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         {
             // Add logo if one is referenced from manifest
             addContainerLogo(context, dso, manifest, pkgFile, params);
+
+            if(type==Constants.COLLECTION)
+            {
+                //Add template item if one is referenced from manifest (only for Collections)
+                addTemplateItem(context, dso, manifest, pkgFile, params, callback);
+            }
         }// end if Community/Collection
         else if (type == Constants.SITE)
         {
@@ -896,6 +902,88 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                 }
             }// end for each file in manifest
         }// end if logo reference found
+    }
+
+    /**
+     * Add a Template Item to a Collection container object based on a METS
+     * Manifest.
+     *
+     * @param context
+     *            DSpace Context
+     * @param dso
+     *            DSpace Container Object
+     * @param manifest
+     *            METS Manifest
+     * @param pkgFile
+     *            the full package file (which may include content files if a
+     *            zip)
+     * @param params
+     *            Ingestion Parameters
+     * @param callback
+     *            the MdrefManager (manages all external metadata files
+     *            referenced by METS <code>mdref</code> elements)
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException
+     * @throws MetadataValidationException
+     * @throws PackageValidationException
+     */
+    protected void addTemplateItem(Context context, DSpaceObject dso,
+            METSManifest manifest, File pkgFile, PackageParameters params,
+            MdrefManager callback)
+            throws SQLException, IOException, AuthorizeException,
+            CrosswalkException, PackageValidationException
+    {
+        //Template items only valid for collections
+        if(dso.getType()!=Constants.COLLECTION)
+            return;
+        
+        Collection collection = (Collection) dso;
+
+        //retrieve list of all <div>s representing child objects from manifest
+        List childObjList = manifest.getChildObjDivs();
+
+        if(childObjList!=null && !childObjList.isEmpty())
+        {
+            Element templateItemDiv = null;
+
+            Iterator childIterator = childObjList.iterator();
+            //Search for the child with a type of "DSpace ITEM Template"
+            while(childIterator.hasNext())
+            {
+                Element childDiv = (Element) childIterator.next();
+                String childType = childDiv.getAttributeValue("TYPE");
+                //should be the only child of type "ITEM" with "Template" for a suffix
+                if(childType.contains(Constants.typeText[Constants.ITEM]) &&
+                   childType.endsWith(AbstractMETSDisseminator.TEMPLATE_TYPE_SUFFIX))
+                {
+                    templateItemDiv = childDiv;
+                    break;
+                }
+            }
+
+            //If an Template Item was found, create it with the specified metadata
+            if(templateItemDiv!=null)
+            {
+                //make sure this templateItemDiv is associated with one or more dmdSecs
+                String templateDmdIds = templateItemDiv.getAttributeValue("DMDID");
+                if(templateDmdIds!=null)
+                {
+                    //create our template item & get a reference to it
+                    collection.createTemplateItem();
+                    Item templateItem = collection.getTemplateItem();
+
+                    //get a reference to the dmdSecs which describe the metadata for this template item
+                    Element[] templateDmds = manifest.getDmdElements(templateDmdIds);
+
+                    // Run our Descriptive metadata (dublin core, etc) crosswalks to add metadata to template item
+                    crosswalkObjectDmd(context, templateItem, manifest, callback, templateDmds, params);
+
+                    // update the template item to save metadata changes
+                    PackageUtils.updateDSpaceObject(templateItem);
+                }
+            }
+        }
     }
 
     /**

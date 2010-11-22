@@ -7,6 +7,7 @@
  */
 package org.dspace.content.packager;
 
+import com.sun.org.apache.bcel.internal.generic.INEG;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -131,6 +132,11 @@ public abstract class AbstractMETSDisseminator
      * 1036368000 seconds * 1000 = Nov 4, 2002 GMT (the date DSpace 1.0 was released)
      */
     private static final int DEFAULT_MODIFIED_DATE = 1036368000 * 1000;
+
+    /**
+     * Suffix for Template objects (e.g. Item Templates)
+     */
+    protected static final String TEMPLATE_TYPE_SUFFIX = " Template";
 
     /**
      * Wrapper for a table of streams to add to the package, such as
@@ -993,7 +999,8 @@ public abstract class AbstractMETSDisseminator
         }
         else if (dso.getType() == Constants.COLLECTION)
         {
-            ItemIterator ii = ((Collection)dso).getItems();
+            Collection collection = (Collection)dso;
+            ItemIterator ii = collection.getItems();
             while (ii.hasNext())
             {
                 //add a child <div> for each item in collection
@@ -1004,7 +1011,47 @@ public abstract class AbstractMETSDisseminator
                     div0.getContent().add(childDiv);
                 }
             }
-            Bitstream logoBs = ((Collection)dso).getLogo();
+
+            // add metadata & info for Template Item, if exists
+            Item templateItem = collection.getTemplateItem();
+            if(templateItem!=null)
+            {
+                String templateDmdId[] = new String[dmdTypes.length];
+                // index where we should add the first template item <dmdSec>.
+                // Index = number of <dmdSecs> already added + number of <metsHdr> = # of dmdSecs + 1
+                // (Note: in order to be a valid METS file, all dmdSecs must be before the 1st amdSec)
+                int dmdIndex = dmdTypes.length + 1;
+                //For each type of dmdSec specified,
+                // add a new dmdSec which contains the Template Item metadata
+                // (Note: Template Items are only metadata -- they have no content files)
+                for (int i = 0; i < dmdTypes.length; ++i)
+                {
+                    MdSec templateDmdSec = makeMdSec(context, templateItem, DmdSec.class, dmdTypes[i], params, extraStreams);
+                    if (templateDmdSec != null)
+                    {
+                        mets.getContent().add(dmdIndex, templateDmdSec);
+                        dmdIndex++;
+                        templateDmdId[i] = templateDmdSec.getID();
+                    }
+                }
+
+                //Now add a child <div> in structMap to represent that Template Item
+                Div templateItemDiv = new Div();
+                templateItemDiv.setID(gensym("div"));
+                templateItemDiv.setTYPE(getObjectTypeString(templateItem) + TEMPLATE_TYPE_SUFFIX);
+                //Link up the dmdSec(s) for the Template Item to this <div>
+                StringBuilder templateDmdIds = new StringBuilder();
+                for (String currdmdId : templateDmdId)
+                {
+                    templateDmdIds.append(" ").append(currdmdId);
+                }
+                templateItemDiv.setDMDID(templateDmdIds.substring(1));
+                //add this child <div> before the listing of normal Items
+                div0.getContent().add(0, templateItemDiv);
+            }
+
+            // add link to Collection Logo, if one exists
+            Bitstream logoBs = collection.getLogo();
             if (logoBs != null)
             {
                 fileSec = new FileSec();
