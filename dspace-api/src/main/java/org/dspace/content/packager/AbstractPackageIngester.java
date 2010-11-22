@@ -273,8 +273,14 @@ public abstract class AbstractPackageIngester
                     // A Collection can map to Items that it does not "own".
                     // If a Collection package has an Item as a child, it
                     // should be mapped regardless of ownership.
-                    if (Constants.COLLECTION == replacedDso.getType())
+
+                    // If a Collection package has an Item as a child, it
+                    // should be mapped regardless of ownership.
+                    // Note: Only perform this mapping if new items were ingested to this collection
+                    if (Constants.COLLECTION == replacedDso.getType() && dsoIngestedList.size()>oldSize)
                     {
+                        // Since running 'replaceAll' on an item, will only ingest one Item at most,
+                        // Just make sure that item is mapped to this collection.
                         Item childItem = (Item)dsoIngestedList.get(oldSize);
                         Collection collection = (Collection)replacedDso;
                         if (!childItem.isIn(collection))
