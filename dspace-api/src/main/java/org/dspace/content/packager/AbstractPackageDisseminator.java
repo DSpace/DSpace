@@ -70,6 +70,7 @@ public abstract class AbstractPackageDisseminator
      * @throws PackageValidationException if package cannot be created or there is
      *  a fatal error in creating it.
      */
+    @Override
     public List<File> disseminateAll(Context context, DSpaceObject dso,
                      PackageParameters params, File pkgFile)
         throws PackageException, CrosswalkException,
@@ -167,7 +168,10 @@ public abstract class AbstractPackageDisseminator
     protected void addToPackageList(File f)
     {
         //add to list of successfully disseminated packages
-        packageFileList.add(f);
+        if(!packageFileList.contains(f))
+        {
+            packageFileList.add(f);
+        }
     }
 
     /**
