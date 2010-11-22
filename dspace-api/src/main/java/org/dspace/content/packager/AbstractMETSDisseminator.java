@@ -1208,8 +1208,7 @@ public abstract class AbstractMETSDisseminator
         Div div = new Div();
         div.setID(gensym("div"));
         div.setTYPE(type);
-        boolean emptyDiv = true;
-
+        
         //make sure we have a handle
         if (handle == null || handle.length()==0)
         {
@@ -1223,35 +1222,23 @@ public abstract class AbstractMETSDisseminator
             mptr.setLOCTYPE(Loctype.HANDLE);
             mptr.setXlinkHref(handle);
             div.getContent().add(mptr);
-            emptyDiv=false;
         }
 
-        // Check to see if this is a recursive dissemination (i.e. disseminating children METS packages)
-        // if so, we want a direct reference to the eventual child METS file
-        if(params.recursiveModeEnabled())
-        {
-            //determine file extension of child references,
-            //based on whether we are exporting just a manifest or a full Zip pkg
-            String childFileExtension  = (params.getBooleanProperty("manifestOnly", false)) ? "xml" : "zip";
+        //determine file extension of child references,
+        //based on whether we are exporting just a manifest or a full Zip pkg
+        String childFileExtension  = (params.getBooleanProperty("manifestOnly", false)) ? "xml" : "zip";
 
-            //create <mptr> with file-name reference to child package
-            Mptr mptr2 = new Mptr();
-            mptr2.setID(gensym("mptr"));
-            mptr2.setLOCTYPE(Loctype.URL);
-            //we get the name of the child package from the Packager -- as it is what will actually create this child pkg file
-            mptr2.setXlinkHref(PackageUtils.getPackageName(dso, childFileExtension));
-            div.getContent().add(mptr2);
-            emptyDiv=false;
-        }
+        // Always create <mptr> with file-name reference to child package
+        // This is what DSpace will expect the child package to be named during ingestion
+        // (NOTE: without this reference, DSpace will be unable to restore any child objects during ingestion)
+        Mptr mptr2 = new Mptr();
+        mptr2.setID(gensym("mptr"));
+        mptr2.setLOCTYPE(Loctype.URL);
+        //we get the name of the child package from the Packager -- as it is what will actually create this child pkg file
+        mptr2.setXlinkHref(PackageUtils.getPackageName(dso, childFileExtension));
+        div.getContent().add(mptr2);
 
-        if(emptyDiv)
-        {
-            return null;
-        }
-        else
-        {
-            return div;
-        }
+        return div;
     }
 
     // put handle in canonical URN format -- note that HandleManager's
