@@ -350,7 +350,10 @@ public abstract class AbstractPackageIngester
     protected void addToIngestedList(DSpaceObject dso)
     {
         //add to list of successfully ingested objects
-        dsoIngestedList.add(dso);
+        if(!dsoIngestedList.contains(dso))
+        {
+            dsoIngestedList.add(dso);
+        }
     }
 
     /**
