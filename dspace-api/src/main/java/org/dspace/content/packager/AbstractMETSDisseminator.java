@@ -7,7 +7,6 @@
  */
 package org.dspace.content.packager;
 
-import com.sun.org.apache.bcel.internal.generic.INEG;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
