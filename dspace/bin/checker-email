@@ -1,0 +1,10 @@
+#!/bin/sh
+
+
+# Shell script for running the checksum email reporter.
+
+# Get the DSPACE/bin directory
+BINDIR=`dirname $0`
+
+$BINDIR/dsrun org.dspace.checker.DailyReportEmailer $@
+
