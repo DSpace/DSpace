@@ -103,7 +103,7 @@
         <!-- <theme name="Test Theme 2" regex="community-list" path="theme2/"/> -->
 
         <!-- Default theme -->
-        <theme name="Default Reference Theme" regex=".*" path="ScholarWorks/" />
+        <theme name="Default Reference Theme" regex=".*" path="Reference/" />
 
         <!-- Classic theme, inspired by the JSP UI -->
         <!-- <theme name="Classic" regex=".*" path="Classic/" /> -->

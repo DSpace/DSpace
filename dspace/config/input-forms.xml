@@ -151,16 +151,6 @@ it, please enter the types and the actual numbers or codes below.</hint>
          <hint>Select the language of the main content of the item.  If the language does not appear in the list below, please select 'Other'.  If the content does not really have a language (for example, if it is a dataset or an image) please select 'N/A'.</hint>
          <required></required>
        </field>
-       <field>
-         <dc-schema>dc</dc-schema>
-         <dc-element>description</dc-element>
-         <dc-qualifier>embargoterms</dc-qualifier>
-         <repeatable>false</repeatable>
-         <label>Embargo Terms</label>
-         <input-type value-pairs-name="embargo_terms">dropdown</input-type>
-         <hint>If required, select embargo terms.</hint>
-         <required></required>
-         </field>
      </page>
 
      <page number="2">
@@ -243,37 +233,6 @@ it, please enter the types and the actual numbers or codes below.</hint>
  <!-- stores the associated stored-values in the database.                  -->
 
  <form-value-pairs>
-   <value-pairs value-pairs-name="embargo_terms" dc-term="embargo.terms">
-     <pair>
-       <displayed-value>90 days</displayed-value>
-       <stored-value>90 days</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>6 months</displayed-value>
-       <stored-value>6 months</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>1 year</displayed-value>
-       <stored-value>1 year</stored-value>
-     </pair>
-  
-     <pair>
-       <displayed-value>2 years</displayed-value>
-       <stored-value>2 years</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>3 years</displayed-value>
-       <stored-value>3 years</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>4 years</displayed-value>
-       <stored-value>4 years</stored-value>
-     </pair>
-     <pair>
-       <displayed-value>5 years</displayed-value>
-       <stored-value>5 years</stored-value>
-     </pair> 
-   </value-pairs>
    <value-pairs value-pairs-name="common_identifiers" dc-term="identifier">
      <pair>
        <displayed-value>ISSN</displayed-value>
