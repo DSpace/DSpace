@@ -1100,7 +1100,9 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                 else
                 {
                     throw new UnsupportedOperationException(
-                            "Could not find a parent DSpaceObject where we can ingest this package.  A valid parent DSpaceObject must be specified in the METS Manifest itself.");
+                            "Could not find a parent DSpaceObject where we can ingest the package "
+                            + pkgFile.getPath()
+                            + ".  A valid parent DSpaceObject must be specified in the METS Manifest itself.");
                 }
 
                 // As this object doesn't already exist, we will perform an
@@ -1313,15 +1315,19 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             if (parent == null)
             {
                 throw new UnsupportedOperationException(
-                        "Could not find a parent DSpaceObject references as '"
+                        "Could not find a parent DSpaceObject referenced as '"
                                 + parentLink
-                                + "' in the METS Manifest. A parent DSpaceObject must be specified from either the 'packager' command or noted in the METS Manifest itself.");
+                                + "' in the METS Manifest for object "
+                                + manifest.getObjID()
+                                + ". A parent DSpaceObject must be specified from either the 'packager' command or noted in the METS Manifest itself.");
             }
         }
         else
         {
             throw new UnsupportedOperationException(
-                    "Could not find a parent DSpaceObject where we can ingest this package.  A parent DSpaceObject must be specified from either the 'packager' command or noted in the METS Manifest itself.");
+                    "Could not find a parent DSpaceObject where we can ingest the packaged object "
+                    + manifest.getObjID()
+                    + ".  A parent DSpaceObject must be specified from either the 'packager' command or noted in the METS Manifest itself.");
         }
 
         return parent;
