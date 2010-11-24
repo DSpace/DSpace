@@ -55,7 +55,7 @@
                   </resource>
                </webResources>
                <overlays>
-                  <!--  
+                  <!--
                      the priority of overlays is determined here
                      1.) default: anything in the current project has highest
                      2.) anything defined here has precedence in the order defined
@@ -66,7 +66,7 @@
                      <groupId>org.dspace</groupId>
                      <artifactId>dspace-xmlui-lang</artifactId>
                      <excludes>
-                        <!--  
+                        <!--
                            keep lang web.xml from overiding xmlui
                         -->
                         <exclude>WEB-INF/web.xml</exclude>
@@ -89,11 +89,11 @@
    </build>
 
    <profiles>
-      <!-- 
+      <!--
          when activated a dspace.config configuration
-         file location passed on the commandline 
-         (-Ddspace.config=...) can be passed through 
-         to be used as a filter source by projects for 
+         file location passed on the commandline
+         (-Ddspace.config=...) can be passed through
+         to be used as a filter source by projects for
          tasks such as updating the ${dspace.dir} in
          web.xml etc.
       -->
@@ -162,11 +162,23 @@
          <artifactId>dspace-xmlui-api</artifactId>
       </dependency>
 
+      <!-- CAS Authentication -->
+      <dependency>
+         <groupId>edu.calstate</groupId>
+         <artifactId>calstate-dspace-cas-authentication</artifactId>
+      </dependency>
+
       <dependency>
          <groupId>javax.servlet</groupId>
          <artifactId>servlet-api</artifactId>
          <version>2.3</version>
          <scope>provided</scope>
+      </dependency>
+
+      <dependency>
+      	<groupId>org.dspace</groupId>
+      	<artifactId>dspace-djatoka-impl</artifactId>
+      	<version>1.6.2</version>
       </dependency>
 
    </dependencies>

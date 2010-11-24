@@ -1,0 +1,912 @@
+/***************************
+
+ CSU SCHOLAR WORKS CSS
+ Author: David Walker
+ Last Updated: 2007-12-6
+ 
+ ***************************/
+
+body {
+	background-color:#6e6f71;
+	background-image:url(../images/bg.gif);
+	background-repeat:repeat-x;
+	text-align:center;
+	font-family:Verdana, Arial, Helvetica, sans-serif;
+	font-size:12px;
+	margin:0;
+	padding:0;
+}
+
+div, table, tr, th, td {font-size: 12px; }
+th { padding: 8px; }
+div, h1, h2, h3, h4, ul, li, fieldset, legend {  margin: 0px; padding: 0px; }
+ul { margin-left: 10px; }
+li { margin-left: 8px; padding-top: 3px; }
+h1, h2, h3, h4 { font-family: Arial, Helvetica, sans-serif; margin-top: 20px; margin-bottom: 20px; }
+h1  { font-size: 200%; margin-top: 0px; margin-bottom: 35px; }
+h2 { font-size: 130%; }
+h3 { font-size: 120%; }
+h4 { font-size: 110%; }
+legend { font-weight: bold;	padding: 10px; }
+fieldset { border: 1px solid #ccc; }
+
+dt { margin-top: 20px; font-weight: bold; }
+
+/***************************
+ CSU SW Structure
+ ***************************/
+
+#surround {
+	width:95%;
+	border:1px solid #333;
+	background-color:#fff;
+	text-align:left;
+	background-image:url(../images/scholarnav.gif);
+	background-repeat:repeat-y;
+	background-position:left top;
+	margin:30px auto 0;
+	padding:0;
+}
+
+#surround:after {
+	content:".";
+	display:block;
+	height:0;
+	clear:both;
+	visibility:hidden;
+}
+
+#scholar_nav {
+	width:255px;
+	float:left;
+	padding-bottom:30px;
+}
+
+#scholar_main {
+	background-repeat:repeat-x;
+	margin:0 0 0 255px;
+	padding:14px 14px 30px;
+}
+
+#scholar_footer {
+	width: 85%;
+	clear: both;
+	margin: 0 auto;
+	padding-top: 50px;
+	padding-bottom: 50px;
+	text-align: left;
+	color: #fff;
+}
+
+/***************************
+ CSU SW: Sidebar Navigation
+ ***************************/
+
+#scholar_nav h2, #scholar_nav h3, #scholar_nav h4 {
+	margin-top: 2px;
+	margin-bottom: 2px;
+}
+
+#scholar_links {
+	padding: 10px;
+	color: #fff;
+	margin-top: 8px;
+}
+#scholar_links a {
+	color: #fff;
+	text-decoration: none;
+}
+#scholar_links a:hover {
+	color: #fff;
+	text-decoration: underline;
+}
+.ds-option-set {
+	margin-bottom: 20px;
+}
+#artifactbrowser_Navigation_list_browse .ds-simple-list {
+	margin-bottom: 10px;
+}
+
+/***************************
+ CSU SW: Main Content
+ ***************************/
+
+.home_top {
+	margin-top: 30px;
+	margin-bottom: 50px;
+}
+.ds-artifact-item {
+	margin-bottom: 10px;
+}
+.ds-notice-div h2 {
+	font-size: 14px;
+	margin: 3px;
+}
+
+/***************************
+ CSU SW: Footer
+ ***************************/
+ 
+.footerLogo {
+	float: left;
+}
+.footerContent {
+	margin-left: 61px;
+}
+
+/*************************
+ CSU SW: Left-hand Search
+ *************************/
+
+#ds-search-option {
+	margin-left: 5px;
+}
+.search_options {
+	margin-top: 8px;
+}
+.search_advanced {
+	margin: 5px;
+}
+
+/*************************
+ CSU SW: Breadcrumbs
+ *************************/
+
+#breadcrumb {
+	margin-bottom: 20px;
+}
+
+ul#ds-trail {
+	margin: 0px;
+	padding: 0px;
+	font-size: 80%;
+	color: #666;
+}
+
+li.ds-trail-link {
+	display: inline;
+	background-image: url(../images/arrow.gif);
+	background-position: bottom left;
+	background-repeat: no-repeat;
+	padding-left: 15px;
+	margin: 0px;
+	margin-left: 3px;
+}
+li.first-link {
+	list-style: none;
+	background-image: none;
+	display: inline;
+	margin-left: -10px;
+}
+.ds-trail-link a {
+	color: #666;
+}
+
+/*************************
+ CSU SW: Item display
+ *************************/
+
+.ds-includeSet-table {
+	margin-bottom: 30px;
+}
+.ds-includeSet-table td {
+	padding-left: 10px;
+	padding-top: 8px;
+}
+.license-info {
+	margin: 20px;
+	margin-top: 0px;
+	margin-bottom: 30px;
+}
+.file-list {
+	margin: 20px;
+	margin-bottom: 0px;
+	background-color: #fcfce8;
+}
+.file-list td {
+	padding: 10px;
+}
+
+
+/***************************
+ Basic Manakin styles
+ ***************************/
+
+.indent {
+	padding-left:35px;
+	padding-right:0;
+}
+
+.doubleIndent {
+	padding-left:55px;
+	padding-right:0;
+}
+
+a.image-link img {
+	border:none;
+}
+
+span.bold {
+	font-weight:700;
+}
+
+span.underline {
+	text-decoration:underline;
+}
+
+span.fade {
+	color:gray;
+	font-size:90%;
+}
+
+span.fade a {
+	color:gray;
+	text-decoration:none;
+}
+
+span.fade a:hover {
+	color:blue;
+	text-decoration:underline;
+}
+
+span.warn {
+	color:red;
+	font-weight:bolder;
+}
+
+/***************************
+ Browse displays
+ ***************************/
+
+ul.alphabet {
+	padding-left:10px;
+	padding-top:0;
+	text-align:center;
+	margin:5px 0 0;
+}
+
+ul.alphabet li {
+	list-style:none;
+	display:inline;
+	margin-right:0px;
+	font-weight:200;
+}
+
+ul.alphabet a {
+	font-weight:600;
+	color:#646432;
+	background-color:inherit;
+}
+
+ul.alphabet a:hover {
+	font-weight:600;
+	color:#969632;
+	background-color:inherit;
+}
+
+p.button-list {
+	margin-top:3px;
+	padding-bottom:0;
+}
+
+*.collection-search-browse td,*.community-search-browse td {
+	white-space:nowrap;
+}
+
+*.collection-search-browse select,*.community-search-browse select {
+	width:auto;
+	max-width:200px;
+}
+
+*.collection-search-browse input,*.community-search-browse input {
+	width:auto;
+	max-width:195px;
+}
+
+*.button-list input {
+	width:auto;
+}
+
+form.search li {
+	margin:0;
+	padding:0!important;
+}
+
+form.navigation input,form.navigation select {
+	margin-left:5px;
+}
+
+div.pagination {
+	position:relative;
+	color:inherit;
+	background-color:#fffff0;
+	border:2px solid #f0f0d2;
+	margin:2px 0 5px 1px;
+	padding:0;
+}
+
+div.pagination * {
+	padding:0;
+}
+
+div.pagination-masked {
+	position:relative;
+	color:inherit;
+	background-color:#fffff0;
+	border:2px solid #f0f0d2;
+	margin-bottom:5px;
+}
+
+a.previous-page-link {
+	position:absolute;
+	left:10px;
+	top:6px;
+	color:#646432;
+	background-color:inherit;
+}
+
+p.pagination-info {
+	text-align:center;
+	margin-left:125px;
+	margin-right:125px;
+}
+
+ul.pagination-links {
+	position:relative;
+	text-align:center;
+	top:-5px;
+	width:360px;
+	line-height:12px;
+	margin:0 auto;
+	padding:0;
+}
+
+*.pagination-links li {
+	list-style:none;
+	display:inline;
+	margin-right:5px;
+	font-weight:bolder;
+	font-size:90%;
+}
+
+li.page-link a,li.first-page-link a,li.last-page-link a {
+	color:#646432;
+	background-color:inherit;
+}
+
+li.current-page-link a {
+	color:#df6e00;
+	background-color:inherit;
+}
+
+a.next-page-link {
+	position:absolute;
+	right:10px;
+	top:6px;
+	color:#646432;
+	background-color:inherit;
+}
+
+/***************************
+ Collection page
+ ***************************/
+
+div.ds-logo-wrapper {
+	float:right;
+	padding:5px 0 5px 10px;
+}
+
+p.copyright-text {
+	margin-top:30px;
+	font-style:italic;
+	text-align:center;
+}
+
+div.primary {
+	overflow: auto;
+	margin-bottom:20px;
+}
+
+.primary .primary {
+	margin-bottom:10px;
+}
+
+/***************************
+ Table stuff
+ ***************************/
+
+tr.ds-table-header-row {
+	color:inherit;
+	background-color:#f0f0d2;
+}
+
+tr.ds-table-header-row.subheader {
+	background-color:#fafad6;
+}
+
+.subheader th {
+	padding-left:5px;
+	font-weight:100;
+}
+
+/*
+tr.ds-table-row.odd {
+	color:inherit;
+	background-color:#fcfce8;
+}
+*/
+
+*.first-cell {
+	vertical-align:middle;
+	text-align:center;
+}
+
+th.indent {
+	padding-left:30px;
+	padding-right:0;
+}
+
+th.doubleIndent {
+	padding-left:50px;
+	padding-right:0;
+}
+
+tr.ds-table-row.highlight {
+	background-color:#d8f5d8;
+}
+
+table.ds-gloss-list {
+	border:none;
+	width:auto;
+	font-size:inherit;
+}
+
+*.ds-gloss-list td {
+	padding:5px;
+}
+
+*.ds-gloss-list-label {
+	font-weight:bolder;
+}
+
+table.ds-gloss-list td ul {
+	list-style-type:none;
+	margin:0;
+	padding:0;
+}
+
+/***************************
+ Artifact display lists
+ ***************************/
+
+ul.ds-artifact-list {
+	list-style-type:none;
+	float:left;
+	width: 90%;
+	margin:0;
+	padding:0;
+}
+
+/*
+ul.ds-artifact-list li.odd {
+	color:inherit;
+	background-color:#fafae8;
+}
+*/
+
+ul.ds-artifact-list li {
+	float:left;
+	width:100%;
+	padding-bottom:3px;
+	padding-top:3px;
+}
+
+ul.ds-artifact-list li div {
+	float:left;
+}
+
+ul.ds-artifact-list li div.artifact-description {
+	float:left;
+	margin-top:0;
+	width:83%;
+	padding:0 5px;
+}
+
+ul.ds-artifact-list li div.artifact-title {
+	float:none;
+	font-family:Arial, Helvetica, sans-serif;
+	font-weight:700;
+}
+
+ul.ds-artifact-list li div.artifact-title a:link {
+	color:#3c3ce6;
+}
+
+ul.ds-artifact-list li div.artifact-title a:visited {
+	color:#7d327d;
+}
+
+ul.ds-artifact-list li div.artifact-info {
+	float:none;
+	margin-left:15px;
+}
+
+ul.ds-artifact-list li div.artifact-preview {
+	float:right;
+}
+
+/***************************
+ Form styles
+ ***************************/
+
+ul.ds-progress-list {
+	text-align:center;
+	margin:0 0 10px;
+	padding:2px 0;
+}
+
+ul.ds-progress-list li {
+	font-family:Arial, Helvetica, sans-serif;
+	font-weight:700;
+	background-color:#fffff0;
+	border:1px solid #f0f0d2;
+	color:#e9a050;
+	overflow:hidden;
+	display:inline;
+	margin-top:2px;
+	margin-left:3px;
+	max-width:400px;
+	line-height:20px;
+	padding:4px 3px;
+}
+
+ul.ds-progress-list li.button {
+	background-color:inherit;
+	border:none;
+	margin-top:2px;
+	margin-left:0!important;
+	padding:1px!important;
+}
+
+ul.ds-progress-list li.button input.ds-button-field {
+	font-size:smaller;
+}
+
+ul.ds-progress-list li.current.button input.ds-button-field {
+	color:#0aaf0a;
+}
+
+ul.ds-progress-list li.current {
+	color:#50b728;
+	background-color:inherit;
+	border-color:#d8f5d8;
+}
+
+ul.ds-progress-list li.arrow {
+	border:none;
+	background:none;
+	font-size:120%;
+	font-weight:400;
+	margin-left:0;
+	margin-right:0;
+}
+
+span.ds-composite-field {
+	display:table-row;
+	padding:2px;
+}
+
+*.ds-composite-field.ds-composite-component {
+	display:table-cell;
+	text-align:left;
+	width:auto;
+	padding-right:10px;
+}
+
+*.ds-composite-field input,*.ds-composite-field textarea,*.ds-composite-field select {
+	margin-right:5px;
+	margin-bottom:-2px;
+}
+
+span.composite-help {
+	display:block;
+	font-size:80%;
+	color:gray;
+	background-color:inherit;
+	text-align:left;
+}
+
+fieldset.ds-checkbox-field,fieldset.ds-radio-field {
+	border:none;
+	margin:0;
+	padding:0;
+}
+
+fieldset.ds-checkbox-field label,fieldset.ds-radio-field label {
+	display:block;
+}
+
+fieldset.ds-form-list {
+	border:2px solid #f0f0d2;
+	color:inherit;
+	background-color:#fffff5;
+	margin-left:0;
+	margin-right:0;
+	padding:0;
+}
+
+fieldset.ds-form-list.thick {
+	border-top:22px solid #f0f0d2;
+}
+
+fieldset.ds-form-list ol {
+	width:100%;
+	list-style-type:none;
+	margin:0;
+	padding:0;
+}
+
+fieldset.ds-form-list legend {
+	color: #993333;
+	background-color:inherit;
+	font-size:115%;
+	font-weight:bolder;
+	margin-left:10px;
+}
+
+fieldset.thick legend {
+	color: #993333;
+	background-color:#fffff5;
+	border-top:2px solid #f0f0d2;
+	padding-left:10px;
+	padding-right:30px;
+}
+
+fieldset.ds-form-sublist {
+	border:1px solid #f0f0d2;
+	margin:5px;
+	padding:0;
+}
+
+form.ds-interactive-div fieldset.ds-form-sublist ol {
+	display:table;
+	width:100%;
+	margin:0;
+	padding:0;
+}
+
+form.ds-interactive-div fieldset.ds-form-sublist legend {
+	color:#993333;
+	font-size:100%;
+	font-weight:bolder;
+	margin-left:10px;
+	background-color:inherit;
+	border:0;
+	padding:0;
+}
+
+form.ds-interactive-div li.ds-form-item {
+	display:block;
+	width:100%;
+	padding:5px 0;
+}
+
+/*
+form.ds-interactive-div li.odd {
+	color:inherit;
+	background-color:#fcfce6;
+}
+*/
+
+form.ds-interactive-div li.ds-form-item.last {
+	border-top:2px solid #f0f0d2;
+	color:inherit;
+	background-color:#f8f8d9;
+}
+
+form.ds-interactive-div.primary {
+	/*float:left; */
+	margin-bottom:10px;
+	padding:0;
+}
+
+li.ds-form-item {
+	float:left;
+	clear:both;
+}
+
+div.ds-form-content {
+	float:left;
+	clear:right;
+	display:block;
+	width:400px;
+	padding:7px;
+}
+
+span.ds-form-label,label.ds-form-label {
+	display:block;
+	float:left;
+	clear:left;
+	width:115px;
+	font-weight:700;
+	vertical-align:middle;
+	overflow:hidden;
+	padding:5px 20px 5px 10px;
+}
+
+label.ds-composite-component {
+	display:block;
+	float:left;
+	font-size:80%;
+	color:blue;
+	background-color:inherit;
+	text-align:left;
+	padding:0 5px 0 0;
+}
+
+span.error {
+	display:block;
+	font-size:85%;
+	color:red;
+	background-color:inherit;
+	margin:0;
+}
+
+span.field-help {
+	display:block;
+	margin-left:5px;
+	font-size:80%;
+	color:gray;
+	background-color:inherit;
+}
+
+input.error,textarea.error,select.error {
+	color:inherit;
+	background-color:#fff5f5;
+	border-color:red;
+}
+
+div.spacer {
+	line-height:0;
+	clear:both;
+	margin:0;
+	padding:0;
+}
+
+form#ds-search-form {
+	font-size:90%;
+}
+
+input.ds-password-field {
+	margin-right:5px;
+}
+
+div.notice {
+	background-color:#fffff0;
+	border:1px solid #f0f0d2;
+	text-align:center;
+	margin:10px 30px;
+	padding:6px;
+}
+
+div.notice.success p {
+	font-weight:700;
+	color:#50b728;
+	text-align:center;
+	margin:0;
+	padding:0;
+	}
+
+div.notice.failure p {
+	font-weight:700;
+	color:#d55028;
+	text-align:center;
+	margin:0;
+	padding:0;
+}
+
+div.license-text {
+	border:1px solid #666;
+	background-color:#EEE;
+	font-family:monospace;
+	font-size:125%;
+	margin:5px 20px 20px;
+	padding:20px;
+}
+
+div#NoticeTransformer_div_general-message h1.ds-div-head {
+	position:absolute;
+	top:11px;
+	left:42px;
+	font-size:small;
+	margin:0;
+	padding:0 5px;
+}
+
+div#ds-system-wide-alert {
+	background-color:#fffff0;
+	border:1px solid #f0f0d2;
+	color:#d55028;
+	margin:10px 30px;
+	padding:6px;
+}
+
+form.administrative {
+	border:1px solid #f0f0d2;
+	border-top:0;
+	width:inherit;
+}
+
+form.administrative h3 {
+	margin:7px;
+}
+
+form#administrative_item_FindItemForm_div_find-item {
+	border:0;
+	margin-left:0;
+}
+
+ul.horizontal {
+	font-weight:700;
+	list-style-type:none;
+	border-bottom:1px solid #f0f0d2;
+	border-left:1px solid #FFF;
+	border-right:1px solid #FFF;
+	width:inherit;
+	margin:0 -1px;
+	padding:0 0 24px;
+}
+
+ul.horizontal li {
+	float:left;
+	height:21px;
+	background-color:#fcfce8;
+	border:1px solid #f0f0d2;
+	margin:2px 2px 0;
+}
+
+ul.horizontal a {
+	float:left;
+	display:block;
+	text-decoration:none;
+	padding:4px;
+}
+
+ul.horizontal a:hover {
+	background:#FFF;
+	text-decoration:underline;
+}
+
+ul.horizontal li span.bold a {
+	border-bottom:1px solid #FFF;
+	background-color:#FFF;
+	color:#000;
+}
+
+fieldset,ul.ds-artifact-list li img {
+	border:0;
+}
+
+span.italics,span.italic,ul.ds-artifact-list li span.publisher {
+	font-style:italic;
+}
+
+p.hidden,div.browse,ul.collection-browse,ul.community-browse,*.collection-search-browse h4,*.community-search-browse h4,fieldset.ds-checkbox-field legend,fieldset.ds-radio-field legend {
+	display:none;
+}
+
+form.navigation p,*.file-list td {
+	text-align:center;
+}
+
+/*
+tr.ds-table-row.even,ul.ds-artifact-list li.even,form.ds-interactive-div li.even {
+	color:inherit;
+	background-color:#fffff5;
+}
+*/
+
+form.administrative fieldset,form.administrative table {
+	width:auto;
+	margin:7px;
+}

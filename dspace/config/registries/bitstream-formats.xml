@@ -733,5 +733,13 @@
       <extension>rdf</extension>
     </bitstream-type>
 
+    <bitstream-type>
+      <mimetype>image/jp2</mimetype>
+      <short_description>JPEG 2000</short_description>
+      <description>JPEG 2000</description>
+      <support_level>1</support_level>
+      <internal>false</internal>
+      <extension>jp2</extension>
+    </bitstream-type>
 
 </dspace-bitstream-types>

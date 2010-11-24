@@ -21,7 +21,7 @@
 							<hasNote>Islamologi</hasNote>
 						</node>
 						<node id="VR110107" label="Faith and reason">
-							<hasNote>Tros- och livsåskådningsvetenskap</hasNote>
+							<hasNote>Tros- och livs??sk??dningsvetenskap</hasNote>
 						</node>
 						<node id="VR110108" label="Sociology of religion">
 							<hasNote>Religionssociologi</hasNote>
@@ -61,7 +61,7 @@
 									<hasNote>Vetenskapsteori</hasNote>
 								</node>
 							</isComposedBy>
-							<hasNote>Filosofiämnen</hasNote>
+							<hasNote>Filosofi??mnen</hasNote>
 						</node>
 						<node id="SCB1112" label="Archaeology subjects">
 							<isComposedBy>
@@ -81,13 +81,13 @@
 									<hasNote>Arkeologi, utomeuropeisk</hasNote>
 								</node>
 								<node id="VR111206" label="African and comparative archaelogy">
-									<hasNote>Afrikansk och jämförande arkeologi</hasNote>
+									<hasNote>Afrikansk och j??mf??rande arkeologi</hasNote>
 								</node>
 								<node id="VR111207" label="Historical osteology">
 									<hasNote>Historisk osteologi</hasNote>
 								</node>
 							</isComposedBy>
-							<hasNote>Arkeologiämnen</hasNote>
+							<hasNote>Arkeologi??mnen</hasNote>
 						</node>
 						<node id="SCB1113" label="History subjects">
 							<isComposedBy>
@@ -95,7 +95,7 @@
 									<hasNote>Historia</hasNote>
 								</node>
 								<node id="VR111302" label="History of science and ideas">
-									<hasNote>Idé- o lärdomshistoria</hasNote>
+									<hasNote>Id??- o l??rdomshistoria</hasNote>
 								</node>
 								<node id="VR111303" label="Economic history">
 									<hasNote>Ekonomisk historia</hasNote>
@@ -116,7 +116,7 @@
 									<hasNote>Vetenskapshistoria</hasNote>
 								</node>
 								<node id="VR111309" label="Legal history">
-									<hasNote>Rättshistoria</hasNote>
+									<hasNote>R??ttshistoria</hasNote>
 								</node>
 								<node id="VR111310" label="History of medicine">
 									<hasNote>Medicinens historia</hasNote>
@@ -128,7 +128,7 @@
 									<hasNote>Bok- och bibliotekshistoria</hasNote>
 								</node>
 							</isComposedBy>
-							<hasNote>Historieämnen</hasNote>
+							<hasNote>Historie??mnen</hasNote>
 						</node>
 						<node id="SCB1114" label="Ethnology">
 							<isComposedBy>
@@ -144,7 +144,7 @@
 						<node id="SCB1115" label="Historical cultures">
 							<isComposedBy>
 								<node id="VR111503" label="Classical archaeology and ancient history">
-									<hasNote>Antikens kultur och samhälle</hasNote>
+									<hasNote>Antikens kultur och samh??lle</hasNote>
 								</node>
 								<node id="VR111505" label="Byzantinology">
 									<hasNote>Bysantinologi</hasNote>
@@ -153,7 +153,7 @@
 							<hasNote>Historiska kulturer</hasNote>
 						</node>
 					</isComposedBy>
-					<hasNote>Historisk-filosofiska ämnen</hasNote>
+					<hasNote>Historisk-filosofiska ??mnen</hasNote>
 				</node>
 				<node id="SCB112" label="Aesthetic subjects">
 					<isComposedBy>
@@ -182,26 +182,26 @@
 							<hasNote>Bebyggelseforskning</hasNote>
 						</node>
 					</isComposedBy>
-					<hasNote>Estetiska ämnen</hasNote>
+					<hasNote>Estetiska ??mnen</hasNote>
 				</node>
 				<node id="SCB113" label="Languages and linguistics">
 					<isComposedBy>
 						<node id="SCB1131" label="Scandinavian languages">
 							<isComposedBy>
 								<node id="VR113102" label="Swedish language">
-									<hasNote>Svenska språket</hasNote>
+									<hasNote>Svenska spr??ket</hasNote>
 								</node>
 								<node id="VR113103" label="Sami language">
 									<hasNote>Samiska</hasNote>
 								</node>
 								<node id="VR113104" label="Norwegian language">
-									<hasNote>Norska språket</hasNote>
+									<hasNote>Norska spr??ket</hasNote>
 								</node>
 								<node id="VR113105" label="Danish language">
-									<hasNote>Danska språket</hasNote>
+									<hasNote>Danska spr??ket</hasNote>
 								</node>
 							</isComposedBy>
-							<hasNote>Nordiska språk</hasNote>
+							<hasNote>Nordiska spr??k</hasNote>
 						</node>
 						<node id="SCB1132" label="Other Germanic languages">
 							<isComposedBy>
@@ -209,58 +209,58 @@
 									<hasNote>Germanistik</hasNote>
 								</node>
 								<node id="VR113201" label="English language">
-									<hasNote>Engelska språket</hasNote>
+									<hasNote>Engelska spr??ket</hasNote>
 								</node>
 								<node id="VR113202" label="German language">
-									<hasNote>Tyska språket</hasNote>
+									<hasNote>Tyska spr??ket</hasNote>
 								</node>
 								<node id="VR113203" label="Dutch language">
-									<hasNote>Nederländska</hasNote>
+									<hasNote>Nederl??ndska</hasNote>
 								</node>
 							</isComposedBy>
-							<hasNote>Övriga germanska språk</hasNote>
+							<hasNote>??vriga germanska spr??k</hasNote>
 						</node>
 						<node id="SCB1133" label="Romance languages">
 							<isComposedBy>
 								<node id="VR113301" label="French language">
-									<hasNote>Franska språket</hasNote>
+									<hasNote>Franska spr??ket</hasNote>
 								</node>
 								<node id="VR113302" label="Italian language">
-									<hasNote>Italienska språket</hasNote>
+									<hasNote>Italienska spr??ket</hasNote>
 								</node>
 								<node id="VR113304" label="Spanish language">
-									<hasNote>Spanska språket</hasNote>
+									<hasNote>Spanska spr??ket</hasNote>
 								</node>
 								<node id="VR113305" label="Portugese language">
 									<hasNote>Portugisiska</hasNote>
 								</node>
 								<node id="VR113306" label="Romanian language">
-									<hasNote>Rumänska</hasNote>
+									<hasNote>Rum??nska</hasNote>
 								</node>
 							</isComposedBy>
-							<hasNote>Romanska språk</hasNote>
+							<hasNote>Romanska spr??k</hasNote>
 						</node>
 						<node id="SCB1134" label="Finno-Ugric languages">
 							<isComposedBy>
 								<node id="VR113402" label="Finnish language">
-									<hasNote>Finska språket</hasNote>
+									<hasNote>Finska spr??ket</hasNote>
 								</node>
 								<node id="VR113403" label="Estonian language">
-									<hasNote>Estniska språket</hasNote>
+									<hasNote>Estniska spr??ket</hasNote>
 								</node>
 							</isComposedBy>
-							<hasNote>Finsk-ugriska språk</hasNote>
+							<hasNote>Finsk-ugriska spr??k</hasNote>
 						</node>
 						<node id="SCB1135" label="Slavic languages">
 							<isComposedBy>
 								<node id="VR113502" label="Russian language">
-									<hasNote>Ryska språket</hasNote>
+									<hasNote>Ryska spr??ket</hasNote>
 								</node>
 								<node id="VR113503" label="Polish language">
-									<hasNote>Polska språket</hasNote>
+									<hasNote>Polska spr??ket</hasNote>
 								</node>
 							</isComposedBy>
-							<hasNote>Slaviska språk</hasNote>
+							<hasNote>Slaviska spr??k</hasNote>
 						</node>
 						<node id="SCB1136" label="Classical philology">
 							<isComposedBy>
@@ -274,27 +274,27 @@
 									<hasNote>Nygrekiska</hasNote>
 								</node>
 							</isComposedBy>
-							<hasNote>Klassiska språk</hasNote>
+							<hasNote>Klassiska spr??k</hasNote>
 						</node>
 						<node id="SCB1137" label="Other languages">
 							<isComposedBy>
 								<node id="VR113701" label="Sanskrit language with Indo-European lingustics">
-									<hasNote>Sanskrit med indoeuropeisk språkforskning</hasNote>
+									<hasNote>Sanskrit med indoeuropeisk spr??kforskning</hasNote>
 								</node>
 								<node id="VR113702" label="Celtic languages">
-									<hasNote>Keltiska språk</hasNote>
+									<hasNote>Keltiska spr??k</hasNote>
 								</node>
 								<node id="VR113703" label="Baltic languages">
-									<hasNote>Baltiska språk</hasNote>
+									<hasNote>Baltiska spr??k</hasNote>
 								</node>
 								<node id="VR113704" label="East Asian languages">
-									<hasNote>Östasiatiska språk</hasNote>
+									<hasNote>??stasiatiska spr??k</hasNote>
 								</node>
 								<node id="VR113705" label="Turkic languages">
-									<hasNote>Turkiska språk</hasNote>
+									<hasNote>Turkiska spr??k</hasNote>
 								</node>
 								<node id="VR113706" label="Iranian languages">
-									<hasNote>Iranska språk</hasNote>
+									<hasNote>Iranska spr??k</hasNote>
 								</node>
 								<node id="VR113707" label="Arabic language">
 									<hasNote>Arabiska</hasNote>
@@ -309,16 +309,16 @@
 									<hasNote>Indonesiska</hasNote>
 								</node>
 								<node id="VR113711" label="African languages">
-									<hasNote>Afrikanska språk</hasNote>
+									<hasNote>Afrikanska spr??k</hasNote>
 								</node>
 								<node id="VR113712" label="Bantu languages">
 									<hasNote>Bantuistik</hasNote>
 								</node>
 								<node id="VR113713" label="Caucasian languages">
-									<hasNote>Kaukasiska språk</hasNote>
+									<hasNote>Kaukasiska spr??k</hasNote>
 								</node>
 								<node id="VR113714" label="Semitic languages">
-									<hasNote>Semitiska språk</hasNote>
+									<hasNote>Semitiska spr??k</hasNote>
 								</node>
 								<node id="VR113715" label="Altaic languages">
 									<hasNote>Altaistik</hasNote>
@@ -336,10 +336,10 @@
 									<hasNote>Koreanologi</hasNote>
 								</node>
 							</isComposedBy>
-							<hasNote>Övriga språk</hasNote>
+							<hasNote>??vriga spr??k</hasNote>
 						</node>
 						<node id="SCB1138" label="Sign language">
-							<hasNote>Teckenspråk</hasNote>
+							<hasNote>Teckenspr??k</hasNote>
 						</node>
 						<node id="SCB1139" label="Linguistic subjects">
 							<isComposedBy>
@@ -350,25 +350,25 @@
 									<hasNote>Fonetik</hasNote>
 								</node>
 								<node id="VR113903" label="Children's language">
-									<hasNote>Barnspråk</hasNote>
+									<hasNote>Barnspr??k</hasNote>
 								</node>
 								<node id="VR113904" label="Bilingualism">
-									<hasNote>Tvåspråkighet</hasNote>
+									<hasNote>Tv??spr??kighet</hasNote>
 								</node>
 								<node id="VR113905" label="Language technology">
-									<hasNote>Språkteknologi</hasNote>
+									<hasNote>Spr??kteknologi</hasNote>
 								</node>
 								<node id="VR113906" label="Computational linguistics">
 									<hasNote>Datorlingvistik</hasNote>
 								</node>
 							</isComposedBy>
-							<hasNote>Lingvistikämnen</hasNote>
+							<hasNote>Lingvistik??mnen</hasNote>
 						</node>
 					</isComposedBy>
-					<hasNote>Språkvetenskap</hasNote>
+					<hasNote>Spr??kvetenskap</hasNote>
 				</node>
 				<node id="SCB119" label="Other humanities and religion">
-					<hasNote>Övrig humaniora och religionsvetenskap</hasNote>
+					<hasNote>??vrig humaniora och religionsvetenskap</hasNote>
 				</node>
 			</isComposedBy>
 			<hasNote>HUMANIORA och RELIGIONSVETENSKAP</hasNote>
@@ -378,16 +378,16 @@
 				<node id="SCB1201" label="Public law">
 					<isComposedBy>
 						<node id="VR120103" label="Administrative law">
-							<hasNote>Förvaltningsrätt</hasNote>
+							<hasNote>F??rvaltningsr??tt</hasNote>
 						</node>
 						<node id="VR120104" label="Constitutional law">
-							<hasNote>Konstitutionell rätt</hasNote>
+							<hasNote>Konstitutionell r??tt</hasNote>
 						</node>
 						<node id="VR120105" label="Social welfare law">
-							<hasNote>Socialrätt</hasNote>
+							<hasNote>Socialr??tt</hasNote>
 						</node>
 					</isComposedBy>
-					<hasNote>Offentlig rätt</hasNote>
+					<hasNote>Offentlig r??tt</hasNote>
 				</node>
 				<node id="SCB1202" label="Procedural law">
 					<isComposedBy>
@@ -398,80 +398,80 @@
 							<hasNote>Straffprocess</hasNote>
 						</node>
 						<node id="VR120203" label="Administrative procedure">
-							<hasNote>Förvaltningsprocess</hasNote>
+							<hasNote>F??rvaltningsprocess</hasNote>
 						</node>
 						<node id="VR120204" label="Arbitration">
-							<hasNote>Skiljemannarätt</hasNote>
+							<hasNote>Skiljemannar??tt</hasNote>
 						</node>
 					</isComposedBy>
-					<hasNote>Processrätt</hasNote>
+					<hasNote>Processr??tt</hasNote>
 				</node>
 				<node id="SCB1203" label="Criminal law">
-					<hasNote>Straffrätt</hasNote>
+					<hasNote>Straffr??tt</hasNote>
 				</node>
 				<node id="SCB1204" label="Financial law">
-					<hasNote>Finansrätt</hasNote>
+					<hasNote>Finansr??tt</hasNote>
 				</node>
 				<node id="SCB1205" label="Private law">
 					<isComposedBy>
 						<node id="VR120502" label="Contract law">
-							<hasNote>Allmän avtalsrätt</hasNote>
+							<hasNote>Allm??n avtalsr??tt</hasNote>
 						</node>
 						<node id="VR120503" label="Labour law">
-							<hasNote>Arbetsrätt</hasNote>
+							<hasNote>Arbetsr??tt</hasNote>
 						</node>
 						<node id="VR120504" label="Commercial and company law">
-							<hasNote>Affärsrätt</hasNote>
+							<hasNote>Aff??rsr??tt</hasNote>
 						</node>
 						<node id="VR120505" label="Company law">
-							<hasNote>Bolagsrätt</hasNote>
+							<hasNote>Bolagsr??tt</hasNote>
 						</node>
 						<node id="VR120506" label="Insurance law">
-							<hasNote>Försäkringsrätt</hasNote>
+							<hasNote>F??rs??kringsr??tt</hasNote>
 						</node>
 						<node id="VR120507" label="Intellectual property law">
-							<hasNote>Immaterialrätt</hasNote>
+							<hasNote>Immaterialr??tt</hasNote>
 						</node>
 						<node id="VR120508" label="Property and real estate law">
-							<hasNote>Sakrätt</hasNote>
+							<hasNote>Sakr??tt</hasNote>
 						</node>
 						<node id="VR120509" label="Tort law">
-							<hasNote>Skadeståndsrätt</hasNote>
+							<hasNote>Skadest??ndsr??tt</hasNote>
 						</node>
 						<node id="VR120510" label="Contract law">
-							<hasNote>Speciell avtalsrätt</hasNote>
+							<hasNote>Speciell avtalsr??tt</hasNote>
 						</node>
 					</isComposedBy>
-					<hasNote>Civilrätt</hasNote>
+					<hasNote>Civilr??tt</hasNote>
 				</node>
 				<node id="SCB1209" label="Other law">
 					<isComposedBy>
 						<node id="VR120901" label="Jurisprudence">
-							<hasNote>Allmän rättslära</hasNote>
+							<hasNote>Allm??n r??ttsl??ra</hasNote>
 						</node>
 						<node id="VR120902" label="European law">
-							<hasNote>EU-rätt</hasNote>
+							<hasNote>EU-r??tt</hasNote>
 						</node>
 						<node id="VR120903" label="International law">
-							<hasNote>Folkrätt</hasNote>
+							<hasNote>Folkr??tt</hasNote>
 						</node>
 						<node id="VR120904" label="International private law and international procedural law">
-							<hasNote>Internationell privat- och processrätt</hasNote>
+							<hasNote>Internationell privat- och processr??tt</hasNote>
 						</node>
 						<node id="VR120905" label="Comparative law">
-							<hasNote>Komparativ rätt</hasNote>
+							<hasNote>Komparativ r??tt</hasNote>
 						</node>
 						<node id="VR120906" label="Competition law">
-							<hasNote>Marknads- och konkurrensrätt</hasNote>
+							<hasNote>Marknads- och konkurrensr??tt</hasNote>
 						</node>
 						<node id="VR120907" label="Environmental law">
-							<hasNote>Miljörätt</hasNote>
+							<hasNote>Milj??r??tt</hasNote>
 						</node>
 					</isComposedBy>
-					<hasNote>Övrig rätt</hasNote>
+					<hasNote>??vrig r??tt</hasNote>
 				</node>
 			</isComposedBy>
-			<hasNote>RÄTTSVETENSKAP/JURIDIK</hasNote>
+			<hasNote>R??TTSVETENSKAP/JURIDIK</hasNote>
 		</node>
 		<node id="SCB13" label="SOCIAL SCIENCES">
 			<isComposedBy>
@@ -480,10 +480,10 @@
 						<node id="SCB1311" label="Education">
 							<isComposedBy>
 								<node id="VR131102" label="Subject didactics">
-									<hasNote>Ämnesdidaktik</hasNote>
+									<hasNote>??mnesdidaktik</hasNote>
 								</node>
 								<node id="VR131103" label="Nursing education">
-									<hasNote>Vårdpedagogik</hasNote>
+									<hasNote>V??rdpedagogik</hasNote>
 								</node>
 								<node id="VR131104" label="Music education">
 									<hasNote>Musikpedagogik</hasNote>
@@ -497,10 +497,10 @@
 						<node id="SCB1312" label="Psychology">
 							<isComposedBy>
 								<node id="VR131202" label="Applied psychology">
-									<hasNote>Tillämpad psykologi</hasNote>
+									<hasNote>Till??mpad psykologi</hasNote>
 								</node>
 								<node id="VR131203" label="Environmental psychology">
-									<hasNote>Miljöpsykologi</hasNote>
+									<hasNote>Milj??psykologi</hasNote>
 								</node>
 								<node id="VR131204" label="Cognitive science">
 									<hasNote>Kognitionsforskning</hasNote>
@@ -547,7 +547,7 @@
 						<node id="SCB1316" label="Sociology">
 							<isComposedBy>
 								<node id="VR131602" label="Sociology of Law">
-									<hasNote>Rättssociologi</hasNote>
+									<hasNote>R??ttssociologi</hasNote>
 								</node>
 							</isComposedBy>
 							<hasNote>Sociologi</hasNote>
@@ -581,7 +581,7 @@
 				<node id="SCB132" label="Business and economics">
 					<isComposedBy>
 						<node id="SCB1321" label="Business studies">
-							<hasNote>Företagsekonomi</hasNote>
+							<hasNote>F??retagsekonomi</hasNote>
 						</node>
 						<node id="SCB1322" label="Human geography, economic geography">
 							<isComposedBy>
@@ -628,7 +628,7 @@
 									<hasNote>Databehandling</hasNote>
 								</node>
 								<node id="VR133107" label="Information and language technology">
-									<hasNote>Informations- och språkteknologi</hasNote>
+									<hasNote>Informations- och spr??kteknologi</hasNote>
 								</node>
 								<node id="VR133108" label="Information processing">
 									<hasNote>Informationsbehandling</hasNote>
@@ -674,13 +674,13 @@
 							<hasNote>Forskningspolitik</hasNote>
 						</node>
 						<node id="VR139910" label="Military intelligence and security service">
-							<hasNote>Militär underrättelse- och säkerhetstjänst</hasNote>
+							<hasNote>Milit??r underr??ttelse- och s??kerhetstj??nst</hasNote>
 						</node>
 					</isComposedBy>
-					<hasNote>Övrig samhällsvetenskap</hasNote>
+					<hasNote>??vrig samh??llsvetenskap</hasNote>
 				</node>
 			</isComposedBy>
-			<hasNote>SAMHÄLLSVETENSKAP</hasNote>
+			<hasNote>SAMH??LLSVETENSKAP</hasNote>
 		</node>
 		<node id="SCB14" label="MATHEMATICS">
 			<isComposedBy>
@@ -710,16 +710,16 @@
 							<hasNote>Matematisk statistik</hasNote>
 						</node>
 						<node id="VR140204" label="Optimization, systems theory">
-							<hasNote>Optimeringslära, systemteori</hasNote>
+							<hasNote>Optimeringsl??ra, systemteori</hasNote>
 						</node>
 						<node id="VR140205" label="Theoretical computer science">
 							<hasNote>Teoretisk datalogi</hasNote>
 						</node>
 					</isComposedBy>
-					<hasNote>Tillämpad matematik</hasNote>
+					<hasNote>Till??mpad matematik</hasNote>
 				</node>
 				<node id="SCB1409" label="Other mathematics">
-					<hasNote>Övrig matematik</hasNote>
+					<hasNote>??vrig matematik</hasNote>
 				</node>
 			</isComposedBy>
 			<hasNote>MATEMATIK</hasNote>
@@ -748,10 +748,10 @@
 									<hasNote>Mellanenergifysik</hasNote>
 								</node>
 								<node id="VR150204" label="Low energy physics">
-									<hasNote>Lågenergifysik</hasNote>
+									<hasNote>L??genergifysik</hasNote>
 								</node>
 							</isComposedBy>
-							<hasNote>Kärnfysik</hasNote>
+							<hasNote>K??rnfysik</hasNote>
 						</node>
 						<node id="SCB1503" label="Atomic and molecular physics">
 							<isComposedBy>
@@ -791,13 +791,13 @@
 									<hasNote>Struktur- och vibrationsfysik</hasNote>
 								</node>
 								<node id="VR150408" label="Critical phenomena (phase transitions)">
-									<hasNote>Kritiska fenomen (fasövergångar)</hasNote>
+									<hasNote>Kritiska fenomen (fas??verg??ngar)</hasNote>
 								</node>
 								<node id="VR150409" label="Liquid physics">
-									<hasNote>Vätskefysik</hasNote>
+									<hasNote>V??tskefysik</hasNote>
 								</node>
 								<node id="VR150410" label="Low temperature physics">
-									<hasNote>Lågtemperaturfysik</hasNote>
+									<hasNote>L??gtemperaturfysik</hasNote>
 								</node>
 								<node id="VR150411" label="Macromolecular physics">
 									<hasNote>Makromolekylfysik</hasNote>
@@ -820,7 +820,7 @@
 									<hasNote>Astropartikelfysik</hasNote>
 								</node>
 								<node id="VR150503" label="High energy astrophysics">
-									<hasNote>Högenergiastrofysik</hasNote>
+									<hasNote>H??genergiastrofysik</hasNote>
 								</node>
 								<node id="VR150504" label="Solar physics">
 									<hasNote>Solfysik</hasNote>
@@ -835,7 +835,7 @@
 									<hasNote>Extragalaktisk astronomi</hasNote>
 								</node>
 								<node id="VR150508" label="Formation and development of stars">
-									<hasNote>Stjärnors bildning och utveckling</hasNote>
+									<hasNote>Stj??rnors bildning och utveckling</hasNote>
 								</node>
 								<node id="VR150509" label="Cosmology">
 									<hasNote>Kosmologi</hasNote>
@@ -869,7 +869,7 @@
 									<hasNote>Matematisk fysik</hasNote>
 								</node>
 								<node id="VR150904" label="Computational physics">
-									<hasNote>Beräkningsfysik</hasNote>
+									<hasNote>Ber??kningsfysik</hasNote>
 								</node>
 								<node id="VR150905" label="Theory of relativity, gravitation">
 									<hasNote>Relativitetsteori, gravitation</hasNote>
@@ -878,10 +878,10 @@
 									<hasNote>Statistisk fysik</hasNote>
 								</node>
 								<node id="VR150907" label="Non-linear dynamics, chaos">
-									<hasNote>Icke-linjär dynamik, kaos</hasNote>
+									<hasNote>Icke-linj??r dynamik, kaos</hasNote>
 								</node>
 							</isComposedBy>
-							<hasNote>Övrig fysik</hasNote>
+							<hasNote>??vrig fysik</hasNote>
 						</node>
 					</isComposedBy>
 					<hasNote>Fysik</hasNote>
@@ -937,7 +937,7 @@
 							<hasNote>Analytisk kemi</hasNote>
 						</node>
 						<node id="SCB1514" label="Molecular biophysics">
-							<hasNote>Molekylär biofysik</hasNote>
+							<hasNote>Molekyl??r biofysik</hasNote>
 						</node>
 						<node id="SCB1515" label="Inorganic chemistry">
 							<isComposedBy>
@@ -945,10 +945,10 @@
 									<hasNote>Koordinationskemi</hasNote>
 								</node>
 								<node id="VR151503" label="Solution chemistry">
-									<hasNote>Lösningskemi</hasNote>
+									<hasNote>L??sningskemi</hasNote>
 								</node>
 								<node id="VR151504" label="Solid state chemistry">
-									<hasNote>Fasta tillståndets kemi</hasNote>
+									<hasNote>Fasta tillst??ndets kemi</hasNote>
 								</node>
 								<node id="VR151505" label="Bio-inorganic chemistry">
 									<hasNote>Bio-oorganisk kemi</hasNote>
@@ -971,7 +971,7 @@
 									<hasNote>Polymerkemi</hasNote>
 								</node>
 								<node id="VR151606" label="Pharmaceutical chemistry">
-									<hasNote>Läkemedelskemi</hasNote>
+									<hasNote>L??kemedelskemi</hasNote>
 								</node>
 							</isComposedBy>
 							<hasNote>Organisk kemi</hasNote>
@@ -979,7 +979,7 @@
 						<node id="SCB1517" label="Biochemistry">
 							<isComposedBy>
 								<node id="VR151702" label="Molecular biology">
-									<hasNote>Molekylärbiologi</hasNote>
+									<hasNote>Molekyl??rbiologi</hasNote>
 								</node>
 								<node id="VR151703" label="Toxicology">
 									<hasNote>Toxikologi</hasNote>
@@ -996,19 +996,19 @@
 						<node id="SCB1518" label="Environmental chemistry">
 							<isComposedBy>
 								<node id="VR151801" label="Persistent organic compounds">
-									<hasNote>Persistenta organiska föreningar</hasNote>
+									<hasNote>Persistenta organiska f??reningar</hasNote>
 								</node>
 								<node id="VR151802" label="Heavy metals and other metals">
-									<hasNote>Tungmetaller och övriga metaller</hasNote>
+									<hasNote>Tungmetaller och ??vriga metaller</hasNote>
 								</node>
 								<node id="VR151803" label="Environmental toxicology">
-									<hasNote>Miljötoxikologi</hasNote>
+									<hasNote>Milj??toxikologi</hasNote>
 								</node>
 							</isComposedBy>
-							<hasNote>Miljökemi</hasNote>
+							<hasNote>Milj??kemi</hasNote>
 						</node>
 						<node id="SCB1519" label="Other chemistry">
-							<hasNote>Övrig kemi</hasNote>
+							<hasNote>??vrig kemi</hasNote>
 						</node>
 					</isComposedBy>
 					<hasNote>Kemi</hasNote>
@@ -1044,7 +1044,7 @@
 									<hasNote>Systematik och fylogeni</hasNote>
 								</node>
 								<node id="VR152204" label="Plant physiology">
-									<hasNote>Växtfysiologi</hasNote>
+									<hasNote>V??xtfysiologi</hasNote>
 								</node>
 								<node id="VR152205" label="Animal physiology">
 									<hasNote>Zoofysiologi</hasNote>
@@ -1061,7 +1061,7 @@
 									<hasNote>Cellbiologi</hasNote>
 								</node>
 								<node id="VR152302" label="Molecular biology">
-									<hasNote>Molekylärbiologi</hasNote>
+									<hasNote>Molekyl??rbiologi</hasNote>
 								</node>
 								<node id="VR152303" label="Immunology">
 									<hasNote>Immunologi</hasNote>
@@ -1076,7 +1076,7 @@
 									<hasNote>Genetik</hasNote>
 								</node>
 							</isComposedBy>
-							<hasNote>Cell- och molekylärbiologi</hasNote>
+							<hasNote>Cell- och molekyl??rbiologi</hasNote>
 						</node>
 						<node id="SCB1529" label="Other biology">
 							<isComposedBy>
@@ -1087,7 +1087,7 @@
 									<hasNote>Funktionsgenomik</hasNote>
 								</node>
 							</isComposedBy>
-							<hasNote>Övrig biologi</hasNote>
+							<hasNote>??vrig biologi</hasNote>
 						</node>
 					</isComposedBy>
 					<hasNote>Biologi</hasNote>
@@ -1114,7 +1114,7 @@
 									<hasNote>Historisk geologi och paleontologi</hasNote>
 								</node>
 								<node id="VR153202" label="Quaternary geology">
-									<hasNote>Kvartärgeologi</hasNote>
+									<hasNote>Kvart??rgeologi</hasNote>
 								</node>
 								<node id="VR153203" label="Physical geography">
 									<hasNote>Naturgeografi</hasNote>
@@ -1143,10 +1143,10 @@
 									<hasNote>Klimatologi</hasNote>
 								</node>
 							</isComposedBy>
-							<hasNote>Atmosfärs- och hydrosfärsvetenskap</hasNote>
+							<hasNote>Atmosf??rs- och hydrosf??rsvetenskap</hasNote>
 						</node>
 						<node id="SCB1539" label="Other earth sciences">
-							<hasNote>Övrig geovetenskap</hasNote>
+							<hasNote>??vrig geovetenskap</hasNote>
 						</node>
 					</isComposedBy>
 					<hasNote>Geovetenskap</hasNote>
@@ -1205,7 +1205,7 @@
 							<hasNote>Systemteknik</hasNote>
 						</node>
 						<node id="SCB1609" label="Other information technology">
-							<hasNote>Övrig informationsteknik</hasNote>
+							<hasNote>??vrig informationsteknik</hasNote>
 						</node>
 					</isComposedBy>
 					<hasNote>Informationsteknik</hasNote>
@@ -1228,7 +1228,7 @@
 							<hasNote>Biofysik</hasNote>
 						</node>
 						<node id="VR161900" label="Other engineering physics">
-							<hasNote>Övrig teknisk fysik</hasNote>
+							<hasNote>??vrig teknisk fysik</hasNote>
 						</node>
 					</isComposedBy>
 					<hasNote>Teknisk fysik</hasNote>
@@ -1248,13 +1248,13 @@
 							<hasNote>Fotonik</hasNote>
 						</node>
 						<node id="SCB1625" label="Electronic measurement and instrumentation">
-							<hasNote>Elektronisk mät- och apparatteknik</hasNote>
+							<hasNote>Elektronisk m??t- och apparatteknik</hasNote>
 						</node>
 						<node id="SCB1626" label="Electric power engineering">
 							<hasNote>Elkraftteknik</hasNote>
 						</node>
 						<node id="SCB1629" label="Other electrical engineering, electronics and photonics">
-							<hasNote>Övrig elektroteknik, elektronik och fotonik</hasNote>
+							<hasNote>??vrig elektroteknik, elektronik och fotonik</hasNote>
 						</node>
 					</isComposedBy>
 					<hasNote>Elektroteknik, elektronik och fotonik</hasNote>
@@ -1270,7 +1270,7 @@
 									<hasNote>Katalys</hasNote>
 								</node>
 								<node id="VR163103" label="Molecular transport processes in chemical process engineering">
-									<hasNote>Molekylära transportprocesser i kemisk processteknik</hasNote>
+									<hasNote>Molekyl??ra transportprocesser i kemisk processteknik</hasNote>
 								</node>
 								<node id="VR163104" label="Chemical energy engineering">
 									<hasNote>Kemisk energiteknik</hasNote>
@@ -1288,7 +1288,7 @@
 									<hasNote>Yt- och kolloidkemi</hasNote>
 								</node>
 								<node id="VR163109" label="Nuclear chemistry">
-									<hasNote>Kärnkemi</hasNote>
+									<hasNote>K??rnkemi</hasNote>
 								</node>
 								<node id="VR163110" label="Chemical process equipment">
 									<hasNote>Kemisk apparatteknik</hasNote>
@@ -1314,7 +1314,7 @@
 							<hasNote>Livsmedelsteknik</hasNote>
 						</node>
 						<node id="SCB1639" label="Other chemical engineering">
-							<hasNote>Övrig kemiteknik</hasNote>
+							<hasNote>??vrig kemiteknik</hasNote>
 						</node>
 					</isComposedBy>
 					<hasNote>Kemiteknik</hasNote>
@@ -1346,13 +1346,13 @@
 							<hasNote>Bioorganisk syntes</hasNote>
 						</node>
 						<node id="VR164109" label="Plant biotechnology">
-							<hasNote>Växtbioteknik</hasNote>
+							<hasNote>V??xtbioteknik</hasNote>
 						</node>
 						<node id="VR164110" label="Bioinformatics">
 							<hasNote>Bioinformatik</hasNote>
 						</node>
 						<node id="VR164900" label="Other bioengineering">
-							<hasNote>Övrig bioteknik</hasNote>
+							<hasNote>??vrig bioteknik</hasNote>
 						</node>
 					</isComposedBy>
 					<hasNote>Bioteknik</hasNote>
@@ -1363,7 +1363,7 @@
 							<hasNote>Fastkroppsmekanik</hasNote>
 						</node>
 						<node id="SCB1652" label="Fluid mechanics">
-							<hasNote>Strömningsmekanik</hasNote>
+							<hasNote>Str??mningsmekanik</hasNote>
 						</node>
 						<node id="SCB1653" label="Construction engineering">
 							<hasNote>Konstruktionsteknik</hasNote>
@@ -1386,7 +1386,7 @@
 							<hasNote>Farkostteknik</hasNote>
 						</node>
 						<node id="SCB1659" label="Other engineering mechanics">
-							<hasNote>Övrig teknisk mekanik</hasNote>
+							<hasNote>??vrig teknisk mekanik</hasNote>
 						</node>
 					</isComposedBy>
 					<hasNote>Teknisk mekanik</hasNote>
@@ -1403,10 +1403,10 @@
 							<hasNote>Ytbehandlingsteknik</hasNote>
 						</node>
 						<node id="SCB1664" label="Other processing/assembly">
-							<hasNote>Övrig bearbetning/sammanfogning</hasNote>
+							<hasNote>??vrig bearbetning/sammanfogning</hasNote>
 						</node>
 						<node id="SCB1669" label="Other materials science">
-							<hasNote>Övrig teknisk materialvetenskap</hasNote>
+							<hasNote>??vrig teknisk materialvetenskap</hasNote>
 						</node>
 					</isComposedBy>
 					<hasNote>Teknisk materialvetenskap</hasNote>
@@ -1434,7 +1434,7 @@
 							<hasNote>Vattenteknik</hasNote>
 						</node>
 						<node id="SCB1675" label="Surveying">
-							<hasNote>Lantmäteri</hasNote>
+							<hasNote>Lantm??teri</hasNote>
 						</node>
 						<node id="SCB1676" label="Architecture and architectural conservation and restoration">
 							<isComposedBy>
@@ -1442,16 +1442,16 @@
 									<hasNote>Arkitektur</hasNote>
 								</node>
 								<node id="VR167602" label="Architectural conservation and restoration">
-									<hasNote>Bebyggelsevård</hasNote>
+									<hasNote>Bebyggelsev??rd</hasNote>
 								</node>
 							</isComposedBy>
-							<hasNote>Arkitektur och bebyggelsevård</hasNote>
+							<hasNote>Arkitektur och bebyggelsev??rd</hasNote>
 						</node>
 						<node id="SCB1679" label="Other civil engineering and architecture">
-							<hasNote>Övrig samhällsbyggnadsteknik och arkitektur</hasNote>
+							<hasNote>??vrig samh??llsbyggnadsteknik och arkitektur</hasNote>
 						</node>
 					</isComposedBy>
-					<hasNote>Samhällsbyggnadsteknik och arkitektur</hasNote>
+					<hasNote>Samh??llsbyggnadsteknik och arkitektur</hasNote>
 				</node>
 				<node id="SCB168" label="Industrial engineering and economy">
 					<isComposedBy>
@@ -1470,10 +1470,10 @@
 							<hasNote>Industriell organisation, administration och ekonomi</hasNote>
 						</node>
 						<node id="SCB1683" label="Physical planning">
-							<hasNote>Fysisk planläggning</hasNote>
+							<hasNote>Fysisk planl??ggning</hasNote>
 						</node>
 						<node id="SCB1689" label="Other industrial engineering and economics">
-							<hasNote>Övrig industriell teknik och ekonomi</hasNote>
+							<hasNote>??vrig industriell teknik och ekonomi</hasNote>
 						</node>
 					</isComposedBy>
 					<hasNote>Industriell teknik och ekonomi</hasNote>
@@ -1484,13 +1484,13 @@
 							<hasNote>Medicinsk teknik</hasNote>
 						</node>
 						<node id="SCB1692" label="Environmental engineering">
-							<hasNote>Miljöteknik</hasNote>
+							<hasNote>Milj??teknik</hasNote>
 						</node>
 						<node id="SCB1693" label="Space engineering">
 							<hasNote>Rymdteknik</hasNote>
 						</node>
 					</isComposedBy>
-					<hasNote>Övriga teknikvetenskaper</hasNote>
+					<hasNote>??vriga teknikvetenskaper</hasNote>
 				</node>
 			</isComposedBy>
 			<hasNote>TEKNIKVETENSKAP</hasNote>
@@ -1509,7 +1509,7 @@
 							<hasNote>Markbiologi</hasNote>
 						</node>
 						<node id="SCB1714" label="Pedology">
-							<hasNote>Jordmånslära</hasNote>
+							<hasNote>Jordm??nsl??ra</hasNote>
 						</node>
 					</isComposedBy>
 					<hasNote>Markvetenskap</hasNote>
@@ -1517,30 +1517,30 @@
 				<node id="SCB172" label="Plant production">
 					<isComposedBy>
 						<node id="SCB1721" label="Plant breeding">
-							<hasNote>Växtförädling</hasNote>
+							<hasNote>V??xtf??r??dling</hasNote>
 						</node>
 						<node id="SCB1722" label="Horticulture">
-							<hasNote>Trädgårdsväxtodling</hasNote>
+							<hasNote>Tr??dg??rdsv??xtodling</hasNote>
 						</node>
 						<node id="SCB1723" label="Agronomy">
-							<hasNote>Jordbruksväxtodling</hasNote>
+							<hasNote>Jordbruksv??xtodling</hasNote>
 						</node>
 						<node id="SCB1724" label="Forestry">
-							<hasNote>Skogsskötsel</hasNote>
+							<hasNote>Skogssk??tsel</hasNote>
 						</node>
 						<node id="SCB1725" label="Plant and forest protection">
-							<hasNote>Växt- och skogsskydd</hasNote>
+							<hasNote>V??xt- och skogsskydd</hasNote>
 						</node>
 					</isComposedBy>
-					<hasNote>Växtproduktion</hasNote>
+					<hasNote>V??xtproduktion</hasNote>
 				</node>
 				<node id="SCB173" label="Animal production">
 					<isComposedBy>
 						<node id="SCB1731" label="Animal breeding">
-							<hasNote>Husdjursförädling</hasNote>
+							<hasNote>Husdjursf??r??dling</hasNote>
 						</node>
 						<node id="SCB1732" label="Animal nutrition and management">
-							<hasNote>Husdjurens utfodring och vård</hasNote>
+							<hasNote>Husdjurens utfodring och v??rd</hasNote>
 						</node>
 						<node id="SCB1733" label="Aquaculture">
 							<hasNote>Vattenbruk</hasNote>
@@ -1557,10 +1557,10 @@
 							<hasNote>Livsmedelsvetenskap</hasNote>
 						</node>
 						<node id="SCB1742" label="Wood fibre and forest products">
-							<hasNote>Träfiber- och virkeslära</hasNote>
+							<hasNote>Tr??fiber- och virkesl??ra</hasNote>
 						</node>
 						<node id="SCB1743" label="Phytochemistry including algae and industrial bio-raw materials">
-							<hasNote>Fytokemi inklusive alger och industribioråvaror</hasNote>
+							<hasNote>Fytokemi inklusive alger och industribior??varor</hasNote>
 						</node>
 					</isComposedBy>
 					<hasNote>Produktforskning</hasNote>
@@ -1574,10 +1574,10 @@
 							<hasNote>Vegetationsbyggnad</hasNote>
 						</node>
 						<node id="SCB1753" label="Nature conservation and landscape management">
-							<hasNote>Natur- och landskapsvård</hasNote>
+							<hasNote>Natur- och landskapsv??rd</hasNote>
 						</node>
 						<node id="SCB1754" label="Comprehensive planning">
-							<hasNote>Översiktlig planering</hasNote>
+							<hasNote>??versiktlig planering</hasNote>
 						</node>
 					</isComposedBy>
 					<hasNote>Landskapsplanering</hasNote>
@@ -1594,7 +1594,7 @@
 							<hasNote>Skogsteknik</hasNote>
 						</node>
 						<node id="SCB1764" label="Remote sensing">
-							<hasNote>Fjärranalys</hasNote>
+							<hasNote>Fj??rranalys</hasNote>
 						</node>
 					</isComposedBy>
 					<hasNote>Areell teknik</hasNote>
@@ -1611,7 +1611,7 @@
 							<hasNote>Skogsuppskattning och skogsindelning</hasNote>
 						</node>
 						<node id="SCB1774" label="Information science">
-							<hasNote>Informationslära</hasNote>
+							<hasNote>Informationsl??ra</hasNote>
 						</node>
 					</isComposedBy>
 					<hasNote>Areell ekonomi</hasNote>
@@ -1629,7 +1629,7 @@
 									<hasNote>Anestesiologi</hasNote>
 								</node>
 								<node id="VR180102" label="Intensive care">
-									<hasNote>Intensivvård</hasNote>
+									<hasNote>Intensivv??rd</hasNote>
 								</node>
 								<node id="VR180103" label="Diasaster medicine">
 									<hasNote>Katastrofmedicin</hasNote>
@@ -1638,7 +1638,7 @@
 									<hasNote>Traumatologi</hasNote>
 								</node>
 							</isComposedBy>
-							<hasNote>Anestesiologi och intensivvård</hasNote>
+							<hasNote>Anestesiologi och intensivv??rd</hasNote>
 						</node>
 						<node id="SCB1802" label="Surgical research">
 							<isComposedBy>
@@ -1652,7 +1652,7 @@
 									<hasNote>Kirurgi</hasNote>
 								</node>
 								<node id="VR180204" label="Vascular surgery">
-									<hasNote>Kärlkirurgi</hasNote>
+									<hasNote>K??rlkirurgi</hasNote>
 								</node>
 								<node id="VR180205" label="Neurosurgery">
 									<hasNote>Neurokirurgi</hasNote>
@@ -1687,10 +1687,10 @@
 									<hasNote>Obstetrik och gynekologi</hasNote>
 								</node>
 								<node id="VR180302" label="Reproductive health">
-									<hasNote>Reproduktiv hälsa</hasNote>
+									<hasNote>Reproduktiv h??lsa</hasNote>
 								</node>
 								<node id="VR180303" label="Reproductive and perinatal care">
-									<hasNote>Reproduktiv och  perinatal omvårdnad</hasNote>
+									<hasNote>Reproduktiv och  perinatal omv??rdnad</hasNote>
 								</node>
 							</isComposedBy>
 							<hasNote>Obstetrik och kvinnosjukdomar</hasNote>
@@ -1740,7 +1740,7 @@
 									<hasNote>Histologi</hasNote>
 								</node>
 								<node id="VR181204" label="Tumour biology">
-									<hasNote>Tumörbiologi</hasNote>
+									<hasNote>Tum??rbiologi</hasNote>
 								</node>
 							</isComposedBy>
 							<hasNote>Morfologi</hasNote>
@@ -1748,10 +1748,10 @@
 						<node id="SCB1813" label="Pathology">
 							<isComposedBy>
 								<node id="VR181302" label="Forensic medicine">
-									<hasNote>Rättsmedicin</hasNote>
+									<hasNote>R??ttsmedicin</hasNote>
 								</node>
 								<node id="VR181303" label="Molecular medicine">
-									<hasNote>Molekylär medicin</hasNote>
+									<hasNote>Molekyl??r medicin</hasNote>
 								</node>
 							</isComposedBy>
 							<hasNote>Patologi</hasNote>
@@ -1770,13 +1770,13 @@
 									<hasNote>Medicinsk genetik</hasNote>
 								</node>
 								<node id="VR182203" label="Forensic genetics">
-									<hasNote>Rättsgenetik</hasNote>
+									<hasNote>R??ttsgenetik</hasNote>
 								</node>
 								<node id="VR182204" label="Molecular biology">
-									<hasNote>Molekylärbiologi</hasNote>
+									<hasNote>Molekyl??rbiologi</hasNote>
 								</node>
 								<node id="VR182205" label="Molecular ecogenetics">
-									<hasNote>Molekykär ekogenetik</hasNote>
+									<hasNote>Molekyk??r ekogenetik</hasNote>
 								</node>
 							</isComposedBy>
 							<hasNote>Klinisk genetik</hasNote>
@@ -1805,13 +1805,13 @@
 									<hasNote>Kardiologi</hasNote>
 								</node>
 								<node id="VR182309" label="Cardiovascular medicine">
-									<hasNote>Kardiovaskulär medicin</hasNote>
+									<hasNote>Kardiovaskul??r medicin</hasNote>
 								</node>
 								<node id="VR182310" label="Lung diseases">
 									<hasNote>Lungsjukdomar</hasNote>
 								</node>
 								<node id="VR182311" label="Molecular medicine (genetics and pathology)">
-									<hasNote>Molekylär medicin (genetik och patologi)</hasNote>
+									<hasNote>Molekyl??r medicin (genetik och patologi)</hasNote>
 								</node>
 								<node id="VR182312" label="Neurology">
 									<hasNote>Neurologi</hasNote>
@@ -1835,10 +1835,10 @@
 									<hasNote>Transfusionsmedicin</hasNote>
 								</node>
 							</isComposedBy>
-							<hasNote>Invärtesmedicin</hasNote>
+							<hasNote>Inv??rtesmedicin</hasNote>
 						</node>
 					</isComposedBy>
-					<hasNote>Dermatologi och venerologi, klinisk genetik, invärtesmedicin</hasNote>
+					<hasNote>Dermatologi och venerologi, klinisk genetik, inv??rtesmedicin</hasNote>
 				</node>
 				<node id="SCB183" label="Physiology and pharmacology">
 					<isComposedBy>
@@ -1859,10 +1859,10 @@
 						<node id="SCB1832" label="Physiology">
 							<isComposedBy>
 								<node id="VR183201" label="Experimental brain research">
-									<hasNote>Experimentell hjärnforskning</hasNote>
+									<hasNote>Experimentell hj??rnforskning</hasNote>
 								</node>
 								<node id="VR183203" label="Laboratory animal science">
-									<hasNote>Försöksdjursvetenskap</hasNote>
+									<hasNote>F??rs??ksdjursvetenskap</hasNote>
 								</node>
 								<node id="VR183204" label="Clinical physiology">
 									<hasNote>Klinisk fysiologi</hasNote>
@@ -1877,7 +1877,7 @@
 									<hasNote>Medicinsk teknik</hasNote>
 								</node>
 								<node id="VR183208" label="Molecular neurobiology">
-									<hasNote>Molekylär neurobiologi</hasNote>
+									<hasNote>Molekyl??r neurobiologi</hasNote>
 								</node>
 								<node id="VR183209" label="Neurobiology">
 									<hasNote>Neurobiologi</hasNote>
@@ -1886,7 +1886,7 @@
 									<hasNote>Neurofysiologi</hasNote>
 								</node>
 								<node id="VR183211" label="Nutrition">
-									<hasNote>Näringslära</hasNote>
+									<hasNote>N??ringsl??ra</hasNote>
 								</node>
 							</isComposedBy>
 							<hasNote>Fysiologi</hasNote>
@@ -1914,7 +1914,7 @@
 									<hasNote>Radiofysik</hasNote>
 								</node>
 								<node id="VR183404" label="Radiation biology">
-									<hasNote>Strålningsbiologi</hasNote>
+									<hasNote>Str??lningsbiologi</hasNote>
 								</node>
 							</isComposedBy>
 							<hasNote>Radiologisk forskning</hasNote>
@@ -1927,7 +1927,7 @@
 						<node id="SCB1841" label="Public health medicine research areas">
 							<isComposedBy>
 								<node id="VR184101" label="Family medicine">
-									<hasNote>Allmänmedicin</hasNote>
+									<hasNote>Allm??nmedicin</hasNote>
 								</node>
 								<node id="VR184102" label="Occupational physiology">
 									<hasNote>Arbetsfysiologi</hasNote>
@@ -1936,19 +1936,19 @@
 									<hasNote>Epidemiologi</hasNote>
 								</node>
 								<node id="VR184104" label="Public health science">
-									<hasNote>Folkhälsovetenskap</hasNote>
+									<hasNote>Folkh??lsovetenskap</hasNote>
 								</node>
 								<node id="VR184105" label="Environmental medicine">
-									<hasNote>Miljömedicin</hasNote>
+									<hasNote>Milj??medicin</hasNote>
 								</node>
 								<node id="VR184106" label="Community medicine">
-									<hasNote>Samhällsmedicin</hasNote>
+									<hasNote>Samh??llsmedicin</hasNote>
 								</node>
 								<node id="VR184108" label="Occupational medicine">
 									<hasNote>Yrkesmedicin</hasNote>
 								</node>
 							</isComposedBy>
-							<hasNote>Folkhälsomedicinska forskningsområden</hasNote>
+							<hasNote>Folkh??lsomedicinska forskningsomr??den</hasNote>
 						</node>
 					</isComposedBy>
 					<hasNote>Socialmedicin</hasNote>
@@ -1970,7 +1970,7 @@
 									<hasNote>Klinisk immunologi</hasNote>
 								</node>
 								<node id="VR185106" label="Tumour immunology">
-									<hasNote>Tumörimmunologi</hasNote>
+									<hasNote>Tum??rimmunologi</hasNote>
 								</node>
 							</isComposedBy>
 							<hasNote>Immunologi</hasNote>
@@ -2013,7 +2013,7 @@
 							<hasNote>Neurokemi</hasNote>
 						</node>
 						<node id="VR186104" label="Forensic chemistry">
-							<hasNote>Rättskemi</hasNote>
+							<hasNote>R??ttskemi</hasNote>
 						</node>
 					</isComposedBy>
 					<hasNote>Kemi</hasNote>
@@ -2024,7 +2024,7 @@
 							<hasNote>Barn- och ungdomspsykiatri</hasNote>
 						</node>
 						<node id="VR187102" label="Addiction medicine">
-							<hasNote>Beroendelära</hasNote>
+							<hasNote>Beroendel??ra</hasNote>
 						</node>
 					</isComposedBy>
 					<hasNote>Psykiatri</hasNote>
@@ -2044,7 +2044,7 @@
 					<hasNote>Cariologi</hasNote>
 				</node>
 				<node id="SCB1904" label="Cell and  molecular biology">
-					<hasNote>Cell- och molekylärbiologi</hasNote>
+					<hasNote>Cell- och molekyl??rbiologi</hasNote>
 				</node>
 				<node id="SCB1905" label="Endodontology">
 					<hasNote>Endodonti</hasNote>
@@ -2071,7 +2071,7 @@
 					<hasNote>Oral mikrobiologi</hasNote>
 				</node>
 				<node id="SCB1915" label="Oral pathology and forensic odontology">
-					<hasNote>Oral patologi och rättsodontologi</hasNote>
+					<hasNote>Oral patologi och r??ttsodontologi</hasNote>
 				</node>
 				<node id="SCB1916" label="Oral prosthetics">
 					<hasNote>Oral protetik</hasNote>
@@ -2089,7 +2089,7 @@
 					<hasNote>Radiologisk forskning</hasNote>
 				</node>
 				<node id="SCB1929" label="Other odontology">
-					<hasNote>Övrig odontologi</hasNote>
+					<hasNote>??vrig odontologi</hasNote>
 				</node>
 			</isComposedBy>
 			<hasNote>ODONTOLOGI</hasNote>
@@ -2124,10 +2124,10 @@
 					<hasNote>Galenisk farmaci</hasNote>
 				</node>
 				<node id="SCB2112" label="Community pharmacy services">
-					<hasNote>Samhällsfarmaci</hasNote>
+					<hasNote>Samh??llsfarmaci</hasNote>
 				</node>
 				<node id="SCB2119" label="Other pharmacy">
-					<hasNote>Övrig farmaci</hasNote>
+					<hasNote>??vrig farmaci</hasNote>
 				</node>
 			</isComposedBy>
 			<hasNote>FARMACI</hasNote>
@@ -2147,7 +2147,7 @@
 					<hasNote>Farmakologisk forskning</hasNote>
 				</node>
 				<node id="SCB2205" label="Physiology and nutrition">
-					<hasNote>Fysiologi och näringslära</hasNote>
+					<hasNote>Fysiologi och n??ringsl??ra</hasNote>
 				</node>
 				<node id="SCB2206" label="Animal hygiene">
 					<hasNote>Husdjurshygien</hasNote>
@@ -2177,13 +2177,13 @@
 					<hasNote>Radiologi</hasNote>
 				</node>
 				<node id="SCB2217" label="Veterinary epidemiology">
-					<hasNote>Veterinärmedicinsk epidemiologi</hasNote>
+					<hasNote>Veterin??rmedicinsk epidemiologi</hasNote>
 				</node>
 				<node id="SCB2219" label="Other veterinary medicine">
-					<hasNote>Övrig veterinärmedicin</hasNote>
+					<hasNote>??vrig veterin??rmedicin</hasNote>
 				</node>
 			</isComposedBy>
-			<hasNote>VETERINÄRMEDICIN</hasNote>
+			<hasNote>VETERIN??RMEDICIN</hasNote>
 		</node>
 		<node id="SCB23" label="INTERDISCIPLINARY RESEARCH AREAS">
 			<isComposedBy>
@@ -2191,19 +2191,19 @@
 					<hasNote>Barn</hasNote>
 				</node>
 				<node id="SCB232" label="Domestic science and nutrition">
-					<hasNote>Hushålls- och kostvetenskap</hasNote>
+					<hasNote>Hush??lls- och kostvetenskap</hasNote>
 				</node>
 				<node id="SCB233" label="Health and medical services in society">
-					<hasNote>Hälso- och sjukvård i samhället</hasNote>
+					<hasNote>H??lso- och sjukv??rd i samh??llet</hasNote>
 				</node>
 				<node id="SCB234" label="Human communication">
-					<hasNote>Kommunikation mellan människor</hasNote>
+					<hasNote>Kommunikation mellan m??nniskor</hasNote>
 				</node>
 				<node id="SCB235" label="Technology and social change">
-					<hasNote>Teknik och social förändring</hasNote>
+					<hasNote>Teknik och social f??r??ndring</hasNote>
 				</node>
 				<node id="SCB236" label="Water in nature and society">
-					<hasNote>Vatten i natur och samhälle</hasNote>
+					<hasNote>Vatten i natur och samh??lle</hasNote>
 				</node>
 				<node id="SCB237" label="Caring sciences">
 					<isComposedBy>
@@ -2214,7 +2214,7 @@
 							<hasNote>Medicinsk laboratorievetenskap</hasNote>
 						</node>
 						<node id="SCB2373" label="Nursing">
-							<hasNote>Omvårdnad</hasNote>
+							<hasNote>Omv??rdnad</hasNote>
 						</node>
 						<node id="SCB2374" label="Physiotherapy">
 							<hasNote>Sjukgymnastik/fysioterapi</hasNote>
@@ -2223,10 +2223,10 @@
 							<hasNote>Social omsorg/socialpedagogik</hasNote>
 						</node>
 						<node id="SCB2376" label="Theory of science regarding care and  nursing">
-							<hasNote>Vetenskapsteori med inriktning mot vård- och omsorgsområdet</hasNote>
+							<hasNote>Vetenskapsteori med inriktning mot v??rd- och omsorgsomr??det</hasNote>
 						</node>
 					</isComposedBy>
-					<hasNote>Vårdvetenskap</hasNote>
+					<hasNote>V??rdvetenskap</hasNote>
 				</node>
 				<node id="SCB238" label="Ethnicity">
 					<hasNote>Etnicitet</hasNote>
@@ -2241,11 +2241,11 @@
 					<hasNote>Idrott</hasNote>
 				</node>
 				<node id="SCB243" label="Older people and ageing">
-					<hasNote>Äldre och åldrande</hasNote>
+					<hasNote>??ldre och ??ldrande</hasNote>
 				</node>
 			</isComposedBy>
-			<hasNote>TVÄRVETENSKAPLIGA FORSKNINGSOMRÅDEN</hasNote>
+			<hasNote>TV??RVETENSKAPLIGA FORSKNINGSOMR??DEN</hasNote>
 		</node>
 	</isComposedBy>
-	<hasNote>Ämneskategorier för vetenskapliga publikationer</hasNote>
+	<hasNote>??mneskategorier f??r vetenskapliga publikationer</hasNote>
 </node>

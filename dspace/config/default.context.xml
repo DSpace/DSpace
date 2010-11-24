@@ -2,9 +2,9 @@
 <Context debug="0" reloadable="true" crossContext="true">
 	<WatchedResource>WEB-INF/web.xml</WatchedResource>
 	<Parameter name="dspace-config" override="false"
-		value="${dspace.dir}/config/dspace.cfg"
+		value="/apps/dspace/scholarworks/dspace/config/dspace.cfg"
 		description="Path to the DSpace configuration file." />
 	<Parameter name="properties" override="false"
-		value="${dspace.dir}/config/oaicat.properties"
+		value="/apps/dspace/scholarworks/dspace/config/oaicat.properties"
 		description="The location of the oaicat.properties file." />
 </Context>
