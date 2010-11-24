@@ -1076,38 +1076,11 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             // are restoring it
             if (dsoToReplace == null)
             {
-                // In order to restore an object, we must first figure out which
-                // parent it belongs to.
-                DSpaceObject parent = null;
-                // Let's try to figure out the parent using the Manifest.
-                // Look for a Parent Object link in manifest <structmap>
-                String parentLink = manifest.getParentOwnerLink();
-
-                // verify we have a valid Parent Object
-                if (parentLink != null && parentLink.length() > 0)
-                {
-                    parent = HandleManager.resolveToObject(context, parentLink);
-                    if (parent == null)
-                    {
-                        throw new UnsupportedOperationException(
-                                "Could not find a parent DSpaceObject referenced as '"
-                                        + parentLink
-                                        + "' in the METS Manifest of package "
-                                        + pkgFile.getPath()
-                                        + ". A valid parent DSpaceObject must be specified in the METS Manifest itself.");
-                    }
-                }
-                else
-                {
-                    throw new UnsupportedOperationException(
-                            "Could not find a parent DSpaceObject where we can ingest the package "
-                            + pkgFile.getPath()
-                            + ".  A valid parent DSpaceObject must be specified in the METS Manifest itself.");
-                }
-
                 // As this object doesn't already exist, we will perform an
                 // ingest of a new object in order to restore it
-                dso = ingestObject(context, parent, manifest, pkgFile, params,
+                // NOTE: passing 'null' as parent object in order to force
+                // ingestObject() method to determine parent using manifest.
+                dso = ingestObject(context, null, manifest, pkgFile, params,
                         null);
 
                 // Log that we created an object
