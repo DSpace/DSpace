@@ -594,52 +594,73 @@ public class BitstreamReader extends AbstractReader implements Recyclable
 //            }
 //        }
 
-        if (byteRange != null)
+        try
         {
-            String entityLength;
-            String entityRange;
-            if (this.bitstreamSize != -1)
+            if (byteRange != null)
             {
-                entityLength = "" + this.bitstreamSize;
-                entityRange = byteRange.intersection(
-                        new ByteRange(0, this.bitstreamSize)).toString();
+                String entityLength;
+                String entityRange;
+                if (this.bitstreamSize != -1)
+                {
+                    entityLength = "" + this.bitstreamSize;
+                    entityRange = byteRange.intersection(
+                            new ByteRange(0, this.bitstreamSize)).toString();
+                }
+                else
+                {
+                    entityLength = "*";
+                    entityRange = byteRange.toString();
+                }
+
+                response.setHeader("Content-Range", entityRange + "/" + entityLength);
+                if (response instanceof HttpResponse)
+                {
+                    // Response with status 206 (Partial content)
+                    response.setStatus(206);
+                }
+
+                int pos = 0;
+                int posEnd;
+                while ((length = this.bitstreamInputStream.read(buffer)) > -1)
+                {
+                    posEnd = pos + length - 1;
+                    ByteRange intersection = byteRange.intersection(new ByteRange(pos, posEnd));
+                    if (intersection != null)
+                    {
+                        out.write(buffer, (int) intersection.getStart() - pos, (int) intersection.length());
+                    }
+                    pos += length;
+                }
             }
             else
             {
-                entityLength = "*";
-                entityRange = byteRange.toString();
-            }
+                response.setHeader("Content-Length", String.valueOf(this.bitstreamSize));
 
-            response.setHeader("Content-Range", entityRange + "/" + entityLength);
-            if (response instanceof HttpResponse)
-            {
-                // Response with status 206 (Partial content)
-                response.setStatus(206);
-            }
-
-            int pos = 0;
-            int posEnd;
-            while ((length = this.bitstreamInputStream.read(buffer)) > -1)
-            {
-                posEnd = pos + length - 1;
-                ByteRange intersection = byteRange.intersection(new ByteRange(pos, posEnd));
-                if (intersection != null)
+                while ((length = this.bitstreamInputStream.read(buffer)) > -1)
                 {
-                    out.write(buffer, (int) intersection.getStart() - pos, (int) intersection.length());
+                    out.write(buffer, 0, length);
                 }
-                pos += length;
+                out.flush();
             }
         }
-        else
+        finally
         {
-            response.setHeader("Content-Length", String.valueOf(this.bitstreamSize));
-
-            while ((length = this.bitstreamInputStream.read(buffer)) > -1)
+            try
             {
-                out.write(buffer, 0, length);
+                // Close the bitstream input stream so that we don't leak a file descriptor
+                this.bitstreamInputStream.close();
+                
+                // Close the output stream as per Cocoon docs: http://cocoon.apache.org/2.2/core-modules/core/2.2/681_1_1.html
+                out.close();
+            } 
+            catch (IOException ioe)
+            {
+                // Closing the stream threw an IOException but do we want this to propagate up to Cocoon?
+                // No point since the user has already got the bitstream contents.
+                log.warn("Caught IO exception when closing a stream: " + ioe.getMessage());
             }
-            out.flush();
         }
+
     }
 
     /**
