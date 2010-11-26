@@ -458,12 +458,24 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
                                 if (fqs.contains(filterQuery)) {
                                     filterValsList.addItem(Math.random() + "", "selected").addContent(displayedValue + " (" + value.getCount() + ")");
                                 } else {
+                                    String paramsQuery = "";
+                                    Enumeration keys = request.getParameterNames();
+                                    if(keys != null){
+                                        while (keys.hasMoreElements()){
+                                            String key = (String) keys.nextElement();
+                                            if(key != null){
+                                                paramsQuery += key + "=" + URLEncoder.encode(request.getParameter(key), "UTF-8");
+                                                paramsQuery += "&";
+                                            }
+                                        }
+                                    }
+
                                     filterValsList.addItem().addXref(
                                             contextPath +
                                                     (dso == null ? "" : "/handle/" + dso.getHandle()) +
                                                     "/discover?" +
-                                                    request.getQueryString() +
-                                                    "&fq=" +
+                                                    paramsQuery +
+                                                    "fq=" +
                                                     URLEncoder.encode(filterQuery, "UTF-8"),
                                             displayedValue + " (" + value.getCount() + ")"
                                     );
