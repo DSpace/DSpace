@@ -75,7 +75,9 @@
                                     <xsl:text>&quot;</xsl:text>
                                     <xsl:value-of
                                             select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath']"/>
-                                    <xsl:text>/handle/&quot; + radio.value + &quot;/search&quot; ; </xsl:text>
+                                    <xsl:text>/handle/&quot; + radio.value + &quot;</xsl:text>
+                                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='search'][@qualifier='simpleURL']"/>
+                                    <xsl:text>&quot; ; </xsl:text>
                                 <xsl:text>
                                     }
                                 </xsl:text>
