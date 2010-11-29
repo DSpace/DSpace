@@ -491,7 +491,9 @@ public class DCDate
     public String displayLocalDate(boolean showTime, Locale locale)
     {
           // forcibly truncate month name to 3 chars -- XXX FIXME?
-        String monthName = getMonthName(getMonth(), locale).substring(0, 3);
+        String monthName = getMonthName(getMonth(), locale);
+        if (monthName.length() > 2)
+            monthName = monthName.substring(0, 3);
 
         // display date and time
         if (showTime && granularity == DateGran.TIME)
@@ -515,7 +517,9 @@ public class DCDate
     public String displayUTCDate(boolean showTime, Locale locale)
     {
           // forcibly truncate month name to 3 chars -- XXX FIXME?
-        String monthName = getMonthName(getMonthUTC(), locale).substring(0, 3);
+        String monthName = getMonthName(getMonthUTC(), locale);
+        if (monthName.length() > 2)
+            monthName = monthName.substring(0, 3);
 
         // display date and time
         if (showTime && granularity == DateGran.TIME)
