@@ -94,6 +94,7 @@
 - [DS-706] Alternative to dri2xhtml, with the goal to be more developer-friendly
 - [DS-710] New Base Theme For DSpace 1.7.0
 - [DS-711] Discovery release for XMLUI
+- [DS-769] Mirage theme: Repeatable oneboxes in submission did not show "Add more" buttons
 - [DSCR-15] Scoped search in simple search form on navigation bar updated to use "discover" URL
 - [DSCR-16] Support for browsing facets after using "Search DSpace" in the navigation bar
 

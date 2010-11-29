@@ -527,7 +527,18 @@ li.ds-form-item .ds-select-field {
 .ds-add-button,
 label.ds-composite-component .ds-select-field {
     margin-top: 6px;
+    margin-bottom: 6px;
 }
+
+li.ds-form-item label.ds-composite-component.last{
+    padding:0;
+}
+
+.ds-add-button {
+    vertical-align: top;
+    margin-left: 8px;
+}
+
 
 .ds-form-content input.ds-button-field {
     font-size: 93%;
