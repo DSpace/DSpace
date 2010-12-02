@@ -31,6 +31,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.apache.log4j.Logger;
 import org.dspace.content.packager.DSpaceAIPIngester;
 import org.dspace.content.packager.METSManifest;
+import org.dspace.handle.HandleManager;
 
 import org.jdom.Element;
 import org.jdom.Namespace;
@@ -461,9 +462,38 @@ public class AIPTechMDCrosswalk
                         }
                         else if (dcField.equals("relation.isReferencedBy"))
                         {
-                            // Ignore relation.isReferencedBy since it only
-                            // lists _extra_ mapped parents, not the primary one.
-                            // These get connected when collections are re-mapped.
+                            // This Item is referenced by other Collections.  This means
+                            // it has been mapped into one or more additional collections.
+
+                            // We'll attempt to map it to all referenced collections.
+                            // But if this is a recursive ingest, it is possible some of these
+                            // collections may not have been created yet. No need to worry,
+                            // when each Collection is created it will create any mappings that
+                            // we were unable to create now.
+                            String parentHandle = value;
+
+                            if(parentHandle!=null && !parentHandle.isEmpty())
+                            {
+                                //Remove 'hdl:' prefix, if it exists
+                                if (parentHandle.startsWith("hdl:"))
+                                {
+                                    parentHandle = parentHandle.substring(4);
+                                }
+
+                                //Get parent object (if it exists)
+                                DSpaceObject parentDso = HandleManager.resolveToObject(context, parentHandle);
+                                //For Items, this parent *must* be a Collection
+                                if(parentDso!=null && parentDso.getType()==Constants.COLLECTION)
+                                {
+                                    Collection collection = (Collection) parentDso;
+
+                                    //If this item is not already mapped into this collection, map it!
+                                    if (!item.isIn(collection))
+                                    {
+                                        collection.addItem(item);
+                                    }
+                                }
+                            }
                         }
                         else
                         {
@@ -484,7 +514,7 @@ public class AIPTechMDCrosswalk
                         {
                             // Ignore relation.isReferencedBy since it only
                             // lists _extra_ mapped parents, not the primary one.
-                            // These get connected when collections are re-mapped.
+                            // DSpace currently doesn't fully support mapping of Collections/Communities
                         }
                         else
                         {

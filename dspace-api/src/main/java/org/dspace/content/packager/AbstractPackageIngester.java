@@ -240,57 +240,58 @@ public abstract class AbstractPackageIngester
         //      the object to be replaced from the package itself.
         DSpaceObject replacedDso = replace(context, dso, pkgFile, params);
 
-        //Log that we replaced object using a package
-        log.info(LogManager.getHeader(context, "package_replace", "object-type=" + Constants.typeText[replacedDso.getType()] + ", object-handle=" + replacedDso.getHandle()));
-
-        //add to list of successfully replaced objects
-        addToIngestedList(replacedDso);
-        
-        //We can only recursively replace non-Items
-        //(NOTE: Items have no children, as Bitstreams/Bundles are created from Item packages)
-        if(replacedDso.getType()!=Constants.ITEM)
+        //as long as our object was replaced successfully
+        if(replacedDso!=null)
         {
-            //Check if we found child package references when replacing this latest DSpaceObject
-            List<String> childPkgRefs = getPackageReferences(replacedDso);
+            //add to list of successfully replaced objects
+            addToIngestedList(replacedDso);
 
-            //we can only recursively ingest child packages
-            //if we have references to them
-            if(childPkgRefs!=null && !childPkgRefs.isEmpty())
+            //We can only recursively replace non-Items
+            //(NOTE: Items have no children, as Bitstreams/Bundles are created from Item packages)
+            if(replacedDso.getType()!=Constants.ITEM)
             {
-                //Recursively replace each child package
-                for(String childPkgRef : childPkgRefs)
+                //Check if we found child package references when replacing this latest DSpaceObject
+                List<String> childPkgRefs = getPackageReferences(replacedDso);
+
+                //we can only recursively ingest child packages
+                //if we have references to them
+                if(childPkgRefs!=null && !childPkgRefs.isEmpty())
                 {
-                    // Remember where the additions start
-                    int oldSize = dsoIngestedList.size();
-
-                    //Assume package reference is relative to current package location
-                    File childPkg = new File(pkgFile.getAbsoluteFile().getParent(), childPkgRef);
-
-                    //fun, it's recursive! -- replaced referenced package as a child of current object
-                    // Pass object to replace as 'null', as we don't know which object to replace.
-                    replaceAll(context, null, childPkg, params);
-
-                    // A Collection can map to Items that it does not "own".
-                    // If a Collection package has an Item as a child, it
-                    // should be mapped regardless of ownership.
-
-                    // If a Collection package has an Item as a child, it
-                    // should be mapped regardless of ownership.
-                    // Note: Only perform this mapping if new items were ingested to this collection
-                    if (Constants.COLLECTION == replacedDso.getType() && dsoIngestedList.size()>oldSize)
+                    //Recursively replace each child package
+                    for(String childPkgRef : childPkgRefs)
                     {
-                        // Since running 'replaceAll' on an item, will only ingest one Item at most,
-                        // Just make sure that item is mapped to this collection.
-                        Item childItem = (Item)dsoIngestedList.get(oldSize);
-                        Collection collection = (Collection)replacedDso;
-                        if (!childItem.isIn(collection))
+                        // Remember where the additions start
+                        int oldSize = dsoIngestedList.size();
+
+                        //Assume package reference is relative to current package location
+                        File childPkg = new File(pkgFile.getAbsoluteFile().getParent(), childPkgRef);
+
+                        //fun, it's recursive! -- replaced referenced package as a child of current object
+                        // Pass object to replace as 'null', as we don't know which object to replace.
+                        replaceAll(context, null, childPkg, params);
+
+                        // A Collection can map to Items that it does not "own".
+                        // If a Collection package has an Item as a child, it
+                        // should be mapped regardless of ownership.
+
+                        // If a Collection package has an Item as a child, it
+                        // should be mapped regardless of ownership.
+                        // Note: Only perform this mapping if new items were ingested to this collection
+                        if (Constants.COLLECTION == replacedDso.getType() && dsoIngestedList.size()>oldSize)
                         {
-                            collection.addItem(childItem);
+                            // Since running 'replaceAll' on an item, will only ingest one Item at most,
+                            // Just make sure that item is mapped to this collection.
+                            Item childItem = (Item)dsoIngestedList.get(oldSize);
+                            Collection collection = (Collection)replacedDso;
+                            if (!childItem.isIn(collection))
+                            {
+                                collection.addItem(childItem);
+                            }
                         }
                     }
-                }
-            }//end if child pkgs
-        }//end if not an Item
+                }//end if child pkgs
+            }//end if not an Item
+        }//end if DSpaceObject not null
 
         //Return list of all objects replaced
         return getIngestedList();

@@ -234,39 +234,43 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             dso = ingestObject(context, parent, manifest, pkgFile, params,
                     license);
 
-            // Log whether we finished an ingest (create new obj) or a restore
-            // (restore previously existing obj)
-            String action = "package_ingest";
-            if (params.restoreModeEnabled())
+            //if ingestion was successful
+            if(dso!=null)
             {
-                action = "package_restore";
-            }
-            log.info(LogManager.getHeader(context, action,
-                    "Created new Object, type="
-                            + Constants.typeText[dso.getType()] + ", handle="
-                            + dso.getHandle() + ", dbID="
-                            + String.valueOf(dso.getID())));
-
-            // Check if the Packager is currently running recursively.
-            // If so, this means the Packager will attempt to recursively
-            // ingest all referenced child packages.
-            if (params.recursiveModeEnabled())
-            {
-                // Retrieve list of all Child object METS file paths from the
-                // current METS manifest.
-                // This is our list of known child packages
-                String[] childFilePaths = manifest.getChildMetsFilePaths();
-
-                // Save this list to our AbstractPackageIngester (and note which
-                // DSpaceObject the pkgs relate to).
-                // NOTE: The AbstractPackageIngester itself will perform the
-                // recursive ingest call, based on these child pkg references
-                for (int i = 0; i < childFilePaths.length; i++)
+                // Log whether we finished an ingest (create new obj) or a restore
+                // (restore previously existing obj)
+                String action = "package_ingest";
+                if (params.restoreModeEnabled())
                 {
-                    addPackageReference(dso, childFilePaths[i]);
+                    action = "package_restore";
                 }
-            }
+                log.info(LogManager.getHeader(context, action,
+                        "Created new Object, type="
+                                + Constants.typeText[dso.getType()] + ", handle="
+                                + dso.getHandle() + ", dbID="
+                                + String.valueOf(dso.getID())));
 
+                // Check if the Packager is currently running recursively.
+                // If so, this means the Packager will attempt to recursively
+                // ingest all referenced child packages.
+                if (params.recursiveModeEnabled())
+                {
+                    // Retrieve list of all Child object METS file paths from the
+                    // current METS manifest.
+                    // This is our list of known child packages
+                    String[] childFilePaths = manifest.getChildMetsFilePaths();
+
+                    // Save this list to our AbstractPackageIngester (and note which
+                    // DSpaceObject the pkgs relate to).
+                    // NOTE: The AbstractPackageIngester itself will perform the
+                    // recursive ingest call, based on these child pkg references
+                    for (int i = 0; i < childFilePaths.length; i++)
+                    {
+                        addPackageReference(dso, childFilePaths[i]);
+                    }
+                }
+            }//end if dso not null
+            
             return dso;
         }
         catch (SQLException se)
@@ -383,8 +387,27 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                 && (parent == null || !params.getBooleanProperty(
                         "ignoreParent", false)))
         {
-            // get parent object from manifest
-            parent = getParentObject(context, manifest);
+            try
+            {
+                // get parent object from manifest
+                parent = getParentObject(context, manifest);
+            }
+            catch(UnsupportedOperationException e)
+            {
+                //If user specified to skip item ingest if any "missing parent" error message occur
+                if(params.getBooleanProperty("skipIfParentMissing", false))
+                {
+                    //log a warning instead of throwning an error
+                    log.warn(LogManager.getHeader(context, "package_ingest",
+                            "SKIPPING ingest of object '" + manifest.getObjID() + "' as parent DSpace Object could not be found. " +
+                            "If you are running a recursive ingest, it is likely this object will be created as soon as its parent is created."));
+                    //return a null object (nothing ingested as parent was missing)
+                    return null;
+                }
+                else //else, throw exception upward to display to user
+                    throw e;
+            }
+
         }
 
         String handle = null;
@@ -1083,12 +1106,16 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                 dso = ingestObject(context, null, manifest, pkgFile, params,
                         null);
 
-                // Log that we created an object
-                log.info(LogManager.getHeader(context, "package_replace",
-                        "Created new Object, type="
-                                + Constants.typeText[dso.getType()]
-                                + ", handle=" + dso.getHandle() + ", dbID="
-                                + String.valueOf(dso.getID())));
+                //if ingestion was successful
+                if(dso!=null)
+                {
+                    // Log that we created an object
+                    log.info(LogManager.getHeader(context, "package_replace",
+                            "Created new Object, type="
+                                    + Constants.typeText[dso.getType()]
+                                    + ", handle=" + dso.getHandle() + ", dbID="
+                                    + String.valueOf(dso.getID())));
+                }
             }
             else
             // otherwise, we found the DSpaceObject to replace -- so, replace
@@ -1108,23 +1135,27 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                                 + String.valueOf(dso.getID())));
             }
 
-            // Check if the Packager is currently running recursively.
-            // If so, this means the Packager will attempt to recursively
-            // replace all referenced child packages.
-            if (params.recursiveModeEnabled())
+            //if ingest/restore/replace successful
+            if(dso!=null)
             {
-                // Retrieve list of all Child object METS file paths from the
-                // current METS manifest.
-                // This is our list of known child packages.
-                String[] childFilePaths = manifest.getChildMetsFilePaths();
-
-                // Save this list to our AbstractPackageIngester (and note which
-                // DSpaceObject the pkgs relate to)
-                // NOTE: The AbstractPackageIngester itself will perform the
-                // recursive ingest call, based on these child pkg references.
-                for (int i = 0; i < childFilePaths.length; i++)
+                // Check if the Packager is currently running recursively.
+                // If so, this means the Packager will attempt to recursively
+                // replace all referenced child packages.
+                if (params.recursiveModeEnabled())
                 {
-                    addPackageReference(dso, childFilePaths[i]);
+                    // Retrieve list of all Child object METS file paths from the
+                    // current METS manifest.
+                    // This is our list of known child packages.
+                    String[] childFilePaths = manifest.getChildMetsFilePaths();
+
+                    // Save this list to our AbstractPackageIngester (and note which
+                    // DSpaceObject the pkgs relate to)
+                    // NOTE: The AbstractPackageIngester itself will perform the
+                    // recursive ingest call, based on these child pkg references.
+                    for (int i = 0; i < childFilePaths.length; i++)
+                    {
+                        addPackageReference(dso, childFilePaths[i]);
+                    }
                 }
             }
 
