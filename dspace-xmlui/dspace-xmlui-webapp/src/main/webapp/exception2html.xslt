@@ -27,12 +27,16 @@ Scott Phillips adapted it for Manakin's need.
 
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-                xmlns:ex="http://apache.org/cocoon/exception/1.0">
+                xmlns:ex="http://apache.org/cocoon/exception/1.0"
+                xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
 
   <xsl:param name="realPath"/>
 
   <!-- let sitemap override default page title -->
   <xsl:param name="pageTitle">An error has occurred</xsl:param>
+
+  <!-- let sitemap override default context path -->
+  <xsl:param name="contextPath">/</xsl:param>
 
   <xsl:template match="ex:exception-report">
     <html>
@@ -42,7 +46,8 @@ Scott Phillips adapted it for Manakin's need.
         </title>
         <style>
           h1 { font-size: 200%; color: #336699; text-align: left; margin: 0px 0px 10px 0px; padding: 0px 0px 0px 60px; border-width: 0px 0px 1px 0px; border-style: solid; border-color: #336699;}
-          p.message { padding: 10px 30px 10px 15px; margin-left: 15px; font-weight: bold; font-size: 110%;  border-left: 1px #336699 dashed;}
+          p.home { padding: 10px 30px 10px 15px; margin-left: 15px; font-size: 100%;}
+          p.message { padding: 10px 30px 10px 15px; margin-left: 15px; font-weight: bold; font-size: 100%;  border-left: 1px #336699 dashed;}
           p.description { padding: 10px 30px 20px 30px; border-width: 0px 0px 1px 0px; border-style: solid; border-color: #336699;}
           p.topped { padding-top: 10px; border-width: 1px 0px 0px 0px; border-style: solid; border-color: #336699; }
           span.switch { cursor: pointer; margin-left: 5px; text-decoration: underline; }
@@ -80,6 +85,9 @@ Scott Phillips adapted it for Manakin's need.
         </xsl:attribute>
 
         <h1><xsl:value-of select="$pageTitle"/></h1>
+        <p class="home">
+          <a><xsl:attribute name="href"><xsl:value-of select="$contextPath"/></xsl:attribute><i18n:text>xmlui.general.go_home</i18n:text></a>
+        </p>
         <p class="message">
           <xsl:value-of select="@class"/>:
           <xsl:apply-templates select="ex:message" mode="breakLines"/>
