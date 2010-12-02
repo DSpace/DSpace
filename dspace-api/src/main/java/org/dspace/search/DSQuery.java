@@ -446,18 +446,26 @@ public class DSQuery
         {
             // So, open a new searcher
             lastModified = IndexReader.getCurrentVersion(indexDir);
-            searcher = new IndexSearcher(indexDir){
-            	/* 
-            	 * TODO: Has Lucene fixed this bug yet?
-            	 * Lucene doesn't release read locks in 
-            	 * windows properly on finalize. Our hack
-            	 * extend IndexSearcher to force close().
-            	 */
-                protected void finalize() throws Throwable {
-            		this.close();
-            		super.finalize();
-            	}
-            };
+            String osName = System.getProperty("os.name");
+            if (osName != null && osName.toLowerCase().contains("windows"))
+            {
+                searcher = new IndexSearcher(indexDir){
+                    /*
+                     * TODO: Has Lucene fixed this bug yet?
+                     * Lucene doesn't release read locks in
+                     * windows properly on finalize. Our hack
+                     * extend IndexSearcher to force close().
+                     */
+                    protected void finalize() throws Throwable {
+                        this.close();
+                        super.finalize();
+                    }
+                };
+            }
+            else
+            {
+                searcher = new IndexSearcher(indexDir);
+            }
         }
 
         return searcher;

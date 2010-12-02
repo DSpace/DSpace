@@ -242,5 +242,7 @@ public class TableRowIterator
         catch (SQLException sqle)
         {
         }
+
+        columnNames = null;
     }
 }

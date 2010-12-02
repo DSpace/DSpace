@@ -304,6 +304,7 @@ public class Context
             // Free the connection
             DatabaseManager.freeConnection(connection);
             connection = null;
+            clearCache();
         }
     }
 
@@ -430,6 +431,7 @@ public class Context
             }
             connection = null;
             events = null;
+            clearCache();
         }
     }
 
