@@ -68,7 +68,7 @@
             <xsl:value-of select="encoder:encode(string(.))"/>
             <xsl:text>&amp;</xsl:text>
         </xsl:for-each>
-        <xsl:text>rfr_id=info%3Asid%2Fdatadryad.org%3Arepo&amp;</xsl:text>
+        <xsl:text>rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;</xsl:text>
         <xsl:for-each select=".//dim:field[@element != 'description' and @mdschema !='dc' and @qualifier != 'provenance']">
             <xsl:value-of select="concat('rft.', @element,'=',encoder:encode(string(.))) "/>
             <xsl:if test="position()!=last()">

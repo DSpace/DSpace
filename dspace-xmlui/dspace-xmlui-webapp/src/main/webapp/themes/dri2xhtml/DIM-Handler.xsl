@@ -980,14 +980,13 @@
     coins
      -->
 
-	<!--- SFX renderCOinS -->
-
-	<xsl:template name="renderCOinS">
+    <!--- SFX renderCOinS -->
+    <xsl:template name="renderCOinS">
        	<xsl:text>ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;</xsl:text>
        	<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='sfx'][@qualifier='server']"/>
        	<xsl:text>&amp;</xsl:text>
-        <xsl:text>rfr_id=info%3Asid%2Fdatadryad.org%3Arepo&amp;</xsl:text>
-	</xsl:template>
+        <xsl:text>rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;</xsl:text>
+    </xsl:template>
     
     
 </xsl:stylesheet>
