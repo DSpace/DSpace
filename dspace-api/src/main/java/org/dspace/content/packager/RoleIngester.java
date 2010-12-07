@@ -314,7 +314,11 @@ public class RoleIngester implements PackageIngester
                 Element member = (Element) members.item(memberx);
                 String memberName = member.getAttribute(RoleDisseminator.NAME);
                 EPerson memberEPerson = EPerson.findByEmail(context, memberName);
-                groupObj.addMember(memberEPerson);
+                if (null != memberEPerson)
+                    groupObj.addMember(memberEPerson);
+                else
+                    throw new PackageValidationException("EPerson " + memberName
+                            + " not found, not added to " + name);
             }
 
             // Actually write Group info to DB
