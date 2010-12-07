@@ -699,7 +699,7 @@ public class Group extends DSpaceObject
      * @param context
      * @param name
      * 
-     * @return Group
+     * @return the named Group, or null if not found
      */
     public static Group findByName(Context context, String name)
             throws SQLException
