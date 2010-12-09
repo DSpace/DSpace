@@ -397,10 +397,11 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                 //If user specified to skip item ingest if any "missing parent" error message occur
                 if(params.getBooleanProperty("skipIfParentMissing", false))
                 {
-                    //log a warning instead of throwning an error
+                    //log a warning instead of throwing an error
                     log.warn(LogManager.getHeader(context, "package_ingest",
-                            "SKIPPING ingest of object '" + manifest.getObjID() + "' as parent DSpace Object could not be found. " +
-                            "If you are running a recursive ingest, it is likely this object will be created as soon as its parent is created."));
+                            "SKIPPING ingest of object '" + manifest.getObjID()
+                            + "' as parent DSpace Object could not be found. "
+                            + "If you are running a recursive ingest, it is likely this object will be created as soon as its parent is created."));
                     //return a null object (nothing ingested as parent was missing)
                     return null;
                 }
@@ -422,8 +423,17 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         // -- Step 2 --
         // Create our DSpace Object based on info parsed from manifest, and
         // packager params
-        DSpaceObject dso = PackageUtils.createDSpaceObject(context, parent,
-                type, handle, params);
+        DSpaceObject dso;
+        try
+        {
+            dso = PackageUtils.createDSpaceObject(context, parent,
+                    type, handle, params);
+        }
+        catch (SQLException sqle)
+        {
+            throw new PackageValidationException("Exception while ingesting "
+                    + pkgFile.getPath(), sqle);
+        }
 
         // if we are uninitialized, throw an error -- something's wrong!
         if (dso == null)
