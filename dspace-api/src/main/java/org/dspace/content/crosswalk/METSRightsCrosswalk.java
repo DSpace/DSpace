@@ -171,8 +171,6 @@ public class METSRightsCrosswalk
            // <Context CONTEXTCLASS='[group-type]'><UserName USERTYPE='GROUP'>[group-name]</UserName>...
            if(group != null)
            {
-               rightsMD.addContent(rightsContext);
-
               //Default all DSpace groups to have "MANAGED GRP" as the type
               String contextClass=GROUP_CONTEXTCLASS;
 
@@ -193,14 +191,27 @@ public class METSRightsCrosswalk
               {
                   try
                   {
-                      //Create <UserName USERTYPE='GROUP'> element.  Add the Group's name to that element
-                      // But first, make sure to crosswalk all DSpace Default Group names:
-                      // e.g. translate COLLECTION_<ID>_ADMIN to COLLECTION_<handle>_ADMIN ,
-                      // as internal IDs are meaningless once content is outside of DSpace
-                      Element rightsUser = new Element("UserName", METSRights_NS);
-                      rightsUser.setAttribute("USERTYPE",GROUP_USERTYPE);
-                      rightsUser.addContent(PackageUtils.translateGroupNameForExport(context, group.getName()));
-                      rightsContext.addContent(rightsUser);
+                      //Translate the Group name for export.  This ensures that groups with Internal IDs in their names
+                      // (e.g. COLLECTION_1_ADMIN) are properly translated using the corresponding Handle or external identifier.
+                      String exportGroupName = PackageUtils.translateGroupNameForExport(context, group.getName());
+
+                      //If translated group name is returned as "null", this means the Group name
+                      // had an Internal Collection/Community ID embedded, which could not be
+                      // translated properly to a Handle.  We will NOT export these groups,
+                      // as they could cause conflicts or data integrity problems if they are
+                      // imported into another DSpace system.
+                      if(exportGroupName!=null && !exportGroupName.isEmpty())
+                      {
+                          //Create <UserName USERTYPE='GROUP'> element.  Add the Group's name to that element
+                          Element rightsUser = new Element("UserName", METSRights_NS);
+                          rightsUser.setAttribute("USERTYPE",GROUP_USERTYPE);
+                          rightsUser.addContent(exportGroupName);
+                          rightsContext.addContent(rightsUser);
+                      }
+                      else
+                          //Skip over this Group, as we couldn't translate it for export.
+                          //The Group seems to refer to a Community or Collection which no longer exists
+                          continue; 
                   }
                   catch(PackageException pe)
                   {
@@ -209,14 +220,15 @@ public class METSRightsCrosswalk
                       throw new CrosswalkException(pe);
                   }
               }
+
+              rightsMD.addContent(rightsContext);
+
            }//end if group
            //Next, handle User-based policies
            // For User policies we need to setup a
            // <Context CONTEXTCLASS='ACADEMIC USER'><UserName USERTYPE='INDIVIDUAL'>[group-name]</UserName>...
            else if(person!=null)
            {
-               rightsMD.addContent(rightsContext);
-
               // All EPeople are considered 'Academic Users'
               rightsContext.setAttribute("CONTEXTCLASS", PERSON_CONTEXTCLASS);
 
@@ -225,6 +237,8 @@ public class METSRightsCrosswalk
               rightsUser.setAttribute("USERTYPE",PERSON_USERTYPE);
               rightsUser.addContent(person.getEmail());
               rightsContext.addContent(rightsUser);
+
+              rightsMD.addContent(rightsContext);
            }//end if person
            else
                log.error("Policy " + String.valueOf(policy.getID())
