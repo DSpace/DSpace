@@ -438,11 +438,15 @@ public abstract class AbstractMETSDisseminator
                             zip.putNextEntry(ze);
                             if (auth)
                             {
-                                Utils.copy(bitstreams[k].retrieve(), zip);
+                                InputStream input = bitstreams[k].retrieve();
+                                Utils.copy(input, zip);
+                                input.close();
                             }
                             else
                             {
-                                log.warn("Adding zero-length file for Bitstream, SID=" + String.valueOf(bitstreams[k].getSequenceID()) + ", not authorized for READ.");
+                                log.warn("Adding zero-length file for Bitstream, SID="
+                                        + String.valueOf(bitstreams[k].getSequenceID())
+                                        + ", not authorized for READ.");
                             }
                             zip.closeEntry();
                         }
