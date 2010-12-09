@@ -164,7 +164,6 @@ public class METSRightsCrosswalk
 
            // Create our <Context> node for this policy
            Element rightsContext = new Element("Context", METSRights_NS);
-           rightsMD.addContent(rightsContext);
 
   
            //First, handle Group-based policies
@@ -172,6 +171,8 @@ public class METSRightsCrosswalk
            // <Context CONTEXTCLASS='[group-type]'><UserName USERTYPE='GROUP'>[group-name]</UserName>...
            if(group != null)
            {
+               rightsMD.addContent(rightsContext);
+
               //Default all DSpace groups to have "MANAGED GRP" as the type
               String contextClass=GROUP_CONTEXTCLASS;
 
@@ -214,6 +215,8 @@ public class METSRightsCrosswalk
            // <Context CONTEXTCLASS='ACADEMIC USER'><UserName USERTYPE='INDIVIDUAL'>[group-name]</UserName>...
            else if(person!=null)
            {
+               rightsMD.addContent(rightsContext);
+
               // All EPeople are considered 'Academic Users'
               rightsContext.setAttribute("CONTEXTCLASS", PERSON_CONTEXTCLASS);
 
@@ -223,6 +226,9 @@ public class METSRightsCrosswalk
               rightsUser.addContent(person.getEmail());
               rightsContext.addContent(rightsUser);
            }//end if person
+           else
+               log.error("Policy " + String.valueOf(policy.getID())
+                       + " is neither user nor group!  Omitted from package.");
 
 
            //Translate the DSpace ResourcePolicy into a <Permissions> element
@@ -415,7 +421,7 @@ public class METSRightsCrosswalk
                 Element permsElement = element.getChild("Permissions", METSRights_NS);
 
                 //Check if this permission pertains to Anonymous users
-                if(contextClass.equals(ANONYMOUS_CONTEXTCLASS))
+                if(ANONYMOUS_CONTEXTCLASS.equals(contextClass))
                 {
                     //get DSpace Anonymous group, ID=0
                     Group anonGroup = Group.find(context, 0);
@@ -426,7 +432,7 @@ public class METSRightsCrosswalk
 
                     assignPermissions(context, dso, anonGroup, permsElement);
                 } // else if this permission declaration pertains to Administrators
-                else if(contextClass.equals(ADMIN_CONTEXTCLASS))
+                else if(ADMIN_CONTEXTCLASS.equals(contextClass))
                 {
                     //get DSpace Administrator group, ID=1
                     Group adminGroup = Group.find(context, 1);
@@ -437,7 +443,7 @@ public class METSRightsCrosswalk
 
                     assignPermissions(context, dso, adminGroup, permsElement);
                 } // else if this permission pertains to another DSpace group
-                else if(contextClass.equals(GROUP_CONTEXTCLASS))
+                else if(GROUP_CONTEXTCLASS.equals(contextClass))
                 {
                     try
                     {
@@ -474,7 +480,7 @@ public class METSRightsCrosswalk
                         throw new CrosswalkException(pe);
                     }
                 }//end if Group
-                else if(contextClass.equals(PERSON_CONTEXTCLASS))
+                else if(PERSON_CONTEXTCLASS.equals(contextClass))
                 {
                     //we need to find the person it pertains to
                     // Get the text within the <UserName> child element,
@@ -505,6 +511,8 @@ public class METSRightsCrosswalk
                     //assign permissions to person on this object
                     assignPermissions(context, dso, person, permsElement);
                 }//end if Person
+                else
+                    log.error("Unrecognized CONTEXTCLASS:  " + contextClass);
             } //end if "Context" element
         }//end while loop
     }
