@@ -87,7 +87,16 @@ public class EmbargoManager
         throws SQLException, AuthorizeException, IOException
     {
         init();
-        String slift = lift.toString();
+        // if lift is null, we might be restoring an item from an AIP
+        DCDate myLift = lift;
+        if (myLift == null)
+        {
+             if ((myLift = recoverEmbargoDate(item)) == null)
+             {
+                 return;
+             }
+        }
+        String slift = myLift.toString();
         boolean ignoreAuth = context.ignoreAuthorization();
         try
         {
@@ -407,5 +416,22 @@ public class EmbargoManager
     {
         String sa[] = field.split("\\.", 3);
         return sa.length > 2 ? sa[2] : null;
+    }
+    
+    // return the lift date assigned when embargo was set, or null, if either:
+    // it was never under embargo, or the lift date has passed.
+    private static DCDate recoverEmbargoDate(Item item) {
+        DCDate liftDate = null;
+        DCValue lift[] = item.getMetadata(lift_schema, lift_element, lift_qualifier, Item.ANY);
+        if (lift.length > 0)
+        {
+            liftDate = new DCDate(lift[0].value);
+            // sanity check: do not allow an embargo lift date in the past.
+            if (liftDate.toDate().before(new Date()))
+            {
+                liftDate = null;
+            }
+        }
+        return liftDate;       
     }
 }
