@@ -696,10 +696,30 @@ span.field-help {
 }
 
 .ds-artifact-item.collection,
-.ds-artifact-item.community,
-#aspect_artifactbrowser_CommunityBrowser_div_comunity-browser .ds-artifact-item {
+.ds-artifact-item.community {
     padding-top: 1px;
     padding-bottom: 1px;
+}
+
+.community .artifact-title a {
+    font-weight: bold;
+}
+
+.collection .artifact-title a {
+    font-weight: normal;
+}
+
+#aspect_artifactbrowser_CommunityBrowser_div_comunity-browser .short-description, #aspect_discovery_SiteRecentSubmissions_div_site-home .short-description {
+    display: none;
+}
+
+#aspect_artifactbrowser_SimpleSearch_div_search-results li, #aspect_discovery_SimpleSearch_div_search-results li, #aspect_artifactbrowser_AdvancedSearch_div_search-results li {
+    padding-top: 15px;
+    padding-bottom: 15px;
+}
+
+#aspect_artifactbrowser_SimpleSearch_div_search-results ul, #aspect_discovery_SimpleSearch_div_search-results ul, #aspect_artifactbrowser_AdvancedSearch_div_search-results ul {
+    margin-bottom: 25px;
 }
 
 .artifact-title {
@@ -776,6 +796,10 @@ form.search .ds-form-item select{
     margin-top: 0;
 }
 
+form.search label.ds-composite-component .ds-select-field{
+    margin-top: 6px;
+}
+
 form.search .ds-form-item label {
     font-size: 100%;
 }
@@ -790,6 +814,16 @@ form.search table input.ds-text-field {
 
 form.search .field-help {
     margin: 3px 0;
+}
+
+.collection .search,
+.community .search {
+    margin-top: 25px;
+}
+
+#aspect_discovery_CollectionSearch_p_search-query,
+#aspect_discovery_CommunitySearch_p_search-query{
+    margin-bottom:0;
 }
 
 .result-query {
@@ -918,7 +952,7 @@ div.spacer{
 
 .file-metadata span.bold,
 .item-metadata span.bold {
-    width: 50px;
+    width: 80px;
     clear: left;
     text-align: right;
     margin-right: 7px;

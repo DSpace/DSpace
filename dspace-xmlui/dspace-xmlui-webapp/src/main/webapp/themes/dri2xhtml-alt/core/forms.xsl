@@ -774,8 +774,10 @@
         <xsl:choose>
                 <xsl:when test="@type = 'checkbox'  or @type='radio'">
                     <xsl:apply-templates select="." mode="normalField"/>
-                    <br/>
-                    <xsl:apply-templates select="dri:label" mode="compositeComponent"/>
+                    <xsl:if test="dri:label">
+                        <br/>
+                        <xsl:apply-templates select="dri:label" mode="compositeComponent"/>
+                    </xsl:if>
                 </xsl:when>
                 <xsl:otherwise>
                         <label class="ds-composite-component">
@@ -783,8 +785,10 @@
                                 <xsl:attribute name="class">ds-composite-component last</xsl:attribute>
                             </xsl:if>
                             <xsl:apply-templates select="." mode="normalField"/>
-                            <br/>
-                            <xsl:apply-templates select="dri:label" mode="compositeComponent"/>
+                            <xsl:if test="dri:label">
+                                <br/>
+                                <xsl:apply-templates select="dri:label" mode="compositeComponent"/>
+                            </xsl:if>
                         </label>
                 </xsl:otherwise>
         </xsl:choose>

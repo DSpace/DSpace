@@ -7,7 +7,7 @@
  */
 /** Additions for Authority Control elements **/
 /* for scriptaculous autocomplete */
-div.autocomplete {
+div.autocomplete, ul.ui-menu {
   position:absolute;
   width:250px;
   background-color:white;
@@ -15,13 +15,13 @@ div.autocomplete {
   margin:0;
   padding:0;
 }
-div.autocomplete ul {
+div.autocomplete ul, ul.ui-menu {
   list-style-type:none;
   margin:0;
   padding:0;
 }
 div.autocomplete ul li.selected { background-color: #ffb;}
-div.autocomplete ul li {
+div.autocomplete ul li, ul.ui-menu li {
   list-style-type:none;
   display:block;
   margin:0;
@@ -30,6 +30,15 @@ div.autocomplete ul li {
   cursor:pointer;
 }
 div.autocomplete ul li span.value { display:none; }
+ul.ui-menu li a {
+    display: block;
+}
+ul.ui-menu li a.ui-state-hover {
+    background-color: #ffb;
+}
+#aspect_submission_StepTransformer_field_dc_title_container {
+    display: none;
+}
 
 /* this magic gets the 16x16 icon to show up.. setting height/width didn't
    do it, but adding padding actually made it show up. */

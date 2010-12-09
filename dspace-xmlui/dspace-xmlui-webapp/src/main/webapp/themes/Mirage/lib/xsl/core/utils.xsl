@@ -48,11 +48,11 @@
             <xsl:attribute name="class">
                 <xsl:text>ds-artifact-item </xsl:text>
                 <xsl:choose>
-                    <xsl:when test="ancestor::dri:reference[contains(@type, 'Community')]">
+                    <xsl:when test="contains(@type, 'Community')">
                         <xsl:text>community </xsl:text>
                     </xsl:when>
-                    <xsl:when test="ancestor::dri:reference[contains(@type, 'Collection')]">
-                        <xsl:text>community </xsl:text>
+                    <xsl:when test="contains(@type, 'Collection')">
+                        <xsl:text>collection </xsl:text>
                     </xsl:when>
                 </xsl:choose>
                 <xsl:choose>

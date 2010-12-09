@@ -42,37 +42,65 @@
 // NOTE: Successful autocomplete always sets confidence to 'accepted' since
 //  authority value (if any) *was* chosen interactively by a human.
 function DSpaceSetupAutocomplete(formID, args) {
+
+    $(function() {
     if (args.authorityName == null)
         args.authorityName = dspace_makeFieldInput(args.inputName, '_authority');
-    var form = document.getElementById(formID);
+        var form = $('#' + formID)[0];
     var inputID = form.elements[args.inputName].id;
+
     var authorityID = null;
     if (form.elements[args.authorityName] != null)
         authorityID = form.elements[args.authorityName].id;
 
     // AJAX menu source, can add &query=TEXT
     var choiceURL = args.contextPath + "/choices/" + args.metadataField;
-
     var collID = args.collection == null ? -1 : args.collection;
+        choiceURL += '?collection=' + collID;
 
-    // field in whcih to store authority value
-    var options =
-    {
-        // class name of spans that contain value in li elements
-        select: "value",
-        // make up query args for AJAX callback
-        parameters: 'collection=' + collID + '&format=ul',
-        callback:
-                function(inField, querystring) {
-                    return querystring + "&query=" + inField.value;
+        var ac = $('#' + inputID);
+        ac.autocomplete({
+            source: function(request, response) {
+                var reqUrl = choiceURL;
+                if(request && request.term) {
+                    reqUrl += "&query=" + request.term;
+                        }
+                $.get(reqUrl, function(xmldata) {
+                    var options = [];
+                    var authorities = [];
+                    $(xmldata).find('Choice').each(function() {
+                        // get value
+                        var value = $(this).attr('value') ? $(this).attr('value') : null;
+                        // get label, if empty set it to value
+                        var label = $(this).text() ? $(this).text() : value;
+                        // if value was empty but label was provided, set value to label
+                        if(!value) {
+                            value = label;
+                        }
+                        // if at this point either value or label == null, this means none of both were set and we shouldn't add it to the list of options
+                        if (label != null) {
+                            options.push({
+                                label: label,
+                                value: value
+                            });
+                            authorities['label: ' + label + ', value: ' + value] = $(this).attr('authority') ? $(this).attr('authority') : value;
+                        }
+                    });
+                    ac.data('authorities',authorities);
+                    response(options);
+                });
                 },
-        // called after target field is updated
-        afterUpdateElement:
-                function(ignoreField, li) {
+            select: function(event, ui) {
                     // NOTE: lookup element late because it might not be in DOM
                     // at the time we evaluate the function..
-                    var authInput = document.getElementById(authorityID);
-                    var authValue = li == null ? "" : li.getAttribute("authority");
+//                var authInput = document.getElementById(authorityID);
+//                var authValue = li == null ? "" : li.getAttribute("authority");
+                var authInput = $('#' + authorityID);
+                if(authInput.length > 0) {
+                    authInput = authInput[0];
+                }
+                var authorities = ac.data('authorities');
+                var authValue = authorities['label: ' + ui.item.label + ', value: ' + ui.item.value];
                     if (authInput != null) {
                         authInput.value = authValue;
                         // update confidence input's value too if available.
@@ -86,15 +114,8 @@ function DSpaceSetupAutocomplete(formID, args) {
                     DSpaceUpdateConfidence(document, args.confidenceIndicatorID,
                             authValue == null || authValue == '' ? 'blank' : 'accepted');
                 }
-    };
-
-    if (args.indicatorID != null)
-        options.indicator = args.indicatorID;
-
-    // be sure to turn off autocomplete, it absorbs arrow-key events!
-    form.elements[args.inputName].setAttribute("autocomplete", "off");
-
-    new Ajax.Autocompleter(inputID, args.containerID, choiceURL, options);
+		});
+	});
 }
 
 // -------------------- support for Lookup Popup
@@ -111,6 +132,11 @@ function DSpaceChoiceLookup(url, field, formID, valueInput, authInput,
     // primary input field - for positioning popup.
     var inputFieldName = isName ? dspace_makeFieldInput(valueInput, '_last') : valueInput;
     var inputField = $('input[name = ' + inputFieldName + ']');
+    // sometimes a textarea is used, in which case the previous jQuery search delivered no results...
+    if(inputField.length == 0) {
+        // so search for a textarea
+        inputField = $('textarea[name = ' + inputFieldName + ']');
+    }
     var cOffset = 0;
     if (inputField != null)
         cOffset = inputField.offset();
@@ -182,8 +208,8 @@ function DSpaceChoicesLoad(form) {
         // lookup text as a metadata value:
         if (isRepeating) {
             if (isName) {
-                of.find('*[name = ' + dspace_makeFieldInput(valueInput, '_last') + ']').val(null);
-                of.find('*[name = ' + dspace_makeFieldInput(valueInput, '_first') + ']').val(null);
+                of.find('*[name = ' + dspace_makeFieldInput(valueInput, '_last') + ']').val('');
+                of.find('*[name = ' + dspace_makeFieldInput(valueInput, '_first') + ']').val('');
             }
             else
                 of.find('*[name = ' + valueInput + ']').val(null);
@@ -191,9 +217,8 @@ function DSpaceChoicesLoad(form) {
     }
 
     // start spinner
-    var indicator = document.getElementById('lookup_indicator_id');
-    if (indicator != null)
-        indicator.style.display = "inline";
+    var indicator = $('#lookup_indicator_id');
+    indicator.show('fast');
 
     $(window).ajaxError(function(e, xhr, settings, exception) {
         window.alert(fail + " Exception=" + e);
@@ -203,68 +228,68 @@ function DSpaceChoicesLoad(form) {
     $.ajax({
         url: contextPath + "/choices/" + field,
         type: "GET",
-        data: {query: value, format: 'select', collection: collID,
+        data: {query: value, collection: collID,
                      start: start, limit: limit},
         error: function() {
             window.alert(fail + " HTTP error resonse");
             if (indicator != null) indicator.style.display = "none";
         },
         success: function(data) {
-            var ul = data.documentElement;
-            var err = ul.getAttributeNode('error');
-            if (err != null && err.value == 'true')
+            var Choices = $(data).find('Choices');
+            var err = Choices.attr('error');
+            if (err != null && err == 'true')
                 window.alert(fail + " Server indicates error in response.");
-            var opts = ul.getElementsByTagName('option');
+            var opts = Choices.find('Choice');
 
             // update range message and update 'more' button
-            var oldStart = 1 * ul.getAttributeNode('start').value;
+            var oldStart = 1 * Choices.attr('start');
             var nextStart = oldStart + opts.length;
-            var lastTotal = ul.getAttributeNode('total').value;
-            var resultMore = ul.getAttributeNode('more');
-            $('*[name = more]').attr('disabled', !(resultMore != null && resultMore.value == 'true'));
+            var lastTotal = Choices.attr('total');
+            var resultMore = Choices.attr('more');
+            $('*[name = more]').attr('disabled', !(resultMore != null && resultMore == 'true'));
             $('*[name = paramStart]').val(nextStart);
 
             // clear select first
-            var select = $('*[name = chooser]')[0];
-            for (var i = select.length - 1; i >= 0; --i)
-                select.remove(i);
+            var select = $('select[name = chooser]:first');
+            select.find('option:not(:last)').remove();
+            var lastOption = select.find('option:last');
 
-            // load select and look for default selection
             var selectedByValue = -1; // select by value match
             var selectedByChoices = -1;  // Choice says its selected
-            for (var i = 0; i < opts.length; ++i) {
-                var opt = opts.item(i);
-                var olabel = "";
-                for (var j = 0; j < opt.childNodes.length; ++j) {
-                    var node = opt.childNodes[j];
-                    if (node.nodeName == "#text")
-                        olabel += node.data;
-                }
-                var ovalue = opt.getAttributeNode('value').value;
-                var option = new Option(olabel, ovalue);
-                option.authority = opt.getAttributeNode('authority').value;
-                select.add(option, null);
-                if (value == ovalue)
-                    selectedByValue = select.options.length - 1;
-                if (opt.getAttributeNode('selected') != null)
-                    selectedByChoices = select.options.length - 1;
-            }
+            $.each(opts, function(index) {
+//                debugger;
+                var current = $(this);
+                if (current.attr('value') == value)
+                    selectedByValue = index;
+                if(current.attr('selected') != undefined)
+                    selectedByChoices = index;
+
+                var newOption = $('<option value="' + current.attr('value') + '">' + current.text() + '</option>');
+                newOption.data('authority', current.attr('authority'));
+
+                if (lastOption.length > 0)
+                    lastOption.insertBefore(newOption);
+                else
+                    select.append(newOption);
+            });
+
+
             // add non-authority option if needed.
             if (!isClosed) {
-                select.add(new Option(dspace_formatMessage(nonAuthority, value), value), null);
+                select.append(new Option(dspace_formatMessage(nonAuthority, value), value), null);
             }
             var defaultSelected = -1;
             if (selectedByChoices >= 0)
                 defaultSelected = selectedByChoices;
             else if (selectedByValue >= 0)
                 defaultSelected = selectedByValue;
-            else if (select.options.length == 1)
+            else if (select[0].options.length == 1)
                 defaultSelected = 0;
 
             // load default-selected value
             if (defaultSelected >= 0) {
-                select.options[defaultSelected].defaultSelected = true;
-                var so = select.options[defaultSelected];
+                select[0].options[defaultSelected].defaultSelected = true;
+                var so = select[0].options[defaultSelected];
                 if (isName) {
                     $('*[name = text1]').val(lastNameOf(so.value));
                     $('*[name = text2]').val(firstNameOf(so.value));
@@ -274,8 +299,7 @@ function DSpaceChoicesLoad(form) {
             }
 
             // turn off spinner
-            if (indicator != null)
-                indicator.style.display = "none";
+            indicator.hide('fast');
 
             // "results" status line
             var statLast = nextStart + (isClosed ? 2 : 1);
@@ -346,8 +370,8 @@ function DSpaceChoicesAcceptOnClick() {
 
             var authValue = null;
             var selectedOption = select.find(':selected');
-            if (selectedOption.length >= 0 && selectedOption.attr('authority') != null) {
-                of.find('*[name = ' + authorityInput + ']').val(selectedOption.attr('authority'));
+            if (selectedOption.length >= 0 && selectedOption.data('authority') != null) {
+                of.find('*[name = ' + authorityInput + ']').val(selectedOption.data('authority'));
             }
             of.find('*[name = ' + confInput + ']').val('accepted');
             // make indicator blank if no authority value

@@ -78,7 +78,7 @@
         <xsl:variable name="metadataWidth" select="675 - $thumbnail.maxwidth - 30"/>
         <div class="item-metadata" style="width: {$metadataWidth}px;">
             <span class="bold"><i18n:text>xmlui.dri2xhtml.pioneer.title</i18n:text><xsl:text>:</xsl:text></span>
-            <span class="content" style="width: {$metadataWidth - 80}px;">
+            <span class="content" style="width: {$metadataWidth - 110}px;">
                 <xsl:element name="a">
                     <xsl:attribute name="href">
                         <xsl:value-of select="$href"/>
@@ -99,7 +99,7 @@
                 </xsl:element>
             </span>
             <span class="bold"><i18n:text>xmlui.dri2xhtml.pioneer.author</i18n:text><xsl:text>:</xsl:text></span>
-            <span class="content" style="width: {$metadataWidth - 80}px;">
+            <span class="content" style="width: {$metadataWidth - 110}px;">
                 <xsl:choose>
                     <xsl:when test="dim:field[@element='contributor'][@qualifier='author']">
                         <xsl:for-each select="dim:field[@element='contributor'][@qualifier='author']">
@@ -139,7 +139,7 @@
             </span>
             <xsl:if test="dim:field[@element='date' and @qualifier='issued'] or dim:field[@element='publisher']">
                 <span class="bold"><i18n:text>xmlui.dri2xhtml.pioneer.date</i18n:text><xsl:text>:</xsl:text></span>
-                <span class="content" style="width: {$metadataWidth - 80}px;">
+                <span class="content" style="width: {$metadataWidth - 110}px;">
                     <xsl:value-of
                             select="substring(dim:field[@element='date' and @qualifier='issued']/node(),1,10)"/>
                 </span>

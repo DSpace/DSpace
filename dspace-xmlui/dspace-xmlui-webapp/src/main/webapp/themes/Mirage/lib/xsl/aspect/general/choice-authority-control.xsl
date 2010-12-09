@@ -289,7 +289,7 @@
       </input>
       <!-- optional "unlock" button on (visible) authority value field -->
       <xsl:if test="$unlockButton">
-        <input type="image" class="ds-authority-lock is-locked ">
+        <input type="image" class="ds-authority-lock is-locked " value="">
           <xsl:attribute name="onClick">
             <xsl:text>javascript: return DSpaceToggleAuthorityLock(this, '</xsl:text>
             <xsl:value-of select="$authFieldID"/>
