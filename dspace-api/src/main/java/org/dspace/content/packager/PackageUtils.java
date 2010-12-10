@@ -35,6 +35,7 @@ import org.dspace.content.Site;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.Utils;
 import org.dspace.handle.HandleManager;
 import org.dspace.license.CreativeCommons;
 import org.dspace.workflow.WorkflowItem;
@@ -758,16 +759,24 @@ public class PackageUtils
         }
     }
 
-
+    /** Recognize and pick apart likely "magic" group names */
     private static final Pattern groupAnalyzer
         = Pattern.compile("^(COMMUNITY|COLLECTION)_([0-9]+)_(.+)");
+
+    /** Lookaside list for translations we've already done, so we don't generate
+     * multiple names for the same group
+     */
+    private static final Map<String, String> orphanGroups = new HashMap<String, String>();
+
     /**
      * When DSpace creates Default Group Names they are of a very specific format,
      * for example:
-     * <li> COMMUNITY_[ID]_ADMIN
-     * <li> COLLECTION_[ID]_ADMIN
-     * <li> COLLECTION_[ID]_SUBMIT
-     * <li> COLLECTION_[ID]_WORKFLOW_STEP_#
+     * <ul>
+     * <li> COMMUNITY_[ID]_ADMIN </li>
+     * <li> COLLECTION_[ID]_ADMIN </li>
+     * <li> COLLECTION_[ID]_SUBMIT </li>
+     * <li> COLLECTION_[ID]_WORKFLOW_STEP_# </li>
+     * </ul>
      * <p>
      * Although these names work fine within DSpace, the DSpace internal ID
      * (represented by [ID] above) becomes meaningless when content is exported
@@ -783,8 +792,9 @@ public class PackageUtils
      * internal IDs with the appropriate external Handle identifier.  If
      * the group name doesn't have an embedded internal ID, it is returned
      * as is. If the group name contains an embedded internal ID, but the
-     * corresponding Handle cannot be determined, then null is returned (as
-     * the group name could not be translated).
+     * corresponding Handle cannot be determined, then it will be translated to
+     * GROUP_[random]_[objectType]_[groupType] and <em>not</em> re-translated on
+     * import.
      * <p>
      * This method may be useful to any Crosswalks/Packagers which deal with
      * import/export of DSpace Groups.
@@ -814,14 +824,34 @@ public class PackageUtils
             //We'll translate this internal ID into a Handle
 
             //First, get the object via the Internal ID
-            DSpaceObject dso = DSpaceObject.find(context, Constants.getTypeID(objType), Integer.parseInt(objID));
+            DSpaceObject dso = DSpaceObject.find(context, Constants
+                    .getTypeID(objType), Integer.parseInt(objID));
 
             if(dso==null)
             {
-                // Just log a warning -- it's possible this Group was not cleaned up when the associated DSpace Object was removed.
+                // No such object.  Change the name to something harmless.
+                String newName;
+                if (orphanGroups.containsKey(groupName))
+                    newName =  orphanGroups.get(groupName);
+                else
+                {
+                    newName= "GROUP_" + Utils.generateHexKey() + "_"
+                            + objType + "_" + groupType;
+                    orphanGroups.put(groupName, newName);
+                    // A given group should only be translated once, since the
+                    // new name contains unique random elements which would be
+                    // different every time.
+                }
+
+                // Just log a warning -- it's possible this Group was not
+                // cleaned up when the associated DSpace Object was removed.
                 // So, we don't want to throw an error and stop all other processing.
-                log.warn("Unable to translate Internal ID to Handle in group named '" + groupName + "' as DSpace Object (ID='" + objID + "', type ='" + objType + "') no longer exists.");
-                return null;
+                log.warn("DSpace Object (ID='" + objID
+                        + "', type ='" + objType
+                        + "') no longer exists -- translating " + groupName
+                        + " to " + newName + ".");
+
+                return newName;
             }
 
             //Create an updated group name, using the Handle to replace the InternalID
