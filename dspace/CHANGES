@@ -99,10 +99,10 @@
 - [DSCR-15] Scoped search in simple search form on navigation bar updated to use "discover" URL
 - [DSCR-16] Support for browsing facets after using "Search DSpace" in the navigation bar
 
-(Bill Hayes, Stuart Lewis)
+(Bill Hays, Stuart Lewis)
 - [DS-738] sword.cfg seems no longer used after 1.5
 
-(Bill Hayes, Kim Shepherd)
+(Bill Hays, Kim Shepherd)
 - [DS-748] COinS in XMLUI has invalid referrer Id and dc metadata, spans are not property constructed
 
 (Andrea Schweer)
