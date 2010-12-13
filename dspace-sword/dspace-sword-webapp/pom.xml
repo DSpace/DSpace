@@ -14,7 +14,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-sword</artifactId>
-      <version>1.7.0-rc2-SNAPSHOT</version>
+      <version>1.7.0-rc2</version>
    </parent>
 
    <!--
@@ -23,9 +23,9 @@
       into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword/dspace-sword-webapp</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword/dspace-sword-webapp</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword/dspace-sword-webapp</url>
+      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.0-rc2/dspace-sword/dspace-sword-webapp</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.0-rc2/dspace-sword/dspace-sword-webapp</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.0-rc2/dspace-sword/dspace-sword-webapp</url>
    </scm>
 
    <build>
@@ -113,7 +113,7 @@
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-sword-api</artifactId>
-         <version>1.7.0-rc2-SNAPSHOT</version>
+         <version>1.7.0-rc2</version>
       </dependency>
    </dependencies>
 
