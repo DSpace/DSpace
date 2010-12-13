@@ -5,13 +5,13 @@
     <packaging>pom</packaging>
     <groupId>org.dspace</groupId>
     <artifactId>discovery-modules</artifactId>
-    <version>1.7.0-rc2</version>
+    <version>1.7.0-rc3-SNAPSHOT</version>
     <name>DSpace Discovery :: Modules</name>
 
     <parent>
         <artifactId>dspace-parent</artifactId>
         <groupId>org.dspace</groupId>
-        <version>1.7.0-rc2</version>
+        <version>1.7.0-rc3-SNAPSHOT</version>
     </parent>
     
     <modules>
@@ -52,11 +52,11 @@
        and releases snapshots into the snapshot repository below.
     -->
     <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.0-rc2/dspace-discovery</connection>
+        <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-discovery</connection>
         <developerConnection>
-            scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.0-rc2/dspace-discovery
+            scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-discovery
         </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.0-rc2/dspace-discovery</url>
+        <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-discovery</url>
     </scm>
 
     <issueManagement>
