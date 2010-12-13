@@ -7,13 +7,17 @@
    <description>
       DSpace SOLR Service Provider Web Application
    </description>
-   <version>1.7.0-rc2-SNAPSHOT</version>
 
-   <!--Force UTF-8 encoding during build on all platforms-->
-   <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-   </properties>
-
+   <!--
+      A Parent POM that Maven inherits DSpace Default
+      POM atrributes from.
+   -->
+   <parent>
+      <groupId>org.dspace</groupId>
+      <artifactId>modules</artifactId>
+      <version>1.7.0-rc2-SNAPSHOT</version>
+   </parent>
+   
    <!--
       The Subversion repository location is used by Continuum to update
       against when changes have occured, this spawns a new build cycle
