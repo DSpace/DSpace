@@ -8,14 +8,14 @@
     <url>http://projects.dspace.org/dspace-services</url>
 
     <organization>
-        <name>The DSpace Foundation</name>
+        <name>DuraSpace</name>
         <url>http://www.dspace.org</url>
     </organization>
     
     <parent>
         <artifactId>dspace-pom</artifactId>
         <groupId>org.dspace</groupId>
-        <version>7</version>
+        <version>8</version>
     </parent>
     
     <version>2.0.3-SNAPSHOT</version>
