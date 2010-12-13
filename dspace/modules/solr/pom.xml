@@ -7,7 +7,7 @@
    <description>
       DSpace SOLR Service Provider Web Application
    </description>
-   <version>1.7.0-rc3-SNAPSHOT</version>
+   <version>1.7.0-rc2-SNAPSHOT</version>
 
    <!--Force UTF-8 encoding during build on all platforms-->
    <properties>

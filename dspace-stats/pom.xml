@@ -3,14 +3,14 @@
 	<parent>
 		<artifactId>dspace-parent</artifactId>
 		<groupId>org.dspace</groupId>
-		<version>1.7.0-rc3-SNAPSHOT</version>
+		<version>1.7.0-rc2-SNAPSHOT</version>
 	</parent>
 	
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.dspace</groupId>
 	<artifactId>dspace-stats</artifactId>
 	<name>DSpace Solr Statistics Logging Client Library</name>
-	<version>1.7.0-rc3-SNAPSHOT</version>
+	<version>1.7.0-rc2-SNAPSHOT</version>
 	<description>Library of Shared UsageEvent and EventConsumer Tools for Logging to Solr.</description>
 
 	<!--
