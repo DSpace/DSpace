@@ -94,7 +94,16 @@
     <!-- Generate the info about the item from the metadata section -->
     <xsl:template match="dim:dim" mode="itemSummaryList-DIM"> 
         <xsl:variable name="itemWithdrawn" select="@withdrawn" />
+
         <div class="artifact-description">
+		    <!-- Generate COinS with empty content per spec but force Cocoon to not create a minified tag  -->
+            <span class="Z3988">
+                <xsl:attribute name="title">
+                    <xsl:call-template name="renderCOinS"/>
+                </xsl:attribute>
+               &#xFEFF; <!-- non-breaking space to force separating the end tag --> 
+            </span>
+
             <div class="artifact-title">
                 <xsl:element name="a">
                     <xsl:attribute name="href">
@@ -107,19 +116,14 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <span class="Z3988">
-                        <xsl:attribute name="title">
-                            <xsl:call-template name="renderCOinS"/>
-                        </xsl:attribute>
-                        <xsl:choose>
-                            <xsl:when test="dim:field[@element='title']">
-                                <xsl:value-of select="dim:field[@element='title'][1]/node()"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </span>
+                    <xsl:choose>
+                        <xsl:when test="dim:field[@element='title']">
+                            <xsl:value-of select="dim:field[@element='title'][1]/node()"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:element>    
             </div>
             <div class="artifact-info">
@@ -406,6 +410,13 @@
     
     <!-- Generate the info about the item from the metadata section -->
     <xsl:template match="dim:dim" mode="itemSummaryView-DIM">
+        <!--  Generate COinS  -->
+        <span class="Z3988">
+            <xsl:attribute name="title">
+                <xsl:call-template name="renderCOinS"/>
+            </xsl:attribute>
+	    &#xFEFF; <!-- non-breaking space to force separating the end tag -->
+        </span>
         <table class="ds-includeSet-table">
          <xsl:call-template name="itemSummaryView-DIM-fields">
          </xsl:call-template>
@@ -458,27 +469,22 @@
             <tr class="ds-table-row {$phase}">
                 <td><span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-title</i18n:text>: </span></td>
                 <td>
-                    <span class="Z3988">
-                        <xsl:attribute name="title">
-                            <xsl:call-template name="renderCOinS"/>
-                        </xsl:attribute>
-                        <xsl:choose>
-                            <xsl:when test="count(dim:field[@element='title'][not(@qualifier)]) &gt; 1">
-                                <xsl:for-each select="dim:field[@element='title'][not(@qualifier)]">
-                            	   <xsl:value-of select="./node()"/>
-                            	   <xsl:if test="count(following-sibling::dim:field[@element='title'][not(@qualifier)]) != 0">
-	                                    <xsl:text>; </xsl:text><br/>
-	                                </xsl:if>
-                                </xsl:for-each>
-                            </xsl:when>
-                            <xsl:when test="count(dim:field[@element='title'][not(@qualifier)]) = 1">
-                                <xsl:value-of select="dim:field[@element='title'][not(@qualifier)][1]/node()"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </span>
+                    <xsl:choose>
+                        <xsl:when test="count(dim:field[@element='title'][not(@qualifier)]) &gt; 1">
+                            <xsl:for-each select="dim:field[@element='title'][not(@qualifier)]">
+                        	   <xsl:value-of select="./node()"/>
+                        	   <xsl:if test="count(following-sibling::dim:field[@element='title'][not(@qualifier)]) != 0">
+                                    <xsl:text>; </xsl:text><br/>
+                                </xsl:if>
+                            </xsl:for-each>
+                        </xsl:when>
+                        <xsl:when test="count(dim:field[@element='title'][not(@qualifier)]) = 1">
+                            <xsl:value-of select="dim:field[@element='title'][not(@qualifier)][1]/node()"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </td>
             </tr>
             <xsl:call-template name="itemSummaryView-DIM-fields">
@@ -730,6 +736,7 @@
             <xsl:attribute name="title">
                  <xsl:call-template name="renderCOinS"/>
             </xsl:attribute>
+            &#xFEFF; <!-- non-breaking space to force separating the end tag -->
         </span>                
 		<table class="ds-includeSet-table">
 		    <xsl:apply-templates mode="itemDetailView-DIM"/>
@@ -980,13 +987,46 @@
     coins
      -->
 
-    <!--- SFX renderCOinS -->
+    <!-- If you are using SFX, uncomment the template below
+         and comment out the default renderCOinS template -->
+
+        <!-- SFX renderCOinS
+
+	        <xsl:template name="renderCOinS">
+	        <xsl:text>ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;</xsl:text>
+	        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='sfx'][@qualifier='server']"/>
+	        <xsl:text>&amp;</xsl:text>
+	        <xsl:text>rfr_id=info%3Asid%2Fdatadryad.org%3Arepo&amp;</xsl:text>
+	        </xsl:template>
+        -->
+
     <xsl:template name="renderCOinS">
-       	<xsl:text>ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;</xsl:text>
-       	<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='sfx'][@qualifier='server']"/>
-       	<xsl:text>&amp;</xsl:text>
+       <xsl:text>ctx_ver=Z39.88-2004&amp;rft_val_fmt=info%3Aofi%2Ffmt%3Akev%3Amtx%3Adc&amp;</xsl:text>
+       <xsl:for-each select=".//dim:field[@element = 'identifier']">
+            <xsl:text>rft_id=</xsl:text>
+            <xsl:value-of select="encoder:encode(string(.))"/>
+            <xsl:text>&amp;</xsl:text>
+        </xsl:for-each>
         <xsl:text>rfr_id=info%3Asid%2Fdspace.org%3Arepository&amp;</xsl:text>
+        <xsl:for-each select=".//dim:field[@mdschema='dc' and @element != 'description' and @element != 'embargo' and @qualifier != 'provenance']">
+
+            <!-- We do need a simple DC crosswalk in place for this, but for now at least fix author
+                 - most other fields will be ok -->
+            
+            <xsl:choose>
+            <xsl:when test="@element = 'contributor' and @qualifier='author'">
+                <xsl:value-of select="concat('rft.', 'creator','=',encoder:encode(string(.))) "/>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="concat('rft.', @element,'=',encoder:encode(string(.))) "/>
+            </xsl:otherwise>
+            </xsl:choose>
+
+            <xsl:if test="position()!=last()">
+                <xsl:text>&amp;</xsl:text>
+            </xsl:if>
+        </xsl:for-each>
     </xsl:template>
-    
+
     
 </xsl:stylesheet>

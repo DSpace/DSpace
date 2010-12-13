@@ -1206,3 +1206,10 @@ input.ds-authority-lock.is-unlocked
 /* Example of authority display: this makes authors with an authority
    value show up as red in the item summary view: */
 span.ds-dc_contributor_author-authority { color: #982521; }
+
+/* Prevent display of COinS span - nonspacing break in span to fix closing tag
+also causes a newline in some browsers */
+span.Z3988 {
+	display: none;
+}
+
