@@ -6,16 +6,17 @@ or
 
 DSpace version information can be found in this release package under
  - CHANGES
+or
+ - docs/html/History.html
 
-Documentation for the most recent stable release may be viewed online at
-dspace.org:
+Documentation for the most recent stable release(s) may be downloaded
+or viewed online at
+ - http://www.dspace.org/latest-release/
+ - http://wiki.duraspace.org/display/DSDOC/
 
- - http://dspace.org/latest-release/
-
-
-Installation instructions for other version may be different, so you
-are encouraged to obtain the corresponding documentation package from
-SourceForge, or to download the latest documentation snapshot from SVN
+Installation instructions for other versions may be different, so you
+are encouraged to obtain the appropriate version of the Documentation
+(from the links above or from SVN).
 
 To obtain files from the SVN repository and build, please see:
 
