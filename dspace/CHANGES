@@ -1,4 +1,4 @@
-1.7.0
+﻿1.7.0
 =====
 (Oleksandr Sytnyk)
 - [DS-561] On login screen, keyboard input focus should be set to the first field (E-mail Address) so you don't have to use the mouse (JSPUI)
@@ -107,6 +107,24 @@
 
 (Andrea Schweer)
 - [DS-268] XMLUI Item Mapper cannot handle multiple words in search box
+
+(Robin Taylor)
+- [DS-660] Tidy up DCDate.
+- [DS-553] Display date generation not working correctly.
+- [DS-215] Single-argument Item.getMetadata does not work with mixed-case metadata terms
+
+(Robin Taylor, Claudia Juergen)
+- [DS-619] Item exports not deleted on deletion of eperson. 
+- [DS-621] Export cleanup
+
+(Andrew Taylor, Robin Taylor)
+- [DS-594] DCDate thread synchronisation issue. 
+
+(Gareth Waller)
+- [DS-755]  BitstreamReader file descriptor leak.
+
+(Bill Hays)
+- [DS-639] Sword swap ingest crosswalk: attribute test for dc.identifier.uri incorrect.
 
 1.6.2
 =====
