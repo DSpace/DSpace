@@ -45,6 +45,15 @@
                 <argLine>-javaagent:"${settings.localRepository}"/org/dspace/dependencies/jmockit/dspace-jmockit/0.999.4/dspace-jmockit-0.999.4.jar</argLine>
             </configuration>
          </plugin>
+         <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <!-- We'd rather this be an open-ended range of versions.
+                     But, because of a Maven bug, we must force a specific version:
+                     http://jira.codehaus.org/browse/MNG-2742
+                     Once the bug is fixed, we should put open-ended range in dspace-pom -->
+                <version>2.1.1</version>
+         </plugin>
       </plugins>
    </build>
 
