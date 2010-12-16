@@ -16,19 +16,50 @@
                                                     </span>
 				    </div>
 				    <div class="pagesubheading">
-					    This page last changed on Nov 06, 2010 by <font color="#0050B2">jtrimble</font>.
+					    This page last changed on Dec 15, 2010 by <font color="#0050B2">tdonohue</font>.
 				    </div>
 
 				    <h1><a name="DSpaceServicesFramework-DSpaceServicesFramework"></a>DSpace Services Framework</h1>
 
+<style type='text/css'>/*<![CDATA[*/
+div.rbtoc1292438324227 {margin-left: 0px;padding: 0px;}
+div.rbtoc1292438324227 ul {list-style: none;margin-left: 0px;}
+div.rbtoc1292438324227 li {margin-left: 0px;padding-left: 0px;}
 
+/*]]>*/</style><div class='rbtoc1292438324227'>
+<ul>
+    <li><span class='TOCOutline'>1</span> <a href='#DSpaceServicesFramework-ConfiguringEventListeners'>Configuring Event Listeners</a></li>
+    <li><span class='TOCOutline'>2</span> <a href='#DSpaceServicesFramework-ArchitecturalOverview'>Architectural Overview</a></li>
+<ul>
+    <li><span class='TOCOutline'>2.1</span> <a href='#DSpaceServicesFramework-DSpaceKernel'>DSpace Kernel</a></li>
+<ul>
+    <li><span class='TOCOutline'>2.1.1</span> <a href='#DSpaceServicesFramework-Kernelregistration'>Kernel registration</a></li>
+    <li><span class='TOCOutline'>2.1.2</span> <a href='#DSpaceServicesFramework-KernelStartupandAccess'>Kernel Startup and Access</a></li>
+</ul>
+    <li><span class='TOCOutline'>2.2</span> <a href='#DSpaceServicesFramework-ServiceManager'>Service Manager</a></li>
+</ul>
+    <li><span class='TOCOutline'>3</span> <a href='#DSpaceServicesFramework-ProvidersandPlugins'>Providers and Plugins</a></li>
+<ul>
+    <li><span class='TOCOutline'>3.1</span> <a href='#DSpaceServicesFramework-Activators'>Activators</a></li>
+    <li><span class='TOCOutline'>3.2</span> <a href='#DSpaceServicesFramework-ProviderStacks'>Provider Stacks</a></li>
+</ul>
+    <li><span class='TOCOutline'>4</span> <a href='#DSpaceServicesFramework-CoreServices'>Core Services</a></li>
+<ul>
+    <li><span class='TOCOutline'>4.1</span> <a href='#DSpaceServicesFramework-CachingService'>Caching Service</a></li>
+    <li><span class='TOCOutline'>4.2</span> <a href='#DSpaceServicesFramework-ConfigurationService'>Configuration Service</a></li>
+    <li><span class='TOCOutline'>4.3</span> <a href='#DSpaceServicesFramework-EventService'>EventService</a></li>
+    <li><span class='TOCOutline'>4.4</span> <a href='#DSpaceServicesFramework-RequestService'>RequestService</a></li>
+    <li><span class='TOCOutline'>4.5</span> <a href='#DSpaceServicesFramework-SessionService'>SessionService</a></li>
+</ul>
+</ul></div>
 
 <h2><a name="DSpaceServicesFramework-ConfiguringEventListeners"></a>Configuring Event Listeners</h2>
 
 <p>Event Listeners can be created by overriding the the EventListener interface:</p>
 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">&lt;?xml version=<span class="code-quote">"1.0"</span> encoding=<span class="code-quote">"UTF-8"</span>?&gt;
+<pre class="code-java">
+&lt;?xml version=<span class="code-quote">"1.0"</span> encoding=<span class="code-quote">"UTF-8"</span>?&gt;
 &lt;beans&gt;
 
     &lt;bean id=<span class="code-quote">"dspace"</span> class=<span class="code-quote">"org.dspace.utils.DSpace"</span>/&gt;
@@ -60,7 +91,8 @@
 
 <p>The kernel can be started and accessed through the use of Servlet Filter/ContextListeners which are provided as part of the DSpace 2 utilities. Developers don't need to understand what is going on behind the scenes and can simply write their applications and package them as webapps and take advantage of the services which are offered by DSpace 2. Access to the kernel is provided via the Kernel Manager and the DSpace object which will locate the kernel object and allow it to be used.&nbsp;</p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">/* Instantiate the Utility <span class="code-object">Class</span> */
+<pre class="code-java">
+/* Instantiate the Utility <span class="code-object">Class</span> */
 DSpace dspace = <span class="code-keyword">new</span> DSpace();
 
 
@@ -82,8 +114,6 @@ EventService service = dspace.getEventService();
 
 
 <p><span class="image-wrap" style="display: block; text-align: center"><img src="attachments/22022824/21954867.png" height="332" width="445" style="border: 0px solid black"/></span></p>
-
-<h2><a name="DSpaceServicesFramework-"></a></h2>
 
 <p>The DS2 kernel is compact so it can be completely started up in a unit test (technically integration test) environment (this is who we test the kernel and core services currently). This allows developers to execute code against a fully functional kernel while developing and then deploy their code with high confidence.</p>
 
@@ -160,7 +190,7 @@ EventService service = dspace.getEventService();
 				<td height="12" background="https://wiki.duraspace.org/images/border/border_bottom.gif"><img src="images/border/spacer.gif" width="1" height="1" border="0"/></td>
 			</tr>
 		    <tr>
-			    <td align="center"><font color="grey">Document generated by Confluence on Nov 06, 2010 19:27</font></td>
+			    <td align="center"><font color="grey">Document generated by Confluence on Dec 16, 2010 16:47</font></td>
 		    </tr>
 	    </table>
     </body>

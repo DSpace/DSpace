@@ -16,17 +16,32 @@
                                                     </span>
 				    </div>
 				    <div class="pagesubheading">
-					    This page last changed on Nov 06, 2010 by <font color="#0050B2">jtrimble</font>.
+					    This page last changed on Nov 17, 2010 by <font color="#0050B2">tdonohue</font>.
 				    </div>
 
 				    <h1><a name="DSpaceStatistics-DSpaceStatistics"></a>DSpace Statistics</h1>
 
-
 <p>DSpace uses the Apache Solr application underlaying the statistics. There is no need to download any separate software. All the necessary software is included.</p>
+
+<style type='text/css'>/*<![CDATA[*/
+div.rbtoc1290016976036 {margin-left: 0px;padding: 0px;}
+div.rbtoc1290016976036 ul {list-style: none;margin-left: 0px;}
+div.rbtoc1290016976036 li {margin-left: 0px;padding-left: 0px;}
+
+/*]]>*/</style><div class='rbtoc1290016976036'>
+<ul>
+    <li><span class='TOCOutline'>1</span> <a href='#DSpaceStatistics-UsageEventLoggingandUsageStatisticsGathering'>Usage Event Logging and Usage Statistics Gathering</a></li>
+    <li><span class='TOCOutline'>2</span> <a href='#DSpaceStatistics-ConfigurationsettingsforStatistics'>Configuration settings for Statistics</a></li>
+<ul>
+    <li><span class='TOCOutline'>2.1</span> <a href='#DSpaceStatistics-'></a></li>
+    <li><span class='TOCOutline'>2.2</span> <a href='#DSpaceStatistics-UpgradeProcessforStatistics.'>Upgrade Process for Statistics.</a></li>
+</ul>
+    <li><span class='TOCOutline'>3</span> <a href='#DSpaceStatistics-Oldersettingthatarenocurrentlyutilizedinthereports'>Older setting that are no currently utilized in the reports</a></li>
+</ul></div>
 
 <h2><a name="DSpaceStatistics-UsageEventLoggingandUsageStatisticsGathering"></a>Usage Event Logging and Usage Statistics Gathering</h2>
 
-<p>The DSpace Statistics Implementation is a Client/Server architecture based on Solr for collecting usage events in the JSPUI and XMLUI user interface applications of DSpace.&nbsp; Solr runs as a separate webapplication and an instance of Apache Http Client is utilized to allow parallel requests to log statistics events into this Solr instance.&nbsp; The Usage Event framework has a couple EventListeners installed which assist in&nbsp;[rest of sentence missing? - Kim]</p>
+<p>The DSpace Statistics Implementation is a Client/Server architecture based on Solr for collecting usage events in the JSPUI and XMLUI user interface applications of DSpace.&nbsp; Solr runs as a separate webapplication and an instance of Apache Http Client is utilized to allow parallel requests to log statistics events into this Solr instance.&nbsp; The Usage Event framework has a couple EventListeners installed which assist in&nbsp; <font color="red">[rest of sentence missing? - Kim]</font></p>
 
 <h2><a name="DSpaceStatistics-ConfigurationsettingsforStatistics"></a>Configuration settings for Statistics</h2>
 
@@ -35,30 +50,40 @@
 <div class='table-wrap'>
 <table class='confluenceTable'><tbody>
 <tr>
-<th class='confluenceTh'> Property Name <br class="atl-forced-newline" /> </th>
-<th class='confluenceTh'> Default Value <br class="atl-forced-newline" /> </th>
-<th class='confluenceTh'> Type <br class="atl-forced-newline" /> </th>
-<th class='confluenceTh'> Description <br class="atl-forced-newline" /> </th>
+<th class='confluenceTh'> Property Name </th>
+<th class='confluenceTh'> Default Value  </th>
+<th class='confluenceTh'> Type  </th>
+<th class='confluenceTh'> Description  </th>
 </tr>
 <tr>
 <td class='confluenceTd'> solr.log.server </td>
 <td class='confluenceTd'> ${dspace.baseUrl}/solr/statistics </td>
-<td class='confluenceTd'> String <br class="atl-forced-newline" /> </td>
-<td class='confluenceTd'> Is used by the SolrLogger Client class to connect tot the Solr server over http and perform updates and queries. In most cases, this can (and should) be set to localhost. </td>
+<td class='confluenceTd'> String </td>
+<td class='confluenceTd'> Is used by the SolrLogger Client class to connect to the Solr server over http and perform updates and queries. In most cases, this can (and should) be set to localhost (or 127.0.0.1). <br class="atl-forced-newline" />
+<br class="atl-forced-newline" />
+To determine the correct path, you can use a tool like <tt>wget</tt> to see where Solr is responding on your server.  For example, you'd want to send a query to Solr like the following: <br class="atl-forced-newline" />
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">wget http:<span class="code-comment">//127.0.0.1/solr/statistics/select?q=*:*</span></pre>
+</div></div>
+<p>Assuming you get an HTTP 200 OK response, then you should set <tt>solr.log.server</tt> to the '/statistics' URL of 'http://127.0.0.1/solr/statistics' (essentially removing the "/select?q=<b>:</b>" query off the end of the responding URL.)</p></td>
+</tr>
+<tr>
 </tr>
 <tr>
 <td class='confluenceTd'> solr.spiderips.urls </td>
-<td class='confluenceTd'> <br class="atl-forced-newline" /> 
-<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<td class='confluenceTd'> <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">
 http:<span class="code-comment">//iplists.com/google.txt, \
-</span>http:<span class="code-comment">//iplists.com/inktomi.txt, \http://iplists.com/lycos.txt, \http://iplists.com/infoseek.txt, \http://iplists.com/altavista.txt \http://iplists.com/excite.txt, \
+</span>http:<span class="code-comment">//iplists.com/inktomi.txt, \
+</span>http:<span class="code-comment">//iplists.com/lycos.txt, \
+</span>http:<span class="code-comment">//iplists.com/infoseek.txt, \
+</span>http:<span class="code-comment">//iplists.com/altavista.txt, \
+</span>http:<span class="code-comment">//iplists.com/excite.txt, \
 </span>http:<span class="code-comment">//iplists.com/misc.txt, \
 </span>http:<span class="code-comment">//iplists.com/non_engines.txt</span>
 </pre>
-</div></div>
-<p><a href="http://iplists.com/non_engines.txt">http://iplists.com/non_engines.txt</a> </p></td>
-<td class='confluenceTd'> String <br class="atl-forced-newline" /> </td>
+</div></div> </td>
+<td class='confluenceTd'> String </td>
 <td class='confluenceTd'> List of URLs to download spiders files into [dspace]/config/spiders. These files contain lists of known spider IPs and are utilized by the SolrLogger to flag usage events with an "isBot" field, or ignore them entirely. <br class="atl-forced-newline" />
 <br class="atl-forced-newline" />
 The "stats-util" command can be used to force an update of spider files, regenerate "isBot" fields on indexed events, and delete spiders from the index. For usage, run: <br class="atl-forced-newline" />
@@ -140,14 +165,14 @@ If true, the event will be logged with the "isBot" field set to true. <br class=
 </pre>
 </div></div>
 
-<p>The last step is only used if you are not mounting <em>[~mdiggory:dspace]/webapps</em> directly into your Tomcat, Resin or Jetty host (the recommended practice)If you only need to build the statistics, and don't make any changes to other web applications, you can replace the copy step above with:</p>
+<p>The last step is only used if you are not mounting <em>[dspace]/webapps</em> directly into your Tomcat, Resin or Jetty host (the recommended practice)If you only need to build the statistics, and don't make any changes to other web applications, you can replace the copy step above with:</p>
 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">
  cp -R dspace/webapps/solr TOMCAT/webapps
 </pre>
 </div></div>
-<p><em>Again, only if you are not mounting [~mdiggory:dspace]/webapps directly into your Tomcat, Resin or Jetty host (the recommended practice)</em></p>
+<p><em>Again, only if you are not mounting [dspace]/webapps directly into your Tomcat, Resin or Jetty host (the recommended practice)</em></p>
 
 <p>Restart your webapps (Tomcat/Jetty/Resin)</p>
 
@@ -180,7 +205,7 @@ If true, the event will be logged with the "isBot" field set to true. <br class=
 				<td height="12" background="https://wiki.duraspace.org/images/border/border_bottom.gif"><img src="images/border/spacer.gif" width="1" height="1" border="0"/></td>
 			</tr>
 		    <tr>
-			    <td align="center"><font color="grey">Document generated by Confluence on Nov 06, 2010 19:27</font></td>
+			    <td align="center"><font color="grey">Document generated by Confluence on Dec 16, 2010 16:47</font></td>
 		    </tr>
 	    </table>
     </body>
