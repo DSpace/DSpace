@@ -16,11 +16,12 @@
                                                     </span>
 				    </div>
 				    <div class="pagesubheading">
-					    This page last changed on Nov 06, 2010 by <font color="#0050B2">jtrimble</font>.
+					    This page last changed on Dec 16, 2010 by <font color="#0050B2">tdonohue</font>.
 				    </div>
 
 				    <h1><a name="UpgradingaDSpaceInstallation-DSpaceSystemDocumentation%3AUpgradingaDSpaceInstallation"></a>DSpace System Documentation: Upgrading a DSpace Installation</h1>
-<p>This section describes how to upgrade a DSpace installation from one version to the next. Details of the differences between the functionality of each version are given in the Version History section.</p>
+
+<p>This section describes how to upgrade a DSpace installation from one version to the next. Details of the differences between the functionality of each version are given in the <a href="History.html" title="History">Version History</a> section.</p>
 
 <div class='panelMacro'><table class='warningMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="images/icons/emoticons/forbidden.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Test Your Upgrade Process</b><br />It is always recommended that when performing an upgrade that the user should use a Development or Test instance or server in order to minimize downtime. You should note any problems you have encountered (and also how to resolve them) before attempting to upgrade your production instance or server. It also gives you a chance to "practice" at the upgrade. (And practice makes perfect.)</td></tr></table></div>
 
@@ -48,20 +49,27 @@
 
 <h2><a name="UpgradingaDSpaceInstallation-Upgradingfrom1.6.xto1.7"></a>Upgrading from 1.6.x to 1.7</h2>
 
-<p>In the notes below <em>[dspace]</em> refers to the install directory for your existing DSpace installation, and <em>[dspace-source]</em> to the source directory for DSpace 1.7.0. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
+<p>In the notes below <tt>[dspace]</tt> refers to the install directory for your existing DSpace installation, and <em>[dspace-source]</em> to the source directory for DSpace 1.7.0. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
+
+<div class='panelMacro'><table class='infoMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="images/icons/emoticons/information.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>Before upgrading you need to check you are using the current recommended minimum versions of Java (1.6), Maven (2.0.8 or above) and ant (1.7 or above).  For more details, see the current listing of <a href="Installation.html#Installation-PrerequisiteSoftware">Prerequisite Software</a></td></tr></table></div>
 
 <ol>
 	<li><b>Backup Your DSpace.</b> First, and foremost, make a complete backup of your system, including:
 	<ul>
-		<li>A snapshot of the database. &#95;To have a "snapshot" of the PostgreSQL database, you need to shut it down during the backup. You should also have your regular PostgreSQL Backup output (using pg_dump commands). _</li>
+		<li>A snapshot of the database. <em>To have a "snapshot" of the PostgreSQL database, you need to shut it down during the backup. You should also have your regular PostgreSQL Backup output (using pg_dump commands).</em></li>
 		<li>The asset store (<em>[dspace]/assetstore</em> by default)</li>
 		<li>Your configuration files and customizations to DSpace (including any customized scripts).</li>
 	</ul>
 	</li>
-	<li><b>Download DSpace 1.7.0</b> Retrieve the new DSpace 1.7.0 source code either as a download from <a href="http://www.dspace.org/latest-release/">SourceForge</a> or check it out directly from the <a href="http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.0/">SVN code repository</a>. If you downloaded DSpace do not unpack it on top of your existing installation.Refer to Chapter 3.3.3 Installation, Step 3 for unpacking directives.</li>
-	<li><b>Stop Tomcat.</b> Take down your servlet container. For Tomcat, use the <em>$CATALINA/shutdown.sh</em> script. (Many installations will have a startup/shutdown script in the <em>/etc/init.d</em> or <em>/etc/rc.d</em> directories.</li>
-	<li><b>Apply any customizations.</b> If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. These are housed in one of the following places:JSPUI modifications: <em>[dspace-source]/dspace/modules/jspui/src/main/webapp/_XMLUI modifications: &#95;[dspace-source]/dspace/modules/xmlui/src/main/webbapp</em></li>
-	<li><b>Update Configuration Files.</b>&nbsp;Some parameters have changed and some are new. &nbsp;Changes will be notes below:
+	<li><b>Download DSpace 1.7.0</b> Retrieve the new DSpace 1.7.0 source code either as a download from <a href="http://www.dspace.org/latest-release/">DSpace.org</a> or check it out directly from the <a href="http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.0/">SVN code repository</a>. If you downloaded DSpace do not unpack it on top of your existing installation. Refer to <a href="Installation.html#Installation-Installation">Installation Instructions, Step 3</a> for unpacking directives.</li>
+	<li><b>Stop Tomcat.</b> Take down your servlet container. For Tomcat, use the <em>$CATALINA_HOME/bin/shutdown.sh</em> script. (Many Unix-based installations will have a startup/shutdown script in the <em>/etc/init.d</em> or <em>/etc/rc.d</em> directories).</li>
+	<li><b>Apply any customizations.</b> If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. These are normally housed in one of the following places:
+	<ul>
+		<li>JSPUI modifications: <em>[dspace-source]/dspace/modules/jspui/src/main/webapp/</em></li>
+		<li>XMLUI modifications: <em>[dspace-source]/dspace/modules/xmlui/src/main/webapp/</em></li>
+	</ul>
+	</li>
+	<li><b>Update Configuration Files.</b> Some parameters have changed and some are new.  You can either attempt to make these changes in your current 1.6.x <tt>dspace.cfg</tt> file, or you can start with a new 1.7.0 <tt>dspace.cfg</tt> and re-modify it as needed. Configuration changes are noted below:
 	<ul>
 		<li>&#42;<b>CORRECTION</b>&#42; &nbsp;There was a missing hyphen "-" in the property key for mail character set:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
@@ -260,19 +268,19 @@ aip.disseminate.rightsMD = DSpaceDepositLicense:DSPACE_DEPLICENSE, \
 # If unspecfied, defaults to <span class="code-quote">"MODS, DIM"</span>
 aip.disseminate.dmd = MODS, DIM</pre>
 </div></div></li>
-		<li>&#42;&#42; NEW*&#42; A new property has been added to control the discovery index for the Event System Configuration:
+		<li>&#42;<b>NEW</b>&#42; A new property has been added to control the discovery index for the Event System Configuration:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java"> consumer to maintain the discovery index
 event.consumer.discovery.class = org.dspace.discovery.IndexEventConsumer
 event.consumer.discovery.filters = Community|Collection|Item|Bundle+Add|Create|Modify|Modify_Metadata|Delete|Remove</pre>
 </div></div></li>
-		<li>&#42;&#42; NEW &#42;&#42; License bundle display is now configurable.  You are able to either display or suppress.
+		<li>&#42;<b>NEW</b>&#42; License bundle display is now configurable.  You are able to either display or suppress.
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java"># whether to display the contents of the licence bundle (often just the deposit
 # licence in standard DSpace installation
 webui.licence_bundle.show = <span class="code-keyword">false</span></pre>
 </div></div></li>
-		<li>&#42;&#42; CORRECTION*&#42; Thumbnail generation.  The width and height of generated thumbnails had a missing equal sign.
+		<li>&#42;<b>CORRECTION</b>&#42; Thumbnail generation.  The width and height of generated thumbnails had a missing equal sign.
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java"># maximum width and height of generated thumbnails
 thumbnail.maxwidth  = 80
@@ -324,9 +332,18 @@ thumbnail.maxheight = 80</pre>
 #webui.bitstream.order.direction = ASC
 </pre>
 </div></div></li>
+		<li>&#42;<b>NEW</b>&#42; DSpace now includes a metadata mapping feature that makes repository content discoverable by Google Scholar:
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+##### Google Scholar Metadata Configuration #####
+google-metadata.config = ${dspace.dir}/config/crosswalks/google-metadata.properties
+google-metadata.enable = <span class="code-keyword">true</span>
+</pre>
+</div></div></li>
 		<li>&#42;<b>NEW</b>&#42; XMLUI is now able to concatenate CSS, JS and JSON files:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java"># Enabling <span class="code-keyword">this</span> property will concatenate CSS, JS and JSON files where possible.
+<pre class="code-java">
+# Enabling <span class="code-keyword">this</span> property will concatenate CSS, JS and JSON files where possible.
 # CSS files can be concatenated <span class="code-keyword">if</span> multiple CSS files with the same media attribute
 # are used in the same page. Links to the CSS files are automatically referring to the
 # concatenated resulting CSS file.
@@ -342,7 +359,8 @@ thumbnail.maxheight = 80</pre>
 </div></div></li>
 		<li>&#42;<b>NEW</b>&#42;  XMLUI Mirage Theme.  This is a new theme with it's own configuration:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">### Setings <span class="code-keyword">for</span> Item lists in Mirage theme ###
+<pre class="code-java">
+### Setings <span class="code-keyword">for</span> Item lists in Mirage theme ###
 # What should the emphasis be in the display of item lists?
 # Possible values : 'file', 'metadata'. If your repository is
 # used mainly <span class="code-keyword">for</span> scientific papers 'metadata' is probably the
@@ -368,7 +386,8 @@ mets.<span class="code-keyword">default</span>.ingest.crosswalk.EPDCX = SWORD
 </div></div></li>
 		<li>&#42;<b>NEW</b>&#42; New SOLR Statistic Property keys:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java"># Timeout <span class="code-keyword">for</span> the resolver in the dns lookup
+<pre class="code-java">
+# Timeout <span class="code-keyword">for</span> the resolver in the dns lookup
 # Time in milliseconds, defaults to 200 <span class="code-keyword">for</span> backward compatibility
 # Your systems <span class="code-keyword">default</span> is usually set in /etc/resolv.conf and varies
 # between 2 to 5 seconds, to high a value might result in solr exhausting
@@ -388,10 +407,10 @@ solr.resolver.timeout = 200
 	</li>
 	<li><b>Build DSpace.</b> Run the following commands to compile DSpace.:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cd /[dspace-source]/dspace/
+<pre class="code-java">cd [dspace-source]/dspace/
 mvn -U clean <span class="code-keyword">package</span></pre>
 </div></div>
-<p>You will find the result in <em>[dspace-source]/dspace/target/dspace-[version]-build.dir</em> . Inside this directory is the compiled binary distribution of DSpace.Before rebuilding DSpace, the above command will clean out any previously compiled code ('clean') and ensure that your local DSpace JAR files are updated from the remote maven repository.</p></li>
+<p> You will find the result in <em>[dspace-source]/dspace/target/dspace-[version]-build.dir</em> . Inside this directory is the compiled binary distribution of DSpace. Before rebuilding DSpace, the above command will clean out any previously compiled code ('clean') and ensure that your local DSpace JAR files are updated from the remote maven code repository.</p></li>
 	<li><b>Update DSpace.</b> Update the DSpace installed directory with the new code and libraries. Issue the following commands:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">cd [dspace-source]/dspace/target/dspace-[version]-build.dir
@@ -417,11 +436,11 @@ ant -Dconfig=[dspace]/config/dspace.cfg update</pre>
 		</li>
 	</ul>
 	</li>
-	<li><b>Generate Browse and Search Indexes</b>. It's always good policy to rebuild your search and browse indexes when upgrading to a new release. To do this, run the following command from your DSpace install directory (as the dspace user):
+	<li><b>Generate Browse and Search Indexes</b>. It's always good policy to rebuild your search and browse indexes when upgrading to a new release. To do this, run the following command from your DSpace install directory (as the 'dspace' user):
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">[dspace]/bin/dspace index-init</pre>
 </div></div></li>
-	<li><b>Deploy Web Applications</b>. Copy the web applications files from your <tt>[dspace]/webapps</tt> directory to the subdirectory of your servlet container (e.g. tomcat): 
+	<li><b>Deploy Web Applications</b>. If your servlet container (e.g. Tomcat) is not configured to look for new web applications in your <tt>[dspace]/webapps</tt> directory, then you will need to copy the web applications files into the appropriate subdirectory of your servlet container.  For example: 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">cp -R [dspace]/webapps/* [tomcat]/webapps/</pre>
 </div></div></li>
@@ -432,19 +451,19 @@ ant -Dconfig=[dspace]/config/dspace.cfg update</pre>
 
 <h2><a name="UpgradingaDSpaceInstallation-Upgradingfrom1.6to1.6.x"></a>Upgrading from 1.6 to 1.6.x</h2>
 
-<p>In the notes below <em>[dspace]</em> refers to the install directory for your existing DSpace installation, and <em>[dspace-source]</em> to the source directory for DSpace 1.6.1. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
+<p>In the notes below <tt>[dspace]</tt> refers to the install directory for your existing DSpace installation, and <tt>[dspace-source]</tt> to the source directory for DSpace 1.6.1. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
 
 <ol>
 	<li><b>Backup Your DSpace.</b> First, and foremost, make a complete backup of your system, including:
 	<ul>
-		<li>A snapshot of the database. &#95;To have a "snapshot" of the PostgreSQL database, you need to shut it down during the backup. You should also have your regular PostgreSQL Backup output (using pg_dump commands). _</li>
+		<li>A snapshot of the database. <em>To have a "snapshot" of the PostgreSQL database, you need to shut it down during the backup. You should also have your regular PostgreSQL Backup output (using pg_dump commands).</em></li>
 		<li>The asset store (<em>[dspace]/assetstore</em> by default)</li>
 		<li>Your configuration files and customizations to DSpace (including any customized scripts).</li>
 	</ul>
 	</li>
-	<li><b>Download DSpace 1.6.1</b> Retrieve the new DSpace 1.6.2 source code either as a download from <a href="http://www.dspace.org/latest-release/">SourceForge</a> or check it out directly from the <a href="http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/">SVN code repository</a>. If you downloaded DSpace do not unpack it on top of your existing installation. Refer to Chapter 3.3.3 Installation, Step 3 for unpacking directives.</li>
+	<li><b>Download DSpace 1.6.1</b> Retrieve the new DSpace 1.6.2 source code either as a download from <a href="http://www.dspace.org/latest-release/">DSpace.org</a> or check it out directly from the <a href="http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/">SVN code repository</a>. If you downloaded DSpace do not unpack it on top of your existing installation. Refer to Chapter 3.3.3 Installation, Step 3 for unpacking directives.</li>
 	<li><b>Stop Tomcat.</b> Take down your servlet container. For Tomcat, use the <em>$CATALINA/shutdown.sh</em> script. (Many installations will have a startup/shutdown script in the <em>/etc/init.d</em> or <em>/etc/rc.d</em> directories.</li>
-	<li><b>Apply any customizations.</b> If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. These are housed in one of the following places:JSPUI modifications: <em>[dspace-source]/dspace/modules/jspui/src/main/webapp/_XMLUI modifications: &#95;[dspace-source]/dspace/modules/xmlui/src/main/webbapp</em></li>
+	<li><b>Apply any customizations.</b> If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. These are housed in one of the following places:JSPUI modifications: <em>[dspace-source]/dspace/modules/jspui/src/main/webapp/_XMLUI modifications: &#95;[dspace-source]/dspace/modules/xmlui/src/main/webapp</em></li>
 	<li><b>Update Configuration Files.</b> There are no additions to this release. So you do not have to update the configuration files.</li>
 	<li><b>Build DSpace.</b> Run the following commands to compile DSpace.:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
@@ -460,17 +479,17 @@ ant -Dconfig=[dspace]/config/dspace.cfg update</pre>
 	<li><b>Run Registry Format Update for CC License.</b> Creative Commons licenses have been assigned the wrong mime-type in past versions of DSpace. Even if you are not currently using CC Licenses, you should update your Bitstream Format Registry to include a new entry with the proper mime-type. To update your registry, run the following command: <em>dspace]/bin/dspace registry-loader &#45;bitstream [dspace]/etc/upgrades/15-16/new-bitstream-formats.xml</em></li>
 	<li><b>Update the Database.</b> If you are using Creative Commons Licenses in your DSpace submission process, you will need to run the 1.5.x to 1.6.x database upgrade script again. In 1.6.0 the improper mime-type was being assigned to all CC Licenses. This has now been resolved, and rerunning the upgrade script will now assign the proper mime-type to all existing CC Licenses in your DSpace installation. NOTE: You will receive messages that most of the script additions already exist. This is normal, and nothing to be worried about.
 	<ul>
-		<li>For PostgreSQL: <em>psql &#45;U [dspace-user] &#45;f [dspace-source]/dspace/etc/postgres/database_schema_15_16.sql [database name]</em> (Your database name is by default 'dspace'). Example: 
+		<li>For PostgreSQL: <em>psql &#45;U [dspace-user] &#45;f [dspace-source]/dspace/etc/postgres/database_schema_15-16.sql [database name]</em> (Your database name is by default 'dspace'). Example: 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">psql -U dspace -f
-   /dspace-1.6-1-src-release/dspace/etc/postgres/database_schema_15_16.sql dspace</pre>
+   /dspace-1.6-1-src-release/dspace/etc/postgres/database_schema_15-16.sql dspace</pre>
 </div></div>
 <p><em>(The line break above is cosmetic. Please place your command in one line.</em></p></li>
 		<li>For Oracle: Execute the upgrade script, e.g. with sqlplus, recording the output:
 		<ol>
 			<li>Start SQL*Plus with "<em>sqlplus [connect args]</em>"</li>
 			<li>Record the output: <em>SQL&gt; spool 'upgrade.lst'</em></li>
-			<li>Run the upgrade script <em>SQL&gt; @[dspace-source]/dspace/etc/oracle/database_schema_15_16.sql</em><em>SQL&gt; spool off</em></li>
+			<li>Run the upgrade script <em>SQL&gt; @[dspace-source]/dspace/etc/oracle/database_schema_15-16.sql</em><em>SQL&gt; spool off</em></li>
 			<li>Please note: The final few statements WILL FAIL. That is because you have run some queries and use the results to construct the statements to remove the constraints, manually‚ Oracle doesn't have any easy way to automate this (unless you know PL/SQL). So, look for the comment line beginning: 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java"><span class="code-quote">"--You need to remove the already in place constraints"</span>
@@ -490,7 +509,7 @@ the output of the queries you'll need.</pre>
 
 <h2><a name="UpgradingaDSpaceInstallation-Upgradingfrom1.5.xto1.6.x"></a>Upgrading from 1.5.x to 1.6.x</h2>
 
-<p>In the notes below <em>[dspace]</em> refers to the install directory for your existing DSpace installation, and <em>[dspace-source]</em> to the source directory for DSpace 1.6. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
+<p>In the notes below <tt>[dspace]</tt> refers to the install directory for your existing DSpace installation, and <em>[dspace-source]</em> to the source directory for DSpace 1.6. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
 
 <ol>
 	<li><b>Backup Your DSpace.</b> First, and foremost, make a complete backup of your system, including:
@@ -500,9 +519,9 @@ the output of the queries you'll need.</pre>
 		<li>Your configuration files and customizations to DSpace (including any customized scripts).</li>
 	</ul>
 	</li>
-	<li><b>Download DSpace 1.6.x</b> Retrieve the new DSpace 1.6.x source code either as a download from <a href="http://www.dspace.org/latest-release/">SourceForge</a> or check it out directly from the <a href="http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/">SVN code repository</a>. If you downloaded DSpace do not unpack it on top of your existing installation.Refer to Chapter 3.3.3 Installation, Step 3 for unpacking directives.</li>
+	<li><b>Download DSpace 1.6.x</b> Retrieve the new DSpace 1.6.x source code either as a download from <a href="http://www.dspace.org/latest-release/">DSpace.org</a> or check it out directly from the <a href="http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/">SVN code repository</a>. If you downloaded DSpace do not unpack it on top of your existing installation.Refer to Chapter 3.3.3 Installation, Step 3 for unpacking directives.</li>
 	<li><b>Stop Tomcat</b>. Take down your servlet container. For Tomcat, use the <em>$CATALINA/shutdown.sh</em> script. (Many installations will have a startup/shutdown script in the <em>/etc/init.d</em> or <em>/etc/rc.d</em> directories.</li>
-	<li><b>Apply any customizations</b>. If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. These are housed in one of the following places:JSPUI modifications: <em>[dspace-source]/dspace/modules/jspui/src/main/webapp/_XMLUI modifications: &#95;[dspace-source]/dspace/modules/xmlui/src/main/webbapp</em></li>
+	<li><b>Apply any customizations</b>. If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. These are housed in one of the following places:JSPUI modifications: <em>[dspace-source]/dspace/modules/jspui/src/main/webapp/_XMLUI modifications: &#95;[dspace-source]/dspace/modules/xmlui/src/main/webapp</em></li>
 	<li><b>Update Configuration Files</b>. Some of the parameters have change and some are new. Changes will be noted below:
 	<ul>
 		<li>&#42;&#42;<b>CHANGE</b>&#42;&#42; The base url and oai urls property keys are set differently 
@@ -543,7 +562,7 @@ dspace.oai.url = ${dspace.baseUrl}/oai</pre>
 #mail.server.disabled = <span class="code-keyword">false</span>
 </pre>
 </div></div></li>
-		<li>&#42;&#42;<b>NEW</b>&#42;*New Authorization levels and parameters. See Section 5.2.10 in Configuration : Delegation Administration for further information.
+		<li>&#42;&#42;<b>NEW</b>&#42;*New Authorization levels and parameters. See the <a href="Configuration.html" title="Configuration">Configuration</a> documentation, "Delegation Administration" section for further information.
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">##### Authorization system configuration - Delegate ADMIN #####
 
@@ -657,7 +676,7 @@ plugin.single.org.dspace.embargo.EmbargoSetter = \
 plugin.single.org.dspace.embargo.EmbargoLifter = \
 				org.dspace.embargo.DefaultEmbargoLifter</pre>
 </div></div></li>
-		<li>&#42;&#42;<b>NEW</b>&#42;&#42; New option for using the Batch Editing capabilities. See Section 5.2.21 in Configuration and also 8.10 in System Administration
+		<li>&#42;&#42;<b>NEW</b>&#42;&#42; New option for using the Batch Editing capabilities. See <a href="Configuration.html#Configuration-BatchMetadataEditing">Batch Metadata Editing Configuration</a> and also <a href="System Administration.html#SystemAdministration-BatchMetadataEditing">System Administration : Batch Metadata Editing</a> 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">### Bulk metadata editor settings ###
 # The delimiter used to separate values within a single field (defaults to a <span class="code-object">double</span> pipe ||)
@@ -959,9 +978,10 @@ harvester.unknownSchema = fail
 #harvester.rejectedHandlePrefix = 123456789, myTestHandle
 						</pre>
 </div></div></li>
-		<li>&#42;&#42;<b>NEW</b>&#42;&#42; SOLR Statistics Configurations.For a little more detailed information regarding the configuration, please refer to Section 5.2.49 DSpace SOLR Statistics Configuration ; or, for installation procedures, refer to  Section 3.4.6 Dspace Statistics.
+		<li>&#42;&#42;<b>NEW</b>&#42;&#42; SOLR Statistics Configurations. For a little more detailed information regarding the configuration, please refer to <a href="Configuration.html#Configuration-DSpaceSOLRStatisticsConfiguration">DSpace SOLR Statistics Configuration</a> ; or, for installation procedures, refer to <a href="Installation.html#Installation-DSpaceStatistics">Advanced Installation: Dspace Statistics</a>.
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">#---------------------------------------------------------------#
+<pre class="code-java">
+#---------------------------------------------------------------#
 #--------------SOLR STATISTICS CONFIGURATIONS-------------------#
 #---------------------------------------------------------------#
 # These configs are only used by the SOLR <span class="code-keyword">interface</span>/webapp to   #
@@ -990,10 +1010,9 @@ statistics.item.authorization.admin=<span class="code-keyword">true</span></pre>
 mvn -U clean <span class="code-keyword">package</span></pre>
 </div></div>
 <p>You will find the result in <em>[dspace-source]/dspace/target/dspace-[version]-build.dir</em> . Inside this directory is the compiled binary distribution of DSpace.Before rebuilding DSpace, the above command will clean out any previously compiled code ('clean') and ensure that your local DSpace JAR files are updated from the remote maven repository.</p></li>
-	<li>&#42;Update Registry for the CC License.*If you use the CC License, an incorrect mime-type type is being assigned. You will need to run the following step: &#95;dspace]/bin/dspace registry-loader &#45;bitstream [dspace]/etc/upgrades/15-16/new-bitstream-formats.xml _</li>
 	<li><b>Update the database</b>. The database schema needs to be updated to accommodate changes to the database. SQL files contain the relevant updates are provided. Please note that if you have made any local customizations to the database schema, you should consult these updates and make sure they will work for you.
 	<ul>
-		<li>For PostgreSQL: <em>psql &#45;U [dspace-user] &#45;f [dspace-source]/dspace/etc/postgres/database_schema_15_16.sql [database name]</em> (Your database name is by default 'dspace'). Example:&#95;<em>psql &#45;U dspace &#45;f /dspace-1.6-1-src-release/dspace/etc/postgres/database_schema_15_16.sql dspace</em>_</li>
+		<li>For PostgreSQL: <tt>psql &#45;U [dspace-user] &#45;f [dspace-source]/dspace/etc/postgres/database_schema_15-16.sql [database name]</tt> (Your database name is by default 'dspace'). Example: <tt>psql &#45;U dspace &#45;f /dspace-1.6-1-src-release/dspace/etc/postgres/database_schema_15-16.sql dspace</tt></li>
 		<li>For Oracle: Execute the upgrade script, e.g. with sqlplus, recording the output:
 		<ol>
 			<li>Start SQL*Plus with "<em>sqlplus [connect args]</em>"</li>
@@ -1015,6 +1034,7 @@ the output of the queries you'll need.</pre>
 <pre class="code-java">cd [dspace-source]/dspace/target/dspace-[version]-build.dir
 ant -Dconfig=[dspace]/config/dspace.cfg update</pre>
 </div></div></li>
+	<li><b>Update Registry for the CC License.</b> If you use the CC License, an incorrect mime-type type is being assigned. You will need to run the following step: &#95;dspace]/bin/dspace registry-loader &#45;bitstream [dspace]/etc/upgrades/15-16/new-bitstream-formats.xml _</li>
 	<li><b>Generate Browse and Search Indexes</b>. It makes good policy to rebuild your search and browse indexes when upgrading to a new release. Almost every release has database changes and indexes can be affected by this. In the DSpace 1.6 release there is Authority Control features and those will need the indexes to be regenerated. To do this, run the following command from your DSpace install directory (as the dspace user):<em>[dspace]/bin/dspace index-init</em></li>
 	<li><b>Deploy Web Applications</b>. Copy the web applications files from your <em>[dspace]/webapps</em> directory to the subdirectory of your servlet container (e.g. tomcat):<em>cp &#45;R [dspace]/webapps/&#42; [tomcat]/webapps/</em></li>
 	<li><b>Restart servlet.</b> Now restart your Tomcat/Jetty/Resin server program and test out the upgrade.</li>
@@ -1024,7 +1044,7 @@ ant -Dconfig=[dspace]/config/dspace.cfg update</pre>
 [dspace]/bin/dspace stats-log-importer -i input file name (probably the output name from above) -m
 </pre>
 </div></div>
-<p>The user is highly recommend to see Section 8.14 DSpace Log Converter.</p></li>
+<p>The user is highly recommend to see the <a href="System Administration.html#SystemAdministration-DSpaceLogConverter">System Administration : DSpace Log Converter</a> documentation.</p></li>
 </ol>
 
 
@@ -1032,7 +1052,7 @@ ant -Dconfig=[dspace]/config/dspace.cfg update</pre>
 
 <p>The changes in DSpace 1.5.2 do not include any database schema upgrades, and the upgrade should be straightforward.</p>
 
-<p>In the notes below <em>[dspace]</em> refers to the install directory for your existing DSpace installation, and <em>[dspace-source]</em> to the source directory for DSpace 1.5. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
+<p>In the notes below <tt>[dspace]</tt> refers to the install directory for your existing DSpace installation, and <em>[dspace-source]</em> to the source directory for DSpace 1.5. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
 
 <ol>
 	<li><b>Backup your DSpace</b> First and foremost, make a complete backup of your system, including:
@@ -1043,10 +1063,11 @@ ant -Dconfig=[dspace]/config/dspace.cfg update</pre>
 		<li>Your statistics scripts (<em>[dspace]/bin/stat&#42;</em>) which contain customizable dates</li>
 	</ul>
 	</li>
-	<li><b>Download DSpace 1.5.2</b> Get the new DSpace 1.5.2 source code either as a download from <a href="http://www.dspace.org/latest-release/">SourceForge</a> or check it out directly from the <a href="http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.5.2/">SVN code repository</a>. If you downloaded DSpace do not unpack it on top of your existing installation.</li>
+	<li><b>Download DSpace 1.5.2</b> Get the new DSpace 1.5.2 source code either as a download from <a href="http://www.dspace.org/latest-release/">DSpace.org</a> or check it out directly from the <a href="http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.5.2/">SVN code repository</a>. If you downloaded DSpace do not unpack it on top of your existing installation.</li>
 	<li><b>Build DSpace</b> Run the following commands to compile DSpace.
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">  cd [dspace-source]/dspace/
+<pre class="code-java">
+  cd [dspace-source]/dspace/
   mvn <span class="code-keyword">package</span>
 </pre>
 </div></div>
@@ -1055,13 +1076,15 @@ ant -Dconfig=[dspace]/config/dspace.cfg update</pre>
 	<li><b>Apply any customizations</b> If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. Commonly these modifications are made to "JSP" pages located inside the <em>[dspace 1.4.2]/jsp/local</em> directory. These should be moved <em>[dspace-source]/dspace/modules/jspui/src/main/webapp/</em> in the new build structure. See Customizing the JSP Pages for more information.</li>
 	<li><b>Update DSpace</b> Update the DSpace installed directory with new code and libraries. Inside the <em>[dspace-source]/dspace/target/dspace-1.5-build.dir/</em> directory run:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cd [dspace-source]/dspace/target/dspace-1.5-build.dir/
+<pre class="code-java">
+cd [dspace-source]/dspace/target/dspace-1.5-build.dir/
 ant -Dconfig=[dspace]/config/dspace.cfg update
 </pre>
 </div></div></li>
 	<li><b>Update configuration files</b> This ant target preserves existing files in <em>[dspace]/config _ and will copy any new configuration files in place. If an existing file prevents copying the new file in place, the new file will have the suffix &#95;.new</em>, for example <em>[dspace]/local/dspace.cfg.new</em>. Note: there is also a configuration option <em>&#45;Doverwrite=true</em> which will instead copy the conflicting target files to &#42;.old suffixes and overwrite target file then with the new file (essentially the opposite) this is beneficial for developers and those who use the <em>[dspace-source]/dspace/config</em> to maintain their changes.
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cd [dspace-source]/dspace/target/dspace-1.5-build.dir/
+<pre class="code-java">
+cd [dspace-source]/dspace/target/dspace-1.5-build.dir/
 ant -Dconfig=[dspace]/config/dspace.cfg update_configs
 </pre>
 </div></div>
@@ -1069,7 +1092,8 @@ ant -Dconfig=[dspace]/config/dspace.cfg update_configs
 	<ul>
 		<li>New option to restrict the expose of private items. The following needs to be added to dspace.cfg: 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">#### Restricted item visibility settings ###
+<pre class="code-java">
+#### Restricted item visibility settings ###
 # By <span class="code-keyword">default</span> RSS feeds, OAI-PMH and subscription emails will include ALL items
 # regardless of permissions set on them.
 #
@@ -1082,7 +1106,8 @@ ant -Dconfig=[dspace]/config/dspace.cfg update_configs
 </div></div></li>
 		<li>Special groups for LDAP and password authentication. 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">##### Password users group #####
+<pre class="code-java">
+##### Password users group #####
 
 # If required, a group name can be given here, and all users who log in
 # using the DSpace password system will automatically become members of
@@ -1100,7 +1125,8 @@ ant -Dconfig=[dspace]/config/dspace.cfg update_configs
 </div></div></li>
 		<li>new option for case insensitivity in browse tables. 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java"># By <span class="code-keyword">default</span>, the display of metadata in the browse indexes is <span class="code-keyword">case</span> sensitive
+<pre class="code-java">
+# By <span class="code-keyword">default</span>, the display of metadata in the browse indexes is <span class="code-keyword">case</span> sensitive
 # So, you will get separate entries <span class="code-keyword">for</span> the terms
 #
 #   Olive oil
@@ -1121,7 +1147,8 @@ ant -Dconfig=[dspace]/config/dspace.cfg update_configs
 </div></div></li>
 		<li>New usage event handler for collecting statistics: 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">### Usage event settings ###
+<pre class="code-java">
+### Usage event settings ###
 # The usage event handler to call.  The <span class="code-keyword">default</span> is the <span class="code-quote">"passive"</span> handler, which ignores events.
 # plugin.single.org.dspace.app.statistics.AbstractUsageEvent = \
 #   org.dspace.app.statistics.PassiveUsageEvent
@@ -1129,19 +1156,22 @@ ant -Dconfig=[dspace]/config/dspace.cfg update_configs
 </div></div></li>
 		<li>The location where sitemaps are stored is now configurable. 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">#### Sitemap settings #####
+<pre class="code-java">
+#### Sitemap settings #####
 # the directory where the generated sitemaps are stored
 sitemap.dir = ${dspace.dir}/sitemaps
 </pre>
 </div></div></li>
 		<li>MARC 21 ordering should now be used as default. Unless you have it set already, or you have it set to a different value, the following should be set: 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">plugin.named.org.dspace.sort.OrderFormatDelegate = org.dspace.sort.OrderFormatTitleMarc21=title
+<pre class="code-java">
+plugin.named.org.dspace.sort.OrderFormatDelegate = org.dspace.sort.OrderFormatTitleMarc21=title
 </pre>
 </div></div></li>
 		<li>Hierarchical LDAP support. 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">##### Hierarchical LDAP Settings #####
+<pre class="code-java">
+##### Hierarchical LDAP Settings #####
 # If your users are spread out across a hierarchical tree on your
 # LDAP server, you will need to use the following stackable authentication
 # class:
@@ -1178,7 +1208,8 @@ sitemap.dir = ${dspace.dir}/sitemaps
 </div></div></li>
 		<li>Shibboleth authentication support. 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">#### Shibboleth Authentication Configuration Settings ####
+<pre class="code-java">
+#### Shibboleth Authentication Configuration Settings ####
 # Check https:<span class="code-comment">//mams.melcoe.mq.edu.au/zope/mams/pubs/Installation/dspace15/view
 </span># <span class="code-keyword">for</span> installation detail.
 #
@@ -1246,7 +1277,8 @@ authentication.shib.role.Librarian = Administrator
 </div></div></li>
 		<li>DOI and handle identifiers can now be rendered in the JSPUI. 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java"># When using <span class="code-quote">"resolver"</span> in webui.itemdisplay to render identifiers as resolvable
+<pre class="code-java">
+# When using <span class="code-quote">"resolver"</span> in webui.itemdisplay to render identifiers as resolvable
 # links, the base URL is taken from &lt;code&gt;webui.resolver.&lt;n&gt;.baseurl&lt;/code&gt;
 # where &lt;code&gt;webui.resolver.&lt;n&gt;.baseurl&lt;/code&gt; matches the urn specified in the metadata value.
 # The value is appended to the <span class="code-quote">"baseurl"</span> as is, so the baseurl need to end with slash almost in any <span class="code-keyword">case</span>.
@@ -1267,7 +1299,8 @@ authentication.shib.role.Librarian = Administrator
 <p> In configuration sections such as webui.itemdisplay.default, values can be changed from (e.g.) metadata.dc.identifier.doi to metadata.doi.dc.identifier.doi</p></li>
 		<li>The whole of the SWORD configuration has changed. The SWORD section must be removed and replaced with 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">#---------------------------------------------------------------#
+<pre class="code-java">
+#---------------------------------------------------------------#
 #--------------SWORD SPECIFIC CONFIGURATIONS--------------------#
 #---------------------------------------------------------------#
 # These configs are only used by the SWORD <span class="code-keyword">interface</span>            #
@@ -1477,7 +1510,7 @@ http:<span class="code-comment">//purl.org/net/sword-types/METSDSpaceSIP \
 
 <p>The changes in DSpace 1.5 are significant and wide spread involving database schema upgrades, code restructuring, completely new user and programmatic interfaces, and new build system.</p>
 
-<p>In the notes below <em>[dspace]</em> refers to the install directory for your existing DSpace installation, and <em>[dspace-source]</em> to the source directory for DSpace 1.5. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
+<p>In the notes below <tt>[dspace]</tt> refers to the install directory for your existing DSpace installation, and <em>[dspace-source]</em> to the source directory for DSpace 1.5. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
 
 <ol>
 	<li><b>Backup your DSpace</b> First and foremost, make a complete backup of your system, including:
@@ -1488,10 +1521,11 @@ http:<span class="code-comment">//purl.org/net/sword-types/METSDSpaceSIP \
 		<li>Your statistics scripts (<em>[dspace]/bin/stat&#42;</em>) which contain customizable dates</li>
 	</ul>
 	</li>
-	<li><b>Download DSpace 1.5</b> Get the new DSpace 1.5 source code either as a download from <a href="#UpgradingaDSpaceInstallation-%5C" title="SourceForge|">SourceForge\</a> or check it out directly from the <a href="#UpgradingaDSpaceInstallation-%5C" title="SVN code repository|">SVN code repository\</a>. If you downloaded DSpace do not unpack it on top of your existing installation.</li>
-	<li><b>Build DSpace</b> The build process has radically changed for DSpace 1.5. With this new release the build system has moved to a maven-based system enabling the various projects (JSPUI, XMLUI, OAI, and Core API) into separate projects. See the Installation section for more information on building DSpace using the new maven-based build system. Run the following commands to compile DSpace.
+	<li><b>Download DSpace 1.5</b> Get the new DSpace 1.5 source code either as a download from <a href="http://sourceforge.net/projects/dspace/">SourceForge</a> or check it out directly from the <a href="#UpgradingaDSpaceInstallation-%5C" title="SVN code repository|">SVN code repository\</a>. If you downloaded DSpace do not unpack it on top of your existing installation.</li>
+	<li><b>Build DSpace</b> The build process has radically changed for DSpace 1.5. With this new release the build system has moved to a maven-based system enabling the various projects (JSPUI, XMLUI, OAI, and Core API) into separate projects. See the <a href="Installation.html" title="Installation">Installation</a> section for more information on building DSpace using the new maven-based build system. Run the following commands to compile DSpace.
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">  cd [dspace-source]/dspace/;
+<pre class="code-java">
+  cd [dspace-source]/dspace/;
   mvn <span class="code-keyword">package</span>
 </pre>
 </div></div>
@@ -1499,7 +1533,8 @@ http:<span class="code-comment">//purl.org/net/sword-types/METSDSpaceSIP \
 	<li><b>Stop Tomcat</b> Take down your servlet container, for Tomcat use the <em>bin/shutdown.sh</em> script.</li>
 	<li><b>Update</b> <b><em>dspace.cfg</em></b> Several new parameters need to be added to your <em>[dspace]/config/dspace.cfg</em>. While it is advisable to start with a fresh <em>DSpace 1.5 &#95;dspace.cfg</em> configuration file&#95; here are the minimum set of parameters that need to be added to an old <em>DSpace 1.4.2 configuration</em>.
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">#### Stackable Authentication Methods #####
+<pre class="code-java">
+#### Stackable Authentication Methods #####
 #
 # Stack of authentication methods
 #  (See org.dspace.authenticate.AuthenticationManager)
@@ -1578,13 +1613,15 @@ event.consumer.eperson.filters = EPerson+Create
 </div></div></li>
 	<li><b>Add</b> <b><em>xmlui.xconf</em></b> <b>Manakin configuration</b> The new Manakin user interface available with DSpace 1.5 requires an extra configuration file that you will need to manually copy it over to your configuration directory.
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cp [dspace-source]/dspace/config/xmlui.xconf
+<pre class="code-java">
+cp [dspace-source]/dspace/config/xmlui.xconf
 	[dspace]/config/xmlui.xconf
 </pre>
 </div></div></li>
 	<li><b>Add</b> <b><em>item-submission.xml</em></b> <b>and</b> <b><em>item-submission.dtd</em></b> <b>configurable submission configuration</b> The new configurable submission system that enables an administrator to re-arrange, or add/remove item submission steps requires this configuration file. You need to manually copy it over to your configuration directory.
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cp [dspace-source]/dspace/config/item-submission.xml
+<pre class="code-java">
+cp [dspace-source]/dspace/config/item-submission.xml
 	[dspace]/config/item-submission.xml
 
 cp [dspace-source]/dspace/config/item-submission.dtd
@@ -1593,7 +1630,8 @@ cp [dspace-source]/dspace/config/item-submission.dtd
 </div></div></li>
 	<li><b>Add new</b> <b><em>input-forms.xml</em></b> <b>and</b> <b><em>input-forms.dtd</em></b> <b>configurable submission configuration</b> The input-forms.xml now has an included dtd reference to support validation. You'll need to merge in your changes to both file/and or copy them into place.
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cp [dspace-source]/dspace/config/input-forms.xml
+<pre class="code-java">
+cp [dspace-source]/dspace/config/input-forms.xml
 	[dspace]/config/input-forms.xml
 
 cp [dspace-source]/dspace/config/input-forms.dtd
@@ -1602,7 +1640,8 @@ cp [dspace-source]/dspace/config/input-forms.dtd
 </div></div></li>
 	<li><b>Add</b> <b><em>sword-swap-ingest.xsl</em></b> <b>and</b> <b><em>xhtml-head-item.properties</em></b> <b>crosswalk files</b> New crosswalk files are required to support SWORD and the inclusion of metadata into the head of items.
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cp [dspace-source]/dspace/config/crosswalks/sword-swap-ingest.xsl
+<pre class="code-java">
+cp [dspace-source]/dspace/config/crosswalks/sword-swap-ingest.xsl
 	[dspace]/config/crosswalks/sword-swap-ingest.xsl
 
 
@@ -1613,7 +1652,8 @@ cp
 </div></div></li>
 	<li><b>Add</b> <b><em>registration_notify</em></b> <b>email files</b> A new configuration option (<em>registration.notify = you@your-email.com</em>) can be set to send a notification email whenever a new user registers to use your DSpace. The email template for this email needs to be copied.
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cp [dspace-source]/dspace/config/emails/registration_notify
+<pre class="code-java">
+cp [dspace-source]/dspace/config/emails/registration_notify
 	[dspace]/config/emails/registration_notify
 
 </pre>
@@ -1627,13 +1667,15 @@ cp
 	<li><b>Apply any customizations</b> If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. Commonly these modifications are made to "JSP" pages located inside the <em>[dspace 1.4.2]/jsp/local</em> directory. These should be moved <em>[dspace-source]/dspace/modules/jspui/src/main/webapp/</em> in the new build structure. See Customizing the JSP Pages for more information.</li>
 	<li><b>Update DSpace</b> Update the DSpace installed directory with new code and libraries. Inside the <em>[dspace-source]/dspace/target/dspace-1.5-build.dir/</em> directory run:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cd [dspace-source]/dspace/target/dspace-1.5-build.dir/;
+<pre class="code-java">
+cd [dspace-source]/dspace/target/dspace-1.5-build.dir/;
 ant -Dconfig=[dspace]/config/dspace.cfg update
 </pre>
 </div></div></li>
 	<li><b>Update the Metadata Registry</b> New Metadata Registry updates are required to support SWORD.
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cp [dspace-source]/dspace/config/registries/sword-metadata.xml
+<pre class="code-java">
+cp [dspace-source]/dspace/config/registries/sword-metadata.xml
 	[dspace]/config/registries/sword-metadata.xml;
 
 [dspace]/bin/dsrun org.dspace.administer.MetadataImporter -f
@@ -1642,18 +1684,21 @@ ant -Dconfig=[dspace]/config/dspace.cfg update
 </div></div></li>
 	<li><b>Rebuild browse and search indexes</b> One of the major new features of DSpace 1.5 is the browse system which necessitates that the indexes be recreated. To do this run the following command from your DSpace installed directory:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">[dspace]/bin/index-init
+<pre class="code-java">
+[dspace]/bin/index-init
 </pre>
 </div></div></li>
 	<li><b>Update statistics scripts</b> The statistics scripts have been rewritten for DSpace 1.5. Prior to 1.5 they were written in Perl, but have been rewritten in Java to avoid having to install Perl. First, make a note of the dates you have specified in your statistics scripts for the statistics to run from. You will find these in <em>[dspace]/bin/stat-initial</em>, as <em>$start_year</em> and <em>$start_month</em>. Note down these values.Copy the new stats scripts: 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">    cp [dspace-source]/dspace/bin/stat* [dspace]/bin/
+<pre class="code-java">
+    cp [dspace-source]/dspace/bin/stat* [dspace]/bin/
 </pre>
 </div></div>
 <p>Then edit your statistics configuration file with the start details. Add the following to <em>[dspace]/conf/dstat.cfg</em><em>&#35; the year and month to start creating reports from</em><em>&#35; - year as four digits (e.g. 2005)</em><em>&#35; - month as a number (e.g. January is 1, December is 12)</em><em>start.year = 2005</em><em>start.month = 1</em> Replace '2005' and '1' as with the values you noted down. <em>dstat.cfg</em> also used to contain the hostname and service name as displayed at the top of the statistics. These values are now taken from <em>dspace.cfg</em> so you can remove <em>host.name</em> and <em>host.url</em> from <em>dstat.cfg</em> if you wish. The values now used are <em>dspace.hostname</em> and <em>dspace.name</em> from <em>dspace.cfg</em></p></li>
 	<li><b>Deploy web applications</b> Copy the web applications files from your [dspace]/webapps directory to the subdirectory of your servlet container (e.g. Tomcat):
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cp [dspace]/webapps/* [tomcat]/webapps/
+<pre class="code-java">
+cp [dspace]/webapps/* [tomcat]/webapps/
 </pre>
 </div></div></li>
 	<li><b>Restart Tomcat</b> Restart your servlet container, for Tomcat use the <em>bin/startup.sh</em> script.</li>
@@ -1669,13 +1714,14 @@ ant -Dconfig=[dspace]/config/dspace.cfg update
 
 <p>The changes in 1.4.x releases are only code and configuration changes so the update is simply a matter of rebuilding the wars and slight changes to your config file.</p>
 
-<p>In the notes below <em>[dspace]</em> refers to the install directory for your existing DSpace installation, and <em>[dspace-1.4.x-source]</em> to the source directory for DSpace 1.4.x. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
+<p>In the notes below <tt>[dspace]</tt> refers to the install directory for your existing DSpace installation, and <em>[dspace-1.4.x-source]</em> to the source directory for DSpace 1.4.x. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
 
 <ol>
-	<li>Get the new DSpace 1.4.x source code from <a href="http://sourceforge.net/projects/dspace/" title="the DSpace page on SourceForge">the DSpace page on SourceForge</a> and unpack it somewhere. Do not unpack it on top of your existing installation&#33;&#33;</li>
+	<li>Get the new DSpace 1.4.x source code from <a href="http://sourceforge.net/projects/dspace/">the DSpace page on SourceForge</a> and unpack it somewhere. Do not unpack it on top of your existing installation&#33;&#33;</li>
 	<li>Copy the PostgreSQL driver JAR to the source tree. For example: 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cd  [dspace]/lib
+<pre class="code-java">
+cd  [dspace]/lib
 cp postgresql.jar  [dspace-1.4.x-source]/lib
 </pre>
 </div></div></li>
@@ -1683,7 +1729,8 @@ cp postgresql.jar  [dspace-1.4.x-source]/lib
 	<li>Take down Tomcat (or whichever servlet container you're using).</li>
 	<li>A new configuration item <em>webui.html.max-depth-guess</em> has been added to avoid infinite URL spaces. Add the following to the dspace.cfg file:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">#### Multi-file HTML document/site settings #####
+<pre class="code-java">
+#### Multi-file HTML document/site settings #####
 #
 # When serving up composite HTML items, how deep can the request be
 	<span class="code-keyword">for</span> us to
@@ -1705,15 +1752,17 @@ webui.html.max-depth-guess = 3
 </pre>
 </div></div>
 <p>If <em>webui.html.max-depth-guess</em> is not present in <em>dspace.cfg</em> the default value is used. If archiving entire web sites or deeply nested HTML documents it is advisable to change the default to a higher value more suitable for these types of materials.</p></li>
-	<li>Your 'localized' JSPs (those in jsp/local) now need to be maintained in the <em>source</em> directory. If you have locally modified JSPs in your <em>[dspace]/jsp/local</em> directory, you will need to merge the changes in the new 1.4.x versions into your locally modified ones. You can use the <em>diff</em> command to compare your JSPs against the 1.4.x versions to do this. You can also check against the <a href="http://dspace.cvs.sourceforge.net/dspace/" title="DSpace CVS">DSpace CVS</a>.</li>
+	<li>Your 'localized' JSPs (those in jsp/local) now need to be maintained in the <em>source</em> directory. If you have locally modified JSPs in your <em>[dspace]/jsp/local</em> directory, you will need to merge the changes in the new 1.4.x versions into your locally modified ones. You can use the <em>diff</em> command to compare your JSPs against the 1.4.x versions to do this. You can also check against the <a href="http://dspace.cvs.sourceforge.net/dspace/">DSpace CVS</a>.</li>
 	<li>In <em>[dspace-1.4.x-source]</em> run:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">ant -Dconfig= [dspace]/config/dspace.cfg update
+<pre class="code-java">
+ant -Dconfig= [dspace]/config/dspace.cfg update
 </pre>
 </div></div></li>
 	<li>Copy the <em>.war</em> Web application files in <em>[dspace-1.4.x-source]/build</em> to the <em>webapps</em> sub-directory of your servlet container (e.g. Tomcat). e.g.:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cp  [dspace-1.4.x-source]/build/*.war
+<pre class="code-java">
+cp  [dspace-1.4.x-source]/build/*.war
 	[tomcat]/webapps
 </pre>
 </div></div>
@@ -1732,10 +1781,11 @@ webui.html.max-depth-guess = 3
 		<li>Your configuration files and localized JSPs</li>
 	</ul>
 	</li>
-	<li>Download the <a href="http://sourceforge.net/projects/dspace/" title="latest DSpace 1.4.x source bundle">latest DSpace 1.4.x source bundle</a> and unpack it in a suitable location (<em>not</em> over your existing DSpace installation or source tree&#33;)</li>
+	<li>Download the <a href="http://sourceforge.net/projects/dspace/">latest DSpace 1.4.x source bundle</a> and unpack it in a suitable location (<em>not</em> over your existing DSpace installation or source tree&#33;)</li>
 	<li>Copy the PostgreSQL driver JAR to the source tree. For example: 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cd  [dspace]/lib
+<pre class="code-java">
+cd  [dspace]/lib
 cp postgresql.jar  [dspace-1.4.x-source]/lib
 </pre>
 </div></div></li>
@@ -1745,7 +1795,8 @@ cp postgresql.jar  [dspace-1.4.x-source]/lib
 	<ul>
 		<li>In <em>dspace.cfg</em>, paste in the following lines for the new stackable authentication feature, the new method for managing Media Filters, and the Checksum Checker.
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">#### Stackable Authentication Methods #####
+<pre class="code-java">
+#### Stackable Authentication Methods #####
 # Stack of authentication methods
 #  (See org.dspace.eperson.AuthenticationManager)
 plugin.sequence.org.dspace.eperson.AuthenticationMethod = \
@@ -1823,12 +1874,14 @@ checker.retention.CHECKSUM_MATCH=8w
 </div></div></li>
 		<li>If you have customized advanced search fields (<em>search.index.n</em> fields, note that you now need to include the schema in the values. Dublin Core is specified as <em>dc</em>. So for example, if in 1.3.2 you had:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">search.index.1 = title:title.alternative
+<pre class="code-java">
+search.index.1 = title:title.alternative
 </pre>
 </div></div>
 <p>That needs to be changed to: </p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">search.index.1 = title:dc.title.alternative
+<pre class="code-java">
+search.index.1 = title:dc.title.alternative
 </pre>
 </div></div></li>
 		<li>If you use LDAP or X509 authentication, you'll need to add <em>org.dspace.eperson.LDAPAuthentication</em> or <em>org.dspace.eperson.X509Authentication</em> respectively. See also configuring custom authentication code.</li>
@@ -1839,7 +1892,8 @@ checker.retention.CHECKSUM_MATCH=8w
 	<li>Your 'localized' JSPs (those in jsp/local) now need to be maintained in the <em>source</em> directory. If you have locally modified JSPs in your <em>[dspace]/jsp/local</em> directory, you will need to merge the changes in the new 1.4.x versions into your locally modified ones. You can use the <em>diff</em> command to compare your JSPs against the 1.4.x versions to do this. You can also check against the <a href="http://dspace.cvs.sourceforge.net/dspace/" title="DSpace CVS">DSpace CVS</a>.</li>
 	<li>In <em>[dspace-1.4.x-source]</em> run:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">ant -Dconfig= [dspace]/config/dspace.cfg update
+<pre class="code-java">
+ant -Dconfig= [dspace]/config/dspace.cfg update
 </pre>
 </div></div></li>
 	<li>The database schema needs updating. SQL files containing the relevant file are provided. If you've modified the schema locally, you may need to check over this and make alterations.
@@ -1851,7 +1905,8 @@ checker.retention.CHECKSUM_MATCH=8w
 	<li>Rebuild the search indexes: <em>[dspace]/bin/index-all</em></li>
 	<li>Copy the <em>.war</em> Web application files in <em>[dspace-1.4-source]/build</em> to the <em>webapps</em> sub-directory of your servlet container (e.g. Tomcat). e.g.:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cp  [dspace-1.4-source]/build/*.war
+<pre class="code-java">
+cp  [dspace-1.4-source]/build/*.war
 	[tomcat]/webapps
 </pre>
 </div></div>
@@ -1864,13 +1919,14 @@ checker.retention.CHECKSUM_MATCH=8w
 
 <p>The changes in 1.3.2 are only code changes so the update is simply a matter of rebuilding the wars.</p>
 
-<p>In the notes below <em>[dspace]</em> refers to the install directory for your existing DSpace installation, and <em>[dspace-1.3.2-source]</em> to the source directory for DSpace 1.3.2. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
+<p>In the notes below <tt>[dspace]</tt> refers to the install directory for your existing DSpace installation, and <em>[dspace-1.3.2-source]</em> to the source directory for DSpace 1.3.2. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
 
 <ol>
 	<li>Get the new DSpace 1.3.2 source code from <a href="http://sourceforge.net/projects/dspace/" title="the DSpace page on SourceForge">the DSpace page on SourceForge</a> and unpack it somewhere. Do not unpack it on top of your existing installation&#33;&#33;</li>
 	<li>Copy the PostgreSQL driver JAR to the source tree. For example: 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cd  [dspace]/lib
+<pre class="code-java">
+cd  [dspace]/lib
 cp postgresql.jar  [dspace-1.3.2-source]/lib
 </pre>
 </div></div></li>
@@ -1878,12 +1934,14 @@ cp postgresql.jar  [dspace-1.3.2-source]/lib
 	<li>Your 'localized' JSPs (those in jsp/local) now need to be maintained in the <em>source</em> directory. If you have locally modified JSPs in your <em>[dspace]/jsp/local</em> directory, you will need to merge the changes in the new 1.3.2 versions into your locally modified ones. You can use the <em>diff</em> command to compare the 1.3.1 and 1.3.2 versions to do this.</li>
 	<li>In <em>[dspace-1.3.2-source]</em> run:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">ant -Dconfig= [dspace]/config/dspace.cfg update
+<pre class="code-java">
+ant -Dconfig= [dspace]/config/dspace.cfg update
 </pre>
 </div></div></li>
 	<li>Copy the <em>.war</em> Web application files in <em>[dspace-1.3.2-source]/build</em> to the <em>webapps</em> sub-directory of your servlet container (e.g. Tomcat). e.g.:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cp  [dspace-1.3.2-source]/build/*.war
+<pre class="code-java">
+cp  [dspace-1.3.2-source]/build/*.war
 	[tomcat]/webapps
 </pre>
 </div></div>
@@ -1894,10 +1952,10 @@ cp postgresql.jar  [dspace-1.3.2-source]/lib
 
 <h2><a name="UpgradingaDSpaceInstallation-UpgradingFrom1.2.xto1.3.x"></a>Upgrading From 1.2.x to 1.3.x</h2>
 
-<p>In the notes below <em>[dspace]</em> refers to the install directory for your existing DSpace installation, and <em>[dspace-1.3.x-source]</em> to the source directory for DSpace 1.3.x. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
+<p>In the notes below <tt>[dspace]</tt> refers to the install directory for your existing DSpace installation, and <em>[dspace-1.3.x-source]</em> to the source directory for DSpace 1.3.x. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
 
 <ol>
-	<li>Step one is, of course, to <b>back up all your data</b> before proceeding&#33;&#33; Include all of the contents of <em>[dspace]</em> and the PostgreSQL database in your backup.</li>
+	<li>Step one is, of course, to <b>back up all your data</b> before proceeding&#33;&#33; Include all of the contents of <tt>[dspace]</tt> and the PostgreSQL database in your backup.</li>
 	<li>Get the new DSpace 1.3.x source code from <a href="http://sourceforge.net/projects/dspace/" title="the DSpace page on SourceForge">the DSpace page on SourceForge</a> and unpack it somewhere. Do not unpack it on top of your existing installation&#33;&#33;</li>
 	<li>Copy the PostgreSQL driver JAR to the source tree. For example: <em>cd [dspace]/lib</em><em>cp postgresql.jar [dspace-1.2.2-source]/lib</em></li>
 	<li>Take down Tomcat (or whichever servlet container you're using).</li>
@@ -1905,7 +1963,8 @@ cp postgresql.jar  [dspace-1.3.2-source]/lib
 	<li>Install the new config files by moving <em>dstat.cfg</em> and <em>dstat.map</em> from <em>[dspace-1.3.x-source]/config/</em> to <em>[dspace]/config</em></li>
 	<li>You need to add new parameters to your <em>[dspace]/dspace.cfg</em>:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">###### Statistical Report Configuration Settings ######
+<pre class="code-java">
+###### Statistical Report Configuration Settings ######
 
 # should the stats be publicly available?  should be set to <span class="code-keyword">false</span> <span class="code-keyword">if</span>
 	you only
@@ -1933,13 +1992,14 @@ report.dir = /dspace/reports/
 
 <p>The changes in 1.2.2 are only code and config changes so the update should be fairly simple.</p>
 
-<p>In the notes below <em>[dspace]</em> refers to the install directory for your existing DSpace installation, and <em>[dspace-1.2.2-source]</em> to the source directory for DSpace 1.2.2. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
+<p>In the notes below <tt>[dspace]</tt> refers to the install directory for your existing DSpace installation, and <em>[dspace-1.2.2-source]</em> to the source directory for DSpace 1.2.2. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
 
 <ol>
 	<li>Get the new DSpace 1.2.2 source code from <a href="http://sourceforge.net/projects/dspace/" title="the DSpace page on SourceForge">the DSpace page on SourceForge</a> and unpack it somewhere. Do not unpack it on top of your existing installation&#33;&#33;</li>
 	<li>Copy the PostgreSQL driver JAR to the source tree. For example: 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cd  [dspace]/lib
+<pre class="code-java">
+cd  [dspace]/lib
 cp postgresql.jar  [dspace-1.2.2-source]/lib
 </pre>
 </div></div></li>
@@ -1947,7 +2007,8 @@ cp postgresql.jar  [dspace-1.2.2-source]/lib
 	<li>Your 'localized' JSPs (those in jsp/local) now need to be maintained in the <em>source</em> directory. If you have locally modified JSPs in your <em>[dspace]/jsp/local</em> directory, you might like to merge the changes in the new 1.2.2 versions into your locally modified ones. You can use the <em>diff</em> command to compare the 1.2.1 and 1.2.2 versions to do this. Also see the version history for a list of modified JSPs.</li>
 	<li>You need to add a new parameter to your <em>[dspace]/dspace.cfg</em> for configurable fulltext indexing
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">##### Fulltext Indexing settings #####
+<pre class="code-java">
+##### Fulltext Indexing settings #####
 # Maximum number of terms indexed <span class="code-keyword">for</span> a single field in Lucene.
 # Default is 10,000 words - often not enough <span class="code-keyword">for</span> full-text indexing.
 # If you change <span class="code-keyword">this</span>, you'll need to re-index <span class="code-keyword">for</span> the change
@@ -1958,12 +2019,14 @@ search.maxfieldlength = 10000
 </div></div></li>
 	<li>In <em>[dspace-1.2.2-source]</em> run:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">ant -Dconfig= [dspace]/config/dspace.cfg update
+<pre class="code-java">
+ant -Dconfig= [dspace]/config/dspace.cfg update
 </pre>
 </div></div></li>
 	<li>Copy the <em>.war</em> Web application files in <em>[dspace-1.2.2-source]/build</em> to the <em>webapps</em> sub-directory of your servlet container (e.g. Tomcat). e.g.:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cp  [dspace-1.2.2-source]/build/*.war
+<pre class="code-java">
+cp  [dspace-1.2.2-source]/build/*.war
 	[tomcat]/webapps
 </pre>
 </div></div>
@@ -1977,13 +2040,14 @@ search.maxfieldlength = 10000
 
 <p>The changes in 1.2.1 are only code changes so the update should be fairly simple.</p>
 
-<p>In the notes below <em>[dspace]</em> refers to the install directory for your existing DSpace installation, and <em>[dspace-1.2.1-source]</em> to the source directory for DSpace 1.2.1. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
+<p>In the notes below <tt>[dspace]</tt> refers to the install directory for your existing DSpace installation, and <em>[dspace-1.2.1-source]</em> to the source directory for DSpace 1.2.1. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
 
 <ol>
 	<li>Get the new DSpace 1.2.1 source code from <a href="http://sourceforge.net/projects/dspace/" title="the DSpace page on SourceForge">the DSpace page on SourceForge</a> and unpack it somewhere. Do not unpack it on top of your existing installation&#33;&#33;</li>
 	<li>Copy the PostgreSQL driver JAR to the source tree. For example: 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cd  [dspace]/lib
+<pre class="code-java">
+cd  [dspace]/lib
 cp postgresql.jar  [dspace-1.2.1-source]/lib
 </pre>
 </div></div></li>
@@ -1991,7 +2055,8 @@ cp postgresql.jar  [dspace-1.2.1-source]/lib
 	<li>Your 'localized' JSPs (those in jsp/local) now need to be maintained in the <em>source</em> directory. If you have locally modified JSPs in your <em>[dspace]/jsp/local</em> directory, you might like to merge the changes in the new 1.2.1 versions into your locally modified ones. You can use the <em>diff</em> command to compare the 1.2 and 1.2.1 versions to do this. Also see the version history for a list of modified JSPs.</li>
 	<li>You need to add a few new parameters to your <em>[dspace]/dspace.cfg</em> for browse/search and item thumbnails display, and for configurable DC metadata fields to be indexed.
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java"># whether to display thumbnails on browse and search results pages
+<pre class="code-java">
+# whether to display thumbnails on browse and search results pages
 	(1.2+)
 webui.browse.thumbnail.show = <span class="code-keyword">false</span>
 
@@ -2037,12 +2102,14 @@ search.index.11 = id:identifier.*
 </div></div></li>
 	<li>In <em>[dspace-1.2.1-source]</em> run:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">ant -Dconfig= [dspace]/config/dspace.cfg update
+<pre class="code-java">
+ant -Dconfig= [dspace]/config/dspace.cfg update
 </pre>
 </div></div></li>
 	<li>Copy the <em>.war</em> Web application files in <em>[dspace-1.2.1-source]/build</em> to the <em>webapps</em> sub-directory of your servlet container (e.g. Tomcat). e.g.:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cp  [dspace-1.2.1-source]/build/*.war
+<pre class="code-java">
+cp  [dspace-1.2.1-source]/build/*.war
 	[tomcat]/webapps
 </pre>
 </div></div>
@@ -2057,14 +2124,15 @@ search.index.11 = id:identifier.*
 
 <p>Note also that if you've substantially modified DSpace, these instructions apply to an unmodified 1.1.1 DSpace instance, and you'll need to adapt the process to any modifications you've made.</p>
 
-<p>This document refers to the install directory for your existing DSpace installation as <em>[dspace]</em>, and to the source directory for DSpace 1.2 as <em>[dspace-1.2-source]</em>. Whenever you see these path references below, be sure to replace them with the actual path names on your local system.</p>
+<p>This document refers to the install directory for your existing DSpace installation as <tt>[dspace]</tt>, and to the source directory for DSpace 1.2 as <em>[dspace-1.2-source]</em>. Whenever you see these path references below, be sure to replace them with the actual path names on your local system.</p>
 
 <ol>
-	<li>Step one is, of course, to <b>back up all your data</b> before proceeding&#33;&#33; Include all of the contents of <em>[dspace]</em> and the PostgreSQL database in your backup.</li>
+	<li>Step one is, of course, to <b>back up all your data</b> before proceeding&#33;&#33; Include all of the contents of <tt>[dspace]</tt> and the PostgreSQL database in your backup.</li>
 	<li>Get the new DSpace 1.2 source code from <a href="http://sourceforge.net/projects/dspace/" title="the DSpace page on SourceForge">the DSpace page on SourceForge</a> and unpack it somewhere. Do not unpack it on top of your existing installation&#33;&#33;</li>
 	<li>Copy the required Java libraries that we couldn't include in the bundle to the source tree. For example:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cd  [dspace]/lib
+<pre class="code-java">
+cd  [dspace]/lib
 cp activation.jar servlet.jar mail.jar
 	[dspace-1.2-source]/lib
 </pre>
@@ -2080,7 +2148,8 @@ cp activation.jar servlet.jar mail.jar
 	</li>
 	<li>You need to add the following new parameters to your <em>[dspace]/dspace.cfg</em>:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">##### Media Filter settings #####
+<pre class="code-java">
+##### Media Filter settings #####
 # maximum width and height of generated thumbnails
 thumbnail.maxwidth = 80
 thumbnail.maxheight = 80
@@ -2088,13 +2157,15 @@ thumbnail.maxheight = 80
 </div></div>
 <p>There are one or two other, optional extra parameters (for controlling the pool of database connections). See the version history for details. If you leave them out, defaults will be used.Also, to avoid future confusion, you might like to <b>remove</b> the following property, which is no longer required:</p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">config.template.oai-web.xml =
+<pre class="code-java">
+config.template.oai-web.xml =
 	[dspace]/oai/WEB-INF/web.xml
 </pre>
 </div></div></li>
-	<li>The layout of the installation directory (i.e. the structure of the contents of <em>[dspace]</em>) has changed somewhat since 1.1.1. First up, your 'localized' JSPs (those in jsp/local) now need to be maintained in the <em>source</em> directory. So make a copy of them now&#33;Once you've done that, you can remove <em>[dspace]/jsp</em> and <em>[dspace]/oai</em>, these are no longer used. (.war Web application archive files are used instead).Also, if you're using the same version of Tomcat as before, you need to <b>remove the lines from Tomcat's conf/server.xml file that enable symbolic links for DSpace.</b> These are the <em>&lt;Context&gt;</em> elements you added to get DSpace 1.1.1 working, looking something like this:
+	<li>The layout of the installation directory (i.e. the structure of the contents of <tt>[dspace]</tt>) has changed somewhat since 1.1.1. First up, your 'localized' JSPs (those in jsp/local) now need to be maintained in the <em>source</em> directory. So make a copy of them now&#33;Once you've done that, you can remove <em>[dspace]/jsp</em> and <em>[dspace]/oai</em>, these are no longer used. (.war Web application archive files are used instead).Also, if you're using the same version of Tomcat as before, you need to <b>remove the lines from Tomcat's conf/server.xml file that enable symbolic links for DSpace.</b> These are the <em>&lt;Context&gt;</em> elements you added to get DSpace 1.1.1 working, looking something like this:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">&lt;Context path=<span class="code-quote">"/dspace"</span> docBase=<span class="code-quote">"dspace"</span> debug=<span class="code-quote">"0"</span> reloadable=<span class="code-quote">"<span class="code-keyword">true</span>"</span>
+<pre class="code-java">
+&lt;Context path=<span class="code-quote">"/dspace"</span> docBase=<span class="code-quote">"dspace"</span> debug=<span class="code-quote">"0"</span> reloadable=<span class="code-quote">"<span class="code-keyword">true</span>"</span>
 	crossContext=<span class="code-quote">"<span class="code-keyword">true</span>"</span>&gt;
   &lt;Resources className=<span class="code-quote">"org.apache.naming.resources.FileDirContext"</span>
 	allowLinking=<span class="code-quote">"<span class="code-keyword">true</span>"</span> /&gt;
@@ -2104,12 +2175,14 @@ thumbnail.maxheight = 80
 <p>Be sure to remove the &lt;Context&gt; elements for both the Web UI and the OAI Web applications.</p></li>
 	<li>Build and install the updated DSpace 1.2 code. Go to the DSpace 1.2 source directory, and run: 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">ant -Dconfig= [dspace]/config/dspace.cfg update
+<pre class="code-java">
+ant -Dconfig= [dspace]/config/dspace.cfg update
 </pre>
 </div></div></li>
 	<li>Copy the new config files in <em>config</em> to your installation, e.g.:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cp  [dspace-1.2-source]/config/news-*
+<pre class="code-java">
+cp  [dspace-1.2-source]/config/news-*
 	[dspace-1.2-source]/config/mediafilter.cfg
 	[dspace-1.2-source]/config/dc2mods.cfg
 	[dspace]/config
@@ -2117,7 +2190,8 @@ thumbnail.maxheight = 80
 </div></div></li>
 	<li>You'll need to make some changes to the database schema in your PostgreSQL database. <em>[dspace-1.2-source]/etc/database_schema_11-12.sql</em> contains the SQL commands to achieve this. If you've modified the schema locally, you may need to check over this and make alterations.To apply the changes, go to the source directory, and run: 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">psql -f etc/database_schema_11-12.sql [DSpace database name] -h
+<pre class="code-java">
+psql -f etc/database_schema_11-12.sql [DSpace database name] -h
 	localhost
 </pre>
 </div></div></li>
@@ -2134,14 +2208,16 @@ thumbnail.maxheight = 80
 </div></div></li>
 	<li>Delete the existing symlinks from your servlet container's (e.g. Tomcat's) <em>webapp</em> sub-directory.Copy the <em>.war</em> Web application files in <em>[dspace-1.2-source]/build</em> to the <em>webapps</em> sub-directory of your servlet container (e.g. Tomcat). e.g.:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cp  [dspace-1.2-source]/build/*.war
+<pre class="code-java">
+cp  [dspace-1.2-source]/build/*.war
 	[tomcat]/webapps
 </pre>
 </div></div></li>
 	<li>Restart Tomcat.</li>
 	<li>To get image thumbnails generated and full-text extracted for indexing automatically, you need to set up a 'cron' job, for example one like this: 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java"># Run the media filter at 02:00 every day
+<pre class="code-java">
+# Run the media filter at 02:00 every day
 0 2 * * *  [dspace]/bin/filter-media
 </pre>
 </div></div>
@@ -2167,19 +2243,21 @@ Now, you should be finished&#33;</li>
 
 <p>Fortunately the changes in 1.1.1 are only code changes so the update is fairly simple.</p>
 
-<p>In the notes below <em>[dspace]</em> refers to the install directory for your existing DSpace installation, and <em>[dspace-1.1.1-source]</em> to the source directory for DSpace 1.1.1. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
+<p>In the notes below <tt>[dspace]</tt> refers to the install directory for your existing DSpace installation, and <em>[dspace-1.1.1-source]</em> to the source directory for DSpace 1.1.1. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
 
 <ol>
 	<li>Take down Tomcat.</li>
 	<li>It would be a good idea to update any of the third-party tools used by DSpace at this point (e.g. PostgreSQL), following the instructions provided with the relevant tools.</li>
 	<li>In <em>[dspace-1.1.1-source]</em> run:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">ant -Dconfig= [dspace]/config/dspace.cfg update
+<pre class="code-java">
+ant -Dconfig= [dspace]/config/dspace.cfg update
 </pre>
 </div></div></li>
 	<li>If you have locally modified JSPs of the following JSPs in your <em>[dspace]/jsp/local</em> directory, you might like to merge the changes in the new 1.1.1 versions into your locally modified ones. You can use the <em>diff</em> command to compare the 1.1 and 1.1.1 versions to do this. The changes are quite minor.
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">collection-home.jsp
+<pre class="code-java">
+collection-home.jsp
 admin/authorize-collection-edit.jsp
 admin/authorize-community-edit.jsp
 admin/authorize-item-edit.jsp
@@ -2192,14 +2270,15 @@ admin/eperson-edit.jsp
 
 <h2><a name="UpgradingaDSpaceInstallation-UpgradingFrom1.0.1to1.1"></a>Upgrading From 1.0.1 to 1.1</h2>
 
-<p>To upgrade from DSpace 1.0.1 to 1.1, follow the steps below. Your <em>dspace.cfg</em> does not need to be changed. In the notes below <em>[dspace]</em> refers to the install directory for your existing DSpace installation, and <em>[dspace-1.1-source]</em> to the source directory for DSpace 1.1. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
+<p>To upgrade from DSpace 1.0.1 to 1.1, follow the steps below. Your <em>dspace.cfg</em> does not need to be changed. In the notes below <tt>[dspace]</tt> refers to the install directory for your existing DSpace installation, and <em>[dspace-1.1-source]</em> to the source directory for DSpace 1.1. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
 
 <ol>
 	<li>Take down Tomcat (or whichever servlet container you're using).</li>
 	<li>We recommend that you upgrade to the latest version of PostgreSQL (7.3.2). Included are some notes to help you do this. Note you will also have to upgrade Ant to version 1.5 if you do this.</li>
 	<li>Make the necessary changes to the DSpace database. These include a couple of minor schema changes, and some new indexes which should improve performance. Also, the names of a couple of database views have been changed since the old names were so long they were causing problems. First run <em>psql</em> to access your database (e.g. <em>psql &#45;U dspace &#45;W</em> and then enter the password), and enter these SQL commands:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">ALTER TABLE bitstream ADD store_number INTEGER;
+<pre class="code-java">
+ALTER TABLE bitstream ADD store_number INTEGER;
 UPDATE bitstream SET store_number = 0;
 
 ALTER TABLE item ADD last_modified TIMESTAMP;
@@ -2239,26 +2318,30 @@ CREATE VIEW CollectionItemsByDateAccession AS SELECT
 </div></div></li>
 	<li>Fix your JSPs for Unicode. If you've modified the site 'skin' (<em>jsp/local/layout/header-default.jsp</em>) you'll need to add the Unicode header, i.e.:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">&lt;meta http-equiv=<span class="code-quote">"Content-Type"</span> content="text/html;
+<pre class="code-java">
+&lt;meta http-equiv=<span class="code-quote">"Content-Type"</span> content="text/html;
 	charset=UTF-8"&gt;
 </pre>
 </div></div>
 <p>to the &lt;HEAD&gt; element. If you have any locally-edited JSPs, you need to add this page directive to the top of all of them: </p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">&lt;%@ page contentType=<span class="code-quote">"text/html;charset=UTF-8"</span> %&gt;
+<pre class="code-java">
+&lt;%@ page contentType=<span class="code-quote">"text/html;charset=UTF-8"</span> %&gt;
 </pre>
 </div></div>
 <p>(If you haven't modified any JSPs, you don't have to do anything.)</p></li>
 	<li>Copy the required Java libraries that we couldn't include in the bundle to the source tree. For example:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cd  [dspace]/lib
+<pre class="code-java">
+cd  [dspace]/lib
 cp *.policy activation.jar servlet.jar mail.jar
 	[dspace-1.1-source]/lib
 </pre>
 </div></div></li>
 	<li>Compile up the new DSpace code, replacing <em>[dspace]/config/dspace.cfg</em> with the path to your current, LIVE configuration. (The second line, <em>touch `find .`</em>, is a precaution, which ensures that the new code has a current datestamp and will overwrite the old code. Note that those are back quotes.)
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">cd  [dspace-1.1-source]
+<pre class="code-java">
+cd  [dspace-1.1-source]
 touch `find .`
 ant
 ant -Dconfig= [dspace]/config/dspace.cfg update
@@ -2266,7 +2349,8 @@ ant -Dconfig= [dspace]/config/dspace.cfg update
 </div></div></li>
 	<li>Update the database tables using the upgrader tool, which sets up the new &gt;<em>last_modified</em> date in the item table:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">Run  [dspace]/bin/dsrun
+<pre class="code-java">
+Run  [dspace]/bin/dsrun
 	org.dspace.administer.Upgrade101To11
 </pre>
 </div></div></li>
@@ -2278,12 +2362,14 @@ ant -Dconfig= [dspace]/config/dspace.cfg update
 </div></div></li>
 	<li>Fix the OAICat properties file. Edit <em>[dspace]/config/templates/oaicat.properties</em>. Change the line that says
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">Identify.deletedRecord=yes
+<pre class="code-java">
+Identify.deletedRecord=yes
 </pre>
 </div></div>
 <p>To: </p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">Identify.deletedRecord=persistent
+<pre class="code-java">
+Identify.deletedRecord=persistent
 </pre>
 </div></div>
 <p>This is needed to fix the OAI-PMH 'Identity' verb response. Then run <em>[dspace]/bin/install-configs</em>.</p></li>
@@ -2294,7 +2380,8 @@ ant -Dconfig= [dspace]/config/dspace.cfg update
 </div></div></li>
 	<li>Restart Tomcat. Tomcat should be run with the following environment variable set, to ensure that Unicode is handled properly. Also, the default JVM memory heap sizes are rather small. Adjust <em>&#45;Xmx512M</em> (512Mb maximum heap size) and <em>&#45;Xms64M</em> (64Mb Java thread stack size) to suit your hardware.
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">JAVA_OPTS=<span class="code-quote">"-Xmx512M -Xms64M -Dfile.encoding=UTF-8"</span>
+<pre class="code-java">
+JAVA_OPTS=<span class="code-quote">"-Xmx512M -Xms64M -Dfile.encoding=UTF-8"</span>
 </pre>
 </div></div></li>
 </ol>
@@ -2309,7 +2396,7 @@ ant -Dconfig= [dspace]/config/dspace.cfg update
 				<td height="12" background="https://wiki.duraspace.org/images/border/border_bottom.gif"><img src="images/border/spacer.gif" width="1" height="1" border="0"/></td>
 			</tr>
 		    <tr>
-			    <td align="center"><font color="grey">Document generated by Confluence on Nov 06, 2010 19:27</font></td>
+			    <td align="center"><font color="grey">Document generated by Confluence on Dec 16, 2010 16:47</font></td>
 		    </tr>
 	    </table>
     </body>

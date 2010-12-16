@@ -16,11 +16,10 @@
                                                     </span>
 				    </div>
 				    <div class="pagesubheading">
-					    This page last changed on Nov 06, 2010 by <font color="#0050B2">jtrimble</font>.
+					    This page last changed on Dec 16, 2010 by <font color="#0050B2">jtrimble</font>.
 				    </div>
 
 				    <h1><a name="SystemAdministration-DSpaceSystemDocumentation%3ASystemAdministration"></a>DSpace System Documentation: System Administration</h1>
-
 
 <p>DSpace operates on several levels: as a Tomcat servlet, cron jobs, and on-demand operations. This section explains many of the on-demand operations. Some of the command operations may be also set up as cron jobs. Many of these operations are performed at the Command Line Interface (CLI) also known as the Unix prompt (<tt>$:</tt>). Future reference will use the term CLI when the use needs to be at the command line.</p>
 
@@ -43,7 +42,113 @@
 </div>
 
 
-<p><b>DSpace Command Launcher</b>. With DSpace Release 1.6, the many commands and scripts have been replaced with a simple <tt>[dspace]/bin/dspace &lt;command&gt;</tt> command. See Application Layer chapter for the details of the <a href="Application.html#Application-DSpaceCommandLauncher">DSpace Command Launcher</a>.</p>
+<div class='panelMacro'><table class='infoMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="images/icons/emoticons/information.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>DSpace Command Launcher</b><br />With DSpace Release 1.6, the many commands and scripts have been replaced with a simple <tt>[dspace]/bin/dspace &lt;command&gt;</tt> command. See Application Layer chapter for the details of the <a href="Application Layer.html#ApplicationLayer-DSpaceCommandLauncher">DSpace Command Launcher</a>.</td></tr></table></div>
+
+<p><b>Table of Contents:</b></p>
+<style type='text/css'>/*<![CDATA[*/
+div.rbtoc1292513589969 {margin-left: 0px;padding: 0px;}
+div.rbtoc1292513589969 ul {list-style: none;margin-left: 0px;}
+div.rbtoc1292513589969 li {margin-left: 0px;padding-left: 0px;}
+
+/*]]>*/</style><div class='rbtoc1292513589969'>
+<ul>
+    <li><span class='TOCOutline'>1</span> <a href='#SystemAdministration-CommunityandCollectionStructureImporter'>Community and Collection Structure Importer</a></li>
+<ul>
+    <li><span class='TOCOutline'>1.1</span> <a href='#SystemAdministration-Limitation'>Limitation</a></li>
+</ul>
+    <li><span class='TOCOutline'>2</span> <a href='#SystemAdministration-PackageImporterandExporter'>Package Importer and Exporter</a></li>
+<ul>
+    <li><span class='TOCOutline'>2.1</span> <a href='#SystemAdministration-Ingesting'>Ingesting</a></li>
+<ul>
+    <li><span class='TOCOutline'>2.1.1</span> <a href='#SystemAdministration-IngestionModes%26Options'>Ingestion Modes &amp; Options</a></li>
+<ul>
+    <li><span class='TOCOutline'>2.1.1.1</span> <a href='#SystemAdministration-IngestingaSinglePackage'>Ingesting a Single Package</a></li>
+    <li><span class='TOCOutline'>2.1.1.2</span> <a href='#SystemAdministration-IngestingMultiplePackagesatOnce'>Ingesting Multiple Packages at Once</a></li>
+</ul>
+    <li><span class='TOCOutline'>2.1.2</span> <a href='#SystemAdministration-Restoring%2FReplacingusingPackages'>Restoring/Replacing using Packages</a></li>
+<ul>
+    <li><span class='TOCOutline'>2.1.2.1</span> <a href='#SystemAdministration-DefaultRestoreMode'>Default Restore Mode</a></li>
+    <li><span class='TOCOutline'>2.1.2.2</span> <a href='#SystemAdministration-Restore%2CKeepExistingMode'>Restore, Keep Existing Mode</a></li>
+    <li><span class='TOCOutline'>2.1.2.3</span> <a href='#SystemAdministration-ForceReplaceMode'>Force Replace Mode</a></li>
+</ul>
+</ul>
+    <li><span class='TOCOutline'>2.2</span> <a href='#SystemAdministration-Disseminating'>Disseminating</a></li>
+<ul>
+    <li><span class='TOCOutline'>2.2.1</span> <a href='#SystemAdministration-DisseminatingaSingleObject'>Disseminating a Single Object</a></li>
+    <li><span class='TOCOutline'>2.2.2</span> <a href='#SystemAdministration-DisseminatingMultipleObjectsatOnce'>Disseminating Multiple Objects at Once</a></li>
+</ul>
+    <li><span class='TOCOutline'>2.3</span> <a href='#SystemAdministration-ArchivalInformationPackages%28AIPs%29'>Archival Information Packages (AIPs)</a></li>
+    <li><span class='TOCOutline'>2.4</span> <a href='#SystemAdministration-METSpackages'>METS packages</a></li>
+</ul>
+    <li><span class='TOCOutline'>3</span> <a href='#SystemAdministration-ItemImporterandExporter'>Item Importer and Exporter</a></li>
+<ul>
+    <li><span class='TOCOutline'>3.1</span> <a href='#SystemAdministration-DSpaceSimpleArchiveFormat'>DSpace Simple Archive Format</a></li>
+    <li><span class='TOCOutline'>3.2</span> <a href='#SystemAdministration-Configuringmetadata%5Cprefix%5C.xmlforDifferentSchema'>Configuring <em>metadata-[prefix].xml</em> for Different Schema</a></li>
+    <li><span class='TOCOutline'>3.3</span> <a href='#SystemAdministration-ImportingItems'>Importing Items</a></li>
+<ul>
+    <li><span class='TOCOutline'>3.3.1</span> <a href='#SystemAdministration-AddingItemstoaCollection'>Adding Items to a Collection</a></li>
+    <li><span class='TOCOutline'>3.3.2</span> <a href='#SystemAdministration-ReplacingItemsinCollection'>Replacing Items in Collection</a></li>
+    <li><span class='TOCOutline'>3.3.3</span> <a href='#SystemAdministration-DeletingorUnimportingItemsinaCollection'>Deleting or Unimporting Items in a Collection</a></li>
+    <li><span class='TOCOutline'>3.3.4</span> <a href='#SystemAdministration-OtherOptions'>Other Options</a></li>
+</ul>
+    <li><span class='TOCOutline'>3.4</span> <a href='#SystemAdministration-ExportingItems'>Exporting Items</a></li>
+</ul>
+    <li><span class='TOCOutline'>4</span> <a href='#SystemAdministration-TransferringItemsBetweenDSpaceInstances'>Transferring Items Between DSpace Instances</a></li>
+    <li><span class='TOCOutline'>5</span> <a href='#SystemAdministration-ItemUpdate'>Item Update</a></li>
+<ul>
+    <li><span class='TOCOutline'>5.1</span> <a href='#SystemAdministration-DSpacesimpleArchiveFormat'>DSpace simple Archive Format</a></li>
+    <li><span class='TOCOutline'>5.2</span> <a href='#SystemAdministration-ItemUpdateCommands'>ItemUpdate Commands</a></li>
+<ul>
+    <li><span class='TOCOutline'>5.2.1</span> <a href='#SystemAdministration-CLIExamples'>CLI Examples</a></li>
+</ul>
+</ul>
+    <li><span class='TOCOutline'>6</span> <a href='#SystemAdministration-Registering%28NotImporting%29Bitstreams'>Registering (Not Importing) Bitstreams</a></li>
+<ul>
+    <li><span class='TOCOutline'>6.1</span> <a href='#SystemAdministration-AccessibleStorage'>Accessible Storage</a></li>
+    <li><span class='TOCOutline'>6.2</span> <a href='#SystemAdministration-RegisteringItemsUsingtheItemImporter'>Registering Items Using the Item Importer</a></li>
+    <li><span class='TOCOutline'>6.3</span> <a href='#SystemAdministration-InternalIdentificationandRetrievalofRegisteredItems'>Internal Identification and Retrieval of Registered Items</a></li>
+    <li><span class='TOCOutline'>6.4</span> <a href='#SystemAdministration-ExportingRegisteredItems'>Exporting Registered Items</a></li>
+    <li><span class='TOCOutline'>6.5</span> <a href='#SystemAdministration-METSExportofRegisteredItems'>METS Export of Registered Items</a></li>
+    <li><span class='TOCOutline'>6.6</span> <a href='#SystemAdministration-DeletingRegisteredItems'>Deleting Registered Items</a></li>
+</ul>
+    <li><span class='TOCOutline'>7</span> <a href='#SystemAdministration-METSTools'>METS Tools</a></li>
+<ul>
+    <li><span class='TOCOutline'>7.1</span> <a href='#SystemAdministration-TheExportTool'>The Export Tool</a></li>
+    <li><span class='TOCOutline'>7.2</span> <a href='#SystemAdministration-Limitations'>Limitations</a></li>
+</ul>
+    <li><span class='TOCOutline'>8</span> <a href='#SystemAdministration-MediaFilters%3ATransformingDSpaceContent'>MediaFilters: Transforming DSpace Content</a></li>
+    <li><span class='TOCOutline'>9</span> <a href='#SystemAdministration-SubCommunityManagement'>Sub-Community Management</a></li>
+    <li><span class='TOCOutline'>10</span> <a href='#SystemAdministration-BatchMetadataEditing'>Batch Metadata Editing</a></li>
+<ul>
+    <li><span class='TOCOutline'>10.1</span> <a href='#SystemAdministration-ExportFunction'>Export Function</a></li>
+<ul>
+    <li><span class='TOCOutline'>10.1.1</span> <a href='#SystemAdministration-ExportingProcess'>Exporting Process</a></li>
+</ul>
+    <li><span class='TOCOutline'>10.2</span> <a href='#SystemAdministration-ImportFunction'>Import Function</a></li>
+<ul>
+    <li><span class='TOCOutline'>10.2.1</span> <a href='#SystemAdministration-ImportingProcess'>Importing Process</a></li>
+</ul>
+    <li><span class='TOCOutline'>10.3</span> <a href='#SystemAdministration-TheCSVFiles'>The CSV Files</a></li>
+</ul>
+    <li><span class='TOCOutline'>11</span> <a href='#SystemAdministration-ChecksumChecker'>Checksum Checker</a></li>
+<ul>
+    <li><span class='TOCOutline'>11.1</span> <a href='#SystemAdministration-CheckerExecutionMode'>Checker Execution Mode</a></li>
+    <li><span class='TOCOutline'>11.2</span> <a href='#SystemAdministration-CheckerResultsPruning'>Checker Results Pruning</a></li>
+    <li><span class='TOCOutline'>11.3</span> <a href='#SystemAdministration-CheckerReporting'>Checker Reporting</a></li>
+    <li><span class='TOCOutline'>11.4</span> <a href='#SystemAdministration-CronorAutomaticExecutionofChecksumChecker'>Cron or Automatic Execution of Checksum Checker</a></li>
+    <li><span class='TOCOutline'>11.5</span> <a href='#SystemAdministration-AutomatedChecksumCheckers%27Results'>Automated Checksum Checkers' Results</a></li>
+</ul>
+    <li><span class='TOCOutline'>12</span> <a href='#SystemAdministration-Embargo'>Embargo</a></li>
+    <li><span class='TOCOutline'>13</span> <a href='#SystemAdministration-BrowseIndexCreation'>Browse Index Creation</a></li>
+<ul>
+    <li><span class='TOCOutline'>13.1</span> <a href='#SystemAdministration-RunningtheIndexingPrograms'>Running the Indexing Programs</a></li>
+    <li><span class='TOCOutline'>13.2</span> <a href='#SystemAdministration-IndexingCustomization'>Indexing Customization</a></li>
+</ul>
+    <li><span class='TOCOutline'>14</span> <a href='#SystemAdministration-DSpaceLogConverter'>DSpace Log Converter</a></li>
+    <li><span class='TOCOutline'>15</span> <a href='#SystemAdministration-ClientStatistics'>Client Statistics</a></li>
+    <li><span class='TOCOutline'>16</span> <a href='#SystemAdministration-TestDatabase'>Test Database</a></li>
+    <li><span class='TOCOutline'>17</span> <a href='#SystemAdministration-Movingitems'>Moving items</a></li>
+</ul></div>
 
 <h2><a name="SystemAdministration-CommunityandCollectionStructureImporter"></a>Community and Collection Structure Importer</h2>
 
@@ -225,7 +330,7 @@
 <div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="images/icons/emoticons/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Not All Packagers Support Bulk Ingest</b><br />Because the packager plugin must know how to locate all child packages from an initial package file, not all plugins can support bulk ingest.  Currently, in DSpace the following Packager Plugins support bulk ingest capabilities:
 <ul>
 	<li>METS Packager Plugin</li>
-	<li><a href="AipBackupRestore.html" title="AipBackupRestore">AIP Packager Plugin</a></li>
+	<li><a href="AIP Backup and Restore.html" title="AIP Backup and Restore">AIP Packager Plugin</a></li>
 </ul>
 </td></tr></table></div>
 
@@ -338,19 +443,20 @@
 
 <h3><a name="SystemAdministration-ArchivalInformationPackages%28AIPs%29"></a>Archival Information Packages (AIPs)</h3>
 
-<p>As of DSpace 1.7, DSpace now can backup and restore all of its contents as a set of <a href="DSpaceAIPFormat.html" title="DSpaceAIPFormat">AIP Files</a>.  This includes all Communities, Collections, Items, Groups and People in the system.</p>
+<p>As of DSpace 1.7, DSpace now can backup and restore all of its contents as a set of <a href="DSpace AIP Format.html" title="DSpace AIP Format">AIP Files</a>.  This includes all Communities, Collections, Items, Groups and People in the system.</p>
 
 <p>This feature came out of a requirement for DSpace to better integrate with DuraCloud (<a href="http://www.duracloud.org">http://www.duracloud.org</a>), and other backup storage systems.  One of these requirements is to be able to essentially "backup" local DSpace contents into the cloud (as a type of offsite backup), and "restore" those contents at a later time.</p>
 
-<p>Essentially, this means DSpace can export the entire hierarchy (i.e. bitstreams, metadata and relationships between Communities/Collections/Items) into a relatively standard format (a METS-based, <a href="DSpaceAIPFormat.html" title="DSpaceAIPFormat">AIP format</a>). This entire hierarchy can also be re-imported into DSpace in the same format (essentially a restore of that content in the same or different DSpace installation).</p>
+<p>Essentially, this means DSpace can export the entire hierarchy (i.e. bitstreams, metadata and relationships between Communities/Collections/Items) into a relatively standard format (a METS-based, <a href="DSpace AIP Format.html" title="DSpace AIP Format">AIP format</a>). This entire hierarchy can also be re-imported into DSpace in the same format (essentially a restore of that content in the same or different DSpace installation).</p>
 
-<p>For more information, see the section on <a href="AipBackupRestore.html" title="AipBackupRestore">AIP backup &amp; Restore for DSpace</a>.</p>
+<p>For more information, see the section on <a href="AIP Backup and Restore.html" title="AIP Backup and Restore">AIP backup &amp; Restore for DSpace</a>.</p>
 
 <h3><a name="SystemAdministration-METSpackages"></a>METS packages</h3>
 
 <p>Since DSpace 1.4 release, the software includes a package disseminator and matching ingester for the DSpace METS SIP (Submission Information Package) format. They were created to help end users prepare sets of digital resources and metadata for submission to the archive using well-defined standards such as <a href="http://www.loc.gov/standards/mets/" title="METS">METS</a>, <a href="http://www.loc.gov/standards/mods/" title="MODS">MODS</a>, and <a href="http://www.loc.gov/standards/premis/" title="PREMIS">PREMIS</a>. The plugin name is <em>METS</em> by default, and it uses MODS for descriptive metadata.</p>
 
 <p>The DSpace METS SIP profile is available at: <a href="https://wiki.duraspace.org/display/DSPACE/DSpaceMETSSIPProfile">https://wiki.duraspace.org/display/DSPACE/DSpaceMETSSIPProfile</a></p>
+
 
 
 
@@ -362,7 +468,8 @@
 
 <p>The basic concept behind the DSpace's simple archive format is to create an archive, which is directory full of items, with a subdirectory per item. Each item directory contains a file for the item's descriptive metadata, and the files that make up the item.</p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">archive_directory/
+<pre class="code-java">
+archive_directory/
     item_000/
         dublin_core.xml         -- qualified Dublin Core metadata <span class="code-keyword">for</span> metadata fields belonging to the dc schema
         metadata_[prefix].xml   -- metadata in another schema, the prefix is the name of the schema as registered with the metadata registry
@@ -383,7 +490,8 @@
 	<li><em>&lt;qualifier&gt;</em> &#45; the element's qualifier</li>
 	<li><em>&lt;language&gt;</em> &#45; (optional)ISO language code for element
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">&lt;dublin_core&gt;
+<pre class="code-java">
+&lt;dublin_core&gt;
     &lt;dcvalue element=<span class="code-quote">"title"</span> qualifier=<span class="code-quote">"none"</span>&gt;A Tale of Two Cities&lt;/dcvalue&gt;
     &lt;dcvalue element=<span class="code-quote">"date"</span> qualifier=<span class="code-quote">"issued"</span>&gt;1990&lt;/dcvalue&gt;
     &lt;dcvalue element=<span class="code-quote">"title"</span> qualifier=<span class="code-quote">"alternate"</span> language=<span class="code-quote">"fr"</span>&gt;J'aime les Printemps&lt;/dcvalue&gt;
@@ -399,7 +507,8 @@
 
 <p>The <em>contents</em> file simply enumerates, one file per line, the bitstream file names. See the following example:</p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">        file_1.doc
+<pre class="code-java">
+        file_1.doc
         file_2.pdf
         license
 </pre>
@@ -1053,7 +1162,7 @@ Adding your own filters is done by creating a class which <em>implements</em> th
 <pre class="code-java">[dspace]/bin/dspace community-filiator -r -p parentID -c childID</pre>
 </div></div>
 
-<p>where '<del>r' or '</del>&#45;remove' means dis-establish the current relationship in which the community identified by 'parentID' is the parent of the community identified by 'childID'. The outcome will be that the 'childID' community will become an orphan, i.e. a top-level community.</p>
+<p>where '<del>r' or '</del>-remove' means dis-establish the current relationship in which the community identified by 'parentID' is the parent of the community identified by 'childID'. The outcome will be that the 'childID' community will become an orphan, i.e. a top-level community.</p>
 
 <p>If the required constraints of operation are violated, an error message will appear explaining the problem, and no change will be made. An example in a removal operation, where the stated child community does not have the stated parent community as its parent: "Error, child community not a child of parent community".</p>
 
@@ -1102,7 +1211,7 @@ Adding your own filters is done by creating a class which <em>implements</em> th
 </tr>
 <tr>
 <td class='confluenceTd'> <tt>&#45;a</tt> or <tt>&#45;-all</tt> </td>
-<td class='confluenceTd'> Include all the metadata fields that are not normally changed (e.g. provenance) or those fields you configured in the <em>dspace.cfg</em> to be ignored on export. </td>
+<td class='confluenceTd'> Include all the metadata fields that are not normally changed (e.g. provenance) or those fields you configured in the <tt>dspace.cfg</tt> to be ignored on export. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> <tt>&#45;h</tt> or <tt>&#45;-help</tt> </td>
@@ -1538,47 +1647,47 @@ checker.retention.CHECKSUM_MATCH = 8w</pre>
 <td class='confluenceTd'> Description </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>r</del></em> or <em>&#45;rebuild</em> </td>
-<td class='confluenceTd'> Should we rebuild all the indexes, which removes old tables and creates new ones. For use with <em>&#45;f</em>. Mutually exclusive with <em>&#45;d</em> </td>
+<td class='confluenceTd'> <tt>&#45;r</tt> or <tt>&#45;rebuild</tt> </td>
+<td class='confluenceTd'> Should we rebuild all the indexes, which removes old tables and creates new ones. For use with <tt>&#45;f</tt>. Mutually exclusive with <tt>&#45;d</tt> </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>s</del></em> or <em>&#45;start</em> </td>
-<td class='confluenceTd'> <em>[-s &lt;int&gt;] &#95;start from this index number and work upwards (mostly only useful for debugging). For use with &#95;-t</em> and <em>&#45;f</em> </td>
+<td class='confluenceTd'> <tt>&#45;s</tt> or <tt>&#45;start</tt> </td>
+<td class='confluenceTd'> <tt>[-s &lt;int&gt;] start from this index number and work upwards (mostly only useful for debugging). For use with {{-t</tt> and <tt>&#45;f</tt> </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>x</del></em> or <em>&#45;execute</em> </td>
-<td class='confluenceTd'> Execute all the remove and create SQL against the database. For use with <em>&#45;t &#95;and &#95;-f</em> </td>
+<td class='confluenceTd'> <tt>&#45;x</tt> or <tt>&#45;execute</tt> </td>
+<td class='confluenceTd'> Execute all the remove and create SQL against the database. For use with <tt>&#45;t</tt> and <tt>&#45;f</tt> </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>i</del></em> or <em>&#45;index</em> </td>
-<td class='confluenceTd'> Actually do the indexing. Mutually exclusive with <em>&#45;t</em> and <em>&#45;f</em>. </td>
+<td class='confluenceTd'> <tt>&#45;i</tt> or <tt>&#45;index</tt> </td>
+<td class='confluenceTd'> Actually do the indexing. Mutually exclusive with <tt>&#45;t</tt> and <tt>&#45;f</tt>. </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>o</del></em> or <em>&#45;out</em> </td>
-<td class='confluenceTd'> <em>[-o&lt;filename&gt;]</em> write the remove and create SQL to the given file. For use with <em>&#45;t</em> and <em>&#45;f</em> </td>
+<td class='confluenceTd'> <tt>&#45;o</tt> or <tt>&#45;out</tt> </td>
+<td class='confluenceTd'> <tt>[-o&lt;filename&gt;]</tt> write the remove and create SQL to the given file. For use with <tt>&#45;t</tt> and <tt>&#45;f</tt> </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>p</del></em> or <em>&#45;print</em> </td>
-<td class='confluenceTd'> Write the remove and create SQL to the stdout. For use with <em>&#45;t</em> and <em>&#45;f</em>. </td>
+<td class='confluenceTd'> <tt>&#45;p</tt> or <tt>&#45;print</tt> </td>
+<td class='confluenceTd'> Write the remove and create SQL to the stdout. For use with <tt>&#45;t</tt> and <tt>&#45;f</tt>. </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>t</del></em> or <em>&#45;tables</em> </td>
-<td class='confluenceTd'> Create the tables only, do no attempt to index. Mutually exclusive with <em>&#45;f</em> and <em>&#45;i</em> </td>
+<td class='confluenceTd'> <tt>&#45;t</tt> or <tt>&#45;tables</tt> </td>
+<td class='confluenceTd'> Create the tables only, do no attempt to index. Mutually exclusive with <tt>&#45;f</tt> and <tt>&#45;i</tt> </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>f</del></em> or <em>&#45;full</em> </td>
-<td class='confluenceTd'> Make the tables, and do the indexing. This forces <em>&#45;x</em>. Mutually exclusive with <em>&#45;f</em> and <em>&#45;i</em>. </td>
+<td class='confluenceTd'> <tt>&#45;f</tt> or <tt>&#45;full</tt> </td>
+<td class='confluenceTd'> Make the tables, and do the indexing. This forces <tt>&#45;x</tt>. Mutually exclusive with <tt>&#45;f</tt> and <tt>&#45;i</tt>. </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>v</del></em> or <em>&#45;verbose</em> </td>
-<td class='confluenceTd'> Print extra information to the stdout. If used in conjunction with <em>&#45;p</em>, you cannot use the stdout to generate your database structure. </td>
+<td class='confluenceTd'> <tt>&#45;v</tt> or <tt>&#45;verbose</tt> </td>
+<td class='confluenceTd'> Print extra information to the stdout. If used in conjunction with <tt>&#45;p</tt>, you cannot use the stdout to generate your database structure. </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>d</del></em> or <em>&#45;delete</em> </td>
-<td class='confluenceTd'> Delete all the indexes, but do not create new ones. For use with <em>&#45;f</em>. This is mutually exclusive with <em>&#45;r</em>. </td>
+<td class='confluenceTd'> <tt>&#45;d</tt> or <tt>&#45;delete</tt> </td>
+<td class='confluenceTd'> Delete all the indexes, but do not create new ones. For use with <tt>&#45;f</tt>. This is mutually exclusive with <tt>&#45;r</tt>. </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>h</del></em> or <em>&#45;help</em> </td>
+<td class='confluenceTd'> <tt>&#45;h</tt> or <tt>&#45;help</tt> </td>
 <td class='confluenceTd'> Show this help documentation. Overrides all other arguments. </td>
 </tr>
 </tbody></table>
@@ -1601,9 +1710,8 @@ checker.retention.CHECKSUM_MATCH = 8w</pre>
 <p><b>Destroy and rebuild.</b> You can destroy and rebuild the database, but do not do the indexing. Output the SQL to do this to the screen and a file, as well as executing it against the database, while being verbose. At the CLI screen:</p>
 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java"></pre>
+<pre class="code-java">[dspace]/bin/dspace index \-r \-t \-p \-v \-x \-o myfile.sql</pre>
 </div></div>
-<p>dspace/bin/dspace index &#45;r &#45;t &#45;p &#45;v &#45;x &#45;o myfile.sql&#95;</p>
 
 
 <h3><a name="SystemAdministration-IndexingCustomization"></a>Indexing Customization</h3>
@@ -1647,7 +1755,7 @@ As one can see, the choices are limited only by your metadata schema, the metada
 <table class='confluenceTable'><tbody>
 <tr>
 <td class='confluenceTd'> Command used: </td>
-<td class='confluenceTd'> _<em>[dspace]</em>_<em>/bin/dspace stats-log-converter</em> </td>
+<td class='confluenceTd'> <tt>[dspace]/bin/dspace stats-log-converter</tt> </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Java class: </td>
@@ -1658,27 +1766,27 @@ As one can see, the choices are limited only by your metadata schema, the metada
 <td class='confluenceTd'> Description </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>i</del></em> or <em>&#45;in</em> </td>
+<td class='confluenceTd'> <tt>&#45;i</tt> or <tt>&#45;in</tt> </td>
 <td class='confluenceTd'> Input file </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>o</del></em> or <em>&#45;out</em> </td>
+<td class='confluenceTd'> <tt>&#45;o</tt> or <tt>&#45;out</tt> </td>
 <td class='confluenceTd'> Output file </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>m</del></em> or <em>&#45;multiple</em> </td>
+<td class='confluenceTd'> <tt>&#45;m</tt> or <tt>&#45;multiple</tt> </td>
 <td class='confluenceTd'> Adds a wildcard at the end of input and output, so it would mean dspace.log&#42; would be converted. (For example, the following files would be included because of this argument: <em>dspace.log, dspace.log.1, dspace.log.2, dspace.log.3,</em> etc.) </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>n</del></em> or <em>&#45;newformat</em> </td>
+<td class='confluenceTd'> <tt>&#45;n</tt> or <tt>&#45;newformat</tt> </td>
 <td class='confluenceTd'> If the log files have been created with DSpace 1.6 </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>v</del></em> or <em>&#45;verbose</em> </td>
+<td class='confluenceTd'> <tt>&#45;v</tt> or <tt>&#45;verbose</tt> </td>
 <td class='confluenceTd'> Display verbose ouput (helpful for debugging) </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>h</del></em> or <em>&#45;help</em> </td>
+<td class='confluenceTd'> <tt>&#45;h</tt> or <tt>&#45;help</tt> </td>
 <td class='confluenceTd'> Help </td>
 </tr>
 </tbody></table>
@@ -1690,7 +1798,7 @@ As one can see, the choices are limited only by your metadata schema, the metada
 <table class='confluenceTable'><tbody>
 <tr>
 <td class='confluenceTd'> Command used: </td>
-<td class='confluenceTd'> _<em>[dspace]</em>_<em>/bin/dspace stats-log-importer</em> </td>
+<td class='confluenceTd'> <tt>[dspace]/bin/dspace stats-log-importer</tt> </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Java class: </td>
@@ -1701,27 +1809,27 @@ As one can see, the choices are limited only by your metadata schema, the metada
 <td class='confluenceTd'> Description </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>i</del></em> or <em>&#45;</em> </td>
+<td class='confluenceTd'> <tt>&#45;i</tt> or <tt>&#45;&#45;</tt> </td>
 <td class='confluenceTd'> input file </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>m</del></em> or <em>&#45;</em> </td>
+<td class='confluenceTd'> <tt>&#45;m</tt> or <tt>&#45;&#45;</tt> </td>
 <td class='confluenceTd'> Adds a wildcard at the end of the input, so it would mean dspace.log&#42; would be imported </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>s</del></em> or <em>&#45;</em> </td>
+<td class='confluenceTd'> <tt>&#45;s</tt> or <tt>&#45;&#45;</tt> </td>
 <td class='confluenceTd'> To skip the reverse DNS lookups that work out where a user is from. (The DNS lookup finds the inforamtion about the host from its IP addess, such as geographical location, etc. This can be slow, and wouldn't work on a server not connected to the internet.) </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>v</del></em> or <em>&#45;</em> </td>
+<td class='confluenceTd'> <tt>&#45;v</tt> or <tt>&#45;&#45;</tt> </td>
 <td class='confluenceTd'> Display verbose ouput (helpful for debugging) </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>l</del></em> or <em>&#45;</em> </td>
+<td class='confluenceTd'> <tt>&#45;l</tt> or <tt>&#45;&#45;</tt> </td>
 <td class='confluenceTd'> For developers: allows you to import a log file from another system, so because the handles won't exist, it looks up random items in your local system to add hits to instead. </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>h</del></em> or <em>&#45;</em> </td>
+<td class='confluenceTd'> <tt>&#45;h</tt> or <tt>&#45;&#45;</tt> </td>
 <td class='confluenceTd'> Help </td>
 </tr>
 </tbody></table>
@@ -1737,7 +1845,7 @@ As one can see, the choices are limited only by your metadata schema, the metada
 <table class='confluenceTable'><tbody>
 <tr>
 <td class='confluenceTd'> Command used: </td>
-<td class='confluenceTd'> _<em>[dspace]</em>_<em>/bin/dspace stats-util</em> </td>
+<td class='confluenceTd'> <tt>[dspace]/bin/dspace stats-util</tt> </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Java class: </td>
@@ -1748,23 +1856,23 @@ As one can see, the choices are limited only by your metadata schema, the metada
 <td class='confluenceTd'> Description </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>u</del></em> or <em>&#45;update-spider-files</em> </td>
-<td class='confluenceTd'> Update Spider IP Files from internet into /dspace/config/spiders. Downloads Spider files identified in <em>dspace.cfg</em> under property </td>
+<td class='confluenceTd'> <tt>&#45;u</tt> or <tt>&#45;update-spider-files</tt> </td>
+<td class='confluenceTd'> Update Spider IP Files from internet into <tt>/dspace/config/spiders</tt>. Downloads Spider files identified in <em>dspace.cfg</em> under property </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>f</del></em> or <em>&#45;delete-spiders-by-flag</em> </td>
-<td class='confluenceTd'> Delete Spiders in Solr By isBot Flag. Will prune out all records that have <em>isBot:true</em> </td>
+<td class='confluenceTd'> <tt>&#45;f</tt> or <tt>&#45;delete-spiders-by-flag</tt> </td>
+<td class='confluenceTd'> Delete Spiders in Solr By isBot Flag. Will prune out all records that have <tt>isBot:true</tt> </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>i</del></em> or <em>&#45;delete-spiders-by-ip</em> </td>
+<td class='confluenceTd'> <tt>&#45;i</tt> or <tt>&#45;delete-spiders-by-ip</tt> </td>
 <td class='confluenceTd'> Delete Spiders in Solr By IP Address. Will prune out all records that have IP's that match spider IPs. </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>m</del></em> or <em>&#45;mark-spiders</em> </td>
+<td class='confluenceTd'> <tt>&#45;m</tt> or <tt>&#45;mark-spiders</tt> </td>
 <td class='confluenceTd'> Update isBog Flag in Solr. Marks any records currently stored in statistics that have IP addresses matched in spiders files </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <em><del>h</del></em> or <em>&#45;help</em> </td>
+<td class='confluenceTd'> <tt>&#45;h</tt> or <tt>&#45;help</tt> </td>
 <td class='confluenceTd'> Calls up this brief help table at CLI. </td>
 </tr>
 </tbody></table>
@@ -1773,11 +1881,11 @@ As one can see, the choices are limited only by your metadata schema, the metada
 
 <p>Notes:</p>
 
-<p>The usage of these options is open for the user to choose, If they want to keep spider entires in their repository, they can just mark them using "<em>&#45;m</em>" and they will be excluded from statistics queries when "<em>solr.statistics.query.filter.isBot = true</em>" in the <em>dspace.cfg</em>.</p>
+<p>The usage of these options is open for the user to choose, If they want to keep spider entires in their repository, they can just mark them using "<tt>&#45;m</tt>" and they will be excluded from statistics queries when "<tt>solr.statistics.query.filter.isBot = true</tt>" in the <tt>dspace.cfg</tt>.</p>
 
-<p>If they want to keep the spiders out of the solr repository, they can run just use the "<em>&#45;i</em>" option and they will be removed immediately.</p>
+<p>If they want to keep the spiders out of the solr repository, they can run just use the "<tt>&#45;i</tt>" option and they will be removed immediately.</p>
 
-<p>There are guards in place to control what can be defined as an IP range for a bot, in <em>[dspace]/config/spiders</em>, spider IP address ranges have to be at least 3 subnet sections in length 123.123.123 and IP Ranges can only be on the smallest subnet [123.123.123.0 - 123.123.123.255]. If not, loading that row will cause exceptions in the dspace logs and exclude that IP entry.</p>
+<p>There are guards in place to control what can be defined as an IP range for a bot, in <tt>[dspace]/config/spiders</tt>, spider IP address ranges have to be at least 3 subnet sections in length 123.123.123 and IP Ranges can only be on the smallest subnet [123.123.123.0 - 123.123.123.255]. If not, loading that row will cause exceptions in the dspace logs and exclude that IP entry.</p>
 
 
 <h2><a name="SystemAdministration-TestDatabase"></a>Test Database</h2>
@@ -1787,7 +1895,7 @@ As one can see, the choices are limited only by your metadata schema, the metada
 <table class='confluenceTable'><tbody>
 <tr>
 <td class='confluenceTd'> Command used: </td>
-<td class='confluenceTd'> _<em>[dspace]</em>_<em>/bin/dspace test-database</em> </td>
+<td class='confluenceTd'> <tt>[dspace]/bin/dspace test-database</tt> </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Java class: </td>
@@ -1798,11 +1906,22 @@ As one can see, the choices are limited only by your metadata schema, the metada
 <td class='confluenceTd'> Description </td>
 </tr>
 <tr>
-<td class='confluenceTd'> or <em>&#45;</em> </td>
+<td class='confluenceTd'> <tt>&#45;</tt> or <tt>&#45;&#45;</tt> </td>
 <td class='confluenceTd'> There are no arguments used at this time. </td>
 </tr>
 </tbody></table>
 </div>
+
+
+<h2><a name="SystemAdministration-Movingitems"></a>Moving items</h2>
+
+<p>It is possible for administrators to move items one at a time using either the JSPUI or the XMLUI.&nbsp; When editing an item, on the 'Edit item' screen select the 'Move Item' option.&nbsp; To move the item, select the new collection for the item to appear in.&nbsp; When the item is moved, it will take its authorizations (who can READ / WRITE it) with it.</p>
+
+<p>If you wish for the item to take on the default authorizations of the destination collection, tick the 'Inherit default policies of destination collection' checkbox.&nbsp; This is useful if you are moving an item from a private collection to a public collection, or from a public collection to a private collection.</p>
+
+<ul>
+	<li>Note: When selecting the 'Inherit default policies of destination collection' option, ensure that this will not override system-managed authorizations such as those imposed by the embargo system.</li>
+</ul>
 
 
 				    
@@ -1814,7 +1933,7 @@ As one can see, the choices are limited only by your metadata schema, the metada
 				<td height="12" background="https://wiki.duraspace.org/images/border/border_bottom.gif"><img src="images/border/spacer.gif" width="1" height="1" border="0"/></td>
 			</tr>
 		    <tr>
-			    <td align="center"><font color="grey">Document generated by Confluence on Nov 06, 2010 19:27</font></td>
+			    <td align="center"><font color="grey">Document generated by Confluence on Dec 16, 2010 16:47</font></td>
 		    </tr>
 	    </table>
     </body>
