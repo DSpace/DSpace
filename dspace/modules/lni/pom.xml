@@ -95,7 +95,7 @@
          <dependencies>
             <dependency>
                <groupId>com.oracle</groupId>
-               <artifactId>ojdbc5</artifactId>
+               <artifactId>ojdbc6</artifactId>
             </dependency>
          </dependencies>
       </profile>
