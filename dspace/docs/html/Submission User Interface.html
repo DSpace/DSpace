@@ -16,13 +16,64 @@
                                                     </span>
 				    </div>
 				    <div class="pagesubheading">
-					    This page last changed on Nov 06, 2010 by <font color="#0050B2">jtrimble</font>.
+					    This page last changed on Dec 15, 2010 by <font color="#0050B2">tdonohue</font>.
 				    </div>
 
 				    <h1><a name="SubmissionUserInterface-DSpaceSystemDocumentation%3ACustomizingandConfiguringSubmissionUserInterface"></a>DSpace System Documentation: Customizing and Configuring Submission User Interface</h1>
 
-
 <p>This page explains various customization and configuration options that are available within DSpace for the Item Submission user interface.</p>
+
+<style type='text/css'>/*<![CDATA[*/
+div.rbtoc1292437768892 {margin-left: 0px;padding: 0px;}
+div.rbtoc1292437768892 ul {list-style: none;margin-left: 0px;}
+div.rbtoc1292437768892 li {margin-left: 0px;padding-left: 0px;}
+
+/*]]>*/</style><div class='rbtoc1292437768892'>
+<ul>
+    <li><span class='TOCOutline'>1</span> <a href='#SubmissionUserInterface-UnderstandingtheSubmissionConfigurationFile'>Understanding the Submission Configuration File</a></li>
+<ul>
+    <li><span class='TOCOutline'>1.1</span> <a href='#SubmissionUserInterface-TheStructureofitemsubmission.xml'>The Structure of <em>item-submission.xml</em></a></li>
+    <li><span class='TOCOutline'>1.2</span> <a href='#SubmissionUserInterface-DefiningSteps%28%3Cstep%3E%29withintheitemsubmission.xml'>Defining Steps ( <em>&lt;step&gt;</em>) within the <em>item-submission.xml</em></a></li>
+<ul>
+    <li><span class='TOCOutline'>1.2.1</span> <a href='#SubmissionUserInterface-Wheretoplaceyour%3Cstep%3Edefinitions'>Where to place your <em>&lt;step&gt;</em> definitions</a></li>
+    <li><span class='TOCOutline'>1.2.2</span> <a href='#SubmissionUserInterface-Theorderingof%3Cstep%3Edefinitionsmatters%5C%21'>The ordering of <em>&lt;step&gt;</em> definitions matters!</a></li>
+    <li><span class='TOCOutline'>1.2.3</span> <a href='#SubmissionUserInterface-Structureofthe%3Cstep%3EDefinition'>Structure of the &lt;step&gt; Definition</a></li>
+</ul>
+</ul>
+    <li><span class='TOCOutline'>2</span> <a href='#SubmissionUserInterface-Reordering%2FRemovingSubmissionSteps'>Reordering/Removing Submission Steps</a></li>
+    <li><span class='TOCOutline'>3</span> <a href='#SubmissionUserInterface-AssigningacustomSubmissionProcesstoaCollection'>Assigning a custom Submission Process to a Collection</a></li>
+<ul>
+    <li><span class='TOCOutline'>3.1</span> <a href='#SubmissionUserInterface-GettingACollection%27sHandle'>Getting A Collection's Handle</a></li>
+</ul>
+    <li><span class='TOCOutline'>4</span> <a href='#SubmissionUserInterface-CustomMetadataentryPagesforSubmission'>Custom Metadata-entry Pages for Submission</a></li>
+<ul>
+    <li><span class='TOCOutline'>4.1</span> <a href='#SubmissionUserInterface-Introduction'>Introduction</a></li>
+    <li><span class='TOCOutline'>4.2</span> <a href='#SubmissionUserInterface-DescribingCustomMetadataForms'>Describing Custom Metadata Forms</a></li>
+    <li><span class='TOCOutline'>4.3</span> <a href='#SubmissionUserInterface-TheStructureofinputforms.xml'>The Structure of <em>input-forms.xml</em></a></li>
+<ul>
+    <li><span class='TOCOutline'>4.3.1</span> <a href='#SubmissionUserInterface-AddingaCollectionMap'>Adding a Collection Map</a></li>
+<ul>
+    <li><span class='TOCOutline'>4.3.1.1</span> <a href='#SubmissionUserInterface-GettingACollection%27sHandle'>Getting A Collection's Handle</a></li>
+</ul>
+    <li><span class='TOCOutline'>4.3.2</span> <a href='#SubmissionUserInterface-AddingaFormSet'>Adding a Form Set</a></li>
+<ul>
+    <li><span class='TOCOutline'>4.3.2.1</span> <a href='#SubmissionUserInterface-FormsandPages'>Forms and Pages</a></li>
+    <li><span class='TOCOutline'>4.3.2.2</span> <a href='#SubmissionUserInterface-CompositionofaField'>Composition of a Field</a></li>
+    <li><span class='TOCOutline'>4.3.2.3</span> <a href='#SubmissionUserInterface-AutomaticallyElidedFields'>Automatically Elided Fields</a></li>
+</ul>
+    <li><span class='TOCOutline'>4.3.3</span> <a href='#SubmissionUserInterface-AddingValuePairs'>Adding Value-Pairs</a></li>
+<ul>
+    <li><span class='TOCOutline'>4.3.3.1</span> <a href='#SubmissionUserInterface-Example'>Example</a></li>
+</ul>
+</ul>
+    <li><span class='TOCOutline'>4.4</span> <a href='#SubmissionUserInterface-DeployingYourCustomForms'>Deploying Your Custom Forms</a></li>
+</ul>
+    <li><span class='TOCOutline'>5</span> <a href='#SubmissionUserInterface-ConfiguringtheFileUploadstep'>Configuring the File Upload step</a></li>
+    <li><span class='TOCOutline'>6</span> <a href='#SubmissionUserInterface-CreatingnewSubmissionSteps'>Creating new Submission Steps</a></li>
+<ul>
+    <li><span class='TOCOutline'>6.1</span> <a href='#SubmissionUserInterface-CreatingaNonInteractiveStep'>Creating a Non-Interactive Step</a></li>
+</ul>
+</ul></div>
 
 <h2><a name="SubmissionUserInterface-UnderstandingtheSubmissionConfigurationFile"></a>Understanding the Submission Configuration File</h2>
 
@@ -75,7 +126,7 @@
 	<li>Within the <em>&lt;step-definitions&gt;</em> section
 	<ul>
 		<li>This is for globally defined <em>&lt;step&gt;</em> definitions (i.e. steps which are used in multiple <em>&lt;submission-process&gt;</em> definitions). Steps defined in this section <b>must</b> define a unique <em>id</em> which can be used to reference this step.</li>
-		<li>For example:¬†
+		<li>For example: 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">&lt;step-definitions&gt;
 	&lt;step id=<span class="code-quote">"custom-step"</span>&gt;
@@ -90,7 +141,7 @@
 	<li>Within a specific <em>&lt;submission-process&gt;</em> definition
 	<ul>
 		<li>This is for steps which are specific to a single <em>&lt;submission-process&gt;</em> definition.</li>
-		<li>For example: ¬†
+		<li>For example:  
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">&lt;submission-process&gt;
 	&lt;step&gt;
@@ -103,7 +154,7 @@
 </ol>
 
 
-<h4><a name="SubmissionUserInterface-Theorderingof%3Cstep%3Edefinitionsmatters%5C%21"></a>The ordering of <em>&lt;step&gt;</em> definitions <b>matters</b>&#33;</h4>
+<h4><a name="SubmissionUserInterface-Theorderingof%3Cstep%3Edefinitionsmatters%5C%21"></a>The ordering of <em>&lt;step&gt;</em> definitions matters&#33;</h4>
 
 <p>The ordering of the <em>&lt;step&gt;</em> tags within a <em>&lt;submission-process&gt;</em> definition directly corresponds to the order in which those steps will appear&#33;</p>
 
@@ -147,18 +198,17 @@
 <p>Each <em>step</em> contains the following elements. The required elements are so marked:</p>
 
 <ul>
-	<li>&#42;<b>heading</b>&#42;: Partial I18N key (defined in <em>Messages.properties</em> for JSPUI or <em>messages.xml</em> for XMLUI) which corresponds to the text that should be displayed in the submission Progress Bar for this step. This partial I18N key is prefixed within either the Messages.properties or messages.xml file, depending on the interface you are using. Therefore, to find the actual key, you will need to search for the partial key with the following prefix:
+	<li><b>heading</b>: Partial I18N key (defined in <em>Messages.properties</em> for JSPUI or <em>messages.xml</em> for XMLUI) which corresponds to the text that should be displayed in the submission Progress Bar for this step. This partial I18N key is prefixed within either the Messages.properties or messages.xml file, depending on the interface you are using. Therefore, to find the actual key, you will need to search for the partial key with the following prefix:
 	<ul>
 		<li>XMLUI: prefix is <em>xmlui.Submission.</em> (e.g. "xmlui.Submission.submit.progressbar.describe" for 'Describe' step)</li>
 		<li>JSPUI: prefix is <em>jsp.</em> (e.g. "jsp.submit.progressbar.describe" for 'Describe' step)<em>The 'heading' need not be defined if the step should not appear in the progress bar (e.g. steps which perform automated processing, i.e. non-interactive, should not appear in the progress bar).</em></li>
 	</ul>
 	</li>
-	<li>&#42;<b>processing-class</b><em>(Required)</em><b>: Full Java path to the Processing Class for this Step. This Processing Class</b> <b><em>must</em></b> <b>perform the primary processing of any information gathered in this step,</b> <b><em>for both the XMLUI and JSPUI</em></b><b>. All valid step processing classes must extend the abstract `</b><b><em>org.dspace.submit.AbstractProcessingStep</em></b><b>` class (or alternatively, extend one of the pre-existing step processing classes in</b> <b><em>org.dspace.submit.step.</em></b>)</li>
-	<li>&#42;<b>jspui-binding</b>&#42;: Full Java path of the JSPUI "binding" class for this Step. This "binding" class should initialize and call the appropriate JSPs to display the step's user interface. A valid JSPUI "binding" class <em>must</em> extend the abstract `<em>org.dspace.app.webui.submit.JSPStep</em>` class. <em>This property need not be defined if you are using the XMLUI interface, or for steps which only perform automated processing, i.e. non-interactive steps.</em></li>
-	<li>&#42;<b>xmlui-binding</b>&#42;: Full Java path of the XMLUI "binding" class for this Step. This "binding" class should generate the Manakin XML (DRI document) necessary to generate the step's user interface. A valid XMLUI "binding" class <em>must</em> extend the abstract `<em>org.dspace.app.xmlui.submission.AbstractSubmissionStep</em>` class. <em>This property need not be defined if you are using the JSPUI interface, or for steps which only perform automated processing, i.e. non-interactive steps.</em></li>
-	<li>&#42;<b>workflow-editable</b>&#42;: Defines whether or not this step can be edited during the <em>Edit Metadata</em> process with the DSpace approval/rejection workflow process. Possible values include <em>true</em> and <em>false</em>. If undefined, defaults to <em>true</em> (which means that workflow reviewers would be allowed to edit information gathered during that step).</li>
+	<li><b>processing-class</b> (Required): Full Java path to the Processing Class for this Step. This Processing Class <b>must</b> perform the primary processing of any information gathered in this step, for both the XMLUI and JSPUI. All valid step processing classes must extend the abstract <tt>org.dspace.submit.AbstractProcessingStep</tt> class (or alternatively, extend one of the pre-existing step processing classes in <tt>org.dspace.submit.step.&#42;</tt>)</li>
+	<li><b>jspui-binding</b>: Full Java path of the JSPUI "binding" class for this Step. This "binding" class should initialize and call the appropriate JSPs to display the step's user interface. A valid JSPUI "binding" class <em>must</em> extend the abstract <tt>org.dspace.app.webui.submit.JSPStep</tt> class. <em>This property need not be defined if you are using the XMLUI interface, or for steps which only perform automated processing, i.e. non-interactive steps.</em></li>
+	<li><b>xmlui-binding</b>: Full Java path of the XMLUI "binding" class for this Step. This "binding" class should generate the Manakin XML (DRI document) necessary to generate the step's user interface. A valid XMLUI "binding" class <em>must</em> extend the abstract <tt>org.dspace.app.xmlui.submission.AbstractSubmissionStep</tt> class. <em>This property need not be defined if you are using the JSPUI interface, or for steps which only perform automated processing, i.e. non-interactive steps.</em></li>
+	<li><b>workflow-editable</b>: Defines whether or not this step can be edited during the <em>Edit Metadata</em> process with the DSpace approval/rejection workflow process. Possible values include <em>true</em> and <em>false</em>. If undefined, defaults to <em>true</em> (which means that workflow reviewers would be allowed to edit information gathered during that step).</li>
 </ul>
-
 
 
 
@@ -173,16 +223,17 @@
 	<li>Reorder the <em>&lt;step&gt;</em> tags within that <em>&lt;submission-process&gt;</em> tag. Be sure to move the <em>entire</em><em>&lt;step&gt;</em> tag (i.e. everything between and including the opening <em>&lt;step&gt;</em> and closing <em>&lt;/step&gt;</em> tags).
 	<ul>
 		<li><em>Hint #1:</em> The <em>&lt;step&gt;</em> defining the <em>Review/Verify</em> step only allows the user to review information from steps which appear <b>before</b> it. So, it's likely you'd want this to appear as one of your last few steps</li>
-		<li><em>Hint #2:</em> If you are using it, the <em>&lt;step&gt;</em> defining the <em>Initial Questions</em> step should always appear <b>before</b> the <em>Upload</em> or <em>Describe</em> steps since it asks questions which help to set up those later steps.<br/>
-<b>Removing one or more steps</b></li>
+		<li><em>Hint #2:</em> If you are using it, the <em>&lt;step&gt;</em> defining the <em>Initial Questions</em> step should always appear <b>before</b> the <em>Upload</em> or <em>Describe</em> steps since it asks questions which help to set up those later steps.</li>
 	</ul>
 	</li>
 </ol>
 
 
+<p><b>Removing one or more steps</b></p>
+
 <ol>
 	<li>Locate the <em>&lt;submission-process&gt;</em> tag which defines the Submission Process that you are using. If you are unsure which Submission Process you are using, it's likely the one with <em>name="traditional"</em>, since this is the traditional DSpace submission process.</li>
-	<li>Comment out (i.e. surround with &lt;&#33;-&#45; and --&gt;) the <em>&lt;step&gt;</em> tags which you want to remove from that <em>&lt;submission-process&gt;</em> tag. Be sure to comment out the <em>entire</em><em>&lt;step&gt;</em> tag (i.e. everything between and including the opening <em>&lt;step&gt;</em> and closing <em>&lt;/step&gt;</em> tags).
+	<li>Comment out (i.e. surround with <tt>&lt;&#33;-&#45;</tt> and <tt>&#45;&#45;&gt;</tt>) the <tt>&lt;step&gt;</tt> tags which you want to remove from that <em>&lt;submission-process&gt;</em> tag. Be sure to comment out the <em>entire {{&lt;step&gt;}}tag (i.e. everything between and including the opening _&lt;step&gt;</em> and closing <em>&lt;/step&gt;</em> tags).
 	<ul>
 		<li><em>Hint #1:</em> You cannot remove the <em>Select a Collection</em> step, as an DSpace Item cannot exist without belonging to a Collection.</li>
 		<li><em>Hint #2:</em> If you decide to remove the <em>&lt;step&gt;</em> defining the <em>Initial Questions</em> step, you should be aware that this may affect your <em>Describe</em> and <em>Upload</em> steps&#33; The <em>Initial Questions</em> step asks questions which help to initialize these later steps. If you decide to remove the <em>Initial Questions</em> step you may wish to create a custom, automated step which will provide default answers for the questions asked&#33;</li>
@@ -198,6 +249,7 @@
 <p>Each <em>name-map</em> element within <em>submission-map</em> associates a collection with the name of a submission definition. Its <em>collection-handle</em> attribute is the Handle of the collection. Its <em>submission-name</em> attribute is the submission definition name, which must match the <em>name</em> attribute of a <em>submission-process</em> element (in the <em>submission-definitions</em> section of <em>item-submission.xml</em>.</p>
 
 <p>For example, the following fragment shows how the collection with handle "12345.6789/42" is assigned the "custom" submission process:</p>
+
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">&lt;submission-map&gt;
     &lt;name-map collection-handle=<span class="code-quote">" 12345.6789/42"</span> submission-name="
@@ -212,17 +264,18 @@
   &lt;/submission-definitions&gt;
 </pre>
 </div></div>
+
 <p>It's a good idea to keep the definition of the <em>default</em> name-map from the example <em>input-forms.xml</em> so there is always a default for collections which do not have a custom form set.</p>
 
 <h3><a name="SubmissionUserInterface-GettingACollection%27sHandle"></a>Getting A Collection's Handle</h3>
 
-<p>You will need the <em>handle</em> of a collection in order to assign it a custom form set. To discover the handle, go to the "Communities &amp; Collections" page under "<b>Browse</b>" in the left-hand menu on your DSpace home page. Then, find the link to your collection. It should look something like:</p>
-<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">    http:<span class="code-comment">//myhost.my.edu/dspace/handle/
-</span>	12345.6789/42</pre>
-</div></div>
-<p>The underlined part of the URL is the handle. It should look familiar to any DSpace administrator. That is what goes in the <em>collection-handle</em> attribute of your <em>name-map</em> element.</p>
+<p>You will need the <em>handle</em> of a collection in order to assign it a custom form set. To discover the handle, go to the "Communities &amp; Collections" page under "Browse" in the left-hand menu on your DSpace home page. Then, find the link to your collection. It should look something like:</p>
 
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">http:<span class="code-comment">//myhost.my.edu/dspace/handle/12345.6789/42</span></pre>
+</div></div>
+
+<p>The underlined part of the URL is the handle. It should look familiar to any DSpace administrator. That is what goes in the <em>collection-handle</em> attribute of your <em>name-map</em> element.</p>
 
 
 <h2><a name="SubmissionUserInterface-CustomMetadataentryPagesforSubmission"></a>Custom Metadata-entry Pages for Submission</h2>
@@ -234,13 +287,14 @@
 <p>You can customize the "default" metadata forms used by all collections, and also create alternate sets of metadata forms and assign them to specific collections. In creating custom metadata forms, you can choose:</p>
 
 <ul>
-	<li>The number of metadata-entry pages.¬†</li>
-	<li>Which fields appear on each page, and their sequence.¬†</li>
-	<li>Labels, prompts, and other text associated with each field.¬†</li>
-	<li>List of available choices for each menu-driven field.¬†<br/>
-&#42;N.B.*The cosmetic and ergonomic details of metadata entry fields remain the same as the fixed metadata pages in previous DSpace releases, and can only be altered by modifying the appropriate stylesheet and JSP pages.</li>
+	<li>The number of metadata-entry pages.</li>
+	<li>Which fields appear on each page, and their sequence.</li>
+	<li>Labels, prompts, and other text associated with each field.</li>
+	<li>List of available choices for each menu-driven field.</li>
 </ul>
 
+
+<p>NOTE: The cosmetic and ergonomic details of metadata entry fields remain the same as the fixed metadata pages in previous DSpace releases, and can only be altered by modifying the appropriate stylesheet and JSP pages.</p>
 
 <p>All of the custom metadata-entry forms for a DSpace instance are controlled by a single XML file, <em>input-forms.xml</em>, in the <em>config</em> subdirectory under the DSpace home. DSpace comes with a sample configuration that implements the traditional metadata-entry forms, which also serves as a well-documented example. The rest of this section explains how to create your own sets of custom forms.</p>
 
@@ -257,8 +311,10 @@
 <h3><a name="SubmissionUserInterface-TheStructureofinputforms.xml"></a>The Structure of <em>input-forms.xml</em></h3>
 
 <p>The XML configuration file has a single top-level element, <em>input-forms</em>, which contains three elements in a specific order. The outline is as follows:</p>
+
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">&lt;input-forms&gt;
+<pre class="code-java">
+&lt;input-forms&gt;
 
   &lt;--  Map of Collections to Form Sets --&gt;
   &lt;form-map&gt;
@@ -289,29 +345,31 @@
 <p>Each <em>name-map</em> element within <em>form-map</em> associates a collection with the name of a form set. Its <em>collection-handle</em> attribute is the Handle of the collection, and its <em>form-name</em> attribute is the form set name, which must match the <em>name</em> attribute of a <em>form</em> element.</p>
 
 <p>For example, the following fragment shows how the collection with handle "12345.6789/42" is attached to the "TechRpt" form set:</p>
+
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">  &lt;form-map&gt;
-    &lt;name-map collection-handle=<span class="code-quote">" 12345.6789/42"</span> form-name=<span class="code-quote">" TechRpt"</span>
-	/&gt;
+<pre class="code-java">
+  &lt;form-map&gt;
+    &lt;name-map collection-handle=<span class="code-quote">" 12345.6789/42"</span> form-name=<span class="code-quote">" TechRpt"</span>/&gt;
     ...
   &lt;/form-map&gt;
 
   &lt;form-definitions&gt;
-    &lt;form name="
-	TechRept"&gt;
+    &lt;form name=<span class="code-quote">"TechRept"</span>&gt;
     ...
   &lt;/form-definitions&gt;
 </pre>
 </div></div>
+
 <p>It's a good idea to keep the definition of the <em>default</em> name-map from the example <em>input-forms.xml</em> so there is always a default for collections which do not have a custom form set.</p>
 
 <h5><a name="SubmissionUserInterface-GettingACollection%27sHandle"></a>Getting A Collection's Handle</h5>
 
 <p>You will need the <em>handle</em> of a collection in order to assign it a custom form set. To discover the handle, go to the "Communities &amp; Collections" page under "<b>Browse</b>" in the left-hand menu on your DSpace home page. Then, find the link to your collection. It should look something like:</p>
+
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">    http:<span class="code-comment">//myhost.my.edu/dspace/handle/
-</span>	12345.6789/42</pre>
+<pre class="code-java">http:<span class="code-comment">//myhost.my.edu/dspace/handle/12345.6789/42</span></pre>
 </div></div>
+
 <p>The underlined part of the URL is the handle. It should look familiar to any DSpace administrator. That is what goes in the <em>collection-handle</em> attribute of your <em>name-map</em> element.</p>
 
 
@@ -326,9 +384,11 @@
 
 <p>A <em>form</em> must contain at least one and at most six pages. They are presented in the order they appear in the XML. Each <em>page</em> element must include a <em>number</em> attribute, that should be its sequence number, e.g.</p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">&lt;page number=<span class="code-quote">"1"</span>&gt;
+<pre class="code-java">
+&lt;page number=<span class="code-quote">"1"</span>&gt;
 </pre>
 </div></div>
+
 <p>The <em>page</em> element, in turn, contains a sequence of <em>field</em> elements. Each field defines an interactive dialog where the submitter enters one of the Dublin Core metadata items.</p>
 
 
@@ -337,12 +397,12 @@
 <p>Each <em>field</em> contains the following elements, in the order indicated. The required sub-elements are so marked:</p>
 
 <ul>
-	<li>&#42;<b>dc-schema</b><em>(Required)</em>&#42;: Name of metadata schema employed, e.g. <em>dc</em> for Dublin Core. This value must match the value of the <em>schema</em> element defined in <em>dublin-core-types.xml</em></li>
-	<li>&#42;<b>dc-element</b><em>(Required)</em>&#42;: Name of the Dublin Core element entered in this field, e.g. <em>contributor</em>.</li>
-	<li>&#42;<b>dc-qualifier</b>&#42;: Qualifier of the Dublin Core element entered in this field, e.g. when the field is <em>contributor.advisor</em> the value of this element would be <em>advisor</em>. Leaving this out means the input is for an unqualified DC element.</li>
-	<li>&#42;<b>repeatable</b>&#42;: Value is <em>true</em> when multiple values of this field are allowed, <em>false</em> otherwise. When you mark a field repeatable, the UI servlet will add a control to let the user ask for more fields to enter additional values. Intended to be used for arbitrarily-repeating fields such as subject keywords, when it is impossible to know in advance how many input boxes to provide.</li>
-	<li>&#42;<b>label</b><em>(Required)</em>&#42;: Text to display as the label of this field, describing what to enter, e.g. "<em>Your Advisor's Name</em>".</li>
-	<li>&#42;<b>input-type</b><em>(Required)</em>&#42;: Defines the kind of interactive widget to put in the form to collect the Dublin Core value. Content must be one of the following keywords:
+	<li><b>dc-schema</b> (Required) : Name of metadata schema employed, e.g. <em>dc</em> for Dublin Core. This value must match the value of the <em>schema</em> element defined in <em>dublin-core-types.xml</em></li>
+	<li><b>dc-element</b> (Required) : Name of the Dublin Core element entered in this field, e.g. <em>contributor</em>.</li>
+	<li><b>dc-qualifier</b>: Qualifier of the Dublin Core element entered in this field, e.g. when the field is <em>contributor.advisor</em> the value of this element would be <em>advisor</em>. Leaving this out means the input is for an unqualified DC element.</li>
+	<li><b>repeatable</b>: Value is <em>true</em> when multiple values of this field are allowed, <em>false</em> otherwise. When you mark a field repeatable, the UI servlet will add a control to let the user ask for more fields to enter additional values. Intended to be used for arbitrarily-repeating fields such as subject keywords, when it is impossible to know in advance how many input boxes to provide.</li>
+	<li><b>label</b> (Required): Text to display as the label of this field, describing what to enter, e.g. "<em>Your Advisor's Name</em>".</li>
+	<li><b>input-type</b> (Required): Defines the kind of interactive widget to put in the form to collect the Dublin Core value. Content must be one of the following keywords:
 	<ul>
 		<li><b>onebox</b> &#8211; A single text-entry box.</li>
 		<li><b>twobox</b> &#8211; A pair of simple text-entry boxes, used for <em>repeatable</em> values such as the DC <em>subject</em> item. <em>Note:</em> The 'twobox' input type is rendered the same as a 'onebox' in the XML-UI, but both allow for ease of adding multiple values.</li>
@@ -355,12 +415,12 @@
 		<li><b>list</b> &#8211; Choose value(s) from a checkbox or radio button list. If the <em>repeatable</em> attribute is set to <em>true</em>, a list of checkboxes is displayed. If the <em>repeatable</em> attribute is set to <em>false</em>, a list of radio buttons is displayed. <b>Note:</b> You must also include a value for the <em>value-pairs-name</em> attribute to specify a list of values from which to choose.</li>
 	</ul>
 	</li>
-	<li>&#42;<b>hint</b><em>(Required)</em>&#42;: Content is the text that will appear as a "hint", or instructions, next to the input fields. Can be left empty, but it must be present.¬†</li>
-	<li>&#42;<b>required</b>&#42;: When this element is included with any content, it marks the field as a required input. If the user tries to leave the page without entering a value for this field, that text is displayed as a warning message. For example,¬†<em>&lt;required&gt;You must enter a title.&lt;/required&gt; Note that leaving the</em> required element empty will <em>not</em> mark a field as required, e.g.:<em>&lt;required&gt;&lt;/required&gt;</em></li>
-	<li>&#42;<b>visibility</b>&#42;: When this optional element is included with a value, it restricts the visibility of the field to the scope defined by that value. If the element is missing or empty, the field is visible in all scopes. Currently supported scopes are:
+	<li><b>hint</b> (Required): Content is the text that will appear as a "hint", or instructions, next to the input fields. Can be left empty, but it must be present.</li>
+	<li><b>required</b>: When this element is included with any content, it marks the field as a required input. If the user tries to leave the page without entering a value for this field, that text is displayed as a warning message. For example, <em>&lt;required&gt;You must enter a title.&lt;/required&gt; Note that leaving the</em> required element empty will <em>not</em> mark a field as required, e.g.:<em>&lt;required&gt;&lt;/required&gt;</em></li>
+	<li><b>visibility</b>: When this optional element is included with a value, it restricts the visibility of the field to the scope defined by that value. If the element is missing or empty, the field is visible in all scopes. Currently supported scopes are:
 	<ul>
 		<li><b>workflow</b> : the field will only be visible in the workflow stages of submission. This is good for hiding difficult fields for users, such as subject classifications, thereby easing the use of the submission system.</li>
-		<li><b>submit</b> : the field will only be visible in the initial submission, and not in the workflow stages. In addition, you can decide which type of restriction apply: read-only or full hidden the field (default behaviour) using the <em>otherwise</em> attribute of the <em>visibility</em> XML element. For example:<em>&lt;visibility otherwise="readonly"&gt;workflow&lt;/visibility&gt;</em> Note that it is considered a configuration error to limit a field's scope while also requiring it - an exception will be generated when this combination is detected.¬†<br/>
+		<li><b>submit</b> : the field will only be visible in the initial submission, and not in the workflow stages. In addition, you can decide which type of restriction apply: read-only or full hidden the field (default behaviour) using the <em>otherwise</em> attribute of the <em>visibility</em> XML element. For example:<em>&lt;visibility otherwise="readonly"&gt;workflow&lt;/visibility&gt;</em> Note that it is considered a configuration error to limit a field's scope while also requiring it - an exception will be generated when this combination is detected.<br/>
 Look at the example <em>input-forms.xml</em> and experiment with a a trial custom form to learn this specification language thoroughly. It is a very simple way to express the layout of data-entry forms, but the only way to learn all its subtleties is to use it.</li>
 	</ul>
 	</li>
@@ -377,22 +437,23 @@ Look at the example <em>input-forms.xml</em> and experiment with a a trial custo
 <p>When a user initiates a submission, DSpace first displays what we'll call the "initial-questions page". By default, it contains three questions with check-boxes:</p>
 <ol>
 	<li><b>The item has more than one title, e.g. a translated title</b> Controls <em>title.alternative</em> field.</li>
-	<li><b>The item has been published or publicly distributed before</b> Controls DC fields: ¬†
+	<li><b>The item has been published or publicly distributed before</b> Controls DC fields:
 	<ul>
 		<li><em>date.issued</em></li>
 		<li><em>publisher</em></li>
 		<li><em>identifier.citation</em></li>
 	</ul>
 	</li>
-	<li><b>The item consists of more than one file</b><em>Does not affect any metadata input fields.</em> The answers to the first two questions control whether inputs for certain of the DC metadata fields will displayed, even if they are defined as fields in a custom page. Conversely, if the metadata fields controlled by a checkbox are not mentioned in the custom form, the checkbox is elided from the initial page to avoid confusing or misleading the user.</li>
+	<li><b>The item consists of more than one file</b> <em>Does not affect any metadata input fields.</em></li>
 </ol>
 
+
+<p>The answers to the first two questions control whether inputs for certain of the DC metadata fields will displayed, even if they are defined as fields in a custom page. Conversely, if the metadata fields controlled by a checkbox are not mentioned in the custom form, the checkbox is elided from the initial page to avoid confusing or misleading the user.</p>
 
 <p>The two relevant checkbox entries are "The item has more than one title, e.g. a translated title", and "The item has been published or publicly distributed before". The checkbox for multiple titles trigger the display of the field with dc-element equal to 'title' and dc-qualifier equal to 'alternative'. If the controlling collection's form set does not contain this field, then the multiple titles question will not appear on the initial questions page.</p>
 
 
-
-<h4><a name="SubmissionUserInterface-AddingValuePairs"></a>Adding <em>Value-Pairs</em></h4>
+<h4><a name="SubmissionUserInterface-AddingValuePairs"></a>Adding Value-Pairs</h4>
 
 <p>Finally, your custom form description needs to define the "value pairs" for any fields with input types that refer to them. Do this by adding a <em>value-pairs</em> element to the contents of <em>form-value-pairs</em>. It has the following required attributes:</p>
 <ul>
@@ -406,12 +467,12 @@ Look at the example <em>input-forms.xml</em> and experiment with a a trial custo
 <h5><a name="SubmissionUserInterface-Example"></a>Example</h5>
 
 <p>Here is a menu of types of common identifiers:</p>
+
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">   &lt;value-pairs value-pairs-name=<span class="code-quote">"common_identifiers"</span>
-	dc-term=<span class="code-quote">"identifier"</span>&gt;
+<pre class="code-java">
+   &lt;value-pairs value-pairs-name=<span class="code-quote">"common_identifiers"</span> dc-term=<span class="code-quote">"identifier"</span>&gt;
      &lt;pair&gt;
-       &lt;displayed-value&gt;Gov't Doc
-	#&lt;/displayed-value&gt;
+       &lt;displayed-value&gt;Gov't Doc #&lt;/displayed-value&gt;
        &lt;stored-value&gt;govdoc&lt;/stored-value&gt;
      &lt;/pair&gt;
      &lt;pair&gt;
@@ -425,27 +486,29 @@ Look at the example <em>input-forms.xml</em> and experiment with a a trial custo
    &lt;/value-pairs&gt;
 </pre>
 </div></div>
+
 <p>It generates the following HTML, which results in the menu widget below. (Note that there is no way to indicate a default choice in the custom input XML, so it cannot generate the HTML <em>SELECTED</em> attribute to mark one of the options as a pre-selected default.) </p>
+
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">&lt;select name=<span class="code-quote">"identifier_qualifier_0"</span>&gt;
-&lt;option VALUE=<span class="code-quote">"govdoc"</span>&gt;Gov't Doc
-	#&lt;/option&gt;
-&lt;option VALUE=<span class="code-quote">"uri"</span>&gt;URI&lt;/option&gt;
-&lt;option VALUE=<span class="code-quote">"isbn"</span>&gt;ISBN&lt;/option&gt;
+<pre class="code-java">
+&lt;select name=<span class="code-quote">"identifier_qualifier_0"</span>&gt;
+    &lt;option VALUE=<span class="code-quote">"govdoc"</span>&gt;Gov't Doc #&lt;/option&gt;
+    &lt;option VALUE=<span class="code-quote">"uri"</span>&gt;URI&lt;/option&gt;
+    &lt;option VALUE=<span class="code-quote">"isbn"</span>&gt;ISBN&lt;/option&gt;
 &lt;/select&gt;
 </pre>
 </div></div>
-<p>&#42;Identifiers:*Gov't Doc #URIISBN</p>
-
-
 
 
 <h3><a name="SubmissionUserInterface-DeployingYourCustomForms"></a>Deploying Your Custom Forms</h3>
 
-<p>The DSpace web application only reads your custom form definitions when it starts up, so it is important to remember:<br/>
-<b><em>You must always restart Tomcat</em></b> <em>(or whatever servlet container you are using) for changes made to the &#95;input-forms.xml</em> file take effect.&#95;<br/>
-Any mistake in the syntax or semantics of the form definitions, such as poorly formed XML or a reference to a nonexistent field name, will cause a fatal error in the DSpace UI. The exception message (at the top of the stack trace in the <em>dspace.log</em> file) usually has a concise and helpful explanation of what went wrong. Don't forget to stop and restart the servlet container before testing your fix to a bug.</p>
+<p>The DSpace web application only reads your custom form definitions when it starts up, so it is important to remember:</p>
+<ul>
+	<li><em>You must always restart Tomcat</em> (or whatever servlet container you are using) for changes made to the <em>input-forms.xml</em> file take effect.</li>
+</ul>
 
+
+<p>Any mistake in the syntax or semantics of the form definitions, such as poorly formed XML or a reference to a nonexistent field name, will cause a fatal error in the DSpace UI. The exception message (at the top of the stack trace in the <em>dspace.log</em> file) usually has a concise and helpful explanation of what went wrong. Don't forget to stop and restart the servlet container before testing your fix to a bug.</p>
 
 
 <h2><a name="SubmissionUserInterface-ConfiguringtheFileUploadstep"></a>Configuring the File Upload step</h2>
@@ -471,49 +534,52 @@ Any mistake in the syntax or semantics of the form definitions, such as poorly f
 <ol>
 	<li>(<b>Required</b>) Create a new Step Processing class
 	<ul>
-		<li>This class <b>must</b> extend the abstract <em>org.dspace.submit.AbstractProcessingStep</em> class and implement all methods defined by that abstract class.</li>
+		<li>This class <b>must</b> extend the abstract <tt>org.dspace.submit.AbstractProcessingStep</tt> class and implement all methods defined by that abstract class.</li>
 		<li>This class should be built in such a way that it can process the input gathered from <em>either</em> the XMLUI or JSPUI interface.</li>
 	</ul>
 	</li>
-	<li>(<em>For steps using JSPUI</em>) Create the JSPs to display the user interface. Create a new JSPUI "binding" class to initialize and call these JSPs.</li>
-	<li>&#35;&#42; Your JSPUI "binding" class must extend the abstract class <em>org.dspace.app.webui.submit.JSPStep</em> and implement all methods defined there. It's recommended to use one of the classes in <em>org.dspace.app.webui.submit.step.&#42;</em> as a reference.
+	<li>(<em>For steps using JSPUI</em>) Create the JSPs to display the user interface. Create a new JSPUI "binding" class to initialize and call these JSPs.
 	<ul>
-		<li>Any JSPs created should be loaded by calling the showJSP() method of the <em>org.dspace.app.webui.submit.JSPStepManager</em> class</li>
-		<li>If this step gathers information to be reviewed, you must also create a Review JSP which will display a read-only view of all data gathered during this step. The path to this JSP must be returned by your getReviewJSP() method. You will find examples of Review JSPs (named similar to <em>review-[step].jsp</em>) in the JSP <em>submit/</em> directory.</li>
+		<li>Your JSPUI "binding" class must extend the abstract class <tt>org.dspace.app.webui.submit.JSPStep</tt> and implement all methods defined there. It's recommended to use one of the classes in <tt>org.dspace.app.webui.submit.step.&#42;</tt> as a reference.</li>
+		<li>Any JSPs created should be loaded by calling the showJSP() method of the <tt>org.dspace.app.webui.submit.JSPStepManager</tt> class</li>
+		<li>If this step gathers information to be reviewed, you must also create a Review JSP which will display a read-only view of all data gathered during this step. The path to this JSP must be returned by your getReviewJSP() method. You will find examples of Review JSPs (named similar to <tt>review-[step].jsp</tt>) in the JSP <tt>submit/</tt> directory.</li>
 	</ul>
 	</li>
 	<li>(<em>For steps using XMLUI</em>) Create an XMLUI "binding" Step Transformer which will generate the DRI XML which Manakin requires.
 	<ul>
-		<li>The Step Transformer must extend and implement all necessary methods within the abstract class <em>org.dspace.app.xmlui.submission.AbstractSubmissionStep</em></li>
-		<li>It is useful to use the existing classes in <em>org.dspace.app.xmlui.submission.submit.&#42;</em> as references</li>
+		<li>The Step Transformer must extend and implement all necessary methods within the abstract class <tt>org.dspace.app.xmlui.submission.AbstractSubmissionStep</tt></li>
+		<li>It is useful to use the existing classes in <tt>org.dspace.app.xmlui.submission.submit.&#42;</tt> as references</li>
 	</ul>
 	</li>
-	<li>(<b>Required</b>) Add a valid Step Definition to the <em>item-submission.xml</em> configuration file.
+	<li>(<b>Required</b>) Add a valid Step Definition to the <tt>item-submission.xml</tt> configuration file.
 	<ul>
-		<li>This may also require that you add an I18N (Internationalization) key for this step's <em>heading</em>. See the sections on Configuring Multilingual Support for JSPUI or Configuring Multilingual Support for XMLUI for more details.</li>
-		<li>For more information on <em>&lt;step&gt;</em> definitions within the <em>item-submission.xml</em>, see the section above on Defining Steps (<em>&lt;step&gt;</em>) within the <em>item-submission.xml</em>.
-<h3><a name="SubmissionUserInterface-CreatingaNonInteractiveStep"></a>Creating a Non-Interactive Step</h3></li>
+		<li>This may also require that you add an I18N (Internationalization) key for this step's <em>heading</em>. See the sections on <a href="Configuration.html#Configuration-JSPUIConfiguringMultilingualSupport">Configuring Multilingual Support for JSPUI</a> or <a href="XMLUI Configuration and Customization.html#XMLUIConfigurationandCustomization-MultilingualSupport">Configuring Multilingual Support for XMLUI</a> for more details.</li>
+		<li>For more information on <em>&lt;step&gt;</em> definitions within the <tt>item-submission.xml</tt>, see the section above on Defining Steps (<em>&lt;step&gt;</em>) within the <tt>item-submission.xml</tt>.</li>
 	</ul>
 	</li>
 </ol>
 
+
+<h3><a name="SubmissionUserInterface-CreatingaNonInteractiveStep"></a>Creating a Non-Interactive Step</h3>
 
 <p>Non-interactive steps are ones that have no user interface and only perform backend processing. You may find a need to create non-interactive steps which perform further processing of previously entered information.</p>
 
 <p>To create a non-interactive step, do the following:</p>
 
 <ol>
-	<li>Create the required Step Processing class, which extends the abstract <em>org.dspace.submit.AbstractProcessingStep</em> class. In this class add any processing which this step will perform.</li>
-	<li>Add your non-interactive step to your <em>item-submission.xml</em> at the place where you wish this step to be called during the submission process. For example, if you want it to be called <em>immediately after</em> the existing 'Upload File' step, then place its configuration immediately after the configuration for that 'Upload File' step. The configuration should look similar to the following: 
-<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java"> &lt;step&gt;
-	&lt;processing-class&gt;org.dspace.submit.step.MyNonInteractveStep&lt;/processi
-/processing-class&gt; &lt;workflow-editable&gt;<span class="code-keyword">false</span>&lt;/workflow-editable&gt;
-	&lt;/step&gt;</pre>
-</div></div>
-<p>Note: Non-interactive steps will not appear in the Progress Bar&#33; Therefore, your submitters will not even know they are there. However, because they are not visible to your users, you should make sure that your non-interactive step does not take a large amount of time to finish its processing and return control to the next step (otherwise there will be a visible time delay in the user interface).</p></li>
+	<li>Create the required Step Processing class, which extends the abstract <tt>org.dspace.submit.AbstractProcessingStep</tt> class. In this class add any processing which this step will perform.</li>
+	<li>Add your non-interactive step to your <em>item-submission.xml</em> at the place where you wish this step to be called during the submission process. For example, if you want it to be called <em>immediately after</em> the existing 'Upload File' step, then place its configuration immediately after the configuration for that 'Upload File' step. The configuration should look similar to the following:</li>
 </ol>
 
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">&lt;step&gt;
+   &lt;processing-class&gt;org.dspace.submit.step.MyNonInteractiveStep&lt;/processing-class&gt; 
+   &lt;workflow-editable&gt;<span class="code-keyword">false</span>&lt;/workflow-editable&gt;
+&lt;/step&gt;</pre>
+</div></div>
+
+<p>Note: Non-interactive steps will not appear in the Progress Bar&#33; Therefore, your submitters will not even know they are there. However, because they are not visible to your users, you should make sure that your non-interactive step does not take a large amount of time to finish its processing and return control to the next step (otherwise there will be a visible time delay in the user interface).</p>
 
 				    
                     			    </td>
@@ -524,7 +590,7 @@ Any mistake in the syntax or semantics of the form definitions, such as poorly f
 				<td height="12" background="https://wiki.duraspace.org/images/border/border_bottom.gif"><img src="images/border/spacer.gif" width="1" height="1" border="0"/></td>
 			</tr>
 		    <tr>
-			    <td align="center"><font color="grey">Document generated by Confluence on Nov 06, 2010 19:27</font></td>
+			    <td align="center"><font color="grey">Document generated by Confluence on Dec 16, 2010 16:47</font></td>
 		    </tr>
 	    </table>
     </body>
