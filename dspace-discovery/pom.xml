@@ -5,13 +5,13 @@
     <packaging>pom</packaging>
     <groupId>org.dspace</groupId>
     <artifactId>discovery-modules</artifactId>
-    <version>1.7.1-SNAPSHOT</version>
+    <version>1.8.0-SNAPSHOT</version>
     <name>DSpace Discovery :: Modules</name>
 
     <parent>
         <artifactId>dspace-parent</artifactId>
         <groupId>org.dspace</groupId>
-        <version>1.7.1-SNAPSHOT</version>
+        <version>1.8.0-SNAPSHOT</version>
     </parent>
     
     <modules>
