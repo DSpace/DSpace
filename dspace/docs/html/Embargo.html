@@ -16,11 +16,37 @@
                                                     </span>
 				    </div>
 				    <div class="pagesubheading">
-					    This page last changed on Nov 06, 2010 by <font color="#0050B2">jtrimble</font>.
+					    This page last changed on Dec 14, 2010 by <font color="#0050B2">tdonohue</font>.
 				    </div>
 
 				    <h1><a name="Embargo-EmbargoSupportinDSpace1.6"></a>Embargo Support in DSpace 1.6</h1>
 
+<style type='text/css'>/*<![CDATA[*/
+div.rbtoc1292367949404 {margin-left: 0px;padding: 0px;}
+div.rbtoc1292367949404 ul {list-style: none;margin-left: 0px;}
+div.rbtoc1292367949404 li {margin-left: 0px;padding-left: 0px;}
+
+/*]]>*/</style><div class='rbtoc1292367949404'>
+<ul>
+    <li><span class='TOCOutline'>1</span> <a href='#Embargo-Whatisanembargo%3F'>What is an embargo?</a></li>
+<ul>
+    <li><span class='TOCOutline'>1.1</span> <a href='#Embargo-Embargomodelandlifecycle'>Embargo model and life-cycle</a></li>
+<ul>
+    <li><span class='TOCOutline'>1.1.1</span> <a href='#Embargo-Termsassignment'>Terms assignment</a></li>
+    <li><span class='TOCOutline'>1.1.2</span> <a href='#Embargo-Termsinterpretation%2Fimposition'>Terms interpretation/imposition</a></li>
+    <li><span class='TOCOutline'>1.1.3</span> <a href='#Embargo-Embargoperiod'>Embargo period</a></li>
+    <li><span class='TOCOutline'>1.1.4</span> <a href='#Embargo-Embargolift'>Embargo lift</a></li>
+    <li><span class='TOCOutline'>1.1.5</span> <a href='#Embargo-Postembargo'>Post embargo</a></li>
+</ul>
+    <li><span class='TOCOutline'>1.2</span> <a href='#Embargo-Configuration'>Configuration</a></li>
+    <li><span class='TOCOutline'>1.3</span> <a href='#Embargo-Operation'>Operation</a></li>
+    <li><span class='TOCOutline'>1.4</span> <a href='#Embargo-Extendingembargofunctionality'>Extending embargo functionality</a></li>
+<ul>
+    <li><span class='TOCOutline'>1.4.1</span> <a href='#Embargo-Setter'>Setter</a></li>
+    <li><span class='TOCOutline'>1.4.2</span> <a href='#Embargo-Lifter'>Lifter</a></li>
+</ul>
+</ul>
+</ul></div>
 
 <h2><a name="Embargo-Whatisanembargo%3F"></a>What is an embargo?</h2>
 
@@ -67,8 +93,9 @@ time the 'lifter' is run. One could immediately lift the embargo by setting the 
 
 <p>The properties that specify these assignments live in dspace.cfg:</p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java"># DC metadata field to hold the user-supplied embargo terms
-embargo.field.terms = SCHEMA.ELEMENT.QUALIFIER}}
+<pre class="code-java">
+# DC metadata field to hold the user-supplied embargo terms
+embargo.field.terms = SCHEMA.ELEMENT.QUALIFIER
 
 # DC metadata field to hold computed <span class="code-quote">"lift date"</span> of embargo
 embargo.field.lift = SCHEMA.ELEMENT.QUALIFIER
@@ -80,7 +107,8 @@ this is the only configuration required, except as noted below.</p>
 
 <p>There is also a property for the special date of 'forever':</p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java"># string in terms field to indicate indefinite embargo
+<pre class="code-java">
+# string in terms field to indicate indefinite embargo
 embargo.terms.open = forever
 </pre>
 </div></div>
@@ -112,7 +140,8 @@ The lifter is available as a target of the 1.6 DSpace launcher - see launcher do
 <p>The default setter recognizes only two expressions of terms:  either a literal, non-relative date in the fixed format 'yyyy-mm-dd' (known as ISO 8601), or a special string used for open-ended embargo (the default configured value for this is 'forever', but this can be changed in dspace.cfg to 'toujours', 'unendlich', etc).  It will perform a minimal sanity check that the date is not in the past. Similarly, the default setter will only remove all read policies as noted above, rather than applying more nuanced rules (e.g allow access to certain IP groups, deny the rest). Fortunately, the setter class itself is configurable and you can 'plug in' any behavior you like, provided it is written in java and conforms to the setter interface. The dspace.cfg property:</p>
 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java"># implementation of embargo setter plugin - replace with local implementation <span class="code-keyword">if</span> applicable
+<pre class="code-java">
+# implementation of embargo setter plugin - replace with local implementation <span class="code-keyword">if</span> applicable
 plugin.single.org.dspace.embargo.EmbargoSetter = org.dspace.embargo.DefaultEmbargoSetter
 </pre>
 </div></div>
@@ -124,7 +153,8 @@ plugin.single.org.dspace.embargo.EmbargoSetter = org.dspace.embargo.DefaultEmbar
 <p>The default lifter behavior as described above - essentially applying the collection policy rules to the item - might also not be sufficient for all purposes. It also can be replaced with another class:</p>
 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java"># implementation of embargo lifter plugin - - replace with local implementation <span class="code-keyword">if</span> applicable
+<pre class="code-java">
+# implementation of embargo lifter plugin - - replace with local implementation <span class="code-keyword">if</span> applicable
 plugin.single.org.dspace.embargo.EmbargoLifter = org.dspace.embargo.DefaultEmbargoLifter
 </pre>
 </div></div>
@@ -138,7 +168,7 @@ plugin.single.org.dspace.embargo.EmbargoLifter = org.dspace.embargo.DefaultEmbar
 				<td height="12" background="https://wiki.duraspace.org/images/border/border_bottom.gif"><img src="images/border/spacer.gif" width="1" height="1" border="0"/></td>
 			</tr>
 		    <tr>
-			    <td align="center"><font color="grey">Document generated by Confluence on Nov 06, 2010 19:27</font></td>
+			    <td align="center"><font color="grey">Document generated by Confluence on Dec 16, 2010 16:47</font></td>
 		    </tr>
 	    </table>
     </body>
