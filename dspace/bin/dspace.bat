@@ -59,7 +59,7 @@ set DSPACE_CLASSPATH=%CLASSPATH%;config
 for %%f in (lib\*.jar) DO CALL bin\buildpath.bat %%f
 
 REM If the user only wants the CLASSPATH, just give it now.
-if "%1"!=="classpath" goto javaOpts
+if not "%1"=="classpath" goto javaOpts
 echo %DSPACE_CLASSPATH%
 goto end
 
