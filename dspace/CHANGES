@@ -7,6 +7,10 @@ releases can be found in the following locations:
 In addition, a listing of all known contributors to DSpace software can be
 found online at: https://wiki.duraspace.org/display/DSPACE/DSpaceContributors
 
+1.7.1
+(Claudia Juergen)
+- [DS-758] Mirage theme - lists of unifished submission/workflow task wrong link in collection column
+
 1.7.0
 =====
 (Oleksandr Sytnyk)
