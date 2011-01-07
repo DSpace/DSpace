@@ -215,7 +215,8 @@ public class Submissions extends AbstractDSpaceTransformer
         	for (WorkflowItem owned : ownedItems)
         	{
         		int workflowItemID = owned.getID();
-        		String url = contextPath+"/handle/"+owned.getCollection().getHandle()+"/workflow?workflowID="+workflowItemID;
+        		String collectionUrl = contextPath + "/handle/" + owned.getCollection().getHandle();
+        		String ownedWorkflowItemUrl = contextPath + "/handle/" + owned.getCollection().getHandle() + "/workflow?workflowID=" + workflowItemID;
         		DCValue[] titles = owned.getItem().getDC("title", null, Item.ANY);
         		String collectionName = owned.getCollection().getMetadata("name");
         		EPerson submitter = owned.getSubmitter();
@@ -231,7 +232,7 @@ public class Submissions extends AbstractDSpaceTransformer
 	        	remove.addOption(workflowItemID);
         		
         		// The task description
-	        	row.addCell().addXref(url,state);
+	        	row.addCell().addXref(ownedWorkflowItemUrl, state);
 
         		// The item description
         		if (titles != null && titles.length > 0)
@@ -241,15 +242,15 @@ public class Submissions extends AbstractDSpaceTransformer
                     {
                         displayTitle = displayTitle.substring(0, 50) + " ...";
                     }
-        			row.addCell().addXref(url,displayTitle);
+        			row.addCell().addXref(ownedWorkflowItemUrl, displayTitle);
         		}
         		else
                 {
-                    row.addCell().addXref(url, T_untitled);
+                    row.addCell().addXref(ownedWorkflowItemUrl, T_untitled);
                 }
 
         		// Submitted too
-        		row.addCell().addXref(url,collectionName);
+        		row.addCell().addXref(collectionUrl, collectionName);
 
         		// Submitted by
 	        	Cell cell = row.addCell();
@@ -287,7 +288,8 @@ public class Submissions extends AbstractDSpaceTransformer
         	for (WorkflowItem pooled : pooledItems)
         	{
         		int workflowItemID = pooled.getID();
-        		String url = contextPath+"/handle/"+pooled.getCollection().getHandle()+"/workflow?workflowID="+workflowItemID;
+        		String collectionUrl = contextPath + "/handle/" + pooled.getCollection().getHandle();
+        		String pooledItemUrl = contextPath + "/handle/" + pooled.getCollection().getHandle() + "/workflow?workflowID=" + workflowItemID;
         		DCValue[] titles = pooled.getItem().getDC("title", null, Item.ANY);
         		String collectionName = pooled.getCollection().getMetadata("name");
         		EPerson submitter = pooled.getSubmitter();
@@ -304,7 +306,7 @@ public class Submissions extends AbstractDSpaceTransformer
 	        	remove.addOption(workflowItemID);
         		
         		// The task description
-	        	row.addCell().addXref(url,state);
+	        	row.addCell().addXref(pooledItemUrl, state);
 
         		// The item description
         		if (titles != null && titles.length > 0)
@@ -315,15 +317,15 @@ public class Submissions extends AbstractDSpaceTransformer
                         displayTitle = displayTitle.substring(0, 50) + " ...";
                     }
         			
-        			row.addCell().addXref(url,displayTitle);
+        			row.addCell().addXref(pooledItemUrl, displayTitle);
         		}
         		else
                 {
-                    row.addCell().addXref(url, T_untitled);
+                    row.addCell().addXref(pooledItemUrl, T_untitled);
                 }
 
         		// Submitted too
-        		row.addCell().addXref(url,collectionName);
+        		row.addCell().addXref(collectionUrl, collectionName);
 
         		// Submitted by
         		Cell cell = row.addCell();
@@ -418,7 +420,8 @@ public class Submissions extends AbstractDSpaceTransformer
 	        	EPerson submitterEPerson = workspaceItem.getItem().getSubmitter();
 	        	
 	        	int workspaceItemID = workspaceItem.getID();
-	        	String url = contextPath+"/submit?workspaceID="+workspaceItemID;
+	        	String collectionUrl = contextPath + "/handle/" + workspaceItem.getCollection().getHandle();
+	        	String workspaceItemUrl = contextPath + "/submit?workspaceID=" + workspaceItemID;
 	        	String submitterName = submitterEPerson.getFullName();
 	        	String submitterEmail = submitterEPerson.getEmail();
 	        	String collectionName = workspaceItem.getCollection().getMetadata("name");
@@ -435,13 +438,13 @@ public class Submissions extends AbstractDSpaceTransformer
                     {
                         displayTitle = displayTitle.substring(0, 50) + " ...";
                     }
-	        		row.addCell().addXref(url,displayTitle);
+	        		row.addCell().addXref(workspaceItemUrl, displayTitle);
 	        	}
 	        	else
                 {
-                    row.addCell().addXref(url, T_untitled);
+                    row.addCell().addXref(workspaceItemUrl, T_untitled);
                 }
-	        	row.addCell().addXref(url,collectionName);
+	        	row.addCell().addXref(collectionUrl, collectionName);
 	        	Cell cell = row.addCell();
 	        	cell.addContent(T_email);
 	        	cell.addXref("mailto:"+submitterEmail,submitterName);
