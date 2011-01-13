@@ -8,6 +8,11 @@ In addition, a listing of all known contributors to DSpace software can be
 found online at: https://wiki.duraspace.org/display/DSPACE/DSpaceContributors
 
 1.7.1
+
+(Ivan Masar, Claudia Juergen)
+- [DS-798] Czech localization of 1.7.0 - jspui translation Messages_cs.properties, changes in dspace-api-lang
+- [DS-798] Czech localization of 1.7.0 - xmlui translation messages_cs.xml, changes in dspace-xmlui-lang
+
 (Claudia Juergen)
 - [DS-758] Mirage theme - lists of unifished submission/workflow task wrong link in collection column
 
