@@ -16,6 +16,9 @@ found online at: https://wiki.duraspace.org/display/DSPACE/DSpaceContributors
 (Claudia Juergen)
 - [DS-758] Mirage theme - lists of unifished submission/workflow task wrong link in collection column
 
+(Peter Dietz)
+- [DS-789] HTTPS renders with errors due to a hardcoded HTTP link (in Mirage)
+
 1.7.0
 =====
 (Oleksandr Sytnyk)
