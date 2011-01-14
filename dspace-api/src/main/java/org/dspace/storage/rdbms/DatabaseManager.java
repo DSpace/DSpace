@@ -1391,7 +1391,7 @@ public class DatabaseManager
             Map<String, ColumnInfo> results = new HashMap<String, ColumnInfo>();
 
             int max = metadata.getMaxTableNameLength();
-            String tname = (table.length() >= max) ? table
+            String tname = ((max > 0) && (table.length() >= max)) ? table
                     .substring(0, max - 1) : table;
             
             pkcolumns = metadata.getPrimaryKeys(catalog, schema, tname);
