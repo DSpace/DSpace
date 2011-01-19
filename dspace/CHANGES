@@ -22,6 +22,9 @@ found online at: https://wiki.duraspace.org/display/DSPACE/DSpaceContributors
 (Peter Dietz)
 - [DS-789] HTTPS renders with errors due to a hardcoded HTTP link (in Mirage)
 
+(Janne Pietarila)
+- [DS-761] MetadataSchema: cache out of sync after calling delete()
+
 1.7.0
 =====
 (Oleksandr Sytnyk)

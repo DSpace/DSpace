@@ -354,6 +354,7 @@ public class MetadataSchema
                 "metadata_schema_id=" + getSchemaID()));
 
         DatabaseManager.delete(context, row);
+        decache();
     }
 
     /**
