@@ -25,6 +25,9 @@ found online at: https://wiki.duraspace.org/display/DSPACE/DSpaceContributors
 (Janne Pietarila)
 - [DS-761] MetadataSchema: cache out of sync after calling delete()
 
+(Keijii Suzuki]
+- [DS-770] New Japanese messages for 1.7.0 - jspui/api translation
+
 1.7.0
 =====
 (Oleksandr Sytnyk)
