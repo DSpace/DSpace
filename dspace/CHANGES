@@ -17,6 +17,9 @@ found online at: https://wiki.duraspace.org/display/DSPACE/DSpaceContributors
 (Janne Pietarila)
 - [DS-761] MetadataSchema: cache out of sync after calling delete()
 
+(Ben Bosman)
+- [DS-808] jqueryUI javascript gets imported without corresponding CSS
+
 1.7.0
 =====
 (Oleksandr Sytnyk)
