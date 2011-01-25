@@ -28,6 +28,9 @@ found online at: https://wiki.duraspace.org/display/DSPACE/DSpaceContributors
 (Keiji Suzuki]
 - [DS-770] New Japanese messages for 1.7.0 - jspui/api translation
 
+(Ben Bosman)
+- [DS-808] jqueryUI javascript gets imported without corresponding CSS
+
 1.7.0
 =====
 (Oleksandr Sytnyk)
