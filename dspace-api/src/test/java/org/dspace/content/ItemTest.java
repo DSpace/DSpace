@@ -290,8 +290,6 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         DCValue[] dc = it.getMetadata(schema, element, qualifier, lang);
         assertThat("testGetMetadata_4args 0",dc,notNullValue());
         assertTrue("testGetMetadata_4args 1",dc.length == 0);
-
-
     }
 
     /**

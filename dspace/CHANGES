@@ -8,7 +8,7 @@ In addition, a listing of all known contributors to DSpace software can be
 found online at: https://wiki.duraspace.org/display/DSPACE/DSpaceContributors
 
 1.7.1
-
+=====
 (Ivan Masar, Claudia Juergen)
 - [DS-798] Czech localization of 1.7.0 - jspui translation Messages_cs.properties, changes in dspace-api-lang
 - [DS-798] Czech localization of 1.7.0 - xmlui translation messages_cs.xml, changes in dspace-xmlui-lang
@@ -33,6 +33,10 @@ found online at: https://wiki.duraspace.org/display/DSPACE/DSpaceContributors
 
 (Ben Bosman)
 - [DS-809] Support for empty dc.abstract dim field in Internet Explorer
+
+(Stuart Lewis, Kim Shepherd)
+- [DS-806] Item.match() incorrect logic for schema testing
+
 
 1.7.0
 =====

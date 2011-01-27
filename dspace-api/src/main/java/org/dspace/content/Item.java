@@ -908,7 +908,8 @@ public class Item extends DSpaceObject
                 return false;
             }
         }
-        else if (!schema.equals(Item.ANY))
+
+        if (!schema.equals(Item.ANY))
         {
             if (dcv.schema != null && !dcv.schema.equals(schema))
             {
