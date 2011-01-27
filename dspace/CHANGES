@@ -19,9 +19,11 @@ found online at: https://wiki.duraspace.org/display/DSPACE/DSpaceContributors
 
 (Ben Bosman)
 - [DS-808] jqueryUI javascript gets imported without corresponding CSS
-
-(Ben Bosman)
 - [DS-809] Support for empty dc.abstract dim field in Internet Explorer
+
+(Stuart Lewis, Kim Shepherd)
+- [DS-806] Item.match() incorrect logic for schema testing
+
 
 1.7.0
 =====
