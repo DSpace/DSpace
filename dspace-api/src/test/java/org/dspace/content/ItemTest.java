@@ -290,6 +290,8 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         DCValue[] dc = it.getMetadata(schema, element, qualifier, lang);
         assertThat("testGetMetadata_4args 0",dc,notNullValue());
         assertTrue("testGetMetadata_4args 1",dc.length == 0);
+
+
     }
 
     /**
@@ -312,6 +314,23 @@ public class ItemTest  extends AbstractDSpaceObjectTest
         dc = it.getMetadata(mdString);
         assertThat("testGetMetadata_String 4",dc,notNullValue());
         assertTrue("testGetMetadata_String 5",dc.length == 0);
+    }
+
+    /**
+     * A test for DS-806: Item.match() incorrect logic for schema testing
+     */
+    @Test
+    public void testDS806()
+    {
+        // Set the item to have two pieces of metadata for dc.type and dc2.type
+        String dcType = "DC-TYPE";
+        String testType = "TEST-TYPE";
+        it.addMetadata("dc", "type", null, null, dcType);
+        it.addMetadata("test", "type", null, null, testType);
+
+        // Check that only one is returned when we ask for all dc.type values
+        DCValue[] values = it.getMetadata("dc", "type", null, null);
+        assertTrue("Return results", values.length == 1);
     }
 
     /**
