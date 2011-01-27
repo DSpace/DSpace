@@ -584,4 +584,18 @@
     <scope_note>Nature or genre of content.</scope_note>
   </dc-type>
 
+
+  <!-- A second test schema for testing purposes. -->
+  <dc-schema>
+      <name>test</name>
+      <namespace>http://example.com/test/</namespace>
+  </dc-schema>
+
+  <dc-type>
+    <schema>test</schema>
+    <element>type</element>
+    <!-- unqualified -->
+    <scope_note>A second test schema type element.</scope_note>
+  </dc-type>
+
 </dspace-dc-types>

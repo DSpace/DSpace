@@ -315,6 +315,23 @@ public class ItemTest  extends AbstractDSpaceObjectTest
     }
 
     /**
+     * A test for DS-806: Item.match() incorrect logic for schema testing
+     */
+    @Test
+    public void testDS806()
+    {
+        // Set the item to have two pieces of metadata for dc.type and dc2.type
+        String dcType = "DC-TYPE";
+        String testType = "TEST-TYPE";
+        it.addMetadata("dc", "type", null, null, dcType);
+        it.addMetadata("test", "type", null, null, testType);
+
+        // Check that only one is returned when we ask for all dc.type values
+        DCValue[] values = it.getMetadata("dc", "type", null, null);
+        assertTrue("Return results", values.length == 1);
+    }
+
+    /**
      * Test of addDC method, of class Item.
      */
     @Test
