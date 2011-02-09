@@ -132,20 +132,36 @@ public class EmbargoManager
         throws SQLException, AuthorizeException, IOException
     {
         init();
-        DCValue terms[] = item.getMetadata(terms_schema, terms_element, terms_qualifier, Item.ANY);
+        DCValue terms[] = item.getMetadata(terms_schema, terms_element,
+                terms_qualifier, Item.ANY);
 
         DCDate result = null;
 
         // Its poor form to blindly use an object that could be null...
-        if(terms != null && terms.length > 0)
+        if (terms == null)
+            return null;
+
+        result = setter.parseTerms(context, item,
+                terms.length > 0 ? terms[0].value : null);
+
+        if (result == null)
+            return null;
+
+        // new DCDate(non-date String) means toDate() will return null
+        Date liftDate = result.toDate();
+        if (liftDate == null)
         {
-        	result = setter.parseTerms(context, item, terms.length > 0 ? terms[0].value : null);
+            throw new IllegalArgumentException(
+                    "Embargo lift date is uninterpretable:  "
+                            + result.toString());
         }
 
         // sanity check: do not allow an embargo lift date in the past.
-        if (result != null && result.toDate().before(new Date()))
+        if (liftDate.before(new Date()))
         {
-            throw new IllegalArgumentException("Embargo lift date must be in the future, but this is in the past: "+result.toString());
+            throw new IllegalArgumentException(
+                    "Embargo lift date must be in the future, but this is in the past: "
+                            + result.toString());
         }
         return result;
     }
