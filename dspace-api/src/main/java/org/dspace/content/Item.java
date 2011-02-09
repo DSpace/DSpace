@@ -2179,15 +2179,19 @@ public class Item extends DSpaceObject
     public void inheritCollectionDefaultPolicies(Collection c)
             throws java.sql.SQLException, AuthorizeException
     {
+        List<ResourcePolicy> policies;
+
         // remove the submit authorization policies
         // and replace them with the collection's default READ policies
-        List<ResourcePolicy> policies = AuthorizeManager.getPoliciesActionFilter(ourContext, c, Constants.DEFAULT_ITEM_READ);
+        policies = AuthorizeManager.getPoliciesActionFilter(ourContext, c,
+                Constants.DEFAULT_ITEM_READ);
 
         // MUST have default policies
         if (policies.size() < 1)
         {
             throw new java.sql.SQLException("Collection " + c.getID()
-                   + " has no default item READ policies");
+                    + " (" + c.getHandle() + ")"
+                    + " has no default item READ policies");
         }
 
         // change the action to just READ
@@ -2199,11 +2203,13 @@ public class Item extends DSpaceObject
 
         replaceAllItemPolicies(policies);
 
-        policies = AuthorizeManager.getPoliciesActionFilter(ourContext, c, Constants.DEFAULT_BITSTREAM_READ);
+        policies = AuthorizeManager.getPoliciesActionFilter(ourContext, c,
+                Constants.DEFAULT_BITSTREAM_READ);
 
         if (policies.size() < 1)
         {
             throw new java.sql.SQLException("Collection " + c.getID()
+                    + " (" + c.getHandle() + ")"
                     + " has no default bitstream READ policies");
         }
 
