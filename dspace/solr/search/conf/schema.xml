@@ -517,6 +517,9 @@
         via copyField further on in this schema  -->
     <field name="text" type="text" indexed="true" stored="false" multiValued="true"/>
 
+
+   <field name="fulltext" type="text" indexed="true" stored="false" multiValued="true"/>
+
     <!-- Internal DSpace Object ID -->
    <field name="search.resourceid" type="sint" indexed="true" stored="true" required="true" omitNorms="true" />
 
