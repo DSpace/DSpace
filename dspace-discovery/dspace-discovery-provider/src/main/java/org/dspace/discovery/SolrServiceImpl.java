@@ -8,6 +8,7 @@
 package org.dspace.discovery;
 
 import org.apache.commons.collections.ExtendedProperties;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -773,9 +774,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                             readers.add(is);
 
                             // Add each InputStream to the Indexed Document
-                            // (Acts like an Append)
-//							doc.addField("default", is);
-                            //doc.add(new Field("default", is));
+							doc.addField("fulltext", IOUtils.toString(is));
 
                             log.debug("  Added BitStream: "
                                     + myBitstreams[j].getStoreNumber() + "	"
