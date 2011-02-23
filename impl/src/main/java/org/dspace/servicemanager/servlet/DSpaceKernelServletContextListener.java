@@ -26,15 +26,13 @@ import org.dspace.servicemanager.config.DSpaceConfigurationService;
  * that is tied to the shutdown of the JVM.
  * <p>
  * This is implemented in the web application web.xml using:
- * <literal>
- * <web-app>
- *
- * <listener>
- *   <listener-class>
- *     org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener
- *   </listener-class>
- * </listener>
- * </literal>
+ * <pre>
+ * {@code <listener>}
+ * {@code   <listener-class>}
+ * {@code     org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener}
+ * {@code   </listener-class>}
+ * {@code </listener>}
+ * </pre>
  *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  * @author Mark Diggory (mdiggory @ gmail.com)

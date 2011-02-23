@@ -5,8 +5,10 @@
  *
  * http://www.dspace.org/license/
  */
+
 /**
- * Support for using DSpace Services in a servlet context.
+ * Support for using DSpace Services in a servlet context.  This is how the
+ * kernel and services get started by the servlet container.
  */
 
 package org.dspace.servicemanager.servlet;

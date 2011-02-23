@@ -37,7 +37,7 @@ public interface CacheProvider {
      * retrieve the one that already exists with this name.
      * <p>
      * NOTE: providers will never be asked to provide request caches
-     * (e.g. {@link CacheConfig.CacheScope#REQUEST})
+     * (e.g. {@link org.dspace.services.model.CacheConfig.CacheScope#REQUEST})
      * 
      * @param cacheName the unique name for this cache (e.g. org.dspace.user.UserCache)
      * @param config (optional) a configuration object.  The cache
