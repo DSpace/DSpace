@@ -911,7 +911,7 @@
             <artifactId>maven-pmd-plugin</artifactId>
             <version>2.4</version>
             <configuration>
-                <targetJdk>${dspace.java.target}</targetJdk>
+                <targetJdk>${maven.compiler.target}</targetJdk>
             </configuration>
          </plugin>
          <plugin>
