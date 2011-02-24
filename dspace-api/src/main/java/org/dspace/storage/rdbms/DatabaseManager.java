@@ -1102,6 +1102,7 @@ public class DatabaseManager
                     break;
 
                 case Types.INTEGER:
+                case Types.NUMERIC:
                     if (isOracle)
                     {
                         long longValue = results.getLong(i);
@@ -1120,7 +1121,6 @@ public class DatabaseManager
                     }
                     break;
 
-                case Types.NUMERIC:
                 case Types.DECIMAL:
                 case Types.BIGINT:
                     row.setColumn(name, results.getLong(i));
