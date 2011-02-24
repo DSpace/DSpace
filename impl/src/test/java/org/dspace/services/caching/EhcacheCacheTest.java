@@ -142,7 +142,7 @@ public class EhcacheCacheTest extends DSpaceAbstractKernelTest {
     }
 
     /**
-     * Test method for {@link org.dspace.services.caching.model.EhcacheCache#put(java.lang.String, java.io.Serializable)}.
+     * Test method for {@link org.dspace.services.caching.model.EhcacheCache#put(java.lang.String, java.lang.Object)}.
      */
     @Test
     public void testPut() {

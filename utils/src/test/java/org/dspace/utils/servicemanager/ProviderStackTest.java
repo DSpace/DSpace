@@ -89,7 +89,7 @@ public class ProviderStackTest {
     }
 
     /**
-     * Test method for {@link org.dspace.utils.servicemanager.ProviderStack#ProviderStack(T[])}.
+     * Test method for {@link org.dspace.utils.servicemanager.ProviderStack#ProviderStack(Object[])}.
      */
     @Test
     public void testProviderStackTArray() {

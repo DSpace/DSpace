@@ -41,7 +41,7 @@ public class DSpaceKernelImplTest {
     }
 
     /**
-     * Test method for {@link org.dspace.servicemanager.DSpaceKernelImpl#init()}.
+     * Test method for {@link org.dspace.servicemanager.DSpaceKernelImpl#start()}.
      */
     @Test
     public void testKernel() {

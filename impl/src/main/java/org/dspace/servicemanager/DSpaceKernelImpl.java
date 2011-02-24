@@ -129,7 +129,7 @@ public final class DSpaceKernelImpl implements DSpaceKernel, DynamicMBean, Commo
      * This starts up the entire core system.  May be called more than 
      * once:  subsequent calls return without effect.
      *
-     * @param dspaceHome path to FIXME
+     * @param dspaceHome path to DSpace home directory
      */
     public void start(String dspaceHome) {
         if (running) {
