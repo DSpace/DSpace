@@ -407,10 +407,7 @@
   </dspace:sidebar>
 
          <div align="center">
-                   <form method="get" action="<%= request.getContextPath() %>/displaystats">
-                       <input type="hidden" name="handle" value="<%= community.getHandle() %>"/>
-                       <input type="submit" name="submit_simple" value="<fmt:message key="jsp.community-home.display-statistics"/>" />
-                   </form>
+                   <a class="statisticsLink" href="<%= request.getContextPath() %>/handle/<%= community.getHandle() %>/statistics"><fmt:message key="jsp.community-home.display-statistics"/></a>
           </div>
 
 
