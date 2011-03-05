@@ -169,12 +169,18 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     
     public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException {
     	super.setup(resolver, objectModel, src, parameters);
-    	try{
-    		availableExports = ItemExport.getExportsAvailable(context.getCurrentUser());
-    	}
-    	catch (Exception e) {
-    		// nothing to do
-    	}
+        availableExports = null;
+        if (context.getCurrentUser() != null)
+        {
+            try
+            {
+                availableExports = ItemExport.getExportsAvailable(context.getCurrentUser());
+            }
+            catch (Exception e)
+            {
+                throw new ProcessingException("Error getting available exports", e);
+            }
+        }
     }
     
     
