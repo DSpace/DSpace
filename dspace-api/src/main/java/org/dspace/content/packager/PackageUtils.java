@@ -345,7 +345,7 @@ public class PackageUtils
      *  generic like ".xml", to accidentally get set to this format.
      * @param context - the context.
      * @param shortDesc - short descriptive name, used to locate existing format.
-     * @param MIMEtype - mime content-type
+     * @param MIMEType - mime content-type
      * @param desc - long description
      * @param internal value for the 'internal' flag of a new format if created.
      * @return BitstreamFormat object that was found or created.  Never null.
@@ -472,11 +472,10 @@ public class PackageUtils
                 //(Note: Handle is not set until item is finished)
                 WorkspaceItem wsi = WorkspaceItem.create(context, (Collection)parent, params.useCollectionTemplate());
 
-                // Finish creating item with specified handle 
-                // (this will either install item immediately or start a workflow, based on params)
-                dso = finishCreateItem(context, wsi, handle, params);
-
-                return dso;
+                // Please note that we are returning an Item which is *NOT* yet in the Archive,
+                // and doesn't yet have a handle assigned.
+                // This Item will remain "incomplete" until 'PackageUtils.finishCreateItem()' is called
+                return wsi.getItem();
                 
             case Constants.SITE:
                 return Site.find(context, Site.SITE_ID);
@@ -528,7 +527,7 @@ public class PackageUtils
         // default: skip workflow, but otherwise normal submission (i.e. package treated like a SIP)
         else
         {
-            // Intall item immediately with the specified handle
+            // Install item immediately with the specified handle
             InstallItem.installItem(context, wsi, handle);
 
             // return newly installed item
@@ -802,7 +801,7 @@ public class PackageUtils
      * Also see the translateGroupNameForImport() method which does the opposite
      * of this method.
      *
-     * @param relatedDso DSpaceObject associated with group
+     * @param context current DSpace Context
      * @param groupName Group's name
      * @return the group name, with any internal IDs translated to Handles
      */
@@ -886,7 +885,7 @@ public class PackageUtils
      * Also see the translateGroupNameForExport() method which does the opposite
      * of this method.
      *
-     * @param relatedDso DSpaceObject associated with group
+     * @param context current DSpace Context
      * @param groupName Group's name
      * @return the group name, with any Handles translated to internal IDs
      */

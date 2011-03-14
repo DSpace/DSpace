@@ -29,6 +29,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.MetadataValidationException;
 import org.dspace.core.ConfigurationManager;
@@ -36,7 +37,6 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
-import org.dspace.workflow.WorkflowItem;
 import org.jdom.Element;
 
 /**
@@ -459,24 +459,34 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         manifest.crosswalkObjectOtherAdminMD(context, params, dso, callback);
 
         // -- Step 4 --
+        // Run our Descriptive metadata (dublin core, etc) crosswalks!
+        crosswalkObjectDmd(context, dso, manifest, callback, manifest
+                .getItemDmds(), params);
+
+        // For Items, also sanity-check the metadata for minimum requirements.
+        if (type == Constants.ITEM)
+        {
+            PackageUtils.checkItemMetadata((Item) dso);
+        }
+
+        // -- Step 5 --
         // Add all content files as bitstreams on new DSpace Object
         if (type == Constants.ITEM)
         {
             Item item = (Item) dso;
-            // @TODO: maybe add an option to apply template Item on ingest??
+
+            //Check if this item is still in a user's workspace.
+            //It should be, as we haven't completed its install yet.
+            WorkspaceItem wsi = WorkspaceItem.findByItem(context, item);
 
             // Get collection this item is being submitted to
             Collection collection = item.getOwningCollection();
             if (collection == null)
             {
-                // If an item doesn't have an owning-collection, that means it
-                // has entered a workflow (and is not fully in the archive yet)
-                WorkflowItem wfi = WorkflowItem.findByItem(context, item);
-
-                // Get the collection this workflow item belongs to
-                if (wfi != null)
+                // Get the collection this workspace item belongs to
+                if (wsi != null)
                 {
-                    collection = wfi.getCollection();
+                    collection = wsi.getCollection();
                 }
             }
 
@@ -492,9 +502,14 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             // have subclass manage license since it may be extra package file.
             addLicense(context, item, license, collection, params);
 
-            // XXX FIXME
-            // should set lastModifiedTime e.g. when ingesting AIP.
-            // maybe only do it in the finishObject() callback for AIP.
+            // Finally, if item is still in the workspace, then we actually need
+            // to install it into the archive & assign its handle.
+            if(wsi!=null)
+            {
+                // Finish creating the item. This actually assigns the handle,
+                // and will either install item immediately or start a workflow, based on params
+                PackageUtils.finishCreateItem(context, wsi, handle, params);
+            }
 
         } // end if ITEM
         else if (type == Constants.COLLECTION || type == Constants.COMMUNITY)
@@ -517,17 +532,6 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             throw new PackageValidationException(
                     "Unknown DSpace Object type in package, type="
                             + String.valueOf(type));
-        }
-
-        // -- Step 5 --
-        // Run our Descriptive metadata (dublin core, etc) crosswalks!
-        crosswalkObjectDmd(context, dso, manifest, callback, manifest
-                .getItemDmds(), params);
-
-        // For Items, also sanity-check the metadata for minimum requirements.
-        if (type == Constants.ITEM)
-        {
-            PackageUtils.checkItemMetadata((Item) dso);
         }
 
         // -- Step 6 --
@@ -635,7 +639,6 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         if (dso.getType() == Constants.ITEM)
         {
             Item item = (Item) dso;
-            // @TODO: maybe add an option to apply template Item on ingest??
 
             // save manifest as a bitstream in Item if desired
             if (preserveManifest())
