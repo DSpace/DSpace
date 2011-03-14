@@ -363,6 +363,34 @@ public class WorkspaceItem implements InProgressSubmission
     }
 
     /**
+     * Check to see if a particular item is currently still in a user's Workspace.
+     * If so, its WorkspaceItem is returned.  If not, null is returned
+     *
+     * @param context
+     *            the context object
+     * @param i
+     *            the item
+     *
+     * @return workflow item corresponding to the item, or null
+     */
+    public static WorkspaceItem findByItem(Context context, Item i)
+            throws SQLException
+    {
+        // Look for the unique workspaceitem entry where 'item_id' references this item
+        TableRow row =  DatabaseManager.findByUnique(context, "workspaceitem", "item_id", i.getID());
+
+        if (row == null)
+        {
+            return null;
+        }
+        else
+        {
+            return new WorkspaceItem(context, row);
+        }
+    }
+
+
+    /**
      * Get all workspace items in the whole system
      *
      * @param   context     the context object
