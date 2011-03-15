@@ -480,7 +480,7 @@
             <!--Treats the entire field as a single token, regardless of its content-->
             <tokenizer class="solr.KeywordTokenizerFactory"/>
 
-            <filter class="solr.LowerCaseFilterFactory" />
+            <!--<filter class="solr.LowerCaseFilterFactory" />-->
         </analyzer>
     </fieldType>
  </types>

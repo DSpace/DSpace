@@ -44,6 +44,8 @@ public class SearchUtils {
 
     private static List<String> dateIndexableFields = new ArrayList<String>();
 
+    public static final String FILTER_SEPARATOR = "|||";
+
     static {
 
         log.debug("loading configuration");
@@ -188,6 +190,20 @@ public class SearchUtils {
             }
         }
         return dateIndexableFields;
+    }
+
+    public static String getFilterQueryDisplay(String filterQuery){
+        String separator = SearchUtils.getConfig().getString("solr.facets.split.char", SearchUtils.FILTER_SEPARATOR);
+        //Escape any regex chars
+        separator = java.util.regex.Pattern.quote(separator);
+        String[] fqParts = filterQuery.split(separator);
+        String result = "";
+        int start = fqParts.length / 2;
+        for(int i = start; i < fqParts.length; i++){
+            result += fqParts[i];
+        }
+
+        return result;
     }
 
     public static class SolrFacetConfig {

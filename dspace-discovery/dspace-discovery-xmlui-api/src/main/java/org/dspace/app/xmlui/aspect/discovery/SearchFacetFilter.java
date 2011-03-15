@@ -558,7 +558,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
         //No use in selecting the same filter twice
         if(filterQueries.contains(filterQuery)){
-            cell.addContent(displayedValue + " (" + value.getCount() + ")");
+            cell.addContent(SearchUtils.getFilterQueryDisplay(displayedValue) + " (" + value.getCount() + ")");
         } else {
             //Add the basics
             Map<String, String> urlParams = new HashMap<String, String>();
@@ -567,8 +567,8 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
             //Add already existing filter queries
             url = addFilterQueriesToUrl(url);
             //Last add the current filter query
-            url += "&fq=" + URLEncoder.encode(filterQuery, "UTF-8");
-            cell.addXref(url, displayedValue + " (" + value.getCount() + ")"
+            url += "&fq=" + filterQuery;
+            cell.addXref(url, SearchUtils.getFilterQueryDisplay(displayedValue) + " (" + value.getCount() + ")"
             );
         }
     }
