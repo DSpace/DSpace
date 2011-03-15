@@ -700,7 +700,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
                 if(SearchUtils.getAllFacets().contains(field) || SearchUtils.getAllFacets().contains(unqualifiedField + "." + Item.ANY)){
                     //Add a special filter
-                    doc.addField(field + "_filter", value);
+                    //We use a separator to split up the lowercase and regular case, this is needed to get our filters in regular case
+                    //Solr has issues with facet prefix and cases
+                    String separator = SearchUtils.getConfig().getString("solr.facets.split.char", SearchUtils.FILTER_SEPARATOR);
+                    doc.addField(field + "_filter", value.toLowerCase() + separator + value);
                 }
 
                 if(SearchUtils.getSortFields().contains(field) && !sortFieldsAdded.contains(field)){

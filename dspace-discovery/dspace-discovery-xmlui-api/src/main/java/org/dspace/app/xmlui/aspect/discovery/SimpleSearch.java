@@ -166,6 +166,9 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
                 if(field.equals("location.comm") || field.equals("location.coll")){
                     //We have a community/collection, resolve it to a dspaceObject
                     value = SolrServiceImpl.locationToName(context, field, value);
+                } else
+                if(field.endsWith("_filter")){
+                    value = SearchUtils.getFilterQueryDisplay(value);
                 }
                 //Check for a range query
                 Pattern pattern = Pattern.compile("\\[(.*? TO .*?)\\]");

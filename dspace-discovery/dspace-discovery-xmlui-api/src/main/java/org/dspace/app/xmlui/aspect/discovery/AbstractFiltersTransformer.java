@@ -37,7 +37,6 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -386,7 +385,7 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
                             continue;
                         }
                         for (FacetField.Count count : facetVals) {
-                            values.add(new FilterDisplayValue(count.getName(), count.getCount(), count.getAsFilterQuery()));
+                            values.add(new FilterDisplayValue(SearchUtils.getFilterQueryDisplay(count.getName()), count.getCount(), count.getAsFilterQuery()));
                         }
                     }
                     if(field.isDate()){
@@ -463,9 +462,12 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
                                     if(keys != null){
                                         while (keys.hasMoreElements()){
                                             String key = (String) keys.nextElement();
-                                            if(key != null){
-                                                paramsQuery += key + "=" + URLEncoder.encode(request.getParameter(key), "UTF-8");
-                                                paramsQuery += "&";
+                                            if(key != null && !"page".equals(key)){
+                                                String[] vals = request.getParameterValues(key);
+                                                for(String paramValue : vals){
+                                                    paramsQuery += key + "=" + paramValue;
+                                                    paramsQuery += "&";
+                                                }
                                             }
                                         }
                                     }
@@ -476,7 +478,7 @@ public abstract class AbstractFiltersTransformer extends AbstractDSpaceTransform
                                                     "/discover?" +
                                                     paramsQuery +
                                                     "fq=" +
-                                                    URLEncoder.encode(filterQuery, "UTF-8"),
+                                                    filterQuery,
                                             displayedValue + " (" + value.getCount() + ")"
                                     );
                                 }
