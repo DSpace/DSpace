@@ -83,16 +83,16 @@ public class LCNameAuthority implements ChoiceAuthority
     }
 
     // punt!  this is a poor implementation..
-    public Choices getBestMatch(String text, int collection, String locale)
+    public Choices getBestMatch(String field, String text, int collection, String locale)
     {
-        return getMatches(text, collection, 0, 2, locale);
+        return getMatches(field, text, collection, 0, 2, locale);
     }
 
     /**
      * Match a proposed value against name authority records
      * Value is assumed to be in "Lastname, Firstname" format.
      */
-    public Choices getMatches(String text, int collection, int start, int limit, String locale)
+    public Choices getMatches(String field, String text, int collection, int start, int limit, String locale)
     {
         Choices result = queryPerson(text, start, limit);
         if (result == null)
@@ -105,7 +105,7 @@ public class LCNameAuthority implements ChoiceAuthority
 
     // punt; supposed to get the canonical display form of a metadata authority key
     // XXX FIXME implement this with a query on the authority key, cache results
-    public String getLabel(String key, String locale)
+    public String getLabel(String field, String key, String locale)
     {
         return key;
     }

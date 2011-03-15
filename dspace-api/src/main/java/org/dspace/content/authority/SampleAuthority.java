@@ -33,7 +33,7 @@ public class SampleAuthority implements ChoiceAuthority
         "Saturday"
     };
 
-    public Choices getMatches(String query, int collection, int start, int limit, String locale)
+    public Choices getMatches(String field, String query, int collection, int start, int limit, String locale)
     {
         int dflt = -1;
         Choice v[] = new Choice[values.length];
@@ -48,7 +48,7 @@ public class SampleAuthority implements ChoiceAuthority
         return new Choices(v, 0, v.length, Choices.CF_AMBIGUOUS, false, dflt);
     }
 
-    public Choices getBestMatch(String text, int collection, String locale)
+    public Choices getBestMatch(String field, String text, int collection, String locale)
     {
         for (int i = 0; i < values.length; ++i)
         {
@@ -62,7 +62,7 @@ public class SampleAuthority implements ChoiceAuthority
         return new Choices(Choices.CF_NOTFOUND);
     }
 
-    public String getLabel(String key, String locale)
+    public String getLabel(String field, String key, String locale)
     {
         return labels[Integer.parseInt(key)];
     }
