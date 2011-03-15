@@ -264,7 +264,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             }
     	}
     	
-    	if (isSystemAdmin && "community-list".equals(this.sitemapURI))
+    	if (isSystemAdmin && ("community-list".equals(this.sitemapURI) || "".equals(this.sitemapURI)))
     	{
             // Only System administrators can create top-level communities
             context.setHead(T_context_head);
@@ -347,7 +347,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             }
     	}
     	
-    	if ("community-list".equals(this.sitemapURI) && AuthorizeManager.isAdmin(this.context))
+    	if (("community-list".equals(this.sitemapURI) || "".equals(this.sitemapURI)) && AuthorizeManager.isAdmin(this.context))
     	{
             context.addItemXref(contextPath+"/admin/community?createNew", T_context_create_community);
             options++;
