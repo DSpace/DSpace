@@ -120,6 +120,13 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         browseGlobal.addItem().addXref(contextPath + "/community-list", T_head_all_of_dspace );
     */
 
+        /* regulate the ordering */
+        options.addList("discovery");
+        options.addList("browse");
+        options.addList("account");
+        options.addList("context");
+        options.addList("administrative");
+
     }
 
     /**
