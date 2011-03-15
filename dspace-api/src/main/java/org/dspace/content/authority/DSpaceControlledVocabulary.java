@@ -154,7 +154,7 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
     	}
     }
 
-    public Choices getMatches(String text, int collection, int start, int limit, String locale)
+    public Choices getMatches(String field, String text, int collection, int start, int limit, String locale)
     {
     	init();
     	log.debug("Getting matches for '" + text + "'");
@@ -203,14 +203,14 @@ public class DSpaceControlledVocabulary extends SelfNamedPlugin implements Choic
     	return new Choices(choices, 0, choices.length, Choices.CF_AMBIGUOUS, false);
     }
 
-    public Choices getBestMatch(String text, int collection, String locale)
+    public Choices getBestMatch(String field, String text, int collection, String locale)
     {
     	init();
     	log.debug("Getting best match for '" + text + "'");
-        return getMatches(text, collection, 0, 2, locale);
+        return getMatches(field, text, collection, 0, 2, locale);
     }
 
-    public String getLabel(String key, String locale)
+    public String getLabel(String field, String key, String locale)
     {
     	init();
     	String xpathExpression = String.format(idTemplate, key);

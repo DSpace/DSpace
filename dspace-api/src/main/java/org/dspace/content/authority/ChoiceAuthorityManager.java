@@ -153,7 +153,7 @@ public final class ChoiceAuthorityManager
      *  Wrapper that calls getMatches method of the plugin corresponding to
      *  the metadata field defined by schema,element,qualifier.
      *
-     * @see ChoiceAuthority#getMatches(String, int, int, int, String)
+     * @see ChoiceAuthority#getMatches(String, String, int, int, int, String)
      * @param schema schema of metadata field
      * @param element element of metadata field
      * @param qualifier qualifier of metadata field
@@ -175,7 +175,7 @@ public final class ChoiceAuthorityManager
      *  Wrapper calls getMatches method of the plugin corresponding to
      *  the metadata field defined by single field key.
      *
-     * @see ChoiceAuthority#getMatches(String, int, int, int, String)
+     * @see ChoiceAuthority#getMatches(String, String, int, int, int, String)
      * @param fieldKey single string identifying metadata field
      * @param query user's value to match
      * @param collection database ID of Collection for context (owner of Item)
@@ -194,14 +194,14 @@ public final class ChoiceAuthorityManager
                     "No choices plugin was configured for  field \"" + fieldKey
                             + "\".");
         }
-        return ma.getMatches(query, collection, start, limit, locale);
+        return ma.getMatches(fieldKey, query, collection, start, limit, locale);
     }
 
     /**
      *  Wrapper that calls getBestMatch method of the plugin corresponding to
      *  the metadata field defined by single field key.
      *
-     * @see ChoiceAuthority#getBestMatch(String, int, String)
+     * @see ChoiceAuthority#getBestMatch(String, String, int, String)
      * @param fieldKey single string identifying metadata field
      * @param query user's value to match
      * @param collection database ID of Collection for context (owner of Item)
@@ -218,7 +218,7 @@ public final class ChoiceAuthorityManager
                     "No choices plugin was configured for  field \"" + fieldKey
                             + "\".");
         }
-        return ma.getBestMatch(query, collection, locale);
+        return ma.getBestMatch(fieldKey, query, collection, locale);
     }
 
     /**
@@ -242,7 +242,7 @@ public final class ChoiceAuthorityManager
         {
             throw new IllegalArgumentException("No choices plugin was configured for  field \"" + fieldKey + "\".");
         }
-        return ma.getLabel(authKey, locale);
+        return ma.getLabel(fieldKey, authKey, locale);
     }
 
     /**

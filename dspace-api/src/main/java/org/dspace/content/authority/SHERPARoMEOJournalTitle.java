@@ -52,4 +52,8 @@ public class SHERPARoMEOJournalTitle extends SHERPARoMEOProtocol
         return result;
     }
 
+    @Override
+    public Choices getMatches(String field, String text, int collection, int start, int limit, String locale) {
+        return getMatches(text, collection, start, limit, locale);
+    }
 }

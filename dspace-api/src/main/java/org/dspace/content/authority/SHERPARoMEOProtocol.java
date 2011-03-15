@@ -72,14 +72,14 @@ public abstract class SHERPARoMEOProtocol implements ChoiceAuthority
     // this implements the specific RoMEO API args and XML tag naming
     public abstract Choices getMatches(String text, int collection, int start, int limit, String locale);
 
-    public Choices getBestMatch(String text, int collection, String locale)
+    public Choices getBestMatch(String field, String text, int collection, String locale)
     {
-        return getMatches(text, collection, 0, 2, locale);
+        return getMatches(field, text, collection, 0, 2, locale);
     }
 
     // XXX FIXME just punt, returning value, never got around to
     //  implementing a reverse query.
-    public String getLabel(String key, String locale)
+    public String getLabel(String field, String key, String locale)
     {
         return key;
     }
