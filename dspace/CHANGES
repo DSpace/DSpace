@@ -32,6 +32,7 @@ found online at: https://wiki.duraspace.org/display/DSPACE/DSpaceContributors
 - [DS-808] jqueryUI javascript gets imported without corresponding CSS
 - [DS-809] Support for empty dc.abstract dim field in Internet Explorer
 - [DS-823] DatabaseManager Oracle compliance
+- [DS-843] Autocomplete in authority control contains small errors in Mirage
 
 (Stuart Lewis, Kim Shepherd)
 - [DS-806] Item.match() incorrect logic for schema testing

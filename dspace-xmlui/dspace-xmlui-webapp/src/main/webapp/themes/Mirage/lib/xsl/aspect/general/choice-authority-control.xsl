@@ -214,31 +214,33 @@
       <xsl:param name="confidenceName" select="''"/>
       <xsl:param name="isClosed" select="'false'"/>
       <script type="text/javascript">
-        <xsl:text>window.onload = function() {</xsl:text>
-        <xsl:text>var gigo = DSpaceSetupAutocomplete('</xsl:text>
-        <xsl:value-of select="$formID"/>
-        <xsl:text>', { metadataField: '</xsl:text>
-        <xsl:value-of select="$metadataField"/>
-        <xsl:text>', isClosed: '</xsl:text>
-        <xsl:value-of select="$isClosed"/>
-        <xsl:text>', inputName: '</xsl:text>
-        <xsl:value-of select="$inputName"/>
-        <xsl:text>', authorityName: '</xsl:text>
-        <xsl:value-of select="$authorityName"/>
-        <xsl:text>', containerID: '</xsl:text>
-        <xsl:value-of select="$containerID"/>
-        <xsl:text>', indicatorID: '</xsl:text>
-        <xsl:value-of select="$indicatorID"/>
-        <xsl:text>', confidenceIndicatorID: '</xsl:text>
-        <xsl:value-of select="$confidenceIndicatorID"/>
-        <xsl:text>', confidenceName: '</xsl:text>
-        <xsl:value-of select="$confidenceName"/>
-        <xsl:text>', collection: </xsl:text>
-        <xsl:value-of select="$collectionID"/>
-        <xsl:text>, contextPath: '</xsl:text>
-        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-        <xsl:text>'});</xsl:text>
-        <xsl:text>};</xsl:text>
+        <xsl:text>runAfterJSImports.add(function() {</xsl:text>
+            <xsl:text>$(document).ready(function() {</xsl:text>
+                <xsl:text>var gigo = DSpaceSetupAutocomplete('</xsl:text>
+                    <xsl:value-of select="$formID"/>
+                    <xsl:text>', { metadataField: '</xsl:text>
+                    <xsl:value-of select="$metadataField"/>
+                    <xsl:text>', isClosed: '</xsl:text>
+                    <xsl:value-of select="$isClosed"/>
+                    <xsl:text>', inputName: '</xsl:text>
+                    <xsl:value-of select="$inputName"/>
+                    <xsl:text>', authorityName: '</xsl:text>
+                    <xsl:value-of select="$authorityName"/>
+                    <xsl:text>', containerID: '</xsl:text>
+                    <xsl:value-of select="$containerID"/>
+                    <xsl:text>', indicatorID: '</xsl:text>
+                    <xsl:value-of select="$indicatorID"/>
+                    <xsl:text>', confidenceIndicatorID: '</xsl:text>
+                    <xsl:value-of select="$confidenceIndicatorID"/>
+                    <xsl:text>', confidenceName: '</xsl:text>
+                    <xsl:value-of select="$confidenceName"/>
+                    <xsl:text>', collection: </xsl:text>
+                    <xsl:value-of select="$collectionID"/>
+                    <xsl:text>, contextPath: '</xsl:text>
+                    <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                <xsl:text>'});</xsl:text>
+            <xsl:text>});</xsl:text>
+        <xsl:text>});</xsl:text>
       </script>
     </xsl:template>
 
