@@ -98,7 +98,7 @@ public class BrowserServlet extends AbstractBrowserServlet
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
-        JSPManager.showJSP(request, response, "/browse/error.jsp");
+        JSPManager.showInternalError(request, response);
     }
 
     /**
