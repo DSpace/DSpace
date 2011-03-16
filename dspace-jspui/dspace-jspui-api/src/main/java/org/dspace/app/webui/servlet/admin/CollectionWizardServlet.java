@@ -18,6 +18,7 @@ import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
@@ -457,88 +458,83 @@ public class CollectionWizardServlet extends DSpaceServlet
             HttpServletResponse response) throws SQLException,
             ServletException, IOException, AuthorizeException
     {
-        // Wrap multipart request to get the submission info
-        FileUploadRequest wrapper = new FileUploadRequest(request);
-
-        Collection collection = Collection.find(context, UIUtil
-                .getIntParameter(wrapper, "collection_id"));
-
-        if (collection == null)
-        {
-            log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
-                    .getRequestLogInfo(wrapper)));
-            JSPManager.showIntegrityError(request, response);
-
-            return;
-        }
-
-        // Get metadata
-        collection.setMetadata("name", wrapper.getParameter("name"));
-        collection.setMetadata("short_description", wrapper
-                .getParameter("short_description"));
-        collection.setMetadata("introductory_text", wrapper
-                .getParameter("introductory_text"));
-        collection.setMetadata("copyright_text", wrapper
-                .getParameter("copyright_text"));
-        collection.setMetadata("side_bar_text", wrapper
-                .getParameter("side_bar_text"));
-        collection.setMetadata("provenance_description", wrapper
-                .getParameter("provenance_description"));
-
-        // Need to be more careful about license -- make sure it's null if
-        // nothing was entered
-        String license = wrapper.getParameter("license");
-
-        if (!StringUtils.isEmpty(license))
-        {
-            collection.setLicense(license);
-        }
-
-        File temp = wrapper.getFile("file");
-
-        if (temp != null)
-        {
-            // Read the temp file as logo
-            InputStream is = new BufferedInputStream(new FileInputStream(temp));
-            Bitstream logoBS = collection.setLogo(is);
-
-            // Strip all but the last filename. It would be nice
-            // to know which OS the file came from.
-            String noPath = wrapper.getFilesystemName("file");
-
-            while (noPath.indexOf('/') > -1)
+        try {
+            // Wrap multipart request to get the submission info
+            FileUploadRequest wrapper = new FileUploadRequest(request);
+            Collection collection = Collection.find(context, UIUtil.getIntParameter(wrapper, "collection_id"));
+            if (collection == null)
             {
-                noPath = noPath.substring(noPath.indexOf('/') + 1);
+                log.warn(LogManager.getHeader(context, "integrity_error", UIUtil.getRequestLogInfo(wrapper)));
+                JSPManager.showIntegrityError(request, response);
+
+                return;
             }
 
-            while (noPath.indexOf('\\') > -1)
+            // Get metadata
+            collection.setMetadata("name", wrapper.getParameter("name"));
+            collection.setMetadata("short_description", wrapper.getParameter("short_description"));
+            collection.setMetadata("introductory_text", wrapper.getParameter("introductory_text"));
+            collection.setMetadata("copyright_text", wrapper.getParameter("copyright_text"));
+            collection.setMetadata("side_bar_text", wrapper.getParameter("side_bar_text"));
+            collection.setMetadata("provenance_description", wrapper.getParameter("provenance_description"));
+            // Need to be more careful about license -- make sure it's null if
+            // nothing was entered
+            String license = wrapper.getParameter("license");
+
+            if (!StringUtils.isEmpty(license))
             {
-                noPath = noPath.substring(noPath.indexOf('\\') + 1);
+                collection.setLicense(license);
             }
 
-            logoBS.setName(noPath);
-            logoBS.setSource(wrapper.getFilesystemName("file"));
+            File temp = wrapper.getFile("file");
 
-            // Identify the format
-            BitstreamFormat bf = FormatIdentifier.guessFormat(context, logoBS);
-            logoBS.setFormat(bf);
-            AuthorizeManager.addPolicy(context, logoBS, Constants.WRITE, context
-                    .getCurrentUser());
-            logoBS.update();
-
-            // Remove temp file
-            if (!temp.delete())
+            if (temp != null)
             {
-                log.trace("Unable to delete temporary file");
+                // Read the temp file as logo
+                InputStream is = new BufferedInputStream(new FileInputStream(temp));
+                Bitstream logoBS = collection.setLogo(is);
+
+                // Strip all but the last filename. It would be nice
+                // to know which OS the file came from.
+                String noPath = wrapper.getFilesystemName("file");
+
+                while (noPath.indexOf('/') > -1)
+                {
+                    noPath = noPath.substring(noPath.indexOf('/') + 1);
+                }
+
+                while (noPath.indexOf('\\') > -1)
+                {
+                    noPath = noPath.substring(noPath.indexOf('\\') + 1);
+                }
+
+                logoBS.setName(noPath);
+                logoBS.setSource(wrapper.getFilesystemName("file"));
+
+                // Identify the format
+                BitstreamFormat bf = FormatIdentifier.guessFormat(context, logoBS);
+                logoBS.setFormat(bf);
+                AuthorizeManager.addPolicy(context, logoBS, Constants.WRITE, context.getCurrentUser());
+                logoBS.update();
+
+                // Remove temp file
+                if (!temp.delete())
+                {
+                    log.trace("Unable to delete temporary file");
+                }
             }
+
+            collection.update();
+
+            // Now work out what next page is
+            showNextPage(context, request, response, collection, BASIC_INFO);
+
+            context.complete();
+        } catch (FileSizeLimitExceededException ex)
+        {
+            log.warn("Upload exceeded upload.max");
+            JSPManager.showFileSizeLimitExceededError(request, response, ex.getMessage(), ex.getActualSize(), ex.getPermittedSize());
         }
-
-        collection.update();
-
-        // Now work out what next page is
-        showNextPage(context, request, response, collection, BASIC_INFO);
-
-        context.complete();
     }
 
     /**

@@ -142,4 +142,26 @@ public class JSPManager
 
         showJSP(request, response, "/error/invalid-id.jsp");
     }
+
+    /**
+     * Display a "file upload was too large" error message. Passing in information
+     * about the size of the file uploaded, and the maximum file size limit so
+     * the user knows why they encountered an error.
+     * @param request
+     * @param response
+     * @param message
+     * @param actualSize
+     * @param permittedSize
+     * @throws ServletException
+     * @throws IOException
+     */
+    public static void showFileSizeLimitExceededError(HttpServletRequest request,
+            HttpServletResponse response, String message, long actualSize, long permittedSize) throws ServletException, IOException
+    {
+        request.setAttribute("error.message", message);
+        request.setAttribute("actualSize", actualSize);
+        request.setAttribute("permittedSize", permittedSize);
+        response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+        showJSP(request, response, "/error/exceeded-size.jsp");
+    }
 }

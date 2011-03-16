@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.dspace.core.ConfigurationManager;
@@ -47,7 +48,7 @@ public class FileUploadRequest extends HttpServletRequestWrapper
      * @param req
      *            the original request
      */
-    public FileUploadRequest(HttpServletRequest req) throws IOException
+    public FileUploadRequest(HttpServletRequest req) throws IOException, FileSizeLimitExceededException
     {
         super(req);
 
@@ -90,6 +91,16 @@ public class FileUploadRequest extends HttpServletRequestWrapper
         }
         catch (Exception e)
         {
+            if(e.getMessage().contains("exceeds the configured maximum"))
+            {
+                // ServletFileUpload is not throwing the correct error, so this is workaround
+                // the request was rejected because its size (11302) exceeds the configured maximum (536)
+                int startFirstParen = e.getMessage().indexOf("(")+1;
+                int endFirstParen = e.getMessage().indexOf(")");
+                String uploadedSize = e.getMessage().substring(startFirstParen, endFirstParen).trim();
+                Long actualSize = Long.parseLong(uploadedSize);
+                throw new FileSizeLimitExceededException(e.getMessage(), actualSize, maxSize);
+            }
             throw new IOException(e.getMessage(), e);
         }
     }

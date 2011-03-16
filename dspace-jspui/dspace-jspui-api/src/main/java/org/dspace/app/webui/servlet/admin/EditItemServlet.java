@@ -25,6 +25,7 @@ import java.util.StringTokenizer;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
@@ -766,77 +767,80 @@ public class EditItemServlet extends DSpaceServlet
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
-        // Wrap multipart request to get the submission info
-        FileUploadRequest wrapper = new FileUploadRequest(request);
-        Bitstream b = null;
+        try {
+            // Wrap multipart request to get the submission info
+            FileUploadRequest wrapper = new FileUploadRequest(request);
+            Bitstream b = null;
+            Item item = Item.find(context, UIUtil.getIntParameter(wrapper, "item_id"));
+            File temp = wrapper.getFile("file");
 
-        Item item = Item.find(context, UIUtil.getIntParameter(wrapper,
-                "item_id"));
+            // Read the temp file as logo
+            InputStream is = new BufferedInputStream(new FileInputStream(temp));
 
-        File temp = wrapper.getFile("file");
+            // now check to see if person can edit item
+            checkEditAuthorization(context, item);
 
-        // Read the temp file as logo
-        InputStream is = new BufferedInputStream(new FileInputStream(temp));
+            // do we already have an ORIGINAL bundle?
+            Bundle[] bundles = item.getBundles("ORIGINAL");
 
-        // now check to see if person can edit item
-        checkEditAuthorization(context, item);
-
-        // do we already have an ORIGINAL bundle?
-        Bundle[] bundles = item.getBundles("ORIGINAL");
-
-        if (bundles.length < 1)
-        {
-            // set bundle's name to ORIGINAL
-            b = item.createSingleBitstream(is, "ORIGINAL");
-            
-            // set the permission as defined in the owning collection
-            Collection owningCollection = item.getOwningCollection();
-            if (owningCollection != null)
+            if (bundles.length < 1)
             {
-                Bundle bnd = b.getBundles()[0];
-                bnd.inheritCollectionDefaultPolicies(owningCollection);
+                // set bundle's name to ORIGINAL
+                b = item.createSingleBitstream(is, "ORIGINAL");
+
+                // set the permission as defined in the owning collection
+                Collection owningCollection = item.getOwningCollection();
+                if (owningCollection != null)
+                {
+                    Bundle bnd = b.getBundles()[0];
+                    bnd.inheritCollectionDefaultPolicies(owningCollection);
+                }
+            } 
+            else
+            {
+                // we have a bundle already, just add bitstream
+                b = bundles[0].createBitstream(is);
             }
-        }
-        else
+
+            // Strip all but the last filename. It would be nice
+            // to know which OS the file came from.
+            String noPath = wrapper.getFilesystemName("file");
+
+            while (noPath.indexOf('/') > -1)
+            {
+                noPath = noPath.substring(noPath.indexOf('/') + 1);
+            }
+
+            while (noPath.indexOf('\\') > -1)
+            {
+                noPath = noPath.substring(noPath.indexOf('\\') + 1);
+            }
+
+            b.setName(noPath);
+            b.setSource(wrapper.getFilesystemName("file"));
+
+            // Identify the format
+            BitstreamFormat bf = FormatIdentifier.guessFormat(context, b);
+            b.setFormat(bf);
+            b.update();
+
+            item.update();
+
+            // Back to edit form
+            showEditForm(context, request, response, item);
+
+            // Remove temp file
+            if (!temp.delete())
+            {
+                log.error("Unable to delete temporary file");
+            }
+
+            // Update DB
+            context.complete();
+        } catch (FileSizeLimitExceededException ex)
         {
-            // we have a bundle already, just add bitstream
-            b = bundles[0].createBitstream(is);
+            log.warn("Upload exceeded upload.max");
+            JSPManager.showFileSizeLimitExceededError(request, response, ex.getMessage(), ex.getActualSize(), ex.getPermittedSize());
         }
-
-        // Strip all but the last filename. It would be nice
-        // to know which OS the file came from.
-        String noPath = wrapper.getFilesystemName("file");
-
-        while (noPath.indexOf('/') > -1)
-        {
-            noPath = noPath.substring(noPath.indexOf('/') + 1);
-        }
-
-        while (noPath.indexOf('\\') > -1)
-        {
-            noPath = noPath.substring(noPath.indexOf('\\') + 1);
-        }
-
-        b.setName(noPath);
-        b.setSource(wrapper.getFilesystemName("file"));
-
-        // Identify the format
-        BitstreamFormat bf = FormatIdentifier.guessFormat(context, b);
-        b.setFormat(bf);
-        b.update();
-
-        item.update();
-
-        // Back to edit form
-        showEditForm(context, request, response, item);
-
-        // Remove temp file
-        if (!temp.delete())
-        {
-            log.error("Unable to delete temporary file");
-        }
-
-        // Update DB
-        context.complete();
     }
 }

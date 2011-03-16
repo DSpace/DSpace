@@ -19,6 +19,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
 import org.apache.log4j.Logger;
 
 import org.dspace.app.util.SubmissionInfo;
@@ -219,7 +220,14 @@ public class SubmissionController extends DSpaceServlet
         if ((contentType != null)
                 && (contentType.indexOf("multipart/form-data") != -1))
         {
-            request = wrapMultipartRequest(request);
+            try
+            {
+                request = wrapMultipartRequest(request);
+            } catch (FileSizeLimitExceededException e)
+            {
+                log.warn("Upload exceeded upload.max");
+                JSPManager.showFileSizeLimitExceededError(request, response, e.getMessage(), e.getActualSize(), e.getPermittedSize());
+            }
             
             //also, upload any files and save their contents to Request (for later processing by UploadStep)
             uploadFiles(context, request);
@@ -1350,7 +1358,7 @@ public class SubmissionController extends DSpaceServlet
      *             if there are no more pages in this step
      */
     private HttpServletRequest wrapMultipartRequest(HttpServletRequest request)
-            throws ServletException
+            throws ServletException, FileSizeLimitExceededException
     {
         HttpServletRequest wrappedRequest;
 
@@ -1369,6 +1377,10 @@ public class SubmissionController extends DSpaceServlet
             { // already wrapped
                 return request;
             }
+        }
+        catch (FileSizeLimitExceededException e)
+        {
+            throw new FileSizeLimitExceededException(e.getMessage(),e.getActualSize(),e.getPermittedSize());
         }
         catch (Exception e)
         {
