@@ -7,6 +7,10 @@
  */
 /** Additions for Authority Control elements **/
 /* for scriptaculous autocomplete */
+div.autocomplete {
+    display: none;
+}
+
 div.autocomplete, ul.ui-menu {
   position:absolute;
   width:250px;
@@ -36,10 +40,6 @@ ul.ui-menu li a {
 ul.ui-menu li a.ui-state-hover {
     background-color: #ffb;
 }
-#aspect_submission_StepTransformer_field_dc_title_container {
-    display: none;
-}
-
 /* this magic gets the 16x16 icon to show up.. setting height/width didn't
    do it, but adding padding actually made it show up. */
 img.ds-authority-confidence
