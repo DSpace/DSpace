@@ -87,7 +87,7 @@ public class WithdrawnBrowserServlet extends AbstractBrowserServlet
     {
         request.setAttribute("useAdminLayout", "yes");
 
-        JSPManager.showJSP(request, response, "/browse/error.jsp");
+        JSPManager.showInternalError(request, response);
     }
 
     /**
