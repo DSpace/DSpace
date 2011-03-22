@@ -44,6 +44,8 @@ found online at: https://wiki.duraspace.org/display/DSPACE/DSpaceContributors
 (Robin Taylor)
 - [DS-215] Single-argument Item.getMetadata does not work with mixed-case metadata terms
 
+(Alvaro Lopez, Claudia Juergen)
+- [DS-837] Translate file to spanish
 
 1.7.0
 =====
