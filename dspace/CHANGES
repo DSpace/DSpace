@@ -37,6 +37,10 @@ found online at: https://wiki.duraspace.org/display/DSPACE/DSpaceContributors
 (Stuart Lewis, Kim Shepherd)
 - [DS-806] Item.match() incorrect logic for schema testing
 
+(Kim Shepherd)
+- [DS-853] MetadataExposure settings for dc.description.provenance are ignored/overridden by XMLUI templates
+- [DS-720] Solr statistics documentation cleanup
+
 (Robin Taylor)
 - [DS-215] Single-argument Item.getMetadata does not work with mixed-case metadata terms
 
