@@ -744,7 +744,6 @@
     </xsl:template>
             
     <xsl:template match="dim:field" mode="itemDetailView-DIM">
-        <xsl:if test="not(@element='description' and @qualifier='provenance')">
             <tr>
                 <xsl:attribute name="class">
                     <xsl:text>ds-table-row </xsl:text>
@@ -770,7 +769,6 @@
             </td>
                 <td><xsl:value-of select="./@language"/></td>
             </tr>
-        </xsl:if>
     </xsl:template>
 
 	
