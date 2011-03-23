@@ -81,6 +81,11 @@
    <!-- 
    Listener to initialise DSpace configuration and clean up the application 
    -->
+    <listener>
+      <listener-class>
+         org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener
+      </listener-class>
+   </listener>
    <listener>
       <listener-class>
          org.dspace.app.util.DSpaceContextListener
