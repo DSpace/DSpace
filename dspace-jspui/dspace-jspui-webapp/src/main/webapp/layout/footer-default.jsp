@@ -83,7 +83,7 @@
                 <td colspan="<%= overallColSpan %>" class="pageFootnote">
                     <table class="pageFooterBar" width="100%">
 <%
-    List messages = request.getAttribute("dspace.layout.messages");
+    List<String> messages = (List<String>)request.getAttribute("dspace.layout.messages");
     if (messages != null)
     {
 %>
@@ -92,7 +92,7 @@
                               <table class="miscTable" width="100%">
 <%
                                   boolean even = true;
-                                  for (Iterator i = ((List) messages.iterator(); i.hasNext(); ) {
+                                  for (Iterator<String> i = (Iterator<String>) messages.iterator(); i.hasNext(); ) {
                                     String tdclass = (even ? "evenRowEvenCol" : "oddRowEvenCol");
 %>
                                     <tr>
