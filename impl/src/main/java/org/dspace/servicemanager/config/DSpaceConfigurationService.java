@@ -7,19 +7,10 @@
  */
 package org.dspace.servicemanager.config;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.Map.Entry;
 
 import org.dspace.constants.Constants;
@@ -29,12 +20,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.SimpleTypeConverter;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 
 /**
  * The central DSpace configuration service.
  * This is effectively immutable once the config has loaded.
- * 
+ *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
+ * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public final class DSpaceConfigurationService implements ConfigurationService {
 
@@ -42,19 +36,21 @@ public final class DSpaceConfigurationService implements ConfigurationService {
 
     public static final String DSPACE_WEB_CONTEXT_PARAM = "dspace-config";
     public static final String DSPACE = "dspace";
-    public static final String DOT_CONFIG = ".cfg";
-    public static final String DOT_PROPERTIES = ".properties";
+    public static final String EXT_CONFIG = "cfg";
+    public static final String DOT_CONFIG = "." + EXT_CONFIG;
 
     public static final String DSPACE_PREFIX = "dspace.";
     public static final String DSPACE_HOME = DSPACE + ".dir";
-    public static final String DEFAULT_CONFIGURATION_FILE_NAME = "dspace-defaults.properties";
+    public static final String DEFAULT_CONFIGURATION_FILE_NAME = "dspace-defaults" + DOT_CONFIG;
     public static final String DEFAULT_DSPACE_CONFIG_PATH = "config/" + DEFAULT_CONFIGURATION_FILE_NAME;
 
-    public static final String DSPACE_CONFIG_PATH = "config/" + DSPACE + DOT_PROPERTIES;
-    public static final String LEGACY_DSPACE_CONFIG_PATH = "config/" + DSPACE + DOT_CONFIG;
-    
+    public static final String DSPACE_CONFIG_PATH = "config/" + DSPACE + DOT_CONFIG;
+
+    public static final String DSPACE_MODULES_CONFIG_PATH = "config" + File.separator + "modules";
+
     protected transient Map<String, Map<String, ServiceConfig>> serviceNameConfigs;
-    
+    public static final String DSPACE_CONFIG_ADDON = "dspace/config-*";
+
     public DSpaceConfigurationService() {
         // init and load up current config settings
         loadInitialConfig(null);
@@ -203,10 +199,10 @@ public final class DSpaceConfigurationService implements ConfigurationService {
 
     /**
      * Load a series of properties into the configuration.
-     * Checks to see if the settings exist or are changed and only loads 
+     * Checks to see if the settings exist or are changed and only loads
      * changes.  Clears out existing ones depending on the setting.
-     * 
-     * @param properties a map of key -> value strings 
+     *
+     * @param properties a map of key -> value strings
      * @param clear if true then clears the existing configuration settings first
      * @return the list of changed configuration names
      */
@@ -232,7 +228,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
      * Load up a bunch of {@link DSpaceConfig}s into the configuration.
      * Checks to see if the settings exist or are changed and only
      * loads changes.  Clears out existing ones depending on the setting.
-     * 
+     *
      * @param dspaceConfigs a list of {@link DSpaceConfig} objects
      * @param clear if true then clears the existing configuration settings first
      * @return the list of changed configuration names
@@ -303,7 +299,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
     // loading from files code
 
     /**
-     * Loads up the default initial configuration from the dspace config 
+     * Loads up the default initial configuration from the dspace config
      * files in the file home and on the classpath.
      */
     public void loadInitialConfig(String providedHome) {
@@ -320,12 +316,12 @@ public final class DSpaceConfigurationService implements ConfigurationService {
 
         // now we load the settings from properties files
         String homePath = System.getProperty(DSPACE_HOME);
-        
+
 		// now we load from the provided parameter if its not null
         if (providedHome != null && homePath == null) {
 			homePath = providedHome;
 		}
-        
+
         if (homePath == null) {
             String catalina = getCatalina();
             if (catalina != null) {
@@ -369,19 +365,62 @@ public final class DSpaceConfigurationService implements ConfigurationService {
                 }
             }
         }
-        
+
         // Collect values from all the properties files: the later ones loaded override settings from prior.
 
-        // read all the known files from the home path that are properties files
-        pushPropsToMap(configMap, readPropertyFile(homePath + File.separatorChar + LEGACY_DSPACE_CONFIG_PATH));
-        pushPropsToMap(configMap, readPropertyFile(homePath + File.separatorChar + DSPACE_CONFIG_PATH));
-        pushPropsToMap(configMap, readPropertyFile(homePath + "local" + DOT_PROPERTIES));
+
+        //Find any addon config files found in the config dir in our jars
+        try {
+            PathMatchingResourcePatternResolver patchMatcher = new PathMatchingResourcePatternResolver();
+            Resource[] resources = patchMatcher.getResources("classpath*:" + DSPACE_CONFIG_ADDON + DOT_CONFIG);
+            for (Resource resource : resources) {
+                String prefix = resource.getFilename().substring(0, resource.getFilename().lastIndexOf(".")).replaceFirst("config-", "");
+                pushPropsToMap(configMap, prefix, readPropertyStream(resource.getInputStream()));
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+
+        }
+        //Attempt to load up all the config files in the modules directory
+        try{
+            File modulesDirectory = new File(homePath + File.separator + DSPACE_MODULES_CONFIG_PATH);
+            if(modulesDirectory.exists()){
+                try{
+                    Resource[] resources = new PathMatchingResourcePatternResolver().getResources("file:" + modulesDirectory.getAbsolutePath() + File.separator + "*" + DOT_CONFIG);
+                    if(resources != null){
+                        for(Resource resource : resources){
+                            String prefix = resource.getFilename().substring(0, resource.getFilename().lastIndexOf("."));
+                            pushPropsToMap(configMap, prefix, readPropertyStream(resource.getInputStream()));
+                        }
+                    }
+                }catch (IOException e){
+                    log.error("Error while loading the modules properties from:" + modulesDirectory.getAbsolutePath());
+                }
+            }else{
+                log.info("Failed to load the modules properties since (" + homePath + File.separator + DSPACE_MODULES_CONFIG_PATH + "): Does not exist");
+            }
+
+        }catch (IllegalArgumentException e){
+            //This happens if we don't have a modules directory
+            log.error("Error while loading the module properties since (" +  homePath + File.separator + DSPACE_MODULES_CONFIG_PATH + "): is not a valid directory", e);
+        }
 
         // attempt to load from the current classloader also (works for commandline config sitting on classpath
         pushPropsToMap(configMap, readPropertyResource(DSPACE + DOT_CONFIG));
-        pushPropsToMap(configMap, readPropertyResource(DSPACE + DOT_PROPERTIES));
-        pushPropsToMap(configMap, readPropertyResource("local" + DOT_PROPERTIES));
-        pushPropsToMap(configMap, readPropertyResource("webapp" + DOT_PROPERTIES));
+
+        // read all the known files from the home path that are properties files
+        pushPropsToMap(configMap, readPropertyFile(homePath + File.separatorChar + DSPACE_CONFIG_PATH));
+//        pushPropsToMap(configMap, readPropertyFile(homePath + File.separatorChar + DSPACE_CONFIG_PATH));
+//      TODO: still use this local file loading?
+//        pushPropsToMap(configMap, readPropertyFile(homePath + File.separatorChar + "local" + DOT_PROPERTIES));
+
+
+//        pushPropsToMap(configMap, readPropertyResource(DSPACE + DOT_PROPERTIES));
+//        pushPropsToMap(configMap, readPropertyResource("local" + DOT_PROPERTIES));
+//        pushPropsToMap(configMap, readPropertyResource("webapp" + DOT_PROPERTIES));
+
+
+
 
         // now push all of these into the config service store
         loadConfiguration(configMap, true);
@@ -390,7 +429,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
 
 
     /**
-     * Adds in this DSConfig and then updates the config by checking for 
+     * Adds in this DSConfig and then updates the config by checking for
      * replacements everywhere else.
      * @param dsConfig a DSConfig to update the value of and then add in to the main config
      * @return true if the config changed or is new
@@ -437,9 +476,9 @@ public final class DSpaceConfigurationService implements ConfigurationService {
     }
 
     /**
-     * This will replace the ${key} with the value from the matching key 
+     * This will replace the ${key} with the value from the matching key
      * if it exists.  Logs a warning if the key does not exist.
-     * Goes through and updates the replacements for the the entire 
+     * Goes through and updates the replacements for the the entire
      * configuration and updates any replaced values.
      */
     protected void replaceVariables(Map<String, DSpaceConfig> dsConfiguration) {
@@ -485,7 +524,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
             else
             {
             	log.info("Failed to load config properties from file ("+filePathName+"): Does not exist");
-                	
+
             }
         } catch (Exception e) {
             log.warn("Failed to load config properties from file ("+filePathName+"): " + e.getMessage(), e);
@@ -515,9 +554,43 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         return props;
     }
 
+    protected Properties readPropertyFile(File propertyFile) {
+        Properties props = new Properties();
+        try{
+            if(propertyFile.exists()){
+                props.load(new FileInputStream(propertyFile));
+                log.info("Loaded"+props.size() + " config properties from file: " + propertyFile.getName());
+                System.out.println("Loaded"+props.size() + " config properties from file: " + propertyFile.getName());
+            }
+
+        } catch (Exception e){
+            log.warn("Failed to load config properties from file (" + propertyFile.getName() + ": "+ e.getMessage(), e);
+        }
+        return props;
+    }
+
+    protected Properties readPropertyStream(InputStream propertyStream){
+        Properties props = new Properties();
+        try{
+            props.load(propertyStream);
+            log.info("Loaded"+props.size() + " config properties from stream");
+        } catch (Exception e){
+            log.warn("Failed to load config properties from stream: " + e.getMessage(), e);
+        }
+        return props;
+    }
+
     protected void pushPropsToMap(Map<String, String> map, Properties props) {
+        pushPropsToMap(map, null, props);
+
+    }
+    protected void pushPropsToMap(Map<String, String> map, String prefix, Properties props) {
         for (Entry<Object, Object> entry : props.entrySet()) {
-            map.put(entry.getKey().toString(), entry.getValue() == null ? "" : entry.getValue().toString());
+            String key = entry.getKey().toString();
+            if(prefix != null){
+                key = prefix + "." + key;
+            }
+            map.put(key, entry.getValue() == null ? "" : entry.getValue().toString());
         }
     }
 
@@ -540,7 +613,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
 
 
     /**
-     * Constructs service name configs map for fast lookup of service 
+     * Constructs service name configs map for fast lookup of service
      * configurations.
      * @return the map of config service settings
      */

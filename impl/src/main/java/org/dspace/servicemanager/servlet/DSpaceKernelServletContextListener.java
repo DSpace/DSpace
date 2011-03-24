@@ -57,11 +57,11 @@ public final class DSpaceKernelServletContextListener implements ServletContextL
 		
 		if (providedHome == null)
 		{
-			String dspaceHome = arg0.getServletContext().getInitParameter(DSpaceConfigurationService.DSPACE_WEB_CONTEXT_PARAM);
+			String dspaceHome = arg0.getServletContext().getInitParameter(DSpaceConfigurationService.DSPACE_HOME);
 			if(dspaceHome != null && !dspaceHome.equals("") && 
 					!dspaceHome.equals("${" + DSpaceConfigurationService.DSPACE_HOME + "}")){
 				File test = new File(dspaceHome);
-				if(test.exists() && new File(test,DSpaceConfigurationService.LEGACY_DSPACE_CONFIG_PATH).exists()) {
+				if(test.exists() && new File(test,DSpaceConfigurationService.DSPACE_CONFIG_PATH).exists()) {
 					providedHome = dspaceHome;
                 }
 			}
