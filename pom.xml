@@ -28,9 +28,7 @@
             <configuration>
                 <!-- During release:perform, enable the "addons" profile -->
                 <releaseProfiles>addons</releaseProfiles>
-                <goals>
-                    <goal>deploy</goal>
-                </goals>
+                <goals>deploy</goals>
                 <!-- Auto-Version all modules the same as the parent module -->
                 <autoVersionSubmodules>true</autoVersionSubmodules>
             </configuration>
