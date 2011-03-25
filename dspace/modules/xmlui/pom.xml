@@ -13,7 +13,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>1.7.2-SNAPSHOT</version>
+      <version>1.7.1-SNAPSHOT</version>
    </parent>
 
    <scm>
@@ -143,13 +143,13 @@
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-discovery-xmlui-api</artifactId>
-         <version>1.7.2-SNAPSHOT</version>
+         <version>1.7.1-SNAPSHOT</version>
       </dependency>
 
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-discovery-xmlui-webapp</artifactId>
-         <version>1.7.2-SNAPSHOT</version>
+         <version>1.7.1-SNAPSHOT</version>
          <type>war</type>
       </dependency>
 
