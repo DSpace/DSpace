@@ -5,9 +5,9 @@ or
  - docs/pdf/DSpace-Manual.pdf
 
 DSpace version information can be found in this release package under
- - CHANGES
-or
  - docs/html/History.html
+or viewed online at
+ - https://wiki.duraspace.org/display/DSDOC/History
 
 Documentation for the most recent stable release(s) may be downloaded
 or viewed online at
@@ -31,12 +31,12 @@ mailing list.
 
 Detailed Issue Tracking for DSpace is done on our JIRA Issue Tracker
 
- - http://jira.dspace.org/
+ - https://jira.duraspace.org/browse/DS
 
 
 To contribute to DSpace, please see:
 
- - https://wiki.duraspace.org/display/DSPACE/HowToContribute
+ - https://wiki.duraspace.org/display/DSPACE/How+to+Contribute+to+DSpace
 
 
 For more details about DSpace, including a list of service providers,
@@ -48,5 +48,5 @@ places to seek help, news articles and lists of other users, please see:
 DSpace source code licensing information available online at:
  - http://www.dspace.org/license/
 
-Copyright (c) 2002-2010, DuraSpace.  All rights reserved.
+Copyright (c) 2002-2011, DuraSpace.  All rights reserved.
 
