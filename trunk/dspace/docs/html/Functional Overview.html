@@ -1,0 +1,716 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>DSpace Documentation : Functional Overview</title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">	    
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <div class="pageheader">
+					    <span class="pagetitle">
+                            DSpace Documentation : Functional Overview
+                                                    </span>
+				    </div>
+				    <div class="pagesubheading">
+					    This page last changed on Dec 15, 2010 by <font color="#0050B2">mwood</font>.
+				    </div>
+
+				    <h1><a name="FunctionalOverview-DSpaceSystemDocumentation%3AFunctionalOverview"></a>DSpace System Documentation: Functional Overview</h1>
+
+<p>The following sections describe the various functional aspects of the DSpace system.</p>
+
+<style type='text/css'>/*<![CDATA[*/
+div.rbtoc1292450544145 {margin-left: 0px;padding: 0px;}
+div.rbtoc1292450544145 ul {list-style: none;margin-left: 0px;}
+div.rbtoc1292450544145 li {margin-left: 0px;padding-left: 0px;}
+
+/*]]>*/</style><div class='rbtoc1292450544145'>
+<ul>
+    <li><span class='TOCOutline'>1</span> <a href='#FunctionalOverview-DataModel'>Data Model</a></li>
+    <li><span class='TOCOutline'>2</span> <a href='#FunctionalOverview-PluginManager'>Plugin Manager</a></li>
+    <li><span class='TOCOutline'>3</span> <a href='#FunctionalOverview-Metadata'>Metadata</a></li>
+    <li><span class='TOCOutline'>4</span> <a href='#FunctionalOverview-PackagerPlugins'>Packager Plugins</a></li>
+    <li><span class='TOCOutline'>5</span> <a href='#FunctionalOverview-CrosswalkPlugins'>Crosswalk Plugins</a></li>
+    <li><span class='TOCOutline'>6</span> <a href='#FunctionalOverview-EPeopleandGroups'>E-People and Groups</a></li>
+<ul>
+    <li><span class='TOCOutline'>6.1</span> <a href='#FunctionalOverview-EPerson'>E-Person</a></li>
+    <li><span class='TOCOutline'>6.2</span> <a href='#FunctionalOverview-Groups'>Groups</a></li>
+</ul>
+    <li><span class='TOCOutline'>7</span> <a href='#FunctionalOverview-Authentication'>Authentication </a></li>
+    <li><span class='TOCOutline'>8</span> <a href='#FunctionalOverview-Authorization'>Authorization</a></li>
+    <li><span class='TOCOutline'>9</span> <a href='#FunctionalOverview-IngestProcessandWorkflow'>Ingest Process and Workflow</a></li>
+<ul>
+    <li><span class='TOCOutline'>9.1</span> <a href='#FunctionalOverview-WorkflowSteps'>Workflow Steps</a></li>
+</ul>
+    <li><span class='TOCOutline'>10</span> <a href='#FunctionalOverview-SupervisionandCollaboration'>Supervision and Collaboration</a></li>
+    <li><span class='TOCOutline'>11</span> <a href='#FunctionalOverview-Handles'>Handles</a></li>
+    <li><span class='TOCOutline'>12</span> <a href='#FunctionalOverview-Bitstream%27Persistent%27Identifiers'>Bitstream 'Persistent' Identifiers</a></li>
+    <li><span class='TOCOutline'>13</span> <a href='#FunctionalOverview-StorageResourceBroker%28SRB%29Support'>Storage Resource Broker (SRB) Support</a></li>
+    <li><span class='TOCOutline'>14</span> <a href='#FunctionalOverview-SearchandBrowse'>Search and Browse</a></li>
+    <li><span class='TOCOutline'>15</span> <a href='#FunctionalOverview-HTMLSupport'>HTML Support</a></li>
+    <li><span class='TOCOutline'>16</span> <a href='#FunctionalOverview-OAISupport'>OAI Support</a></li>
+    <li><span class='TOCOutline'>17</span> <a href='#FunctionalOverview-OpenURLSupport'>OpenURL Support</a></li>
+    <li><span class='TOCOutline'>18</span> <a href='#FunctionalOverview-CreativeCommonsSupport'>Creative Commons Support</a></li>
+    <li><span class='TOCOutline'>19</span> <a href='#FunctionalOverview-Subscriptions'>Subscriptions</a></li>
+    <li><span class='TOCOutline'>20</span> <a href='#FunctionalOverview-ImportandExport'>Import and Export</a></li>
+    <li><span class='TOCOutline'>21</span> <a href='#FunctionalOverview-Registration'>Registration</a></li>
+    <li><span class='TOCOutline'>22</span> <a href='#FunctionalOverview-Statistics'>Statistics</a></li>
+<ul>
+    <li><span class='TOCOutline'>22.1</span> <a href='#FunctionalOverview-SystemStatistics'>System Statistics</a></li>
+    <li><span class='TOCOutline'>22.2</span> <a href='#FunctionalOverview-Item%2CCollectionandCommunityUsageStatistics'>Item, Collection and Community Usage Statistics</a></li>
+</ul>
+    <li><span class='TOCOutline'>23</span> <a href='#FunctionalOverview-ChecksumChecker'>Checksum Checker</a></li>
+    <li><span class='TOCOutline'>24</span> <a href='#FunctionalOverview-UsageInstrumentation'>Usage Instrumentation</a></li>
+    <li><span class='TOCOutline'>25</span> <a href='#FunctionalOverview-ChoiceManagementandAuthorityControl'>Choice Management and Authority Control</a></li>
+<ul>
+    <li><span class='TOCOutline'>25.1</span> <a href='#FunctionalOverview-IntroductionandMotivation'>Introduction and Motivation</a></li>
+<ul>
+    <li><span class='TOCOutline'>25.1.1</span> <a href='#FunctionalOverview-Definitions'>Definitions</a></li>
+    <li><span class='TOCOutline'>25.1.2</span> <a href='#FunctionalOverview-AboutAuthorityControl'>About Authority Control</a></li>
+    <li><span class='TOCOutline'>25.1.3</span> <a href='#FunctionalOverview-SomeTerminology'>Some Terminology</a></li>
+</ul>
+</ul>
+</ul></div>
+
+<h2><a name="FunctionalOverview-DataModel"></a>Data Model</h2>
+
+<p><span class="image-wrap" style=""><img src="attachments/22022823/21954865.gif" style="border: 0px solid black"/></span></p>
+
+<p><b>Data Model Diagram</b></p>
+
+<p>The way data is organized in DSpace is intended to reflect the structure of the organization using the DSpace system. Each DSpace site is divided into <em>communities</em>, which can be further divided into <em>sub-communities</em> reflecting the typical university structure of college, departement, research center, or laboratory.</p>
+
+<p>Communities contain <em>collections</em>, which are groupings of related content. A collection may appear in more than one community.</p>
+
+<p>Each collection is composed of <em>items</em>, which are the basic archival elements of the archive. Each item is owned by one collection. Additionally, an item may appear in additional collections; however every item has one and only one owning collection.</p>
+
+<p>Items are further subdivided into named <em>bundles</em> of <em>bitstreams</em>. Bitstreams are, as the name suggests, streams of bits, usually ordinary computer files. Bitstreams that are somehow closely related, for example HTML files and images that compose a single HTML document, are organised into bundles.</p>
+
+<p>In practice, most items tend to have these named bundles:</p>
+
+<ul>
+	<li><em>ORIGINAL</em> &#8211; the bundle with the original, deposited bitstreams</li>
+	<li><em>THUMBNAILS</em> &#8211; thumbnails of any image bitstreams</li>
+	<li><em>TEXT</em> &#8211; extracted full-text from bitstreams in ORIGINAL, for indexing</li>
+	<li><em>LICENSE</em> &#8211; contains the deposit license that the submitter granted the host organization; in other words, specifies the rights that the hosting organization have</li>
+	<li><em>CC_LICENSE</em> &#8211; contains the distribution license, if any (a <a href="http://www.creativecommons.org" title="Creative Commons">Creative Commons</a> license) associated with the item. This license specifies what end users downloading the content can do with the content</li>
+</ul>
+
+
+<p>Each bitstream is associated with one <em>Bitstream Format</em>. Because preservation services may be an important aspect of the DSpace service, it is important to capture the specific formats of files that users submit. In DSpace, a bitstream format is a unique and consistent way to refer to a particular file format. An integral part of a bitstream format is an either implicit or explicit notion of how material in that format can be interpreted. For example, the interpretation for bitstreams encoded in the JPEG standard for still image compression is defined explicitly in the Standard ISO/IEC 10918-1. The interpretation of bitstreams in Microsoft Word 2000 format is defined implicitly, through reference to the Microsoft Word 2000 application. Bitstream formats can be more specific than MIME types or file suffixes. For example, <em>application/ms-word</em> and <em>.doc</em> span multiple versions of the Microsoft Word application, each of which produces bitstreams with presumably different characteristics.</p>
+
+<p>Each bitstream format additionally has a <em>support level</em>, indicating how well the hosting institution is likely to be able to preserve content in the format in the future. There are three possible support levels that bitstream formats may be assigned by the hosting institution. The host institution should determine the exact meaning of each support level, after careful consideration of costs and requirements. MIT Libraries' interpretation is shown below:</p>
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<td class='confluenceTd'> <b>Supported</b> </td>
+<td class='confluenceTd'> The format is recognized, and the hosting institution is confident it can make bitstreams of this format useable in the future, using whatever combination of techniques (such as migration, emulation, etc.) is appropriate given the context of need. </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <b>Known</b> </td>
+<td class='confluenceTd'> The format is recognized, and the hosting institution will promise to preserve the bitstream as-is, and allow it to be retrieved. The hosting institution will attempt to obtain enough information to enable the format to be upgraded to the 'supported' level. </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <b>Unsupported</b> </td>
+<td class='confluenceTd'> The format is unrecognized, but the hosting institution will undertake to preserve the bitstream as-is and allow it to be retrieved. </td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p>Each item has one qualified Dublin Core metadata record. Other metadata might be stored in an item as a serialized bitstream, but we store Dublin Core for every item for interoperability and ease of discovery. The Dublin Core may be entered by end-users as they submit content, or it might be derived from other metadata as part of an ingest process.</p>
+
+<p>Items can be removed from DSpace in one of two ways: They may be 'withdrawn', which means they remain in the archive but are completely hidden from view. In this case, if an end-user attempts to access the withdrawn item, they are presented with a 'tombstone,' that indicates the item has been removed. For whatever reason, an item may also be 'expunged' if necessary, in which case all traces of it are removed from the archive.</p>
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<td class='confluenceTd'> <b>Object</b> </td>
+<td class='confluenceTd'> <b>Example</b> </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Community </td>
+<td class='confluenceTd'> Laboratory of Computer Science; Oceanographic Research Center </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Collection </td>
+<td class='confluenceTd'> LCS Technical Reports; ORC Statistical Data Sets </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Item </td>
+<td class='confluenceTd'> A technical report; a data set with accompanying description; a video recording of a lecture </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Bundle </td>
+<td class='confluenceTd'> A group of HTML and image bitstreams making up an HTML document </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Bitstream </td>
+<td class='confluenceTd'> A single HTML file; a single image file; a source code file </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Bitstream Format </td>
+<td class='confluenceTd'> Microsoft Word version 6.0; JPEG encoded image format </td>
+</tr>
+</tbody></table>
+</div>
+
+
+
+<h2><a name="FunctionalOverview-PluginManager"></a>Plugin Manager</h2>
+
+<p>The PluginManager is a very simple component container. It creates and organizes components (plugins), and helps select a plugin in the cases where there are many possible choices. It also gives some limited control over the lifecycle of a plugin.</p>
+
+<p>A plugin is defined by a Java interface. The consumer of a plugin asks for its plugin by interface. A Plugin is an instance of any class that implements the plugin interface. It is interchangeable with other implementations, so that any of them may be "plugged in".</p>
+
+<p>The mediafilter is a simple example of a plugin implementation. Refer to the <a href="Business Logic Layer.html" title="Business Logic Layer">Business Logic Layer</a> for more details on Plugins.</p>
+
+
+<h2><a name="FunctionalOverview-Metadata"></a>Metadata</h2>
+
+<p>Broadly speaking, DSpace holds three sorts of metadata about archived content:</p>
+
+<ul>
+	<li><b>Descriptive Metadata</b>:  DSpace can support multiple flat metadata schemas for describing an item. A qualified Dublin Core metadata schema loosely based on the <a href="http://www.dublincore.org/documents/library-application-profile/" title="Library Application Profile">Library Application Profile</a> set of elements and qualifiers is provided by default. The <a href="http://dspace.org/technology/metadata.html" title="set of elements and qualifiers used by MIT Libraries">set of elements and qualifiers used by MIT Libraries</a> comes pre-configured with the DSpace source code. However, you can configure multiple schemas and select metadata fields from a mix of configured schemas to describe your items. Other descriptive metadata about items (e.g. metadata described in a hierarchical schema) may be held in serialized bitstreams. <em>Communities</em> and <em>collections</em> have some simple descriptive metadata (a name, and some descriptive prose), held in the DBMS.</li>
+	<li><b>Administrative Metadata</b>:  This includes preservation metadata, provenance and authorization policy data. Most of this is held within DSpace's relational DBMS schema. Provenance metadata (prose) is stored in Dublin Core records. Additionally, some other administrative metadata (for example, bitstream byte sizes and MIME types) is replicated in Dublin Core records so that it is easily accessible outside of DSpace.</li>
+	<li><b>Structural Metadata</b>:  This includes information about how to present an item, or bitstreams within an item, to an end-user, and the relationships between constituent parts of the item. As an example, consider a thesis consisting of a number of TIFF images, each depicting a single page of the thesis. Structural metadata would include the fact that each image is a single page, and the ordering of the TIFF images/pages. Structural metadata in DSpace is currently fairly basic; within an item, bitstreams can be arranged into separate bundles as described above. A bundle may also optionally have a <em>primary bitstream</em>. This is currently used by the HTML support to indicate which bitstream in the bundle is the first HTML file to send to a browser. In addition to some basic technical metadata, a bitstream also has a 'sequence ID' that uniquely identifies it within an item. This is used to produce a 'persistent' bitstream identifier for each bitstream. Additional structural metadata can be stored in serialized bitstreams, but DSpace does not currently understand this natively.</li>
+</ul>
+
+
+<h2><a name="FunctionalOverview-PackagerPlugins"></a>Packager Plugins</h2>
+
+<p><em>Packagers</em> are software modules that translate between DSpace Item objects and a self-contained external representation, or "package". A <em>Package Ingester</em> interprets, or <em>ingests</em>, the package and creates an Item. A <em>Package Disseminator</em> writes out the contents of an Item in the package format.</p>
+
+<p>A package is typically an archive file such as a Zip or "tar" file, including a <em>manifest</em> document which contains metadata and a description of the package contents. The <a href="http://www.imsglobal.org/content/packaging/" title="IMS Content Package">IMS Content Package</a> is a typical packaging standard. A package might also be a single document or media file that contains its own metadata, such as a PDF document with embedded descriptive metadata.</p>
+
+<p>Package ingesters and package disseminators are each a type of named plugin (see <a href="#FunctionalOverview-PluginManager">Plugin Manager</a>), so it is easy to add new packagers specific to the needs of your site. You do not have to supply both an ingester and disseminator for each format; it is perfectly acceptable to just implement one of them.</p>
+
+<p>Most packager plugins call upon <a href="#FunctionalOverview-CrosswalkPlugins">Crosswalk Plugins</a> to translate the metadata between DSpace's object model and the package format.</p>
+
+<p>More information about calling Packagers to ingest or disseminate content can be found in the <a href="System Administration.html#SystemAdministration-PackageImporterandExporter">Package Importer and Exporter</a> section of the System Administration documentation.</p>
+
+
+<h2><a name="FunctionalOverview-CrosswalkPlugins"></a>Crosswalk Plugins</h2>
+
+<p><em>Crosswalks</em> are software modules that translate between DSpace object metadata and a specific external representation. An <em>Ingestion Crosswalk</em> interprets the external format and crosswalks it to DSpace's internal data structure, while a <em>Dissemination Crosswalk</em> does the opposite.</p>
+
+<p>For example, a MODS ingestion crosswalk translates descriptive metadata from the MODS format to the metadata fields on a DSpace Item. A MODS dissemination crosswalk generates a MODS document from the metadata on a DSpace Item.</p>
+
+<p>Crosswalk plugins are named plugins (see <a href="#FunctionalOverview-PluginManager">Plugin Manager</a>), so it is easy to add new crosswalks. You do not have to supply both an ingester and disseminator for each format; it is perfectly acceptable to just implement one of them.</p>
+
+<p>There is also a special pair of crosswalk plugins which use XSL stylesheets to translate the external metadata to or from an internal DSpace format. You can add and modify XSLT crosswalks simply by editing the DSpace configuration and the stylesheets, which are stored in files in the DSpace installation directory.</p>
+
+<p>The Packager plugins and OAH-PMH server make use of crosswalk plugins.</p>
+
+
+<h2><a name="FunctionalOverview-EPeopleandGroups"></a>E-People and Groups</h2>
+
+<p>Although many of DSpace's functions such as document discovery and retrieval can be used anonymously, some features (and perhaps some documents) are only available to certain "privileged" users. E-People and Groups are the way DSpace identifies application users for the purpose of granting privileges. This identity is bound to a session of a DSpace application such as the Web UI or one of the command-line batch programs. Both E-People and Groups are granted privileges by the authorization system described below.</p>
+
+<h3><a name="FunctionalOverview-EPerson"></a>E-Person</h3>
+
+<p>DSpace holds the following information about each e-person:</p>
+
+<ul>
+	<li>E-mail address</li>
+	<li>First and last names</li>
+	<li>Whether the user is able to log in to the system via the Web UI, and whether they must use an X509 certificate to do so;</li>
+	<li>A password (encrypted), if appropriate</li>
+	<li>A list of collections for which the e-person wishes to be notified of new items</li>
+	<li>Whether the e-person 'self-registered' with the system; that is, whether the system created the e-person record automatically as a result of the end-user independently registering with the system, as opposed to the e-person record being generated from the institution's personnel database, for example.</li>
+	<li>The network ID for the corresponding LDAP record, if LDAP authentication is used for this E-Person.</li>
+</ul>
+
+
+<h3><a name="FunctionalOverview-Groups"></a>Groups</h3>
+
+<p>Groups are another kind of entity that can be granted permissions in the authorization system. A group is usually an explicit list of E-People; anyone identified as one of those E-People also gains the privileges granted to the group.</p>
+
+<p>However, an application session can be assigned membership in a group <em>without</em> being identified as an E-Person. For example, some sites use this feature to identify users of a local network so they can read restricted materials not open to the whole world. Sessions originating from the local network are given membership in the "LocalUsers" group and gain the corresonding privileges.</p>
+
+<p>Administrators can also use groups as "roles" to manage the granting of privileges more efficiently.</p>
+
+
+
+<h2><a name="FunctionalOverview-Authentication"></a>Authentication<a name="FunctionalOverview-Authentication"></a></h2>
+
+<p><em>Authentication</em> is when an application session positively identifies itself as belonging to an E-Person and/or Group. In DSpace 1.4 and later, it is implemented by a mechanism called <em>Stackable Authentication</em>: the DSpace configuration declares a "stack" of authentication methods. An application (like the Web UI) calls on the Authentication Manager, which tries each of these methods in turn to identify the E-Person to which the session belongs, as well as any extra Groups. The E-Person authentication methods are tried in turn until one succeeds. Every authenticator in the stack is given a chance to assign extra Groups. This mechanism offers the following advantages:</p>
+
+<ul>
+	<li>Separates authentication from the Web user interface so the same authentication methods are used for other applications such as non-interactive Web Services</li>
+	<li>Improved modularity: The authentication methods are all independent of each other. Custom authentication methods can be "stacked" on top of the default DSpace username/password method.</li>
+	<li>Cleaner support for "implicit" authentication where username is found in the environment of a Web request, e.g. in an X.509 client certificate.</li>
+</ul>
+
+
+<h2><a name="FunctionalOverview-Authorization"></a>Authorization</h2>
+
+<p>DSpace's authorization system is based on associating actions with objects and the lists of EPeople who can perform them. The associations are called Resource Policies, and the lists of EPeople are called Groups. There are two built-in groups: 'Administrators', who can do anything in a site, and 'Anonymous', which is a list that contains all users. Assigning a policy for an action on an object to anonymous means giving everyone permission to do that action. (For example, most objects in DSpace sites have a policy of 'anonymous' READ.) Permissions must be explicit - lack of an explicit permission results in the default policy of 'deny'. Permissions also do not 'commute'; for example, if an e-person has READ permission on an item, they might not necessarily have READ permission on the bundles and bitstreams in that item. Currently Collections, Communities and Items are discoverable in the browse and search systems regardless of READ authorization.</p>
+
+<p>The following actions are possible:</p>
+
+<p><b>Collection</b></p>
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<td class='confluenceTd'> ADD/REMOVE </td>
+<td class='confluenceTd'> add or remove items (ADD = permission to submit items) </td>
+</tr>
+<tr>
+<td class='confluenceTd'> DEFAULT_ITEM_READ </td>
+<td class='confluenceTd'> inherited as READ by all submitted items </td>
+</tr>
+<tr>
+<td class='confluenceTd'> DEFAULT_BITSTREAM_READ </td>
+<td class='confluenceTd'> inherited as READ by Bitstreams of all submitted items. Note: only affects Bitstreams of an item at the time it is initially submitted. If a Bitstream is added later, it does <em>not</em> get the same default read policy. </td>
+</tr>
+<tr>
+<td class='confluenceTd'> COLLECTION_ADMIN </td>
+<td class='confluenceTd'> collection admins can edit items in a collection, withdraw items, map other items into this collection. </td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p><b>Item</b></p>
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<td class='confluenceTd'> ADD/REMOVE </td>
+<td class='confluenceTd'> add or remove bundles </td>
+</tr>
+<tr>
+<td class='confluenceTd'> READ </td>
+<td class='confluenceTd'> can view item (item metadata is always viewable) </td>
+</tr>
+<tr>
+<td class='confluenceTd'> WRITE </td>
+<td class='confluenceTd'> can modify item </td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p><b>Bundle</b></p>
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<td class='confluenceTd'> ADD/REMOVE </td>
+<td class='confluenceTd'> add or remove bitstreams to a bundle </td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p><b>Bitstream</b></p>
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<td class='confluenceTd'> READ </td>
+<td class='confluenceTd'> view bitstream </td>
+</tr>
+<tr>
+<td class='confluenceTd'> WRITE </td>
+<td class='confluenceTd'> modify bitstream </td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p>Note that there is no 'DELETE' action. In order to 'delete' an object (e.g. an item) from the archive, one must have REMOVE permission on all objects (in this case, collection) that contain it. The 'orphaned' item is automatically deleted.</p>
+
+<p>Policies can apply to individual e-people or groups of e-people.</p>
+
+
+<h2><a name="FunctionalOverview-IngestProcessandWorkflow"></a>Ingest Process and Workflow</h2>
+
+<p>Rather than being a single subsystem, ingesting is a process that spans several. Below is a simple illustration of the current ingesting process in DSpace.</p>
+
+<p><span class="image-wrap" style=""><img src="attachments/22022823/21954864.gif" style="border: 0px solid black"/></span></p>
+
+<p>DSpace Ingest Process</p>
+
+<p>The batch item importer is an application, which turns an external SIP (an XML metadata document with some content files) into an "in progress submission" object. The Web submission UI is similarly used by an end-user to assemble an "in progress submission" object.</p>
+
+<p>Depending on the policy of the collection to which the submission in targeted, a workflow process may be started. This typically allows one or more human reviewers or 'gatekeepers' to check over the submission and ensure it is suitable for inclusion in the collection.</p>
+
+<p>When the Batch Ingester or Web Submit UI completes the InProgressSubmission object, and invokes the next stage of ingest (be that workflow or item installation), a provenance message is added to the Dublin Core which includes the filenames and checksums of the content of the submission. Likewise, each time a workflow changes state (e.g. a reviewer accepts the submission), a similar provenance statement is added. This allows us to track how the item has changed since a user submitted it.</p>
+
+<p>Once any workflow process is successfully and positively completed, the InProgressSubmission object is consumed by an "item installer", that converts the InProgressSubmission into a fully blown archived item in DSpace. The item installer:</p>
+
+<ul>
+	<li>Assigns an accession date</li>
+	<li>Adds a "date.available" value to the Dublin Core metadata record of the item</li>
+	<li>Adds an issue date if none already present</li>
+	<li>Adds a provenance message (including bitstream checksums)</li>
+	<li>Assigns a Handle persistent identifier</li>
+	<li>Adds the item to the target collection, and adds appropriate authorization policies</li>
+	<li>Adds the new item to the search and browse indices</li>
+</ul>
+
+
+<h3><a name="FunctionalOverview-WorkflowSteps"></a>Workflow Steps</h3>
+
+<p>A collection's workflow can have up to three steps. Each collection may have an associated e-person group for performing each step; if no group is associated with a certain step, that step is skipped. If a collection has no e-person groups associated with any step, submissions to that collection are installed straight into the main archive.</p>
+
+<p>In other words, the sequence is this: The collection receives a submission. If the collection has a group assigned for workflow step 1, that step is invoked, and the group is notified. Otherwise, workflow step 1 is skipped. Likewise, workflow steps 2 and 3 are performed if and only if the collection has a group assigned to those steps.</p>
+
+<p>When a step is invoked, the submission is put into the 'task pool' of the step's associated group. One member of that group takes the task from the pool, and it is then removed from the task pool, to avoid the situation where several people in the group may be performing the same task without realizing it.</p>
+
+<p>The member of the group who has taken the task from the pool may then perform one of three actions:</p>
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<td class='confluenceTd'> <b>Workflow Step</b> </td>
+<td class='confluenceTd'> <b>Possible actions</b> </td>
+</tr>
+<tr>
+<td class='confluenceTd'> 1 </td>
+<td class='confluenceTd'> Can accept submission for inclusion, or reject submission. </td>
+</tr>
+<tr>
+<td class='confluenceTd'> 2 </td>
+<td class='confluenceTd'> Can edit metadata provided by the user with the submission, but cannot change the submitted files. Can accept submission for inclusion, or reject submission. </td>
+</tr>
+<tr>
+<td class='confluenceTd'> 3 </td>
+<td class='confluenceTd'> Can edit metadata provided by the user with the submission, but cannot change the submitted files. Must then commit to archive; may not reject submission. </td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p><span class="image-wrap" style=""><img src="attachments/22022823/21954863.gif" style="border: 0px solid black"/></span></p>
+
+<p><b>Submission Workflow in DSpace</b></p>
+
+<p>If a submission is rejected, the reason (entered by the workflow participant) is e-mailed to the submitter, and it is returned to the submitter's 'My DSpace' page. The submitter can then make any necessary modifications and re-submit, whereupon the process starts again.</p>
+
+<p>If a submission is 'accepted', it is passed to the next step in the workflow. If there are no more workflow steps with associated groups, the submission is installed in the main archive.</p>
+
+<p>One last possibility is that a workflow can be 'aborted' by a DSpace site administrator. This is accomplished using the administration UI.</p>
+
+<p>The reason for this apparently arbitrary design is that is was the simplist case that covered the needs of the early adopter communities at MIT. The functionality of the workflow system will no doubt be extended in the future.</p>
+
+<h2><a name="FunctionalOverview-SupervisionandCollaboration"></a>Supervision and Collaboration</h2>
+
+<p>In order to facilitate, as a primary objective, the opportunity for thesis authors to be supervised in the preparation of their e-theses, a supervision order system exists to bind groups of other users (thesis supervisors) to an item in someone's pre-submission workspace. The bound group can have system policies associated with it that allow different levels of interaction with the student's item; a small set of default policy groups are provided:</p>
+
+<ul>
+	<li>Full editorial control</li>
+	<li>View item contents</li>
+	<li>No policies<br/>
+Once the default set has been applied, a system administrator may modify them as they would any other policy set in DSpace</li>
+</ul>
+
+
+<p>This functionality could also be used in situations where researchers wish to collaborate on a particular submission, although there is no particular collaborative workspace functionality.</p>
+
+
+<h2><a name="FunctionalOverview-Handles"></a>Handles</h2>
+
+<p>Researchers require a stable point of reference for their works. The simple evolution from sharing of citations to emailing of URLs broke when Web users learned that sites can disappear or be reconfigured without notice, and that their bookmark files containing critical links to research results couldn't be trusted in the long term. To help solve this problem, a core DSpace feature is the creation of a persistent identifier for every item, collection and community stored in DSpace. To persist identifiers, DSpace requires a storage&#45; and location&#45; independent mechanism for creating and maintaining identifiers. DSpace uses the <a href="http://www.handle.net/" title="CNRI Handle System">CNRI Handle System</a> for creating these identifiers. The rest of this section assumes a basic familiarity with the Handle system.</p>
+
+<p>DSpace uses Handles primarily as a means of assigning globally unique identifiers to objects. Each site running DSpace needs to obtain a unique Handle 'prefix' from CNRI, so we know that if we create identifiers with that prefix, they won't clash with identifiers created elsewhere.</p>
+
+<p>Presently, Handles are assigned to communities, collections, and items. Bundles and bitstreams are not assigned Handles, since over time, the way in which an item is encoded as bits may change, in order to allow access with future technologies and devices. Older versions may be moved to off-line storage as a new standard becomes de facto. Since it's usually the <em>item</em> that is being preserved, rather than the particular bit encoding, it only makes sense to persistently identify and allow access to the item, and allow users to access the appropriate bit encoding from there.</p>
+
+<p>Of course, it may be that a particular bit encoding of a file is explicitly being preserved; in this case, the bitstream could be the only one in the item, and the item's Handle would then essentially refer just to that bitstream. The same bitstream can also be included in other items, and thus would be citable as part of a greater item, or individually.</p>
+
+<p>The Handle system also features a global resolution infrastructure; that is, an end-user can enter a Handle into any service (e.g. Web page) that can resolve Handles, and the end-user will be directed to the object (in the case of DSpace, community, collection or item) identified by that Handle. In order to take advantage of this feature of the Handle system, a DSpace site must also run a 'Handle server' that can accept and resolve incoming resolution requests. All the code for this is included in the DSpace source code bundle.</p>
+
+<p>Handles can be written in two forms:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+hdl:1721.123/4567
+http:<span class="code-comment">//hdl.handle.net/1721.123/4567</span>
+</pre>
+</div></div>
+<p>The above represent the same Handle. The first is possibly more convenient to use only as an identifier; however, by using the second form, any Web browser becomes capable of resolving Handles. An end-user need only access this form of the Handle as they would any other URL. It is possible to enable some browsers to resolve the first form of Handle as if they were standard URLs using <a href="http://www.handle.net/resolver/index.html" title="CNRI's Handle Resolver plug-in">CNRI's Handle Resolver plug-in</a>, but since the first form can always be simply derived from the second, DSpace displays Handles in the second form, so that it is more useful for end-users.</p>
+
+<p>It is important to note that DSpace uses the CNRI Handle infrastructure only at the 'site' level. For example, in the above example, the DSpace site has been assigned the prefix '1721.123'. It is still the responsibility of the DSpace site to maintain the association between a full Handle (including the '4567' local part) and the community, collection or item in question.</p>
+
+
+<h2><a name="FunctionalOverview-Bitstream%27Persistent%27Identifiers"></a>Bitstream 'Persistent' Identifiers</h2>
+
+<p>Similar to handles for DSpace items, bitstreams also have 'Persistent' identifiers. They are more volatile than Handles, since if the content is moved to a different server or organizaion, they will no longer work (hence the quotes around 'persistent'). However, they are more easily persisted than the simple URLs based on database primary key previously used. This means that external systems can more reliably refer to specific bitstreams stored in a DSpace instance.</p>
+
+<p>Each bitstream has a sequence ID, unique within an item. This sequence ID is used to create a persistent ID, of the form:</p>
+
+<p><em>dspace url/bitstream/handle/sequence ID/filename</em></p>
+
+<p>For example:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+https:<span class="code-comment">//dspace.myu.edu/bitstream/123.456/789/24/foo.html</span>
+</pre>
+</div></div>
+<p>The above refers to the bitstream with sequence ID 24 in the item with the Handle <em>hdl:123.456/789</em>. The <em>foo.html</em> is really just there as a hint to browsers: Although DSpace will provide the appropriate MIME type, some browsers only function correctly if the file has an expected extension.</p>
+
+
+<h2><a name="FunctionalOverview-StorageResourceBroker%28SRB%29Support"></a>Storage Resource Broker (SRB) Support</h2>
+
+<p>DSpace offers two means for storing bitstreams. The first is in the file system on the server. The second is using <a href="http://www.sdsc.edu/srb" title="SRB (Storage Resource Broker)">SRB (Storage Resource Broker)</a>. Both are achieved using a simple, lightweight API.</p>
+
+<p>SRB is purely an option but may be used in lieu of the server's file system or in addition to the file system. Without going into a full description, SRB is a very robust, sophisticated storage manager that offers essentially unlimited storage and straightforward means to replicate (in simple terms, backup) the content on other local or remote storage resources.</p>
+
+
+<h2><a name="FunctionalOverview-SearchandBrowse"></a>Search and Browse</h2>
+
+<p>DSpace allows end-users to discover content in a number of ways, including:</p>
+
+<ul>
+	<li>Via external reference, such as a Handle</li>
+	<li>Searching for one or more keywords in metadata or extracted full-text</li>
+	<li>Browsing though title, author, date or subject indices, with optional image thumbnails<br/>
+Search is an essential component of discovery in DSpace. Users' expectations from a search engine are quite high, so a goal for DSpace is to supply as many search features as possible. DSpace's indexing and search module has a very simple API which allows for indexing new content, regenerating the index, and performing searches on the entire corpus, a community, or collection. Behind the API is the Java freeware search engine <a href="http://jakarta.apache.org/lucene/" title="Lucene">Lucene</a>. Lucene gives us fielded searching, stop word removal, stemming, and the ability to incrementally add new indexed content without regenerating the entire index. The specific Lucene search indexes are configurable enabling institutions to customize which DSpace metadata fields are indexed.</li>
+</ul>
+
+
+<p>Another important mechanism for discovery in DSpace is the browse. This is the process whereby the user views a particular index, such as the title index, and navigates around it in search of interesting items. The browse subsystem provides a simple API for achieving this by allowing a caller to specify an index, and a subsection of that index. The browse subsystem then discloses the portion of the index of interest. Indices that may be browsed are item title, item issue date, item author, and subject terms. Additionally, the browse can be limited to items within a particular collection or community.</p>
+
+
+<h2><a name="FunctionalOverview-HTMLSupport"></a>HTML Support</h2>
+
+<p>For the most part, at present DSpace simply supports uploading and downloading of bitstreams as-is. This is fine for the majority of commonly-used file formats &#8211; for example PDFs, Microsoft Word documents, spreadsheets and so forth. HTML documents (Web sites and Web pages) are far more complicated, and this has important ramifications when it comes to digital preservation:</p>
+
+<ul>
+	<li>Web pages tend to consist of several files &#8211; one or more HTML files that contain references to each other, and stylesheets and image files that are referenced by the HTML files.</li>
+	<li>Web pages also link to or include content from other sites, often imperceptably to the end-user. Thus, in a few year's time, when someone views the preserved Web site, they will probably find that many links are now broken or refer to other sites than are now out of context.In fact, it may be unclear to an end-user when they are viewing content stored in DSpace and when they are seeing content included from another site, or have navigated to a page that is not stored in DSpace. This problem can manifest when a submitter uploads some HTML content. For example, the HTML document may include an image from an external Web site, or even their local hard drive. When the submitter views the HTML in DSpace, their browser is able to use the reference in the HTML to retrieve the appropriate image, and so to the submitter, the whole HTML document appears to have been deposited correctly. However, later on, when another user tries to view that HTML, their browser might not be able to retrieve the included image since it may have been removed from the external server. Hence the HTML will seem broken.</li>
+	<li>Often Web pages are produced dynamically by software running on the Web server, and represent the state of a changing database underneath it.<br/>
+Dealing with these issues is the topic of much active research. Currently, DSpace bites off a small, tractable chunk of this problem. DSpace can store and provide on-line browsing capability for <em>self-contained, non-dynamic</em> HTML documents. In practical terms, this means:</li>
+</ul>
+
+
+<ul>
+	<li>No dynamic content (CGI scripts and so forth)</li>
+	<li>All links to preserved content must be <em>relative links</em>, that do not refer to 'parents' above the 'root' of the HTML document/site:
+	<ul>
+		<li><em>diagram.gif</em> is OK</li>
+		<li><em>image/foo.gif</em> is OK</li>
+		<li><em>../index.html</em> is only OK in a file that is at least a directory deep in the HTML document/site hierarchy</li>
+		<li><em>/stylesheet.css</em> is not OK (the link will break)</li>
+		<li><em><a href="http://somedomain.com/content.html">http://somedomain.com/content.html</a></em> is not OK (the link will continue to link to the external site which may change or disappear)</li>
+	</ul>
+	</li>
+	<li>Any 'absolute links' (e.g. <em><a href="http://somedomain.com/content.html">http://somedomain.com/content.html</a></em>) are stored 'as is', and will continue to link to the external content (as opposed to relative links, which will link to the copy of the content stored in DSpace.) Thus, over time, the content refered to by the absolute link may change or disappear.</li>
+</ul>
+
+
+<h2><a name="FunctionalOverview-OAISupport"></a>OAI Support</h2>
+
+<p>The <a href="http://www.openarchives.org/" title="Open Archives Initiative">Open Archives Initiative</a> has developed a <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html" title="protocol for metadata harvesting">protocol for metadata harvesting</a>. This allows sites to programmatically retrieve or 'harvest' the metadata from several sources, and offer services using that metadata, such as indexing or linking services. Such a service could allow users to access information from a large number of sites from one place.</p>
+
+<p>DSpace exposes the Dublin Core metadata for items that are publicly (anonymously) accessible. Additionally, the collection structure is also exposed via the OAI protocol's 'sets' mechanism. OCLC's open source <a href="http://www.oclc.org/research/software/oai/cat.shtm" title="OAICat">OAICat</a> framework is used to provide this functionality.</p>
+
+<p>You can also configure the OAI service to make use of any crosswalk plugin to offer additional metadata formats, such as MODS.</p>
+
+<p>DSpace's OAI service does support the exposing of deletion information for withdrawn items, but not for items that are 'expunged' (see above). DSpace also supports OAI-PMH resumption tokens.</p>
+
+
+<h2><a name="FunctionalOverview-OpenURLSupport"></a>OpenURL Support</h2>
+
+<p>DSpace supports the <a href="http://www.sfxit.com/OpenURL/" title="OpenURL protocol">OpenURL protocol</a> from <a href="http://www.sfxit.com/" title="SFX">SFX</a>, in a rather simple fashion. If your institution has an SFX server, DSpace will display an OpenURL link on every item page, automatically using the Dublin Core metadata. Additionally, DSpace can respond to incoming OpenURLs. Presently it simply passes the information in the OpenURL to the search subsystem. A list of results is then displayed, which usually gives the relevant item (if it is in DSpace) at the top of the list.</p>
+
+
+<h2><a name="FunctionalOverview-CreativeCommonsSupport"></a>Creative Commons Support</h2>
+
+<p>Dspace provides support for Creative Commons licenses to be attached to items in the repository. They represent an alternative to traditional copyright. To learn more about Creative Commons, visit <a href="http://creativecommons.org" title="their website">their website</a>. Support for the licenses is controlled by a site-wide configuration option, and since license selection involves redirection to the Creative Commons website, additional parameters may be configured to work with a proxy server. If the option is enabled, users may select a Creative Commons license during the submission process, or elect to skip Creative Commons licensing. If a selection is made a copy of the license text and RDF metadata is stored along with the item in the repository. There is also an indication - text and a Creative Commons icon - in the item display page of the web user interface when an item is licensed under Creative Commons.</p>
+
+
+<h2><a name="FunctionalOverview-Subscriptions"></a>Subscriptions</h2>
+
+<p>As noted above, end-users (e-people) may 'subscribe' to collections in order to be alerted when new items appear in those collections. Each day, end-users who are subscribed to one or more collections will receive an e-mail giving brief details of all new items that appeared in any of those collections the previous day. If no new items appeared in any of the subscribed collections, no e-mail is sent. Users can unsubscribe themselves at any time. RSS feeds of new items are also available for collections and communities.</p>
+
+
+<h2><a name="FunctionalOverview-ImportandExport"></a>Import and Export</h2>
+
+<p>DSpace also includes batch tools to import and export items in a simple directory structure, where the Dublin Core metadata is stored in an XML file. This may be used as the basis for moving content between DSpace and other systems.</p>
+
+<p>There is also a METS-based export tool, which exports items as METS-based metadata with associated bitstreams referenced from the METS file.</p>
+
+
+<h2><a name="FunctionalOverview-Registration"></a>Registration</h2>
+
+<p>Registration is an alternate means of incorporating items, their metadata, and their bitstreams into DSpace by taking advantage of the bitstreams already being in accessible computer storage. An example might be that there is a repository for existing digital assets. Rather than using the normal interactive ingest process or the batch import to furnish DSpace the metadata and to upload bitstreams, registration provides DSpace the metadata and the location of the bitstreams. DSpace uses a variation of the import tool to accomplish registration.</p>
+
+
+<h2><a name="FunctionalOverview-Statistics"></a>Statistics</h2>
+
+<p>DSpace offers system statistics for administrator usage, as well as usage statistics on the level of items, communities and collections.</p>
+
+<h3><a name="FunctionalOverview-SystemStatistics"></a>System Statistics</h3>
+
+<p>Various statistical reports about the contents and use of your system can be automatically generated by the system. These are generated by analysing DSpace's log files. Statistics can be broken down monthly.</p>
+
+<p>The report includes following sections</p>
+
+<ul>
+	<li>A customisable general overview of activities in the archive, by default including:
+	<ul>
+		<li>Number of items archived</li>
+		<li>Number of bitstream views</li>
+		<li>Number of item page views</li>
+		<li>Number of collection page views</li>
+		<li>Number of community page views</li>
+		<li>Number of user logins</li>
+		<li>Number of searches performed</li>
+		<li>Number of license rejections</li>
+		<li>Number of OAI Requests</li>
+	</ul>
+	</li>
+	<li>Customisable summary of archive contents</li>
+	<li>Broken-down list of item viewings</li>
+	<li>A full break-down of all performed actions</li>
+	<li>User logins</li>
+	<li>Most popular searches</li>
+	<li>Log Level Information</li>
+	<li>Processing information&#33;stats_genrl_overview.png&#33;<br/>
+The results of statistical analysis can be presented on a by-month and an in-total report, and are available via the user interface. The reports can also either be made public or restricted to administrator access only.</li>
+</ul>
+
+
+
+<h3><a name="FunctionalOverview-Item%2CCollectionandCommunityUsageStatistics"></a>Item, Collection and Community Usage Statistics</h3>
+
+<p>Usage statistics can be retrieved from individual item, collection and community pages. These Usage Statistics pages show:</p>
+
+<ul>
+	<li>Total page visits (all time)</li>
+	<li>Total Visits per Month</li>
+	<li>File Downloads (all time)&#42;</li>
+	<li>Top Country Views (all time)</li>
+	<li>Top City Views (all time)</li>
+</ul>
+
+
+<p>&#42;File Downloads information is only displayed for item-level statistics. Note that downloads from separate bitstreams are also recorded and represented separatly. DSpace is able to capture and store File Download information, even when the bitstream was downloaded from a direct link on an external website.</p>
+
+<p><span class="image-wrap" style=""><img src="attachments/22022823/22675569.png" style="border: 1px solid black"/></span></p>
+
+
+<h2><a name="FunctionalOverview-ChecksumChecker"></a>Checksum Checker</h2>
+
+<p>The purpose of the checker is to verify that the content in a DSpace repository has not become corrupted or been tampered with. The functionality can be invoked on an ad-hoc basis from the command line, or configured via cron or similar. Options exist to support large repositories that cannot be entirely checked in one run of the tool. The tool is extensible to new reporting and checking priority approaches.</p>
+
+
+<h2><a name="FunctionalOverview-UsageInstrumentation"></a>Usage Instrumentation</h2>
+
+<p>DSpace can report usage events, such as bitstream downloads, to a pluggable event processor. This can be used for developing customized usage statistics, for example. Sample event processor plugins writes event records to a file as tab-separated values or XML.</p>
+
+
+<h2><a name="FunctionalOverview-ChoiceManagementandAuthorityControl"></a>Choice Management and Authority Control</h2>
+
+<p>This is a configurable framework that lets you define plug-in classes to control the choice of values for a given DSpace metadata fields. It also lets you configure fields to include "authority" values along with the textual metadata value. The chocie-control system includes a user interface in both the Configurable Submission UI and the Admin UI (edit Item pages) that assists the user in choosing metadata values.</p>
+
+<h3><a name="FunctionalOverview-IntroductionandMotivation"></a>Introduction and Motivation</h3>
+
+<h4><a name="FunctionalOverview-Definitions"></a>Definitions</h4>
+
+<p><b>Choice Management</b></p>
+
+<p>This is a mechanism that generates a list of choices for a value to be entered in a given metadata field. Depending on your implementation, the exact choice list might be determined by a proposed value or query, or it could be a fixed list that is the same for every query. It may also be closed (limited to choices produced internally) or open, allowing the user-supplied query to be included as a choice.</p>
+
+<p><b>Authority Control</b></p>
+
+<p>This works in addition to choice management to supply an authority key along with the chosen value, which is also assigned to the Item's metadata field entry. Any authority-controlled field is also inherently choice-controlled.</p>
+
+
+<h4><a name="FunctionalOverview-AboutAuthorityControl"></a>About Authority Control</h4>
+
+<p>The advantages we seek from an authority controlled metadata field are:</p>
+
+<ol>
+	<li><b>There is a simple and positive way to test whether two values are identical</b>, by comparing authority keys.
+	<ul>
+		<li>Comparing plain text values can give false positive results e.g. when two different people have a name that is written the same.</li>
+		<li>It can also give false negative results when the same name is written different ways, e.g. "J. Smith" vs. "John Smith".</li>
+	</ul>
+	</li>
+	<li><b>Help in entering correct metadata values.</b> The submission and admin UIs may call on the authority to check a proposed value and list possible matches to help the user select one.</li>
+	<li><b>Improved interoperability.</b> By sharing a name authority with another application, your DSpace can interoperate more cleanly with other applications.
+	<ul>
+		<li>For example, a DSpace institutional repository sharing a naming authority with the campus social network would let the social network construct a list of all DSpace Items matching the shared author identifier, rather than by error-prone name matching.</li>
+		<li>When the name authority is shared with a campus directory, DSpace can look up the email address of an author to send automatic email about works of theirs submitted by a third party. That author does not have to be an EPerson.</li>
+	</ul>
+	</li>
+	<li>Authority keys are normally invisible in the public web UIs. They are only seen by administrators editing metadata. The value of an authority key is not expected to be meaningful to an end-user or site visitor.<br/>
+Authority control is different from the controlled vocabulary of keywords already implemented in the submission UI:</li>
+</ol>
+
+
+<ol>
+	<li><b>Authorities are external to DSpace.</b> The source of authority control is typically an external database or network resource.
+	<ul>
+		<li>Plug-in architecture makes it easy to integrate new authorities without modifying any core code.</li>
+	</ul>
+	</li>
+	<li>This authority proposal impacts all phases of metadata management.
+	<ul>
+		<li>The keyword vocabularies are only for the submission UI.</li>
+		<li>Authority control is asserted everywhere metadata values are changed, including unattended/batch submission, LNI and SWORD package submission, and the administrative UI.</li>
+	</ul>
+	</li>
+</ol>
+
+
+<h4><a name="FunctionalOverview-SomeTerminology"></a>Some Terminology</h4>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<td class='confluenceTd'> <b>Authority</b> </td>
+<td class='confluenceTd'> An authority is a source of fixed values for a given domain, each unique value identified by a key. </td>
+</tr>
+<tr>
+<td class='confluenceTd'> . </td>
+<td class='confluenceTd'> For example, the OCLC LC Name Authority Service. </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <b>Authority Record</b> </td>
+<td class='confluenceTd'> The information associated with one of the values in an authority; may include alternate spellings and equivalent forms of the value, etc. </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <b>Authority Key</b> </td>
+<td class='confluenceTd'> An opaque, hopefully persistent, identifier corresponding to exactly one record in the authority. </td>
+</tr>
+</tbody></table>
+</div>
+
+
+				    					    <br/>
+                        <div class="tabletitle">
+                            <a name="attachments">Attachments:</a>
+                        </div>
+
+                        <div class="greybox" align="left">
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/22022823/21954865.gif">data-model.gif</a> (image/gif)
+                                <br/>
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/22022823/21954863.gif">workflow.gif</a> (image/gif)
+                                <br/>
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/22022823/21954864.gif">ingest.gif</a> (image/gif)
+                                <br/>
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/22022823/22675569.png">item-visits.png</a> (image/png)
+                                <br/>
+                                                    </div>
+				    
+                    			    </td>
+		    </tr>
+	    </table>
+	    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+				<td height="12" background="https://wiki.duraspace.org/images/border/border_bottom.gif"><img src="images/border/spacer.gif" width="1" height="1" border="0"/></td>
+			</tr>
+		    <tr>
+			    <td align="center"><font color="grey">Document generated by Confluence on Dec 16, 2010 11:47</font></td>
+		    </tr>
+	    </table>
+    </body>
+</html>

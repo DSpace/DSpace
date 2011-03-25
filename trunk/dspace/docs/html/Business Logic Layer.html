@@ -1,0 +1,1213 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>DSpace Documentation : Business Logic Layer</title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">	    
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <div class="pageheader">
+					    <span class="pagetitle">
+                            DSpace Documentation : Business Logic Layer
+                                                    </span>
+				    </div>
+				    <div class="pagesubheading">
+					    This page last changed on Dec 15, 2010 by <font color="#0050B2">tdonohue</font>.
+				    </div>
+
+				    <h1><a name="BusinessLogicLayer-SystemArchitecture%3ABusinessLogicLayer"></a>System Architecture: Business Logic Layer</h1>
+
+<style type='text/css'>/*<![CDATA[*/
+div.rbtoc1292448694802 {margin-left: 0px;padding: 0px;}
+div.rbtoc1292448694802 ul {list-style: none;margin-left: 0px;}
+div.rbtoc1292448694802 li {margin-left: 0px;padding-left: 0px;}
+
+/*]]>*/</style><div class='rbtoc1292448694802'>
+<ul>
+    <li><span class='TOCOutline'>1</span> <a href='#BusinessLogicLayer-CoreClasses'>Core Classes</a></li>
+<ul>
+    <li><span class='TOCOutline'>1.1</span> <a href='#BusinessLogicLayer-TheConfigurationManager'>The Configuration Manager</a></li>
+    <li><span class='TOCOutline'>1.2</span> <a href='#BusinessLogicLayer-Constants'>Constants</a></li>
+    <li><span class='TOCOutline'>1.3</span> <a href='#BusinessLogicLayer-Context'>Context</a></li>
+    <li><span class='TOCOutline'>1.4</span> <a href='#BusinessLogicLayer-Email'>Email</a></li>
+    <li><span class='TOCOutline'>1.5</span> <a href='#BusinessLogicLayer-LogManager'>LogManager</a></li>
+    <li><span class='TOCOutline'>1.6</span> <a href='#BusinessLogicLayer-Utils'>Utils</a></li>
+</ul>
+    <li><span class='TOCOutline'>2</span> <a href='#BusinessLogicLayer-ContentManagementAPI'>Content Management API</a></li>
+<ul>
+    <li><span class='TOCOutline'>2.1</span> <a href='#BusinessLogicLayer-OtherClasses'>Other Classes</a></li>
+    <li><span class='TOCOutline'>2.2</span> <a href='#BusinessLogicLayer-Modifications'>Modifications</a></li>
+    <li><span class='TOCOutline'>2.3</span> <a href='#BusinessLogicLayer-What%27sInMemory%3F'>What's In Memory?</a></li>
+    <li><span class='TOCOutline'>2.4</span> <a href='#BusinessLogicLayer-DublinCoreMetadata'>Dublin Core Metadata</a></li>
+    <li><span class='TOCOutline'>2.5</span> <a href='#BusinessLogicLayer-SupportforOtherMetadataSchemas'>Support for Other Metadata Schemas</a></li>
+    <li><span class='TOCOutline'>2.6</span> <a href='#BusinessLogicLayer-PackagerPlugins'>Packager Plugins</a></li>
+</ul>
+    <li><span class='TOCOutline'>3</span> <a href='#BusinessLogicLayer-PluginManager'>Plugin Manager</a></li>
+<ul>
+    <li><span class='TOCOutline'>3.1</span> <a href='#BusinessLogicLayer-Concepts'>Concepts</a></li>
+    <li><span class='TOCOutline'>3.2</span> <a href='#BusinessLogicLayer-UsingthePluginManager'>Using the Plugin Manager</a></li>
+<ul>
+    <li><span class='TOCOutline'>3.2.1</span> <a href='#BusinessLogicLayer-TypesofPlugin'>Types of Plugin</a></li>
+    <li><span class='TOCOutline'>3.2.2</span> <a href='#BusinessLogicLayer-SelfNamedPlugins'>Self-Named Plugins</a></li>
+    <li><span class='TOCOutline'>3.2.3</span> <a href='#BusinessLogicLayer-ObtainingaPluginInstance'>Obtaining a Plugin Instance</a></li>
+    <li><span class='TOCOutline'>3.2.4</span> <a href='#BusinessLogicLayer-LifecycleManagement'>Lifecycle Management</a></li>
+    <li><span class='TOCOutline'>3.2.5</span> <a href='#BusinessLogicLayer-GettingMetaInformation'>Getting Meta-Information</a></li>
+</ul>
+    <li><span class='TOCOutline'>3.3</span> <a href='#BusinessLogicLayer-Implementation'>Implementation</a></li>
+<ul>
+    <li><span class='TOCOutline'>3.3.1</span> <a href='#BusinessLogicLayer-PluginManagerClass'>PluginManager Class</a></li>
+    <li><span class='TOCOutline'>3.3.2</span> <a href='#BusinessLogicLayer-SelfNamedPluginClass'>SelfNamedPlugin Class</a></li>
+    <li><span class='TOCOutline'>3.3.3</span> <a href='#BusinessLogicLayer-ErrorsandExceptions'>Errors and Exceptions</a></li>
+</ul>
+    <li><span class='TOCOutline'>3.4</span> <a href='#BusinessLogicLayer-ConfiguringPlugins'>Configuring Plugins</a></li>
+<ul>
+    <li><span class='TOCOutline'>3.4.1</span> <a href='#BusinessLogicLayer-ConfiguringSingleton%28Single%29Plugins'>Configuring Singleton (Single) Plugins</a></li>
+    <li><span class='TOCOutline'>3.4.2</span> <a href='#BusinessLogicLayer-ConfiguringSequenceofPlugins'>Configuring Sequence of Plugins</a></li>
+    <li><span class='TOCOutline'>3.4.3</span> <a href='#BusinessLogicLayer-ConfiguringNamedPlugins'>Configuring Named Plugins</a></li>
+    <li><span class='TOCOutline'>3.4.4</span> <a href='#BusinessLogicLayer-ConfiguringtheReusableStatusofaPlugin'>Configuring the Reusable Status of a Plugin</a></li>
+</ul>
+    <li><span class='TOCOutline'>3.5</span> <a href='#BusinessLogicLayer-ValidatingtheConfiguration'>Validating the Configuration</a></li>
+    <li><span class='TOCOutline'>3.6</span> <a href='#BusinessLogicLayer-UseCases'>Use Cases</a></li>
+<ul>
+    <li><span class='TOCOutline'>3.6.1</span> <a href='#BusinessLogicLayer-ManagingtheMediaFilterpluginstransparently'>Managing the MediaFilter plugins transparently</a></li>
+    <li><span class='TOCOutline'>3.6.2</span> <a href='#BusinessLogicLayer-ASingletonPlugin'>A Singleton Plugin</a></li>
+    <li><span class='TOCOutline'>3.6.3</span> <a href='#BusinessLogicLayer-PluginthatNamesItself'>Plugin that Names Itself</a></li>
+    <li><span class='TOCOutline'>3.6.4</span> <a href='#BusinessLogicLayer-StackableAuthentication'>Stackable Authentication</a></li>
+</ul>
+</ul>
+    <li><span class='TOCOutline'>4</span> <a href='#BusinessLogicLayer-WorkflowSystem'>Workflow System</a></li>
+    <li><span class='TOCOutline'>5</span> <a href='#BusinessLogicLayer-AdministrationToolkit'>Administration Toolkit</a></li>
+    <li><span class='TOCOutline'>6</span> <a href='#BusinessLogicLayer-Eperson%2FGroupManager'>E-person/Group Manager</a></li>
+    <li><span class='TOCOutline'>7</span> <a href='#BusinessLogicLayer-Authorization'>Authorization</a></li>
+<ul>
+    <li><span class='TOCOutline'>7.1</span> <a href='#BusinessLogicLayer-SpecialGroups'>Special Groups</a></li>
+    <li><span class='TOCOutline'>7.2</span> <a href='#BusinessLogicLayer-MiscellaneousAuthorizationNotes'>Miscellaneous Authorization Notes</a></li>
+</ul>
+    <li><span class='TOCOutline'>8</span> <a href='#BusinessLogicLayer-HandleManager%2FHandlePlugin'>Handle Manager/Handle Plugin</a></li>
+    <li><span class='TOCOutline'>9</span> <a href='#BusinessLogicLayer-Search'>Search</a></li>
+<ul>
+    <li><span class='TOCOutline'>9.1</span> <a href='#BusinessLogicLayer-CurrentLuceneImplementation'>Current Lucene Implementation</a></li>
+    <li><span class='TOCOutline'>9.2</span> <a href='#BusinessLogicLayer-IndexedFields'>Indexed Fields</a></li>
+    <li><span class='TOCOutline'>9.3</span> <a href='#BusinessLogicLayer-HarvestingAPI'>Harvesting API</a></li>
+</ul>
+    <li><span class='TOCOutline'>10</span> <a href='#BusinessLogicLayer-BrowseAPI'>Browse API</a></li>
+<ul>
+    <li><span class='TOCOutline'>10.1</span> <a href='#BusinessLogicLayer-UsingtheAPI'>Using the API</a></li>
+    <li><span class='TOCOutline'>10.2</span> <a href='#BusinessLogicLayer-IndexMaintenance'>Index Maintenance</a></li>
+    <li><span class='TOCOutline'>10.3</span> <a href='#BusinessLogicLayer-Caveats'>Caveats</a></li>
+</ul>
+    <li><span class='TOCOutline'>11</span> <a href='#BusinessLogicLayer-Checksumchecker'>Checksum checker</a></li>
+    <li><span class='TOCOutline'>12</span> <a href='#BusinessLogicLayer-OpenSearchSupport'>OpenSearch Support</a></li>
+    <li><span class='TOCOutline'>13</span> <a href='#BusinessLogicLayer-EmbargoSupport'>Embargo Support</a></li>
+<ul>
+    <li><span class='TOCOutline'>13.1</span> <a href='#BusinessLogicLayer-WhatisanEmbargo%3F'>What is an Embargo?</a></li>
+    <li><span class='TOCOutline'>13.2</span> <a href='#BusinessLogicLayer-EmbargoModelandLifeCycle'>Embargo Model and Life-Cycle</a></li>
+</ul>
+</ul></div>
+
+<h2><a name="BusinessLogicLayer-CoreClasses"></a>Core Classes</h2>
+
+<p>The <em>org.dspace.core</em> package provides some basic classes that are used throughout the DSpace code.</p>
+
+<h3><a name="BusinessLogicLayer-TheConfigurationManager"></a>The Configuration Manager</h3>
+
+<p>The configuration manager is responsible for reading the main <em>dspace.cfg</em> properties file, managing the 'template' configuration files for other applications such as Apache, and for obtaining the text for e-mail messages.</p>
+
+<p>The system is configured by editing the relevant files in <tt>[dspace]/config</tt>, as described in the configuration section.</p>
+
+<p><b>When editing configuration files for applications that DSpace uses, such as Apache Tomcat, you may want to edit the copy in <tt>[dspace-source]</tt> and then run <tt>ant update</tt> or <tt>ant overwrite_configs</tt> rather than editing the 'live' version directly&#33;</b>  This will ensure you have a backup copy of your modified configuration files, so that they are not accidentally overwritten in the future.</p>
+
+<p>The <em>ConfigurationManager</em> class can also be invoked as a command line tool:</p>
+
+<ul>
+	<li><tt>[dspace]/bin/dspace dsprop property.name</tt> This writes the value of <em>property.name</em> from <em>dspace.cfg</em> to the standard output, so that shell scripts can access the DSpace configuration. If the property has no value, nothing is written.</li>
+</ul>
+
+
+<h3><a name="BusinessLogicLayer-Constants"></a>Constants</h3>
+
+<p>This class contains constants that are used to represent types of object and actions in the database. For example, authorization policies can relate to objects of different types, so the <em>resourcepolicy</em> table has columns <em>resource_id</em>, which is the internal ID of the object, and <em>resource_type_id</em>, which indicates whether the object is an item, collection, bitstream etc. The value of <em>resource_type_id</em> is taken from the <em>Constants</em> class, for example <em>Constants.ITEM</em>.</p>
+
+
+<h3><a name="BusinessLogicLayer-Context"></a>Context</h3>
+
+<p>The <em>Context</em> class is central to the DSpace operation. Any code that wishes to use the any API in the business logic layer must first create itself a <em>Context</em> object. This is akin to opening a connection to a database (which is in fact one of the things that happens.)</p>
+
+<p>A context object is involved in most method calls and object constructors, so that the method or object has access to information about the current operation. When the context object is constructed, the following information is automatically initialized:</p>
+
+<ul>
+	<li>A connection to the database. This is a transaction-safe connection. i.e. the 'auto-commit' flag is set to false.</li>
+	<li>A cache of content management API objects. Each time a content object is created (for example <em>Item</em> or <em>Bitstream</em>) it is stored in the <em>Context</em> object. If the object is then requested again, the cached copy is used. Apart from reducing database use, this addresses the problem of having two copies of the same object in memory in different states.<br/>
+The following information is also held in a context object, though it is the responsibility of the application creating the context object to fill it out correctly:</li>
+</ul>
+
+
+<ul>
+	<li>The current authenticated user, if any</li>
+	<li>Any 'special groups' the user is a member of. For example, a user might automatically be part of a particular group based on the IP address they are accessing DSpace from, even though they don't have an e-person record. Such a group is called a 'special group'.</li>
+	<li>Any extra information from the application layer that should be added to log messages that are written within this context. For example, the Web UI adds a session ID, so that when the logs are analyzed the actions of a particular user in a particular session can be tracked.</li>
+	<li>A flag indicating whether authorization should be circumvented. This should only be used in rare, specific circumstances. For example, when first installing the system, there are no authorized administrators who would be able to create an administrator account&#33;As noted above, the public API is <em>trusted</em>, so it is up to applications in the application layer to use this flag responsibly.<br/>
+Typical use of the context object will involve constructing one, and setting the current user if one is authenticated. Several operations may be performed using the context object. If all goes well, <em>complete</em> is called to commit the changes and free up any resources used by the context. If anything has gone wrong, <em>abort</em> is called to roll back any changes and free up the resources.</li>
+</ul>
+
+
+<p>You should always <em>abort</em> a context if <em>any</em> error happens during its lifespan; otherwise the data in the system may be left in an inconsistent state. You can also <em>commit</em> a context, which means that any changes are written to the database, and the context is kept active for further use.</p>
+
+
+<h3><a name="BusinessLogicLayer-Email"></a>Email</h3>
+
+<p>Sending e-mails is pretty easy. Just use the configuration manager's <em>getEmail</em> method, set the arguments and recipients, and send.</p>
+
+<p>The e-mail texts are stored in <tt>[dspace]/config/emails</tt>. They are processed by the standard <em>java.text.MessageFormat</em>. At the top of each e-mail are listed the appropriate arguments that should be filled out by the sender. Example usage is shown in the <em>org.dspace.core.Email</em> Javadoc API documentation.</p>
+
+
+<h3><a name="BusinessLogicLayer-LogManager"></a>LogManager</h3>
+
+<p>The log manager consists of a method that creates a standard log header, and returns it as a string suitable for logging. Note that this class does not actually write anything to the logs; the log header returned should be logged directly by the sender using an appropriate Log4J call, so that information about where the logging is taking place is also stored.</p>
+
+<p>The level of logging can be configured on a per-package or per-class basis by editing <tt>[dspace]/config/log4j.properties</tt>. You will need to stop and restart Tomcat for the changes to take effect.</p>
+
+<p>A typical log entry looks like this:</p>
+
+<p><em>2002-11-11 08:11:32,903 INFO org.dspace.app.webui.servlet.DSpaceServlet @ anonymous:session_id=BD84E7C194C2CF4BD0EC3A6CAD0142BB:view_item:handle=1721.1/1686</em></p>
+
+<p>This is breaks down like this:</p>
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<td class='confluenceTd'> Date and time, milliseconds </td>
+<td class='confluenceTd'> <em>2002-11-11 08:11:32,903</em> </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Level (<em>FATAL</em>, <em>WARN</em>, <em>INFO</em> or <em>DEBUG</em>) </td>
+<td class='confluenceTd'> <em>INFO</em> </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Java class </td>
+<td class='confluenceTd'> <em>org.dspace.app.webui.servlet.DSpaceServlet</em> </td>
+</tr>
+<tr>
+<td class='confluenceTd'>&nbsp;</td>
+<td class='confluenceTd'> <em>@</em> </td>
+</tr>
+<tr>
+<td class='confluenceTd'> User email or <em>anonymous</em> </td>
+<td class='confluenceTd'> <em>anonymous</em> </td>
+</tr>
+<tr>
+<td class='confluenceTd'>&nbsp;</td>
+<td class='confluenceTd'> <em>:</em> </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Extra log info from context </td>
+<td class='confluenceTd'> <em>session_id=BD84E7C194C2CF4BD0EC3A6CAD0142BB</em> </td>
+</tr>
+<tr>
+<td class='confluenceTd'>&nbsp;</td>
+<td class='confluenceTd'> <em>:</em> </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Action </td>
+<td class='confluenceTd'> <em>view_item</em> </td>
+</tr>
+<tr>
+<td class='confluenceTd'>&nbsp;</td>
+<td class='confluenceTd'> <em>:</em> </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Extra info </td>
+<td class='confluenceTd'> <em>handle=1721.1/1686</em> </td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p>The above format allows the logs to be easily parsed and analyzed. The <tt>[dspace]/bin/log-reporter</tt> script is a simple tool for analyzing logs. Try:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">[dspace]/bin/log-reporter --help</pre>
+</div></div>
+
+<p>It's a good idea to 'nice' this log reporter to avoid an impact on server performance.</p>
+
+
+<h3><a name="BusinessLogicLayer-Utils"></a>Utils</h3>
+
+<p><em>Utils</em> contains miscellaneous utility method that are required in a variety of places throughout the code, and thus have no particular 'home' in a subsystem.</p>
+
+
+
+<h2><a name="BusinessLogicLayer-ContentManagementAPI"></a>Content Management API</h2>
+
+<p>The content management API package <em>org.dspace.content</em> contains Java classes for reading and manipulating content stored in the DSpace system. This is the API that components in the application layer will probably use most.</p>
+
+<p>Classes corresponding to the main elements in the DSpace data model (<em>Community</em>, <em>Collection</em>, <em>Item</em>, <em>Bundle</em> and <em>Bitstream</em>) are sub-classes of the abstract class <em>DSpaceObject</em>. The <em>Item</em> object handles the Dublin Core metadata record.</p>
+
+<p>Each class generally has one or more static <em>find</em> methods, which are used to instantiate content objects. Constructors do not have public access and are just used internally. The reasons for this are:</p>
+
+<ul>
+	<li>"Constructing" an object may be misconstrued as the action of creating an object in the DSpace system, for example one might expect something like:
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">Context dsContent = <span class="code-keyword">new</span> Context();
+Item myItem = <span class="code-keyword">new</span> Item(context, id)</pre>
+</div></div>
+<p>to construct a brand new item in the system, rather than simply instantiating an in-memory instance of an object in the system.</p></li>
+	<li><em>find</em> methods may often be called with invalid IDs, and return <em>null</em> in such a case. A constructor would have to throw an exception in this case. A <em>null</em> return value from a static method can in general be dealt with more simply in code.</li>
+	<li>If an instantiation representing the same underlying archival entity already exists, the <em>find</em> method can simply return that same instantiation to avoid multiple copies and any inconsistencies which might result.</li>
+</ul>
+
+
+<p><em>Collection</em>, <em>Bundle</em> and <em>Bitstream</em> do not have <em>create</em> methods; rather, one has to create an object using the relevant method on the container. For example, to create a collection, one must invoke <em>createCollection</em> on the community that the collection is to appear in:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">Context context = <span class="code-keyword">new</span> Context();
+Community existingCommunity = Community.find(context, 123);
+Collection myNewCollection = existingCommunity.createCollection();</pre>
+</div></div>
+
+<p>The primary reason for this is for determining authorization. In order to know whether an e-person may create an object, the system must know which container the object is to be added to. It makes no sense to create a collection outside of a community, and the authorization system does not have a policy for that.</p>
+
+<p><em>Item_s are first created in the form of an implementation of &#95;InProgressSubmission</em>. An <em>InProgressSubmission</em> represents an item under construction; once it is complete, it is installed into the main archive and added to the relevant collection by the <em>InstallItem</em> class. The <em>org.dspace.content</em> package provides an implementation of <em>InProgressSubmission</em> called <em>WorkspaceItem</em>; this is a simple implementation that contains some fields used by the Web submission UI. The <em>org.dspace.workflow</em> also contains an implementation called <em>WorkflowItem</em> which represents a submission undergoing a workflow process.</p>
+
+<p>In the previous chapter there is an overview of the item ingest process which should clarify the previous paragraph. Also see the section on the workflow system.</p>
+
+<p><em>Community</em> and <em>BitstreamFormat</em> do have static <em>create</em> methods; one must be a site administrator to have authorization to invoke these.</p>
+
+<h3><a name="BusinessLogicLayer-OtherClasses"></a>Other Classes</h3>
+
+<p>Classes whose name begins <em>DC</em> are for manipulating Dublin Core metadata, as explained below.</p>
+
+<p>The <em>FormatIdentifier</em> class attempts to guess the bitstream format of a particular bitstream. Presently, it does this simply by looking at any file extension in the bitstream name and matching it up with the file extensions associated with bitstream formats. Hopefully this can be greatly improved in the future&#33;</p>
+
+<p>The <em>ItemIterator</em> class allows items to be retrieved from storage one at a time, and is returned by methods that may return a large number of items, more than would be desirable to have in memory at once.</p>
+
+<p>The <em>ItemComparator</em> class is an implementation of the standard <em>java.util.Comparator</em> that can be used to compare and order items based on a particular Dublin Core metadata field.</p>
+
+
+<h3><a name="BusinessLogicLayer-Modifications"></a>Modifications</h3>
+
+<p>When creating, modifying or for whatever reason removing data with the content management API, it is important to know when changes happen in-memory, and when they occur in the physical DSpace storage.</p>
+
+<p>Primarily, one should note that no change made using a particular <em>org.dspace.core.Context</em> object will actually be made in the underlying storage unless <em>complete</em> or <em>commit</em> is invoked on that <em>Context</em>. If anything should go wrong during an operation, the context should always be aborted by invoking <em>abort</em>, to ensure that no inconsistent state is written to the storage.</p>
+
+<p>Additionally, some changes made to objects only happen in-memory. In these cases, invoking the <em>update</em> method lines up the in-memory changes to occur in storage when the <em>Context</em> is committed or completed. In general, methods that change any [meta]data field only make the change in-memory; methods that involve relationships with other objects in the system line up the changes to be committed with the context. See individual methods in the API Javadoc.</p>
+
+<p>Some examples to illustrate this are shown below:</p>
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<td class='confluenceTd'> <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">Context context = <span class="code-keyword">new</span> Context();
+Bitstream b = Bitstream.find(context, 1234);
+b.setName(<span class="code-quote">"newfile.txt"</span>);
+b.update();
+context.complete();</pre>
+</div></div> </td>
+<td class='confluenceTd'> <b>Will</b> change storage </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">Context context = <span class="code-keyword">new</span> Context();
+Bitstream b = Bitstream.find(context, 1234);
+b.setName(<span class="code-quote">"newfile.txt"</span>);
+b.update();
+context.abort();</pre>
+</div></div> </td>
+<td class='confluenceTd'> <b>Will not</b> change storage (context aborted) </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">Context context = <span class="code-keyword">new</span> Context();
+Bitstream b = Bitstream.find(context, 1234);
+b.setName(<span class="code-quote">"newfile.txt"</span>);
+context.complete();</pre>
+</div></div> </td>
+<td class='confluenceTd'> The new name <b>will not</b> be stored since <em>update</em> was not invoked </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">Context context = <span class="code-keyword">new</span> Context();
+Bitstream bs = Bitstream.find(context, 1234);
+Bundle bnd = Bundle.find(context, 5678);
+bnd.add(bs);
+context.complete();</pre>
+</div></div> </td>
+<td class='confluenceTd'> The bitstream <b>will</b> be included in the bundle, since <em>update</em> doesn't need to be called </td>
+</tr>
+</tbody></table>
+</div>
+
+
+
+<h3><a name="BusinessLogicLayer-What%27sInMemory%3F"></a>What's In Memory?</h3>
+
+<p>Instantiating some content objects also causes other content objects to be loaded into memory.</p>
+
+<p>Instantiating a <em>Bitstream</em> object causes the appropriate <em>BitstreamFormat</em> object to be instantiated. Of course the <em>Bitstream</em> object does not load the underlying bits from the bitstream store into memory&#33;</p>
+
+<p>Instantiating a <em>Bundle</em> object causes the appropriate <em>Bitstream</em> objects (and hence &#95;BitstreamFormat_s) to be instantiated.</p>
+
+<p>Instantiating an <em>Item</em> object causes the appropriate <em>Bundle</em> objects (etc.) and hence &#95;BitstreamFormat_s to be instantiated. All the Dublin Core metadata associated with that item are also loaded into memory.</p>
+
+<p>The reasoning behind this is that for the vast majority of cases, anyone instantiating an item object is going to need information about the bundles and bitstreams within it, and this methodology allows that to be done in the most efficient way and is simple for the caller. For example, in the Web UI, the servlet (controller) needs to pass information about an item to the viewer (JSP), which needs to have all the information in-memory to display the item without further accesses to the database which may cause errors mid-display.</p>
+
+<p>You do not need to worry about multiple in-memory instantiations of the same object, or any inconsistencies that may result; the <em>Context</em> object keeps a cache of the instantiated objects. The <em>find</em> methods of classes in <em>org.dspace.content</em> will use a cached object if one exists.</p>
+
+<p>It may be that in enough cases this automatic instantiation of contained objects reduces performance in situations where it is important; if this proves to be true the API may be changed in the future to include a <em>loadContents</em> method or somesuch, or perhaps a Boolean parameter indicating what to do will be added to the <em>find</em> methods.</p>
+
+<p>When a <em>Context</em> object is completed, aborted or garbage-collected, any objects instantiated using that context are invalidated and should not be used (in much the same way an AWT button is invalid if the window containing it is destroyed).</p>
+
+
+<h3><a name="BusinessLogicLayer-DublinCoreMetadata"></a>Dublin Core Metadata</h3>
+
+<p>The <em>DCValue</em> class is a simple container that represents a single Dublin Core element, optional qualifier, value and language. Note that since DSpace 1.4 the <em>MetadataValue</em> and associated classes are preferred (see Support for Other Metadata Schemas). The other classes starting with <em>DC</em> are utility classes for handling types of data in Dublin Core, such as people's names and dates. As supplied, the DSpace registry of elements and qualifiers corresponds to the <a href="http://www.dublincore.org/documents/2002/09/24/library-application-profile/" title="Library Application Profile">Library Application Profile</a> for Dublin Core. It should be noted that these utility classes assume that the values will be in a certain syntax, which will be true for all data generated within the DSpace system, but since Dublin Core does not always define strict syntax, this may not be true for Dublin Core originating outside DSpace.</p>
+
+<p>Below is the specific syntax that DSpace expects various fields to adhere to:</p>
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<td class='confluenceTd'> <b>Element</b> </td>
+<td class='confluenceTd'> <b>Qualifier</b> </td>
+<td class='confluenceTd'> <b>Syntax</b> </td>
+<td class='confluenceTd'> <b>Helper Class</b> </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <em>date</em> </td>
+<td class='confluenceTd'> Any or unqualified </td>
+<td class='confluenceTd'> ISO 8601 in the UTC time zone, with either year, month, day, or second precision. Examples:_2000 2002-10 2002-08-14 1999-01-01T14:35:23Z _ </td>
+<td class='confluenceTd'> <em>DCDate</em> </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <em>contributor</em> </td>
+<td class='confluenceTd'> Any or unqualified </td>
+<td class='confluenceTd'> In general last name, then a comma, then first names, then any additional information like "Jr.". If the contributor is an organization, then simply the name. Examples:_Doe, John Smith, John Jr. van Dyke, Dick Massachusetts Institute of Technology _ </td>
+<td class='confluenceTd'> <em>DCPersonName</em> </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <em>language</em> </td>
+<td class='confluenceTd'> <em>iso</em> </td>
+<td class='confluenceTd'> A two letter code taken ISO 639, followed optionally by a two letter country code taken from ISO 3166. Examples:_en fr en_US _ </td>
+<td class='confluenceTd'> <em>DCLanguage</em> </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <em>relation</em> </td>
+<td class='confluenceTd'> <em>ispartofseries</em> </td>
+<td class='confluenceTd'> The series name, following by a semicolon followed by the number in that series. Alternatively, just free text._MIT-TR; 1234 My Report Series; ABC-1234 NS1234 _ </td>
+<td class='confluenceTd'> <em>DCSeriesNumber</em> </td>
+</tr>
+</tbody></table>
+</div>
+
+
+
+<h3><a name="BusinessLogicLayer-SupportforOtherMetadataSchemas"></a>Support for Other Metadata Schemas</h3>
+
+<p>To support additional metadata schemas a new set of metadata classes have been added. These are backwards compatible with the DC classes and should be used rather than the DC specific classes wherever possible. Note that hierarchical metadata schemas are not currently supported, only flat schemas (such as DC) are able to be defined.</p>
+
+<p>The <em>MetadataField</em> class describes a metadata field by schema, element and optional qualifier. The value of a <em>MetadataField</em> is described by a <em>MetadataValue</em> which is roughly equivalent to the older <em>DCValue</em> class. Finally the <em>MetadataSchema</em> class is used to describe supported schemas. The DC schema is supported by default. Refer to the javadoc for method details.</p>
+
+
+<h3><a name="BusinessLogicLayer-PackagerPlugins"></a>Packager Plugins</h3>
+
+<p>The Packager plugins let you <em>ingest</em> a package to create a new DSpace Object, and <em>disseminate</em> a content Object as a package. A package is simply a data stream; its contents are defined by the packager plugin's implementation.</p>
+
+<p>To ingest an object, which is currently only implemented for Items, the sequence of operations is:</p>
+
+<ol>
+	<li>Get an instance of the chosen <em>PackageIngester</em> plugin.</li>
+	<li>Locate a Collection in which to create the new Item.</li>
+	<li>Call its <em>ingest</em> method, and get back a <em>WorkspaceItem</em>.<br/>
+The packager also takes a <em>PackageParameters</em> object, which is a property list of parameters specific to that packager which might be passed in from the user interface.</li>
+</ol>
+
+
+<p>Here is an example package ingestion code fragment:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">Collection collection =  find target collection
+     InputStream source = ...;
+     PackageParameters params = ...;
+     <span class="code-object">String</span> license = <span class="code-keyword">null</span>;
+
+    PackageIngester sip = (PackageIngester) PluginManager
+            .getNamedPlugin(PackageIngester.class, packageType);
+
+    WorkspaceItem wi = sip.ingest(context, collection, source, params, license);</pre>
+</div></div>
+<p>Here is an example of a package dissemination:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">     OutputStream destination = ...;
+     PackageParameters params = ...;
+     DSpaceObject dso = ...;
+
+     PackageIngester dip = (PackageDisseminator) PluginManager
+             .getNamedPlugin(PackageDisseminator.class, packageType);
+
+     dip.disseminate(context, dso, params, destination);</pre>
+</div></div>
+
+
+<h2><a name="BusinessLogicLayer-PluginManager"></a>Plugin Manager</h2>
+
+<p>The PluginManager is a very simple component container. It creates and organizes components (plugins), and helps select a plugin in the cases where there are many possible choices. It also gives some limited control over the life cycle of a plugin.</p>
+
+<h3><a name="BusinessLogicLayer-Concepts"></a>Concepts</h3>
+
+<p>The following terms are important in understanding the rest of this section:</p>
+
+<ul>
+	<li><b>Plugin Interface</b> A Java interface, the defining characteristic of a plugin. The consumer of a plugin asks for its plugin by interface.</li>
+	<li><b>Plugin</b> a.k.a. Component, this is an instance of a class that implements a certain interface. It is interchangeable with other implementations, so that any of them may be "plugged in", hence the name. A Plugin is an instance of any class that implements the plugin interface.</li>
+	<li><b>Implementation class</b> The actual class of a plugin. It may implement several plugin interfaces, but must implement at least one.</li>
+	<li><b>Name</b> Plugin implementations can be distinguished from each other by name, a short String meant to symbolically represent the implementation class. They are called "named plugins". Plugins only need to be named when the caller has to make an active choice between them.</li>
+	<li><b>SelfNamedPlugin class</b> Plugins that extend the <em>SelfNamedPlugin</em> class can take advantage of additional features of the Plugin Manager. Any class can be managed as a plugin, so it is not necessary, just possible.</li>
+	<li><b>Reusable</b> Reusable plugins are only instantiated once, and the Plugin Manager returns the same (cached) instance whenever that same plugin is requested again. This behavior can be turned off if desired.</li>
+</ul>
+
+
+<h3><a name="BusinessLogicLayer-UsingthePluginManager"></a>Using the Plugin Manager</h3>
+
+<h4><a name="BusinessLogicLayer-TypesofPlugin"></a>Types of Plugin</h4>
+
+<p>The Plugin Manager supports three different patterns of usage:</p>
+
+<ol>
+	<li><b>Singleton Plugins</b> There is only one implementation class for the plugin. It is indicated in the configuration. This type of plugin chooses an implementation of a service, for the entire system, at configuration time. Your application just fetches the plugin for that interface and gets the configured-in choice. See the getSinglePlugin() method.</li>
+	<li><b>Sequence Plugins</b> You need a sequence or series of plugins, to implement a mechanism like Stackable Authentication or a pipeline, where each plugin is called in order to contribute its implementation of a process to the whole. The Plugin Manager supports this by letting you configure a sequence of plugins for a given interface. See the getPluginSequence() method.</li>
+	<li><b>Named Plugins</b> Use a named plugin when the application has to choose one plugin implementation out of many available ones. Each implementation is bound to one or more names (symbolic identifiers) in the configuration.The name is just a string to be associated with the combination of implementation class and interface. It may contain any characters except for comma (,) and equals (=). It may contain embedded spaces. Comma is a special character used to separate names in the configuration entry.Names must be unique within an interface: No plugin classes implementing the same interface may have the same name.Think of plugin names as a controlled vocabulary &#8211; for a given plugin interface, there is a set of names for which plugins can be found. The designer of a Named Plugin interface is responsible for deciding what the name means and how to derive it; for example, names of metadata crosswalk plugins may describe the target metadata format.See the getNamedPlugin() method and the getPluginNames() methods.</li>
+</ol>
+
+
+<h4><a name="BusinessLogicLayer-SelfNamedPlugins"></a>Self-Named Plugins</h4>
+
+<p>Named plugins can get their names either from the configuration or, for a variant called self-named plugins, from within the plugin itself.</p>
+
+<p>Self-named plugins are necessary because one plugin implementation can be configured itself to take on many "personalities", each of which deserves its own plugin name. It is already managing its own configuration for each of these personalities, so it makes sense to allow it to export them to the Plugin Manager rather than expecting the plugin configuration to be kept in sync with it own configuration.</p>
+
+<p>An example helps clarify the point: There is a named plugin that does crosswalks, call it <em>CrosswalkPlugin</em>. It has several implementations that crosswalk some kind of metadata. Now we add a new plugin which uses XSL stylesheet transformation (XSLT) to crosswalk many types of metadata &#8211; so the single plugin can act like many different plugins, depending on which stylesheet it employs.</p>
+
+<p>This XSLT-crosswalk plugin has its own configuration that maps a Plugin Name to a stylesheet &#8211; it has to, since of course the Plugin Manager doesn't know anything about stylesheets. It becomes a self-named plugin, so that it reads its configuration data, gets the list of names to which it can respond, and passes those on to the Plugin Manager.</p>
+
+<p>When the Plugin Manager creates an instance of the XSLT-crosswalk, it records the Plugin Name that was responsible for that instance. The plugin can look at that Name later in order to configure itself correctly for the Name that created it. This mechanism is all part of the SelfNamedPlugin class which is part of any self-named plugin.</p>
+
+
+<h4><a name="BusinessLogicLayer-ObtainingaPluginInstance"></a>Obtaining a Plugin Instance</h4>
+
+<p>The most common thing you will do with the Plugin Manager is obtain an instance of a plugin. To request a plugin, you must always specify the plugin interface you want. You will also supply a name when asking for a named plugin.</p>
+
+<p>A sequence plugin is returned as an array of &#95;Object_s since it is actually an ordered list of plugins.</p>
+
+<p>See the getSinglePlugin(), getPluginSequence(), getNamedPlugin() methods.</p>
+
+
+<h4><a name="BusinessLogicLayer-LifecycleManagement"></a>Lifecycle Management</h4>
+
+<p>When <em>PluginManager</em> fulfills a request for a plugin, it checks whether the implementation class is reusable; if so, it creates one instance of that class and returns it for every subsequent request for that interface and name. If it is not reusable, a new instance is always created.</p>
+
+<p>For reasons that will become clear later, the manager actually caches a separate instance of an implementation class for each name under which it can be requested.</p>
+
+<p>You can ask the <em>PluginManager</em> to forget about (decache) a plugin instance, by releasing it. See the PluginManager.releasePlugin() method. The manager will drop its reference to the plugin so the garbage collector can reclaim it. The next time that plugin/name combination is requested, it will create a new instance.</p>
+
+
+<h4><a name="BusinessLogicLayer-GettingMetaInformation"></a>Getting Meta-Information</h4>
+
+<p>The <em>PluginManager</em> can list all the names of the Named Plugins which implement an interface. You may need this, for example, to implement a menu in a user interface that presents a choice among all possible plugins. See the getPluginNames() method.</p>
+
+<p>Note that it only returns the plugin name, so if you need a more sophisticated or meaningful "label" (i.e. a key into the I18N message catalog) then you should add a method to the plugin itself to return that.</p>
+
+
+
+<h3><a name="BusinessLogicLayer-Implementation"></a>Implementation</h3>
+
+<p>Note: The <em>PluginManager</em> refers to interfaces and classes internally only by their names whenever possible, to avoid loading classes until absolutely necessary (i.e. to create an instance). As you'll see below, self-named classes still have to be loaded to query them for names, but for the most part it can avoid loading classes. This saves a lot of time at start-up and keeps the JVM memory footprint down, too. As the Plugin Manager gets used for more classes, this will become a greater concern.</p>
+
+<p>The only downside of "on-demand" loading is that errors in the configuration don't get discovered right away. The solution is to call the <em>checkConfiguration()</em> method after making any changes to the configuration.</p>
+
+<h4><a name="BusinessLogicLayer-PluginManagerClass"></a>PluginManager Class</h4>
+
+<p>The <em>PluginManager</em> class is your main interface to the Plugin Manager. It behaves like a factory class that never gets instantiated, so its public methods are static.</p>
+
+<p>Here are the public methods, followed by explanations:</p>
+
+<ul>
+	<li><div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java"><span class="code-keyword">static</span> <span class="code-object">Object</span> getSinglePlugin(<span class="code-object">Class</span> intface)
+     <span class="code-keyword">throws</span> PluginConfigurationError;</pre>
+</div></div>
+<p> Returns an instance of the singleton (single) plugin implementing the given interface. There must be exactly one single plugin configured for this interface, otherwise the <em>PluginConfigurationError</em> is thrown.Note that this is the only "get plugin" method which throws an exception. It is typically used at initialization time to set up a permanent part of the system so any failure is fatal.See the <em>plugin.single</em> configuration key for configuration details.</p></li>
+	<li><div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java"><span class="code-keyword">static</span> <span class="code-object">Object</span>[] getPluginSequence(<span class="code-object">Class</span> intface);</pre>
+</div></div>
+<p> Returns instances of all plugins that implement the interface <em>intface</em>, in an <em>Array</em>. Returns an empty array if no there are no matching plugins.The order of the plugins in the array is the same as their class names in the configuration's value field.See the <em>plugin.sequence</em> configuration key for configuration details.</p></li>
+	<li><div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java"><span class="code-keyword">static</span> <span class="code-object">Object</span> getNamedPlugin(<span class="code-object">Class</span> intface, <span class="code-object">String</span> name);</pre>
+</div></div>
+<p> Returns an instance of a plugin that implements the interface <em>intface</em> and is bound to a name matching name. If there is no matching plugin, it returns null. The names are matched by <em>String.equals()</em>.See the <em>plugin.named</em> and <em>plugin.selfnamed</em> configuration keys for configuration details.</p></li>
+	<li><div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java"><span class="code-keyword">static</span> void releasePlugin(<span class="code-object">Object</span> plugin);</pre>
+</div></div>
+<p> Tells the Plugin Manager to let go of any references to a reusable plugin, to prevent it from being given out again and to allow the object to be garbage-collected. Call this when a plugin instance must be taken out of circulation.</p></li>
+	<li><div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java"><span class="code-keyword">static</span> <span class="code-object">String</span>[] getAllPluginNames(<span class="code-object">Class</span> intface);</pre>
+</div></div>
+<p> Returns all of the names under which a named plugin implementing the interface <em>intface</em> can be requested (with <em>getNamedPlugin()</em>). The array is empty if there are no matches. Use this to populate a menu of plugins for interactive selection, or to document what the possible choices are.The names are NOT returned in any predictable order, so you may wish to sort them first.Note: Since a plugin may be bound to more than one name, the list of names this returns does not represent the list of plugins. To get the list of unique implementation classes corresponding to the names, you might have to eliminate duplicates (i.e. create a Set of classes).</p></li>
+	<li><div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java"><span class="code-keyword">static</span> void checkConfiguration();</pre>
+</div></div>
+<p> Validates the keys in the DSpace <em>ConfigurationManager</em> pertaining to the Plugin Manager and reports any errors by logging them. This is intended to be used interactively by a DSpace administrator, to check the configuration file after modifying it. See the section about validating configuration for details.</p></li>
+</ul>
+
+
+<h4><a name="BusinessLogicLayer-SelfNamedPluginClass"></a>SelfNamedPlugin Class</h4>
+
+<p>A named plugin implementation must extend this class if it wants to supply its own Plugin Name(s). See Self-Named Plugins for why this is sometimes necessary.</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java"><span class="code-keyword">abstract</span> class SelfNamedPlugin
+{
+    <span class="code-comment">// Your class must override <span class="code-keyword">this</span>:
+</span>    <span class="code-comment">// Return all names by which <span class="code-keyword">this</span> plugin should be known.
+</span>    <span class="code-keyword">public</span> <span class="code-keyword">static</span> <span class="code-object">String</span>[] getPluginNames();
+
+    <span class="code-comment">// Returns the name under which <span class="code-keyword">this</span> instance was created.
+</span>    <span class="code-comment">// This is implemented by SelfNamedPlugin and should NOT be
+</span>	overridden.
+    <span class="code-keyword">public</span> <span class="code-object">String</span> getPluginInstanceName();
+}</pre>
+</div></div>
+
+<h4><a name="BusinessLogicLayer-ErrorsandExceptions"></a>Errors and Exceptions</h4>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java"><span class="code-keyword">public</span> class PluginConfigurationError <span class="code-keyword">extends</span> Error
+{
+    <span class="code-keyword">public</span> PluginConfigurationError(<span class="code-object">String</span> message);
+}</pre>
+</div></div>
+<p>An error of this type means the caller asked for a single plugin, but either there was no single plugin configured matching that interface, or there was more than one. Either case causes a fatal configuration error.</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java"><span class="code-keyword">public</span> class PluginInstantiationException <span class="code-keyword">extends</span> RuntimeException
+{
+    <span class="code-keyword">public</span> PluginInstantiationException(<span class="code-object">String</span> msg, Throwable cause)
+}</pre>
+</div></div>
+<p>This exception indicates a fatal error when instantiating a plugin class. It should only be thrown when something unexpected happens in the course of instantiating a plugin, e.g. an access error, class not found, etc. Simply not finding a class in the configuration is not an exception.</p>
+
+<p>This is a <em>RuntimeException</em> so it doesn't have to be declared, and can be passed all the way up to a generalized fatal exception handler.</p>
+
+
+
+<h3><a name="BusinessLogicLayer-ConfiguringPlugins"></a>Configuring Plugins</h3>
+
+<p>All of the Plugin Manager's configuration comes from the DSpace Configuration Manager, which is a Java Properties map. You can configure these characteristics of each plugin:</p>
+
+<ol>
+	<li><b>Interface</b>: Classname of the Java interface which defines the plugin, including package name. e.g. <em>org.dspace.app.mediafilter.FormatFilter</em></li>
+	<li><b>Implementation Class</b>: Classname of the implementation class, including package. e.g. <em>org.dspace.app.mediafilter.PDFFilter</em></li>
+	<li><b>Names</b>: (Named plugins only) There are two ways to bind names to plugins: listing them in the value of a plugin.named.interface key, or configuring a class in <em>plugin.selfnamed.interface</em> which extends the <em>SelfNamedPlugin</em> class.</li>
+	<li><b>Reusable option</b>: (Optional) This is declared in a <em>plugin.reusable</em> configuration line. Plugins are reusable by default, so you only need to configure the non-reusable ones.</li>
+</ol>
+
+
+<h4><a name="BusinessLogicLayer-ConfiguringSingleton%28Single%29Plugins"></a>Configuring Singleton (Single) Plugins</h4>
+
+<p>This entry configures a Single Plugin for use with getSinglePlugin():</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">plugin.single.<span class="code-keyword">interface</span> = classname</pre>
+</div></div>
+
+<p>For example, this configures the class <em>org.dspace.checker.SimpleDispatcher</em> as the plugin for interface <em>org.dspace.checker.BitstreamDispatcher</em>:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">plugin.single.org.dspace.checker.BitstreamDispatcher=org.dspace.checker.SimpleDispatcher</pre>
+</div></div>
+
+
+<h4><a name="BusinessLogicLayer-ConfiguringSequenceofPlugins"></a>Configuring Sequence of Plugins</h4>
+
+<p>This kind of configuration entry defines a Sequence Plugin, which is bound to a sequence of implementation classes. The key identifies the interface, and the value is a comma-separated list of classnames:<br/>
+plugin.sequence.interface = classname, ...<br/>
+The plugins are returned by <em>getPluginSequence()</em> in the same order as their classes are listed in the configuration value.</p>
+
+<p>For example, this entry configures Stackable Authentication with three implementation classes:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">plugin.sequence.org.dspace.eperson.AuthenticationMethod = \
+            org.dspace.eperson.X509Authentication, \
+            org.dspace.eperson.PasswordAuthentication, \
+            edu.mit.dspace.MITSpecialGroup</pre>
+</div></div>
+
+<h4><a name="BusinessLogicLayer-ConfiguringNamedPlugins"></a>Configuring Named Plugins</h4>
+
+<p>There are two ways of configuring named plugins:</p>
+
+<ol>
+	<li><b>Plugins Named in the Configuration</b> A named plugin which gets its name(s) from the configuration is listed in this kind of entry:_plugin.named.interface = classname = name [ , name.. ] [ classname = name.. ]_The syntax of the configuration value is: classname, followed by an equal-sign and then at least one plugin name. Bind more names to the same implementation class by adding them here, separated by commas. Names may include any character other than comma (,) and equal-sign (=).For example, this entry creates one plugin with the names GIF, JPEG, and image/png, and another with the name TeX:
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">plugin.named.org.dspace.app.mediafilter.MediaFilter = \
+        org.dspace.app.mediafilter.JPEGFilter = GIF, JPEG, image/png \
+        org.dspace.app.mediafilter.TeXFilter = TeX</pre>
+</div></div>
+<p>This example shows a plugin name with an embedded whitespace character. Since comma (,) is the separator character between plugin names, spaces are legal (between words of a name; leading and trailing spaces are ignored).This plugin is bound to the names "Adobe PDF", "PDF", and "Portable Document Format".</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">plugin.named.org.dspace.app.mediafilter.MediaFilter = \
+      org.dspace.app.mediafilter.TeXFilter = TeX \
+      org.dspace.app.mediafilter.PDFFilter =  Adobe PDF, PDF, Portable Document Format</pre>
+</div></div>
+<p>NOTE: Since there can only be one key with plugin.named. followed by the interface name in the configuration, all of the plugin implementations must be configured in that entry.</p></li>
+	<li><b>Self-Named Plugins</b> Since a self-named plugin supplies its own names through a static method call, the configuration only has to include its interface and classname:<em>plugin.selfnamed.interface = classname [ , classname.. ]_The following example first demonstrates how the plugin class, &#95;XsltDisseminationCrosswalk</em> is configured to implement its own names "MODS" and "DublinCore". These come from the keys starting with <em>crosswalk.dissemination.stylesheet.</em>. The value is a stylesheet file.The class is then configured as a self-named plugin:
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">crosswalk.dissemination.stylesheet.DublinCore = xwalk/TESTDIM-2-DC_copy.xsl
+crosswalk.dissemination.stylesheet.MODS = xwalk/mods.xsl
+
+plugin.selfnamed.crosswalk.org.dspace.content.metadata.DisseminationCrosswalk = \
+        org.dspace.content.metadata.MODSDisseminationCrosswalk, \
+        org.dspace.content.metadata.XsltDisseminationCrosswalk
+</pre>
+</div></div>
+<p>NOTE: Since there can only be one key with <em>plugin.selfnamed.</em> followed by the interface name in the configuration, all of the plugin implementations must be configured in that entry. The <em>MODSDisseminationCrosswalk</em> class is only shown to illustrate this point.</p></li>
+</ol>
+
+
+<h4><a name="BusinessLogicLayer-ConfiguringtheReusableStatusofaPlugin"></a>Configuring the Reusable Status of a Plugin</h4>
+
+<p>Plugins are assumed to be reusable by default, so you only need to configure the ones which you would prefer not to be reusable. The format is as follows:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">plugin.reusable.classname = ( <span class="code-keyword">true</span> | <span class="code-keyword">false</span> )</pre>
+</div></div>
+
+<p>For example, this marks the PDF plugin from the example above as non-reusable:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">plugin.reusable.org.dspace.app.mediafilter.PDFFilter = <span class="code-keyword">false</span></pre>
+</div></div>
+
+
+
+<h3><a name="BusinessLogicLayer-ValidatingtheConfiguration"></a>Validating the Configuration</h3>
+
+<p>The Plugin Manager is very sensitive to mistakes in the DSpace configuration. Subtle errors can have unexpected consequences that are hard to detect: for example, if there are two "plugin.single" entries for the same interface, one of them will be silently ignored.</p>
+
+<p>To validate the Plugin Manager configuration, call the <em>PluginManager.checkConfiguration()</em> method. It looks for the following mistakes:</p>
+
+<ul>
+	<li>Any duplicate keys starting with "<em>plugin.</em>".</li>
+	<li>Keys starting <em>plugin.single</em>, <em>plugin.sequence</em>, <em>plugin.named</em>, and <em>plugin.selfnamed</em> that don't include a valid interface.</li>
+	<li>Classnames in the configuration values that don't exist, or don't implement the plugin interface in the key.</li>
+	<li>Classes declared in plugin.selfnamed lines that don't extend the <em>SelfNamedPlugin</em> class.</li>
+	<li>Any name collisions among named plugins for a given interface.</li>
+	<li>Named plugin configuration entries without any names.</li>
+	<li>Classnames mentioned in <em>plugin.reusable</em> keys must exist and have been configured as a plugin implementation class.<br/>
+The <em>PluginManager</em> class also has a <em>main()</em> method which simply runs <em>checkConfiguration()</em>, so you can invoke it from the command line to test the validity of plugin configuration changes.</li>
+</ul>
+
+
+<p>Eventually, someone should develop a general configuration-file sanity checker for DSpace, which would just call <em>PluginManager.checkConfiguration().</em></p>
+
+
+<h3><a name="BusinessLogicLayer-UseCases"></a>Use Cases</h3>
+
+<p>Here are some usage examples to illustrate how the Plugin Manager works.</p>
+
+<h4><a name="BusinessLogicLayer-ManagingtheMediaFilterpluginstransparently"></a>Managing the MediaFilter plugins transparently</h4>
+
+<p>The existing DSpace 1.3 MediaFilterManager implementation has been largely replaced by the Plugin Manager. The MediaFilter classes become plugins named in the configuration. Refer to the configuration guide for further details.</p>
+
+
+<h4><a name="BusinessLogicLayer-ASingletonPlugin"></a>A Singleton Plugin</h4>
+
+<p>This shows how to configure and access a single anonymous plugin, such as the BitstreamDispatcher plugin:</p>
+
+<p>Configuration:</p>
+
+<p><em>plugin.single.org.dspace.checker.BitstreamDispatcher=org.dspace.checker.SimpleDispatcher</em></p>
+
+<p>The following code fragment shows how dispatcher, the service object, is initialized and used:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">BitstreamDispatcher dispatcher =
+
+	(BitstreamDispatcher)PluginManager.getSinglePlugin(BitstreamDispatcher
+.class);
+
+<span class="code-object">int</span> id = dispatcher.next();
+
+<span class="code-keyword">while</span> (id != BitstreamDispatcher.SENTINEL)
+{
+     /*
+        <span class="code-keyword">do</span> some processing here
+     */
+
+     id = dispatcher.next();
+}</pre>
+</div></div>
+
+<h4><a name="BusinessLogicLayer-PluginthatNamesItself"></a>Plugin that Names Itself</h4>
+
+<p>This crosswalk plugin acts like many different plugins since it is configured with different XSL translation stylesheets. Since it already gets each of its stylesheets out of the DSpace configuration, it makes sense to have the plugin give PluginManager the names to which it answers instead of forcing someone to configure those names in two places (and try to keep them synchronized).</p>
+
+<p>NOTE: Remember how <em>getPlugin()</em> caches a separate instance of an implementation class for every name bound to it? This is why: the instance can look at the name under which it was invoked and configure itself specifically for that name. Since the instance for each name might be different, the Plugin Manager has to cache a separate instance for each name.</p>
+
+<p>Here is the configuration file listing both the plugin's own configuration and the <em>PluginManager</em> config line:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">crosswalk.dissemination.stylesheet.DublinCore = xwalk/TESTDIM-2-DC_copy.xsl
+crosswalk.dissemination.stylesheet.MODS = xwalk/mods.xsl
+
+plugin.selfnamed.org.dspace.content.metadata.DisseminationCrosswalk = \
+  org.dspace.content.metadata.XsltDisseminationCrosswalk</pre>
+</div></div>
+<p>This look into the implementation shows how it finds configuration entries to populate the array of plugin names returned by the <em>getPluginNames()</em> method. Also note, in the <em>getStylesheet()</em> method, how it uses the plugin name that created the current instance (returned by <em>getPluginInstanceName()</em>) to find the correct stylesheet.</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java"><span class="code-keyword">public</span> class XsltDisseminationCrosswalk <span class="code-keyword">extends</span> SelfNamedPlugin
+{
+    ....
+    <span class="code-keyword">private</span> <span class="code-keyword">final</span> <span class="code-object">String</span> prefix =
+	<span class="code-quote">"crosswalk.dissemination.stylesheet."</span>;
+    ....
+    <span class="code-keyword">public</span> <span class="code-keyword">static</span> <span class="code-object">String</span>[] getPluginNames()
+    {
+        List aliasList = <span class="code-keyword">new</span> ArrayList();
+        Enumeration pe = ConfigurationManager.propertyNames();
+
+        <span class="code-keyword">while</span> (pe.hasMoreElements())
+        {
+            <span class="code-object">String</span> key = (<span class="code-object">String</span>)pe.nextElement();
+            <span class="code-keyword">if</span> (key.startsWith(prefix))
+                aliasList.add(key.substring(prefix.length()));
+        }
+        <span class="code-keyword">return</span> (<span class="code-object">String</span>[])aliasList.toArray(<span class="code-keyword">new</span>
+	<span class="code-object">String</span>[aliasList.size()]);
+    }
+
+    <span class="code-comment">// get the crosswalk stylesheet <span class="code-keyword">for</span> an instance of the plugin:
+</span>    <span class="code-keyword">private</span> <span class="code-object">String</span> getStylesheet()
+    {
+        <span class="code-keyword">return</span> ConfigurationManager.getProperty(prefix +
+	getPluginInstanceName());
+    }
+}</pre>
+</div></div>
+
+<h4><a name="BusinessLogicLayer-StackableAuthentication"></a>Stackable Authentication</h4>
+
+<p>The Stackable Authentication mechanism needs to know all of the plugins configured for the interface, in the order of configuration, since order is significant. It gets a Sequence Plugin from the Plugin Manager. Refer to the Configuration Section on Stackable Authentication for further details.</p>
+
+
+
+
+<h2><a name="BusinessLogicLayer-WorkflowSystem"></a>Workflow System</h2>
+
+<p>The primary classes are:</p>
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<td class='confluenceTd'> <em>org.dspace.content.WorkspaceItem</em> </td>
+<td class='confluenceTd'> contains an Item before it enters a workflow </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <em>org.dspace.workflow.WorkflowItem</em> </td>
+<td class='confluenceTd'> contains an Item while in a workflow </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <em>org.dspace.workflow.WorkflowManager</em> </td>
+<td class='confluenceTd'> responds to events, manages the WorkflowItem states </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <em>org.dspace.content.Collection</em> </td>
+<td class='confluenceTd'> contains List of defined workflow steps </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <em>org.dspace.eperson.Group</em> </td>
+<td class='confluenceTd'> people who can perform workflow tasks are defined in EPerson Groups </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <em>org.dspace.core.Email</em> </td>
+<td class='confluenceTd'> used to email messages to Group members and submitters </td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p>The workflow system models the states of an Item in a state machine with 5 states (SUBMIT, STEP_1, STEP_2, STEP_3, ARCHIVE.) These are the three optional steps where the item can be viewed and corrected by different groups of people. Actually, it's more like 8 states, with STEP_1_POOL, STEP_2_POOL, and STEP_3_POOL. These pooled states are when items are waiting to enter the primary states.</p>
+
+<p>The WorkflowManager is invoked by events. While an Item is being submitted, it is held by a WorkspaceItem. Calling the start() method in the WorkflowManager converts a WorkspaceItem to a WorkflowItem, and begins processing the WorkflowItem's state. Since all three steps of the workflow are optional, if no steps are defined, then the Item is simply archived.</p>
+
+<p>Workflows are set per Collection, and steps are defined by creating corresponding entries in the List named workflowGroup. If you wish the workflow to have a step 1, use the administration tools for Collections to create a workflow Group with members who you want to be able to view and approve the Item, and the workflowGroup[0] becomes set with the ID of that Group.</p>
+
+<p>If a step is defined in a Collection's workflow, then the WorkflowItem's state is set to that step_POOL. This pooled state is the WorkflowItem waiting for an EPerson in that group to claim the step's task for that WorkflowItem. The WorkflowManager emails the members of that Group notifying them that there is a task to be performed (the text is defined in config/emails,) and when an EPerson goes to their 'My DSpace' page to claim the task, the WorkflowManager is invoked with a claim event, and the WorkflowItem's state advances from STEP_x_POOL to STEP_x (where x is the corresponding step.) The EPerson can also generate an 'unclaim' event, returning the WorkflowItem to the STEP_x_POOL.</p>
+
+<p>Other events the WorkflowManager handles are advance(), which advances the WorkflowItem to the next state. If there are no further states, then the WorkflowItem is removed, and the Item is then archived. An EPerson performing one of the tasks can reject the Item, which stops the workflow, rebuilds the WorkspaceItem for it and sends a rejection note to the submitter. More drastically, an abort() event is generated by the admin tools to cancel a workflow outright.</p>
+
+
+<h2><a name="BusinessLogicLayer-AdministrationToolkit"></a>Administration Toolkit</h2>
+
+<p>The <em>org.dspace.administer</em> package contains some classes for administering a DSpace system that are not generally needed by most applications.</p>
+
+<p>The <em>CreateAdministrator</em> class is a simple command-line tool, executed via <tt>[dspace]/bin/dspace create-administrator</tt>, that creates an administrator e-person with information entered from standard input. This is generally used only once when a DSpace system is initially installed, to create an initial administrator who can then use the Web administration UI to further set up the system. This script does not check for authorization, since it is typically run before there are any e-people to authorize&#33; Since it must be run as a command-line tool on the server machine, generally this shouldn't cause a problem. A possibility is to have the script only operate when there are no e-people in the system already, though in general, someone with access to command-line scripts on your server is probably in a position to do what they want anyway&#33;</p>
+
+<p>The <em>DCType</em> class is similar to the <em>org.dspace.content.BitstreamFormat</em> class. It represents an entry in the Dublin Core type registry, that is, a particular element and qualifier, or unqualified element. It is in the <em>administer</em> package because it is only generally required when manipulating the registry itself. Elements and qualifiers are specified as literals in <em>org.dspace.content.Item</em> methods and the <em>org.dspace.content.DCValue</em> class. Only administrators may modify the Dublin Core type registry.</p>
+
+<p>The <em>org.dspace.administer.RegistryLoader</em> class contains methods for initializing the Dublin Core type registry and bitstream format registry with entries in an XML file. Typically this is executed via the command line during the build process (see <em>build.xml</em> in the source.) To see examples of the XML formats, see the files in <em>config/registries</em> in the source directory. There is no XML schema, they aren't validated strictly when loaded in.</p>
+
+
+<h2><a name="BusinessLogicLayer-Eperson%2FGroupManager"></a>E-person/Group Manager</h2>
+
+<p>DSpace keeps track of registered users with the <em>org.dspace.eperson.EPerson</em> class. The class has methods to create and manipulate an <em>EPerson</em> such as get and set methods for first and last names, email, and password. (Actually, there is no <em>getPassword()</em> method‚Äîan MD5 hash of the password is stored, and can only be verified with the <em>checkPassword()</em> method.) There are find methods to find an EPerson by email (which is assumed to be unique,) or to find all EPeople in the system.</p>
+
+<p>The <em>EPerson</em> object should probably be reworked to allow for easy expansion; the current EPerson object tracks pretty much only what MIT was interested in tracking - first and last names, email, phone. The access methods are hardcoded and should probably be replaced with methods to access arbitrary name/value pairs for institutions that wish to customize what EPerson information is stored.</p>
+
+<p>Groups are simply lists of <em>EPerson</em> objects. Other than membership, <em>Group</em> objects have only one other attribute: a name. Group names must be unique, so we have adopted naming conventions where the role of the group is its name, such as <em>COLLECTION_100_ADD</em>. Groups add and remove EPerson objects with <em>addMember()</em> and <em>removeMember()</em> methods. One important thing to know about groups is that they store their membership in memory until the <em>update()</em> method is called - so when modifying a group's membership don't forget to invoke <em>update()</em> or your changes will be lost&#33; Since group membership is used heavily by the authorization system a fast <em>isMember()</em> method is also provided.</p>
+
+<p>Another kind of Group is also implemented in DSpace‚Äîspecial Groups. The <em>Context</em> object for each session carries around a List of Group IDs that the user is also a member of‚Äîcurrently the MITUser Group ID is added to the list of a user's special groups if certain IP address or certificate criteria are met.</p>
+
+
+<h2><a name="BusinessLogicLayer-Authorization"></a>Authorization</h2>
+
+<p>The primary classes are:</p>
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<td class='confluenceTd'> <em>org.dspace.authorize.AuthorizeManager</em> </td>
+<td class='confluenceTd'> does all authorization, checking policies against Groups </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <em>org.dspace.authorize.ResourcePolicy</em> </td>
+<td class='confluenceTd'> defines all allowable actions for an object </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <em>org.dspace.eperson.Group</em> </td>
+<td class='confluenceTd'> all policies are defined in terms of EPerson Groups </td>
+</tr>
+</tbody></table>
+</div>
+
+
+<p>The authorization system is based on the classic 'police state' model of security; no action is allowed unless it is expressed in a policy. The policies are attached to resources (hence the name <em>ResourcePolicy</em>,) and detail who can perform that action. The resource can be any of the DSpace object types, listed in <em>org.dspace.core.Constants</em> (<em>BITSTREAM</em>, <em>ITEM</em>, <em>COLLECTION</em>, etc.) The 'who' is made up of EPerson groups. The actions are also in <em>Constants.java</em> (<em>READ</em>, <em>WRITE</em>, <em>ADD</em>, etc.) The only non-obvious actions are <em>ADD</em> and <em>REMOVE</em>, which are authorizations for container objects. To be able to create an Item, you must have <em>ADD</em> permission in a Collection, which contains Items. (Communities, Collections, Items, and Bundles are all container objects.)</p>
+
+<p>Currently most of the read policy checking is done with items‚Äîcommunities and collections are assumed to be openly readable, but items and their bitstreams are checked. Separate policy checks for items and their bitstreams enables policies that allow publicly readable items, but parts of their content may be restricted to certain groups.</p>
+
+<p>The <em>AuthorizeManager</em> class'<br/>
+<em>authorizeAction(Context, object, action)</em> is the primary source of all authorization in the system. It gets a list of all of the ResourcePolicies in the system that match the object and action. It then iterates through the policies, extracting the EPerson Group from each policy, and checks to see if the EPersonID from the Context is a member of any of those groups. If all of the policies are queried and no permission is found, then an <em>AuthorizeException</em> is thrown. An <em>authorizeAction()</em> method is also supplied that returns a boolean for applications that require higher performance.</p>
+
+<p>ResourcePolicies are very simple, and there are quite a lot of them. Each can only list a single group, a single action, and a single object. So each object will likely have several policies, and if multiple groups share permissions for actions on an object, each group will get its own policy. (It's a good thing they're small.)</p>
+
+<h3><a name="BusinessLogicLayer-SpecialGroups"></a>Special Groups</h3>
+
+<p>All users are assumed to be part of the public group (ID=0.) DSpace admins (ID=1) are automatically part of all groups, much like super-users in the Unix OS. The Context object also carries around a List of special groups, which are also first checked for membership. These special groups are used at MIT to indicate membership in the MIT community, something that is very difficult to enumerate in the database&#33; When a user logs in with an MIT certificate or with an MIT IP address, the login code adds this MIT user group to the user's Context.</p>
+
+
+<h3><a name="BusinessLogicLayer-MiscellaneousAuthorizationNotes"></a>Miscellaneous Authorization Notes</h3>
+
+<p>Where do items get their read policies? From the their collection's read policy. There once was a separate item read default policy in each collection, and perhaps there will be again since it appears that administrators are notoriously bad at defining collection's read policies. There is also code in place to enable policies that are timed‚Äîhave a start and end date. However, the admin tools to enable these sorts of policies have not been written.</p>
+
+
+
+<h2><a name="BusinessLogicLayer-HandleManager%2FHandlePlugin"></a>Handle Manager/Handle Plugin</h2>
+
+<p>The <em>org.dspace.handle</em> package contains two classes; <em>HandleManager</em> is used to create and look up Handles, and <em>HandlePlugin</em> is used to expose and resolve DSpace Handles for the outside world via the CNRI Handle Server code.</p>
+
+<p>Handles are stored internally in the <em>handle</em> database table in the form:</p>
+
+<p><em>1721.123/4567</em></p>
+
+<p>Typically when they are used outside of the system they are displayed in either URI or "URL proxy" forms:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">hdl:1721.123/4567
+http:<span class="code-comment">//hdl.handle.net/1721.123/4567</span></pre>
+</div></div>
+<p>It is the responsibility of the caller to extract the basic form from whichever displayed form is used.</p>
+
+<p>The <em>handle</em> table maps these Handles to resource type/resource ID pairs, where resource type is a value from <em>org.dspace.core.Constants</em> and resource ID is the internal identifier (database primary key) of the object. This allows Handles to be assigned to any type of object in the system, though as explained in the functional overview, only communities, collections and items are presently assigned Handles.</p>
+
+<p><em>HandleManager</em> contains static methods for:</p>
+
+<ul>
+	<li>Creating a Handle</li>
+	<li>Finding the Handle for a <em>DSpaceObject</em>, though this is usually only invoked by the object itself, since <em>DSpaceObject</em> has a <em>getHandle</em> method</li>
+	<li>Retrieving the <em>DSpaceObject</em> identified by a particular Handle</li>
+	<li>Obtaining displayable forms of the Handle (URI or "proxy URL").<br/>
+<em>HandlePlugin</em> is a simple implementation of the Handle Server's <em>net.handle.hdllib.HandleStorage</em> interface. It only implements the basic Handle retrieval methods, which get information from the <em>handle</em> database table. The CNRI Handle Server is configured to use this plug-in via its <em>config.dct</em> file.</li>
+</ul>
+
+
+<p>Note that since the Handle server runs as a separate JVM to the DSpace Web applications, it uses a separate 'Log4J' configuration, since Log4J does not support multiple JVMs using the same daily rolling logs. This alternative configuration is located at <tt>[dspace]/config/log4j-handle-plugin.properties</tt>. The <tt>[dspace]/bin/start-handle-server</tt> script passes in the appropriate command line parameters so that the Handle server uses this configuration.</p>
+
+
+<h2><a name="BusinessLogicLayer-Search"></a>Search</h2>
+
+<p>DSpace's search code is a simple API which currently wraps the Lucene search engine. The first half of the search task is indexing, and <em>org.dspace.search.DSIndexer</em> is the indexing class, which contains <em>indexContent()</em> which if passed an <em>Item</em>, <em>Community</em>, or <em>Collection</em>, will add that content's fields to the index. The methods <em>unIndexContent()</em> and <em>reIndexContent()</em> remove and update content's index information. The <em>DSIndexer</em> class also has a <em>main()</em> method which will rebuild the index completely. This can be invoked by the <em>dspace/bin/index-init</em> (complete rebuild) or <em>dspace/bin/index-update</em> (update) script. The intent was for the <em>main()</em> method to be invoked on a regular basis to avoid index corruption, but we have had no problem with that so far.</p>
+
+<p>Which fields are indexed by <em>DSIndexer</em>? These fields are defined in dspace.cfg in the section "Fields to index for search" as name-value-pairs. The name must be unique in the form search.index.i (i is an arbitrary positive number). The value on the right side has a unique value again, which can be referenced in search-form (e.g. title, author). Then comes the metadata element which is indexed. '*' is a wildcard which includes all sub elements. For example:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">search.index.4 = keyword:dc.subject.*</pre>
+</div></div>
+
+<p>tells the indexer to create a keyword index containing all dc.subject element values. Since the wildcard ('*') character was used in place of a qualifier, all subject metadata fields will be indexed (e.g. dc.subject.other, dc.subject.lcsh, etc)</p>
+
+<p>By default, the fields shown in the <em>Indexed Fields</em> section below are indexed. These are hardcoded in the DSIndexer class. If any search.index.i items are specified in <em>dspace.cfg</em> these are used rather than these hardcoded fields.</p>
+
+<p>The query class <em>DSQuery</em> contains the three flavors of <em>doQuery()</em> methods‚Äîone searches the DSpace site, and the other two restrict searches to Collections and Communities. The results from a query are returned as three lists of handles; each list represents a type of result. One list is a list of Items with matches, and the other two are Collections and Communities that match. This separation allows the UI to handle the types of results gracefully without resolving all of the handles first to see what kind of content the handle points to. The <em>DSQuery</em> class also has a <em>main()</em> method for debugging via command-line searches.</p>
+
+<h3><a name="BusinessLogicLayer-CurrentLuceneImplementation"></a>Current Lucene Implementation</h3>
+
+<p>Currently we have our own Analyzer and Tokenizer classes (<em>DSAnalyzer</em> and <em>DSTokenizer</em>) to customize our indexing. They invoke the stemming and stop word features within Lucene. We create an <em>IndexReader</em> for each query, which we now realize isn't the most efficient use of resources - we seem to run out of filehandles on really heavy loads. (A wildcard query can open many filehandles&#33;) Since Lucene is thread-safe, a better future implementation would be to have a single Lucene IndexReader shared by all queries, and then is invalidated and re-opened when the index changes. Future API growth could include relevance scores (Lucene generates them, but we ignore them,) and abstractions for more advanced search concepts such as booleans.</p>
+
+
+<h3><a name="BusinessLogicLayer-IndexedFields"></a>Indexed Fields</h3>
+
+<p>The <em>DSIndexer</em> class shipped with DSpace indexes the Dublin Core metadata in the following way:</p>
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<td class='confluenceTd'> <b>Search Field</b> </td>
+<td class='confluenceTd'> <b>Taken from Dublin Core Fields</b> </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Authors </td>
+<td class='confluenceTd'> <em>contributor.</em><b><em>creator.</em></b><em>description.statementofresponsibility</em> </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Titles </td>
+<td class='confluenceTd'> <em>title.&#42;</em> </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Keywords </td>
+<td class='confluenceTd'> <em>subject.&#42;</em> </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Abstracts </td>
+<td class='confluenceTd'> <em>description.abstract</em><em>description.tableofcontents</em> </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Series </td>
+<td class='confluenceTd'> <em>relation.ispartofseries</em> </td>
+</tr>
+<tr>
+<td class='confluenceTd'> MIME types </td>
+<td class='confluenceTd'> <em>format.mimetype</em> </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Sponsors </td>
+<td class='confluenceTd'> <em>description.sponsorship</em> </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Identifiers </td>
+<td class='confluenceTd'> <em>identifier.&#42;</em> </td>
+</tr>
+</tbody></table>
+</div>
+
+
+
+<h3><a name="BusinessLogicLayer-HarvestingAPI"></a>Harvesting API</h3>
+
+<p>The <em>org.dspace.search</em> package also provides a 'harvesting' API. This allows callers to extract information about items modified within a particular timeframe, and within a particular scope (all of DSpace, or a community or collection.) Currently this is used by the Open Archives Initiative metadata harvesting protocol application, and the e-mail subscription code.</p>
+
+<p>The <em>Harvest.harvest</em> is invoked with the required scope and start and end dates. Either date can be omitted. The dates should be in the ISO8601, UTC time zone format used elsewhere in the DSpace system.</p>
+
+<p><em>HarvestedItemInfo</em> objects are returned. These objects are simple containers with basic information about the items falling within the given scope and date range. Depending on parameters passed to the <em>harvest</em> method, the <em>containers</em> and <em>item</em> fields may have been filled out with the IDs of communities and collections containing an item, and the corresponding <em>Item</em> object respectively. Electing not to have these fields filled out means the harvest operation executes considerable faster.</p>
+
+<p>In case it is required, <em>Harvest</em> also offers a method for creating a single <em>HarvestedItemInfo</em> object, which might make things easier for the caller.</p>
+
+
+
+<h2><a name="BusinessLogicLayer-BrowseAPI"></a>Browse API</h2>
+
+<p>The browse API maintains indexes of dates, authors, titles and subjects, and allows callers to extract parts of these:</p>
+
+<ul>
+	<li><b>Title</b>:  Values of the Dublin Core element <b>title</b> (unqualified) are indexed. These are sorted in a case-insensitive fashion, with any leading article removed. For example: "The DSpace System" would appear under 'D' rather than 'T'.</li>
+	<li><b>Author</b>:  Values of the <b>contributor</b> (any qualifier or unqualified) element are indexed. Since <em>contributor</em> values typically are in the form 'last name, first name', a simple case-insensitive alphanumeric sort is used which orders authors in last name order.Note that this is an index of <em>authors</em>, and not <em>items by author</em>. If four items have the same author, that author will appear in the index only once. Hence, the index of authors may be greater or smaller than the index of titles; items often have more than one author, though the same author may have authored several items.The author indexing in the browse API does have limitations:
+	<ul>
+		<li>Ideally, a name that appears as an author for more than one item would appear in the author index only once. For example, 'Doe, John' may be the author of tens of items. However, in practice, author's names often appear in slightly differently forms, for example:
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">Doe, John
+Doe, John Stewart
+Doe, John S.</pre>
+</div></div>
+<p>Currently, the above three names would all appear as separate entries in the author index even though they may refer to the same author. In order for an author of several papers to be correctly appear once in the index, each item must specify <em>exactly</em> the same form of their name, which doesn't always happen in practice.</p></li>
+		<li>Another issue is that two authors may have the same name, even within a single institution. If this is the case they may appear as one author in the index.These issues are typically resolved in libraries with <em>authority control records</em>, in which are kept a 'preferred' form of the author's name, with extra information (such as date of birth/death) in order to distinguish between authors of the same name. Maintaining such records is a huge task with many issues, particularly when metadata is received from faculty directly rather than trained library catalogers.</li>
+	</ul>
+	</li>
+	<li><b>Date of Issue</b>:  Items are indexed by date of issue. This may be different from the date that an item appeared in DSpace; many items may have been originally published elsewhere beforehand. The Dublin Core field used is <b>date.issued</b>. The ordering of this index may be reversed so 'earliest first' and 'most recent first' orderings are possible.Note that the index is of <em>items by date</em>, as opposed to an index of <em>dates</em>. If 30 items have the same issue date (say 2002), then those 30 items all appear in the index adjacent to each other, as opposed to a single 2002 entry.Since dates in DSpace Dublin Core are in ISO8601, all in the UTC time zone, a simple alphanumeric sort is sufficient to sort by date, including dealing with varying granularities of date reasonably. For example:
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">2001-12-10
+2002
+2002-04
+2002-04-05
+2002-04-09T15:34:12Z
+2002-04-09T19:21:12Z
+2002-04-10</pre>
+</div></div></li>
+	<li><b>Date Accessioned</b>:  In order to determine which items most recently appeared, rather than using the date of issue, an item's accession date is used. This is the Dublin Core field <b>date.accessioned</b>. In other aspects this index is identical to the date of issue index.</li>
+	<li><b>Items by a Particular Author</b>:  The browse API can perform is to extract items by a particular author. They do not have to be primary author of an item for that item to be extracted. You can specify a scope, too; that is, you can ask for items by author X in collection Y, for example.This particular flavor of browse is slightly simpler than the others. You cannot presently specify a particular subset of results to be returned. The API call will simply return all of the items by a particular author within a certain scope.Note that the author of the item must <em>exactly</em> match the author passed in to the API; see the explanation about the caveats of the author index browsing to see why this is the case.</li>
+	<li><b>Subject</b>:  Values of the Dublin Core element <b>subject</b> (both unqualified and with any qualifier) are indexed. These are sorted in a case-insensitive fashion.</li>
+</ul>
+
+
+<h3><a name="BusinessLogicLayer-UsingtheAPI"></a>Using the API</h3>
+
+<p>The API is generally invoked by creating a <em>BrowseScope</em> object, and setting the parameters for which particular part of an index you want to extract. This is then passed to the relevant <em>Browse</em> method call, which returns a <em>BrowseInfo</em> object which contains the results of the operation. The parameters set in the <em>BrowseScope</em> object are:</p>
+
+<ul>
+	<li>How many entries from the index you want</li>
+	<li>Whether you only want entries from a particular community or collection, or from the whole of DSpace</li>
+	<li>Which part of the index to start from (called the <em>focus</em> of the browse). If you don't specify this, the start of the index is used</li>
+	<li>How many entries to include before the <em>focus</em> entry</li>
+</ul>
+
+
+<p>To illustrate, here is an example:</p>
+
+<ul>
+	<li>We want <b>7</b> entries in total</li>
+	<li>We want entries from collection <em>x</em></li>
+	<li>We want the focus to be 'Really'</li>
+	<li>We want <b>2</b> entries included before the focus.</li>
+</ul>
+
+
+<p>The results of invoking <em>Browse.getItemsByTitle</em> with the above parameters might look like this:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">        Rabble-Rousing Rabbis From Sardinia
+        Reality TV: Love It or Hate It?
+FOCUS&gt;  The Really Exciting Research Video
+        Recreational Housework Addicts: Please Visit My House
+        Regional Television Variation Studies
+        Revenue Streams
+        Ridiculous Example Titles:  I'm Out of Ideas</pre>
+</div></div>
+
+<p>Note that in the case of title and date browses, <em>Item</em> objects are returned as opposed to actual titles. In these cases, you can specify the 'focus' to be a specific item, or a partial or full literal value. In the case of a literal value, if no entry in the index matches exactly, the closest match is used as the focus. It's quite reasonable to specify a focus of a single letter, for example.</p>
+
+<p>Being able to specify a specific item to start at is particularly important with dates, since many items may have the save issue date. Say 30 items in a collection have the issue date 2002. To be able to page through the index 20 items at a time, you need to be able to specify exactly which item's 2002 is the focus of the browse, otherwise each time you invoked the browse code, the results would start at the first item with the issue date 2002.</p>
+
+<p>Author browses return <em>String</em> objects with the actual author names. You can only specify the focus as a full or partial literal <em>String</em>.</p>
+
+<p>Another important point to note is that presently, the browse indexes contain metadata for all items in the main archive, regardless of authorization policies. This means that all items in the archive will appear to all users when browsing. Of course, should the user attempt to access a non-public item, the usual authorization mechanism will apply. Whether this approach is ideal is under review; implementing the browse API such that the results retrieved reflect a user's level of authorization may be possible, but rather tricky.</p>
+
+
+<h3><a name="BusinessLogicLayer-IndexMaintenance"></a>Index Maintenance</h3>
+
+<p>The browse API contains calls to add and remove items from the index, and to regenerate the indexes from scratch. In general the content management API invokes the necessary browse API calls to keep the browse indexes in sync with what is in the archive, so most applications will not need to invoke those methods.</p>
+
+<p>If the browse index becomes inconsistent for some reason, the <em>InitializeBrowse</em> class is a command line tool (generally invoked using the <tt>[dspace]/bin/dspace index-init</tt> command) that causes the indexes to be regenerated from scratch.</p>
+
+
+<h3><a name="BusinessLogicLayer-Caveats"></a>Caveats</h3>
+
+<p>Presently, the browse API is not tremendously efficient. 'Indexing' takes the form of simply extracting the relevant Dublin Core value, normalizing it (lower-casing and removing any leading article in the case of titles), and inserting that normalized value with the corresponding item ID in the appropriate browse database table. Database views of this table include collection and community IDs for browse operations with a limited scope. When a browse operation is performed, a simple <em>SELECT</em> query is performed, along the lines of:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">SELECT item_id FROM ItemsByTitle ORDER BY sort_title OFFSET 40 LIMIT 20</pre>
+</div></div>
+<p>There are two main drawbacks to this: Firstly, <em>LIMIT</em> and <em>OFFSET</em> are PostgreSQL-specific keywords. Secondly, the database is still actually performing dynamic sorting of the titles, so the browse code as it stands will not scale particularly well. The code does cache <em>BrowseInfo</em> objects, so that common browse operations are performed quickly, but this is not an ideal solution.</p>
+
+
+
+<h2><a name="BusinessLogicLayer-Checksumchecker"></a>Checksum checker</h2>
+
+<p>Checksum checker is used to verify every item within DSpace. While DSpace calculates and records the checksum of every file submitted to it, the checker can determine whether the file has been changed. The idea being that the earlier you can identify a file has changed, the more likely you would be able to record it (assuming it was not a wanted change).</p>
+
+<p><tt>org.dspace.checker.CheckerCommand</tt> class, is the class for the checksum checker tool, which calculates checksums for each bitstream whose ID is in the <em>most_recent_checksum</em> table, and compares it against the last calculated checksum for that bitstream.</p>
+
+
+<h2><a name="BusinessLogicLayer-OpenSearchSupport"></a>OpenSearch Support</h2>
+
+<p>DSpace is able to support OpenSearch. For those not acquainted with the standard, a very brief introduction, with emphasis on what possibilities it holds for current use and future development.</p>
+
+<p>OpenSearch is a small set of conventions and documents for describing and using 'search engines', meaning any service that returns a set of results for a query. It is nearly ubiquitous‚Äîbut also nearly invisible‚ in modern web sites with search capability. If you look at the page source of Wikipedia, Facebook, CNN, etc you will find buried a link element declaring OpenSearch support. It is very much a lowest-common-denominator abstraction (think Google box), but does provide a means to extend its expressive power. This first implementation for DSpace supports <em>none</em> of these extensions‚Äîmany of which are of potential value‚ so it should be regarded as a foundation, not a finished solution. So the short answer is that DSpace appears as a 'search-engine' to OpenSearch-aware software.</p>
+
+<p>Another way to look at OpenSearch is as a RESTful web service for search, very much like SRW/U, but considerably simpler. This comparative loss of power is offset by the fact that it is widely supported by web tools and players: browsers understand it, as do large metasearch tools.</p>
+
+
+
+<p><b>How Can It Be Used</b></p>
+
+<ul>
+	<li>Browser IntegrationMany recent browsers (IE7+, FF2+) can detect, or 'autodiscover', links to the document describing the search engine. Thus you can easily add your or other DSpace instances to the drop-down list of search engines in your browser. This list typically appears in the upper right corner of the browser, with a search box. In Firefox, for example, when you visit a site supporting OpenSearch, the color of the drop-down list widget changes color, and if you open it to show the list of search engines, you are offered an opportunity to add the site to the list. IE works nearly the same way but instead labels the web sites 'search providers'. When you select a DSpace instance as the search engine and enter a search, you are simply sent to the regular search results page of the instance.</li>
+	<li>Flexible, interesting RSS FeedsBecause one of the formats that OpenSearch specifies for its results is RSS (or Atom), you can turn any search query into an RSS feed. So if there are keywords highly discriminative of content in a collection or repository, these can be turned into a URL that a feed reader can subscribe to. Taken to the extreme, one could take any search a user makes, and dynamically compose an RSS feed URL for it in the page of returned results. To see an example, if you have a DSpace with OpenSearch enabled, try: 
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">http:<span class="code-comment">//dspace.mysite.edu/open-search/?query=&lt;your query&gt;</span></pre>
+</div></div>
+<p> The default format returned is Atom 1.0, so you should see an Atom document containing your search results.</p></li>
+	<li>You can extend the syntax with a few other parameters, as follows:
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'> Parameter </th>
+<th class='confluenceTh'> Values </th>
+</tr>
+<tr>
+<td class='confluenceTd'> format </td>
+<td class='confluenceTd'> atom, rss, html </td>
+</tr>
+<tr>
+<td class='confluenceTd'> scope </td>
+<td class='confluenceTd'> handle of a collection or community to restrict the search to </td>
+</tr>
+<tr>
+<td class='confluenceTd'> rpp </td>
+<td class='confluenceTd'> number indicating the number of results per page (i.e. per request) </td>
+</tr>
+<tr>
+<td class='confluenceTd'> start </td>
+<td class='confluenceTd'> number of page to start with (if paginating results) </td>
+</tr>
+<tr>
+<td class='confluenceTd'> sort_by </td>
+<td class='confluenceTd'> number indicating sorting criteria (same as DSpace advanced search values </td>
+</tr>
+</tbody></table>
+</div>
+
+<p>Multiple parameters may be specified on the query string, using the "&amp;" character as the delimiter, e.g.:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">http:<span class="code-comment">//dspace.mysite.edu/open-search/?query=&lt;your query&gt;&amp;format=rss&amp;scope=123456789/1</span></pre>
+</div></div></li>
+	<li>Cheap metasearchSearch aggregators like A9 (Amazon) recognize OpenSearch-compliant providers, and so can be added to metasearch sets using their UIs. Then you site can be used to aggregate search results with others.</li>
+</ul>
+
+
+<p>Configuration is through the <tt>dspace.cfg</tt> file. See <a href="Configuration.html#Configuration-OpenSearchSupport">OpenSearch Support</a> for more details.</p>
+
+
+<h2><a name="BusinessLogicLayer-EmbargoSupport"></a>Embargo Support</h2>
+
+<h3><a name="BusinessLogicLayer-WhatisanEmbargo%3F"></a>What is an Embargo?</h3>
+
+<p>An embargo is a temporary access restriction placed on content, commencing at time of accession. It's scope or duration may vary, but the fact that it eventually expires is what distinguishes it from other content restrictions. For example, it is not unusual for content destined for DSpace to come with permanent restrictions on use or access based on license-driven or other IP-based requirements that limit access to institutionally affiliated users. Restrictions such as these are imposed and managed using standard administrative tools in DSpace, typically by attaching specific policies to Items or Collections, Bitstreams, etc. The embargo functionally introduced in 1.6, however, includes tools to automate the imposition and removal of restrictions in managed timeframes.</p>
+
+
+<h3><a name="BusinessLogicLayer-EmbargoModelandLifeCycle"></a>Embargo Model and Life-Cycle</h3>
+
+<p>Functionally, the embargo system allows you to attach 'terms' to an item before it is placed into the repository, which express how the embargo should be applied. What do 'we mean by terms' here? They are really any expression that the system is capable of turning into (1) the time the embargo expires, and (2) a concrete set of access restrictions. Some examples:<br/>
+"2020-09-12" - an absolute date (i.e. the date embargo will be lifted)"6 months" - a time relative to when the item is accessioned"forever" - an indefinite, or open-ended embargo"local only until 2015" - both a time and an exception (public has no access until 2015, local users OK immediately)"Nature Publishing Group standard" - look-up to a policy somewhere (typically 6 months)<br/>
+These terms are 'interpreted' by the embargo system to yield a specific date on which the embargo can be removed or 'lifted', and a specific set of access policies. Obviously, some terms are easier to interpret than others (the absolute date really requires none at all), and the 'default' embargo logic understands only the most basic terms (the first and third examples above). But as we will see below, the embargo system provides you with the ability to add in your own 'interpreters' to cope with any terms expressions you wish to have. This date that is the result of the interpretation is stored with the item and the embargo system detects when that date has passed, and removes the embargo ("lifts it"), so the item bitstreams become available. Here is a more detailed life-cycle for an embargoed item:</p>
+
+<ol>
+	<li><b>Terms Assignment.</b> The first step in placing an embargo on an item is to attach (assign) 'terms' to it. If these terms are missing, no embargo will be imposed. As we will see below, terms are carried in a configurable DSpace metadata field, so assigning terms just means assigning a value to a metadata field. This can be done in a web submission user interface form, in a SWORD deposit package, a batch import, etc. - anywhere metadata is passed to DSpace. The terms are not immediately acted upon, and may be revised, corrected, removed, etc, up until the next stage of the life-cycle. Thus a submitter could enter one value, and a collection editor replace it, and only the last value will be used. Since metadata fields are multivalued, theoretically there can be multiple terms values, but in the default implementation only one is recognized.</li>
+	<li><b>Terms interpretation/imposition.</b> In DSpace terminology, when an item has exited the last of any workflow steps (or if none have been defined for it), it is said to be 'installed' into the repository. At this precise time, the 'interpretation' of the terms occurs, and a computed 'lift date' is assigned, which like the terms is recorded in a configurable metadata field. It is important to understand that this interpretation happens only once, (just like the installation), and cannot be revisited later. Thus, although an administrator can assign a new value to the metadata field holding the terms after the item has been installed, this will have no effect on the embargo, whose 'force' now resides entirely in the 'lift date' value. For this reason, you cannot embargo content already in your repository (at least using standard tools). The other action taken at installation time is the actual imposition of the embargo. The default behavior here is simply to remove the read policies on all the bundles and bitstreams except for the "LICENSE" or "METADATA" bundles. See the section on <em>Extending Embargo Functionality</em> for how to alter this behavior. Also note that since these policy changes occur before installation, there is no time during which embargoed content is 'exposed' (accessible by non-administrators). The terms interpretation and imposition together are called 'setting' the embargo, and the component that performs them both is called the embargo 'setter'.</li>
+	<li><b>Embargo Period.</b> After an embargoed item has been installed, the policy restrictions remain in effect until removed. This is not an automatic process, however: a 'lifter' must be run periodically to look for items whose 'lift date' is past. Note that this means the effective removal of an embargo is <b>not</b> the lift date, but the earliest date after the lift date that the lifter is run. Typically, a nightly cron-scheduled invocation of the lifter is more than adequate, given the granularity of embargo terms. Also note that during the embargo period, all metadata of the item remains visible.  This default behavior can be changed. One final point to note is that the 'lift date', although it was computed and assigned during the previous stage, is in the end a regular metadata field. That means, if there are extraordinary circumstances that require an administrator (or collection editor‚Äîanyone with edit permissions on metadata) to change the lift date, they can do so. Thus, they can 'revise' the lift date without reference to the original terms. This date will be checked the next time the 'lifter' is run. One could immediately lift the embargo by setting the lift date to the current day, or change it to 'forever' to indefinitely postpone lifting.</li>
+	<li><b>Embargo Lift.</b> When the lifter discovers an item whose lift date is in the past, it removes (lifts) the embargo. The default behavior of the lifter is to add the resource policies <em>that would have been added</em> had the embargo not been imposed. That is, it replicates the standard DSpace behavior, in which an item inherits it's policies from its owning collection. As with all other parts of the embargo system, you may replace or extend the default behavior of the lifter (see section V. below).  You may wish, e.g. to send an email to an administrator or other interested parties, when an embargoed item becomes available.</li>
+	<li><b>Post Embargo.</b> After the embargo has been lifted, the item ceases to respond to any of the embargo life-cycle events.  The values of the metadata fields reflect essentially historical or provenance values. With the exception of the additional metadata fields, they are indistinguishable from items that were never subject to embargo.</li>
+</ol>
+
+
+				    
+                    			    </td>
+		    </tr>
+	    </table>
+	    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+				<td height="12" background="https://wiki.duraspace.org/images/border/border_bottom.gif"><img src="images/border/spacer.gif" width="1" height="1" border="0"/></td>
+			</tr>
+		    <tr>
+			    <td align="center"><font color="grey">Document generated by Confluence on Dec 16, 2010 11:47</font></td>
+		    </tr>
+	    </table>
+    </body>
+</html>

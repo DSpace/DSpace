@@ -1,0 +1,175 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>DSpace Documentation : Embargo</title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">	    
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <div class="pageheader">
+					    <span class="pagetitle">
+                            DSpace Documentation : Embargo
+                                                    </span>
+				    </div>
+				    <div class="pagesubheading">
+					    This page last changed on Dec 14, 2010 by <font color="#0050B2">tdonohue</font>.
+				    </div>
+
+				    <h1><a name="Embargo-EmbargoSupportinDSpace1.6"></a>Embargo Support in DSpace 1.6</h1>
+
+<style type='text/css'>/*<![CDATA[*/
+div.rbtoc1292367949404 {margin-left: 0px;padding: 0px;}
+div.rbtoc1292367949404 ul {list-style: none;margin-left: 0px;}
+div.rbtoc1292367949404 li {margin-left: 0px;padding-left: 0px;}
+
+/*]]>*/</style><div class='rbtoc1292367949404'>
+<ul>
+    <li><span class='TOCOutline'>1</span> <a href='#Embargo-Whatisanembargo%3F'>What is an embargo?</a></li>
+<ul>
+    <li><span class='TOCOutline'>1.1</span> <a href='#Embargo-Embargomodelandlifecycle'>Embargo model and life-cycle</a></li>
+<ul>
+    <li><span class='TOCOutline'>1.1.1</span> <a href='#Embargo-Termsassignment'>Terms assignment</a></li>
+    <li><span class='TOCOutline'>1.1.2</span> <a href='#Embargo-Termsinterpretation%2Fimposition'>Terms interpretation/imposition</a></li>
+    <li><span class='TOCOutline'>1.1.3</span> <a href='#Embargo-Embargoperiod'>Embargo period</a></li>
+    <li><span class='TOCOutline'>1.1.4</span> <a href='#Embargo-Embargolift'>Embargo lift</a></li>
+    <li><span class='TOCOutline'>1.1.5</span> <a href='#Embargo-Postembargo'>Post embargo</a></li>
+</ul>
+    <li><span class='TOCOutline'>1.2</span> <a href='#Embargo-Configuration'>Configuration</a></li>
+    <li><span class='TOCOutline'>1.3</span> <a href='#Embargo-Operation'>Operation</a></li>
+    <li><span class='TOCOutline'>1.4</span> <a href='#Embargo-Extendingembargofunctionality'>Extending embargo functionality</a></li>
+<ul>
+    <li><span class='TOCOutline'>1.4.1</span> <a href='#Embargo-Setter'>Setter</a></li>
+    <li><span class='TOCOutline'>1.4.2</span> <a href='#Embargo-Lifter'>Lifter</a></li>
+</ul>
+</ul>
+</ul></div>
+
+<h2><a name="Embargo-Whatisanembargo%3F"></a>What is an embargo?</h2>
+
+<p>An embargo is a temporary access restriction placed on content, commencing at time of accession. It's scope or duration may vary, but the fact that it eventually expires is what distinguishes it from other content restrictions. For example, it is not unusual for content destined for DSpace to come with permanent restrictions on use or access based on license-driven or other IP-based requirements that limit access to institutionally affiliated users. Restrictions such as these are imposed and managed using standard administrative tools in DSpace, typically by attaching specific policies to Items or Collections, Bitstreams, etc.  The embargo functionally introduced in 1.6, however, includes tools to automate the imposition and removal of restrictions in managed timeframes.</p>
+
+<h3><a name="Embargo-Embargomodelandlifecycle"></a>Embargo model and life-cycle</h3>
+
+<p>Functionally, the embargo system allows you to attach 'terms'  to an item before it is placed into the repository, which express how the embargo should be applied. What do 'we mean by terms' here? They are really any expression that the system is capable of turning into (1) the time the embargo expires, and (2) a concrete set of access restrictions. Some examples:</p>
+
+<p>"2020-09-12"  - an absolute date (i.e. the date embargo will be lifted)<br/>
+"6 months" - a time relative to when the item is accessioned<br/>
+"forever"  - an indefinite, or open-ended embargo<br/>
+"local only until 2015" -  both a time and an exception (public has no access until 2015, local users OK immediately)<br/>
+"Nature Publishing Group standard" - look-up to a policy somewhere (typically 6 months)</p>
+
+<p>These terms are 'interpreted' by the embargo system to yield a specific date on which the embargo can be removed or 'lifted'., and a specific set of access policies. Obviously, some terms are easier to interpret than others (the absolute date really requires none at all), and the 'default' embargo logic understands only the most basic terms (the first and third examples above). But as we will see below, the embargo system provides you with the ability to add in your own 'interpreters' to cope with any terms expressions you wish to have. This date that is the result of the interpretation is stored with the item and the embargo system detects when that date has passed, and removes the embargo ("lifts it"), so the item bitstreams become available. Here is a more detailed life-cycle for an embargoed item:</p>
+
+<h4><a name="Embargo-Termsassignment"></a>Terms assignment</h4>
+
+<p>The first step in placing an embargo on an item is to attach (assign) 'terms' to it.<br/>
+If these terms are missing, no embargo will be imposed. As we will see below, terms are carried in a configurable DSpace metadata field, so assigning terms just means assigning a value to a metadata field. This can be done in a web submission user interface form, in a SWORD deposit package, a batch import, etc. - anywhere metadata is passed to DSpace. The terms are not immediately acted upon, and may be revised, corrected, removed, etc, up until the next stage of the life-cycle. Thus a submitter could enter one value, and a collection editor replace it, and only the last value will be used. Since metadata fields are multivalued, theoretically there can be multiple terms values, but in the default implementation only one is recognized.</p>
+
+<h4><a name="Embargo-Termsinterpretation%2Fimposition"></a>Terms interpretation/imposition</h4>
+
+<p>In DSpace terminology, when an Item has exited the last of any workflow steps (or if none have been defined for it), it is said to be 'installed' into the repository. At this precise time, the 'interpretation' of the terms occurs, and a computed 'lift date' is assigned, which like the terms is recorded in a configurable metadata field. It is important to understand that this interpretation happens only once, (just like the installation), and cannot be revisited later. Thus, although an administrator can assign a new value to the metadata field holding the terms after the item has been installed, this will have no effect on the embargo, whose 'force' now resides entirely in the 'lift date' value.  For this reason, you cannot embargo content already in your repository (at least using standard tools). The other action taken at installation time is the actual imposition of the embargo. The default behavior here is simply to remove the read policies on all the bundles and bitstreams except for the "LICENSE" or "METADATA" bundles. See section V. below for how to alter this behavior. Also note that since these policy changes occur before installation, there is no time during which embargoed content is 'exposed' (accessible by non-administrators). The terms interpretation and imposition together are called 'setting' the embargo, and the component that performs them both is called the embargo 'setter'.</p>
+
+<h4><a name="Embargo-Embargoperiod"></a>Embargo period</h4>
+
+<p>After an embargoed item has been installed, the policy restrictions remain in effect until removed. This is not an automatic process, however:  a 'lifter' must be run periodically to look for items whose 'lift date' is past. Note that this means the effective removal of an embargo is <b>not</b> the lift date, but the earliest date after the lift date that the lifter is run. Typically, a nightly cron-scheduled invocation of the lifter is more than adequate, given the granularity of embargo terms. Also note that during the embargo period, all metadata of the item remains visible.This default behavior can be changed. One final point to note is that the 'lift date', although it was computed and assigned during the previous stage, is in the end a regular metadata field. That means, if there are extraordinary circumstances that require an administrator (or collection editor - anyone with edit permissions on metadata) to change the lift date, they can do so. Thus, they can 'revise' the lift date without reference to the original terms. This date will be checked the next<br/>
+time the 'lifter' is run. One could immediately lift the embargo by setting the lift date to the current day, or change it to 'forever' to indefinitely postpone lifting.</p>
+
+<h4><a name="Embargo-Embargolift"></a>Embargo lift</h4>
+
+<p>When the lifter discovers an item whose lift date is in the past, it removes (lifts) the embargo. The default behavior of the lifter is to add the resource policies<br/>
+<b>that would have been added</b> had the embargo not been imposed. That is, it replicates the standard DSpace behavior,  in which an item inherits it's policies from its owning collection. As with all other parts of the embargo system, you may replace or extend the default behavior of the lifter (see section V. below). You may wish, e.g. to send an email to an administrator or other interested parties, when an embargoed item becomes available.</p>
+
+<h4><a name="Embargo-Postembargo"></a>Post embargo</h4>
+
+<p>After the embargo has been lifted, the item ceases to respond to any of the embargo life-cycle events. The values of the metadata fields reflect essentially historical or provenance values. With the exception of the additional metadata fields, they are indistinguishable from items that were never subject to embargo.</p>
+
+<h3><a name="Embargo-Configuration"></a>Configuration</h3>
+
+<p>DSpace embargoes utilize standard metadata fields to hold both the 'terms' and the 'lift date'. Which fields you use are configurable,  and no specific metadata element is dedicated or pre-defined for use in embargo. Rather, you specify exactly what field you want the embargo system to examine when it needs to find the terms or assign the lift date.</p>
+
+<p>The properties that specify these assignments live in dspace.cfg:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+# DC metadata field to hold the user-supplied embargo terms
+embargo.field.terms = SCHEMA.ELEMENT.QUALIFIER
+
+# DC metadata field to hold computed <span class="code-quote">"lift date"</span> of embargo
+embargo.field.lift = SCHEMA.ELEMENT.QUALIFIER
+</pre>
+</div></div>
+
+<p>You replace the placeholder values with real metadata field names. If you only need the 'default' embargo behavior - which essentially accepts only absolute dates as 'terms' ,<br/>
+this is the only configuration required, except as noted below.</p>
+
+<p>There is also a property for the special date of 'forever':</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+# string in terms field to indicate indefinite embargo
+embargo.terms.open = forever
+</pre>
+</div></div>
+<p>which you may change to suit linguistic or other preference.</p>
+
+<p>You are free to use existing metadata fields, or create new fields. If you choose the latter, you must understand that the embargo system does <b>not</b> create or configure these fields:  i.e. you must follow all the standard documented procedures for actually creating them (i.e. adding them to the metadata registry, or to display templates, etc) - this does not happen automatically. Likewise, if you want the field for 'terms' to appear in submission screens and workflows, you must follow the documented procedure for configurable submission (basically, this means adding the field to input-forms.xml). The flexibility of metadata configuration makes if easy for you to restrict embargoes to specific collections, since configurable submission can be defined per collection.</p>
+
+<p>Key recommendations:</p>
+
+<ol>
+	<li>If using existing metadata fields, avoid any that are automatically managed by DSpace. For example, fields like 'date.issued'  or 'date.accessioned' are normally automatically assigned, and thus must not be recruited for embargo use.</li>
+	<li>Do not place the field for 'lift date' in submission screens. This can potentially confuse submitters because they may feel that they can directly assign values to it. As noted in the life-cycle above, this is erroneous: the lift date gets assigned by the embargo system based on the terms. Any pre-existing value will be over-written. But see next recommendation for an exception.</li>
+	<li>As the life-cycle discussion above makes clear, after the terms are applied, that field is no longer actionable in the embargo system. Conversely, the 'lift date' field is not actionable <b>until</b> the application. Thus you may want to consider configuring both the 'terms' and 'lift date' to use the same metadata field. In this way,<br/>
+during workflow you would see only the terms, and after item installation, only the lift date. If you wish the metadata to retain the terms for any resaon, use 2 distinct fields instead.</li>
+</ol>
+
+
+<h3><a name="Embargo-Operation"></a>Operation</h3>
+
+<p>After the fields defined for terms and lift date have been assigned in dspace.cfg, and created and configured wherever they will be used, you can begin to embargo items simply by entering data (dates, if using the default setter) in the terms field. They will automatically be embargoed as they exit workflow. For the embargo to be lifted on any item, however, a new administrative procedure must be added: the 'embargo lifter' must be invoked on a regular basis. This task examines all embargoed items, and if their 'lift date' has passed, it removes the access restrictions on the item. Good practice dictates automating this procedure using cron jobs or the like, rather than manually running it.<br/>
+The lifter is available as a target of the 1.6 DSpace launcher - see launcher documentation for details.</p>
+
+<h3><a name="Embargo-Extendingembargofunctionality"></a>Extending embargo functionality</h3>
+
+<p>The 1.6 embargo system supplies a default  'interpreter/imposition' class (the 'Setter') as well as a 'Lifter', but they are fairly rudimentary in several respects.</p>
+
+<h4><a name="Embargo-Setter"></a>Setter</h4>
+
+<p>The default setter recognizes only two expressions of terms:  either a literal, non-relative date in the fixed format 'yyyy-mm-dd' (known as ISO 8601), or a special string used for open-ended embargo (the default configured value for this is 'forever', but this can be changed in dspace.cfg to 'toujours', 'unendlich', etc).  It will perform a minimal sanity check that the date is not in the past. Similarly, the default setter will only remove all read policies as noted above, rather than applying more nuanced rules (e.g allow access to certain IP groups, deny the rest). Fortunately, the setter class itself is configurable and you can 'plug in' any behavior you like, provided it is written in java and conforms to the setter interface. The dspace.cfg property:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+# implementation of embargo setter plugin - replace with local implementation <span class="code-keyword">if</span> applicable
+plugin.single.org.dspace.embargo.EmbargoSetter = org.dspace.embargo.DefaultEmbargoSetter
+</pre>
+</div></div>
+
+<p>controls which setter to use.</p>
+
+<h4><a name="Embargo-Lifter"></a>Lifter</h4>
+
+<p>The default lifter behavior as described above - essentially applying the collection policy rules to the item - might also not be sufficient for all purposes. It also can be replaced with another class:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+# implementation of embargo lifter plugin - - replace with local implementation <span class="code-keyword">if</span> applicable
+plugin.single.org.dspace.embargo.EmbargoLifter = org.dspace.embargo.DefaultEmbargoLifter
+</pre>
+</div></div>
+
+				    
+                    			    </td>
+		    </tr>
+	    </table>
+	    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+				<td height="12" background="https://wiki.duraspace.org/images/border/border_bottom.gif"><img src="images/border/spacer.gif" width="1" height="1" border="0"/></td>
+			</tr>
+		    <tr>
+			    <td align="center"><font color="grey">Document generated by Confluence on Dec 16, 2010 11:47</font></td>
+		    </tr>
+	    </table>
+    </body>
+</html>

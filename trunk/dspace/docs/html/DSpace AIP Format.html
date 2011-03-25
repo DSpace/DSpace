@@ -1,0 +1,1046 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>DSpace Documentation : DSpace AIP Format</title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">	    
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <div class="pageheader">
+					    <span class="pagetitle">
+                            DSpace Documentation : DSpace AIP Format
+                                                    </span>
+				    </div>
+				    <div class="pagesubheading">
+					    This page last changed on Dec 13, 2010 by <font color="#0050B2">tdonohue</font>.
+				    </div>
+
+				    <h1><a name="DSpaceAIPFormat-TheDSpaceAIPFormat"></a>The DSpace AIP Format</h1>
+
+<style type='text/css'>/*<![CDATA[*/
+div.rbtoc1292258670743 {margin-left: 0px;padding: 0px;}
+div.rbtoc1292258670743 ul {list-style: none;margin-left: 0px;}
+div.rbtoc1292258670743 li {margin-left: 0px;padding-left: 0px;}
+
+/*]]>*/</style><div class='rbtoc1292258670743'>
+<ul>
+    <li><span class='TOCOutline'>1</span> <a href='#DSpaceAIPFormat-MakeupandDefinitionofAIPs'>Makeup and Definition of AIPs</a></li>
+<ul>
+    <li><span class='TOCOutline'>1.1</span> <a href='#DSpaceAIPFormat-AIPsareArchivalInformationPackages.'>AIPs are Archival Information Packages.</a></li>
+    <li><span class='TOCOutline'>1.2</span> <a href='#DSpaceAIPFormat-GeneralAIPStructure%2FExamples'>General AIP Structure / Examples</a></li>
+<ul>
+    <li><span class='TOCOutline'>1.2.1</span> <a href='#DSpaceAIPFormat-CustomizingWhatIsStoredinYourAIPs'>Customizing What Is Stored in Your AIPs</a></li>
+</ul>
+</ul>
+    <li><span class='TOCOutline'>2</span> <a href='#DSpaceAIPFormat-AIPDetails%3AMETSStructure'>AIP Details: METS Structure</a></li>
+    <li><span class='TOCOutline'>3</span> <a href='#DSpaceAIPFormat-MetadatainMETS'>Metadata in METS</a></li>
+<ul>
+    <li><span class='TOCOutline'>3.1</span> <a href='#DSpaceAIPFormat-DIM%28DSpaceIntermediateMetadata%29Schema'>DIM (DSpace Intermediate Metadata) Schema</a></li>
+<ul>
+    <li><span class='TOCOutline'>3.1.1</span> <a href='#DSpaceAIPFormat-DIMDescriptiveElementsforItemobjects'>DIM Descriptive Elements for Item objects</a></li>
+    <li><span class='TOCOutline'>3.1.2</span> <a href='#DSpaceAIPFormat-DIMDescriptiveElementsforCollectionobjects'>DIM Descriptive Elements for Collection objects</a></li>
+    <li><span class='TOCOutline'>3.1.3</span> <a href='#DSpaceAIPFormat-DIMDescriptiveElementsforCommunityobjects'>DIM Descriptive Elements for Community objects</a></li>
+    <li><span class='TOCOutline'>3.1.4</span> <a href='#DSpaceAIPFormat-DIMDescriptiveElementsforSiteobjects'>DIM Descriptive Elements for Site objects</a></li>
+</ul>
+    <li><span class='TOCOutline'>3.2</span> <a href='#DSpaceAIPFormat-MODSSchema'>MODS Schema</a></li>
+    <li><span class='TOCOutline'>3.3</span> <a href='#DSpaceAIPFormat-AIPTechnicalMetadataSchema%28AIPTECHMD%29'>AIP Technical Metadata Schema (AIP-TECHMD)</a></li>
+<ul>
+    <li><span class='TOCOutline'>3.3.1</span> <a href='#DSpaceAIPFormat-AIPTechnicalMetadataforItem'>AIP Technical Metadata for Item</a></li>
+    <li><span class='TOCOutline'>3.3.2</span> <a href='#DSpaceAIPFormat-AIPTechnicalMetadataforBitstream'>AIP Technical Metadata for Bitstream</a></li>
+    <li><span class='TOCOutline'>3.3.3</span> <a href='#DSpaceAIPFormat-AIPTechnicalMetadataforCollection'>AIP Technical Metadata for Collection</a></li>
+    <li><span class='TOCOutline'>3.3.4</span> <a href='#DSpaceAIPFormat-AIPTechnicalMetadataforCommunity'>AIP Technical Metadata for Community</a></li>
+    <li><span class='TOCOutline'>3.3.5</span> <a href='#DSpaceAIPFormat-AIPTechnicalMetadataforSite'>AIP Technical Metadata for Site</a></li>
+</ul>
+    <li><span class='TOCOutline'>3.4</span> <a href='#DSpaceAIPFormat-PREMISSchema'>PREMIS Schema</a></li>
+<ul>
+    <li><span class='TOCOutline'>3.4.1</span> <a href='#DSpaceAIPFormat-PREMISMetadataforBitstream'>PREMIS Metadata for Bitstream</a></li>
+</ul>
+    <li><span class='TOCOutline'>3.5</span> <a href='#DSpaceAIPFormat-DSPACEROLESSchema'>DSPACE-ROLES Schema</a></li>
+<ul>
+    <li><span class='TOCOutline'>3.5.1</span> <a href='#DSpaceAIPFormat-ExampleofDSPACEROLESSchemaforaSITEAIP'>Example of DSPACE-ROLES Schema for a SITE AIP</a></li>
+    <li><span class='TOCOutline'>3.5.2</span> <a href='#DSpaceAIPFormat-ExampleofDSPACEROLESSchemaforaCommunityorCollection'>Example of DSPACE-ROLES Schema for a Community or Collection</a></li>
+</ul>
+    <li><span class='TOCOutline'>3.6</span> <a href='#DSpaceAIPFormat-METSRightsSchema'>METSRights Schema</a></li>
+<ul>
+    <li><span class='TOCOutline'>3.6.1</span> <a href='#DSpaceAIPFormat-ExampleofMETSRightsSchemaforanItem'>Example of METSRights Schema for an Item</a></li>
+    <li><span class='TOCOutline'>3.6.2</span> <a href='#DSpaceAIPFormat-ExampleofMETSRightsSchemaforaCollection'>Example of METSRights Schema for a Collection</a></li>
+    <li><span class='TOCOutline'>3.6.3</span> <a href='#DSpaceAIPFormat-ExampleofMETSRightsSchemaforaCommunity'>Example of METSRights Schema for a Community</a></li>
+</ul>
+</ul>
+</ul></div>
+
+<h2><a name="DSpaceAIPFormat-MakeupandDefinitionofAIPs"></a>Makeup and Definition of AIPs</h2>
+
+<h3><a name="DSpaceAIPFormat-AIPsareArchivalInformationPackages."></a>AIPs are Archival Information Packages.</h3>
+
+<ul>
+	<li>AIP is a package describing <b>one archival object</b> in DSpace.
+	<ul>
+		<li>The <b>archival object</b> may be a single <b>Item</b>, <b>Collection</b>, <b>Community</b>, or <b>Site</b> (Site AIPs contain site-wide information). Bitstreams are included in an Item's AIP.</li>
+		<li>Each AIP is logically self-contained, can be restored without rest of the archive. (So you could restore a single Item, Collection or Community)</li>
+		<li>Collection or Community AIPs do <b>not</b> include all child objects (e.g. Items in those Collections or Communities), as each AIP only describes <b>one</b> object.  However, these container AIPs do contain references (links) to all child objects.  These references can be used by DSpace to automatically restore all referenced AIPs when restoring a Collection or Community.</li>
+		<li>AIPs are only generated for objects which are currently in the "in archive" state in DSpace.  This means that in-progress, uncompleted submissions are not described in AIPs and cannot be restored after a disaster.  Permanently removed objects will also no longer be exported as AIPs after their removal.  However, withdrawn objects will continue to be exported as AIPs, since they are still considered under the "in archive" status.</li>
+		<li>AIPs with identical contents will always have identical <a href="http://en.wikipedia.org/wiki/Checksum">checksums</a>. This provides a basic means of validating whether the contents within an AIP have changed.  For example, if a Collection's AIP has the same checksum at two different points in time, it means that Collection has not changed during that time period.</li>
+		<li>AIP profile favors completeness and accuracy rather than presenting the semantics of an object in a standard format.  It conforms to the quirks of DSpace's internal object model rather than attempting to produce a universally understandable representation of the object.  When possible, an AIP tries to use common standards to express objects.</li>
+		<li>An AIP <em>can</em> serve as a DIP (Dissemination Information Package) or SIP (Submission Information Package), especially when transferring custody of objects to another DSpace implementation.</li>
+		<li>In contrast to SIP or DIP, the AIP should include all available DSpace structural and administrative metadata, and basic provenance information.  AIPs also describe some basic system level information (e.g. Groups and People).</li>
+	</ul>
+	</li>
+</ul>
+
+
+<h3><a name="DSpaceAIPFormat-GeneralAIPStructure%2FExamples"></a>General AIP Structure / Examples</h3>
+
+<p>Generally speaking, an AIP is an Zip file containing a METS manifest and all related content bitstreams, license files and any other associated files.</p>
+
+<p>Some examples include:</p>
+<ul>
+	<li>Site AIP  (Sample: <a href="attachments/22021312/22675553.zip">SITE-example.zip</a>)
+	<ul>
+		<li>METS contains basic metadata about DSpace Site and persistent IDs referencing all Top Level Communities</li>
+		<li>METS also contains a list of all Groups and EPeople information defined in the DSpace system.  (NOTE: By default, user passwords are not stored in AIPs, unless you specify the 'passwords' flag.  See <a href="AIP Backup and Restore.html#AIPBackupandRestore-AdditionalPackagerOptions">Additional Packager Options</a>.)</li>
+	</ul>
+	</li>
+	<li>Community AIP (Sample: <a href="attachments/22021312/22675556.zip">COMMUNITY@123456789-1.zip</a>)
+	<ul>
+		<li>METS contains all metadata for Community and persistent IDs referencing all members (SubCommunities or Collections).  Package may also include a Logo file, if one exists.</li>
+		<li>METS contains any Group information for Commmunity-specific groups (e.g. <tt>COMMUNITY&#95;&lt;ID&gt;&#95;ADMIN</tt> group).</li>
+		<li>METS contains all Community permissions/policies (translated into <a href="http://www.loc.gov/standards/rights/METSRights.xsd">METSRights schema</a>)</li>
+	</ul>
+	</li>
+	<li>Collection AIP (Sample: <a href="attachments/22021312/22675555.zip">COLLECTION@123456789-2.zip</a>)
+	<ul>
+		<li>METS contains all metadata for Collection and persistent IDs referencing all members (Items).  Package may also include a Logo file, if one exists.</li>
+		<li>METS contains any Group information for Collection-specific groups (e.g. <tt>COLLECTION&#95;&lt;ID&gt;&#95;ADMIN</tt>, <tt>COLLECTION&#95;&lt;ID&gt;&#95;SUBMIT</tt>, etc.).</li>
+		<li>METS contains all Collection permissions/policies (translated into <a href="http://www.loc.gov/standards/rights/METSRights.xsd">METSRights schema</a>)</li>
+		<li>If the Collection has an Item Template, the METS will also contain all the metadata for that Item Template.</li>
+	</ul>
+	</li>
+	<li>Item AIP (Sample: <a href="attachments/22021312/22675554.zip">ITEM@123456789-8.zip</a>)
+	<ul>
+		<li>METS contains all metadata for Item and references to all Bundles and Bitstreams.  Package also includes all Bitstream files.</li>
+		<li>METS contains all Item/Bundle/Bitstream permissions/policies (translated into <a href="http://www.loc.gov/standards/rights/METSRights.xsd">METSRights schema</a>)</li>
+	</ul>
+	</li>
+</ul>
+
+
+<p><em>Notes:</em></p>
+<ul>
+	<li>Bitstreams and Bundles are second-class archival objects; they are recorded in the context of an Item.</li>
+	<li>BitstreamFormats are not even second-class; they are described implicitly within Item technical metadata, and reconstructed from that during restoration</li>
+	<li>EPeople are only defined in Site AIP, but may be referenced from Community or Collection AIPs</li>
+	<li>Groups may be defined in Site AIP, Community AIP or Collection AIP.  Where they are defined depends on whether the Group relates specifically to a single Community or Collection, or is just a general site-wide group.</li>
+</ul>
+
+
+<p><b>What is NOT in AIPs</b></p>
+<ul>
+	<li>DSpace Site configurations ([dspace]/config/ directory) or customizations (themes, stylesheets, etc) are not described in AIPs</li>
+	<li>DSpace Database model (or customizations therein) is not described in AIPs</li>
+	<li>Any objects which are not currently in the "In Archive" state are not described in AIPs.  This means that in-progress, unfinished submissions are never included in AIPs.</li>
+</ul>
+
+
+<h4><a name="DSpaceAIPFormat-CustomizingWhatIsStoredinYourAIPs"></a>Customizing What Is Stored in Your AIPs</h4>
+
+<p>If you choose, you can customize exactly what information is stored in your AIPs.  However, you should be aware that you can only restore information which is stored within your AIPs.  If you choose to remove information from your AIPs, you will be unable to restore it later on (unless you are also backing up your entire DSpace database and assetstore folder).</p>
+
+<div class='panelMacro'><table class='infoMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="images/icons/emoticons/information.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>AIP Recommendations</b><br />It is recommended to minimally use the default settings when generating AIPs. DSpace can only restore information that is included within an AIP. Therefore, if you choose to no longer include some information in an AIP, DSpace will no longer be able to restore that information from an AIP backup</td></tr></table></div>
+
+<p>There are two ways to go about customizing your AIP format:  </p>
+<ol>
+	<li>You can <a href="AIP Backup and Restore.html#AIPBackupandRestore-Configurationin%27dspace.cfg%27">customize your <tt>dspace.cfg</tt> settings pertaining to AIP generation</a>.  These configurations will allow you to specify exactly which DSpace Crosswalks will be called when generating the AIP METS manifest.</li>
+	<li>You can export your AIPs using one of the <a href="AIP Backup and Restore.html#AIPBackupandRestore-AdditionalPackagerOptions">special options/flags</a>.</li>
+</ol>
+
+
+
+<h2><a name="DSpaceAIPFormat-AIPDetails%3AMETSStructure"></a>AIP Details: METS Structure</h2>
+
+<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="images/icons/emoticons/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>This METS Structure is based on the structure decided for the original <a href="https://wiki.duraspace.org/display/DSPACE/AipPrototype" title="AipPrototype">AipPrototype</a>, developed as part of the MIT &amp; UCSD PLEDGE project.</td></tr></table></div>
+
+
+<ul>
+	<li><tt>mets</tt> element
+	<ul>
+		<li><tt>@PROFILE</tt> fixed value="http://www.dspace.org/schema/aip/1.0/mets.xsd" (this is how we identify an AIP manifest)</li>
+		<li><tt>@OBJID</tt> URN-format persistent identifier (i.e. Handle) if available, or else a unique identifier. (e.g. "hdl:123456789/1")</li>
+		<li><tt>@LABEL</tt> title if available</li>
+		<li><tt>@TYPE</tt> DSpace object type, one of "DSpace ITEM", "DSpace COLLECTION", "DSpace COMMUNITY" or  "DSpace SITE".</li>
+		<li><tt>@ID</tt> is a globally unique identifier, built using the Handle and the Object type (e.g. <tt>dspace-COLLECTION-hdl:123456789/3</tt>).</li>
+	</ul>
+	</li>
+	<li><tt>mets/metsHdr</tt> element
+	<ul>
+		<li><tt>@LASTMODDATE</tt> last-modified date for a DSpace Item, or nothing for other objects.</li>
+		<li><tt>agent</tt> element:
+		<ul>
+			<li><tt>@ROLE</tt> = "CUSTODIAN",</li>
+			<li><tt>@TYPE</tt> = "OTHER",</li>
+			<li><tt>@OTHERTYPE</tt> = "DSpace Archive",</li>
+			<li><tt>name</tt> = <em>Site handle</em>.  (Note: The Site Handle is of the format <tt>[handle_prefix]/0</tt>, e.g. "123456789/0")</li>
+		</ul>
+		</li>
+		<li><tt>agent</tt> element:
+		<ul>
+			<li><tt>@ROLE</tt> = "CREATOR",</li>
+			<li><tt>@TYPE</tt> = "OTHER",</li>
+			<li><tt>@OTHERTYPE</tt> = "DSpace Software",</li>
+			<li><tt>name</tt> = "DSpace [version]" (Where "[version]" is the specific version of DSpace software which created this AIP, e.g. "1.7.0")</li>
+		</ul>
+		</li>
+	</ul>
+	</li>
+	<li><tt>mets/dmdSec</tt> element(s)
+	<ul>
+		<li>By default, two <tt>dmdSec</tt> elements are included for all AIPs:
+		<ol>
+			<li>object's descriptive metadata crosswalked to MODS (specified by <tt>mets/dmdSec/mdWrap@MDTYPE="MODS"</tt>). See <a href="#DSpaceAIPFormat-MODSSchema">MODS Schema</a> section below for more information.</li>
+			<li>object's descriptive metadata in DSpace native DIM intermediate format, to serve as a complete and precise record for restoration or ingestion into another DSpace. Specified by <tt>mets/dmdSec/mdWrap@MDTYPE="OTHER",@OTHERMDTYPE="DIM"</tt>.  See <a href="#DSpaceAIPFormat-DIM%28DSpaceIntermediateMetadata%29Schema">DIM &#40;DSpace Intermediate Metadata&#41; Schema</a> section below for more information.</li>
+		</ol>
+		</li>
+		<li>For Collection AIPs, additional <tt>dmdSec</tt> elements may exist which describe the Item Template for that Collection.  Since an Item template is not an actual Item (i.e. it only includes metadata), it is stored within the Collection AIP.  The Item Template's <tt>dmdSec</tt> elements will be referenced by a <tt>div @TYPE="DSpace ITEM Template"</tt> in the METS <tt>structMap</tt>.</li>
+		<li>When the <tt>mdWrap</tt> <tt>@TYPE</tt> value is <tt>OTHER</tt>, the element <em>MUST</em> include a value for the <tt>@OTHERTYPE</tt> attribute which names the crosswalk that produced (or interprets) that metadata, e.g. <tt>DIM</tt>.</li>
+	</ul>
+	</li>
+	<li><tt>mets/amdSec</tt> element(s)
+	<ul>
+		<li>One or more <tt>amdSec</tt> elements are include for all AIPs.  The first <tt>amdSec</tt> element contains administrative metadata (technical, source, rights, and provenance) for the entire archival object. Additional <tt>amdSec</tt> elements may exist to describe parts of the archival object (e.g. Bitstreams or Bundles in an Item).
+		<ul>
+			<li><tt>techMD</tt> elements.  By default, two types of <tt>techMD</tt> elements may be included:
+			<ul>
+				<li><tt>PREMIS</tt> metadata about an object may be included here (<em>currently only specified for Bitstreams (files)</em>).  Specified by <tt>mdWrap@MDTYPE="PREMIS"</tt>. See <a href="#DSpaceAIPFormat-PREMISSchema">PREMIS Schema</a> section below for more information.</li>
+				<li><tt>DSPACE-ROLES</tt> metadata may appear here to describe the Groups or EPeople related to this object (_currently only specified for Site, Community and Collection).  Specified by <tt>mdWrap@MDTYPE="OTHER",@OTHERMDTYPE="DSPACE-ROLES"</tt>.  See <a href="#DSpaceAIPFormat-DSPACEROLESSchema">DSPACE&#45;ROLES Schema</a> section below for more information.</li>
+			</ul>
+			</li>
+			<li><tt>rightsMD</tt> elements.  By default, there are four possible types of <tt>rightsMD</tt> elements which may be included:
+			<ul>
+				<li><tt>METSRights</tt> metadata may appear here to describe the permissions on this object.  Specified by <tt>mdWrap@MDTYPE="OTHER",@OTHERMDTYPE="METSRIGHTS"</tt>.  See <a href="#DSpaceAIPFormat-METSRightsSchema">METSRights Schema</a> section below for more information.</li>
+				<li><tt>DSpaceDepositLicense</tt> if the object is an Item and it has a deposit license, it is contained here. Specified by <tt>mdWrap@MDTYPE="OTHER",@OTHERMDTYPE="DSpaceDepositLicense"</tt>.</li>
+				<li><tt>CreativeCommonsRDF</tt> If the object is an Item with a Creative Commons license expressed in RDF, it is included here. Specified by <tt>mdWrap@MDTYPE="OTHER",@OTHERMDTYPE="CreativeCommonsRDF"</tt>.</li>
+				<li><tt>CreativeCommonsText</tt> If the object is an Item with a Creative Commons license in plain text, it is included here. Specified by <tt>mdWrap@MDTYPE="OTHER",@OTHERMDTYPE="CreativeCommonsText"</tt>.</li>
+			</ul>
+			</li>
+			<li><tt>sourceMD</tt> element.  By default, there is only one type of <tt>sourceMD</tt> element which may appear:
+			<ul>
+				<li><tt>AIP-TECHMD</tt> metadata may appear here. This stores basic technical/source metadata about in object in a DSpace native format. Specified by <tt>mdWrap@MDTYPE="OTHER",@OTHERMDTYPE="AIP-TECHMD"</tt>. See <a href="#DSpaceAIPFormat-AIPTechnicalMetadataSchema%28AIPTECHMD%29">AIP Technical Metadata Schema &#40;AIP&#45;TECHMD&#41;</a> section below for more information.</li>
+			</ul>
+			</li>
+			<li><tt>digiprovMD</tt> element.
+			<ul>
+				<li><em>Not used at this time.</em></li>
+			</ul>
+			</li>
+		</ul>
+		</li>
+	</ul>
+	</li>
+	<li><tt>mets/fileSec</tt> element
+	<ul>
+		<li>For ITEM objects:
+		<ul>
+			<li>Each distinct Bundle in an Item goes into a <tt>fileGrp</tt>.   The <tt>fileGrp</tt> has a <tt>@USE</tt> attribute which corresponds to the Bundle name.</li>
+			<li>Bitstreams in bundles become <tt>file</tt> elements under <tt>fileGrp</tt>.</li>
+			<li><tt>mets/fileSec/fileGrp/file</tt> elements
+			<ul>
+				<li>Set <tt>@SIZE</tt> to length of the bitstream.  There is a redundant value in the &lt;techMD&gt; but it is more accessible here.</li>
+				<li>Set <tt>@MIMETYPE</tt>, <tt>@CHECKSUM</tt>, <tt>@CHECKSUMTYPE</tt> to corresponding bitstream values.  There is redundant info in the &lt;techMD&gt;.  (For DSpace, the <tt>@CHECKSUMTYPE="MD5"</tt> at all times)</li>
+				<li>SET <tt>@SEQ</tt> to bitstream's SequenceID if it has one.</li>
+				<li>SET <tt>@ADMID</tt> to the list of <tt>&lt;amdSec&gt;</tt> element(s) which describe this bitstream.</li>
+			</ul>
+			</li>
+		</ul>
+		</li>
+		<li>For COLLECTION and COMMUNITY objects:
+		<ul>
+			<li><em>Only</em> if the object has a <em>logo bitstream</em>, there is a <tt>fileSec</tt> with one <tt>fileGrp</tt> child of <tt>@USE="LOGO"</tt>.</li>
+			<li>The <tt>fileGrp</tt> contains one <tt>file</tt> element, representing the logo Bitstream.  It has the same <tt>@MIMETYPE</tt>, <tt>@CHECKSUM</tt>, <tt>@CHECKSUMTYPE</tt> attributes as the Item content bitstreams, but does NOT include metadata section references (e.g. <tt>@ADMID</tt>) or a <tt>@SEQ</tt> attribute.</li>
+			<li>See the main <tt>structMap</tt> for the <tt>fptr</tt> reference to this logo file.</li>
+		</ul>
+		</li>
+	</ul>
+	</li>
+	<li><tt>mets/structMap</tt> - Primary structure map, <tt>@LABEL="DSpace Object", @TYPE="LOGICAL"</tt>
+	<ul>
+		<li>For ITEM objects:
+		<ol>
+			<li>Top-Level <tt>div</tt> with <tt>@TYPE="DSpace Object Contents"</tt>.
+			<ul>
+				<li>For every Bitstream in Item it  contains a <tt>div</tt> with <tt>@TYPE="DSpace BITSTREAM"</tt>.  Each Bitstream <tt>div</tt> has a single <tt>fptr</tt> element which references the bitstream location.</li>
+			</ul>
+			</li>
+		</ol>
+		<ul>
+			<li>If Item has primary bitstream, put it in <tt>structMap/div/fptr</tt> (i.e. directly under the <tt>div</tt> with <tt>@TYPE="DSpace Object Contents"</tt>)</li>
+		</ul>
+		</li>
+		<li>For COLLECTION objects:
+		<ol>
+			<li>Top-Level <tt>div</tt> with <tt>@TYPE="DSpace Object Contents"</tt>.
+			<ul>
+				<li>For every Item in the Collection, it contains a <tt>div</tt> with <tt>@TYPE="DSpace ITEM"</tt>. Each Item <tt>div</tt> has up to two child <tt>mptr</tt> elements:
+				<ol>
+					<li>One linking to the Handle of that Item. Its <tt>@LOCTYPE="HANDLE"</tt>, and <tt>@xlink:href</tt> value is the raw Handle.</li>
+					<li>(Optional) one linking to the location of the local AIP for that Item (if known).  Its <tt>@LOCTYPE="URL"</tt>, and <tt>@xlink:href</tt> value is a relative link to the AIP file on the local filesystem.</li>
+				</ol>
+				</li>
+			</ul>
+			</li>
+		</ol>
+		<ul>
+			<li>If Collection has a Logo bitstream, there is an <tt>fptr</tt> reference to it in the very first <tt>div</tt>.</li>
+			<li>If the Collection includes an Item Template, there will be a <tt>div</tt> with <tt>@TYPE="DSpace ITEM Template"</tt> within the very first <tt>div</tt>.  This <tt>div @TYPE="DSpace ITEM Template"</tt> must have a <tt>@DMDID</tt> specified, which links to the <tt>dmdSec</tt> element(s) that contain the metadata for the Item Template.</li>
+		</ul>
+		</li>
+		<li>For COMMUNITY objects:
+		<ol>
+			<li>Top-Level <tt>div</tt> with <tt>@TYPE="DSpace Object Contents"</tt>.
+			<ul>
+				<li>For every Sub-Community in the Community it  contains a <tt>div</tt> with <tt>@TYPE="DSpace COMMUNITY"</tt>.  Each Community <tt>div</tt> has up to two <tt>mptr</tt> elements:
+				<ol>
+					<li>One linking to the Handle of that Community. Its <tt>@LOCTYPE="HANDLE"</tt>, and <tt>@xlink:href</tt> value is the raw Handle.</li>
+					<li>(Optional) one linking to the location of the local AIP file for that Community (if known).  Its <tt>@LOCTYPE="URL"</tt>, and <tt>@xlink:href</tt> value is a relative link to the AIP file on the local filesystem.</li>
+				</ol>
+				</li>
+				<li>For every Collection in the Community there is a <tt>div</tt> with <tt>@TYPE="DSpace COLLECTION"</tt>.  Each Collection <tt>div</tt> has up to two <tt>mptr</tt> elements:
+				<ol>
+					<li>One linking to the Handle of that Collection. Its <tt>@LOCTYPE="HANDLE"</tt>, and <tt>@xlink:href</tt> value is the raw Handle.</li>
+					<li>(Optional) one linking to the location of the local AIP file for that Collection (if known).  Its <tt>@LOCTYPE="URL"</tt>, and <tt>@xlink:href</tt> value is a relative link to the AIP file on the local filesystem.</li>
+				</ol>
+				</li>
+			</ul>
+			</li>
+		</ol>
+		<ul>
+			<li>If Community has a Logo bitstream, there is an <tt>fptr</tt> reference to it in the very first  <tt>div</tt>.</li>
+		</ul>
+		</li>
+		<li>For SITE objects:
+		<ol>
+			<li>Top-Level <tt>div</tt> with <tt>@TYPE="DSpace Object Contents"</tt>.
+			<ul>
+				<li>For every Top-level Community in Site, it contains a <tt>div</tt> with <tt>@TYPE="DSpace COMMUNITY"</tt>. Each Item <tt>div</tt> has up to two child <tt>mptr</tt> elements:
+				<ol>
+					<li>One linking to the Handle of that Community. Its <tt>@LOCTYPE="HANDLE"</tt>, and <tt>@xlink:href</tt> value is the raw Handle.</li>
+					<li>(Optional) one linking to the location of the local AIP for that Community (if known).  Its <tt>@LOCTYPE="URL"</tt>, and <tt>@xlink:href</tt> value is a relative link to the AIP file on the local filesystem.</li>
+				</ol>
+				</li>
+			</ul>
+			</li>
+		</ol>
+		</li>
+	</ul>
+	</li>
+	<li><tt>mets/structMap</tt> - Structure Map to indicate object's Parent, <tt>@LABEL="Parent", @TYPE="LOGICAL"</tt>
+	<ul>
+		<li>Contains one <tt>div</tt> element which has the unique attribute value <tt>TYPE="AIP Parent Link"</tt> to identify it as the older of the <em>parent pointer</em>.
+		<ul>
+			<li>It contains a <tt>mptr</tt> element whose <tt>xlink:href</tt> attribute value is the raw Handle of the parent object, e.g. <tt>1721.1/4321</tt>.</li>
+		</ul>
+		</li>
+	</ul>
+	</li>
+</ul>
+
+
+<h2><a name="DSpaceAIPFormat-MetadatainMETS"></a>Metadata in METS</h2>
+
+<p>The following tables describe how various metadata schemas are populated (via DSpace Crosswalks) in the METS file for an AIP.</p>
+
+<h3><a name="DSpaceAIPFormat-DIM%28DSpaceIntermediateMetadata%29Schema"></a>DIM (DSpace Intermediate Metadata) Schema</h3>
+
+<p><a href="https://wiki.duraspace.org/display/DSPACE/DSpaceIntermediateMetadata" title="DSpaceIntermediateMetadata">DIM Schema</a> is essentially a way of representing DSpace internal metadata structure in XML.  DSpace's internal metadata is very similar to a Qualified Dublin Core in its structure, and is primarily meant for descriptive metadata.  However, DSpace's metadata allows for custom elements, qualifiers or schemas to be created (so it is extendable to any number of schemas, elements, qualifiers).  These custom fields/schemas may or may not be able to be translated into normal Qualified Dublin Core.  So, the DIM Schema must be able to express metadata schemas, elements or qualifiers which may or may not exist within Qualified Dublin Core.</p>
+
+<p>In the METS structure, DIM metadata always appears within a <tt>dmdSec</tt> inside an <tt>&lt;mdWrap MDTYPE="OTHER" OTHERMDTYPE="DIM"&gt;</tt> element. For example:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+  &lt;dmdSec ID=<span class="code-quote">"dmdSec_2190"</span>&gt; 
+     &lt;mdWrap MDTYPE=<span class="code-quote">"OTHER"</span> OTHERMDTYPE=<span class="code-quote">"DIM"</span>&gt;
+      ...
+     &lt;/mdWrap&gt;
+  &lt;/dmdSec&gt;
+</pre>
+</div></div>
+
+<p>By default, DIM metadata is always included in AIPs. It is controlled by the following configuration in your <tt>dspace.cfg</tt>:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+aip.disseminate.dmd = MODS, DIM
+</pre>
+</div></div>
+
+
+<h4><a name="DSpaceAIPFormat-DIMDescriptiveElementsforItemobjects"></a>DIM Descriptive Elements for Item objects</h4>
+
+<p>As all DSpace Items already have user-assigned DIM (essentially Qualified Dublin Core) metadata fields, those fields are just exported into the <a href="https://wiki.duraspace.org/display/DSPACE/DSpaceIntermediateMetadata" title="DSpaceIntermediateMetadata">DIM Schema</a> within the METS file.</p>
+
+<h4><a name="DSpaceAIPFormat-DIMDescriptiveElementsforCollectionobjects"></a>DIM Descriptive Elements for Collection objects</h4>
+
+<p>For Collections, the following fields are translated to the DIM schema:</p>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'> DIM Metadata Field </th>
+<th class='confluenceTh'> Database field or value </th>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.description </td>
+<td class='confluenceTd'> 'introductory_text' field </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.description.abstract </td>
+<td class='confluenceTd'> 'short_description' field </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.description.tableofcontents </td>
+<td class='confluenceTd'> 'side_bar_text' field </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.identifier.uri </td>
+<td class='confluenceTd'> Collection's handle </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.provenance </td>
+<td class='confluenceTd'> 'provenance_description' field </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.rights </td>
+<td class='confluenceTd'> 'copyright_text' field </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.rights.license </td>
+<td class='confluenceTd'> 'license' field </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.title </td>
+<td class='confluenceTd'> 'name' field </td>
+</tr>
+</tbody></table>
+</div>
+
+
+
+<h4><a name="DSpaceAIPFormat-DIMDescriptiveElementsforCommunityobjects"></a>DIM Descriptive Elements for Community objects</h4>
+
+<p>For Communities, the following fields are translated to the DIM schema:</p>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'> DIM Metadata Field </th>
+<th class='confluenceTh'> Database field or value </th>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.description </td>
+<td class='confluenceTd'> 'introductory_text' field </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.description.abstract </td>
+<td class='confluenceTd'> 'short_description' field </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.description.tableofcontents </td>
+<td class='confluenceTd'> 'side_bar_text' field </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.identifier.uri </td>
+<td class='confluenceTd'> Handle of Community </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.rights </td>
+<td class='confluenceTd'> 'copyright_text' field </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.title </td>
+<td class='confluenceTd'> 'name' field </td>
+</tr>
+</tbody></table>
+</div>
+
+
+
+<h4><a name="DSpaceAIPFormat-DIMDescriptiveElementsforSiteobjects"></a>DIM Descriptive Elements for Site objects</h4>
+
+<p>For the Site Object, the following fields are translated to the DIM schema:</p>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'> Metadata Field </th>
+<th class='confluenceTh'> Value </th>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.identifier.uri </td>
+<td class='confluenceTd'> Handle of Site (format: <tt>[handle_prefix]/0</tt>) </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.title </td>
+<td class='confluenceTd'> Name of Site (from dspace.cfg 'dspace.name' config) </td>
+</tr>
+</tbody></table>
+</div>
+
+
+<h3><a name="DSpaceAIPFormat-MODSSchema"></a>MODS Schema</h3>
+
+<p>By default, all DSpace descriptive metadata (DIM) is also translated into the <a href="http://www.loc.gov/standards/mods/">MODS Schema</a> by utilizing DSpace's <tt>MODSDisseminationCrosswalk</tt>.  DSpace's DIM to MODS crosswalk is defined within your <tt>[dspace]/config/crosswalks/mods.properties</tt> configuration file.  This file allows you to customize the MODS that is included within your AIPs.</p>
+
+<p>For more information on the MODS Schema, see <a href="http://www.loc.gov/standards/mods/mods-schemas.html">http://www.loc.gov/standards/mods/mods-schemas.html</a></p>
+
+<p>In the METS structure, MODS metadata always appears within a <tt>dmdSec</tt> inside an <tt>&lt;mdWrap MDTYPE="MODS"&gt;</tt> element. For example:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+  &lt;dmdSec ID=<span class="code-quote">"dmdSec_2189"</span>&gt; 
+     &lt;mdWrap MDTYPE=<span class="code-quote">"MODS"</span>&gt;
+      ...
+     &lt;/mdWrap&gt;
+  &lt;/dmdSec&gt;
+</pre>
+</div></div>
+
+<p>By default, MODS metadata is always included in AIPs. It is controlled by the following configuration in your <tt>dspace.cfg</tt>:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+aip.disseminate.dmd = MODS, DIM
+</pre>
+</div></div>
+
+<p>The MODS metadata is included within your AIP to support interoperability.  It provides a way for other systems to interact with or ingest the AIP without needing to understand the DIM Schema. You may choose to disable MODS if you wish, however this may decrease the likelihood that you'd be able to easily ingest your AIPs into a non-DSpace system (unless that non-DSpace system is able to understand the DIM schema). When restoring/ingesting AIPs, DSpace will always first attempt to restore DIM descriptive metadata.  Only if no DIM metadata is found, will the MODS metadata be used during a restore.</p>
+
+<h3><a name="DSpaceAIPFormat-AIPTechnicalMetadataSchema%28AIPTECHMD%29"></a>AIP Technical Metadata Schema (AIP-TECHMD) </h3>
+
+<p>The AIP Technical Metadata Schema is a way to translate technical metadata about a DSpace object into the <a href="https://wiki.duraspace.org/display/DSPACE/DSpaceIntermediateMetadata" title="DSpaceIntermediateMetadata">DIM Schema</a>.  It is kept separate from DIM as it is considered technical metadata rather than descriptive metadata.</p>
+
+<p>In the METS structure, AIP-TECHMD metadata always appears within a <tt>sourceMD</tt> inside an <tt>&lt;mdWrap MDTYPE="OTHER" OTHERMDTYPE="AIP-TECHMD"&gt;</tt> element.  For example:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+  &lt;amdSec ID=<span class="code-quote">"amd_2191"</span>&gt; 
+      ...
+      &lt;sourceMD ID=<span class="code-quote">"sourceMD_2198"</span>&gt;
+         &lt;mdWrap MDTYPE=<span class="code-quote">"OTHER"</span> OTHERMDTYPE=<span class="code-quote">"AIP-TECHMD"</span>&gt;
+         ...
+         &lt;/mdWrap&gt;
+      &lt;/sourceMD&gt;
+      ...
+  &lt;/amdSec&gt;
+</pre>
+</div></div>
+
+<p>By default, AIP-TECHMD metadata is always included in AIPs. It is controlled by the following configuration in your <tt>dspace.cfg</tt>:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+aip.disseminate.sourceMD = AIP-TECHMD
+</pre>
+</div></div>
+
+<h4><a name="DSpaceAIPFormat-AIPTechnicalMetadataforItem"></a>AIP Technical Metadata for Item</h4>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'> Metadata Field </th>
+<th class='confluenceTh'> Value </th>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.contributor </td>
+<td class='confluenceTd'> Submitter's email address </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.identifier.uri </td>
+<td class='confluenceTd'> Handle of Item </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.relation.isPartOf </td>
+<td class='confluenceTd'> Owning Collection's Handle (<em>as a URN</em>) </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.relation.isReferencedBy </td>
+<td class='confluenceTd'> All other Collection's this item is linked to (<em>Handle URN of each non-owner</em>) </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.rights.accessRights </td>
+<td class='confluenceTd'> <em>"WITHDRAWN"</em> if item is withdrawn </td>
+</tr>
+</tbody></table>
+</div>
+
+
+
+<h4><a name="DSpaceAIPFormat-AIPTechnicalMetadataforBitstream"></a>AIP Technical Metadata for Bitstream</h4>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'> Metadata Field </th>
+<th class='confluenceTh'> Value </th>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.title </td>
+<td class='confluenceTd'> Bitstream's name/title </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.title.alternative </td>
+<td class='confluenceTd'> Bitstream's source </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.description </td>
+<td class='confluenceTd'> Bitstream's description </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.format </td>
+<td class='confluenceTd'> Bitstream Format Description </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.format.medium </td>
+<td class='confluenceTd'> Short Name of Format  </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.format.mimetype </td>
+<td class='confluenceTd'> MIMEType of Format </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.format.supportlevel </td>
+<td class='confluenceTd'> System Support Level for Format (necessary to recreate Format during restore, if the format isn't know to DSpace by default) </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.format.internal </td>
+<td class='confluenceTd'> Whether Format is internal (necessary to recreate Format during restore, if the format isn't know to DSpace by default) </td>
+</tr>
+</tbody></table>
+</div>
+
+
+
+<ul>
+	<li>Outstanding Question: Why are we recording the file format support status?  That's a DSpace property, rather than an Item property.  Do DSpace instances rely on objects to tell them their support status?
+	<ul>
+		<li>Possible answer (from Larry Stone): Format support and other properties of the BitstreamFormat are recorded here in case the Item is restored in an empty DSpace that doesn't have that format yet, and the relevant bits of the format entry have to be reconstructed from the AIP. --lcs</li>
+	</ul>
+	</li>
+</ul>
+
+
+<h4><a name="DSpaceAIPFormat-AIPTechnicalMetadataforCollection"></a>AIP Technical Metadata for Collection</h4>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'> Metadata Field </th>
+<th class='confluenceTh'> Value </th>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.identifier.uri </td>
+<td class='confluenceTd'> Handle of Collection </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.relation.isPartOf </td>
+<td class='confluenceTd'> Owning Community's Handle (<em>as a URN</em>) </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.relation.isReferencedBy </td>
+<td class='confluenceTd'> All other Communities this Collection is linked to (<em>Handle URN of each non-owner</em>) </td>
+</tr>
+</tbody></table>
+</div>
+
+
+
+<h4><a name="DSpaceAIPFormat-AIPTechnicalMetadataforCommunity"></a>AIP Technical Metadata for Community</h4>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'> Metadata Field </th>
+<th class='confluenceTh'> Value </th>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.identifier.uri </td>
+<td class='confluenceTd'> Handle of Community </td>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.relation.isPartOf </td>
+<td class='confluenceTd'> Handle of Parent Community (<em>as a URN</em>) </td>
+</tr>
+</tbody></table>
+</div>
+
+
+
+<h4><a name="DSpaceAIPFormat-AIPTechnicalMetadataforSite"></a>AIP Technical Metadata for Site</h4>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'> Metadata Field </th>
+<th class='confluenceTh'> Value </th>
+</tr>
+<tr>
+<td class='confluenceTd'> dc.identifier.uri </td>
+<td class='confluenceTd'> Site Handle (format: <tt>[handle_prefix]/0</tt>) </td>
+</tr>
+</tbody></table>
+</div>
+
+
+
+<h3><a name="DSpaceAIPFormat-PREMISSchema"></a>PREMIS Schema</h3>
+
+<p>At this point in time, the <a href="http://www.loc.gov/standards/premis/">PREMIS Schema</a> is only used to represent technical metadata about DSpace Bitstreams (i.e. Files).  The PREMIS metadata is generated by DSpace's <tt>PREMISCrosswalk</tt>.  Only the <a href="http://www.loc.gov/standards/premis/schemas.html">PREMIS Object Entity Schema</a> is used.</p>
+
+<p>In the METS structure, PREMIS metadata always appears within a <tt>techMD</tt> inside an <tt>&lt;mdWrap MDTYPE="PREMIS"&gt;</tt> element.  PREMIS metadata is <b>always</b> wrapped withn a <tt>&lt;premis:premis&gt;</tt> element. For example:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+  &lt;amdSec ID=<span class="code-quote">"amd_2209"</span>&gt; 
+      ...
+      &lt;techMD ID=<span class="code-quote">"techMD_2210"</span>&gt;
+         &lt;mdWrap MDTYPE=<span class="code-quote">"PREMIS"</span>&gt;
+            &lt;premis:premis&gt;
+              ...
+            &lt;/premis:premis&gt;
+         &lt;/mdWrap&gt;
+      &lt;/techMD&gt;
+      ...
+  &lt;/amdSec&gt;
+</pre>
+</div></div>
+<p>Each Bitstream (file) has its own <tt>amdSec</tt> within a METS manifest.  So, there will be a separate PREMIS <tt>techMD</tt> for each Bitstream within a single Item.</p>
+
+<p>By default, PREMIS metadata is always included in AIPs. It is controlled by the following configuration in your <tt>dspace.cfg</tt>:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+aip.disseminate.techMD = PREMIS, DSPACE-ROLES
+</pre>
+</div></div>
+
+<h4><a name="DSpaceAIPFormat-PREMISMetadataforBitstream"></a>PREMIS Metadata for Bitstream</h4>
+
+<p>The following Bitstream information is translated into PREMIS for each DSpace Bitstream (file):</p>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<th class='confluenceTh'> Metadata Field </th>
+<th class='confluenceTh'> Value </th>
+</tr>
+<tr>
+<td class='confluenceTd'> &lt;premis:objectIdentifier&gt; </td>
+<td class='confluenceTd'> Contains Bitstream direct URL </td>
+</tr>
+<tr>
+<td class='confluenceTd'> &lt;premis:objectCategory&gt; </td>
+<td class='confluenceTd'> Always set to "File" </td>
+</tr>
+<tr>
+<td class='confluenceTd'> &lt;premis:fixity&gt; </td>
+<td class='confluenceTd'> Contains MD5 Checksum of Bitstream </td>
+</tr>
+<tr>
+<td class='confluenceTd'> &lt;premis:format&gt; </td>
+<td class='confluenceTd'> Contains File Format information of Bistream </td>
+</tr>
+<tr>
+<td class='confluenceTd'> &lt;premis:originalName&gt; </td>
+<td class='confluenceTd'> Contains original name of file </td>
+</tr>
+</tbody></table>
+</div>
+
+
+
+<h3><a name="DSpaceAIPFormat-DSPACEROLESSchema"></a>DSPACE-ROLES Schema</h3>
+
+<p>All DSpace Groups and EPeople objects are translated into a custom <tt>DSPACE-ROLES</tt> XML Schema.  This XML Schema is a very simple representation of the underlying DSpace database model for Groups and EPeople.  The <tt>DSPACE-ROLES</tt> Schemas is generated by DSpace's <tt>RoleCrosswalk</tt>.</p>
+
+<p>Only the following DSpace Objects utilize the DSPACE-ROLES Schema in their AIPs:</p>
+<ul>
+	<li>Site AIP &#8211; all Groups and EPeople are represented in DSPACE-ROLES Schema</li>
+	<li>Community AIP &#8211; only Community-based groups (e.g. <tt>COMMUNITY_1_ADMIN</tt>) are represented in DSPACE-ROLES Schema</li>
+	<li>Collection AIP &#8211; only Collection-based groups (e.g. <tt>COLLECTION_2_ADMIN</tt>, <tt>COLLECTION_2_SUBMIT</tt>, etc.) are represented in DSPACE-ROLES Schema</li>
+</ul>
+
+
+<p>In the METS structure, DSPACE-ROLES metadata always appears within a <tt>techMD</tt> inside an <tt>&lt;mdWrap MDTYPE="OTHER" OTHERMDTYPE="DSPACE-ROLES"&gt;</tt> element. For example:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+  &lt;amdSec ID=<span class="code-quote">"amd_2068"</span>&gt; 
+      ...
+      &lt;techMD ID=<span class="code-quote">"techMD_2070"</span>&gt;
+         &lt;mdWrap MDTYPE=<span class="code-quote">"OTHER"</span> OTHERMDTYPE=<span class="code-quote">"DSPACE-ROLES"</span>&gt;
+              ...
+         &lt;/mdWrap&gt;
+      &lt;/techMD&gt;
+      ...
+  &lt;/amdSec&gt;
+</pre>
+</div></div>
+
+<p>By default, DSPACE-ROLES metadata is always included in AIPs. It is controlled by the following configuration in your <tt>dspace.cfg</tt>:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+aip.disseminate.techMD = PREMIS, DSPACE-ROLES
+</pre>
+</div></div>
+
+
+<h4><a name="DSpaceAIPFormat-ExampleofDSPACEROLESSchemaforaSITEAIP"></a>Example of DSPACE-ROLES Schema for a SITE AIP</h4>
+
+<p>Below is a general example of the structure of a DSPACE-ROLES XML file, as it would appear in a SITE AIP.</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+&lt;DSpaceRoles&gt;
+  &lt;Groups&gt;
+    &lt;Group ID=<span class="code-quote">"1"</span> Name=<span class="code-quote">"Administrator"</span>&gt;
+      &lt;Members&gt;
+        &lt;Member ID=<span class="code-quote">"1"</span> Name=<span class="code-quote">"bsmith@myu.edu"</span> /&gt;
+      &lt;/Members&gt;
+    &lt;/Group&gt;
+    &lt;Group ID=<span class="code-quote">"0"</span> Name=<span class="code-quote">"Anonymous"</span> /&gt;
+    &lt;Group ID=<span class="code-quote">"70"</span> Name=<span class="code-quote">"COLLECTION_hdl:123456789/57_ADMIN"</span>&gt;
+      &lt;Members&gt;
+        &lt;Member ID=<span class="code-quote">"1"</span> Name=<span class="code-quote">"bsmith@myu.edu"</span> /&gt;
+      &lt;/Members&gt;
+    &lt;/Group&gt;
+    &lt;Group ID=<span class="code-quote">"75"</span> Name=<span class="code-quote">"COLLECTION_hdl:123456789/57_DEFAULT_READ"</span>&gt;
+      &lt;MemberGroups&gt;
+        &lt;MemberGroup ID=<span class="code-quote">"0"</span> Name=<span class="code-quote">"Anonymous"</span> /&gt;
+      &lt;/MemberGroups&gt;
+    &lt;/Group&gt;
+    &lt;Group ID=<span class="code-quote">"71"</span> Name=<span class="code-quote">"COLLECTION_hdl:123456789/57_SUBMIT"</span>&gt;
+      &lt;Members&gt;
+        &lt;Member ID=<span class="code-quote">"1"</span> Name=<span class="code-quote">"bsmith@myu.edu"</span> /&gt;
+      &lt;/Members&gt;
+    &lt;/Group&gt;
+    &lt;Group ID=<span class="code-quote">"72"</span> Name=<span class="code-quote">"COLLECTION_hdl:123456789/57_WORKFLOW_STEP_1"</span>&gt;
+      &lt;MemberGroups&gt;
+        &lt;MemberGroup ID=<span class="code-quote">"1"</span> Name=<span class="code-quote">"Administrator"</span> /&gt;
+      &lt;/MemberGroups&gt;
+    &lt;/Group&gt;
+    &lt;Group ID=<span class="code-quote">"73"</span> Name=<span class="code-quote">"COLLECTION_hdl:123456789/57_WORKFLOW_STEP_2"</span>&gt;
+      &lt;MemberGroups&gt;
+        &lt;MemberGroup ID=<span class="code-quote">"1"</span> Name=<span class="code-quote">"Administrator"</span> /&gt;
+      &lt;/MemberGroups&gt;
+    &lt;/Group&gt;
+    &lt;Group ID=<span class="code-quote">"8"</span> Name=<span class="code-quote">"COLLECTION_hdl:123456789/6703_DEFAULT_READ"</span> /&gt;
+    &lt;Group ID=<span class="code-quote">"9"</span> Name=<span class="code-quote">"COLLECTION_hdl:123456789/2_ADMIN"</span>&gt;
+      &lt;Members&gt;
+        &lt;Member ID=<span class="code-quote">"1"</span> Name=<span class="code-quote">"bsmith@myu.edu"</span> /&gt;
+      &lt;/Members&gt;
+    &lt;/Group&gt;
+  &lt;/Groups&gt;
+  &lt;People&gt;
+    &lt;Person ID=<span class="code-quote">"1"</span>&gt;
+      &lt;Email&gt;bsmith@myu.edu&lt;/Email&gt;
+      &lt;Netid&gt;bsmith&lt;/Netid&gt;
+      &lt;FirstName&gt;Bob&lt;/FirstName&gt;
+      &lt;LastName&gt;Smith&lt;/LastName&gt;
+      &lt;Language&gt;en&lt;/Language&gt;
+      &lt;CanLogin /&gt;
+    &lt;/Person&gt;
+    &lt;Person ID=<span class="code-quote">"2"</span>&gt;
+      &lt;Email&gt;jjones@myu.edu&lt;/Email&gt;
+      &lt;FirstName&gt;Jane&lt;/FirstName&gt;
+      &lt;LastName&gt;Jones&lt;/LastName&gt;
+      &lt;Language&gt;en&lt;/Language&gt;
+      &lt;CanLogin /&gt;
+      &lt;SelfRegistered /&gt;
+    &lt;/Person&gt;
+  &lt;/People&gt;
+&lt;/DSpaceRoles&gt;
+</pre>
+</div></div>
+
+<div class='panelMacro'><table class='infoMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="images/icons/emoticons/information.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Why are there Group Names with Handles?</b><br />You may have noticed several odd looking group names in the above example, where a Handle is embedded in the name (e.g. "COLLECTION_hdl:123456789/57_SUBMIT").  This is a translation of a Group name which included a Community or Collection <em>Internal ID</em> (e.g. "COLLECTION_45_SUBMIT").  Since you are exporting these Groups outside of DSpace, the <em>Internal ID</em> may no longer be valid or be understandable.  Therefore, before export, these Group names are all translated to include an externally understandable identifier, in the form of a Handle.  If you use this AIP to restore your groups later, they will be translated back to the normal DSpace format (i.e. the handle will be translated back to the new <em>Internal ID</em>).</td></tr></table></div>
+
+<div class='panelMacro'><table class='warningMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="images/icons/emoticons/forbidden.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Other Groups May Be Renamed On Export</b><br />If a Group name includes a Community or Collection <em>Internal ID</em> (e.g. "COLLECTION_45_SUBMIT"), and that Community or Collection no longer exists, then the Group will be renamed to a more generic, random name of the format: "GROUP&#95;[random-hex-key]&#95;[object-type]&#95;[group-type]" (e.g. "GROUP_123eb3a_COLLECTION_ADMIN").  The reasoning is that we were unable to translate an <em>Internal ID</em> into an <em>External ID</em> (i.e. Handle).  If we are unable to do that translation, re-importing or restoring a group with an <em>old</em> internal ID could cause conflicts or instability in your DSpace system.  In order to avoid such conflicts, these groups are renamed using a random, unique key.</td></tr></table></div>
+
+<h4><a name="DSpaceAIPFormat-ExampleofDSPACEROLESSchemaforaCommunityorCollection"></a>Example of DSPACE-ROLES Schema for a Community or Collection</h4>
+
+<p>Below is a general example of the structure of a DSPACE-ROLES XML file, as it would appear in a Community or Collection AIP.  </p>
+
+<p>This specific example is for a Collection, which has associated Administrator, Submitter, and Workflow approver groups.  In this very simple example, each group only has one Person as a member of it.  Please notice that the Person's information (Name, NetID, etc) is NOT contained in this content (however they are available in the DSPACE-ROLES example for a SITE, as shown above)</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+&lt;DSpaceRoles&gt;
+  &lt;Groups&gt;
+    &lt;Group ID=<span class="code-quote">"9"</span> Name=<span class="code-quote">"COLLECTION_hdl:123456789/2_ADMIN"</span> Type=<span class="code-quote">"ADMIN"</span>&gt;
+      &lt;Members&gt;
+        &lt;Member ID=<span class="code-quote">"1"</span> Name=<span class="code-quote">"bsmith@myu.edu"</span> /&gt;
+      &lt;/Members&gt;
+    &lt;/Group&gt;
+    &lt;Group ID=<span class="code-quote">"13"</span> Name=<span class="code-quote">"COLLECTION_hdl:123456789/2_SUBMIT"</span> Type=<span class="code-quote">"SUBMIT"</span>&gt;
+      &lt;Members&gt;
+        &lt;Member ID=<span class="code-quote">"2"</span> Name=<span class="code-quote">"jjones@myu.edu"</span> /&gt;
+      &lt;/Members&gt;
+    &lt;/Group&gt;
+    &lt;Group ID=<span class="code-quote">"10"</span> Name=<span class="code-quote">"COLLECTION_hdl:123456789/2_WORKFLOW_STEP_1"</span> Type=<span class="code-quote">"WORKFLOW_STEP_1"</span>&gt;
+      &lt;Members&gt;
+        &lt;Member ID=<span class="code-quote">"1"</span> Name=<span class="code-quote">"bsmith@myu.edu"</span> /&gt;
+      &lt;/Members&gt;
+    &lt;/Group&gt;
+    &lt;Group ID=<span class="code-quote">"11"</span> Name=<span class="code-quote">"COLLECTION_hdl:123456789/2_WORKFLOW_STEP_2"</span> Type=<span class="code-quote">"WORKFLOW_STEP_2"</span>&gt;
+      &lt;Members&gt;
+        &lt;Member ID=<span class="code-quote">"2"</span> Name=<span class="code-quote">"jjones@myu.edu"</span> /&gt;
+      &lt;/Members&gt;
+    &lt;/Group&gt;
+    &lt;Group ID=<span class="code-quote">"12"</span> Name=<span class="code-quote">"COLLECTION_hdl:123456789/2_WORKFLOW_STEP_3"</span> Type=<span class="code-quote">"WORKFLOW_STEP_3"</span>&gt;
+      &lt;Members&gt;
+        &lt;Member ID=<span class="code-quote">"1"</span> Name=<span class="code-quote">"bsmith@myu.edu"</span> /&gt;
+      &lt;/Members&gt;
+    &lt;/Group&gt;
+  &lt;/Groups&gt;
+&lt;/DSpaceRoles&gt;
+</pre>
+</div></div>
+
+
+
+<h3><a name="DSpaceAIPFormat-METSRightsSchema"></a>METSRights Schema</h3>
+
+<p>All DSpace Policies (permissions on objects) are translated into the <a href="http://www.loc.gov/standards/rights/METSRights.xsd">METSRights schema</a>.  This is different than the above DSPACE-ROLES schema, which only represents Groups and People objects.   Instead, the METSRights schema is used to translate the permission statements (e.g. a group named "Library Admins" has Administrative permissions on a Community named "University Library").  But the METSRights schema doesn't represent who is a member of a particular group (that is defined in the DSPACE-ROLES schema, as described above).</p>
+
+<div class='panelMacro'><table class='infoMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="images/icons/emoticons/information.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>METSRights should always be used with DSPACE-ROLES</b><br />The METSRights Schema must be used in conjunction with the DSPACE-ROLES Schema for Groups, People and Permissions to all be restored properly. As mentioned above, the METSRights metadata can only be used to restore permissions (i.e. DSpace policies).  The DSPACE-ROLES metadata must also exist if you wish to restore the actual Group or EPeople objects to which those permissions apply.</td></tr></table></div>
+
+<p>All DSpace Object's AIPs (except for the SITE AIP) utilize the METSRights Schema in order to define what permissions people and groups have on that object.  Although there are several sections to the METSRights Schema, DSpace AIPs <em>only use</em> the <tt>&lt;RightsDeclarationMD&gt;</tt> section, as this is what is used to describe rights on an object.</p>
+
+<p>In the METS structure, METSRights metadata always appears within a <tt>rightsMD</tt> inside an <tt>&lt;mdWrap MDTYPE="OTHER" OTHERMDTYPE="METSRIGHTS"&gt;</tt> element. For example:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+  &lt;amdSec ID=<span class="code-quote">"amd_2068"</span>&gt; 
+      ...
+      &lt;rightsMD ID=<span class="code-quote">"rightsMD_2074"</span>&gt;
+         &lt;mdWrap MDTYPE=<span class="code-quote">"OTHER"</span> OTHERMDTYPE=<span class="code-quote">"METSRIGHTS"</span>&gt;
+              ...
+         &lt;/mdWrap&gt;
+      &lt;/rightsMD&gt;
+      ...
+  &lt;/amdSec&gt;
+</pre>
+</div></div>
+
+<p>By default, METSRights metadata is always included in AIPs. It is controlled by the following configuration in your <tt>dspace.cfg</tt>:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+aip.disseminate.rightsMD = DSpaceDepositLicense:DSPACE_DEPLICENSE, \
+    CreativeCommonsRDF:DSPACE_CCRDF, CreativeCommonsText:DSPACE_CCTEXT, METSRIGHTS
+</pre>
+</div></div>
+
+
+<h4><a name="DSpaceAIPFormat-ExampleofMETSRightsSchemaforanItem"></a>Example of METSRights Schema for an Item</h4>
+
+<p>An Item AIP will almost always contain several METSRights metadata sections within its METS Manifest.  A separate METSRights metadata section is used to describe the permissions on:</p>
+<ul>
+	<li>the Item itself</li>
+	<li>each Bundle (group of files) in the Item</li>
+	<li>each Bitstream (file) within an Item's bundle</li>
+</ul>
+
+
+<p>Below is an example of a METSRights sections for a publicly visible Bitstream, Bundle or Item.  Notice it specifies that the "GENERAL PUBLIC" has the permission to DISCOVER or DISPLAY this object.</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+&lt;rights:RightsDeclarationMD xmlns:rights=<span class="code-quote">"http:<span class="code-comment">//cosimo.stanford.edu/sdr/metsrights/"</span> RIGHTSCATEGORY=<span class="code-quote">"LICENSED"</span>&gt;
+</span>  &lt;rights:Context CONTEXTCLASS=<span class="code-quote">"GENERAL PUBLIC"</span>&gt;
+    &lt;rights:Permissions DISCOVER=<span class="code-quote">"<span class="code-keyword">true</span>"</span> DISPLAY=<span class="code-quote">"<span class="code-keyword">true</span>"</span> MODIFY=<span class="code-quote">"<span class="code-keyword">false</span>"</span> DELETE=<span class="code-quote">"<span class="code-keyword">false</span>"</span> /&gt;
+  &lt;/rights:Context&gt;
+&lt;/rights:RightsDeclarationMD&gt;
+</pre>
+</div></div>
+
+
+<h4><a name="DSpaceAIPFormat-ExampleofMETSRightsSchemaforaCollection"></a>Example of METSRights Schema for a Collection</h4>
+
+<p>A Collection AIP contains one METSRights section, which describes the permissions different Groups or People have within the Collection</p>
+
+<p>Below is an example of a METSRights sections for a publicly visible Collection, which also has an Administrator group, a Submitter group, and a group for each of the three DSpace workflow approval steps.  You'll notice that each of the groups is provided with very specific permissions within the Collection.  Submitters &amp; Workflow approvers can "ADD CONTENTS" to a collection (but cannot delete the collection).  Administrators have full rights.</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+&lt;rights:RightsDeclarationMD xmlns:rights=<span class="code-quote">"http:<span class="code-comment">//cosimo.stanford.edu/sdr/metsrights/"</span> RIGHTSCATEGORY=<span class="code-quote">"LICENSED"</span>&gt;
+</span>  &lt;rights:Context CONTEXTCLASS=<span class="code-quote">"MANAGED_GRP"</span>&gt;
+    &lt;rights:UserName USERTYPE=<span class="code-quote">"GROUP"</span>&gt;COLLECTION_hdl:123456789/2_SUBMIT&lt;/rights:UserName&gt;
+    &lt;rights:Permissions DISCOVER=<span class="code-quote">"<span class="code-keyword">true</span>"</span> DISPLAY=<span class="code-quote">"<span class="code-keyword">true</span>"</span> MODIFY=<span class="code-quote">"<span class="code-keyword">true</span>"</span> DELETE=<span class="code-quote">"<span class="code-keyword">false</span>"</span> OTHER=<span class="code-quote">"<span class="code-keyword">true</span>"</span> OTHERPERMITTYPE=<span class="code-quote">"ADD CONTENTS"</span> /&gt;
+  &lt;/rights:Context&gt;
+  &lt;rights:Context CONTEXTCLASS=<span class="code-quote">"MANAGED_GRP"</span>&gt;
+    &lt;rights:UserName USERTYPE=<span class="code-quote">"GROUP"</span>&gt;COLLECTION_hdl:123456789/2_WORKFLOW_STEP_3&lt;/rights:UserName&gt;
+    &lt;rights:Permissions DISCOVER=<span class="code-quote">"<span class="code-keyword">true</span>"</span> DISPLAY=<span class="code-quote">"<span class="code-keyword">true</span>"</span> MODIFY=<span class="code-quote">"<span class="code-keyword">true</span>"</span> DELETE=<span class="code-quote">"<span class="code-keyword">false</span>"</span> OTHER=<span class="code-quote">"<span class="code-keyword">true</span>"</span> OTHERPERMITTYPE=<span class="code-quote">"ADD CONTENTS"</span> /&gt;
+  &lt;/rights:Context&gt;
+  &lt;rights:Context CONTEXTCLASS=<span class="code-quote">"MANAGED_GRP"</span>&gt;
+    &lt;rights:UserName USERTYPE=<span class="code-quote">"GROUP"</span>&gt;COLLECTION_hdl:123456789/2_WORKFLOW_STEP_2&lt;/rights:UserName&gt;
+    &lt;rights:Permissions DISCOVER=<span class="code-quote">"<span class="code-keyword">true</span>"</span> DISPLAY=<span class="code-quote">"<span class="code-keyword">true</span>"</span> MODIFY=<span class="code-quote">"<span class="code-keyword">true</span>"</span> DELETE=<span class="code-quote">"<span class="code-keyword">false</span>"</span> OTHER=<span class="code-quote">"<span class="code-keyword">true</span>"</span> OTHERPERMITTYPE=<span class="code-quote">"ADD CONTENTS"</span> /&gt;
+  &lt;/rights:Context&gt;
+  &lt;rights:Context CONTEXTCLASS=<span class="code-quote">"MANAGED_GRP"</span>&gt;
+    &lt;rights:UserName USERTYPE=<span class="code-quote">"GROUP"</span>&gt;COLLECTION_hdl:123456789/2_WORKFLOW_STEP_1&lt;/rights:UserName&gt;
+    &lt;rights:Permissions DISCOVER=<span class="code-quote">"<span class="code-keyword">true</span>"</span> DISPLAY=<span class="code-quote">"<span class="code-keyword">true</span>"</span> MODIFY=<span class="code-quote">"<span class="code-keyword">true</span>"</span> DELETE=<span class="code-quote">"<span class="code-keyword">false</span>"</span> OTHER=<span class="code-quote">"<span class="code-keyword">true</span>"</span> OTHERPERMITTYPE=<span class="code-quote">"ADD CONTENTS"</span> /&gt;
+  &lt;/rights:Context&gt;
+  &lt;rights:Context CONTEXTCLASS=<span class="code-quote">"MANAGED_GRP"</span>&gt;
+    &lt;rights:UserName USERTYPE=<span class="code-quote">"GROUP"</span>&gt;COLLECTION_hdl:123456789/2_ADMIN&lt;/rights:UserName&gt;
+    &lt;rights:Permissions DISCOVER=<span class="code-quote">"<span class="code-keyword">true</span>"</span> DISPLAY=<span class="code-quote">"<span class="code-keyword">true</span>"</span> COPY=<span class="code-quote">"<span class="code-keyword">true</span>"</span> DUPLICATE=<span class="code-quote">"<span class="code-keyword">true</span>"</span> MODIFY=<span class="code-quote">"<span class="code-keyword">true</span>"</span> DELETE=<span class="code-quote">"<span class="code-keyword">true</span>"</span> PRINT=<span class="code-quote">"<span class="code-keyword">true</span>"</span> OTHER=<span class="code-quote">"<span class="code-keyword">true</span>"</span> OTHERPERMITTYPE=<span class="code-quote">"ADMIN"</span> /&gt;
+  &lt;/rights:Context&gt;
+  &lt;rights:Context CONTEXTCLASS=<span class="code-quote">"GENERAL PUBLIC"</span>&gt;
+    &lt;rights:Permissions DISCOVER=<span class="code-quote">"<span class="code-keyword">true</span>"</span> DISPLAY=<span class="code-quote">"<span class="code-keyword">true</span>"</span> MODIFY=<span class="code-quote">"<span class="code-keyword">false</span>"</span> DELETE=<span class="code-quote">"<span class="code-keyword">false</span>"</span> /&gt;
+  &lt;/rights:Context&gt;
+&lt;/rights:RightsDeclarationMD&gt;
+</pre>
+</div></div>
+
+<h4><a name="DSpaceAIPFormat-ExampleofMETSRightsSchemaforaCommunity"></a>Example of METSRights Schema for a Community</h4>
+
+<p>A Community AIP contains one METSRights section, which describes the permissions different Groups or People have within that Community.</p>
+
+<p>Below is an example of a METSRights sections for a publicly visible Community, which also has an Administrator group.  As you'll notice, this content looks very similar to the Collection METSRights section (as described above)</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+&lt;rights:RightsDeclarationMD xmlns:rights=<span class="code-quote">"http:<span class="code-comment">//cosimo.stanford.edu/sdr/metsrights/"</span> RIGHTSCATEGORY=<span class="code-quote">"LICENSED"</span>&gt;
+</span>  &lt;rights:Context CONTEXTCLASS=<span class="code-quote">"MANAGED_GRP"</span>&gt;
+    &lt;rights:UserName USERTYPE=<span class="code-quote">"GROUP"</span>&gt;COMMUNITY_hdl:123456789/10_ADMIN&lt;/rights:UserName&gt;
+    &lt;rights:Permissions DISCOVER=<span class="code-quote">"<span class="code-keyword">true</span>"</span> DISPLAY=<span class="code-quote">"<span class="code-keyword">true</span>"</span> COPY=<span class="code-quote">"<span class="code-keyword">true</span>"</span> DUPLICATE=<span class="code-quote">"<span class="code-keyword">true</span>"</span> MODIFY=<span class="code-quote">"<span class="code-keyword">true</span>"</span> DELETE=<span class="code-quote">"<span class="code-keyword">true</span>"</span> PRINT=<span class="code-quote">"<span class="code-keyword">true</span>"</span> OTHER=<span class="code-quote">"<span class="code-keyword">true</span>"</span> OTHERPERMITTYPE=<span class="code-quote">"ADMIN"</span> /&gt;
+  &lt;/rights:Context&gt;
+  &lt;rights:Context CONTEXTCLASS=<span class="code-quote">"GENERAL PUBLIC"</span>&gt;
+    &lt;rights:Permissions DISCOVER=<span class="code-quote">"<span class="code-keyword">true</span>"</span> DISPLAY=<span class="code-quote">"<span class="code-keyword">true</span>"</span> MODIFY=<span class="code-quote">"<span class="code-keyword">false</span>"</span> DELETE=<span class="code-quote">"<span class="code-keyword">false</span>"</span> /&gt;
+  &lt;/rights:Context&gt;
+&lt;/rights:RightsDeclarationMD&gt;
+</pre>
+</div></div>
+
+				    					    <br/>
+                        <div class="tabletitle">
+                            <a name="attachments">Attachments:</a>
+                        </div>
+
+                        <div class="greybox" align="left">
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/22021312/22675553.zip">SITE-example.zip</a> (application/octet-stream)
+                                <br/>
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/22021312/22675554.zip">ITEM-123456789-8.zip</a> (application/octet-stream)
+                                <br/>
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/22021312/22675555.zip">COLLECTION-123456789-2.zip</a> (application/octet-stream)
+                                <br/>
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/22021312/22675556.zip">COMMUNITY-123456789-1.zip</a> (application/octet-stream)
+                                <br/>
+                                                    </div>
+				    
+                    			    </td>
+		    </tr>
+	    </table>
+	    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+				<td height="12" background="https://wiki.duraspace.org/images/border/border_bottom.gif"><img src="images/border/spacer.gif" width="1" height="1" border="0"/></td>
+			</tr>
+		    <tr>
+			    <td align="center"><font color="grey">Document generated by Confluence on Dec 16, 2010 11:47</font></td>
+		    </tr>
+	    </table>
+    </body>
+</html>

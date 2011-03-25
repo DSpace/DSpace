@@ -1,0 +1,197 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>DSpace Documentation : DSpace Services Framework</title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">	    
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <div class="pageheader">
+					    <span class="pagetitle">
+                            DSpace Documentation : DSpace Services Framework
+                                                    </span>
+				    </div>
+				    <div class="pagesubheading">
+					    This page last changed on Dec 15, 2010 by <font color="#0050B2">tdonohue</font>.
+				    </div>
+
+				    <h1><a name="DSpaceServicesFramework-DSpaceServicesFramework"></a>DSpace Services Framework</h1>
+
+<style type='text/css'>/*<![CDATA[*/
+div.rbtoc1292438324227 {margin-left: 0px;padding: 0px;}
+div.rbtoc1292438324227 ul {list-style: none;margin-left: 0px;}
+div.rbtoc1292438324227 li {margin-left: 0px;padding-left: 0px;}
+
+/*]]>*/</style><div class='rbtoc1292438324227'>
+<ul>
+    <li><span class='TOCOutline'>1</span> <a href='#DSpaceServicesFramework-ConfiguringEventListeners'>Configuring Event Listeners</a></li>
+    <li><span class='TOCOutline'>2</span> <a href='#DSpaceServicesFramework-ArchitecturalOverview'>Architectural Overview</a></li>
+<ul>
+    <li><span class='TOCOutline'>2.1</span> <a href='#DSpaceServicesFramework-DSpaceKernel'>DSpace Kernel</a></li>
+<ul>
+    <li><span class='TOCOutline'>2.1.1</span> <a href='#DSpaceServicesFramework-Kernelregistration'>Kernel registration</a></li>
+    <li><span class='TOCOutline'>2.1.2</span> <a href='#DSpaceServicesFramework-KernelStartupandAccess'>Kernel Startup and Access</a></li>
+</ul>
+    <li><span class='TOCOutline'>2.2</span> <a href='#DSpaceServicesFramework-ServiceManager'>Service Manager</a></li>
+</ul>
+    <li><span class='TOCOutline'>3</span> <a href='#DSpaceServicesFramework-ProvidersandPlugins'>Providers and Plugins</a></li>
+<ul>
+    <li><span class='TOCOutline'>3.1</span> <a href='#DSpaceServicesFramework-Activators'>Activators</a></li>
+    <li><span class='TOCOutline'>3.2</span> <a href='#DSpaceServicesFramework-ProviderStacks'>Provider Stacks</a></li>
+</ul>
+    <li><span class='TOCOutline'>4</span> <a href='#DSpaceServicesFramework-CoreServices'>Core Services</a></li>
+<ul>
+    <li><span class='TOCOutline'>4.1</span> <a href='#DSpaceServicesFramework-CachingService'>Caching Service</a></li>
+    <li><span class='TOCOutline'>4.2</span> <a href='#DSpaceServicesFramework-ConfigurationService'>Configuration Service</a></li>
+    <li><span class='TOCOutline'>4.3</span> <a href='#DSpaceServicesFramework-EventService'>EventService</a></li>
+    <li><span class='TOCOutline'>4.4</span> <a href='#DSpaceServicesFramework-RequestService'>RequestService</a></li>
+    <li><span class='TOCOutline'>4.5</span> <a href='#DSpaceServicesFramework-SessionService'>SessionService</a></li>
+</ul>
+</ul></div>
+
+<h2><a name="DSpaceServicesFramework-ConfiguringEventListeners"></a>Configuring Event Listeners</h2>
+
+<p>Event Listeners can be created by overriding the the EventListener interface:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+&lt;?xml version=<span class="code-quote">"1.0"</span> encoding=<span class="code-quote">"UTF-8"</span>?&gt;
+&lt;beans&gt;
+
+    &lt;bean id=<span class="code-quote">"dspace"</span> class=<span class="code-quote">"org.dspace.utils.DSpace"</span>/&gt;
+
+    &lt;bean id=<span class="code-quote">"dspace.eventService"</span>
+          factory-bean=<span class="code-quote">"dspace"</span>
+          factory-method=<span class="code-quote">"getEventService"</span>/&gt;
+
+    &lt;bean class=<span class="code-quote">"org.my.EventListener"</span>&gt;
+         &lt;property name=<span class="code-quote">"eventService"</span> &gt;
+    		&lt;ref bean=<span class="code-quote">"dspace.eventService"</span>/&gt;
+    	&lt;/property&gt;
+    &lt;/bean&gt;
+&lt;/beans&gt;
+</pre>
+</div></div>
+
+<h2><a name="DSpaceServicesFramework-ArchitecturalOverview"></a>Architectural Overview</h2>
+
+<h3><a name="DSpaceServicesFramework-DSpaceKernel"></a>DSpace Kernel</h3>
+
+<p>The DSpace Kernel manages the start up and access services in the DSpace Services framework. It is meant to allow for a simple way to control the core parts of DSpace and allow for flexible ways to startup the kernel. For example, the kernel can be run inside a single webapp along with a frontend piece (like JSPUI) or it can be started as part of the servlet container so that multiple webapps can use a single kernel (this increases speed and efficiency). The kernel is also designed to happily allow multiple kernels to run in a single servlet container using identifier keys.</p>
+
+<h4><a name="DSpaceServicesFramework-Kernelregistration"></a>Kernel registration</h4>
+
+<p>The kernel will automatically register itself as an MBean in when it starts up so that it can be managed. It allows startup and shutdown and provides direct access to the ServiceManager and the ConfigurationService. All the other core services can be retrieved from the ServiceManager by their APIs. <span class="image-wrap" style="display: block; text-align: center"><img src="attachments/22022824/21954868.png" style="border: 0px solid black"/></span></p>
+
+<h4><a name="DSpaceServicesFramework-KernelStartupandAccess"></a>Kernel Startup and Access</h4>
+
+<p>The kernel can be started and accessed through the use of Servlet Filter/ContextListeners which are provided as part of the DSpace 2 utilities. Developers don't need to understand what is going on behind the scenes and can simply write their applications and package them as webapps and take advantage of the services which are offered by DSpace 2. Access to the kernel is provided via the Kernel Manager and the DSpace object which will locate the kernel object and allow it to be used.&nbsp;</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+/* Instantiate the Utility <span class="code-object">Class</span> */
+DSpace dspace = <span class="code-keyword">new</span> DSpace();
+
+
+/* Access get the Service Manager by convenience method */
+ServiceManager manager = dspace.getServiceManager();
+
+
+/* Or access by convenience method <span class="code-keyword">for</span> <span class="code-keyword">default</span> services */
+EventService service = dspace.getEventService();
+
+</pre>
+</div></div>
+
+
+<h3><a name="DSpaceServicesFramework-ServiceManager"></a>Service Manager</h3>
+
+
+<p>The ServiceManager abstracts the concepts of service lookups and lifecycle control. It also manages the configuration of services by allowing properties to be pushed into the services as they start up (mostly from the ConfigurationService). The ServiceManagerSystem abstraction allows the DSpace ServiceManager to use different systems to manage it's services. The current implementations include Spring and Guice. This allows DSpace 2 to have very little service management code but still be flexible and not tied to specific technology. Developers who are comfortable with those technologies can consume the services from a parent Spring ApplicationContext or a parent Guice Module. The abstraction also means that we can replace Spring/Guice or add other dependency injection systems later without requiring developers to change their code. The interface provides simple methods for looking up services by interface type for developers who do not want to have to use or learn a dependency injection system or are using one which is not currently supported.</p>
+
+
+<p><span class="image-wrap" style="display: block; text-align: center"><img src="attachments/22022824/21954867.png" height="332" width="445" style="border: 0px solid black"/></span></p>
+
+<p>The DS2 kernel is compact so it can be completely started up in a unit test (technically integration test) environment (this is who we test the kernel and core services currently). This allows developers to execute code against a fully functional kernel while developing and then deploy their code with high confidence.</p>
+
+<h2><a name="DSpaceServicesFramework-ProvidersandPlugins"></a>Providers and Plugins</h2>
+
+<p>For developers (how we are trying to make your lives easier): The DS2 ServiceManager supports a plugin/provider system which is runtime hot-swappable. The implementor can register any service/provider bean or class with the DS2 kernel ServiceManager. The ServiceManager will manage the lifecycle of beans (if desired) and will instantiate and manage the lifecycle of any classes it is given. This can be done at any time and does not have to be done during Kernel startup. This allows providers to be swapped out at runtime without disrupting the service if desired. The goal of this system is to allow DS2 to be extended without requiring any changes to the core codebase or a rebuild of the code code.</p>
+
+<h3><a name="DSpaceServicesFramework-Activators"></a>Activators</h3>
+
+<p>Developers can use an activator to allow the system to startup their service or provider. It is a simple interface with 2 methods which are called to startup the provider(s) and later to shut them down. These simply allow a developer to run some arbitrary code in order to create and register services if desired. It is the method provided to add plugins directly to the system via configuration as the activators are just listed in the configuration file and the system starts them up in the order it finds them.</p>
+
+<h3><a name="DSpaceServicesFramework-ProviderStacks"></a>Provider Stacks</h3>
+
+<p>Utilities are provided to assist with stacking and ordering providers. The priority is handled via a priority number such that 1 is the highest priority and something like 10 would be lower. 0 indicates that priority is not important for this service and can be used to ensure the provider is placed at or near the end without having to set some arbitrarily high number.</p>
+
+
+
+
+<p>The DSpace Services Framework is a backporting of the DSpace 2.0 Development Groups work in creating a reasonable and abstractable "Core Services" layer for DSpace components to operate within.&nbsp; The Services Framework represents a "best practices" for new DSpace architecture and implementation of exentsions to the DSpace application.&nbsp; DSpace Services are best described as a "Simple Registry" where plugins.&nbsp; The DS2 (<a href="http://wiki.dspace.org/index.php/DSpace_2.0">DSpace 2.0</a>) core services are the main services that make up a DS2 system. These includes services for things like user and permissions management and storage and caching. These services can be used by any developer writing DS2 plugins (e.g. statistics), providers (e.g. Authn), or user interfaces (e.g. JSPUI).</p>
+
+<h2><a name="DSpaceServicesFramework-CoreServices"></a>Core Services</h2>
+
+<p>The core services are all behind APIs so that they can be reimplemented without affecting developers who are using the services. Most of the services have plugin/provider points so that customizations can be added into the system without touching the core services code. For example, let's say a deployer has a specialized authentication system and wants to manage the authentication calls which come into the system. The implementor can simply implement an AuthenticationProvider and then register it with the DS2 kernel ServiceManager. This can be done at any time and does not have to be done during Kernel startup. This allows providers to be swapped out at runtime without disrupting the DS2 service if desired. It can also speed up development by allowing quick hot redeploys of code during development.</p>
+
+<h3><a name="DSpaceServicesFramework-CachingService"></a>Caching Service</h3>
+
+<p>Provides for a centralized way to handle caching in the system and thus a single point for configuration and control over all caches in the system. Provider and plugin developers are strongly encouraged to use this rather than implementing their own caching. The caching service has the concept of scopes so even storing data in maps or lists is discouraged unless there are good reasons to do so.</p>
+
+<h3><a name="DSpaceServicesFramework-ConfigurationService"></a>Configuration Service</h3>
+
+<p>The ConfigurationService controls the external and internal configuration of DSpace 2. It reads in properties files when the kernel starts up and merges them with any dynamic configuration data which is available from the services. The service allows settings to be updated as the system is running and also provides listeners which allow services to know when their configuration settings have changed and take action if desired. It is the central point to access and manage all the configuration settings in DSpace 2.</p>
+
+<p>Manages the configuration of the DSpace 2 system. Can be used to manage configuration for providers and plugins also.</p>
+
+<h3><a name="DSpaceServicesFramework-EventService"></a>EventService</h3>
+
+<p>Handles events and provides access to listeners for consumption of events.</p>
+
+
+<h3><a name="DSpaceServicesFramework-RequestService"></a>RequestService</h3>
+
+<p>In DS2 a request is the concept of a request (HTTP) or an atomic transaction in the system. It is likely to be an HTTP request in many cases but it does not have to be. This service provides the core services with a way to manage atomic transactions so that when a request comes in which requires mutliple things to happen they can either all suceed or all fail without each service attempting to manage this independently. In a nutshell this simply allows identification of the current request and the ability to discover if it succeeded or failed when it ends. Nothing in the system will enforce usage of the service but we encourage developers who are interacting with the system to make use of this service so they know if the request they are participating in with has succeeded or failed and take appropriate actions.</p>
+
+
+<h3><a name="DSpaceServicesFramework-SessionService"></a>SessionService</h3>
+
+<p>In DS2 a session is like an HttpSession (and generally is actually one) so this service is here to allow developers to find information about the current session and to access information in it. The session identifies the current user (if authenticated) so it also serves as a way to track user sessions. Since we use HttpSession directly it is easy to mirror sessions across multiple servers in order to allow for no-interruption failover for users when servers go offline.</p>
+
+				    					    <br/>
+                        <div class="tabletitle">
+                            <a name="attachments">Attachments:</a>
+                        </div>
+
+                        <div class="greybox" align="left">
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/22022824/21954867.png">DS2-kernel-diagram.png</a> (image/png)
+                                <br/>
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/22022824/21954866.gif">Kernel Overview.gif</a> (image/gif)
+                                <br/>
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/22022824/21954869.png">Kernel Overview.png</a> (image/png)
+                                <br/>
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/22022824/21954868.png">dspace-services-kernel.png</a> (image/png)
+                                <br/>
+                                                    </div>
+				    
+                    			    </td>
+		    </tr>
+	    </table>
+	    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+				<td height="12" background="https://wiki.duraspace.org/images/border/border_bottom.gif"><img src="images/border/spacer.gif" width="1" height="1" border="0"/></td>
+			</tr>
+		    <tr>
+			    <td align="center"><font color="grey">Document generated by Confluence on Dec 16, 2010 11:47</font></td>
+		    </tr>
+	    </table>
+    </body>
+</html>

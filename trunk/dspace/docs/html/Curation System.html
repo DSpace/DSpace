@@ -1,0 +1,497 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>DSpace Documentation : Curation System</title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">	    
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <div class="pageheader">
+					    <span class="pagetitle">
+                            DSpace Documentation : Curation System
+                                                    </span>
+				    </div>
+				    <div class="pagesubheading">
+					    This page last changed on Dec 16, 2010 by <font color="#0050B2">rrodgers</font>.
+				    </div>
+
+				    <h1><a name="CurationSystem-CurationSystem"></a>Curation System</h1>
+
+<p>As of release 1.7, DSpace supports running curation tasks, which are described in this section. DSpace 1.7 and subsequent distributions will bundle (include) several useful tasks, but the system also is designed to allow new tasks to be added between releases, both general purpose tasks that come from the community, and locally written and deployed tasks.</p>
+
+<style type='text/css'>/*<![CDATA[*/
+div.rbtoc1292518262800 {margin-left: 0px;padding: 0px;}
+div.rbtoc1292518262800 ul {list-style: none;margin-left: 0px;}
+div.rbtoc1292518262800 li {margin-left: 0px;padding-left: 0px;}
+
+/*]]>*/</style><div class='rbtoc1292518262800'>
+<ul>
+    <li><span class='TOCOutline'>1</span> <a href='#CurationSystem-Tasks'>Tasks</a></li>
+    <li><span class='TOCOutline'>2</span> <a href='#CurationSystem-Activation'>Activation</a></li>
+    <li><span class='TOCOutline'>3</span> <a href='#CurationSystem-Writingyourowntasks'>Writing your own tasks</a></li>
+    <li><span class='TOCOutline'>4</span> <a href='#CurationSystem-TaskInvocation'>Task Invocation</a></li>
+<ul>
+    <li><span class='TOCOutline'>4.1</span> <a href='#CurationSystem-Onthecommandline'>On the command line</a></li>
+    <li><span class='TOCOutline'>4.2</span> <a href='#CurationSystem-IntheadminUI'>In the admin UI</a></li>
+    <li><span class='TOCOutline'>4.3</span> <a href='#CurationSystem-Inworkflow'>In workflow</a></li>
+    <li><span class='TOCOutline'>4.4</span> <a href='#CurationSystem-Inarbitraryusercode'>In arbitrary user code</a></li>
+</ul>
+    <li><span class='TOCOutline'>5</span> <a href='#CurationSystem-Asynchronous%28Deferred%29Operation'>Asynchronous (Deferred) Operation</a></li>
+    <li><span class='TOCOutline'>6</span> <a href='#CurationSystem-TaskOutputandReporting'>Task Output and Reporting</a></li>
+<ul>
+    <li><span class='TOCOutline'>6.1</span> <a href='#CurationSystem-StatusCode'>Status Code</a></li>
+    <li><span class='TOCOutline'>6.2</span> <a href='#CurationSystem-ResultString'>Result String</a></li>
+    <li><span class='TOCOutline'>6.3</span> <a href='#CurationSystem-ReportingStream'>Reporting Stream</a></li>
+</ul>
+    <li><span class='TOCOutline'>7</span> <a href='#CurationSystem-TaskAnnotations'>Task Annotations</a></li>
+    <li><span class='TOCOutline'>8</span> <a href='#CurationSystem-StarterTasks'>Starter Tasks</a></li>
+<ul>
+    <li><span class='TOCOutline'>8.1</span> <a href='#CurationSystem-BitstreamFormatProfiler'>Bitstream Format Profiler</a></li>
+    <li><span class='TOCOutline'>8.2</span> <a href='#CurationSystem-RequiredMetadata'>Required Metadata</a></li>
+    <li><span class='TOCOutline'>8.3</span> <a href='#CurationSystem-VirusScan'>Virus Scan</a></li>
+<ul>
+    <li><span class='TOCOutline'>8.3.1</span> <a href='#CurationSystem-SetuptheservicefromtheClamAVdocumentation.'>Setup the service from the ClamAV documentation.</a></li>
+    <li><span class='TOCOutline'>8.3.2</span> <a href='#CurationSystem-DSpaceConfiguration'>DSpace Configuration</a></li>
+    <li><span class='TOCOutline'>8.3.3</span> <a href='#CurationSystem-TaskOperationfromtheGUI'>Task Operation from the GUI</a></li>
+    <li><span class='TOCOutline'>8.3.4</span> <a href='#CurationSystem-TaskOperationfromthecurationcommandlineclient'>Task Operation from the curation command line client</a></li>
+<ul>
+    <li><span class='TOCOutline'>8.3.4.1</span> <a href='#CurationSystem-Table1VirusScanResultsTable'>Table 1 - Virus Scan Results Table</a></li>
+</ul>
+</ul>
+</ul>
+</ul></div>
+
+<h2><a name="CurationSystem-Tasks"></a>Tasks</h2>
+
+<p>The goal of the curation system ('CS') is to provide a simple, extensible, way to manage routine content operations on a repository. These operations are known to CS as 'tasks', and they can operate on any DSpaceObject (i.e. subclasses of DSpaceObject) - which means Communities, Collections, and Items - viz. core data model objects. Tasks may elect to work on only one type of DSpace object - typically an Item - and in this case they may simply ignore other data types (tasks have the ability to 'skip' objects for any reason).  The DSpace core distribution will provide a number of useful tasks, but the system is designed to encourage local extension - tasks can be written for any purpose, and placed in any java package. This gives DSpace sites the ability to customize the behavior of their repository without having to alter - and therefore manage synchronization with - the DSpace source code. What sorts of activities are appropriate for tasks?</p>
+
+<p>Some examples:</p>
+
+<ul>
+	<li>apply a virus scan to item bitstreams (this will be our example below)</li>
+	<li>profile a collection based on format types - good for identifying format migrations</li>
+	<li>ensure a given set of metadata fields are present in every item, or even that they have particular values</li>
+	<li>call a network service to enhance/replace/normalize an items's metadata or content</li>
+	<li>ensure all item bitstreams are readable and their checksums agree with the ingest values</li>
+</ul>
+
+
+<p>Since tasks have access to, and can modify, DSpace content, performing tasks is considered an administrative function to be available only to knowledgeable collection editors, repository administrators, sysadmins, etc. No tasks are exposed in the public interfaces.</p>
+
+<h2><a name="CurationSystem-Activation"></a>Activation</h2>
+
+<p>For CS to run a task, the code for the task must of course be included with other deployed code (to <tt>[dspace]/lib</tt>, WAR, etc) but it must also be declared and given a name. This is done via a configuration property in <tt>[dspace]/config/modules/curate.cfg</tt> as follows:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+plugin.named.org.dspace.curate.CurationTask = \
+org.dspace.curate.ProfileFormats = profileformats, \
+org.dspace.curate.RequiredMetadata = requiredmetadata, \
+org.dspace.curate.ClamScan = vscan
+</pre>
+</div></div>
+
+<p>For each activated task, a 'class'='taskname' line is added. The taskname is used elsewhere to configure the use of the task, as will be seen below. Note that the curate.cfg configuration file, while in the config directory, is located under 'modules'. The intent is that tasks, as well as any configuration they require, will be optional 'add-ons' to the basic system configuration. Adding or removing tasks has no impact on dspace.cfg.</p>
+
+<p>For many tasks, this activation configuration is all that will be required to use it. But for others, the task needs specific configuration itself. A concrete example is described below, but here note that these task-specific configuration property files also reside in <tt>[dspace]/config/modules</tt></p>
+
+<h2><a name="CurationSystem-Writingyourowntasks"></a>Writing your own tasks</h2>
+
+<p>A task is just a java class that can contain arbitrary code, but it must have 2 properties:</p>
+
+<p>First, it must provide a no argument constructor, so it can be loaded by the PluginManager. Thus, all tasks are 'named' plugins, with the taskname being the plugin name.</p>
+
+<p>Second, it must implement the interface 'org.dspace.curate.CurationTask'</p>
+
+<p>The CurationTask interface is almost a 'tagging' interface, and only requires a few very high-level methods be implemented. The most significant is:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java"> <span class="code-object">int</span> perform(DSpaceObject dso); </pre>
+</div></div>
+
+<p>The return value should be a code describing one of 4 conditions:</p>
+
+<ul>
+	<li>0  : SUCCESS the task completed successfully</li>
+	<li>1  : FAIL the task failed (it is up to the task to decide what 'counts' as failure - an example might be that the virus scan finds an infected file)</li>
+	<li>2  : SKIPPED the task could not be performed on the object, perhaps because it was not applicable</li>
+	<li>&#45;1 : ERROR the task could not be completed due to an error</li>
+</ul>
+
+
+<p>If a task extends the AbstractCurationTask class, that is the only method it needs to define.</p>
+
+<h2><a name="CurationSystem-TaskInvocation"></a>Task Invocation</h2>
+
+<p>Tasks are invoked using CS framework classes that manage a few details (to be described below), and this invocation can occur wherever needed, but CS offers great versatility 'out of the box':</p>
+
+<h3><a name="CurationSystem-Onthecommandline"></a>On the command line</h3>
+
+<p>A simple tool 'CurationCli' provides access to CS via the command line. This tool bears the name 'curate' in the DSpace launcher. For example, to perform a virus check on collection '4':</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java"> [dspace]/bin/dspace curate -t vscan -i 123456789/4 </pre>
+</div></div>
+
+<p>As with other command-line tools, these invocations could be placed in a cron table and run on a fixed schedule, or run on demand by an administrator.</p>
+
+<h3><a name="CurationSystem-IntheadminUI"></a>In the admin UI</h3>
+
+<p>In the XMLUI, there is a 'Curate' tab (appearing within the 'Edit  Community/Collection/Item') that exposes a drop-down list of configured tasks, with a button to 'perform' the task, or queue it for later operation (see section below). Not all activated tasks need appear in the Curate tab - you filter them by means of a configuration property. This property also permits you to assign to the task a 'prettier' name than the PluginManager task name. The property resides in <tt>[dspace]/config/modules/curate.cfg</tt>:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+ui.tasknames = \
+     profileformats = Profile Bitstream Formats, \
+     requiredmetadata = Check <span class="code-keyword">for</span> Required Metadata
+</pre>
+</div></div>
+
+<p>When a task is selected from the drop-down list and performed, the tab displays both a phrase interpreting the 'status code' of the task execution, and the 'result' message if any has been defined. When the task has been queued, an acknowlegement appears instead. You may configure the words used for status codes in curate.cfg (for clarity, language localization, etc):</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+ui.statusmessages = \
+    -3 = Unknown Task, \
+    -2 = No Status Set, \
+    -1 = Error, \
+     0 = Success, \
+     1 = Fail, \
+     2 = Skip, \
+     other = Invalid Status
+</pre>
+</div></div>
+
+
+<h3><a name="CurationSystem-Inworkflow"></a>In workflow</h3>
+
+<p>CS provides the ability to attach any number of tasks to standard DSpace workflows. Using a configuration file <tt>[dspace]/config/workflow-curation.xml</tt>, you can declaratively (without coding) wire tasks to any step in a workflow. An example:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+&lt;taskset-map&gt;
+   &lt;mapping collection-handle=<span class="code-quote">"<span class="code-keyword">default</span>"</span> taskset=<span class="code-quote">"cautious"</span> /&gt;
+&lt;/taskset-map&gt;
+&lt;tasksets&gt;
+  &lt;taskset name=<span class="code-quote">"cautious"</span>&gt;
+    &lt;flowstep name=<span class="code-quote">"step1"</span>&gt;
+      &lt;task name=<span class="code-quote">"vscan"</span>&gt;
+        &lt;workflow&gt;reject&lt;/workflow&gt;
+        &lt;notify on=<span class="code-quote">"fail"</span>&gt;$flowgroup&lt;/notify&gt;
+        &lt;notify on=<span class="code-quote">"fail"</span>&gt;$colladmin&lt;/notify&gt;
+        &lt;notify on=<span class="code-quote">"error"</span>&gt;$siteadmin&lt;/notify&gt;
+      &lt;/task&gt;
+    &lt;/flowstep&gt;
+  &lt;/taskset&gt;
+&lt;/tasksets&gt;
+</pre>
+</div></div>
+
+<p>This markup would cause a virus scan to occur during step one of workflow for any collection, and automatically reject any submissions with infected files. It would further notify (via email) both the reviewers (step 1 group), and the collection administrators, if either of these are defined. If it could not perform the scan, the site administrator would be notified.</p>
+
+<p>The notifications use the same procedures that other workflow notifications do - namely email. There is a new email template defined for curation task use: <tt>[dspace]/config/emails/flowtask_notify</tt>. This may be language-localized or otherwise modified like any other email template.</p>
+
+<p>Like configurable submission, you can assign these task rules per collection, as well as having a default for any collection.</p>
+
+<h3><a name="CurationSystem-Inarbitraryusercode"></a>In arbitrary user code</h3>
+
+<p>If these pre-defined ways are not sufficient, you can of course manage curation directly in your code. You would use the CS helper classes. For example:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+Collection coll = (Collection)HandleManager.resolveToObject(context, <span class="code-quote">"123456789/4"</span>);
+Curator curator = <span class="code-keyword">new</span> Curator();
+curator.addTask(<span class="code-quote">"vscan"</span>).curate(coll);
+<span class="code-object">System</span>.out.println(<span class="code-quote">"Result: "</span> + curator.getResult(<span class="code-quote">"vscan"</span>));
+</pre>
+</div></div>
+
+<p>would do approximately what the command line invocation did. the method 'curate' just performs all the tasks configured<br/>
+(you can add multiple tasks to a curator).</p>
+
+<h2><a name="CurationSystem-Asynchronous%28Deferred%29Operation"></a>Asynchronous (Deferred) Operation</h2>
+
+<p>Because some tasks may consume a fair amount of time, it may not be desirable to run them in an interactive context. CS provides a simple API and means to defer task execution, by a queuing system. Thus, using the previous example:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+     Curator curator = <span class="code-keyword">new</span> Curator();
+     curator.addTask(<span class="code-quote">"vscan"</span>).queue(context, <span class="code-quote">"monthly"</span>, <span class="code-quote">"123456789/4"</span>);
+</pre>
+</div></div>
+
+<p>would place a request on a named queue "monthly" to virus scan the collection. To read (and process) the queue, we could for example:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java"> [dspace]/bin/dspace curate -q monthly </pre>
+</div></div>
+
+<p>use the command-line tool, but we could also read the queue programmatically. Any number of queues can be defined and used as needed.<br/>
+In the administrative UI curation 'widget', there is the ability to both perform a task, but also place it on a queue for later processing.</p>
+
+<h2><a name="CurationSystem-TaskOutputandReporting"></a>Task Output and Reporting</h2>
+
+<p>Few assumptions are made by CS about what the 'outcome' of a task may be (if any) - it. could e.g. produce a report to a temporary file. But the CS runtime does provide a few pieces of information that a task can assign:</p>
+
+<h3><a name="CurationSystem-StatusCode"></a>Status Code</h3>
+
+<p>This was mentioned above. This is returned to CS whenever a task is called. The complete list of values:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+      -3 NOTASK - CS could not find the requested task
+      -2 UNSET  - task did not <span class="code-keyword">return</span> a status code because it has not yet run
+      -1 ERROR - task could not be performed
+       0 SUCCESS - task performed successfully
+       1 FAIL - task performed, but failed
+       2 SKIP - task not performed due to object not being eligible
+</pre>
+</div></div>
+
+<h3><a name="CurationSystem-ResultString"></a>Result String</h3>
+
+<p>The task may define a string indicating details of the outcome. This result is displayed, e.g. in the 'curation widget' described above:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+       <span class="code-quote">"Virus 12312 detected on Bitstream 4 of 1234567789/3"</span>
+</pre>
+</div></div>
+
+<p>CS does not interpret or assign result strings, the task does it.</p>
+
+<h3><a name="CurationSystem-ReportingStream"></a>Reporting Stream</h3>
+
+<p>This is not currently fully implemented, just writes to standard out. But if more details should be recorded, they can be pushed to this stream.</p>
+
+<p>All 3 are accessed (or set) by methods on the Curation object:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+     Curator curator = <span class="code-keyword">new</span> Curator();
+     curator.addTask(<span class="code-quote">"vscan"</span>).curate(coll);
+     <span class="code-object">int</span> status = curator.getStatus(<span class="code-quote">"vscan"</span>);
+</pre>
+</div></div>
+
+<h2><a name="CurationSystem-TaskAnnotations"></a>Task Annotations</h2>
+
+<p>CS looks for, and will use, certain java annotations in the task Class definition that can help it invoke tasks more intelligently. An example may explain best. Since tasks operate on DSOs that can either be simple (Items) or containers (Collections, and Communities), there is a fundamental problem or ambiguity in how a task is invoked: if the DSO is a collection, should the CS invoke the task on each member of the collection, or does the task 'know' how to do that itself? The decision is made by looking for the @Distributive annotation: if present, CS assumes that the task will manage the details, otherwise CS will walk the collection, and invoke the task on each member. The java class would be defined:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+@Distributive
+<span class="code-keyword">public</span> class MyTask <span class="code-keyword">implements</span> CurationTask
+</pre>
+</div></div>
+
+<p>A related issue concerns how non-distributive tasks report their status and results: the status will normally reflect only the last invocation of the task in the container, so important outcomes could be lost. If a task declares itself @Suspendable, however, the CS will cease processing when it encounters a FAIL status. When used in the UI, for example, this would mean that if our virus scan is running over a collection, it would stop and return status (and result) to the scene on the first infected item it encounters. You can even tune @Supendable tasks more precisely by annotating what invocations you want to suspend on. For example:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+@Suspendable(invoked=Curator.Invoked.INTERACTIVE)
+<span class="code-keyword">public</span> class MyTask <span class="code-keyword">implements</span> CurationTask
+</pre>
+</div></div>
+
+<p>would mean that the task would suspend if invoked in the UI, but would run to completion if run on the command-line.</p>
+
+<p>Only a few annotation types have been defined so far, but as the number of tasks grow, we can look for common behavior that can be signaled by annotation. For example, there is a @Mutative type: that tells CS that the task may alter (mutate) the object it is working on.</p>
+
+<h2><a name="CurationSystem-StarterTasks"></a>Starter Tasks</h2>
+
+<p>DSpace 1.7 bundles a few tasks and activates 2 by default to demonstrate the use of the curation system. These may be removed (deactivated by means of configuration) if desired without affecting system integrity. Each task is briefly described here.</p>
+
+<h3><a name="CurationSystem-BitstreamFormatProfiler"></a>Bitstream Format Profiler</h3>
+
+<p>The task with the task name 'formatprofiler' (in the admin UI it is labelled "Profile Bitstream Formats") examines all the bitstreams in an item any produces a table ("profile") which is assigned to the result string. It has the layout:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+     10 (K) Portable Network Graphics
+     5  (S) Plain Text
+</pre>
+</div></div>
+
+<p>where the left column is the count of bitstreams of the named format and the letter in parentheses is an abbreviation of the repository-assigned support level for that format:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+    U  Unsupported
+    K  Known
+    S  Supported
+</pre>
+</div></div>
+
+<p>The profiler will operate on any DSpace object. If the object is an item, then only that item's bitstreams are profiled; if a collection, all the bitsteams of all the items; if a community, all the items of all the collections of the community.</p>
+
+<h3><a name="CurationSystem-RequiredMetadata"></a>Required Metadata</h3>
+
+<p>The 'requiredmetadata' task examines item metadata and determines whether fields that the web submission (input-forms.xml) marks as required are present. It sets the result string to either indicate that all required fields are present, or constructs a list of metadata elements that are required but missing.</p>
+
+<h3><a name="CurationSystem-VirusScan"></a>Virus Scan</h3>
+
+<p>The 'vscan' task performs a virus scan on the bitstreams of items using the ClamAV software product.<br/>
+Clam AntiVirus is an open source (GPL) anti-virus toolkit for UNIX. The virus scanning curation task interacts with the ClamAV virus scanning service to scan the bitstreams contained in items, reporting on infection(s).  Like other curation tasks, it can be run against a container or item, in the GUI or from the command line. It should be installed according to the documentation at <a href="http://www.clamav.net/">http://www.clamav.net</a>. It should not be installed in the dspace installation directory. You may install it on the same machine as your dspace installation, or on another machine which has been configured properly.</p>
+
+<h4><a name="CurationSystem-SetuptheservicefromtheClamAVdocumentation."></a>Setup the service from the ClamAV documentation.</h4>
+
+<p>This plugin requires a ClamAV daemon installed and configured for TCP sockets. Instructions for installing ClamAV (<a href="http://www.clamav.net/doc/latest/clamdoc.pdf"><font color="#0000ff">http://</font></a><a href="http://www.clamav.net/doc/latest/clamdoc.pdf"><font color="#0000ff">www.clamav.net/doc/latest/</font></a><a href="http://www.clamav.net/doc/latest/clamdoc.pdf"><font color="#0000ff"><b>clamdoc</b></font></a><a href="http://www.clamav.net/doc/latest/clamdoc.pdf"><font color="#0000ff">.pdf</font></a> )</p>
+
+<p>NOTICE: The following directions assume there is a properly installed and configured clamav daemon. Refer to links above for more information about ClamAV.<br/>
+The Clam anti-virus database must be updated regularly to maintain the most current level of anti-virus protection.  Please refer to the ClamAV documentation for instructions about maintaining the anti-virus database.</p>
+
+<h4><a name="CurationSystem-DSpaceConfiguration"></a>DSpace Configuration</h4>
+
+<p>In <tt>[dspace]/config/modules/curate.cfg</tt>, activate the task:</p>
+<ul>
+	<li>Add the plugin to the comma separated list of curation tasks.</li>
+</ul>
+
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+### Task <span class="code-object">Class</span> implementations
+plugin.named.org.dspace.curate.CurationTask = \
+org.dspace.curate.ProfileFormats = profileformats, \
+org.dspace.curate.RequiredMetadata = requiredmetadata, \
+org.dspace.curate.ClamScan = vscan
+</pre>
+</div></div>
+
+<ul>
+	<li>Optionally, add the vscan friendly name to the configuration to enable it in the administrative it in the administrative user interface.</li>
+</ul>
+
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+ui.tasknames = \
+profileformats = Profile Bitstream Formats, \
+requiredmetadata = Check <span class="code-keyword">for</span> Required Metadata, \
+vscan = Scan <span class="code-keyword">for</span> Viruses
+</pre>
+</div></div>
+
+<p>In <tt>[dspace]/config/modules</tt>, edit configuration file clamav.cfg:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+service.host = 127.0.0.1
+Change <span class="code-keyword">if</span> not running on the same host as your DSpace installation.
+service.port = 3310
+Change <span class="code-keyword">if</span> not using standard ClamAV port
+socket.timeout = 120
+Change <span class="code-keyword">if</span> longer timeout needed
+scan.failfast = <span class="code-keyword">false</span>
+Change only <span class="code-keyword">if</span> items have large numbers of bitstreams
+</pre>
+</div></div>
+
+<h4><a name="CurationSystem-TaskOperationfromtheGUI"></a>Task Operation from the GUI</h4>
+
+<p>Curation tasks can be run against container and item dspace objects by e-persons with administrative privileges. A curation tab will appear in the administrative ui after logging into DSpace:</p>
+<ol>
+	<li>Click on the curation tab.</li>
+	<li>Select the option configured in ui.tasknames above.</li>
+	<li>Select Perform.</li>
+</ol>
+
+
+<h4><a name="CurationSystem-TaskOperationfromthecurationcommandlineclient"></a>Task Operation from the curation command line client</h4>
+
+<p>To output the results to the console:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+[dspace]/bin/dspace curate -t vscan -i &lt;handle of container or item dso&gt; -r -
+</pre>
+</div></div>
+
+<p>Or capture the results in a file:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+[dspace]/bin/dspace curate -t vscan -i &lt;handle of container or item dso&gt; -r - &gt; /&lt;path...&gt;/&lt;name&gt;
+</pre>
+</div></div>
+
+<h5><a name="CurationSystem-Table1VirusScanResultsTable"></a>Table 1 &#8211; Virus Scan Results Table</h5>
+
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<td class='confluenceTd'> <b>GUI (Interactive Mode)</b> </td>
+<td class='confluenceTd'> <b>FailFast</b> </td>
+<td class='confluenceTd'> <b>Expectation</b> </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Container </td>
+<td class='confluenceTd'> T </td>
+<td class='confluenceTd'> Stop on 1<sup>st</sup> Infected Bitstream </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Container </td>
+<td class='confluenceTd'> F </td>
+<td class='confluenceTd'> Stop on 1<sup>st</sup> Infected Item </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Item </td>
+<td class='confluenceTd'> T </td>
+<td class='confluenceTd'> Stop on 1<sup>st</sup> Infected Bitstream </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Item </td>
+<td class='confluenceTd'> F </td>
+<td class='confluenceTd'> Scan all bitstreams </td>
+</tr>
+<tr>
+<td class='confluenceTd'>&nbsp;</td>
+<td class='confluenceTd'>&nbsp;</td>
+<td class='confluenceTd'>&nbsp;</td>
+</tr>
+<tr>
+<td class='confluenceTd'> <b>Command Line</b> </td>
+<td class='confluenceTd'>&nbsp;</td>
+<td class='confluenceTd'>&nbsp;</td>
+</tr>
+<tr>
+<td class='confluenceTd'> Container </td>
+<td class='confluenceTd'> T </td>
+<td class='confluenceTd'> Report on 1<sup>st</sup> infected bitstream within an item/Scan all contained Items </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Container </td>
+<td class='confluenceTd'> F </td>
+<td class='confluenceTd'> Report on all infected bitstreams/Scan all contained Items </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Item </td>
+<td class='confluenceTd'>&nbsp;</td>
+<td class='confluenceTd'> Report on 1<sup>st</sup> infected bitstream </td>
+</tr>
+<tr>
+<td class='confluenceTd'> Item </td>
+<td class='confluenceTd'>&nbsp;</td>
+<td class='confluenceTd'> Report on all infected bitstreams </td>
+</tr>
+</tbody></table>
+</div>
+
+
+				    
+                    			    </td>
+		    </tr>
+	    </table>
+	    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+				<td height="12" background="https://wiki.duraspace.org/images/border/border_bottom.gif"><img src="images/border/spacer.gif" width="1" height="1" border="0"/></td>
+			</tr>
+		    <tr>
+			    <td align="center"><font color="grey">Document generated by Confluence on Dec 16, 2010 11:47</font></td>
+		    </tr>
+	    </table>
+    </body>
+</html>

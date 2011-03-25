@@ -1,0 +1,295 @@
+# Alexa
+# UA "ia_archiver"
+# Has many IPs
+crawl8-public.alexa.com
+209.247.40.99
+
+# Almaden
+# UA "http://www.almaden.ibm.com/cs/crawler"
+# IBM research project
+wfp2.almaden.ibm.com
+198.4.83.49
+
+# Cyveillance
+# UA "Mozilla/4.0 (compatible; MSIE 5.01; Windows NT 5.0)"
+# A snoop bot to check for copyright/trademark violations
+63.148.99.224 - 63.148.99.255
+
+# Curl
+# UA "curl/7.9.1 (win32) libcurl 7.9.1"
+# it's a php tool used to grab web pages, etc.
+# comes from a multitude of IPs
+
+# DTSearch
+# UA "dtSearchSpider"
+# retail search software
+# probably coming from many IPs
+64.222.18.44
+
+# Eidetica.com
+# UA "Mozilla/4.7 (compatible; http://eidetica.com/spider)"
+# Search engine hosting/spidering service
+idle.eidetica.com
+62.58.2.5
+
+# e-SocietyRobot
+# UA "e-SocietyRobot(http://www.yama.info.waseda.ac.jp/~yamana/es/)"
+# Japanese research project
+210.128.142.42
+
+# Fantoma
+# UA "Mozilla/4.0 (fantomBrowser)"
+# UA "Mozilla/4.0 (stealthBrowser)"
+# UA "Mozilla/4.0 (cloakBrowser)"
+# UA "Mozilla/4.0 (fantomCrew Browser)"
+# UA "multiBlocker browser - IP blocker for Spam, Fraud + Snoop Protection"
+# UA "multiBlocker browser"
+# does spidering for promotional purposes and cataloging purposes
+# also spoofs referring URL in header with link to their website
+
+# Girafa.com
+# UA "Mozilla/4.0 (compatible; MSIE 5.0; Windows NT; Girafabot; girafabot at girafa dot com; http://www.girafa.com)"
+# a client program similar to Alexa
+64.210.196.195
+64.210.196.198
+
+# Googlebot Fake
+# UA "Googlebot/2.1 (+http://www.googlebot.com/bot.html)"
+# This is somebody in China with a bot faking Googlebot's user agent
+# I've heard reports it's a hacker
+211.154.211.209
+
+# Googlebot Fake
+# UA "Mozilla/4.0 (compatible; MSIE 6.0; Googlebot/2.1 (+http://www.googlebot.com/bot.html); .NET CLR 1.0.3705)"
+# IP resolves to someplace in New Hampshire
+66.94.35.20
+
+# Grub.org
+# UA "-"
+# open source spider
+brain.grub.org
+208.128.7.215
+
+# IncyWincy
+# UA "IncyWincy data gatherer(webmaster@loopimprovements.com,http://www.loopimprovements.com/robot.html)"
+# appears to be a search engine spider for sale to anybody
+dsl081-243-066.sfo1.dsl.speakeasy.net
+64.81.243.66
+64.133.109.250
+
+# Indy Library
+# UA "Mozilla/3.0 (compatible; Indy Library)"
+# An email harvester
+# Probably running from many independent locations/IPs
+211.101.236.91
+211.101.236.162
+212.1.26.100
+
+# Inria.fr
+# UA "Sqworm/2.9.72-BETA (beta_release; 20010821-737; i686-pc-linux-gnu)"
+# UA "larbin" (or some variations on larbin)
+# a French research institute
+# larbin appears to be a distributed spider
+213.97.108.143
+63.212.171.171
+
+# Intelliseek
+# UA "Mozilla/4.7 (compatible; Intelliseek; http://www.intelliseek.com)"
+# A data mining company
+64.158.138.48
+
+# Internetseer.com
+# UA "sitecheck.internetseer.com"
+# an uptime verifier
+198.139.155.7
+198.139.155.32
+
+# Larbin
+# UA "larbin"
+# a crawler available under GPL
+# related to Xyleme
+# running in a number of independent locations
+
+# Lexis-Nexis.com
+# UA "LNSpiderguy"
+# snoop bot
+198.185.18.207
+
+# LinkWalker
+# UA "LinkWalker"
+# looks like a link verifier
+209.167.50.22
+209.167.50.25
+
+# Lite Bot
+# UA "Lite Bot 0916b"
+# Probably a distributed bot used for a variety
+# of purposes.  Does not obey robots.txt
+24.126.133.124
+
+# MarkWatch.com
+# UA "MarkWatch/1.0"
+# trademark violation investigation bot
+204.62.226.36
+206.190.171.174
+206.190.171.175
+
+# Metacarta.com
+# UA "flunky"
+# This bot belongs to an information gathering company
+# Also known as Bigfoot
+66.28.20.194
+66.28.44.122 
+66.28.44.123 
+66.28.44.125 
+66.28.68.234
+66.28.68.235
+66.28.68.236
+66.28.68.237
+
+# Microsoft URL control
+# UA "Microsoft URL Control - 5.01.4319"
+# VisualBasic tool for grabbing web pages. Probably in use
+# from multiple independent IPs
+195.166.231.3
+
+# NameProtect
+# UA "NAMEPROTECT"
+# UA "Mozilla/4.7"
+# UA "RPT-HTTPClient/0.3-3"
+# UA "NPBot-1/2.0 (http://www.nameprotect.com/botinfo.html)"
+# UA "aipbot/1.0 (aipbot; http://www.aipbot.com; aipbot@aipbot.com)"
+# snoop bot to check for trademark violations
+crawler918.com
+12.40.85
+12.148.209.196
+
+# NetMechanic
+# UA "NetMechanic V2.0"
+147.208.15.13
+216.182.214.7
+
+# NetSpective
+# UA "WebFilter Robot 1.0"
+# A web filterer
+
+# PicaLoader
+# UA "PicaLoader 1.0"
+# A site/picture downloader
+
+# Robozilla
+# UA "Robozilla/1.0"
+# Link checker for ODP... http://www.dmoz.org
+207.200.81.145
+
+# RPT-HTTPClient
+# UA "RPT-HTTPClient/0.3-3"
+# A Java library used for spidering
+
+# ScoutAbout
+# UA "ScoutAbout"
+# is not a SE spider -- it's for sale to anybody
+zeus.nj.nec.com
+138.15.164.9
+
+# SlySearch
+# UA "TurnitinBot/1.4 http://www.turnitin.com/robot/crawlerinfo.html"
+# UA "SlySearch"
+# a bot used to verify plagiarism, etc.
+
+# Spidersoft
+# UA "WebZIP/4.0 (http://www.spidersoft.com)"
+# web page downloader probably from many independent IPs
+212.253.129.11
+
+# Teleport Pro
+# UA "Teleport Pro/1.28"
+# a personal bot for windows
+# operating from many IPs... not worth listing any
+
+# Teradex Mapper
+# UA "(Teradex Mapper; mapper@teradex.com; http://www.teradex.com)"
+# a bot that belongs to the human reviewed Teradex directory
+64.69.79.210
+
+# Tivra
+# UA "tivraSpider/1.0 (crawler@tivra.com)"
+# looks like an IBM or AT&T research spider
+panchma.tivra.com
+207.140.168.143
+207.140.168.146
+
+# Tracerlock
+# http://www.tracerlock.com
+# news monitoring service
+# UA "libwww-perl/5.47"
+tracerlock.com
+209.61.182.37
+
+# UbiCrawler
+# UA "UbiCrawler/v0.3beta (http://ubi.imc.pi.cnr.it/projects/ubicrawler/)"
+# an experimental bot
+146.48.78.32
+146.48.78.38
+
+# Webclipping.com
+# UA "Webclipping.com"
+# a data mining bot
+209.73.228.163
+209.73.228.167
+
+# Webrank
+# UA "webrank"
+# looks like a ranking checker
+xs4.kso.co.uk
+207.235.6.157
+
+# Websquash.com
+# UA: "websquash.com ( Add Url Robot )"
+# A fishy engine that belongs to sitereleases.com, a SEO company
+66.221.171.1
+
+# websmostlinked.com
+# UA "lwp-trivial/1.34"
+# UA "AESOP_com_SpiderMan"
+# could be a legitimate spider but more likely a hazard for cloakers
+64.14.241.54
+
+# Whizbang
+# UA "ozilla/4.7 (compatible; Whizbang)"
+# WhizBang is a company that sells a spider to build databases
+pixnat06.whizbang.com
+63.173.190.16
+pixnat09.whizbang.com
+63.173.190.19
+
+# X-Crawler
+# UA "TECOMAC-Crawler/0.3"
+# UA "X-Crawler"
+# a distributed spider sold by Arexera
+
+# Xyleme.com
+# UA "cosmos/0.8)_(robot@xyleme.com)"
+# related to Inria.fr
+# related to Larbin
+212.73.246.73
+212.73.246.71
+
+# Yahoo.com URL verifiers
+# UA "Mozilla/4.05"
+morgue1.corp.yahoo.com
+216.145.54.35
+hanta.yahoo.com
+216.145.50.40
+
+# Zealbot
+# UA "Mozilla/4.0(compatible; Zealbot 1.0)"
+# LookSmarts link checker
+64.241.242.11
+64.241.243.32
+64.241.243.65
+64.241.243.66
+
+# Zeus Webster
+# UA "Zeus 60359 Webster Pro V2.9 Win32"
+# directory builder available retail
