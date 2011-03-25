@@ -56,27 +56,6 @@
      <url>http://svn.apache.org/viewvc/maven/pom/tags/dspace-solr-parent-1.4.1.0</url>
   </scm>
 
-   <!--
-      Distribution Management is currently used by the Continuum server
-      to update snapshots it generates. This will also be used on
-      release to deploy release versions to the repository by the
-      release manager.
-   -->
-   <distributionManagement>
-      <repository>
-         <id>maven.dspace.org/release</id>
-         <name>DSpace Maven Repository</name>
-         <url>scp://maven.dspace.org/var/maven/release</url>
-      </repository>
-      <snapshotRepository>
-         <id>maven.dspace.org-snapshot</id>
-         <name>DSpace Maven Repository</name>
-         <url>scp://maven.dspace.org/var/maven/snapshot</url>
-         <uniqueVersion>true</uniqueVersion>
-      </snapshotRepository>
-   </distributionManagement>
-
-
    <modules>
       <module>webapp</module>
    </modules>
