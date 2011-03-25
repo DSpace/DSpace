@@ -20,24 +20,24 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-solr-parent</artifactId>
-      <version>1.4.1.1</version>
+      <version>1.4.1.2-SNAPSHOT</version>
    </parent>
 
    <groupId>org.dspace</groupId>
    <artifactId>dspace-solr</artifactId>
    <name>Apache Solr Webapp</name>
-   <version>1.4.1.1</version>
+   <version>1.4.1.2-SNAPSHOT</version>
    <description>Apache Solr Server</description>
    <packaging>war</packaging>
 
    <scm>
       <connection>
-      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/tags/dspace-solr-parent-1.4.1.1/webapp
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk/webapp
     </connection>
       <developerConnection>
-      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/tags/dspace-solr-parent-1.4.1.1/webapp
+      scm:svn:https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk/webapp
     </developerConnection>
-     <url>https://scm.dspace.org/svn/repo/modules/dspace-solr/tags/dspace-solr-parent-1.4.1.1/webapp</url>
+     <url>https://scm.dspace.org/svn/repo/modules/dspace-solr/trunk/webapp</url>
   </scm>
    
    <build>
