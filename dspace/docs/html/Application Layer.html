@@ -1,0 +1,578 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+    <head>
+        <title>DSpace Documentation : Application Layer</title>
+	    <link rel="stylesheet" href="styles/site.css" type="text/css" />
+        <META http-equiv="Content-Type" content="text/html; charset=UTF-8">	    
+    </head>
+
+    <body>
+	    <table class="pagecontent" border="0" cellpadding="0" cellspacing="0" width="100%" bgcolor="#ffffff">
+		    <tr>
+			    <td valign="top" class="pagebody">
+				    <div class="pageheader">
+					    <span class="pagetitle">
+                            DSpace Documentation : Application Layer
+                                                    </span>
+				    </div>
+				    <div class="pagesubheading">
+					    This page last changed on Feb 17, 2011 by <font color="#0050B2">helix84</font>.
+				    </div>
+
+				    <h1><a name="ApplicationLayer-SystemArchitecture%3AApplicationLayer"></a>System Architecture: Application Layer</h1>
+
+<p>The following explains how the application layer is built and used.</p>
+
+<style type='text/css'>/*<![CDATA[*/
+div.rbtoc1297951722587 {margin-left: 0px;padding: 0px;}
+div.rbtoc1297951722587 ul {list-style: none;margin-left: 0px;}
+div.rbtoc1297951722587 li {margin-left: 0px;padding-left: 0px;}
+
+/*]]>*/</style><div class='rbtoc1297951722587'>
+<ul>
+    <li><span class='TOCOutline'>1</span> <a href='#ApplicationLayer-WebUserInterface'>Web User Interface</a></li>
+<ul>
+    <li><span class='TOCOutline'>1.1</span> <a href='#ApplicationLayer-WebUIFiles'>Web UI Files</a></li>
+    <li><span class='TOCOutline'>1.2</span> <a href='#ApplicationLayer-TheBuildProcess'>The Build Process</a></li>
+    <li><span class='TOCOutline'>1.3</span> <a href='#ApplicationLayer-ServletsandJSPs%28JSPUIOnly%29'>Servlets and JSPs (JSPUI Only)</a></li>
+    <li><span class='TOCOutline'>1.4</span> <a href='#ApplicationLayer-CustomJSPTags%28JSPUIOnly%29'>Custom JSP Tags (JSPUI Only)</a></li>
+    <li><span class='TOCOutline'>1.5</span> <a href='#ApplicationLayer-Internationalization%28JSPUIOnly%29'>Internationalization (JSPUI Only)</a></li>
+<ul>
+    <li><span class='TOCOutline'>1.5.1</span> <a href='#ApplicationLayer-MessageKeyConvention'>Message Key Convention</a></li>
+    <li><span class='TOCOutline'>1.5.2</span> <a href='#ApplicationLayer-WhichLanguagesarecurrentlysupported%3F'>Which Languages are currently supported?</a></li>
+</ul>
+    <li><span class='TOCOutline'>1.6</span> <a href='#ApplicationLayer-HTMLContentinItems'>HTML Content in Items</a></li>
+    <li><span class='TOCOutline'>1.7</span> <a href='#ApplicationLayer-ThesisBlocking'>Thesis Blocking</a></li>
+</ul>
+    <li><span class='TOCOutline'>2</span> <a href='#ApplicationLayer-OAIPMHDataProvider'>OAI-PMH Data Provider</a></li>
+<ul>
+    <li><span class='TOCOutline'>2.1</span> <a href='#ApplicationLayer-Sets'>Sets</a></li>
+    <li><span class='TOCOutline'>2.2</span> <a href='#ApplicationLayer-UniqueIdentifier'>Unique Identifier</a></li>
+    <li><span class='TOCOutline'>2.3</span> <a href='#ApplicationLayer-Accesscontrol'>Access control</a></li>
+    <li><span class='TOCOutline'>2.4</span> <a href='#ApplicationLayer-ModificationDate%28OAIDateStamp%29'>Modification Date (OAI Date Stamp)</a></li>
+    <li><span class='TOCOutline'>2.5</span> <a href='#ApplicationLayer-%27About%27Information'>'About' Information</a></li>
+    <li><span class='TOCOutline'>2.6</span> <a href='#ApplicationLayer-Deletions'>Deletions</a></li>
+    <li><span class='TOCOutline'>2.7</span> <a href='#ApplicationLayer-FlowControl%28ResumptionTokens%29'>Flow Control (Resumption Tokens)</a></li>
+</ul>
+    <li><span class='TOCOutline'>3</span> <a href='#ApplicationLayer-DSpaceCommandLauncher'>DSpace Command Launcher</a></li>
+<ul>
+    <li><span class='TOCOutline'>3.1</span> <a href='#ApplicationLayer-OlderVersions'>Older Versions</a></li>
+    <li><span class='TOCOutline'>3.2</span> <a href='#ApplicationLayer-CommandLauncherStructure'>Command Launcher Structure</a></li>
+</ul>
+</ul></div>
+
+<h2><a name="ApplicationLayer-WebUserInterface"></a>Web User Interface</h2>
+
+<p>The DSpace Web UI is the largest and most-used component in the application layer. Built on Java Servlet and JavaServer Page technology, it allows end-users to access DSpace over the Web via their Web browsers. As of Dspace 1.3.2 the UI meets both XHTML 1.0 standards and Web Accessibility Initiative (WAI) level-2 standard.</p>
+
+<p>It also features an administration section, consisting of pages intended for use by central administrators. Presently, this part of the Web UI is not particularly sophisticated; users of the administration section need to know what they are doing&#33; Selected parts of this may also be used by collection administrators.</p>
+
+<h3><a name="ApplicationLayer-WebUIFiles"></a>Web UI Files</h3>
+
+<p>The Web UI-related files are located in a variety of directories in the DSpace source tree. Note that as of DSpace version 1.5, the deployment has changed. The build systems has moved to a maven-based system enabling the various projects (JSPUI, XMLUI, etc.) into separate projects. The system still uses the familar 'Ant' to deploy the webapps in later stages.</p>
+<div class='table-wrap'>
+<table class='confluenceTable'><tbody>
+<tr>
+<td class='confluenceTd'> <b>Location</b> </td>
+<td class='confluenceTd'> <b>Description</b> </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <em>[dspace-source]/dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui</em> </td>
+<td class='confluenceTd'> Web UI source files </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <em>[dspace-source]/dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/filters</em> </td>
+<td class='confluenceTd'> Servlet Filters (Servlet 2.3 spec) </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <em>[dspace-source]/dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/jsptag</em> </td>
+<td class='confluenceTd'> Custom JSP tag class files </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <em>[dspace-source]/dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/servlet</em> </td>
+<td class='confluenceTd'> Servlets for main Web UI (controllers) </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <em>[dspace-source]/dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/servlet/admin</em> </td>
+<td class='confluenceTd'> Servlets that comprise the administration part of the Web UI </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <em>[dspace-source]/dspace-jspui/dspace-jspui-api/src/main/java/org/dspace/app/webui/util/</em> </td>
+<td class='confluenceTd'> Miscellaneous classes used by the servlets and filters </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <em>[dspace-source]/dspace-jspui</em> </td>
+<td class='confluenceTd'> The JSP files </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <em>[dspace-source]/dspace/modules/jspui/src/main/webapp</em> </td>
+<td class='confluenceTd'> This is where you place customized versions of JSPs‚Äîsee 6. JSPUI Configuration and Customization </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <em>[dspace-source]/dspace/modules/xmlui/src/main/webapp</em> </td>
+<td class='confluenceTd'> This is where you place customizations for the Manakin interface‚Äîsee 7. Manakin [XMLUI] Configuration and Customization </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <em>[dspace-source/dspace/modules/jspui/src/main/resources</em> </td>
+<td class='confluenceTd'> This is where you can place you customize version of the <em>Messages.properties</em> file. </td>
+</tr>
+<tr>
+<td class='confluenceTd'> <em>[dspace-source]/dspace-jspui/dspace-jspui-webapp/src/main/webapp/WEB-INF/dspace-tags.tld</em> </td>
+<td class='confluenceTd'> Custom DSpace JSP tag descriptor </td>
+</tr>
+</tbody></table>
+</div>
+
+
+
+<h3><a name="ApplicationLayer-TheBuildProcess"></a>The Build Process</h3>
+
+<p>The DSpace Maven build process constructs a full DSpace installation template directory structure containing a series of web applications.  The results  are placed in <em>[dspace-source]/dspace/target/dspace-[version]-build.dir/</em>. The process works as follows:</p>
+
+<ul>
+	<li>All the DSpace source code is compiled, and/or automatically downloaded from the Maven Central code/libraries repository.</li>
+	<li>A full DSpace "installation template" folder is built in <tt>[dspace-source]/dspace/target/dspace-[version]-build.dir/</tt>
+	<ul>
+		<li>This DSpace "installation template" folder has a structure identical to the <a href="Directories.html#Directories-InstalledDirectoryLayout">Installed Directory Layout</a></li>
+	</ul>
+	</li>
+</ul>
+
+
+<p>In order to then install &amp; deploy DSpace from this "installation template" folder, you must run the following from <tt>[dspace-source]/dspace/target/dspace-[version]-build.dir/</tt> :</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">ant -D [dspace]/config/dspace.cfg update</pre>
+</div></div>
+
+<p>Please see the <a href="Installation.html" title="Installation">Installation</a> instructions for more details about the Installation process.</p>
+
+
+<h3><a name="ApplicationLayer-ServletsandJSPs%28JSPUIOnly%29"></a>Servlets and JSPs (JSPUI Only)</h3>
+
+<p>The JSPUI Web UI is loosely based around the MVC (model, view, controller) model. The content management API corresponds to the model, the Java Servlets are the controllers, and the JSPs are the views. Interactions take the following basic form:</p>
+
+<ol>
+	<li>An HTTP request is received from a browser</li>
+	<li>The appropriate servlet is invoked, and processes the request by invoking the DSpace business logic layer public API</li>
+	<li>Depending on the outcome of the processing, the servlet invokes the appropriate JSP</li>
+	<li>The JSP is processed and sent to the browser<br/>
+The reasons for this approach are:</li>
+</ol>
+
+
+<ul>
+	<li>All of the processing is done before the JSP is invoked, so any error or problem that occurs does not occur halfway through HTML rendering</li>
+	<li>The JSPs contain as little code as possible, so they can be customized without having to delve into Java code too much<br/>
+The <em>org.dspace.app.webui.servlet.LoadDSpaceConfig</em> servlet is always loaded first. This is a very simple servlet that checks the <em>dspace-config</em> context parameter from the DSpace deployment descriptor, and uses it to locate <em>dspace.cfg</em>. It also loads up the Log4j configuration. It's important that this servlet is loaded first, since if another servlet is loaded up, it will cause the system to try and load DSpace and Log4j configurations, neither of which would be found.</li>
+</ul>
+
+
+<p>All DSpace servlets are subclasses of the <em>DSpaceServlet</em> class. The <em>DSpaceServlet</em> class handles some basic operations such as creating a DSpace <em>Context</em> object (opening a database connection etc.), authentication and error handling. Instead of overriding the <em>doGet</em> and <em>doPost</em> methods as one normally would for a servlet, DSpace servlets implement <em>doDSGet</em> or <em>doDSPost</em> which have an extra context parameter, and allow the servlet to throw various exceptions that can be handled in a standard way.</p>
+
+<p>The DSpace servlet processes the contents of the HTTP request. This might involve retrieving the results of a search with a query term, accessing the current user's eperson record, or updating a submission in progress. According to the results of this processing, the servlet must decide which JSP should be displayed. The servlet then fills out the appropriate attributes in the <em>HttpRequest</em> object that represents the HTTP request being processed. This is done by invoking the <em>setAttribute</em> method of the <em>javax.servlet.http.HttpServletRequest</em> object that is passed into the servlet from Tomcat. The servlet then forwards control of the request to the appropriate JSP using the <em>JSPManager.showJSP</em> method.</p>
+
+<p>The <em>JSPManager.showJSP</em> method uses the standard Java servlet forwarding mechanism is then used to forward the HTTP request to the JSP. The JSP is processed by Tomcat and the results sent back to the user's browser.</p>
+
+<p>There is an exception to this servlet/JSP style: <em>index.jsp</em>, the 'home page', receives the HTTP request directly from Tomcat without a servlet being invoked first. This is because in the servlet 2.3 specification, there is no way to map a servlet to handle only requests made to '<em>/</em>'; such a mapping results in every request being directed to that servlet. By default, Tomcat forwards requests to '<em>/</em>' to <em>index.jsp</em>. To try and make things as clean as possible, <em>index.jsp</em> contains some simple code that would normally go in a servlet, and then forwards to <em>home.jsp</em> using the <em>JSPManager.showJSP</em> method. This means localized versions of the 'home page' can be created by placing a customized <em>home.jsp</em> in <em>[dspace-source]/jsp/local</em>, in the same manner as other JSPs.</p>
+
+<p><em>[dspace-source]/jsp/dspace-admin/index.jsp</em>, the administration UI index page, is invoked directly by Tomcat and not through a servlet for similar reasons.</p>
+
+<p>At the top of each JSP file, right after the license and copyright header, is documented the appropriate attributes that a servlet must fill out prior to forwarding to that JSP. No validation is performed; if the servlet does not fill out the necessary attributes, it is likely that an internal server error will occur.</p>
+
+<p>Many JSPs containing forms will include hidden parameters that tell the servlets which form has been filled out. The submission UI servlet (<em>SubmissionController</em> is a prime example of a servlet that deals with the input from many different JSPs. The <em>step</em> and <em>page</em> hidden parameters (written out by the <em>SubmissionController.getSubmissionParameters()</em> method) are used to inform the servlet which page of which step has just been filled out (i.e. which page of the submission the user has just completed).</p>
+
+<p>Below is a detailed, scary diagram depicting the flow of control during the whole process of processing and responding to an HTTP request. More information about the authentication mechanism is mostly described in the configuration section.</p>
+
+<p><span class="image-wrap" style=""><img src="attachments/22022819/21954860.gif" style="border: 0px solid black"/></span></p>
+
+<p>Flow of Control During HTTP Request Processing</p>
+
+
+<h3><a name="ApplicationLayer-CustomJSPTags%28JSPUIOnly%29"></a>Custom JSP Tags (JSPUI Only)</h3>
+
+<p>The DSpace JSPs all use some custom tags defined in <em>/dspace/jsp/WEB-INF/dspace-tags.tld</em>, and the corresponding Java classes reside in <em>org.dspace.app.webui.jsptag</em>. The tags are listed below. The <em>dspace-tags.tld</em> file contains detailed comments about how to use the tags, so that information is not repeated here.</p>
+
+<ul>
+	<li><b><em>layout</em></b>: Just about every JSP uses this tag. It produces the standard HTML header and <em>&lt;BODY&gt;_tag. Thus the content of each JSP is nested inside a &#95;&lt;dspace:layout&gt;</em> tag. The (XML-style)attributes of this tag are slightly complicated--see <em>dspace-tags.tld</em>. The JSPs in the source code bundle also provide plenty of examples.</li>
+	<li><b><em>sidebar</em></b>: Can only be used inside a <em>layout</em> tag, and can only be used once per JSP. The content between the start and end <em>sidebar</em> tags is rendered in a column on the right-hand side of the HTML page. The contents can contain further JSP tags and Java 'scriptlets'.</li>
+	<li><b><em>date</em></b>: Displays the date represented by an <em>org.dspace.content.DCDate</em> object. Just the one representation of date is rendered currently, but this could use the user's browser preferences to display a localized date in the future.</li>
+	<li><b><em>include</em></b>: Obsolete, simple tag, similar to <em>jsp:include</em>. In versions prior to DSpace 1.2, this tag would use the locally modified version of a JSP if one was installed in jsp/local. As of 1.2, the build process now performs this function, however this tag is left in for backwards compatibility.</li>
+	<li><b><em>item</em></b>: Displays an item record, including Dublin Core metadata and links to the bitstreams within it. Note that the displaying of the bitstream links is simplistic, and does not take into account any of the bundling structure. This is because DSpace does not have a fully-fledged dissemination architectural piece yet. Displaying an item record is done by a tag rather than a JSP for two reasons: Firstly, it happens in several places (when verifying an item record during submission or workflow review, as well as during standard item accesses), and secondly, displaying the item turns out to be mostly code-work rather than HTML anyway. Of course, the disadvantage of doing it this way is that it is slightly harder to customize exactly what is displayed from an item record; it is necessary to edit the tag code (<em>org.dspace.app.webui.jsptag.ItemTag</em>). Hopefully a better solution can be found in the future.</li>
+	<li><b><em>itemlist</em></b><b>,</b> <b><em>collectionlist</em></b><b>,</b> <b><em>communitylist</em></b>: These tags display ordered sequences of items, collections and communities, showing minimal information but including a link to the page containing full details. These need to be used in HTML tables.</li>
+	<li><b><em>popup</em></b>: This tag is used to render a link to a pop-up page (typically a help page.) If Javascript is available, the link will either open or pop to the front any existing DSpace pop-up window. If Javascript is not available, a standard HTML link is displayed that renders the link destination in a window named '<em>dspace.popup</em>'. In graphical browsers, this usually opens a new window or re-uses an existing window of that name, but if a window is re-used it is not 'raised' which might confuse the user. In text browsers, following this link will simply replace the current page with the destination of the link. This obviously means that Javascript offers the best functionality, but other browsers are still supported.</li>
+	<li><b><em>selecteperson</em></b>: A tag which produces a widget analogous to HTML <em>&lt;SELECT&gt;</em>, that allows a user to select one or multiple e-people from a pop-up list.</li>
+	<li><b><em>sfxlink</em></b>: Using an item's Dublin Core metadata DSpace can display an SFX link, if an SFX server is available. This tag does so for a particular item if the <em>sfx.server.url</em> property is defined in <em>dspace.cfg</em>.</li>
+</ul>
+
+
+<h3><a name="ApplicationLayer-Internationalization%28JSPUIOnly%29"></a>Internationalization (JSPUI Only)</h3>
+
+<div class='panelMacro'><table class='infoMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="images/icons/emoticons/information.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>XMLUI Internationalization</b><br />For information about XMLUI Internationalization please see: <a href="XMLUI Configuration and Customization.html#XMLUIConfigurationandCustomization-MultilingualSupport">XMLUI Multilingual Support</a>.</td></tr></table></div>
+
+<p>The <a href="http://jakarta.apache.org/taglibs/doc/standard-1.0-doc/intro.html" title="Java Standard Tag Library v1.0">Java Standard Tag Library v1.0</a> is used to specify messages in the JSPs like this:</p>
+
+<p>OLD:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">&lt;H1&gt;Search Results&lt;/H1&gt;</pre>
+</div></div>
+<p>NEW:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">&lt;H1&gt;&lt;fmt:message key=<span class="code-quote">"jsp.search.results.title"</span>/&gt;&lt;/H1&gt;</pre>
+</div></div>
+<p>This message can now be changed using the <em>config/language-packs/Messages.properties</em> file. (This must be done at build-time: <em>Messages.properties</em> is placed in the <em>dspace.war</em> Web application file.)</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">jsp.search.results.title = Search Results</pre>
+</div></div>
+<p>Phrases may have parameters to be passed in, to make the job of translating easier, reduce the number of 'keys' and to allow translators to make the translated text flow more appropriately for the target language.</p>
+
+<p>OLD:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">&lt;P&gt;Results &lt;%= r.getFirst() %&gt; to &lt;%= r.getLast() %&gt; of &lt;%=r.getTotal() %&gt;&lt;/P&gt;</pre>
+</div></div>
+<p>NEW:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">&lt;fmt:message key=<span class="code-quote">"jsp.search.results.text"</span>&gt;
+  &lt;fmt:param&gt;&lt;%= r.getFirst() %&gt;&lt;/fmt:param&gt;
+  &lt;fmt:param&gt;&lt;%= r.getLast() %&gt;&lt;/fmt:param&gt;
+  &lt;fmt:param&gt;&lt;%= r.getTotal() %&gt;&lt;/fmt:param&gt;
+&lt;/fmt:message&gt;</pre>
+</div></div>
+<p>(Note: JSTL 1.0 does not seem to allow JSP &lt;%= %&gt; expressions to be passed in as values of attribute in &lt;fmt:param value=""/&gt;)</p>
+
+<p>The above would appear in the <em>Messages_xx.properties</em> file as:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">jsp.search.results.text = Results {0}-{1} of {2} </pre>
+</div></div>
+<p>Introducing number parameters that should be formatted according to the locale used makes no difference in the message key compared to string parameters:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">jsp.submit.show-uploaded-file.size-in-bytes = {0} bytes</pre>
+</div></div>
+<p>In the JSP using this key can be used in the way belov:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">&lt;fmt:message key=<span class="code-quote">"jsp.submit.show-uploaded-file.size-in-bytes"</span>&gt;
+  &lt;fmt:param&gt;&lt;fmt:formatNumber&gt;&lt;%= bitstream.getSize()%&gt;&lt;/fmt:formatNumber&gt;&lt;/fmt:param&gt;
+&lt;/fmt:message&gt;
+</pre>
+</div></div>
+<p>(Note: JSTL offers a way to include numbers in the message keys as <em>jsp.foo.key = {0,number} bytes</em>. Setting the parameter as <em>&lt;fmt:param value="${variable}" /&gt;</em> workes when <em>variable</em> is a single variable name and doesn't work when trying to use a method's return value instead: <em>bitstream.getSize()</em>. Passing the number as string (or using the &lt;%= %&gt; expression) also does not work.)</p>
+
+<p>Multiple <em>Messages.properties</em> can be created for different languages. See <a href="http://java.sun.com/j2se/1.4.2/docs/api/java/util/ResourceBundle.html#getBundle(java.lang.String,%20java.util.Locale,%20java.lang.ClassLoader)" title="ResourceBundle.getBundle">ResourceBundle.getBundle</a>. e.g. you can add German and Canadian French translations:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">Messages_de.properties
+Messages_fr_CA.properties</pre>
+</div></div>
+<p>The end user's browser settings determine which language is used. The English language file <em>Messages.properties</em> (or the default server locale) will be used as a default if there's no language bundle for the end user's preferred language. (Note that the English file is not called <em>Messages_en.properties</em> &#8211; this is so it is always available as a default, regardless of server configuration.)</p>
+
+<p>The <em>dspace:layout</em> tag has been updated to allow dictionary keys to be passed in for the titles. It now has two new parameters: <em>titlekey</em> and <em>parenttitlekey</em>. So where before you'd do:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">&lt;dspace:layout title=<span class="code-quote">"Here"</span>
+               parentlink=<span class="code-quote">"/mydspace"</span>
+               parenttitle=<span class="code-quote">"My DSpace"</span>&gt;
+</pre>
+</div></div>
+<p>You now do:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">&lt;dspace:layout titlekey=<span class="code-quote">"jsp.page.title"</span>
+               parentlink=<span class="code-quote">"/mydspace"</span>
+               parenttitlekey=<span class="code-quote">"jsp.mydspace"</span>&gt;
+
+</pre>
+</div></div>
+<p>And so the layout tag itself gets the relevant stuff out of the dictionary. <em>title</em> and <em>parenttitle</em> still work as before for backwards compatibility, and the odd spot where that's preferable.</p>
+
+<h4><a name="ApplicationLayer-MessageKeyConvention"></a>Message Key Convention</h4>
+
+<p>When translating further pages, please follow the convention for naming message keys to avoid clashes.</p>
+
+<p><b>For text in JSPs</b> use the complete path + filename of the JSP, then a one-word name for the message. e.g. for the title of <em>jsp/mydspace/main.jsp</em> use:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">jsp.mydspace.main.title</pre>
+</div></div>
+<p>Some common words (e.g. "Help") can be brought out into keys starting <em>jsp.</em> for ease of translation, e.g.:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">jsp.admin = Administer</pre>
+</div></div>
+<p>Other common words/phrases are brought out into 'general' parameters if they relate to a set (directory) of JSPs, e.g.</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">jsp.tools.general.delete = Delete</pre>
+</div></div>
+<p>Phrases that relate <b>strongly</b> to a topic (eg. MyDSpace) but used in many JSPs outside the particular directory are more convenient to be cross-referenced. For example one could use the key below in <em>jsp/submit/saved.jsp</em> to provide a link back to the user's <em>MyDSpace</em>:</p>
+
+<p><em>(Cross-referencing of keys</em> <b><em>in general</em></b> <em>is not a good idea as it may make maintenance more difficult. But in some cases it has more advantages as the meaning is obvious.)</em></p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">jsp.mydspace.general.<span class="code-keyword">goto</span>-mydspace = Go to My DSpace</pre>
+</div></div>
+<p><b>For text in servlet code</b>, in custom JSP tags or wherever applicable use the fully qualified classname + a one-word name for the message. e.g.</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">org.dspace.app.webui.jsptag.ItemListTag.title = Title</pre>
+</div></div>
+
+<h4><a name="ApplicationLayer-WhichLanguagesarecurrentlysupported%3F"></a>Which Languages are currently supported?</h4>
+
+<p>To view translations currently being developed, please refer to the <a href="http://wiki.dspace.org/I18nSupport" title="i18n page">i18n page</a> of the DSpace Wiki.</p>
+
+
+
+<h3><a name="ApplicationLayer-HTMLContentinItems"></a>HTML Content in Items</h3>
+
+<p>For the most part, the DSpace item display just gives a link that allows an end-user to download a bitstream. However, if a bundle has a primary bitstream whose format is of MIME type <em>text/html</em>, instead a link to the HTML servlet is given.</p>
+
+<p>So if we had an HTML document like this:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">contents.html
+chapter1.html
+chapter2.html
+chapter3.html
+figure1.gif
+figure2.jpg
+figure3.gif
+figure4.jpg
+figure5.gif
+figure6.gif</pre>
+</div></div>
+<p>The Bundle's primary bitstream field would point to the contents.html Bitstream, which we know is HTML (check the format MIME type) and so we know which to serve up first.</p>
+
+<p>The HTML servlet employs a trick to serve up HTML documents without actually modifying the HTML or other files themselves. Say someone is looking at <em>contents.html</em> from the above example, the URL in their browser will look like this:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">https:<span class="code-comment">//dspace.mit.edu/html/1721.1/12345/contents.html</span></pre>
+</div></div>
+<p>If there's an image called <em>figure1.gif</em> in that HTML page, the browser will do HTTP GET on this URL:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">https:<span class="code-comment">//dspace.mit.edu/html/1721.1/12345/figure1.gif</span></pre>
+</div></div>
+<p>The HTML document servlet can work out which item the user is looking at, and then which Bitstream in it is called <em>figure1.gif</em>, and serve up that bitstream. Similar for following links to other HTML pages. Of course all the links and image references have to be relative and not absolute.</p>
+
+<p>HTML documents must be "self-contained", as explained here. Provided that full path information is known by DSpace, any depth or complexity of HTML document can be served subject to those constraints. This is usually possible with some kind of batch import. If, however, the document has been uploaded one file at a time using the Web UI, the path information has been stripped. The system can cope with relative links that refer to a deeper path, e.g.</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">&lt;IMG SRC=<span class="code-quote">"images/figure1.gif"</span>&gt;</pre>
+</div></div>
+<p>If the item has been uploaded via the Web submit UI, in the Bitstream table in the database we have the 'name' field, which will contain the filename with no path (<em>figure1.gif</em>). We can still work out what <em>images/figure1.gif</em> is by making the HTML document servlet strip any path that comes in from the URL, e.g.</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">https:<span class="code-comment">//dspace.mit.edu/html/1721.1/12345/images/figure1.gif
+</span>                                         ^^^^^^^
+                                        Strip <span class="code-keyword">this</span></pre>
+</div></div>
+<p>BUT all the filenames (regardless of directory names) must be unique. For example, this wouldn't work:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">contents.html
+chapter1.html
+chapter2.html
+chapter1_images/figure.gif
+chapter2_images/figure.gif</pre>
+</div></div>
+<p>since the HTML document servlet wouldn't know which bitstream to serve up for:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">https:<span class="code-comment">//dspace.mit.edu/html/1721.1/12345/chapter1_images/figure.gif
+</span>https:<span class="code-comment">//dspace.mit.edu/html/1721.1/12345/chapter2_images/figure.gif</span></pre>
+</div></div>
+<p>since it would just have <em>figure.gif</em></p>
+
+<p>To prevent "infinite URL spaces" appearing (e.g. if a file <em>foo.html</em> linked to <em>bar/foo.html</em>, which would link to <em>bar/bar/foo.html</em>...) this behavior can be configured by setting the configuration property <em>webui.html.max-depth-guess</em>.</p>
+
+<p>For example, if we receive a request for <em>foo/bar/index.html</em>, and we have a bitstream called just <em>index.html</em>, we will serve up that bitstream for the request if <em>webui.html.max-depth-guess</em> is 2 or greater. If <em>webui.html.max-depth-guess</em> is 1 or less, we would not serve that bitstream, as the depth of the file is greater. If <em>webui.html.max-depth-guess</em> is zero, the request filename and path must always exactly match the bitstream name. The default value (if that property is not present in <em>dspace.cfg</em>) is 3.</p>
+
+
+<h3><a name="ApplicationLayer-ThesisBlocking"></a>Thesis Blocking</h3>
+
+<p>The submission UI has an optional feature that came about as a result of MIT Libraries policy. If the <em>block.theses</em> parameter in <em>dspace.cfg</em> is <em>true</em>, an extra checkbox is included in the first page of the submission UI. This asks the user if the submission is a thesis. If the user checks this box, the submission is halted (deleted) and an error message displayed, explaining that DSpace should not be used to submit theses. This feature can be turned off and on, and the message displayed (<em>/dspace/jsp/submit/no-theses.jsp</em> can be localized as necessary.</p>
+
+
+
+<h2><a name="ApplicationLayer-OAIPMHDataProvider"></a>OAI-PMH Data Provider</h2>
+
+<p>The DSpace platform supports the <a href="http://www.openarchives.org/" title="Open Archives Initiative Protocol for Metadata Harvesting">Open Archives Initiative Protocol for Metadata Harvesting</a> (OAI-PMH) version 2.0 as a data provider. This is accomplished using the <a href="http://www.oclc.org/research/software/oai/cat.shtm" title="OAICat framework from OCLC">OAICat framework from OCLC</a>.</p>
+
+<p>The DSpace build process builds a Web application archive, <em>[dspace-source]/build/oai.war</em>), in much the same way as the Web UI build process described above. The only differences are that the JSPs are not included, and <em>[dspace-source]/etc/oai-web.xml</em> is used as the deployment descriptor. This 'webapp' is deployed to receive and respond to OAI-PMH requests via HTTP. Note that typically it should <em>not</em> be deployed on SSL (<em>https:</em> protocol). In a typical configuration, this is deployed at <em>oai</em>, for example:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+http:<span class="code-comment">//dspace.myu.edu/oai/request?verb=Identify</span>
+</pre>
+</div></div>
+<p>The 'base URL' of this DSpace deployment would be:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+http:<span class="code-comment">//dspace.myu.edu/oai/request</span>
+</pre>
+</div></div>
+<p>It is this URL that should be registered with <a href="http://www.openarchives.org/" title="www.openarchives.org">www.openarchives.org</a>. Note that you can easily change the '<em>request</em>' portion of the URL by editing <em>[dspace-source]/etc/oai-web.xml</em> and rebuilding and deploying <em>oai.war</em>.</p>
+
+<p>DSpace provides implementations of the OAICat interfaces <em>AbstractCatalog</em>, <em>RecordFactory</em> and <em>Crosswalk</em> that interface with the DSpace content management API and harvesting API (in the search subsystem).</p>
+
+<p>Only the basic <em>oai_dc</em> unqualified Dublin Core metadata set export is enabled by default; this is particularly easy since all items have qualified Dublin Core metadata. When this metadata is harvested, the qualifiers are simply stripped; for example, <em>description.abstract</em> is exposed as unqualified <em>description</em>. The <em>description.provenance</em> field is hidden, as this contains private information about the submitter and workflow reviewers of the item, including their e-mail addresses. Additionally, to keep in line with OAI community practices, values of <em>contributor.author</em> are exposed as <em>creator</em> values.</p>
+
+<p>Other metadata formats are supported as well, using other <em>Crosswalk</em> implementations; consult the <em>oaicat.properties</em> file described below. To enable a format, simply uncomment the lines beginning with <em>Crosswalks.&#42;</em>. Multiple formats are allowed, and the current list includes, in addition to unqualified DC: MPEG DIDL, METS, MODS. There is also an incomplete, experimental qualified DC.</p>
+
+<p>Note that the current simple DC implementation (<em>org.dspace.app.oai.OAIDCCrosswalk</em>) does not currently strip out any invalid XML characters that may be lying around in the data. If your database contains a DC value with, for example, some ASCII control codes (form feed etc.) this may cause OAI harvesters problems. This should rarely occur, however. XML entities (such as <em>&gt;</em>) are encoded (e.g. to <em>&gt;</em>)</p>
+
+<p>In addition to the implementations of the OAICat interfaces, there is one main configuration file relevant to OAI-PMH support:</p>
+
+<ul>
+	<li><b>oaicat.properties</b>: This file resides in <tt>[dspace]/config</tt>. You probably won't need to edit this, as it is pre-configured to meet most needs. You might want to change the <tt>Identify.earliestDatestamp</tt> field to more accurately reflect the oldest datestamp in your local DSpace system. (Note that this is the value of the <tt>last_modified</tt> column in the <tt>Item</tt> database table.)</li>
+</ul>
+
+
+<h3><a name="ApplicationLayer-Sets"></a>Sets</h3>
+
+<p>OAI-PMH allows repositories to expose an hierarchy of sets in which records may be placed. A record can be in zero or more sets.</p>
+
+<p>DSpace exposes collections as sets. The organization of communities is likely to change over time, and is therefore a less stable basis for selective harvesting.</p>
+
+<p>Each collection has a corresponding OAI set, discoverable by harvesters via the ListSets verb. The setSpec is the Handle of the collection, with the ':' and '/' converted to underscores so that the Handle is a legal setSpec, for example:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+hdl_1721.1_1234
+</pre>
+</div></div>
+<p>Naturally enough, the collection name is also the name of the corresponding set.</p>
+
+
+<h3><a name="ApplicationLayer-UniqueIdentifier"></a>Unique Identifier</h3>
+
+<p>Every item in OAI-PMH data repository must have an unique identifier, which must conform to the URI syntax. As of DSpace 1.2, Handles are not used; this is because in OAI-PMH, the OAI identifier identifies the <em>metadata record</em> associated with the <em>resource</em>. The <em>resource</em> is the DSpace item, whose <em>resource identifier</em> is the Handle. In practical terms, using the Handle for the OAI identifier may cause problems in the future if DSpace instances share items with the same Handles; the OAI metadata record identifiers should be different as the different DSpace instances would need to be harvested separately and may have different metadata for the item.</p>
+
+<p>The OAI identifiers that DSpace uses are of the form:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">oai:host name:handle</pre>
+</div></div>
+
+<p>For example:</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">oai:dspace.myu.edu:123456789/345</pre>
+</div></div>
+
+<p>If you wish to use a different scheme, this can easily be changed by editing the value of <em>OAI_ID_PREFIX</em> at the top of the <tt>org.dspace.app.oai.DSpaceOAICatalog</tt> class. (You do not need to change the code if the above scheme works for you; the code picks up the host name and Handles automatically from the DSpace configuration.)</p>
+
+
+<h3><a name="ApplicationLayer-Accesscontrol"></a>Access control</h3>
+
+<p>OAI provides no authentication/authorisation details, although these could be implemented using standard HTTP methods. It is assumed that all access will be anonymous for the time being.</p>
+
+<p>A question is, "is all metadata public?" Presently the answer to this is yes; all metadata is exposed via OAI-PMH, even if the item has restricted access policies. The reasoning behind this is that people who do actually have permission to read a restricted item should still be able to use OAI-based services to discover the content.</p>
+
+<p>If in the future, this 'expose all metadata' approach proves unsatisfactory for any reason, it should be possible to expose only publicly readable metadata. The authorisation system has separate permissions for READing and item and READing the content (bitstreams) within it. This means the system can differentiate between an item with public metadata and hidden content, and an item with hidden metadata as well as hidden content. In this case the OAI data repository should only expose items those with anonymous READ access, so it can hide the existence of records to the outside world completely. In this scenario, one should be wary of protected items that are made public after a time. When this happens, the items are "new" from the OAI-PMH perspective.</p>
+
+
+<h3><a name="ApplicationLayer-ModificationDate%28OAIDateStamp%29"></a>Modification Date (OAI Date Stamp)</h3>
+
+<p>OAI-PMH harvesters need to know when a record has been created, changed or deleted. DSpace keeps track of a 'last modified' date for each item in the system, and this date is used for the OAI-PMH date stamp. This means that any changes to the metadata (e.g. admins correcting a field, or a withdrawal) will be exposed to harvesters.</p>
+
+
+<h3><a name="ApplicationLayer-%27About%27Information"></a>'About' Information</h3>
+
+<p>As part of each record given out to a harvester, there is an optional, repeatable "about" section which can be filled out in any (XML-schema conformant) way. Common uses are for provenance and rights information, and there are schemas in use by OAI communities for this. Presently DSpace does not provide any of this information.</p>
+
+
+<h3><a name="ApplicationLayer-Deletions"></a>Deletions</h3>
+
+<p>DSpace keeps track of deletions (withdrawals). These are exposed via OAI, which has a specific mechansim for dealing with this. Since DSpace keeps a permanent record of withdrawn items, in the OAI-PMH sense DSpace supports deletions 'persistently'. This is as opposed to 'transient' deletion support, which would mean that deleted records are forgotten after a time.</p>
+
+<p>Once an item has been withdrawn, OAI-PMH harvests of the date range in which the withdrawal occurred will find the 'deleted' record header. Harvests of a date range prior to the withdrawal will <em>not</em> find the record, despite the fact that the record did exist at that time.</p>
+
+<p>As an example of this, consider an item that was created on 2002-05-02 and withdrawn on 2002-10-06. A request to harvest the month 2002-10 will yield the 'record deleted' header. However, a harvest of the month 2002-05 will not yield the original record.</p>
+
+<p>Note that presently, the deletion of 'expunged' items is not exposed through OAI.</p>
+
+
+<h3><a name="ApplicationLayer-FlowControl%28ResumptionTokens%29"></a>Flow Control (Resumption Tokens)</h3>
+
+<p>An OAI data provider can prevent any performance impact caused by harvesting by forcing a harvester to receive data in time-separated chunks. If the data provider receives a request for a lot of data, it can send part of the data with a resumption token. The harvester can then return later with the resumption token and continue.</p>
+
+<p>DSpace supports resumption tokens for 'ListRecords' OAI-PMH requests. ListIdentifiers and ListSets requests do not produce a particularly high load on the system, so resumption tokens are not used for those requests.</p>
+
+<p>Each OAI-PMH ListRecords request will return at most 100 records. This limit is set at the top of <em>org.dspace.app.oai.DSpaceOAICatalog.java</em> (<em>MAX_RECORDS</em>). A potential issue here is that if a harvest yields an exact multiple of <em>MAX_RECORDS</em>, the last operation will result in a harvest with no records in it. It is unclear from the OAI-PMH specification if this is acceptable.</p>
+
+<p>When a resumption token is issued, the optional <em>completeListSize</em> and <em>cursor</em> attributes are not included. OAICat sets the <em>expirationDate</em> of the resumption token to one hour after it was issued, though in fact since DSpace resumption tokens contain all the information required to continue a request they do not actually expire.</p>
+
+<p>Resumption tokens contain all the state information required to continue a request. The format is:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+from/until/setSpec/offset
+</pre>
+</div></div>
+<p><em>from</em> and <em>until</em> are the ISO 8601 dates passed in as part of the original request, and <em>setSpec</em> is also taken from the original request. <em>offset</em> is the number of records that have already been sent to the harvester. For example:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">
+2003-01-01<span class="code-comment">//hdl_1721_1_1234/300</span>
+</pre>
+</div></div>
+<p>This means the harvest is 'from'<br/>
+<em>2003-01-01</em>, has no 'until' date, is for collection hdl:1721.1/1234, and 300 records have already been sent to the harvester. (Actually, if the original OAI-PMH request doesn't specify a 'from' or 'until, OAICat fills them out automatically to '0000-00-00T00:00:00Z' and '9999-12-31T23:59:59Z' respectively. This means DSpace resumption tokens will always have from and until dates in them.)</p>
+
+
+
+<h2><a name="ApplicationLayer-DSpaceCommandLauncher"></a>DSpace Command Launcher</h2>
+
+<p>Introduced in Release 1.6, the DSpace Command Launcher brings together the various command and scripts into a standard-practice for running CLI runtime programs.</p>
+
+<h3><a name="ApplicationLayer-OlderVersions"></a>Older Versions</h3>
+
+<p>Prior to Release 1.6, there were various scripts written that masked a more manual approach to running CLI programs.  The user had to issue <em>[dspace]/bin/dsrun</em> and then java class that ran that program.  With release 1.5, scripts were written to mask the <em>[dspace]/bin/dsrun</em> command.  We have left the java class in the System Administration section since it does have value for debugging purposes and for those who wish to learn about DSpace<br/>
+programming or wish to customize the code at any time.</p>
+
+
+<h3><a name="ApplicationLayer-CommandLauncherStructure"></a>Command Launcher Structure</h3>
+
+<p>There are two components to the command launcher:  the dspace script and the launcher.xml.  The DSpace command calls a java class which in turn refers to <em>launcher.xml</em> that is stored in the <em>[dspace]/config</em> directory</p>
+
+<p><em>launcher.xml</em> is made of several components:</p>
+
+<ul>
+	<li><em>&lt;command&gt;</em> begins the stanza for a command</li>
+	<li><em>&lt;name&gt;</em>_<em>name of command</em>_<em>&lt;/name&gt;</em> the name of the command that you would use.</li>
+	<li><em>&lt;description&gt;</em>_<em>the description of the command</em>_<em>&lt;/description&gt;</em></li>
+	<li><em>&lt;step&gt;  &lt;/step&gt;</em> User arguments are parsed and tested.</li>
+	<li><em>&lt;class&gt;</em>_<em>&lt;the java class that is being used to run the CLI program&gt;</em>_<em>&lt;/class&gt;</em><br/>
+Prior to release 1.5 if one wanted to regenerate the browse index, one would have to issue the following commands manually:
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">[dspace]/bin/dsrun org.dspace.browse.IndexBrowse -f -r
+[dspace]/bin/dsrun org.dspace.browse.ItemCounter
+[dspace]/bin/dsrun org.dspace.search.DSIndexer</pre>
+</div></div>
+<p>In release 1.5 a script was written and in release 1.6 the command <em>[dspace]/bin/dspace index-init</em> replaces the script.  The stanza from <em>launcher.xml</em> show us how one can build more commands if needed:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">&lt;command&gt;
+        &lt;name&gt;index-update&lt;/name&gt;
+        &lt;description&gt;Update the search and browse indexes&lt;/description&gt;
+        &lt;step passuserargs=<span class="code-quote">"<span class="code-keyword">false</span>"</span>&gt;
+            &lt;class&gt;org.dspace.browse.IndexBrowse&lt;/class&gt;
+            &lt;argument&gt;-i&lt;/argument&gt;
+        &lt;/step&gt;
+        &lt;step passuserargs=<span class="code-quote">"<span class="code-keyword">false</span>"</span>&gt;
+            &lt;class&gt;org.dspace.browse.ItemCounter&lt;/class&gt;
+        &lt;/step&gt;
+        &lt;step passuserargs=<span class="code-quote">"<span class="code-keyword">false</span>"</span>&gt;
+            &lt;class&gt;org.dspace.search.DSIndexer&lt;/class&gt;
+        &lt;/step&gt;
+&lt;/command&gt;</pre>
+</div></div>
+<p>.</p></li>
+</ul>
+
+
+				    					    <br/>
+                        <div class="tabletitle">
+                            <a name="attachments">Attachments:</a>
+                        </div>
+
+                        <div class="greybox" align="left">
+                                                            <img src="images/icons/bullet_blue.gif" height="8" width="8" alt=""/>
+                                <a href="attachments/22022819/21954860.gif">web-ui-flow.gif</a> (image/gif)
+                                <br/>
+                                                    </div>
+				    
+                    			    </td>
+		    </tr>
+	    </table>
+	    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+			<tr>
+				<td height="12" background="https://wiki.duraspace.org/images/border/border_bottom.gif"><img src="images/border/spacer.gif" width="1" height="1" border="0"/></td>
+			</tr>
+		    <tr>
+			    <td align="center"><font color="grey">Document generated by Confluence on Mar 25, 2011 19:21</font></td>
+		    </tr>
+	    </table>
+    </body>
+</html>
