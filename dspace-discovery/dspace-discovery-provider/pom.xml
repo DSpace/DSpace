@@ -4,7 +4,7 @@
 	<packaging>jar</packaging>
 	<groupId>org.dspace</groupId>
 	<artifactId>dspace-discovery-provider</artifactId>
-	<version>1.7.2-SNAPSHOT</version>
+	<version>1.7.1-SNAPSHOT</version>
     <name>DSpace Discovery :: Discovery Provider Library</name>
     <description>
 
@@ -17,7 +17,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>discovery-modules</artifactId>
-        <version>1.7.2-SNAPSHOT</version>
+        <version>1.7.1-SNAPSHOT</version>
    </parent>
 
     <dependencies>
