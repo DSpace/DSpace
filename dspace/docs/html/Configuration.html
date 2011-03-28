@@ -16,7 +16,7 @@
                                                     </span>
 				    </div>
 				    <div class="pagesubheading">
-					    This page last changed on Mar 16, 2011 by <font color="#0050B2">helix84</font>.
+					    This page last changed on Mar 28, 2011 by <font color="#0050B2">kshepherd</font>.
 				    </div>
 
 				    <h1><a name="Configuration-DSpaceSystemDocumentation%3AConfiguration"></a>DSpace System Documentation: Configuration</h1>
@@ -6435,7 +6435,7 @@ filter.org.dspace.app.mediafilter.MyComplexMediaFilter.Excel2CSV.outputFormat = 
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> The base URL of the SWORD deposit. This is the URL from which DSpace will construct the deposit location URLs for collections. The default is <em>{dspace.url}/sword/deposit</em>. In the event that you are not deploying DSpace as the ROOT application in the servlet container, this will generate incorrect URLs, and you should override the functionality by specifying in full as shown in the example value. </td>
+<td class='confluenceTd'> The base URL of the SWORD deposit. This is the URL from which DSpace will construct the deposit location URLs for collections. The default is <em>{dspace.baseUrl}/sword/deposit</em>. In the event that you are not deploying DSpace as the ROOT application in the servlet container, this will generate incorrect URLs, and you should override the functionality by specifying in full as shown in the example value. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Properties: </td>
@@ -6447,7 +6447,7 @@ filter.org.dspace.app.mediafilter.MyComplexMediaFilter.Excel2CSV.outputFormat = 
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> The base URL of the SWORD service document. This is the URL from which DSpace will construct the service document location URLs for the site, and for individual collections. The default is <em>{dspace.url}/sword/servicedocument</em> . In the event that you are not deploying DSpace as the ROOT application in the servlet container, this will generate incorrect URLs, and you should override the functionality by specifying in full as shown in the example value. </td>
+<td class='confluenceTd'> The base URL of the SWORD service document. This is the URL from which DSpace will construct the service document location URLs for the site, and for individual collections. The default is <em>{dspace.baseUrl}/sword/servicedocument</em> . In the event that you are not deploying DSpace as the ROOT application in the servlet container, this will generate incorrect URLs, and you should override the functionality by specifying in full as shown in the example value. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Properties: </td>
@@ -6459,7 +6459,7 @@ filter.org.dspace.app.mediafilter.MyComplexMediaFilter.Excel2CSV.outputFormat = 
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> The base URL of the SWORD media links. This is the URL which DSpace will use to construct the media link URLs for items which are deposited via sword. The default is {<tt>dspace.url}/sword/media-link</tt>. In the event that you are not deploying DSpace as the ROOT application in the servlet container, this will generate incorrect URLs, and you should override the functionality by specifying in full as shown in the example value. </td>
+<td class='confluenceTd'> The base URL of the SWORD media links. This is the URL which DSpace will use to construct the media link URLs for items which are deposited via sword. The default is {<tt>dspace.baseUrl}/sword/media-link</tt>. In the event that you are not deploying DSpace as the ROOT application in the servlet container, this will generate incorrect URLs, and you should override the functionality by specifying in full as shown in the example value. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Properties: </td>
