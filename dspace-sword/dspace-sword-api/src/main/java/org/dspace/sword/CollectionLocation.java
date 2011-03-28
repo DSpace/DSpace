@@ -101,9 +101,9 @@ public class CollectionLocation
 	 * If the configuration sword.deposit.url is set, this will be returned,
 	 * but if not, it will construct the url as follows:
 	 * 
-	 * [dspace.url]/dspace-sword/deposit
+	 * [dspace.baseUrl]/sword/deposit
 	 * 
-	 * where dspace.url is also in the configuration file.
+	 * where dspace.baseUrl is also in the configuration file.
 	 * 
 	 * @return	the base URL for sword deposit
 	 * @throws DSpaceSWORDException
@@ -114,10 +114,10 @@ public class CollectionLocation
 		String depositUrl = ConfigurationManager.getProperty("sword.deposit.url");
 		if (depositUrl == null || "".equals(depositUrl))
 		{
-			String dspaceUrl = ConfigurationManager.getProperty("dspace.url");
+			String dspaceUrl = ConfigurationManager.getProperty("dspace.baseUrl");
 			if (dspaceUrl == null || "".equals(dspaceUrl))
 			{
-				throw new DSpaceSWORDException("Unable to construct deposit urls, due to missing/invalid config in sword.deposit.url and/or dspace.url");
+				throw new DSpaceSWORDException("Unable to construct deposit urls, due to missing/invalid config in sword.deposit.url and/or dspace.baseUrl");
 			}
 
             try
@@ -127,7 +127,7 @@ public class CollectionLocation
             }
             catch (MalformedURLException e)
             {
-                throw new DSpaceSWORDException("Unable to construct deposit urls, due to invalid dspace.url " + e.getMessage(),e);
+                throw new DSpaceSWORDException("Unable to construct deposit urls, due to invalid dspace.baseUrl " + e.getMessage(),e);
             }
 			
 			
