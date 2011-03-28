@@ -97,7 +97,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 //        String searchUrl = SearchUtils.getConfig().getString("solr.search.server");
 //        if(searchUrl != null && !searchUrl.endsWith("/"))
 //            searchUrl += "/";
-        String searchUrl = ConfigurationManager.getProperty("dspace.url") + "/JSON/discovery/searchSolr";
+        String searchUrl = contextPath + "/JSON/discovery/searchSolr";
 
         search.addHidden("solr-search-url").setValue(searchUrl);
         search.addHidden("contextpath").setValue(contextPath);

@@ -16,7 +16,7 @@
                                                     </span>
 				    </div>
 				    <div class="pagesubheading">
-					    This page last changed on Dec 16, 2010 by <font color="#0050B2">jtrimble</font>.
+					    This page last changed on Mar 21, 2011 by <font color="#0050B2">tdonohue</font>.
 				    </div>
 
 				    <h1><a name="SystemAdministration-DSpaceSystemDocumentation%3ASystemAdministration"></a>DSpace System Documentation: System Administration</h1>
@@ -46,11 +46,11 @@
 
 <p><b>Table of Contents:</b></p>
 <style type='text/css'>/*<![CDATA[*/
-div.rbtoc1292513589969 {margin-left: 0px;padding: 0px;}
-div.rbtoc1292513589969 ul {list-style: none;margin-left: 0px;}
-div.rbtoc1292513589969 li {margin-left: 0px;padding-left: 0px;}
+div.rbtoc1300725952153 {margin-left: 0px;padding: 0px;}
+div.rbtoc1300725952153 ul {list-style: none;margin-left: 0px;}
+div.rbtoc1300725952153 li {margin-left: 0px;padding-left: 0px;}
 
-/*]]>*/</style><div class='rbtoc1292513589969'>
+/*]]>*/</style><div class='rbtoc1300725952153'>
 <ul>
     <li><span class='TOCOutline'>1</span> <a href='#SystemAdministration-CommunityandCollectionStructureImporter'>Community and Collection Structure Importer</a></li>
 <ul>
@@ -460,6 +460,9 @@ div.rbtoc1292513589969 li {margin-left: 0px;padding-left: 0px;}
 
 
 
+
+
+
 <h2><a name="SystemAdministration-ItemImporterandExporter"></a>Item Importer and Exporter</h2>
 
 <p>DSpace has a set of command line tools for importing and exporting items in batches, using the DSpace simple archive format. The tools are not terribly robust, but are useful and are easily modified. They also give a good demonstration of how to implement your own item importer if desired.</p>
@@ -526,16 +529,16 @@ archive_directory/
 
 <p>It is possible to use other Schema such as EAD, VRA Core, etc. Make sure you have defined the new scheme in the DSpace Metada Schema Registry.</p>
 <ol>
-	<li>Create a separate file for the other schema named "<em>metadata</em>{prefix}.xml_", where the <em>{prefix}</em> is replaced with the schema's prefix.</li>
+	<li>Create a separate file for the other schema named "<em>metadata-[prefix].xml</em>", where the <em>{prefix}</em> is replaced with the schema's prefix.</li>
 	<li>Inside the xml file use the dame Dublin Core <em>syntax</em>, but on the <em>&lt;dublin_core&gt;</em> element include the attribute "<em>schema={prefix}</em>".</li>
 	<li>Here is an example for ETD metadata, which would be in the file "<em>metadata_etd.xml"</em>:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">&lt;xml version=<span class="code-quote">"1.0"</span> encoding=<span class="code-quote">"UTF-8"</span>?&gt;
+<pre class="code-java">&lt;?xml version=<span class="code-quote">"1.0"</span> encoding=<span class="code-quote">"UTF-8"</span>?&gt;
 &lt;dublin_core schema=<span class="code-quote">"etd"</span>&gt;
      &lt;dcvalue element=<span class="code-quote">"degree"</span> qualifier=<span class="code-quote">"department"</span>&gt;Computer Science&lt;/dcvalue&gt;
      &lt;dcvalue element=<span class="code-quote">"degree"</span> qualifier=<span class="code-quote">"level"</span>&gt;Masters&lt;/dcvalue&gt;
      &lt;dcvalue element=<span class="code-quote">"degree"</span> qualifier=<span class="code-quote">"grantor"</span>&gt;Texas A &amp; M&lt;/dcvalue&gt;
-						</pre>
+&lt;/dublin_core&gt;</pre>
 </div></div></li>
 </ol>
 
@@ -806,7 +809,7 @@ In order to avoid duplication of this metadata, run</li>
 
 <p>ItemUpdate is a batch-mode command-line tool for altering the metadata and bitstream content of existing items in a DSpace instance. It is a companion tool to ItemImport and uses the DSpace simple archive format to specify changes in metadata and bitstream contents. Those familiar with generating the source trees for ItemImporter will find a similar environment in the use of this batch processing tool.</p>
 
-<p>For metadata, ItemUpdate can perform 'add' and 'delete' actions on specified metadta elements. For bitstreams, 'add' and 'delete' are similarly available. All these actions can be combined in a single batch run.</p>
+<p>For metadata, ItemUpdate can perform 'add' and 'delete' actions on specified metadata elements. For bitstreams, 'add' and 'delete' are similarly available. All these actions can be combined in a single batch run.</p>
 
 <p>ItemUpdate supports an undo feature for all actions except bitstream deletion. There is also a test mode, as with ItemImport. However, unlike ItemImport, there is no resume feature for incomplete processing. There is more extensive logging with a summary statement at the end with counts of successful and unsuccessful items processed.</p>
 
@@ -851,11 +854,11 @@ In order to avoid duplication of this metadata, run</li>
 </tr>
 <tr>
 <td class='confluenceTd'> <tt>&#45;A</tt> or <tt>&#45;-addbitstream</tt> </td>
-<td class='confluenceTd'> Adds bitstreams listed in the contents file with the bistream metadata cited there. </td>
+<td class='confluenceTd'> Adds bitstreams listed in the contents file with the bitstream metadata cited there. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> <tt>&#45;D</tt> or <tt>&#45;-deletebitstream [filter plug classname or alias]</tt> </td>
-<td class='confluenceTd'> Not repeatable. With no argument, this operation deletes bistreams listed in the <em>deletes_contents</em> file. Only bitstream ids are recognized identifiers for this operatiotn. The optional filter argument is the classname of an implementation of <em>org.dspace.app.itemdupate.BitstreamFilter</em> class to identify files for deletion or one of the aliases (ORIGINAL, ORIGINAL_AND_DERIVATIVES, TEXT, THUMBNAIL) which reference existing filters based on membership in a bundle of that name. IN this case, the <em>delete_contents</em> file is not required for any item. The filter properties file will contains properties pertinent to the particular filer used. Multiple filters are not allowed. </td>
+<td class='confluenceTd'> Not repeatable. With no argument, this operation deletes bitstreams listed in the <em>deletes_contents</em> file. Only bitstream ids are recognized identifiers for this operatiotn. The optional filter argument is the classname of an implementation of <em>org.dspace.app.itemdupate.BitstreamFilter</em> class to identify files for deletion or one of the aliases (ORIGINAL, ORIGINAL_AND_DERIVATIVES, TEXT, THUMBNAIL) which reference existing filters based on membership in a bundle of that name. IN this case, the <em>delete_contents</em> file is not required for any item. The filter properties file will contains properties pertinent to the particular filer used. Multiple filters are not allowed. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> <tt>&#45;h</tt> or <tt>&#45;-help</tt> </td>
@@ -879,7 +882,7 @@ In order to avoid duplication of this metadata, run</li>
 </tr>
 <tr>
 <td class='confluenceTd'> <tt>&#45;P</tt> or <tt>&#45;-alterprovenance</tt> </td>
-<td class='confluenceTd'> Prevents any changes to the provenance field to represent changes in the bitstream content resulting from an Add or Delete. No provenance statements are written for thumbnails or text derivative bitstreams, un keepin with the practice of MediaFilterManager. (Optional) </td>
+<td class='confluenceTd'> Prevents any changes to the provenance field to represent changes in the bitstream content resulting from an Add or Delete. No provenance statements are written for thumbnails or text derivative bitstreams, in keeping with the practice of MediaFilterManager. (Optional) </td>
 </tr>
 <tr>
 <td class='confluenceTd'> <tt>&#45;F</tt> or <tt>&#45;-filterproperties</tt> </td>
@@ -1162,7 +1165,7 @@ Adding your own filters is done by creating a class which <em>implements</em> th
 <pre class="code-java">[dspace]/bin/dspace community-filiator -r -p parentID -c childID</pre>
 </div></div>
 
-<p>where '<del>r' or '</del>-remove' means dis-establish the current relationship in which the community identified by 'parentID' is the parent of the community identified by 'childID'. The outcome will be that the 'childID' community will become an orphan, i.e. a top-level community.</p>
+<p>where '<del>r' or '</del>&#45;remove' means dis-establish the current relationship in which the community identified by 'parentID' is the parent of the community identified by 'childID'. The outcome will be that the 'childID' community will become an orphan, i.e. a top-level community.</p>
 
 <p>If the required constraints of operation are violated, an error message will appear explaining the problem, and no change will be made. An example in a removal operation, where the stated child community does not have the stated parent community as its parent: "Error, child community not a child of parent community".</p>
 
@@ -1304,7 +1307,7 @@ Adding your own filters is done by creating a class which <em>implements</em> th
 <pre class="code-java">[dspace]/bin/dspace metadata-<span class="code-keyword">import</span> -f /dImport/col_14.csv</pre>
 </div></div>
 
-<p>If you are wishing to upload new metadata <b>without</b> bistreams, at the command line:</p>
+<p>If you are wishing to upload new metadata <b>without</b> bitstreams, at the command line:</p>
 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">[dspace]/bin/dspace/metadata-<span class="code-keyword">import</span> -f /dImport/new_file.csv -e joe@user.com -w -n -t</pre>
@@ -1312,13 +1315,15 @@ Adding your own filters is done by creating a class which <em>implements</em> th
 
 <p>In the above example we threw in all the arguments. This would add the metadata and engage the workflow, notification, and templates to all be applied to the items that are being added.</p>
 
+<div class='panelMacro'><table class='infoMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="images/icons/emoticons/information.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Importing large CSV files</b><br />It is not recommended to import CSV files of more than 1,000 lines.&nbsp; When importing files larger than this, it is hard to accurately verify the changes that the import tool states it will make, and large files may cause 'Out Of Memory' errors part way through the process.</td></tr></table></div>
+
 
 
 <h3><a name="SystemAdministration-TheCSVFiles"></a>The CSV Files</h3>
 
 <p>The csv files that this tool can import and export abide by the RFC4180 CSV format <a href="http://www.ietf.org/rfc/rfc4180.txt" title="http://www.ietf.org/rfc/rfc4180.txt">http://www.ietf.org/rfc/rfc4180.txt</a>. This means that new lines, and embedded commas can be included by wrapping elements in double quotes. Double quotes can be included by using two double quotes. The code does all this for you, and any good csv editor such as Excel or OpenOffice will comply with this convention.</p>
 
-<p><b>File Structure.</b> The first row of the csv must define the metadata values that the rest of the csv represents. The first column must always be "id" which refers to the item'id. All other columns are optional. The other columns contain the dublin core metadata fields that the data is to reside.</p>
+<p><b>File Structure.</b> The first row of the csv must define the metadata values that the rest of the csv represents. The first column must always be "id" which refers to the item's id. All other columns are optional. The other columns contain the dublin core metadata fields that the data is to reside.</p>
 
 <p>A typical heading row looks like:</p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
@@ -1334,7 +1339,7 @@ Adding your own filters is done by creating a class which <em>implements</em> th
 </div></div>
 <p>Elements are stored in the database in the order that they appear in the csv file. You can use this to order elements where order may matter, such as authors, or controlled vocabulary such as Library of Congress Subject Headings.</p>
 
-<p>When importing a csv file, the importer will <em>overlay</em> the data onto what is already in the repository to determine the differences. It only acts on the contents of the cvs file, rather than on the complete item metadata. This means that the CSV file that is exported can be manipulated quite substantially before being re-imported. Rows (items) or Columns (metadata elements) can be removed and will be ignored. For example, if you only want to edit item abstracts, you can remove all of the other columns and just leave the abstract column. (You do need to leave the ID column intact. This is mandatory).</p>
+<p>When importing a csv file, the importer will <em>overlay</em> the data onto what is already in the repository to determine the differences. It only acts on the contents of the csv file, rather than on the complete item metadata. This means that the CSV file that is exported can be manipulated quite substantially before being re-imported. Rows (items) or Columns (metadata elements) can be removed and will be ignored. For example, if you only want to edit item abstracts, you can remove all of the other columns and just leave the abstract column. (You do need to leave the ID column intact. This is mandatory).</p>
 
 <p><b>Editing collection membership.</b> Items can be moved between collections by editing the collection handles in the 'collection' column. Multiple collections can be included. The first collection is the 'owning collection'. The owning collection is the primary collection that the item appears in. Subsequent collections (separated by the field separator) are treated as mapped collections. These are the same as using the map item functionality in the DSpace user interface. To move items between collections, or to edit which other collections they are mapped to, change the data in the collection column.</p>
 
@@ -1461,10 +1466,10 @@ The user should refer to Chapter 5. Configuration for specific configuration bey
 </div>
 
 <p>The checker will keep starting new bitstream checks for the specific durations, so actual execution duration will be slightly longer than the specified duration. Bear this in mind when scheduling checks.</p></li>
-	<li><b>Specific Bistream mode:</b> <tt>[dspace]/bin/dspace checker &#45;b</tt> Checker will only look at the internal bitsteam IDs. Example: <tt>[dspace]/bin/dspace checker &#45;b 112 113 4567</tt> Checker will only check bitstream IDs 112, 113 and 4567.</li>
-	<li><b>Specific Handle mode:</b> <tt>[dspace]/bin/dspace checker &#45;a</tt> Checker will only check bistreams within the Community, Community or the item itself. Example: <tt>[dspace]/bin/dspace checker &#45;a 123456/999</tt> Checker will only check this handle. If it is a Collection or Community, it will run through the entire Collection or Community.</li>
+	<li><b>Specific Bitstream mode:</b> <tt>[dspace]/bin/dspace checker &#45;b</tt> Checker will only look at the internal bitstream IDs. Example: <tt>[dspace]/bin/dspace checker &#45;b 112 113 4567</tt> Checker will only check bitstream IDs 112, 113 and 4567.</li>
+	<li><b>Specific Handle mode:</b> <tt>[dspace]/bin/dspace checker &#45;a</tt> Checker will only check bitstreams within the Community, Community or the item itself. Example: <tt>[dspace]/bin/dspace checker &#45;a 123456/999</tt> Checker will only check this handle. If it is a Collection or Community, it will run through the entire Collection or Community.</li>
 	<li><b>Looping mode:</b> <tt>[dspace]/bin/dspace checker &#45;l</tt> or <tt>[dspace]/bin/dspace checker &#45;L</tt> There are two modes. The lowercase 'el' (-l) specifies to check every bitstream in the repository once. This is recommended for smaller repositories who are able to loop through all their content in just a few hours maximum. An uppercase 'L' (-L) specifies to continuously loops through the repository. This is not recommended for most repository systems. <b>Cron Jobs</b>. For large repositories that cannot be completely checked in a couple of hours, we recommend the &#45;d option in cron.</li>
-	<li><b>Pruning mode:</b> <tt>[dspace]/bin/dspace checker &#45;p</tt> The Checksum Checker will store the result of every check in the checksum_history table. By default, successful checksum matches that are eight weeks old or older will be deleted when the &#45;p option is used. (Unsuccessful ones will be retained indefinitel). Without this option, the retention settings are ignored and the database table may grow rather large&#33;</li>
+	<li><b>Pruning mode:</b> <tt>[dspace]/bin/dspace checker &#45;p</tt> The Checksum Checker will store the result of every check in the checksum_history table. By default, successful checksum matches that are eight weeks old or older will be deleted when the &#45;p option is used. (Unsuccessful ones will be retained indefinitely). Without this option, the retention settings are ignored and the database table may grow rather large&#33;</li>
 </ul>
 
 
@@ -1474,7 +1479,7 @@ The user should refer to Chapter 5. Configuration for specific configuration bey
 
 <ol>
 	<li>Editing the retention policies in <tt>[dspace]/config/dspace.cfg</tt> See Chapter 5 Configuration for the property keys. OR</li>
-	<li>Pass in a properties file containting retention policies when using the &#45;p option.To do this, create a file with the following two property keys: 
+	<li>Pass in a properties file containing retention policies when using the &#45;p option.To do this, create a file with the following two property keys: 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">checker.retention.<span class="code-keyword">default</span> = 10y
 checker.retention.CHECKSUM_MATCH = 8w</pre>
@@ -1543,7 +1548,7 @@ checker.retention.CHECKSUM_MATCH = 8w</pre>
 </tr>
 <tr>
 <td class='confluenceTd'> <tt>&#45;c</tt> or <tt>&#45;-Changed</tt> </td>
-<td class='confluenceTd'> Send E-mail report for all bitstrems where checksum has been changed for today. </td>
+<td class='confluenceTd'> Send E-mail report for all bitstreams where checksum has been changed for today. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> <tt>&#45;u</tt> or <tt>&#45;-Unchanged</tt> </td>
@@ -1696,12 +1701,12 @@ checker.retention.CHECKSUM_MATCH = 8w</pre>
 
 <h3><a name="SystemAdministration-RunningtheIndexingPrograms"></a>Running the Indexing Programs</h3>
 
-<p><b>Complete Index Regeneration</b>. By running <tt>[dspace]/bin/dspace index-init</tt> you will completely regenerate your indexes, tearing down all old tables and reconstructing with the new cofiguration.</p>
+<p><b>Complete Index Regeneration</b>. By running <tt>[dspace]/bin/dspace index-init</tt> you will completely regenerate your indexes, tearing down all old tables and reconstructing with the new configuration.</p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">[dspace]/bin/dspace index-init</pre>
 </div></div>
 
-<p><b>Updating the Indexes</b>. By running <tt>[dspace]/bin/dspace index-update</tt> you will reindex your full browse wihtout modifying the table structure. (This should be your default approach if indexing, for example, via a cron job periodically).</p>
+<p><b>Updating the Indexes</b>. By running <tt>[dspace]/bin/dspace index-update</tt> you will reindex your full browse without modifying the table structure. (This should be your default approach if indexing, for example, via a cron job periodically).</p>
 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">[dspace]/bin/dspace index-update</pre>
@@ -1742,7 +1747,7 @@ As one can see, the choices are limited only by your metadata schema, the metada
 </ul>
 
 
-<p>Remember to run <em>index-init</em> after adding any new defitions in the <em>dspace.cfg</em> to have the indexes created and the data indexed.</p>
+<p>Remember to run <em>index-init</em> after adding any new definitions in the <em>dspace.cfg</em> to have the indexes created and the data indexed.</p>
 
 
 
@@ -1783,7 +1788,7 @@ As one can see, the choices are limited only by your metadata schema, the metada
 </tr>
 <tr>
 <td class='confluenceTd'> <tt>&#45;v</tt> or <tt>&#45;verbose</tt> </td>
-<td class='confluenceTd'> Display verbose ouput (helpful for debugging) </td>
+<td class='confluenceTd'> Display verbose output (helpful for debugging) </td>
 </tr>
 <tr>
 <td class='confluenceTd'> <tt>&#45;h</tt> or <tt>&#45;help</tt> </td>
@@ -1818,7 +1823,7 @@ As one can see, the choices are limited only by your metadata schema, the metada
 </tr>
 <tr>
 <td class='confluenceTd'> <tt>&#45;s</tt> or <tt>&#45;&#45;</tt> </td>
-<td class='confluenceTd'> To skip the reverse DNS lookups that work out where a user is from. (The DNS lookup finds the inforamtion about the host from its IP addess, such as geographical location, etc. This can be slow, and wouldn't work on a server not connected to the internet.) </td>
+<td class='confluenceTd'> To skip the reverse DNS lookups that work out where a user is from. (The DNS lookup finds the information about the host from its IP address, such as geographical location, etc. This can be slow, and wouldn't work on a server not connected to the internet.) </td>
 </tr>
 <tr>
 <td class='confluenceTd'> <tt>&#45;v</tt> or <tt>&#45;&#45;</tt> </td>
@@ -1890,7 +1895,7 @@ As one can see, the choices are limited only by your metadata schema, the metada
 
 <h2><a name="SystemAdministration-TestDatabase"></a>Test Database</h2>
 
-<p>This command can be used at any time to test for Database connectivity. It will assist in troubleshooting PostgreSQL and Oracle connection issues with the datase.</p>
+<p>This command can be used at any time to test for Database connectivity. It will assist in troubleshooting PostgreSQL and Oracle connection issues with the database.</p>
 <div class='table-wrap'>
 <table class='confluenceTable'><tbody>
 <tr>
@@ -1924,6 +1929,8 @@ As one can see, the choices are limited only by your metadata schema, the metada
 </ul>
 
 
+<p>Items may also be moved in bulk by using the CSV batch metadata editor (see above).</p>
+
 				    
                     			    </td>
 		    </tr>
@@ -1933,7 +1940,7 @@ As one can see, the choices are limited only by your metadata schema, the metada
 				<td height="12" background="https://wiki.duraspace.org/images/border/border_bottom.gif"><img src="images/border/spacer.gif" width="1" height="1" border="0"/></td>
 			</tr>
 		    <tr>
-			    <td align="center"><font color="grey">Document generated by Confluence on Dec 16, 2010 11:47</font></td>
+			    <td align="center"><font color="grey">Document generated by Confluence on Mar 25, 2011 19:21</font></td>
 		    </tr>
 	    </table>
     </body>

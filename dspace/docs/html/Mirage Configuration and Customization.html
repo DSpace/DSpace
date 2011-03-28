@@ -16,20 +16,17 @@
                                                     </span>
 				    </div>
 				    <div class="pagesubheading">
-					    This page last changed on Dec 16, 2010 by <font color="#0050B2">jtrimble</font>.
+					    This page last changed on Mar 25, 2011 by <font color="#0050B2">peterdietz</font>.
 				    </div>
 
-				    <h1><a name="MirageConfigurationandCustomization-"></a></h1>
-
-
-<h1><a name="MirageConfigurationandCustomization-MirageThemeConfigurationandCustomization"></a>Mirage Theme Configuration and Customization</h1>
+				    <h1><a name="MirageConfigurationandCustomization-MirageThemeConfigurationandCustomization"></a>Mirage Theme Configuration and Customization</h1>
 
 <style type='text/css'>/*<![CDATA[*/
-div.rbtoc1292512351516 {margin-left: 0px;padding: 0px;}
-div.rbtoc1292512351516 ul {list-style: none;margin-left: 0px;}
-div.rbtoc1292512351516 li {margin-left: 0px;padding-left: 0px;}
+div.rbtoc1301079432729 {margin-left: 0px;padding: 0px;}
+div.rbtoc1301079432729 ul {list-style: none;margin-left: 0px;}
+div.rbtoc1301079432729 li {margin-left: 0px;padding-left: 0px;}
 
-/*]]>*/</style><div class='rbtoc1292512351516'>
+/*]]>*/</style><div class='rbtoc1301079432729'>
 <ul>
     <li><span class='TOCOutline'>1</span> <a href='#MirageConfigurationandCustomization-Introduction'>Introduction</a></li>
     <li><span class='TOCOutline'>2</span> <a href='#MirageConfigurationandCustomization-ConfigurationParameters'>Configuration Parameters</a></li>
@@ -38,6 +35,10 @@ div.rbtoc1292512351516 li {margin-left: 0px;padding-left: 0px;}
     <li><span class='TOCOutline'>3.1</span> <a href='#MirageConfigurationandCustomization-Look%26Feel'>Look &amp; Feel</a></li>
     <li><span class='TOCOutline'>3.2</span> <a href='#MirageConfigurationandCustomization-Structuralenhancementsforeasiercustomization.'>Structural enhancements for easier customization.</a></li>
     <li><span class='TOCOutline'>3.3</span> <a href='#MirageConfigurationandCustomization-EnhancedPerformance'>Enhanced Performance</a></li>
+</ul>
+    <li><span class='TOCOutline'>4</span> <a href='#MirageConfigurationandCustomization-Troubleshooting'>Troubleshooting</a></li>
+<ul>
+    <li><span class='TOCOutline'>4.1</span> <a href='#MirageConfigurationandCustomization-ErrorsusingHTTPS'>Errors using HTTPS</a></li>
 </ul>
 </ul></div>
 
@@ -63,41 +64,41 @@ div.rbtoc1292512351516 li {margin-left: 0px;padding-left: 0px;}
 </tr>
 <tr>
 <td class='confluenceTd'> Example Value: </td>
-<td class='confluenceTd'> xmlui.theme.mirage.item-list.emphasis = metadata<br class="atl-forced-newline" /> </td>
+<td class='confluenceTd'> xmlui.theme.mirage.item-list.emphasis = metadata <br class="atl-forced-newline" /> </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> Determines which style should be used to display item lists. Allowed values:&nbsp;<br class="atl-forced-newline" />
+<td class='confluenceTd'> Determines which style should be used to display item lists. Allowed values:&nbsp; <br class="atl-forced-newline" />
 <ul>
 	<li><b>metadata</b>: includes item abstracts in the listing and is suited for scientific articles.</li>
-	<li><b>file</b>: immediately shows you whether files are attached to the items, by displaying a large thumbnail icon for each of the items.<br/>
-metatdate is the default value. </li>
+	<li><b>file</b>: immediately shows you whether files are attached to the items, by displaying a large thumbnail icon for each of the items. <br class="atl-forced-newline" />
+metadata is the default value. </li>
 </ul>
 </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Property: </td>
-<td class='confluenceTd'> xmlui.theme.enableConcatenation<br class="atl-forced-newline" /> </td>
+<td class='confluenceTd'> xmlui.theme.enableConcatenation <br class="atl-forced-newline" /> </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Example Value: </td>
-<td class='confluenceTd'> xmlui.theme.enableConcatenation = false<br class="atl-forced-newline" /> </td>
+<td class='confluenceTd'> xmlui.theme.enableConcatenation = false <br class="atl-forced-newline" /> </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> Allows to enable concatenation for .js and .css files. Enhances performance when enabled by lowering the number of files that needs to be sent to the client per page request (as mutiple files will be concatenated together and sent as one file). &nbsp;Value can be true or false. &nbsp;False by default.<br class="atl-forced-newline" /> </td>
+<td class='confluenceTd'> Allows to enable concatenation for .js and .css files. Enhances performance when enabled by lowering the number of files that needs to be sent to the client per page request (as multiple files will be concatenated together and sent as one file). &nbsp;Value can be true or false. &nbsp;False by default. <br class="atl-forced-newline" /> </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Property: </td>
-<td class='confluenceTd'> xmlui.theme.enableMinification<br class="atl-forced-newline" /> </td>
+<td class='confluenceTd'> xmlui.theme.enableMinification <br class="atl-forced-newline" /> </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Example Value: </td>
-<td class='confluenceTd'> xmlui.theme.enableMinification = false<br class="atl-forced-newline" /> </td>
+<td class='confluenceTd'> xmlui.theme.enableMinification = false <br class="atl-forced-newline" /> </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> Allows to enable minification for .js and .css files. Enhances performance when enabled by removing unnecessary whitespaces and other characters, thus reducing the size of files to be sent. &nbsp;Value can be true or false. &nbsp;False by default.<br class="atl-forced-newline" /> </td>
+<td class='confluenceTd'> Allows to enable minification for .js and .css files. Enhances performance when enabled by removing unnecessary whitespaces and other characters, thus reducing the size of files to be sent. &nbsp;Value can be true or false. &nbsp;False by default. <br class="atl-forced-newline" /> </td>
 </tr>
 </tbody></table>
 </div>
@@ -122,7 +123,7 @@ metatdate is the default value. </li>
 <h3><a name="MirageConfigurationandCustomization-Structuralenhancementsforeasiercustomization."></a>Structural enhancements for easier customization.</h3>
 
 <ul>
-	<li><b>Based on the new restructured dri2xhtml base templates</b>. Templates in the theme, overriding the new base templates, are located in the same folder hierarchy to ensure full transparancy.</li>
+	<li><b>Based on the new restructured dri2xhtml base templates</b>. Templates in the theme, overriding the new base templates, are located in the same folder hierarchy to ensure full transparency.</li>
 	<li><b>Automated browser feature detection</b> for improved browser compatibility.
 	<ul>
 		<li>In other themes, user agent detection is used to identify which browser version your user is using. Based on the result of this detection, the theme would use a different cascaded style sheet (CSS) to render a compatible page for the visitor. This approach has 2 major issues:
@@ -172,6 +173,29 @@ metatdate is the default value. </li>
 </ul>
 
 
+<h2><a name="MirageConfigurationandCustomization-Troubleshooting"></a>Troubleshooting</h2>
+
+<h3><a name="MirageConfigurationandCustomization-ErrorsusingHTTPS"></a>Errors using HTTPS</h3>
+
+<p>DSpace 1.7.0 ships with a hardcoded http:// link for JQuery, causing problems for users running 1.7.0 Mirage on HTTPS. While awaiting the implementation of this fix in an upcoming release, you can solve in the following file: <b>lib/core/page-structure.xsl</b>, <b>addJavascript</b> template. In this file, you will need to <b>replace</b></p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">&lt;script type=<span class="code-quote">"text/javascript"</span> src=<span class="code-quote">"http:<span class="code-comment">//ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"</span>&gt;&amp;#160;&lt;/script&gt;</span>
+</pre>
+</div></div>
+
+<p>with</p>
+
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">        &lt;script type=<span class="code-quote">"text/javascript"</span>&gt;
+            &lt;xsl:text disable-output-escaping=<span class="code-quote">"yes"</span>&gt;<span class="code-keyword">var</span> JsHost = ((<span class="code-quote">"https:"</span> == document.location.protocol) ? <span class="code-quote">"https:<span class="code-comment">//"</span> : <span class="code-quote">"http://"</span>);
+</span>            document.write(unescape(<span class="code-quote">"%3Cscript src='"</span> + JsHost + <span class="code-quote">"ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js' type='text/javascript'%3E%3C/script%3E"</span>));&lt;/xsl:text&gt;
+        &lt;/script&gt;
+</pre>
+</div></div>
+
+<p>Thanks Peter Dietz for providing this fix. Note: This issue is resolved in 1.7.1</p>
+
 				    
                     			    </td>
 		    </tr>
@@ -181,7 +205,7 @@ metatdate is the default value. </li>
 				<td height="12" background="https://wiki.duraspace.org/images/border/border_bottom.gif"><img src="images/border/spacer.gif" width="1" height="1" border="0"/></td>
 			</tr>
 		    <tr>
-			    <td align="center"><font color="grey">Document generated by Confluence on Dec 16, 2010 11:47</font></td>
+			    <td align="center"><font color="grey">Document generated by Confluence on Mar 25, 2011 19:21</font></td>
 		    </tr>
 	    </table>
     </body>

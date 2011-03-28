@@ -16,7 +16,7 @@
                                                     </span>
 				    </div>
 				    <div class="pagesubheading">
-					    This page last changed on Dec 16, 2010 by <font color="#0050B2">tdonohue</font>.
+					    This page last changed on Mar 28, 2011 by <font color="#0050B2">kshepherd</font>.
 				    </div>
 
 				    <h1><a name="Configuration-DSpaceSystemDocumentation%3AConfiguration"></a>DSpace System Documentation: Configuration</h1>
@@ -34,11 +34,11 @@
 
 <p>The full table of contents follows:</p>
 <style type='text/css'>/*<![CDATA[*/
-div.rbtoc1292513232240 {margin-left: 0px;padding: 0px;}
-div.rbtoc1292513232240 ul {list-style: none;margin-left: 0px;}
-div.rbtoc1292513232240 li {margin-left: 0px;padding-left: 0px;}
+div.rbtoc1300307475749 {margin-left: 0px;padding: 0px;}
+div.rbtoc1300307475749 ul {list-style: none;margin-left: 0px;}
+div.rbtoc1300307475749 li {margin-left: 0px;padding-left: 0px;}
 
-/*]]>*/</style><div class='rbtoc1292513232240'>
+/*]]>*/</style><div class='rbtoc1300307475749'>
 <ul>
     <li><span class='TOCOutline'>1</span> <a href='#Configuration-DSpaceSystemDocumentation%3AConfiguration'>DSpace System Documentation: Configuration</a></li>
 <ul>
@@ -158,7 +158,7 @@ div.rbtoc1292513232240 li {margin-left: 0px;padding-left: 0px;}
 <ul>
     <li><span class='TOCOutline'>1.3.2.1</span> <a href='#Configuration-InstallationOverview'>Installation Overview</a></li>
     <li><span class='TOCOutline'>1.3.2.2</span> <a href='#Configuration-InstallXPDFTools'>Install XPDF Tools</a></li>
-    <li><span class='TOCOutline'>1.3.2.3</span> <a href='#Configuration-FetchandinstalljaiimageioJAR'> <b>Fetch and install jai_imageio JAR</b></a></li>
+    <li><span class='TOCOutline'>1.3.2.3</span> <a href='#Configuration-FetchandinstalljaiimageioJAR'>Fetch and install jai_imageio JAR</a></li>
     <li><span class='TOCOutline'>1.3.2.4</span> <a href='#Configuration-EditDSpaceConfiguration'>Edit DSpace Configuration</a></li>
     <li><span class='TOCOutline'>1.3.2.5</span> <a href='#Configuration-BuildandInstall'>Build and Install</a></li>
 </ul>
@@ -187,17 +187,16 @@ div.rbtoc1292513232240 li {margin-left: 0px;padding-left: 0px;}
 
 <h3><a name="Configuration-InputConventions"></a>Input Conventions</h3>
 
-<p>We will use the dspace.cfg as our example for input conventions used through out the system. It is a basic Java properties file, where lines are either comments, starting with a '#', blank lines, or property/value pairs of the form:</p>
+<p>We will use the dspace.cfg as our example for input conventions used throughout the system. It is a basic Java properties file, where lines are either comments, starting with a '#', blank lines, or property/value pairs of the form:</p>
 
 <p><tt>property.name = property value</tt></p>
 
-<p>Some property defaults are "commented out". That is, they have a "#" proceeding them, and the DSpace software ignores the config property. This may cause the feature not to be enabled, or, cause a default property to be used when the software is compiled and updated.</p>
+<p>Some property defaults are "commented out". That is, they have a "#" preceding them, and the DSpace software ignores the config property. This may cause the feature not to be enabled, or, cause a default property to be used when the software is compiled and updated.</p>
 
 <p>The property value may contain references to other configuration properties, in the form <tt>${property.name</tt>}. This follows the ant convention of allowing references in property files. A property may not refer to itself. Examples:</p>
 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-property.name = word1 ${other.property.name} more words
+<pre class="code-java">property.name = word1 ${other.property.name} more words
 property2.name = ${dspace.dir}/<span class="code-keyword">rest</span>/of/path
 </pre>
 </div></div>
@@ -205,8 +204,7 @@ property2.name = ${dspace.dir}/<span class="code-keyword">rest</span>/of/path
 <p>Property values can include other, previously defined values, by enclosing the property name in ${...}. For example, if your dspace.cfg contains:</p>
 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-dspace.dir = /dspace
+<pre class="code-java">dspace.dir = /dspace
 dspace.history = ${dspace.dir}/history</pre>
 </div></div>
 
@@ -246,13 +244,13 @@ The runtime file is supposed to be the <b>copy</b> of the source file, which is 
 
 <p>The primary way of configuring DSpace is to edit the <em>dspace.cfg</em>. You will definitely have to do this before you can run DSpace properly. <em>dspace.cfg</em> contains basic information about a DSpace installation, including system path information, network host information, and other like items. To assist you in this endeavor, below is a place for you to write down some of the preliminary data so that you may facilitate faster configuration.</p>
 <ul>
-	<li>Server IP:________________________________&#95;</li>
-	<li><em>Host Name (Server name)</em>&#95;&#95;__________<em>&#95;</em>________________&#95;</li>
-	<li><em>dspace.url</em>&#95;&#95;__________<em>&#95;</em>________________&#95;</li>
-	<li><em>Administrator's email:</em>&#95;&#95;__________<em>&#95;</em>________________&#95;</li>
-	<li><em>handle prefix:</em>&#95;&#95;__________<em>&#95;</em>________________&#95;</li>
-	<li><em>assetstore directory:</em>&#95;&#95;__________<em>&#95;</em>________________&#95;</li>
-	<li><em>SMTP server:</em>&#95;_____________________________&#95;</li>
+	<li>Server IP: &#95;_______________________________&#95;</li>
+	<li>Host Name (Server name): &#95;_______________________________&#95;</li>
+	<li>dspace.url: &#95;_______________________________&#95;</li>
+	<li>Administrator's email: &#95;_______________________________&#95;</li>
+	<li>handle prefix: &#95;_______________________________&#95;</li>
+	<li>assetstore directory: &#95;_______________________________&#95;</li>
+	<li>SMTP server: &#95;_______________________________&#95;</li>
 </ul>
 
 
@@ -754,11 +752,11 @@ webui.strengths.cache</pre>
 </tr>
 <tr>
 <td class='confluenceTd'> <br class="atl-forced-newline" />
-<tt>webui.browse.index.</tt><em>n</em> </td>
+<tt>webui.browse.index.</tt><tt><em>n</em></tt> </td>
 <td class='confluenceTd'> 6.3.26 </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <tt>webui.itemlist.sort-option.</tt><em>n</em> </td>
+<td class='confluenceTd'> <tt>webui.itemlist.sort-option.</tt><tt><em>n</em></tt> </td>
 <td class='confluenceTd'> 6.3.26 </td>
 </tr>
 <tr>
@@ -788,7 +786,7 @@ webui.browse.author-limit</pre>
 <td class='confluenceTd'> Other Browse Contexts </td>
 </tr>
 <tr>
-<td class='confluenceTd'> <tt>webui.browse.link.</tt><em>n</em> </td>
+<td class='confluenceTd'> <tt>webui.browse.link.</tt><tt><em>n</em></tt> </td>
 <td class='confluenceTd'> 6.3.28 </td>
 </tr>
 <tr>
@@ -893,7 +891,7 @@ lcname.url
 sherpa.romeo.url
 authority.minconfidence
 xmlui.lookup.select.size</pre>
-</div></div></td>
+</div></div> </td>
 <td class='confluenceTd'> 6.3.36 </td>
 </tr>
 <tr>
@@ -1490,7 +1488,7 @@ solr.spiderips.urls</pre>
 
 <h3><a name="Configuration-FileStorage"></a>File Storage</h3>
 
-<p>DSpace supports two distinct options for storing your repository bitstreams (uploaded files). The files are not stored in the database in which Metadata, user information, ... are stored. An assetstore is a directory on your server, on which the bitstreams are stored and consulted afterwards. The usage of different assetstore directories is the default "technique" in DSpace. The parameters below define which assetstores are present, and which one should be used for newly incoming items. As an alternative, DSpace can also use SRB (Storage Resource Brokerage) as an alternative. See Section 5.2.6 for details regarding SRB.</p>
+<p>DSpace supports two distinct options for storing your repository bitstreams (uploaded files). The files are not stored in the database in which Metadata, user information, ... are stored. An assetstore is a directory on your server, on which the bitstreams are stored and consulted afterwards. The usage of different assetstore directories is the default "technique" in DSpace. The parameters below define which assetstores are present, and which one should be used for newly incoming items. As an alternative, DSpace can also use SRB (Storage Resource Brokerage) as an alternative. See <a href="#Configuration-SRB%28StorageResourceBrokerage%29FileStorage">SRB File Storage</a> for details regarding SRB.</p>
 <div class='table-wrap'>
 <table class='confluenceTable'><tbody>
 <tr>
@@ -1503,7 +1501,7 @@ solr.spiderips.urls</pre>
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> This is Asset (bitstream) store number 0 (Zero). You need not place your assetstore under the <em>/dspace</em> directory, but may want to place it on a different logical volume on the server that DSpace resides. So, you might have something like this: _ assetstore.dir = /storevgm/assestore_. </td>
+<td class='confluenceTd'> This is Asset (bitstream) store number 0 (Zero). You need not place your assetstore under the <em>/dspace</em> directory, but may want to place it on a different logical volume on the server that DSpace resides. So, you might have something like this: <tt>assetstore.dir = /storevgm/assestore</tt> . </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Property: </td>
@@ -1539,7 +1537,7 @@ assetstore.dir.2 = /third/assetstore</pre>
 </div>
 
 
-<div class='panelMacro'><table class='infoMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="images/icons/emoticons/information.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Be Careful</b><br />In the examples above, you can see that your storage does not have to be under the <em>/dspace</em> directory. For the default installation it needs to reside on the same server (unless you plan to configure SRB (cf. below)). So, if you added storage space to your server, and it has a different logical volume/name/directory, you could have the following as an example:</td></tr></table></div>
+<div class='panelMacro'><table class='infoMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="images/icons/emoticons/information.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Be Careful</b><br />In the examples above, you can see that your storage does not have to be under the <tt>/dspace</tt> directory. For the default installation it needs to reside on the same server (unless you plan to configure SRB (see below)). So, if you added storage space to your server, and it has a different logical volume/name/directory, you could have the following as an example:</td></tr></table></div>
 <p><tt>assetstore.dir = /storevgm/assetstore</tt>
 <br class="atl-forced-newline" />
 <tt>assetstore.dir.1 = /storevgm2/assetstore</tt>
@@ -1681,7 +1679,7 @@ in this broadened use of the 'asset.incoming' integer will refer to one of the f
 <ul>
 	<li>a local file system directory (native DSpace)</li>
 	<li>a set of SRB account parameters (host, port, zone, domain, username, password, home directory, and resource<br/>
-Should the be any conflict, like '2' referring to a local directory and to a set of SRB parameters, the program will select the local directory.</li>
+Should there be any conflict, like '2' referring to a local directory and to a set of SRB parameters, the program will select the local directory.</li>
 </ul>
 
 
@@ -1703,8 +1701,7 @@ Should the be any conflict, like '2' referring to a local directory and to a set
 <td class='confluenceTd'> Informational Note: </td>
 <td class='confluenceTd'> This is where your logging configuration file is located. You may override the default log4j configuration by providing your own. Existing alternatives are:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-log.init.config = ${dspace.dir}/config/log4j.properties
+<pre class="code-java">log.init.config = ${dspace.dir}/config/log4j.properties
 log.init.config = ${dspace.dir}/config/log4j-console.properties</pre>
 </div></div>
 <p> </p></td>
@@ -1799,7 +1796,7 @@ log.init.config = ${dspace.dir}/config/log4j-console.properties</pre>
 </tr>
 <tr>
 <td class='confluenceTd'> Example Value: </td>
-<td class='confluenceTd'> <tt>search.analyzer = org.apache.lucene.analysis .cn.ChineseAnalyzer</tt> </td>
+<td class='confluenceTd'> <tt>search.analyzer = org.apache.lucene.analysis.cn.ChineseAnalyzer</tt> </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
@@ -1827,11 +1824,11 @@ log.init.config = ${dspace.dir}/config/log4j-console.properties</pre>
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> This is the maximum number of terms indexed for a single field in Lucene. The default is 10,000 words‚Äîoften not enough for full-text indexing. If you change this, you will need to re-index for the change to take effect on previously added items. <em>&#45;1</em> = unlimited (Integer.MAG_VALUE) </td>
+<td class='confluenceTd'> This is the maximum number of terms indexed for a single field in Lucene. The default is 10,000 words‚ often not enough for full-text indexing. If you change this, you will need to re-index for the change to take effect on previously added items. <em>&#45;1</em> = unlimited (Integer.MAG_VALUE) </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Property: </td>
-<td class='confluenceTd'> <tt>search.index.</tt><em>n</em> </td>
+<td class='confluenceTd'> <tt>search.index.</tt><tt><em>n</em></tt> </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Example Value: </td>
@@ -1884,7 +1881,7 @@ log.init.config = ${dspace.dir}/config/log4j-console.properties</pre>
 
 <p>In the example above, <tt>search.index.1</tt> and <tt>search.index.2</tt> and <tt>search.index.3</tt> are configured as the <tt>author</tt> search field. The <tt>author</tt> index is created by Lucene indexing all <tt>dc.contributor.&#42;</tt>,<tt>dc.creator.&#42;</tt> and <tt>description.statementofresponsibility</tt> metadata fields.</p>
 
-<p>After changing the configuration run <tt>/[dspace]/bin/index-init</tt> to regenerate the indexes.</p>
+<p>After changing the configuration run <tt>/[dspace]/bin/dspace index-init</tt> to regenerate the indexes.</p>
 
 <p>While the indexes are created, this only affects the search results and has no effect on the search components of the user interface. One will need to customize the user interface to reflect the changes, for example, to add the a new search category to the Advanced Search.</p>
 
@@ -2350,7 +2347,7 @@ authentication.shib-role.header.ignore-scope = <span class="code-keyword">true</
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> These two options specify which attribute that is responsible for providing user's roles to DSpace and unscope the attributes if needed. When not specified, it is defaulted to 'Shib-EP-UnscopedAffiliation', and ignore-scope is defaulted to 'false'. The value is specified in <em>AAP.xml</em> (Shib 1.3.x) or <em>attribute-filter.xml</em> (Shib 2.x). The value is CASE-Sensitive. The values provided in this header are separated by semi-colon or comma. If your sp only provides scoped role header, you need to set <em>authentication.shib.role-header.ignore-Scope</em> as '<em>true</em>'. For example if you only get Shib-EP-ScopedAffiliation instead of Shib-EP-ScopedAffiliation, you name to make your settings as in the example value above. </td>
+<td class='confluenceTd'> These two options specify which attribute that is responsible for providing user's roles to DSpace and unscope the attributes if needed. When not specified, it is defaulted to 'Shib-EP-UnscopedAffiliation', and ignore-scope is defaulted to 'false'. The value is specified in <em>AAP.xml</em> (Shib 1.3.x) or <em>attribute-filter.xml</em> (Shib 2.x). The value is CASE-Sensitive. The values provided in this header are separated by semi-colon or comma. If your service provider (SP) only provides scoped role header, you need to set <em>authentication.shib.role-header.ignore-Scope</em> as '<em>true</em>'. For example if you only get Shib-EP-ScopedAffiliation instead of Shib-EP-ScopedAffiliation, you name to make your settings as in the example value above. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Property: </td>
@@ -2442,15 +2439,17 @@ authentication.shib.role.Librarian = Administrator</pre>
 
 <h4><a name="Configuration-ConfiguringIPAuthentication"></a>Configuring IP Authentication</h4>
 
-<p>You can enable IP authentication by adding its method to the stack in the DSpace configuration, e.g.:<br/>
-<tt>plugin.sequence.org.dspace.authenticate.AuthenticationMethod =</tt><br/>
-{{   org.dspace.authenticate.IPAuthentication}}<br/>
-You are than able to map DSpace groups to IP's in dspace.cfg by setting <tt>authentication.ip.GROUPNAME = iprange[, iprange ...]</tt>, e.g:</p>
+<p>You can enable IP authentication by adding its method to the stack in the DSpace configuration, e.g.:</p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">authentication.ip.MY_UNIVERSITY = 10.1.2.3, \            # Full IP
-                                  13.5, \                # Partial IP
-                                  11.3.4.5/24, \         # with CIDR
-                                  12.7.8.9/255.255.128.0 # with netmask</pre>
+<pre class="code-java">plugin.sequence.org.dspace.authenticate.AuthenticationMethod = org.dspace.authenticate.IPAuthentication</pre>
+</div></div>
+<p>You are then able to map DSpace groups to IP addresses in dspace.cfg by setting <tt>authentication.ip.GROUPNAME = iprange[, iprange ...]</tt>, e.g:</p>
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">authentication.ip.MY_UNIVERSITY = 10.1.2.3, \                  # Full IP
+                                  13.5, \                      # Partial IP
+                                  11.3.4.5/24, \               # with CIDR
+                                  12.7.8.9/255.255.128.0,      # with netmask
+                                  2001:18e8::/32               # IPv6 too</pre>
 </div></div>
 <p>Negative matches can be set by prepending the entry with a '-'. For example if you want to include all of a class B network except for users of a contained class c network, you could use: 111.222,-111.222.333.</p>
 
@@ -2549,7 +2548,7 @@ You are than able to map DSpace groups to IP's in dspace.cfg by setting <tt>auth
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> This is the LDAP object field where the user's email address is stored. "mail" is the default and the most common for ldap servers. If the mail field is not found the username will be used as the email address when creating the eperson object. </td>
+<td class='confluenceTd'> This is the LDAP object field where the user's email address is stored. "mail" is the default and the most common for LDAP servers. If the mail field is not found the username will be used as the email address when creating the eperson object. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Property: </td>
@@ -2951,20 +2950,17 @@ The <em>PluginName</em> is the name of the plugin (&#33;) . The <em>path</em> va
 
 <p>You can make two different plugin names point to the same crosswalk, by adding two configuration entries with the same path:</p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-     crosswalk.submission.MyFormat.stylesheet = crosswalks/myformat.xslt
+<pre class="code-java">     crosswalk.submission.MyFormat.stylesheet = crosswalks/myformat.xslt
      crosswalk.submission.almost_DC.stylesheet = crosswalks/myformat.xslt</pre>
 </div></div>
 <p>The dissemination crosswalk must also be configured with an XML Namespace (including prefix and URI) and an XML schema for its output format. This is configured on additional properties in the DSpace configuration:</p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-     crosswalk.dissemination.PluginName.namespace.Prefix = namespace-URI
+<pre class="code-java">     crosswalk.dissemination.PluginName.namespace.Prefix = namespace-URI
      crosswalk.dissemination.PluginName.schemaLocation = schemaLocation value</pre>
 </div></div>
 <p>For example:</p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-     crosswalk.dissemination.qdc.namespace.dc = http:<span class="code-comment">//purl.org/dc/elements/1.1/
+<pre class="code-java">     crosswalk.dissemination.qdc.namespace.dc = http:<span class="code-comment">//purl.org/dc/elements/1.1/
 </span>     crosswalk.dissemination.qdc.namespace.dcterms = http:<span class="code-comment">//purl.org/dc/terms/
 </span>     crosswalk.dissemination.qdc.schemalocation = http:<span class="code-comment">//purl.org/dc/elements/1.1/ \
 </span>     http:<span class="code-comment">//dublincore.org/schemas/xmls/qdc/2003/04/02/qualifieddc.xsd</span></pre>
@@ -3031,7 +3027,7 @@ The <em>PluginName</em> is the name of the plugin (&#33;) . The <em>path</em> va
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> Configuration of the QDC Crosswalk dissemination plugin for Qualified DC. &#95;(Add lower-case name for OAI-PMH. That is, change QDC to qdc.)}} </td>
+<td class='confluenceTd'> Configuration of the QDC Crosswalk dissemination plugin for Qualified DC. <em>(Add lower-case name for OAI-PMH. That is, change QDC to qdc.)</em>}} </td>
 </tr>
 </tbody></table>
 </div>
@@ -3332,7 +3328,7 @@ The <em>PluginName</em> is the name of the plugin (&#33;) . The <em>path</em> va
 plugin.single.org.dspace.embargo.EmbargoSetter = org.dspace.embargo.DefaultEmbargoSetter</pre>
 </div></div>
 <p>controls which setter to use.</p></li>
-	<li>Lifter.The default lifter behavior as described above‚Äîessentially applying the collection policy rules to the item‚Äîmight also not be sufficient for all purposes. It also can be replaced with another class:
+	<li>Lifter.The default lifter behavior as described above‚ essentially applying the collection policy rules to the item‚ might also not be sufficient for all purposes. It also can be replaced with another class:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java"># implementation of embargo lifter plugin--replace with local implementation <span class="code-keyword">if</span> applicable
 plugin.single.org.dspace.embargo.EmbargoLifter = org.dspace.embargo.DefaultEmbargoLifter</pre>
@@ -3346,7 +3342,7 @@ plugin.single.org.dspace.embargo.EmbargoLifter = org.dspace.embargo.DefaultEmbar
 	<li>Simple Dates.If you want to enter simple calendar dates for when an embargo will expire, follow these steps.
 	<ol>
 		<li>Select a metadata field. Let's use <em>dc.description.embargo</em>. This field does not exist in in the default DSpace metadata directory, so login as an administrator, go the metadata registry page, select the 'dc' schema, then add the metadata field.</li>
-		<li>Expose the metadata field. Edit <em>[dspace]/config/input-forms.xml</em> . If you have only one form‚Äîusually 'traditional', add it there. If you have multiple forms, add it only to the forms linked to collections for which embargo applies:
+		<li>Expose the metadata field. Edit <em>[dspace]/config/input-forms.xml</em> . If you have only one form‚ usually 'traditional', add it there. If you have multiple forms, add it only to the forms linked to collections for which embargo applies:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">&lt;form name=<span class="code-quote">"traditional"</span>&gt;
     &lt;page number=<span class="code-quote">"1"</span>&gt;
@@ -3376,7 +3372,7 @@ embargo.field.lift = dc.description.embargo</pre>
 		<li>Periodically run the lifter. Run the task:_[dspace]/bin/dspace embargo-lifter_You will want to run this task in a cron-scheduled or other repeating way. Item embargoes will be lifted as their dates pass.</li>
 	</ol>
 	</li>
-	<li>Period Sets.If you wish to use a fixed set of time periods (e.g. 90 days, 6 months and 1 year) as embargo terms, follow these steps, which involve using a custom 'setter'.
+	<li>Period Sets. If you wish to use a fixed set of time periods (e.g. 90 days, 6 months and 1 year) as embargo terms, follow these steps, which involve using a custom 'setter'.
 	<ol>
 		<li>Select two metadata fields. Let's use '<em>dc.embargo.terms</em>' and '<em>dc.embargo.lift</em>'. These fields do not exist in the default DSpace metadata registry. Login as an administrator, go the metadata registry page, select the 'dc' schema, then add the metadata fields.</li>
 		<li>Expose the 'term' metadata field. The lift field will be assigned by the embargo system, so it should not be exposed directly. Edit <em>[dspace]/config/input-forms.xml</em> . If you have only one form (usually 'traditional') add it there. If you have multiple forms, add it only to the form(s) linked to collection(s) for which embargo applies. First, add the new field to the 'form definition':
@@ -3498,7 +3494,7 @@ You will want to run this task in a cron-scheduled or other repeating way. Item 
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> This option specifies the time frame after which a successful ‚Äúmatch‚Äù will be removed from your DSpace database (defaults to 8 weeks). This means that after 8 weeks, all successful matches are automatically deleted from your database (in order to keep that database table from growing too large). </td>
+<td class='confluenceTd'> This option specifies the time frame after which a successful match will be removed from your DSpace database (defaults to 8 weeks). This means that after 8 weeks, all successful matches are automatically deleted from your database (in order to keep that database table from growing too large). </td>
 </tr>
 </tbody></table>
 </div>
@@ -3921,7 +3917,7 @@ In this section of Configuration, we address the agnostic WEB User Interface tha
 </tr>
 <tr>
 <td class='confluenceTd'> Example Value: </td>
-<td class='confluenceTd'> <tt>webui.preview.brand.font = SanSerif</tt> </td>
+<td class='confluenceTd'> <tt>webui.preview.brand.font = SansSerif</tt> </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
@@ -4033,7 +4029,7 @@ webui.browse.index.4 = subject:metadata:dc.subject.*:text
 </tr>
 <tr>
 <td class='confluenceTd'> <tt>webui.browse.index.</tt>{&lt;<em>n</em><tt>&gt;</tt> </td>
-<td class='confluenceTd'> <em>n</em> is the index number. The index numbers must start from 1 and increment continuously by 1 thereafter. Deviation form this will cause an error during install or a configuration update. So anytime you add a new browse index, remember to increase the number. (Commented out index numbers may be used over again). </td>
+<td class='confluenceTd'> <em>n</em> is the index number. The index numbers must start from 1 and increment continuously by 1 thereafter. Deviation from this will cause an error during install or a configuration update. So anytime you add a new browse index, remember to increase the number. (Commented out index numbers may be used over again). </td>
 </tr>
 <tr>
 <td class='confluenceTd'> <tt>&lt;index name&gt;</tt> </td>
@@ -4089,7 +4085,7 @@ webui.itemlist.sort-option.3 = dateaccessioned:dc.date.accessioned:date</pre>
 <th class='confluenceTh'> <b>Definition and Options (if available)</b> </th>
 </tr>
 <tr>
-<td class='confluenceTd'> <tt>webui.browse.index.</tt>&lt;<em>n</em><tt>&gt;</tt> </td>
+<td class='confluenceTd'> <tt>webui.browse.index.</tt><tt><em>n</em></tt> </td>
 <td class='confluenceTd'> <em>n</em> is an arbitrary number you choose. </td>
 </tr>
 <tr>
@@ -4136,7 +4132,7 @@ However, clicking through from either of these will result in the same set of it
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> This controls the normalization of the index entry. Uncommenting the option (which is commented out by default) will make the metadata items case-insensitive. This will result in a single entry in the example above. However, the value displayed may be any one of the above‚Äîdepending on what representation was present in the first item indexed. </td>
+<td class='confluenceTd'> This controls the normalization of the index entry. Uncommenting the option (which is commented out by default) will make the metadata items case-insensitive. This will result in a single entry in the example above. However, the value displayed may be any one of the above‚ depending on what representation was present in the first item indexed. </td>
 </tr>
 </tbody></table>
 </div>
@@ -4205,7 +4201,7 @@ org.dspace.sort.OrderFormatTitleMarc21=title</pre>
 title  = org.dspace.sort.OrderFormatTitle
 text   = org.dspace.sort.OrderFormatText</pre>
 </div></div>
-<p>If you redefine a default datatype here, the configuration will be used in preferences to the default. However, if you do not explicitly redefine a datatype, then the default will still be used in addition to the datatypes you do specify.As of DSpace release 1.5.2, the multi-lingual MARC21 title ordering is configured as default, as shown in the example above. To use the previous title ordering (before release 1.5.2), comment out the configuration in your <em>dspace.cfg</em> file. </p></td>
+<p>If you redefine a default datatype here, the configuration will be used in preferences to the default. However, if you do not explicitly redefine a datatype, then the default will still be used in addition to the datatypes you do specify. As of DSpace release 1.5.2, the multi-lingual MARC21 title ordering is configured as default, as shown in the example above. To use the previous title ordering (before release 1.5.2), comment out the configuration in your <em>dspace.cfg</em> file. </p></td>
 </tr>
 </tbody></table>
 </div>
@@ -4264,10 +4260,10 @@ text   = org.dspace.sort.OrderFormatText</pre>
 </tr>
 <tr>
 <td class='confluenceTd'> Example Value: </td>
-<td class='confluenceTd'> <tt>webui.browse.author-limit = &lt;</tt><em>n</em><tt>&gt;</tt> </td>
+<td class='confluenceTd'> <tt>webui.browse.author-limit = &lt;</tt><tt><em>n</em></tt><tt>&gt;</tt> </td>
 </tr>
 <tr>
-<td class='confluenceTd'> Informational Note: &#124; Where &lt;<em>n</em><tt>&gt;</tt> is an integer number of values to be displayed. Use <tt>&#45;1</tt> for unlimited (the default value). </td>
+<td class='confluenceTd'> Informational Note: &#124; Where <tt>&lt;</tt><tt><em>n</em></tt><tt>&gt;</tt> is an integer number of values to be displayed. Use <tt>&#45;1</tt> for unlimited (the default value). </td>
 </tr>
 </tbody></table>
 </div>
@@ -4282,7 +4278,7 @@ text   = org.dspace.sort.OrderFormatText</pre>
 <table class='confluenceTable'><tbody>
 <tr>
 <td class='confluenceTd'> Property: </td>
-<td class='confluenceTd'> <tt>webui.browse.link.&lt;</tt><em>n</em><tt>&gt;</tt> </td>
+<td class='confluenceTd'> <tt>webui.browse.link.</tt><tt><em>n</em></tt> </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Example Value: </td>
@@ -4304,8 +4300,8 @@ text   = org.dspace.sort.OrderFormatText</pre>
 <th class='confluenceTh'> <b>Definition and Options (if available)</b> </th>
 </tr>
 <tr>
-<td class='confluenceTd'> <tt>webui.browse.link.</tt>&lt;<em>n</em><tt>&gt;</tt> </td>
-<td class='confluenceTd'> {{&lt;<em>n</em>{{&gt;}}is an arbitrary number you choose </td>
+<td class='confluenceTd'> <tt>webui.browse.link.</tt><tt><em>n</em></tt> </td>
+<td class='confluenceTd'> {{<em>n</em> is an arbitrary number you choose </td>
 </tr>
 <tr>
 <td class='confluenceTd'> <tt>&lt;index name&gt;</tt> </td>
@@ -4409,7 +4405,7 @@ plugin.sequence.org.dspace.plugin.CollectionHomeProcessor = \
 
 <h3><a name="Configuration-SyndicationFeed%28RSS%29Settings"></a>Syndication Feed (RSS) Settings</h3>
 
-<p>This will enable syndication feeds‚Äîlinks display on community and collection home pages. This setting is not used by the XMLUI, as you enable feeds in your theme.</p>
+<p>This will enable syndication feeds‚ links display on community and collection home pages. This setting is not used by the XMLUI, as you enable feeds in your theme.</p>
 <div class='table-wrap'>
 <table class='confluenceTable'><tbody>
 <tr>
@@ -4747,7 +4743,7 @@ plugin.sequence.org.dspace.plugin.CollectionHomeProcessor = \
 
 <h3><a name="Configuration-ContentInlineDispositionThreshold"></a>Content Inline Disposition Threshold</h3>
 
-<p>The following configuration is used to change the disposition behavior of the browser. That is, when the browser will attempt to open the file or download it to the user's specified location. For example, the default size is 8Mb. When an item being viewed is larger than 8MB, the browser will download the file to the desktop (or wherever you have it set to download) and the user will have to open it manually.</p>
+<p>The following configuration is used to change the disposition behavior of the browser. That is, when the browser will attempt to open the file or download it to the user-specified location. For example, the default size is 8MB. When an item being viewed is larger than 8MB, the browser will download the file to the desktop (or wherever you have it set to download) and the user will have to open it manually.</p>
 <div class='table-wrap'>
 <table class='confluenceTable'><tbody>
 <tr>
@@ -4760,7 +4756,7 @@ plugin.sequence.org.dspace.plugin.CollectionHomeProcessor = \
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> The default value is set to 8Mb. This property key applies to the JSPUI interface. </td>
+<td class='confluenceTd'> The default value is set to 8MB. This property key applies to the JSPUI interface. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Property: </td>
@@ -4772,7 +4768,7 @@ plugin.sequence.org.dspace.plugin.CollectionHomeProcessor = \
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> The default value is set to 8Mb. This property key applies to the XMLUI (Manakin) interface. </td>
+<td class='confluenceTd'> The default value is set to 8MB. This property key applies to the XMLUI (Manakin) interface. </td>
 </tr>
 </tbody></table>
 </div>
@@ -5008,14 +5004,14 @@ plugin.sequence.org.dspace.plugin.CollectionHomeProcessor = \
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> This is used to customize the DC metadata fields that display in the item display (the brief display) when pulling up a record. The format is: <tt>&lt;schema&gt;.&lt;element&gt;.&lt;</tt><tt><em>{</em></tt><tt>}optional</tt><tt><em>{</em></tt><tt>}qualifier&gt;</tt> .  In place of the qualifier, one can use the wildcard "*" to include all fields of the same element, or, leave it blank for unqualified elements. Additionally, two additional options are available for behavior/rendering: (date) and (link). See the following examples: <br class="atl-forced-newline" />
+<td class='confluenceTd'> This is used to customize the DC metadata fields that display in the item display (the brief display) when pulling up a record. The format is: <tt>&lt;schema&gt;.&lt;element&gt;.&lt;_optional_qualifier&gt;</tt> .  In place of the qualifier, one can use the wildcard "*" to include all fields of the same element, or, leave it blank for unqualified elements. Additionally, two additional options are available for behavior/rendering: (date) and (link). See the following examples: <br class="atl-forced-newline" />
 <br class="atl-forced-newline" />
 <tt>dc.title</tt> = Dublin Core element 'title' (unqualified) <br class="atl-forced-newline" />
 <tt>dc.title.alternative</tt> = DC element 'title', qualifier 'alternative' <br class="atl-forced-newline" />
 <tt>dc.title.&#42;</tt> = All fields with Dublin Core element 'title' (any or no qualifier) <br class="atl-forced-newline" />
 <tt>dc.identifier.uri(link)</tt> = DC identifier.uri, rendered as a link <br class="atl-forced-newline" />
 <tt>dc.date.issued(date)</tt> = DC date.issued, rendered as a date <br class="atl-forced-newline" />
-The <tt>Messages.properties</tt> file controls how the fields defined above will display to the user. If the field is missing from the &#95;Messages.properties_file, it will not be display. Look in <tt>Messages.properties}}under {{metadata.dc.&lt;field&gt;</tt>. Example: <br class="atl-forced-newline" />
+The <tt>Messages.properties</tt> file controls how the fields defined above will display to the user. If the field is missing from the &#95;Messages.properties&#95; file, it will not be displayed. Look in <tt>Messages.properties}}under {{metadata.dc.&lt;field&gt;</tt>. Example: <br class="atl-forced-newline" />
 <tt>metadata.dc.contributor.other       = Authors</tt> <br class="atl-forced-newline" />
 <tt>metadata.dc.contributor.author      = Authors</tt> <br class="atl-forced-newline" />
 <tt>metadata.dc.title.&#42;                 = Title</tt> <br class="atl-forced-newline" />
@@ -5041,7 +5037,7 @@ webui.resolver.2.baseurl = http:<span class="code-comment">//hdl.handle.net/</sp
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> When using "resolver" in <em>webui.itemdisplay</em> to render identifiers as resolvable links, the base URL is take from &lt;code&gt;webui.resolver.&lt;n&gt;.baseurl&lt;code&gt; where &lt;code&gt;webui.resolver.&lt;n&gt;.baseurl&lt;code&gt; matches the urn specified in the metadata value. The value is appended to the "baseurl" as is, so the baseurl needs to end with the forward slash almost in any case. If no urn is specified in the value it will be displayed as simple text.For the doi and hdl urn defaults values are provided, respectively <a href="http://dc.doi.org">http://dc.doi.org</a> and <a href="http://hdl.handle.net">http://hdl.handle.net</a> are used.If a metadata value with style "doi", "handle" or "resolver" matches a URL already, it is simply rendered as a link with no other manipulation. </td>
+<td class='confluenceTd'> When using "resolver" in <em>webui.itemdisplay</em> to render identifiers as resolvable links, the base URL is take from &lt;code&gt;webui.resolver.&lt;n&gt;.baseurl&lt;code&gt; where &lt;code&gt;webui.resolver.&lt;n&gt;.baseurl&lt;code&gt; matches the urn specified in the metadata value. The value is appended to the "baseurl" as is, so the baseurl needs to end with the forward slash almost in any case. If no urn is specified in the value it will be displayed as simple text. For the doi and hdl urn defaults values are provided, respectively <a href="http://dc.doi.org">http://dc.doi.org</a> and <a href="http://hdl.handle.net">http://hdl.handle.net</a> are used. If a metadata value with style "doi", "handle" or "resolver" matches a URL already, it is simply rendered as a link with no other manipulation. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Property: </td>
@@ -5075,14 +5071,14 @@ webui.resolver.2.baseurl = http:<span class="code-comment">//hdl.handle.net/</sp
 <td class='confluenceTd'> Property: </td>
 <td class='confluenceTd'> <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">webui.itemdisplay.metadata-style
-webui.itemdisplay.metadata-syle</pre>
+webui.itemdisplay.metadata-style</pre>
 </div></div> </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Example Value: </td>
 <td class='confluenceTd'> <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">webui.itemdisplay.metadata-style = schema.element[.qualifier|.*]
-webui.itemdisplay.metadata-syle = dc.type</pre>
+webui.itemdisplay.metadata-style = dc.type</pre>
 </div></div> </td>
 </tr>
 <tr>
@@ -5104,7 +5100,7 @@ webui.itemdisplay.metadata-syle = dc.type</pre>
 <td class='confluenceTd'> Informational Note: </td>
 <td class='confluenceTd'> Customize the DC fields to use in the item listing page. Elements will be displayed left to right in the order they are specified here. The form is &lt;schema prefix&gt;.&lt;element&gt;[.&lt;qualifier&gt; &#124; .*][(date)], ... <br class="atl-forced-newline" />
 Although not a requirement, it would make sense to include among the listed fields at least the date and title fields as specified by the&#42; <b><em>webui.browse.index.</em></b> configuration options in the next section mentioned. (cf.) <br class="atl-forced-newline" />
-If you have enabled thumbnails (webui.browse.thumbnail.show), you must also include a 'thumbnail' entry in your columns‚Äîthis is where the thumbnail will be displayed. </td>
+If you have enabled thumbnails (webui.browse.thumbnail.show), you must also include a 'thumbnail' entry in your columns‚ this is where the thumbnail will be displayed. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Property: </td>
@@ -5121,8 +5117,7 @@ If you have enabled thumbnails (webui.browse.thumbnail.show), you must also incl
 <tr>
 <td class='confluenceTd'> Property: </td>
 <td class='confluenceTd'> <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-webui.itemlist.browse.&lt;index name&gt;.sort.&lt;sort name&gt;.columns
+<pre class="code-java">webui.itemlist.browse.&lt;index name&gt;.sort.&lt;sort name&gt;.columns
 webui.itemlist.sort.&lt;sort name&gt;.columns
 webui.itemlist.browse.&lt;browse name&gt;.columns
 webui.itemlist.&lt;sort or index name&gt;.columns</pre>
@@ -5134,7 +5129,7 @@ webui.itemlist.&lt;sort or index name&gt;.columns</pre>
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> You can override the DC fields used on the listing page for a given browse index and/or sort option. As a sort option or index may be defined on a field that isn't normally included in the list, this allows you to display the fields that have been indexed/sorted on.There are a number of forms the configuration can take, and the order in which they are listed below is the priority in which they will be used (so a combination of an index name and sort name will take precedence over just the browse name).In the last case, a sort option name will always take precedence over a browse index name. Note also, that for any additional columns you list, you will need to ensure there is an <em>itemlist.&lt;field name&gt;</em> entry in the messages file. </td>
+<td class='confluenceTd'> You can override the DC fields used on the listing page for a given browse index and/or sort option. As a sort option or index may be defined on a field that isn't normally included in the list, this allows you to display the fields that have been indexed/sorted on. There are a number of forms the configuration can take, and the order in which they are listed below is the priority in which they will be used (so a combination of an index name and sort name will take precedence over just the browse name).In the last case, a sort option name will always take precedence over a browse index name. Note also, that for any additional columns you list, you will need to ensure there is an <em>itemlist.&lt;field name&gt;</em> entry in the messages file. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Property: </td>
@@ -5146,7 +5141,7 @@ webui.itemlist.&lt;sort or index name&gt;.columns</pre>
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> This would display the date of the accession in place f the issue date whenever the dateaccessioned browsed index or sort option is selected. Just like <em>webui.itemlist.columns</em>, you will need to include a 'thumbnail' entry to display the thumbnails in the item list. </td>
+<td class='confluenceTd'> This would display the date of the accession in place of the issue date whenever the dateaccessioned browsed index or sort option is selected. Just like <em>webui.itemlist.columns</em>, you will need to include a 'thumbnail' entry to display the thumbnails in the item list. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Property: </td>
@@ -5158,7 +5153,7 @@ webui.itemlist.&lt;sort or index name&gt;.columns</pre>
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> As in the aforementioned property key, you can customize the width of the columns for each configured column list, substituting '<em>.widths</em>' for '<em>.columns</em>' in the property name. See the setting for &#95;webui.itemlist.widths_for more information. </td>
+<td class='confluenceTd'> As in the aforementioned property key, you can customize the width of the columns for each configured column list, substituting '<em>.widths</em>' for '<em>.columns</em>' in the property name. See the setting for <em>webui.itemlist.widths</em> for more information. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Property: </td>
@@ -5272,7 +5267,7 @@ Files to be localized:</li>
 <ul>
 	<li><tt>[dspace-source]/dspace/modules/jspui/src/main/resources/Messages_LOCALE.properties</tt></li>
 	<li><tt>[dspace-source]/dspace/config/input-forms_LOCALE.xml</tt></li>
-	<li><tt>[dspace-source]/dspace/config/default_LOCALE.license</tt><tt><em>{</em></tt><tt>}should be pure ascii</tt></li>
+	<li><tt>[dspace-source]/dspace/config/default_LOCALE.license - should be pure ASCII</tt></li>
 	<li><tt>[dspace-source]/dspace/config/news-top_LOCALE.html</tt></li>
 	<li><tt>[dspace-source]/dspace/config/news-side_LOCALE.html</tt></li>
 	<li><tt>[dspace-source]/dspace/config/emails/change_password_LOCALE</tt></li>
@@ -5284,9 +5279,9 @@ Files to be localized:</li>
 	<li><tt>[dspace-source]/dspace/config/emails/submit_task_LOCALE</tt></li>
 	<li><tt>[dspace-source]/dspace/config/emails/subscription_LOCALE</tt></li>
 	<li><tt>[dspace-source]/dspace/config/emails/suggest_LOCALE</tt></li>
-	<li><tt>[dspace]/webapps/jspui/help/collection-admin_LOCALE.html</tt><tt><em>{</em></tt><tt>}in html keep the jump link as original; must be copied to [dspace-source]/dspace/modules/jspui/src/main/webapp/help</tt></li>
-	<li><tt>[dspace]/webapps/jspui/help/index_LOCALE.html</tt><tt><em>{</em></tt><tt>}must be copied to [dspace-source]/dspace/modules/jspui/src/main/webapp/help</tt></li>
-	<li><tt>[dspace]/webapps/jspui/help/site-admin_LOCALE.html</tt><tt><em>{</em></tt><tt>}must be copied to [dspace-source]/dspace/modules/jspui/src/main/webapp/help</tt></li>
+	<li><tt>[dspace]/webapps/jspui/help/collection-admin_LOCALE.html - in html keep the jump link as original; must be copied to [dspace-source]/dspace/modules/jspui/src/main/webapp/help</tt></li>
+	<li><tt>[dspace]/webapps/jspui/help/index_LOCALE.html - must be copied to [dspace-source]/dspace/modules/jspui/src/main/webapp/help</tt></li>
+	<li><tt>[dspace]/webapps/jspui/help/site-admin_LOCALE.html - must be copied to [dspace-source]/dspace/modules/jspui/src/main/webapp/help</tt></li>
 </ul>
 
 
@@ -5362,9 +5357,9 @@ Files to be localized:</li>
 </div>
 
 
-<p>All the parameters mapping are defined in <tt>[</tt><tt>dspace</tt><tt>]</tt><tt>/config/sfx.xml</tt> file. The program will check the parameters in <tt>sfx.xml</tt> and retrieve the correct metadata of the item.  It will then parse the string to your resolver.</p>
+<p>All the parameters mapping are defined in <tt>[dspace]/config/sfx.xml</tt> file. The program will check the parameters in <tt>sfx.xml</tt> and retrieve the correct metadata of the item.  It will then parse the string to your resolver.</p>
 
-<p>For the following example, the program will search the first query-pair which is DOI of the item.  If there is a DOI for that item, your retrieval results will be, for example:<br/>
+<p>For the following example, the program will search the first query-pair which is DOI of the item. If there is a DOI for that item, your retrieval results will be, for example:<br/>
 <tt><a href="http://researchspace.auckland.ac.nz/handle/2292/5763">http://researchspace.auckland.ac.nz/handle/2292/5763</a></tt></p>
 
 <p>Example. For setting DOI in <tt>sfx.xml</tt></p>
@@ -5460,7 +5455,7 @@ Files to be localized:</li>
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> Enable or disable the controlled vocabulary add-on. WARNING: This feature is not compatible with WAI (it requires javascript to function). </td>
+<td class='confluenceTd'> Enable or disable the controlled vocabulary add-on. WARNING: This feature is not compatible with WAI (it requires JavaScript to function). </td>
 </tr>
 </tbody></table>
 </div>
@@ -5475,8 +5470,7 @@ Files to be localized:</li>
 <p>The taxonomies are described in XML following this (very simple) structure:</p>
 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-&lt;node id=<span class="code-quote">"acmccs98"</span> label=<span class="code-quote">"ACMCCS98"</span>&gt;
+<pre class="code-java">&lt;node id=<span class="code-quote">"acmccs98"</span> label=<span class="code-quote">"ACMCCS98"</span>&gt;
     &lt;isComposedBy&gt;
         &lt;node id=<span class="code-quote">"A."</span> label=<span class="code-quote">"General Literature"</span>&gt;
             &lt;isComposedBy&gt;
@@ -5488,9 +5482,9 @@ Files to be localized:</li>
 &lt;/node&gt;</pre>
 </div></div>
 
-<p>Your are free to use any application you want to create your controlled vocabularies. A simple text editor should be enough for small projects. Bigger projects will require more complex tools. You may use Proteg√© to create your taxonomies, save them as OWL and then use a XML Stylesheet (XSLT) to transform your documents to the appropriate format. Future enhancements to this add-on should make it compatible with standard schemas such as OWL or RDF.</p>
+<p>You are free to use any application you want to create your controlled vocabularies. A simple text editor should be enough for small projects. Bigger projects will require more complex tools. You may use Protegé to create your taxonomies, save them as OWL and then use a XML Stylesheet (XSLT) to transform your documents to the appropriate format. Future enhancements to this add-on should make it compatible with standard schemas such as OWL or RDF.</p>
 
-<p>In order to make DSpace compatible with WAI 2.0, the add-on is <b>turned off</b> by default (the add-on relies strongly on Javascript to function). It can be activated by setting the following property in <tt>dspace.cfg</tt>:</p>
+<p>In order to make DSpace compatible with WAI 2.0, the add-on is <b>turned off</b> by default (the add-on relies strongly on JavaScript to function). It can be activated by setting the following property in <tt>dspace.cfg</tt>:</p>
 
 <p><tt>webui.controlledvocabulary.enable = true</tt></p>
 
@@ -5499,8 +5493,7 @@ Files to be localized:</li>
 <p>Vocabularies need to be associated with the correspondent DC metadata fields. Edit the file <tt>[dspace]/config/input-forms.xml</tt> and place a <em>"vocabulary"</em> tag under the <em>"field"</em> element that you want to control. Set value of the <em>"vocabulary"</em> element to the name of the file that contains the vocabulary, leaving out the extension (the add-on will only load files with extension "*.xml"). For example:</p>
 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-&lt;field&gt;
+<pre class="code-java">&lt;field&gt;
     &lt;dc-schema&gt;dc&lt;/dc-schema&gt;
     &lt;dc-element&gt;subject&lt;/dc-element&gt;
     &lt;dc-qualifier&gt;&lt;/dc-qualifier&gt;
@@ -5703,7 +5696,7 @@ Files to be localized:</li>
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> If you would like to use Google analytics to track general website statistics then use the following parameter to provide your analytics key. First sign up for an account at <a href="http://analytics.google.com" title="http://analytics.google.com">http://analytics.google.com</a>, then create an entry for your repositories website. Google Analytics will give you a snippet of javascript code to place on your site, inside that snip it is your google analytics key usually found in the line: &#95;uacct = "UA-XXXXXXX-X" Take this key (just the UA-XXXXXX-X part) and place it here in this parameter. </td>
+<td class='confluenceTd'> If you would like to use Google Analytics to track general website statistics then use the following parameter to provide your analytics key. First sign up for an account at <a href="http://analytics.google.com" title="http://analytics.google.com">http://analytics.google.com</a>, then create an entry for your repositories website. Google Analytics will give you a snippet of javascript code to place on your site, inside that snip it is your Google Analytics key usually found in the line: &#95;uacct = "UA-XXXXXXX-X" Take this key (just the UA-XXXXXX-X part) and place it here in this parameter. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Property: </td>
@@ -5752,7 +5745,7 @@ Files to be localized:</li>
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> Max response size for DIDL. This is the maximum size in bytes of the files you wish to enclose Base64 encoded in your responses, remember that the base64 encoding process uses a lot of memory. We recommend at most 200000 for answers of 30 records each on a 1 Gigabyte machine. Ultimately this will change to a streaming model and remove this restriction. Also please remember to allocate plenty of memory, at least 512 MB to your Tomcat.Optional: DSpace uses 100 records as the limit for the oai responses. You can alter this by changing <em>/[dspace-source]/dspace-oai/dspace-oai-api/src/main/java/org/dspace/app/oai/DSpaceOAICatalog.java</em> to codify the declaration: private final int MAX_RECORDS = 100 to private final int MAX_RECORDS = 30 </td>
+<td class='confluenceTd'> Max response size for DIDL. This is the maximum size in bytes of the files you wish to enclose Base64 encoded in your responses, remember that the base64 encoding process uses a lot of memory. We recommend at most 200000 for answers of 30 records each on a 1 Gigabyte machine. Ultimately this will change to a streaming model and remove this restriction. Also please remember to allocate plenty of memory, at least 512 MB to your Tomcat. Optional: DSpace uses 100 records as the limit for the oai responses. You can alter this by changing <em>/[dspace-source]/dspace-oai/dspace-oai-api/src/main/java/org/dspace/app/oai/DSpaceOAICatalog.java</em> to codify the declaration: private final int MAX_RECORDS = 100 to private final int MAX_RECORDS = 30 </td>
 </tr>
 </tbody></table>
 </div>
@@ -6065,7 +6058,7 @@ hdl.handle.net, handle.test.edu</pre>
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> Timeout for the resolver in the dns lookup time in milliseconds, defaults to 200 for backward compatibility; your systems default is usually set in <tt>/etc/resolv.conf</tt> and varies between 2 to 5 seconds, to high a value might result in solr exhausting your connection pool. </td>
+<td class='confluenceTd'> Timeout for the resolver in the DNS lookup time in milliseconds, defaults to 200 for backward compatibility; your system's default is usually set in <tt>/etc/resolv.conf</tt> and varies between 2 to 5 seconds, too high a value might result in solr exhausting your connection pool. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Property: </td>
@@ -6113,7 +6106,7 @@ hdl.handle.net, handle.test.edu</pre>
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> Controls solr statistics querying to look at "isBot" field to determin if record is a bot.  True by default. </td>
+<td class='confluenceTd'> Controls solr statistics querying to look at "isBot" field to determine if record is a bot. True by default. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Property: </td>
@@ -6226,9 +6219,9 @@ Deleting a format will cause any existing bitstreams of this format to be revert
 </ul>
 
 
-<h4><a name="Configuration-FetchandinstalljaiimageioJAR"></a><b>Fetch and install jai_imageio JAR</b></h4>
+<h4><a name="Configuration-FetchandinstalljaiimageioJAR"></a>Fetch and install jai_imageio JAR</h4>
 
-<p>Fetch and install the Java^TM&#94; Advanced Imaging Image I/O Tools.</p>
+<p>Fetch and install the Java Advanced Imaging Image I/O Tools.</p>
 
 <p>For AIX, Sun support has the following: "JAI has native acceleration for the above but it also works in pure Java mode. So as long as you have an appropriate JDK for AIX (1.3 or later, I believe), you should be able to use it. You can download any of them, extract just the jars, and put those in your $CLASSPATH."</p>
 
@@ -6236,15 +6229,13 @@ Deleting a format will cause any existing bitstreams of this format to be revert
 
 <p>For these filters you do NOT have to worry about the native code, just the JAR, so choose a download for any platform.</p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-curl -O http:<span class="code-comment">//download.java.net/media/jai-imageio/builds/release/1.1/jai_imageio-1_1-lib-linux-i586.tar.gz
+<pre class="code-java">curl -O http:<span class="code-comment">//download.java.net/media/jai-imageio/builds/release/1.1/jai_imageio-1_1-lib-linux-i586.tar.gz
 </span>tar xzf jai_imageio-1_1-lib-linux-i586.tar.gz
 </pre>
 </div></div>
 <p>The preceding example leaves the JAR in <b><em>jai_imageio-1_1/lib/jai_imageio.jar</em></b> . Now install it in your local Maven repository, e.g.: (changing the path after <em>file=</em> if necessary)</p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-       mvn install:install-file                       \
+<pre class="code-java">       mvn install:install-file                       \
           -Dfile=jai_imageio-1_1/lib/jai_imageio.jar  \
           -DgroupId=com.sun.media                     \
           -DartifactId=jai_imageio                    \
@@ -6303,7 +6294,7 @@ curl -O http:<span class="code-comment">//download.java.net/media/jai-imageio/bu
 <p>Follow your usual DSpace installation/update procedure, only add <em>&#45;Pxpdf-mediafilter-support</em> to the Maven invocation:</p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">     mvn -Pxpdf-mediafilter-support <span class="code-keyword">package</span>
-     ant -Dconfig=etc. ...</pre>
+     ant -Dconfig=\[dspace\]/config/dspace.cfg update</pre>
 </div></div>
 
 
@@ -6406,8 +6397,7 @@ filter.org.dspace.app.mediafilter.MyComplexMediaFilter.Excel2CSV.outputFormat = 
 <td class='confluenceTd'> Informational Note: </td>
 <td class='confluenceTd'> The property key tell the SWORD METS implementation which package ingester to use to install deposited content. This should refer to one of the classes configured for:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-                        plugin.named.org.dspace.content.packager.PackageIngester</pre>
+<pre class="code-java">                        plugin.named.org.dspace.content.packager.PackageIngester</pre>
 </div></div>
 <p>The value of sword.mets-ingester.package-ingester tells the system which named plugin for this interface should be used to ingest SWORD METS packages. </p></td>
 </tr>
@@ -6445,7 +6435,7 @@ filter.org.dspace.app.mediafilter.MyComplexMediaFilter.Excel2CSV.outputFormat = 
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> The base URL of the SWORD deposit. This is the URL from which DSpace will construct the deposit location urls for collections. The default is <em>{dspace.url}/sword/deposit</em>. In the event that you are not deploying DSpace as the ROOT application in the servlet container, this will generate incorrect URLs, and you should override the functionality by specifying in full as shown in the example value. </td>
+<td class='confluenceTd'> The base URL of the SWORD deposit. This is the URL from which DSpace will construct the deposit location URLs for collections. The default is <em>{dspace.baseUrl}/sword/deposit</em>. In the event that you are not deploying DSpace as the ROOT application in the servlet container, this will generate incorrect URLs, and you should override the functionality by specifying in full as shown in the example value. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Properties: </td>
@@ -6457,7 +6447,7 @@ filter.org.dspace.app.mediafilter.MyComplexMediaFilter.Excel2CSV.outputFormat = 
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> The base URL of the SWORD service document. This is the URL from which DSpace will construct the service document location urls for the site, and for individual collections. The default is <em>{dspace.url}/sword/servicedocument</em> . In the event that you are not deploying DSpace as the ROOT application in the servlet container, this will generate incorrect URLs, and you should override the functionality by specifying in full as shown in the example value. </td>
+<td class='confluenceTd'> The base URL of the SWORD service document. This is the URL from which DSpace will construct the service document location URLs for the site, and for individual collections. The default is <em>{dspace.baseUrl}/sword/servicedocument</em> . In the event that you are not deploying DSpace as the ROOT application in the servlet container, this will generate incorrect URLs, and you should override the functionality by specifying in full as shown in the example value. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Properties: </td>
@@ -6469,7 +6459,7 @@ filter.org.dspace.app.mediafilter.MyComplexMediaFilter.Excel2CSV.outputFormat = 
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> The base URL of the SWORD media links. This is the URL which DSpace will use to construct the media link urls for items which are deposited via sword. The default is {<tt>dspace.url}/sword/media-link</tt>. In the event that you are not deploying DSpace as the ROOT application in the servlet container, this will generate incorrect URLs, and you should override the functionality by specifying in full as shown in the example value. </td>
+<td class='confluenceTd'> The base URL of the SWORD media links. This is the URL which DSpace will use to construct the media link URLs for items which are deposited via sword. The default is {<tt>dspace.baseUrl}/sword/media-link</tt>. In the event that you are not deploying DSpace as the ROOT application in the servlet container, this will generate incorrect URLs, and you should override the functionality by specifying in full as shown in the example value. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Properties: </td>
@@ -6511,16 +6501,14 @@ filter.org.dspace.app.mediafilter.MyComplexMediaFilter.Excel2CSV.outputFormat = 
 <tr>
 <td class='confluenceTd'> Properties: </td>
 <td class='confluenceTd'> <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-sword.accept-packaging.METSDSpaceSIP.identifier
+<pre class="code-java">sword.accept-packaging.METSDSpaceSIP.identifier
 sword.accept-packaging.METSDSpaceSIP.q</pre>
 </div></div> </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Example Value: </td>
 <td class='confluenceTd'> <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-sword.accept-packaging.METSDSpaceSIP.identifier = http:<span class="code-comment">//purl.org/net/sword-types/METSDSpaceSIP
+<pre class="code-java">sword.accept-packaging.METSDSpaceSIP.identifier = http:<span class="code-comment">//purl.org/net/sword-types/METSDSpaceSIP
 </span>sword.accept-packaging.METSDSpaceSIP.q = 1.0</pre>
 </div></div> </td>
 </tr>
@@ -6531,16 +6519,14 @@ sword.accept-packaging.METSDSpaceSIP.identifier = http:<span class="code-comment
 <tr>
 <td class='confluenceTd'> Properties: </td>
 <td class='confluenceTd'> <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-sword.accept-packaging.[handle].METSDSpaceSIP.identifier
+<pre class="code-java">sword.accept-packaging.[handle].METSDSpaceSIP.identifier
 sword.accept-packaging.[handle].METSDSpaceSIP.q</pre>
 </div></div> </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Example Value: </td>
 <td class='confluenceTd'> <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-sword.accept-packaging.[handle].METSDSpaceSIP.identifier = http:<span class="code-comment">//purl.org/net/sword-types/METSDSpaceSIP
+<pre class="code-java">sword.accept-packaging.[handle].METSDSpaceSIP.identifier = http:<span class="code-comment">//purl.org/net/sword-types/METSDSpaceSIP
 </span>sword.accept-packaging.[handle].METSDSpaceSIP.q = 1.0</pre>
 </div></div> </td>
 </tr>
@@ -6635,15 +6621,13 @@ sword.accept-packaging.[handle].METSDSpaceSIP.identifier = http:<span class="cod
 <tr>
 <td class='confluenceTd'> Properties: </td>
 <td class='confluenceTd'> <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-plugin.named.org.dspace.sword.SWORDingester</pre>
+<pre class="code-java">plugin.named.org.dspace.sword.SWORDingester</pre>
 </div></div> </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Example Value: </td>
 <td class='confluenceTd'> <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-plugin.named.org.dspace.sword.SWORDIngester = \
+<pre class="code-java">plugin.named.org.dspace.sword.SWORDIngester = \
   org.dspace.sword.SWORDMETSIngester = http:<span class="code-comment">//purl.org/net/sword-types/METSDSpaceSIP \
 </span>  org.dspace.sword.SimpleFileIngester = SimpleFileIngester</pre>
 </div></div> </td>
@@ -6677,7 +6661,7 @@ plugin.named.org.dspace.sword.SWORDIngester = \
 				<td height="12" background="https://wiki.duraspace.org/images/border/border_bottom.gif"><img src="images/border/spacer.gif" width="1" height="1" border="0"/></td>
 			</tr>
 		    <tr>
-			    <td align="center"><font color="grey">Document generated by Confluence on Dec 16, 2010 11:47</font></td>
+			    <td align="center"><font color="grey">Document generated by Confluence on Mar 25, 2011 19:21</font></td>
 		    </tr>
 	    </table>
     </body>

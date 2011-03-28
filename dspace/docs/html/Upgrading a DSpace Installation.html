@@ -16,20 +16,23 @@
                                                     </span>
 				    </div>
 				    <div class="pagesubheading">
-					    This page last changed on Dec 16, 2010 by <font color="#0050B2">tdonohue</font>.
+					    This page last changed on Mar 25, 2011 by <font color="#0050B2">tdonohue</font>.
 				    </div>
 
 				    <h1><a name="UpgradingaDSpaceInstallation-DSpaceSystemDocumentation%3AUpgradingaDSpaceInstallation"></a>DSpace System Documentation: Upgrading a DSpace Installation</h1>
 
 <p>This section describes how to upgrade a DSpace installation from one version to the next. Details of the differences between the functionality of each version are given in the <a href="History.html" title="History">Version History</a> section.</p>
 
-<div class='panelMacro'><table class='warningMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="images/icons/emoticons/forbidden.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Test Your Upgrade Process</b><br />It is always recommended that when performing an upgrade that the user should use a Development or Test instance or server in order to minimize downtime. You should note any problems you have encountered (and also how to resolve them) before attempting to upgrade your production instance or server. It also gives you a chance to "practice" at the upgrade. (And practice makes perfect.)</td></tr></table></div>
+<div class='panelMacro'><table class='warningMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="images/icons/emoticons/forbidden.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Test Your Upgrade Process</b><br />In order to minimize downtime, it is always recommended to first perform a DSpace upgrade using a Development or Test server. You should note any problems you may have encountered (and also how to resolve them) before attempting to upgrade your Production server. It also gives you a chance to "practice" at the upgrade. Practice makes perfect, and minimizes problems and downtime. Additionally, if you are using a version control system, such as subversion or git, to manage your locally developed features or modifications, then you can do all of your upgrades in your local version control system on your Development server and commit the changes. That way your Production server can just checkout your well tested and upgraded code.</td></tr></table></div>
+
+<div class='panelMacro'><table class='infoMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="images/icons/emoticons/information.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>If you are upgrading across multiple versions</b><br />You should perform all of the steps of each upgrade between the version from which you are starting and the version to which you are upgrading. You do <em>not</em> need to install each intervening version, but you do need to carry out all of the configuration changes and additions, and all of the database updates, for each one. For example, when upgrading from 1.5.x to 1.7.x, you need to perform the configuration &amp; database upgrade steps detailed in <a href="#UpgradingaDSpaceInstallation-Upgradingfrom1.5.xto1.6.x">Upgrading from 1.5.x to 1.6.x</a> followed by those detailed in <a href="#UpgradingaDSpaceInstallation-Upgradingfrom1.6.xto1.7.x">Upgrading from 1.6.x to 1.7.x</a>.</td></tr></table></div>
 
 <div>
 <ul>
     <li><a href='#UpgradingaDSpaceInstallation-DSpaceSystemDocumentation%3AUpgradingaDSpaceInstallation'>DSpace System Documentation: Upgrading a DSpace Installation</a></li>
 <ul>
-    <li><a href='#UpgradingaDSpaceInstallation-Upgradingfrom1.6.xto1.7'>Upgrading from 1.6.x to 1.7</a></li>
+    <li><a href='#UpgradingaDSpaceInstallation-Upgradingfrom1.7to1.7.x'>Upgrading from 1.7 to 1.7.x</a></li>
+    <li><a href='#UpgradingaDSpaceInstallation-Upgradingfrom1.6.xto1.7.x'>Upgrading from 1.6.x to 1.7.x</a></li>
     <li><a href='#UpgradingaDSpaceInstallation-Upgradingfrom1.6to1.6.x'>Upgrading from 1.6 to 1.6.x</a></li>
     <li><a href='#UpgradingaDSpaceInstallation-Upgradingfrom1.5.xto1.6.x'>Upgrading from 1.5.x to 1.6.x</a></li>
     <li><a href='#UpgradingaDSpaceInstallation-UpgradingFrom1.5or1.5.1to1.5.2'>Upgrading From 1.5 or 1.5.1 to 1.5.2</a></li>
@@ -47,29 +50,74 @@
 </ul>
 </ul></div>
 
-<h2><a name="UpgradingaDSpaceInstallation-Upgradingfrom1.6.xto1.7"></a>Upgrading from 1.6.x to 1.7</h2>
+<h2><a name="UpgradingaDSpaceInstallation-Upgradingfrom1.7to1.7.x"></a>Upgrading from 1.7 to 1.7.x</h2>
 
-<p>In the notes below <tt>[dspace]</tt> refers to the install directory for your existing DSpace installation, and <em>[dspace-source]</em> to the source directory for DSpace 1.7.0. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
+<p>In the notes below <tt>[dspace]</tt> refers to the install directory for your existing DSpace installation, and <tt>[dspace-source]</tt> to the source directory for DSpace 1.7.1. Whenever you see these path references, be sure to replace them with the actual path names on your local system. Additionally, be sure to backup your configs, source code modifications, and database before doing a step that could destroy your instance.</p>
+
+
+<ol>
+	<li><b>Download DSpace 1.7.1</b> Either download DSpace 1.7.1 from <a href="http://www.dspace.org/latest-release/">DSpace.org</a> or check it out directly from the&nbsp;<a href="http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.1/">SVN code repository</a>. If you downloaded DSpace do not unpack it on top of your existing installation. Refer to <a href="Installation.html#Installation-Installation">Installation Instructions, Step 3</a> for unpacking directives.</li>
+	<li><b>Apply any customizations.</b>&nbsp;If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. These are housed in one of the following places:
+	<ul>
+		<li>JSPUI modifications: <tt>[dspace-source]/dspace/modules/jspui/src/main/webapp/</tt></li>
+		<li>XMLUI modifications: <tt>[dspace-source]/dspace/modules/xmlui/src/main/webapp/</tt></li>
+		<li>Config modifications: [dspace]/config</li>
+	</ul>
+	</li>
+	<li><b>Build DSpace.</b>&nbsp;Run the following commands to compile DSpace:
+<div class="preformatted panel" style="border-width: 1px;"><div class="preformattedContent panelContent">
+<pre>cd [dspace-source]/dspace/
+mvn -U clean package</pre>
+</div></div>
+<p> You will find the result in <tt>[dspace-source]/dspace/target/dspace-[version]-build.dir</tt> . Inside this directory is the compiled binary distribution of DSpace. Before rebuilding DSpace ('package'), the above command will clean out any previously compiled code ('clean') and ensure that your local DSpace JAR files are updated from the remote maven repository.</p></li>
+	<li><b>Stop Tomcat.</b>&nbsp;Take down your servlet container. For Tomcat, use the&nbsp; <tt>$CATALINA/shutdown.sh</tt> &nbsp;script. (Many Unix-based installations will have a startup/shutdown script in the <tt>/etc/init.d</tt> or <tt>/etc/rc.d</tt> directories.)</li>
+	<li><b>Backup Your DSpace.</b> Make a complete backup of your system, including:
+	<ul>
+		<li>A snapshot of the database.&nbsp;<em>To have a "snapshot" of the PostgreSQL database use Postgres'</em> <em><a href="http://www.postgresql.org/docs/8.4/static/app-pgdump.html">pg_dump</a></em> <em>command.</em></li>
+		<li>The asset store (<tt>[dspace]/assetstore</tt> by default, and any other assetstores configured in the <tt>[dspace]/config/dspace.cfg</tt> "assetstore.dir" and "assetstore.dir.#" settings)</li>
+		<li>Your configuration files and customizations to DSpace (including any customized scripts).</li>
+	</ul>
+	</li>
+	<li><b>Update DSpace.</b> Update the DSpace installed directory with the new code and libraries. Issue the following commands:
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">cd [dspace-source]/dspace/target/dspace-[version]-build.dir
+ant -Dconfig=[dspace]/config/dspace.cfg update</pre>
+</div></div></li>
+	<li><b>Generate Browse and Search Indexes</b>. Though there are not any database changes between 1.7 and 1.7.1 release, it makes good policy to rebuild your search and browse indexes when upgrading to a new release. To do this, run the following command from your DSpace install directory (as the dspace user): 
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">[dspace]/bin/dspace index-init</pre>
+</div></div></li>
+	<li><b>Deploy Web Applications</b>. Copy the web applications files from your <tt>[dspace]/webapps</tt> directory to the subdirectory of your servlet container (e.g. tomcat): 
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">cp -R [dspace]/webapps/* [tomcat]/webapps/</pre>
+</div></div></li>
+	<li><b>Restart servlet container.</b> Now restart your Tomcat/Jetty/Resin server program and test out the upgrade.</li>
+</ol>
+
+
+<h2><a name="UpgradingaDSpaceInstallation-Upgradingfrom1.6.xto1.7.x"></a>Upgrading from 1.6.x to 1.7.x</h2>
+
+<p>In the notes below <tt>[dspace]</tt> refers to the install directory for your existing DSpace installation, and <em>[dspace-source]</em> to the source directory for DSpace 1.7.x. Whenever you see these path references, be sure to replace them with the actual path names on your local system.</p>
 
 <div class='panelMacro'><table class='infoMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="images/icons/emoticons/information.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>Before upgrading you need to check you are using the current recommended minimum versions of Java (1.6), Maven (2.0.8 or above) and ant (1.7 or above).  For more details, see the current listing of <a href="Installation.html#Installation-PrerequisiteSoftware">Prerequisite Software</a></td></tr></table></div>
 
 <ol>
 	<li><b>Backup Your DSpace.</b> First, and foremost, make a complete backup of your system, including:
 	<ul>
-		<li>A snapshot of the database. <em>To have a "snapshot" of the PostgreSQL database, you need to shut it down during the backup. You should also have your regular PostgreSQL Backup output (using pg_dump commands).</em></li>
-		<li>The asset store (<em>[dspace]/assetstore</em> by default)</li>
+		<li>A snapshot of the database. <em>To have a "snapshot" of the PostgreSQL database, you need to shut it down during the backup. You should also have your regular PostgreSQL Backup output (using Postgres'</em> <em><a href="http://www.postgresql.org/docs/8.4/static/app-pgdump.html">pg_dump command</a></em><em>).</em></li>
+		<li>The asset store (<tt>[dspace]/assetstore</tt> by default)</li>
 		<li>Your configuration files and customizations to DSpace (including any customized scripts).</li>
 	</ul>
 	</li>
-	<li><b>Download DSpace 1.7.0</b> Retrieve the new DSpace 1.7.0 source code either as a download from <a href="http://www.dspace.org/latest-release/">DSpace.org</a> or check it out directly from the <a href="http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.0/">SVN code repository</a>. If you downloaded DSpace do not unpack it on top of your existing installation. Refer to <a href="Installation.html#Installation-Installation">Installation Instructions, Step 3</a> for unpacking directives.</li>
-	<li><b>Stop Tomcat.</b> Take down your servlet container. For Tomcat, use the <em>$CATALINA_HOME/bin/shutdown.sh</em> script. (Many Unix-based installations will have a startup/shutdown script in the <em>/etc/init.d</em> or <em>/etc/rc.d</em> directories).</li>
+	<li><b>Download DSpace 1.7.x</b> Retrieve the new DSpace 1.7.x source code either as a download from <a href="http://www.dspace.org/latest-release/">DSpace.org</a> or check it out directly from the <a href="http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.1/">SVN code repository</a>. If you downloaded DSpace do not unpack it on top of your existing installation. Refer to <a href="Installation.html#Installation-Installation">Installation Instructions, Step 3</a> for unpacking directives.</li>
+	<li><b>Stop Tomcat.</b> Take down your servlet container. For Tomcat, use the <tt>$CATALINA_HOME/bin/shutdown.sh</tt> script. (Many Unix-based installations will have a startup/shutdown script in the <tt>/etc/init.d</tt> or <tt>/etc/rc.d</tt> directories).</li>
 	<li><b>Apply any customizations.</b> If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. These are normally housed in one of the following places:
 	<ul>
-		<li>JSPUI modifications: <em>[dspace-source]/dspace/modules/jspui/src/main/webapp/</em></li>
-		<li>XMLUI modifications: <em>[dspace-source]/dspace/modules/xmlui/src/main/webapp/</em></li>
+		<li>JSPUI modifications: <tt>[dspace-source]/dspace/modules/jspui/src/main/webapp/</tt></li>
+		<li>XMLUI modifications: <tt>[dspace-source]/dspace/modules/xmlui/src/main/webapp/</tt></li>
 	</ul>
 	</li>
-	<li><b>Update Configuration Files.</b> Some parameters have changed and some are new.  You can either attempt to make these changes in your current 1.6.x <tt>dspace.cfg</tt> file, or you can start with a new 1.7.0 <tt>dspace.cfg</tt> and re-modify it as needed. Configuration changes are noted below:
+	<li><b>Update Configuration Files.</b> Some parameters have changed and some are new.  You can either attempt to make these changes in your current 1.6.x <tt>dspace.cfg</tt> file, or you can start with a new 1.7 <tt>dspace.cfg</tt> and re-modify it as needed. Configuration changes are noted below:
 	<ul>
 		<li>&#42;<b>CORRECTION</b>&#42; &nbsp;There was a missing hyphen "-" in the property key for mail character set:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
@@ -270,7 +318,7 @@ aip.disseminate.dmd = MODS, DIM</pre>
 </div></div></li>
 		<li>&#42;<b>NEW</b>&#42; A new property has been added to control the discovery index for the Event System Configuration:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java"> consumer to maintain the discovery index
+<pre class="code-java"># consumer to maintain the discovery index
 event.consumer.discovery.class = org.dspace.discovery.IndexEventConsumer
 event.consumer.discovery.filters = Community|Collection|Item|Bundle+Add|Create|Modify|Modify_Metadata|Delete|Remove</pre>
 </div></div></li>
@@ -410,7 +458,7 @@ solr.resolver.timeout = 200
 <pre class="code-java">cd [dspace-source]/dspace/
 mvn -U clean <span class="code-keyword">package</span></pre>
 </div></div>
-<p> You will find the result in <em>[dspace-source]/dspace/target/dspace-[version]-build.dir</em> . Inside this directory is the compiled binary distribution of DSpace. Before rebuilding DSpace, the above command will clean out any previously compiled code ('clean') and ensure that your local DSpace JAR files are updated from the remote maven code repository.</p></li>
+<p> You will find the result in <tt>[dspace-source]/dspace/target/dspace-[version]-build.dir</tt> . Inside this directory is the compiled binary distribution of DSpace. Before rebuilding DSpace, the above command will clean out any previously compiled code ('clean') and ensure that your local DSpace JAR files are updated from the remote maven code repository.</p></li>
 	<li><b>Update DSpace.</b> Update the DSpace installed directory with the new code and libraries. Issue the following commands:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">cd [dspace-source]/dspace/target/dspace-[version]-build.dir
@@ -430,7 +478,7 @@ ant -Dconfig=[dspace]/config/dspace.cfg update</pre>
 		<ol>
 			<li>Start SQL*Plus with <tt>sqlplus [connect args]</tt></li>
 			<li>Record the output: <tt>SQL&gt; spool 'upgrade.lst'</tt></li>
-			<li>Run the upgrade script <tt>SQL&gt; @[dspace-source]/dspace/etc/oracle/database_schema_16_17.sql</tt></li>
+			<li>Run the upgrade script <tt>SQL&gt; @[dspace-source]/dspace/etc/oracle/database_schema_16-17.sql</tt></li>
 			<li>Turn off recording of output: <tt>SQL&gt; spool off</tt></li>
 		</ol>
 		</li>
@@ -444,7 +492,7 @@ ant -Dconfig=[dspace]/config/dspace.cfg update</pre>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">cp -R [dspace]/webapps/* [tomcat]/webapps/</pre>
 </div></div></li>
-	<li><b>Restart servlet.</b> Now restart your Tomcat/Jetty/Resin server program and test out the upgrade.</li>
+	<li><b>Restart servlet container.</b> Now restart your Tomcat/Jetty/Resin server program and test out the upgrade.</li>
 </ol>
 
 
@@ -461,16 +509,21 @@ ant -Dconfig=[dspace]/config/dspace.cfg update</pre>
 		<li>Your configuration files and customizations to DSpace (including any customized scripts).</li>
 	</ul>
 	</li>
-	<li><b>Download DSpace 1.6.1</b> Retrieve the new DSpace 1.6.2 source code either as a download from <a href="http://www.dspace.org/latest-release/">DSpace.org</a> or check it out directly from the <a href="http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/">SVN code repository</a>. If you downloaded DSpace do not unpack it on top of your existing installation. Refer to Chapter 3.3.3 Installation, Step 3 for unpacking directives.</li>
+	<li><b>Download DSpace 1.6.2</b>&nbsp;Retrieve the new DSpace 1.6.2 source code either as a download from <a href="http://www.dspace.org/latest-release/">DSpace.org</a> or check it out directly from the <a href="http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/">SVN code repository</a>. If you downloaded DSpace do not unpack it on top of your existing installation. Refer to <a href="Installation.html#Installation-Installation">Installation Instructions, Step 3</a> for unpacking directives.</li>
 	<li><b>Stop Tomcat.</b> Take down your servlet container. For Tomcat, use the <em>$CATALINA/shutdown.sh</em> script. (Many installations will have a startup/shutdown script in the <em>/etc/init.d</em> or <em>/etc/rc.d</em> directories.</li>
-	<li><b>Apply any customizations.</b> If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. These are housed in one of the following places:JSPUI modifications: <em>[dspace-source]/dspace/modules/jspui/src/main/webapp/_XMLUI modifications: &#95;[dspace-source]/dspace/modules/xmlui/src/main/webapp</em></li>
+	<li><b>Apply any customizations.</b> If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. These are housed in one of the following places:
+	<ul>
+		<li>JSPUI modifications: <tt>[dspace-source]/dspace/modules/jspui/src/main/webapp/</tt></li>
+		<li>XMLUI modifications: <tt>[dspace-source]/dspace/modules/xmlui/src/main/webapp/</tt></li>
+	</ul>
+	</li>
 	<li><b>Update Configuration Files.</b> There are no additions to this release. So you do not have to update the configuration files.</li>
 	<li><b>Build DSpace.</b> Run the following commands to compile DSpace.:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">cd /[dspace-source]/dspace/
 mvn -U clean <span class="code-keyword">package</span></pre>
 </div></div>
-<p>You will find the result in <em>[dspace-source]/dspace/target/dspace-[version]-build.dir</em> . Inside this directory is the compiled binary distribution of DSpace.Before rebuilding DSpace, the above command will clean out any previously compiled code ('clean') and ensure that your local DSpace JAR files are updated from the remote maven repository.</p></li>
+<p>You will find the result in <em>[dspace-source]/dspace/target/dspace-[version]-build.dir</em> . Inside this directory is the compiled binary distribution of DSpace. Before rebuilding DSpace, the above command will clean out any previously compiled code ('clean') and ensure that your local DSpace JAR files are updated from the remote maven repository.</p></li>
 	<li><b>Update DSpace.</b> Update the DSpace installed directory with the new code and libraries. Issue the following commands:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">cd [dspace-source]/dspace/target/dspace-[version]-build.dir
@@ -487,9 +540,10 @@ ant -Dconfig=[dspace]/config/dspace.cfg update</pre>
 <p><em>(The line break above is cosmetic. Please place your command in one line.</em></p></li>
 		<li>For Oracle: Execute the upgrade script, e.g. with sqlplus, recording the output:
 		<ol>
-			<li>Start SQL*Plus with "<em>sqlplus [connect args]</em>"</li>
-			<li>Record the output: <em>SQL&gt; spool 'upgrade.lst'</em></li>
-			<li>Run the upgrade script <em>SQL&gt; @[dspace-source]/dspace/etc/oracle/database_schema_15-16.sql</em><em>SQL&gt; spool off</em></li>
+			<li>Start SQL*Plus with <tt>sqlplus [connect args]</tt></li>
+			<li>Record the output: <tt>SQL&gt; spool 'upgrade.lst'</tt></li>
+			<li>Run the upgrade script <tt>SQL&gt; @[dspace-source]/dspace/etc/oracle/database_schema_15-16.sql</tt></li>
+			<li>Turn off recording of output: <tt>SQL&gt; spool off</tt></li>
 			<li>Please note: The final few statements WILL FAIL. That is because you have run some queries and use the results to construct the statements to remove the constraints, manually‚ Oracle doesn't have any easy way to automate this (unless you know PL/SQL). So, look for the comment line beginning: 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java"><span class="code-quote">"--You need to remove the already in place constraints"</span>
@@ -519,9 +573,14 @@ the output of the queries you'll need.</pre>
 		<li>Your configuration files and customizations to DSpace (including any customized scripts).</li>
 	</ul>
 	</li>
-	<li><b>Download DSpace 1.6.x</b> Retrieve the new DSpace 1.6.x source code either as a download from <a href="http://www.dspace.org/latest-release/">DSpace.org</a> or check it out directly from the <a href="http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/">SVN code repository</a>. If you downloaded DSpace do not unpack it on top of your existing installation.Refer to Chapter 3.3.3 Installation, Step 3 for unpacking directives.</li>
+	<li><b>Download DSpace 1.6.x</b> Retrieve the new DSpace 1.6.x source code either as a download from <a href="http://www.dspace.org/latest-release/">DSpace.org</a> or check it out directly from the <a href="http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/">SVN code repository</a>. If you downloaded DSpace do not unpack it on top of your existing installation. Refer to <a href="Installation.html#Installation-Installation">Installation Instructions, Step 3</a> for unpacking directives.</li>
 	<li><b>Stop Tomcat</b>. Take down your servlet container. For Tomcat, use the <em>$CATALINA/shutdown.sh</em> script. (Many installations will have a startup/shutdown script in the <em>/etc/init.d</em> or <em>/etc/rc.d</em> directories.</li>
-	<li><b>Apply any customizations</b>. If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. These are housed in one of the following places:JSPUI modifications: <em>[dspace-source]/dspace/modules/jspui/src/main/webapp/_XMLUI modifications: &#95;[dspace-source]/dspace/modules/xmlui/src/main/webapp</em></li>
+	<li><b>Apply any customizations</b>. If you have made any local customizations to your DSpace installation they will need to be migrated over to the new DSpace. These are housed in one of the following places:
+	<ul>
+		<li>JSPUI modifications: <tt>[dspace-source]/dspace/modules/jspui/src/main/webapp/</tt></li>
+		<li>XMLUI modifications: <tt>[dspace-source]/dspace/modules/xmlui/src/main/webapp/</tt></li>
+	</ul>
+	</li>
 	<li><b>Update Configuration Files</b>. Some of the parameters have change and some are new. Changes will be noted below:
 	<ul>
 		<li>&#42;&#42;<b>CHANGE</b>&#42;&#42; The base url and oai urls property keys are set differently 
@@ -994,12 +1053,6 @@ solr.spidersfile = ${dspace.dir}/config/spiders.txt
 solr.dbfile = ${dspace.dir}/config/GeoLiteCity.dat
 useProxies = <span class="code-keyword">true</span>
 
-statistics.items.dc.1=dc.identifier
-statistics.items.dc.2=dc.date.accessioned
-statistics.items.type.1=dcinput
-statistics.items.type.2=date
-statistics.<span class="code-keyword">default</span>.start.datepick = 01/01/1977
-
 statistics.item.authorization.admin=<span class="code-keyword">true</span></pre>
 </div></div></li>
 	</ul>
@@ -1015,9 +1068,10 @@ mvn -U clean <span class="code-keyword">package</span></pre>
 		<li>For PostgreSQL: <tt>psql &#45;U [dspace-user] &#45;f [dspace-source]/dspace/etc/postgres/database_schema_15-16.sql [database name]</tt> (Your database name is by default 'dspace'). Example: <tt>psql &#45;U dspace &#45;f /dspace-1.6-1-src-release/dspace/etc/postgres/database_schema_15-16.sql dspace</tt></li>
 		<li>For Oracle: Execute the upgrade script, e.g. with sqlplus, recording the output:
 		<ol>
-			<li>Start SQL*Plus with "<em>sqlplus [connect args]</em>"</li>
-			<li>Record the output: <em>SQL&gt; spool 'upgrade.lst'</em></li>
-			<li>Run the upgrade script <em>SQL&gt; @[dspace-source]/dspace/etc/oracle/database_schema_15_16.sql</em><em>SQL&gt; spool off</em></li>
+			<li>Start SQL*Plus with <tt>sqlplus [connect args]</tt></li>
+			<li>Record the output: <tt>SQL&gt; spool 'upgrade.lst'</tt></li>
+			<li>Run the upgrade script <tt>SQL&gt; @[dspace-source]/dspace/etc/oracle/database_schema_15-16.sql</tt></li>
+			<li>Turn off recording of output: <tt>SQL&gt; spool off</tt></li>
 			<li>Please note: The final few statements WILL FAIL. That is because you have run some queries and use the results to construct the statements to remove the constraints, manually‚ Oracle doesn't have any easy way to automate this (unless you know PL/SQL). So, look for the comment line beginning: 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java"><span class="code-quote">"--You need to remove the already in place constraints"</span>
@@ -1521,7 +1575,7 @@ http:<span class="code-comment">//purl.org/net/sword-types/METSDSpaceSIP \
 		<li>Your statistics scripts (<em>[dspace]/bin/stat&#42;</em>) which contain customizable dates</li>
 	</ul>
 	</li>
-	<li><b>Download DSpace 1.5</b> Get the new DSpace 1.5 source code either as a download from <a href="http://sourceforge.net/projects/dspace/">SourceForge</a> or check it out directly from the <a href="#UpgradingaDSpaceInstallation-%5C" title="SVN code repository|">SVN code repository\</a>. If you downloaded DSpace do not unpack it on top of your existing installation.</li>
+	<li><b>Download DSpace 1.5.x</b> Get the new DSpace 1.5 source code either as a download from <a href="http://sourceforge.net/projects/dspace/">SourceForge</a> or check it out directly from the <a href="http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.5.2/">SVN code repository</a>. If you downloaded DSpace do not unpack it on top of your existing installation.</li>
 	<li><b>Build DSpace</b> The build process has radically changed for DSpace 1.5. With this new release the build system has moved to a maven-based system enabling the various projects (JSPUI, XMLUI, OAI, and Core API) into separate projects. See the <a href="Installation.html" title="Installation">Installation</a> section for more information on building DSpace using the new maven-based build system. Run the following commands to compile DSpace.
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">
@@ -1611,14 +1665,14 @@ event.consumer.eperson.class = org.dspace.eperson.EPersonConsumer
 event.consumer.eperson.filters = EPerson+Create
 </pre>
 </div></div></li>
-	<li><b>Add</b> <b><em>xmlui.xconf</em></b> <b>Manakin configuration</b> The new Manakin user interface available with DSpace 1.5 requires an extra configuration file that you will need to manually copy it over to your configuration directory.
+	<li><b>Add 'xmlui.xconf' Manakin configuration</b> The new Manakin user interface available with DSpace 1.5 requires an extra configuration file that you will need to manually copy it over to your configuration directory.
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">
 cp [dspace-source]/dspace/config/xmlui.xconf
 	[dspace]/config/xmlui.xconf
 </pre>
 </div></div></li>
-	<li><b>Add</b> <b><em>item-submission.xml</em></b> <b>and</b> <b><em>item-submission.dtd</em></b> <b>configurable submission configuration</b> The new configurable submission system that enables an administrator to re-arrange, or add/remove item submission steps requires this configuration file. You need to manually copy it over to your configuration directory.
+	<li><b>Add 'item-submission.xml' and 'item-submission.dtd' configurable submission configuration</b> The new configurable submission system that enables an administrator to re-arrange, or add/remove item submission steps requires this configuration file. You need to manually copy it over to your configuration directory.
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">
 cp [dspace-source]/dspace/config/item-submission.xml
@@ -1628,7 +1682,7 @@ cp [dspace-source]/dspace/config/item-submission.dtd
 	[dspace]/config/item-submission.dtd
 </pre>
 </div></div></li>
-	<li><b>Add new</b> <b><em>input-forms.xml</em></b> <b>and</b> <b><em>input-forms.dtd</em></b> <b>configurable submission configuration</b> The input-forms.xml now has an included dtd reference to support validation. You'll need to merge in your changes to both file/and or copy them into place.
+	<li><b>Add new 'input-forms.xml' and 'input-forms.dtd' configurable submission configuration</b> The input-forms.xml now has an included dtd reference to support validation. You'll need to merge in your changes to both file/and or copy them into place.
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">
 cp [dspace-source]/dspace/config/input-forms.xml
@@ -1638,7 +1692,7 @@ cp [dspace-source]/dspace/config/input-forms.dtd
 	[dspace]/config/inputforms.dtd
 </pre>
 </div></div></li>
-	<li><b>Add</b> <b><em>sword-swap-ingest.xsl</em></b> <b>and</b> <b><em>xhtml-head-item.properties</em></b> <b>crosswalk files</b> New crosswalk files are required to support SWORD and the inclusion of metadata into the head of items.
+	<li><b>Add 'sword-swap-ingest.xsl' and 'xhtml-head-item.properties' crosswalk files</b> New crosswalk files are required to support SWORD and the inclusion of metadata into the head of items.
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">
 cp [dspace-source]/dspace/config/crosswalks/sword-swap-ingest.xsl
@@ -1650,7 +1704,7 @@ cp
 	[dspace]/config/crosswalks/xhtml-head-item.properties
 </pre>
 </div></div></li>
-	<li><b>Add</b> <b><em>registration_notify</em></b> <b>email files</b> A new configuration option (<em>registration.notify = you@your-email.com</em>) can be set to send a notification email whenever a new user registers to use your DSpace. The email template for this email needs to be copied.
+	<li><b>Add 'registration_notify' email files</b> A new configuration option (<em>registration.notify = you@your-email.com</em>) can be set to send a notification email whenever a new user registers to use your DSpace. The email template for this email needs to be copied.
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">
 cp [dspace-source]/dspace/config/emails/registration_notify
@@ -1979,7 +2033,7 @@ report.dir = /dspace/reports/
 </pre>
 </div></div></li>
 	<li>Build and install the updated DSpace 1.3.x code. Go to the <em>[dspace-1.3.x-source]</em> directory, and run:<em>ant &#45;Dconfig=[dspace]/config/dspace.cfg update</em></li>
-	<li>You'll need to make some changes to the database schema in your PostgreSQL database. <em>[dspace-1.3.x-source]/etc/database_schema_12-13.sql</em> contains the SQL commands to achieve this. If you've modified the schema locally, you may need to check over this and make alterations.To apply the changes, go to the source directory, and run: <em>psql &#45;f etc/database_schema_12-13.sql [DSpace database name] &#45;h localhost</em></li>
+	<li>You'll need to make some changes to the database schema in your PostgreSQL database. <em>[dspace-1.3.x-source]/etc/database_schema_12-13.sql</em> contains the SQL commands to achieve this. If you've modified the schema locally, you may need to check over this and make alterations. To apply the changes, go to the source directory, and run: <em>psql &#45;f etc/database_schema_12-13.sql [DSpace database name] &#45;h localhost</em></li>
 	<li>Customize the stat generating statistics as per the instructions in System Statistical Reports</li>
 	<li>Initialize the statistics using: <em>[dspace]/bin/stat-initial</em><em>[dspace]/bin/stat-general</em><em>[dspace]/bin/stat-report-initial</em><em>[dspace]/bin/stat-report-general</em></li>
 	<li>Rebuild the search indexes: <em>[dspace]/bin/index-all</em></li>
@@ -2222,13 +2276,13 @@ cp  [dspace-1.2-source]/build/*.war
 </pre>
 </div></div>
 <p>You might also wish to run it now to generate thumbnails and index full text for the content already in your system.</p></li>
-	<li><b>Note 1</b>: This update process has effectively 'touched' all of your items. Although the dates in the Dublin Core metadata won't have changed (accession date and so forth), the 'last modified' date in the database for each will have been changed.This means the e-mail subscription tool may be confused, thinking that all items in the archive have been deposited that day, and could thus send a rather long email to lots of subscribers. So, it is recommended that you <b>turn off the e-mail subscription feature for the next day</b>, by commenting out the relevant line in DSpace's cron job, and then re-activating it the next day.Say you performed the update on 08-June-2004 (UTC), and your e-mail subscription cron job runs at 4am (UTC). When the subscription tool runs at 4am on 09-June-2004, it will find that everything in the system has a modification date in 08-June-2004, and accordingly send out huge emails. So, immediately after the update, you would edit DSpace's 'crontab' and comment out the <em>/dspace/bin/subs-daily</em> line. Then, after 4am on 09-June-2004 you'd 'un-comment' it out, so that things proceed normally.Of course this means, any <em>real</em> new deposits on 08-June-2004 won't get e-mailed, however if you're updating the system it's likely to be down for some time so this shouldn't be a big problem.</li>
+	<li><b>Note 1</b>: This update process has effectively 'touched' all of your items. Although the dates in the Dublin Core metadata won't have changed (accession date and so forth), the 'last modified' date in the database for each will have been changed. This means the e-mail subscription tool may be confused, thinking that all items in the archive have been deposited that day, and could thus send a rather long email to lots of subscribers. So, it is recommended that you <b>turn off the e-mail subscription feature for the next day</b>, by commenting out the relevant line in DSpace's cron job, and then re-activating it the next day. Say you performed the update on 08-June-2004 (UTC), and your e-mail subscription cron job runs at 4am (UTC). When the subscription tool runs at 4am on 09-June-2004, it will find that everything in the system has a modification date in 08-June-2004, and accordingly send out huge emails. So, immediately after the update, you would edit DSpace's 'crontab' and comment out the <em>/dspace/bin/subs-daily</em> line. Then, after 4am on 09-June-2004 you'd 'un-comment' it out, so that things proceed normally. Of course this means, any <em>real</em> new deposits on 08-June-2004 won't get e-mailed, however if you're updating the system it's likely to be down for some time so this shouldn't be a big problem.</li>
 	<li><b>Note 2:</b> After consultation with the OAI community, various OAI-PMH changes have occurred:
 	<ul>
 		<li>The OAI-PMH identifiers have changed (they're now of the form <em>oai:hostname:handle</em> as opposed to just Handles)</li>
 		<li>The set structure has changed, due to the new sub-communities feature.</li>
 		<li>The default base URL has changed</li>
-		<li>As noted in note 1, every item has been 'touched' and will need re-harvesting. The above means that, if already registered and harvested, you will need to re-register your repository, effectively as a 'new' OAI-PMH data provider. You should also consider posting an announcement to the <a href="http://www.openarchives.org/mailman/listinfo/OAI-implementers" title="OAI implementers e-mail list">OAI implementers e-mail list</a> so that harvesters know to update their systems.Also note that your site may, over the next few days, take quite a big hit from OAI-PMH harvesters. The resumption token support should alleviate this a little, but you might want to temporarily whack up the database connection pool parameters in <em>[dspace]/config/dspace.cfg</em>. See the <em>dspace.cfg</em> distributed with the source code to see what these parameters are and how to use them. (You need to stop and restart Tomcat after changing them.)I realize this is not ideal; for discussion as to the reasons behind this please see relevant posts to the OAI community: <a href="http://openarchives.org/pipermail/oai-implementers/2004-June/001214.html" title="post one">post one</a>, <a href="http://openarchives.org/pipermail/oai-implementers/2004-June/001224.html" title="post two">post two</a>, as well as <a href="#UpgradingaDSpaceInstallation-%5C" title="this post to the dspace-tech mailing list|">this post to the dspace-tech mailing list\</a>.If you really can't live with updating the base URL like this, you can fairly easily have thing proceed more-or-less as they are, by doing the following:</li>
+		<li>As noted in note 1, every item has been 'touched' and will need re-harvesting. The above means that, if already registered and harvested, you will need to re-register your repository, effectively as a 'new' OAI-PMH data provider. You should also consider posting an announcement to the <a href="http://www.openarchives.org/mailman/listinfo/OAI-implementers" title="OAI implementers e-mail list">OAI implementers e-mail list</a> so that harvesters know to update their systems. Also note that your site may, over the next few days, take quite a big hit from OAI-PMH harvesters. The resumption token support should alleviate this a little, but you might want to temporarily whack up the database connection pool parameters in <em>[dspace]/config/dspace.cfg</em>. See the <em>dspace.cfg</em> distributed with the source code to see what these parameters are and how to use them. (You need to stop and restart Tomcat after changing them.)I realize this is not ideal; for discussion as to the reasons behind this please see relevant posts to the OAI community: <a href="http://openarchives.org/pipermail/oai-implementers/2004-June/001214.html" title="post one">post one</a>, <a href="http://openarchives.org/pipermail/oai-implementers/2004-June/001224.html" title="post two">post two</a>, as well as <a href="#UpgradingaDSpaceInstallation-%5C" title="this post to the dspace-tech mailing list|">this post to the dspace-tech mailing list\</a>.If you really can't live with updating the base URL like this, you can fairly easily have thing proceed more-or-less as they are, by doing the following:</li>
 		<li>Change the value of <em>OAI_ID_PREFIX</em> at the top of the <em>org.dspace.app.oai.DSpaceOAICatalog</em> class to <em>hdl:</em></li>
 		<li>Change the servlet mapping for the <em>OAIHandler</em> servlet back to <em>/</em> (from <em>/request</em>)</li>
 		<li>Rebuild and deploy &#95;oai.war_However, note that in this case, all the records will be re-harvested by harvesters anyway, so you still need to brace for the associated DB activity; also note that the set spec changes may not be picked up by some harvesters. It's recommended you read the above-linked mailing list posts to understand why the change was made.<br/>
@@ -2396,7 +2450,7 @@ JAVA_OPTS=<span class="code-quote">"-Xmx512M -Xms64M -Dfile.encoding=UTF-8"</spa
 				<td height="12" background="https://wiki.duraspace.org/images/border/border_bottom.gif"><img src="images/border/spacer.gif" width="1" height="1" border="0"/></td>
 			</tr>
 		    <tr>
-			    <td align="center"><font color="grey">Document generated by Confluence on Dec 16, 2010 11:47</font></td>
+			    <td align="center"><font color="grey">Document generated by Confluence on Mar 25, 2011 19:21</font></td>
 		    </tr>
 	    </table>
     </body>

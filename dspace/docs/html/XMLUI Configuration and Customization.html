@@ -16,7 +16,7 @@
                                                     </span>
 				    </div>
 				    <div class="pagesubheading">
-					    This page last changed on Dec 15, 2010 by <font color="#0050B2">bram</font>.
+					    This page last changed on Feb 17, 2011 by <font color="#0050B2">helix84</font>.
 				    </div>
 
 				    <h1><a name="XMLUIConfigurationandCustomization-DSpaceSystemDocumentation%3AManakin%5CXMLUI%5CConfigurationandCustomization"></a>DSpace System Documentation: Manakin [XMLUI] Configuration and Customization</h1>
@@ -24,11 +24,11 @@
 <p>The DSpace digital repository supports two user interfaces: one based on JavaServer Pages (JSP) technologies and one based upon the Apache Cocoon framework (XMLUI). This chapter describes those parameters which are specific to the Manakin (XMLUI) interface based upon the Cocoon framework.</p>
 
 <style type='text/css'>/*<![CDATA[*/
-div.rbtoc1292428718703 {margin-left: 0px;padding: 0px;}
-div.rbtoc1292428718703 ul {list-style: none;margin-left: 0px;}
-div.rbtoc1292428718703 li {margin-left: 0px;padding-left: 0px;}
+div.rbtoc1297951040386 {margin-left: 0px;padding: 0px;}
+div.rbtoc1297951040386 ul {list-style: none;margin-left: 0px;}
+div.rbtoc1297951040386 li {margin-left: 0px;padding-left: 0px;}
 
-/*]]>*/</style><div class='rbtoc1292428718703'>
+/*]]>*/</style><div class='rbtoc1297951040386'>
 <ul>
     <li><span class='TOCOutline'>1</span> <a href='#XMLUIConfigurationandCustomization-ManakinConfigurationPropertyKeys'>Manakin Configuration Property Keys</a></li>
     <li><span class='TOCOutline'>2</span> <a href='#XMLUIConfigurationandCustomization-ConfiguringThemesandAspects'>Configuring Themes and Aspects</a></li>
@@ -194,7 +194,7 @@ div.rbtoc1292428718703 li {margin-left: 0px;padding-left: 0px;}
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> Optionally, you may configure Manakin to take advantage of metadata stored as a bitstream. The METS metadata file must be inside the "METADATA" bundle and named METS.xml. If this optino is set to "true" and the bitstream is present then it is made available to the theme for display. </td>
+<td class='confluenceTd'> Optionally, you may configure Manakin to take advantage of metadata stored as a bitstream. The METS metadata file must be inside the "METADATA" bundle and named METS.xml. If this option is set to "true" and the bitstream is present then it is made available to the theme for display. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Property: </td>
@@ -206,7 +206,7 @@ div.rbtoc1292428718703 li {margin-left: 0px;padding-left: 0px;}
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> If you would like to use google analytics to track general website statistics then use the following parameter to provide your analytics key. First sign up for an account at <a href="http://analytics.google.com" title="http://analytics.google.com">http://analytics.google.com</a>, then create an entry for your repositories website. Google Analytics will give you a snipit of javascript code to place on your site, inside that snip it is your google analytics key usually found in the line: &#95;uacct = "UA-XXXXXXX-X" Take this key (just the UA-XXXXXX-X part) and place it here in this parameter. </td>
+<td class='confluenceTd'> If you would like to use google analytics to track general website statistics then use the following parameter to provide your analytics key. First sign up for an account at <a href="http://analytics.google.com" title="http://analytics.google.com">http://analytics.google.com</a>, then create an entry for your repositories website. Google Analytics will give you a snipit of javascript code to place on your site, inside that snip it is your Google Analytics key usually found in the line: &#95;uacct = "UA-XXXXXXX-X" Take this key (just the UA-XXXXXX-X part) and place it here in this parameter. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Property: </td>
@@ -218,7 +218,7 @@ div.rbtoc1292428718703 li {margin-left: 0px;padding-left: 0px;}
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> Assign how many page views will be recorded and displayed in the control panel's activity viewer. The activity tab allows an administrator to debug problems in a running DSpace by understanding who and how their dspace is currently being used. The default value is 250. </td>
+<td class='confluenceTd'> Assign how many page views will be recorded and displayed in the control panel's activity viewer. The activity tab allows an administrator to debug problems in a running DSpace by understanding who and how their DSpace is currently being used. The default value is 250. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> Property: </td>
@@ -230,7 +230,7 @@ div.rbtoc1292428718703 li {margin-left: 0px;padding-left: 0px;}
 </tr>
 <tr>
 <td class='confluenceTd'> Informational Note: </td>
-<td class='confluenceTd'> Determine where the control panel's activity viewer recieves an events IP address from. If your DSpace is in a load balanced enviornment or otherwise behind a context-switch then you will need to set the paramater to the HTTP parameter that records the original IP address. </td>
+<td class='confluenceTd'> Determine where the control panel's activity viewer receives an events IP address from. If your DSpace is in a load balanced environment or otherwise behind a context-switch then you will need to set the parameter to the HTTP parameter that records the original IP address. </td>
 </tr>
 </tbody></table>
 </div>
@@ -247,7 +247,8 @@ div.rbtoc1292428718703 li {margin-left: 0px;padding-left: 0px;}
 
 <p>The <em>&lt;aspects&gt;</em> section defines the "Aspect Chain", or the linear set of aspects that are installed in the repository. For each aspect that is installed in the repository, the aspect makes available new features to the interface. For example, if the "submission" aspect were to be commented out or removed from the <em>xmlui.xconf</em>, then users would not be able to submit new items into the repository (even the links and language prompting users to submit items are removed). Each <em>&lt;aspect&gt;</em> element has two attributes, <em>name</em> and <em>path</em>. The name is used to identify the Aspect, while the path determines the directory where the aspect's code is located. Here is the default aspect configuration:</p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">    &lt;aspects&gt;
+<pre class="code-java">
+    &lt;aspects&gt;
         &lt;aspect name=<span class="code-quote">"Artifact Browser"</span> path=<span class="code-quote">"resource:<span class="code-comment">//aspects/ArtifactBrowser/"</span> /&gt;
 </span>        &lt;aspect name=<span class="code-quote">"Administration"</span>	path=<span class="code-quote">"resource:<span class="code-comment">//aspects/Administrative/"</span> /&gt;
 </span>        &lt;aspect name=<span class="code-quote">"E-Person"</span> path=<span class="code-quote">"resource:<span class="code-comment">//aspects/EPerson/"</span>	/&gt;
@@ -275,7 +276,8 @@ div.rbtoc1292428718703 li {margin-left: 0px;padding-left: 0px;}
 	<li><b>handle</b> (<em>either regex and/or handle is required</em>)The handle attribute determines which community, collection, or item the theme should apply to.<br/>
 If you use the "handle" attribute, the effect is cascading, meaning if a rule is established for a community then all collections and items within that community will also have this theme apply to them as well. Here is an example configuration:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">    &lt;themes&gt;
+<pre class="code-java">
+    &lt;themes&gt;
         &lt;theme name=<span class="code-quote">"Theme 1"</span> handle=<span class="code-quote">"123456789/23"</span> path=<span class="code-quote">"theme1/"</span>/&gt;
         &lt;theme name=<span class="code-quote">"Theme 2"</span> regex=<span class="code-quote">"community-list"</span>	path=<span class="code-quote">"theme2/"</span>/&gt;
         &lt;theme name=<span class="code-quote">"Reference Theme"</span> regex=<span class="code-quote">".*"</span> path=<span class="code-quote">"Reference/"</span>/&gt;
@@ -314,7 +316,8 @@ Most theme developers do not create a new theme from scratch; instead they start
 <b>2) Modify theme variables</b><br/>
 The next step is to modify the theme's parameters so that the theme knows where it is located. Open the <em>[your theme's directory]/sitemap.xmap</em> and look for <em>&lt;global-variables&gt;</em></p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">    &lt;global-variables&gt;
+<pre class="code-java">
+    &lt;global-variables&gt;
         &lt;theme-path&gt;[your theme's 	directory]&lt;/theme-path&gt;
         &lt;theme-name&gt;[your theme's name]&lt;/theme-name&gt;
     &lt;/global-variables&gt;</pre>
@@ -327,7 +330,7 @@ The base theme template will produce a repository interface without any style - 
 
 <p><em>[your theme's directory]/lib/style-ie.css</em> (Specific stylesheet used for internet explorer)<br/>
 <b>4) Install theme and rebuild DSpace</b><br/>
-Next rebuild and deploy Dspace (replace &lt;version&gt; with the your current release):</p>
+Next rebuild and deploy DSpace (replace &lt;version&gt; with the your current release):</p>
 
 <ol>
 	<li>Rebuild the DSpace installation package by running the following command from your <em>[dspace-source]/dspace/</em> directory:
@@ -379,7 +382,8 @@ This will ensure the theme has been installed as described in the previous secti
 </div></div>
 <p>Example 2: all text replaced by references to localizable message keys:</p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">&lt;document&gt;
+<pre class="code-java">
+&lt;document&gt;
       &lt;body&gt;
         &lt;div id=<span class="code-quote">"file.news.div.news"</span> n=<span class="code-quote">"news"</span> rend=<span class="code-quote">"primary"</span>&gt;
           &lt;head&gt;&lt;i18n:text&gt;myuni.repo.title&lt;/i18n:text&gt;&lt;/head&gt;
@@ -408,7 +412,8 @@ This will ensure the theme has been installed as described in the previous secti
 
 <p>Any static HTML content you add to this directory may also reference static content (e.g. CSS, Javascript, Images, etc.) from the same <em>[dspace-source]/dspace/modules/xmlui/src/main/webapp/static/</em> directory. You may reference other static content from your static HTML files similar to the following:</p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">  &lt;link href=<span class="code-quote">"./<span class="code-keyword">static</span>/mystyle.css"</span> rel=<span class="code-quote">"stylesheet"</span> type=<span class="code-quote">"text/css"</span>/&gt;
+<pre class="code-java">
+  &lt;link href=<span class="code-quote">"./<span class="code-keyword">static</span>/mystyle.css"</span> rel=<span class="code-quote">"stylesheet"</span> type=<span class="code-quote">"text/css"</span>/&gt;
   &lt;img src=<span class="code-quote">"./<span class="code-keyword">static</span>/images/<span class="code-keyword">static</span>-image.gif"</span> alt=<span class="code-quote">"Static image in /<span class="code-keyword">static</span>/images/ directory"</span>/&gt;
   &lt;img src=<span class="code-quote">"./<span class="code-keyword">static</span>/<span class="code-keyword">static</span>-image.jpg"</span> alt=<span class="code-quote">"Static image in /<span class="code-keyword">static</span>/ directory"</span>/&gt; </pre>
 </div></div>
@@ -431,14 +436,14 @@ This will ensure the theme has been installed as described in the previous secti
 		<li>Click the Test Settings button will verify the settings supplied in the previous steps and will usually let you know what, if anything is missing or does not match up.</li>
 	</ul>
 	</li>
-	<li>The list of radio buttons labeled "Content being harvested" allows you to select the harvest level.  The first one requires no OAI-ORE support on the part of the provider and can be used to harvest metadata from any provider compliant with the OAI-PMH 2.0 specifications.  The middle options will harvest the metadata and generate links to bitstreams stored remotely, while the last one will perform full local replication.Select the middle option and click Save<br/>
+	<li>The list of radio buttons labeled "Content being harvested" allows you to select the harvest level.  The first one requires no OAI-ORE support on the part of the provider and can be used to harvest metadata from any provider compliant with the OAI-PMH 2.0 specifications.  The middle options will harvest the metadata and generate links to bitstreams stored remotely, while the last one will perform full local replication. Select the middle option and click Save<br/>
 At this point the settings are saved and the menu changes to provide three options:</li>
 </ol>
 
 
 <ul>
 	<li>"Change Settings" takes you back to the edit screen.</li>
-	<li>"Import Now" performs a single harvest from the remote collection  into the local one.  Success, notes, and errors encountered in the process will be reflected in the "Last Harvest Result" entry.  More detailed information is available in the dspace log.  Note that the whole harvest cycle is execuited withtin a single HTTP request and will time out for large collections.  For this reason, it is advisable to use the automatic harvest scheduler set up<br/>
+	<li>"Import Now" performs a single harvest from the remote collection  into the local one.  Success, notes, and errors encountered in the process will be reflected in the "Last Harvest Result" entry.  More detailed information is available in the DSpace log.  Note that the whole harvest cycle is executed within a single HTTP request and will time out for large collections.  For this reason, it is advisable to use the automatic harvest scheduler set up<br/>
 either in XMLUI or from the command line.  If the scheduler is running, "Import Now" will handle the harvest task as a separate thread.</li>
 	<li>"Reset and Reimport Collection" will perform the same function as "Import Now", but will clear the collection of all existing items before doing so.</li>
 </ul>
@@ -485,7 +490,7 @@ either in XMLUI or from the command line.  If the scheduler is running, "Import 
 				<td height="12" background="https://wiki.duraspace.org/images/border/border_bottom.gif"><img src="images/border/spacer.gif" width="1" height="1" border="0"/></td>
 			</tr>
 		    <tr>
-			    <td align="center"><font color="grey">Document generated by Confluence on Dec 16, 2010 11:47</font></td>
+			    <td align="center"><font color="grey">Document generated by Confluence on Mar 25, 2011 19:21</font></td>
 		    </tr>
 	    </table>
     </body>

@@ -16,14 +16,38 @@
                                                     </span>
 				    </div>
 				    <div class="pagesubheading">
-					    This page last changed on Dec 16, 2010 by <font color="#0050B2">tdonohue</font>.
+					    This page last changed on Mar 25, 2011 by <font color="#0050B2">peterdietz</font>.
 				    </div>
 
 				    <div class='panelMacro'><table class='infoMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="images/icons/emoticons/information.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Online Version of Documentation also available</b><br />This documentation was produced with <a href="http://www.atlassian.com/software/confluence/">Confluence</a> software. HTML and PDF versions were generated directly from Confluence.  An online, updated version of this Documentation is also available at: <a href="https://wiki.duraspace.org/display/DSDOC">https://wiki.duraspace.org/display/DSDOC</a></td></tr></table></div>
 
 <h1><a name="Preface-Preface"></a>Preface</h1>
 
-<p>Welcome to Release 1.7.0! The committers have volunteered many hours to fix, re-write and contribute new software code for this release. Documentation has also been updated. </p>
+<p>Welcome to Release 1.7.1&#33; The committers have volunteered many hours to fix, re-write and contribute new software code for this release. Documentation has also been updated. The 1.7.1 bug fix release includes all the new features of 1.7.0 but fixes many known issues discovered since the release of 1.7.0.</p>
+
+
+<p>Bug Fixes in 1.7.1 include (but not exhaustive):</p>
+<ul>
+	<li>DS-858 Multicore SOLR needs to prevent remote access to solr cores</li>
+	<li>DS-785 SWORD deposits fail when ingest events are fired if Discovery event consumer is configured</li>
+	<li>DS-806 Item.match() incorrect logic for schema testing</li>
+	<li>DS-823 DatabaseManager is no longer Oracle compliant</li>
+	<li>DS-821 AbstractMETSIngester creates an item before adding descriptive metadata</li>
+	<li>DS-776 Collection admin cannot add bitstreams unless there is at least one bundle</li>
+	<li>DS-853 MetadataExposure settings for dc.description.provenance are ignored/overridden by XMLUI templates</li>
+	<li>DS-435 "My Exports" displayed in navigation bar, when no user is logged in</li>
+	<li>DS-789 HTTPS renders with errors due to hardcoded HTTP link in xmlui theme</li>
+	<li>DS-620 Exceeding maximum file size limit while uploading files to lead to friendly error page</li>
+</ul>
+
+
+<p>Improvements in 1.7.1 include (but not exhaustive):</p>
+<ul>
+	<li>DS-840 Add Ability to create Top Level Community at the home page</li>
+	<li>DS-839 Adding Field to Choice Authority to allow Authorities to be able to know field being required</li>
+	<li>DS-828 Enable "restore mode" ingestion via sword</li>
+</ul>
+
 
 <p>The following is a list of the new features included for release 1.7.0 (not an exhaustive list):</p>
 
@@ -41,9 +65,9 @@
 
 <p>A full list of all changes / bug fixes in 1.7.0 is available in the <a href="History.html" title="History">History</a> section.</p>
 
-<p>The following people have contributed directly to this release of DSpace: @mire, Andrea Bollini, Andrea Schweer, Andreas Schwander, Andrew Hankinson, Andrew Taylor, Antero Neto, Ben Bosman, Bill Hays, BioMed Central, Caryn Neiswender, Christophe Dupriez, Claudia Jürgen, Enovation Solutions, Erick Rocha Fonseca, Flávio Botelho, Gabriela Mircea, Gareth Waller, Graham Triggs, Hardy Pottinger, Ivan Masár, Jason Stirnaman, Jeffrey Trimble, Keiji Suzuki, Keith Gilbertson, Kevin Van de Velde, Kim Shepherd, Mark Diggory, Mark H. Wood, Marvin Pollard, Michael B. Klein, Nicholas Riley, Nick Nicholas, OhioLINK, Oleksandr Sytnyk, Pere Villega, Peter Dietz, Reinhard Engels, Richard Rodgers, Robin Taylor, Sands Fish, Sarah Shreeves, Scott Phillips, Simon Brown, Stuart Lewis, Tim Donohue, Vladislav Zhivkov, Yin Yin Latt.  Many of them could not do this work without the support (release time and financial) of their associated institutions. We offer thanks to those institutions for supporting their staff to take time to contribute to the DSpace project.</p>
+<p>The following people have contributed directly to this release of DSpace: @mire, Andrea Bollini, Andrea Schweer, Andreas Schwander, Andrew Hankinson, Andrew Taylor, Antero Neto, Ben Bosman, Bill Hays, BioMed Central, Bram Luyten, Caryn Neiswender, Christophe Dupriez, Claudia Jürgen, Enovation Solutions, Erick Rocha Fonseca, Flávio Botelho, Gabriela Mircea, Gareth Waller, Graham Triggs, Hardy Pottinger, Ivan Masár, Jason Stirnaman, Jeffrey Trimble, Keiji Suzuki, Keith Gilbertson, Kevin Van de Velde, Kim Shepherd, Mark Diggory, Mark H. Wood, Marvin Pollard, Michael B. Klein, Nicholas Riley, Nick Nicholas, OhioLINK, Oleksandr Sytnyk, Pere Villega, Peter Dietz, Reinhard Engels, Richard Rodgers, Robin Taylor, Sands Fish, Sarah Shreeves, Scott Phillips, Simon Brown, Stuart Lewis, Tim Donohue, Vladislav Zhivkov, Yin Yin Latt.  Many of them could not do this work without the support (release time and financial) of their associated institutions. We offer thanks to those institutions for supporting their staff to take time to contribute to the DSpace project.</p>
 
-<p>We apologize to any contributor accidentally left off this list. DSpace has such a large, active development community that we sometimes lose track of all our contributors. Our ongoing list of all known people/institutions that have contributed to DSpace software can be found on our <a href="https://wiki.duraspace.org/display/DSPACE/DSpaceContributors" title="DSpaceContributors">DSpace Contributors page</a>. Acknowledgements to those left off will be made in future releases.  Want to make sure you make it on the short list of contributors?  All you have to do is report an issue, fix a bug or help us determine the necessary requirements for a new feature!  Visit our <a href="https://jira.duraspace.org/browse/DS">Issue Tracker</a> to take part and get your name on the list of DSpace Contributors!</p>
+<p>We apologize to any contributor accidentally left off this list. DSpace has such a large, active development community that we sometimes lose track of all our contributors. Our ongoing list of all known people/institutions that have contributed to DSpace software can be found on our <a href="https://wiki.duraspace.org/display/DSPACE/DSpaceContributors" title="DSpaceContributors">DSpace Contributors page</a>. Acknowledgements to those left off will be made in future releases.  Want to make sure you make it on the short list of contributors?  All you have to do is report an issue, fix a bug or help us determine the necessary requirements for a new feature&#33;  Visit our <a href="https://jira.duraspace.org/browse/DS">Issue Tracker</a> to take part and get your name on the list of DSpace Contributors&#33;</p>
 
 <p>The Documentation Gardener for this release was Jeffrey Trimble with input from everyone. &nbsp;All typos are his fault.</p>
 
@@ -60,7 +84,7 @@
 				<td height="12" background="https://wiki.duraspace.org/images/border/border_bottom.gif"><img src="images/border/spacer.gif" width="1" height="1" border="0"/></td>
 			</tr>
 		    <tr>
-			    <td align="center"><font color="grey">Document generated by Confluence on Dec 16, 2010 11:47</font></td>
+			    <td align="center"><font color="grey">Document generated by Confluence on Mar 25, 2011 19:21</font></td>
 		    </tr>
 	    </table>
     </body>

@@ -549,7 +549,7 @@
 	<schema>dc</schema>
     <element>subject</element>
     <qualifier>mesh</qualifier>
-    <scope_note>Medical Subject Headings</scope_note>
+    <scope_note>MEdical Subject Headings</scope_note>
   </dc-type>
 
   <dc-type>
@@ -592,7 +592,7 @@
   </dc-schema>
 
   <dc-type>
-	<schema>test</schema>
+    <schema>test</schema>
     <element>type</element>
     <!-- unqualified -->
     <scope_note>A second test schema type element.</scope_note>

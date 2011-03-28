@@ -73,22 +73,22 @@ public class ItemImport
 {
     private static final Logger log = Logger.getLogger(ItemImport.class);
 
-    private static boolean useWorkflow = false;
+    static boolean useWorkflow = false;
 
-    private static boolean useWorkflowSendEmail = false;
+    static boolean useWorkflowSendEmail = false;
 
-    private static boolean isTest = false;
+    static boolean isTest = false;
 
-    private static boolean isResume = false;
+    static boolean isResume = false;
 
-    private static boolean isQuiet = false;
+    static boolean isQuiet = false;
+    
+    static boolean template = false;
 
-    private static boolean template = false;
-
-    private static PrintWriter mapOut = null;
+    static PrintWriter mapOut = null;
 
     // File listing filter to look for metadata files
-    private static FilenameFilter metadataFileFilter = new FilenameFilter()
+    static FilenameFilter metadataFileFilter = new FilenameFilter()
     {
         public boolean accept(File dir, String n)
         {
@@ -97,7 +97,7 @@ public class ItemImport
     };
 
     // File listing filter to check for folders
-    private static FilenameFilter directoryFilter = new FilenameFilter()
+    static FilenameFilter directoryFilter = new FilenameFilter()
     {
         public boolean accept(File dir, String n)
         {
@@ -447,10 +447,10 @@ public class ItemImport
                 {
                     ZipFile zf = new ZipFile(zipfilename);
                     ZipEntry entry;
-                    Enumeration<? extends ZipEntry> entries = zf.entries();
+                    Enumeration entries = zf.entries();
                     while (entries.hasMoreElements())
                     {
-                        entry = entries.nextElement();
+                        entry = (ZipEntry)entries.nextElement();
                         if (entry.isDirectory())
                         {
                             if (!new File(ziptempdir + entry.getName()).mkdir())
@@ -490,7 +490,7 @@ public class ItemImport
                     }
                 }
 
-                c.turnOffAuthorisationSystem();
+                c.setIgnoreAuthorization(true);
 
                 if ("add".equals(command))
                 {
@@ -595,7 +595,7 @@ public class ItemImport
         // open and process the source directory
         File d = new java.io.File(sourceDir);
 
-        if (d == null || !d.isDirectory())
+        if (d == null)
         {
             System.out.println("Error, cannot open source directory " + sourceDir);
             System.exit(1);
@@ -626,7 +626,7 @@ public class ItemImport
         // verify the source directory
         File d = new java.io.File(sourceDir);
 
-        if (d == null || !d.isDirectory())
+        if (d == null)
         {
             System.out.println("Error, cannot open source directory "
                     + sourceDir);
@@ -693,7 +693,7 @@ public class ItemImport
         Map<String, String> myhash = readMapFile(mapFile);
 
         // now delete everything that appeared in the mapFile
-        Iterator<String> i = myhash.keySet().iterator();
+        Iterator i = myhash.keySet().iterator();
 
         while (i.hasNext())
         {
@@ -717,11 +717,9 @@ public class ItemImport
     }
 
     /**
-     * item? try and add it to the archive.
-     * @param mycollections - add item to these Collections.
-     * @param path - directory containing the item directories.
-     * @param itemname handle - non-null means we have a pre-defined handle already 
-     * @param mapOut - mapfile we're writing
+     * item? try and add it to the archive c mycollection path itemname handle -
+     * non-null means we have a pre-defined handle already mapOut - mapfile
+     * we're writing
      */
     private Item addItem(Context c, Collection[] mycollections, String path,
             String itemname, PrintWriter mapOut, boolean template) throws Exception

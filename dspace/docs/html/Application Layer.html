@@ -16,7 +16,7 @@
                                                     </span>
 				    </div>
 				    <div class="pagesubheading">
-					    This page last changed on Dec 15, 2010 by <font color="#0050B2">tdonohue</font>.
+					    This page last changed on Feb 17, 2011 by <font color="#0050B2">helix84</font>.
 				    </div>
 
 				    <h1><a name="ApplicationLayer-SystemArchitecture%3AApplicationLayer"></a>System Architecture: Application Layer</h1>
@@ -24,11 +24,11 @@
 <p>The following explains how the application layer is built and used.</p>
 
 <style type='text/css'>/*<![CDATA[*/
-div.rbtoc1292448187896 {margin-left: 0px;padding: 0px;}
-div.rbtoc1292448187896 ul {list-style: none;margin-left: 0px;}
-div.rbtoc1292448187896 li {margin-left: 0px;padding-left: 0px;}
+div.rbtoc1297951722587 {margin-left: 0px;padding: 0px;}
+div.rbtoc1297951722587 ul {list-style: none;margin-left: 0px;}
+div.rbtoc1297951722587 li {margin-left: 0px;padding-left: 0px;}
 
-/*]]>*/</style><div class='rbtoc1292448187896'>
+/*]]>*/</style><div class='rbtoc1297951722587'>
 <ul>
     <li><span class='TOCOutline'>1</span> <a href='#ApplicationLayer-WebUserInterface'>Web User Interface</a></li>
 <ul>
@@ -198,7 +198,7 @@ The <em>org.dspace.app.webui.servlet.LoadDSpaceConfig</em> servlet is always loa
 	<li><b><em>sidebar</em></b>: Can only be used inside a <em>layout</em> tag, and can only be used once per JSP. The content between the start and end <em>sidebar</em> tags is rendered in a column on the right-hand side of the HTML page. The contents can contain further JSP tags and Java 'scriptlets'.</li>
 	<li><b><em>date</em></b>: Displays the date represented by an <em>org.dspace.content.DCDate</em> object. Just the one representation of date is rendered currently, but this could use the user's browser preferences to display a localized date in the future.</li>
 	<li><b><em>include</em></b>: Obsolete, simple tag, similar to <em>jsp:include</em>. In versions prior to DSpace 1.2, this tag would use the locally modified version of a JSP if one was installed in jsp/local. As of 1.2, the build process now performs this function, however this tag is left in for backwards compatibility.</li>
-	<li><b><em>item</em></b>: Displays an item record, including Dublin Core metadata and links to the bitstreams within it. Note that the displaying of the bitstream links is simplistic, and does not take into account any of the bundling structure. This is because DSpace does not have a fully-fledged dissemination architectural piece yet.Displaying an item record is done by a tag rather than a JSP for two reasons: Firstly, it happens in several places (when verifying an item record during submission or workflow review, as well as during standard item accesses), and secondly, displaying the item turns out to be mostly code-work rather than HTML anyway. Of course, the disadvantage of doing it this way is that it is slightly harder to customize exactly what is displayed from an item record; it is necessary to edit the tag code (<em>org.dspace.app.webui.jsptag.ItemTag</em>). Hopefully a better solution can be found in the future.</li>
+	<li><b><em>item</em></b>: Displays an item record, including Dublin Core metadata and links to the bitstreams within it. Note that the displaying of the bitstream links is simplistic, and does not take into account any of the bundling structure. This is because DSpace does not have a fully-fledged dissemination architectural piece yet. Displaying an item record is done by a tag rather than a JSP for two reasons: Firstly, it happens in several places (when verifying an item record during submission or workflow review, as well as during standard item accesses), and secondly, displaying the item turns out to be mostly code-work rather than HTML anyway. Of course, the disadvantage of doing it this way is that it is slightly harder to customize exactly what is displayed from an item record; it is necessary to edit the tag code (<em>org.dspace.app.webui.jsptag.ItemTag</em>). Hopefully a better solution can be found in the future.</li>
 	<li><b><em>itemlist</em></b><b>,</b> <b><em>collectionlist</em></b><b>,</b> <b><em>communitylist</em></b>: These tags display ordered sequences of items, collections and communities, showing minimal information but including a link to the page containing full details. These need to be used in HTML tables.</li>
 	<li><b><em>popup</em></b>: This tag is used to render a link to a pop-up page (typically a help page.) If Javascript is available, the link will either open or pop to the front any existing DSpace pop-up window. If Javascript is not available, a standard HTML link is displayed that renders the link destination in a window named '<em>dspace.popup</em>'. In graphical browsers, this usually opens a new window or re-uses an existing window of that name, but if a window is re-used it is not 'raised' which might confuse the user. In text browsers, following this link will simply replace the current page with the destination of the link. This obviously means that Javascript offers the best functionality, but other browsers are still supported.</li>
 	<li><b><em>selecteperson</em></b>: A tag which produces a widget analogous to HTML <em>&lt;SELECT&gt;</em>, that allows a user to select one or multiple e-people from a pop-up list.</li>
@@ -244,7 +244,7 @@ The <em>org.dspace.app.webui.servlet.LoadDSpaceConfig</em> servlet is always loa
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">jsp.search.results.text = Results {0}-{1} of {2} </pre>
 </div></div>
-<p>Introducing number parameters that should be formatted according to the locale used makes no difference in the message key compared to atring parameters:</p>
+<p>Introducing number parameters that should be formatted according to the locale used makes no difference in the message key compared to string parameters:</p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">jsp.submit.show-uploaded-file.size-in-bytes = {0} bytes</pre>
 </div></div>
@@ -343,7 +343,7 @@ figure6.gif</pre>
 </div></div>
 <p>The HTML document servlet can work out which item the user is looking at, and then which Bitstream in it is called <em>figure1.gif</em>, and serve up that bitstream. Similar for following links to other HTML pages. Of course all the links and image references have to be relative and not absolute.</p>
 
-<p>HTML documents must be "self-contained", as explained here. Provided that full path information is known by DSpace, any depth or complexity of HTML document can be served subject to those contraints. This is usually possible with some kind of batch import. If, however, the document has been uploaded one file at a time using the Web UI, the path information has been stripped. The system can cope with relative links that refer to a deeper path, e.g.</p>
+<p>HTML documents must be "self-contained", as explained here. Provided that full path information is known by DSpace, any depth or complexity of HTML document can be served subject to those constraints. This is usually possible with some kind of batch import. If, however, the document has been uploaded one file at a time using the Web UI, the path information has been stripped. The system can cope with relative links that refer to a deeper path, e.g.</p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">&lt;IMG SRC=<span class="code-quote">"images/figure1.gif"</span>&gt;</pre>
 </div></div>
@@ -520,7 +520,7 @@ programming or wish to customize the code at any time.</p>
 <p><em>launcher.xml</em> is made of several components:</p>
 
 <ul>
-	<li><em>&lt;command&gt;</em> begins the stanza for a comand</li>
+	<li><em>&lt;command&gt;</em> begins the stanza for a command</li>
 	<li><em>&lt;name&gt;</em>_<em>name of command</em>_<em>&lt;/name&gt;</em> the name of the command that you would use.</li>
 	<li><em>&lt;description&gt;</em>_<em>the description of the command</em>_<em>&lt;/description&gt;</em></li>
 	<li><em>&lt;step&gt;  &lt;/step&gt;</em> User arguments are parsed and tested.</li>
@@ -571,7 +571,7 @@ Prior to release 1.5 if one wanted to regenerate the browse index, one would hav
 				<td height="12" background="https://wiki.duraspace.org/images/border/border_bottom.gif"><img src="images/border/spacer.gif" width="1" height="1" border="0"/></td>
 			</tr>
 		    <tr>
-			    <td align="center"><font color="grey">Document generated by Confluence on Dec 16, 2010 11:47</font></td>
+			    <td align="center"><font color="grey">Document generated by Confluence on Mar 25, 2011 19:21</font></td>
 		    </tr>
 	    </table>
     </body>

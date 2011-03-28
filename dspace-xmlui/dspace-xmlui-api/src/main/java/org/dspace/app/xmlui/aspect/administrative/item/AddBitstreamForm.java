@@ -31,16 +31,16 @@ import org.dspace.core.Constants;
 import org.xml.sax.SAXException;
 
 /**
- * 
- * Show a form that allows the user to upload a new bitstream. The 
- * user can select the new bitstream's bundle (which is unchangable 
+ *
+ * Show a form that allows the user to upload a new bitstream. The
+ * user can select the new bitstream's bundle (which is unchangable
  * after upload) and a description for the file.
- * 
+ *
  * @author Scott Phillips
  */
 public class AddBitstreamForm extends AbstractDSpaceTransformer
 {
-	
+
 	/** Language strings */
 	private static final Message T_dspace_home = message("xmlui.general.dspace_home");
 	private static final Message T_submit_cancel = message("xmlui.general.cancel");
@@ -58,9 +58,9 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
 
 	private static final Message T_no_bundles = message("xmlui.administrative.item.AddBitstreamForm.no_bundles");
 
-	
+
 	private static final String DEFAULT_BUNDLE_LIST = "ORIGINAL, METADATA, THUMBNAIL, LICENSE, CC_LICENSE";
-		
+
 	public void addPageMeta(PageMeta pageMeta) throws WingException
 	{
             pageMeta.addMetadata("title").addContent(T_title);
@@ -141,13 +141,13 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
 
             div.addHidden("administrative-continue").setValue(knot.getId());
         }
-	
+
 	/**
-         * Add the bundleName to the list of bundles available to submit to. 
-         * Performs an authorization check that the current user has privileges 
+         * Add the bundleName to the list of bundles available to submit to.
+         * Performs an authorization check that the current user has privileges
          * @param item DSO item being evaluated
          * @param select DRI wing select box that is being added to
-         * @param bundleName 
+         * @param bundleName
          * @return boolean indicating whether user can upload to bundle
          * @throws SQLException
          * @throws WingException
@@ -182,5 +182,5 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
             select.addOption(bundleName, message("xmlui.administrative.item.AddBitstreamForm.bundle." + bundleName));
             return true;
         }
-	
+
 }

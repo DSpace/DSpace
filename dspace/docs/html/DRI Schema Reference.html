@@ -16,7 +16,7 @@
                                                     </span>
 				    </div>
 				    <div class="pagesubheading">
-					    This page last changed on Dec 15, 2010 by <font color="#0050B2">tdonohue</font>.
+					    This page last changed on Feb 17, 2011 by <font color="#0050B2">helix84</font>.
 				    </div>
 
 				    <h1><a name="DRISchemaReference-DSpaceSystemDocumentation%3ADRISchemaReference"></a>DSpace System Documentation: DRI Schema Reference</h1>
@@ -25,11 +25,11 @@
 
 <p><b>Table of Contents:</b></p>
 <style type='text/css'>/*<![CDATA[*/
-div.rbtoc1292436648637 {margin-left: 0px;padding: 0px;}
-div.rbtoc1292436648637 ul {list-style: none;margin-left: 0px;}
-div.rbtoc1292436648637 li {margin-left: 0px;padding-left: 0px;}
+div.rbtoc1297952110371 {margin-left: 0px;padding: 0px;}
+div.rbtoc1297952110371 ul {list-style: none;margin-left: 0px;}
+div.rbtoc1297952110371 li {margin-left: 0px;padding-left: 0px;}
 
-/*]]>*/</style><div class='rbtoc1292436648637'>
+/*]]>*/</style><div class='rbtoc1297952110371'>
 <ul>
     <li><span class='TOCOutline'>1</span> <a href='#DRISchemaReference-Introduction'>Introduction</a></li>
 <ul>
@@ -104,7 +104,7 @@ div.rbtoc1292436648637 li {margin-left: 0px;padding-left: 0px;}
 
 <p>The DRI schema was developed for use in Manakin. The choice to develop our own schema rather than adapt an existing one came after a careful analysis of the schema's purpose as well as the lessons learned from earlier attempts at customizing the DSpace interface. Since every DSpace page in Manakin exists as an XML Document at some point in the process, the schema describing that Document had to be able to structurally represent all content, metadata and relationships between different parts of a DSpace page. It had to be precise enough to avoid losing any structural information, and yet generic enough to allow Themes a certain degree of freedom in expressing that information in a readable format.</p>
 
-<p>Popular schemas such as XHTML suffer from the problem of not relating elements together explicitly. For example, if a heading precedes a paragraph, the heading is related to the paragraph not because it is encoded as such but because it happens to precede it. When these structures are attempted to be translated into formats where these types of relationships are explicit, the translation becomes tedious, and potentially problematic. More structured schemas, like TEI or Docbook, are domain specific (much like DRI itself) and therefore not suitable for our purposes.</p>
+<p>Popular schemas such as XHTML suffer from the problem of not relating elements together explicitly. For example, if a heading precedes a paragraph, the heading is related to the paragraph not because it is encoded as such but because it happens to precede it. When these structures are attempted to be translated into formats where these types of relationships are explicit, the translation becomes tedious, and potentially problematic. More structured schemas, like TEI or DocBook, are domain specific (much like DRI itself) and therefore not suitable for our purposes.</p>
 
 <p>We also decided that the schema should natively support a metadata standard for encoding artifacts. Rather than encoding artifact metadata in structural elements, like tables or lists, the schema would include artifacts as objects encoded in a particular standard. The inclusion of metadata in native format would enable the Theme to choose the best method to render the artifact for display without being tied to a particular structure.</p>
 
@@ -199,7 +199,7 @@ div.rbtoc1292436648637 li {margin-left: 0px;padding-left: 0px;}
 
 <h3><a name="DRISchemaReference-Changesfrom1.0to1.1"></a>Changes from 1.0 to 1.1</h3>
 
-<p>There were major structural changes between these two version numbers. Several elements were removed from the schema:<em>includeSet</em>, <em>include</em>, <em>objectMeta</em>, and <em>object</em>. Originally all metadata for objects were included in-line with the DRI document, this proved to have several problems and has been removed in version 1.1 of the DRI schema. Instead of including metadata in-line, external references to the metadata is included. Thus, a <em>reference</em> element has been added along with <em>referenceSet</em>. These new elements operate like their counterparts in the previous version except refrencing metadata contained on the <em>objectMeta</em> element they reference metadata in external files. The <em>repository</em> and <em>repositoryMeta</em> elements were alse modified in a similar mannor removing in-line metadata and refrencing external metadata documents.</p>
+<p>There were major structural changes between these two version numbers. Several elements were removed from the schema:<em>includeSet</em>, <em>include</em>, <em>objectMeta</em>, and <em>object</em>. Originally all metadata for objects were included in-line with the DRI document, this proved to have several problems and has been removed in version 1.1 of the DRI schema. Instead of including metadata in-line, external references to the metadata is included. Thus, a <em>reference</em> element has been added along with <em>referenceSet</em>. These new elements operate like their counterparts in the previous version except refrencing metadata contained on the <em>objectMeta</em> element they reference metadata in external files. The <em>repository</em> and <em>repositoryMeta</em> elements were alse modified in a similar manner removing in-line metadata and refrencing external metadata documents.</p>
 
 
 
@@ -1751,7 +1751,7 @@ Example needed.
 
      &lt;pageMeta&gt;
 
-        &lt;metadata element=<span class="code-quote">"title"</span>&gt;Examlpe DRI
+        &lt;metadata element=<span class="code-quote">"title"</span>&gt;Example DRI
 	page&lt;/metadata&gt;
 
         &lt;metadata
@@ -1799,7 +1799,7 @@ Example needed.
 	<li><b>cols</b>: (optional) The default number of columns that the text area should span. This applies only to textarea field types.</li>
 	<li><b>maxlength</b>: (optional) The maximum length that the theme should accept for form input. This applies to text and password field types.</li>
 	<li><b>multiple</b>: (optional) yes/no value. Determine if the field can accept multiple values for the field. This applies only to select lists.</li>
-	<li><b>operations</b>: (optional) The possible operations that may be preformed on this field. The possible values are "add" and/or "delete". If both operations are possible then they should be provided as a space separated list.The "add" operations indicates that there may be multiple values for this field and the user may add to the set one at a time. The front-end should render a button that enables the user to add more fields to the set. The button must be named the field name appended with the string "_add", thus if the field's name is "firstName" the button must be called "firstName_add".The "delete" operation indicates that there may be multiple values for this field each of which may be removed from the set. The front-end should render a checkbox by each field value, except for the first, The checkbox must be named the field name appended with the string "_selected", thus if the field's name is "firstName" the checkbox must be called "firstName_selected" and the value of each successive checkbox should be the field name. The front-end must also render a delete button. The delete button name must be the field's name appended with the string "_delete".</li>
+	<li><b>operations</b>: (optional) The possible operations that may be preformed on this field. The possible values are "add" and/or "delete". If both operations are possible then they should be provided as a space separated list. The "add" operations indicates that there may be multiple values for this field and the user may add to the set one at a time. The front-end should render a button that enables the user to add more fields to the set. The button must be named the field name appended with the string "_add", thus if the field's name is "firstName" the button must be called "firstName_add".The "delete" operation indicates that there may be multiple values for this field each of which may be removed from the set. The front-end should render a checkbox by each field value, except for the first, The checkbox must be named the field name appended with the string "_selected", thus if the field's name is "firstName" the checkbox must be called "firstName_selected" and the value of each successive checkbox should be the field name. The front-end must also render a delete button. The delete button name must be the field's name appended with the string "_delete".</li>
 	<li><b>rows</b>: (optional) The default number of rows that the text area should span. This applies only to textarea field types.</li>
 	<li><b>size</b>: (optional) The default size for a field. This applies to text, password, and select field types.</li>
 </ul>
@@ -1830,7 +1830,7 @@ Example needed.
 
 <p>Metadata Reference Element</p>
 
-<p><em>reference</em> is a reference element used to access information stored in an extarnal metadata file. The <em>url</em> attribute is used to locate the external metadata file. The <em>type</em> attribute provides a short limited description of the referenced object's type.</p>
+<p><em>reference</em> is a reference element used to access information stored in an external metadata file. The <em>url</em> attribute is used to locate the external metadata file. The <em>type</em> attribute provides a short limited description of the referenced object's type.</p>
 
 <p><em>reference</em> elements can be both contained by <em>includeSet</em> elements and contain <em>includeSets</em> themselves, making the structure recursive.</p>
 
@@ -1969,7 +1969,7 @@ Example needed.
 
 <p>Metadata Element</p>
 
-<p>The <em>repositoryMeta</em> element contains metadata refernces about the repositories used in the used or referenced in the document. It can contain any number of <em>repository</em> elements.</p>
+<p>The <em>repositoryMeta</em> element contains metadata references about the repositories used in the used or referenced in the document. It can contain any number of <em>repository</em> elements.</p>
 
 <p>See the <em>repository</em> tag entry for more information on the structure of <em>repository</em> elements.</p>
 
@@ -2169,7 +2169,7 @@ Example needed.
 <pre class="code-java">
 &lt;pageMeta&gt;
 
-    &lt;metadata element=<span class="code-quote">"title"</span>&gt;Examlpe DRI
+    &lt;metadata element=<span class="code-quote">"title"</span>&gt;Example DRI
 	page&lt;/metadata&gt;
 
     &lt;metadata
@@ -2353,10 +2353,7 @@ Example needed.
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">
 &lt;p&gt;
-
-     &lt;xref target=<span class="code-quote">"/url/link/target"</span>&gt;This text is shown as a
-	link.&lt;/xref&gt;
-
+     &lt;xref target=<span class="code-quote">"/url/link/target"</span>&gt;This text is shown as a link.&lt;/xref&gt;
 &lt;/p&gt;
 </pre>
 </div></div>
@@ -2383,7 +2380,7 @@ Example needed.
 				<td height="12" background="https://wiki.duraspace.org/images/border/border_bottom.gif"><img src="images/border/spacer.gif" width="1" height="1" border="0"/></td>
 			</tr>
 		    <tr>
-			    <td align="center"><font color="grey">Document generated by Confluence on Dec 16, 2010 11:47</font></td>
+			    <td align="center"><font color="grey">Document generated by Confluence on Mar 25, 2011 19:21</font></td>
 		    </tr>
 	    </table>
     </body>

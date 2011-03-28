@@ -16,24 +16,24 @@
                                                     </span>
 				    </div>
 				    <div class="pagesubheading">
-					    This page last changed on Dec 16, 2010 by <font color="#0050B2">tdonohue</font>.
+					    This page last changed on Mar 11, 2011 by <font color="#0050B2">stuartlewis</font>.
 				    </div>
 
 				    <h1><a name="Installation-DSpaceSystemDocumentation%3AInstallation"></a>DSpace System Documentation: Installation</h1>
 
 <style type='text/css'>/*<![CDATA[*/
-div.rbtoc1292516387159 {margin-left: 0px;padding: 0px;}
-div.rbtoc1292516387159 ul {list-style: none;margin-left: 0px;}
-div.rbtoc1292516387159 li {margin-left: 0px;padding-left: 0px;}
+div.rbtoc1299806510998 {margin-left: 0px;padding: 0px;}
+div.rbtoc1299806510998 ul {list-style: none;margin-left: 0px;}
+div.rbtoc1299806510998 li {margin-left: 0px;padding-left: 0px;}
 
-/*]]>*/</style><div class='rbtoc1292516387159'>
+/*]]>*/</style><div class='rbtoc1299806510998'>
 <ul>
     <li><span class='TOCOutline'>1</span> <a href='#Installation-FortheImpatient'>For the Impatient</a></li>
     <li><span class='TOCOutline'>2</span> <a href='#Installation-PrerequisiteSoftware'>Prerequisite Software</a></li>
 <ul>
     <li><span class='TOCOutline'>2.1</span> <a href='#Installation-UNIXlikeOSorMicrosoftWindows'>UNIX-like OS or Microsoft Windows</a></li>
     <li><span class='TOCOutline'>2.2</span> <a href='#Installation-OracleJavaJDK6orlater%28standardSDKisfine%2Cyoudon%27tneedJ2EE%29'>Oracle Java JDK 6 or later (standard SDK is fine, you don't need J2EE)</a></li>
-    <li><span class='TOCOutline'>2.3</span> <a href='#Installation-ApacheMaven2.0.8orlater%28Javabuildtool%29'>Apache Maven 2.0.8 or later (Java build tool)</a></li>
+    <li><span class='TOCOutline'>2.3</span> <a href='#Installation-ApacheMaven2.2.x%28Javabuildtool%29'>Apache Maven 2.2.x (Java build tool)</a></li>
 <ul>
     <li><span class='TOCOutline'>2.3.1</span> <a href='#Installation-ConfiguringaProxy'>Configuring a Proxy</a></li>
 </ul>
@@ -81,8 +81,7 @@ div.rbtoc1292516387159 li {margin-left: 0px;padding-left: 0px;}
 <div class='panelMacro'><table class='warningMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="images/icons/emoticons/forbidden.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td>Only experienced unix admins should even attempt the following without going to the detailed <a href="#Installation-InstallationInstructions">Installation Instructions</a></td></tr></table></div>
 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-useradd -m dspace
+<pre class="code-java">useradd -m dspace
 gunzip -c dspace-1.x-src-release.tar.gz | tar -xf -
 createuser -U postgres -d -A -P dspace
 createdb -U dspace -E UNICODE dspace
@@ -120,13 +119,17 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
 
 <p>Java can be downloaded from the following location: <a href="http://java.sun.com/javase/downloads/index.jsp">http://java.sun.com/javase/downloads/index.jsp</a></p>
 
+
 <p>Only Oracle's Java has been tested with each release and is known to work correctly. Other flavors of Java may pose problems.</p>
 
-<h3><a name="Installation-ApacheMaven2.0.8orlater%28Javabuildtool%29"></a>Apache Maven 2.0.8 or later (Java build tool)</h3>
+<h3><a name="Installation-ApacheMaven2.2.x%28Javabuildtool%29"></a>Apache Maven 2.2.x (Java build tool)</h3>
 
-<p>Maven is necessary in the first stage of the build process to assemble the installation package for your DSpace instance. It gives you the flexibility to customize DSpace using the exisitng Maven projects found in the <em>[dspace-source]/dspace/modules</em> directory or by adding in your own Maven project to build the installation package for DSpace, and apply any custom interface "overlay" changes.</p>
+<div class='panelMacro'><table class='noteMacro'><colgroup><col width='24'><col></colgroup><tr><td valign='top'><img src="images/icons/emoticons/warning.gif" width="16" height="16" align="absmiddle" alt="" border="0"></td><td><b>Known issue with Maven 2.0.x and Maven 3.x and DSpace 1.7.0</b><br />DSpace 1.7.0 does not build properly when using Maven 2.0.x or Maven 3.x.  This is a known issue. <b>The quick fix is to use Maven 2.2.x.</b> More information on this issue can be found in the following JIRA issue: <a href="https://jira.duraspace.org/browse/DS-788">DS-788</a>.</td></tr></table></div>
+
+<p>Maven is necessary in the first stage of the build process to assemble the installation package for your DSpace instance. It gives you the flexibility to customize DSpace using the existing Maven projects found in the <em>[dspace-source]/dspace/modules</em> directory or by adding in your own Maven project to build the installation package for DSpace, and apply any custom interface "overlay" changes.</p>
 
 <p>Maven can be downloaded from the following location: <a href="http://maven.apache.org/download.html">http://maven.apache.org/download.html</a></p>
+
 
 <h4><a name="Installation-ConfiguringaProxy"></a>Configuring a Proxy</h4>
 
@@ -161,6 +164,7 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
 <p>Ant can be downloaded from the following location: <a href="http://ant.apache.org/" title="http://ant.apache.org">http://ant.apache.org</a></p>
 
 
+
 <h3><a name="Installation-RelationalDatabase%3A%28PostgreSQLorOracle%29."></a>Relational Database: (PostgreSQL or Oracle).</h3>
 
 <ul>
@@ -183,8 +187,7 @@ cp -r [dspace]/webapps/* [tomcat]/webapps
 		<li>You need to ensure that Tomcat has a) enough memory to run DSpace and b) uses UTF-8 as its default file encoding for international character support. So ensure in your startup scripts (etc) that the following environment variable is set: <em>JAVA_OPTS="-Xmx512M &#45;Xms64M &#45;Dfile.encoding=UTF-8"</em></li>
 		<li><b>Modifications in</b> <b><em>[tomcat]/conf/server.xml</em></b>:  You also need to alter Tomcat's default configuration to support searching and browsing of multi-byte UTF-8 correctly. You need to add a configuration option to the <em>&lt;Connector&gt;</em> element in <em>[tomcat]/config/server.xml</em>: <em>URIEncoding="UTF-8"</em> e.g. if you're using the default Tomcat config, it should read:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-&lt;!-- Define a non-SSL HTTP/1.1 Connector on port 8080 --&gt;
+<pre class="code-java">&lt;!-- Define a non-SSL HTTP/1.1 Connector on port 8080 --&gt;
 &lt;Connector port=<span class="code-quote">"8080"</span>
               maxThreads=<span class="code-quote">"150"</span>
               minSpareThreads=<span class="code-quote">"25"</span>
@@ -299,7 +302,7 @@ For details on the contents of these separate directory trees, refer to director
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">bunzip2 dspace-1.7-release.tar.bz | tar -xf -</pre>
 </div></div>
-<p>For ease of reference, we will refer to the location of this unzipped version of the DSpace release as <em>[dspace-source]</em> in the remainder of these instructions.After unpacking the file, the user may which to change the ownership of the <em>dspace-1.6-release</em> to the 'dspace' user. (And you may need to change the group).</p></li>
+<p>For ease of reference, we will refer to the location of this unzipped version of the DSpace release as <em>[dspace-source]</em> in the remainder of these instructions. After unpacking the file, the user may which to change the ownership of the <em>dspace-1.6-release</em> to the 'dspace' user. (And you may need to change the group).</p></li>
 	</ol>
 	</li>
 	<li><b>Database Setup</b>
@@ -309,7 +312,8 @@ For details on the contents of these separate directory trees, refer to director
 			<li>A PostgreSQL JDBC driver is configured as part of the default DSpace build. You no longer need to copy any PostgreSQL jars to get PostgreSQL installed.</li>
 			<li>Create a <tt>dspace}}database, owned by the {{dspace</tt> PostgreSQL user <em>(you are still logged in at 'root')</em>:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">createuser -U postgres -d -A -P dspace ; createdb -U dspace -E UNICODE dspace</pre>
+<pre class="code-java">createuser -U postgres -d -A -P dspace 
+createdb -U dspace -E UNICODE dspace</pre>
 </div></div>
 <p>You will be prompted for a password for the DSpace database. (This isn't the same as the <em>dspace</em> user's UNIX password.)</p></li>
 		</ul>
@@ -318,14 +322,13 @@ For details on the contents of these separate directory trees, refer to director
 		<ul>
 			<li>Setting up oracle is a bit different now. You will need still need to get a Copy of the oracle JDBC driver, but instead of copying it into a lib directory you will need to install it into your local Maven repository. (You'll need to download it first from this location: <a href="http://www.oracle.com/technetwork/database/enterprise-edition/jdbc-112010-090769.html">http://www.oracle.com/technetwork/database/enterprise-edition/jdbc-112010-090769.html</a>)  Run the following command (all on one line)
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">mvn install:install-file -Dfile=ojdbc6.jar -DgroupId=com.oracle 
+<pre class="code-java">mvn install:install-file -Dfile=ojdbc6.jar -DgroupId=com.oracle
     -DartifactId=ojdbc6 -Dversion=11.2.0.2.0 -Dpackaging=jar -DgeneratePom=<span class="code-keyword">true</span></pre>
 </div></div></li>
 			<li>Create a database for DSpace. Make sure that the character set is one of the Unicode character sets. DSpace uses UTF-8 natively, and it is required that the Oracle database use the same character set. Create a user account for DSpace (e.g. <em>dspace</em>,) and ensure that it has permissions to add and remove tables in the database.</li>
 			<li>Edit the <em>[dspace-source]/dspace/config/dspace.cfg</em> database settings:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-db.name   = oracle
+<pre class="code-java">db.name   = oracle
 db.url    = jdbc:oracle:thin:@<span class="code-comment">//host:port/dspace
 </span>db.driver = oracle.jdbc.OracleDriver
 </pre>
@@ -526,8 +529,7 @@ ant fresh_install</pre>
 		<ul>
 			<li>Create a new key pair under the alias name <em>"tomcat"</em>. When generating your key, give the Distinguished Name fields the appropriate values for your server and institution. CN should be the fully-qualified domain name of your server host. Here is an example:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-$JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
+<pre class="code-java">$JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
 	1024 \
   -keystore $CATALINA_BASE/conf/keystore -storepass changeit
 	-validity 365 \
@@ -538,24 +540,21 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
 </div></div></li>
 			<li>Then, create a <em>CSR</em> (Certificate Signing Request) and send it to your Certifying Authority. They will send you back a signed Server Certificate. This example command creates a CSR in the file <em>tomcat.csr</em>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
- $JAVA_HOME/bin/keytool -keystore $CATALINA_BASE/conf/keystore
+<pre class="code-java"> $JAVA_HOME/bin/keytool -keystore $CATALINA_BASE/conf/keystore
 	-storepass changeit \
    -certreq -alias tomcat -v -file tomcat.csr
 </pre>
 </div></div></li>
 			<li>Before importing the signed certificate, you must have the CA's certificate in your keystore as a <em>trusted certificate</em>. Get their certificate, and import it with a command like this (for the example <em>mitCA.pem</em>):
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
- $JAVA_HOME/bin/keytool -keystore $CATALINA_BASE/conf/keystore
+<pre class="code-java"> $JAVA_HOME/bin/keytool -keystore $CATALINA_BASE/conf/keystore
 	-storepass changeit \
      -<span class="code-keyword">import</span> -alias mitCA -trustcacerts -file mitCA.pem
 </pre>
 </div></div></li>
 			<li>Finally, when you get the signed certificate from your CA, import it into the keystore with a command like the following example: (cert is in the file <em>signed-cert.pem</em>)
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
- $JAVA_HOME/bin/keytool -keystore $CATALINA_BASE/conf/keystore
+<pre class="code-java"> $JAVA_HOME/bin/keytool -keystore $CATALINA_BASE/conf/keystore
 	-storepass changeit \
      -<span class="code-keyword">import</span> -alias tomcat -trustcacerts -file signed-cert.pem
 </pre>
@@ -565,16 +564,14 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
 		</li>
 		<li>Create a Java keystore for your server with the password <em>changeit</em>, and install your server certificate under the alias <em>"tomcat"</em>. This assumes the certificate was put in the file <em>server.pem</em>:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
- $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keystore
+<pre class="code-java"> $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keystore
 	$CATALINA_BASE/conf/keystore -storepass changeit
 </pre>
 </div></div>
 <p>When answering the questions to identify the certificate, be sure to respond to "First and last name" with the fully-qualified domain name of your server (e.g. <em>test-dspace.myuni.edu</em>). The other questions are not important.</p></li>
 		<li>Optional &#8211; ONLY if you need to accept client certificates for the X.509 certificate stackable authentication module See the configuration section for instructions on enabling the X.509 authentication method. Load the keystore with the CA (certifying authority) certificates for the authorities of any clients whose certificates you wish to accept. For example, assuming the client CA certificate is in <em>client1.pem</em>:
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
- $JAVA_HOME/bin/keytool -<span class="code-keyword">import</span> -noprompt -storepass changeit
+<pre class="code-java"> $JAVA_HOME/bin/keytool -<span class="code-keyword">import</span> -noprompt -storepass changeit
 	-trustcacerts -keystore $CATALINA_BASE/conf/keystore  -alias client1
 	-file client1.pem
 </pre>
@@ -591,8 +588,7 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
 
 <p><b><em>If you are using X.509 Client Certificates for authentication:</em></b> add these configuration options to the appropriate <em>httpd</em> configuration file, e.g. <em>ssl.conf</em>, and be sure they are in force for the virtual host and namespace locations dedicated to DSpace:</p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-        ##  SSLVerifyClient can be <span class="code-quote">"optional"</span> or
+<pre class="code-java">        ##  SSLVerifyClient can be <span class="code-quote">"optional"</span> or
 	<span class="code-quote">"require"</span>
         SSLVerifyClient optional
         SSLVerifyDepth  10
@@ -616,7 +612,7 @@ $JAVA_HOME/bin/keytool -genkey -alias tomcat -keyalg RSA -keysize
 
 <ul>
 	<li>You don't <b>have</b> to use CNRI's Handle system. At the moment, you need to change the code a little to use something else (e.g PURLs) but that should change soon.</li>
-	<li>You'll notice that while you've been playing around with a test server, DSpace has apparently been creating handles for you looking like <em>hdl:123456789/24</em> and so forth. These aren't really Handles, since the global Handle system doesn't actually know about them, and lots of other DSpace test installs will have created the same IDs.They're only really Handles once you've registered a prefix with CNRI (see below) and have correctly set up the Handle server included in the DSpace distribution. This Handle server communicates with the rest of the global Handle infrastructure so that anyone that understands Handles can find the Handles your DSpace has created.<br/>
+	<li>You'll notice that while you've been playing around with a test server, DSpace has apparently been creating handles for you looking like <em>hdl:123456789/24</em> and so forth. These aren't really Handles, since the global Handle system doesn't actually know about them, and lots of other DSpace test installs will have created the same IDs. They're only really Handles once you've registered a prefix with CNRI (see below) and have correctly set up the Handle server included in the DSpace distribution. This Handle server communicates with the rest of the global Handle infrastructure so that anyone that understands Handles can find the Handles your DSpace has created.<br/>
 If you want to use the Handle system, you'll need to set up a Handle server. This is included with DSpace. Note that this is not required in order to evaluate DSpace; you only need one if you are running a production service. You'll need to obtain a Handle prefix from <a href="http://www.handle.net/" title="the central CNRI Handle site">the central CNRI Handle site</a>.</li>
 </ul>
 
@@ -624,7 +620,11 @@ If you want to use the Handle system, you'll need to set up a Handle server. Thi
 <p>A Handle server runs as a separate process that receives TCP requests from other Handle servers, and issues resolution requests to a global server or servers if a Handle entered locally does not correspond to some local content. The Handle protocol is based on TCP, so it will need to be installed on a server that can broadcast and receive TCP on port 2641.</p>
 
 <ol>
-	<li>To configure your DSpace installation to run the handle server, run the following command: <em>[dspace]/bin/dspace make-handle-config</em> Ensure that &#95;[dspace]/handle-server&#95; matches whatever you have in <em>dspace.cfg</em> for the <em>handle.dir</em> property.</li>
+	<li>To configure your DSpace installation to run the handle server, run the following command: 
+<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
+<pre class="code-java">[dspace]/bin/dspace make-handle-config [dspace]/handle-server</pre>
+</div></div>
+<p> Ensure that <em>[dspace]/handle-server</em> matches whatever you have in <em>dspace.cfg</em> for the <em>handle.dir</em> property.</p></li>
 	<li>Edit the resulting <em>[dspace]/handle-server/config.dct</em> file to include the following lines in the <em>"server_config"</em> clause: 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java"><span class="code-quote">"storage_type"</span> = <span class="code-quote">"CUSTOM"</span>
@@ -633,7 +633,7 @@ If you want to use the Handle system, you'll need to set up a Handle server. Thi
 </div></div>
 <p>This tells the Handle server to get information about individual Handles from the DSpace code.</p></li>
 	<li>Once the configuration file has been generated, you will need to go to <a href="http://hdl.handle.net/4263537/5014">http://hdl.handle.net/4263537/5014</a> to upload the generated sitebndl.zip file. The upload page will ask you for your contact information. An administrator will then create the naming authority/prefix on the root service (known as the Global Handle Registry), and notify you when this has been completed. You will not be able to continue the handle server installation until you receive further information concerning your naming authority.</li>
-	<li>When CNRI has sent you your naming authority prefix, you will need to edit the <em>config.dct</em> file. The file will be found in <em>/[dspace]/handle-server</em>. Look for <em>"300:0.NA/YOUR_NAMING_AUTHORITY"_Replace &#95;YOUR_NAMING_AUTHORITY</em> with the assigned naming authority prefix sent to you.</li>
+	<li>When CNRI has sent you your naming authority prefix, you will need to edit the <em>config.dct</em> file. The file will be found in <em>/[dspace]/handle-server</em>. Look for <em>"300:0.NA/YOUR_NAMING_AUTHORITY"</em>. Replace <em>YOUR_NAMING_AUTHORITY</em> with the assigned naming authority prefix sent to you.</li>
 	<li>Now start your handle server (as the dspace user): 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">[dspace]/bin/start-handle-server</pre>
@@ -679,8 +679,7 @@ HTML sitemaps follow the same procedure:</li>
 
 <p>You can generate the sitemaps automatically every day using an additional cron job:</p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-# Generate sitemaps
+<pre class="code-java"># Generate sitemaps
 
 
 0 6 * * * [dspace]/bin/generate-sitemaps
@@ -710,21 +709,12 @@ solr.spiderips.urls = http:<span class="code-comment">//iplists.com/google.txt, 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
 <pre class="code-java">useProxies = <span class="code-keyword">true</span></pre>
 </div></div></li>
-	<li><b>DSpace configuration for fields indexed into Solr Event records for search.</b> In the <em>dspace.cfg</em> file, review the following property keys to make sure they are uncommented:
-<div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">statistics.items.dc.1=dc.identifier
-statistics.items.dc.2=dc.date.accessioned
-statistics.items.type.1=dcinput
-statistics.items.type.2=date
-statistics.<span class="code-keyword">default</span>.start.datepick = 01/01/1977</pre>
-</div></div></li>
 	<li><b>Configuration Control.</b> In the <em>dspace.cfg</em> set the following property key:_statistics.item.authorization.admin=true_This will require the user to sign on to see that statistics. Setting the statistics to "false" will make them publicly available.</li>
 	<li>Final steps.
 	<ul>
 		<li>Perform the following step: 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-cd [dspace-source]/dspace
+<pre class="code-java">cd [dspace-source]/dspace
 mvn <span class="code-keyword">package</span>
 cd [dspace-source]/dspace/target/dspace-&lt;version&gt;-build.dir
 ant -Dconfig=[dspace]/config/dspace.cfg update
@@ -762,8 +752,7 @@ cp -R [dspace]/webapps/* [TOMCAT]/webapps
 	</li>
 	<li>Update paths in <em>[dspace-source]\dspace\config\dspace.cfg</em>. <b>Note:</b> Use forward slashes / for path separators, though you can still use drive letters, e.g.:_dspace.dir = C:/DSpace_Make sure you change all of the parameters with file paths to suit, specifically: 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-        dspace.dir
+<pre class="code-java">        dspace.dir
         config.template.log4j.properties
         config.template.log4j-handle-plugin.properties
         config.template.oaicat.properties
@@ -777,8 +766,7 @@ cp -R [dspace]/webapps/* [TOMCAT]/webapps
 	<li>Create the directory for the DSpace installation (e.g. <em>C:\DSpace</em>)</li>
 	<li>Generate the DSpace installation package by running the following from command line (cmd) from your <em>[dspace-source]/dspace/</em> directory: 
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-mvn <span class="code-keyword">package</span>
+<pre class="code-java">mvn <span class="code-keyword">package</span>
 </pre>
 </div></div>
 	<ul>
@@ -805,8 +793,7 @@ mvn <span class="code-keyword">package</span>
 	<ul>
 		<li>Alternatively, Tell your Tomcat installation where to find your DSpace web application(s). As an example, in the <em>&lt;Host&gt;</em> section of your <em>[tomcat]/conf/server.xml</em> you could add lines similar to the following (but replace <em>[dspace]</em> with your installation location):
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-&lt;!-- DEFINE A CONTEXT PATH FOR DSpace JSP User Interface  --&gt;
+<pre class="code-java">&lt;!-- DEFINE A CONTEXT PATH FOR DSpace JSP User Interface  --&gt;
 &lt;Context path=<span class="code-quote">"/jspui"</span> docBase=<span class="code-quote">"[dspace]\webapps\jspui"</span> debug=<span class="code-quote">"0"</span>
 	reloadable=<span class="code-quote">"<span class="code-keyword">true</span>"</span> cachingAllowed=<span class="code-quote">"<span class="code-keyword">false</span>"</span>
 	allowLinking=<span class="code-quote">"<span class="code-keyword">true</span>"</span>/&gt;
@@ -868,8 +855,7 @@ bc1Connection.java:204)
 </div></div>
 <p> it usually means you haven't yet added the relevant configuration parameter to your PostgreSQL configuration (see above), or perhaps you haven't restarted PostgreSQL after making the change. Also, make sure that the <em>db.username</em> and <em>db.password</em> properties are correctly set in <em>[dspace-source]/config/dspace.cfg</em>. An easy way to check that your DB is working OK over TCP/IP is to try this on the command line: </p>
 <div class="code panel" style="border-width: 1px;"><div class="codeContent panelContent">
-<pre class="code-java">
-psql -U dspace -W -h localhost</pre>
+<pre class="code-java">psql -U dspace -W -h localhost</pre>
 </div></div>
 <p> Enter the <em>dspace</em> database password, and you should be dropped into the psql tool with a <em>dspace=&gt;</em> prompt.</p></li>
 		<li>Another common error looks like this: 
@@ -931,7 +917,7 @@ psql -U dspace -W -h localhost</pre>
 				<td height="12" background="https://wiki.duraspace.org/images/border/border_bottom.gif"><img src="images/border/spacer.gif" width="1" height="1" border="0"/></td>
 			</tr>
 		    <tr>
-			    <td align="center"><font color="grey">Document generated by Confluence on Dec 16, 2010 11:47</font></td>
+			    <td align="center"><font color="grey">Document generated by Confluence on Mar 25, 2011 19:21</font></td>
 		    </tr>
 	    </table>
     </body>

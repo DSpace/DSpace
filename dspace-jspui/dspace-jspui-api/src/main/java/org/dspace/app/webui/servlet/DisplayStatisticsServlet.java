@@ -75,31 +75,15 @@ public class DisplayStatisticsServlet extends DSpaceServlet
             SQLException, AuthorizeException
     {
 
-        DSpaceObject dso = null;
+
         String handle = request.getParameter("handle");
+        DSpaceObject dso = HandleManager.resolveToObject(context, handle);
 
-        if("".equals(handle) || handle == null)
-        {
-            // We didn't get passed a handle parameter.
-            // That means we're looking at /handle/*/*/statistics
-            // with handle injected as attribute from HandleServlet
-            handle = (String) request.getAttribute("handle");
-
-        }
-
-        if(handle != null)
-        {
-                dso = HandleManager.resolveToObject(context, handle);
-        }
-
-        if(dso == null)
-        {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                JSPManager.showJSP(request, response, "/error/404.jsp");
-                    return;
-        }
-
-
+	if(dso == null) {
+		response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+	        JSPManager.showJSP(request, response, "/error/404.jsp");
+                return;
+	}
 
         boolean isItem = false;
 
@@ -197,6 +181,7 @@ public class DisplayStatisticsServlet extends DSpaceServlet
         if(dso instanceof org.dspace.content.Item)
         {
             isItem = true;
+
             try
             {
 

@@ -211,7 +211,10 @@
     </tr>
   </table>
           <div align="center">
-                   <a class="statisticsLink" href="<%= request.getContextPath() %>/handle/<%= collection.getHandle() %>/statistics"><fmt:message key="jsp.collection-home.display-statistics"/></a>
+                   <form method="get" action="<%= request.getContextPath() %>/displaystats">
+                       <input type="hidden" name="handle" value="<%= collection.getHandle() %>"/>
+                       <input type="submit" name="submit_simple" value="<fmt:message key="jsp.collection-home.display-statistics"/>" />
+                   </form>
           </div>
 
   <%= intro %>

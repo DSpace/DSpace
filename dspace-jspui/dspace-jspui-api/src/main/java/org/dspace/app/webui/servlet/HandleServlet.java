@@ -13,7 +13,6 @@ import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.List;
 
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -67,7 +66,7 @@ import org.jdom.output.XMLOutputter;
 public class HandleServlet extends DSpaceServlet
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(HandleServlet.class);
+    private static Logger log = Logger.getLogger(DSpaceServlet.class);
 
     /** For obtaining &lt;meta&gt; elements to put in the &lt;head&gt; */
     private DisseminationCrosswalk xHTMLHeadCrosswalk;
@@ -135,56 +134,34 @@ public class HandleServlet extends DSpaceServlet
             return;
         }
 
-        if("/statistics".equals(extraPathInfo))
-        {
-            // Check configuration properties, auth, etc.
-            // Inject handle attribute
-            log.info(LogManager.getHeader(context, "display_statistics", "handle=" + handle + ", path=" + extraPathInfo));
-            request.setAttribute("handle", handle);
-
-            // Forward to DisplayStatisticsServlet without changing path.
-            RequestDispatcher dispatch = getServletContext().getNamedDispatcher("displaystats");
-            dispatch.forward(request, response);
-
-            // If we don't return here, we keep processing and end up
-            // throwing a NPE when checking community authorization
-            // and firing a usage event for the DSO we're reporting for
-            return;
-
-        }
-
         // OK, we have a valid Handle. What is it?
         if (dso.getType() == Constants.ITEM)
         {
-         // do we actually want to display the item, or forward to another page?
-            if ((extraPathInfo == null) || (extraPathInfo.equals("/")))
+            Item item = (Item) dso;
+
+            new DSpace().getEventService().fireEvent(
+            		new UsageEvent(
+            				UsageEvent.Action.VIEW,
+            				request, 
+            				context, 
+            				dso));
+            
+            // Only use last-modified if this is an anonymous access
+            // - caching content that may be generated under authorisation
+            //   is a security problem
+            if (context.getCurrentUser() == null)
             {
-                Item item = (Item) dso;
+                response.setDateHeader("Last-Modified", item
+                        .getLastModified().getTime());
 
-                // Only use last-modified if this is an anonymous access
-                // - caching content that may be generated under authorisation
-                //   is a security problem
+                // Check for if-modified-since header
+                long modSince = request.getDateHeader("If-Modified-Since");
 
-                if (context.getCurrentUser() == null)
+                if (modSince != -1 && item.getLastModified().getTime() < modSince)
                 {
-                    response.setDateHeader("Last-Modified", item
-                            .getLastModified().getTime());
-
-                    // Check for if-modified-since header
-
-                    long modSince = request.getDateHeader("If-Modified-Since");
-
-                    if (modSince != -1 && item.getLastModified().getTime() < modSince)
-                    {
-                        // Item has not been modified since requested date,
-                        // hence bitstream has not; return 304
-                        response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
-                    }
-                    else
-                    {
-                        // Display the item page
-                        displayItem(context, request, response, item, handle);
-                    }
+                    // Item has not been modified since requested date,
+                    // hence bitstream has not; return 304
+                    response.setStatus(HttpServletResponse.SC_NOT_MODIFIED);
                 }
                 else
                 {
@@ -194,15 +171,24 @@ public class HandleServlet extends DSpaceServlet
             }
             else
             {
-                // Forward to another servlet
-                request.getRequestDispatcher(extraPathInfo).forward(request,
-                        response);
+                // Display the item page
+                displayItem(context, request, response, item, handle);
             }
-
         }
         else if (dso.getType() == Constants.COLLECTION)
         {
             Collection c = (Collection) dso;
+
+            new DSpace().getEventService().fireEvent(
+            		new UsageEvent(
+            				UsageEvent.Action.VIEW,
+            				request, 
+            				context, 
+            				dso));
+            
+            //UsageEvent ue = new UsageEvent();
+            //ue.fire(request, context, AbstractUsageEvent.VIEW,
+            //        Constants.COLLECTION, dso.getID());
 
             // Store collection location in request
             request.setAttribute("dspace.collection", c);
@@ -238,6 +224,17 @@ public class HandleServlet extends DSpaceServlet
         else if (dso.getType() == Constants.COMMUNITY)
         {
             Community c = (Community) dso;
+
+            new DSpace().getEventService().fireEvent(
+            		new UsageEvent(
+            				UsageEvent.Action.VIEW,
+            				request, 
+            				context, 
+            				dso));
+            
+            //UsageEvent ue = new UsageEvent();
+            //ue.fire(request, context, AbstractUsageEvent.VIEW,
+            //        Constants.COMMUNITY, dso.getID());
 
             // Store collection location in request
             request.setAttribute("dspace.community", c);
@@ -398,15 +395,7 @@ public class HandleServlet extends DSpaceServlet
                 suggestEnable = (context.getCurrentUser() == null ? false : true);
             }
         }
-
-        // Fire usage event.
-        new DSpace().getEventService().fireEvent(
-            		new UsageEvent(
-            				UsageEvent.Action.VIEW,
-            				request,
-            				context,
-            				item));
-
+        
         // Set attributes and display
         request.setAttribute("suggest.enable", Boolean.valueOf(suggestEnable));
         request.setAttribute("display.all", Boolean.valueOf(displayAll));
@@ -470,14 +459,6 @@ public class HandleServlet extends DSpaceServlet
                 // set a variable to create an edit button
                 request.setAttribute("remove_button", Boolean.TRUE);
             }
-
-            // Fire usage event.
-            new DSpace().getEventService().fireEvent(
-            		new UsageEvent(
-            				UsageEvent.Action.VIEW,
-            				request,
-            				context,
-            				community));
 
             // Forward to community home page
             request.setAttribute("community", community);
@@ -611,14 +592,6 @@ public class HandleServlet extends DSpaceServlet
                             Boolean.FALSE);
                 }
             }
-
-            // Fire usage event.
-            new DSpace().getEventService().fireEvent(
-            		new UsageEvent(
-            				UsageEvent.Action.VIEW,
-            				request,
-            				context,
-            				collection));
 
             // Forward to collection home page
             request.setAttribute("collection", collection);

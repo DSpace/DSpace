@@ -16,7 +16,7 @@
                                                     </span>
 				    </div>
 				    <div class="pagesubheading">
-					    This page last changed on Dec 15, 2010 by <font color="#0050B2">mwood</font>.
+					    This page last changed on Jan 07, 2011 by <font color="#0050B2">tdonohue</font>.
 				    </div>
 
 				    <h1><a name="FunctionalOverview-DSpaceSystemDocumentation%3AFunctionalOverview"></a>DSpace System Documentation: Functional Overview</h1>
@@ -24,11 +24,11 @@
 <p>The following sections describe the various functional aspects of the DSpace system.</p>
 
 <style type='text/css'>/*<![CDATA[*/
-div.rbtoc1292450544145 {margin-left: 0px;padding: 0px;}
-div.rbtoc1292450544145 ul {list-style: none;margin-left: 0px;}
-div.rbtoc1292450544145 li {margin-left: 0px;padding-left: 0px;}
+div.rbtoc1294416174557 {margin-left: 0px;padding: 0px;}
+div.rbtoc1294416174557 ul {list-style: none;margin-left: 0px;}
+div.rbtoc1294416174557 li {margin-left: 0px;padding-left: 0px;}
 
-/*]]>*/</style><div class='rbtoc1292450544145'>
+/*]]>*/</style><div class='rbtoc1294416174557'>
 <ul>
     <li><span class='TOCOutline'>1</span> <a href='#FunctionalOverview-DataModel'>Data Model</a></li>
     <li><span class='TOCOutline'>2</span> <a href='#FunctionalOverview-PluginManager'>Plugin Manager</a></li>
@@ -82,13 +82,13 @@ div.rbtoc1292450544145 li {margin-left: 0px;padding-left: 0px;}
 
 <p><b>Data Model Diagram</b></p>
 
-<p>The way data is organized in DSpace is intended to reflect the structure of the organization using the DSpace system. Each DSpace site is divided into <em>communities</em>, which can be further divided into <em>sub-communities</em> reflecting the typical university structure of college, departement, research center, or laboratory.</p>
+<p>The way data is organized in DSpace is intended to reflect the structure of the organization using the DSpace system. Each DSpace site is divided into <em>communities</em>, which can be further divided into <em>sub-communities</em> reflecting the typical university structure of college, department, research center, or laboratory.</p>
 
 <p>Communities contain <em>collections</em>, which are groupings of related content. A collection may appear in more than one community.</p>
 
 <p>Each collection is composed of <em>items</em>, which are the basic archival elements of the archive. Each item is owned by one collection. Additionally, an item may appear in additional collections; however every item has one and only one owning collection.</p>
 
-<p>Items are further subdivided into named <em>bundles</em> of <em>bitstreams</em>. Bitstreams are, as the name suggests, streams of bits, usually ordinary computer files. Bitstreams that are somehow closely related, for example HTML files and images that compose a single HTML document, are organised into bundles.</p>
+<p>Items are further subdivided into named <em>bundles</em> of <em>bitstreams</em>. Bitstreams are, as the name suggests, streams of bits, usually ordinary computer files. Bitstreams that are somehow closely related, for example HTML files and images that compose a single HTML document, are organized into bundles.</p>
 
 <p>In practice, most items tend to have these named bundles:</p>
 
@@ -108,7 +108,7 @@ div.rbtoc1292450544145 li {margin-left: 0px;padding-left: 0px;}
 <table class='confluenceTable'><tbody>
 <tr>
 <td class='confluenceTd'> <b>Supported</b> </td>
-<td class='confluenceTd'> The format is recognized, and the hosting institution is confident it can make bitstreams of this format useable in the future, using whatever combination of techniques (such as migration, emulation, etc.) is appropriate given the context of need. </td>
+<td class='confluenceTd'> The format is recognized, and the hosting institution is confident it can make bitstreams of this format usable in the future, using whatever combination of techniques (such as migration, emulation, etc.) is appropriate given the context of need. </td>
 </tr>
 <tr>
 <td class='confluenceTd'> <b>Known</b> </td>
@@ -229,7 +229,7 @@ div.rbtoc1292450544145 li {margin-left: 0px;padding-left: 0px;}
 
 <p>Groups are another kind of entity that can be granted permissions in the authorization system. A group is usually an explicit list of E-People; anyone identified as one of those E-People also gains the privileges granted to the group.</p>
 
-<p>However, an application session can be assigned membership in a group <em>without</em> being identified as an E-Person. For example, some sites use this feature to identify users of a local network so they can read restricted materials not open to the whole world. Sessions originating from the local network are given membership in the "LocalUsers" group and gain the corresonding privileges.</p>
+<p>However, an application session can be assigned membership in a group <em>without</em> being identified as an E-Person. For example, some sites use this feature to identify users of a local network so they can read restricted materials not open to the whole world. Sessions originating from the local network are given membership in the "LocalUsers" group and gain the corresponding privileges.</p>
 
 <p>Administrators can also use groups as "roles" to manage the granting of privileges more efficiently.</p>
 
@@ -348,7 +348,7 @@ div.rbtoc1292450544145 li {margin-left: 0px;padding-left: 0px;}
 	<li>Adds a provenance message (including bitstream checksums)</li>
 	<li>Assigns a Handle persistent identifier</li>
 	<li>Adds the item to the target collection, and adds appropriate authorization policies</li>
-	<li>Adds the new item to the search and browse indices</li>
+	<li>Adds the new item to the search and browse index</li>
 </ul>
 
 
@@ -393,7 +393,7 @@ div.rbtoc1292450544145 li {margin-left: 0px;padding-left: 0px;}
 
 <p>One last possibility is that a workflow can be 'aborted' by a DSpace site administrator. This is accomplished using the administration UI.</p>
 
-<p>The reason for this apparently arbitrary design is that is was the simplist case that covered the needs of the early adopter communities at MIT. The functionality of the workflow system will no doubt be extended in the future.</p>
+<p>The reason for this apparently arbitrary design is that is was the simplest case that covered the needs of the early adopter communities at MIT. The functionality of the workflow system will no doubt be extended in the future.</p>
 
 <h2><a name="FunctionalOverview-SupervisionandCollaboration"></a>Supervision and Collaboration</h2>
 
@@ -436,7 +436,7 @@ http:<span class="code-comment">//hdl.handle.net/1721.123/4567</span>
 
 <h2><a name="FunctionalOverview-Bitstream%27Persistent%27Identifiers"></a>Bitstream 'Persistent' Identifiers</h2>
 
-<p>Similar to handles for DSpace items, bitstreams also have 'Persistent' identifiers. They are more volatile than Handles, since if the content is moved to a different server or organizaion, they will no longer work (hence the quotes around 'persistent'). However, they are more easily persisted than the simple URLs based on database primary key previously used. This means that external systems can more reliably refer to specific bitstreams stored in a DSpace instance.</p>
+<p>Similar to handles for DSpace items, bitstreams also have 'Persistent' identifiers. They are more volatile than Handles, since if the content is moved to a different server or organization, they will no longer work (hence the quotes around 'persistent'). However, they are more easily persisted than the simple URLs based on database primary key previously used. This means that external systems can more reliably refer to specific bitstreams stored in a DSpace instance.</p>
 
 <p>Each bitstream has a sequence ID, unique within an item. This sequence ID is used to create a persistent ID, of the form:</p>
 
@@ -479,7 +479,7 @@ Search is an essential component of discovery in DSpace. Users' expectations fro
 
 <ul>
 	<li>Web pages tend to consist of several files &#8211; one or more HTML files that contain references to each other, and stylesheets and image files that are referenced by the HTML files.</li>
-	<li>Web pages also link to or include content from other sites, often imperceptably to the end-user. Thus, in a few year's time, when someone views the preserved Web site, they will probably find that many links are now broken or refer to other sites than are now out of context.In fact, it may be unclear to an end-user when they are viewing content stored in DSpace and when they are seeing content included from another site, or have navigated to a page that is not stored in DSpace. This problem can manifest when a submitter uploads some HTML content. For example, the HTML document may include an image from an external Web site, or even their local hard drive. When the submitter views the HTML in DSpace, their browser is able to use the reference in the HTML to retrieve the appropriate image, and so to the submitter, the whole HTML document appears to have been deposited correctly. However, later on, when another user tries to view that HTML, their browser might not be able to retrieve the included image since it may have been removed from the external server. Hence the HTML will seem broken.</li>
+	<li>Web pages also link to or include content from other sites, often imperceptibly to the end-user. Thus, in a few year's time, when someone views the preserved Web site, they will probably find that many links are now broken or refer to other sites than are now out of context.In fact, it may be unclear to an end-user when they are viewing content stored in DSpace and when they are seeing content included from another site, or have navigated to a page that is not stored in DSpace. This problem can manifest when a submitter uploads some HTML content. For example, the HTML document may include an image from an external Web site, or even their local hard drive. When the submitter views the HTML in DSpace, their browser is able to use the reference in the HTML to retrieve the appropriate image, and so to the submitter, the whole HTML document appears to have been deposited correctly. However, later on, when another user tries to view that HTML, their browser might not be able to retrieve the included image since it may have been removed from the external server. Hence the HTML will seem broken.</li>
 	<li>Often Web pages are produced dynamically by software running on the Web server, and represent the state of a changing database underneath it.<br/>
 Dealing with these issues is the topic of much active research. Currently, DSpace bites off a small, tractable chunk of this problem. DSpace can store and provide on-line browsing capability for <em>self-contained, non-dynamic</em> HTML documents. In practical terms, this means:</li>
 </ul>
@@ -496,7 +496,7 @@ Dealing with these issues is the topic of much active research. Currently, DSpac
 		<li><em><a href="http://somedomain.com/content.html">http://somedomain.com/content.html</a></em> is not OK (the link will continue to link to the external site which may change or disappear)</li>
 	</ul>
 	</li>
-	<li>Any 'absolute links' (e.g. <em><a href="http://somedomain.com/content.html">http://somedomain.com/content.html</a></em>) are stored 'as is', and will continue to link to the external content (as opposed to relative links, which will link to the copy of the content stored in DSpace.) Thus, over time, the content refered to by the absolute link may change or disappear.</li>
+	<li>Any 'absolute links' (e.g. <em><a href="http://somedomain.com/content.html">http://somedomain.com/content.html</a></em>) are stored 'as is', and will continue to link to the external content (as opposed to relative links, which will link to the copy of the content stored in DSpace.) Thus, over time, the content referred to by the absolute link may change or disappear.</li>
 </ul>
 
 
@@ -518,7 +518,7 @@ Dealing with these issues is the topic of much active research. Currently, DSpac
 
 <h2><a name="FunctionalOverview-CreativeCommonsSupport"></a>Creative Commons Support</h2>
 
-<p>Dspace provides support for Creative Commons licenses to be attached to items in the repository. They represent an alternative to traditional copyright. To learn more about Creative Commons, visit <a href="http://creativecommons.org" title="their website">their website</a>. Support for the licenses is controlled by a site-wide configuration option, and since license selection involves redirection to the Creative Commons website, additional parameters may be configured to work with a proxy server. If the option is enabled, users may select a Creative Commons license during the submission process, or elect to skip Creative Commons licensing. If a selection is made a copy of the license text and RDF metadata is stored along with the item in the repository. There is also an indication - text and a Creative Commons icon - in the item display page of the web user interface when an item is licensed under Creative Commons.</p>
+<p>DSpace provides support for Creative Commons licenses to be attached to items in the repository. They represent an alternative to traditional copyright. To learn more about Creative Commons, visit <a href="http://creativecommons.org" title="their website">their website</a>. Support for the licenses is controlled by a site-wide configuration option, and since license selection involves redirection to the Creative Commons website, additional parameters may be configured to work with a proxy server. If the option is enabled, users may select a Creative Commons license during the submission process, or elect to skip Creative Commons licensing. If a selection is made a copy of the license text and RDF metadata is stored along with the item in the repository. There is also an indication - text and a Creative Commons icon - in the item display page of the web user interface when an item is licensed under Creative Commons.</p>
 
 
 <h2><a name="FunctionalOverview-Subscriptions"></a>Subscriptions</h2>
@@ -544,12 +544,12 @@ Dealing with these issues is the topic of much active research. Currently, DSpac
 
 <h3><a name="FunctionalOverview-SystemStatistics"></a>System Statistics</h3>
 
-<p>Various statistical reports about the contents and use of your system can be automatically generated by the system. These are generated by analysing DSpace's log files. Statistics can be broken down monthly.</p>
+<p>Various statistical reports about the contents and use of your system can be automatically generated by the system. These are generated by analyzing DSpace's log files. Statistics can be broken down monthly.</p>
 
 <p>The report includes following sections</p>
 
 <ul>
-	<li>A customisable general overview of activities in the archive, by default including:
+	<li>A customizable general overview of activities in the archive, by default including:
 	<ul>
 		<li>Number of items archived</li>
 		<li>Number of bitstream views</li>
@@ -562,7 +562,7 @@ Dealing with these issues is the topic of much active research. Currently, DSpac
 		<li>Number of OAI Requests</li>
 	</ul>
 	</li>
-	<li>Customisable summary of archive contents</li>
+	<li>Customizable summary of archive contents</li>
 	<li>Broken-down list of item viewings</li>
 	<li>A full break-down of all performed actions</li>
 	<li>User logins</li>
@@ -587,7 +587,7 @@ The results of statistical analysis can be presented on a by-month and an in-tot
 </ul>
 
 
-<p>&#42;File Downloads information is only displayed for item-level statistics. Note that downloads from separate bitstreams are also recorded and represented separatly. DSpace is able to capture and store File Download information, even when the bitstream was downloaded from a direct link on an external website.</p>
+<p>&#42;File Downloads information is only displayed for item-level statistics. Note that downloads from separate bitstreams are also recorded and represented separately. DSpace is able to capture and store File Download information, even when the bitstream was downloaded from a direct link on an external website.</p>
 
 <p><span class="image-wrap" style=""><img src="attachments/22022823/22675569.png" style="border: 1px solid black"/></span></p>
 
@@ -604,7 +604,7 @@ The results of statistical analysis can be presented on a by-month and an in-tot
 
 <h2><a name="FunctionalOverview-ChoiceManagementandAuthorityControl"></a>Choice Management and Authority Control</h2>
 
-<p>This is a configurable framework that lets you define plug-in classes to control the choice of values for a given DSpace metadata fields. It also lets you configure fields to include "authority" values along with the textual metadata value. The chocie-control system includes a user interface in both the Configurable Submission UI and the Admin UI (edit Item pages) that assists the user in choosing metadata values.</p>
+<p>This is a configurable framework that lets you define plug-in classes to control the choice of values for a given DSpace metadata fields. It also lets you configure fields to include "authority" values along with the textual metadata value. The choice-control system includes a user interface in both the Configurable Submission UI and the Admin UI (edit Item pages) that assists the user in choosing metadata values.</p>
 
 <h3><a name="FunctionalOverview-IntroductionandMotivation"></a>Introduction and Motivation</h3>
 
@@ -709,7 +709,7 @@ Authority control is different from the controlled vocabulary of keywords alread
 				<td height="12" background="https://wiki.duraspace.org/images/border/border_bottom.gif"><img src="images/border/spacer.gif" width="1" height="1" border="0"/></td>
 			</tr>
 		    <tr>
-			    <td align="center"><font color="grey">Document generated by Confluence on Dec 16, 2010 11:47</font></td>
+			    <td align="center"><font color="grey">Document generated by Confluence on Mar 25, 2011 19:21</font></td>
 		    </tr>
 	    </table>
     </body>
