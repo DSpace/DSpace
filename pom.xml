@@ -834,9 +834,9 @@
       snapshots into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/dspace/trunk</url>
+      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/branches/dspace-1_7_x</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/branches/dspace-1_7_x</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/branches/dspace-1_7_x</url>
    </scm>
 
    <reporting>
