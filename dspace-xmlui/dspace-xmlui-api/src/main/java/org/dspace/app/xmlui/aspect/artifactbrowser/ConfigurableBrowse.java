@@ -10,14 +10,13 @@ package org.dspace.app.xmlui.aspect.artifactbrowser;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
+import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
@@ -57,6 +56,8 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.xml.sax.SAXException;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Implements all the browse functionality (browse by title, subject, authors,
@@ -244,7 +245,16 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
     public void addBody(Body body) throws SAXException, WingException, UIException, SQLException,
             IOException, AuthorizeException
     {
-        BrowseParams params = getUserParams();
+        BrowseParams params = null;
+
+        try {
+            params = getUserParams();
+        } catch (ResourceNotFoundException e) {
+           HttpServletResponse response = (HttpServletResponse)objectModel
+		.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+	    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
+
         BrowseInfo info = getBrowseInfo();
 
         String type = info.getBrowseIndex().getName();
@@ -605,8 +615,8 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
      * @throws SQLException
      * @throws UIException
      */
-    private BrowseParams getUserParams() throws SQLException, UIException
-    {
+    private BrowseParams getUserParams() throws SQLException, UIException, ResourceNotFoundException, IllegalArgumentException {
+
         if (this.userParams != null)
         {
             return this.userParams;
@@ -638,11 +648,21 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         {
             String type   = request.getParameter(BrowseParams.TYPE);
             int    sortBy = RequestUtils.getIntParameter(request, BrowseParams.SORT_BY);
-            
+
+            if(!request.getParameters().containsKey("type"))
+            {
+                // default to first browse index.
+                String defaultBrowseIndex = ConfigurationManager.getProperty("webui.browse.index.1");
+                if(defaultBrowseIndex != null)
+                {
+                    type = defaultBrowseIndex.split(":")[0];
+                }
+            }
+
             BrowseIndex bi = BrowseIndex.getBrowseIndex(type);
             if (bi == null)
             {
-                throw new BrowseException("There is no browse index of the type: " + type);
+                throw new ResourceNotFoundException("Browse index " + type + " not found");
             }
             
             // If we don't have a sort column
@@ -650,7 +670,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             {
                 // Get the default one
                 SortOption so = bi.getSortOption();
-                if (so != null)
+                if (so != null)                             
                 {
                     sortBy = so.getNumber();
                 }
@@ -769,7 +789,12 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
         // Get the parameters we will use for the browse
         // (this includes a browse scope)
-        BrowseParams params = getUserParams();
+        BrowseParams params = null;
+        try {
+            params = getUserParams();
+        } catch (ResourceNotFoundException e) {
+            return null;
+        }
 
         try
         {
