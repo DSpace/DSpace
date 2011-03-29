@@ -684,7 +684,13 @@ public class Bitstream extends DSpaceObject
     public int getStoreNumber() {
         return bRow.getIntColumn("store_number");
     }
-    
+
+    /**
+     * Get the parent object of a bitstream. It can either be an item if this is a normal 
+     * bitstream, otherwise it could be a collection or a community if it is a logo.     
+     * @return
+     * @throws SQLException
+     */    
     public DSpaceObject getParentObject() throws SQLException
     {
         Bundle[] bundles = getBundles();

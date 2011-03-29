@@ -625,7 +625,7 @@ public class FlowItemUtils
 	 * 
 	 * @param context Current dspace content
 	 * @param itemID The item id from which to remove bitstreams
-	 * @param bitstreamIDs A bundle slash bitstream id pair of bitstreams to be removed.
+	 * @param bitstreamIDs A bundleID slash bitstreamID pair of bitstreams to be removed.
 	 * @return A flow result
 	 */
 	public static FlowResult processDeleteBitstreams(Context context, int itemID, String[] bitstreamIDs) throws SQLException, AuthorizeException, IOException, UIException
