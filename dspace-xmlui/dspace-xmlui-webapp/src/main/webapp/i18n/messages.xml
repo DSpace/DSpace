@@ -1528,7 +1528,7 @@
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.label_metadata_format">Metadata Format</message>
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.help_oaiurl">The url of the target repository's OAI provider service</message>
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.error_oaiurl">You must provide a set id of the target collection.</message>
-	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.help_oaisetid">The persistent identifier used by the OAI provider to desginate the target collection</message>
+	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.help_oaisetid">The persistent identifier used by the OAI provider to designate the target collection</message>
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.error_oaisetid">You must provide a set id of the target collection.</message>
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.label_harvest_level">Content being harvested</message>
 	<message key="xmlui.administrative.collection.SetupCollectionHarvestingForm.label_harvest_level">Content being harvested</message>
@@ -1549,8 +1549,8 @@
 	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.harvest_status_ready">Collection ready for harvest</message>
 	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.harvest_status_busy">Collection is currently being harvested</message>
 	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.harvest_status_queued">Collection is in queue for harvest</message>
-	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.harvest_status_oai_error">OAI error occured during last harvest</message>
-	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.harvest_status_unknown_error">Unexpected error occured during last harvest</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.harvest_status_oai_error">OAI error occurred during last harvest</message>
+	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.harvest_status_unknown_error">Unexpected error occurred during last harvest</message>
 	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.option_md_only">Harvest metadata only.</message>
 	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.option_md_and_ref">Harvest metadata and references to bitstreams.</message>
 	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.option_md_and_bs">Harvest metadata and bitstreams (full replication).</message>
@@ -1660,7 +1660,7 @@
 	<message key="xmlui.administrative.ControlPanel.java_vendor">Java Runtime Environment Vendor</message>
 	<message key="xmlui.administrative.ControlPanel.os_name">Operating System Name</message>
 	<message key="xmlui.administrative.ControlPanel.os_arch">Operating System Architecture</message>
-	<message key="xmlui.administrative.ControlPanel.os_version">Operating Systesm Version</message>
+	<message key="xmlui.administrative.ControlPanel.os_version">Operating System Version</message>
 	<message key="xmlui.administrative.ControlPanel.runtime_head">Runtime statistics</message>
 	<message key="xmlui.administrative.ControlPanel.runtime_processors">Available processors</message>
 	<message key="xmlui.administrative.ControlPanel.runtime_max">Maximum memory</message>
@@ -1721,8 +1721,8 @@
 	<!-- org.dspace.app.xmlui.administrative.NotAuthorized -->
 	<message key="xmlui.administrative.NotAuthorized.title">Not Authorized</message>
 	<message key="xmlui.administrative.NotAuthorized.trail">Not authorized</message>
-	<message key="xmlui.administrative.NotAuthorized.head">Insufficent privileges</message>
-	<message key="xmlui.administrative.NotAuthorized.para1a">Your account has insufficent privileges to perform the requested action. If you feel this is an error or have questions about your privileges, please contact the site's </message>
+	<message key="xmlui.administrative.NotAuthorized.head">Insufficient privileges</message>
+	<message key="xmlui.administrative.NotAuthorized.para1a">Your account has insufficient privileges to perform the requested action. If you feel this is an error or have questions about your privileges, please contact the site's </message>
 	<message key="xmlui.administrative.NotAuthorized.para1b">system administrators</message>
 	<message key="xmlui.administrative.NotAuthorized.para1c">.</message>
 	<message key="xmlui.administrative.NotAuthorized.para2">Login as another user</message>
