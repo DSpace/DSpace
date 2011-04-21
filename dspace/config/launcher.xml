@@ -89,7 +89,7 @@
 
     <command>
         <name>filter-media</name>
-        <description>Perform the media filtering to extract full text from docuemnts and to create thumbnails</description>
+        <description>Perform the media filtering to extract full text from documents and to create thumbnails</description>
         <step>
             <class>org.dspace.app.mediafilter.MediaFilterManager</class>
         </step>
@@ -121,7 +121,7 @@
 
     <command>
         <name>index</name>
-        <description>General index command (requires extra paramters)</description>
+        <description>General index command (requires extra parameters)</description>
         <step>
             <class>org.dspace.browse.IndexBrowse</class>
         </step>
@@ -301,7 +301,7 @@
 
     <command>
         <name>structure-builder</name>
-        <description>Build DSpace commnity and collection structure</description>
+        <description>Build DSpace community and collection structure</description>
         <step>
             <class>org.dspace.administer.StructBuilder</class>
         </step>
@@ -325,7 +325,7 @@
 
     <command>
         <name>test-email</name>
-        <description>Test the DSpace email server settings OK</description>
+        <description>Test the DSpace email server settings are OK</description>
         <step>
             <class>org.dspace.core.Email</class>
         </step>
