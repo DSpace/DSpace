@@ -87,11 +87,6 @@
     </build>
     <dependencies>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-jdbc</artifactId>
-            <version>2.5.6</version>
-        </dependency>
-        <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>handle</artifactId>
             <version>6.2</version>
