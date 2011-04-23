@@ -113,7 +113,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
             if (name == null 
                     && bean == null) {
                 try {
-                    Map<String, Object> map = applicationContext.getBeansOfType(type);
+                    Map<String, T> map = applicationContext.getBeansOfType(type);
                     if (map.size() == 1) {
                         // only return the bean if there is exactly one
                         bean = (T) map.values().iterator().next();
@@ -130,7 +130,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
     @SuppressWarnings("unchecked")
     public <T> List<T> getServicesByType(Class<T> type) {
         ArrayList<T> l = new ArrayList<T>();
-        Map<String, Object> beans;
+        Map<String, T> beans;
         try {
             beans = applicationContext.getBeansOfType(type, true, true);
             l.addAll( (Collection<? extends T>) beans.values() );
