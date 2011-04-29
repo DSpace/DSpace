@@ -1,12 +1,11 @@
 /*
  * BrowseInfo.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4365 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-10-05 19:52:42 -0400 (Mon, 05 Oct 2009) $
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -102,6 +100,9 @@ public class BrowseInfo
 
     /** the value browsed upon */
     private String value;
+
+    /** the authority key browsed upon */
+    private String authority;
 
     /** is this a "starts_with" browse? */
     private boolean startsWith = false;
@@ -228,6 +229,20 @@ public class BrowseInfo
 	public boolean hasValue()
     {
     	if (this.value != null)
+    	{
+    		return true;
+    	}
+    	return false;
+    }
+
+	/**
+	 * Is there an authority key associated with this browse
+	 *
+	 * @return	true if  an authority key, false if not
+	 */
+	public boolean hasAuthority()
+    {
+    	if (this.authority != null)
     	{
     		return true;
     	}
@@ -437,6 +452,22 @@ public class BrowseInfo
 	}
 
 	/**
+	 * @return Returns the authority key.
+	 */
+	public String getAuthority()
+	{
+		return authority;
+	}
+
+	/**
+	 * @param value The authority key to set.
+	 */
+	public void setAuthority(String authority)
+	{
+		this.authority = authority;
+	}
+
+	/**
 	 * is this a top level (0) browse?  Examples of this are a full item
 	 * browse or a single browse.  Other browse types are considered
 	 * second level (1)
@@ -468,8 +499,9 @@ public class BrowseInfo
 	}
 
     /**
-     * The results of the Browse. Each member of the list is either a String
-     * (for the authors browse) or an {@link org.dspace.content.Item}(for the
+     * The results of the Browse. Each member of the list is either a String array
+     * (for the authors browse: first element the value, second element the authority key)
+     * or an {@link org.dspace.content.Item}(for the
      * other browses).
      *
      * @return Result list. This list cannot be modified.
@@ -480,13 +512,14 @@ public class BrowseInfo
     }
 
     /**
-     * Return the results of the Browse as a String array.
+     * Return the results of the Browse as an array of String array.
+     * The first element (i.e. index 0) is the value, the second is the authority key
      *
      * @return The results of the Browse as a String array.
      */
-    public String[] getStringResults()
+    public String[][] getStringResults()
     {
-        return (String[]) results.toArray(new String[results.size()]);
+        return (String[][]) results.toArray(new String[results.size()][2]);
     }
 
     /**

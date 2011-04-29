@@ -1,9 +1,9 @@
 /*
  * FlowAuthorizationUtils.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4309 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-09-30 15:20:07 -0400 (Wed, 30 Sep 2009) $
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -43,6 +43,7 @@ package org.dspace.app.xmlui.aspect.administrative;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -151,7 +152,13 @@ public class FlowAuthorizationUtils {
 		boolean added = false;
 	
 		ResourcePolicy policy = ResourcePolicy.find(context, policyID);
-			
+		
+		// check authorization to edit an existent policy
+		if (policy != null)
+		{
+		    AuthorizeUtil.authorizeManagePolicy(context, policy);
+		}
+		
 		/* First and foremost, if no group or action was selected, throw an error back to the user */
 		if (actionID == -1) {
 			result.setContinue(false);
@@ -168,15 +175,41 @@ public class FlowAuthorizationUtils {
 		DSpaceObject policyParent = null;
 		if (policy == null) 
 		{
-			policy = ResourcePolicy.create(context);
-			
 			switch (objectType) {
-			case Constants.COMMUNITY: policyParent = Community.find(context, objectID); break;
-			case Constants.COLLECTION: policyParent = Collection.find(context, objectID); break;
-			case Constants.ITEM: policyParent = Item.find(context, objectID); break;
-			case Constants.BUNDLE: policyParent = Bundle.find(context, objectID); break;
-			case Constants.BITSTREAM: policyParent = Bitstream.find(context, objectID); break;
+			case Constants.COMMUNITY: 
+			    {
+			        policyParent = Community.find(context, objectID); 
+			        AuthorizeUtil.authorizeManageCommunityPolicy(context, (Community)policyParent);
+			        break;
+			    }
+			case Constants.COLLECTION:
+		        {
+			        policyParent = Collection.find(context, objectID); 
+			        AuthorizeUtil.authorizeManageCollectionPolicy(context, (Collection)policyParent);        
+			        break;
+		        }
+			case Constants.ITEM:
+		        {
+			        policyParent = Item.find(context, objectID); 
+			        AuthorizeUtil.authorizeManageItemPolicy(context, (Item) policyParent);
+			        break;
+		        }
+			case Constants.BUNDLE:
+		        {
+			        policyParent = Bundle.find(context, objectID); 
+			        AuthorizeUtil.authorizeManageItemPolicy(context, (Item) (policyParent.getParentObject()));
+			        break;
+		        }
+			case Constants.BITSTREAM: 
+		        {
+			        policyParent = Bitstream.find(context, objectID); 
+			        AuthorizeUtil
+                        .authorizeManageItemPolicy(context, (Item) (policyParent
+                                .getParentObject()));
+			        break;
+		        }
 			}
+			policy = ResourcePolicy.create(context);
 			policy.setResource(policyParent);
 			added = true;
 		}
@@ -231,13 +264,15 @@ public class FlowAuthorizationUtils {
 	 * @param policyIDs The unique ids of the policies being deleted.
 	 * @return A process result's object.   
 	 */
-	public static FlowResult processDeletePolicies(Context context, String[] policyIDs) throws NumberFormatException, SQLException
+	public static FlowResult processDeletePolicies(Context context, String[] policyIDs) throws NumberFormatException, SQLException, AuthorizeException
 	{
 		FlowResult result = new FlowResult();
 	
 		for (String id : policyIDs) 
 		{
 			ResourcePolicy policyDeleted = ResourcePolicy.find(context, Integer.valueOf(id));
+			// check authorization
+			AuthorizeUtil.authorizeManagePolicy(context, policyDeleted);
 			policyDeleted.delete();
 	    }
 	
@@ -262,6 +297,7 @@ public class FlowAuthorizationUtils {
 	public static FlowResult processAdvancedPolicyAdd(Context context, String[] groupIDs, int actionID,
 			int resourceID, String [] collectionIDs) throws NumberFormatException, SQLException, AuthorizeException
 	{
+	    AuthorizeUtil.requireAdminRole(context);
 		FlowResult result = new FlowResult();
 		
 		for (String groupID : groupIDs) 
@@ -300,6 +336,7 @@ public class FlowAuthorizationUtils {
 	public static FlowResult processAdvancedPolicyDelete(Context context, int resourceID, String [] collectionIDs) 
 			throws NumberFormatException, SQLException, AuthorizeException
 	{
+	    AuthorizeUtil.requireAdminRole(context);
 		FlowResult result = new FlowResult();
 		
 		for (String collectionID : collectionIDs) 

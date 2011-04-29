@@ -1,12 +1,11 @@
 /*
  * DSpaceMETSIngester
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4575 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-11-30 16:37:44 -0500 (Mon, 30 Nov 2009) $
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -68,7 +66,7 @@ import org.jdom.Element;
  * for more information about the DSpace METS SIP profile.
  *
  * @author Larry Stone
- * @version $Revision: 3705 $
+ * @version $Revision: 4575 $
  * @see org.dspace.content.packager.METSManifest
  */
 public class DSpaceMETSIngester
@@ -105,30 +103,49 @@ public class DSpaceMETSIngester
      * Choose DMD section(s) to crosswalk.
      * <p>
      * The algorithm is:<br>
-     * 1. Find MODS (preferably) or DC as primary DMD.<br>
-     * 2. If (1) succeeds, crosswalk it and ignore all other DMDs with
+     * 1. Use whatever the <code>dmd</code> parameter specifies as the primary DMD.<br>
+     * 2. If (1) is unspecified, find MODS (preferably) or DC as primary DMD.<br>
+     * 3. If (1) or (2) succeeds, crosswalk it and ignore all other DMDs with
      *    same GROUPID<br>
-     * 3. Crosswalk remaining DMDs not eliminated already.
+     * 4. Crosswalk remaining DMDs not eliminated already.
      */
     public void chooseItemDmd(Context context, Item item,
                               METSManifest manifest,
                               AbstractMETSIngester.MdrefManager callback,
-                              Element dmds[])
+                              Element dmds[], PackageParameters params)
         throws CrosswalkException,
                AuthorizeException, SQLException, IOException
     {
         int found = -1;
 
-        // MODS is preferred
-        for (int i = 0; i < dmds.length; ++i)
-            if ("MODS".equals(manifest.getMdType(dmds[i])))
-                found = i;
+        // Check to see what dmdSec the user specified in the 'dmd' parameter
+        String userDmd = null;
+        if (params != null)
+            userDmd = params.getProperty("dmd");
+        if (userDmd != null && userDmd.length() > 0)
+        {
+            for (int i = 0; i < dmds.length; ++i)
+                if (userDmd.equalsIgnoreCase(manifest.getMdType(dmds[i])))
+                    found = i;
+        }
+
+        // MODS is preferred, if nothing specified by user
+        if (found == -1)
+        {
+            for (int i = 0; i < dmds.length; ++i)
+                //NOTE: METS standard actually says this should be MODS (all uppercase). But,
+                // just in case, we're going to be a bit more forgiving.
+                if ("MODS".equalsIgnoreCase(manifest.getMdType(dmds[i])))
+                    found = i;
+        }
 
         // DC acceptable if no MODS
         if (found == -1)
         {
             for (int i = 0; i < dmds.length; ++i)
-                if ("DC".equals(manifest.getMdType(dmds[i])))
+                //NOTE: METS standard actually says this should be DC (all uppercase). But,
+                // just in case, we're going to be a bit more forgiving.
+                if ("DC".equalsIgnoreCase(manifest.getMdType(dmds[i])))
                     found = i;
         }
 

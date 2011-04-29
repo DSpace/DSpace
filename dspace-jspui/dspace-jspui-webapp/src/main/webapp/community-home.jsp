@@ -1,9 +1,9 @@
 <%--
   - community-home.jsp
   -
-  - Version: $Revision: 3705 $
+  - Version: $Revision: 4603 $
   -
-  - Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+  - Date: $Date: 2009-12-03 03:17:54 -0500 (Thu, 03 Dec 2009) $
   -
   - Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
   - Institute of Technology.  All rights reserved.
@@ -380,6 +380,14 @@
               </form>
             </td>
           </tr>
+          <tr>
+            <td headers="t1" class="standard" align="center">
+               <form method="post" action="<%=request.getContextPath()%>/dspace-admin/metadataexport">
+                 <input type="hidden" name="handle" value="<%= community.getHandle() %>" />
+                 <input type="submit" value="<fmt:message key="jsp.general.metadataexport.button"/>" />
+               </form>
+             </td>
+          </tr>
 			<% } %>
             <tr>
               <td headers="t1" class="standard" align="center">
@@ -390,8 +398,9 @@
 	</td>
       </tr>
     </table>
+
     <% } %>
-    
+   
     <%-- Recently Submitted items --%>
 	<h3><fmt:message key="jsp.community-home.recentsub"/></h3>
 <%
@@ -454,6 +463,13 @@
     <%= sidebar %>
 
   </dspace:sidebar>
+
+         <div align="center">
+                   <form method="get" action="<%= request.getContextPath() %>/displaystats">
+                       <input type="hidden" name="handle" value="<%= community.getHandle() %>"/>
+                       <input type="submit" name="submit_simple" value="<fmt:message key="jsp.community-home.display-statistics"/>" />
+                   </form>
+          </div>
 
 
 </dspace:layout>

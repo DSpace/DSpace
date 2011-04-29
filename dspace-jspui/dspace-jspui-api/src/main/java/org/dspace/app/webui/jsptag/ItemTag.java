@@ -1,9 +1,9 @@
 /*
  * ItemTag.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4931 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2010-05-13 17:09:17 -0400 (Thu, 13 May 2010) $
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -59,6 +59,7 @@ import javax.servlet.jsp.jstl.fmt.LocaleSupport;
 import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.util.MetadataExposure;
 import org.dspace.app.webui.util.StyleSelection;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.browse.BrowseException;
@@ -68,8 +69,10 @@ import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
 import org.dspace.core.PluginManager;
@@ -204,7 +207,7 @@ import org.dspace.core.Utils;
  * </PRE>
  * 
  * @author Robert Tansley
- * @version $Revision: 3705 $
+ * @version $Revision: 4931 $
  */
 public class ItemTag extends TagSupport
 {
@@ -382,10 +385,11 @@ public class ItemTag extends TagSupport
     /**
      * Render an item in the given style
      */
-    private void render() throws IOException
+    private void render() throws IOException, SQLException
     {
         JspWriter out = pageContext.getOut();
         HttpServletRequest request = (HttpServletRequest)pageContext.getRequest();
+        Context context = UIUtil.obtainContext(request);
         
         String configLine = styleSelection.getConfigurationForStyle(style);
 
@@ -451,6 +455,11 @@ public class ItemTag extends TagSupport
             {
                 qualifier = eq[2];
             }
+
+            // check for hidden field, even if it's configured..
+            if (MetadataExposure.isHidden(context, schema, element, qualifier))
+                continue;
+
             // FIXME: Still need to fix for metadata language?
             DCValue[] values = item.getMetadata(schema, element, qualifier, Item.ANY);
             
@@ -463,7 +472,7 @@ public class ItemTag extends TagSupport
                 {
                     label = I18nUtil.getMessage("metadata."
                             + (style != null ? style + "." : "") + field,
-                            pageContext.getRequest().getLocale());
+                            context);
                 }
                 catch (MissingResourceException e)
                 {
@@ -478,83 +487,100 @@ public class ItemTag extends TagSupport
 
                 for (int j = 0; j < values.length; j++)
                 {
-                    if (j > 0)
+                    if (values[j] != null && values[j].value != null)
                     {
-                        out.print("<br />");
-                    }
-
-                    if (isLink)
-                    {
-                        out.print("<a href=\"" + values[j].value + "\">"
-                                + Utils.addEntities(values[j].value) + "</a>");
-                    }
-                    else if (isDate)
-                    {
-                        DCDate dd = new DCDate(values[j].value);
-
-                        // Parse the date
-                        out.print(UIUtil.displayDate(dd, false, false, (HttpServletRequest)pageContext.getRequest()));
-                    }
-                    else if (isResolver)
-                    {
-                        String value = values[j].value;
-                        if (value.startsWith("http://")
-                                || value.startsWith("https://")
-                                || value.startsWith("ftp://")
-                                || value.startsWith("ftps://"))
+                        if (j > 0)
                         {
-                            // Already a URL, print as if it was a regular link
-                            out.print("<a href=\"" + value + "\">"
-                                    + Utils.addEntities(value) + "</a>");
+                            out.print("<br />");
                         }
-                        else
+
+                        if (isLink)
                         {
-                            String foundUrn = null;
-                            if (!style.equals("resolver"))
+                            out.print("<a href=\"" + values[j].value + "\">"
+                                    + Utils.addEntities(values[j].value) + "</a>");
+                        }
+                        else if (isDate)
+                        {
+                            DCDate dd = new DCDate(values[j].value);
+
+                            // Parse the date
+                            out.print(UIUtil.displayDate(dd, false, false, (HttpServletRequest)pageContext.getRequest()));
+                        }
+                        else if (isResolver)
+                        {
+                            String value = values[j].value;
+                            if (value.startsWith("http://")
+                                    || value.startsWith("https://")
+                                    || value.startsWith("ftp://")
+                                    || value.startsWith("ftps://"))
                             {
-                                foundUrn = style;
+                                // Already a URL, print as if it was a regular link
+                                out.print("<a href=\"" + value + "\">"
+                                        + Utils.addEntities(value) + "</a>");
                             }
                             else
                             {
-                                for (String checkUrn : urn2baseurl.keySet())
+                                String foundUrn = null;
+                                if (!style.equals("resolver"))
                                 {
-                                    if (value.startsWith(checkUrn))
+                                    foundUrn = style;
+                                }
+                                else
+                                {
+                                    for (String checkUrn : urn2baseurl.keySet())
                                     {
-                                        foundUrn = checkUrn;
+                                        if (value.startsWith(checkUrn))
+                                        {
+                                            foundUrn = checkUrn;
+                                        }
                                     }
                                 }
-                            }
 
-                            if (foundUrn != null)
-                            {
-
-                                if (value.startsWith(foundUrn + ":"))
+                                if (foundUrn != null)
                                 {
-                                    value = value.substring(foundUrn.length()+1);
+
+                                    if (value.startsWith(foundUrn + ":"))
+                                    {
+                                        value = value.substring(foundUrn.length()+1);
+                                    }
+
+                                    String url = urn2baseurl.get(foundUrn);
+                                    out.print("<a href=\"" + url
+                                            + value + "\">"
+                                            + Utils.addEntities(values[j].value)
+                                            + "</a>");
                                 }
+                                else
+                                {
+                                    out.print(value);
+                                }
+                            }
 
-                                String url = urn2baseurl.get(foundUrn);
-                                out.print("<a href=\"" + url
-                                        + value + "\">"
-                                        + Utils.addEntities(values[j].value)
-                                        + "</a>");
-                            }
-                            else
-                            {
-                                out.print(value);
-                            }
                         }
-
-                    }
-                    else if (browseIndex != null)
-                    {
-                    	out.print("<a href=\"" + request.getContextPath() + "/browse?type=" + browseIndex + "&amp;value="
-                    				+ URLEncoder.encode(values[j].value, "UTF-8") + "\">" + Utils.addEntities(values[j].value)
-                    				+ "</a>");
-                    }
-                    else
-                    {
-                        out.print(getDisplay(values[j].value));
+                        else if (browseIndex != null)
+                        {
+	                        String argument, value;
+	                        if ( values[j].authority != null &&
+	                                            values[j].confidence >= MetadataAuthorityManager.getManager()
+	                                                .getMinConfidence( values[j].schema,  values[j].element,  values[j].qualifier))
+	                        {
+	                            argument = "authority";
+	                            value = values[j].authority;
+	                        }
+	                        else
+	                        {
+	                            argument = "value";
+	                            value = values[j].value;
+	                        }
+	                    	out.print("<a class=\"" + ("authority".equals(argument)?"authority ":"") + browseIndex + "\""
+	                                                + "href=\"" + request.getContextPath() + "/browse?type=" + browseIndex + "&amp;" + argument + "="
+	                    				+ URLEncoder.encode(value, "UTF-8") + "\">" + Utils.addEntities(values[j].value)
+	                    				+ "</a>");
+	                    }
+                        else
+                        {
+                            out.print(getDisplay(values[j].value));
+                        }
                     }
                 }
 
@@ -580,9 +606,11 @@ public class ItemTag extends TagSupport
     /**
      * Render full item record
      */
-    private void renderFull() throws IOException
+    private void renderFull() throws IOException, SQLException
     {
         JspWriter out = pageContext.getOut();
+        HttpServletRequest request = (HttpServletRequest)pageContext.getRequest();
+        Context context = UIUtil.obtainContext(request);
 
         // Get all the metadata
         DCValue[] values = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
@@ -606,20 +634,9 @@ public class ItemTag extends TagSupport
 
         for (int i = 0; i < values.length; i++)
         {
-            boolean hidden = false;
-
-            // Mask description.provenance
-            if (values[i].element.equals("description")
-                    && ((values[i].qualifier != null) && values[i].qualifier
-                            .equals("provenance")))
+            if (!MetadataExposure.isHidden(context, values[i].schema, values[i].element, values[i].qualifier))
             {
-                hidden = true;
-            }
-
-            if (!hidden)
-            {
-                out
-                        .print("<tr><td headers=\"s1\" class=\"metadataFieldLabel\">");
+                out.print("<tr><td headers=\"s1\" class=\"metadataFieldLabel\">");
                 out.print(values[i].schema);
                 out.print("." + values[i].element);
 
@@ -628,11 +645,9 @@ public class ItemTag extends TagSupport
                     out.print("." + values[i].qualifier);
                 }
 
-                out
-                        .print("</td><td headers=\"s2\" class=\"metadataFieldValue\">");
+                out.print("</td><td headers=\"s2\" class=\"metadataFieldValue\">");
                 out.print(getDisplay(values[i].value));
-                out
-                        .print("</td><td headers=\"s3\" class=\"metadataFieldValue\">");
+                out.print("</td><td headers=\"s3\" class=\"metadataFieldValue\">");
 
                 if (values[i].language == null)
                 {
@@ -755,7 +770,19 @@ public class ItemTag extends TagSupport
         {
         	Bundle[] bundles = item.getBundles("ORIGINAL");
 
-        	if (bundles.length == 0)
+        	boolean filesExist = false;
+            
+            for (Bundle bnd : bundles)
+            {
+            	filesExist = bnd.getBitstreams().length > 0;
+            	if (filesExist)
+            	{
+            		break;
+            	}
+            }
+            
+            // if user already has uploaded at least one file
+        	if (!filesExist)
         	{
         		out.println("<p>"
         				+ LocaleSupport.getLocalizedMessage(pageContext,

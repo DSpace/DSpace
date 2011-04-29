@@ -5,6 +5,8 @@
 #             {2} Session ID
 #             {3} URL + HTTP parameters, if any
 #             {4} Exception stack trace
+#             {5} User details
+#             {6} IP address
 #
 # See org.dspace.core.Email for information on the format of this file.
 #
@@ -13,6 +15,8 @@ An internal server error occurred on {0}:
 
 Date:       {1}
 Session ID: {2}
+User:       {5}
+IP address: {6}
 
 {3}
 

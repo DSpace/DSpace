@@ -1,9 +1,9 @@
 <%--
   - supervise-list.jsp
   -
-  - Version: $Revision: 3705 $
+  - Version: $Revision: 4309 $
   -
-  - Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+  - Date: $Date: 2009-09-30 15:20:07 -0400 (Wed, 30 Sep 2009) $
   -
   - Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
   - Institute of Technology.  All rights reserved.
@@ -119,7 +119,7 @@
     <tr>
         <td class="<%= row %>RowOddCol">
             <%-- form to navigate to the item policies --%>
-            <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post">
+            <form action="<%= request.getContextPath() %>/tools/authorize" method="post">
                 <input type="hidden" name="item_id" value="<%=supervisedItems[i].getItem().getID() %>"/>
                 <input type="submit" name="submit_item_select" value="<fmt:message key="jsp.dspace-admin.supervise-list.policies.button"/>"/>
             </form>

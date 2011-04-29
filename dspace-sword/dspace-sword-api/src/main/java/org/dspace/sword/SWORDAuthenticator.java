@@ -129,7 +129,44 @@ public class SWORDAuthenticator
 			throws SWORDException, SWORDErrorException, SWORDAuthenticationException
 	{
 		Context context = this.constructContext(request.getIPAddress());
-		return this.authenticate(context, request);
+		SWORDContext sc = null;
+		try
+        {
+            sc = this.authenticate(context, request);
+        }
+        catch (SWORDException e)
+        {
+            if (context != null && context.isValid())
+            {
+                context.abort();
+            }
+            throw e;
+        }
+        catch (SWORDErrorException e)
+        {
+            if (context != null && context.isValid())
+            {
+                context.abort();
+            }
+            throw e;
+        }
+        catch (SWORDAuthenticationException e)
+        {
+            if (context != null && context.isValid())
+            {
+                context.abort();
+            }
+            throw e;
+        }
+        catch (RuntimeException e)
+        {
+            if (context != null && context.isValid())
+            {
+                context.abort();
+            }
+            throw e;
+        }
+		return sc; 
 	}
 
 	/**
@@ -146,8 +183,45 @@ public class SWORDAuthenticator
 			throws SWORDException, SWORDErrorException, SWORDAuthenticationException
 	{
 		Context context = this.constructContext(request.getIPAddress());
-		return this.authenticate(context, request);
-	}
+		SWORDContext sc = null;
+		try
+        {
+            sc = this.authenticate(context, request);
+        }
+        catch (SWORDException e)
+        {
+            if (context != null && context.isValid())
+            {
+                context.abort();
+            }
+            throw e;
+        }
+        catch (SWORDErrorException e)
+        {
+            if (context != null && context.isValid())
+            {
+                context.abort();
+            }
+            throw e;
+        }
+        catch (SWORDAuthenticationException e)
+        {
+            if (context != null && context.isValid())
+            {
+                context.abort();
+            }
+            throw e;
+        }
+        catch (RuntimeException e)
+        {
+            if (context != null && context.isValid())
+            {
+                context.abort();
+            }
+            throw e;
+        }
+        return sc;
+    }
 
 	/**
 	 * Authenticate the incoming service document request.  Calls:
@@ -194,7 +268,44 @@ public class SWORDAuthenticator
 			throws SWORDException, SWORDErrorException, SWORDAuthenticationException
 	{
 		Context context = this.constructContext(deposit.getIPAddress());
-		return this.authenticate(context, deposit);
+		SWORDContext sc = null;
+		try
+		{
+		    sc = this.authenticate(context, deposit);
+		}
+        catch (SWORDException e)
+        {
+            if (context != null && context.isValid())
+            {
+                context.abort();
+            }
+            throw e;
+        }
+        catch (SWORDErrorException e)
+        {
+            if (context != null && context.isValid())
+            {
+                context.abort();
+            }
+            throw e;
+        }
+        catch (SWORDAuthenticationException e)
+        {
+            if (context != null && context.isValid())
+            {
+                context.abort();
+            }
+            throw e;
+        }
+        catch (RuntimeException e)
+        {
+            if (context != null && context.isValid())
+            {
+                context.abort();
+            }
+            throw e;
+        }
+        return sc;
 	}
 
 	/**
@@ -262,6 +373,15 @@ public class SWORDAuthenticator
 				{
 					authenticated = true;
 					sc.setAuthenticated(ep);
+					 // Set any special groups - invoke the authentication mgr.
+		            int[] groupIDs = AuthenticationManager.getSpecialGroups(context, null);
+
+		            for (int i = 0; i < groupIDs.length; i++)
+		            {
+		                context.setSpecialGroup(groupIDs[i]);
+		                log.debug("Adding Special Group id="+String.valueOf(groupIDs[i]));
+		            }
+					
 					sc.setAuthenticatorContext(context);
 					sc.setContext(context);
 				}
@@ -283,6 +403,14 @@ public class SWORDAuthenticator
 						sc.setOnBehalfOf(epObo);
 						Context oboContext = this.constructContext(ip);
 						oboContext.setCurrentUser(epObo);
+		                // Set any special groups - invoke the authentication mgr.
+	                    int[] groupIDs = AuthenticationManager.getSpecialGroups(oboContext, null);
+
+	                    for (int i = 0; i < groupIDs.length; i++)
+	                    {
+	                        oboContext.setSpecialGroup(groupIDs[i]);
+	                        log.debug("Adding Special Group id="+String.valueOf(groupIDs[i]));
+	                    }
 						sc.setContext(oboContext);
 					}
 					else

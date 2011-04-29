@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<!--
+
+    $Id: sitemap.xmap 4401 2009-10-07 08:30:07Z mdiggory $
+    $URL: https://scm.dspace.org/svn/repo/modules/dspace-stats/trunk/dspace-xmlui-stats/src/main/resources/aspects/Statistics/sitemap.xmap $
+    *************************************************************************
+    Copyright (c) 2002-2009, DuraSpace.  All rights reserved
+    Licensed under the DuraSpace Foundation License.
+
+    A copy of the DuraSpace License has been included in this
+    distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
+
+-->
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+	<map:components>
+		<map:transformers>
+			<map:transformer name="StatisticsTransformer" src="org.dspace.app.xmlui.aspect.statistics.StatisticsTransformer"/>
+			<map:transformer name="Navigation" src="org.dspace.app.xmlui.aspect.statistics.Navigation"/>
+            <map:transformer name="RestrictedItem" src="org.dspace.app.xmlui.aspect.artifactbrowser.RestrictedItem"/>
+        </map:transformers>
+		<map:matchers default="wildcard">
+			<map:matcher name="HandleTypeMatcher" src="org.dspace.app.xmlui.aspect.general.HandleTypeMatcher"/>
+			<map:matcher name="StatisticsAuthorizedMatcher" src="org.dspace.app.xmlui.aspect.statistics.StatisticsAuthorizedMatcher"/>
+		</map:matchers>
+        <map:selectors>
+            <map:selector name="AuthenticatedSelector" src="org.dspace.app.xmlui.aspect.general.AuthenticatedSelector"/>
+        </map:selectors>
+	</map:components>
+    
+	<map:pipelines>
+		<map:pipeline>
+
+			<map:generate/>
+
+            <!--Only show the stats link if we have read rights-->
+            <map:match pattern="handle/*/**">
+                <map:match type="StatisticsAuthorizedMatcher" pattern="READ">
+                    <map:transform type="Navigation"/>
+                </map:match>
+            </map:match>
+
+
+            <!--Match our statistics-->
+            <map:match pattern="handle/*/*/statistics">
+                <map:match type="StatisticsAuthorizedMatcher" pattern="READ">
+                    <map:transform type="StatisticsTransformer"/>
+                </map:match>
+
+                <map:match type="StatisticsAuthorizedMatcher" pattern="!READ">
+                    <map:select type="AuthenticatedSelector">
+                            <map:when test="eperson">
+                                    <map:transform type="RestrictedItem"/>
+                                    <map:serialize/>
+                            </map:when>
+                            <map:otherwise>
+                                    <map:act type="StartAuthentication">
+                                            <map:parameter name="header" value="xmlui.ArtifactBrowser.RestrictedItem.auth_header"/>
+                                            <map:parameter name="message" value="xmlui.ArtifactBrowser.RestrictedItem.auth_message"/>
+                                    </map:act>
+                                    <map:serialize/>
+                            </map:otherwise>
+                    </map:select>
+                </map:match>
+            </map:match>
+
+            <map:match pattern="">
+                <map:transform type="StatisticsTransformer"/>
+            </map:match>
+
+			<map:serialize type="xml"/>
+
+		</map:pipeline>
+	</map:pipelines>
+</map:sitemap>

@@ -32,7 +32,7 @@ Scott Phillips adapted it for Manakin's need.
   <xsl:param name="realPath"/>
 
   <!-- let sitemap override default page title -->
-  <xsl:param name="pageTitle">An error has occured</xsl:param>
+  <xsl:param name="pageTitle">An error has occurred</xsl:param>
 
   <xsl:template match="ex:exception-report">
     <html>

@@ -43,6 +43,7 @@ import org.dspace.core.ConfigurationManager;
 import org.apache.log4j.Logger;
 
 import java.util.Map;
+import java.util.List;
 
 /**
  * Class to generate ATOM Collection Elements which represent
@@ -135,7 +136,12 @@ public class CollectionCollectionGenerator extends ATOMCollectionGenerator
 		}
 
 		scol.setMediation(mediation);
-		scol.addAccepts(zip);
+
+        List<String> accepts = swordService.getSwordConfig().getCollectionAccepts();
+        for (String accept : accepts)
+        {
+            scol.addAccepts(accept);
+        }
 
 		// add the accept packaging values
 		Map<String, Float> aps = swordConfig.getAcceptPackaging(col);

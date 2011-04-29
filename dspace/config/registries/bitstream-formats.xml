@@ -3,9 +3,9 @@
 <!--
   - bitstream-formats.xml
   -
-  - Version:  $Revision: 3705 $
+  - Version:  $Revision: 5899 $
   -
-  - Date:     $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+  - Date:     $Date: 2010-11-24 04:54:40 -0500 (Wed, 24 Nov 2010) $
   -
   - Initial contents for bitstream format registry.  Once the registry has
   - been loaded, this file becomes obsolete; the current version of the
@@ -47,11 +47,20 @@
     <internal>false</internal>
   </bitstream-type>
 
-    <!-- Used by system: do not remove -->
+  <!-- Used by system: do not remove -->
   <bitstream-type>
     <mimetype>text/plain; charset=utf-8</mimetype>
     <short_description>License</short_description>
     <description>Item-specific license agreed upon to submission</description>
+    <support_level>1</support_level>
+    <internal>true</internal>
+  </bitstream-type>
+
+  <!-- Used by system: do not remove -->
+  <bitstream-type>
+    <mimetype>text/html; charset=utf-8</mimetype>
+    <short_description>CC License</short_description>
+    <description>Item-specific Creative Commons license agreed upon to submission</description>
     <support_level>1</support_level>
     <internal>true</internal>
   </bitstream-type>
@@ -714,6 +723,15 @@
 	  <internal>false</internal>
 	  <extension>sdm</extension>
 	</bitstream-type>
+
+    <bitstream-type>
+      <mimetype>application/rdf+xml; charset=utf-8</mimetype>
+      <short_description>RDF XML</short_description>
+      <description>RDF serialized in XML</description>
+      <support_level>1</support_level>
+      <internal>false</internal>
+      <extension>rdf</extension>
+    </bitstream-type>
 
 
 </dspace-bitstream-types>

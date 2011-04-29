@@ -1,0 +1,530 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<chapter remap="h1">
+    <title><anchor id="docbook-xmlui.html"/>DSpace System Documentation: Manakin [XMLUI] Configuration and Customization</title>
+    <para>The DSpace digital repository supports two user interfaces: one based on JavaServer Pages (JSP) technologies and one based upon the Apache Cocoon framework. This chapter describes those parameters which are specific to the Manakin (XMLUI) interface based upon the Cocoon framework.</para>
+    <section remap="h2">
+        <title><anchor id="docbook-xmlui.html-configuration" xreflabel="Manakin Configuration"/>Manakin Configuration Property Keys</title>
+        <para>In an effort to save the programmer/administrator some time, the configuration table below is taken from 5.3.43. <emphasis>XMLUI Specific Configuration</emphasis>.</para>
+        <informaltable>
+            <?dbhtml table-width="100%"?>
+            <?dbfo table-width="100%"?>
+            <tgroup cols="2"><colspec colname="c1" colwidth="30*" colsep="1"/><colspec colname="c2" colwidth="70*"/><spanspec spanname="notespan" namest="c1" nameend="c2" align="center"/><tbody>
+                    <row>
+                        <entry align="right">Property:</entry>
+                        <entry><literal>xmlui.supportedLocales</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Example Value:</entry>
+                        <entry><literal>xmlui.supportedLocales = en, de</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Informational Note:</entry>
+                        <entry>A list of supported locales for Manakin. Manakin will look at a user's browser configuration for the first language that appears in this list to make available to in the interface. This parameter is a comma separated list of Locales. All types of Locales country, country_language, country_language_variant. Note that if the appropriate files are not present (i.e. Messages_XX_XX.xml) then Manakin will fall back through to a more general language.</entry>
+                    </row>
+                    <row>
+                        <?dbfo row-height="5mm"?>
+                        <?dbhtml row-height="5mm"?>
+                        <entry spanname="notespan"/>
+                    </row>
+                    <row>
+                        <entry align="right">Property:</entry>
+                        <entry><literal>xmlui.force.ssl</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Example Value:</entry>
+                        <entry><literal>xmlui.force.ssl = true</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Informational Note:</entry>
+                        <entry>Force all authenticated connections to use SSL, only non-authenticated connections are allowed over plain http. If set to true, then you need to ensure that the &apos;<literal>dspace.hostname</literal>&apos; parameter is set to the correctly.</entry>
+                    </row>
+                    <row>
+                        <?dbfo row-height="5mm"?>
+                        <?dbhtml row-height="5mm"?>
+                        <entry spanname="notespan"/>
+                    </row>
+                    <row>
+                        <entry align="right">Property:</entry>
+                        <entry><literal>xmlui.user.registration</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Example Value:</entry>
+                        <entry><literal>xmlui.user.registration = true</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Informational Note:</entry>
+                        <entry>Determine if new users should be allowed to register. This parameter is useful in conjunction with Shibboleth where you want to disallow registration because Shibboleth will automatically register the user. Default value is true.</entry>
+                    </row>
+                    <row>
+                        <?dbfo row-height="5mm"?>
+                        <?dbhtml row-height="5mm"?>
+                        <entry spanname="notespan"/>
+                    </row>
+                    <row>
+                        <entry align="right">Property:</entry>
+                        <entry><literal>xmlui.user.editmetadata</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Example Value:</entry>
+                        <entry><literal>xmlui.user.editmetadata = true</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Informational Note:</entry>
+                        <entry>Determines if users should be able to edit their own metadata. This parameter is useful in conjunction with Shibboleth where you want to disable the user&apos;s ability to edit their metadata because it came from Shibboleth. Default value is true.</entry>
+                    </row>
+                    <row>
+                        <?dbfo row-height="5mm"?>
+                        <?dbhtml row-height="5mm"?>
+                        <entry spanname="notespan"/>
+                    </row>
+                    <row>
+                        <entry align="right">Property:</entry>
+                        <entry><literal>xmlui.user.assumelogon</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Example Value:</entry>
+                        <entry><literal>xmlui.user.assumelogon = true</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Informational Note:</entry>
+                        <entry>Determine if super administrators (those whom are in the Administrators group) can login as another user from the &quot;edit eperson&quot; page. This is useful for debugging problems in a running dspace instance, especially in the workflow process. The default value is false, i.e., no one may assume the login of another user.</entry>
+                    </row>
+                    <row>
+                        <?dbfo row-height="5mm"?>
+                        <?dbhtml row-height="5mm"?>
+                        <entry spanname="notespan"/>
+                    </row>
+                    <row>
+                        <entry align="right">Property:</entry>
+                        <entry><literal>xmlui.user.loginredirect</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Example Value:</entry>
+                        <entry><literal>xmlui.user.loginredirect = /profile</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Informational Note:</entry>
+                        <entry>After a user has logged into the system, which url should they be directed? Leave this parameter blank or undefined to direct users to the homepage, or <literal>/profile</literal> for the user's profile, or another reasonable choice is <literal>/submissions</literal> to see if the user has any tasks awaiting their attention. The default is the repository home page.</entry>
+                    </row>
+                    <row>
+                        <?dbfo row-height="5mm"?>
+                        <?dbhtml row-height="5mm"?>
+                        <entry spanname="notespan"/>
+                    </row>
+                    <row>
+                        <entry align="right">Property:</entry>
+                        <entry><literal>xmlui.theme.allowoverrides</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Example Value:</entry>
+                        <entry><literal>xmlui.theme.allowoverrides = false</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Informational Note:</entry>
+                        <entry>Allow the user to override which theme is used to display a particular page. When submitting a request add the HTTP parameter "themepath" which corresponds to a particular theme, that specified theme will be used instead of the any other configured theme. Note that this is a potential security hole allowing execution of unintended code on the server, this option is only for development and debugging it should be turned off for any production repository. The default value unless otherwise specified is &quot;false&quot;.</entry>
+                    </row>
+                    <row>
+                        <?dbfo row-height="5mm"?>
+                        <?dbhtml row-height="5mm"?>
+                        <entry spanname="notespan"/>
+                    </row>
+                    <row>
+                        <entry align="right">Property:</entry>
+                        <entry><literal>xmlui.bundle.upload</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Example Value:</entry>
+                        <entry><literal>xmlui.bundle.upload = ORIGINAL, METADATA, THUMBNAIL, LICENSE, CC_LICENSE</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Informational Note:</entry>
+                        <entry>Determine which bundles administrators and collection administrators may upload into an existing item through the administrative interface. If the user does not have the appropriate privileges (add and write) on the bundle then that bundle will not be shown to the user as an option.</entry>
+                    </row>
+                    <row>
+                        <?dbfo row-height="5mm"?>
+                        <?dbhtml row-height="5mm"?>
+                        <entry spanname="notespan"/>
+                    </row>
+                    <row>
+                        <entry align="right">Property:</entry>
+                        <entry><literal>xmlui.community-list.render.full</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Example Value:</entry>
+                        <entry><literal>xmlui.community-list.render.full = true</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Informational Note:</entry>
+                        <entry>On the community-list page should all the metadata about a community/collection be available to the theme. This parameter defaults to true, but if you are experiencing performance problems on the community-list page you should experiment with turning this option off.</entry>
+                    </row>
+                    <row>
+                        <?dbfo row-height="5mm"?>
+                        <?dbhtml row-height="5mm"?>
+                        <entry spanname="notespan"/>
+                    </row>
+                    <row>
+                        <entry align="right">Property:</entry>
+                        <entry><literal>xmlui.community-list.cache</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Example Value:</entry>
+                        <entry><literal>xmlui.community-list.cache = 12 hours</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Informational Note:</entry>
+                        <entry>Normally, Manakin will fully verify any cache pages before using a cache copy. This means that when the community-list page is viewed the database is queried for each community/collection to see if their metadata has been modified. This can be expensive for repositories with a large community tree. To help solve this problem you can set the cache to be assumed valued for a specific set of time. The downside of this is that new or editing communities/collections may not show up the website for a period of time.</entry>
+                    </row>
+                    <row>
+                        <?dbfo row-height="5mm"?>
+                        <?dbhtml row-height="5mm"?>
+                        <entry spanname="notespan"/>
+                    </row>
+                    <row>
+                        <entry align="right">Property:</entry>
+                        <entry><literal>xmlui.bistream.mods</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Example Value:</entry>
+                        <entry><literal>xmlui.bistream.mods = true</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Informational Note:</entry>
+                        <entry>Optionally, you may configure Manakin to take advantage of metadata stored as a bitstream. The MODS metadata file must be inside the &quot;METADATA&quot; bundle and named MODS.xml. If this option is set to &apos;true&apos; and the bitstream is present then it is made available to the theme for display.</entry>
+                    </row>
+                    <row>
+                        <?dbfo row-height="5mm"?>
+                        <?dbhtml row-height="5mm"?>
+                        <entry spanname="notespan"/>
+                    </row>
+                    <row>
+                        <entry align="right">Property:</entry>
+                        <entry><literal>xmlui.bitstream.mets</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Example Value:</entry>
+                        <entry><literal>xmlui.bitstream.mets = true</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Informational Note:</entry>
+                        <entry>Optionally, you may configure Manakin to take advantage of metadata stored as a bitstream. The METS metadata file must be inside the &quot;METADATA&quot; bundle and named METS.xml. If this optino is set to &quot;true&quot; and the bitstream is present then it is made available to the theme for display.</entry>
+                    </row>
+                    <row>
+                        <?dbfo row-height="5mm"?>
+                        <?dbhtml row-height="5mm"?>
+                        <entry spanname="notespan"/>
+                    </row>
+                    <row>
+                        <entry align="right">Property:</entry>
+                        <entry><literal>xmlui.google.analytics.key</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Example Value:</entry>
+                        <entry><literal>xmlui.google.analytics.key = UA-XXXXXX-X</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Informational Note:</entry>
+                        <entry>If you would like to use google analytics to track general website statistics then use the following parameter to provide your analytics key. First sign up for an account at <ulink url="http://analytics.google.com"
+                            >http://analytics.google.com</ulink>, then create an entry for your repositories website. Google Analytics will give you a snipit of javascript code to place on your site, inside that snip it is your google analytics key usually found in the line: _uacct = "UA-XXXXXXX-X" Take this key (just the UA-XXXXXX-X part) and place it here in this parameter.</entry>
+                    </row>
+                    <row>
+                        <?dbfo row-height="5mm"?>
+                        <?dbhtml row-height="5mm"?>
+                        <entry spanname="notespan"/>
+                    </row>
+                    <row>
+                        <entry align="right">Property:</entry>
+                        <entry><literal>xmlui.controlpanel.activity.max</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Example Value:</entry>
+                        <entry><literal>xmlui.controlpanel.activity.max = 250</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Informational Note:</entry>
+                        <entry>Assign how many page views will be recorded and displayed in the control panel's activity viewer. The activity tab allows an administrator to debug problems in a running DSpace by understanding who and how their dspace is currently being used. The default value is 250.</entry>
+                    </row>
+                    <row>
+                        <?dbfo row-height="5mm"?>
+                        <?dbhtml row-height="5mm"?>
+                        <entry spanname="notespan"/>
+                    </row>
+                    <row>
+                        <entry align="right">Property:</entry>
+                        <entry><literal>xmlui.controlpanel.activity.ipheader</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Example Value:</entry>
+                        <entry><literal>xmlui.controlpanel.activity.ipheader = X-Forward-For</literal></entry>
+                    </row>
+                    <row>
+                        <entry align="right">Informational Note:</entry>
+                        <entry>Determine where the control panel's activity viewer recieves an events IP address from. If your DSpace is in a load balanced enviornment or otherwise behind a context-switch then you will need to set the paramater to the HTTP parameter that records the original IP address.</entry>
+                    </row>
+                </tbody></tgroup>
+        </informaltable>
+    </section>
+    <section remap="h2">
+        <title><anchor id="docbook-xmlui.html-conthemeasp" xreflabel="Configuring Themes and Aspects"/>Configuring Themes and Aspects</title>
+        <para>The Manakin user interface is composed of two distinct components: <emphasis>aspects</emphasis> and <emphasis>themes</emphasis>. Manakin aspects are like extensions or plugins for Manakin; they are interactive components that modify existing features or provide new features for the digital repository. Manakin themes stylize the look-and-feel of the repository, community, or collection.</para>
+        <para>The repository administrator is able to define which aspects and themes are installed for the particular repository by editing the <literal>[dspace]/config/xmlui.xconf</literal> configuration file. The <literal>xmlui.xconf</literal> file consists of two major sections: Aspects and Themes.</para>
+        <section remap="h3">
+            <title><anchor id="docbook-xmlui.html-aspects" xreflabel="Aspects"/>Aspects</title>
+            <para>The <literal>&lt;aspects&gt;</literal> section defines the &quot;Aspect Chain&quot;, or the linear set of aspects that are installed in the repository. For each aspect that is installed in the repository, the aspect makes available new features to the interface. For example, if the &quot;submission&quot; aspect were to be commented out or removed from the <literal>xmlui.xconf</literal>, then users would not be able to submit new items into the repository (even the links and language prompting users to submit items are removed). Each <literal>&lt;aspect&gt;</literal> element has two attributes, <emphasis>name</emphasis> and <emphasis>path</emphasis>. The name is used to identify the Aspect, while the path determines the directory where the aspect&apos;s code is located. Here is the default aspect configuration:</para>
+            <screen>
+    &lt;aspects&gt;
+        &lt;aspect name=&quot;Artifact Browser&quot; path=&quot;resource://aspects/ArtifactBrowser/&quot; /&gt;
+        &lt;aspect name=&quot;Administration&quot;	path=&quot;resource://aspects/Administrative/&quot; /&gt;
+        &lt;aspect name=&quot;E-Person&quot; path=&quot;resource://aspects/EPerson/&quot;	/&gt;
+        &lt;aspect name=&quot;Submission and Workflow&quot; path=&quot;resource://aspects/Submission/&quot; /&gt;
+    &lt;/aspects&gt;</screen>
+            <para>A standard distribution of Manakin/DSpace includes four &quot;core&quot; aspects: <itemizedlist>
+                    <listitem>
+                        <para><emphasis role="bold">Artifact Browser</emphasis></para>
+                        <para>The Artifact Browser Aspect is responsible for browsing communities, collections, items and bitstreams, viewing an individual item and searching the repository.</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">E-Person</emphasis></para>
+                        <para>The E-Person Aspect is responsible for logging in, logging out, registering new users, dealing with forgotten passwords, editing profiles and changing passwords.</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">Submission</emphasis></para>
+                        <para>The Submission Aspect is responsible for submitting new items to DSpace, determining the workflow process and ingesting the new items into the DSpace repository.</para>
+                    </listitem>
+                    <listitem>
+                        <para><emphasis role="bold">Administrative</emphasis></para>
+                        <para>The Administrative Aspect is responsible for administrating DSpace, such as creating, modifying and removing all communities, collections, e-persons, groups, registries and authorizations.</para>
+                    </listitem>
+                </itemizedlist></para>
+        </section>
+        <section remap="h3">
+            <title><anchor id="docbook-xmlui.html-themes" xreflabel="Themes"/>Themes</title>
+            <para>The <literal>&lt;themes&gt;</literal> section defines a set of &quot;rules&quot; that determine where themes are installed in the repository. Each rule is processed in the order that it appears, and the first rule that matches determines the theme that is applied (so order is important). Each rule consists of a <literal>&lt;theme&gt;</literal> element with several possible attributes:</para>
+            <itemizedlist>
+                <listitem>
+                    <para><emphasis role="bold">name</emphasis> (<emphasis>always required</emphasis>)</para>
+                    <para>The name attribute is used to document the theme&apos;s name.</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">path</emphasis> (<emphasis>always required</emphasis>)</para>
+                    <para>The path attribute determines where the theme is located relative to the <literal>themes/</literal> directory and must either contain a trailing slash or point directly to the theme&apos;s <literal>sitemap.xmap</literal> file.</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">regex</emphasis> (<emphasis>either regex and/or handle is required</emphasis>)</para>
+                    <para>The regex attribute determines which URLs the theme should apply to.</para>
+                </listitem>
+                <listitem>
+                    <para><emphasis role="bold">handle</emphasis> (<emphasis>either regex and/or handle is required</emphasis>)</para>
+                    <para>The handle attribute determines which community, collection, or item the theme should apply to.</para>
+                </listitem>
+            </itemizedlist>
+            <para>If you use the &quot;handle&quot; attribute, the effect is cascading, meaning if a rule is established for a community then all collections and items within that community will also have this theme apply to them as well. Here is an example configuration:</para>
+            <screen>
+    &lt;themes&gt;
+        &lt;theme name=&quot;Theme 1&quot; handle=&quot;123456789/23&quot; path=&quot;theme1/&quot;/&gt;
+        &lt;theme name=&quot;Theme 2&quot; regex=&quot;community-list&quot;	path=&quot;theme2/&quot;/&gt;
+        &lt;theme name=&quot;Reference Theme&quot; regex=&quot;.*&quot; path=&quot;Reference/&quot;/&gt;
+    &lt;/themes&gt;</screen>
+            <para>In the example above three themes are configured: &quot;Theme 1&quot;, &quot;Theme 2&quot;, and the &quot;Reference Theme&quot;. The first rule specifies that &quot;Theme 1&quot; will apply to all communities, collections, or items that are contained under the parent community &quot;123456789/23&quot;. The next rule specifies any URL containing the string &quot;community-list&quot; will get &quot;Theme 2&quot;. The final rule, using the regular expression &quot;.*&quot;, will match <emphasis
+                    role="bold">anything</emphasis>, so all pages which have not matched one of the preceding rules will be matched to the Reference Theme.</para>
+        </section>
+    </section>
+    <section remap="h2">
+        <title><anchor id="docbook-xmlui.html-multilingual" xreflabel="Multilingual Support"/>Multilingual Support</title>
+        <para>The XMLUI user interface supports multiple languages through the use of internationalization catalogues as defined by the <ulink url="http://cocoon.apache.org/2.1/userdocs/i18nTransformer.html">Cocoon Internationalization Transformer</ulink>. Each catalog contains the translation of all user-displayed strings into a particular language or variant. Each catalog is a single xml file whose name is based upon the language it is designated for, thus:</para>
+        <para>messages_<emphasis>language</emphasis>_<emphasis>country</emphasis>_<emphasis>variant</emphasis>.xml</para>
+        <para>messages_<emphasis>language</emphasis>_<emphasis>country</emphasis>.xml</para>
+        <para>messages_<emphasis>language</emphasis>.xml</para>
+        <para>messages.xml</para>
+        <para>The interface will automatically determine which file to select based upon the user&apos;s browser and system configuration. For example, if the user&apos;s browser is set to Australian English then first the system will check if <literal>messages_en_au.xml</literal> is available. If this translation is not available it will fall back to <literal>messages_en.xml</literal>, and finally if that is not available, <literal>messages.xml</literal>.</para>
+        <para>Manakin supplies an English only translation of the interface. In order to add other translations to the system, locate the <literal>[dspace-source]/dspace/modules/xmlui/src/main/webapp/i18n/</literal> directory. By default this directory will be empty; to add additional translations add alternative versions of the <literal>messages.xml</literal> file in specific language and country variants as needed for your installation.</para>
+        <para>To set a language other than English as the default language for the repository&apos;s interface, simply name the translation catalogue for the new default language &quot;<literal>messages.xml</literal>&quot;</para>
+    </section>
+    <section remap="h2">
+        <title><anchor id="docbook-xmlui.html-newtheme" xreflabel="Creating a New Theme"/>Creating a New Theme</title>
+        <para>Manakin themes stylize the look-and-feel of the repository, community, or collection and are distributed as self-contained packages. A Manakin/DSpace installation may have multiple themes installed and available to be used in different parts of the repository. The central component of a theme is the sitemap.xmap, which defines what resources are available to the theme such as XSL stylesheets, CSS stylesheets, images, or multimedia files.</para>
+        <simpara>
+            <emphasis role="bold">1) Create theme skeleton</emphasis>
+        </simpara>
+        <para>Most theme developers do not create a new theme from scratch; instead they start from the standard theme template, which defines a skeleton structure for a theme. The template is located at: <literal>[dspace-source]/dspace-xmlui/dspace-xmlui-webbapp/src/main/webbapp/themes/template</literal>. To start your new theme simply copy the theme template into your locally defined modules directory, <literal>[dspace-source]/dspace/modules/xmlui/src/main/webbapp/themes/[your theme&apos;s directory]/</literal>.</para>
+        <simpara>
+            <emphasis role="bold">2) Modify theme variables</emphasis>
+        </simpara>
+        <para>The next step is to modify the theme&apos;s parameters so that the theme knows where it is located. Open the <literal>[your theme&apos;s directory]/sitemap.xmap</literal> and look for <literal>&lt;global-variables&gt;</literal></para>
+        <screen>
+    &lt;global-variables&gt;
+        &lt;theme-path&gt;[your theme&apos;s 	directory]&lt;/theme-path&gt;
+        &lt;theme-name&gt;[your theme&apos;s name]&lt;/theme-name&gt;
+    &lt;/global-variables&gt;</screen>
+        <para>Update both the theme&apos;s path to the directory name you created in step one. The theme&apos;s name is used only for documentation.</para>
+        <simpara>
+            <emphasis role="bold">3) Add your CSS stylesheets</emphasis>
+        </simpara>
+        <para>The base theme template will produce a repository interface without any style - just plain XHTML with no color or formatting. To make your theme useful you will need to supply a CSS Stylesheet that creates your desired look-and-feel. Add your new CSS stylesheets:</para>
+        <para><literal>[your theme&apos;s directory]/lib/style.css</literal> (The base style sheet used for all browsers)</para>
+        <para><literal>[your theme&apos;s directory]/lib/style-ie.css</literal> (Specific stylesheet used for internet explorer)</para>
+        <simpara>
+            <emphasis role="bold">4) Install theme and rebuild DSpace</emphasis>
+        </simpara>
+        <para>Next rebuild and deploy Dspace (replace &lt;version&gt; with the your current release):</para>
+        <orderedlist>
+            <listitem>
+                <para>Rebuild the DSpace installation package by running the following command from your <literal>[dspace-source]/dspace/</literal> directory:</para>
+                <screen>mvn package</screen>
+            </listitem>
+            <listitem>
+                <para>Update all DSpace webapps to <literal>[dspace]/webapps</literal> by running the following command from your <literal>[dspace-source]/dspace/target/dspace-[version]-build.dir</literal> directory:</para>
+                <screen>ant -Dconfig=<emphasis>[dspace]</emphasis>/config/dspace.cfg update </screen>
+            </listitem>
+            <listitem>
+                <para>Deploy the the new webapps: <screen>cp -R /[dspace]/webapps/* /[tomcat]/webapps</screen></para>
+            </listitem>
+            <listitem>
+                <para>Restart Tomcat</para>
+            </listitem>
+        </orderedlist>
+        <para>This will ensure the theme has been installed as described in the previous section &quot;<link linkend="docbook-xmlui.html-conthemeasp">Configuring Themes and Aspects</link>&quot;.</para>
+    </section>
+	<section remap="h2">
+		<title><anchor id="docbook-xmlui.html-news" xreflabel="XMLUI News Content"/>Customizing the News Document</title>
+		<para>The XMLUI "news" document is only shown on the root page of your repository.  It was intended to provide the title and introductory message, but you may use it for anything.</para>
+		<para>The news document is located at <literal>[dspace]/dspace/config/news-xmlui.xml</literal>.  There is only one version; it is localized by inserting "i18n" callouts into the text areas.  It must be a complete and valid XML DRI document (see Chapter 15).</para>
+		<para>Its (the News document) exact rendering in the XHTML UI depends, of course, on the theme.  The default content is designed to operate with the reference themes, so when you modify it, be sure to preserve the tag structure and e.g. the exact attributes of the first DIV tag.  Also note that the text is DRI, not HTML, so you must use only DRI tags, such as the XREF tag to construct a link.</para>
+		<para>Example 1: a single language:</para>
+<screen>&lt;document&gt;
+      &lt;body&gt;
+        &lt;div id=&quot;file.news.div.news&quot; n=&quot;news&quot; rend=&quot;primary&quot;&gt;
+          &lt;head&gt; TITLE OF YOUR REPOSITORY HERE &lt;/head&gt;
+          &lt;p&gt;
+            INTRO MESSAGE HERE
+            Welcome to my wonderful repository etc etc ...
+            A service of &lt;xref target=&quot;http://myuni.edu/&quot;&gt;My University&lt;/xref&gt;
+          &lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/body&gt;
+      &lt;options/&gt;
+      &lt;meta&gt;
+        &lt;userMeta/&gt;
+        &lt;pageMeta/&gt;
+        &lt;repositoryMeta/&gt;
+      &lt;/meta&gt;
+   &lt;/document&gt;</screen>
+		<para>Example 2: all text replaced by references to localizable message keys:</para>
+<screen>
+&lt;document&gt;
+      &lt;body&gt;
+        &lt;div id=&quot;file.news.div.news&quot; n=&quot;news&quot; rend=&quot;primary&quot;&gt;
+          &lt;head&gt;&lt;i18n:text&gt;myuni.repo.title&lt;/i18n:text&gt;&lt;/head&gt;
+          &lt;p&gt;
+            &lt;i18n:text&gt;myuni.repo.intro&lt;/i18n:text&gt;
+            &lt;i18n:text&gt;myuni.repo.a.service.of&lt;/i18n:text&gt;
+            &lt;xref target=&quot;http://myuni.edu/&quot;&gt;&lt;i18n:text&gt;myuni.name&lt;/i18n:text&gt;&lt;/xref&gt;
+          &lt;/p&gt;
+        &lt;/div&gt;
+      &lt;/body&gt;
+      &lt;options/&gt;
+      &lt;meta&gt;
+        &lt;userMeta/&gt;
+        &lt;pageMeta/&gt;
+        &lt;repositoryMeta/&gt;
+      &lt;/meta&gt;
+    &lt;/document&gt;
+</screen>
+		
+		
+	</section>
+    <section remap="h2">
+        <title><anchor id="docbook-xmlui.html-staticcontent" xreflabel="Static Content"/>Adding Static Content</title>
+        <para>The XMLUI user interface supports the addition of globally static content (as well as static content within individual themes).</para>
+        <para>Globally static content can be placed in the <literal>[dspace-source]/dspace/modules/xmlui/src/main/webapp/static/</literal> directory. By default this directory only contains the default <literal>robots.txt</literal> file, which provides helpful site information to web spiders/crawlers. However, you may also add static HTML (<literal>*.html</literal>) content to this directory, as needed for your installation.</para>
+        <para>Any static HTML content you add to this directory may also reference static content (e.g. CSS, Javascript, Images, etc.) from the same <literal>[dspace-source]/dspace/modules/xmlui/src/main/webapp/static/</literal> directory. You may reference other static content from your static HTML files similar to the following:</para>
+        <screen>
+  &lt;link href=&quot;./static/mystyle.css&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot;/&gt;
+  &lt;img src=&quot;./static/images/static-image.gif&quot; alt=&quot;Static image in /static/images/ directory&quot;/&gt;
+  &lt;img src=&quot;./static/static-image.jpg&quot; alt=&quot;Static image in /static/ directory&quot;/&gt; </screen>
+    </section>
+	<section remap="h2">
+		<title><anchor id="docbook-xmlui.html-oai-ore" xreflabel="OAI-ORE Harvestor"/>Enabling OAI-ORE Harvester using XMLUI</title>
+		<para>This section will give the necessary steps to set up the OAI-ORE Harvester usig Manakin.</para>
+		<para>Setting up a collection (Collection Edit Screen):</para>
+		<orderedlist>
+			<listitem>
+				<para>Login and create a new collection.</para>
+			</listitem>
+			<listitem>
+				<para>Go to the tab named &quot;Content Source&quot; that now appears next to &quot;Edit Metadata&quot; and &quot;Assign Roles &quot; in the collection edit screens.</para>
+			</listitem>
+			<listitem>
+				<para>The two counter source options are standards (selected by default) and harvested.  Select &quot;harvests from external source&quot; and click Save.</para>
+			</listitem>
+			<listitem>
+				<para>A new set of menus appear to configure the harvesting settings:</para>
+				<itemizedlist>
+					<listitem>
+						<para>&quot;OAI Provide&quot; is in the URL of the OAI-PMH provider that the content from this collection should be harvested from.  The PMH provider deployed with DSpace typically has the form:</para>
+						<para>&quot;http://dspace.url/oai/reuqest&quot;.  For this example use &quot;http://web01.library.tamu.edu/oai-h151/request&quot;</para>
+					</listitem>
+					<listitem>
+						<para>&quot;OAI Set id&quot; is the setSpec of the collection you wish to harvest from.</para>
+						<para>Use &quot;hdl_1969.1_5671&quot; for this example.</para>
+					</listitem>
+					<listitem>
+						<para>&quot;Metadata format&quot; determines the format that the descriptive metdata will be harvested.  Since DSpace stores metadata in its own internal format, not all metadata values might bet harvested if a specific format is specified.  Select &quot;DSpace Intermediate Metadata&quot; if available and &quot;Simple Dublin Core&quot; otherwise.</para>
+					</listitem>
+					<listitem>
+						<para>Click the Test Settings button will verify the settings supplied in the previous steps and will usually let you know what, if anything is missing or does not match up.</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para>The list of radio buttons labeled &quot;Content being harvested&quot; allows you to select the harvest level.  The first one requires no OAI-ORE support on the part of the provider and can be used to harvest metadata from any provider compliant with the OAI-PMH 2.0 specifications.  The middle options will harvest the metadata and generate links to bitstreams stored remotely, while the last one will perform full local replication.</para>
+				<para>Select the middle option and click Save</para>
+			</listitem>
+		</orderedlist>
+		<para>At this point the settings are saved and the menu changes to provide three options:</para>
+		<itemizedlist>
+			<listitem>
+				<para>&quot;Change Settings&quot; takes you back to the edit screen.</para>
+			</listitem>
+			<listitem>
+				<para>&quot;Import Now&quot; performs a single harvest from the remote collection  into the local one.  Success, notes, and errors encountered in the process will be reflected in the &quot;Last Harvest Result&quot; entry.  More detailed information is available in the dspace log.  Note that the whole harvest cycle is execuited withtin a single HTTP request and will time out for large collections.  For this reason, it is advisable to use the automatic harvest scheduler set up
+				either in XMLUI or from the command line.  If the scheduler is running, &quot;Import Now&quot; will handle the harvest task as a separate thread.</para>
+			</listitem>
+			<listitem>
+				<para>&quot;Reset and Reimport Collection&quot; will perform the same function as &quot;Import Now&quot;, but will clear the collection of all existing items before doing so.</para>
+			</listitem>
+		</itemizedlist>
+		<section remap="h3">
+			<title><anchor id="docbook-xmlui.html-oai-ore-scheduler" xreflabel="Harvester Scheduler"/>Automatic Harvesting (Scheduler)</title>
+			<para>Setting up automatic harvesting in the Control Panel Screen.</para>
+			<itemizedlist>
+				<listitem>
+					<para>A new tabl, Harvesting, has been added under Administrative &#151;&#62; Control Panel.</para>
+				</listitem>
+				<listitem>
+					<para>The panel offers the following information:</para>
+					<itemizedlist>
+						<listitem>
+							<para>Available actions:</para>
+							<itemizedlist>
+								<listitem>
+									<para>STart Harvester: starts the scheduler.  From this point on, all properly configured collections (listed on the next line) will be harvested at regular intervals.  This interval can be changed in the <literal>dspace.cfg</literal> using the &quot;<literal>harvester.harvestFrequency</literal>&quot; parameter.</para>
+								</listitem>
+								<listitem>
+									<para>Pause: the &quot;nice&quot; stop; waits for the active harvests to finish, saves the state/progress and pauses execution.  Can be either resumed or stopped.</para>
+								</listitem>
+								<listitem>
+									<para>Stop: the &quot;full stop&quot;; waits for the current item to finish harvesting, and aborts further execution.</para>
+								</listitem>
+								<listitem>
+									<para>Reset Harvest Status:  since stoppin in the middle of a harvest is likely to result in collections getting &quot;stuck&quot; in the queue, the button is available to clear all states.</para>
+								</listitem>
+							</itemizedlist>
+							
+						</listitem>
+					</itemizedlist>
+				</listitem>
+			</itemizedlist>
+			
+		</section>
+	</section>
+</chapter>

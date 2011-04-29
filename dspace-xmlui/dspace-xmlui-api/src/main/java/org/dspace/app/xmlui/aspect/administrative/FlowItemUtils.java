@@ -1,12 +1,11 @@
 /*
  * FlowItemUtils.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4500 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-11-02 21:15:38 -0500 (Mon, 02 Nov 2009) $
  *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -36,7 +34,8 @@
  * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
  * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
  * DAMAGE.
- */package org.dspace.app.xmlui.aspect.administrative;
+ */
+package org.dspace.app.xmlui.aspect.administrative;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,6 +48,7 @@ import org.apache.cocoon.servlet.multipart.Part;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
@@ -58,6 +58,7 @@ import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
+import org.dspace.content.authority.Choices;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
@@ -77,6 +78,8 @@ public class FlowItemUtils
 	private static final Message T_metadata_added = new Message("default","New metadata was added.");
 	private static final Message T_item_withdrawn = new Message("default","The item has been withdrawn.");
 	private static final Message T_item_reinstated = new Message("default","The item has been reinstated.");
+    private static final Message T_item_moved = new Message("default","The item has been moved.");
+    private static final Message T_item_move_destination_not_found = new Message("default","The selected destination collection could not be found.");
 	private static final Message T_bitstream_added = new Message("default","The new bitstream was successfully uploaded.");
 	private static final Message T_bitstream_failed = new Message("default","Error while uploading file.");
 	private static final Message T_bitstream_updated = new Message("default","The bitstream has been updated.");
@@ -210,6 +213,8 @@ public class FlowItemUtils
 		{
 			String name = request.getParameter("name_"+index);
 			String value = request.getParameter("value_"+index);
+                        String authority = request.getParameter("value_"+index+"_authority");
+                        String confidence = request.getParameter("value_"+index+"_confidence");
 			String lang = request.getParameter("language_"+index);
 			String remove = request.getParameter("remove_"+index);
 			
@@ -220,8 +225,15 @@ public class FlowItemUtils
 			// get the field's name broken up
 			String[] parts = parseName(name);
 			
-			// Add the metadata back in.
-			item.addMetadata(parts[0], parts[1], parts[2], lang, value);	
+                        // probe for a confidence value
+                        int iconf = Choices.CF_UNSET;
+                        if (confidence != null && confidence.length() > 0)
+                            iconf = Choices.getConfidenceValue(confidence);
+                        // upgrade to a minimum of NOVALUE if there IS an authority key
+                        if (authority != null && authority.length() > 0 && iconf == Choices.CF_UNSET)
+                            iconf = Choices.CF_NOVALUE;
+                        item.addMetadata(parts[0], parts[1], parts[2], lang,
+                                             value, authority, iconf);
 		}
 		
 		item.update();
@@ -320,6 +332,82 @@ public class FlowItemUtils
 	}
 	
 	
+    /**
+     * Move the specified item to another collection.
+     *
+     * @param context The DSpace context
+     * @param itemID The id of the to-be-moved item.
+     * @param collectionID The id of the destination collection.
+     * @return A result object
+     */
+    public static FlowResult processMoveItem(Context context, int itemID, int collectionID) throws SQLException, AuthorizeException, IOException
+    {
+        FlowResult result = new FlowResult();
+        result.setContinue(false);
+
+        Item item = Item.find(context, itemID);
+
+        if(AuthorizeManager.isAdmin(context, item))
+        {
+          //Add a policy giving this user *explicit* admin permissions on the item itself.
+          //This ensures that the user will be able to call item.update() even if he/she
+          // moves it to a Collection that he/she doesn't administer.
+          AuthorizeManager.addPolicy(context, item, Constants.ADMIN, context.getCurrentUser());
+
+          Collection destination = Collection.find(context, collectionID);
+          if (destination == null)
+          {
+              result.setOutcome(false);
+              result.setContinue(false);
+              result.setMessage(T_item_move_destination_not_found);
+              return result;
+          }
+
+          Collection owningCollection = item.getOwningCollection();
+          if (destination.equals(owningCollection))
+          {
+              // nothing to do
+              result.setOutcome(false);
+              result.setContinue(false);
+              return result;
+          }
+
+          // note: an item.move() method exists, but does not handle several cases:
+          // - no preexisting owning collection (first arg is null)
+          // - item already in collection, but not an owning collection
+          //   (works, but puts item in collection twice)
+
+          // Don't re-add the item to a collection it's already in.
+          boolean alreadyInCollection = false;
+          for (Collection collection : item.getCollections())
+          {
+              if (collection.equals(destination))
+              {
+                  alreadyInCollection = true;
+                  break;
+              }
+          }
+
+          // Remove item from its owning collection and add to the destination
+          if (!alreadyInCollection)
+              destination.addItem(item);
+
+          if (owningCollection != null)
+              owningCollection.removeItem(item);
+
+          item.setOwningCollection(destination);
+          item.update();
+          context.commit();
+
+          result.setOutcome(true);
+          result.setContinue(true);
+          result.setMessage(T_item_moved);
+        }
+
+        return result;
+    }
+
+
 	/**
 	 * Permanently delete the specified item, this method assumes that
 	 * the action has been confirmed.
@@ -432,6 +520,8 @@ public class FlowItemUtils
 			bitstream.update();
 			item.update();
 			
+			context.commit();
+			
 			result.setContinue(true);
 	        result.setOutcome(true);
 	        result.setMessage(T_bitstream_added); 
@@ -467,7 +557,7 @@ public class FlowItemUtils
 
 		//Step 1:
 		// Update the bitstream's description
-		if (description != null && description.length() > 0)
+		if (description != null)
 		{
 			bitstream.setDescription(description);
 		}
@@ -572,6 +662,8 @@ public class FlowItemUtils
 		}
 		
 		item.update();
+		
+		context.commit();
 		
 		result.setContinue(true);
 		result.setOutcome(true);

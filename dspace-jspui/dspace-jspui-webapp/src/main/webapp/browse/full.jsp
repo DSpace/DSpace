@@ -1,9 +1,9 @@
 <%--
   - full.jsp
   -
-  - Version: $Revision: 3705 $
+  - Version: $Revision: 4639 $
   -
-  - Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+  - Date: $Date: 2009-12-20 03:20:35 -0500 (Sun, 20 Dec 2009) $
   -
   - Copyright (c) 2006, Hewlett-Packard Company and Massachusetts
   - Institute of Technology.  All rights reserved.
@@ -55,8 +55,6 @@
 <%@ page import="org.dspace.browse.BrowseIndex" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="java.net.URLEncoder" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="java.util.Iterator" %>
 <%@ page import="org.dspace.content.DCDate" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 
@@ -65,10 +63,12 @@
 
     String urlFragment = "browse";
     String layoutNavbar = "default";
+    boolean withdrawn = false;
 	if (request.getAttribute("browseWithdrawn") != null)
 	{
 	    layoutNavbar = "admin";
         urlFragment = "dspace-admin/withdrawn";
+        withdrawn = true;
     }
 
 	// First, get the browse info object
@@ -103,11 +103,6 @@
 	
 	type = bix.getName();
 	
-	if (bi.hasValue())
-	{
-		value = "\"" + bi.getValue() + "\"";
-	}
-	
 	// next and previous links are of the form:
 	// [handle/<prefix>/<suffix>/]browse?type=<type>&sort_by=<sort_by>&order=<order>[&value=<value>][&rpp=<rpp>][&[focus=<focus>|vfocus=<vfocus>]
 	
@@ -123,12 +118,25 @@
 	}
 	
 	String direction = (bi.isAscending() ? "ASC" : "DESC");
-	String valueString = "";
-	if (bi.hasValue())
+	
+	String argument = null;
+	if (bi.hasAuthority())
+    {
+        value = bi.getAuthority();
+        argument = "authority";
+    }
+	else if (bi.hasValue())
 	{
-		valueString = "&amp;value=" + URLEncoder.encode(bi.getValue());
+		value = bi.getValue();
+	    argument = "value";
 	}
 
+	String valueString = "";
+	if (value!=null)
+	{
+		valueString = "&amp;" + argument + "=" + URLEncoder.encode(value);
+	}
+	
     String sharedLink = linkBase + urlFragment + "?";
 
     if (bix.getName() != null)
@@ -180,6 +188,10 @@
 		typeKey = "browse.type.item." + bi.getSortOption().getName();
 	else
 		typeKey = "browse.type.item." + bix.getSortOption().getName();
+
+    // Admin user or not
+    Boolean admin_b = (Boolean)request.getAttribute("admin_button");
+    boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
 %>
 
 <%-- OK, so here we start to develop the various components we will use in the UI --%>
@@ -202,7 +214,11 @@
 			<input type="hidden" name="rpp" value="<%= rpp %>"/>
 			<input type="hidden" name="etal" value="<%= bi.getEtAl() %>" />
 <%
-		if (bi.hasValue())
+		if (bi.hasAuthority())
+		{
+		%><input type="hidden" name="authority" value="<%=bi.getAuthority() %>"/><%
+		}
+		else if (bi.hasValue())
 		{
 			%><input type="hidden" name="value" value="<%= bi.getValue() %>"/><%
 		}
@@ -312,7 +328,11 @@
 	<form method="get" action="<%= formaction %>">
 		<input type="hidden" name="type" value="<%= bix.getName() %>"/>
 <%
-		if (bi.hasValue())
+		if (bi.hasAuthority())
+		{
+		%><input type="hidden" name="authority" value="<%=bi.getAuthority() %>"/><%
+		}
+		else if (bi.hasValue())
 		{
 			%><input type="hidden" name="value" value="<%= bi.getValue() %>"/><%
 		}
@@ -429,6 +449,14 @@
 		</select>
 		
 		<input type="submit" name="submit_browse" value="<fmt:message key="jsp.general.update"/>"/>
+
+<%
+    if (admin_button && !withdrawn)
+    {
+        %><input type="submit" name="submit_export_metadata" value="<fmt:message key="jsp.general.metadataexport.button"/>" /><%
+    }
+%>
+
 	</form>
 	</div>
 
@@ -517,7 +545,6 @@
 	<%-- 
 	<!-- <%= bi.toString() %> -->
 	--%>
- 
 
 </dspace:layout>
 

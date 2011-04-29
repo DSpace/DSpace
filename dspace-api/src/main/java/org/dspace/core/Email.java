@@ -1,12 +1,11 @@
 /*
  * Email.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4659 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2010-01-06 16:37:39 -0500 (Wed, 06 Jan 2010) $
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -39,6 +37,8 @@
  */
 package org.dspace.core;
 
+import org.apache.log4j.Logger;
+
 import java.io.File;
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -46,6 +46,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Properties;
+import java.security.Security;
 
 import javax.activation.DataHandler;
 import javax.activation.FileDataSource;
@@ -121,7 +122,7 @@ import javax.mail.internet.MimeMultipart;
  * 
  * @author Robert Tansley
  * @author Jim Downing - added attachment handling code
- * @version $Revision: 3705 $
+ * @version $Revision: 4659 $
  */
 public class Email
 {
@@ -154,7 +155,9 @@ public class Email
 
     /** The character set this message will be sent in */
     private String charset;
-    
+
+    private static final Logger log = Logger.getLogger(Email.class);
+
     /**
      * Create a new email message.
      */
@@ -266,6 +269,12 @@ public class Email
         // Get the mail configuration properties
         String server = ConfigurationManager.getProperty("mail.server");
         String from = ConfigurationManager.getProperty("mail.from.address");
+        boolean disabled = ConfigurationManager.getBooleanProperty("mail.server.disabled", false);
+
+        if (disabled) {
+            log.info("message not sent due to mail.server.disabled: " + subject);
+            return;
+        }
 
         // Set up properties for mail session
         Properties props = System.getProperties();
@@ -304,6 +313,20 @@ public class Email
             session = Session.getDefaultInstance(props);
         }
 
+        // Set extra configuration properties
+        String extras = ConfigurationManager.getProperty("mail.extraproperties");
+        if ((extras != null) && (!"".equals(extras.trim())))
+        {
+            String arguments[] = extras.split(",");
+            String key, value;
+            for (String argument : arguments)
+            {
+                key = argument.substring(0, argument.indexOf('=')).trim();
+                value = argument.substring(argument.indexOf('=') + 1).trim();
+                props.put(key, value);
+            }
+        }
+
         // Create message
         MimeMessage message = new MimeMessage(session);
 
@@ -323,7 +346,19 @@ public class Email
 
         message.setSentDate(date);
         message.setFrom(new InternetAddress(from));
-        message.setSubject(subject);
+
+        // Set the subject of the email (may contain parameters)
+        String fullSubject = MessageFormat.format(subject, args);
+        if (charset != null)
+        {
+            message.setSubject(fullSubject, charset);
+        }
+        else
+        {
+            message.setSubject(fullSubject);
+        }
+        
+        // Add attachments
         if (attachments.isEmpty())
         {
             // If a character set has been specified, or a default exists
@@ -371,6 +406,40 @@ public class Email
         }
 
         Transport.send(message);
+    }
+
+    /**
+     * Test method to send an email to check email server settings
+     *
+     * @param args Command line options
+     */
+    public static void main(String[] args)
+    {
+        String to = ConfigurationManager.getProperty("mail.admin");
+        String subject = "DSpace test email";
+        String server = ConfigurationManager.getProperty("mail.server");
+        String url = ConfigurationManager.getProperty("dspace.url");
+        Email e = new Email();
+        e.setSubject(subject);
+        e.addRecipient(to);
+        e.content = "This is a test email sent from DSpace: " + url;
+        System.out.println("\nAbout to send test email:");
+        System.out.println(" - To: " + to);
+        System.out.println(" - Subject: " + subject);
+        System.out.println(" - Server: " + server);
+        try
+        {
+            e.send();
+        }
+        catch (MessagingException me)
+        {
+            System.err.println("\nError sending email:");
+            System.err.println(" - Error: " + me);
+            System.err.println("\nPlease see the DSpace documentation for assistance.\n");
+            System.err.println("\n");
+            System.exit(1);
+        }
+        System.out.println("\nEmail sent successfully!\n");
     }
 
     /**

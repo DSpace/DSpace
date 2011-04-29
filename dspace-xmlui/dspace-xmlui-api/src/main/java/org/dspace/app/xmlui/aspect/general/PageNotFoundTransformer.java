@@ -1,9 +1,9 @@
 /*
  * PageNotFoundTransformer.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4209 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-08-12 13:14:24 -0400 (Wed, 12 Aug 2009) $
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -201,7 +201,7 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
             
             notFound.addPara(T_para1); 
             
-            notFound.addPara().addXref(contextPath,T_go_home);
+            notFound.addPara().addXref(contextPath + "/",T_go_home);
 
 	    HttpServletResponse response = (HttpServletResponse)objectModel
 		.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);

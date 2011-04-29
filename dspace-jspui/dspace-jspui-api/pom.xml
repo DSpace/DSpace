@@ -14,7 +14,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-jspui</artifactId>
-      <version>1.5.2</version>
+      <version>1.6.2</version>
    </parent>
 
    <repositories>
@@ -40,9 +40,9 @@
       into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2/dspace-jspui/dspace-jspui-api</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2/dspace-jspui/dspace-jspui-api</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/tags/dspace-1.5.2/dspace-jspui/dspace-jspui-api</url>
+      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-jspui/dspace-jspui-api</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-jspui/dspace-jspui-api</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-jspui/dspace-jspui-api</url>
    </scm>
 
    <dependencies>
@@ -54,9 +54,25 @@
          <groupId>org.dspace</groupId>
          <artifactId>dspace-api-lang</artifactId>
       </dependency>
+         <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-services-impl</artifactId>
+      </dependency>
       <dependency>
-          <groupId>commons-validator</groupId>
-          <artifactId>commons-validator</artifactId>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-services-api</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-services-utils</artifactId>
+      </dependency>
+      <dependency>
+      <groupId>org.dspace</groupId>
+        <artifactId>dspace-stats</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>commons-validator</groupId>
+         <artifactId>commons-validator</artifactId>
       </dependency>
       <dependency>
          <groupId>javax.servlet</groupId>
@@ -77,6 +93,12 @@
          <groupId>org.apache.tomcat</groupId>
          <artifactId>catalina</artifactId>
          <scope>provided</scope>
+      </dependency>
+      <dependency>
+         <groupId>org.springframework</groupId>
+         <artifactId>spring-webmvc</artifactId>
+         <version>2.5.6</version>
+         <type>jar</type>
       </dependency>
    </dependencies>
 

@@ -1,9 +1,9 @@
 /*
  * EditItemBitstreamForm.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4309 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-09-30 15:20:07 -0400 (Wed, 30 Sep 2009) $
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -233,6 +233,7 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
 		
 		// PARA: actions
 		Para actions = main.addPara("editItemActionsP","editItemActionsP" );
+        // Only System Administrators can delete bitstreams
 		if (AuthorizeManager.authorizeActionBoolean(context, item, Constants.REMOVE))
 			actions.addButton("submit_delete").setValue(T_submit_delete);
 		else

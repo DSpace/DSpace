@@ -1,9 +1,9 @@
 /*
  * SimpleHTMLFragment.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4695 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2010-01-15 12:06:30 -0500 (Fri, 15 Jan 2010) $
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -161,9 +161,9 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 			}
 
 		} catch (JDOMException e) {
+                        //If we are here, then a parsing error occurred within the XHTML fragment.  We'll just assume
+                        // that this is not supposed to be XHTML and display the fragment as plain text within <dri:p> tags.
 			startElement(contentHandler, namespaces, Para.E_PARA, null);
-			sendCharacters(contentHandler, "Error unable to parse: "
-					+ e.getMessage());
 			sendCharacters(contentHandler, fragment);
 			endElement(contentHandler, namespaces, Para.E_PARA);
 		} catch (IOException ioe) {

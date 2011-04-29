@@ -1,6 +1,5 @@
 /*
- * Copyright (c) 2004-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -13,8 +12,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -91,7 +89,7 @@ public class DailyReportEmailer
      * Send the report through email.
      * 
      * @param attachment
-     *            the file conntaing the report
+     *            the file containing the report
      * @param numberOfBitstreams
      *            the number of bitstreams reported
      * 
@@ -119,7 +117,7 @@ public class DailyReportEmailer
         // create the first part of the email
         BodyPart messageBodyPart = new MimeBodyPart();
         messageBodyPart
-                .setText("This is the checksum checker report see attachement for details \n"
+                .setText("This is the checksum checker report see attachment for details \n"
                         + numberOfBitstreams
                         + " Bitstreams found with POSSIBLE issues");
         multipart.addBodyPart(messageBodyPart);
@@ -185,7 +183,7 @@ public class DailyReportEmailer
                         "c",
                         "Changed",
                         false,
-                        "Send E-mail report for all bitstrems where checksum has been changed for today");
+                        "Send E-mail report for all bitstreams where checksum has been changed for today");
         options.addOption("a", "All", false, "Send all E-mail reports");
 
         options.addOption("u", "Unchecked", false,

@@ -1,12 +1,11 @@
 /*
  * DCPersonName.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4290 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-09-28 22:57:36 -0400 (Mon, 28 Sep 2009) $
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -50,7 +48,7 @@ package org.dspace.content;
  * <em>FIXME:  No policy for dealing with "van"/"van der" and "Jr."</em>
  * 
  * @author Robert Tansley
- * @version $Revision: 3705 $
+ * @version $Revision: 4290 $
  */
 public class DCPersonName
 {
@@ -92,17 +90,17 @@ public class DCPersonName
                 commaIndex = rawValue.length();
             }
 
-            lastName = rawValue.substring(0, commaIndex);
+            lastName = rawValue.substring(0, commaIndex).trim();
 
             // Just in case the first name is blank
-            if (rawValue.length() > (commaIndex + 2))
+            if (rawValue.length() > (commaIndex + 1))
             {
-                firstNames = rawValue.substring(commaIndex + 2);
+                firstNames = rawValue.substring(commaIndex + 1).trim();
             }
             else
             {
                 // Since we have a name, we don't want to
-                // leave the last name as null
+                // leave the first name as null
                 firstNames = "";
             }
         }

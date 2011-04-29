@@ -1,12 +1,11 @@
 /*
  * BrowseDAOPostgres.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4365 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-10-05 19:52:42 -0400 (Mon, 05 Oct 2009) $
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -98,6 +96,8 @@ public class BrowseDAOPostgres implements BrowseDAO
 
     /** value to restrict browse to (e.g. author name) */
     private String value = null;
+
+    private String authority = null;
 
     /** exact or partial matching of the value */
     private boolean valuePartial = false;
@@ -433,8 +433,9 @@ public class BrowseDAOPostgres implements BrowseDAO
             while (tri.hasNext())
             {
                 TableRow row = tri.next();
-                String stringResult = row.getStringColumn("value");
-                results.add(stringResult);
+                String valueResult = row.getStringColumn("value");
+                String authorityResult = row.getStringColumn("authority");
+                results.add(new String[]{valueResult,authorityResult});
             }
 
             return results;
@@ -911,9 +912,13 @@ public class BrowseDAOPostgres implements BrowseDAO
     {
         if (tableMap != null && tableDis != null)
         {
-            queryBuf.append(tableMap).append(".distinct_id=").append(tableDis).append(".id");
+            queryBuf.append(tableMap).append(".distinct_id=").append(tableDis).append(".distinct_id");
             queryBuf.append(" AND ");
-            queryBuf.append(tableDis).append(".sort_value");
+            if (authority == null)
+            {
+                queryBuf.append(tableDis).append(".authority IS NULL");
+            queryBuf.append(" AND ");
+                queryBuf.append(tableDis).append(".").append(valueField);
 
             if (valuePartial)
             {
@@ -940,6 +945,12 @@ public class BrowseDAOPostgres implements BrowseDAO
                 {
                     params.add(utils.truncateValue(value));
                 }
+            }
+        }
+            else
+            {
+                queryBuf.append(tableDis).append(".authority=?");
+                params.add(utils.truncateValue(authority,100));
             }
         }
 
@@ -1086,7 +1097,7 @@ public class BrowseDAOPostgres implements BrowseDAO
         queryBuf.append(table);
         if (containerTable != null || (value != null && valueField != null && tableDis != null && tableMap != null))
         {
-            queryBuf.append(", (SELECT ");
+            queryBuf.append(", (SELECT " + (containerTable != null ? "" : "DISTINCT "));
             queryBuf.append(containerTable != null ? containerTable : tableMap).append(".item_id");
             queryBuf.append(" FROM ");
             buildFocusedSelectTables(queryBuf);
@@ -1384,5 +1395,13 @@ public class BrowseDAOPostgres implements BrowseDAO
         }
 
         return queryParams.toArray();
+    }
+
+    public void setAuthorityValue(String value) {
+        authority = value;
+    }
+
+    public String getAuthorityValue() {
+        return authority;
     }
 }

@@ -1,9 +1,9 @@
 <%--
   - creative-commons.jsp
   -
-  - Version: $Revision: 3705 $
+  - Version: $Revision: 3996 $
   -
-  - Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+  - Date: $Date: 2009-07-01 19:36:04 -0400 (Wed, 01 Jul 2009) $
   -
   - Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
   - Institute of Technology.  All rights reserved.
@@ -56,6 +56,7 @@
 <%@ page import="org.dspace.app.util.SubmissionInfo" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.license.CreativeCommons" %>
+<%@ page import="org.dspace.core.ConfigurationManager" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
@@ -76,7 +77,17 @@
     String exitURL = baseURL + "/submit/cc-license.jsp?license_url=[license_url]";
     Boolean lExists = (Boolean)request.getAttribute("cclicense.exists");
     boolean licenseExists = (lExists == null ? false : lExists.booleanValue());
-	
+
+    String jurisdiction = ConfigurationManager.getProperty("webui.submit.cc-jurisdiction");
+    if ((jurisdiction != null) && (!"".equals(jurisdiction)))
+    {
+        jurisdiction = "&amp;jurisdiction=" + jurisdiction.trim();
+    }
+    else
+    {
+        jurisdiction = "";
+    }
+
     String licenseURL = "";
     if(licenseExists)
         licenseURL = CreativeCommons.getLicenseURL(subInfo.getSubmissionItem().getItem());
@@ -126,7 +137,7 @@
 
 	<%-- <iframe src="http://creativecommons.org/license/?partner=dspace&stylesheet=<%= java.net.URLEncoder.encode(ssURL) %>&exit_url=<%= java.net.URLEncoder.encode(exitURL) %>" width="100%" height="540">Your browser must support IFrames to use this feature
 	</iframe> --%>
-	<iframe src="http://creativecommons.org/license/?partner=dspace&amp;stylesheet=<%= java.net.URLEncoder.encode(ssURL) %>&amp;exit_url=<%= java.net.URLEncoder.encode(exitURL) %>" width="100%" height="540"><fmt:message key="jsp.submit.creative-commons.info3"/>
+	<iframe src="http://creativecommons.org/license/?partner=dspace&amp;stylesheet=<%= java.net.URLEncoder.encode(ssURL) %>&amp;exit_url=<%= java.net.URLEncoder.encode(exitURL) %><%= jurisdiction %>" width="100%" height="540"><fmt:message key="jsp.submit.creative-commons.info3"/>
 	</iframe>
 
     <%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>

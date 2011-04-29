@@ -19,7 +19,7 @@ http://cwspace.mit.edu/docs/WorkActivity/Metadata/Crosswalks/MODS-2-DIM/CSAIL-DI
 
  Author:   William Reilly
  Revision: $Revision: 3705 $
- Date:     $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ Date:     $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
 
 
      **************************************************

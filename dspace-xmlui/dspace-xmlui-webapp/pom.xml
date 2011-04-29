@@ -13,7 +13,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-xmlui</artifactId>
-      <version>1.5.2</version>
+      <version>1.6.2</version>
    </parent>
 
    <repositories>
@@ -34,9 +34,9 @@
    </repositories>
 
    <scm>
-      <connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2/dspace-xmlui/dspace-xmlui-webapp</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/tags/dspace-1.5.2/dspace-xmlui/dspace-xmlui-webapp</url>
+      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-xmlui/dspace-xmlui-webapp</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-xmlui/dspace-xmlui-webapp</url>
    </scm>
 
    <build>
@@ -69,11 +69,11 @@
    </build>
 
    <profiles>
-      <!-- 
+      <!--
          when activated a dspace.config configuration
-         file location passed on the commandline 
-         (-Ddspace.config=...) can be passed through 
-         to be used as a filter source by projects for 
+         file location passed on the commandline
+         (-Ddspace.config=...) can be passed through
+         to be used as a filter source by projects for
          tasks such as updating the ${dspace.dir} in
          web.xml etc.
       -->
@@ -128,6 +128,12 @@
          <artifactId>dspace-xmlui-api</artifactId>
       </dependency>
 
+      <!-- Shared JS code for Choice/Authority control -->
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-ui-shared</artifactId>
+         <type>war</type>
+      </dependency>
    </dependencies>
 
 </project>

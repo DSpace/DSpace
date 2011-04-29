@@ -1,9 +1,9 @@
 <%--
   - collection-home.jsp
   -
-  - Version: $Revision: 3705 $
+  - Version: $Revision: 4603 $
   -
-  - Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+  - Date: $Date: 2009-12-03 03:17:54 -0500 (Thu, 03 Dec 2009) $
   -
   - Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
   - Institute of Technology.  All rights reserved.
@@ -264,6 +264,12 @@
       </td>
     </tr>
   </table>
+          <div align="center">
+                   <form method="get" action="<%= request.getContextPath() %>/displaystats">
+                       <input type="hidden" name="handle" value="<%= collection.getHandle() %>"/>
+                       <input type="submit" name="submit_simple" value="<fmt:message key="jsp.collection-home.display-statistics"/>" />
+                   </form>
+          </div>
 
   <%= intro %>
 
@@ -329,6 +335,14 @@
                  <input type="hidden" name="collection_id" value="<%= collection.getID() %>" />
                  <input type="hidden" name="step" value="<%= MyDSpaceServlet.REQUEST_MIGRATE_ARCHIVE %>" />
                  <input type="submit" value="<fmt:message key="jsp.mydspace.request.export.migratecollection"/>" />
+               </form>
+             </td>
+           </tr>
+           <tr>
+             <td headers="t1" class="standard" align="center">
+               <form method="post" action="<%=request.getContextPath()%>/dspace-admin/metadataexport">
+                 <input type="hidden" name="handle" value="<%= collection.getHandle() %>" />
+                 <input type="submit" value="<fmt:message key="jsp.general.metadataexport.button"/>" />
                </form>
              </td>
            </tr>

@@ -147,6 +147,10 @@ public class DepositServlet extends HttpServlet {
 		if ((tempDirectory == null) || (tempDirectory.equals(""))) {
 			tempDirectory = System.getProperty("java.io.tmpdir");
 		}
+        if (!tempDirectory.endsWith(System.getProperty("file.separator")))
+        {
+            tempDirectory += System.getProperty("file.separator");
+        }
 		File tempDir = new File(tempDirectory);
 		log.info("Upload temporary directory set to: " + tempDir);
 		if (!tempDir.exists()) {
@@ -214,6 +218,7 @@ public class DepositServlet extends HttpServlet {
 			// Write the file to the temp directory
 			filename = tempDirectory + "SWORD-"
 					+ request.getRemoteAddr() + "-" + counter.addAndGet(1);
+            log.debug("Package temporarily stored as: " + filename);
 			InputStream inputstream = request.getInputStream();
 			OutputStream outputstream = new FileOutputStream(new File(filename));
 			try

@@ -1,9 +1,9 @@
 /*
  * JSPUploadStep.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4931 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2010-05-13 17:09:17 -0400 (Thu, 13 May 2010) $
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -39,11 +39,7 @@
  */
 package org.dspace.app.webui.submit.step;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
 
 import javax.servlet.ServletException;
@@ -51,14 +47,12 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-
 import org.dspace.app.util.DCInputsReader;
-import org.dspace.app.util.Util;
+import org.dspace.app.util.DCInputsReaderException;
+import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.webui.submit.JSPStep;
 import org.dspace.app.webui.submit.JSPStepManager;
-import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
-import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -66,7 +60,6 @@ import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.FormatIdentifier;
-import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -95,13 +88,13 @@ import org.dspace.submit.step.UploadStep;
  * <li>Once all pages are complete, control is forwarded back to the
  * SubmissionController, and the next step is called.</li>
  * </ul>
- * 
+ *
  * @see org.dspace.app.webui.servlet.SubmissionController
  * @see org.dspace.app.webui.submit.JSPStep
  * @see org.dspace.submit.step.UploadStep
- * 
+ *
  * @author Tim Donohue
- * @version $Revision: 3705 $
+ * @version $Revision: 4931 $
  */
 public class JSPUploadStep extends JSPStep
 {
@@ -142,7 +135,7 @@ public class JSPUploadStep extends JSPStep
      * If this step doesn't require user interaction OR you are solely using
      * Manakin for your user interface, then this method may be left EMPTY,
      * since all step processing should occur in the doProcessing() method.
-     * 
+     *
      * @param context
      *            current DSpace context
      * @param request
@@ -161,11 +154,18 @@ public class JSPUploadStep extends JSPStep
         if (subInfo != null)
         {
             Collection c = subInfo.getSubmissionItem().getCollection();
-            DCInputsReader inputsReader = new DCInputsReader();
-            request.setAttribute("submission.inputs", inputsReader.getInputs(c
-                    .getHandle()));
+            try
+            {
+                DCInputsReader inputsReader = new DCInputsReader();
+                request.setAttribute("submission.inputs", inputsReader.getInputs(c
+                        .getHandle()));
+            }
+            catch (DCInputsReaderException e)
+            {
+                throw new ServletException(e);
+            }
         }
-
+             
         // show whichever upload page is appropriate
         // (based on if this item already has files or not)
         showUploadPage(context, request, response, subInfo, false);
@@ -182,7 +182,7 @@ public class JSPUploadStep extends JSPStep
      * If this step doesn't require user interaction OR you are solely using
      * Manakin for your user interface, then this method may be left EMPTY,
      * since all step processing should occur in the doProcessing() method.
-     * 
+     *
      * @param context
      *            current DSpace context
      * @param request
@@ -209,8 +209,19 @@ public class JSPUploadStep extends JSPStep
             Bundle[] bundles = subInfo.getSubmissionItem().getItem()
                     .getBundles("ORIGINAL");
 
+            boolean fileAlreadyUploaded = false;
+            
+            for (Bundle bnd : bundles)
+            {
+            	fileAlreadyUploaded = bnd.getBitstreams().length > 0;
+            	if (fileAlreadyUploaded)
+            	{
+            		break;
+            	}
+            }
+            
             // if user already has uploaded at least one file
-            if (bundles.length > 0)
+            if (fileAlreadyUploaded)
             {
                 // return to list of uploaded files
                 showUploadFileList(context, request, response, subInfo, true,
@@ -254,10 +265,18 @@ public class JSPUploadStep extends JSPStep
                     // We need to show the file upload error page
                     if (subInfo != null)
                     {
-                        Collection c = subInfo.getSubmissionItem().getCollection();
-                        DCInputsReader inputsReader = new DCInputsReader();
-                        request.setAttribute("submission.inputs", inputsReader
-                                .getInputs(c.getHandle()));
+                        try
+                        {
+                            Collection c = subInfo.getSubmissionItem().getCollection();
+                            DCInputsReader inputsReader = new DCInputsReader();
+                            request.setAttribute("submission.inputs", inputsReader
+                                    .getInputs(c.getHandle()));
+                        }
+                        catch (DCInputsReaderException e)
+                        {
+                            throw new ServletException(e);
+                        }
+
                     }
                     JSPStepManager.showJSP(request, response, subInfo, UPLOAD_ERROR_JSP);
                 }
@@ -373,7 +392,7 @@ public class JSPUploadStep extends JSPStep
      * Display the appropriate upload page in the file upload sequence. Which
      * page this is depends on whether the user has uploaded any files in this
      * item already.
-     * 
+     *
      * @param context
      *            the DSpace context object
      * @param request
@@ -392,8 +411,23 @@ public class JSPUploadStep extends JSPStep
     {
         Bundle[] bundles = subInfo.getSubmissionItem().getItem().getBundles(
                 "ORIGINAL");
-
-        if (justUploaded || bundles.length > 0)
+        
+        boolean fileAlreadyUploaded = false;
+        
+        if (!justUploaded)
+        {
+	        for (Bundle bnd : bundles)
+	        {
+	        	fileAlreadyUploaded = bnd.getBitstreams().length > 0;
+	        	if (fileAlreadyUploaded)
+	        	{
+	        		break;
+	        	}
+	        }
+        }
+        
+        // if user already has uploaded at least one file
+        if (justUploaded || fileAlreadyUploaded)
         {
             // The item already has files associated with it.
             showUploadFileList(context, request, response, subInfo,
@@ -408,7 +442,7 @@ public class JSPUploadStep extends JSPStep
 
     /**
      * Show the page which allows the user to choose another file to upload
-     * 
+     *
      * @param context
      *            current DSpace context
      * @param request
@@ -433,7 +467,7 @@ public class JSPUploadStep extends JSPStep
 
     /**
      * Show the page which lists all the currently uploaded files
-     * 
+     *
      * @param context
      *            current DSpace context
      * @param request
@@ -473,7 +507,7 @@ public class JSPUploadStep extends JSPStep
     /**
      * Show the page which allows the user to change the format of the file that
      * was just uploaded
-     * 
+     *
      * @param context
      *            context object
      * @param request
@@ -513,7 +547,7 @@ public class JSPUploadStep extends JSPStep
     /**
      * Show the page which allows the user to edit the description of already
      * uploaded files
-     * 
+     *
      * @param context
      *            context object
      * @param request
@@ -539,7 +573,7 @@ public class JSPUploadStep extends JSPStep
      * This Review JSP is loaded by the 'Verify' Step, in order to dynamically
      * generate a submission verification page consisting of the information
      * gathered in all the enabled submission steps.
-     * 
+     *
      * @param context
      *            current DSpace context
      * @param request
@@ -553,5 +587,5 @@ public class JSPUploadStep extends JSPStep
             HttpServletResponse response, SubmissionInfo subInfo)
     {
         return REVIEW_JSP;
-    } 
+    }
 }

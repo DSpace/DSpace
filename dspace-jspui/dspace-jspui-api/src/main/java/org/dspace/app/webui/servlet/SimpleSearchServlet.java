@@ -1,9 +1,9 @@
 /*
  * SimpleSearchServlet.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4231 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-08-24 23:17:33 -0400 (Mon, 24 Aug 2009) $
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -40,6 +40,7 @@
 package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -54,10 +55,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
+import org.dspace.app.bulkedit.MetadataExport;
+import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.Item;
+import org.dspace.content.ItemIterator;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -66,6 +71,7 @@ import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
 import org.dspace.sort.SortOption;
+import org.dspace.browse.*;
 
 /**
  * Servlet for handling a simple search.
@@ -146,7 +152,12 @@ public class SimpleSearchServlet extends DSpaceServlet
         {
         }
 
-        if (rpp > 0)
+        // Override the page setting if exporting metadata
+        if ("submit_export_metadata".equals(UIUtil.getSubmitButton(request, "submit")))
+        {
+            qArgs.setPageSize(Integer.MAX_VALUE);
+        }
+        else if (rpp > 0)
         {
             qArgs.setPageSize(rpp);
         }
@@ -377,6 +388,12 @@ public class SimpleSearchServlet extends DSpaceServlet
 
         request.setAttribute("order",  qArgs.getSortOrder());
         request.setAttribute("sortedBy", sortOption);
+
+        if (AuthorizeManager.isAdmin(context))
+        {
+            // Set a variable to create admin buttons
+            request.setAttribute("admin_button", new Boolean(true));
+        }
         
         if ((fromAdvanced != null) && (qResults.getHitCount() == 0))
         {
@@ -399,9 +416,51 @@ public class SimpleSearchServlet extends DSpaceServlet
 
             JSPManager.showJSP(request, response, "/search/advanced.jsp");
         }
+        else if ("submit_export_metadata".equals(UIUtil.getSubmitButton(request, "submit")))
+        {
+            exportMetadata(context, response, resultsItems);
+        }
         else
         {
             JSPManager.showJSP(request, response, "/search/results.jsp");
         }
+    }
+
+    /**
+     * Export the search results as a csv file
+     *
+     * @param context The DSpace context
+     * @param response The request object
+     * @param items The result items
+     * @throws IOException
+     * @throws ServletException
+     */
+    protected void exportMetadata(Context context, HttpServletResponse response, Item[] items)
+            throws IOException, ServletException
+    {
+        // Log the attempt
+        log.info(LogManager.getHeader(context, "metadataexport", "exporting_search"));
+
+        // Export a search view
+        ArrayList iids = new ArrayList();
+        for (Item item : items)
+        {
+            iids.add(item.getID());
+        }
+        ItemIterator ii = new ItemIterator(context, iids);
+        MetadataExport exporter = new MetadataExport(context, ii, false);
+
+        // Perform the export
+        DSpaceCSV csv = exporter.export();
+
+        // Return the csv file
+        response.setContentType("text/csv; charset=UTF-8");
+        response.setHeader("Content-Disposition", "attachment; filename=search-results.csv");
+        PrintWriter out = response.getWriter();
+        out.write(csv.toString());
+        out.flush();
+        out.close();
+        log.info(LogManager.getHeader(context, "metadataexport", "exported_file:search-results.csv"));
+        return;
     }
 }

@@ -1,12 +1,11 @@
 /*
  * CreativeCommons.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4566 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-11-25 22:20:34 -0500 (Wed, 25 Nov 2009) $
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -158,20 +156,24 @@ public class CreativeCommons
         String license_text = fetchLicenseText(cc_license_url);
         String license_rdf = fetchLicenseRDF(cc_license_url);
         
-        // set the format
-        BitstreamFormat bs_format = BitstreamFormat.findByShortDescription(
+        // set the formats
+        BitstreamFormat bs_url_format = BitstreamFormat.findByShortDescription(
                 context, "License");
+        BitstreamFormat bs_text_format = BitstreamFormat.findByShortDescription(
+                context, "CC License");
+        BitstreamFormat bs_rdf_format = BitstreamFormat.findByShortDescription(
+                context, "RDF XML");
 
         // set the URL bitstream
-        setBitstreamFromBytes(item, bundle, BSN_LICENSE_URL, bs_format,
+        setBitstreamFromBytes(item, bundle, BSN_LICENSE_URL, bs_url_format,
                 cc_license_url.getBytes());
 
         // set the license text bitstream
-        setBitstreamFromBytes(item, bundle, BSN_LICENSE_TEXT, bs_format,
+        setBitstreamFromBytes(item, bundle, BSN_LICENSE_TEXT, bs_text_format,
                 license_text.getBytes());
 
         // set the RDF bitstream
-        setBitstreamFromBytes(item, bundle, BSN_LICENSE_RDF, bs_format,
+        setBitstreamFromBytes(item, bundle, BSN_LICENSE_RDF, bs_rdf_format,
                 license_rdf.getBytes());
     }
 
@@ -181,9 +183,18 @@ public class CreativeCommons
     {
         Bundle bundle = getCcBundle(item);
 
-        // generic "License" format -- change for CC?
-        BitstreamFormat bs_format = BitstreamFormat.findByShortDescription(
-                context, "License");
+        // set the format
+        BitstreamFormat bs_format;
+        if (mimeType.equalsIgnoreCase("text/xml"))
+        {
+            bs_format = BitstreamFormat.findByShortDescription(context, "CC License");
+        }
+        else if (mimeType.equalsIgnoreCase("text/rdf")) {
+            bs_format = BitstreamFormat.findByShortDescription(context, "RDF XML");
+        }
+        else {
+            bs_format = BitstreamFormat.findByShortDescription(context, "License");
+        }
 
         Bitstream bs = bundle.createBitstream(licenseStm);
         bs.setSource(CC_BS_SOURCE);

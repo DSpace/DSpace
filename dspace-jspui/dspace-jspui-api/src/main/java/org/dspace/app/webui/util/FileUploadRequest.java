@@ -1,9 +1,9 @@
 /*
  * FileUploadRequest.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4243 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-09-02 05:12:23 -0400 (Wed, 02 Sep 2009) $
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -66,7 +66,7 @@ import org.dspace.core.ConfigurationManager;
  * allowable upload size.
  * 
  * @author Robert Tansley
- * @version $Revision: 3705 $
+ * @version $Revision: 4243 $
  */
 public class FileUploadRequest extends HttpServletRequestWrapper
 {
@@ -98,7 +98,7 @@ public class FileUploadRequest extends HttpServletRequestWrapper
         original = req;
 
         tempDir = ConfigurationManager.getProperty("upload.temp.dir");
-        int maxSize = ConfigurationManager.getIntProperty("upload.max");
+        long maxSize = ConfigurationManager.getLongProperty("upload.max");
 
         // Create a factory for disk-based file items
         DiskFileItemFactory factory = new DiskFileItemFactory();

@@ -1,12 +1,11 @@
 /*
  * DSpaceObject.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4309 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-09-30 15:20:07 -0400 (Wed, 30 Sep 2009) $
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -141,6 +139,52 @@ public abstract class DSpaceObject
             case Constants.EPERSON   : return EPerson.find(context, id);
             case Constants.SITE      : return Site.find(context, id);
         }
+        return null;
+    }
+
+    /**
+     * Return the dspace object where an ADMIN action right is sufficient to
+     * grant the initial authorize check.
+     * <p>
+     * Default behaviour is ADMIN right on the object grant right on all other
+     * action on the object itself. Subclass should override this method as
+     * need.
+     * 
+     * @param action
+     *            ID of action being attempted, from
+     *            <code>org.dspace.core.Constants</code>. The ADMIN action is
+     *            not a valid parameter for this method, an
+     *            IllegalArgumentException should be thrown
+     * @return the dspace object, if any, where an ADMIN action is sufficient to
+     *         grant the original action
+     * @throws SQLException
+     * @throws IllegalArgumentException
+     *             if the ADMIN action is supplied as parameter of the method
+     *             call
+     */
+    public DSpaceObject getAdminObject(int action) throws SQLException
+    {
+        if (action == Constants.ADMIN)
+        {
+            throw new IllegalArgumentException("Illegal call to the DSpaceObject.getAdminObject method");
+        }
+        return this;
+    }
+
+    /**
+     * Return the dspace object that "own" the current object in the hierarchy.
+     * Note that this method has a meaning slightly different from the
+     * getAdminObject because it is independent of the action but it is in a way
+     * related to it. It defines the "first" dspace object <b>OTHER</b> then the
+     * current one, where allowed ADMIN actions imply allowed ADMIN actions on
+     * the object self.
+     * 
+     * @return the dspace object that "own" the current object in
+     *         the hierarchy
+     * @throws SQLException
+     */
+    public DSpaceObject getParentObject() throws SQLException
+    {
         return null;
     }
 }

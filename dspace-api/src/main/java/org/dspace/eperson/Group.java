@@ -1,12 +1,11 @@
 /*
  * Group.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4903 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2010-05-10 04:29:50 -0400 (Mon, 10 May 2010) $
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -50,8 +48,12 @@ import java.util.Set;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.util.AuthorizeUtil;
+import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -66,7 +68,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * Class representing a group of e-people.
  * 
  * @author David Stuve
- * @version $Revision: 3705 $
+ * @version $Revision: 4903 $
  */
 public class Group extends DSpaceObject
 {
@@ -121,7 +123,6 @@ public class Group extends DSpaceObject
     /**
      * Populate Group with eperson and group objects
      * 
-     * @param context
      * @throws SQLException
      */
     public void loadData()
@@ -475,10 +476,18 @@ public class Group extends DSpaceObject
         }
         // Also need to get all "Special Groups" user is a member of!
         // Otherwise, you're ignoring the user's membership to these groups!
-        Group[] specialGroups = c.getSpecialGroups();
-        for(int j=0; j<specialGroups.length;j++)
-            groupIDs.add(new Integer(specialGroups[j].getID()));
-        
+        // However, we only do this is we are looking up the special groups
+        // of the current user, as we cannot look up the special groups
+        // of a user who is not logged in.
+        if ((c.getCurrentUser() == null) || (((c.getCurrentUser() != null) && (c.getCurrentUser().getID() == e.getID()))))
+        {
+            Group[] specialGroups = c.getSpecialGroups();
+            for(Group special : specialGroups)
+            {
+                groupIDs.add(new Integer(special.getID()));
+            }
+        }
+
         // all the users are members of the anonymous group 
         groupIDs.add(new Integer(0));
         
@@ -1319,5 +1328,92 @@ public class Group extends DSpaceObject
         }
 
         return myChildren;
+    }
+    
+    public DSpaceObject getParentObject() throws SQLException
+    {
+        // could a collection/community admin manage related groups?
+        // check before the configuration options could give a performance gain
+        // if all group management are disallowed
+        if (AuthorizeConfiguration.canCollectionAdminManageAdminGroup()
+                || AuthorizeConfiguration.canCollectionAdminManageSubmitters()
+                || AuthorizeConfiguration.canCollectionAdminManageWorkflows()
+                || AuthorizeConfiguration.canCommunityAdminManageAdminGroup()
+                || AuthorizeConfiguration
+                        .canCommunityAdminManageCollectionAdminGroup()
+                || AuthorizeConfiguration
+                        .canCommunityAdminManageCollectionSubmitters()
+                || AuthorizeConfiguration
+                        .canCommunityAdminManageCollectionWorkflows())
+        {
+            // is this a collection related group?
+            TableRow qResult = DatabaseManager
+                    .querySingle(
+                            myContext,
+                            "SELECT collection_id, workflow_step_1, workflow_step_2, " +
+                            " workflow_step_3, submitter, admin FROM collection "
+                                    + " WHERE workflow_step_1 = ? OR "
+                                    + " workflow_step_2 = ? OR "
+                                    + " workflow_step_3 = ? OR "
+                                    + " submitter =  ? OR " + " admin = ?",
+                            getID(), getID(), getID(), getID(), getID());
+            if (qResult != null)
+            {
+                Collection collection = Collection.find(myContext, qResult
+                        .getIntColumn("collection_id"));
+                
+                if ((qResult.getIntColumn("workflow_step_1") == getID() ||
+                        qResult.getIntColumn("workflow_step_2") == getID() ||
+                        qResult.getIntColumn("workflow_step_3") == getID()))
+                {
+                    if (AuthorizeConfiguration.canCollectionAdminManageWorkflows())
+                    {
+                        return collection;
+                    }
+                    else if (AuthorizeConfiguration.canCommunityAdminManageCollectionWorkflows())
+                    {
+                        return collection.getParentObject();
+                    }
+                }
+                if (qResult.getIntColumn("submitter") == getID())
+                {
+                    if (AuthorizeConfiguration.canCollectionAdminManageSubmitters())
+                    {
+                        return collection;
+                    }
+                    else if (AuthorizeConfiguration.canCommunityAdminManageCollectionSubmitters())
+                    {
+                        return collection.getParentObject();
+                    }
+                }
+                if (qResult.getIntColumn("admin") == getID())
+                {
+                    if (AuthorizeConfiguration.canCollectionAdminManageAdminGroup())
+                    {
+                        return collection;
+                    }
+                    else if (AuthorizeConfiguration.canCommunityAdminManageCollectionAdminGroup())
+                    {
+                        return collection.getParentObject();
+                    }
+                }
+            }
+            // is the group releated to a community and community admin allowed
+            // to manage it?
+            else if (AuthorizeConfiguration.canCommunityAdminManageAdminGroup())
+            {
+                qResult = DatabaseManager.querySingle(myContext,
+                        "SELECT community_id FROM community "
+                                + "WHERE admin = ?", getID());
+
+                if (qResult != null)
+                {
+                    Community community = Community.find(myContext, qResult
+                            .getIntColumn("community_id"));
+                    return community;
+                }
+            }
+        }
+        return null;
     }
 }

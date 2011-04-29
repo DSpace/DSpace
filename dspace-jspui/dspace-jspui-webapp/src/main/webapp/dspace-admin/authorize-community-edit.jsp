@@ -1,7 +1,7 @@
 <%--
   - authorize_community_edit.jsp
   -
-  - $Id: authorize-community-edit.jsp 3705 2009-04-11 17:02:24Z mdiggory $
+  - $Id: authorize-community-edit.jsp 4309 2009-09-30 19:20:07Z bollini $
   -
   - Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
   - Institute of Technology.  All rights reserved.
@@ -100,7 +100,7 @@
     </tr>
   </table>
 
-  <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post">
+  <form action="<%= request.getContextPath() %>/tools/authorize" method="post">
     <p align="center">
             <input type="hidden" name="community_id" value="<%=community.getID()%>" />
             <input type="submit" name="submit_community_add_policy" value="<fmt:message key="jsp.dspace-admin.general.addpolicy"/>" />
@@ -134,14 +134,14 @@
                     <%= (rp.getGroup()   == null ? "..." : rp.getGroup().getName() ) %>  
              </td>
              <td headers="t4" class="<%= row %>RowEvenCol">
-                <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post">-->
+                <form action="<%= request.getContextPath() %>/tools/authorize" method="post">
                     <input type="hidden" name="policy_id" value="<%= rp.getID() %>" />
                     <input type="hidden" name="community_id" value="<%= community.getID() %>" />
                     <input type="submit" name="submit_community_edit_policy" value="<fmt:message key="jsp.dspace-admin.general.edit"/>" />
                 </form>
              </td>
              <td headers="t5" class="<%= row %>RowOddCol">
-                <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post">-->
+                <form action="<%= request.getContextPath() %>/tools/authorize" method="post">
                     <input type="hidden" name="policy_id" value="<%= rp.getID() %>" />
                     <input type="hidden" name="community_id" value="<%= community.getID() %>" />
                     <input type="submit" name="submit_community_delete_policy" value="<fmt:message key="jsp.dspace-admin.general.delete"/>" />

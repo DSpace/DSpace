@@ -1,9 +1,9 @@
 <%--
   - review-metadata.jsp
   -
-  - Version: $Revision: 3705 $
+  - Version: $Revision: 4365 $
   -
-  - Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+  - Date: $Date: 2009-10-05 19:52:42 -0400 (Mon, 05 Oct 2009) $
   -
   - Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
   - Institute of Technology.  All rights reserved.
@@ -56,6 +56,7 @@
 <%@ page import="org.dspace.content.InProgressSubmission" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 <%@ page import="org.dspace.app.util.DCInputsReader" %>
+<%@ page import="org.dspace.app.util.DCInputsReaderException" %>
 <%@ page import="org.dspace.app.util.DCInputSet" %>
 <%@ page import="org.dspace.app.util.DCInput" %>
 <%@ page import="org.dspace.content.Collection" %>
@@ -65,6 +66,8 @@
 <%@ page import="org.dspace.content.Item" %>
 <%@ page import="org.dspace.core.Context" %>
 <%@ page import="org.dspace.core.Utils" %>
+
+<%@ page import="org.dspace.content.authority.MetadataAuthorityManager" %>
 
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 <%@ page import="javax.servlet.jsp.PageContext" %>
@@ -77,33 +80,42 @@
     request.setAttribute("LanguageSwitch", "hide");
 
     // Obtain DSpace context
-    Context context = UIUtil.obtainContext(request);    
+    Context context = UIUtil.obtainContext(request);
 
-	//get submission information object
+        //get submission information object
     SubmissionInfo subInfo = SubmissionController.getSubmissionInfo(context, request);
 
-	//get the step number (for jump-to link and to determine page)
-	String stepJump = (String) request.getParameter("submission.jump");
+        //get the step number (for jump-to link and to determine page)
+        String stepJump = (String) request.getParameter("submission.jump");
 
-	//extract out the step & page numbers from the stepJump (format: stepNum.pageNum)
-	//(since there are multiple pages, we need to know which page we are reviewing!)
+        //extract out the step & page numbers from the stepJump (format: stepNum.pageNum)
+        //(since there are multiple pages, we need to know which page we are reviewing!)
     String[] fields = stepJump.split("\\.");  //split on period
     int stepNum = Integer.parseInt(fields[0]);
-	int pageNum = Integer.parseInt(fields[1]);
+        int pageNum = Integer.parseInt(fields[1]);
 
     Item item = subInfo.getSubmissionItem().getItem();
     
-	//get the inputs reader
-	DCInputsReader inputsReader = DescribeStep.getInputsReader();
-
-	// determine collection
+    // determine collection
     Collection c = subInfo.getSubmissionItem().getCollection();
 
-	//load the input set for the current collection
-    DCInputSet inputSet = inputsReader.getInputs(c.getHandle());
+    DCInputSet inputSet = null;
+
+    try
+    {
+        //get the inputs reader
+        DCInputsReader inputsReader = DescribeStep.getInputsReader();
+
+        //load the input set for the current collection
+        inputSet = inputsReader.getInputs(c.getHandle());
+    }
+    catch (DCInputsReaderException e)
+    {
+        throw new ServletException(e);
+    }
 %>
 
-<%!void layoutSection(HttpServletRequest request, 
+<%!void layoutSection(HttpServletRequest request,
                        javax.servlet.jsp.JspWriter out,
                        DCInputSet inputSet,
                        SubmissionInfo subInfo,
@@ -114,12 +126,21 @@
     {
        InProgressSubmission ip = subInfo.getSubmissionItem();
 
-	   //need to actually get the rows for pageNum-1 (since first page is index 0)
-	   DCInput[] inputs = inputSet.getPageRows(pageNum-1,
-	                                           ip.hasMultipleTitles(),
-	                                           ip.isPublishedBefore());  
+           //need to actually get the rows for pageNum-1 (since first page is index 0)
+           DCInput[] inputs = inputSet.getPageRows(pageNum-1,
+                                                   ip.hasMultipleTitles(),
+                                                   ip.isPublishedBefore());
+
+        MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();
+
+
        for (int z = 0; z < inputs.length; z++)
-       { 
+       {
+          String scope = subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE;
+          if (!inputs[z].isVisible(scope) && !inputs[z].isReadOnly(scope))
+          {
+              continue;
+          }
           String inputType = inputs[z].getInputType();
           String pairsName = inputs[z].getPairsType();
           String value;
@@ -140,12 +161,15 @@
           {
              values = item.getMetadata(inputs[z].getSchema(), inputs[z].getElement(), inputs[z].getQualifier(), Item.ANY);
           }
-          if (values.length == 0) 
+          if (values.length == 0)
           {
              row.append(LocaleSupport.getLocalizedMessage(pageContext, "jsp.submit.review.no_md"));
           }
-          else 
+          else
           {
+             boolean isAuthorityControlled = mam.isAuthorityControlled(inputs[z].getSchema(),
+                                                    inputs[z].getElement(),inputs[z].getQualifier());
+
              for (int i = 0; i < values.length; i++)
              {
                 boolean newline = true;
@@ -191,11 +215,16 @@
                         }
                    }
                 }
-                else 
+                else
                 {
                    row.append(Utils.addEntities(values[i].value));
                 }
-
+                                if (isAuthorityControlled)
+                {
+                    row.append("<span class=\"ds-authority-confidence cf-")
+                       .append(values[i].confidence).append("\">")
+                       .append(" </span>");
+                }
                 if (newline)
                 {
                     row.append("<br />");
@@ -213,18 +242,19 @@
 <%-- ====================================================== --%>
 <%--             DESCRIBE ITEM ELEMENTS                     --%>
 <%-- ====================================================== --%>
-            <table width="100%">
+            
+<%@page import="org.dspace.workflow.WorkflowItem"%><table width="100%">
                <tr>
                    <td width="100%">
                    <table width="700px">
 
 <%
-	    layoutSection(request, out, inputSet, subInfo, item, pageNum, pageContext);
+            layoutSection(request, out, inputSet, subInfo, item, pageNum, pageContext);
 %>
-					</table>
-				    </td>
-				    <td valign="middle">
-					 <input type="submit" name="submit_jump_<%=stepJump%>" value="<fmt:message key="jsp.submit.review.button.correct"/>" />
-				    </td>
-				</tr>
-			</table>
+                                        </table>
+                                    </td>
+                                    <td valign="middle">
+                                         <input type="submit" name="submit_jump_<%=stepJump%>" value="<fmt:message key="jsp.submit.review.button.correct"/>" />
+                                    </td>
+                                </tr>
+                        </table>

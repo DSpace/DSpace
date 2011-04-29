@@ -1,11 +1,11 @@
 /*
  * SearchConsumer.java
  *
- * Location: $URL: https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2/dspace-api/src/main/java/org/dspace/search/SearchConsumer.java $
+ * Location: $URL: http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-api/src/main/java/org/dspace/search/SearchConsumer.java $
  * 
  * Version: $Revision: 3705 $
  * 
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
  *
  * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.

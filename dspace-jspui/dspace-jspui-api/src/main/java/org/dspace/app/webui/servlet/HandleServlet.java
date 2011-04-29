@@ -1,9 +1,9 @@
 /*
  * HandleServlet.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4430 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-10-10 13:21:30 -0400 (Sat, 10 Oct 2009) $
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -39,35 +39,46 @@
  */
 package org.dspace.app.webui.servlet;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.net.URLEncoder;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.statistics.AbstractUsageEvent;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
-import org.dspace.app.webui.util.UsageEvent;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.*;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.DCValue;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
-import org.dspace.core.*;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.core.LogManager;
+import org.dspace.core.PluginManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.Subscribe;
 import org.dspace.handle.HandleManager;
 import org.dspace.plugin.CollectionHomeProcessor;
 import org.dspace.plugin.CommunityHomeProcessor;
+import org.dspace.usage.UsageEvent;
+import org.dspace.utils.DSpace;
 import org.jdom.Element;
+import org.jdom.Text;
 import org.jdom.output.XMLOutputter;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.net.URLEncoder;
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Servlet for handling requests within a community or collection. The Handle is
@@ -81,7 +92,7 @@ import java.util.List;
  * after the Handle, the community or collection home page is shown.
  * 
  * @author Robert Tansley
- * @version $Revision: 3705 $
+ * @version $Revision: 4430 $
  */
 public class HandleServlet extends DSpaceServlet
 {
@@ -149,7 +160,7 @@ public class HandleServlet extends DSpaceServlet
         {
             log.info(LogManager
                     .getHeader(context, "invalid_id", "path=" + path));
-            JSPManager.showInvalidIDError(request, response, path, -1);
+            JSPManager.showInvalidIDError(request, response, StringEscapeUtils.escapeHtml(path), -1);
 
             return;
         }
@@ -159,10 +170,13 @@ public class HandleServlet extends DSpaceServlet
         {
             Item item = (Item) dso;
 
-            UsageEvent ue = new UsageEvent();
-            ue.fire(request, context, AbstractUsageEvent.VIEW, Constants.ITEM,
-                    dso.getID());
-
+            new DSpace().getEventService().fireEvent(
+            		new UsageEvent(
+            				UsageEvent.Action.VIEW,
+            				request, 
+            				context, 
+            				dso));
+            
             // Only use last-modified if this is an anonymous access
             // - caching content that may be generated under authorisation
             //   is a security problem
@@ -196,9 +210,16 @@ public class HandleServlet extends DSpaceServlet
         {
             Collection c = (Collection) dso;
 
-            UsageEvent ue = new UsageEvent();
-            ue.fire(request, context, AbstractUsageEvent.VIEW,
-                    Constants.COLLECTION, dso.getID());
+            new DSpace().getEventService().fireEvent(
+            		new UsageEvent(
+            				UsageEvent.Action.VIEW,
+            				request, 
+            				context, 
+            				dso));
+            
+            //UsageEvent ue = new UsageEvent();
+            //ue.fire(request, context, AbstractUsageEvent.VIEW,
+            //        Constants.COLLECTION, dso.getID());
 
             // Store collection location in request
             request.setAttribute("dspace.collection", c);
@@ -235,9 +256,16 @@ public class HandleServlet extends DSpaceServlet
         {
             Community c = (Community) dso;
 
-            UsageEvent ue = new UsageEvent();
-            ue.fire(request, context, AbstractUsageEvent.VIEW,
-                    Constants.COMMUNITY, dso.getID());
+            new DSpace().getEventService().fireEvent(
+            		new UsageEvent(
+            				UsageEvent.Action.VIEW,
+            				request, 
+            				context, 
+            				dso));
+            
+            //UsageEvent ue = new UsageEvent();
+            //ue.fire(request, context, AbstractUsageEvent.VIEW,
+            //        Constants.COMMUNITY, dso.getID());
 
             // Store collection location in request
             request.setAttribute("dspace.community", c);
@@ -265,7 +293,7 @@ public class HandleServlet extends DSpaceServlet
             log.info(LogManager.getHeader(context,
                     "Handle not an item, collection or community", "handle="
                             + handle));
-            JSPManager.showInvalidIDError(request, response, path, -1);
+            JSPManager.showInvalidIDError(request, response, StringEscapeUtils.escapeHtml(path), -1);
 
             return;
         }
@@ -346,6 +374,7 @@ public class HandleServlet extends DSpaceServlet
             StringWriter sw = new StringWriter();
 
             XMLOutputter xmlo = new XMLOutputter();
+            xmlo.output(new Text("\n"), sw);
             for (int i = 0; i < l.size(); i++)
             {
                 Element e = (Element) l.get(i);
@@ -354,6 +383,7 @@ public class HandleServlet extends DSpaceServlet
                 // work for Manakin as well as the JSP-based UI.
                 e.setNamespace(null);
                 xmlo.output(e, sw);
+                xmlo.output(new Text("\n"), sw);
             }
             headMetadata = sw.toString();
         }
@@ -542,7 +572,7 @@ public class HandleServlet extends DSpaceServlet
                 subscribed = Subscribe.isSubscribed(context, e, collection);
 
                 // is the user a COLLECTION_EDITOR?
-                if (collection.canEditBoolean())
+                if (collection.canEditBoolean(true))
                 {
                     // set a variable to create an edit button
                     request.setAttribute("editor_button", new Boolean(true));
@@ -679,8 +709,7 @@ public class HandleServlet extends DSpaceServlet
     /**
      * Utility method to obtain the titles for the Items in the given list.
      * 
-     * @param List
-     *            of Items
+     * @param items List of Items
      * @return array of corresponding titles
      */
     private String[] getItemTitles(List items)

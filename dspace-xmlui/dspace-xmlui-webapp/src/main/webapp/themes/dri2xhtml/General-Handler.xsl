@@ -3,9 +3,9 @@
 <!--
   DS-METS-1.0.xsl
 
-  Version: $Revision: 3705 $
+  Version: $Revision: 4902 $
  
-  Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+  Date: $Date: 2010-05-10 00:29:48 -0400 (Mon, 10 May 2010) $
  
   Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
   Institute of Technology.  All rights reserved.
@@ -90,7 +90,11 @@
                 <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-size</i18n:text></th>
                 <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-format</i18n:text></th>
                 <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-view</i18n:text></th>
-            </tr>
+                <!-- Display header for 'Description' only if at least one bitstream contains a description -->
+                <xsl:if test="mets:file/mets:FLocat/@xlink:label != ''">
+                    <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-description</i18n:text></th>
+                </xsl:if>
+		    </tr>
             <xsl:choose>
                 <!-- If one exists and it's of text/html MIME type, only display the primary bitstream -->
                 <xsl:when test="mets:file[@ID=$primaryBitstream]/@MIMETYPE='text/html'">
@@ -178,7 +182,7 @@
             <td>
                 <xsl:choose>
                     <xsl:when test="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/
-                        mets:file[@GROUP_ID=current()/@GROUP_ID]">
+                        mets:file[@GROUPID=current()/@GROUPID]">
                         <a class="image-link">
                             <xsl:attribute name="href">
                                 <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
@@ -186,7 +190,7 @@
                             <img alt="Thumbnail">
                                 <xsl:attribute name="src">
                                     <xsl:value-of select="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/
-                                        mets:file[@GROUP_ID=current()/@GROUP_ID]/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
+                                        mets:file[@GROUPID=current()/@GROUPID]/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
                                 </xsl:attribute>
                             </img>
                         </a>
@@ -201,6 +205,13 @@
                     </xsl:otherwise>
                 </xsl:choose>                        
             </td>
+	    <!-- Display the contents of 'Description' as long as at least one bitstream contains a description -->
+	    <xsl:if test="$context/mets:fileSec/mets:fileGrp[@USE='CONTENT']/mets:file/mets:FLocat/@xlink:label != ''">
+	        <td>
+	            <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label"/>
+	        </td>
+	    </xsl:if>
+
         </tr>
     </xsl:template>
     

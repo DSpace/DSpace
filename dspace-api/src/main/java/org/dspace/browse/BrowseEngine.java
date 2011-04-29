@@ -1,12 +1,11 @@
 /*
  * BrowseEngine.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4365 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-10-05 19:52:42 -0400 (Mon, 05 Oct 2009) $
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -254,9 +252,19 @@ public class BrowseEngine
                 value = OrderFormat.makeSortString(value, scope.getFilterValueLang(),
                             scope.getBrowseIndex().getDataType());
 
+                dao.setAuthorityValue(scope.getAuthorityValue());
+
                 // set the values in the Browse Query
-                dao.setFilterValueField("sort_value");
-                dao.setFilterValue(value);
+                if (scope.isSecondLevel())
+                {
+                    dao.setFilterValueField("value");
+                    dao.setFilterValue(rawValue);    
+                }
+                else
+                {
+	                dao.setFilterValueField("sort_value");
+	                dao.setFilterValue(value);
+                }
                 dao.setFilterValuePartial(scope.getFilterValuePartial());
 
                 // to apply the filtering, we need the distinct and map tables for the index
@@ -382,6 +390,9 @@ public class BrowseEngine
 
             // set the browse value if there is one
             browseInfo.setValue(rawValue);
+
+            // set the browse authority key if there is one
+            browseInfo.setAuthority(scope.getAuthorityValue());
 
             // set the focus value if there is one
             browseInfo.setFocus(rawFocusValue);

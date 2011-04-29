@@ -1,9 +1,9 @@
 /*
  * SendFeedbackAction.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4455 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-10-16 16:56:44 -0400 (Fri, 16 Oct 2009) $
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -82,13 +82,29 @@ public class SendFeedbackAction extends AbstractAction
         // Obtain information from request
         // The page where the user came from
         String fromPage = request.getHeader("Referer");
-
         // Prevent spammers and splogbots from poisoning the feedback page
         String host = ConfigurationManager.getProperty("dspace.hostname");
+        String allowedReferrersString = ConfigurationManager.getProperty("mail.allowed.referrers");
+
+        String[] allowedReferrersSplit = null;
+        boolean validReferral = false;
+
+        if((allowedReferrersString != null) && (allowedReferrersString.length() > 0))
+        {
+            allowedReferrersSplit = allowedReferrersString.trim().split("\\s*,\\s*");
+            for(int i = 0; i < allowedReferrersSplit.length; i++)
+            {
+                if(fromPage.indexOf(allowedReferrersSplit[i]) != -1)
+                {
+                    validReferral = true;
+                    break;
+                }
+            }
+        }
 
         String basicHost = "";
         if (host.equals("localhost") || host.equals("127.0.0.1")
-        		|| host.equals(InetAddress.getLocalHost().getHostAddress()))
+                        || host.equals(InetAddress.getLocalHost().getHostAddress()))
             basicHost = host;
         else
         {
@@ -98,9 +114,10 @@ public class SendFeedbackAction extends AbstractAction
             basicHost = host.substring(host.substring(0, lastDot).lastIndexOf("."));
         }
 
-        if (fromPage == null || fromPage.indexOf(basicHost) == -1)
+        if ((fromPage == null) || ((fromPage.indexOf(basicHost) == -1) && (validReferral == false)))
         {
-            throw new AuthorizeException();
+            // N.B. must use old message catalog because Cocoon i18n is only available to transformed pages.
+            throw new AuthorizeException(I18nUtil.getMessage("feedback.error.forbidden"));
         }
 
         // User email from context

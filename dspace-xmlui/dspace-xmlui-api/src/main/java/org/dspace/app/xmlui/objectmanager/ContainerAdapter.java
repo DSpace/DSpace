@@ -1,9 +1,9 @@
 /*
  * ContainerAdapter.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4265 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-09-16 05:16:58 -0400 (Wed, 16 Sep 2009) $
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -728,9 +728,9 @@ public class ContainerAdapter extends AbstractAdapter
 	        	try {
 	        		// Wrap the value inside a root element (which will be trimed out 
 	        		// by the SAX filter and set the default namespace to XHTML. 
-		        	String xml = "<fragment xmlns=\"http://www.w3.org/1999/xhtml\">"+value+"</fragment>";
-		     	   
-		     	   	ByteArrayInputStream inputStream = new ByteArrayInputStream(xml.getBytes());
+		        	String xml = "<?xml version='1.0' encoding='UTF-8'?><fragment xmlns=\"http://www.w3.org/1999/xhtml\">"+value+"</fragment>";
+
+		            ByteArrayInputStream inputStream = new ByteArrayInputStream(xml.getBytes("UTF-8"));
 		     	   
 			 	    SAXBuilder builder = new SAXBuilder();
 					Document document = builder.build(inputStream);

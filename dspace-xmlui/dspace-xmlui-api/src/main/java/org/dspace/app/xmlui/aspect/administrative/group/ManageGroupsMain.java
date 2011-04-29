@@ -1,9 +1,9 @@
 /*
  * ManageGroupsMain.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 3981 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-06-29 10:37:47 -0400 (Mon, 29 Jun 2009) $
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -56,6 +56,8 @@ import org.dspace.app.xmlui.wing.element.Row;
 import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.eperson.Group;
 
 /**
@@ -135,8 +137,8 @@ public class ManageGroupsMain extends AbstractDSpaceTransformer
 	/** The number of results to show on one page. */
 	private static final int PAGE_SIZE = 15;
 	
-	/** The maximum size of a collection name allowed */
-	private static final int MAX_COLLECTION_NAME = 30;
+    /** The maximum size of a collection or community name allowed */
+    private static final int MAX_COLLECTION_OR_COMMUNITY_NAME = 30;
 	
 	public void addPageMeta(PageMeta pageMeta) throws WingException
     {
@@ -246,26 +248,47 @@ public class ManageGroupsMain extends AbstractDSpaceTransformer
         	row.addCell().addContent(memberCount == 0 ? "-" : String.valueOf(memberCount));
         	
         	Cell cell = row.addCell();
-        	if (FlowGroupUtils.getCollectionId(group.getName()) > -1)
-        	{
-        		Collection collection = Collection.find(context, FlowGroupUtils.getCollectionId(group.getName()) );
-        		if (collection != null)
-        		{
-	        		String collectionName = collection.getMetadata("name");
+        	String groupName = group.getName();
+            DSpaceObject collectionOrCommunity = null;
+            String collectionOrCommunityName = null;
+            int id;
+            id = FlowGroupUtils.getCollectionId(groupName);
+            if (id > -1)
+            {
+                Collection collection = Collection.find(context, id);
+                if (collection != null)
+                {
+                    collectionOrCommunityName = collection.getMetadata("name");
+                    collectionOrCommunity = collection;
+                }
+            } 
+            else
+            {
+                id = FlowGroupUtils.getCommunityId(groupName);
+                if (id > -1)
+                {
+                    Community community = Community.find(context, id);
+                    if (community != null)
+                    {
+                        collectionOrCommunityName = community.getMetadata("name");
+                        collectionOrCommunity = community;
+                    }
+                }
+            }
+            if (collectionOrCommunity != null)
+            {
+                if (collectionOrCommunityName == null)
+                    collectionOrCommunityName = "";
+                else if (collectionOrCommunityName.length() > MAX_COLLECTION_OR_COMMUNITY_NAME)
+                    collectionOrCommunityName = collectionOrCommunityName.substring(0,MAX_COLLECTION_OR_COMMUNITY_NAME-3) + "...";
 	        		
-	        		if (collectionName == null)
-	        			collectionName = "";
-	        		else if (collectionName.length() > MAX_COLLECTION_NAME)
-	        			collectionName = collectionName.substring(0,MAX_COLLECTION_NAME-3) + "...";
+                cell.addContent(collectionOrCommunityName + " ");
 	        		
-	        		cell.addContent(collectionName+" ");
-	        		
-	        		Highlight highlight = cell.addHighlight("fade");
-	        		
-	        		highlight.addContent("[");
-	        		highlight.addXref(contextPath+"/handle/"+collection.getHandle(), T_collection_link);
-	        		highlight.addContent("]");
-        		}
+	        	Highlight highlight = cell.addHighlight("fade");
+
+                highlight.addContent("[");
+                highlight.addXref(contextPath+"/handle/"+collectionOrCommunity.getHandle(), T_collection_link);
+	        	highlight.addContent("]");
         	}
         	
         }

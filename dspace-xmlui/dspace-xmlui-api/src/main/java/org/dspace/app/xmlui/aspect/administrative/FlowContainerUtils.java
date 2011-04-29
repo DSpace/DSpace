@@ -1,9 +1,9 @@
 /*
  * FlowContainerUtils.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4716 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2010-01-21 11:57:40 -0500 (Thu, 21 Jan 2010) $
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -41,8 +41,14 @@
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.servlet.multipart.Part;
@@ -51,14 +57,24 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.browse.BrowseException;
+import org.dspace.browse.IndexBrowse;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.harvest.HarvestedCollection;
 import org.dspace.content.Item;
+import org.dspace.content.ItemIterator;
+import org.dspace.harvest.OAIHarvester;
+import org.dspace.harvest.OAIHarvester.HarvestScheduler;
+import org.dspace.harvest.OAIHarvester.HarvestingException;
+import org.dspace.content.crosswalk.CrosswalkException;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+import org.xml.sax.SAXException;
 
 /**
  * Utility methods to processes actions on Communities and Collections. 
@@ -164,6 +180,213 @@ public class FlowContainerUtils
 		return result;
 	}
 	
+	/**
+	 * Process the collection harvesting options form.
+	 * 
+	 * @param context The current DSpace context.
+	 * @param collectionID The collection id.
+	 * @param request the Cocoon request object
+	 * @return A process result's object.
+	 */
+	public static FlowResult processSetupCollectionHarvesting(Context context, int collectionID, Request request) throws SQLException, IOException, AuthorizeException
+	{
+		FlowResult result = new FlowResult();
+		HarvestedCollection hc = HarvestedCollection.find(context, collectionID);
+
+		String contentSource = request.getParameter("source");
+
+		// First, if this is not a harvested collection (anymore), set the harvest type to 0; possibly also wipe harvest settings  
+		if (contentSource.equals("source_normal")) 
+		{
+			if (hc != null) 
+				hc.delete();
+			
+			result.setContinue(true);
+		}
+		else 
+		{
+			FlowResult subResult = testOAISettings(context, request);
+			
+			// create a new harvest instance if all the settings check out
+			if (hc == null) {
+				hc = HarvestedCollection.create(context, collectionID);
+			}
+			
+			// if the supplied options all check out, set the harvesting parameters on the collection
+			if (subResult.getErrors().isEmpty()) {
+				String oaiProvider = request.getParameter("oai_provider");
+				boolean oaiAllSets = "all".equals(request.getParameter("oai-set-setting"));
+                String oaiSetId;
+                if(oaiAllSets)
+                    oaiSetId = "all";
+                else
+                    oaiSetId = request.getParameter("oai_setid");
+
+
+				String metadataKey = request.getParameter("metadata_format");
+				String harvestType = request.getParameter("harvest_level");
+				
+				hc.setHarvestParams(Integer.parseInt(harvestType), oaiProvider, oaiSetId, metadataKey);
+				hc.setHarvestStatus(HarvestedCollection.STATUS_READY);
+			}
+			else {
+				result.setErrors(subResult.getErrors());
+				result.setContinue(false);
+				return result;
+			}
+			
+			hc.update();
+		}
+		        
+        // Save everything
+        context.commit();
+        
+        // No notice...
+        //result.setMessage(new Message("default","Harvesting options successfully modified."));
+        result.setOutcome(true);
+        result.setContinue(true);
+		
+		return result;
+	}
+	
+	
+	/**
+	 * Use the collection's harvest settings to immediately perform a harvest cycle.
+	 * 
+	 * @param context The current DSpace context.
+	 * @param collectionID The collection id.
+	 * @param request the Cocoon request object
+	 * @return A process result's object.
+	 * @throws TransformerException 
+	 * @throws SAXException 
+	 * @throws ParserConfigurationException 
+	 * @throws CrosswalkException 
+	 */
+	public static FlowResult processRunCollectionHarvest(Context context, int collectionID, Request request) throws SQLException, IOException, AuthorizeException, CrosswalkException, ParserConfigurationException, SAXException, TransformerException
+	{
+		FlowResult result = new FlowResult();
+		OAIHarvester harvester;
+		List<String> testErrors = new ArrayList<String>();
+		Collection collection = Collection.find(context, collectionID);
+		HarvestedCollection hc = HarvestedCollection.find(context, collectionID);
+
+		//TODO: is there a cleaner way to do this?
+		try {
+			if (HarvestScheduler.status != HarvestScheduler.HARVESTER_STATUS_STOPPED) {
+				synchronized(HarvestScheduler.lock) {
+					HarvestScheduler.interrupt = HarvestScheduler.HARVESTER_INTERRUPT_INSERT_THREAD;
+					HarvestScheduler.interruptValue = collection.getID();
+					HarvestScheduler.lock.notify();
+				}
+			}
+			else {
+				harvester = new OAIHarvester(context, collection, hc);
+				harvester.runHarvest();
+			}
+		}
+		catch (Exception e) {
+			testErrors.add(e.getMessage());
+			result.setErrors(testErrors);
+			result.setContinue(false);
+			return result;
+		}
+		
+        result.setContinue(true);
+		
+		return result;
+	}
+	
+	
+	/**
+	 * Purge the collection of all items, then run a fresh harvest cycle.
+	 * 
+	 * @param context The current DSpace context.
+	 * @param collectionID The collection id.
+	 * @param request the Cocoon request object
+	 * @return A process result's object.
+	 * @throws TransformerException 
+	 * @throws SAXException 
+	 * @throws ParserConfigurationException 
+	 * @throws CrosswalkException 
+	 * @throws BrowseException 
+	 */
+	public static FlowResult processReimportCollection(Context context, int collectionID, Request request) throws SQLException, IOException, AuthorizeException, CrosswalkException, ParserConfigurationException, SAXException, TransformerException, BrowseException 
+	{
+		FlowResult result = new FlowResult();
+		Collection collection = Collection.find(context, collectionID);
+		HarvestedCollection hc = HarvestedCollection.find(context, collectionID);
+		
+		ItemIterator it = collection.getAllItems();
+		//IndexBrowse ib = new IndexBrowse(context);
+		while (it.hasNext()) {
+			Item item = it.next();
+			//System.out.println("Deleting: " + item.getHandle());
+			//ib.itemRemoved(item);
+			collection.removeItem(item);
+		}
+		hc.setHarvestResult(null,"");
+		hc.update();
+		collection.update();
+		context.commit();
+		
+		result = processRunCollectionHarvest(context, collectionID, request);		
+		
+		return result;		
+	}
+	
+	
+	/**
+	 * Test the supplied OAI settings. 
+	 * 
+	 * @param context
+	 * @param request
+	 * @return
+	 */
+	public static FlowResult testOAISettings(Context context, Request request)  
+	{
+		FlowResult result  = new FlowResult();
+		
+		String oaiProvider = request.getParameter("oai_provider");
+		String oaiSetId = request.getParameter("oai_setid");
+        oaiSetId = request.getParameter("oai-set-setting");
+        if(!"all".equals(oaiSetId))
+            oaiSetId = request.getParameter("oai_setid");
+		String metadataKey = request.getParameter("metadata_format");
+		String harvestType = request.getParameter("harvest_level");
+		int harvestTypeInt = 0;
+		
+		if (oaiProvider == null || oaiProvider.length() == 0)
+			result.addError("oai_provider");
+		if (oaiSetId == null || oaiSetId.length() == 0)
+			result.addError("oai_setid");
+		if (metadataKey == null || metadataKey.length() == 0)
+			result.addError("metadata_format");
+		if (harvestType == null || harvestType.length() == 0)
+			result.addError("harvest_level");
+		else
+			harvestTypeInt = Integer.parseInt(harvestType);
+			
+		
+		if (result.getErrors() == null) {
+			List<String> testErrors = OAIHarvester.verifyOAIharvester(oaiProvider, oaiSetId, metadataKey, (harvestTypeInt>1));
+			result.setErrors(testErrors);
+		}
+		
+		if (result.getErrors() == null || result.getErrors().isEmpty()) {
+			result.setOutcome(true);
+			// On a successful test we still want to stay in the loop, not continue out of it
+			//result.setContinue(true);
+			result.setMessage(new Message("default","Harvesting settings are valid."));
+		}
+		else {
+			result.setOutcome(false);
+			result.setContinue(false);
+			// don't really need a message when the errors are highlighted already
+			//result.setMessage(new Message("default","Harvesting is not properly configured."));
+		}
+
+		return result;
+	}
 	
 	/**
 	 * Look up the id of the template item for a given collection.
@@ -706,7 +929,106 @@ public class FlowContainerUtils
 		return result;
 	}
 	
+	/**
+     * Look up the id of a group authorized for one of the given roles. If no group is currently 
+     * authorized to perform this role then a new group will be created and assigned the role.
+     * 
+     * @param context The current DSpace context.
+     * @param collectionID The collection id.
+     * @param roleName ADMIN.
+     * @return The id of the group associated with that particular role, or -1 if the role was not found.
+     */
+    public static int getCommunityRole(Context context, int communityID, String roleName) throws SQLException, AuthorizeException, IOException
+    {
+        Community community = Community.find(context, communityID);
 	
+        // Determine the group based upon which role we are looking for.
+        Group role = null;
+        if (ROLE_ADMIN.equals(roleName))
+        {
+            role = community.getAdministrators();
+            if (role == null)
+                role = community.createAdministrators();
+        } 
+	
+        // In case we needed to create a group, save our changes
+        community.update();
+        context.commit();
+        
+        // If the role name was valid then role should be non null,
+        if (role != null)
+            return role.getID();
+        
+        return -1;
+    }
+
+	/**
+     * Delete one of a community's roles
+     * 
+     * @param context The current DSpace context.
+     * @param communityID The community id.
+     * @param roleName ADMIN.
+     * @param groupID The id of the group associated with this role.
+     * @return A process result's object.
+     */
+    public static FlowResult processDeleteCommunityRole(Context context, int communityID, String roleName, int groupID) throws SQLException, UIException, IOException, AuthorizeException
+    {
+        FlowResult result = new FlowResult();
+        
+        Community community = Community.find(context, communityID);
+        Group role = Group.find(context, groupID);
+        
+        // First, unregister the role
+        if (ROLE_ADMIN.equals(roleName))
+        {
+            community.removeAdministrators();
+        }
+        
+        // Second, remove all authorizations for this role by searching for all policies that this 
+        // group has on the collection and remove them otherwise the delete will fail because 
+        // there are dependencies.
+        @SuppressWarnings("unchecked") // the cast is correct
+        List<ResourcePolicy> policies = AuthorizeManager.getPolicies(context, community);
+        for (ResourcePolicy policy : policies)
+        {
+            if (policy.getGroupID() == groupID)
+                policy.delete();
+        }
+        
+        // Finally, delete the role's actual group.
+        community.update();
+        role.delete();
+        context.commit();
+    
+        result.setContinue(true);
+        result.setOutcome(true);
+        result.setMessage(new Message("default","The role was successfully deleted."));
+        return result;
+    }
+    
+    /**
+     * Delete a collection's template item (which is not a member of the collection).
+     * 
+     * @param context
+     * @param collectionID
+     * @return
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
+     */
+    public static FlowResult processDeleteTemplateItem(Context context, int collectionID) throws SQLException, AuthorizeException, IOException
+    {
+        FlowResult result = new FlowResult();
+        
+        Collection collection = Collection.find(context, collectionID);
+        
+        collection.removeTemplateItem();
+        context.commit();
+        
+        result.setContinue(true);
+        result.setOutcome(true);
+        return result;
+    }
 	
 	/**
 	 * Check whether this metadata value is a proper XML fragment. If the value is not 
@@ -722,9 +1044,15 @@ public class FlowContainerUtils
 		value = escapeXMLEntities(value);
 		
 		// Try and parse the XML into a mini-dom
-    	String xml = "<fragment>"+value+"</fragment>";
+    	String xml = "<?xml version='1.0' encoding='UTF-8'?><fragment>"+value+"</fragment>";
  	   
- 	   	ByteArrayInputStream inputStream = new ByteArrayInputStream(xml.getBytes());
+ 	   	ByteArrayInputStream inputStream = null;
+        try {
+            inputStream = new ByteArrayInputStream(xml.getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            inputStream = new ByteArrayInputStream(xml.getBytes()); //not supposed to happen, but never hurts
+
+        }
  	   
  	    SAXBuilder builder = new SAXBuilder();
 		try 

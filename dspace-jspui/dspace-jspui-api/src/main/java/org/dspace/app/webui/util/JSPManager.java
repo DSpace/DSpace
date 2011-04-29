@@ -1,9 +1,9 @@
 /*
  * JSPManager.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 5087 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2010-06-10 17:37:50 -0400 (Thu, 10 Jun 2010) $
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -45,6 +45,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -54,7 +55,7 @@ import org.dspace.core.LogManager;
  * Methods for displaying UI pages to the user.
  * 
  * @author Robert Tansley
- * @version $Revision: 3705 $
+ * @version $Revision: 5087 $
  */
 public class JSPManager
 {
@@ -163,7 +164,7 @@ public class JSPManager
             HttpServletResponse response, String badID, int type)
             throws ServletException, IOException
     {
-        request.setAttribute("bad.id", badID);
+        request.setAttribute("bad.id", StringEscapeUtils.escapeHtml(badID));
         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 
         if (type != -1)

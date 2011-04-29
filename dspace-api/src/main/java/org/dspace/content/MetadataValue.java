@@ -1,12 +1,11 @@
 /*
  * MetadataValue.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4365 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-10-05 19:52:42 -0400 (Mon, 05 Oct 2009) $
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -81,6 +79,12 @@ public class MetadataValue
     /** The position of the record. */
     public int place = 1;
 
+    /** Authority key, if any */
+    public String authority = null;
+
+    /** Authority confidence value -- see Choices class for values */
+    public int confidence = 0;
+
     /** log4j logger */
     private static Logger log = Logger.getLogger(MetadataValue.class);
 
@@ -102,6 +106,8 @@ public class MetadataValue
             value = row.getStringColumn("text_value");
             language = row.getStringColumn("text_lang");
             place = row.getIntColumn("place");
+            authority = row.getStringColumn("authority");
+            confidence = row.getIntColumn("confidence");
             this.row = row;
         }
     }
@@ -234,6 +240,46 @@ public class MetadataValue
     }
 
     /**
+     * Get the metadata authority
+     *
+     * @return metadata authority
+     */
+    public String getAuthority ()
+    {
+        return authority ;
+    }
+
+    /**
+     * Set the metadata authority
+     *
+     * @param value new metadata authority
+     */
+    public void setAuthority (String value)
+    {
+        this.authority  = value;
+    }
+
+    /**
+     * Get the metadata confidence
+     *
+     * @return metadata confidence
+     */
+    public int getConfidence()
+    {
+        return confidence;
+    }
+
+    /**
+     * Set the metadata confidence
+     *
+     * @param value new metadata confidence
+     */
+    public void setConfidence(int value)
+    {
+        this.confidence = value;
+    }
+
+    /**
      * Creates a new metadata value.
      *
      * @param context
@@ -250,6 +296,8 @@ public class MetadataValue
         row.setColumn("text_value", value);
         row.setColumn("text_lang", language);
         row.setColumn("place", place);
+        row.setColumn("authority", authority);
+        row.setColumn("confidence", confidence);
         DatabaseManager.insert(context, row);
 
         // Remember the new row number
@@ -354,6 +402,8 @@ public class MetadataValue
         row.setColumn("text_value", value);
         row.setColumn("text_lang", language);
         row.setColumn("place", place);
+        row.setColumn("authority", authority);
+        row.setColumn("confidence", confidence);
         DatabaseManager.update(context, row);
 
         log.info(LogManager.getHeader(context, "update_metadatavalue",

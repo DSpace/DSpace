@@ -39,7 +39,7 @@ package org.purl.sword.base;
 /**
  * List of the namespaces that are used by SWORD. 
  * 
- * Last updated on: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Last updated on: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
  * 
  * @author Neil Taylor
  * @version $Revision: 3705 $

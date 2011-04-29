@@ -1,9 +1,9 @@
 <%--
   - styles.css.jsp
   -
-  - Version: $Revision: 3705 $
+  - Version: $Revision: 4603 $
   -
-  - Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+  - Date: $Date: 2009-12-03 03:17:54 -0500 (Thu, 03 Dec 2009) $
   -
   - Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
   - Institute of Technology.  All rights reserved.
@@ -70,8 +70,8 @@ BODY { font-family: "verdana", Arial, Helvetica, sans-serif;
        margin: 0;
        padding: 0;
        margin-left:0px;
-       margin-right:0px; 
-       margin-top:0px; 
+       margin-right:0px;
+       margin-top:0px;
        margin-bottom:0px }
 
 <%-- Note: Font information must be repeated for broken Netscape 4.xx --%>
@@ -107,9 +107,9 @@ p {  margin-left: 10px;
 <%-- (or block element) surrounding it in order to be valid XHTML 1.0 --%>
 DIV { margin-left: 10px;
       margin-right: 10px;
-      margin-bottom: 15px; 
+      margin-bottom: 15px;
       font-family: "verdana", "Arial", "Helvetica", sans-serif;
-      font-size: 10pt;}      
+      font-size: 10pt;}
 
 UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
      font-size: 12px }
@@ -277,7 +277,7 @@ OL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
  }
 
 .communityStrength {
-				font-family: "verdana", "Arial", "Helvetica", sans-serif;
+                                font-family: "verdana", "Arial", "Helvetica", sans-serif;
                  font-size: 12pt;
                  font-weight: normal }
 
@@ -586,7 +586,7 @@ OL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                   text-decoration: none;
                   vertical-align: middle }
 
-.attentionTable 
+.attentionTable
 {
     font-style: normal;
     font-weight: normal;
@@ -596,7 +596,7 @@ OL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
     background: #cc9966;
 }
 
-.attentionCell 
+.attentionCell
 {
     background: #ffffcc;
     text-align: center;
@@ -652,47 +652,47 @@ OL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
 <%-- The following rules are used by the controlled-vocabulary add-on --%>
 
 ul.controlledvocabulary  {
-		list-style-type:none; }
+                list-style-type:none; }
 
-	
+        
 .controlledvocabulary ul  li ul {
-	     list-style-type:none;
-		display:none; }
+             list-style-type:none;
+                display:none; }
 
 input.controlledvocabulary  {
-		border:0px; }
+                border:0px; }
 
 img.controlledvocabulary {
-		margin-right:8px ! important;
-		margin-left:11px ! important;
-		cursor:hand; }                    
+                margin-right:8px ! important;
+                margin-left:11px ! important;
+                cursor:hand; }
 
-.submitFormHelpControlledVocabularies {  
-		   margin-left: 10px;
+.submitFormHelpControlledVocabularies {
+                   margin-left: 10px;
            margin-right: 10px;
            font-family: "verdana", "Arial", "Helvetica", sans-serif;
            font-size: 8pt;
-           text-align: left; }           
+           text-align: left; }
 
-.controlledVocabularyLink {  
+.controlledVocabularyLink {
            font-family: "verdana", "Arial", "Helvetica", sans-serif;
-           font-size: 8pt; }   
+           font-size: 8pt; }
            
 .browse_buttons
 {
-	float: right;
-	padding: 1px;
-	margin: 1px;
+        float: right;
+        padding: 1px;
+        margin: 1px;
 }
 
 #browse_navigation
 {
-	margin-bottom: 10px;
+        margin-bottom: 10px;
 }
 
 #browse_controls
 {
-	margin-bottom: 10px;
+        margin-bottom: 10px;
 }
 
 .browse_range
@@ -706,3 +706,116 @@ img.controlledvocabulary {
   font-size: 10px;
   font-weight: normal;
 } 
+
+
+<%-- styles added by authority control --%>
+div.autocomplete {
+    background-color:white;
+    border:1px solid #888888;
+    margin:0;
+    padding:0;
+    position:absolute;
+    width:250px;
+}
+
+div.autocomplete ul {
+    list-style-type:none;
+    margin:0;
+    padding:0;
+}
+
+div.autocomplete ul li {
+    cursor:pointer;
+}
+
+div.autocomplete ul li.selected {
+    text-decoration: underline;
+}
+div.autocomplete ul li:hover {
+    text-decoration: underline;
+}
+
+div.autocomplete ul li span.value {
+    display:none;
+}
+
+
+/* this magic gets the 16x16 icon to show up.. setting height/width didn't
+   do it, but adding padding actually made it show up. */
+img.ds-authority-confidence,
+span.ds-authority-confidence
+{ width: 16px; height: 16px; margin: 5px; background-repeat: no-repeat;
+  padding: 0px 2px; vertical-align: bottom; color: transparent;}
+img.ds-authority-confidence.cf-unset,
+span.ds-authority-confidence.cf-unset
+  { background-image: url(<%= request.getContextPath() %>/image/authority/bug.png);}
+img.ds-authority-confidence.cf-novalue,
+span.ds-authority-confidence.cf-novalue
+  { background-image: url(<%= request.getContextPath() %>/image/confidence/0-unauthored.gif);}
+img.ds-authority-confidence.cf-rejected,
+img.ds-authority-confidence.cf-failed,
+span.ds-authority-confidence.cf-rejected,
+span.ds-authority-confidence.cf-failed
+  { background-image: url(<%= request.getContextPath() %>/image/confidence/2-errortriangle.gif); }
+img.ds-authority-confidence.cf-notfound,
+span.ds-authority-confidence.cf-notfound
+  { background-image: url(<%= request.getContextPath() %>/image/confidence/3-thumb1.gif); }
+img.ds-authority-confidence.cf-ambiguous,
+span.ds-authority-confidence.cf-ambiguous
+  { background-image: url(<%= request.getContextPath() %>/image/confidence/4-question.gif); }
+img.ds-authority-confidence.cf-uncertain,
+span.ds-authority-confidence.cf-uncertain
+  { background-image: url(<%= request.getContextPath() %>/image/confidence/5-pinion.gif); }
+img.ds-authority-confidence.cf-accepted,
+span.ds-authority-confidence.cf-accepted
+  { background-image: url(<%= request.getContextPath() %>/image/confidence/6-greencheck.gif); }
+
+/* hide authority-value inputs in forms */
+input.ds-authority-value { display:none; }
+
+/** XXX Change to this to get the authority value to show up for debugging:
+ input.ds-authority-value { display:inline; }
+**/
+
+/* ..except, show authority-value inputs in on the Item EditMetadata page */
+table.miscTable input.ds-authority-value { display: inline; }
+
+table.authority-statistics {padding: 5px; margin-bottom: 15px;}
+table.authority-statistics table {float: left; text-align: center;}
+
+.statsTable {
+        border: 1px gray solid;
+        width: 85%;
+}
+
+.statsTable td {
+        font-size: 0.8em;
+}
+
+
+div.authority-key-nav-link, div.authority-page-nav-link {margin-top: 20px;}
+
+div#authority-message {
+    width: 80%;
+    display:block;
+    text-align: center;
+    margin-left: 10%;
+    padding: 10px;
+    border: 1px dashed #FFCC00;
+    background-color: #FFF4C8;
+ }
+
+a.authority {
+    background: transparent url(<%= request.getContextPath() %>/image/authority/book_key.png) no-repeat;
+    background-position: top right;
+    padding-right: 20px;
+}
+
+/* for edit-item-form lock button */
+input.ds-authority-lock
+  { vertical-align: bottom; height: 24px; width: 24px; margin-right: 8px;
+    background-repeat: no-repeat; background-color: transparent; }
+input.ds-authority-lock.is-locked
+  { background-image: url(<%= request.getContextPath() %>/image/lock24.png); }
+input.ds-authority-lock.is-unlocked
+  { background-image: url(<%= request.getContextPath() %>/image/unlock24.png); }

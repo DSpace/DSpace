@@ -1,12 +1,11 @@
 /*
  * SupervisedItem.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 3761 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-05-07 00:18:02 -0400 (Thu, 07 May 2009) $
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -63,7 +61,7 @@ import org.dspace.storage.rdbms.TableRow;
  * WorkspaceItem class and adds the methods required to be a Supervised Item.
  *
  * @author Richard Jones
- * @version  $Revision: 3705 $
+ * @version  $Revision: 3761 $
  */
 public class SupervisedItem extends WorkspaceItem
 {

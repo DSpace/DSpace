@@ -7,14 +7,14 @@
    <url>http://projects.dspace.org/dspace-jspui/dspace-jspui-webapp</url>
    <description>DSpace JSP Based Webapplication Resources</description>
 
-   <!-- 
-      A Parent POM that Maven inherits DSpace Default 
-      POM atrributes from. 
+   <!--
+      A Parent POM that Maven inherits DSpace Default
+      POM atrributes from.
    -->
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-jspui</artifactId>
-      <version>1.5.2</version>
+      <version>1.6.2</version>
    </parent>
 
    <repositories>
@@ -34,15 +34,15 @@
       </repository>
    </repositories>
 
-   <!-- 
+   <!--
       The Subversion repository location is used by Continuum to update against
       when changes have occured, this spawns a new build cycle and releases snapshots
       into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2/dspace-jspui/dspace-jspui-webapp</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2/dspace-jspui/dspace-jspui-webapp</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/tags/dspace-1.5.2/dspace-jspui/dspace-jspui-webapp</url>
+      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-jspui/dspace-jspui-webapp</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-jspui/dspace-jspui-webapp</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-jspui/dspace-jspui-webapp</url>
    </scm>
 
    <build>
@@ -75,11 +75,11 @@
    </build>
 
    <profiles>
-      <!-- 
+      <!--
          when activated a dspace.config configuration
-         file location passed on the commandline 
-         (-Ddspace.config=...) can be passed through 
-         to be used as a filter source by projects for 
+         file location passed on the commandline
+         (-Ddspace.config=...) can be passed through
+         to be used as a filter source by projects for
          tasks such as updating the ${dspace.dir} in
          web.xml etc.
       -->
@@ -134,6 +134,11 @@
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-jspui-api</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-ui-shared</artifactId>
+         <type>war</type>
       </dependency>
    </dependencies>
 

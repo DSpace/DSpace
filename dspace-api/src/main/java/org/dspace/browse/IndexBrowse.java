@@ -1,8 +1,7 @@
 /*
  * IndexBrowse.java
  *
- * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -15,8 +14,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -56,6 +54,8 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.authority.ChoiceAuthorityManager;
+import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.Context;
 import org.dspace.sort.SortOption;
 import org.dspace.sort.SortException;
@@ -425,8 +425,11 @@ public class IndexBrowse
                             DCValue[] values = item.getMetadata(md[0], md[1], md[2], Item.ANY);
 
                             // if we have values to index on, then do so
-                            if (values != null)
+                            if (values != null && values.length > 0)
                             {
+                                int minConfidence = MetadataAuthorityManager.getManager()
+                                        .getMinConfidence(values[0].schema, values[0].element, values[0].qualifier);
+
                                 for (int x = 0; x < values.length; x++)
                                 {
                                     // Ensure that there is a value to index before inserting it
@@ -438,14 +441,53 @@ public class IndexBrowse
                                                 (values[x].qualifier == null ? "" : "." + values[x].qualifier));
                                     }
                                     else
-                                    {
+                                    {                                        
+                                        if (bis[i].isAuthorityIndex() && 
+                                                (values[x].authority == null || values[x].confidence < minConfidence))
+                                        {
+                                            // if we have an authority index only authored metadata will go here!
+                                            log.debug("Skipping item="+item.getID()+", field="+values[x].schema+"."+values[x].element+"."+values[x].qualifier+", value="+values[x].value+", authority="+values[x].authority+", confidence="+values[x].confidence+" (BAD AUTHORITY)");
+                                            break;
+                                        }
+                                        
+                                        // is there any valid (with appropriate confidence) authority key?
+                                        if (values[x].authority != null
+                                                && values[x].confidence >= minConfidence)
+                                        {
+                                            boolean isValueVariants = false;
+                                            List<String> variants = ChoiceAuthorityManager.getManager()
+                                                                        .getVariants(values[x].schema, values[x].element, values[x].qualifier,
+                                                                                        values[x].authority, values[x].language);
+                                            if (variants != null)
+                                            {
+                                                for (String var : variants)
+                                                {
+                                                    String nVal = OrderFormat.makeSortString(var, values[x].language, bis[i].getDataType());
+                                                    distIDSet.add(dao.getDistinctID(bis[i].getDistinctTableName(), var, values[x].authority, nVal));
+                                                    if (var.equals(values[x].value))
+                                                    {
+                                                        isValueVariants = true;
+                                                    }
+                                                }
+                                            }
+
+                                            if (!isValueVariants)
+                                            {
+                                                // get the normalised version of the value
+                                                String nVal = OrderFormat.makeSortString(values[x].value, values[x].language, bis[i].getDataType());
+                                                distIDSet.add(dao.getDistinctID(bis[i].getDistinctTableName(), values[x].value, values[x].authority, nVal));
+                                            }
+                                        }
+                                        else // put it in the browse index as if it hasn't have an authority key
+                                        {
                                         // get the normalised version of the value
                                         String nVal = OrderFormat.makeSortString(values[x].value, values[x].language, bis[i].getDataType());
-                                        distIDSet.add(dao.getDistinctID(bis[i].getDistinctTableName(), values[x].value, nVal));
+                                            distIDSet.add(dao.getDistinctID(bis[i].getDistinctTableName(), values[x].value, null, nVal));
                                     }
                                 }
                             }
                         }
+                    }
                     }
 
                     // Do we have any mappings?

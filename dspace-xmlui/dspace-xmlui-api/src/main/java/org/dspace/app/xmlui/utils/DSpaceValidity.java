@@ -1,9 +1,9 @@
 /*
  * DSpaceValidity.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 3992 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-07-01 17:07:29 -0400 (Wed, 01 Jul 2009) $
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -298,6 +298,8 @@ public class DSpaceValidity implements SourceValidity
             
             validityKey.append("Item:");
             validityKey.append(item.getHandle());            
+            validityKey.append(item.getOwningCollection());
+            validityKey.append(item.getLastModified());
             // Include all metadata values in the validity key.
             DCValue[] dcvs = item.getDC(Item.ANY,Item.ANY,Item.ANY);
             for (DCValue dcv : dcvs)

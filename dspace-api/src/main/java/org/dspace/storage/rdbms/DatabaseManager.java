@@ -1,9 +1,9 @@
 /*
  * DatabaseManager.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4658 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2010-01-06 16:30:42 -0500 (Wed, 06 Jan 2010) $
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -88,7 +88,7 @@ import org.dspace.core.LogManager;
  * 
  * @author Peter Breton
  * @author Jim Downing
- * @version $Revision: 3705 $
+ * @version $Revision: 4658 $
  */
 public class DatabaseManager
 {
@@ -112,7 +112,7 @@ public class DatabaseManager
      * type attacks because we are unable to determine where the input came from. Instead
      * we could pass in static integer constants which are then mapped to their sql name. 
      */
-    private static final Pattern DB_SAFE_NAME = Pattern.compile("^[a-zA-Z_1-9]+$");
+    private static final Pattern DB_SAFE_NAME = Pattern.compile("^[a-zA-Z_1-9.]+$");
 
     /**
      * A map of database column information. The key is the table name, a
@@ -130,6 +130,76 @@ public class DatabaseManager
      */
     protected DatabaseManager()
     {
+    }
+    
+    /**
+     * Set the constraint check to deferred (commit time)
+     * 
+     * @param context
+     *            The context object
+     * @param constraintName
+     *            the constraint name to deferred
+     * @throws SQLException
+     */
+    public static void setConstraintDeferred(Context context,
+            String constraintName) throws SQLException
+    {
+        Statement statement = null;
+        try
+        {
+            statement = context.getDBConnection().createStatement();
+            statement
+                    .execute("SET CONSTRAINTS " + constraintName + " DEFERRED");
+            statement.close();
+        }
+        finally
+        {
+            if (statement != null)
+            {
+                try
+                {
+                    statement.close();
+                }
+                catch (SQLException sqle)
+                {
+                }
+            }
+        }
+    }
+
+    /**
+     * Set the constraint check to immediate (every query)
+     * 
+     * @param context
+     *            The context object
+     * @param constraintName
+     *            the constraint name to check immediately after every query
+     * @throws SQLException
+     */
+    public static void setConstraintImmediate(Context context,
+            String constraintName) throws SQLException
+    {
+        Statement statement = null;
+        try
+        {
+            statement = context.getDBConnection().createStatement();
+            statement.execute("SET CONSTRAINTS " + constraintName
+                    + " IMMEDIATE");
+            statement.close();
+        }
+        finally
+        {
+            if (statement != null)
+            {
+                try
+                {
+                    statement.close();
+                }
+                catch (SQLException sqle)
+                {
+                }
+            }
+        }
     }
     
     /**
@@ -1146,6 +1216,10 @@ public class DatabaseManager
             {
                 row.setColumn(name, results.getLong(i));
             }
+            else if (jdbctype == Types.DOUBLE)
+            {
+                row.setColumn(name, results.getDouble(i));
+            }
             else if (jdbctype == Types.CLOB && "oracle".equals(dbName))
             {
                 // Support CLOBs in place of TEXT columns in Oracle
@@ -1440,6 +1514,17 @@ public class DatabaseManager
         try
         {
             String schema = ConfigurationManager.getProperty("db.schema");
+            String catalog = null;
+            
+            int dotIndex = table.indexOf("."); 
+            if (dotIndex > 0)
+            {
+                catalog = table.substring(0, dotIndex);
+                table = table.substring(dotIndex + 1, table.length());
+                log.warn("catalog: " + catalog);
+                log.warn("table: " + table);
+            }
+            
             connection = getConnection();
 
             DatabaseMetaData metadata = connection.getMetaData();
@@ -1448,14 +1533,15 @@ public class DatabaseManager
             int max = metadata.getMaxTableNameLength();
             String tname = (table.length() >= max) ? table
                     .substring(0, max - 1) : table;
-
-            pkcolumns = metadata.getPrimaryKeys(null, schema, tname);
+            
+            pkcolumns = metadata.getPrimaryKeys(catalog, schema, tname);
+            
             Set pks = new HashSet();
 
             while (pkcolumns.next())
                 pks.add(pkcolumns.getString(4));
 
-            columns = metadata.getColumns(null, schema, tname, null);
+            columns = metadata.getColumns(catalog, schema, tname, null);
 
             while (columns.next())
             {
@@ -1726,6 +1812,39 @@ public class DatabaseManager
 	    	}        	
 	    }
 	}
+
+    /**
+     * Main method used to perform tests on the database
+     *
+     * @param args The command line arguments
+     */
+    public static void main(String[] args)
+    {
+        // Get something from dspace.cfg to get the log lines out the way
+        String url = ConfigurationManager.getProperty("db.url");
+
+        // Try to connect to the database
+        System.out.println("\nAttempting to connect to database: ");
+        System.out.println(" - URL: " + url);
+        System.out.println(" - Driver: " + ConfigurationManager.getProperty("db.driver"));
+        System.out.println(" - Username: " + ConfigurationManager.getProperty("db.username"));
+        System.out.println(" - Password: " + ConfigurationManager.getProperty("db.password"));
+        System.out.println(" - Schema: " + ConfigurationManager.getProperty("db.schema"));
+        System.out.println("\nTesting connection...");
+        try
+        {
+            Connection connection = DatabaseManager.getConnection();
+        }
+        catch (SQLException sqle)
+        {
+            System.err.println("\nError: ");
+            System.err.println(" - " + sqle);
+            System.err.println("\nPlease see the DSpace documentation for assistance.\n");
+            System.exit(1);
+        }
+
+        System.out.println("Connected succesfully!\n");
+    }
 
 }
 

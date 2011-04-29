@@ -1,12 +1,11 @@
 --
 -- update-sequences.sql
 --
--- Version: $Revision: 3705 $
+-- Version: $Revision: 4875 $
 --
--- Date:    $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+-- Date:    $Date: 2010-04-27 06:42:34 -0400 (Tue, 27 Apr 2010) $
 --
--- Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
--- Institute of Technology.  All rights reserved.
+-- Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
 -- 
 -- Redistribution and use in source and binary forms, with or without
 -- modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
 -- notice, this list of conditions and the following disclaimer in the
 -- documentation and/or other materials provided with the distribution.
 -- 
--- - Neither the name of the Hewlett-Packard Company nor the name of the
--- Massachusetts Institute of Technology nor the names of their
+-- - Neither the name of the DSpace Foundation nor the names of its
 -- contributors may be used to endorse or promote products derived from
 -- this software without specific prior written permission.
 -- 
@@ -63,7 +61,7 @@
 @updateseq.sql eperson_seq eperson eperson_id
 @updateseq.sql epersongroup_seq epersongroup eperson_group_id
 @updateseq.sql group2group_seq group2group id
-@updateseq.sql group2groupcache group2groupcache id
+@updateseq.sql group2groupcache_seq group2groupcache id
 @updateseq.sql item_seq item item_id
 @updateseq.sql bundle_seq bundle bundle_id
 @updateseq.sql item2bundle_seq item2bundle id
@@ -83,11 +81,10 @@
 @updateseq.sql tasklistitem_seq tasklistitem tasklist_id
 @updateseq.sql registrationdata_seq registrationdata registrationdata_id
 @updateseq.sql subscription_seq subscription subscription_id
-@updateseq.sql history_seq history history_id
-@updateseq.sql historystate_seq historystate history_state_id
 @updateseq.sql communities2item_seq communities2item id
-@updateseq.sql itemsbyauthor_seq itemsbyauthor items_by_author_id
-@updateseq.sql itemsbytitle_seq itemsbytitle items_by_title_id
-@updateseq.sql itemsbydate_seq itemsbydate items_by_date_id
-@updateseq.sql itemsbydateaccessioned_seq itemsbydateaccessioned items_by_date_accessioned_id
 @updateseq.sql epersongroup2workspaceitem_seq epersongroup2workspaceitem id
+@updateseq.sql metadatafieldregistry_seq metadatafieldregistry metadata_field_id
+@updateseq.sql metadatavalue_seq metadatavalue metadata_value_id
+@updateseq.sql metadataschemaregistry_seq metadataschemaregistry metadata_schema_id
+@updateseq.sql harvested_collection_seq harvested_collection id
+@updateseq.sql harvested_item_seq harvested_item id

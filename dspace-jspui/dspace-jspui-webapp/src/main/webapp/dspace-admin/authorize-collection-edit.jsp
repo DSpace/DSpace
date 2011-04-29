@@ -1,11 +1,11 @@
 <%--
   - authorize_collection_edit.jsp
   -
-  - $Id: authorize-collection-edit.jsp 3705 2009-04-11 17:02:24Z mdiggory $
+  - $Id: authorize-collection-edit.jsp 4309 2009-09-30 19:20:07Z bollini $
   -
-  - Version: $Revision: 3705 $
+  - Version: $Revision: 4309 $
   -
-  - Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+  - Date: $Date: 2009-09-30 15:20:07 -0400 (Wed, 30 Sep 2009) $
   -
   - Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
   - Institute of Technology.  All rights reserved.
@@ -105,7 +105,7 @@
     </tr>
   </table>
 
- <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post"> 
+ <form action="<%= request.getContextPath() %>/tools/authorize" method="post"> 
     <p align="center">
             <input type="hidden" name="collection_id" value="<%=collection.getID()%>" />
             <input type="submit" name="submit_collection_add_policy" value="<fmt:message key="jsp.dspace-admin.general.addpolicy"/>" />
@@ -120,7 +120,7 @@
     {
         ResourcePolicy rp = (ResourcePolicy) i.next();
 %>
-      <form action="<%= request.getContextPath() %>/dspace-admin/authorize" method="post">
+      <form action="<%= request.getContextPath() %>/tools/authorize" method="post">
         <table class="miscTable" align="center" summary="Collection Policy Edit Form">
             <tr>
                <th class="oddRowOddCol"><strong><fmt:message key="jsp.general.id" /></strong></th>

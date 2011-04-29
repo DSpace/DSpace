@@ -1,8 +1,7 @@
 /*
  * BrowseItemDAOOracle.java
  *
- * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -15,8 +14,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -52,7 +50,8 @@ public class BrowseItemDAOOracle implements BrowseItemDAO
     private String findAll = "SELECT item_id, in_archive, withdrawn FROM item WHERE in_archive = 1 OR withdrawn = 1";
 
     /** query to get the text value of a metadata element only (qualifier is NULL) */
-    private String getByMetadataElement = "SELECT text_value,text_lang,element,qualifier FROM metadatavalue, metadatafieldregistry, metadataschemaregistry " +
+    private String getByMetadataElement = "SELECT authority, confidence, text_value,text_lang,element,qualifier FROM metadatavalue, metadatafieldregistry, metadataschemaregistry " +
+
                                     "WHERE metadatavalue.item_id = ? " +
                                     " AND metadatavalue.metadata_field_id = metadatafieldregistry.metadata_field_id " +
                                     " AND metadatafieldregistry.element = ? " +
@@ -62,7 +61,7 @@ public class BrowseItemDAOOracle implements BrowseItemDAO
                                     " ORDER BY metadatavalue.metadata_field_id, metadatavalue.place";
 
     /** query to get the text value of a metadata element and qualifier */
-    private String getByMetadata = "SELECT text_value,text_lang,element,qualifier FROM metadatavalue, metadatafieldregistry, metadataschemaregistry " +
+    private String getByMetadata = "SELECT authority, confidence, text_value,text_lang,element,qualifier FROM metadatavalue, metadatafieldregistry, metadataschemaregistry " +
                                     "WHERE metadatavalue.item_id = ? " +
                                     " AND metadatavalue.metadata_field_id = metadatafieldregistry.metadata_field_id " +
                                     " AND metadatafieldregistry.element = ? " +
@@ -72,7 +71,7 @@ public class BrowseItemDAOOracle implements BrowseItemDAO
                                     " ORDER BY metadatavalue.metadata_field_id, metadatavalue.place";
 
     /** query to get the text value of a metadata element with the wildcard qualifier (*) */
-    private String getByMetadataAnyQualifier = "SELECT text_value,text_lang,element,qualifier FROM metadatavalue, metadatafieldregistry, metadataschemaregistry " +
+    private String getByMetadataAnyQualifier = "SELECT authority, confidence, text_value,text_lang,element,qualifier FROM metadatavalue, metadatafieldregistry, metadataschemaregistry " +
                                     "WHERE metadatavalue.item_id = ? " +
                                     " AND metadatavalue.metadata_field_id = metadatafieldregistry.metadata_field_id " +
                                     " AND metadatafieldregistry.element = ? " +
@@ -153,6 +152,8 @@ public class BrowseItemDAOOracle implements BrowseItemDAO
                 dcv.qualifier = tr.getStringColumn("qualifier");
                 dcv.language = tr.getStringColumn("text_lang");
                 dcv.value = tr.getStringColumn("text_value");
+                dcv.authority = tr.getStringColumn("authority");
+                dcv.confidence = tr.getIntColumn("confidence");
                 values.add(dcv);
             }
         }

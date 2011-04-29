@@ -1,9 +1,9 @@
 /*
  * Authenticate.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4866 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2010-04-09 05:01:28 -0400 (Fri, 09 Apr 2010) $
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -564,7 +564,11 @@ public class AuthenticationUtil
         	
         	// Return the path for which this request belongs too. Only urls
         	// for this path may be resumed.
-        	return interruptedRequest.getServletPath();
+        	if (interruptedRequest.getServletPath() == null || interruptedRequest.getServletPath().length() == 0) {
+                return interruptedRequest.getActualPath();
+            } else {
+        	    return interruptedRequest.getServletPath();
+            }
         }
         
         // No request was interrupted.

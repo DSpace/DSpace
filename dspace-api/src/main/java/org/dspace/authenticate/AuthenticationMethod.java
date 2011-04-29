@@ -1,12 +1,11 @@
 /*
  * AuthenticationMethod.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4308 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-09-30 15:01:21 -0400 (Wed, 30 Sep 2009) $
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -69,7 +67,7 @@ import org.dspace.eperson.EPerson;
  * @see AuthenticationManager
  *
  * @author Larry Stone
- * @version $Revision: 3705 $
+ * @version $Revision: 4308 $
  */
 public interface AuthenticationMethod {
 
@@ -162,26 +160,26 @@ public interface AuthenticationMethod {
     public boolean isImplicit();
 
     /**
-     * Get list of extra groups that user implicitly belongs to.
-     * Returns IDs of any EPerson-groups that the user authenticated by
-     * this request is <em>implicitly</em> a member of -- e.g.
-     * a group that depends on the client network-address.
+     * Get list of extra groups that user implicitly belongs to. Note that this
+     * method will be invoked regardless of the authentication status of the
+     * user (logged-in or not) e.g. a group that depends on the client
+     * network-address.
      * <p>
      * It might make sense to implement this method by itself in a separate
-     * authentication method that just adds special groups, if the
-     * code doesn't belong with any existing auth method.
-     * The stackable authentication system was designed expressly to
-     * separate functions into "stacked" methods to keep your
-     * site-specific code  modular and tidy.
-     *
+     * authentication method that just adds special groups, if the code doesn't
+     * belong with any existing auth method. The stackable authentication system
+     * was designed expressly to separate functions into "stacked" methods to
+     * keep your site-specific code modular and tidy.
+     * 
      * @param context
-     *  A valid DSpace context.
-     *
+     *            A valid DSpace context.
+     * 
      * @param request
-     *  The request that started this operation, or null if not applicable.
-     *
-     * @return array of EPerson-group IDs, possibly 0-length, but
-     * never <code>null</code>.
+     *            The request that started this operation, or null if not
+     *            applicable.
+     * 
+     * @return array of EPerson-group IDs, possibly 0-length, but never
+     *         <code>null</code>.
      */
     public int[] getSpecialGroups(Context context, HttpServletRequest request)
         throws SQLException;

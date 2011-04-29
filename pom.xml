@@ -3,31 +3,34 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-parent</artifactId>
    <packaging>pom</packaging>
-   <version>1.5.2</version>
+   <version>1.6.2</version>
    <name>DSpace Parent Project</name>
    <url>http://projects.dspace.org</url>
 
    <organization>
-      <name>The DSpace Foundation</name>
+      <name>DuraSpace</name>
       <url>http://www.dspace.org</url>
    </organization>
 
+   <!--Force UTF-8 encoding during build on all platforms-->
+   <properties>
+      <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+   </properties>
+
    <build>
       <plugins>
-         <!-- 
+         <!--
             Java 1.5 is our officially endorsed build target
-            platform.  
+            platform.
          -->
          <plugin>
-			<artifactId>maven-release-plugin</artifactId>
-			<configuration>
-				<!--
-					During release:perform, enable the "addons" profile
-				-->
-				<releaseProfiles>addons</releaseProfiles>
-				<goals>deploy</goals>
-			</configuration>
-		 </plugin>
+            <artifactId>maven-release-plugin</artifactId>
+            <configuration>
+                <!-- During release:perform, enable the "addons" profile -->
+                <releaseProfiles>addons</releaseProfiles>
+                <goals>deploy</goals>
+            </configuration>
+         </plugin>
          <plugin>
             <artifactId>maven-compiler-plugin</artifactId>
             <configuration>
@@ -54,7 +57,9 @@
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
+            <version>2.1-beta-1</version>
             <configuration>
+               <failOnMissingWebXml>false</failOnMissingWebXml>
                <archive>
                   <manifest>
                      <addDefaultImplementationEntries>
@@ -72,11 +77,11 @@
 
    <profiles>
    
-      <!-- 
-         ========================================================
-         These are admiistrative profiles used by release manager
-         To complete release tasks.
-         ========================================================
+      <!--
+         =========================================================
+         These are administrative profiles used by release manager
+         to complete release tasks.
+         =========================================================
          
          Use 'mvn release:prepare -Pall' for tagging the release.
       -->
@@ -87,6 +92,8 @@
          </activation>
          <modules>
             <module>dspace-api</module>
+            <module>dspace-stats</module>
+            <module>dspace-ui-shared</module>
             <module>dspace-jspui</module>
             <module>dspace-xmlui</module>
             <module>dspace-lni</module>
@@ -97,9 +104,9 @@
       </profile>
       
       
-      <!-- 
+      <!--
          Use 'mvn deploy -Paddons' while doing Continuous Integration
-         and deploying addons to the Maven repository. 
+         and deploying addons to the Maven repository.
        -->
       <profile>
          <id>addons</id>
@@ -108,6 +115,8 @@
          </activation>
          <modules>
             <module>dspace-api</module>
+            <module>dspace-stats</module>
+            <module>dspace-ui-shared</module>
             <module>dspace-jspui</module>
             <module>dspace-xmlui</module>
             <module>dspace-lni</module>
@@ -116,8 +125,8 @@
          </modules>
       </profile>
       
-      <!-- 
-         Use 'mvn package -Pdistributions' to create distributions 
+      <!--
+         Use 'mvn package -Pdistributions' to create distributions
          to upload to S.F.
        -->
       <profile>
@@ -176,10 +185,25 @@
             <checksumPolicy>fail</checksumPolicy>
          </snapshots>
       </repository>
+      <repository>
+         <id>java.net</id>
+         <name>Java.net Maven Repository</name>
+         <url>http://download.java.net/maven/2</url>
+         <releases>
+            <enabled>true</enabled>
+            <updatePolicy>always</updatePolicy>
+            <checksumPolicy>warn</checksumPolicy>
+         </releases>
+         <snapshots>
+            <enabled>false</enabled>
+            <updatePolicy>never</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+         </snapshots>
+      </repository>
    </repositories>
 
-   <!-- 
-      Distribution management provides a means to control which
+   <!--
+      Dependency management provides a means to control which
       versions of dependency jars are used for compilation
       and packaging into the distribution.  Rather than placing
       a version in your dependencies, look here first to see if
@@ -191,83 +215,109 @@
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
-            <version>${project.version}</version>
+            <version>1.6.2</version>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-ui-shared</artifactId>
+            <version>1.6.2</version>
+            <type>war</type>
          </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-sword-api</artifactId>
-              <version>${project.version}</version>
+              <version>1.6.2</version>
           </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-sword-webapp</artifactId>
-              <version>${project.version}</version>
+              <version>1.6.2</version>
               <type>war</type>
           </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui-api</artifactId>
-            <version>${project.version}</version>
+            <version>1.6.2</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui-webapp</artifactId>
-            <version>${project.version}</version>
+            <version>1.6.2</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai-api</artifactId>
-            <version>${project.version}</version>
+            <version>1.6.2</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai-webapp</artifactId>
-            <version>${project.version}</version>
+            <version>1.6.2</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-core</artifactId>
-            <version>${project.version}</version>
+            <version>1.6.2</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-client</artifactId>
-            <version>${project.version}</version>
+            <version>1.6.2</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-webapp</artifactId>
-            <version>${project.version}</version>
+            <version>1.6.2</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-api</artifactId>
-            <version>${project.version}</version>
+            <version>1.6.2</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-webapp</artifactId>
-            <version>${project.version}</version>
+            <version>1.6.2</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-wing</artifactId>
-            <version>${project.version}</version>
+            <version>1.6.2</version>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-services-impl</artifactId>
+            <version>2.0.1</version>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-services-api</artifactId>
+            <version>2.0.1</version>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-services-utils</artifactId>
+            <version>2.0.1</version>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-stats</artifactId>
+            <version>1.6.2</version>
          </dependency>
          <!-- DSpace Localization Packages -->
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api-lang</artifactId>
-            <version>[1.5.0.0,1.6.0.0)</version>
+            <version>[1.6.0.0,1.7.0.0)</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-lang</artifactId>
-            <version>[1.5.0.0,1.6.0.0)</version>
+            <version>[1.6.0.0,1.7.0.0)</version>
             <type>war</type>
          </dependency>
          <!-- DSpace third Party Dependencies -->
@@ -285,7 +335,7 @@
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers</artifactId>
             <version>2.3.0</version>
-         </dependency>         
+         </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>handle</artifactId>
@@ -377,7 +427,6 @@
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>2.3</version>
-            <scope>provided</scope>
          </dependency>
 
          <dependency>
@@ -429,7 +478,12 @@
          <dependency>
             <groupId>rome</groupId>
             <artifactId>rome</artifactId>
-            <version>0.8</version>
+            <version>1.0</version>
+         </dependency>
+         <dependency>
+            <groupId>rome</groupId>
+            <artifactId>modules</artifactId>
+            <version>0.3.2</version>
          </dependency>
          <dependency>
             <groupId>xalan</groupId>
@@ -515,6 +569,16 @@
             <artifactId>casclient</artifactId>
             <version>2.1.1</version>
          </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>oclc-harvester2</artifactId>
+            <version>0.1.12</version>
+         </dependency>
+         <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.1</version>
+         </dependency>
       </dependencies>
    </dependencyManagement>
 
@@ -562,16 +626,16 @@
          </archive>
       </mailingList>
       <mailingList>
-         <name>DSpace Manakin List</name>
+         <name>DSpace General Issues List</name>
          <subscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-manakin
+            http://lists.sourceforge.net/mailman/listinfo/dspace-general
          </subscribe>
          <unsubscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-manakin
+            http://lists.sourceforge.net/mailman/listinfo/dspace-general
          </unsubscribe>
-         <post>dspace-manakin AT lists.sourceforge.net</post>
+         <post>dspace-general AT lists.sourceforge.net</post>
          <archive>
-            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-manakin
+            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-general
          </archive>
       </mailingList>
       <mailingList>
@@ -602,15 +666,24 @@
          <timezone>+1</timezone>
       </developer>
       <developer>
+         <name>Ben Bosman</name>
+         <email>benbosman at atmire.com</email>
+         <organization>@mire NV</organization>
+         <organizationUrl>http://www.atmire.com</organizationUrl>
+          <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
          <name>Mark Diggory</name>
-         <email>mdiggory at mit.edu</email>
-         <url>http://www.linkedin.com/in/mdiggory</url>
-         <organization>MIT Libraries</organization>
-         <organizationUrl>http://libraries.mit.edu</organizationUrl>
+         <email>mdiggory at atmire.com</email>
+         <url>http://purl.org/net/mdiggory/homepage</url>
+         <organization>@mire NV</organization>
+         <organizationUrl>http://www.atmire.com</organizationUrl>
          <roles>
             <role>commiter</role>
          </roles>
-         <timezone>-5</timezone>
+         <timezone>-8</timezone>
       </developer>
       <developer>
          <name>Tim Donohue</name>
@@ -642,10 +715,14 @@
       </developer>
       <developer>
          <name>Stuart Lewis</name>
-         <email>stuartlewis at users.sourceforge.net</email>
+         <email>stuart at stuartlewis.com</email>
+         <url>http://stuartlewis.com/</url>
+         <organization>University of Auckland Library</organization>
+         <organizationUrl>http://www.library.auckland.ac.nz/</organizationUrl>
          <roles>
             <role>commiter</role>
          </roles>
+         <timezone>+12</timezone>
       </developer>
       <developer>
          <name>Gabriela Mircea</name>
@@ -676,6 +753,26 @@
          </roles>
       </developer>
       <developer>
+          <name>Kim Shepherd</name>
+          <email>kims at waikato.ac.nz</email>
+          <organization>Library Consortium of New Zealand</organization>
+          <organizationUrl>http://www.lconz.ac.nz/</organizationUrl>
+          <roles>
+              <role>commiter</role>
+          </roles>
+          <timezone>+12</timezone>
+      </developer>
+      <developer>
+         <name>Larry Stone</name>
+         <email>lcs at mit.edu</email>
+         <organization>MIT Libraries</organization>
+         <organizationUrl>http://libraries.mit.edu</organizationUrl>
+         <roles>
+            <role>commiter</role>
+         </roles>
+         <timezone>-5</timezone>
+      </developer>
+      <developer>
          <name>Robert Tansley</name>
          <email>rtansley at users.sourceforge.net</email>
          <roles>
@@ -688,6 +785,13 @@
          <roles>
             <role>commiter</role>
          </roles>
+      </developer>
+      <developer>
+         <name>Jeffrey Trimble</name>
+         <email />
+         <roles>
+           <role>commiter</role>
+        </roles>
       </developer>
       <developer>
          <name>Mark H. Wood</name>
@@ -727,32 +831,22 @@
          </roles>
          <timezone>-5</timezone>
       </contributor>
-      <contributor>
-         <name>Larry Stone</name>
-         <email>lcs at mit.edu</email>
-         <organization>MIT Libraries</organization>
-         <organizationUrl>http://libraries.mit.edu</organizationUrl>
-         <roles>
-            <role>developer</role>
-         </roles>
-         <timezone>-5</timezone>
-      </contributor>
    </contributors>
 
-   <!-- 
+   <!--
       The Subversion repository location is used by Continuum to update against
-      when changes have occured, this spawns a new build cycle and releases snapshots
-      into the snapshot repository below.
+      when changes have occurred.  This spawns a new build cycle and releases
+      snapshots into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/tags/dspace-1.5.2</url>
+      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2</url>
    </scm>
 
-   <!-- 
+   <!--
       Distribution Management is currently used by the Continuum server
-      to update snapshots it generates. This will also be used on 
+      to update snapshots it generates. This will also be used on
       release to deploy release versions to the repository by the
       release manager.
    -->
@@ -766,6 +860,7 @@
          <id>maven.dspace.org-snapshot</id>
          <name>DSpace Maven Repository</name>
          <url>scp://maven.dspace.org/var/maven/snapshot</url>
+         <uniqueVersion>false</uniqueVersion>
       </snapshotRepository>
       <site>
          <id>website</id>

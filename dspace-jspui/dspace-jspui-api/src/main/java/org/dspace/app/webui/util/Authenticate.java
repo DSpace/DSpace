@@ -1,9 +1,9 @@
 /*
  * Authenticate.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4753 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2010-02-08 16:48:34 -0500 (Mon, 08 Feb 2010) $
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -42,11 +42,13 @@ package org.dspace.app.webui.util;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.Locale;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.jsp.jstl.core.Config;
 
 import org.apache.log4j.Logger;
 import org.dspace.authenticate.AuthenticationManager;
@@ -54,6 +56,7 @@ import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
 
 /**
@@ -62,7 +65,7 @@ import org.dspace.eperson.EPerson;
  * the <code>org.dspace.eperson.AuthenticationMethod</code> interface.
  * 
  * @author Robert Tansley
- * @version $Revision: 3705 $
+ * @version $Revision: 4753 $
  */
 public class Authenticate
 {
@@ -247,10 +250,33 @@ public class Authenticate
      * @param eperson
      *            the eperson logged in
      */
-    public static void loggedIn(Context context, HttpServletRequest request,
-            EPerson eperson)
+    public static void loggedIn(Context context,
+                                HttpServletRequest request,
+                                EPerson eperson)
     {
         HttpSession session = request.getSession();
+
+        // For security reasons after login, give the user a new session
+        if ((!session.isNew()) && (session.getAttribute("dspace.current.user.id") == null))
+        {
+            // Keep the user's locale setting if set
+            Locale sessionLocale = UIUtil.getSessionLocale(request);
+
+            // Invalidate session unless dspace.cfg says not to
+            if(ConfigurationManager.getBooleanProperty("webui.session.invalidate", true))
+            {
+               session.invalidate();
+            }
+
+            // Give the user a new session
+            session = request.getSession();
+
+            // Restore the session locale
+            if (sessionLocale != null)
+            {
+                Config.set(request.getSession(), Config.FMT_LOCALE, sessionLocale);
+            }
+        }
 
         context.setCurrentUser(eperson);
         
@@ -268,7 +294,6 @@ public class Authenticate
         {
             request.setAttribute("is.admin", new Boolean(isAdmin));
         }
-    
 
         // We store the current user in the request as an EPerson object...
         request.setAttribute("dspace.current.user", eperson);
@@ -301,5 +326,21 @@ public class Authenticate
         request.removeAttribute("dspace.current.user");
         session.removeAttribute("dspace.current.user.id");
         session.removeAttribute("dspace.current.user.ldap");
+
+        // Keep the user's locale setting if set
+        Locale sessionLocale = UIUtil.getSessionLocale(request);
+
+        // Invalidate session unless dspace.cfg says not to
+        if(ConfigurationManager.getBooleanProperty("webui.session.invalidate", true))
+        {
+            session.invalidate();
+        }
+
+
+        // Restore the session locale
+        if (sessionLocale != null)
+        {
+            Config.set(request.getSession(), Config.FMT_LOCALE, sessionLocale);
+        }
     }
 }

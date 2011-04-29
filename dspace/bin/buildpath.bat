@@ -1,12 +1,11 @@
 @REM
 @REM buildpath.bat
 @REM
-@REM Version: $Revision: 3705 $
+@REM Version: $Revision: 3730 $
 @REM
-@REM Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+@REM Date: $Date: 2009-04-23 23:11:14 -0400 (Thu, 23 Apr 2009) $
 @REM
-@REM Copyright (c) 2005, Hewlett-Packard Company and Massachusetts
-@REM Institute of Technology.  All rights reserved.
+@REM Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
 @REM
 @REM Redistribution and use in source and binary forms, with or without
 @REM modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
 @REM notice, this list of conditions and the following disclaimer in the
 @REM documentation and/or other materials provided with the distribution.
 @REM
-@REM - Neither the name of the Hewlett-Packard Company nor the name of the
-@REM Massachusetts Institute of Technology nor the names of their
+@REM - Neither the name of the DSpace Foundation nor the names of its
 @REM contributors may be used to endorse or promote products derived from
 @REM this software without specific prior written permission.
 @REM

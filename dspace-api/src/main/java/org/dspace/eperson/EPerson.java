@@ -1,12 +1,11 @@
 /*
  * EPerson.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4742 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2010-02-05 07:11:05 -0500 (Fri, 05 Feb 2010) $
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -61,7 +59,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * Class representing an e-person.
  * 
  * @author David Stuve
- * @version $Revision: 3705 $
+ * @version $Revision: 4742 $
  */
 public class EPerson extends DSpaceObject
 {
@@ -154,8 +152,14 @@ public class EPerson extends DSpaceObject
     public static EPerson findByEmail(Context context, String email)
             throws SQLException, AuthorizeException
     {
+        if (email == null)
+        {
+            return null;
+        }
+        
+        // All email addresses are stored as lowercase, so ensure that the email address is lowercased for the lookup 
         TableRow row = DatabaseManager.findByUnique(context, "eperson",
-                "email", email);
+                "email", email.toLowerCase());
 
         if (row == null)
         {
@@ -568,18 +572,15 @@ public class EPerson extends DSpaceObject
      }
      
      /**
-     * Set the EPerson's laguage
+     * Set the EPerson's language.  Value is expected to be a Unix/POSIX
+     * Locale specification of the form {language} or {language}_{territory},
+     * e.g. "en", "en_US", "pt_BR" (the latter is Brazilian Portugese).
      * 
      * @param s
      *            language
      */
      public void setLanguage(String language)
      {
-         if (language != null)
-         {
-             language = language.toLowerCase();
-         }
-
          myRow.setColumn("language", language);
      }
   

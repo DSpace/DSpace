@@ -1,12 +1,11 @@
 /*
  * RegistryLoader.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4660 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2010-01-06 20:57:33 -0500 (Wed, 06 Jan 2010) $
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -73,7 +71,7 @@ import org.xml.sax.SAXException;
  * <code>RegistryLoader -dc dc-types.xml</code>
  * 
  * @author Robert Tansley
- * @version $Revision: 3705 $
+ * @version $Revision: 4660 $
  */
 public class RegistryLoader
 {
@@ -140,6 +138,7 @@ public class RegistryLoader
                 context.abort();
             }
 
+            System.err.println("Error: \n - " + e.getMessage());
             System.exit(1);
         }
     }

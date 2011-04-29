@@ -1,12 +1,11 @@
 /*
  * DescribeStep.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4895 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2010-05-05 15:30:15 -0400 (Wed, 05 May 2010) $
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -51,6 +49,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 import org.dspace.app.util.DCInputsReader;
+import org.dspace.app.util.DCInputsReaderException;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
@@ -62,6 +61,9 @@ import org.dspace.content.DCSeriesNumber;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
+import org.dspace.content.authority.MetadataAuthorityManager;
+import org.dspace.content.authority.ChoiceAuthorityManager;
+import org.dspace.content.authority.Choices;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.submit.AbstractProcessingStep;
@@ -72,16 +74,16 @@ import org.dspace.submit.AbstractProcessingStep;
  * DSpace.
  * <P>
  * This class performs all the behind-the-scenes processing that
- * this particular step requires.  This class's methods are utilized 
+ * this particular step requires.  This class's methods are utilized
  * by both the JSP-UI and the Manakin XML-UI
  * <P>
- * 
+ *
  * @see org.dspace.app.util.SubmissionConfig
  * @see org.dspace.app.util.SubmissionStepConfig
  * @see org.dspace.submit.AbstractProcessingStep
- * 
+ *
  * @author Tim Donohue
- * @version $Revision: 3705 $
+ * @version $Revision: 4895 $
  */
 public class DescribeStep extends AbstractProcessingStep
 {
@@ -89,12 +91,12 @@ public class DescribeStep extends AbstractProcessingStep
     private static Logger log = Logger.getLogger(DescribeStep.class);
 
     /** hash of all submission forms details */
-    private static DCInputsReader inputsReader;
+    private static DCInputsReader inputsReader = null;
 
     /***************************************************************************
      * STATUS / ERROR FLAGS (returned by doProcessing() if an error occurs or
      * additional user interaction may be required)
-     * 
+     *
      * (Do NOT use status of 0, since it corresponds to STATUS_COMPLETE flag
      * defined in the JSPStepManager class)
      **************************************************************************/
@@ -126,7 +128,7 @@ public class DescribeStep extends AbstractProcessingStep
      * <P>
      * NOTE: If this step is a non-interactive step (i.e. requires no UI), then
      * it should perform *all* of its processing in this method!
-     * 
+     *
      * @param context
      *            current DSpace context
      * @param request
@@ -153,15 +155,29 @@ public class DescribeStep extends AbstractProcessingStep
 
         // lookup applicable inputs
         Collection c = subInfo.getSubmissionItem().getCollection();
-        DCInput[] inputs = inputsReader.getInputs(c.getHandle()).getPageRows(
-                currentPage - 1,
-                subInfo.getSubmissionItem().hasMultipleTitles(),
-                subInfo.getSubmissionItem().isPublishedBefore());
+        DCInput[] inputs = null;
+        try
+        {
+            inputs = inputsReader.getInputs(c.getHandle()).getPageRows(
+                    currentPage - 1,
+                    subInfo.getSubmissionItem().hasMultipleTitles(),
+                    subInfo.getSubmissionItem().isPublishedBefore());
+        }
+        catch (DCInputsReaderException e)
+        {
+            throw new ServletException(e);
+        }
 
         // Step 1:
         // clear out all item metadata defined on this page
         for (int i = 0; i < inputs.length; i++)
         {
+            if (!inputs[i]
+                    .isVisible(subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE
+                            : DCInput.SUBMISSION_SCOPE))
+            {
+                continue;
+            }
             String qualifier = inputs[i].getQualifier();
             if (qualifier == null
                     && inputs[i].getInputType().equals("qualdrop_value"))
@@ -172,12 +188,22 @@ public class DescribeStep extends AbstractProcessingStep
                     qualifier, Item.ANY);
         }
 
+        // Clear required-field errors first since missing authority
+        // values can add them too.
+        clearErrorFields(request);
+
         // Step 2:
         // now update the item metadata.
         String fieldName;
         boolean moreInput = false;
         for (int j = 0; j < inputs.length; j++)
         {
+            if (!inputs[j]
+                        .isVisible(subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE
+                                : DCInput.SUBMISSION_SCOPE))
+            {
+                continue;
+            }
             String element = inputs[j].getElement();
             String qualifier = inputs[j].getQualifier();
             String schema = inputs[j].getSchema();
@@ -190,6 +216,8 @@ public class DescribeStep extends AbstractProcessingStep
                 fieldName = schema + "_" + element;
             }
 
+            String fieldKey = MetadataAuthorityManager.makeFieldKey(schema, element, qualifier);
+            ChoiceAuthorityManager cmgr = ChoiceAuthorityManager.getManager();
             String inputType = inputs[j].getInputType();
             if (inputType.equals("name"))
             {
@@ -199,6 +227,25 @@ public class DescribeStep extends AbstractProcessingStep
             else if (inputType.equals("date"))
             {
                 readDate(request, item, schema, element, qualifier);
+            }
+            // choice-controlled input with "select" presentation type is
+            // always rendered as a dropdown menu
+            else if (inputType.equals("dropdown") || inputType.equals("list") ||
+                     (cmgr.isChoicesConfigured(fieldKey) &&
+                      "select".equals(cmgr.getPresentation(fieldKey))))
+            {
+                String[] vals = request.getParameterValues(fieldName);
+                if (vals != null)
+                {
+                    for (int z = 0; z < vals.length; z++)
+                    {
+                        if (!vals[z].equals(""))
+                        {
+                            item.addMetadata(schema, element, qualifier, LANGUAGE_QUALIFIER,
+                                    vals[z]);
+                        }
+                    }
+                }
             }
             else if (inputType.equals("series"))
             {
@@ -228,21 +275,6 @@ public class DescribeStep extends AbstractProcessingStep
                     }
                 }
             }
-            else if (inputType.equals("dropdown") || inputType.equals("list"))
-            {
-                String[] vals = request.getParameterValues(fieldName);
-                if (vals != null)
-                {
-                    for (int z = 0; z < vals.length; z++)
-                    {
-                        if (!vals[z].equals(""))
-                        {
-                            item.addMetadata(schema, element, qualifier, LANGUAGE_QUALIFIER,
-                                    vals[z]);
-                        }
-                    }
-                }
-            }
             else if ((inputType.equals("onebox"))
                     || (inputType.equals("twobox"))
                     || (inputType.equals("textarea")))
@@ -264,6 +296,11 @@ public class DescribeStep extends AbstractProcessingStep
                 subInfo.setJumpToField(fieldName);
                 moreInput = true;
             }
+            // was XMLUI's "remove" button pushed?
+            else if (buttonPressed.equals("submit_" + fieldName + "_delete"))
+            {
+                subInfo.setJumpToField(fieldName);
+            }
         }
 
         // Step 3:
@@ -274,7 +311,6 @@ public class DescribeStep extends AbstractProcessingStep
                 || buttonPressed.equals(PREVIOUS_BUTTON)
                 || buttonPressed.equals(CANCEL_BUTTON))
         {
-            clearErrorFields(request);
             for (int i = 0; i < inputs.length; i++)
             {
                 DCValue[] values = item.getMetadata(inputs[i].getSchema(),
@@ -326,23 +362,17 @@ public class DescribeStep extends AbstractProcessingStep
      * Steps which are non-interactive (i.e. they do not display an interface to
      * the user) should return a value of 1, so that they are only processed
      * once!
-     * 
+     *
      * @param request
      *            The HTTP Request
      * @param subInfo
      *            The current submission information object
-     * 
+     *
      * @return the number of pages in this step
      */
     public int getNumberOfPages(HttpServletRequest request,
             SubmissionInfo subInfo) throws ServletException
     {
-        if (inputsReader == null)
-        {
-            // read configurable submissions forms data
-            inputsReader = new DCInputsReader();
-        }
-
         // by default, use the "default" collection handle
         String collectionHandle = DCInputsReader.DEFAULT_COLLECTION;
 
@@ -353,11 +383,18 @@ public class DescribeStep extends AbstractProcessingStep
         }
 
         // get number of input pages (i.e. "Describe" pages)
-        return inputsReader.getNumberInputPages(collectionHandle);
+        try
+        {
+            return getInputsReader().getNumberInputPages(collectionHandle);
+        }
+        catch (DCInputsReaderException e)
+        {
+            throw new ServletException(e);
+        }
     }
 
     /**
-     * 
+     *
      * @return the current DCInputsReader
      */
     public static DCInputsReader getInputsReader() throws ServletException
@@ -366,7 +403,14 @@ public class DescribeStep extends AbstractProcessingStep
         if (inputsReader == null)
         {
             // read configurable submissions forms data
-            inputsReader = new DCInputsReader();
+            try
+            {
+                inputsReader = new DCInputsReader();
+            }
+            catch (DCInputsReaderException e)
+            {
+                throw new ServletException(e);
+            }
         }
         
         return inputsReader;
@@ -375,11 +419,18 @@ public class DescribeStep extends AbstractProcessingStep
     /**
      * @param filename
      *        file to get the input reader for
-     * @return the current DCInputsReader 
+     * @return the current DCInputsReader
      */
     public static DCInputsReader getInputsReader(String filename) throws ServletException
     {
-        inputsReader = new DCInputsReader(filename);
+        try
+        {
+            inputsReader = new DCInputsReader(filename);
+        }
+        catch (DCInputsReaderException e)
+        {
+            throw new ServletException(e);
+        }
         return inputsReader;
     }
     
@@ -393,7 +444,7 @@ public class DescribeStep extends AbstractProcessingStep
        language = ConfigurationManager.getProperty("default.language");
        if (language == null || language == "")
        {
-    	   language = "en";
+           language = "en";
        }
        return language;
     }
@@ -409,28 +460,28 @@ public class DescribeStep extends AbstractProcessingStep
      * Some fields are repeatable in the form. If this is the case, and the
      * field is "dc.contributor.author", the names in the request will be from
      * the fields as follows:
-     * 
+     *
      * dc_contributor_author_last -> last name of first author
      * dc_contributor_author_first -> first name(s) of first author
      * dc_contributor_author_last_1 -> last name of second author
      * dc_contributor_author_first_1 -> first name(s) of second author
-     * 
+     *
      * and so on. If the field is unqualified:
-     * 
+     *
      * dc_contributor_last -> last name of first contributor
      * dc_contributor_first -> first name(s) of first contributor
-     * 
+     *
      * If the parameter "submit_dc_contributor_author_remove_n" is set, that
      * value is removed.
-     * 
+     *
      * Otherwise the parameters are of the form:
-     * 
+     *
      * dc_contributor_author_last dc_contributor_author_first
-     * 
+     *
      * The values will be put in separate DCValues, in the form "last name,
      * first name(s)", ordered as they appear in the list. These will replace
      * any existing values.
-     * 
+     *
      * @param request
      *            the request object
      * @param item
@@ -450,9 +501,14 @@ public class DescribeStep extends AbstractProcessingStep
         String metadataField = MetadataField
                 .formKey(schema, element, qualifier);
 
+        String fieldKey = MetadataAuthorityManager.makeFieldKey(schema, element, qualifier);
+        boolean isAuthorityControlled = MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey);
+
         // Names to add
         List firsts = new LinkedList();
         List lasts = new LinkedList();
+        List auths = new LinkedList();
+        List confs = new LinkedList();
 
         if (repeated)
         {
@@ -460,6 +516,14 @@ public class DescribeStep extends AbstractProcessingStep
                     + "_first");
             lasts = getRepeatedParameter(request, metadataField, metadataField
                     + "_last");
+
+            if(isAuthorityControlled)
+            {
+               auths = getRepeatedParameter(request, metadataField, metadataField
+                    + "_authority");
+               confs = getRepeatedParameter(request, metadataField, metadataField
+                    + "_confidence");
+           }
 
             // Find out if the relevant "remove" button was pressed
             // TODO: These separate remove buttons are only relevant
@@ -475,6 +539,11 @@ public class DescribeStep extends AbstractProcessingStep
 
                 firsts.remove(valToRemove);
                 lasts.remove(valToRemove);
+                if(isAuthorityControlled)
+                {
+                   auths.remove(valToRemove);
+                   confs.remove(valToRemove);
+                }
             }
         }
         else
@@ -482,15 +551,19 @@ public class DescribeStep extends AbstractProcessingStep
             // Just a single name
             String lastName = request.getParameter(metadataField + "_last");
             String firstNames = request.getParameter(metadataField + "_first");
+            String authority = request.getParameter(metadataField + "_authority");
+            String confidence = request.getParameter(metadataField + "_confidence");
 
             if (lastName != null)
                 lasts.add(lastName);
             if (firstNames != null)
                 firsts.add(firstNames);
+            auths.add(authority == null ? "" : authority);
+            confs.add(confidence == null ? "" : confidence);
         }
 
-        // Remove existing values
-        item.clearMetadata(schema, element, qualifier, Item.ANY);
+        // Remove existing values, already done in doProcessing see also bug DS-203
+        // item.clearMetadata(schema, element, qualifier, Item.ANY);
 
         // Put the names in the correct form
         for (int i = 0; i < lasts.size(); i++)
@@ -524,8 +597,25 @@ public class DescribeStep extends AbstractProcessingStep
                     }
                 }
 
-                // Add to the database
-                item.addMetadata(schema, element, qualifier, null,
+                // Add to the database -- unless required authority is missing
+                if (isAuthorityControlled)
+                {
+                    String authKey = auths.size() > i ? (String)auths.get(i) : null;
+                    String sconf = (authKey != null && confs.size() > i) ? (String)confs.get(i) : null;
+                    if (MetadataAuthorityManager.getManager().isAuthorityRequired(fieldKey) &&
+                        (authKey == null || authKey.length() == 0))
+                    {
+                        log.warn("Skipping value of "+metadataField+" because the required Authority key is missing or empty.");
+                        addErrorField(request, metadataField);
+                    }
+                    else
+                        item.addMetadata(schema, element, qualifier, null,
+                                new DCPersonName(l, f).toString(), authKey,
+                                (sconf != null && sconf.length() > 0) ?
+                                    Choices.getConfidenceValue(sconf) : Choices.CF_ACCEPTED);
+                }
+                else
+                    item.addMetadata(schema, element, qualifier, null,
                         new DCPersonName(l, f).toString());
             }
         }
@@ -534,20 +624,20 @@ public class DescribeStep extends AbstractProcessingStep
     /**
      * Fill out an item's metadata values from a plain standard text field. If
      * the field isn't repeatable, the input field name is called:
-     * 
+     *
      * element_qualifier
-     * 
+     *
      * or for an unqualified element:
-     * 
+     *
      * element
-     * 
+     *
      * Repeated elements are appended with an underscore then an integer. e.g.:
-     * 
+     *
      * dc_title_alternative dc_title_alternative_1
-     * 
+     *
      * The values will be put in separate DCValues, ordered as they appear in
      * the list. These will replace any existing values.
-     * 
+     *
      * @param request
      *            the request object
      * @param item
@@ -571,12 +661,22 @@ public class DescribeStep extends AbstractProcessingStep
         String metadataField = MetadataField
                 .formKey(schema, element, qualifier);
 
+        String fieldKey = MetadataAuthorityManager.makeFieldKey(schema, element, qualifier);
+        boolean isAuthorityControlled = MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey);
+
         // Values to add
-        List vals = new LinkedList();
+        List vals = null;
+        List auths = null;
+        List confs = null;
 
         if (repeated)
         {
             vals = getRepeatedParameter(request, metadataField, metadataField);
+            if (isAuthorityControlled)
+            {
+                auths = getRepeatedParameter(request, metadataField, metadataField+"_authority");
+                confs = getRepeatedParameter(request, metadataField, metadataField+"_confidence");
+            }
 
             // Find out if the relevant "remove" button was pressed
             // TODO: These separate remove buttons are only relevant
@@ -591,29 +691,58 @@ public class DescribeStep extends AbstractProcessingStep
                         .substring(removeButton.length()));
 
                 vals.remove(valToRemove);
+                if(isAuthorityControlled)
+                {
+                   auths.remove(valToRemove);
+                   confs.remove(valToRemove);
+                }
             }
         }
         else
         {
             // Just a single name
+            vals = new LinkedList();
             String value = request.getParameter(metadataField);
-
             if (value != null)
                 vals.add(value.trim());
+            if (isAuthorityControlled)
+            {
+                auths = new LinkedList();
+                confs = new LinkedList();
+                String av = request.getParameter(metadataField+"_authority");
+                String cv = request.getParameter(metadataField+"_confidence");
+                auths.add(av == null ? "":av.trim());
+                confs.add(cv == null ? "":cv.trim());
+        }
         }
 
-        // Remove existing values
-        item.clearMetadata(schema, element, qualifier, Item.ANY);
+        // Remove existing values, already done in doProcessing see also bug DS-203
+        // item.clearMetadata(schema, element, qualifier, Item.ANY);
 
         // Put the names in the correct form
         for (int i = 0; i < vals.size(); i++)
         {
             // Add to the database if non-empty
             String s = (String) vals.get(i);
-
             if ((s != null) && !s.equals(""))
             {
-                item.addMetadata(schema, element, qualifier, lang, s);
+                if (isAuthorityControlled)
+                {
+                    String authKey = auths.size() > i ? (String)auths.get(i) : null;
+                    String sconf = (authKey != null && confs.size() > i) ? (String)confs.get(i) : null;
+                    if (MetadataAuthorityManager.getManager().isAuthorityRequired(fieldKey) &&
+                        (authKey == null || authKey.length() == 0))
+                    {
+                        log.warn("Skipping value of "+metadataField+" because the required Authority key is missing or empty.");
+                        addErrorField(request, metadataField);
+                    }
+                    else
+                        item.addMetadata(schema, element, qualifier, lang, s,
+                                authKey, (sconf != null && sconf.length() > 0) ?
+                                           Choices.getConfidenceValue(sconf) : Choices.CF_ACCEPTED);
+                }
+                else
+                    item.addMetadata(schema, element, qualifier, lang, s);
             }
         }
     }
@@ -621,12 +750,12 @@ public class DescribeStep extends AbstractProcessingStep
     /**
      * Fill out a metadata date field with the value from a form. The date is
      * taken from the three parameters:
-     * 
+     *
      * element_qualifier_year element_qualifier_month element_qualifier_day
-     * 
+     *
      * The granularity is determined by the values that are actually set. If the
      * year isn't set (or is invalid)
-     * 
+     *
      * @param request
      *            the request object
      * @param item
@@ -655,7 +784,8 @@ public class DescribeStep extends AbstractProcessingStep
 
         d.setDateLocal(year, month, day, -1, -1, -1);
 
-        item.clearMetadata(schema, element, qualifier, Item.ANY);
+        // already done in doProcessing see also bug DS-203
+        // item.clearMetadata(schema, element, qualifier, Item.ANY);
 
         if (year > 0)
         {
@@ -669,22 +799,22 @@ public class DescribeStep extends AbstractProcessingStep
      * form. Some fields are repeatable in the form. If this is the case, and
      * the field is "relation.ispartof", the names in the request will be from
      * the fields as follows:
-     * 
+     *
      * dc_relation_ispartof_series dc_relation_ispartof_number
      * dc_relation_ispartof_series_1 dc_relation_ispartof_number_1
-     * 
+     *
      * and so on. If the field is unqualified:
-     * 
+     *
      * dc_relation_series dc_relation_number
-     * 
+     *
      * Otherwise the parameters are of the form:
-     * 
+     *
      * dc_relation_ispartof_series dc_relation_ispartof_number
-     * 
+     *
      * The values will be put in separate DCValues, in the form "last name,
      * first name(s)", ordered as they appear in the list. These will replace
      * any existing values.
-     * 
+     *
      * @param request
      *            the request object
      * @param item
@@ -746,8 +876,8 @@ public class DescribeStep extends AbstractProcessingStep
             }
         }
 
-        // Remove existing values
-        item.clearMetadata(schema, element, qualifier, Item.ANY);
+        // Remove existing values, already done in doProcessing see also bug DS-203
+        // item.clearMetadata(schema, element, qualifier, Item.ANY);
 
         // Put the names in the correct form
         for (int i = 0; i < series.size(); i++)
@@ -771,7 +901,7 @@ public class DescribeStep extends AbstractProcessingStep
      * <P>
      * This method can also handle "composite fields" (metadata fields which may
      * require multiple params, etc. a first name and last name).
-     * 
+     *
      * @param request
      *            the HTTP request containing the form information
      * @param metadataField
@@ -779,7 +909,7 @@ public class DescribeStep extends AbstractProcessingStep
      * @param param
      *            the repeated parameter on the page (used to fill out the
      *            metadataField)
-     * 
+     *
      * @return a List of Strings
      */
     protected List getRepeatedParameter(HttpServletRequest request,
@@ -789,9 +919,6 @@ public class DescribeStep extends AbstractProcessingStep
 
         int i = 1;    //start index at the first of the previously entered values
         boolean foundLast = false;
-
-        log.debug("getRepeatedParameter: metadataField=" + metadataField
-                + " param=" + metadataField);
 
         // Iterate through the values in the form.
         while (!foundLast)
@@ -841,12 +968,15 @@ public class DescribeStep extends AbstractProcessingStep
             i++;
         }
 
+        log.debug("getRepeatedParameter: metadataField=" + metadataField
+                + " param=" + metadataField + ", return count = "+vals.size());
+
         return vals;
     }
 
     /**
      * Return the HTML / DRI field name for the given input.
-     * 
+     *
      * @param input
      * @return
      */

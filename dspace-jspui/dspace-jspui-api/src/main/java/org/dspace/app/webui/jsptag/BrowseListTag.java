@@ -1,9 +1,9 @@
 /*
  * BrowseListTag.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4365 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-10-05 19:52:42 -0400 (Mon, 05 Oct 2009) $
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -66,14 +66,16 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.StringTokenizer;
+import org.dspace.content.authority.MetadataAuthorityManager;
 
 /**
  * Tag for display a list of items
  *
  * @author Robert Tansley
- * @version $Revision: 3705 $
+ * @version $Revision: 4365 $
  */
 public class BrowseListTag extends TagSupport
 {
@@ -532,19 +534,36 @@ public class BrowseListTag extends TagSupport
                             	String endLink = "";
                             	if (!StringUtils.isEmpty(browseType[colIdx]) && !disableCrossLinks)
                             	{
-                            		String argument = "value";
+                                    String argument;
+                                    String value;
+                                    if (metadataArray[j].authority != null &&
+                                            metadataArray[j].confidence >= MetadataAuthorityManager.getManager()
+                                                .getMinConfidence(metadataArray[j].schema, metadataArray[j].element, metadataArray[j].qualifier))
+                                    {
+                                        argument = "authority";
+                                        value = metadataArray[j].authority;
+                                    }
+                                    else
+                                    {
+                                        argument = "value";
+                                        value = metadataArray[j].value;
+                                    }
                             		if (viewFull[colIdx])
                             		{
                             			argument = "vfocus";
                             		}
                             		startLink = "<a href=\"" + hrq.getContextPath() + "/browse?type=" + browseType[colIdx] + "&amp;" +
-                                            argument + "=" + Utils.addEntities(metadataArray[j].value);
+                                        argument + "=" + URLEncoder.encode(value,"UTF-8");
 
                                     if (metadataArray[j].language != null)
                                     {
                                         startLink = startLink + "&amp;" +
-                                            argument + "_lang=" + Utils.addEntities(metadataArray[j].language) +
-                                            "\">";
+                                            argument + "_lang=" + URLEncoder.encode(metadataArray[j].language, "UTF-8");
+									}
+
+                                    if ("authority".equals(argument))
+                                    {
+                                        startLink += "\" class=\"authority " +browseType[colIdx] + "\">";
                                     }
                                     else
                                     {

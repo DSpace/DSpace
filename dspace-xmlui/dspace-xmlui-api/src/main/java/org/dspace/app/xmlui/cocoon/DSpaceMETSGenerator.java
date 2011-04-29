@@ -1,9 +1,9 @@
 /*
  * DSpaceMETSGenerator.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4917 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2010-05-11 22:48:13 -0400 (Tue, 11 May 2010) $
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -172,7 +172,7 @@ public class DSpaceMETSGenerator extends AbstractGenerator
          	
          	// Handles can be either items or containers.
          	if (dso instanceof Item)
-         		adapter = new ItemAdapter((Item) dso, contextPath);
+                        adapter = new ItemAdapter(context, (Item) dso, contextPath);
          	else if (dso instanceof Collection || dso instanceof Community)
          		adapter = new ContainerAdapter(context, dso, contextPath);
          }
@@ -184,32 +184,38 @@ public class DSpaceMETSGenerator extends AbstractGenerator
          	if (parts.length == 2)
          	{
          		String type = parts[0];
-         		int id = Integer.valueOf(parts[1]);
-         		
-         		if ("item".equals(type))
-         		{
-         			Item item = Item.find(context,id);
-         			if (item != null)
-         				adapter = new ItemAdapter(item,contextPath);
-         		}
-         		else if ("collection".equals(type))
-         		{
-         			Collection collection = Collection.find(context,id);
-         			if (collection != null)
-         				adapter = new ContainerAdapter(context, collection,contextPath);
-         		}
-         		else if ("community".equals(type))
-         		{
-         			Community community = Community.find(context,id);
-         			if (community != null)
-         				adapter = new ContainerAdapter(context, community,contextPath);
-         		}
-         		else if ("repository".equals(type))
-     			{
-         			if (ConfigurationManager.getProperty("handle.prefix").equals(String.valueOf(id)))
-                        adapter = new RepositoryAdapter(context,contextPath);
-     			}
-         		
+                       String strid = parts[1];
+         		int id = 0;
+
+                        // Handle prefixes must be treated as strings
+                        // all non-repository types need integer IDs
+                        if ("repository".equals(type))
+                        {
+                                if (ConfigurationManager.getProperty("handle.prefix").equals(strid))
+                                        adapter = new RepositoryAdapter(context,contextPath);
+                        }
+                        else
+                        {
+                               id = Integer.valueOf(parts[1]); 
+         			if ("item".equals(type))
+         			{
+         				Item item = Item.find(context,id);
+         				if (item != null)
+                                       	        adapter = new ItemAdapter(context,item,contextPath);
+         			}
+         			else if ("collection".equals(type))
+         			{
+         				Collection collection = Collection.find(context,id);
+         				if (collection != null)
+         					adapter = new ContainerAdapter(context, collection,contextPath);
+         			}
+         			else if ("community".equals(type))
+         			{
+         				Community community = Community.find(context,id);
+         				if (community != null)
+         					adapter = new ContainerAdapter(context, community,contextPath);
+         			}
+			}
          	}
          }
 		 return adapter;

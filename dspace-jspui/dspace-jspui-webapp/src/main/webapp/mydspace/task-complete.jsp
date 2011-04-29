@@ -1,9 +1,9 @@
 <%--
   - task-complete.jsp
   -
-  - Version: $Revision: 3705 $
+  - Version: $Revision: 3986 $
   -
-  - Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+  - Date: $Date: 2009-06-30 10:22:06 -0400 (Tue, 30 Jun 2009) $
   -
   - Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
   - Institute of Technology.  All rights reserved.
@@ -52,7 +52,7 @@
 <dspace:layout locbar="link"
                parentlink="/mydspace"
                parenttitlekey="jsp.mydspace"
-               title="jsp.mydspace.task-complete.title">
+               titlekey="jsp.mydspace.task-complete.title">
 
 <%-- <h1>Thank You</h1> --%>
 <h1><fmt:message key="jsp.mydspace.task-complete.title"/></h1>

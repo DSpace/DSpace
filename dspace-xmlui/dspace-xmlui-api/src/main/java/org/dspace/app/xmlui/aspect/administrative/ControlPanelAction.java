@@ -1,9 +1,9 @@
 /*
  * ControlPanelAction.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4228 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-08-24 17:18:09 -0400 (Mon, 24 Aug 2009) $
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -48,6 +48,8 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Redirector;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
+import org.dspace.harvest.OAIHarvester;
+import org.dspace.harvest.OAIHarvester.HarvestScheduler;
 
 /**
  * Update the alert system based upon the form submitted from the control panel.
@@ -127,7 +129,22 @@ public class ControlPanelAction extends AbstractAction
         {
         	SystemwideAlerts.deactivateAlert();
         }
-        
+        else if (request.getParameter("submit_harvest_start") != null) {
+        	OAIHarvester.startNewScheduler();
+        }
+        else if (request.getParameter("submit_harvest_resume") != null) {
+        	OAIHarvester.resumeScheduler();
+        }
+        else if (request.getParameter("submit_harvest_pause") != null) {
+        	OAIHarvester.pauseScheduler();
+        }
+        else if (request.getParameter("submit_harvest_stop") != null) {
+        	OAIHarvester.stopScheduler();
+        }
+        else if (request.getParameter("submit_harvest_reset") != null) {
+        	OAIHarvester.resetScheduler();
+        }
+
         return null;
     }
 

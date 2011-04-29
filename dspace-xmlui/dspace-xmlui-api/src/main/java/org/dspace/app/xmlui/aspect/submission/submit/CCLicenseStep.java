@@ -1,9 +1,9 @@
 /*
  * CCLicensePage.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 3996 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-07-01 19:36:04 -0400 (Wed, 01 Jul 2009) $
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -56,6 +56,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.license.CreativeCommons;
+import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
 
 /**
@@ -149,7 +150,13 @@ public class CCLicenseStep extends AbstractSubmissionStep
 	    offsiteDiv.addHidden("submission-continue").setValue(knot.getId()); 
 	    offsiteDiv.addHidden("partner").setValue("dspace");
 	    offsiteDiv.addHidden("exit_url").setValue(exitURL);
-	    
+
+        String jurisdiction = ConfigurationManager.getProperty("webui.submit.cc-jurisdiction");
+        if ((jurisdiction != null) && (!"".equals(jurisdiction)))
+        {
+            offsiteDiv.addHidden("jurisdiction").setValue(jurisdiction.trim());
+        }
+
 	    Para ccPara = offsiteDiv.addPara("creative-commons-button","creative-commons-button");
 	    ccPara.addButton("submit_to_creative_commons").setValue(T_submit_to_creative_commons);
 	

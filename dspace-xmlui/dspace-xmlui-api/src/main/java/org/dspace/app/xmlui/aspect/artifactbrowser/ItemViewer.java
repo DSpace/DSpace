@@ -1,9 +1,9 @@
 /*
  * ItemViewer.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4430 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-10-10 13:21:30 -0400 (Sat, 10 Oct 2009) $
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -55,10 +55,10 @@ import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
+import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
-import org.dspace.app.xmlui.utils.UsageEvent;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
@@ -76,7 +76,10 @@ import org.dspace.content.crosswalk.DisseminationCrosswalk;
 import org.dspace.core.Constants;
 import org.dspace.core.LogManager;
 import org.dspace.core.PluginManager;
+import org.dspace.usage.UsageEvent;
+import org.dspace.utils.DSpace;
 import org.jdom.Element;
+import org.jdom.Text;
 import org.jdom.output.XMLOutputter;
 import org.xml.sax.SAXException;
 
@@ -155,9 +158,6 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
 	            // Ignore all errors and just invalidate the cache.
 	        }
 
-            // add log message that we are viewing the item
-            // done here, as the serialization may not occur if the cache is valid
-            log.info(LogManager.getHeader(context, "view_item", "handle=" + (dso == null ? "" : dso.getHandle())));
     	}
     	return this.validity;
     }
@@ -201,6 +201,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
             StringWriter sw = new StringWriter();
 
             XMLOutputter xmlo = new XMLOutputter();
+            xmlo.output(new Text("\n"), sw);
             for (int i = 0; i < l.size(); i++)
             {
                 Element e = (Element) l.get(i);
@@ -209,6 +210,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
                 // work for Manakin as well as the JSP-based UI.
                 e.setNamespace(null);
                 xmlo.output(e, sw);
+                xmlo.output(new Text("\n"), sw);
             }
             pageMeta.addMetadata("xhtml_head_item").addContent(sw.toString());
         }
@@ -230,9 +232,6 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         if (!(dso instanceof Item))
             return;
         Item item = (Item) dso;
-
-        new UsageEvent().fire((Request) ObjectModelHelper.getRequest(objectModel),
-                context, UsageEvent.VIEW, Constants.ITEM, item.getID());
         
         // Build the item viewer division.
         Division division = body.addDivision("item-view","primary");

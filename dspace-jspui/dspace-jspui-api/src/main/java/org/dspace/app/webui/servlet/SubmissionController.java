@@ -1,9 +1,9 @@
 /*
  * SubmissionController.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 3864 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-06-06 08:30:05 -0400 (Sat, 06 Jun 2009) $
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -117,7 +117,7 @@ import org.dspace.submit.step.UploadStep;
  * @see org.dspace.app.webui.submit.JSPStepManager
  * 
  * @author Tim Donohue
- * @version $Revision: 3705 $
+ * @version $Revision: 3864 $
  */
 public class SubmissionController extends DSpaceServlet
 {
@@ -576,20 +576,12 @@ public class SubmissionController extends DSpaceServlet
         else if (currentStepNum > FIRST_STEP)
         {
             
-            //need to find a previous step that is VISIBLE to the user!
-            while(currentStepNum>FIRST_STEP)
+            currentStepConfig = getPreviousVisibleStep(request, subInfo);
+            
+            if(currentStepConfig != null)
             {
-                // update the current step & do this previous step
-                currentStepNum--;
-            
-                //get previous step
-                currentStepConfig = subInfo.getSubmissionConfig().getStep(currentStepNum);
-            
-                if(currentStepConfig.isVisible())
-                {
-                    foundPrevious = true;
-                    break;
-                }
+                currentStepNum = currentStepConfig.getStepNumber();
+                foundPrevious = true;
             }
                 
             if(foundPrevious)
@@ -1091,7 +1083,7 @@ public class SubmissionController extends DSpaceServlet
     }
 
     /**
-     * Checks if the current step is also the first step in the item submission
+     * Checks if the current step is also the first "visibile" step in the item submission
      * process.
      * 
      * @param request
@@ -1106,7 +1098,7 @@ public class SubmissionController extends DSpaceServlet
     {
         SubmissionStepConfig step = getCurrentStepConfig(request, si);
 
-        if ((step != null) && (step.getStepNumber() == FIRST_STEP))
+        if ((step != null) && (getPreviousVisibleStep(request, si) == null))
         {
             return true;
         }
@@ -1114,6 +1106,44 @@ public class SubmissionController extends DSpaceServlet
         {
             return false;
         }
+    }
+    
+    /**
+     * Return the previous "visibile" step in the item submission
+     * process if any, <code>null</code> otherwise.
+     * 
+     * @param request
+     *            HTTP request
+     * @param si
+     *            The current Submission Info
+     * 
+     * @return the previous step in the item submission process if any
+     */
+    public static SubmissionStepConfig getPreviousVisibleStep(HttpServletRequest request,
+            SubmissionInfo si)
+    {
+        SubmissionStepConfig step = getCurrentStepConfig(request, si);
+
+        SubmissionStepConfig currentStepConfig, previousStep = null;
+
+        int currentStepNum = step.getStepNumber();
+        
+        //need to find a previous step that is VISIBLE to the user!
+        while(currentStepNum>FIRST_STEP)
+        {
+            // update the current step & do this previous step
+            currentStepNum--;
+        
+            //get previous step
+            currentStepConfig = si.getSubmissionConfig().getStep(currentStepNum);
+        
+            if(currentStepConfig.isVisible())
+            {
+                previousStep = currentStepConfig;
+                break;
+            }
+        }
+        return previousStep;
     }
 
     /**

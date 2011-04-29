@@ -1,9 +1,9 @@
 /*
  * RetrieveServlet.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4430 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-10-10 13:21:30 -0400 (Sat, 10 Oct 2009) $
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -48,15 +48,15 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.statistics.AbstractUsageEvent;
 import org.dspace.app.webui.util.JSPManager;
-import org.dspace.app.webui.util.UsageEvent;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
+import org.dspace.usage.UsageEvent;
+import org.dspace.utils.DSpace;
 
 /**
  * Servlet for retrieving bitstreams. The bits are simply piped to the user.
@@ -64,7 +64,7 @@ import org.dspace.core.Utils;
  * <code>/retrieve/bitstream-id</code>
  * 
  * @author Robert Tansley
- * @version $Revision: 3705 $
+ * @version $Revision: 4430 $
  */
 public class RetrieveServlet extends DSpaceServlet
 {
@@ -115,9 +115,16 @@ public class RetrieveServlet extends DSpaceServlet
             log.info(LogManager.getHeader(context, "view_bitstream",
                     "bitstream_id=" + bitstream.getID()));
 
-            UsageEvent ue = new UsageEvent();
-            ue.fire(request, context, AbstractUsageEvent.VIEW,
-		Constants.BITSTREAM, bitstream.getID());
+            new DSpace().getEventService().fireEvent(
+            		new UsageEvent(
+            				UsageEvent.Action.VIEW,
+            				request, 
+            				context, 
+            				bitstream));
+            
+            //UsageEvent ue = new UsageEvent();
+           // ue.fire(request, context, AbstractUsageEvent.VIEW,
+		   //Constants.BITSTREAM, bitstream.getID());
 
             // Pipe the bits
             InputStream is = bitstream.retrieve();

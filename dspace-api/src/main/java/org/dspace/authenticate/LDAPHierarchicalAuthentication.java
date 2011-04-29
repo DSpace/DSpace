@@ -1,12 +1,11 @@
 /*
  * LDAPHierarchicalAuthentication.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4690 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2010-01-13 07:16:24 -0500 (Wed, 13 Jan 2010) $
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -48,6 +46,7 @@ import javax.naming.directory.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
@@ -64,7 +63,7 @@ import org.dspace.eperson.Group;
  * chack the credentials of the user by binding directly to their DN.
  *
  * @author Stuart Lewis, Chris Yates, Alex Barbieri, Flavio Botelho, Reuben Pasquini
- * @version $Revision: 3705 $
+ * @version $Revision: 4690 $
  */
 public class LDAPHierarchicalAuthentication
     implements AuthenticationMethod {
@@ -433,7 +432,12 @@ public class LDAPHierarchicalAuthentication
 
 					while (answer.hasMoreElements()) {
 						SearchResult sr = answer.next();
-						resultDN = (sr.getName() + "," + ldap_search_context);
+                        if (StringUtils.isEmpty(ldap_search_context)) {
+                            resultDN = sr.getName();
+                        } else {
+                            resultDN = (sr.getName() + "," + ldap_search_context);
+                        }
+
 						String attlist[] = {ldap_email_field, ldap_givenname_field,
 								            ldap_surname_field, ldap_phone_field};
 						Attributes atts = sr.getAttributes();

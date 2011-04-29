@@ -1,12 +1,11 @@
 /*
  * ItemExport.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4505 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-11-05 08:26:45 -0500 (Thu, 05 Nov 2009) $
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -138,6 +136,7 @@ public class ItemExport
         options.addOption("m", "migrate", false, "export for migration (remove handle and metadata that will be re-created in new system)");
         options.addOption("n", "number", true,
                 "sequence number to begin exporting items with");
+        options.addOption("z", "zip", true, "export as zip file (specify filename e.g. export.zip)");
         options.addOption("h", "help", false, "help");
 
         CommandLine line = parser.parse(options, argv);
@@ -196,6 +195,14 @@ public class ItemExport
         if (line.hasOption('m')) // number
         {
             migrate = true;
+        }
+
+        boolean zip = false;
+        String zipFileName = "";
+        if (line.hasOption('z'))
+        {
+            zip = true;
+            zipFileName = line.getOptionValue('z');
         }
 
         // now validate the args
@@ -281,25 +288,42 @@ public class ItemExport
             }
         }
 
-        if (myItem != null)
+        if (zip)
         {
-            // it's only a single item
-            exportItem(c, myItem, destDirName, seqStart, migrate);
+            ItemIterator items;
+            if (myItem != null)
+            {
+                items = new ItemIterator(c, new ArrayList(myItem.getID()));
+            }
+            else
+            {
+                System.out.println("Exporting from collection: " + myIDString);
+                items = mycollection.getItems();
+            }
+            exportAsZip(c, items, destDirName, zipFileName, seqStart, migrate);
         }
         else
         {
-            System.out.println("Exporting from collection: " + myIDString);
-
-            // it's a collection, so do a bunch of items
-            ItemIterator i = mycollection.getItems();
-            try
+            if (myItem != null)
             {
-                exportItem(c, i, destDirName, seqStart, migrate);
+                // it's only a single item
+                exportItem(c, myItem, destDirName, seqStart, migrate);
             }
-            finally
+            else
             {
-                if (i != null)
-                    i.close();
+                System.out.println("Exporting from collection: " + myIDString);
+
+                // it's a collection, so do a bunch of items
+                ItemIterator i = mycollection.getItems();
+                try
+                {
+                    exportItem(c, i, destDirName, seqStart, migrate);
+                }
+                finally
+                {
+                    if (i != null)
+                        i.close();
+                }
             }
         }
 
@@ -456,9 +480,8 @@ public class ItemExport
             String dateIssued = null;
             String dateAccessioned = null;
 
-            for (int j = 0; j < dcorevalues.length; j++)
+            for (DCValue dcv : dcorevalues)
             {
-                DCValue dcv = dcorevalues[j];
                 String qualifier = dcv.qualifier;
 
                 if (qualifier == null)
@@ -466,8 +489,20 @@ public class ItemExport
                     qualifier = "none";
                 }
 
+                String language = dcv.language;
+
+                if (language != null)
+                {
+                    language = " language=\"" + language + "\"";
+                }
+                else
+                {
+                    language = "";
+                }
+
                 utf8 = ("  <dcvalue element=\"" + dcv.element + "\" "
-                        + "qualifier=\"" + qualifier + "\">"
+                        + "qualifier=\"" + qualifier + "\""
+                        + language + ">"
                         + Utils.addEntities(dcv.value) + "</dcvalue>\n")
                         .getBytes("UTF-8");
 
@@ -476,7 +511,9 @@ public class ItemExport
                      (dcv.element.equals("date") && qualifier.equals("issued")) ||
                      (dcv.element.equals("date") && qualifier.equals("accessioned")) ||
                      (dcv.element.equals("date") && qualifier.equals("available")) ||
-                     (dcv.element.equals("identifier") && qualifier.equals("uri")) ||
+                     (dcv.element.equals("identifier") && qualifier.equals("uri") &&
+                      (dcv.value.startsWith("http://hdl.handle.net/" +
+                       ConfigurationManager.getProperty("handle.prefix") + "/"))) ||
                      (dcv.element.equals("description") && qualifier.equals("provenance")) ||
                      (dcv.element.equals("format") && qualifier.equals("extent")) ||
                      (dcv.element.equals("format") && qualifier.equals("mimetype")))))
@@ -497,7 +534,10 @@ public class ItemExport
             }
 
             // When migrating, only keep date.issued if it is different to date.accessioned
-            if ((migrate) && (!dateIssued.equals(dateAccessioned)))
+            if ((migrate) &&
+                (dateIssued != null) &&
+                (dateAccessioned != null) &&
+                (!dateIssued.equals(dateAccessioned)))
             {
                 utf8 = ("  <dcvalue element=\"date\" "
                         + "qualifier=\"issued\">"
@@ -594,6 +634,11 @@ public class ItemExport
                         description = "";
                     }
 
+                    String primary = "";
+                    if (bundles[j].getPrimaryBitstreamID() == b.getID()) {
+                        primary = "\tprimary:true ";
+                    }
+
                     int myPrefix = 1; // only used with name conflict
 
                     InputStream is = b.retrieve();
@@ -627,11 +672,13 @@ public class ItemExport
                             {
                                 out.println("-r -s " + b.getStoreNumber()
                                         + " -f " + myName +
-                                        "\tbundle:" + bundleName + description);
+                                        "\tbundle:" + bundleName +
+                                        primary + description);
                             }
                             else
                             {
-                                out.println(myName + "\tbundle:" + bundleName + description);
+                                out.println(myName + "\tbundle:" + bundleName +
+                                            primary + description);
                             }
 
                             isDone = true;
@@ -656,6 +703,44 @@ public class ItemExport
         {
             throw new Exception("Cannot create contents in " + destDir);
         }
+    }
+
+    /**
+     * Method to perform an export and save it as a zip file.
+     *
+     * @param context The DSpace Context
+     * @param items The items to export
+     * @param destDirName The directory to save the export in
+     * @param zipFileName The name to save the zip file as
+     * @param seqStart The first number in the sequence
+     * @param migrate Whether to use the migrate option or not
+     * @throws Exception
+     */
+    public static void exportAsZip(Context context, ItemIterator items,
+                                   String destDirName, String zipFileName,
+                                   int seqStart, boolean migrate) throws Exception
+    {
+        String workDir = getExportWorkDirectory() +
+                         System.getProperty("file.separator") +
+                         zipFileName;
+
+        File wkDir = new File(workDir);
+        if (!wkDir.exists())
+        {
+            wkDir.mkdirs();
+        }
+
+        File dnDir = new File(destDirName);
+        if (!dnDir.exists())
+        {
+            dnDir.mkdirs();
+        }
+
+        // export the items using normal export method
+        exportItem(context, items, workDir, seqStart, migrate);
+
+        // now zip up the export directory created above
+        zip(workDir, destDirName + System.getProperty("file.separator") + zipFileName);
     }
 
     /**
@@ -1261,7 +1346,7 @@ public class ItemExport
         try
         {
             Locale supportedLocale = I18nUtil.getEPersonLocale(eperson);
-            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "export_success"));
+            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "export_error"));
             email.addRecipient(eperson.getEmail());
             email.addArgument(error);
             email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/feedback");
@@ -1296,6 +1381,10 @@ public class ItemExport
             zipFiles(cpFile, strSource, tempFileName, cpZipOutputStream);
             cpZipOutputStream.finish();
             cpZipOutputStream.close();
+
+            // Fix issue on Windows with stale file handles open before trying to delete them
+            System.gc();
+
             deleteDirectory(cpFile);
             targetFile.renameTo(new File(target));
         }

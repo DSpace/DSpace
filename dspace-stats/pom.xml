@@ -1,0 +1,176 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	
+	<parent>
+		<artifactId>dspace-parent</artifactId>
+		<groupId>org.dspace</groupId>
+		<version>1.6.2</version>
+	</parent>
+	
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.dspace</groupId>
+	<artifactId>dspace-stats</artifactId>
+	<name>DSpace Solr Statistics Logging Client Library</name>
+	<version>1.6.2</version>
+	<description>Library of Shared UsageEvent and EventConsumer Tools for Logging to Solr.</description>
+
+	<repositories>
+		<repository>
+			<id>dspace-snapshot</id>
+			<name>DSpace Snapshot Repository</name>
+			<url>http://maven.dspace.org/snapshot</url>
+			<releases>
+				<enabled>false</enabled>
+				<checksumPolicy>fail</checksumPolicy>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+				<updatePolicy>daily</updatePolicy>
+				<checksumPolicy>fail</checksumPolicy>
+			</snapshots>
+		</repository>
+	</repositories>
+
+	<!--
+		The Subversion repository location is used by Continuum to update
+		against when changes have occured, this spawns a new build cycle and
+		releases snapshots into the snapshot repository below.
+	-->
+	<scm>
+		<connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-stats</connection>
+		<developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-stats</developerConnection>
+		<url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-stats</url>
+	</scm>
+
+	<distributionManagement>
+		<repository>
+			<id>maven.dspace.org/release</id>
+			<name>DSpace Maven Repository</name>
+			<url>scp://maven.dspace.org/var/maven/release
+            </url>
+		</repository>
+		<snapshotRepository>
+			<id>maven.dspace.org/snapshot</id>
+			<name>DSpace Maven Repository</name>
+			<url>scp://maven.dspace.org/var/maven/snapshot
+            </url>
+			<uniqueVersion>false</uniqueVersion>
+		</snapshotRepository>
+		<site>
+			<id>website</id>
+			<url> scp://projects.dspace.org/var/www/projects.dspace.org/htdocs/${artifactId}</url>
+		</site>
+	</distributionManagement>
+
+	<developers>
+		<developer>
+			<name>Ben Bosman</name>
+			<email>ben at atmire.com</email>
+			<url>http://www.atmire.com</url>
+			<organization>@MIRE</organization>
+			<organizationUrl>http://www.atmire.com</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<name>Mark Diggory</name>
+			<email>mdiggory at atmire.com</email>
+			<url>http://www.atmire.com</url>
+			<organization>@MIRE</organization>
+			<organizationUrl>http://www.atmire.com</organizationUrl>
+			<timezone>-5</timezone>
+		</developer>
+		<developer>
+			<name>Lieven Droogmans</name>
+			<email>lieven at atmire.com</email>
+			<url>http://www.atmire.com</url>
+			<organization>@MIRE</organization>
+			<organizationUrl>http://www.atmire.com</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<name>Art Lowel</name>
+			<email>art at atmire.com</email>
+			<url>http://www.atmire.com</url>
+			<organization>@MIRE</organization>
+			<organizationUrl>http://www.atmire.com</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
+		<developer>
+			<name>Kevin Van de velde</name>
+			<email>kevin at atmire.com</email>
+			<url>http://www.atmire.com</url>
+			<organization>@MIRE</organization>
+			<organizationUrl>http://www.atmire.com</organizationUrl>
+			<timezone>+1</timezone>
+		</developer>
+	</developers>
+   
+    <contributors />
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.solr</groupId>
+			<artifactId>solr-solrj</artifactId>
+			<version>1.3.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-api</artifactId>
+			<version>1.6.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace.dependencies</groupId>
+			<artifactId>dspace-geoip</artifactId>
+			<version>1.2.3</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.ant</groupId>
+			<artifactId>ant</artifactId>
+			<version>1.7.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace.dnsjava</groupId>
+			<artifactId>dnsjava</artifactId>
+			<version>2.0.6</version>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<version>2.4</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-services-api</artifactId>
+			<version>2.0.0-alpha</version>
+		</dependency>
+        <dependency>
+            <groupId>org.ostermiller</groupId>
+            <artifactId>utils</artifactId>
+            <version>1.07.00</version>
+        </dependency>
+	</dependencies>
+   
+   <reporting>
+      <excludeDefaults>false</excludeDefaults>
+      <plugins>
+         <plugin>
+            <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+      
+          <minmemory>128m</minmemory>
+          <maxmemory>1g</maxmemory>
+       
+       </configuration>
+         </plugin>
+         <plugin>
+            <artifactId>maven-jxr-plugin</artifactId>
+            <configuration>
+               <aggregate>true</aggregate>
+            </configuration>
+         </plugin>
+         <plugin>
+            <artifactId>maven-site-plugin</artifactId>
+         </plugin>
+      </plugins>
+   </reporting>
+</project>

@@ -1,12 +1,11 @@
 /*
  * ConfigurationManager.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4243 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-09-02 05:12:23 -0400 (Wed, 02 Sep 2009) $
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -80,7 +78,7 @@ import org.apache.log4j.helpers.OptionConverter;
  * @author Robert Tansley
  * @author Larry Stone - Interpolated values.
  * @author Mark Diggory - General Improvements to detection, logging and loading.
- * @version $Revision: 3705 $
+ * @version $Revision: 4243 $
  */
 public class ConfigurationManager
 {
@@ -134,8 +132,13 @@ public class ConfigurationManager
         {
             loadConfig(null);
         }
-
-        return properties.getProperty(property);
+        String propertyValue = properties.getProperty(property);
+        
+        if (propertyValue != null)
+        {
+            propertyValue = propertyValue.trim();
+        }
+        return propertyValue;
     }
 
     /**
@@ -190,6 +193,60 @@ public class ConfigurationManager
         }
 
         return intValue;
+    }
+
+    /**
+     * Get a configuration property as a long
+     *
+     * @param property
+     *            the name of the property
+     *
+     * @return the value of the property. <code>0</code> is returned if the
+     *         property does not exist. To differentiate between this case and
+     *         when the property actually is zero, use <code>getProperty</code>.
+     */
+    public static long getLongProperty(String property)
+    {
+        return getLongProperty(property, 0);
+    }
+
+    /**
+     * Get a configuration property as an long, with default
+     *
+     * @param property
+     *            the name of the property
+     *
+     * @param defaultValue
+     *            value to return if property is not found or is not a Long.
+     *
+     * @return the value of the property. <code>default</code> is returned if
+     *         the property does not exist or is not an Integer. To differentiate between this case
+     *         and when the property actually is false, use
+     *         <code>getProperty</code>.
+     */
+    public static long getLongProperty(String property, int defaultValue)
+    {
+        if (properties == null)
+        {
+            loadConfig(null);
+        }
+
+        String stringValue = properties.getProperty(property);
+        long longValue = defaultValue;
+
+        if (stringValue != null)
+        {
+            try
+            {
+                longValue = Long.parseLong(stringValue.trim());
+            }
+            catch (NumberFormatException e)
+            {
+                warn("Warning: Number format error in property: " + property);
+            }
+        }
+
+        return longValue;
     }
 
     /**

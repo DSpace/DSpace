@@ -3,9 +3,9 @@
 <!--
   DS-METS-1.0-DIM.xsl
 
-  Version: $Revision: 3705 $
+  Version: $Revision: 4901 $
  
-  Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+  Date: $Date: 2010-05-10 00:27:40 -0400 (Mon, 10 May 2010) $
  
   Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
   Institute of Technology.  All rights reserved.
@@ -53,6 +53,9 @@
     xmlns:dim="http://www.dspace.org/xmlns/dspace/dim" 
     xmlns:xlink="http://www.w3.org/TR/xlink/"
     xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
+    xmlns:atom="http://www.w3.org/2005/Atom"
+    xmlns:ore="http://www.openarchives.org/ore/terms/"
+    xmlns:oreatom="http://www.openarchives.org/ore/atom/"
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:xalan="http://xml.apache.org/xalan" 
     xmlns:encoder="xalan://java.net.URLEncoder"
@@ -156,7 +159,12 @@
                     <xsl:choose>
                         <xsl:when test="dim:field[@element='contributor'][@qualifier='author']">
                             <xsl:for-each select="dim:field[@element='contributor'][@qualifier='author']">
-                                <xsl:copy-of select="./node()"/>
+                                <span>
+                                  <xsl:if test="@authority">
+                                    <xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
+                                  </xsl:if>
+                                  <xsl:copy-of select="node()"/>
+                                </span>
                                 <xsl:if test="count(following-sibling::dim:field[@element='contributor'][@qualifier='author']) != 0">
                                     <xsl:text>; </xsl:text>
                                 </xsl:if>
@@ -394,32 +402,36 @@
         
         <!-- Generate the bitstream information from the file section -->
         <xsl:choose>
-        	<xsl:when test="not(./mets:fileSec/mets:fileGrp[@USE='CONTENT'])">
-        	<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h2> 
-        	 <table class="ds-table file-list">
-	            <tr class="ds-table-header-row">
-	                <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-file</i18n:text></th>
-	                <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-size</i18n:text></th>
-	                <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-format</i18n:text></th>
-	                <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-view</i18n:text></th>
-	            </tr>
-	            <tr>
-	            <td colspan="4">
-        		<p><i18n:text>xmlui.dri2xhtml.METS-1.0.item-no-files</i18n:text></p>
-        		</td>
-        		</tr>
-        		</table>
-        	</xsl:when>
-        	<xsl:otherwise>
-		        <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CONTENT']">
-		            <xsl:with-param name="context" select="."/>
-		            <xsl:with-param name="primaryBitstream" select="./mets:structMap[@TYPE='LOGICAL']/mets:div[@TYPE='DSpace Item']/mets:fptr/@FILEID"/>
-		        </xsl:apply-templates>
-        	</xsl:otherwise>
+            <xsl:when test="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']">
+                <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']">
+                    <xsl:with-param name="context" select="."/>
+                    <xsl:with-param name="primaryBitstream" select="./mets:structMap[@TYPE='LOGICAL']/mets:div[@TYPE='DSpace Item']/mets:fptr/@FILEID"/>
+                </xsl:apply-templates>
+            </xsl:when>
+            <!-- Special case for handling ORE resource maps stored as DSpace bitstreams -->
+            <xsl:when test="./mets:fileSec/mets:fileGrp[@USE='ORE']">
+                <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='ORE']"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h2> 
+                <table class="ds-table file-list">
+                    <tr class="ds-table-header-row">
+                        <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-file</i18n:text></th>
+                        <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-size</i18n:text></th>
+                        <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-format</i18n:text></th>
+                        <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-view</i18n:text></th>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            <p><i18n:text>xmlui.dri2xhtml.METS-1.0.item-no-files</i18n:text></p>
+                        </td>
+                    </tr>
+                </table>
+            </xsl:otherwise>
         </xsl:choose>
 
-        <!-- Generate the license information from the file section -->
-        <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CC-LICENSE' or @USE='LICENSE']"/>
+        <!-- Generate the Creative Commons license information from the file section (DSpace deposit license hidden by default)-->
+        <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CC-LICENSE']"/>
 
     </xsl:template>
     
@@ -427,7 +439,30 @@
     <!-- Generate the info about the item from the metadata section -->
     <xsl:template match="dim:dim" mode="itemSummaryView-DIM">
         <table class="ds-includeSet-table">
-            <!--
+         <xsl:call-template name="itemSummaryView-DIM-fields">
+         </xsl:call-template>
+        </table>
+    </xsl:template>
+
+    <!-- render each field on a row, alternating phase between odd and even -->
+    <!-- recursion needed since not every row appears for each Item. -->
+    <xsl:template name="itemSummaryView-DIM-fields">
+      <xsl:param name="clause" select="'1'"/>
+      <xsl:param name="phase" select="'even'"/>
+      <xsl:variable name="otherPhase">
+            <xsl:choose>
+              <xsl:when test="$phase = 'even'">
+                <xsl:text>odd</xsl:text>
+              </xsl:when>
+              <xsl:otherwise>
+                <xsl:text>even</xsl:text>
+              </xsl:otherwise>
+            </xsl:choose>
+      </xsl:variable>
+
+      <xsl:choose>
+
+            <!--  artifact?
             <tr class="ds-table-row odd">
                 <td><span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-preview</i18n:text>:</span></td>
                 <td>
@@ -449,8 +484,10 @@
                     </xsl:choose>
                 </td>
             </tr>-->
-            <tr class="ds-table-row even">
             
+          <!-- Title row -->
+          <xsl:when test="$clause = 1">
+            <tr class="ds-table-row {$phase}">
                 <td><span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-title</i18n:text>: </span></td>
                 <td>
                     <span class="Z3988">
@@ -476,14 +513,26 @@
                     </span>
                 </td>
             </tr>
-            <xsl:if test="dim:field[@element='contributor'][@qualifier='author'] or dim:field[@element='creator'] or dim:field[@element='contributor']">
-	            <tr class="ds-table-row odd">
+            <xsl:call-template name="itemSummaryView-DIM-fields">
+              <xsl:with-param name="clause" select="($clause + 1)"/>
+              <xsl:with-param name="phase" select="$otherPhase"/>
+            </xsl:call-template>
+          </xsl:when>
+
+          <!-- Author(s) row -->
+          <xsl:when test="$clause = 2 and (dim:field[@element='contributor'][@qualifier='author'] or dim:field[@element='creator'] or dim:field[@element='contributor'])">
+                    <tr class="ds-table-row {$phase}">
 	                <td><span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-author</i18n:text>:</span></td>
 	                <td>
 	                    <xsl:choose>
 	                        <xsl:when test="dim:field[@element='contributor'][@qualifier='author']">
 	                            <xsl:for-each select="dim:field[@element='contributor'][@qualifier='author']">
+                                        <span>
+                                          <xsl:if test="@authority">
+                                            <xsl:attribute name="class"><xsl:text>ds-dc_contributor_author-authority</xsl:text></xsl:attribute>
+                                          </xsl:if>
 	                                <xsl:copy-of select="node()"/>
+                                        </span>
 	                                <xsl:if test="count(following-sibling::dim:field[@element='contributor'][@qualifier='author']) != 0">
 	                                    <xsl:text>; </xsl:text>
 	                                </xsl:if>
@@ -511,9 +560,15 @@
 	                    </xsl:choose>
 	                </td>
 	            </tr>
-            </xsl:if>
-            <xsl:if test="dim:field[@element='description' and @qualifier='abstract']">
-	            <tr class="ds-table-row even">
+              <xsl:call-template name="itemSummaryView-DIM-fields">
+                <xsl:with-param name="clause" select="($clause + 1)"/>
+                <xsl:with-param name="phase" select="$otherPhase"/>
+              </xsl:call-template>
+          </xsl:when>
+
+          <!-- Abstract row -->
+          <xsl:when test="$clause = 3 and (dim:field[@element='description' and @qualifier='abstract'])">
+                    <tr class="ds-table-row {$phase}">
 	                <td><span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-abstract</i18n:text>:</span></td>
 	                <td>
 	                <xsl:if test="count(dim:field[@element='description' and @qualifier='abstract']) &gt; 1">
@@ -530,9 +585,15 @@
 	                </xsl:if>
 	                </td>
 	            </tr>
-            </xsl:if>
-            <xsl:if test="dim:field[@element='description' and not(@qualifier)]">
-	            <tr class="ds-table-row odd">
+              <xsl:call-template name="itemSummaryView-DIM-fields">
+                <xsl:with-param name="clause" select="($clause + 1)"/>
+                <xsl:with-param name="phase" select="$otherPhase"/>
+              </xsl:call-template>
+          </xsl:when>
+
+          <!-- Description row -->
+          <xsl:when test="$clause = 4 and (dim:field[@element='description' and not(@qualifier)])">
+                    <tr class="ds-table-row {$phase}">
 	                <td><span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-description</i18n:text>:</span></td>
 	                <td>
 	                <xsl:if test="count(dim:field[@element='description' and not(@qualifier)]) &gt; 1 and not(count(dim:field[@element='description' and @qualifier='abstract']) &gt; 1)">
@@ -549,9 +610,15 @@
 	                </xsl:if>
 	                </td>
 	            </tr>
-            </xsl:if>
-            <xsl:if test="dim:field[@element='identifier' and @qualifier='uri']">
-	            <tr class="ds-table-row even">
+              <xsl:call-template name="itemSummaryView-DIM-fields">
+                <xsl:with-param name="clause" select="($clause + 1)"/>
+                <xsl:with-param name="phase" select="$otherPhase"/>
+              </xsl:call-template>
+          </xsl:when>
+
+          <!-- identifier.uri row -->
+          <xsl:when test="$clause = 5 and (dim:field[@element='identifier' and @qualifier='uri'])">
+                    <tr class="ds-table-row {$phase}">
 	                <td><span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-uri</i18n:text>:</span></td>
 	                <td>
 	                	<xsl:for-each select="dim:field[@element='identifier' and @qualifier='uri']">
@@ -567,9 +634,15 @@
 	                    </xsl:for-each>
 	                </td>
 	            </tr>
-            </xsl:if>
-            <xsl:if test="dim:field[@element='date' and @qualifier='issued']">
-	            <tr class="ds-table-row odd">
+              <xsl:call-template name="itemSummaryView-DIM-fields">
+                <xsl:with-param name="clause" select="($clause + 1)"/>
+                <xsl:with-param name="phase" select="$otherPhase"/>
+              </xsl:call-template>
+          </xsl:when>
+
+          <!-- date.issued row -->
+          <xsl:when test="$clause = 6 and (dim:field[@element='date' and @qualifier='issued'])">
+                    <tr class="ds-table-row {$phase}">
 	                <td><span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-date</i18n:text>:</span></td>
 	                <td>
 		                <xsl:for-each select="dim:field[@element='date' and @qualifier='issued']">
@@ -580,8 +653,23 @@
 		                </xsl:for-each>
 	                </td>
 	            </tr>
+              <xsl:call-template name="itemSummaryView-DIM-fields">
+                <xsl:with-param name="clause" select="($clause + 1)"/>
+                <xsl:with-param name="phase" select="$otherPhase"/>
+              </xsl:call-template>
+          </xsl:when>
+
+          <!-- recurse without changing phase if we didn't output anything -->
+          <xsl:otherwise>
+            <!-- IMPORTANT: This test should be updated if clauses are added! -->
+            <xsl:if test="$clause &lt; 7">
+              <xsl:call-template name="itemSummaryView-DIM-fields">
+                <xsl:with-param name="clause" select="($clause + 1)"/>
+                <xsl:with-param name="phase" select="$phase"/>
+              </xsl:call-template>
             </xsl:if>
-        </table>
+          </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 
     
@@ -633,33 +721,37 @@
         
 		<!-- Generate the bitstream information from the file section -->
         <xsl:choose>
-        	<xsl:when test="not(./mets:fileSec/mets:fileGrp[@USE='CONTENT'])">
-        	<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h2> 
-        	 <table class="ds-table file-list">
-	            <tr class="ds-table-header-row">
-	                <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-file</i18n:text></th>
-	                <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-size</i18n:text></th>
-	                <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-format</i18n:text></th>
-	                <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-view</i18n:text></th>
-	            </tr>
-	            <tr>
-	            <td colspan="4">
-        		<p><i18n:text>xmlui.dri2xhtml.METS-1.0.item-no-files</i18n:text></p>
-        		</td>
-        		</tr>
-        		</table>
-        	</xsl:when>
-        	<xsl:otherwise>
-		        <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CONTENT']">
-		            <xsl:with-param name="context" select="."/>
-		            <xsl:with-param name="primaryBitstream" select="./mets:structMap[@TYPE='LOGICAL']/mets:div[@TYPE='DSpace Item']/mets:fptr/@FILEID"/>
-		        </xsl:apply-templates>
-        	</xsl:otherwise>
+            <xsl:when test="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']">
+                <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']">
+                    <xsl:with-param name="context" select="."/>
+                    <xsl:with-param name="primaryBitstream" select="./mets:structMap[@TYPE='LOGICAL']/mets:div[@TYPE='DSpace Item']/mets:fptr/@FILEID"/>
+                </xsl:apply-templates>
+            </xsl:when>
+            <!-- Special case for handling ORE resource maps stored as DSpace bitstreams -->
+            <xsl:when test="./mets:fileSec/mets:fileGrp[@USE='ORE']">
+                <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='ORE']"/>
+            </xsl:when>
+            <xsl:otherwise>
+                <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h2> 
+                <table class="ds-table file-list">
+                    <tr class="ds-table-header-row">
+                        <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-file</i18n:text></th>
+                        <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-size</i18n:text></th>
+                        <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-format</i18n:text></th>
+                        <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-view</i18n:text></th>
+                    </tr>
+                    <tr>
+                        <td colspan="4">
+                            <p><i18n:text>xmlui.dri2xhtml.METS-1.0.item-no-files</i18n:text></p>
+                        </td>
+                    </tr>
+                </table>
+            </xsl:otherwise>
         </xsl:choose>
 
         
-        <!-- Generate the license information from the file section -->
-        <xsl:apply-templates select="mets:fileSec/mets:fileGrp[@USE='CC-LICENSE' or @USE='LICENSE']" mode="itemSummaryView"/>
+        <!-- Generate the Creative Commons license information from the file section (DSpace deposit license hidden by default) -->
+        <xsl:apply-templates select="mets:fileSec/mets:fileGrp[@USE='CC-LICENSE']"/>
         
     </xsl:template>
     
@@ -677,24 +769,33 @@
     </xsl:template>
             
     <xsl:template match="dim:field" mode="itemDetailView-DIM">
-        <tr>
-            <xsl:attribute name="class">
-                <xsl:text>ds-table-row </xsl:text>
-                <xsl:if test="(position() div 2 mod 2 = 0)">even </xsl:if>
-                <xsl:if test="(position() div 2 mod 2 = 1)">odd </xsl:if>
-            </xsl:attribute>
-            <td>
-            	<xsl:value-of select="./@mdschema"/>
-            	<xsl:text>.</xsl:text>
-                <xsl:value-of select="./@element"/>
-                <xsl:if test="./@qualifier">
+        <xsl:if test="not(@element='description' and @qualifier='provenance')">
+            <tr>
+                <xsl:attribute name="class">
+                    <xsl:text>ds-table-row </xsl:text>
+                    <xsl:if test="(position() div 2 mod 2 = 0)">even </xsl:if>
+                    <xsl:if test="(position() div 2 mod 2 = 1)">odd </xsl:if>
+                </xsl:attribute>
+                <td>
+                    <xsl:value-of select="./@mdschema"/>
                     <xsl:text>.</xsl:text>
-                    <xsl:value-of select="./@qualifier"/>
-                </xsl:if>
+                    <xsl:value-of select="./@element"/>
+                    <xsl:if test="./@qualifier">
+                        <xsl:text>.</xsl:text>
+                        <xsl:value-of select="./@qualifier"/>
+                    </xsl:if>
+                </td>
+            <td>
+              <xsl:copy-of select="./node()"/>
+              <xsl:if test="./@authority and ./@confidence">
+                <xsl:call-template name="authorityConfidenceIcon">
+                  <xsl:with-param name="confidence" select="./@confidence"/>
+                </xsl:call-template>
+              </xsl:if>
             </td>
-            <td><xsl:copy-of select="./node()"/></td>
-            <td><xsl:value-of select="./@language"/></td>
-        </tr>
+                <td><xsl:value-of select="./@language"/></td>
+            </tr>
+        </xsl:if>
     </xsl:template>
 
 	
@@ -728,17 +829,11 @@
         	</div>
         </xsl:if>
         
-        <xsl:if test="string-length(dim:field[@element='rights'][not(@qualifier)])&gt;0 or string-length(dim:field[@element='rights'][@qualifier='license'])&gt;0">
+        <xsl:if test="string-length(dim:field[@element='rights'][not(@qualifier)])&gt;0">
         	<div class="detail-view-rights-and-license">
-        		<h3><i18n:text>xmlui.dri2xhtml.METS-1.0.copyright</i18n:text></h3>
 		        <xsl:if test="string-length(dim:field[@element='rights'][not(@qualifier)])&gt;0">
 		            <p class="copyright-text">
 		                <xsl:copy-of select="dim:field[@element='rights'][not(@qualifier)]/node()"/>
-		            </p>
-		        </xsl:if>
-		        <xsl:if test="string-length(dim:field[@element='rights'][@qualifier='license'])&gt;0">
-		            <p class="license-text">
-		                <xsl:copy-of select="dim:field[@element='rights'][@qualifier='license']/node()"/>
 		            </p>
 		        </xsl:if>
         	</div>
@@ -747,8 +842,111 @@
     
     
 	
+    <!-- Rendering the file list from an Atom ReM bitstream stored in the ORE bundle -->
+    <xsl:template match="mets:fileGrp[@USE='ORE']">
+        <xsl:variable name="AtomMapURL" select="concat('cocoon:/',substring-after(mets:file/mets:FLocat[@LOCTYPE='URL']//@*[local-name(.)='href'],$context-path))"/>
+        <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h2>
+        <table class="ds-table file-list">
+            <thead>
+                <tr class="ds-table-header-row">
+                    <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-file</i18n:text></th>
+                    <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-size</i18n:text></th>
+                    <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-format</i18n:text></th>
+                    <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-view</i18n:text></th>
+                </tr>
+            </thead>
+            <tbody>
+                <xsl:apply-templates select="document($AtomMapURL)/atom:entry/atom:link[@rel='http://www.openarchives.org/ore/terms/aggregates']">
+                    <xsl:sort select="@title"/>
+                </xsl:apply-templates>
+            </tbody>
+        </table>
+    </xsl:template>    
 	
 	
+    <!-- Iterate over the links in the ORE resource maps and make them into bitstream references in the file section -->
+    <xsl:template match="atom:link[@rel='http://www.openarchives.org/ore/terms/aggregates']">
+        <tr>
+            <xsl:attribute name="class">
+                <xsl:text>ds-table-row </xsl:text>
+                <xsl:if test="(position() mod 2 = 0)">even </xsl:if>
+                <xsl:if test="(position() mod 2 = 1)">odd </xsl:if>
+            </xsl:attribute>
+            <td>
+                <a>
+                    <xsl:attribute name="href">
+                        <xsl:value-of select="@href"/>
+                    </xsl:attribute>
+                    <xsl:attribute name="title">
+                        <xsl:choose>
+                            <xsl:when test="@title">
+                                <xsl:value-of select="@title"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="@href"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <xsl:choose>
+                        <xsl:when test="string-length(@title) > 50">
+                            <xsl:variable name="title_length" select="string-length(@title)"/>
+                            <xsl:value-of select="substring(@title,1,15)"/>
+                            <xsl:text> ... </xsl:text>
+                            <xsl:value-of select="substring(@title,$title_length - 25,$title_length)"/>
+                        </xsl:when>
+                        <xsl:when test="@title">
+                            <xsl:value-of select="@title"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="@href"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </a>
+            </td>
+            <!-- File size always comes in bytes and thus needs conversion --> 
+            <td>
+                <xsl:choose>
+                    <xsl:when test="@length &lt; 1000">
+                        <xsl:value-of select="@length"/>
+                        <i18n:text>xmlui.dri2xhtml.METS-1.0.size-bytes</i18n:text>
+                    </xsl:when>
+                    <xsl:when test="@length &lt; 1000000">
+                        <xsl:value-of select="substring(string(@length div 1000),1,5)"/>
+                        <i18n:text>xmlui.dri2xhtml.METS-1.0.size-kilobytes</i18n:text>
+                    </xsl:when>
+                    <xsl:when test="@length &lt; 1000000001">
+                        <xsl:value-of select="substring(string(@length div 1000000),1,5)"/>
+                        <i18n:text>xmlui.dri2xhtml.METS-1.0.size-megabytes</i18n:text>
+                    </xsl:when>
+                    <xsl:when test="@length &gt; 1000000000">
+                        <xsl:value-of select="substring(string(@length div 1000000000),1,5)"/>
+                        <i18n:text>xmlui.dri2xhtml.METS-1.0.size-gigabytes</i18n:text>
+                    </xsl:when>
+                    <!-- When one isn't available -->
+                    <xsl:otherwise><xsl:text>n/a</xsl:text></xsl:otherwise>
+                </xsl:choose>
+            </td>
+            <!-- Currently format carries forward the mime type. In the original DSpace, this 
+                would get resolved to an application via the Bitstream Registry, but we are
+                constrained by the capabilities of METS and can't really pass that info through. -->
+            <td>
+                <xsl:value-of select="substring-before(@type,'/')"/>
+                <xsl:text>/</xsl:text>
+                <xsl:value-of select="substring-after(@type,'/')"/>
+            </td>
+            <td>
+                <a>
+                    <xsl:attribute name="href">
+                        <xsl:value-of select="@href"/>
+                    </xsl:attribute>
+                    <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-viewOpen</i18n:text>
+                </a>
+            </td>
+        </tr>
+    </xsl:template>
+    
+    
+    
     <!-- A community rendered in the detailView pattern; default way of viewing a community. -->
     <xsl:template name="communityDetailView-DIM">
         <div class="detail-view">&#160;
@@ -779,7 +977,6 @@
         
         <xsl:if test="string-length(dim:field[@element='rights'][not(@qualifier)])&gt;0">
         	<div class="detail-view-rights-and-license">
-        		<h3><i18n:text>xmlui.dri2xhtml.METS-1.0.copyright</i18n:text></h3>
 	            <p class="copyright-text">
 	                <xsl:copy-of select="dim:field[@element='rights'][not(@qualifier)]/node()"/>
 	            </p>

@@ -1,3 +1,316 @@
+1.6.2
+=====
+
+(Tim Donohue, Kim Shepherd, Keith Gilbertson, Stuart Lewis)
+- [DS-584] start-handle-server script broken - Error in launcher.xml: Invalid class name
+
+(Stuart Lewis)
+- [DS-607] Invalid identifiers not escaped
+- [DS-608] Batch metadata import missing item headers
+
+(Ivan Masar, Claudia Jurgen)
+- [DS-567] Czech localization of 1.6.0
+- [DS-595] Czech localization of 1.6.1
+
+1.6.1
+=====
+
+(Javier Garrido)
+- [DS-582] Basque translation (of jspui for DSpace 1.5.2)
+
+(Mark Diggory)
+- [DS-571] Upgrade DSpace Services to next release 2.0.1
+
+
+(Dale Poulter)
+- [DS-557] LC Authority Names - Lookup Feature - names w/o dates
+
+(Paulo Jobim)
+- [DS-471] Accessing site-level 'mets.xml' in XMLUI doesn't work properly for handle prefixes with periods (e.g. 2010.1)
+
+(Yin Yin Latt)
+- [DS-565] Empty description column in Itemview Page - General-Handler.xsl
+- [DS-566] Side bar menu dropping when there is license text in collection - DIM-Handler.xsl
+
+(Robin Taylor)
+- [DS-497] Date month and day get default values when user returns to describe form
+- [DS-501] Change kubrick.xsl to check for the presence of a day and month before displaying them
+
+(Keiji Suzuki)
+- [DS-537] Malformed Japanese option values in the authority lookup window
+
+(Peter Dietz)
+- [DS-509] SOLR returns ArrayIndexOutOfBounds with non-existent country code OR when there is no view/download data
+- [DS-542] verbose output for stats-log-importer displays spurious city/country from previous committed entry
+
+(Kim Shepherd)
+- [DS-547] Value for Recent Submissions is not workin in the XMLUI
+- [DS-527] Withdrawn items not shown as deleted in OAI
+- [DS-548] Removing repeatable values in DescribeStep does not properly test for authority control
+- [DS-544] Removal of mapped items can lead to NPE
+
+(Claudia Jurgen)
+- [DS-558] Error in update sequence script 1.5 to 1.6 Oracle
+- [DS-551] Export directories dspace.cfg and build.xml out of sync
+- [DS-543] Harvest not internationalized
+
+(Serhij Dubyk)
+- [DS-500] Ukrainian for DSpace 1.6.0
+
+(Andrea Bollini)
+ - [DS-513] Connection leak in SWORD authentication process 
+ - [DS-581] DIDL doesn't respect the hidden fields and the oai_dc metadata section is different than the simple oai_dc implementation
+ - [DS-580] DIDL format include HTML element if the item has no files
+ - [DS-574] DSpaceMETSIngester creates empty original bundle
+ - [DS-573] NPE resuming submission for item with an empty bundle original
+ 
+(Caryn Neiswender)
+ - [DS-518] Duplicate listing of dependencies in dspace-sword/pom.xml
+
+(Keith Gilbertson)
+ - [DS-123] xmlui browse in empty collection displays "Now showing items 1-0" of 0 - incorrect numbering
+ - [DS-508] Attachment spelled as attachement in DailyReportEmailer
+ - [DS-539] Misspelled attribute in MODS/METS output
+
+(Stuart Lewis)
+ - [DS-242] Special groups shown for logged in user rather than for user being examined
+ - [DS-506] embargo-lifter command missing from launcher.xml
+ - [DS-516] DSRUN does not start Service Manager
+ - [DS-526] ItemUpdate - script update
+ - [DS-572] Batch metadata editor fails to notice change of item's owning collection
+
+(Mark Wood)
+ - [DS-469] DCDate.displayDate(false,*) displays only year
+
+ (Ivan Masar)
+ - [DS-515] Czech localization of 1.5.2
+
+(Ben Bosman)
+ - [DS-579] Required fields in submissions display wrong error message
+ - [DS-538] restricted items are being returned in OAI GetRecord method while using harvest.includerestricted.oai
+ - [DS-493] Url in browser is incorrect after login
+
+1.6.0 final
+===========
+
+(Alexey Maslov)
+ - [DS-289] OAI-PMH + OAI-ORE harvesting support
+
+(Kim Shepherd)
+ - [DS-118] File preview link during submission leads to page not found
+ - [DS-121] XMLUI Feedback form breaks with multiple hostnames
+ - [DS-156] File description not available in XMLUI
+ - [DS-198] File descriptions can not be removed/cleared in XMLUI
+ - [DS-240] Item validityKey not complete
+ - [DS-251] Bulk Metadata Editing: XMLUI aspect and forms
+ - [DS-363] JSPUI statistics views
+ - [DS-406] View Statistics button does not work in item page
+ - [DS-409] JSPUI stats display ignores 'statistics.item.authorization.admin'
+ - [DS-414] File downloads listed in collections and communities statistics
+ - [DS-438] JSPUI stats - filenames incorrect
+ - [DS-418] I18n broken in JSPUI
+ - [DS-474] handle.canonical.prefix undocumented
+
+(Claudia Juergen)
+ - [DS-114] Links not working due to trailing white space in dspace.url
+ - [DS-188] Misspell exclude.type=indentifier in dstat.cfg
+ - [DS-197] Deleting a primary bitstream does not clear the primary_bitstream_id on the bundle table
+ - [DS-222] Email alerts due to internal errors are not sent, if context is missing
+ - [DS-231] Missig file (just some obsolete use of index-all in the current documentation, corrected the docs)
+ - [DS-248] Missing admin column in community table in database-schema.sql and update - community admin patch
+ - Item Importer - documented the use of non-dc metadata during item import
+ - [DS-269] Oracle JDBC connection string wrong in dspace.cfg - ID: 2722093
+ - Removed superfluous statistics configuration parameters from dspace.cfg
+
+(Andreas Schwander / Claudia Juergen)
+ - [DS-337] A bug related with adding new -EPersons
+ 
+(Andreas Schwander / Kim Shepherd)
+ - [DS-331] Config property mismatch between dspace.cfg and DSpaceLocaleAction (XMLUI)
+
+(Bram Luyten)
+ - [DS-425] JSPUI cosmetics - horizontal scroll bar
+
+(Ricardo Saraiva)
+ - [DS-190] Portuguese (pt_PT) translation Messages.properties JSP-UI v1.5.2
+
+(Stuart Lewis)
+ - [DS-44] Monthly statistics skip first and last of month - SF ID: 2541435
+ - [DS-161] Bulk metadata editing
+ - [DS-194] Give METS ingester configuration option to make use of collection templates
+ - [DS-195] Allow the primary bitstream to be set in the item importer / exporter
+ - [DS-196] METS exposed via OAI-PMH includes description.provenance information
+ - [DS-200] SWORD module requires the X-Packaging header
+ - [DS-204] New -zip option for item exporter and importer
+ - [DS-209] Context.java turnOffAuthorisationSystem() can throw a NPE
+ - [DS-212] NPE thrown during Harvest of non-items when visibility restriction is enabled
+ - [DS-213] IPAuthentication extended to allow negative matching
+ - [DS-216] Migrating items that use additional metadata schemas causes an NPE
+ - [DS-219] Internal Server error - include login details of user
+ - [DS-221] XMLUI 'current activity' recognises Google Chrome as Safari
+ - [DS-234] Configurable passing of Javamail parameter settings
+ - [DS-242] Special groups shown for logged in user rather than for user being examined
+ - [DS-250] Invalid identifiers are not escaped
+ - [DS-256] Item Export ignores metadata language qualifier
+ - [DS-279] XMLUI Item Mapper will map the same item more than one time
+ - [DS-290] [dspace]/exports is not created during fresh install
+ - [DS-303] Export migrate option incorrectly removes non-handle identifier.uris
+ - [DS-315] Enhance readability of embedded metadata in html head
+ - [DS-316] Make SWORD app:accepts configurable
+ - [DS-318] JSPUI: Left over text in edit item about format
+ - [DS-319] Replace '/dspace/bin/dsrun org.dspace.browse.ItemCounter' with /dspace/bin/itemcounter
+ - [DS-321] DSpace command launcher
+ - [DS-327] SWORD temp upload directory missing trailling slash
+ - [DS-328] SWORD service documents do not include atom:generator element
+ - [DS-333] Adjust SWORD ingest crosswalk to store bibliographic citation
+ - [DS-364] Script to convert legacy dspace.log stats into solr stats records
+ - [DS-372] New verbose option for [dspace]/bin/dspace cleanup script
+ - [DS-388] Item importer - new option to enable workflow notification emails
+ - [DS-389] Misleading label: "Submit to This Collection"
+ - [DS-424] Export metadata button displayed in JSPUI Administration List of withdrawn items
+ - [DS-442] Enable RSS feeds by default
+ - [DS-445] New Bitstream.findAll() method
+ - [DS-446] New ant step - test_database
+ - [DS-447] Email test script
+
+(Larry Stone)
+ - [DS-400] Fix DCDate date formatting for display in JSPUI (thanks also to Stuart Lewis for testing and final adjustment)
+ - [DS-284] alternate odd and even styles correctly on table rows in Item Summary view
+ - [DS-393] Fix DCDate and submission timezone bugs that changed date on page reload
+ - [DS-377] Add META tags identifying DSpace source version
+ - [DS-373] Fix "Letter" link URLs in 2nd-stage Browse
+ - [DS-294] Add preferred language setting to Edit Profile page in XMLUI
+ - [DS-361] Syndication Feeds refactoring, support all RSS/Atom formats for both feed and OpenSearch
+ - [DS-369] Follow harvest.includerestricted.rss in XMLUI
+ - [DS-349] Admins can choose Internal BitstreamFormats in XMLUI
+ - [DS-347] Add --quiet option to filter-media (MediaFilterManager) to disable progress messages
+ - [DS-297] Move PostgreSQL-specific SQL into etc/postgres for greater clarity
+ - [DS-338] Disable cache advice (Expires header) on Bitstream download that requires authorization (XMLUI)
+ - [DS-285] Respond to If-Modified-Since request header in XMLUI, also provide Last-Modified response header for Bitstreams
+ - [DS-288] Configurable option to hide metadata fields in public UIs and OAI-PMH
+ - [DS-128] Fix repositioning on submission pages after add button is clicked (XMLUI)
+ - [DS-255] Protect submission from being lost if exception occurs in CompleteStep
+ - [DS-254] Fix response for authorization failure on Bitstream when user is logged-in
+ - [DS-232] Parse personal names correctly if there is no space after the last name
+ - [DS-191] metadataschemaregistry_seq is not initialized correctly under Oracle
+ - [DS-193] OAI RDF crosswalk fails when DC value is null
+ - [DS-249] sub-daily utility script does not pass arguments to Java
+ - [DS-252] Interpolate variables in the Subject: line of email templates as well
+ - [DS-262] Bug in DS-118, new patch included
+ - [DS-274] Typo in XSL breaks rendering of dri:xref with class
+ - [DS-275] License files not listed on Item Summary page
+ - [DS-276] Patch to fix spelling error in Exception page
+ - [DS-280] build.xml fails for ant versions below 1.7
+
+(Larry Stone / Andrea Bollini)
+ - [DS-236] Authority control for metadata fields and Choice Authority plugin framework
+
+(Mark Diggory / Stuart Lewis)
+ - [DS-201] handle.jar upgraded to version 6.2
+
+(Mark Diggory / Ben Bosman / Kevin Van de velde)
+ - [DS-335] DatabaseManager additions from Minho statistics addon.
+ - [DS-247] Contribution of @MIRE Solr Based Statistics Engine to DSpace.
+ - [DS-336] DSpace 2.0 Services Support / including fix for System.out lines.
+ - [DS-241] DSpace Assembly Improvement
+  
+(Andrea Bollini)
+ - [DS-206] Input form visibility restriction doesn't work properly
+ - [DS-199] SWORD module doesn't accept X-No-Op header (dry run)
+ - [DS-223] Submission process show previous button in JSPUI also if the step is the first "visible" step
+ - [DS-227] Values with double apos doesn't work in dropdown and list input type
+ - [DS-259] Community/collection admin should not to be able to delete their admin group
+ - [DS-261] Community Admin JSPUI: porting of the DS-228 patch
+ - [DS-271] Make the OAI DC crosswalk configurable
+ - [DS-260] Template item some times has owningCollection filled and some times not
+ - [DS-309] Shiboleth default roles are applied also to anonymous user and user logged-in with other methods
+ - [DS-270] Make delegate admin permissions configurable
+ - [DS-436] SWORD Authenticator doesn't support the special groups infrastructure
+ - [DS-415] Create groups via admin UI authorization denied
+ - [DS-217] Hardcoded String in the license bitstream
+
+(Tim Donohue)
+ - [DS-218] Cannot add/remove email subscriptions from Profile page in XMLUI
+ - [DS-238] Move item function in xmlui
+ - [DS-281] Invalid Link to "Go to DSpace Home" on Page Not Found (XMLUI)
+ - [DS-378] XMLUI Submission Interface messes up in IE7 after an empty <hint> in input_forms.xml
+ - [DS-382] Proposal: Add 'dc.creator' to Author browse index by default
+ - [DS-385] Packager script is unable to import the same METS + DIM package that was exported
+ - [DS-386] Allow user to specify which <dmdSec> is used by the METS Ingester when importing METS from Packager script
+ - [DS-398] Submission license displayed on collection and item homepage (XMLUI)
+ - [DS-399] Special characters in collection license lead to parse error (XMLUI)
+
+(Tim Donohue / Claudia Juergen)
+ - [DS-423] Ant target 'clean_database' doesn't drop all tables.
+
+(Tim Donohue / Andrea Bollini)
+ - [DS-228] Community Admin XMLUI: Delegated Admins Patch
+
+(Ben Bosman)
+ - [DS-483] statistics.item.authorization.admin ignored by xmlui
+ - [DS-365] support for OAI gateways that do not use sets in harvester
+ - [DS-392] Error messages in the submission do not disappear if e.g. one of the two errors are solved
+ - [DS-381] community and collection homepage
+ - [DS-310] UTF-8 encoding in community and collection text
+ - [DS-307] Offer access in AbstractSearch to QueryResults for subclasses
+ - [DS-306] Option to disable mailserver
+ - [DS-226] confirmation page of edit profile has an invalid link
+ - [DS-247] Update of contribution of @MIRE Solr Based Statistics Engine to DSpace.
+
+(OhioLINK)
+ - [DS-225] dc.description.provenance - public display
+
+(Yin Yin Latt / Stuart Lewis)
+ - [DS-205] Creative Commons - option to set legal jurisdiction
+
+(Fabio Kepler / Steve Williams)
+ - [DS-258] Item View Thumbnails not displaying in XMLUI
+
+(Van Ly)
+ - [DS-291] README update for top level of dspace 1.6.0 package directory
+
+(Graham Triggs)
+ - [DS-299] Allow long values to be specified for the max upload request (> 2GB uploads)
+ - [DS-344] Fix problem where apostrophe in email address would stop EPerson being selected
+ - [DS-359] Add alternate file appender for log4j
+
+(Mark Wood)
+ - [DS-52] Factor out common webapp installation - ID: 2042160
+ - [DS-455] Remove dspace/config/log4j.xml
+
+(Ekaterina Pechekhonova)
+ - [DS-330] Create new session on login / invalidate sessions on logout
+
+(Richard Rodgers)
+ - [DS-324] Add OpenSearch support
+
+(Toni Prieto)
+ - [DS-356] Antispam for suggest item feature
+ - [DS-289 Oracle Patch] OAI-PMH + OAI-ORE harvesting support
+
+(Flavio Botelho)
+ - [DS-246] Fix configurable browse parameter encoding (XMLUI)
+ - [DS-320] java.util.NoSuchElementException: Timeout waiting for idle object
+ - [DS-353] Missing commits in XMLUI server-side javascript code.
+
+(Flavio Botelho / Kim Shepherd)
+ - [DS-468] Fixed "foreign characters broken in group names (XMLUI)"
+
+(Hardik Mishra)
+ - [DS-370] E Mail Sent On Item Export Error Message
+
+(Keller)
+ - [DS-375] Dspace 1.5.2 Russian translation
+
+(Steven Williams / Ladd Hanson / Stuart Lewis)
+ - [DS-295] CC License being assigned incorrect Mime Type during submission.
+
+(Stuart Lewis / Graham Triggs)
+ - [DS-460] Change logging from RollingFileAppender to DailyFileAppender
+
+1.5.2 final
+===========
+
 (Graham Triggs)
  - Fixes for critical bugs identified by Findbugs
 
@@ -69,7 +382,7 @@
  - [DS-31] Fix for SF Bug #2512868 Double quote problem in some fields of JSPUI
  - [DS-32] Fix for SF Bug #2411653 Export Item email hardcoded strings in sources
  - [DS-148] SF Patch #2537799 jspui 1.updated Thai translation 1.4.2 (gone into google code)
- - [DS-147] SF Patch #2540683 jspui Thai translation for 1.5.1 (gone into google code) 
+ - [DS-147] SF Patch #2540683 jspui Thai translation for 1.5.1 (gone into google code)
  - [DS-146] SF patch [2560974] for SF feature request [2560839] Make sitemap directory configurable
  - [DS-145] SF patch [2615647] Greek translation for xmlui version 1.5.1 submitted to Google code
  - [DS-144] SF patch [2612341] Patch for SF Feature Request [2609564] group delete confirm
@@ -78,7 +391,7 @@
  - Added blanks between label and text in subscription email.
  
 (Claudia Juergen / Andrea Bollini)
- - [DS-46] Bug 1617889 Years < 1000 do not display in simple item view - ID: 2524083 
+ - [DS-46] Bug 1617889 Years < 1000 do not display in simple item view - ID: 2524083
  
 (Elliot Metsger)
  - [DS-33] Patch for SF bug #2016130 checksum checker can not retrieve very large bitstream
@@ -97,7 +410,7 @@
  - Fix for Jira [DS-96] XMLUI Wing-Framework 'Radio' class doesn't support adding radio buttons which are unselected by default.
  - Fix for Jira [DS-97] XMLUI does not come with a robots.txt out-of-the-box. It also does not provide suggestions for loading global static content.
  - [1712125] Allow dsrun and dsrun.bat to use JAVA_OPTS
- - Fix for Jira [DS-130] XMLUI Browse by Author doesn't work for names with special characters (for example: é, è, ö, etc.)
+ - Fix for Jira [DS-130] XMLUI Browse by Author doesn't work for names with special characters (for example: ï¿½, ï¿½, ï¿½, etc.)
  - Fix for Jira [DS-132] XMLUI overall UTF-8 encoding is inconsistent and forms do not use UTF-8 (also resolves [DS-112])
  - Fix for Jira [DS-120] Cocoon 2.2 "hijacks" the dspace.log file
  - Fix for Jira [DS-85] XMLUI Cocoon logs should not be stored under [xmlui-webapp]/WEB-INF/logs/
@@ -105,7 +418,7 @@
 (Kim Shepherd)
  - [DS-39] [2385187] Fix for toDate method in DCDate
 
-(Andrea Bollini /Kim Shepherd) 
+(Andrea Bollini /Kim Shepherd)
  - [DS-47] Add support for rendering DOI links in JSPUI (1.4, 1.5) - ID: 2521493
  
 (Andrea Bollini)
@@ -152,24 +465,24 @@
 ===========
 
 (Scott Philips)
-- (Scott Phillips) Fixed bug where users could not finish registering nor reset 
+- (Scott Phillips) Fixed bug where users could not finish registering nor reset
   their password because the authentication method signatures were changed.
 - Jay Paz (SF#1898241) Additional fixes to patch to enable reuse of methods.
 - Added the ability to manage sessions with site wide alerts to prevent users from authenticating.
 - Fixes a bug where the ability to edit an item durring workflow step 2 is not displayed.
 - Jay Paz (SF#1898241) Add item Export from jspui and xmlui.
 - Added easy support for google analytics statistics
-- Added the ability for super admins to login as other users. 
+- Added the ability for super admins to login as other users.
 - Added an activity viewer to the Control Panel
 
-(Mark Diggory) 
+(Mark Diggory)
 - Fix for SF Bug #2082236 Subscription notification (sub-daily) no emails sent
 - [2102580] William Hays: Duplicate Handle exception when replacing bitstreams
 - [2102617] Sands Fish: X509Authentication fails to assign appropriate specialgroups
 - (Sands Fish) Add "Select Primary Bitstream" functionality to submission workflow
-- Guard against Community/Collection metadata having only whitespace characters 
+- Guard against Community/Collection metadata having only whitespace characters
   and eliminate cases where null pointer exceptions would be thrown
-- Improve DSIndexer logic in both branches to support removal of items from index 
+- Improve DSIndexer logic in both branches to support removal of items from index
   when withdrawn from repository.
 - (Sands Fish) Provides fix for AuthenticationUtil where users ID's are not properly compared.
 - Fix NullPointerException cause by nullified Context object in LNI map item to new collection.
@@ -222,9 +535,9 @@
 - Fix problem with SWORD not accepting multiple concurrent submissions
 - Fix #1963060 Authors listed in reverse order
 - Fix #1970852 - XMLUI: Browse by Issue Date "Type in Year" doesn't work
-- Statistics viewer for XMLUI, based on existing DStat. Note that this generates 
+- Statistics viewer for XMLUI, based on existing DStat. Note that this generates
   the view from the analysis files (.dat), does not require HTML report generation.
-- Fixed incorrect downloading of bitstream on withdrawn item 
+- Fixed incorrect downloading of bitstream on withdrawn item
 - Add JSPUI compatible log messages to XMLUI transformers
 - Clean up use of ThreadLocal
 - Improved cleanup of database resources when web
@@ -239,7 +552,7 @@
 - New options for ItemImporter to support bitstream permissions and descriptions.
 
 (Graham Triggs/Mark Diggory)
-- S.F. Bug 1824710 Creative Commons RDF has changed. Adjusted CC processing to be XSL driven 
+- S.F. Bug 1824710 Creative Commons RDF has changed. Adjusted CC processing to be XSL driven
   and adjusted generated XML/RDF. Created LicenseCleanup CLI to process existing CC license_rdf
   
 (Brian Helm)
@@ -250,7 +563,7 @@ SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
 - Added IP Authentication (SF patch #1566820)
 
 (Richard Jones)
-- S.F. Patch 1670093 More stable metadata and schema registry import 
+- S.F. Patch 1670093 More stable metadata and schema registry import
 - Option to generate community and collection "strength" as a batch job
 - S.F. Patch 1659868 Improved database level debugging
 
@@ -261,7 +574,7 @@ SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
   (S.F. Patches 1702233 and 1672065)
 
 (Flavio Botelho)
-- S.F. Patch 1764069 Replace "String" with "Integer" in PreparedStatement 
+- S.F. Patch 1764069 Replace "String" with "Integer" in PreparedStatement
   Parameters where appropriate.
 - SF Patch 1743188 Patch for Request #1145499 - Move Items
 
@@ -330,7 +643,7 @@ SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
 ===========
 
 (Mark Diggory/Graham Triggs)
-- SF Patch 1655583 Fixes issues with FilterMedia, the UI and Index locking, includes 
+- SF Patch 1655583 Fixes issues with FilterMedia, the UI and Index locking, includes
   a lucene upgrade to support better management of index locking.
   
 (Robert Tansley)
@@ -486,7 +799,7 @@ SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
   docs/configure.html
 - added a note about contact info in "The Wording of E-Mails" in
   docs/configure.html
-- config/registries/dublin-core-types.xml replaced deprecated reference to org.dspace.administer.DCType.java 
+- config/registries/dublin-core-types.xml replaced deprecated reference to org.dspace.administer.DCType.java
   with the reference to the appropriate org.dspace.content.Metadata... classes
 - docs/configure.html
   updated "The Dublin Core and Bitstream Format Registries" for multiple metadata schemas
@@ -598,7 +911,7 @@ SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
 
 (Scott Yeadon)
 - Fix to QDCCrosswalk so type attribute is not ignored
-- SF Patch #1469235 - default language is not applied, fixes bug #1358144 
+- SF Patch #1469235 - default language is not applied, fixes bug #1358144
 - Show bundle names on item authorization page
 - SF bug #1456540 - incorrect link in list-metadata-fields.jsp
 - SF bug #1466268 - Supervisor Orders on Oracle
@@ -622,7 +935,7 @@ SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
 - SF Patch #1456241 - Minor fix to Submission Progress bar "Jump To"
 
 (Martin Hald)
-- SF Patch #1456372 - Non-DC browse indices, fixes SF bug #1456227 
+- SF Patch #1456372 - Non-DC browse indices, fixes SF bug #1456227
 - SF Patch #1456306 - Configuring simple item, fixes SF bugs #1455712, #1456566 and #1455691
 - SF Patch #1455107 - MetadataValue Database Index
 - SF Patch #1455605 - Submit Review Page Schema fix
@@ -693,7 +1006,7 @@ SF Patch 1794700  Bug fix for stat-monthly and stat-report-monthly
   addition of terms during submission.
   SF Patch: #1244559
 
-(Richard Jones) 
+(Richard Jones)
 - Add 'visibility' element to input-forms.xml
   SF Patch #1368160
 

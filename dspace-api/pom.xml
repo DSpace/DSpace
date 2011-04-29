@@ -6,14 +6,14 @@
    <description>DSpace core data model and service APIs.</description>
    <url>http://projects.dspace.org/dspace-api</url>
 
-   <!-- 
-      A Parent POM that Maven inherits DSpace Defaults 
-      POM atrributes from. 
+   <!--
+      A Parent POM that Maven inherits DSpace Defaults
+      POM atrributes from.
    -->
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
-      <version>1.5.2</version>
+      <version>1.6.2</version>
    </parent>
 
    <repositories>
@@ -33,24 +33,25 @@
       </repository>
    </repositories>
 
-   <!-- 
+   <!--
       The Subversion repository location is used by Continuum to update against
       when changes have occured, this spawns a new build cycle and releases snapshots
       into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2/dspace</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2/dspace</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/tags/dspace-1.5.2/dspace</url>
+      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace</url>
    </scm>
 
-   <!-- 
+   <!--
       Runtime and Compile Time dependencies for DSpace.
    -->
    <dependencies>
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>handle</artifactId>
+         <version>6.2</version>
       </dependency>
       <dependency>
          <groupId>org.dspace</groupId>
@@ -71,7 +72,7 @@
       <dependency>
          <groupId>org.apache.lucene</groupId>
          <artifactId>lucene-analyzers</artifactId>
-      </dependency>      
+      </dependency>
       <dependency>
          <groupId>commons-cli</groupId>
          <artifactId>commons-cli</artifactId>
@@ -142,7 +143,7 @@
        <dependency>
           <groupId>org.fontbox</groupId>
           <artifactId>fontbox</artifactId>
-       </dependency>          
+       </dependency>
        <dependency>
           <groupId>org.jempbox</groupId>
           <artifactId>jempbox</artifactId>
@@ -154,6 +155,10 @@
       <dependency>
          <groupId>rome</groupId>
          <artifactId>rome</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>rome</groupId>
+         <artifactId>modules</artifactId>
       </dependency>
       <dependency>
          <groupId>xalan</groupId>
@@ -186,6 +191,22 @@
       <dependency>
          <groupId>cas</groupId>
          <artifactId>casclient</artifactId>
+      </dependency>
+      <dependency>
+        <groupId>org.dspace</groupId>
+        <artifactId>oclc-harvester2</artifactId>
+      </dependency>
+       <dependency>
+           <groupId>org.dspace</groupId>
+           <artifactId>dspace-services-api</artifactId>
+       </dependency>
+       <dependency>
+           <groupId>org.dspace</groupId>
+           <artifactId>dspace-services-impl</artifactId>
+       </dependency>
+      <dependency>
+         <groupId>commons-httpclient</groupId>
+         <artifactId>commons-httpclient</artifactId>
       </dependency>
    </dependencies>
 

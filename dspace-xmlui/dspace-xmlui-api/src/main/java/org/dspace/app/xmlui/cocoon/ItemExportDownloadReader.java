@@ -1,9 +1,9 @@
 /*
  * ItemExportDownlaodReader.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4301 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-09-29 17:24:49 -0400 (Tue, 29 Sep 2009) $
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -130,7 +130,7 @@ public class ItemExportDownloadReader extends AbstractReader implements Recyclab
             // Is there a User logged in and does the user have access to read it?
             if (!ItemExport.canDownload(context, fileName))
             {
-            	if(this.request.getSession().getAttribute("dspace.current.user.id")!=null){
+                if(context.getCurrentUser()!=null){
             		// A user is logged in, but they are not authorized to read this bitstream, 
             		// instead of asking them to login again we'll point them to a friendly error 
             		// message that tells them the bitstream is restricted.

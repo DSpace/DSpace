@@ -2,8 +2,7 @@
  * I18nUtil.java
  *
  *
- * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -16,8 +15,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -46,21 +44,22 @@ import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.StringTokenizer;
-
+import java.util.List;
+import java.util.ArrayList;
 
 
 
 /**
  * I18nUtil.java
- * 
- * Some Utilities for i18n Support. 
+ *
+ * Some Utilities for i18n Support.
  * - getting the default Locale for this DSpace Instance
  * - getting all supported Locales for this DSpace Instance
  * - getting email template, help file, input forms for a given Locale
- * 
- * 
+ *
+ *
  * @author Bernadette Schlonsok and Claudia Juergen
- *  
+ *
  * @version 1.0
  */
 
@@ -71,55 +70,59 @@ public class I18nUtil
     // the default Locale of this DSpace Instance
     public static final Locale DEFAULTLOCALE = getDefaultLocale();
 
+    // delimiters between elements of UNIX/POSIX locale spec, e.g. en_US.UTF-8
+    private static final String LOCALE_DELIMITERS = " _.";
+
     /**
      * Gets the default locale as defined in dspace.cfg If no default locale is
      * defined, the Locale of the JVM is used
-     * 
+     *
      * @return defaultLocale
      *         the default Locale for this DSpace instance
      */
     public static Locale getDefaultLocale()
     {
+        // First, try configured default locale
         Locale defaultLocale = null;
         if ((ConfigurationManager.getProperty("default.locale") != null)
                 && (ConfigurationManager.getProperty("default.locale") != ""))
         {
-            StringTokenizer configDefaultLocale = new StringTokenizer(
-                    ConfigurationManager.getProperty("default.locale"));
-            int countTokens = configDefaultLocale.countTokens();
-            switch (countTokens)
-            {
-
-            case 1:
-                defaultLocale = new Locale(configDefaultLocale.nextToken()
-                        .trim());
-                break;
-
-            case 2:
-                defaultLocale = new Locale(configDefaultLocale.nextToken()
-                        .trim(), configDefaultLocale.nextToken().trim());
-                break;
-            case 3:
-                defaultLocale = new Locale(configDefaultLocale.nextToken()
-                        .trim(), configDefaultLocale.nextToken().trim(),
-                        configDefaultLocale.nextToken().trim());
-                break;
+            defaultLocale = makeLocale(ConfigurationManager.getProperty("default.locale"));
             }
 
-        }
+        // Finally, get the Locale of the JVM
         if (defaultLocale == null)
         {
-            // use the Locale of the JVM
             defaultLocale = Locale.getDefault();
         }
 
         return defaultLocale;
     }
 
+    // Translate a string locale specification (e.g. "en_US.UTF-8") into Locale
+    // This is needed because Locale constructor expects args for
+    // language, territory, and variant to be separated already.
+    private static Locale makeLocale(String localeSpec)
+    {
+        StringTokenizer st = new StringTokenizer(localeSpec, LOCALE_DELIMITERS);
+        int countTokens = st.countTokens();
+        switch (countTokens)
+        {
+        case 1:
+            return new Locale(st.nextToken().trim());
+        case 2:
+            return new Locale(st.nextToken().trim(), st.nextToken().trim());
+        case 3:
+            return new Locale(st.nextToken().trim(), st.nextToken().trim(),
+                              st.nextToken().trim());
+        }
+        return null;
+    }
+
     /**
      * Get the Locale for a specified EPerson. If the language is missing,
      * return the default Locale for the repository.
-     * 
+     *
      * @param ep
      * @return
      */
@@ -145,64 +148,32 @@ public class I18nUtil
     /**
      * get the available Locales for the User Interface as defined in dspace.cfg
      * returns an array of Locales or null
-     * 
+     *
      * @return an array of supported Locales or null
      */
     public static Locale[] getSupportedLocales()
     {
-        Locale[] availableLocales;
         
-        if (ConfigurationManager.getProperty("webui.supported.locales") != null)
+        String ll = ConfigurationManager.getProperty("webui.supported.locales");
+        if (ll != null)
         {
-
-            StringTokenizer configuredLocales = new StringTokenizer(
-                    ConfigurationManager.getProperty("webui.supported.locales"),
-                    ",");
-            availableLocales = new Locale[configuredLocales
-                    .countTokens()];
-
-            while (configuredLocales.hasMoreTokens())
-            {
-                StringTokenizer localeElements = new StringTokenizer(
-                        configuredLocales.nextToken().trim(), "_");
-                int countTokens = localeElements.countTokens();
-                switch (countTokens)
-                {
-
-                case 1:
-                    availableLocales[configuredLocales.countTokens()] = new Locale(
-                            localeElements.nextToken().trim());
-                    break;
-
-                case 2:
-                    availableLocales[configuredLocales.countTokens()] = new Locale(
-                            localeElements.nextToken().trim(), localeElements
-                                    .nextToken().trim());
-                    break;
-                case 3:
-                    availableLocales[configuredLocales.countTokens()] = new Locale(
-                            localeElements.nextToken().trim(), localeElements
-                                    .nextToken().trim(), localeElements
-                                    .nextToken().trim());
-                    break;
-                }
-            }
+            return parseLocales(ll);
         }
         else
         {
-            availableLocales = new Locale[1];
+            Locale[] availableLocales = new Locale[1];
             availableLocales[0] =  DEFAULTLOCALE;
+            return availableLocales;
         }
-        return availableLocales;
     }
 
     /**
      * Gets the appropriate supported Locale according for a given Locale If
      * no appropriate supported locale is found, the DEFAULTLOCALE is used
-     * 
+     *
      * @param locale
      *        Locale to find the corresponding Locale
-     * @return supportedLocale 
+     * @return supportedLocale
      *         Locale for session according to locales supported by this DSpace instance as set in dspace.cfg
      */
     
@@ -270,7 +241,7 @@ public class I18nUtil
                 supportedLocale = DEFAULTLOCALE;
             }
         }
-        return supportedLocale; 
+        return supportedLocale;
     }
 
 
@@ -279,7 +250,7 @@ public class I18nUtil
 
     /**
      * Get the appropriate localized version of input-forms.xml according to language settings
-     * 
+     *
      * @param locale
      *        Locale, the local to get the input-forms.xml for
      * @return String - localized filename for input-forms.xml
@@ -297,14 +268,14 @@ public class I18nUtil
     }
     /**
      * et the i18n message string for a given key and use the default Locale
-     * 
+     *
      * @param key
      *        String - name of the key to get the message for
-     *        
+     *
      * @return message
      *         String of the message
-     * 
-     * 
+     *
+     *
      */
     public static String getMessage(String key) throws MissingResourceException
     {
@@ -316,16 +287,16 @@ public class I18nUtil
     
     /**
      * Get the i18n message string for a given key and locale
-     * 
+     *
      * @param key
      *        String - name of the key to get the message for
      * @param locale
      *        Locale, to get the message for
-     *        
+     *
      * @return message
      *         String of the message
-     * 
-     * 
+     *
+     *
      */
     public static String getMessage(String key, Locale locale) throws MissingResourceException
     {
@@ -342,16 +313,16 @@ public class I18nUtil
     
     /**
      * Get the i18n message string for a given key and locale
-     * 
+     *
      * @param key
      *        String - name of the key to get the message for
      * @param locale
      *        Locale, to get the message for
-     *        
+     *
      * @return message
      *         String of the message
-     * 
-     * 
+     *
+     *
      */
     public static String getMessage(String key, Context c) throws MissingResourceException
     {
@@ -363,10 +334,10 @@ public class I18nUtil
 
     /**
      * Get the appropriate localized version of the default.license according to language settings
-     * 
+     *
      * @param context
      *        the current DSpace context
-     * @return fileName 
+     * @return fileName
      *         String - localized filename for default.license
      */
     public static String getDefaultLicense(Context context)
@@ -386,7 +357,7 @@ public class I18nUtil
     /**
      * Get the appropriate localized version of a file according to language settings
      * e. g. help files in jsp/help/
-     * 
+     *
      * @param locale
      *        Locale to get the file for
      * @param fileName
@@ -465,12 +436,12 @@ public class I18nUtil
     
     /**
      * Get the appropriate localized version of an email template according to language settings
-     * 
+     *
      * @param locale
      *        Locale for this request
      * @param name
-     *        String - base name of the email template 
-     * @return templateName 
+     *        String - base name of the email template
+     * @return templateName
      *         String - localized filename of an email template
      */
     public static String getEmailFilename(Locale locale, String name)
@@ -484,4 +455,21 @@ public class I18nUtil
         return templateName;
     }
 
+    /**
+     * Creates array of Locales from text list of locale-specifications.
+     * Used to parse lists in DSpace configuration properties.
+     * @param ll locale list of comma-separated values
+     * @return array of locale results, possibly empty
+     */
+    public static Locale[] parseLocales(String ll)
+    {
+        List<Locale> resultList = new ArrayList<Locale>();
+        for (String ls : ll.trim().split("\\s*,\\s*"))
+        {
+            Locale lc = makeLocale(ls);
+            if (lc != null)
+                resultList.add(lc);
+        }
+        return resultList.toArray(new Locale[resultList.size()]);
+    }
 }

@@ -1,9 +1,9 @@
 /*
  * ContextUtil.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4500 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-11-02 21:15:38 -0500 (Mon, 02 Nov 2009) $
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -46,8 +46,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
-import org.apache.cocoon.environment.Request;
-import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.log4j.Logger;
 import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.core.Context;
@@ -79,7 +77,20 @@ public class ContextUtil
      */
     public static Context obtainContext(Map objectModel) throws SQLException
     {
-        Request request = ObjectModelHelper.getRequest(objectModel);
+        return obtainContext(ObjectModelHelper.getRequest(objectModel));
+    }
+    
+    /**
+     * Obtain a new context object. If a context object has already been created
+     * for this HTTP request, it is re-used, otherwise it is created.
+     * 
+     * @param request
+     *            the cocoon or servlet request object
+     * 
+     * @return a context object
+     */
+    public static Context obtainContext(HttpServletRequest request) throws SQLException
+    {
         Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
 
         if (context == null)
@@ -91,13 +102,10 @@ public class ContextUtil
             context.setExtraLogInfo("session_id="
                     + request.getSession().getId());
 
-            // Check if we've all ready been authenticated.
-            final HttpServletRequest httpRequest = (HttpServletRequest) objectModel
-                    .get(HttpEnvironment.HTTP_REQUEST_OBJECT);
-            AuthenticationUtil.resumeLogin(context, httpRequest);
+            AuthenticationUtil.resumeLogin(context, request);
 
             // Set any special groups - invoke the authentication mgr.
-            int[] groupIDs = AuthenticationManager.getSpecialGroups(context, httpRequest);
+            int[] groupIDs = AuthenticationManager.getSpecialGroups(context, request);
 
             for (int i = 0; i < groupIDs.length; i++)
             {
@@ -115,25 +123,38 @@ public class ContextUtil
         return context;
     }
 
+    
     /**
      * Check if a context exists for this request, if so complete the context.
      * 
      * @param request
      *            The request object 
      */
-    public static void closeContext(HttpServletRequest request) throws ServletException
+    public static void completeContext(HttpServletRequest request) throws ServletException
     {
     	Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
 
     	if (context != null && context.isValid())
     	{
-    		try {
-    			context.complete();
-    		} catch (SQLException sqle) {
-    			throw new ServletException("Unable to close DSpace context.",sqle);
-    		}
+   			try
+			{
+				context.complete();
+			}
+			catch (SQLException e)
+			{
+				throw new ServletException(e);
+			}
     	}
-
     }
+
+	public static void abortContext(HttpServletRequest request)
+	{
+    	Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
+
+    	if (context != null && context.isValid())
+    	{
+   			context.abort();
+    	}
+	}
 
 }

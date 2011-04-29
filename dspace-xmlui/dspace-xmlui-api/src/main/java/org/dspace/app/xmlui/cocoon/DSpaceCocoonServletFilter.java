@@ -1,9 +1,9 @@
 /*
  * DSpaceCocoonServlet.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4500 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-11-02 21:15:38 -0500 (Mon, 02 Nov 2009) $
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -58,6 +58,7 @@ import org.dspace.app.xmlui.configuration.XMLUIConfiguration;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.harvest.OAIHarvester;
 
 /**
  * This is a wrapper servlet around the cocoon servlet that prefroms two functions, 1) it 
@@ -212,6 +213,16 @@ public class DSpaceCocoonServletFilter implements Filter
     				"DSpace configuration directory. \n\n",t);
     	}
    
+		if (ConfigurationManager.getBooleanProperty("harvester.autoStart")) 
+    	{
+    		try {
+    			OAIHarvester.startNewScheduler();
+    		}
+    		catch (Throwable t)
+    		{
+    			//ignore
+    		}
+    	}
     	
     }
     
@@ -226,25 +237,30 @@ public class DSpaceCocoonServletFilter implements Filter
     
 		HttpServletRequest realRequest = (HttpServletRequest)request;
 		HttpServletResponse realResponse = (HttpServletResponse) response;
-    	// Check if there is a request to be resumed.
-        realRequest = AuthenticationUtil.resumeRequest(realRequest);
 
-        // Send the real request or the resumed request off to
-        // cocoon....
-
-        // if force ssl is on and the user has authenticated and the request is not secure redirect to https
-        if ((ConfigurationManager.getBooleanProperty("xmlui.force.ssl")) && (realRequest.getSession().getAttribute("dspace.current.user.id")!=null) && (!realRequest.isSecure())) {
-                StringBuffer location = new StringBuffer("https://");
-                location.append(ConfigurationManager.getProperty("dspace.hostname")).append(realRequest.getContextPath()).append(realRequest.getServletPath()).append(
-                        realRequest.getQueryString() == null ? ""
-                                : ("?" + realRequest.getQueryString()));
-                realResponse.sendRedirect(location.toString());
-        }
-
-        arg2.doFilter(realRequest, realResponse);
-
-        // Close out the DSpace context no matter what.
-        ContextUtil.closeContext(realRequest);
+		try {
+	    	// Check if there is a request to be resumed.
+	        realRequest = AuthenticationUtil.resumeRequest(realRequest);
+	
+	        // Send the real request or the resumed request off to
+	        // cocoon....
+	
+	        // if force ssl is on and the user has authenticated and the request is not secure redirect to https
+	        if ((ConfigurationManager.getBooleanProperty("xmlui.force.ssl")) && (realRequest.getSession().getAttribute("dspace.current.user.id")!=null) && (!realRequest.isSecure())) {
+	                StringBuffer location = new StringBuffer("https://");
+	                location.append(ConfigurationManager.getProperty("dspace.hostname")).append(realRequest.getContextPath()).append(realRequest.getServletPath()).append(
+	                        realRequest.getQueryString() == null ? ""
+	                                : ("?" + realRequest.getQueryString()));
+	                realResponse.sendRedirect(location.toString());
+	        }
+	
+	        arg2.doFilter(realRequest, realResponse);
+		} catch (Throwable t) {
+	        ContextUtil.abortContext(realRequest);
+		} finally {
+	        // Close out the DSpace context no matter what.
+	        ContextUtil.completeContext(realRequest);
+		}
     }
 
 	public void destroy() {

@@ -1,9 +1,9 @@
 /*
  * eperson.js
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4517 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-11-10 17:57:37 -0500 (Tue, 10 Nov 2009) $
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -107,6 +107,7 @@ function doRegister()
                 // The user attempted to register with an email address that all ready exists then they clicked
                 // the "I forgot my password" button. In this case, we send them a forgot password token.
                 AccountManager.sendForgotPasswordInfo(getDSContext(),email);
+                getDSContext().commit();
 
                 cocoon.sendPage("forgot/verify", {"email":email});
                 return;
@@ -130,6 +131,7 @@ function doRegister()
                 {
                     // May throw the AddressException or a varity of SMTP errors.
                     AccountManager.sendRegistrationInfo(getDSContext(),email);
+                    getDSContext().commit();
                 } 
                 catch (error) 
                 {
@@ -191,6 +193,7 @@ function doRegister()
         // Log the newly created user in.
         AuthenticationUtil.logIn(getObjectModel(),eperson);
         AccountManager.deleteToken(getDSContext(), token);
+        getDSContext().commit();
         
         cocoon.sendPage("register/finished");
         return;
@@ -232,6 +235,7 @@ function doForgotPassword()
             // An Eperson was found for the given email, so use the forgot password 
             // mechanism. This may throw a AddressException if the email is ill-formed.
             AccountManager.sendForgotPasswordInfo(getDSContext(),email);
+            getDSContext().commit();
         } while (errors.length > 0)
         
         cocoon.sendPage("forgot/verify", {"email":email});
@@ -275,6 +279,7 @@ function doForgotPassword()
         // Log the user in and remove the token.
         AuthenticationUtil.logIn(getObjectModel(),eperson);
         AccountManager.deleteToken(getDSContext(), token);
+        getDSContext().commit();
 
         cocoon.sendPage("forgot/finished");
     }
@@ -327,7 +332,7 @@ function doUpdateProfile()
                 } 
             }
         }
-        else if (cocoon.request.get("subscriptions_add"))
+        else if (cocoon.request.get("submit_subscriptions_add"))
         {
             // Add the a new subscription
             var collection = Collection.find(getDSContext(),cocoon.request.get("subscriptions"));
@@ -337,7 +342,7 @@ function doUpdateProfile()
                 getDSContext().commit();
             }
         }
-        else if (cocoon.request.get("subscriptions_delete"))
+        else if (cocoon.request.get("submit_subscriptions_delete"))
         {
             // Remove any selected subscriptions
             var names = cocoon.request.getParameterValues("subscriptions_selected");
@@ -381,6 +386,7 @@ function updateInformation(eperson)
 	var lastName = cocoon.request.getParameter("last_name");
 	var firstName = cocoon.request.getParameter("first_name");
 	var phone = cocoon.request.getParameter("phone");
+        var language = cocoon.request.getParameter("language");
 
     // first check that each parameter is filled in before seting anything.	
 	var idx = 0;
@@ -406,6 +412,7 @@ function updateInformation(eperson)
 	eperson.setLastName(lastName);
 	
 	eperson.setMetadata("phone", phone);
+        eperson.setLanguage(language);
 	eperson.update();
 	
     return new Array();
@@ -449,7 +456,3 @@ function updatePassword(eperson)
 	
 	return new Array();
 }
-
-
-
-

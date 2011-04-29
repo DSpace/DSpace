@@ -13,7 +13,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>1.5.2</version>
+      <version>1.6.2</version>
    </parent>
 
    <repositories>
@@ -33,9 +33,9 @@
    </repositories>
 
    <scm>
-      <connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2/dspace/modules/xmlui</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2/dspace/modules/xmlui</url>
+      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace/modules/xmlui</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace/modules/xmlui</url>
    </scm>
 
    <build>

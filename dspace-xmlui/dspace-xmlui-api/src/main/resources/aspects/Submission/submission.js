@@ -1,9 +1,9 @@
 /*
  * submission.js
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4568 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-11-30 11:37:13 -0500 (Mon, 30 Nov 2009) $
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -634,7 +634,8 @@ function saveErrorFields(errorFields)
 	}
 	else
 	{	
-		//iterate through the fields	
+        ERROR_FIELDS="";
+		//iterate through the fields
 		var i = errorFields.iterator();
 	
 		//build comma-separated list of error fields

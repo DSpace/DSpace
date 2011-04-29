@@ -1,9 +1,9 @@
 /*
  * Harvest.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4889 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2010-05-05 15:07:23 -0400 (Wed, 05 May 2010) $
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -69,7 +69,7 @@ import org.dspace.eperson.Group;
  * withdrawn within a particular range of dates.
  * 
  * @author Robert Tansley
- * @version $Revision: 3705 $
+ * @version $Revision: 4889 $
  */
 public class Harvest
 {
@@ -231,6 +231,7 @@ public class Harvest
         TableRowIterator tri = DatabaseManager.query(context, query, parametersArray);
         List infoObjects = new LinkedList();
         int index = 0;
+        int itemCounter = 0;
 
         try
         {
@@ -239,12 +240,35 @@ public class Harvest
             {
                 TableRow row = tri.next();
 
+                /**
+                 * If we are looking for public-only items, we need to scan all objects
+                 * for permissions in order to properly calculate the offset
+                 */
+                if ((!nonAnon) && (index < offset))
+                {
+                    HarvestedItemInfo itemInfo = new HarvestedItemInfo();
+                    itemInfo.itemID = row.getIntColumn("resource_id");
+                    itemInfo.item = Item.find(context, itemInfo.itemID);
+                    Group[] authorizedGroups = AuthorizeManager.getAuthorizedGroups(context, itemInfo.item, Constants.READ);
+                        boolean added = false;
+                        for (int i = 0; i < authorizedGroups.length; i++)
+                        {
+                            if ((authorizedGroups[i].getID() == 0) && (!added))
+                            {
+                                added = true;
+                            }
+                        }
+                        if (!added)
+                        {
+                            offset++;
+                        }
+                }
+
                 /*
                  * This conditional ensures that we only process items within any
                  * constraints specified by 'offset' and 'limit' parameters.
                  */
-                if ((index >= offset)
-                        && ((limit == 0) || (index < (offset + limit))))
+                else if ((index >= offset) && ((limit == 0) || (itemCounter < limit)))
                 {
                     HarvestedItemInfo itemInfo = new HarvestedItemInfo();
 
@@ -265,9 +289,10 @@ public class Harvest
                         itemInfo.item = Item.find(context, itemInfo.itemID);
                     }
 
-                    if (nonAnon)
+                    if ((nonAnon) || (itemInfo.item == null) || (withdrawn && itemInfo.withdrawn))
                     {
                         infoObjects.add(itemInfo);
+                        itemCounter++;
                     } else
                     {
                         Group[] authorizedGroups = AuthorizeManager.getAuthorizedGroups(context, itemInfo.item, Constants.READ);
@@ -278,6 +303,7 @@ public class Harvest
                             {
                                 infoObjects.add(itemInfo);
                                 added = true;
+                                itemCounter++;
                             }
                         }
                     }

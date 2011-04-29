@@ -456,6 +456,11 @@ public class Collection extends XmlElement implements SwordElementInterface
       Attribute href = new Attribute(ATTRIBUTE_HREF, location);
       collection.addAttribute(href);
 
+      if (title == null)
+      {
+          title = new Title();
+          title.setContent("Untitled");
+      }
       collection.appendChild(title.marshall());
 
       for (Accept item:accepts)

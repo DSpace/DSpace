@@ -1,9 +1,9 @@
 <%--
   - single.jsp
   -
-  - Version: $Revision: 3705 $
+  - Version: $Revision: 4365 $
   -
-  - Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+  - Date: $Date: 2009-10-05 19:52:42 -0400 (Mon, 05 Oct 2009) $
   -
   - Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
   - Institute of Technology.  All rights reserved.
@@ -332,14 +332,14 @@
 <%
     // Row: toggles between Odd and Even
     String row = "odd";
-    String[] results = bi.getStringResults();
+    String[][] results = bi.getStringResults();
 
     for (int i = 0; i < results.length; i++)
     {
 %>
             <tr>
                 <td class="<%= row %>RowOddCol">
-                    <a href="<%= sharedLink %>&amp;value=<%= URLEncoder.encode(results[i], "UTF-8") %>"><%= Utils.addEntities(results[i]) %></a>
+                    <a href="<%= sharedLink %><% if (results[i][1] != null) { %>&amp;authority=<%= URLEncoder.encode(results[i][1], "UTF-8") %>" class="authority <%= bix.getName() %>"><%= Utils.addEntities(results[i][0]) %></a> <% } else { %>&amp;value=<%= URLEncoder.encode(results[i][0], "UTF-8") %>"><%= Utils.addEntities(results[i][0]) %></a> <% } %>
                 </td>
             </tr>
 <%

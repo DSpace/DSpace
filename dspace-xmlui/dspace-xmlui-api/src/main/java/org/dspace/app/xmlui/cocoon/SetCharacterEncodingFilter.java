@@ -3,7 +3,7 @@
  *
  * Version: $Revision: 3705 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -79,7 +79,7 @@ import javax.servlet.ServletResponse;
  *
  * @author Craig McClanahan - Apache
  * @author Tim Donohue (minor modifications)
- * @version $Revision: 3705 $ $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * @version $Revision: 3705 $ $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
  */
 
 public class SetCharacterEncodingFilter implements Filter

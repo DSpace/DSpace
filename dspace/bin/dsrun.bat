@@ -1,9 +1,9 @@
 @REM
 @REM dsrun.bat
 @REM
-@REM Version: $Revision: 3705 $
+@REM Version: $Revision: 4916 $
 @REM
-@REM Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+@REM Date: $Date: 2010-05-11 17:22:57 -0400 (Tue, 11 May 2010) $
 @REM
 @REM Copyright (c) 2005, Hewlett-Packard Company and Massachusetts
 @REM Institute of Technology.  All rights reserved.
@@ -43,49 +43,4 @@
 REM This is a simple shell script for running a command-line DSpace tool.
 REM sets the CLASSPATH appropriately before invoking Java.
 
-REM Remember startup dir
-
-set CURRENT_DIR=%cd%
-
-
-REM Guess DSpace directory: CD to directory script is in; CD to parent
-
-chdir /D "%~p0"
-chdir ..
-
-REM Check we can find dspace.cfg.  Quit with an error if not.
-
-if exist "config\dspace.cfg" goto okExec
-echo Cannot find %cd%\config\dspace.cfg
-goto end
-
-
-:okExec
-
-echo Using DSpace installation in: %cd%
-
-REM Build a CLASSPATH
-
-set DSPACE_CLASSPATH=%CLASSPATH%;config
-for %%f in (lib\*.jar) DO CALL bin\buildpath.bat %%f
-
-REM If JAVA_OPTS specified, use those options
-REM Otherwise, default Java to using 256MB of memory
-
-if "%JAVA_OPTS%"=="" set JAVA_OPTS=-Xmx256m
-
-REM Execute Java
-
-java %JAVA_OPTS% -classpath "%DSPACE_CLASSPATH%" %*
-
-
-REM Clean up DSPACE_CLASSPATH variable
-
-set DSPACE_CLASSPATH=
-
-
-:end
-
-REM Back to original dir
-
-chdir /D %CURRENT_DIR%
+@call dspace.bat dsrun %*

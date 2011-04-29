@@ -1,9 +1,9 @@
 /*
  * RDFCrosswalk.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 3728 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-04-23 00:00:26 -0400 (Thu, 23 Apr 2009) $
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -61,7 +61,7 @@ import ORG.oclc.oai.server.verb.CannotDisseminateFormatException;
  * DSpace items into typed RDF format.
  * 
  * @author Richard Rodgers
- * @version $Revision: 3705 $
+ * @version $Revision: 3728 $
  */
 public class RDFCrosswalk extends Crosswalk
 {
@@ -139,6 +139,12 @@ public class RDFCrosswalk extends Crosswalk
 
                 // Escape XML chars <, > and &
                 String value = allDC[i].value;
+
+                // Check for null values
+                if (value == null)
+                {
+                    value = "";
+                }
 
                 // First do &'s - need to be careful not to replace the
                 // & in "&amp;" again!

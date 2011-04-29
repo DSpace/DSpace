@@ -7,22 +7,22 @@ package org.dspace.app.mediafilter;
  *
  * Date: $Date: $
  *
- * Copyright (C) 2009, The DSpace Foundation.  All rights reserved.
+  * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
  * met:
  *
- *     - Redistributions of source code must retain the above copyright
- *       notice, this list of conditions and the following disclaimer.
+ * - Redistributions of source code must retain the above copyright
+ * notice, this list of conditions and the following disclaimer.
  *
- *     - Redistributions in binary form must reproduce the above copyright
- *       notice, this list of conditions and the following disclaimer in the
- *       documentation and/or other materials provided with the distribution.
+ * - Redistributions in binary form must reproduce the above copyright
+ * notice, this list of conditions and the following disclaimer in the
+ * documentation and/or other materials provided with the distribution.
  *
- *     - Neither the name of the DSpace Foundation nor the names of their
- *       contributors may be used to endorse or promote products derived from
- *       this software without specific prior written permission.
+ * - Neither the name of the DSpace Foundation nor the names of its
+ * contributors may be used to endorse or promote products derived from
+ * this software without specific prior written permission.
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -78,10 +78,10 @@ public class XPDF2Text extends MediaFilter
 {
     private static Logger log = Logger.getLogger(XPDF2Text.class);
 
-    // command to get image from PDF; @FILE@, @OUTPUT@ are placeholders
+    // Command to get text from pdf; @infile@, @COMMAND@ are placeholders
     private static final String XPDF_PDFTOTEXT_COMMAND[] =
     {
-        "@COMMAND@", "-q", "@infile@", "-"
+        "@COMMAND@", "-q", "-enc", "UTF-8", "@infile@", "-"
     };
 
 
@@ -134,7 +134,7 @@ public class XPDF2Text extends MediaFilter
 
             String pdfCmd[] = XPDF_PDFTOTEXT_COMMAND.clone();
             pdfCmd[0] = pdftotextPath;
-            pdfCmd[2] = sourceTmp.toString();
+            pdfCmd[4] = sourceTmp.toString();
 
             log.debug("Running command: "+Arrays.deepToString(pdfCmd));
             Process pdfProc = Runtime.getRuntime().exec(pdfCmd);
@@ -145,9 +145,16 @@ public class XPDF2Text extends MediaFilter
             baos.close();
 
             status = pdfProc.waitFor();
-            if (status != 0)
+            String msg = null;
+            if (status == 1)
+                msg = "pdftotext failed opening input: file="+sourceTmp.toString();
+            else if (status == 3)
+                msg = "pdftotext permission failure (perhaps copying of text from this document is not allowed - check PDF file's internal permissions): file="+sourceTmp.toString();
+            else if (status != 0)
+                msg = "pdftotext failed, maybe corrupt PDF? status="+String.valueOf(status);
+
+            if (msg != null)
             {
-                String msg = "pdftotext failed, maybe corrupt PDF? status="+String.valueOf(status);
                 log.error(msg);
                 throw new IOException(msg);
             }

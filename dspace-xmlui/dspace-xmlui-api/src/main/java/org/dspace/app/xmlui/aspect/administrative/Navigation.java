@@ -1,9 +1,9 @@
 /*
  * Navigation.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4461 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-10-19 22:42:11 -0400 (Mon, 19 Oct 2009) $
  *
  * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -92,7 +92,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_context_create_collection 	= message("xmlui.administrative.Navigation.context_create_collection");
     private static final Message T_context_create_subcommunity 	= message("xmlui.administrative.Navigation.context_create_subcommunity");
     private static final Message T_context_create_community 	= message("xmlui.administrative.Navigation.context_create_community");
-
+    private static final Message T_context_export_metadata      = message("xmlui.administrative.Navigation.context_export_metadata");
+    private static final Message T_administrative_import_metadata       = message("xmlui.administrative.Navigation.administrative_import_metadata");
     private static final Message T_administrative_head 				= message("xmlui.administrative.Navigation.administrative_head");
     private static final Message T_administrative_access_control 	= message("xmlui.administrative.Navigation.administrative_access_control");
     private static final Message T_administrative_people 			= message("xmlui.administrative.Navigation.administrative_people");
@@ -226,33 +227,41 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         if(availableExports!=null && availableExports.size()>0){
             account.addItem().addXref(contextPath+"/admin/export", T_account_export);
         }
-        
-        
+
+        //Check if a system administrator
+        boolean isSystemAdmin = AuthorizeManager.isAdmin(this.context);
+
         // Context Administrative options
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
     	if (dso instanceof Item)
     	{
-    		
     		Item item = (Item) dso;
     		if (item.canEdit())
     		{
-            	context.setHead(T_context_head);
-            	context.addItem().addXref(contextPath+"/admin/item?itemID="+item.getID(), T_context_edit_item);
-            	context.addItem().addXref(contextPath+"/admin/export?itemID="+item.getID(), T_context_export_item );
-    		}
+                    context.setHead(T_context_head);
+                    context.addItem().addXref(contextPath+"/admin/item?itemID="+item.getID(), T_context_edit_item);
+                    if (AuthorizeManager.isAdmin(this.context, dso))
+                    {
+                        context.addItem().addXref(contextPath+"/admin/export?itemID="+item.getID(), T_context_export_item );
+                        context.addItem().addXref(contextPath+ "/csv/handle/"+dso.getHandle(),T_context_export_metadata );
+                    }
+                }
     	}
     	else if (dso instanceof Collection)
     	{
     		Collection collection = (Collection) dso;
     		
-    		
     		// can they admin this collection?
-            if (AuthorizeManager.authorizeActionBoolean(this.context, collection, Constants.COLLECTION_ADMIN))
+            if (collection.canEditBoolean(true))
             {
             	context.setHead(T_context_head);
             	context.addItemXref(contextPath+"/admin/collection?collectionID=" + collection.getID(), T_context_edit_collection);            	
             	context.addItemXref(contextPath+"/admin/mapper?collectionID="+collection.getID(), T_context_item_mapper); 
-            	context.addItem().addXref(contextPath+"/admin/export?collectionID="+collection.getID(), T_context_export_collection );
+            	if (AuthorizeManager.isAdmin(this.context, dso))
+                {
+                    context.addItem().addXref(contextPath+"/admin/export?collectionID="+collection.getID(), T_context_export_collection );
+                    context.addItem().addXref(contextPath+ "/csv/handle/"+dso.getHandle(),T_context_export_metadata );
+                }
             }
     	}
     	else if (dso instanceof Community)
@@ -264,27 +273,24 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             {
             	context.setHead(T_context_head);
             	context.addItemXref(contextPath+"/admin/community?communityID=" + community.getID(), T_context_edit_community); 
-            	context.addItem().addXref(contextPath+"/admin/export?communityID="+community.getID(), T_context_export_community );
+            	if (AuthorizeManager.isAdmin(this.context, dso))
+                    context.addItem().addXref(contextPath+"/admin/export?communityID="+community.getID(), T_context_export_community );
+                    context.addItem().addXref(contextPath+ "/csv/handle/"+dso.getHandle(),T_context_export_metadata );
             }
             
             // can they add to this community?
             if (AuthorizeManager.authorizeActionBoolean(this.context, community,Constants.ADD))
             {
             	context.setHead(T_context_head);
-            	context.addItemXref(contextPath+"/admin/collection?createNew&communityID=" + community.getID(), T_context_create_collection);         	
-            }
-            
-            // Only administrators can create communities
-            if (AuthorizeManager.isAdmin(this.context))
-            {
-            	context.setHead(T_context_head);
-            	context.addItemXref(contextPath+"/admin/community?createNew&communityID=" + community.getID(), T_context_create_subcommunity);  	
+            	context.addItemXref(contextPath+"/admin/collection?createNew&communityID=" + community.getID(), T_context_create_collection);
+                context.addItemXref(contextPath+"/admin/community?createNew&communityID=" + community.getID(), T_context_create_subcommunity);      
             }
     	}
     	
     	if ("community-list".equals(this.sitemapURI))
     	{
-    		if (AuthorizeManager.isAdmin(this.context))
+            // Only System administrators can create top-level communities
+    		if (isSystemAdmin)
             {
             	context.setHead(T_context_head);
     			context.addItemXref(contextPath+"/admin/community?createNew", T_context_create_community);    			
@@ -293,7 +299,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         
         
         // System Administrator options!
-        if (AuthorizeManager.isAdmin(this.context))
+        if (isSystemAdmin)
         {
 	        admin.setHead(T_administrative_head);
 	                
@@ -313,6 +319,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             admin.addItemXref(contextPath+"/admin/withdrawn", T_administrative_withdrawn);	        
 	        admin.addItemXref(contextPath+"/admin/panel", T_administrative_control_panel);
             admin.addItemXref(contextPath+"/statistics", T_statistics);
+            admin.addItemXref(contextPath+ "/admin/metadataimport", T_administrative_import_metadata);
         }
     }
     
@@ -339,7 +346,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     		
     		
     		// can they admin this collection?
-            if (AuthorizeManager.authorizeActionBoolean(this.context, collection, Constants.COLLECTION_ADMIN))
+            if (AuthorizeManager.authorizeActionBoolean(this.context, collection, Constants.ADMIN))
             {            	
             	context.addItemXref(contextPath+"/admin/collection?collectionID=" + collection.getID(), T_context_edit_collection);
             	context.addItemXref(contextPath+"/admin/mapper?collectionID="+collection.getID(), T_context_item_mapper);            	

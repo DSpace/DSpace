@@ -1,9 +1,9 @@
 <%--
   - results.jsp
   -
-  - Version: $Revision: 3705 $
+  - Version: $Revision: 4055 $
   -
-  - Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+  - Date: $Date: 2009-07-06 20:25:02 -0400 (Mon, 06 Jul 2009) $
   -
   - Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
   - Institute of Technology.  All rights reserved.
@@ -58,6 +58,8 @@
   -   collections      - results, Collection[]
   -
   -   query            - The original query
+  -
+  -   admin_button     - If the user is an admin
   --%>
 
 <%@ page contentType="text/html;charset=UTF-8" %>
@@ -113,6 +115,10 @@
     } else {
 	searchScope = "/handle/" + collection.getHandle();
     }
+
+    // Admin user or not
+    Boolean admin_b = (Boolean)request.getAttribute("admin_button");
+    boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
 %>
 
 <dspace:layout titlekey="jsp.search.results.title">
@@ -304,6 +310,14 @@ else
            </select>
            <%-- add results per page, etc. --%>
            <input type="submit" name="submit_search" value="<fmt:message key="search.update" />" />
+
+<%
+    if (admin_button)
+    {
+        %><input type="submit" name="submit_export_metadata" value="<fmt:message key="jsp.general.metadataexport.button"/>" /><%
+    }
+%>
+           
        </td></tr>
    </table>
    </form>

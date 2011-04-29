@@ -1,9 +1,9 @@
 /*
  * DSpaceOAICatalog.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4865 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2010-04-09 05:00:25 -0400 (Fri, 09 Apr 2010) $
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -52,16 +52,19 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
 import org.dspace.handle.HandleManager;
 import org.dspace.search.Harvest;
 import org.dspace.search.HarvestedItemInfo;
+import org.dspace.eperson.Group;
 
 import ORG.oclc.oai.server.catalog.AbstractCatalog;
 import ORG.oclc.oai.server.verb.BadArgumentException;
@@ -81,7 +84,7 @@ import ORG.oclc.oai.server.verb.OAIInternalServerError;
  * something else will need to update this code too. Sorry about that.
  * 
  * @author Robert Tansley
- * @version $Revision: 3705 $
+ * @version $Revision: 4865 $
  */
 public class DSpaceOAICatalog extends AbstractCatalog
 {
@@ -237,10 +240,14 @@ public class DSpaceOAICatalog extends AbstractCatalog
             // Get the relevant OAIItemInfo objects to make headers
             DSpaceObject scope = resolveSet(context, set);
             boolean includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.oai", true);
+            // Warning: In large repositories, setting harvest.includerestricted.oai to false may cause
+            // performance problems as all items will need to have their authorization permissions checked,
+            // but because we haven't implemented resumption tokens in ListIdentifiers, ALL items will
+            // need checking whenever a ListIdentifiers request is made.
             List itemInfos = Harvest.harvest(context, scope, from, until, 0, 0, // Everything
                                                                                 // for
                                                                                 // now
-                    false, true, true, includeAll);
+                    !includeAll, true, true, includeAll);
 
             // No Item objects, but we need to know collections they're in and
             // withdrawn items
@@ -364,6 +371,28 @@ public class DSpaceOAICatalog extends AbstractCatalog
                 log.info(LogManager.getHeader(null, "oai_error",
                         "id_does_not_exist"));
                 throw new IdDoesNotExistException(identifier);
+            }
+            
+            boolean includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.oai", true);
+
+            if (!includeAll)
+            {
+                Group[] authorizedGroups = AuthorizeManager.getAuthorizedGroups(context, itemInfo.item, Constants.READ);
+                boolean authorized = false;
+                for (int i = 0; i < authorizedGroups.length; i++)
+                {
+                    if ((authorizedGroups[i].getID() == 0) && (!authorized))
+                    {
+                        authorized = true;
+                    }
+                }
+
+                if (!authorized)
+                {
+                    log.info(LogManager.getHeader(null, "oai_error",
+                            "id_not_accessible"));
+                    throw new IdDoesNotExistException(identifier);
+                }
             }
 
             String schemaURL;

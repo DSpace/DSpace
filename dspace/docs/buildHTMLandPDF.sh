@@ -4,9 +4,12 @@
 #
 # Developed On Ubuntu Hardy Heron, you'll need at least:
 # apt-get install herold docbook-utils docbook2x xsltproc docbook-xsl dbdoclet
-
+#
+# November 2009	Jeffrey Trimble Moved xslt and fo to print.xsl and
+#                               html.xsl style sheets
+  
 if [ "a$DS_VERSION" == "a" ]; then
-  DS_VERSION="1.5.2"
+  DS_VERSION="1.6-RC1"
 fi
 
 DBxml="docbook"
@@ -76,8 +79,8 @@ if [ $haveDB -lt 1 ]; then
 <?xml version='1.0' encoding='UTF-8'?>
 <!DOCTYPE book PUBLIC '-//OASIS//DTD DocBook XML V4.5//EN' 'http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd' [
 
-<!ENTITY art01 SYSTEM "index.xml">
-<!ENTITY art02 SYSTEM "introduction.xml">
+<!ENTITY art01 SYSTEM "introduction.xml">
+<!ENTITY art02 SYSTEM "functional.xml">
 <!ENTITY art03 SYSTEM "install.xml">
 <!ENTITY art04 SYSTEM "update.xml">
 <!ENTITY art05 SYSTEM "configure.xml">
@@ -86,11 +89,10 @@ if [ $haveDB -lt 1 ]; then
 <!ENTITY art08 SYSTEM "architecture.xml">
 <!ENTITY art09 SYSTEM "application.xml">
 <!ENTITY art10 SYSTEM "business.xml">
-<!ENTITY art11 SYSTEM "functional.xml">
-<!ENTITY art12 SYSTEM "submission.xml">
-<!ENTITY art13 SYSTEM "DRISchemaReference.xml">
-<!ENTITY art14 SYSTEM "history.xml">
-<!ENTITY art15 SYSTEM "appendix.xml">
+<!ENTITY art11 SYSTEM "submission.xml">
+<!ENTITY art12 SYSTEM "DRISchemaReference.xml">
+<!ENTITY art13 SYSTEM "history.xml">
+<!ENTITY appa SYSTEM "appendix.xml">
 ]>
 
 <book>
@@ -135,9 +137,8 @@ if [ $haveDB -lt 1 ]; then
 
 <toc/>
 
-<!-- &art01; -->
+&art01;
 &art02;
-&art11;
 &art03;
 &art04;
 &art05;
@@ -146,10 +147,10 @@ if [ $haveDB -lt 1 ]; then
 &art08;
 &art09;
 &art10;
+&art11;
 &art12;
 &art13;
-&art14;
-&art15;
+&appa;
 <index/>
 </book>
 EOF
@@ -229,14 +230,14 @@ xslhtml="$DBxml/html.xsl"
 
 XSLTP=" -param body.start.indent 0pt \
 	-param section.autolabel 1 \
-	-param section.autolabel.max.depth 2  \
+	-param section.autolabel.max.depth 3  \
 	-param section.label.includes.component.label 1 \
 	-param chunk.section.depth 0 \
 	-param variablelist.as.blocks 1"
 
 # PDF it using XSL, note that fop is actually java hiding under a script
 if [ "a$FOP_HOME" == "a" ]; then
-    FOP_HOME=/usr/local/share/fop-0.94
+    FOP_HOME=/usr/local/fop-0.94
 fi
 java -Xmx128m -Dfop.home=$FOP_HOME -jar $FOP_HOME/build/fop.jar -xml $DBxml/book.xml -xsl $xslprint -pdf $PDFfinal/DSpace-$DS_VERSION.pdf $XSLTP
 

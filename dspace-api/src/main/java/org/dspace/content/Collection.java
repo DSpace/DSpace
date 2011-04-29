@@ -1,12 +1,11 @@
 /*
  * Collection.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4309 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-09-30 15:20:07 -0400 (Wed, 30 Sep 2009) $
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -49,6 +47,8 @@ import java.util.List;
 import java.util.MissingResourceException;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.util.AuthorizeUtil;
+import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
@@ -81,7 +81,7 @@ import org.dspace.workflow.WorkflowItem;
  * effect.
  * 
  * @author Robert Tansley
- * @version $Revision: 3705 $
+ * @version $Revision: 4309 $
  */
 public class Collection extends DSpaceObject
 {
@@ -488,7 +488,7 @@ public class Collection extends DSpaceObject
         if (!((is == null) && AuthorizeManager.authorizeActionBoolean(
                 ourContext, this, Constants.DELETE)))
         {
-            canEdit();
+            canEdit(true);
         }
 
         // First, delete any existing logo
@@ -543,12 +543,16 @@ public class Collection extends DSpaceObject
     public Group createWorkflowGroup(int step) throws SQLException,
             AuthorizeException
     {
-        // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+        // Check authorisation - Must be an Admin to create Workflow Group
+        AuthorizeUtil.authorizeManageWorkflowsGroup(ourContext, this);
 
         if (workflowGroup[step - 1] == null)
         {
+            //turn off authorization so that Collection Admins can create Collection Workflow Groups
+            ourContext.turnOffAuthorisationSystem();
             Group g = Group.create(ourContext);
+            ourContext.restoreAuthSystemState();
+
             g.setName("COLLECTION_" + getID() + "_WORKFLOW_STEP_" + step);
             g.update();
             setWorkflowGroup(step, g);
@@ -611,12 +615,16 @@ public class Collection extends DSpaceObject
      */
     public Group createSubmitters() throws SQLException, AuthorizeException
     {
-        // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+        // Check authorisation - Must be an Admin to create Submitters Group
+        AuthorizeUtil.authorizeManageSubmittersGroup(ourContext, this);
 
         if (submitters == null)
         {
+            //turn off authorization so that Collection Admins can create Collection Submitters
+            ourContext.turnOffAuthorisationSystem();
             submitters = Group.create(ourContext);
+            ourContext.restoreAuthSystemState();
+
             submitters.setName("COLLECTION_" + getID() + "_SUBMIT");
             submitters.update();
         }
@@ -638,8 +646,8 @@ public class Collection extends DSpaceObject
      */
     public void removeSubmitters() throws SQLException, AuthorizeException
     {
-    	// Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+    	// Check authorisation - Must be an Admin to delete Submitters Group
+        AuthorizeUtil.authorizeManageSubmittersGroup(ourContext, this);
 
         // just return if there is no administrative group.
         if (submitters == null)
@@ -680,29 +688,26 @@ public class Collection extends DSpaceObject
      */
     public Group createAdministrators() throws SQLException, AuthorizeException
     {
-        // Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+        // Check authorisation - Must be an Admin to create more Admins
+        AuthorizeUtil.authorizeManageAdminGroup(ourContext, this);
 
         if (admins == null)
         {
+            //turn off authorization so that Community Admins can create Collection Admins
+            ourContext.turnOffAuthorisationSystem();
             admins = Group.create(ourContext);
+            ourContext.restoreAuthSystemState();
+            
             admins.setName("COLLECTION_" + getID() + "_ADMIN");
             admins.update();
         }
 
         AuthorizeManager.addPolicy(ourContext, this,
-                Constants.COLLECTION_ADMIN, admins);
+                Constants.ADMIN, admins);
 
         // register this as the admin group
         collectionRow.setColumn("admin", admins.getID());
         
-        // administrators also get ADD on the submitter group
-        if (submitters != null)
-        {
-            AuthorizeManager.addPolicy(ourContext, submitters, Constants.ADD,
-                    admins);
-        }
-
         modified = true;
         return admins;
     }
@@ -715,8 +720,8 @@ public class Collection extends DSpaceObject
      */
     public void removeAdministrators() throws SQLException, AuthorizeException
     {
-    	// Check authorisation
-        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+        // Check authorisation - Must be an Admin of the parent community to delete Admin Group
+        AuthorizeUtil.authorizeRemoveAdminGroup(ourContext, this);
 
         // just return if there is no administrative group.
         if (admins == null)
@@ -825,7 +830,7 @@ public class Collection extends DSpaceObject
     public void createTemplateItem() throws SQLException, AuthorizeException
     {
         // Check authorisation
-        canEdit();
+        AuthorizeUtil.authorizeManageTemplateItem(ourContext, this);
 
         if (template == null)
         {
@@ -854,7 +859,7 @@ public class Collection extends DSpaceObject
             IOException
     {
         // Check authorisation
-        canEdit();
+        AuthorizeUtil.authorizeManageTemplateItem(ourContext, this);
 
         collectionRow.setColumnNull("template_item_id");
         DatabaseManager.update(ourContext, collectionRow);
@@ -916,46 +921,27 @@ public class Collection extends DSpaceObject
         // Check authorisation
         AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
 
+        // will be the item an orphan?
+        TableRow row = DatabaseManager.querySingle(ourContext,
+                "SELECT COUNT(DISTINCT collection_id) AS num FROM collection2item WHERE item_id= ? ",
+                item.getID());
+
+        DatabaseManager.setConstraintDeferred(ourContext, "coll2item_item_fk");
+        if (row.getLongColumn("num") == 1)
+        {
+            // Orphan; delete it
+            item.delete();
+        }
         log.info(LogManager.getHeader(ourContext, "remove_item",
                 "collection_id=" + getID() + ",item_id=" + item.getID()));
-
+    
         DatabaseManager.updateQuery(ourContext,
                 "DELETE FROM collection2item WHERE collection_id= ? "+
                 "AND item_id= ? ",
                 getID(), item.getID());
-
+        DatabaseManager.setConstraintImmediate(ourContext, "coll2item_item_fk");
+        
         ourContext.addEvent(new Event(Event.REMOVE, Constants.COLLECTION, getID(), Constants.ITEM, item.getID(), item.getHandle()));
-
-        // Is the item an orphan?
-        TableRowIterator tri = DatabaseManager.query(ourContext,
-                "SELECT * FROM collection2item WHERE item_id= ? ",
-                item.getID());
-
-        try
-        {
-            if (!tri.hasNext())
-            {
-                //make the right to remove the item explicit because the implicit
-                // relation
-                //has been removed. This only has to concern the currentUser
-                // because
-                //he started the removal process and he will end it too.
-                //also add right to remove from the item to remove it's bundles.
-                AuthorizeManager.addPolicy(ourContext, item, Constants.DELETE,
-                        ourContext.getCurrentUser());
-                AuthorizeManager.addPolicy(ourContext, item, Constants.REMOVE,
-                        ourContext.getCurrentUser());
-
-                // Orphan; delete it
-                item.delete();
-            }
-        }
-        finally
-        {
-            // close the TableRowIterator to free up resources
-            if (tri != null)
-                tri.close();
-        }
     }
 
     /**
@@ -969,7 +955,7 @@ public class Collection extends DSpaceObject
     public void update() throws SQLException, IOException, AuthorizeException
     {
         // Check authorisation
-        canEdit();
+        canEdit(true);
 
         log.info(LogManager.getHeader(ourContext, "update_collection",
                 "collection_id=" + getID()));
@@ -988,12 +974,17 @@ public class Collection extends DSpaceObject
             clearDetails();
         }
     }
-
+    
     public boolean canEditBoolean() throws java.sql.SQLException
+    {
+        return canEditBoolean(true);
+    }
+
+    public boolean canEditBoolean(boolean useInheritance) throws java.sql.SQLException
     {
         try
         {
-            canEdit();
+            canEdit(useInheritance);
 
             return true;
         }
@@ -1003,27 +994,31 @@ public class Collection extends DSpaceObject
         }
     }
 
-    public void canEdit() throws AuthorizeException, SQLException
+    public void canEdit()  throws AuthorizeException, SQLException
+    {
+        canEdit(true);
+    }
+    
+    public void canEdit(boolean useInheritance) throws AuthorizeException, SQLException
     {
         Community[] parents = getCommunities();
 
         for (int i = 0; i < parents.length; i++)
         {
             if (AuthorizeManager.authorizeActionBoolean(ourContext, parents[i],
-                    Constants.WRITE))
+                    Constants.WRITE, useInheritance))
             {
                 return;
             }
 
             if (AuthorizeManager.authorizeActionBoolean(ourContext, parents[i],
-                    Constants.ADD))
+                    Constants.ADD, useInheritance))
             {
                 return;
             }
         }
 
-        AuthorizeManager.authorizeAnyOf(ourContext, this, new int[] {
-                Constants.WRITE, Constants.COLLECTION_ADMIN });
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE, useInheritance);
     }
 
     /**
@@ -1425,4 +1420,54 @@ public class Collection extends DSpaceObject
 
         return itemcount;
      }
+     
+    public DSpaceObject getAdminObject(int action) throws SQLException
+    {
+        DSpaceObject adminObject = null;
+        Community community = null;
+        Community[] communities = getCommunities();
+        if (communities != null && communities.length > 0)
+        {
+            community = communities[0];
+        }
+
+        switch (action)
+        {
+        case Constants.REMOVE:
+            if (AuthorizeConfiguration.canCollectionAdminPerformItemDeletion())
+            {
+                adminObject = this;
+            }
+            else if (AuthorizeConfiguration.canCommunityAdminPerformItemDeletion())
+            {
+                adminObject = community;
+            }
+            break;
+
+        case Constants.DELETE:
+            if (AuthorizeConfiguration.canCommunityAdminPerformSubelementDeletion())
+            {
+                adminObject = community;
+            }
+            break;
+        default:
+            adminObject = this;
+            break;
+        }
+        return adminObject;
+    }
+    
+    @Override
+    public DSpaceObject getParentObject() throws SQLException
+    {
+        Community[] communities = this.getCommunities();
+        if (communities != null && (communities.length > 0 && communities[0] != null))
+        {
+            return communities[0];
+        }
+        else
+        {
+            return null;
+        }
+    }
 }

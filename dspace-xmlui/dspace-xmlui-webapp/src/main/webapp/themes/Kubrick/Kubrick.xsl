@@ -3,9 +3,9 @@
 <!--
   template.xsl
 
-  Version: $Revision: 3705 $
+  Version: $Revision: 4913 $
  
-  Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+  Date: $Date: 2010-05-11 12:21:27 -0400 (Tue, 11 May 2010) $
 
 -->
 
@@ -800,24 +800,40 @@
                         </span>
                         <xsl:text>, </xsl:text>
                     </xsl:if>
+                    
                     <span class="date">
-                        <!--
-		    	<xsl:value-of select="substring(dim:field[@element='date' and @qualifier='issued']/node(),1,10)"/>
-			-->
-			<xsl:call-template name="month-name">
-				<xsl:with-param name="date-time" select = "dim:field[@element='date' and @qualifier='issued']/node()"/>					
-			</xsl:call-template>
-			<xsl:text> </xsl:text>
-			<xsl:call-template name="day-in-month">
-				<xsl:with-param name="date-time" select = "dim:field[@element='date' and @qualifier='issued']/node()"/>
-			</xsl:call-template>
-			<xsl:text>, </xsl:text>
-			<xsl:call-template name="year">
-				<xsl:with-param name="date-time" select = "dim:field[@element='date' and @qualifier='issued']/node()"/>
-			</xsl:call-template>				
+
+                        <xsl:variable name="month-issued" select= "substring(dim:field[@element='date' and @qualifier='issued']/node(),6,2)"/>
+                        <xsl:variable name="day-issued" select= "substring(dim:field[@element='date' and @qualifier='issued']/node(),9,2)"/>
+
+                        <xsl:if test="string-length($month-issued) > 0">
+
+                            <xsl:call-template name="month-name">
+                                <xsl:with-param name="date-time" select = "dim:field[@element='date' and @qualifier='issued']/node()"/>
+                            </xsl:call-template>
+
+                            <xsl:text> </xsl:text>
+
+                            <xsl:if test="string-length($day-issued) > 0">
+
+                                <xsl:call-template name="day-in-month">
+                                    <xsl:with-param name="date-time" select = "dim:field[@element='date' and @qualifier='issued']/node()"/>
+                                </xsl:call-template>
+
+                            </xsl:if>
+
+                            <xsl:text>, </xsl:text>
+
+                        </xsl:if>
+
+                        <xsl:call-template name="year">
+                            <xsl:with-param name="date-time" select = "dim:field[@element='date' and @qualifier='issued']/node()"/>
+                        </xsl:call-template>
+
                     </span>
                     <xsl:text>)</xsl:text>
                 </span>
+
             </div>
         </div>
     </xsl:template>

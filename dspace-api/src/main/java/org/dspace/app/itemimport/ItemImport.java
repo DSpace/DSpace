@@ -1,12 +1,11 @@
 /*
  * ItemImport.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4563 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-11-20 22:01:30 -0500 (Fri, 20 Nov 2009) $
  *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+ * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are
@@ -19,8 +18,7 @@
  * notice, this list of conditions and the following disclaimer in the
  * documentation and/or other materials provided with the distribution.
  *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
+ * - Neither the name of the DSpace Foundation nor the names of its
  * contributors may be used to endorse or promote products derived from
  * this software without specific prior written permission.
  *
@@ -39,25 +37,14 @@
  */
 package org.dspace.app.itemimport;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
-import java.io.IOException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.Vector;
+import java.util.*;
+import java.util.zip.ZipFile;
+import java.util.zip.ZipEntry;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -121,6 +108,8 @@ public class ItemImport
     static Connection connection = null;
     static PreparedStatement st = null;
   
+    static boolean useWorkflowSendEmail = false;
+
     static boolean isTest = false;
 
     static boolean isResume = false;
@@ -161,6 +150,7 @@ public class ItemImport
         options.addOption("d", "delete", false,
                 "delete items listed in mapfile");
         options.addOption("s", "source", true, "source of items (directory)");
+        options.addOption("z", "zip", true, "name of zip file");
         options.addOption("c", "collection", true,
                 "destination collection(s) Handle or database ID");
         options.addOption("m", "mapfile", true, "mapfile items in mapfile");
@@ -168,6 +158,8 @@ public class ItemImport
                 "email of eperson doing importing");
         options.addOption("w", "workflow", false,
                 "send submission through collection's workflow");
+        options.addOption("n", "notification", false,
+                        "if sending submissions through the workflow, send notification emails");
         options.addOption("t", "test", false,
                 "test run - do not actually import items");
         options.addOption("p", "template", false, "apply template");
@@ -191,7 +183,9 @@ public class ItemImport
             HelpFormatter myhelp = new HelpFormatter();
             myhelp.printHelp("ItemImport\n", options);
             System.out
-                    .println("\nadding items:    ItemImport -a -e eperson -c collection -s sourcedir -m mapfile");
+                   .println("\nadding items:    ItemImport -a -e eperson -c collection -s sourcedir -m mapfile");
+            System.out
+                    .println("\nadding items from zip file:    ItemImport -a -e eperson -c collection -s sourcedir -z filename.zip -m mapfile");
             System.out
                     .println("replacing items: ItemImport -r -e eperson -c collection -s sourcedir -m mapfile");
             System.out
@@ -220,6 +214,10 @@ public class ItemImport
         if (line.hasOption('w'))
         {
             useWorkflow = true;
+            if (line.hasOption('n'))
+            {
+                useWorkflowSendEmail = true;
+            }
         }
 
         if (line.hasOption('t'))
@@ -259,6 +257,15 @@ public class ItemImport
             isResume = true;
             System.out
                     .println("**Resume import** - attempting to import items not already imported");
+        }
+
+        boolean zip = false;
+        String zipfilename = "";
+        String ziptempdir = ConfigurationManager.getProperty("org.dspace.app.itemexport.work.dir");
+        if (line.hasOption('z'))
+        {
+            zip = true;
+            zipfilename = sourcedir + System.getProperty("file.separator") + line.getOptionValue('z');
         }
 
         // now validate
@@ -338,6 +345,36 @@ public class ItemImport
             System.out
                     .println("Either delete it or use --resume if attempting to resume an aborted import.");
             System.exit(1);
+        }
+
+        // does the zip file exist and can we write to the temp directory
+        if (zip)
+        {
+            File zipfile = new File(sourcedir);
+            if (!zipfile.canRead())
+            {
+                System.out.println("Zip file '" + sourcedir + "' does not exist, or is not readable.");
+                System.exit(1);
+            }
+
+            if (ziptempdir == null)
+            {
+                System.out.println("Unable to unzip import file as the key 'org.dspace.app.itemexport.work.dir' is not set in dspace.cfg");
+                System.exit(1);
+            }
+            zipfile = new File(ziptempdir);
+            if (!zipfile.isDirectory())
+            {
+                System.out.println("'" + ConfigurationManager.getProperty("org.dspace.app.itemexport.work.dir") +
+                                   "' as defined by the key 'org.dspace.app.itemexport.work.dir' in dspace.cfg " +
+                                   "is not a valid directory");
+                System.exit(1);
+            }
+            File tempdir = new File(ziptempdir);
+            tempdir.mkdirs();
+            sourcedir = ziptempdir + System.getProperty("file.separator") + line.getOptionValue("z");
+            ziptempdir = ziptempdir + System.getProperty("file.separator") +
+                         line.getOptionValue("z") + System.getProperty("file.separator");
         }
 
         ItemImport myloader = new ItemImport();
@@ -430,6 +467,48 @@ public class ItemImport
 
         try
         {
+            // If this is a zip archive, unzip it first
+            if (zip)
+            {
+                ZipFile zf = new ZipFile(zipfilename);
+                ZipEntry entry;
+                Enumeration entries = zf.entries();
+                while (entries.hasMoreElements())
+                {
+                    entry = (ZipEntry)entries.nextElement();
+                    if (entry.isDirectory())
+                    {
+                        new File(ziptempdir + entry.getName()).mkdir();
+                    }
+                    else
+                    {
+                        System.out.println("Extracting file: " + entry.getName());
+                        int index = entry.getName().lastIndexOf('/');
+                        if (index == -1)
+                        {
+                            // Was it created on Windows instead?
+                            index = entry.getName().lastIndexOf('\\');
+                        }
+                        if (index > 0)
+                        {
+                            File dir = new File(ziptempdir + entry.getName().substring(0, index));
+                            dir.mkdirs();
+                        }
+                        byte[] buffer = new byte[1024];
+                        int len;
+                        InputStream in = zf.getInputStream(entry);
+                        BufferedOutputStream out = new BufferedOutputStream(
+                            new FileOutputStream(ziptempdir + entry.getName()));
+                        while((len = in.read(buffer)) >= 0)
+                        {
+                            out.write(buffer, 0, len);
+                        }
+                        in.close();
+                        out.close();
+                    }
+                }
+            }
+
             c.setIgnoreAuthorization(true);
 
             if (command.equals("add"))
@@ -467,6 +546,21 @@ public class ItemImport
             e.printStackTrace();
             System.out.println(e);
             status = 1;
+        }
+
+        // Delete the unzipped file
+        try
+        {
+            if (zip)
+            {
+                System.gc();
+                System.out.println("Deleting temporary zip directory: " + ziptempdir);
+                ItemImport.deleteDirectory(new File(ziptempdir));
+            }
+        }
+        catch (Exception ex)
+        {
+            System.out.println("Unable to delete temporary zip archive location: " + ziptempdir);
         }
 
         if (mapOut != null)
@@ -675,7 +769,16 @@ public class ItemImport
             // start up a workflow
             if (!isTest)
             {
-                WorkflowManager.start(c, wi);
+
+                // Should we send a workflow alert email or not?
+                if (useWorkflowSendEmail)
+                {
+                    WorkflowManager.start(c, wi);
+                }
+                else
+                {
+                    WorkflowManager.startWithoutNotify(c, wi);
+                }
 
                 // send ID to the mapfile
                 mapOutput = itemname + " " + myitem.getID();
@@ -1132,7 +1235,7 @@ public class ItemImport
                 if (bitstreamEndIndex == -1)
                 {
                     // no extra info
-                    processContentFileEntry(c, i, path, line, null);
+                    processContentFileEntry(c, i, path, line, null, false);
                     System.out.println("\tBitstream: " + line);
                 }
                 else
@@ -1186,19 +1289,30 @@ public class ItemImport
                         descriptionExists = true;
                     }
 
+                    // is this the primary bitstream?
+                    String primaryBitstreamMarker = "\tprimary:true";
+                    boolean primary = false;
+                    String primaryStr = "";
+                    if (line.contains(primaryBitstreamMarker))
+                    {
+                        primary = true;
+                        primaryStr = "\t **Setting as primary bitstream**";
+                    }
+
                     if (bundleExists)
                     {
                         String bundleName = line.substring(bMarkerIndex
                                 + bundleMarker.length(), bEndIndex).trim();
 
-                        processContentFileEntry(c, i, path, bitstreamName, bundleName);
-                        System.out.println("\tBitstream: " + bitstreamName
-                                + "\tBundle: " + bundleName);
+                        processContentFileEntry(c, i, path, bitstreamName, bundleName, primary);
+                        System.out.println("\tBitstream: " + bitstreamName +
+                                           "\tBundle: " + bundleName +
+                                           primaryStr);
                     }
                     else
                     {
-                        processContentFileEntry(c, i, path, bitstreamName, null);
-                        System.out.println("\tBitstream: " + bitstreamName);
+                        processContentFileEntry(c, i, path, bitstreamName, null, primary);
+                        System.out.println("\tBitstream: " + bitstreamName + primaryStr);
                     }
 
                     if (permissionsExist || descriptionExists)
@@ -1244,7 +1358,7 @@ public class ItemImport
      * @throws AuthorizeException
      */
     private void processContentFileEntry(Context c, Item i, String path,
-            String fileName, String bundleName) throws SQLException,
+            String fileName, String bundleName, boolean primary) throws SQLException,
             IOException, AuthorizeException
     {
         String fullpath = path + File.separatorChar + fileName;
@@ -1297,6 +1411,13 @@ public class ItemImport
             // file format!
             BitstreamFormat bf = FormatIdentifier.guessFormat(c, bs);
             bs.setFormat(bf);
+
+            // Is this a the primary bitstream?
+            if (primary)
+            {
+                targetBundle.setPrimaryBitstreamID(bs.getID());
+                targetBundle.update();
+            }
 
             bs.update();
         }
@@ -1644,5 +1765,32 @@ public class ItemImport
                 .newDocumentBuilder();
 
         return builder.parse(new File(filename));
+    }
+
+    /**
+     * Delete a directory and its child files and directories
+     * @param path The directory to delete
+     * @return Whether the deletion was successful or not
+     */
+    private static boolean deleteDirectory(File path)
+    {
+        if (path.exists())
+        {
+            File[] files = path.listFiles();
+            for (int i = 0; i < files.length; i++)
+            {
+                if (files[i].isDirectory())
+                {
+                    deleteDirectory(files[i]);
+                }
+                else
+                {
+                    files[i].delete();
+                }
+            }
+        }
+
+        boolean pathDeleted = path.delete();
+        return (pathDeleted);
     }
 }

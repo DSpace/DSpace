@@ -1,9 +1,9 @@
 /*
  * OrderFormatDate.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4250 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-09-09 17:23:36 -0400 (Wed, 09 Sep 2009) $
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -50,14 +50,23 @@ public class OrderFormatDate implements OrderFormatDelegate
 {
     public String makeSortString(String value, String language)
     {
+        int padding = 0;
         int endYearIdx = value.indexOf("-");
-        int length = value.length();
-        if (length < 4 || (endYearIdx >= 0 && endYearIdx < 4))
+
+        if (endYearIdx >= 0 && endYearIdx < 4)
+        {
+            padding = 4 - endYearIdx;
+        }
+        else if (value.length() < 4)
+        {
+            padding = 4 - value.length();
+        }
+
+        if (padding > 0)
         {
             // padding the value from left with 0 so that 87 -> 0087, 687-11-24
             // -> 0687-11-24
-            return String.format("%1$0"
-                    + (length > 4 ? 4 - endYearIdx : 4 - length) + "d", 0)
+            return String.format("%1$0" + padding + "d", 0)
                     + value;
         }
         else

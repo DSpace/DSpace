@@ -1,149 +1,65 @@
-Detailed Issue Tracking for DSpace is done on our JIRA Issue Tracker
+INTRODUCTION
+=============================================================================
 
-http://jira.dspace.org
+Detailed Issue Tracking for DSpace is managed in our JIRA issue tracker:
+
+ - http://jira.dspace.org/
 
 In the past we used Sourceforge Trackers to track issues with. Older
 detailed bug descriptions and some status may still be available on 
 the SourceForge bug tracker:
 
-http://sourceforge.net/tracker/?group_id=19984&atid=119984
+ - http://sourceforge.net/tracker/?group_id=19984
 
-2088526	List group membership    
-2088431	IP Authentication only works on logged in users 
-2088426	encoding in some form-fields buggy 
-2088360	xmlui hardcoded string in AuthenticationUtil.java 
-2086708	xmlui Creative Commons not properly displayed 
-2086673	xmlui selection of authentication method 
-2086565	provenance information while logged in as another user 
-2086481	xmlui Administrative log in as another eperson 
-2082623	Metadata values saved in incorrect order, xmlui 
-2082242	xmlui eperson language setting 
-2081981	Collection Admin role not working 
-2081957	hardcoded strings in DIDLCrosswalk 
-2073396	xmlui display navigation bar overlaps central page 
-2073344	Wrong count in list of withdrawn items 
-2041817	Archive Export access to restricted material 
-2016130	checksum checker can not retrieve very large bitstream 
-2002866	Not found page returns 200 OK instead of 404 Not Found 
-1993036	Bitstream access rights inheritenc, editing in_archive items 
-1991757	scalability problem in "view accepted submission" 
-1984110	DCInputsReader doesn't expand entity refs in input-forms.xml 
-1969190	javadoc creation documented wrong and/or broken 
-1968082	SWORD Service Document fails if Collection is untitled 
-1967482	DSpace OAI-PMH driver aborts context prematurely 
-1951859	DSpace Home link style in breadcrumb trail 
-1931796	DSpace 1.5 Controlled Vocab (edit-metadata.jsp) 
-1926296	order of aspects matters for nav options 
-1926285	null ids for certain fieldsets 
 
-Known issues in 1.5.0 that may or may not have been corrected.
+KNOWN BUGS
+=============================================================================
 
-1904122 Help text in submission process doesn't parse html tags
-1899801 SWORD ingest fails with METSExport tool
-1899709 Creative Commons XMLUI Firefox displayed as text
-1899705 Links in CC license broken, IE
-1898560 Errors not logged in dspace.log in xmlui
-1897993 HTML not stripped in user profile data information in JSPUI
-1897642 Move item works on both mapped items and owned items moved
-1897262 Bitstream listing description is missing
-1897236 An item can be mapped multiple times to the same collection
-1896980 SWORD code does not make use of proxy
-1896960 SWORD authentication doesn't work with LDAP
-1896259 No check for unique netid in LDAP authN
-1896225 HTML tags not stripped in statistics display
-1896119 Bitstream format display
-1896055 bitstream format registry, setting bitstream internal
-1896013 Missing online help
-1879848 Anchor for add button in submission process
-1879838 Creative Commons - Licence Dependancy
-1856364 Wrong label for First/Last name in admin tool
-1832509 RSS feeds dont work on large collection / communities
-1827597 Registration Notification for eperson reg. via admin ui
-1810898 NullPointer upon submission
-1779601 filtermedia: OutOfMemory
-1775059 Repeated execution of chooser.jsp exhausts db conn pool
-1774958 Nested folders do not export correctly
-1756384 Authorization denied resulting in ServletException
-1753027 Double format string in supervise-list.jsp
-1745573 Itemmap-browse.jsp throws Exception on items without date
-1730606 Restricted Items metadata exposed via OAI
-1725817 Error in authorization to submit when you add collection.
-1725675 Incorrect count for mapped items in same community
-1715242 SequenceID gets reused if highest-SID bitstream is deleted
-1714851 Subscription Notification on Modified Items
-1707821 JPEGFilter throws IllegalArgumentException
-1695186 No sanity checking of self-register emails
-1689143 ControlledVocabulary don't works with onebox
-1688445 Anonymous group don't works as subgroup
-1686277 Cached Bitstream and Bundles have wrong Context stored
-1678703 OAI-PMH requests with from/until datestamps on Oracle
-1644932 Creative Commons iFrame disappears in Firefox 2.0
-1631575 Collection Templates language of metadata partially ignored
-1627199 DSRUN.BAT does not run a new class?
-1619473 Wrong dfg entry in webui.itemdisplay.* -> err. display
-1617889 Years < 1000 do not display in simple item view
+The following is a list of some of the known bugs in DSpace version 1.6 which
+will likely be fixed in 1.6.1.
 
-Plus these following bugs from previous releases which may 
-have or may not have been fixed:
+ - http://jira.dspace.org/jira/browse/DS-493
+   - Url in browser is incorrect after login
+   - Affects XMLUI only
 
-1609427 OAI server doesn't generate resumption token
-1606789 When collection is deleted, mapped item remains in community
-1606458 The MyDSpace page is very unstructured
-1606456 wrong link to register
-1606447 Cache strength information
-1606445 resolving messages with apostrophe in fmt tags
-1606444 Missing notification of the submitter on workflow abort
-1606441 Moving metadata fields between schemas
-1606439 Exception handling for deleting a metadata field
-1604365 Unbalanced brackets cause search error
-1596576 Stackable LDAP authentication does not work
-1583372 DCDate.toString returns invalid string when hour is zero
-1571645 NullPointerException possible in review.jsp
-1552792 Not possible to uncheck a primary bitstream
-1552760 Submit interface looks bad in Safari browser
-1550641 LDAP auth logic broken for large trees
-1550456 TableRow doesn't contain table name in some cases
-1549290 Suggest Features uses hard coded strings in dspace.cfg
-1548715 Multiple Metadata Schema moving fields failed,values moved
-1540108 RSS feeds fail on OS X
-1520527 PluginManager messy fail
-1517528 Finishing a submission as a supervisor fails
-1506556 Textareas in Oracle (VARCHAR datatype)
-1490162 Malformed OAI-PMH response: illegal bytes in UTF-8
-1472729 Permissions for Approval Users
-1461607 errors on oracle -- database_schema_13-14.sql
-1461606 oracle errors on-- database_schema.sql (ORACLE version!)
-1460754 Problems with Long Java datatype and Oracle
-1456594 Collection Administrator can delete any item
-1456593 links to controlled vocab docs required
-1456590 Values of templates are not visible for the user
-1456587 Authorisation Policies
-1456580 admin redirected after item withdrawn
-1456568 Input-Forms.xml validation required
-1456541 Statistics Link problem
-1456526 Batch Import Indexing
-1456459 Certain item-level DC fields describe bitstreams
-1456321 Initial Questions and Collection Template not in sync
-1456320 Collection admin on dspace-admin page
-1456317 Edit Item as Collection Admin - but Admin Buttons displayed
-1456300 Searching for an URL as identifier -> invalid search string
-1456257 restricted access and cc licenses
-1456231 Possible to have no access to items from browse
-1455320 unnecessary ldap.enable
-1452262 4th item highlighted on browse-by-author
-1451749 MetadataField has inconsistent lifecycle methods
-1445573 Stats not working on Oracle
-1442292 Item submission with null "Submitter" is not prevented
-1415166 Missing Access Control in WorkSpace, WorkFlow objects
-1358131 Non authorized users can perform WFStep using back button
-1324358 Dates disappear in browsing oldest first
-1256920 Mapped Items not added to Community (DSpace 1.3.1)
-1242527 Duplicate Items during submission
-1238166 Multi Media and D-Space
-1217068 Failed to complete review in workflow
-1174342 Potencial Memory Issue for a large collection
-1173600 Items Mapper has memory issue for a large collection
-1169975 workspace item policy not updated after workflow change
-1155173 Forms in custom 'skin' break group admin tool
-1120726 Performance bottlekneck in Group.update()
-1076506 Templates applied to imported items
+ - http://jira.dspace.org/jira/browse/DS-463
+   - Collection administrator help page not linked in some places
+   - Affects JSPUI only
+
+ - http://jira.dspace.org/jira/browse/DS-471
+   - Accessing site-level 'mets.xml' in XMLUI doesn't work properly for
+     handle prefixes with periods (e.g. 2010.1)
+   - Affects XMLUI only
+
+ - http://jira.dspace.org/jira/browse/DS-494
+   - DatabaseManager.process() unnecessarily limits range of DECIMAL or
+     NUMERIC
+   - Affects core DSpace API
+
+ - http://jira.dspace.org/jira/browse/DS-239
+   - java.net.MalformedURLException: unknown protocol: resource
+   - Affects XMLUI only
+
+ - http://jira.dspace.org/jira/browse/DS-469
+   - DCDate.displayDate(false,*) displays only year
+   - Affects core DSpace API
+
+ - http://jira.dspace.org/jira/browse/DS-501
+   - Kubrick Theme - NaN in Item Browse
+   - Affects XMLUI only
+
+ - http://jira.dspace.org/jira/browse/DS-298
+   - Caching problem when users logout
+   - Affects XMLUI only
+
+ - http://jira.dspace.org/jira/browse/DS-449
+   - Command line utility org.dspace.app.harvest.Harvest -S throws
+     AuthorizeException
+   - Affects core DSpace API
+
+
+This list is not exhaustive, but a definitive and up to date list of bugs
+affecting DSpace version 1.6 can be found in the JIRA issue tracker:
+
+ - http://jira.dspace.org/jira/secure/IssueNavigator.jspa?reset=true&&type=1
+    &pid=10020&resolution=-1&fixfor=-2&version=10020

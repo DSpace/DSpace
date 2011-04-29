@@ -1,9 +1,9 @@
 /*
  * CollectionWizardServlet.java
  *
- * Version: $Revision: 3705 $
+ * Version: $Revision: 4309 $
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ * Date: $Date: 2009-09-30 15:20:07 -0400 (Wed, 30 Sep 2009) $
  *
  * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
  * Institute of Technology.  All rights reserved.
@@ -52,6 +52,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
@@ -76,7 +77,7 @@ import org.dspace.eperson.Group;
  * Collection creation wizard UI
  * 
  * @author Robert Tansley
- * @version $Revision: 3705 $
+ * @version $Revision: 4309 $
  */
 public class CollectionWizardServlet extends DSpaceServlet
 {
@@ -174,11 +175,49 @@ public class CollectionWizardServlet extends DSpaceServlet
             // Create the collection
             Collection newCollection = c.createCollection();
             request.setAttribute("collection", newCollection);
+
             if (AuthorizeManager.isAdmin(context))
             {
                 // set a variable to show all buttons
-                request.setAttribute("admin_button", new Boolean(true));
+                request.setAttribute("sysadmin_button", new Boolean(true));
             }
+            
+            try 
+            {
+                AuthorizeUtil.authorizeManageAdminGroup(context, newCollection);                
+                request.setAttribute("admin_create_button", new Boolean(true));
+            }
+            catch (AuthorizeException authex) {
+                request.setAttribute("admin_create_button", new Boolean(false));
+            }
+            
+            try 
+            {
+                AuthorizeUtil.authorizeManageSubmittersGroup(context, newCollection);                
+                request.setAttribute("submitters_button", new Boolean(true));
+            }
+            catch (AuthorizeException authex) {
+                request.setAttribute("submitters_button", new Boolean(false));
+            }
+            
+            try 
+            {
+                AuthorizeUtil.authorizeManageWorkflowsGroup(context, newCollection);                
+                request.setAttribute("workflows_button", new Boolean(true));
+            }
+            catch (AuthorizeException authex) {
+                request.setAttribute("workflows_button", new Boolean(false));
+            }
+            
+            try 
+            {
+                AuthorizeUtil.authorizeManageTemplateItem(context, newCollection);                
+                request.setAttribute("template_button", new Boolean(true));
+            }
+            catch (AuthorizeException authex) {
+                request.setAttribute("template_button", new Boolean(false));
+            }
+            
             JSPManager.showJSP(request, response,
                     "/dspace-admin/wizard-questions.jsp");
             context.complete();
@@ -253,8 +292,9 @@ public class CollectionWizardServlet extends DSpaceServlet
         Group anonymousGroup = Group.find(context, 0);
 
         // "Public read" checkbox. Only need to do anything
-        // if it's not checked.
-        if (!UIUtil.getBoolParameter(request, "public_read"))
+        // if it's not checked (only system admin can uncheck this!).
+        if (!UIUtil.getBoolParameter(request, "public_read")
+                && AuthorizeManager.isAdmin(context))
         {
             // Remove anonymous default policies for new items
             AuthorizeManager.removePoliciesActionFilter(context, collection,
@@ -515,6 +555,8 @@ public class CollectionWizardServlet extends DSpaceServlet
             // Identify the format
             BitstreamFormat bf = FormatIdentifier.guessFormat(context, logoBS);
             logoBS.setFormat(bf);
+            AuthorizeManager.addPolicy(context, logoBS, Constants.WRITE, context
+                    .getCurrentUser());
             logoBS.update();
 
             // Remove temp file
@@ -710,11 +752,7 @@ public class CollectionWizardServlet extends DSpaceServlet
                 Community[] communities = collection.getCommunities();
                 request.setAttribute("community", communities[0]);
 
-                if (AuthorizeManager.isAdmin(context))
-                {
-                    // set a variable to show all buttons
-                    request.setAttribute("admin_button", new Boolean(true));
-                }
+                EditCommunitiesServlet.storeAuthorizeAttributeCollectionEdit(context, request, collection);
             }
 
             JSPManager.showJSP(request, response, "/tools/edit-collection.jsp");

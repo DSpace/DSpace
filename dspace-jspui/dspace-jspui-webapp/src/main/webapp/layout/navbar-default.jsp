@@ -1,9 +1,9 @@
 <%--
   - navbar-default.jsp
   -
-  - Version: $Revision: 3705 $
+  - Version: $Revision: 4020 $
   -
-  - Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+  - Date: $Date: 2009-07-02 23:55:39 -0400 (Thu, 02 Jul 2009) $
   -
   - Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
   - Institute of Technology.  All rights reserved.
@@ -205,7 +205,7 @@
     if (user != null) {
   %>
   <tr class="navigationBarItem">
-      	<td nowrap="" colspan="2" class="loggedIn">
+      	<td nowrap colspan="2" class="loggedIn">
           Logged&nbsp;in&nbsp;as<br/> 
           <%= navbarEmail %>
       	</td>
