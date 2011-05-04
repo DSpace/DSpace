@@ -49,8 +49,6 @@
 	
 <%@ page import="java.io.PrintWriter" %>
 
-<%@ page isErrorPage="true" %>
-
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <dspace:layout titlekey="jsp.error.internal.title">

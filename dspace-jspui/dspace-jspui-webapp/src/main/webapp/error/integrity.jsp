@@ -48,8 +48,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt"
     prefix="fmt" %>
 
-<%@ page isErrorPage="true" %>
-
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 
 <dspace:layout titlekey="jsp.error.integrity.title">
