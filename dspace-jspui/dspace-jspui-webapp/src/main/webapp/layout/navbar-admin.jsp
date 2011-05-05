@@ -207,7 +207,7 @@
     
   <tr class="navigationBarItem">
     <td>
-      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/metadataimport") ? "arrow-highlight" : "arrow") %>.gif" width="16" height="16"/>
+      <img alt="" src="<%= request.getContextPath() %>/image/<%= (currentPage.endsWith("/metadataimport") ? "arrow-highlight" : "arrow") %>.gif" width="7" height="13"/>
     </td>
     <td nowrap="nowrap" class="navigationBarItem">
       <a href="<%= request.getContextPath() %>/dspace-admin/metadataimport"><fmt:message key="jsp.layout.navbar-admin.metadataimport"/></a>
