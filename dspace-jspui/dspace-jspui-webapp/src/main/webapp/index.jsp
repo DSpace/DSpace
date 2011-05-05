@@ -75,10 +75,12 @@
 
 <%
     // go to canonical home address
-    String path = request.getRequestURI().substring(request.getContextPath().length());
-    if (path.equals("/index.jsp")) {
-        response.sendRedirect(request.getContextPath() + "/");
-        return;
+    if (! request.getServerName().equals("localhost")) {
+        String path = request.getRequestURI().substring(request.getContextPath().length());
+        if (path.equals("/index.jsp")) {
+            response.sendRedirect(request.getContextPath() + "/");
+            return;
+        }
     }
 
     Context context = null;
