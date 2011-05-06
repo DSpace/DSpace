@@ -87,6 +87,18 @@
     </build>
     <dependencies>
         <dependency>
+            <groupId>edu.umd.lib</groupId>
+            <artifactId>lims-util</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.marc4j</groupId>
+            <artifactId>marc4j</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>cas</groupId>
+            <artifactId>casclient</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-jdbc</artifactId>
             <version>2.5.6</version>
