@@ -1,55 +1,13 @@
-/*
- * SHERPARoMEOProtocol.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.content.authority;
 
 import java.io.IOException;
-import java.io.FileNotFoundException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.FileReader;
-import java.io.BufferedReader;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.ParserConfigurationException;
@@ -58,7 +16,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXParseException;
 
 import org.apache.log4j.Logger;
@@ -75,7 +32,7 @@ import org.apache.commons.httpclient.HttpException;
  * Choice Authority based on SHERPA/RoMEO - for Publishers and Journals
  * See the subclasses  SHERPARoMEOPublisher and SHERPARoMEOJournalTitle
  * for actual choice plugin implementations.  This is a superclass
- * containing all the common prototcol logic.
+ * containing all the common protocol logic.
  *
  * Reads these DSpace Config properties:
  *
@@ -86,7 +43,8 @@ import org.apache.commons.httpclient.HttpException;
  *  as a proof-of-concept.  Any site that actually wants to use it will
  *  probably have to refine it (and give patches back to dspace.org).
  *
- * @see SHERPARoMEOPublisher, SHERPARoMEOJournalTitle
+ * @see SHERPARoMEOPublisher
+ * @see SHERPARoMEOJournalTitle
  * @author Larry Stone
  * @version $Revision $
  */
@@ -105,21 +63,23 @@ public abstract class SHERPARoMEOProtocol implements ChoiceAuthority
 
             // sanity check
             if (url == null)
+            {
                 throw new IllegalStateException("Missing DSpace configuration keys for SHERPA/RoMEO Query");
+            }
         }
     }
 
     // this implements the specific RoMEO API args and XML tag naming
     public abstract Choices getMatches(String text, int collection, int start, int limit, String locale);
 
-    public Choices getBestMatch(String text, int collection, String locale)
+    public Choices getBestMatch(String field, String text, int collection, String locale)
     {
-        return getMatches(text, collection, 0, 2, locale);
+        return getMatches(field, text, collection, 0, 2, locale);
     }
 
     // XXX FIXME just punt, returning value, never got around to
     //  implementing a reverse query.
-    public String getLabel(String key, String locale)
+    public String getLabel(String field, String key, String locale)
     {
         return key;
     }
@@ -152,11 +112,17 @@ public abstract class SHERPARoMEOProtocol implements ChoiceAuthority
                 xr.parse(new InputSource(get.getResponseBodyAsStream()));
                 int confidence;
                 if (handler.total == 0)
+                {
                     confidence = Choices.CF_NOTFOUND;
+                }
                 else if (handler.total == 1)
+                {
                     confidence = Choices.CF_UNCERTAIN;
+                }
                 else
+                {
                     confidence = Choices.CF_AMBIGUOUS;
+                }
                 return new Choices(handler.result, start, handler.total, confidence, false);
             }
         }
@@ -226,9 +192,13 @@ public abstract class SHERPARoMEOProtocol implements ChoiceAuthority
             if (newValue.length() > 0)
             {
                 if (textValue == null)
+                {
                     textValue = newValue;
+                }
                 else
+                {
                     textValue += newValue;
+                }
             }
         }
 
@@ -251,27 +221,30 @@ public abstract class SHERPARoMEOProtocol implements ChoiceAuthority
                     }
                 }
             }
-
-            // after start of result element, get next hit ready
             else if (localName.equals(resultElement))
             {
+                // after start of result element, get next hit ready
                 if (++rindex < result.length)
+                {
                     result[rindex] = new Choice();
+                }
             }
-
-            // plug in label value
             else if (localName.equals(labelElement) && textValue != null)
-                result[rindex].value =
-                result[rindex].label = textValue.trim();
-
-            // plug in authority value
-            else if (authorityElement != null &&
-                     localName.equals(authorityElement) && textValue != null)
+            {
+                // plug in label value
+                result[rindex].value = textValue.trim();
+                result[rindex].label = result[rindex].value; 
+            }
+            else if (authorityElement != null && localName.equals(authorityElement) && textValue != null)
+            {
+                // plug in authority value
                 result[rindex].authority = textValue.trim();
-
-            // error message
+            }
             else if (localName.equals("message") && textValue != null)
-                log.warn("SHERPA/RoMEO response error message: "+textValue.trim());
+            {
+                // error message
+                log.warn("SHERPA/RoMEO response error message: " + textValue.trim());
+            }
         }
 
         // subclass overriding this MUST call it with super()

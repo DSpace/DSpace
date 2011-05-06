@@ -1,41 +1,9 @@
-/*
- * ItemMapServlet.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4942 $
- *
- * Date: $Date: 2010-05-13 21:58:27 -0400 (Thu, 13 May 2010) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.webui.servlet.admin;
 
@@ -65,7 +33,7 @@ import java.util.Map;
 /**
  * Servlet for editing and deleting (expunging) items
  * 
- * @version $Revision: 4942 $
+ * @version $Revision: 5845 $
  */
 public class ItemMapServlet extends DSpaceServlet
 {
@@ -120,9 +88,9 @@ public class ItemMapServlet extends DSpaceServlet
     		// also holds for interruption by pressing 'Cancel'
     		int count_native = 0; // # of items owned by this collection
     		int count_import = 0; // # of virtual items
-    		Map myItems = new HashMap(); // # for the browser
-    		Map myCollections = new HashMap(); // collections for list
-    		Map myCounts = new HashMap(); // counts for each collection
+    		Map<Integer, Item> myItems = new HashMap<Integer, Item>(); // # for the browser
+    		Map<Integer, Collection> myCollections = new HashMap<Integer, Collection>(); // collections for list
+    		Map<Integer, Integer> myCounts = new HashMap<Integer, Integer>(); // counts for each collection
     		
     		// get all items from that collection, add them to a hash
     		ItemIterator i = myCollection.getItems();
@@ -136,7 +104,7 @@ public class ItemMapServlet extends DSpaceServlet
                     Item myItem = i.next();
 
                     // get key for hash
-                    Integer myKey = new Integer(myItem.getID());
+                    Integer myKey = Integer.valueOf(myItem.getID());
 
                     if (myItem.isOwningCollection(myCollection))
                     {
@@ -149,21 +117,21 @@ public class ItemMapServlet extends DSpaceServlet
 
                     // is the collection in the hash?
                     Collection owningCollection = myItem.getOwningCollection();
-                    Integer cKey = new Integer(owningCollection.getID());
+                    Integer cKey = Integer.valueOf(owningCollection.getID());
 
                     if (myCollections.containsKey(cKey))
                     {
-                        Integer x = (Integer) myCounts.get(cKey);
+                        Integer x = myCounts.get(cKey);
                         int myCount = x.intValue() + 1;
 
                         // increment count for that collection
-                        myCounts.put(cKey, new Integer(myCount));
+                        myCounts.put(cKey, Integer.valueOf(myCount));
                     }
                     else
                     {
                         // store and initialize count
                         myCollections.put(cKey, owningCollection);
-                        myCounts.put(cKey, new Integer(1));
+                        myCounts.put(cKey, Integer.valueOf(1));
                     }
 
                     // store the item
@@ -173,18 +141,20 @@ public class ItemMapServlet extends DSpaceServlet
             finally
             {
                 if (i != null)
+                {
                     i.close();
+                }
             }
             
             // remove this collection's entry because we already have a native
     		// count
-    		myCollections.remove(new Integer(myCollection.getID()));
+    		myCollections.remove(Integer.valueOf(myCollection.getID()));
     		
     		// sort items - later
     		// show page
     		request.setAttribute("collection", myCollection);
-    		request.setAttribute("count_native", new Integer(count_native));
-    		request.setAttribute("count_import", new Integer(count_import));
+    		request.setAttribute("count_native", Integer.valueOf(count_native));
+    		request.setAttribute("count_import", Integer.valueOf(count_import));
     		request.setAttribute("items", myItems);
     		request.setAttribute("collections", myCollections);
     		request.setAttribute("collection_counts", myCounts);
@@ -203,7 +173,7 @@ public class ItemMapServlet extends DSpaceServlet
     		// get item IDs to remove
     		String[] itemIDs = request.getParameterValues("item_ids");
     		String message = "remove";
-    		LinkedList removedItems = new LinkedList();
+    		LinkedList<String> removedItems = new LinkedList<String>();
     		
                 if (itemIDs == null)
                 {
@@ -225,7 +195,7 @@ public class ItemMapServlet extends DSpaceServlet
     					try
     					{
     						IndexBrowse ib = new IndexBrowse(context);
-    						ib.itemChanged(myItem);
+                            ib.indexItem(myItem);
     					}
     					catch (BrowseException e)
     					{
@@ -251,7 +221,7 @@ public class ItemMapServlet extends DSpaceServlet
     		// get item IDs to add
     		String[] itemIDs = request.getParameterValues("item_ids");
     		String message = "added";
-    		LinkedList addedItems = new LinkedList();
+    		LinkedList<String> addedItems = new LinkedList<String>();
     		
     		
     		if (itemIDs == null)
@@ -266,8 +236,7 @@ public class ItemMapServlet extends DSpaceServlet
     				
     				Item myItem = Item.find(context, i);
     				
-    				if (AuthorizeManager.authorizeActionBoolean(context,
-    						myItem, Constants.READ))
+    				if (AuthorizeManager.authorizeActionBoolean(context, myItem, Constants.READ))
     				{
     					// make sure item doesn't belong to this collection
     					if (!myItem.isOwningCollection(myCollection))
@@ -276,7 +245,7 @@ public class ItemMapServlet extends DSpaceServlet
     						try
     	    				{
     	    					IndexBrowse ib = new IndexBrowse(context);
-    	    					ib.itemChanged(myItem);
+    	    					ib.indexItem(myItem);
     	    				}
     	    				catch (BrowseException e)
     	    				{
@@ -307,7 +276,7 @@ public class ItemMapServlet extends DSpaceServlet
     		{
     			throw new ServletException("There is no configuration for itemmap.author.index");
     		}
-    		Map items = new HashMap();
+    		Map<Integer, Item> items = new HashMap<Integer, Item>();
     		try
     		{
     			BrowserScope bs = new BrowserScope(context);
@@ -331,21 +300,21 @@ public class ItemMapServlet extends DSpaceServlet
     			ItemIterator itr = myCollection.getItems();
                 try
                 {
-                    ArrayList idslist = new ArrayList();
+                    ArrayList<Integer> idslist = new ArrayList<Integer>();
                     while (itr.hasNext())
                     {
-                        idslist.add(new Integer(itr.nextID()));
+                        idslist.add(Integer.valueOf(itr.nextID()));
                     }
 
                     for (int i = 0; i < browseItems.length; i++)
                     {
                         // only if it isn't already in this collection
-                        if (!idslist.contains(new Integer(browseItems[i].getID())))
+                        if (!idslist.contains(Integer.valueOf(browseItems[i].getID())))
                         {
                             // only put on list if you can read item
                             if (AuthorizeManager.authorizeActionBoolean(context, browseItems[i], Constants.READ))
                             {
-                                items.put(new Integer(browseItems[i].getID()), browseItems[i]);
+                                items.put(Integer.valueOf(browseItems[i].getID()), browseItems[i]);
                             }
                         }
                     }
@@ -353,7 +322,9 @@ public class ItemMapServlet extends DSpaceServlet
                 finally
                 {
                     if (itr != null)
+                    {
                         itr.close();
+                    }
                 }
             }
     		catch (BrowseException e)
@@ -365,7 +336,7 @@ public class ItemMapServlet extends DSpaceServlet
     		request.setAttribute("collection", myCollection);
     		request.setAttribute("browsetext", name);
     		request.setAttribute("items", items);
-    		request.setAttribute("browsetype", new String("Add"));
+    		request.setAttribute("browsetype", "Add");
     		
     		jspPage = "itemmap-browse.jsp";
     		JSPManager.showJSP(request, response, jspPage);
@@ -379,7 +350,7 @@ public class ItemMapServlet extends DSpaceServlet
     		
     		// now find all imported items from that collection
     		// seemingly inefficient, but database should have this query cached
-            Map items = new HashMap();
+            Map<Integer, Item> items = new HashMap<Integer, Item>();
     		ItemIterator i = myCollection.getItems();
             try
             {
@@ -389,7 +360,7 @@ public class ItemMapServlet extends DSpaceServlet
 
                     if (myItem.isOwningCollection(targetCollection))
                     {
-                        Integer myKey = new Integer(myItem.getID());
+                        Integer myKey = Integer.valueOf(myItem.getID());
                         items.put(myKey, myItem);
                     }
                 }
@@ -397,14 +368,16 @@ public class ItemMapServlet extends DSpaceServlet
             finally
             {
                 if (i != null)
+                {
                     i.close();
+                }
             }
     		
             request.setAttribute("collection", myCollection);
     		request.setAttribute("browsetext", targetCollection
     				.getMetadata("name"));
     		request.setAttribute("items", items);
-    		request.setAttribute("browsetype", new String("Remove"));
+    		request.setAttribute("browsetype", "Remove");
     		
     		// show this page when we're done
     		jspPage = "itemmap-browse.jsp";

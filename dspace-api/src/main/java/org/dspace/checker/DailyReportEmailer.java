@@ -1,33 +1,9 @@
-/*
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.checker;
 
@@ -43,6 +19,7 @@ import javax.activation.DataSource;
 import javax.activation.FileDataSource;
 import javax.mail.BodyPart;
 import javax.mail.Message;
+import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Session;
 import javax.mail.Transport;
@@ -63,7 +40,7 @@ import org.dspace.core.ConfigurationManager;
 /**
  * <p>
  * The email reporter creates and sends emails to an administrator. This only
- * reports information for todays date. It is expected this will be used just
+ * reports information for today's date. It is expected this will be used just
  * after the checksum checker has been run.
  * </p>
  * 
@@ -154,9 +131,9 @@ public class DailyReportEmailer
      *            <dt>-m</dt>
      *            <dd>Bitstreams missing from assetstore</dd>
      *            <dt>-c</dt>
-     *            <dd>Bitstreams whoses checksums were changed</dd>
+     *            <dd>Bitstreams whose checksums were changed</dd>
      *            <dt>-n</dt>
-     *            <dd>Bitstreams whoses checksums were changed</dd>
+     *            <dd>Bitstreams whose checksums were changed</dd>
      *            <dt>-a</dt>
      *            <dd>Send all reports in one email</dd>
      *            </dl>
@@ -350,7 +327,11 @@ public class DailyReportEmailer
                 }
             }
         }
-        catch (Exception e)
+        catch (MessagingException e)
+        {
+            log.fatal(e);
+        }
+        catch (IOException e)
         {
             log.fatal(e);
         }
@@ -368,11 +349,11 @@ public class DailyReportEmailer
                 }
             }
 
-            if (report != null)
+            if (report != null && report.exists())
             {
-                if (report.exists())
+                if (!report.delete())
                 {
-                    report.delete();
+                    log.error("Unable to delete report file");
                 }
             }
         }

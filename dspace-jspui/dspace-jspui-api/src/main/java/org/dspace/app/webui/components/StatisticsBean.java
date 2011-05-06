@@ -1,15 +1,13 @@
 /**
- * $Id: $
- * $URL: $
- * *************************************************************************
- * Copyright (c) 2002-2009, DuraSpace.  All rights reserved
- * Licensed under the DuraSpace Foundation License.
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * A copy of the DuraSpace License has been included in this
- * distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.webui.components;
+import org.apache.commons.lang.ArrayUtils;
+
 import java.util.List;
 /**
  *
@@ -63,11 +61,11 @@ public class StatisticsBean implements java.io.Serializable
     }
     public String[][] getMatrix()
     {
-        return this.matrix;
+        return (String[][]) ArrayUtils.clone(this.matrix);
     }
     public void setMatrix(final String[][] matrix)
     {
-        this.matrix = matrix;
+        this.matrix = (String[][]) ArrayUtils.clone(matrix);
     }
 }
 

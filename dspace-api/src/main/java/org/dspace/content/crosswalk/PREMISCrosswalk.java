@@ -1,50 +1,20 @@
-/*
- * PREMISCrosswalk.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3761 $
- *
- * Date: $Date: 2009-05-07 00:18:02 -0400 (Thu, 07 May 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.content.crosswalk;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
@@ -69,7 +39,7 @@ import org.jdom.Namespace;
  * specification for both ingest and dissemination.
  *
  * @author Larry Stone
- * @version $Revision: 3761 $
+ * @version $Revision: 5844 $
  */
 public class PREMISCrosswalk
     implements IngestionCrosswalk, DisseminationCrosswalk
@@ -84,9 +54,6 @@ public class PREMISCrosswalk
     private String schemaLocation =
         PREMIS_NS.getURI()+" http://www.loc.gov/standards/premis/PREMIS-v1-0.xsd";
 
-    private static final Namespace XLINK_NS =
-        Namespace.getNamespace("xlink", "http://www.w3.org/TR/xlink");
-
     private static final Namespace namespaces[] = { PREMIS_NS };
 
     /*----------- Submission functions -------------------*/
@@ -95,36 +62,41 @@ public class PREMISCrosswalk
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
         if (!(root.getName().equals("premis")))
-            throw new MetadataValidationException("Wrong root element for PREMIS: "+root.toString());
+        {
+            throw new MetadataValidationException("Wrong root element for PREMIS: " + root.toString());
+        }
         ingest(context, dso, root.getChildren());
     }
 
-    public void ingest(Context context, DSpaceObject dso, List ml)
+    public void ingest(Context context, DSpaceObject dso, List<Element> ml)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
         // we only understand how to crosswalk PREMIS to a Bitstream.
         if (dso.getType() != Constants.BITSTREAM)
+        {
             throw new CrosswalkObjectNotSupported("Wrong target object type, PREMISCrosswalk can only crosswalk to a Bitstream.");
+        }
 
         Bitstream bitstream = (Bitstream)dso;
         String MIMEType = null;
         String bsName = null;
-        Iterator mi = ml.iterator();
-        while (mi.hasNext())
+        for (Element me : ml)
         {
-            Element me = (Element)mi.next();
-
-            // if we're fed a <premis> wrapper object, recurse on its guts:
             if (me.getName().equals("premis"))
+            {
+                // if we're fed a <premis> wrapper object, recurse on its guts:
                 ingest(context, dso, me.getChildren());
-
-            // "object" section:
+            }
             else if (me.getName().equals("object"))
             {
+                // "object" section:
+
                 // originalName becomes new bitstream source and (default) name
                 Element on = me.getChild("originalName", PREMIS_NS);
                 if (on != null)
+                {
                     bsName = on.getTextTrim();
+                }
 
                 // Reconcile technical metadata with bitstream content;
                 // check that length and message digest (checksum) match.
@@ -139,9 +111,11 @@ public class PREMISCrosswalk
                         {
                             int size = Integer.parseInt(ssize);
                             if (bitstream.getSize() != size)
+                            {
                                 throw new MetadataValidationException(
-                                 "Bitstream size ("+String.valueOf(bitstream.getSize())+
-                                 ") does not match size in PREMIS ("+ssize+"), rejecting it.");
+                                        "Bitstream size (" + String.valueOf(bitstream.getSize()) +
+                                                ") does not match size in PREMIS (" + ssize + "), rejecting it.");
+                            }
                         }
                         catch (NumberFormatException ne)
                         {
@@ -155,18 +129,22 @@ public class PREMISCrosswalk
                         String md = fixity.getChildTextTrim("messageDigest", PREMIS_NS);
                         String b_alg = bitstream.getChecksumAlgorithm();
                         String b_md = bitstream.getChecksum();
-                        if (alg != null && md != null &&
-                            b_alg != null && b_md != null &&
-                            alg.equals(b_alg))
+                        if (StringUtils.equals(alg, b_alg))
                         {
-                            if (md.equals(b_md))
-                                log.debug("Bitstream checksum agrees with PREMIS: "+bitstream.getName());
+                            if (StringUtils.equals(md, b_md))
+                            {
+                                log.debug("Bitstream checksum agrees with PREMIS: " + bitstream.getName());
+                            }
                             else
-                                throw new MetadataValidationException("Bitstream "+alg+" Checksum does not match value in PREMIS ("+b_md+" != "+md+"), for bitstream: "+bitstream.getName());
+                            {
+                                throw new MetadataValidationException("Bitstream " + alg + " Checksum does not match value in PREMIS (" + b_md + " != " + md + "), for bitstream: " + bitstream.getName());
+                            }
                         }
                         else
-                            log.warn("Cannot test checksum on bitstream="+bitstream.getName()+
-                                     ", algorithm in PREMIS is different: "+alg);
+                        {
+                            log.warn("Cannot test checksum on bitstream=" + bitstream.getName() +
+                                    ", algorithm in PREMIS is different: " + alg);
+                        }
                     }
 
                     // Look for formatDesignation/formatName, which is
@@ -176,7 +154,9 @@ public class PREMISCrosswalk
                     {
                         Element fd = format.getChild("formatDesignation", PREMIS_NS);
                         if (fd != null)
+                        {
                             MIMEType = fd.getChildTextTrim("formatName", PREMIS_NS);
+                        }
                     }
                 }
 
@@ -193,12 +173,19 @@ public class PREMISCrosswalk
                 BitstreamFormat bf = (MIMEType == null) ? null :
                         BitstreamFormat.findByMIMEType(context, MIMEType);
                 if (bf == null)
+                {
                     bf = FormatIdentifier.guessFormat(context, bitstream);
+                }
+
                 if (bf != null)
+                {
                     bitstream.setFormat(bf);
+                }
             }
             else
-                log.debug("Skipping element: "+me.toString());
+            {
+                log.debug("Skipping element: " + me.toString());
+            }
         }
         bitstream.update();
     }
@@ -207,7 +194,7 @@ public class PREMISCrosswalk
 
     public Namespace[] getNamespaces()
     {
-        return namespaces;
+        return (Namespace[]) ArrayUtils.clone(namespaces);
     }
 
     public String getSchemaLocation()
@@ -218,10 +205,7 @@ public class PREMISCrosswalk
     public boolean canDisseminate(DSpaceObject dso)
     {
         //PREMISCrosswalk can only crosswalk a Bitstream
-        if (dso.getType() == Constants.BITSTREAM)
-          return true;
-        else
-          return false;
+        return (dso.getType() == Constants.BITSTREAM);
     }
 
     public Element disseminateElement(DSpaceObject dso)
@@ -229,7 +213,9 @@ public class PREMISCrosswalk
                IOException, SQLException, AuthorizeException
     {
         if (dso.getType() != Constants.BITSTREAM)
+        {
             throw new CrosswalkObjectNotSupported("PREMISCrosswalk can only crosswalk a Bitstream.");
+        }
         Bitstream bitstream = (Bitstream)dso;
 
         Element premis = new Element("premis", PREMIS_NS);
@@ -256,7 +242,9 @@ public class PREMISCrosswalk
         {
             Item bi[] = bn[0].getItems();
             if (bi.length > 0)
+            {
                 handle = bi[0].getHandle();
+            }
         }
         // get or make up name for bitstream:
         String bsName = bitstream.getName();
@@ -266,6 +254,7 @@ public class PREMISCrosswalk
             bsName = "bitstream_"+sid+ (ext.length > 0 ? ext[0] : "");
         }
         if (handle != null && baseUrl != null)
+        {
             oiv.setText(baseUrl
                     + "/bitstream/"
                     + URLEncoder.encode(handle, "UTF-8")
@@ -273,8 +262,11 @@ public class PREMISCrosswalk
                     + sid
                     + "/"
                     + URLEncoder.encode(bsName, "UTF-8"));
+        }
         else
+        {
             oiv.setText(URLEncoder.encode(bsName, "UTF-8"));
+        }
 
         oid.addContent(oiv);
         object.addContent(oid);
@@ -323,7 +315,9 @@ public class PREMISCrosswalk
         // originalName <- name (or source if none)
         String oname = bitstream.getName();
         if (oname == null)
+        {
             oname = bitstream.getSource();
+        }
         if (oname != null)
         {
             Element on = new Element("originalName", PREMIS_NS);
@@ -334,11 +328,11 @@ public class PREMISCrosswalk
         return premis;
     }
 
-    public List disseminateList(DSpaceObject dso)
+    public List<Element> disseminateList(DSpaceObject dso)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
-        List result = new ArrayList(1);
+        List<Element> result = new ArrayList<Element>(1);
         result.add(disseminateElement(dso));
         return result;
     }

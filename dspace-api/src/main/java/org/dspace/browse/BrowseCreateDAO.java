@@ -1,44 +1,15 @@
-/*
- * BrowseCreateDAO.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4365 $
- *
- * Date: $Date: 2009-10-05 19:52:42 -0400 (Mon, 05 Oct 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.browse;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Interface for any class wishing to provide a browse storage later.  This particular
@@ -103,7 +74,7 @@ public interface BrowseCreateDAO
 	 * @param sortCols	an Integer-String map of sort column numbers and values
 	 * @throws BrowseException
 	 */
-    public void insertIndex(String table, int itemID, Map sortCols) throws BrowseException;
+    public void insertIndex(String table, int itemID, Map<Integer, String> sortCols) throws BrowseException;
 
     /**
      * Updates an index record into the given table for the given item id.  The Map should contain
@@ -127,7 +98,7 @@ public interface BrowseCreateDAO
      * @return true if the record is updated, false if not found
      * @throws BrowseException
      */
-    public boolean updateIndex(String table, int itemID, Map sortCols) throws BrowseException;
+    public boolean updateIndex(String table, int itemID, Map<Integer, String> sortCols) throws BrowseException;
 
     /**
 	 * Get the browse index's internal id for the location of the given string
@@ -184,9 +155,10 @@ public interface BrowseCreateDAO
      * @param table		 	the mapping table
      * @param itemID		the item id
      * @param distinctIDs	the id of the distinct record
+     * @return the ids of any distinct records that have been unmapped
      * @throws BrowseException
      */
-    public boolean updateDistinctMappings(String table, int itemID, int[] distinctIDs) throws BrowseException;
+    public MappingResults updateDistinctMappings(String table, int itemID, Set<Integer> distinctIDs) throws BrowseException;
 
 	/**
 	 * Find out of a given table exists.
@@ -195,7 +167,7 @@ public interface BrowseCreateDAO
 	 * @return			true if exists, false if not
 	 * @throws BrowseException
 	 */
-	public boolean testTableExistance(String table) throws BrowseException;
+	public boolean testTableExistence(String table) throws BrowseException;
 	
 	/**
 	 * Drop the given table name, and all other resources that are attached to it.  In normal
@@ -275,7 +247,7 @@ public interface BrowseCreateDAO
      * @return          the instructions (SQL) that effect the creation
      * @throws BrowseException
      */
-    public String createPrimaryTable(String table, List sortCols, boolean execute) throws BrowseException;
+    public String createPrimaryTable(String table, List<Integer> sortCols, boolean execute) throws BrowseException;
 	
     /**
 	 * Create any indices that the implementing DAO sees fit to maximise performance.
@@ -334,6 +306,8 @@ public interface BrowseCreateDAO
 	 * @throws BrowseException
 	 */
 	public String createCommunityView(String table, String view, boolean execute) throws BrowseException;
+
+    public List<Integer> deleteMappingsByItemID(String mapTable, int itemID) throws BrowseException;
 	
 	/**
 	 * Create the table which will hold the distinct metadata values that appear in multiple
@@ -365,16 +339,26 @@ public interface BrowseCreateDAO
 	
 	/**
 	 * So that any left over indices for items which have been deleted can be assured to have
-	 * been removed, this method checks for indicies for items which are not in the item table.
+	 * been removed, this method checks for indices for items which are not in the item table.
 	 * If it finds an index which does not have an associated item it removes it.
 	 * 
 	 * @param table		the index table to check
-	 * @param map		the name of the associated distinct mapping table
 	 * @param withdrawn TODO
 	 * @throws BrowseException
 	 */
-	public void pruneExcess(String table, String map, boolean withdrawn) throws BrowseException;
-	
+	public void pruneExcess(String table, boolean withdrawn) throws BrowseException;
+
+    /**
+     * So that any left over indices for items which have been deleted can be assured to have
+     * been removed, this method checks for indices for items which are not in the item table.
+     * If it finds an index which does not have an associated item it removes it.
+     *
+     * @param map		the name of the associated distinct mapping table
+     * @param withdrawn TODO
+     * @throws BrowseException
+     */
+    public void pruneMapExcess(String map, boolean withdrawn, List<Integer> distinctIds) throws BrowseException;
+
 	/**
 	 * So that there are no distinct values indexed which are no longer referenced from the
 	 * map table, this method checks for values which are not referenced from the map,
@@ -384,5 +368,5 @@ public interface BrowseCreateDAO
 	 * @param map		the name of the associated distinct mapping table.
 	 * @throws BrowseException
 	 */
-	public void pruneDistinct(String table, String map) throws BrowseException;
+	public void pruneDistinct(String table, String map, List<Integer> distinctIds) throws BrowseException;
 }

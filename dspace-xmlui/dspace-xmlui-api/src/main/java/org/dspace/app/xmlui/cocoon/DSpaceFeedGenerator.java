@@ -1,43 +1,10 @@
-/*
- * DSpaceFeedGenerator.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4511 $
- *
- * Date: $Date: 2009-11-05 23:26:26 -0500 (Thu, 05 Nov 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.xmlui.cocoon;
 
 import java.io.IOException;
@@ -45,9 +12,7 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import org.apache.avalon.excalibur.pool.Recyclable;
 import org.apache.avalon.framework.configuration.Configurable;
@@ -58,7 +23,6 @@ import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
-import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.generation.AbstractGenerator;
 import org.apache.cocoon.util.HashUtil;
@@ -74,36 +38,22 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
-import org.dspace.browse.BrowseItem;
 import org.dspace.browse.BrowserScope;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
-import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
-import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
-import com.sun.syndication.feed.rss.Channel;
-import com.sun.syndication.feed.rss.Description;
-import com.sun.syndication.feed.rss.Image;
-import com.sun.syndication.feed.module.DCModuleImpl;
-import com.sun.syndication.feed.module.DCModule;
 import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.WireFeedOutput;
 
 /**
  *
@@ -146,7 +96,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     private String handle = null;
     
     /** number of DSpace items per feed */
-    private static int itemCount = 0;
+    private static final int ITEM_COUNT = ConfigurationManager.getIntProperty("webui.feed.items");
     
     /**
      * How long should RSS feed cache entries be valid? milliseconds * seconds *
@@ -161,9 +111,6 @@ public class DSpaceFeedGenerator extends AbstractGenerator
         CACHE_AGE = 1000 * 60 * 60 * ageCfg;
     }
     
-        /**     default fields to display in item description */
-    private static String defaultDescriptionFields = "dc.description.abstract, dc.description, dc.title.alternative, dc.title";
-
     /** configuration option to include Item which does not have READ by Anonymous enabled **/
     private static boolean includeRestrictedItems = ConfigurationManager.getBooleanProperty("harvest.includerestricted.rss", true);
 
@@ -204,7 +151,9 @@ public class DSpaceFeedGenerator extends AbstractGenerator
                 DSpaceObject dso = null;
                 
                 if (handle != null && !handle.contains("site"))
+                {
                     dso = HandleManager.resolveToObject(context, handle);
+                }
                 
                 validity.add(dso);
                 
@@ -216,9 +165,13 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 
                 this.validity = validity.complete();
             }
+            catch (RuntimeException e)
+            {
+                throw e;
+            }
             catch (Exception e)
             {
-                // Just ignore all errors and return an invalid cache.
+                return null;
             }
         }
         return this.validity;
@@ -231,7 +184,6 @@ public class DSpaceFeedGenerator extends AbstractGenerator
      */
     public void configure(Configuration conf) throws ConfigurationException
     {
-        itemCount = ConfigurationManager.getIntProperty("webui.feed.items");
     }
     
     
@@ -286,7 +238,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
         }
         catch (IllegalArgumentException iae)
         {
-                throw new ResourceNotFoundException("Syndication feed format, '"+this.format+"', is not supported.");
+                throw new ResourceNotFoundException("Syndication feed format, '"+this.format+"', is not supported.", iae);
         }
         catch (FeedException fe)
         {
@@ -306,15 +258,21 @@ public class DSpaceFeedGenerator extends AbstractGenerator
             throws SQLException
     {
         if (recentSubmissionItems != null)
-                return recentSubmissionItems;
+        {
+            return recentSubmissionItems;
+        }
 
         String source = ConfigurationManager.getProperty("recent.submissions.sort-option");
         BrowserScope scope = new BrowserScope(context);
         if (dso instanceof Collection)
-                scope.setCollection((Collection) dso);
+        {
+            scope.setCollection((Collection) dso);
+        }
         else if (dso instanceof Community)
-                scope.setCommunity((Community) dso);
-        scope.setResultsPerPage(itemCount);
+        {
+            scope.setCommunity((Community) dso);
+        }
+        scope.setResultsPerPage(ITEM_COUNT);
 
         // FIXME Exception handling
         try
@@ -385,9 +343,9 @@ public class DSpaceFeedGenerator extends AbstractGenerator
      * without rechecking it, for 24 hours.
      *
      */
-    private class FeedValidity extends DSpaceValidity
+    private static class FeedValidity extends DSpaceValidity
     {
-                private static final long serialVersionUID = 1L;
+        private static final long serialVersionUID = 1L;
                         
         /** When the cache's validity expires */
         private long expires = 0;
@@ -439,19 +397,16 @@ public class DSpaceFeedGenerator extends AbstractGenerator
          */
         public int isValid(SourceValidity otherValidity)
         {
-            if (this.completed)
+            if (this.completed && otherValidity instanceof FeedValidity)
             {
-                if (otherValidity instanceof FeedValidity)
+                FeedValidity other = (FeedValidity) otherValidity;
+                if (hash == other.hash)
                 {
-                    FeedValidity other = (FeedValidity) otherValidity;
-                    if (hash == other.hash)
-                    {
-                        // Update both cache's expiration time.
-                        this.expires = System.currentTimeMillis() + CACHE_AGE;
-                        other.expires = System.currentTimeMillis() + CACHE_AGE;
-                        
-                        return SourceValidity.VALID;
-                    }
+                    // Update both cache's expiration time.
+                    this.expires = System.currentTimeMillis() + CACHE_AGE;
+                    other.expires = System.currentTimeMillis() + CACHE_AGE;
+
+                    return SourceValidity.VALID;
                 }
             }
 

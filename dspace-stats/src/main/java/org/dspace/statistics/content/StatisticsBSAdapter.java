@@ -1,12 +1,9 @@
 /**
- * $Id: StatisticsBSAdapter.java 4405 2009-10-07 08:35:32Z mdiggory $
- * $URL: http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-stats/src/main/java/org/dspace/statistics/content/StatisticsBSAdapter.java $
- * *************************************************************************
- * Copyright (c) 2002-2009, DuraSpace.  All rights reserved
- * Licensed under the DuraSpace Foundation License.
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * A copy of the DuraSpace License has been included in this
- * distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
+ * http://www.dspace.org/license/
  */
 package org.dspace.statistics.content;
 
@@ -20,11 +17,12 @@ import org.dspace.statistics.SolrLogger;
 import org.dspace.statistics.content.filter.StatisticsFilter;
 
 /**
+ * Class that will hold the data needed to show
+ * statistics in the browse and search pages.
+ * 
  * User: @author kevinvandevelde at atmire.com (kevin at atmire.com)
  * Date: 20-mei-2009
  * Time: 16:44:29
- * Class that will hold the data needed to show
- * statistical data in the browse, search pages
  */
 
 public class StatisticsBSAdapter {
@@ -34,8 +32,11 @@ public class StatisticsBSAdapter {
     private boolean displayTotalViews;
     private List<StatisticsFilter> filters;
 
+    /** visitType is ITEM */
     public static final int ITEM_VISITS = 0;
+    /** visitType is BITSTREAM */
     public static final int BITSTREAM_VISITS = 1;
+    /** visitType is TOTAL */
     public static final int TOTAL_VISITS = 2;
 
     public StatisticsBSAdapter() {
@@ -45,8 +46,9 @@ public class StatisticsBSAdapter {
     }
 
     /**
-     * Returns the number of visits for the item,
-     * depending on the visitype it can either be item, bitstream, total, ...
+     * Returns the number of visits for the item.
+     * Depending on the visitType it can either be item, bitstream, total, ...
+     * 
      * @param visitType the type of visits we want, from the item, bitstream, total
      * @param item the item from which we need our visits
      * @return the number of visits
@@ -66,15 +68,17 @@ public class StatisticsBSAdapter {
     }
 
     private String resolveFilterQueries(){
-        String out = "";
+        StringBuilder out = new StringBuilder();
         for (int i = 0; i < filters.size(); i++) {
             StatisticsFilter statisticsFilter = filters.get(i);
-            out += statisticsFilter.toQuery();
+            out.append(statisticsFilter.toQuery());
 
             if(i != 0 && (i != filters.size() -1))
-                out += " AND ";
+            {
+                out.append(" AND ");
+            }
         }
-        return out;
+        return out.toString();
     }
 
     ///////////////////////

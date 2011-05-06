@@ -1,47 +1,18 @@
-/*
- * DAVItem.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.dav;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -60,6 +31,7 @@ import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.packager.PackageDisseminator;
 import org.dspace.content.packager.PackageException;
 import org.dspace.content.packager.PackageParameters;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
@@ -116,7 +88,7 @@ class DAVItem extends DAVDSpaceObject
             DAV.NS_DSPACE);
 
     /** The all props. */
-    private static List allProps = new Vector(commonProps);
+    private static List<Element> allProps = new ArrayList<Element>(commonProps);
     static
     {
         allProps.add(submitterProperty);
@@ -134,7 +106,7 @@ class DAVItem extends DAVDSpaceObject
      * @see org.dspace.app.dav.DAVResource#getAllProperties()
      */
     @Override
-    protected List getAllProperties()
+    protected List<Element> getAllProperties()
     {
         return allProps;
     }
@@ -224,7 +196,7 @@ class DAVItem extends DAVDSpaceObject
         catch (NumberFormatException ne)
         {
             throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,
-                    "Error parsing number in request URI.");
+                    "Error parsing number in request URI.", ne);
         }
     }
 
@@ -356,7 +328,7 @@ class DAVItem extends DAVDSpaceObject
         }
         else if (elementsEqualIsh(property, getlastmodifiedProperty))
         {
-            value = DAV.HttpDateFormat.format(this.item.getLastModified());
+            value = DAV.applyHttpDateFormat(this.item.getLastModified());
         }
         else if (elementsEqualIsh(property, licenseProperty))
         {
@@ -466,7 +438,6 @@ class DAVItem extends DAVDSpaceObject
      * 
      * @throws SQLException the SQL exception
      * @throws AuthorizeException the authorize exception
-     * @throws ServletException the servlet exception
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws DAVStatusException the DAV status exception
      */
@@ -478,8 +449,6 @@ class DAVItem extends DAVDSpaceObject
         AuthorizeManager.authorizeAction(this.context, this.item, Constants.READ);
 
         String packageType = this.request.getParameter("package");
-        Bundle[] original = this.item.getBundles("ORIGINAL");
-        int bsid;
 
         if (packageType == null)
         {
@@ -497,23 +466,43 @@ class DAVItem extends DAVDSpaceObject
         {
             try
             {
+                // Create a temporary file to disseminate into
+                String tempDirectory = ConfigurationManager.getProperty("upload.temp.dir");
+                File tempFile = File.createTempFile("DAVItemGet" + this.item.hashCode(), null, new File(tempDirectory));
+                tempFile.deleteOnExit();
+
+                // Disseminate item to temporary file
                 PackageParameters pparams = PackageParameters.create(this.request);
                 this.response.setContentType(dip.getMIMEType(pparams));
-                dip.disseminate(this.context, this.item, pparams, this.response
-                        .getOutputStream());
+                dip.disseminate(this.context, this.item, pparams, tempFile);
+
+                // Copy temporary file contents to response stream
+                FileInputStream fileIn = null;
+                try
+                {
+                    fileIn = new FileInputStream(tempFile);
+                    Utils.copy(fileIn, this.response.getOutputStream());
+                }
+                finally
+                {
+                    if (fileIn != null)
+                    {
+                        fileIn.close();
+                    }
+                }
             }
             catch (CrosswalkException pe)
             {
                 throw new DAVStatusException(
                         HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-                        "Failed in crosswalk of metadata: " + pe.toString());
+                        "Failed in crosswalk of metadata: " + pe.toString(), pe);
             }
             catch (PackageException pe)
             {
                 pe.log(log);
                 throw new DAVStatusException(
                         HttpServletResponse.SC_INTERNAL_SERVER_ERROR, pe
-                                .toString());
+                                .toString(), pe);
             }
         }
     }

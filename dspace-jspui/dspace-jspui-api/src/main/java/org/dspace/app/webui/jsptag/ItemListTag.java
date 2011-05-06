@@ -1,55 +1,22 @@
-/*
- * ItemListTag.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4365 $
- *
- * Date: $Date: 2009-10-05 19:52:42 -0400 (Mon, 05 Oct 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.webui.jsptag;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.UIUtil;
 
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.CrossLinks;
 
 import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
@@ -87,14 +54,14 @@ import org.dspace.content.authority.MetadataAuthorityManager;
  * Tag for display a list of items
  *
  * @author Robert Tansley
- * @version $Revision: 4365 $
+ * @version $Revision: 5845 $
  */
 public class ItemListTag extends TagSupport
 {
     private static Logger log = Logger.getLogger(ItemListTag.class);
 
     /** Items to display */
-    private Item[] items;
+    private transient Item[] items;
 
     /** Row to highlight, -1 for no row */
     private int highlightRow = -1;
@@ -103,15 +70,15 @@ public class ItemListTag extends TagSupport
     private String emphColumn;
 
     /** Config value of thumbnail view toggle */
-    private boolean showThumbs;
+    private static boolean showThumbs;
 
     /** Config browse/search width and height */
-    private int thumbItemListMaxWidth;
+    private static int thumbItemListMaxWidth;
 
-    private int thumbItemListMaxHeight;
+    private static int thumbItemListMaxHeight;
 
     /** Config browse/search thumbnail link behaviour */
-    private boolean linkToBitstream = false;
+    private static boolean linkToBitstream = false;
 
     /** Config to include an edit link */
     private boolean linkToEdit = false;
@@ -120,10 +87,10 @@ public class ItemListTag extends TagSupport
     private boolean disableCrossLinks = false;
 
     /** The default fields to be displayed when listing items */
-    private static String listFields;
+    private static final String DEFAULT_LIST_FIELDS;
 
     /** The default widths for the columns */
-    private static String listWidths;
+    private static final String DEFAULT_LIST_WIDTHS;
 
     /** The default field which is bound to the browse by date */
     private static String dateField = "dc.date.issued";
@@ -133,25 +100,50 @@ public class ItemListTag extends TagSupport
 
     private static String authorField = "dc.contributor.*";
 
-    private static int authorLimit = -1;
+    private int authorLimit = -1;
 
-    private SortOption sortOption = null;
+    private transient SortOption sortOption = null;
 
-    public ItemListTag()
+    private static final long serialVersionUID = 348762897199116432L;
+
+    static
     {
-        super();
         getThumbSettings();
 
         if (showThumbs)
         {
-            listFields = "thumbnail, dc.date.issued(date), dc.title, dc.contributor.*";
-            listWidths = "*, 130, 60%, 40%";
+            DEFAULT_LIST_FIELDS = "thumbnail, dc.date.issued(date), dc.title, dc.contributor.*";
+            DEFAULT_LIST_WIDTHS = "*, 130, 60%, 40%";
         }
         else
         {
-            listFields = "dc.date.issued(date), dc.title, dc.contributor.*";
-            listWidths = "130, 60%, 40%";
+            DEFAULT_LIST_FIELDS = "dc.date.issued(date), dc.title, dc.contributor.*";
+            DEFAULT_LIST_WIDTHS = "130, 60%, 40%";
         }
+
+        // get the date and title fields
+        String dateLine = ConfigurationManager.getProperty("webui.browse.index.date");
+        if (dateLine != null)
+        {
+            dateField = dateLine;
+        }
+
+        String titleLine = ConfigurationManager.getProperty("webui.browse.index.title");
+        if (titleLine != null)
+        {
+            titleField = titleLine;
+        }
+
+        String authorLine = ConfigurationManager.getProperty("webui.browse.author-field");
+        if (authorLine != null)
+        {
+            authorField = authorLine;
+        }
+    }
+
+    public ItemListTag()
+    {
+        super();
     }
 
     public int doStartTag() throws JspException
@@ -220,7 +212,9 @@ public class ItemListTag extends TagSupport
                         if (listTok != null)
                         {
                             if (newLLine.length() > 0)
+                            {
                                 newLLine.append(",");
+                            }
 
                             newLLine.append(listTok);
                         }
@@ -228,7 +222,9 @@ public class ItemListTag extends TagSupport
                         if (widthTok != null)
                         {
                             if (newWLine.length() > 0)
+                            {
                                 newWLine.append(",");
+                            }
 
                             newWLine.append(widthTok);
                         }
@@ -239,33 +235,16 @@ public class ItemListTag extends TagSupport
                 configLine  = newLLine.toString();
                 widthLine = newWLine.toString();
             }
-
-            listFields = configLine;
-            listWidths = widthLine;
         }
-
-        // get the date and title fields
-        String dateLine = ConfigurationManager.getProperty("webui.browse.index.date");
-        if (dateLine != null)
+        else
         {
-            dateField = dateLine;
-        }
-
-        String titleLine = ConfigurationManager.getProperty("webui.browse.index.title");
-        if (titleLine != null)
-        {
-            titleField = titleLine;
-        }
-
-        String authorLine = ConfigurationManager.getProperty("webui.browse.author-field");
-        if (authorLine != null)
-        {
-            authorField = authorLine;
+            configLine = DEFAULT_LIST_FIELDS;
+            widthLine = DEFAULT_LIST_WIDTHS;
         }
 
         // Arrays used to hold the information we will require when outputting each row
-        String[] fieldArr  = listFields.split("\\s*,\\s*");
-        String[] widthArr  = listWidths == null ? new String[0] : listWidths.split("\\s*,\\s*");
+        String[] fieldArr  = configLine == null ? new String[0] : configLine.split("\\s*,\\s*");
+        String[] widthArr  = widthLine  == null ? new String[0] : widthLine.split("\\s*,\\s*");
         boolean isDate[]   = new boolean[fieldArr.length];
         boolean emph[]     = new boolean[fieldArr.length];
         boolean isAuthor[] = new boolean[fieldArr.length];
@@ -407,7 +386,7 @@ public class ItemListTag extends TagSupport
                 }
                 else
                 {
-                    rOddOrEven = ((i % 2) == 1 ? "odd" : "even");
+                    rOddOrEven = ((i & 1) == 1 ? "odd" : "even");
                 }
 
                 for (int colIdx = 0; colIdx < fieldArr.length; colIdx++)
@@ -551,7 +530,7 @@ public class ItemListTag extends TagSupport
                             if (truncated)
                             {
                                 String etal = LocaleSupport.getLocalizedMessage(pageContext, "itemlist.et-al");
-                                sb.append(", " + etal);
+                                sb.append(", ").append(etal);
                             }
                             metadata = "<em>" + sb.toString() + "</em>";
                         }
@@ -649,7 +628,7 @@ public class ItemListTag extends TagSupport
      */
     public Item[] getItems()
     {
-        return items;
+        return (Item[]) ArrayUtils.clone(items);
     }
 
     /**
@@ -660,7 +639,7 @@ public class ItemListTag extends TagSupport
      */
     public void setItems(Item[] itemsIn)
     {
-        items = itemsIn;
+        items = (Item[]) ArrayUtils.clone(itemsIn);
     }
 
     /**
@@ -727,7 +706,7 @@ public class ItemListTag extends TagSupport
     }
 
     /* get the required thumbnail config items */
-    private void getThumbSettings()
+    private static void getThumbSettings()
     {
         showThumbs = ConfigurationManager
                 .getBooleanProperty("webui.browse.thumbnail.show");
@@ -756,12 +735,9 @@ public class ItemListTag extends TagSupport
         String linkBehaviour = ConfigurationManager
                 .getProperty("webui.browse.thumbnail.linkbehaviour");
 
-        if (linkBehaviour != null)
+        if ("bitstream".equals(linkBehaviour))
         {
-            if (linkBehaviour.equals("bitstream"))
-            {
-                linkToBitstream = true;
-            }
+            linkToBitstream = true;
         }
     }
 
@@ -791,11 +767,11 @@ public class ItemListTag extends TagSupport
         }
         catch (SQLException sqle)
         {
-            throw new JspException(sqle.getMessage());
+            throw new JspException(sqle.getMessage(), sqle);
         }
         catch (IOException ioe)
         {
-            throw new JspException(ioe.getMessage());
+            throw new JspException(ioe.getMessage(), ioe);
         }
 
         // now get the image dimensions
@@ -864,9 +840,8 @@ public class ItemListTag extends TagSupport
             String alt = thumb.getName();
             String scAttr = getScalingAttr(hrq, thumb);
             thumbFrag.append("<img src=\"")
-                     .append(img)
-                     .append("\" alt=\"")
-                     .append(alt + "\" ")
+                    .append(img)
+                    .append("\" alt=\"").append(alt).append("\" ")
                      .append(scAttr)
                      .append("/ border=\"0\"></a>");
 
@@ -874,7 +849,7 @@ public class ItemListTag extends TagSupport
         }
         catch (SQLException sqle)
         {
-            throw new JspException(sqle.getMessage());
+            throw new JspException(sqle.getMessage(), sqle);
         }
         catch (UnsupportedEncodingException e)
         {

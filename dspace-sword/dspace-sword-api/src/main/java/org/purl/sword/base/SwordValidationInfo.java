@@ -1,43 +1,15 @@
 /**
- * Copyright (c) 2009, Aberystwyth University
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *  - Redistributions of source code must retain the above
- *    copyright notice, this list of conditions and the
- *    following disclaimer.
- *
- *  - Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- *  - Neither the name of the Centre for Advanced Software and
- *    Intelligent Systems (CASIS) nor the names of its
- *    contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
- * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.purl.sword.base;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * Represents an validation information item about
@@ -70,21 +42,21 @@ public class SwordValidationInfo {
     private SwordValidationInfoType type;
 
     /** List of nested validation info items */
-    private ArrayList<SwordValidationInfo> elementInfo;
+    private List<SwordValidationInfo> elementInfo;
 
-    private ArrayList<SwordValidationInfo> attributeInfo;
+    private List<SwordValidationInfo> attributeInfo;
 
     /**
      * List of validation info notes that were generated during
-     * an unmarshall stage.
+     * an unmarshal stage.
      */
-    private ArrayList<SwordValidationInfo> unmarshallElementInfo;
+    private List<SwordValidationInfo> unmarshallElementInfo;
 
     /**
      * List of validation info notes that were generated during an
-     * unmarshall stage.
+     * unmarshal stage.
      */
-    private ArrayList<SwordValidationInfo> unmarshallAttributeInfo;
+    private List<SwordValidationInfo> unmarshallAttributeInfo;
 
     public static final String UNKNOWN_ELEMENT = "This element is present, but it is not used as part of the SWORD profile";
 
@@ -105,7 +77,7 @@ public class SwordValidationInfo {
      * Create a new information object for the specified element. Sets the
      * default type to be VALID.
      *
-     * @param theElement The element.
+     * @param element The element.
      */
     public SwordValidationInfo(XmlName element)
     {
@@ -116,8 +88,8 @@ public class SwordValidationInfo {
      * Create a new information object for the specified element's
      * attribute. Sets the default type to be VALID.
      *
-     * @param theElement   the element.
-     * @param theAttribute the attribute. 
+     * @param element   the element.
+     * @param attribute the attribute. 
      */
     public SwordValidationInfo(XmlName element, XmlName attribute)
     {
@@ -128,7 +100,7 @@ public class SwordValidationInfo {
      * Create a new instance of a validation information object that
      * reports on an element.
      *
-     * @param theElement The element.
+     * @param element The element.
      * @param theMessage The information message.
      * @param theType    The type of message.
      */
@@ -143,10 +115,8 @@ public class SwordValidationInfo {
      * Create a new instance of a validation information object that
      * reports on an attribute in the specified element.
      *
-     * @param elementPrefix    Prefix for the element.
-     * @param elementName      The local name for the element.
-     * @param attributePrefix  Prefix for the attribute. 
-     * @param attributeName    The attribute.
+     * @param element          The local name for the element.
+     * @param attribute        The attribute.
      * @param theMessage       The information message.
      * @param theType          The type of message.
      */
@@ -322,12 +292,9 @@ public class SwordValidationInfo {
         while( iterator.hasNext() )
         {
             item = iterator.next();
-            if( item != null )
+            if( item != null && type.compareTo(item.getType()) < 0 )
             {
-                if( type.compareTo(item.getType()) < 0 )
-                {
-                    type = item.getType(); 
-                }
+                type = item.getType();
             }
         }
     }
@@ -390,8 +357,8 @@ public class SwordValidationInfo {
      * @param attributeItems
      */
     public void addUnmarshallValidationInfo(
-            ArrayList<SwordValidationInfo> elementItems,
-            ArrayList<SwordValidationInfo> attributeItems)
+            List<SwordValidationInfo> elementItems,
+            List<SwordValidationInfo> attributeItems)
     {
        if( elementItems != null )
        {

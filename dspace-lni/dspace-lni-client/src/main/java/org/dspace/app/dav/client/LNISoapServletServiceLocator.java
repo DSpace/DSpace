@@ -1,4 +1,11 @@
 /**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+/**
  * LNISoapServletServiceLocator.java
  *
  * This file was auto-generated from WSDL
@@ -108,7 +115,7 @@ public class LNISoapServletServiceLocator extends org.apache.axis.client.Service
         return new javax.xml.namespace.QName("http://dspace.org/xmlns/lni", "LNISoapServletService");
     }
 
-    private java.util.HashSet ports = null;
+    private java.util.Set ports = null;
 
     public java.util.Iterator getPorts() {
         if (ports == null) {

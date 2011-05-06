@@ -1,12 +1,9 @@
 /**
- * $Id: StatisticsLoggingConsumer.java 4440 2009-10-10 19:03:27Z mdiggory $
- * $URL: http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-stats/src/main/java/org/dspace/statistics/StatisticsLoggingConsumer.java $
- * *************************************************************************
- * Copyright (c) 2002-2009, DuraSpace.  All rights reserved
- * Licensed under the DuraSpace Foundation License.
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * A copy of the DuraSpace License has been included in this
- * distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
+ * http://www.dspace.org/license/
  */
 package org.dspace.statistics;
 
@@ -81,14 +78,13 @@ public class StatisticsLoggingConsumer implements Consumer
                     updateQuery, null, null);
 
             // Get all the metadata
-            Map metadataStorageInfo = SolrLogger.getMetadataStorageInfo();
+            Map<String, String> metadataStorageInfo = SolrLogger.getMetadataStorageInfo();
             List<String> storageFieldList = new ArrayList<String>();
             List<List<Object>> storageValuesList = new ArrayList<List<Object>>();
 
-            for (Object storageField : metadataStorageInfo.keySet())
+            for (Map.Entry<String, String> entry : metadataStorageInfo.entrySet())
             {
-                String[] metadataFieldInfo = String.valueOf(
-                        metadataStorageInfo.get(storageField)).split("\\.");
+                String[] metadataFieldInfo = entry.getValue().split("\\.");
 
                 List<Object> values = new ArrayList<Object>();
                 List<Object> valuesLow = new ArrayList<Object>();
@@ -104,17 +100,18 @@ public class StatisticsLoggingConsumer implements Consumer
                             Item.ANY)[i].value.toLowerCase());
                 }
 
-                List<String> indexedVals = indexedValues.get("" + storageField);
+                List<String> indexedVals = indexedValues.get(entry.getKey());
 
                 boolean update = true;
-                if (values.containsAll(indexedVals)
-                        && values.size() == indexedVals.size())
+                if (values.size() == indexedVals.size() && values.containsAll(indexedVals))
+                {
                     update = false;
+                }
 
                 if (update)
                 {
-                    storageFieldList.add((String) storageField);
-                    storageFieldList.add(storageField + "_search");
+                    storageFieldList.add(entry.getKey());
+                    storageFieldList.add(entry.getKey() + "_search");
                     storageValuesList.add(values);
                     storageValuesList.add(valuesLow);
                 }
@@ -195,9 +192,13 @@ public class StatisticsLoggingConsumer implements Consumer
             throws SQLException
     {
         if (comm == null)
+        {
             return;
+        }
         if (!parentComms.contains(comm.getID()))
+        {
             parentComms.add(comm.getID());
+        }
         findComms(comm.getParentCommunity(), parentComms);
     }
 

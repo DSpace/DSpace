@@ -1,46 +1,16 @@
-/*
- * ItemIterator.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3761 $
- *
- * Date: $Date: 2009-05-07 00:18:02 -0400 (Thu, 07 May 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.content;
 
 import java.sql.SQLException;
 
 import java.util.Iterator;
-import java.util.ArrayList;
+import java.util.List;
 
 import org.dspace.core.Context;
 import org.dspace.storage.rdbms.TableRow;
@@ -57,7 +27,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * 
  * @author Robert Tansley
  * @author Richard Jones
- * @version $Revision: 3761 $
+ * @version $Revision: 5844 $
  */
 public class ItemIterator
 {
@@ -72,7 +42,7 @@ public class ItemIterator
     private TableRowIterator itemRows;
 
     /** a real iterator which works over the item ids when present */
-    private Iterator iditr;
+    private Iterator<Integer> iditr;
     
     /**
      * Construct an item iterator using a set of TableRow objects from
@@ -97,7 +67,7 @@ public class ItemIterator
      * @param iids
      *            the array list to be iterated over
      */
-    public ItemIterator(Context context, ArrayList iids)
+    public ItemIterator(Context context, List<Integer> iids)
     {
     	ourContext = context;
     	iditr = iids.iterator();
@@ -155,7 +125,7 @@ public class ItemIterator
     	if (iditr.hasNext())
         {
     		// get the id
-    		int id = ((Integer) iditr.next()).intValue();
+    		int id = iditr.next().intValue();
     		
             // Check cache
             Item fromCache = (Item) ourContext.fromCache(Item.class, id);
@@ -206,7 +176,7 @@ public class ItemIterator
     	if (iditr.hasNext())
         {
     		// get the id
-    		int id = ((Integer) iditr.next()).intValue();
+    		int id = iditr.next().intValue();
     		
             return id;
         }
@@ -275,6 +245,8 @@ public class ItemIterator
     public void close()
     {
         if (itemRows != null)
+        {
             itemRows.close();
+        }
     }
 }

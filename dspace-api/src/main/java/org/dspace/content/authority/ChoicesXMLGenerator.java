@@ -1,49 +1,14 @@
-/*
- * ChoicesXMLGenerator.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.content.authority;
 
-import org.dspace.content.authority.Choices;
-import org.dspace.content.authority.Choice;
-
 import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
-import org.xml.sax.ext.LexicalHandler;
-import org.xml.sax.Attributes;
 import org.xml.sax.helpers.AttributesImpl;
 
 
@@ -63,12 +28,15 @@ public class ChoicesXMLGenerator
     public static void generate(Choices result, String format, ContentHandler contentHandler)
         throws SAXException
     {
-        Attributes noAtts = new AttributesImpl();
         AttributesImpl resultAtts = new AttributesImpl();
         if (result.more)
+        {
             resultAtts.addAttribute("", "more", "more", "boolean", "true");
+        }
         if (result.isError())
+        {
             resultAtts.addAttribute("", "error", "error", "boolean", "true");
+        }
         resultAtts.addAttribute("", "start", "start", "int", String.valueOf(result.start));
         resultAtts.addAttribute("", "total", "total", "int", String.valueOf(result.total));
 
@@ -85,7 +53,9 @@ public class ChoicesXMLGenerator
                 va.addAttribute("", "authority", "authority", "string", mdav.authority == null ? "":mdav.authority);
                 va.addAttribute("", "value", "value", "string", mdav.value);
                 if (result.defaultSelected == i)
+                {
                     va.addAttribute("", "selected", "selected", "boolean", "");
+                }
                 contentHandler.startElement(NS_URI, NS_NAME, "option", va);
                   contentHandler.characters(mdav.label.toCharArray(), 0, mdav.label.length());
                 contentHandler.endElement(NS_URI, NS_NAME, "option");
@@ -107,7 +77,9 @@ public class ChoicesXMLGenerator
                 AttributesImpl va = new AttributesImpl();
                 va.addAttribute("", "authority", "authority", "string", mdav.authority == null ? "":mdav.authority);
                 if (result.defaultSelected == i)
+                {
                     va.addAttribute("", "selected", "selected", "boolean", "");
+                }
                 contentHandler.startElement(NS_URI, NS_NAME, "li", va);
                   contentHandler.startElement(NS_URI, NS_NAME, "span", classLabel);
                     contentHandler.characters(mdav.label.toCharArray(), 0, mdav.label.length());
@@ -131,7 +103,9 @@ public class ChoicesXMLGenerator
                 va.addAttribute("", "authority", "authority", "string", mdav.authority == null ? "":mdav.authority);
                 va.addAttribute("", "value", "value", "string", mdav.value);
                 if (result.defaultSelected == i)
+                {
                     va.addAttribute("", "selected", "selected", "boolean", "");
+                }
                 contentHandler.startElement(NS_URI, NS_NAME, "Choice", va);
                   contentHandler.characters(mdav.label.toCharArray(), 0, mdav.label.length());
                 contentHandler.endElement(NS_URI, NS_NAME, "Choice");

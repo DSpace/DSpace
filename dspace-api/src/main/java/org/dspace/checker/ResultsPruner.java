@@ -1,35 +1,10 @@
-/*
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.checker;
 
 import java.io.FileInputStream;
@@ -38,7 +13,6 @@ import java.io.IOException;
 import java.text.ParseException;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -82,7 +56,7 @@ public final class ResultsPruner
         }
         catch (FileNotFoundException e)
         {
-            throw new RuntimeException(
+            throw new IllegalStateException(
                     "VeryExceptionalException - config file not there! ", e);
         }
 
@@ -112,12 +86,13 @@ public final class ResultsPruner
         }
         catch (IOException e)
         {
-            throw new RuntimeException("Problem loading properties file: "
+            throw new IllegalStateException("Problem loading properties file: "
                     + e.getMessage(), e);
         }
         finally
         {
             if (fin != null)
+            {
                 try
                 {
                     fin.close();
@@ -126,6 +101,7 @@ public final class ResultsPruner
                 {
                     LOG.warn(e);
                 }
+            }
         }
     }
     
@@ -144,12 +120,14 @@ public final class ResultsPruner
         ResultsPruner rp = new ResultsPruner();
         Pattern retentionPattern = Pattern
                 .compile("checker\\.retention\\.(.*)");
-        for (Enumeration en = props.propertyNames(); en.hasMoreElements();)
+        for (Enumeration<String> en = (Enumeration<String>)props.propertyNames(); en.hasMoreElements();)
         {
-            String name = (String) en.nextElement();
+            String name = en.nextElement();
             Matcher matcher = retentionPattern.matcher(name);
             if (!matcher.matches())
+            {
                 continue;
+            }
             String resultCode = matcher.group(1);
             long duration;
             try
@@ -158,7 +136,7 @@ public final class ResultsPruner
             }
             catch (ParseException e)
             {
-                throw new RuntimeException("Problem parsing duration: "
+                throw new IllegalStateException("Problem parsing duration: "
                         + e.getMessage(), e);
             }
             if ("default".equals(resultCode))
@@ -180,7 +158,7 @@ public final class ResultsPruner
     /**
      * Map of retention durations, keyed by result code name
      */
-    Map interests = new HashMap();
+    Map<String, Long> interests = new HashMap<String, Long>();
 
     /**
      * Checksum results database Data access
@@ -214,7 +192,7 @@ public final class ResultsPruner
      */
     public void addInterested(String result, long duration)
     {
-        interests.put(result, new Long(duration));
+        interests.put(result, Long.valueOf(duration));
     }
 
     /**
@@ -255,13 +233,12 @@ public final class ResultsPruner
      */
     public int prune()
     {
-        List codes = checksumResultDAO.listAllCodes();
-        for (Iterator iter = codes.iterator(); iter.hasNext();)
+        List<String> codes = checksumResultDAO.listAllCodes();
+        for (String code : codes)
         {
-            String code = (String) iter.next();
             if (!interests.containsKey(code))
             {
-                interests.put(code, new Long(defaultDuration));
+                interests.put(code, Long.valueOf(defaultDuration));
             }
 
         }

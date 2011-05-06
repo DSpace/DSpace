@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.xmlui.cocoon;
 
 import org.dspace.app.xmlui.utils.ContextUtil;
@@ -54,7 +61,9 @@ public class UsageLoggerAction extends AbstractAction {
 
     public static void logDspaceObject(Request request, DSpaceObject dso, Context context){
         if(dso == null)
+        {
             return;
+        }
 
         try {
         	
@@ -138,7 +147,9 @@ public class UsageLoggerAction extends AbstractAction {
     private Bitstream findBitstreamBySequence(Item item, int sequence) throws SQLException
     {
     	if (item == null)
-    		return null;
+        {
+            return null;
+        }
 
     	Bundle[] bundles = item.getBundles();
         for (Bundle bundle : bundles)
@@ -169,12 +180,16 @@ public class UsageLoggerAction extends AbstractAction {
     private Bitstream findBitstreamByName(Item item, String name) throws SQLException
     {
     	if (name == null || item == null)
-    		return null;
+        {
+            return null;
+        }
 
     	// Determine our the maximum number of directories that will be removed for a path.
     	int maxDepthPathSearch = 3;
     	if (ConfigurationManager.getProperty("xmlui.html.max-depth-guess") != null)
-    		maxDepthPathSearch = ConfigurationManager.getIntProperty("xmlui.html.max-depth-guess");
+        {
+            maxDepthPathSearch = ConfigurationManager.getIntProperty("xmlui.html.max-depth-guess");
+        }
 
     	// Search for the named bitstream on this item. Each time through the loop
     	// a directory is removed from the name until either our maximum depth is
@@ -203,9 +218,11 @@ public class UsageLoggerAction extends AbstractAction {
 	        int indexOfSlash = name.indexOf('/');
 
 	        if (indexOfSlash < 0)
-	        	// No more directories to remove from the path, so return null for no
-	        	// bitstream found.
-	        	return null;
+            {
+                // No more directories to remove from the path, so return null for no
+                // bitstream found.
+                return null;
+            }
 
 	        name = name.substring(indexOfSlash+1);
 
@@ -215,7 +232,9 @@ public class UsageLoggerAction extends AbstractAction {
     		{
     			int indexOfLastSlash = name.lastIndexOf('/');
     			if (indexOfLastSlash > -1)
-    				name = name.substring(indexOfLastSlash+1);
+                {
+                    name = name.substring(indexOfLastSlash + 1);
+                }
     		}
 
     	}

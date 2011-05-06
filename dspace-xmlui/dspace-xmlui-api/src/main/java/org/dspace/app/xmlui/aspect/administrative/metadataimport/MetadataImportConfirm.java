@@ -1,45 +1,15 @@
-/*
- * MetadataImportConfirm.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: $
- *
- * Date: $Date: $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
-*/
-
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.xmlui.aspect.administrative.metadataimport;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
@@ -114,6 +84,11 @@ public class MetadataImportConfirm extends AbstractDSpaceTransformer {
             changes = ((ArrayList<BulkEditChange>)request.getAttribute("changes"));
         }
 
+        if (changes == null)
+        {
+            changes = new ArrayList<BulkEditChange>();
+        }
+
 		// DIVISION: metadata-import
 		Division div = body.addInteractiveDivision("metadata-import",contextPath + "/admin/metadataimport", Division.METHOD_MULTIPART,"primary administrative");
 		div.setHead(T_head1);
@@ -125,23 +100,20 @@ public class MetadataImportConfirm extends AbstractDSpaceTransformer {
                 if(changes.size() > 0) {
                     Table mdchanges = div.addTable("metadata-changes", changes.size(), 2);
 
-
                     // Display the changes
-                    int changeCounter = 0;
                     for (BulkEditChange change : changes)
                     {
                         // Get the changes
-                        ArrayList<DCValue> adds = change.getAdds();
-                        ArrayList<DCValue> removes = change.getRemoves();
-                        ArrayList<Collection> newCollections = change.getNewMappedCollections();
-                        ArrayList<Collection> oldCollections = change.getOldMappedCollections();
+                        List<DCValue> adds = change.getAdds();
+                        List<DCValue> removes = change.getRemoves();
+                        List<Collection> newCollections = change.getNewMappedCollections();
+                        List<Collection> oldCollections = change.getOldMappedCollections();
 
                         if ((adds.size() > 0) || (removes.size() > 0) ||
                             (newCollections.size() > 0) || (oldCollections.size() > 0) ||
                             (change.getNewOwningCollection() != null) || (change.getOldOwningCollection() != null))
                         {
                             Row headerrow = mdchanges.addRow(Row.ROLE_HEADER);
-
                             // Show the item
                             if (!change.isNewItem())
                             {
@@ -149,14 +121,12 @@ public class MetadataImportConfirm extends AbstractDSpaceTransformer {
                                 Cell cell = headerrow.addCell();
                                 cell.addContent(T_changes_committed);
                                 cell.addContent(" " + i.getID() + " (" + i.getHandle() + ")");
-
                             }
                             else
                             {
                               headerrow.addCellContent(T_new_item);
                             }
                             headerrow.addCell();
-                            changeCounter++;
                         }
 
                         // Show new owning collection

@@ -1,39 +1,9 @@
-/*
- * DescribeStep.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4895 $
- *
- * Date: $Date: 2010-05-05 15:30:15 -0400 (Wed, 05 May 2010) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.submit.step;
 
@@ -46,6 +16,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import org.dspace.app.util.DCInputsReader;
@@ -83,7 +54,7 @@ import org.dspace.submit.AbstractProcessingStep;
  * @see org.dspace.submit.AbstractProcessingStep
  *
  * @author Tim Donohue
- * @version $Revision: 4895 $
+ * @version $Revision: 5844 $
  */
 public class DescribeStep extends AbstractProcessingStep
 {
@@ -254,18 +225,18 @@ public class DescribeStep extends AbstractProcessingStep
             }
             else if (inputType.equals("qualdrop_value"))
             {
-                List quals = getRepeatedParameter(request, schema + "_"
+                List<String> quals = getRepeatedParameter(request, schema + "_"
                         + element, schema + "_" + element + "_qualifier");
-                List vals = getRepeatedParameter(request, schema + "_"
+                List<String> vals = getRepeatedParameter(request, schema + "_"
                         + element, schema + "_" + element + "_value");
                 for (int z = 0; z < vals.size(); z++)
                 {
-                    String thisQual = (String) quals.get(z);
+                    String thisQual = quals.get(z);
                     if ("".equals(thisQual))
                     {
                         thisQual = null;
                     }
-                    String thisVal = (String) vals.get(z);
+                    String thisVal = vals.get(z);
                     if (!buttonPressed.equals("submit_" + schema + "_"
                             + element + "_remove_" + z)
                             && !thisVal.equals(""))
@@ -442,7 +413,7 @@ public class DescribeStep extends AbstractProcessingStep
     {
        String language = "";
        language = ConfigurationManager.getProperty("default.language");
-       if (language == null || language == "")
+       if (StringUtils.isEmpty(language))
        {
            language = "en";
        }
@@ -505,10 +476,10 @@ public class DescribeStep extends AbstractProcessingStep
         boolean isAuthorityControlled = MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey);
 
         // Names to add
-        List firsts = new LinkedList();
-        List lasts = new LinkedList();
-        List auths = new LinkedList();
-        List confs = new LinkedList();
+        List<String> firsts = new LinkedList<String>();
+        List<String> lasts = new LinkedList<String>();
+        List<String> auths = new LinkedList<String>();
+        List<String> confs = new LinkedList<String>();
 
         if (repeated)
         {
@@ -555,9 +526,13 @@ public class DescribeStep extends AbstractProcessingStep
             String confidence = request.getParameter(metadataField + "_confidence");
 
             if (lastName != null)
+            {
                 lasts.add(lastName);
+            }
             if (firstNames != null)
+            {
                 firsts.add(firstNames);
+            }
             auths.add(authority == null ? "" : authority);
             confs.add(confidence == null ? "" : confidence);
         }
@@ -568,8 +543,8 @@ public class DescribeStep extends AbstractProcessingStep
         // Put the names in the correct form
         for (int i = 0; i < lasts.size(); i++)
         {
-            String f = (String) firsts.get(i);
-            String l = (String) lasts.get(i);
+            String f = firsts.get(i);
+            String l = lasts.get(i);
 
             // only add if lastname is non-empty
             if ((l != null) && !((l.trim()).equals("")))
@@ -600,8 +575,8 @@ public class DescribeStep extends AbstractProcessingStep
                 // Add to the database -- unless required authority is missing
                 if (isAuthorityControlled)
                 {
-                    String authKey = auths.size() > i ? (String)auths.get(i) : null;
-                    String sconf = (authKey != null && confs.size() > i) ? (String)confs.get(i) : null;
+                    String authKey = auths.size() > i ? auths.get(i) : null;
+                    String sconf = (authKey != null && confs.size() > i) ? confs.get(i) : null;
                     if (MetadataAuthorityManager.getManager().isAuthorityRequired(fieldKey) &&
                         (authKey == null || authKey.length() == 0))
                     {
@@ -609,14 +584,18 @@ public class DescribeStep extends AbstractProcessingStep
                         addErrorField(request, metadataField);
                     }
                     else
+                    {
                         item.addMetadata(schema, element, qualifier, null,
                                 new DCPersonName(l, f).toString(), authKey,
                                 (sconf != null && sconf.length() > 0) ?
-                                    Choices.getConfidenceValue(sconf) : Choices.CF_ACCEPTED);
+                                        Choices.getConfidenceValue(sconf) : Choices.CF_ACCEPTED);
+                    }
                 }
                 else
+                {
                     item.addMetadata(schema, element, qualifier, null,
-                        new DCPersonName(l, f).toString());
+                            new DCPersonName(l, f).toString());
+                }
             }
         }
     }
@@ -665,9 +644,9 @@ public class DescribeStep extends AbstractProcessingStep
         boolean isAuthorityControlled = MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey);
 
         // Values to add
-        List vals = null;
-        List auths = null;
-        List confs = null;
+        List<String> vals = null;
+        List<String> auths = null;
+        List<String> confs = null;
 
         if (repeated)
         {
@@ -701,14 +680,16 @@ public class DescribeStep extends AbstractProcessingStep
         else
         {
             // Just a single name
-            vals = new LinkedList();
+            vals = new LinkedList<String>();
             String value = request.getParameter(metadataField);
             if (value != null)
+            {
                 vals.add(value.trim());
+            }
             if (isAuthorityControlled)
             {
-                auths = new LinkedList();
-                confs = new LinkedList();
+                auths = new LinkedList<String>();
+                confs = new LinkedList<String>();
                 String av = request.getParameter(metadataField+"_authority");
                 String cv = request.getParameter(metadataField+"_confidence");
                 auths.add(av == null ? "":av.trim());
@@ -723,13 +704,13 @@ public class DescribeStep extends AbstractProcessingStep
         for (int i = 0; i < vals.size(); i++)
         {
             // Add to the database if non-empty
-            String s = (String) vals.get(i);
+            String s = vals.get(i);
             if ((s != null) && !s.equals(""))
             {
                 if (isAuthorityControlled)
                 {
-                    String authKey = auths.size() > i ? (String)auths.get(i) : null;
-                    String sconf = (authKey != null && confs.size() > i) ? (String)confs.get(i) : null;
+                    String authKey = auths.size() > i ? auths.get(i) : null;
+                    String sconf = (authKey != null && confs.size() > i) ? confs.get(i) : null;
                     if (MetadataAuthorityManager.getManager().isAuthorityRequired(fieldKey) &&
                         (authKey == null || authKey.length() == 0))
                     {
@@ -737,12 +718,16 @@ public class DescribeStep extends AbstractProcessingStep
                         addErrorField(request, metadataField);
                     }
                     else
+                    {
                         item.addMetadata(schema, element, qualifier, lang, s,
                                 authKey, (sconf != null && sconf.length() > 0) ?
-                                           Choices.getConfidenceValue(sconf) : Choices.CF_ACCEPTED);
+                                        Choices.getConfidenceValue(sconf) : Choices.CF_ACCEPTED);
+                    }
                 }
                 else
+                {
                     item.addMetadata(schema, element, qualifier, lang, s);
+                }
             }
         }
     }
@@ -780,9 +765,7 @@ public class DescribeStep extends AbstractProcessingStep
 
         // FIXME: Probably should be some more validation
         // Make a standard format date
-        DCDate d = new DCDate();
-
-        d.setDateLocal(year, month, day, -1, -1, -1);
+        DCDate d = new DCDate(year, month, day, -1, -1, -1);
 
         // already done in doProcessing see also bug DS-203
         // item.clearMetadata(schema, element, qualifier, Item.ANY);
@@ -835,8 +818,8 @@ public class DescribeStep extends AbstractProcessingStep
                 .formKey(schema, element, qualifier);
 
         // Names to add
-        List series = new LinkedList();
-        List numbers = new LinkedList();
+        List<String> series = new LinkedList<String>();
+        List<String> numbers = new LinkedList<String>();
 
         if (repeated)
         {
@@ -869,7 +852,9 @@ public class DescribeStep extends AbstractProcessingStep
             {
                 // if number is null, just set to a nullstring
                 if (n == null)
+                {
                     n = "";
+                }
 
                 series.add(s);
                 numbers.add(n);
@@ -882,8 +867,8 @@ public class DescribeStep extends AbstractProcessingStep
         // Put the names in the correct form
         for (int i = 0; i < series.size(); i++)
         {
-            String s = ((String) series.get(i)).trim();
-            String n = ((String) numbers.get(i)).trim();
+            String s = (series.get(i)).trim();
+            String n = (numbers.get(i)).trim();
 
             // Only add non-empty
             if (!s.equals("") || !n.equals(""))
@@ -912,10 +897,10 @@ public class DescribeStep extends AbstractProcessingStep
      *
      * @return a List of Strings
      */
-    protected List getRepeatedParameter(HttpServletRequest request,
+    protected List<String> getRepeatedParameter(HttpServletRequest request,
             String metadataField, String param)
     {
-        List vals = new LinkedList();
+        List<String> vals = new LinkedList<String>();
 
         int i = 1;    //start index at the first of the previously entered values
         boolean foundLast = false;
@@ -962,7 +947,9 @@ public class DescribeStep extends AbstractProcessingStep
                 }
 
                 if (addValue)
-                  vals.add(s.trim());
+                {
+                    vals.add(s.trim());
+                }
             }
 
             i++;

@@ -1,45 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
-  structural.xsl
 
-  Version: $Revision: 4716 $
- 
-  Date: $Date: 2010-01-21 11:57:40 -0500 (Thu, 21 Jan 2010) $
- 
-  Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
-  Institute of Technology.  All rights reserved.
- 
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are
-  met:
- 
-  - Redistributions of source code must retain the above copyright
-  notice, this list of conditions and the following disclaimer.
- 
-  - Redistributions in binary form must reproduce the above copyright
-  notice, this list of conditions and the following disclaimer in the
-  documentation and/or other materials provided with the distribution.
- 
-  - Neither the name of the Hewlett-Packard Company nor the name of the
-  Massachusetts Institute of Technology nor the names of their
-  contributors may be used to endorse or promote products derived from
-  this software without specific prior written permission.
- 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-  HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
-  OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
-  TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
-  USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
-  DAMAGE.
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
 -->
-
 <!--
     TODO: Describe this XSL file
     Author: Alexey Maslov
@@ -280,17 +248,17 @@
             
             <!-- Add a google analytics script if the key is present -->
             <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']">
-                                <script type="text/javascript">
-                                        <xsl:text>var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");</xsl:text>
-                                        <xsl:text>document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));</xsl:text>
-                                </script>
+                <script type="text/javascript"><xsl:text>
+                       var _gaq = _gaq || [];
+                       _gaq.push(['_setAccount', '</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>']);
+                       _gaq.push(['_trackPageview']);
 
-                                <script type="text/javascript">
-                                        <xsl:text>try {</xsl:text>
-                                                <xsl:text>var pageTracker = _gat._getTracker("</xsl:text><xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='google'][@qualifier='analytics']"/><xsl:text>");</xsl:text>
-                                                <xsl:text>pageTracker._trackPageview();</xsl:text>
-                                        <xsl:text>} catch(err) {}</xsl:text>
-                                </script>
+                       (function() {
+                           var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+                           ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+                           var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+                       })();
+               </xsl:text></script>
             </xsl:if>
             
             
@@ -312,6 +280,11 @@
                 <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='xhtml_head_item']"
                               disable-output-escaping="yes"/>
             </xsl:if>
+
+            <!-- Add all Google Scholar Metadata values -->
+            <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[substring(@element, 1, 9) = 'citation_']">
+                <meta name="{@element}" content="{.}"></meta>
+            </xsl:for-each>
             
         </head>
     </xsl:template>
@@ -502,6 +475,14 @@
                 </div>
             </xsl:if>
             <xsl:apply-templates />
+              	<xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='sfx'][@qualifier='server']">
+	 			<a>
+                   <xsl:attribute name="href">
+                    	<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='sfx'][@qualifier='server']"/>
+                    </xsl:attribute>
+                    <xsl:text>Find Full text</xsl:text>
+                </a>
+			</xsl:if>
         </div>
     </xsl:template>
 
@@ -542,7 +523,9 @@
                                 </xsl:text>
                                 <xsl:text>&quot;</xsl:text>
                                 <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath']"/>
-                                <xsl:text>/handle/&quot; + radio.value + &quot;/search&quot; ; </xsl:text>
+                                <xsl:text>/handle/&quot; + radio.value + &quot;</xsl:text>
+                                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='search'][@qualifier='simpleURL']"/>
+                                <xsl:text>&quot; ; </xsl:text>
                                 <xsl:text>
                                     }
                                 </xsl:text>
@@ -1561,8 +1544,18 @@
     
     <xsl:template match="dri:xref">
         <a>
-            <xsl:attribute name="href"><xsl:value-of select="@target"/></xsl:attribute>
-            <xsl:attribute name="class"><xsl:value-of select="@rend"/></xsl:attribute>
+            <xsl:if test="@target">
+                <xsl:attribute name="href"><xsl:value-of select="@target"/></xsl:attribute>
+            </xsl:if>
+            
+            <xsl:if test="@rend">
+                <xsl:attribute name="class"><xsl:value-of select="@rend"/></xsl:attribute>
+            </xsl:if>
+            
+            <xsl:if test="@n">
+                <xsl:attribute name="name"><xsl:value-of select="@n"/></xsl:attribute>
+            </xsl:if>
+
             <xsl:apply-templates />
         </a>
     </xsl:template>
@@ -2051,8 +2044,10 @@
         <xsl:choose>
                 <xsl:when test="@type = 'checkbox'  or @type='radio'">
                     <xsl:apply-templates select="." mode="normalField"/>
-                    <br/>
-                    <xsl:apply-templates select="dri:label" mode="compositeComponent"/>
+                    <xsl:if test="dri:label">
+                        <br/>
+                        <xsl:apply-templates select="dri:label" mode="compositeComponent"/>
+                    </xsl:if>
                 </xsl:when>
                 <xsl:otherwise>
                         <label class="ds-composite-component">
@@ -2060,8 +2055,10 @@
                                 <xsl:attribute name="class">ds-composite-component last</xsl:attribute>
                             </xsl:if>
                             <xsl:apply-templates select="." mode="normalField"/>
-                            <br/>
-                            <xsl:apply-templates select="dri:label" mode="compositeComponent"/>
+                            <xsl:if test="dri:label">
+                                <br/>
+                                <xsl:apply-templates select="dri:label" mode="compositeComponent"/>
+                            </xsl:if>
                         </label>
                 </xsl:otherwise>
         </xsl:choose>
@@ -2422,7 +2419,14 @@
                     </xsl:if>
                     <p class="pagination-info">
                         <i18n:translate>
-                            <i18n:text>xmlui.dri2xhtml.structural.pagination-info</i18n:text>
+                            <xsl:choose>
+                                <xsl:when test="parent::node()/@itemsTotal = -1">
+                                    <i18n:text>xmlui.dri2xhtml.structural.pagination-info.nototal</i18n:text>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <i18n:text>xmlui.dri2xhtml.structural.pagination-info</i18n:text>
+                                </xsl:otherwise>
+                            </xsl:choose>
                             <i18n:param><xsl:value-of select="parent::node()/@firstItemIndex"/></i18n:param>
                             <i18n:param><xsl:value-of select="parent::node()/@lastItemIndex"/></i18n:param>
                             <i18n:param><xsl:value-of select="parent::node()/@itemsTotal"/></i18n:param>
@@ -2460,7 +2464,14 @@
                     </xsl:if>
                     <p class="pagination-info">
                         <i18n:translate>
-                            <i18n:text>xmlui.dri2xhtml.structural.pagination-info</i18n:text>
+                            <xsl:choose>
+                                <xsl:when test="parent::node()/@itemsTotal = -1">
+                                    <i18n:text>xmlui.dri2xhtml.structural.pagination-info.nototal</i18n:text>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <i18n:text>xmlui.dri2xhtml.structural.pagination-info</i18n:text>
+                                </xsl:otherwise>
+                            </xsl:choose>
                             <i18n:param><xsl:value-of select="parent::node()/@firstItemIndex"/></i18n:param>
                             <i18n:param><xsl:value-of select="parent::node()/@lastItemIndex"/></i18n:param>
                             <i18n:param><xsl:value-of select="parent::node()/@itemsTotal"/></i18n:param>
@@ -2785,7 +2796,7 @@
                 <xsl:value-of select="@rend"/>
             </xsl:if>
         </xsl:attribute>
-        
+
     </xsl:template>
     
     <!-- templates for required textarea attributes used if not found in DRI document -->
@@ -2801,9 +2812,41 @@
     
     <!-- This does it for all the DRI elements. The only thing left to do is to handle Cocoon's i18n
         transformer tags that are used for text translation. The templates below simply push through
-        the i18n elements so that they can translated after the XSL step. -->
+        the i18n elements so that they can translated after the XSL step. -->   
     <xsl:template match="i18n:text">
-        <xsl:copy-of select="."/>
+       <xsl:param name="text" select="."/>
+       <xsl:choose>
+         <xsl:when test="contains($text, '&#xa;')">
+           <xsl:value-of select="substring-before($text, '&#xa;')"/>
+           <ul>
+                <xsl:attribute name="style">float:left; list-style-type:none; text-align:left;</xsl:attribute>
+                <xsl:call-template name="linebreak">
+                  <xsl:with-param name="text" select="substring-after($text,'&#xa;')"/>
+                </xsl:call-template>
+           </ul>
+         </xsl:when>
+         <xsl:otherwise>
+           <xsl:copy-of select="$text"/>
+         </xsl:otherwise>
+       </xsl:choose>
+    </xsl:template>
+
+    <!-- Function to replace \n -->
+    <xsl:template name="linebreak">
+       <xsl:param name="text" select="."/>
+       <xsl:choose>
+         <xsl:when test="contains($text, '&#xa;')">
+           <li>
+           <xsl:value-of select="substring-before($text, '&#xa;')"/>
+           </li>
+           <xsl:call-template name="linebreak">
+             <xsl:with-param name="text" select="substring-after($text,'&#xa;')"/>
+           </xsl:call-template>
+         </xsl:when>
+         <xsl:otherwise>
+           <xsl:value-of select="$text"/>
+         </xsl:otherwise>
+       </xsl:choose>
     </xsl:template>
     
     <xsl:template match="i18n:translate">
@@ -2886,7 +2929,7 @@
       <xsl:param name="confidence" select="'blank'"/>
       <xsl:param name="id" select="''"/>
       <xsl:variable name="lcConfidence" select="translate($confidence,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')"/>
-      <img i18n:attr="title">
+      <img>
         <xsl:if test="string-length($id) > 0">
           <xsl:attribute name="id">
              <xsl:value-of select="$id"/>

@@ -1,41 +1,9 @@
-/*
- * AssignCollectionRoles.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4309 $
- *
- * Date: $Date: 2009-09-30 15:20:07 -0400 (Wed, 30 Sep 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.administrative.collection;
 
@@ -75,7 +43,8 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 	private static final Message T_options_metadata = message("xmlui.administrative.collection.general.options_metadata");	
 	private static final Message T_options_roles = message("xmlui.administrative.collection.general.options_roles");
 	private static final Message T_options_harvest = message("xmlui.administrative.collection.GeneralCollectionHarvestingForm.options_harvest");
-	
+	private static final Message T_options_curate = message("xmlui.administrative.collection.general.options_curate");
+        
 	private static final Message T_submit_return = message("xmlui.general.return");
 	
 	private static final Message T_title = message("xmlui.administrative.collection.AssignCollectionRoles.title");
@@ -140,7 +109,9 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 		Group defaultRead = null;
 		int defaultReadID = FlowContainerUtils.getCollectionDefaultRead(context, collectionID);
 		if (defaultReadID >= 0)
-			defaultRead = Group.find(context, defaultReadID);
+        {
+            defaultRead = Group.find(context, defaultReadID);
+        }
 		
 		// DIVISION: main
 	    Division main = body.addInteractiveDivision("collection-assign-roles",contextPath+"/admin/collection",Division.METHOD_POST,"primary administrative collection");
@@ -150,6 +121,7 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 	    options.addItem().addXref(baseURL+"&submit_metadata",T_options_metadata);
 	    options.addItem().addHighlight("bold").addXref(baseURL+"&submit_roles",T_options_roles);
 	    options.addItem().addXref(baseURL+"&submit_harvesting",T_options_harvest);
+            options.addItem().addXref(baseURL+"&submit_curate",T_options_curate);
 	    	    
 	    // The table of admin roles
 	    Table rolesTable = main.addTable("roles-table", 6, 5);

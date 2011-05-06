@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.dspace</groupId>
 		<artifactId>modules</artifactId>
-		<version>1.6.2</version>
+		<version>1.7.1</version>
 	</parent>
 
 	<profiles>
@@ -65,33 +65,17 @@
 			<dependencies>
 				<dependency>
 					<groupId>com.oracle</groupId>
-					<artifactId>ojdbc14</artifactId>
+					<artifactId>ojdbc6</artifactId>
 				</dependency>
 			</dependencies>
 		</profile>
 
 	</profiles>
 
-	<repositories>
-		<repository>
-			<id>maven.dspace.org-snapshot</id>
-			<name>DSpace Maven Snapshot Repository</name>
-			<url>http://maven.dspace.org/snapshot</url>
-			<releases>
-				<enabled>false</enabled>
-				<checksumPolicy>fail</checksumPolicy>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<checksumPolicy>fail</checksumPolicy>
-			</snapshots>
-		</repository>
-	</repositories>
-
 	<scm>
-		<connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2</connection>
-		<developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace/modules/jspui</developerConnection>
-		<url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace/modules/jspui</url>
+		<connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.1</connection>
+		<developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.1</developerConnection>
+		<url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.1</url>
 	</scm>
 
 	<build>
@@ -123,15 +107,23 @@
 	</build>
 
 	<dependencies>
+
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-jspui-webapp</artifactId>
 			<type>war</type>
 		</dependency>
+
 		<dependency>
 			<groupId>org.dspace</groupId>
 			<artifactId>dspace-jspui-api</artifactId>
 		</dependency>
+
+		<dependency>
+           <groupId>org.dspace</groupId>
+           <artifactId>dspace-discovery-provider</artifactId>
+        </dependency>
+
 		<dependency>
 		   <groupId>javax.servlet</groupId>
 		   <artifactId>servlet-api</artifactId>

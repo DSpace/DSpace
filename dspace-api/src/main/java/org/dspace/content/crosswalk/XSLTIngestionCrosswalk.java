@@ -1,41 +1,10 @@
-/*
- * XSLTIngestionCrosswalk.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4365 $
- *
- * Date: $Date: 2009-10-05 19:52:42 -0400 (Mon, 05 Oct 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.content.crosswalk;
 
 import java.io.FileInputStream;
@@ -44,14 +13,17 @@ import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
-import org.dspace.content.MetadataValue;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.packager.PackageUtils;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
@@ -69,7 +41,7 @@ import org.jdom.transform.XSLTransformer;
  * See the XSLTCrosswalk superclass for details on configuration.
  *
  * @author Larry Stone
- * @version $Revision: 4365 $
+ * @version $Revision: 5844 $
  * @see XSLTCrosswalk
  */
 public class XSLTIngestionCrosswalk
@@ -77,32 +49,32 @@ public class XSLTIngestionCrosswalk
     implements IngestionCrosswalk
 {
     /** log4j category */
-    private static Logger log = Logger.getLogger(XSLTIngestionCrosswalk.class);
+    private static final Logger log = Logger.getLogger(XSLTIngestionCrosswalk.class);
 
-    private final static String DIRECTION = "submission";
+    private static final String DIRECTION = "submission";
 
     private static String aliases[] = makeAliases(DIRECTION);
 
     public static String[] getPluginNames()
     {
-        return aliases;
+        return (String[]) ArrayUtils.clone(aliases);
     }
 
     // apply metadata values returned in DIM to the target item.
-    private void applyDim(List dimList, Item item)
+    private static void applyDim(List<Element> dimList, Item item)
         throws MetadataValidationException
     {
-        Iterator di = dimList.iterator();
-        while (di.hasNext())
+        for (Element elt : dimList)
         {
-            Element elt = (Element)di.next();
-            if (elt.getName().equals("field") && elt.getNamespace().equals(DIM_NS))
+            if ("field".equals(elt.getName()) && DIM_NS.equals(elt.getNamespace()))
+            {
                 applyDimField(elt, item);
-
-            // if it's a <dim> container, apply its guts
-            else if (elt.getName().equals("dim") && elt.getNamespace().equals(DIM_NS))
+            }
+            else if ("dim".equals(elt.getName()) && DIM_NS.equals(elt.getNamespace()))
+            {
+                // if it's a <dim> container, apply its guts
                 applyDim(elt.getChildren(), item);
-
+            }
             else
             {
                 log.error("Got unexpected element in DIM list: "+elt.toString());
@@ -112,7 +84,7 @@ public class XSLTIngestionCrosswalk
     }
 
     // adds the metadata element from one <field>
-    private void applyDimField(Element field, Item item)
+    private static void applyDimField(Element field, Item item)
     {
         String schema = field.getAttributeValue("mdschema");
         String element = field.getAttributeValue("element");
@@ -121,6 +93,13 @@ public class XSLTIngestionCrosswalk
         String authority = field.getAttributeValue("authority");
         String sconf = field.getAttributeValue("confidence");
 
+        // sanity check: some XSL puts an empty string in qualifier,
+        // change it to null so we match the unqualified DC field:
+        if (qualifier != null && qualifier.equals(""))
+        {
+            qualifier = null;
+        }
+        
         if ((authority != null && authority.length() > 0) ||
             (sconf != null && sconf.length() > 0))
         {
@@ -140,26 +119,24 @@ public class XSLTIngestionCrosswalk
      * these correspond directly to Item.addMetadata() calls so
      * they are simply executed.
      */
-    public void ingest(Context context, DSpaceObject dso, List metadata)
+    public void ingest(Context context, DSpaceObject dso, List<Element> metadata)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
-        if (dso.getType() != Constants.ITEM)
-            throw new CrosswalkObjectNotSupported("XsltSubmissionionCrosswalk can only crosswalk to an Item.");
-        Item item = (Item)dso;
-
         XSLTransformer xform = getTransformer(DIRECTION);
         if (xform == null)
+        {
             throw new CrosswalkInternalException("Failed to initialize transformer, probably error loading stylesheet.");
+        }
         try
         {
             List dimList = xform.transform(metadata);
-            applyDim(dimList, item);
+            ingestDIM(context, dso, dimList);
         }
         catch (XSLTransformException e)
         {
             log.error("Got error: "+e.toString());
-            throw new CrosswalkInternalException("XSL Transformation failed: "+e.toString());
+            throw new CrosswalkInternalException("XSL Transformation failed: "+e.toString(), e);
         }
     }
 
@@ -171,25 +148,115 @@ public class XSLTIngestionCrosswalk
     public void ingest(Context context, DSpaceObject dso, Element root)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
-        if (dso.getType() != Constants.ITEM)
-            throw new CrosswalkObjectNotSupported("XsltSubmissionionCrosswalk can only crosswalk to an Item.");
-        Item item = (Item)dso;
-
         XSLTransformer xform = getTransformer(DIRECTION);
         if (xform == null)
+        {
             throw new CrosswalkInternalException("Failed to initialize transformer, probably error loading stylesheet.");
+        }
         try
         {
             Document dimDoc = xform.transform(new Document((Element)root.clone()));
-            applyDim(dimDoc.getRootElement().getChildren(), item);
+            ingestDIM(context, dso, dimDoc.getRootElement().getChildren());
         }
         catch (XSLTransformException e)
         {
             log.error("Got error: "+e.toString());
-            throw new CrosswalkInternalException("XSL Transformation failed: "+e.toString());
+            throw new CrosswalkInternalException("XSL Transformation failed: "+e.toString(), e);
         }
 
     }
+
+    // return coll/comm "metadata" label corresponding to a DIM field.
+    private static String getMetadataForDIM(Element field)
+    {
+        // make up fieldname, then look for it in xwalk
+        String element = field.getAttributeValue("element");
+        String qualifier = field.getAttributeValue("qualifier");
+        String fname = "dc." + element;
+        if (qualifier != null)
+        {
+            fname += "." + qualifier;
+        }
+        return PackageUtils.dcToContainerMetadata(fname);
+    }
+
+    /**
+     * Ingest a DIM metadata expression directly, without
+     * translating some other format into DIM.
+     * The <code>dim</code> element is expected to be be the root of
+     * a DIM document.
+     * <p>
+     * Note that this is ONLY implemented for Item, Collection, and
+     * Community objects.  Also only works for the "dc" metadata schema.
+     * <p>
+     * @param context the context
+     * @param dso object into which to ingest metadata
+     * @param  dim root of a DIM expression
+     */
+
+    public static void ingestDIM(Context context, DSpaceObject dso, Element dim)
+        throws CrosswalkException,
+               IOException, SQLException, AuthorizeException
+    {
+        ingestDIM(context, dso, dim.getChildren());
+    }
+
+    public static void ingestDIM(Context context, DSpaceObject dso, List<Element> fields)
+        throws CrosswalkException,
+               IOException, SQLException, AuthorizeException
+    {
+        int type = dso.getType();
+        if (type == Constants.ITEM)
+        {
+            Item item = (Item)dso;
+            applyDim(fields, item);
+        }
+        else if (type == Constants.COLLECTION ||
+                 type == Constants.COMMUNITY)
+        {
+            for (Element field : fields)
+            {
+                String schema = field.getAttributeValue("mdschema");
+                if ("dim".equals(field.getName()) && DIM_NS.equals(field.getNamespace()))
+                {
+                    ingestDIM(context, dso, field.getChildren());
+                }
+                else if ("field".equals(field.getName()) &&
+                        DIM_NS.equals(field.getNamespace()) &&
+                    schema != null && "dc".equals(schema))
+                {
+                    String md = getMetadataForDIM(field);
+                    if (md == null)
+                    {
+                        log.warn("Cannot map to Coll/Comm metadata field, DIM element=" +
+                                field.getAttributeValue("element") + ", qualifier=" + field.getAttributeValue("qualifier"));
+                    }
+                    else
+                    {
+                        if (type == Constants.COLLECTION)
+                        {
+                            ((Collection) dso).setMetadata(md, field.getText());
+                        }
+                        else
+                        {
+                            ((Community) dso).setMetadata(md, field.getText());
+                        }
+                    }
+                }
+
+                else
+                {
+                    log.warn("ignoring unrecognized DIM element: " + field.toString());
+                }
+            }
+        }
+        else
+        {
+            throw new CrosswalkObjectNotSupported("XsltSubmissionionCrosswalk can only crosswalk to an Item.");
+        }
+
+    }
+
 
     /**
      * Simple command-line rig for testing the DIM output of a stylesheet.
@@ -221,7 +288,9 @@ public class XSLTIngestionCrosswalk
 
         XSLTransformer xform = ((XSLTIngestionCrosswalk)xwalk).getTransformer(DIRECTION);
         if (xform == null)
+        {
             throw new CrosswalkInternalException("Failed to initialize transformer, probably error loading stylesheet.");
+        }
 
         SAXBuilder builder = new SAXBuilder();
         Document inDoc = builder.build(new FileInputStream(argv[i+1]));
@@ -248,7 +317,9 @@ public class XSLTIngestionCrosswalk
             // skip over comment, text and other trash some XSLs generate..
             Object o = di.next();
             if (!(o instanceof Element))
+            {
                 continue;
+            }
 
             Element elt = (Element)o;
             if (elt.getName().equals("field") && elt.getNamespace().equals(DIM_NS))
@@ -273,8 +344,10 @@ public class XSLTIngestionCrosswalk
                     MetadataField mf = MetadataField.findByElement(context,
                                   ms.getSchemaID(), element, qualifier);
                     if (mf == null)
-                        System.err.println("DIM Error, Cannot find metadata field for: schema=\""+schema+
-                            "\", element=\""+element+"\", qualifier=\""+qualifier+"\"");
+                    {
+                        System.err.println("DIM Error, Cannot find metadata field for: schema=\"" + schema +
+                                "\", element=\"" + element + "\", qualifier=\"" + qualifier + "\"");
+                    }
                 }
             }
             else

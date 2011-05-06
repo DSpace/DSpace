@@ -1,44 +1,13 @@
-/*
- * MetadataImport.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision$
- *
- * Date: $Date$
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.bulkedit;
 
 import org.apache.commons.cli.*;
-import org.apache.log4j.Logger;
 
 import org.dspace.content.*;
 import org.dspace.core.Context;
@@ -49,12 +18,12 @@ import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowManager;
 
 import java.util.ArrayList;
-import java.util.Enumeration;
 import java.io.File;
 import java.io.InputStreamReader;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Metadata importer to allow the batch import of metadata from a file
@@ -67,10 +36,7 @@ public class MetadataImport
     Context c;
 
     /** The lines to import */
-    ArrayList<DSpaceCSVLine> toImport;
-
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(MetadataImport.class);
+    List<DSpaceCSVLine> toImport;
 
     /**
      * Create an instance of the metadata importer. Requires a context and an array of CSV lines
@@ -79,7 +45,7 @@ public class MetadataImport
      * @param c The context
      * @param toImport An array of CSV lines to examine
      */
-    public MetadataImport(Context c, ArrayList<DSpaceCSVLine> toImport)
+    public MetadataImport(Context c, List<DSpaceCSVLine> toImport)
     {
         // Store the import settings
         this.c = c;
@@ -98,7 +64,7 @@ public class MetadataImport
      *
      * @throws MetadataImportException if something goes wrong
      */
-    public ArrayList<BulkEditChange> runImport(boolean change,
+    public List<BulkEditChange> runImport(boolean change,
                                                boolean useWorkflow,
                                                boolean workflowNotify,
                                                boolean useTemplate) throws MetadataImportException
@@ -127,7 +93,7 @@ public class MetadataImport
                     BulkEditChange whatHasChanged = new BulkEditChange(item);
 
                     // Has it moved collection?
-                    ArrayList<String> collections = line.get("collection");
+                    List<String> collections = line.get("collection");
                     if (collections != null)
                     {
                         // Sanity check we're not orphaning it
@@ -140,11 +106,9 @@ public class MetadataImport
                     }
 
                     // Iterate through each metadata element in the csv line
-                    Enumeration<String> e = line.keys();
-                    while (e.hasMoreElements())
+                    for (String md : line.keys())
                     {
                         // Get the values we already have
-                        String md = e.nextElement();
                         if (!"id".equals(md))
                         {
                             // Get the values from the CSV
@@ -172,12 +136,10 @@ public class MetadataImport
                     }
 
                     // Iterate through each metadata element in the csv line
-                    Enumeration<String> e = line.keys();
                     BulkEditChange whatHasChanged = new BulkEditChange();
-                    while (e.hasMoreElements())
+                    for (String md : line.keys())
                     {
                         // Get the values we already have
-                        String md = e.nextElement();
                         if (!"id".equals(md))
                         {
                             // Get the values from the CSV
@@ -189,7 +151,7 @@ public class MetadataImport
                     }
 
                     // Check it has an owning collection
-                    ArrayList<String> collections = line.get("collection");
+                    List<String> collections = line.get("collection");
                     if (collections == null)
                     {
                         throw new MetadataImportException("New items must have a 'collection' assigned in the form of a handle");
@@ -223,7 +185,7 @@ public class MetadataImport
                         }
                         catch (Exception ex)
                         {
-                            throw new MetadataImportException("'" + handle + "' is not a Collection! You must specify a valid collection for new items");
+                            throw new MetadataImportException("'" + handle + "' is not a Collection! You must specify a valid collection for new items", ex);
                         }
                     }
 
@@ -346,7 +308,7 @@ public class MetadataImport
         // If there is a language on the element, strip if off
         if (element.contains("["))
         {
-            element = element.substring(0, element.indexOf("["));
+            element = element.substring(0, element.indexOf('['));
         }
         String qualifier = null;
         if (bits.length > 2)
@@ -356,7 +318,7 @@ public class MetadataImport
             // If there is a language, strip if off
             if (qualifier.contains("["))
             {
-                qualifier = qualifier.substring(0, qualifier.indexOf("["));
+                qualifier = qualifier.substring(0, qualifier.indexOf('['));
             }
         }
         DCValue[] current = item.getMetadata(schema, element, qualifier, language);
@@ -412,8 +374,8 @@ public class MetadataImport
             ((changes.getAdds().size() > 0) || (changes.getRemoves().size() > 0)))
         {
             // Get the complete list of what values should now be in that element
-            ArrayList<DCValue> list = changes.getComplete();
-            ArrayList<String> values = new ArrayList<String>();
+            List<DCValue> list = changes.getComplete();
+            List<String> values = new ArrayList<String>();
             for (DCValue value : list)
             {
                 if ((qualifier == null) && (language == null))
@@ -482,7 +444,7 @@ public class MetadataImport
      * @throws MetadataImportException If something goes wrong to be reported back to the user
      */
     private void compare(Item item,
-                         ArrayList<String> collections,
+                         List<String> collections,
                          Collection[] actualCollections,
                          BulkEditChange bechange,
                          boolean change) throws SQLException, AuthorizeException, IOException, MetadataImportException
@@ -557,14 +519,10 @@ public class MetadataImport
                 }
                 else
                 {
-                    if (!first)
+                    // Is it there?
+                    if (!first && collection.getHandle().equals(csvcollection))
                     {
-                        // Is it there?
-                        if (collection.getHandle().equals(csvcollection))
-                        {
-                            found = true;
-                        }
-
+                        found = true;
                     }
                 }
                 first = false;
@@ -655,7 +613,7 @@ public class MetadataImport
         // If there is a language on the element, strip if off
         if (element.contains("["))
         {
-            element = element.substring(0, element.indexOf("["));
+            element = element.substring(0, element.indexOf('['));
         }
         String qualifier = null;
         if (bits.length > 2)
@@ -665,7 +623,7 @@ public class MetadataImport
             // If there is a language, strip if off
             if (qualifier.contains("["))
             {
-                qualifier = qualifier.substring(0, qualifier.indexOf("["));
+                qualifier = qualifier.substring(0, qualifier.indexOf('['));
             }
         }
 
@@ -748,17 +706,17 @@ public class MetadataImport
      * @param changed Whether or not the changes have been made
      * @return The number of items that have changed
      */
-    private static int displayChanges(ArrayList<BulkEditChange> changes, boolean changed)
+    private static int displayChanges(List<BulkEditChange> changes, boolean changed)
     {
         // Display the changes
         int changeCounter = 0;
         for (BulkEditChange change : changes)
         {
             // Get the changes
-            ArrayList<DCValue> adds = change.getAdds();
-            ArrayList<DCValue> removes = change.getRemoves();
-            ArrayList<Collection> newCollections = change.getNewMappedCollections();
-            ArrayList<Collection> oldCollections = change.getOldMappedCollections();
+            List<DCValue> adds = change.getAdds();
+            List<DCValue> removes = change.getRemoves();
+            List<Collection> newCollections = change.getNewMappedCollections();
+            List<Collection> oldCollections = change.getOldMappedCollections();
             if ((adds.size() > 0) || (removes.size() > 0) ||
                 (newCollections.size() > 0) || (oldCollections.size() > 0) ||
                 (change.getNewOwningCollection() != null) || (change.getOldOwningCollection() != null))
@@ -1026,7 +984,7 @@ public class MetadataImport
         DSpaceCSV csv;
         try
         {
-            csv = new DSpaceCSV(new File(filename));
+            csv = new DSpaceCSV(new File(filename), c);
         }
         catch (Exception e)
         {
@@ -1035,9 +993,9 @@ public class MetadataImport
             return;
         }
 
-        // Perform the first import - just higlight differences
+        // Perform the first import - just highlight differences
         MetadataImport importer = new MetadataImport(c, csv.getCSVLines());
-        ArrayList<BulkEditChange> changes;
+        List<BulkEditChange> changes;
 
         if (!line.hasOption('s'))
         {

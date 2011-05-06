@@ -1,39 +1,9 @@
-/* SWORDConfiguration.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Copyright (c) 2007, Aberystwyth University
- *
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *  - Redistributions of source code must retain the above
- *    copyright notice, this list of conditions and the
- *    following disclaimer.
- *
- *  - Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- *  - Neither the name of the Centre for Advanced Software and
- *    Intelligent Systems (CASIS) nor the names of its
- *    contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
- * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.sword;
 
@@ -44,7 +14,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.BitstreamFormat;
 import org.purl.sword.base.SWORDErrorException;
-import org.apache.log4j.Logger;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,6 +22,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.sql.SQLException;
+
+import org.apache.log4j.Logger;
 
 /**
  * @author Richard Jones
@@ -71,8 +42,9 @@ import java.sql.SQLException;
  */
 public class SWORDConfiguration
 {
-	/** logger */
-	private static Logger log = Logger.getLogger(SWORDConfiguration.class);
+
+    /** logger */
+ 	public static final Logger log = Logger.getLogger(SWORDConfiguration.class);
 
 	/** whether we can support noOp */
 	private boolean noOp = true;
@@ -86,11 +58,17 @@ public class SWORDConfiguration
 	/** do we support mediation */
 	private boolean mediated = false;
 
-	/** should we keep the original package */
+	/** should we keep the original package as bitstream */
 	private boolean keepOriginal = false;
 
 	/** item bundle in which sword deposits are stored */
 	private String swordBundle = "SWORD";
+	
+ 	/** should we keep the original package as a file on ingest error */
+ 	private boolean keepPackageOnFailedIngest = false;
+ 	
+ 	/** location of directory to store packages on ingest error */
+ 	private String failedPackageDir = null;
 
     /** Accepted formats */
     private List<String> swordaccepts;
@@ -111,7 +89,7 @@ public class SWORDConfiguration
 		// set the mediation value
 		this.mediated = ConfigurationManager.getBooleanProperty("sword.on-behalf-of.enable");
 
-		// find out if we keep the original
+		// find out if we keep the original as bitstream
 		this.keepOriginal = ConfigurationManager.getBooleanProperty("sword.keep-original-package");
 
 		// get the sword bundle
@@ -120,6 +98,12 @@ public class SWORDConfiguration
 		{
 			this.swordBundle = bundle;
 		}
+
+        // find out if we keep the package as a file in specified directory
+        this.keepPackageOnFailedIngest = ConfigurationManager.getBooleanProperty("sword.keep-package-on-fail", false);
+ 
+        // get directory path and name
+        this.failedPackageDir = ConfigurationManager.getProperty("sword.failed-package.dir");
 
         // Get the accepted formats
         String acceptsProperty = ConfigurationManager.getProperty("sword.accepts");
@@ -245,6 +229,43 @@ public class SWORDConfiguration
 		this.keepOriginal = keepOriginal;
 	}
 
+ 	/**
+ 	 * set whether the repository should write file of the original package if ingest fails
+ 	 * @param keepOriginalOnFail
+ 	 */
+ 	public void setKeepPackageOnFailedIngest(boolean keepOriginalOnFail)
+ 	{
+ 		keepPackageOnFailedIngest = keepOriginalOnFail;
+ 	}
+
+    /**
+ 	 * should the repository write file of the original package if ingest fails
+ 	 * @return keepPackageOnFailedIngest
+ 	 */
+ 	public boolean isKeepPackageOnFailedIngest()
+ 	{
+ 		return keepPackageOnFailedIngest;
+ 	}
+ 
+ 	/**
+ 	 * set the directory to write file of the original package
+ 	 * @param dir
+ 	 */
+ 	public void setFailedPackageDir(String dir)
+ 	{
+ 		failedPackageDir = dir;
+ 	}
+ 
+ 	/**
+ 	 * directory location of the files with original packages
+     * for failed ingests
+ 	 * @return failedPackageDir
+ 	 */
+ 	public String getFailedPackageDir()
+ 	{
+ 		return failedPackageDir;
+ 	}
+
 	/**
 	 * Get the list of mime types that the given dspace object will
 	 * accept as packages
@@ -356,22 +377,20 @@ public class SWORDConfiguration
                     qs.put(bits[0], value);
                 }
             }
-            if (bits.length == 3)
+
+            // collection settings
+            if (bits.length == 3 && bits[0].equals(handle))
             {
-                // collection settings
-				if (bits[0].equals(handle))
-				{
-					// this is configuration for our collection
-					String value = props.getProperty(key);
-					if (bits[2].equals("identifier"))
-					{
-						identifiers.put(bits[1], value);
-					}
-					else if (bits[2].equals("q"))
-					{
-						qs.put(bits[1], value);
-					}
-				}
+                // this is configuration for our collection
+                String value = props.getProperty(key);
+                if (bits[2].equals("identifier"))
+                {
+                    identifiers.put(bits[1], value);
+                }
+                else if (bits[2].equals("q"))
+                {
+                    qs.put(bits[1], value);
+                }
             }
         }
 

@@ -1,41 +1,9 @@
-/*
- * DescribeStep.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4919 $
- *
- * Date: $Date: 2010-05-12 07:45:38 -0400 (Wed, 12 May 2010) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.submission.submit;
 
@@ -45,8 +13,6 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 import javax.servlet.ServletException;
-
-import org.apache.log4j.Logger;
 
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
@@ -70,7 +36,6 @@ import org.dspace.app.xmlui.wing.element.Radio;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.app.xmlui.wing.element.TextArea;
-import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
@@ -98,9 +63,6 @@ import org.xml.sax.SAXException;
  */
 public class DescribeStep extends AbstractSubmissionStep
 {
-        private static Logger log = Logger.getLogger(DescribeStep.class);
-
-        
         /** Language Strings **/
     protected static final Message T_head =
         message("xmlui.Submission.submit.DescribeStep.head");
@@ -138,7 +100,9 @@ public class DescribeStep extends AbstractSubmissionStep
     private static void initializeInputsReader() throws DCInputsReaderException
     {
         if (INPUTS_READER == null)
+        {
             INPUTS_READER = new DCInputsReader();
+        }
     }
     
     /**
@@ -175,12 +139,15 @@ public class DescribeStep extends AbstractSubmissionStep
         public void addPageMeta(PageMeta pageMeta) throws SAXException, WingException,
         UIException, SQLException, IOException, AuthorizeException
         {
+            super.addPageMeta(pageMeta);
             int collectionID = submission.getCollection().getID();
             pageMeta.addMetadata("choice", "collection").addContent(String.valueOf(collectionID));
 
             String jumpTo = submissionInfo.getJumpToField();
             if (jumpTo != null)
-                pageMeta.addMetadata("page","jumpTo").addContent(jumpTo);
+            {
+                pageMeta.addMetadata("page", "jumpTo").addContent(jumpTo);
+            }
         }
 
         public void addBody(Body body) throws SAXException, WingException,
@@ -191,8 +158,8 @@ public class DescribeStep extends AbstractSubmissionStep
                 Collection collection = submission.getCollection();
                 String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";
 
-                DCInputSet inputSet = null;
-                DCInput[] inputs = {};
+                DCInputSet inputSet;
+                DCInput[] inputs;
                 try
                 {
                         inputSet = getInputsReader().getInputs(submission.getCollection().getHandle());
@@ -202,8 +169,6 @@ public class DescribeStep extends AbstractSubmissionStep
                 {
                         throw new UIException(se);
                 }
-                
-                
 
                 Division div = body.addInteractiveDivision("submit-describe",actionURL,Division.METHOD_POST,"primary submission");
                 div.setHead(T_submission_head);
@@ -220,7 +185,9 @@ public class DescribeStep extends AbstractSubmissionStep
                     
                     // If the input is invisible in this scope, then skip it.
                         if (!dcInput.isVisible(scope) && !readonly)
-                                continue;
+                        {
+                            continue;
+                        }
                         
                         String schema = dcInput.getSchema();
                         String element = dcInput.getElement();
@@ -350,11 +317,13 @@ public class DescribeStep extends AbstractSubmissionStep
             // If the input is invisible in this scope, then skip it.
             String scope = submissionInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE;
             if (!input.isVisible(scope) && !input.isReadOnly(scope))
+            {
                 continue;
+            }
 
             String inputType = input.getInputType();
             String pairsName = input.getPairsType();
-            DCValue[] values = new DCValue[0];
+            DCValue[] values;
 
             if (inputType.equals("qualdrop_value"))
             {
@@ -365,7 +334,7 @@ public class DescribeStep extends AbstractSubmissionStep
                 values = submission.getItem().getMetadata(input.getSchema(), input.getElement(), input.getQualifier(), Item.ANY);
             }
 
-            if (values.length > 0)
+            if (values != null && values.length > 0)
             {
                 for (DCValue value : values)
                 {
@@ -408,7 +377,9 @@ public class DescribeStep extends AbstractSubmissionStep
                             authItem.addContent(displayValue);
                         }
                         else
-                        describeSection.addItem(displayValue);
+                        {
+                            describeSection.addItem(displayValue);
+                        }
                     }
                 } // For each DCValue
             } // If values exist
@@ -445,17 +416,28 @@ public class DescribeStep extends AbstractSubmissionStep
                 fullName.setLabel(dcInput.getLabel());
                 fullName.setHelp(cleanHints(dcInput.getHints()));
                 if (dcInput.isRequired())
-                        fullName.setRequired();
+                {
+                    fullName.setRequired();
+                }
                 if (isFieldInError(fieldName))
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                {
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
+                    {
                         fullName.addError(dcInput.getWarning());
-                    } else {
+                    }
+                    else
+                    {
                         fullName.addError(T_required_field);
                     }
+                }
                 if (dcInput.isRepeatable() && !readonly)
-                        fullName.enableAddOperation();
+                {
+                    fullName.enableAddOperation();
+                }
                 if ((dcInput.isRepeatable() || dcValues.length > 1)  && !readonly)
-                        fullName.enableDeleteOperation();
+                {
+                    fullName.enableDeleteOperation();
+                }
                 String fieldKey = MetadataAuthorityManager.makeFieldKey(dcInput.getSchema(), dcInput.getElement(), dcInput.getQualifier());
                 boolean isAuthorityControlled = MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey);
                 if (isAuthorityControlled)
@@ -495,9 +477,13 @@ public class DescribeStep extends AbstractSubmissionStep
                                 if (isAuthorityControlled)
                                 {
                                     if (dcValue.authority == null || dcValue.authority.equals(""))
+                                    {
                                         fi.setAuthorityValue("", "blank");
+                                    }
                                     else
+                                    {
                                         fi.setAuthorityValue(dcValue.authority, Choices.getConfidenceText(dcValue.confidence));
+                                    }
                         }
                 }
                 }
@@ -510,9 +496,13 @@ public class DescribeStep extends AbstractSubmissionStep
                         if (isAuthorityControlled)
                         {
                             if (dcValues[0].authority == null || dcValues[0].authority.equals(""))
+                            {
                                 lastName.setAuthorityValue("", "blank");
+                            }
                             else
+                            {
                                 lastName.setAuthorityValue(dcValues[0].authority, Choices.getConfidenceText(dcValues[0].confidence));
+                            }
                 }
         }
         }
@@ -545,17 +535,28 @@ public class DescribeStep extends AbstractSubmissionStep
                 fullDate.setLabel(dcInput.getLabel());
                 fullDate.setHelp(cleanHints(dcInput.getHints()));
                 if (dcInput.isRequired())
-                        fullDate.setRequired();
+                {
+                    fullDate.setRequired();
+                }
                 if (isFieldInError(fieldName))
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                {
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
+                    {
                         fullDate.addError(dcInput.getWarning());
-                    } else {
+                    }
+                    else
+                    {
                         fullDate.addError(T_required_field);
                     }
+                }
                 if (dcInput.isRepeatable() && !readonly)
-                        fullDate.enableAddOperation();
+                {
+                    fullDate.enableAddOperation();
+                }
                 if ((dcInput.isRepeatable() || dcValues.length > 1) && !readonly)
-                        fullDate.enableDeleteOperation();
+                {
+                    fullDate.enableDeleteOperation();
+                }
 
                 if (readonly)
                 {
@@ -603,9 +604,13 @@ public class DescribeStep extends AbstractSubmissionStep
                         // Check if the day field is not specified, if so then just
                         // put a blank value in instead of the wiered looking -1.
                         if (dcDate.getDay() == -1)
-                                day.setValue("");
+                        {
+                            day.setValue("");
+                        }
                         else
-                                day.setValue(String.valueOf(dcDate.getDay()));
+                        {
+                            day.setValue(String.valueOf(dcDate.getDay()));
+                        }
                 }
         }
         
@@ -638,17 +643,28 @@ public class DescribeStep extends AbstractSubmissionStep
                 fullSeries.setLabel(dcInput.getLabel());
                 fullSeries.setHelp(cleanHints(dcInput.getHints()));
                 if (dcInput.isRequired())
-                        fullSeries.setRequired();
+                {
+                    fullSeries.setRequired();
+                }
                 if (isFieldInError(fieldName))
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                {
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
+                    {
                         fullSeries.addError(dcInput.getWarning());
-                    } else {
+                    }
+                    else
+                    {
                         fullSeries.addError(T_required_field);
                     }
+                }
                 if (dcInput.isRepeatable() && !readonly)
-                        fullSeries.enableAddOperation();
+                {
+                    fullSeries.enableAddOperation();
+                }
                 if ((dcInput.isRepeatable() || dcValues.length > 1) && !readonly)
-                        fullSeries.enableDeleteOperation();
+                {
+                    fullSeries.enableDeleteOperation();
+                }
 
                 series.setLabel(T_series_name);
                 number.setLabel(T_report_no);
@@ -708,18 +724,29 @@ public class DescribeStep extends AbstractSubmissionStep
                 qualdrop.setLabel(dcInput.getLabel());
                 qualdrop.setHelp(cleanHints(dcInput.getHints()));
                 if (dcInput.isRequired())
-                        qualdrop.setRequired();
+                {
+                    qualdrop.setRequired();
+                }
                 if (isFieldInError(fieldName))
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                {
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
+                    {
                         qualdrop.addError(dcInput.getWarning());
-                    } else {
+                    }
+                    else
+                    {
                         qualdrop.addError(T_required_field);
                     }
+                }
                 if (dcInput.isRepeatable() && !readonly)
-                        qualdrop.enableAddOperation();
+                {
+                    qualdrop.enableAddOperation();
+                }
                 // Update delete based upon the filtered values.
                 if ((dcInput.isRepeatable() || dcValues.length > 1) && !readonly)
-                        qualdrop.enableDeleteOperation();
+                {
+                    qualdrop.enableDeleteOperation();
+                }
                 
                 if (readonly)
                 {
@@ -790,17 +817,28 @@ public class DescribeStep extends AbstractSubmissionStep
                     textArea.setChoicesClosed(ChoiceAuthorityManager.getManager().isClosed(fieldKey));
                 }
                 if (dcInput.isRequired())
-                        textArea.setRequired();
+                {
+                    textArea.setRequired();
+                }
                 if (isFieldInError(fieldName))
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                {
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
+                    {
                         textArea.addError(dcInput.getWarning());
-                    } else {
+                    }
+                    else
+                    {
                         textArea.addError(T_required_field);
                     }
+                }
                 if (dcInput.isRepeatable() && !readonly)
-                        textArea.enableAddOperation();
+                {
+                    textArea.enableAddOperation();
+                }
                 if ((dcInput.isRepeatable() || dcValues.length > 1) && !readonly)
-                        textArea.enableDeleteOperation();
+                {
+                    textArea.enableDeleteOperation();
+                }
 
                 if (readonly)
                 {
@@ -817,9 +855,13 @@ public class DescribeStep extends AbstractSubmissionStep
                                 if (isAuth)
                                 {
                                     if (dcValue.authority == null || dcValue.authority.equals(""))
+                                    {
                                         ti.setAuthorityValue("", "blank");
+                                    }
                                     else
+                                    {
                                         ti.setAuthorityValue(dcValue.authority, Choices.getConfidenceText(dcValue.confidence));
+                                    }
                         }
                 }
                 }
@@ -829,9 +871,13 @@ public class DescribeStep extends AbstractSubmissionStep
                         if (isAuth)
                         {
                             if (dcValues[0].authority == null || dcValues[0].authority.equals(""))
+                            {
                                 textArea.setAuthorityValue("", "blank");
+                            }
                             else
+                            {
                                 textArea.setAuthorityValue(dcValues[0].authority, Choices.getConfidenceText(dcValues[0].confidence));
+                            }
                 }
         }
         }
@@ -854,7 +900,9 @@ public class DescribeStep extends AbstractSubmissionStep
         {
                 String fieldKey = MetadataAuthorityManager.makeFieldKey(dcInput.getSchema(), dcInput.getElement(), dcInput.getQualifier());
                 if (MetadataAuthorityManager.getManager().isAuthorityControlled(fieldKey))
-                    throw new WingException("Field "+fieldKey+" has choice presentation of type \""+Params.PRESENTATION_SELECT+"\", it may NOT be authority-controlled.");
+                {
+                    throw new WingException("Field " + fieldKey + " has choice presentation of type \"" + Params.PRESENTATION_SELECT + "\", it may NOT be authority-controlled.");
+                }
 
                 // Plain old select list.
                 Select select = form.addItem().addSelect(fieldName,"submit-select");
@@ -863,13 +911,20 @@ public class DescribeStep extends AbstractSubmissionStep
                 select.setLabel(dcInput.getLabel());
                 select.setHelp(cleanHints(dcInput.getHints()));
                 if (dcInput.isRequired())
-                        select.setRequired();
+                {
+                    select.setRequired();
+                }
                 if (isFieldInError(fieldName))
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                {
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
+                    {
                         select.addError(dcInput.getWarning());
-                    } else {
+                    }
+                    else
+                    {
                         select.addError(T_required_field);
                     }
+                }
                 if (dcInput.isRepeatable() || dcValues.length > 1)
                 {
                         // Use the multiple functionality from the HTML
@@ -878,7 +933,9 @@ public class DescribeStep extends AbstractSubmissionStep
                         select.setSize(6);
                 }
                 else
-                        select.setSize(1);
+                {
+                    select.setSize(1);
+                }
 
                 if (readonly)
                 {
@@ -887,7 +944,9 @@ public class DescribeStep extends AbstractSubmissionStep
 
                 Choices cs = ChoiceAuthorityManager.getManager().getMatches(fieldKey, "", coll.getID(), 0, 0, null);
                 if (dcValues.length == 0)
+                {
                     select.addOption(true, "", "");
+                }
                 for (Choice c : cs.values)
                 {
                     select.addOption(c.value, c.label);
@@ -922,13 +981,20 @@ public class DescribeStep extends AbstractSubmissionStep
                 select.setLabel(dcInput.getLabel());
                 select.setHelp(cleanHints(dcInput.getHints()));
                 if (dcInput.isRequired())
-                        select.setRequired();
+                {
+                    select.setRequired();
+                }
                 if (isFieldInError(fieldName))
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                {
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
+                    {
                         select.addError(dcInput.getWarning());
-                    } else {
+                    }
+                    else
+                    {
                         select.addError(T_required_field);
                     }
+                }
                 if (dcInput.isRepeatable() || dcValues.length > 1)
                 {
                         // Use the multiple functionality from the HTML
@@ -1000,13 +1066,20 @@ public class DescribeStep extends AbstractSubmissionStep
                 listField.setLabel(dcInput.getLabel());
                 listField.setHelp(cleanHints(dcInput.getHints()));
                 if (dcInput.isRequired())
-                        listField.setRequired();
+                {
+                    listField.setRequired();
+                }
                 if (isFieldInError(fieldName))
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                {
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
+                    {
                         listField.addError(dcInput.getWarning());
-                    } else {
+                    }
+                    else
+                    {
                         listField.addError(T_required_field);
                     }
+                }
 
         
                 //Setup each of the possible options
@@ -1080,17 +1153,28 @@ public class DescribeStep extends AbstractSubmissionStep
                 }
 
                 if (dcInput.isRequired())
-                        text.setRequired();
+                {
+                    text.setRequired();
+                }
                 if (isFieldInError(fieldName))
-                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0) {
+                {
+                    if (dcInput.getWarning() != null && dcInput.getWarning().length() > 0)
+                    {
                         text.addError(dcInput.getWarning());
-                    } else {
+                    }
+                    else
+                    {
                         text.addError(T_required_field);
                     }
+                }
                 if (dcInput.isRepeatable() && !readonly)
-                        text.enableAddOperation();
+                {
+                    text.enableAddOperation();
+                }
                 if ((dcInput.isRepeatable() || dcValues.length > 1) && !readonly)
-                        text.enableDeleteOperation();
+                {
+                    text.enableDeleteOperation();
+                }
 
                 if (readonly)
                 {
@@ -1107,9 +1191,13 @@ public class DescribeStep extends AbstractSubmissionStep
                                 if (isAuth)
                                 {
                                     if (dcValue.authority == null || dcValue.authority.equals(""))
+                                    {
                                         ti.setAuthorityValue("", "blank");
+                                    }
                                     else
+                                    {
                                         ti.setAuthorityValue(dcValue.authority, Choices.getConfidenceText(dcValue.confidence));
+                                    }
                         }
                 }
                 }
@@ -1119,9 +1207,13 @@ public class DescribeStep extends AbstractSubmissionStep
                         if (isAuth)
                         {
                             if (dcValues[0].authority == null || dcValues[0].authority.equals(""))
+                            {
                                 text.setAuthorityValue("", "blank");
+                            }
                             else
+                            {
                                 text.setAuthorityValue(dcValues[0].authority, Choices.getConfidenceText(dcValues[0].confidence));
+                            }
                 }
         }
         }
@@ -1136,10 +1228,7 @@ public class DescribeStep extends AbstractSubmissionStep
          */
         private boolean isFieldInError(String fieldName)
         {
-                if(this.errorFields.contains(fieldName))
-                        return true;
-                else
-                        return false;
+            return (this.errorFields.contains(fieldName));
         }
         
         /**

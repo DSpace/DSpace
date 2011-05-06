@@ -1,49 +1,17 @@
-/*
- * ContainerAdapter.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4265 $
- *
- * Date: $Date: 2009-09-16 05:16:58 -0400 (Wed, 16 Sep 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.xmlui.objectmanager;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.wing.AttributeMap;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.authorize.AuthorizeException;
@@ -85,6 +53,7 @@ import org.xml.sax.SAXException;
  */
 public class ContainerAdapter extends AbstractAdapter
 {
+    private static final Logger log = Logger.getLogger(ContainerAdapter.class);
 
     /** The community or collection this adapter represents. */
     private DSpaceObject dso;
@@ -132,7 +101,9 @@ public class ContainerAdapter extends AbstractAdapter
     protected String getMETSOBJID()
     {
     	if (dso.getHandle() != null)
-    		return contextPath+"/handle/" + dso.getHandle();
+        {
+            return contextPath + "/handle/" + dso.getHandle();
+        }
     	return null;
     }
 
@@ -152,12 +123,18 @@ public class ContainerAdapter extends AbstractAdapter
     	if (dso.getHandle() == null)
     	{
         	if (dso instanceof Collection)
-        		return "collection:"+dso.getID();
+            {
+                return "collection:" + dso.getID();
+            }
         	else
-        		return "community:"+dso.getID();
+            {
+                return "community:" + dso.getID();
+            }
     	}
         else
-        	return "hdl:"+dso.getHandle();
+        {
+            return "hdl:" + dso.getHandle();
+        }
     }
 
     /**
@@ -176,9 +153,13 @@ public class ContainerAdapter extends AbstractAdapter
     protected String getMETSLabel()
     {
         if (dso instanceof Community)
+        {
             return "DSpace Community";
+        }
         else
+        {
             return "DSpace Collection";
+        }
     }
 
     /**
@@ -304,9 +285,7 @@ public class ContainerAdapter extends AbstractAdapter
 	                }
 	                catch(ItemCountException e)
 	                {
-	                    IOException ioe = new IOException("Could not obtain Collection item-count");
-	                    ioe.initCause(e);
-	                	throw ioe;
+	                    throw new IOException("Could not obtain Collection item-count", e);
 	                }
         		}
             } 
@@ -340,9 +319,7 @@ public class ContainerAdapter extends AbstractAdapter
 	                }
 	                catch(ItemCountException e)
 	                {
-	                	IOException ioe = new IOException("Could not obtain Collection item-count");
-		                ioe.initCause(e);
-		                throw ioe;
+	                	throw new IOException("Could not obtain Collection item-count", e);
 	                }
         		}
             }
@@ -359,27 +336,25 @@ public class ContainerAdapter extends AbstractAdapter
           
         }
         
-        
-        
-        
-        
-        
-        
     	for (String dmdType : dmdTypes)
     	{
     		// If DIM was requested then it was generated above without using
     		// the crosswalk API. So we can skip this one.
     		if ("DIM".equals(dmdType))
-    			continue;
+            {
+                continue;
+            }
     		
     		DisseminationCrosswalk crosswalk = getDisseminationCrosswalk(dmdType);
     		
     		if (crosswalk == null)
-    			continue;
+            {
+                continue;
+            }
     		
         	String dmdID = getGenericID("dmd_");
 	   		// Add our id to the list.
-	   		dmdSecIDS.append(" " + dmdID);
+            dmdSecIDS.append(" ").append(dmdID);
 
             // ////////////////////////////////
             // Start a new dmdSec for each crosswalk.
@@ -445,7 +420,7 @@ public class ContainerAdapter extends AbstractAdapter
             }
             else
             {
-                dmdSecIDS.append(" " + dmdID);
+                dmdSecIDS.append(" ").append(dmdID);
 
             }
         }
@@ -513,7 +488,6 @@ public class ContainerAdapter extends AbstractAdapter
     {
     	AttributeMap attributes;
     	
-    	
     	// ///////////////////////
     	// Start a new structure map
     	attributes = new AttributeMap();
@@ -527,7 +501,9 @@ public class ContainerAdapter extends AbstractAdapter
     	attributes.put("TYPE", getMETSLabel());
     	// add references to the Descriptive metadata
     	if (dmdSecIDS != null)
-    		attributes.put("DMDID", dmdSecIDS.toString());
+        {
+            attributes.put("DMDID", dmdSecIDS.toString());
+        }
     	startElement(METS,"div",attributes);
     	
     	
@@ -612,7 +588,9 @@ public class ContainerAdapter extends AbstractAdapter
     private int countOccurances(String string, char character)
     {
     	if (string == null || string.length() == 0)
-    		return 0;
+        {
+            return 0;
+        }
     	
     	int fromIndex = -1;
         int count = 0;
@@ -622,7 +600,9 @@ public class ContainerAdapter extends AbstractAdapter
         	fromIndex = string.indexOf('>', fromIndex+1);
         	
         	if (fromIndex == -1)
-        		break;
+            {
+                break;
+            }
         	
         	count++;
         }
@@ -643,13 +623,17 @@ public class ContainerAdapter extends AbstractAdapter
     {
     	// Is the string long enough?
     	if (string.length() <= index + characters.length)
-    		return false;
+        {
+            return false;
+        }
     	
     	// Do all the characters match?
     	for (char character : characters)
     	{
     		if (string.charAt(index) != character)
-    			return false;
+            {
+                return false;
+            }
     		index++;
     	}
     	
@@ -675,9 +659,13 @@ public class ContainerAdapter extends AbstractAdapter
 		attributes.put("mdschema",schema);
 		attributes.put("element", element);
 		if (qualifier != null)
-			attributes.put("qualifier", qualifier);
+        {
+            attributes.put("qualifier", qualifier);
+        }
 		if (language != null)
-			attributes.put("language", language);
+        {
+            attributes.put("language", language);
+        }
 		startElement(DIM,"field",attributes);
 		
 		// Only try and add the metadata's value, but only if it is non null.
@@ -697,27 +685,39 @@ public class ContainerAdapter extends AbstractAdapter
 	        	{
 	        		// Is it an xml entity named by number?
 	        		if (substringCompare(value,amp+1,'#'))
-	        			continue;
+                    {
+                        continue;
+                    }
 	        		
 	        		// &amp;
 	        		if (substringCompare(value,amp+1,'a','m','p',';'))
-	        			continue;
+                    {
+                        continue;
+                    }
 	        		
 	        		// &apos;
 	        		if (substringCompare(value,amp+1,'a','p','o','s',';'))
-	        			continue;
+                    {
+                        continue;
+                    }
 	        		
 	        		// &quot;
 	        		if (substringCompare(value,amp+1,'q','u','o','t',';'))
-	        			continue;
+                    {
+                        continue;
+                    }
 	        			
 	        		// &lt;
 	        		if (substringCompare(value,amp+1,'l','t',';'))
-	        			continue;
+                    {
+                        continue;
+                    }
 	        		
 	        		// &gt;
 	        		if (substringCompare(value,amp+1,'g','t',';'))
-	        			continue;
+                    {
+                        continue;
+                    }
 	        		
 	        		// Replace the ampersand with an XML entity.
 	        		value = value.substring(0,amp) + "&amp;" + value.substring(amp+1);
@@ -739,7 +739,7 @@ public class ContainerAdapter extends AbstractAdapter
 	        	} 
 	        	catch (Exception e) 
 				{
-	        		// ignore any errors we get, and just add the string literaly.
+                    log.trace("Caught exception", e);
 				}
 	        }		
 					

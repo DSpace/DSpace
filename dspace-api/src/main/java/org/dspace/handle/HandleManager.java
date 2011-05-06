@@ -1,39 +1,9 @@
-/*
- * HandleManager.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3762 $
- *
- * Date: $Date: 2009-05-07 00:36:47 -0400 (Thu, 07 May 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.handle;
 
@@ -46,6 +16,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.Site;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -64,12 +35,15 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * </p>
  * 
  * @author Peter Breton
- * @version $Revision: 3762 $
+ * @version $Revision: 5844 $
  */
 public class HandleManager
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(HandleManager.class);
+
+    /** Prefix registered to no one */
+    static final String EXAMPLE_PREFIX = "123456789";
 
     /** Private Constructor */
     private HandleManager()
@@ -149,6 +123,7 @@ public class HandleManager
     //    {
     //        return "http://hdl.handle.net/" + handle;
     //    }
+
     /**
      * Creates a new handle in the database.
      * 
@@ -174,7 +149,7 @@ public class HandleManager
         if (log.isDebugEnabled())
         {
             log.debug("Created new handle for "
-                    + Constants.typeText[dso.getType()] + " " + handleId);
+                    + Constants.typeText[dso.getType()] + " (ID=" + dso.getID() + ") " + handleId );
         }
 
         return handleId;
@@ -191,14 +166,50 @@ public class HandleManager
      * @param suppliedHandle
      *            existing handle value
      * @return the Handle
+     * @throws IllegalStateException if specified handle is already in use by another object
      */
     public static String createHandle(Context context, DSpaceObject dso,
-            String suppliedHandle) throws SQLException
+            String suppliedHandle) throws SQLException, IllegalStateException
     {
-        TableRow handle = DatabaseManager.create(context, "Handle");
-        String handleId = suppliedHandle;
+        //Check if the supplied handle is already in use -- cannot use the same handle twice
+        TableRow handle = findHandleInternal(context, suppliedHandle);
+        if(handle!=null && !handle.isColumnNull("resource_id"))
+        {
+            //Check if this handle is already linked up to this specified DSpace Object
+            if(handle.getIntColumn("resource_id")==dso.getID() &&
+               handle.getIntColumn("resource_type_id")==dso.getType())
+            {
+                //This handle already links to this DSpace Object -- so, there's nothing else we need to do
+                return suppliedHandle;
+            }
+            else
+            {
+                //handle found in DB table & already in use by another existing resource
+                throw new IllegalStateException("Attempted to create a handle which is already in use: " + suppliedHandle);
+            }
+        }
+        else if(handle!=null && !handle.isColumnNull("resource_type_id"))
+        {
+            //If there is a 'resource_type_id' (but 'resource_id' is empty), then the object using
+            // this handle was previously unbound (see unbindHandle() method) -- likely because object was deleted
+            int previousType = handle.getIntColumn("resource_type_id");
 
-        handle.setColumn("handle", handleId);
+            //Since we are restoring an object to a pre-existing handle, double check we are restoring the same *type* of object
+            // (e.g. we will not allow an Item to be restored to a handle previously used by a Collection)
+            if(previousType != dso.getType())
+            {
+                throw new IllegalStateException("Attempted to reuse a handle previously used by a " +
+                        Constants.typeText[previousType] + " for a new " +
+                        Constants.typeText[dso.getType()]);
+            }
+        }
+        else if(handle==null) //if handle not found, create it
+        {
+            //handle not found in DB table -- create a new table entry
+            handle = DatabaseManager.create(context, "Handle");
+            handle.setColumn("handle", suppliedHandle);
+        }
+
         handle.setColumn("resource_type_id", dso.getType());
         handle.setColumn("resource_id", dso.getID());
         DatabaseManager.update(context, handle);
@@ -206,10 +217,43 @@ public class HandleManager
         if (log.isDebugEnabled())
         {
             log.debug("Created new handle for "
-                    + Constants.typeText[dso.getType()] + " " + handleId);
+                    + Constants.typeText[dso.getType()] + " (ID=" + dso.getID() + ") " + suppliedHandle );
         }
 
-        return handleId;
+        return suppliedHandle;
+    }
+
+    /**
+     * Removes binding of Handle to a DSpace object, while leaving the
+     * Handle in the table so it doesn't get reallocated.  The AIP
+     * implementation also needs it there for foreign key references.
+     *
+     * @param context DSpace context
+     * @param dso DSpaceObject whose Handle to unbind.
+     */
+    public static void unbindHandle(Context context, DSpaceObject dso)
+        throws SQLException
+    {
+        TableRow row = getHandleInternal(context, dso.getType(), dso.getID());
+        if (row != null)
+        {
+            //Only set the "resouce_id" column to null when unbinding a handle.
+            // We want to keep around the "resource_type_id" value, so that we
+            // can verify during a restore whether the same *type* of resource
+            // is reusing this handle!
+            row.setColumnNull("resource_id");
+            DatabaseManager.update(context, row);
+
+            if(log.isDebugEnabled())
+            {
+                log.debug("Unbound Handle " + row.getStringColumn("handle") + " from object " + Constants.typeText[dso.getType()] + " id=" + dso.getID());
+            }
+
+        }
+        else
+        {
+            log.warn("Cannot find Handle entry to unbind for object " + Constants.typeText[dso.getType()] + " id=" + dso.getID());
+        }
     }
 
     /**
@@ -222,23 +266,35 @@ public class HandleManager
      *            The handle to resolve
      * @return The object which handle maps to, or null if handle is not mapped
      *         to any object.
+     * @exception IllegalStateException
+     *                If handle was found but is not bound to an object
      * @exception SQLException
      *                If a database error occurs
      */
     public static DSpaceObject resolveToObject(Context context, String handle)
-            throws SQLException
+            throws IllegalStateException, SQLException
     {
         TableRow dbhandle = findHandleInternal(context, handle);
 
         if (dbhandle == null)
         {
+            //If this is the Site-wide Handle, return Site object
+            if (handle.equals(Site.getSiteHandle()))
+            {
+                return Site.find(context, 0);
+            }
+            //Otherwise, return null (i.e. handle not found in DB)
             return null;
         }
 
+        // check if handle was allocated previously, but is currently not
+        // associated with a DSpaceObject 
+        // (this may occur when 'unbindHandle()' is called for an obj that was removed)
         if ((dbhandle.isColumnNull("resource_type_id"))
                 || (dbhandle.isColumnNull("resource_id")))
         {
-            throw new IllegalStateException("No associated resource type");
+            //if handle has been unbound, just return null (as this will result in a PageNotFound)
+            return null;
         }
 
         // What are we looking at here?
@@ -300,10 +356,22 @@ public class HandleManager
     public static String findHandle(Context context, DSpaceObject dso)
             throws SQLException
     {
-        //        if (!(obj instanceof Item))
-        //            return null;
-        //        Item item = (Item) obj;
-        return getHandleInternal(context, dso.getType(), dso.getID());
+        TableRow row = getHandleInternal(context, dso.getType(), dso.getID());
+        if (row == null)
+        {
+            if (dso.getType() == Constants.SITE)
+            {
+                return Site.getSiteHandle();
+            }
+            else
+            {
+                return null;
+            }
+        }
+        else
+        {
+            return row.getStringColumn("handle");
+        }
     }
 
     /**
@@ -318,12 +386,12 @@ public class HandleManager
      * @exception SQLException
      *                If a database error occurs
      */
-    static List getHandlesForPrefix(Context context, String prefix)
+    static List<String> getHandlesForPrefix(Context context, String prefix)
             throws SQLException
     {
         String sql = "SELECT handle FROM handle WHERE handle LIKE ? ";
         TableRowIterator iterator = DatabaseManager.queryTable(context, null, sql, prefix+"%");
-        List results = new ArrayList();
+        List<String> results = new ArrayList<String>();
 
         try
         {
@@ -337,10 +405,27 @@ public class HandleManager
         {
             // close the TableRowIterator to free up resources
             if (iterator != null)
+            {
                 iterator.close();
+            }
         }
 
         return results;
+    }
+
+    /**
+     * Get the configured Handle prefix string, or a default
+     * @return configured prefix or "123456789"
+     */
+    public static String getPrefix()
+    {
+        String prefix = ConfigurationManager.getProperty("handle.prefix");
+        if (null == prefix)
+        {
+            prefix = EXAMPLE_PREFIX; // XXX no good way to exit cleanly
+            log.error("handle.prefix is not configured; using " + prefix);
+        }
+        return prefix;
     }
 
     ////////////////////////////////////////
@@ -360,15 +445,13 @@ public class HandleManager
      * @exception SQLException
      *                If a database error occurs
      */
-    private static String getHandleInternal(Context context, int type, int id)
+    private static TableRow getHandleInternal(Context context, int type, int id)
             throws SQLException
     {   	
-      	String sql = "SELECT handle FROM Handle WHERE resource_type_id = ? " + 
+      	String sql = "SELECT * FROM Handle WHERE resource_type_id = ? " +
       				 "AND resource_id = ?";
-		
-		TableRow row = DatabaseManager.querySingle(context, sql,type,id);
 
-        return (row == null) ? null : row.getStringColumn("handle");
+	return DatabaseManager.querySingleTable(context, "Handle", sql, type, id);
     }
 
     /**
@@ -397,14 +480,14 @@ public class HandleManager
     /**
      * Create a new handle id. The implementation uses the PK of the RDBMS
      * Handle table.
-     * 
+     *
      * @return A new handle id
      * @exception SQLException
      *                If a database error occurs
      */
     private static String createId(int id) throws SQLException
     {
-        String handlePrefix = ConfigurationManager.getProperty("handle.prefix");
+        String handlePrefix = getPrefix();
 
         return new StringBuffer().append(handlePrefix).append(
                 handlePrefix.endsWith("/") ? "" : "/").append(id).toString();

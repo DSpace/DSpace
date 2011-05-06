@@ -1,39 +1,9 @@
-/*
- * IPAuthentication.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4637 $
- *
- * Date: $Date: 2009-12-17 06:47:00 -0500 (Thu, 17 Dec 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.authenticate;
 
@@ -69,7 +39,7 @@ import org.dspace.eperson.Group;
  * <p>
  * For supported IP ranges see {@link org.dspace.authenticate.IPMatcher}.
  * 
- * @version $Revision: 4637 $
+ * @version $Revision: 5844 $
  * @author Robert Tansley
  */
 public class IPAuthentication implements AuthenticationMethod
@@ -77,12 +47,16 @@ public class IPAuthentication implements AuthenticationMethod
     /** Our logger */
     private static Logger log = Logger.getLogger(IPAuthentication.class);
 
+    /** Whether to look for x-forwarded headers for logging IP addresses */
+    private static Boolean useProxies;
+
     /** All the IP matchers */
     private List<IPMatcher> ipMatchers;
 
     /** All the negative IP matchers */
     private List<IPMatcher> ipNegativeMatchers;
 
+    
     /**
      * Maps IPMatchers to group names when we don't know group DB ID yet. When
      * the DB ID is known, the IPMatcher is moved to ipMatcherGroupIDs and then
@@ -201,14 +175,22 @@ public class IPAuthentication implements AuthenticationMethod
         }
         List<Integer> groupIDs = new ArrayList<Integer>();
 
-        String addrForward = request.getHeader("x-forwarded-for");
-
-        String addr = (addrForward != null 
-                       ? addrForward 
-                       : request.getRemoteAddr());
-
-        log.debug(LogManager.getHeader(context, "",
-                                       "addrs="+request.getRemoteAddr()+","+addrForward+","+addr));
+        // Get the user's IP address
+        String addr = request.getRemoteAddr();
+        if (useProxies == null) {
+            useProxies = ConfigurationManager.getBooleanProperty("useProxies", false);
+        }
+        if (useProxies && request.getHeader("X-Forwarded-For") != null)
+        {
+            /* This header is a comma delimited list */
+            for(String xfip : request.getHeader("X-Forwarded-For").split(","))
+            {
+                if(!request.getHeader("X-Forwarded-For").contains(addr))
+                {
+                    addr = xfip.trim();
+                }
+            }
+        }
 
         for (IPMatcher ipm : ipMatchers)
         {
@@ -233,11 +215,10 @@ public class IPAuthentication implements AuthenticationMethod
                             if (group != null)
                             {
                                 // Add ID so we won't have to do lookup again
-                                ipMatcherGroupIDs.put(ipm, new Integer(group
-                                        .getID()));
+                                ipMatcherGroupIDs.put(ipm, Integer.valueOf(group.getID()));
                                 ipMatcherGroupNames.remove(ipm);
 
-                                groupIDs.add(new Integer(group.getID()));
+                                groupIDs.add(Integer.valueOf(group.getID()));
                             }
                             else
                             {
@@ -280,11 +261,10 @@ public class IPAuthentication implements AuthenticationMethod
                             if (group != null)
                             {
                                 // Add ID so we won't have to do lookup again
-                                ipMatcherGroupIDs.put(ipm, new Integer(group
-                                        .getID()));
+                                ipMatcherGroupIDs.put(ipm, Integer.valueOf(group.getID()));
                                 ipMatcherGroupNames.remove(ipm);
 
-                                groupIDs.remove(new Integer(group.getID()));
+                                groupIDs.remove(Integer.valueOf(group.getID()));
                             }
                             else
                             {
@@ -317,8 +297,10 @@ public class IPAuthentication implements AuthenticationMethod
             for (int i = 0; i < results.length; i++)
             {
                 if (i > 0)
+                {
                     gsb.append(",");
-                    gsb.append(results[i]);
+                }
+                gsb.append(results[i]);
             }
 
             log.debug(LogManager.getHeader(context, "authenticated",

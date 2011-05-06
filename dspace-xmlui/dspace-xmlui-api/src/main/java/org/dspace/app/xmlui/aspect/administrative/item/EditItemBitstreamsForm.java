@@ -1,41 +1,9 @@
-/*
- * EditItemBitstreamForm.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4309 $
- *
- * Date: $Date: 2009-09-30 15:20:07 -0400 (Wed, 30 Sep 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.administrative.item;
 
@@ -81,6 +49,7 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
 	private static final Message T_option_bitstreams = message("xmlui.administrative.item.general.option_bitstreams");
 	private static final Message T_option_metadata = message("xmlui.administrative.item.general.option_metadata");
 	private static final Message T_option_view = message("xmlui.administrative.item.general.option_view");
+        private static final Message T_option_curate = message("xmlui.administrative.item.general.option_curate");
 
 	private static final Message T_title = message("xmlui.administrative.item.EditItemBitstreamsForm.title");
 	private static final Message T_trail = message("xmlui.administrative.item.EditItemBitstreamsForm.trail");
@@ -129,6 +98,7 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
 		options.addItem().addHighlight("bold").addXref(baseURL+"&submit_bitstreams",T_option_bitstreams);
 		options.addItem().addXref(baseURL+"&submit_metadata",T_option_metadata);
 		options.addItem().addXref(baseURL + "&view_item", T_option_view);
+                options.addItem().addXref(baseURL + "&submit_curate", T_option_curate);
 
 		
 		
@@ -174,7 +144,9 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
 				String format = null;
 				BitstreamFormat bitstreamFormat = bitstream.getFormat();
 				if (bitstreamFormat != null)
-					format = bitstreamFormat.getShortDescription();
+                {
+                    format = bitstreamFormat.getShortDescription();
+                }
 				String editURL = contextPath + "/admin/item?administrative-continue="+knot.getId()+"&bitstreamID="+bitstream.getID()+"&submit_edit";
 				String viewURL = contextPath + "/bitstream/id/"+bitstream.getID()+"/"+bitstream.getName();
 
@@ -194,7 +166,9 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
 					Cell cell = row.addCell();
 					cell.addXref(editURL,name);
 					if (primary)
-						cell.addXref(editURL,T_primary_label);
+                    {
+                        cell.addXref(editURL, T_primary_label);
+                    }
 					
 					row.addCell().addXref(editURL,description);
 					row.addCell().addXref(editURL,format);
@@ -205,7 +179,9 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
 					Cell cell = row.addCell();
 					cell.addContent(name);
 					if (primary)
-						cell.addContent(T_primary_label);
+                    {
+                        cell.addContent(T_primary_label);
+                    }
 					
 					row.addCell().addContent(description);
 					row.addCell().addContent(format);
@@ -235,7 +211,9 @@ public class EditItemBitstreamsForm extends AbstractDSpaceTransformer {
 		Para actions = main.addPara("editItemActionsP","editItemActionsP" );
         // Only System Administrators can delete bitstreams
 		if (AuthorizeManager.authorizeActionBoolean(context, item, Constants.REMOVE))
-			actions.addButton("submit_delete").setValue(T_submit_delete);
+        {
+            actions.addButton("submit_delete").setValue(T_submit_delete);
+        }
 		else
 		{
 			Button button = actions.addButton("submit_delete");

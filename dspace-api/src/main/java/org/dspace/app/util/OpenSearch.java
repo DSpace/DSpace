@@ -1,57 +1,21 @@
-/*
- * OpenSearch.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 1.20 $
- *
- * Date: $Date: 2005/08/25 17:20:27 $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved. 
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.util;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
 import java.net.URLEncoder;
 import java.io.UnsupportedEncodingException;
 
 import org.w3c.dom.Document;
 
-import org.jdom.DocType;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
@@ -60,29 +24,10 @@ import org.jdom.output.XMLOutputter;
 
 import org.apache.log4j.Logger;
 
-import org.dspace.content.Bitstream;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.handle.HandleManager;
 import org.dspace.search.QueryResults;
 
-import com.sun.syndication.feed.WireFeed;
-import com.sun.syndication.feed.atom.Category;
-import com.sun.syndication.feed.atom.Content;
-import com.sun.syndication.feed.atom.Feed;
-import com.sun.syndication.feed.atom.Entry;
-import com.sun.syndication.feed.atom.Link;
-import com.sun.syndication.feed.atom.Person;
-import com.sun.syndication.feed.rss.Channel;
-import com.sun.syndication.feed.rss.Description;
-import com.sun.syndication.feed.rss.Image;
-import com.sun.syndication.io.WireFeedOutput;
 import com.sun.syndication.feed.module.opensearch.OpenSearchModule;
 import com.sun.syndication.feed.module.opensearch.entity.OSQuery;
 import com.sun.syndication.feed.module.opensearch.impl.OpenSearchModuleImpl;
@@ -212,7 +157,7 @@ public class OpenSearch
         catch (FeedException e)
             {
             log.error(e.toString(), e);
-            	throw new IOException("Unable to generate feed");
+            	throw new IOException("Unable to generate feed", e);
             }
         }
     
@@ -239,7 +184,7 @@ public class OpenSearch
         catch (FeedException e)
         	{
             log.error(e.toString(), e);
-            throw new IOException("Unable to generate feed");
+            throw new IOException("Unable to generate feed", e);
         	}
     
         }
@@ -249,9 +194,13 @@ public class OpenSearch
     {
         // Encode results in requested format
         if ("rss".equals(format))
+        {
             format = "rss_2.0";
+        }
         else if ("atom".equals(format))
+        {
             format = "atom_1.0";
+        }
     	
         SyndicationFeed feed = new SyndicationFeed(labels.get(SyndicationFeed.MSG_UITYPE));
         feed.populate(null, scope, results, labels);
@@ -375,7 +324,7 @@ public class OpenSearch
         }
         catch(JDOMException jde)
         {
-        	throw new IOException("JDOM output exception");
+        	throw new IOException("JDOM output exception", jde);
         }
     }
 }

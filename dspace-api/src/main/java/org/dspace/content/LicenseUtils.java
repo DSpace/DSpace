@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.content;
 
 import java.io.ByteArrayInputStream;
@@ -9,7 +16,6 @@ import java.util.Map;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.license.FormattableArgument;
-import org.dspace.content.license.LicenseArgumentFormatter;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
@@ -37,7 +43,7 @@ public class LicenseUtils
      * LicenseArgumentFormatter plugin (if defined)<br>
      * {6} the eperson object that will be formatted using the appropriate
      * LicenseArgumentFormatter plugin (if defined)<br>
-     * {x} any addittion argument supplied wrapped in the
+     * {x} any addition argument supplied wrapped in the
      * LicenseArgumentFormatter based on his type (map key)
      * 
      * @see LicenseArgumentFormatter
@@ -70,11 +76,10 @@ public class LicenseUtils
 
         if (additionalInfo != null)
         {
-            int i = 1;
-            for (String key : additionalInfo.keySet())
+            int i = 7; // Start is next index after previous args
+            for (Map.Entry<String, Object> info : additionalInfo.entrySet())
             {
-                args[6 + 1] = new FormattableArgument(key, additionalInfo
-                        .get(key));
+                args[i] = new FormattableArgument(info.getKey(), info.getValue());
                 i++;
             }
         }
@@ -86,7 +91,7 @@ public class LicenseUtils
 
     /**
      * Utility method if no additional arguments has need to be supplied to the
-     * license template. (i.e. call the full getLicenseText suppling
+     * license template. (i.e. call the full getLicenseText supplying
      * <code>null</code> for the additionalInfo argument)
      * 
      * @param locale

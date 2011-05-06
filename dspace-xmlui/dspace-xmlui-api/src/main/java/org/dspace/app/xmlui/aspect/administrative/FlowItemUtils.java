@@ -1,39 +1,9 @@
-/*
- * FlowItemUtils.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4500 $
- *
- * Date: $Date: 2009-11-02 21:15:38 -0500 (Mon, 02 Nov 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.administrative;
 
@@ -59,8 +29,10 @@ import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.authority.Choices;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.curate.Curator;
 import org.dspace.handle.HandleManager;
 
 /**
@@ -220,7 +192,9 @@ public class FlowItemUtils
 			
 			// the user selected the remove checkbox.
 			if (remove != null)
+                        {
 				continue;
+                        }
 			
 			// get the field's name broken up
 			String[] parts = parseName(name);
@@ -228,10 +202,14 @@ public class FlowItemUtils
                         // probe for a confidence value
                         int iconf = Choices.CF_UNSET;
                         if (confidence != null && confidence.length() > 0)
+                        {
                             iconf = Choices.getConfidenceValue(confidence);
+                        }
                         // upgrade to a minimum of NOVALUE if there IS an authority key
                         if (authority != null && authority.length() > 0 && iconf == Choices.CF_UNSET)
+                        {
                             iconf = Choices.CF_NOVALUE;
+                        }
                         item.addMetadata(parts[0], parts[1], parts[2], lang,
                                              value, authority, iconf);
 		}
@@ -338,9 +316,10 @@ public class FlowItemUtils
      * @param context The DSpace context
      * @param itemID The id of the to-be-moved item.
      * @param collectionID The id of the destination collection.
+     * @param inherit Whether to inherit the policies of the destination collection
      * @return A result object
      */
-    public static FlowResult processMoveItem(Context context, int itemID, int collectionID) throws SQLException, AuthorizeException, IOException
+    public static FlowResult processMoveItem(Context context, int itemID, int collectionID, boolean inherit) throws SQLException, AuthorizeException, IOException
     {
         FlowResult result = new FlowResult();
         result.setContinue(false);
@@ -349,10 +328,13 @@ public class FlowItemUtils
 
         if(AuthorizeManager.isAdmin(context, item))
         {
-          //Add a policy giving this user *explicit* admin permissions on the item itself.
+          //Add an action giving this user *explicit* admin permissions on the item itself.
           //This ensures that the user will be able to call item.update() even if he/she
           // moves it to a Collection that he/she doesn't administer.
-          AuthorizeManager.addPolicy(context, item, Constants.ADMIN, context.getCurrentUser());
+          if (item.canEdit())
+          {
+              AuthorizeManager.authorizeAction(context, item, Constants.WRITE);
+          }
 
           Collection destination = Collection.find(context, collectionID);
           if (destination == null)
@@ -390,12 +372,23 @@ public class FlowItemUtils
 
           // Remove item from its owning collection and add to the destination
           if (!alreadyInCollection)
+          {
               destination.addItem(item);
+          }
 
           if (owningCollection != null)
+          {
               owningCollection.removeItem(item);
+          }
 
           item.setOwningCollection(destination);
+
+          // Inherit policies of destination collection if required
+          if (inherit)
+          {
+              item.inheritCollectionDefaultPolicies(destination);
+          }
+
           item.update();
           context.commit();
 
@@ -465,7 +458,9 @@ public class FlowItemUtils
 		Object object = request.get("file");
 		Part filePart = null;
 		if (object instanceof Part)
+                {
 			filePart = (Part) object;
+                }
 
 		if (filePart != null && filePart.getSize() > 0)
 		{
@@ -645,7 +640,9 @@ public class FlowItemUtils
 			String[] parts = id.split("/");
 			
 			if (parts.length != 2)
+                        {
 				throw new UIException("Unable to parse id into bundle and bitstream id: "+id);
+                        }
 			
 			int bundleID = Integer.valueOf(parts[0]);
 			int bitstreamID = Integer.valueOf(parts[1]);
@@ -671,7 +668,59 @@ public class FlowItemUtils
 		
 		return result;
 	}
-	
+
+        /**
+         * processCurateDSO
+         *
+         * Utility method to process curation tasks
+         * submitted via the DSpace GUI
+         *
+         * @param context
+         * @param itemID
+         * @param request
+         *
+         */
+        public static FlowResult processCurateItem(Context context, int itemID, Request request)
+                                                                throws AuthorizeException, IOException, SQLException, Exception
+	{
+                String task = request.getParameter("curate_task");
+		Curator curator = FlowCurationUtils.getCurator(task);
+                Item item = Item.find(context, itemID);
+                if (item != null)
+                {
+                    curator.curate(item);
+                }
+                return FlowCurationUtils.getRunFlowResult(task, curator);
+	}
+
+      /**
+       * queues curation tasks
+       */
+        public static FlowResult processQueueItem(Context context, int itemID, Request request)
+                                                                throws AuthorizeException, IOException, SQLException, Exception
+	{
+                String task = request.getParameter("curate_task");
+                Curator curator = FlowCurationUtils.getCurator(task);
+                String objId = String.valueOf(itemID);
+                String taskQueueName = ConfigurationManager.getProperty("curate", "ui.queuename");
+                boolean status = false;
+                Item item = Item.find(context, itemID);
+                if (item != null)
+                {
+                    objId = item.getHandle();
+                    try
+                    {
+                        curator.queue(context, objId, taskQueueName);
+                        status = true;
+                    }
+                    catch (IOException ioe)
+                    {
+                        // no-op
+                    }
+                }
+                return FlowCurationUtils.getQueueFlowResult(task, status, objId, taskQueueName);
+	}
+
 	
 	/**
 	 * Parse the given name into three parts, divided by an _. Each part should represent the 

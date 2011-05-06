@@ -1,47 +1,12 @@
-/*
- * HTMLReport.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3734 $
- *
- * Date: $Date: 2009-04-24 00:00:19 -0400 (Fri, 24 Apr 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.statistics;
 
-import org.dspace.app.statistics.Report;
-import org.dspace.app.statistics.Stat;
-import org.dspace.app.statistics.Statistics;
-import org.dspace.app.statistics.ReportTools;
 import org.dspace.core.ConfigurationManager;
 
 import java.text.DateFormat;
@@ -50,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.io.*;
@@ -66,7 +30,7 @@ public class HTMLReport implements Report
     // outputting anything
     
     /** a list of the statistic blocks being managed by this class */
-    private List blocks = new ArrayList();
+    private List<Statistics> blocks = new ArrayList<Statistics>();
     
     /** the title for the page */
     private String pageTitle = null;
@@ -81,13 +45,13 @@ public class HTMLReport implements Report
     private Date end = null;
 
     /** the output file to which to write aggregation data */
-   private static String output = ConfigurationManager.getProperty("dspace.dir") +
+   private String output = ConfigurationManager.getProperty("dspace.dir") +
                             File.separator + "log" + File.separator + "report";
     
     /**
      * constructor for HTML reporting
      */
-    public void HTMLReport()
+    public HTMLReport()
     {
         // empty constructor
     }
@@ -116,12 +80,12 @@ public class HTMLReport implements Report
         
         // output the report blocks
         // FIXME: perhaps the order of report blocks should be configurable
-        Iterator statSets = blocks.iterator();
+        Iterator<Statistics> statSets = blocks.iterator();
         while (statSets.hasNext())
         {
             frag.append(navigation());
             
-            Statistics stats = (Statistics) statSets.next();
+            Statistics stats = statSets.next();
             frag.append(sectionHeader(stats.getSectionHeader()));
             frag.append(topLink());
             frag.append(blockExplanation(stats.getExplanation()));
@@ -160,8 +124,7 @@ public class HTMLReport implements Report
      */
     public String topLink()
     {
-        String frag = "<div class=\"reportNavigation\"><a href=\"#top\">Top</a></div>";
-        return frag;
+        return "<div class=\"reportNavigation\"><a href=\"#top\">Top</a></div>";
     }
     
     
@@ -216,7 +179,7 @@ public class HTMLReport implements Report
      */
     public void setStartDate(Date start)
     {
-        this.start = start;
+        this.start = (start == null ? null : new Date(start.getTime()));
     }
     
     
@@ -227,7 +190,7 @@ public class HTMLReport implements Report
      */
     public void setEndDate(Date end)
     {
-        this.end = end;
+        this.end = (end == null ? null : new Date(end.getTime()));
     }
     
     
@@ -277,8 +240,7 @@ public class HTMLReport implements Report
      */
     public String mainTitle()
     {
-        String frag = "<div class=\"reportTitle\"><a name=\"top\">" + mainTitle + "</a></div>\n\n";
-        return frag;
+        return "<div class=\"reportTitle\"><a name=\"top\">" + mainTitle + "</a></div>\n\n";
     }
     
     
@@ -356,8 +318,7 @@ public class HTMLReport implements Report
         Matcher matchSpace = space.matcher(aName);
         aName = matchSpace.replaceAll("_");
 
-        String frag = "<div class=\"reportSection\"><a name=\"" + aName + "\">" + title + "</a></div>\n\n";
-        return frag;
+        return "<div class=\"reportSection\"><a name=\"" + aName + "\">" + title + "</a></div>\n\n";
     }
     
     
@@ -411,7 +372,7 @@ public class HTMLReport implements Report
         {
             String style = null;
  
-            if ((i % 2) == 1)
+            if ((i & 1) == 1)
             {
                 style = "reportOddRow";
             }
@@ -434,10 +395,10 @@ public class HTMLReport implements Report
             }
             frag.append("\n");
             frag.append("\t\t</td>\n\t\t<td class=\"rightAlign\">\n");
-            frag.append("\t\t\t" + ReportTools.numberFormat(stats[i].getValue()));
+            frag.append("\t\t\t").append(ReportTools.numberFormat(stats[i].getValue()));
             if (stats[i].getUnits() != null)
             {
-                frag.append(" " + stats[i].getUnits());
+                frag.append(" ").append(stats[i].getUnits());
             }
             frag.append("\n");
             frag.append("\t\t</td>\n\t</tr>\n");

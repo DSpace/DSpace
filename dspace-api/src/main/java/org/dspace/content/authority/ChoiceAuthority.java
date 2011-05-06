@@ -1,39 +1,9 @@
-/*
- * ChoiceAuthority.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.content.authority;
 
@@ -42,12 +12,13 @@ package org.dspace.content.authority;
  * one metadata field.
  *
  * @author Larry Stone
- * @see ChoiceAuthorityManager, MetadataAuthorityManager
+ * @see ChoiceAuthorityManager
+ * @see MetadataAuthorityManager
  */
 public interface ChoiceAuthority
 {
     /**
-     * Get all values from the authority that match the proferred value.
+     * Get all values from the authority that match the profferred value.
      * Note that the offering was entered by the user and may contain
      * mixed/incorrect case, whitespace, etc so the plugin should be careful
      * to clean up user data before making comparisons.
@@ -60,6 +31,7 @@ public interface ChoiceAuthority
      * defaultSelected index in the Choices instance to the choice, if any,
      * that matches the value.
      *
+     * @param field being matched for
      * @param text user's value to match
      * @param collection database ID of Collection for context (owner of Item)
      * @param start choice at which to start, 0 is first.
@@ -67,7 +39,7 @@ public interface ChoiceAuthority
      * @param locale explicit localization key if available, or null
      * @return a Choices object (never null).
      */
-    public Choices getMatches(String text, int collection, int start, int limit, String locale);
+    public Choices getMatches(String field, String text, int collection, int start, int limit, String locale);
 
     /**
      * Get the single "best" match (if any) of a value in the authority
@@ -78,12 +50,13 @@ public interface ChoiceAuthority
      * This call is typically used in non-interactive metadata ingest
      * where there is no interactive agent to choose from among options.
      *
+     * @param field being matched for
      * @param text user's value to match
      * @param collection database ID of Collection for context (owner of Item)
      * @param locale explicit localization key if available, or null
      * @return a Choices object (never null) with 1 or 0 values.
      */
-    public Choices getBestMatch(String text, int collection, String locale);
+    public Choices getBestMatch(String field, String text, int collection, String locale);
 
     /**
      * Get the canonical user-visible "label" (i.e. short descriptive text)
@@ -93,9 +66,10 @@ public interface ChoiceAuthority
      * This may get called many times while populating a Web page so it should
      * be implemented as efficiently as possible.
      *
+     * @param field being matched for     
      * @param key authority key known to this authority.
      * @param locale explicit localization key if available, or null
      * @return descriptive label - should always return something, never null.
      */
-    public String getLabel(String key, String locale);
+    public String getLabel(String field, String key, String locale);
 }

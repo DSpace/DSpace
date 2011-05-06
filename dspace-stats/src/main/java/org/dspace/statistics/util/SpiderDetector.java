@@ -1,12 +1,9 @@
 /**
- * $Id: SpiderDetector.java 4745 2010-02-07 17:44:17Z mdiggory $
- * $URL: http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-stats/src/main/java/org/dspace/statistics/util/SpiderDetector.java $
- * *************************************************************************
- * Copyright (c) 2002-2009, DuraSpace.  All rights reserved
- * Licensed under the DuraSpace Foundation License.
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * A copy of the DuraSpace License has been included in this
- * distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
+ * http://www.dspace.org/license/
  */
 package org.dspace.statistics.util;
 
@@ -47,11 +44,13 @@ public class SpiderDetector {
      * @return a vector full of ip's
      * @throws IOException could not happen since we check the file be4 we use it
      */
-    public static HashSet<String> readIpAddresses(File spiderIpFile) throws IOException {
-        HashSet<String> ips = new HashSet<String>();
+    public static Set<String> readIpAddresses(File spiderIpFile) throws IOException {
+        Set<String> ips = new HashSet<String>();
 
         if (!spiderIpFile.exists() || !spiderIpFile.isFile())
+        {
             return ips;
+        }
 
         //Read our file & get all them ip's
         BufferedReader in = new BufferedReader(new FileReader(spiderIpFile));
@@ -143,7 +142,9 @@ public class SpiderDetector {
             /* This header is a comma delimited list */
             for (String xfip : request.getHeader("X-Forwarded-For").split(",")) {
                 if (isSpider(xfip))
+                {
                     return true;
+                }
             }
         }
 

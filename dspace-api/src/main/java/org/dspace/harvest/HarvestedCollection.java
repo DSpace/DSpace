@@ -1,44 +1,11 @@
-package org.dspace.harvest;
-
-/*
- * HarvestedCollection.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 1.0 $
- *
- * Date: $Date: 2008/01/01 04:11:09 $
- *
- * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
+package org.dspace.harvest;
 
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
@@ -62,8 +29,7 @@ public class HarvestedCollection
 {
 	private Context context;
 	private TableRow harvestRow;
-	boolean modified;
-	
+
 	public static final int TYPE_NONE = 0;
 	public static final int TYPE_DMD = 1;
 	public static final int TYPE_DMDREF = 2;
@@ -95,7 +61,6 @@ public class HarvestedCollection
     {
         context = c;
         harvestRow = row;
-        modified = false;
     }
     
     
@@ -124,10 +89,10 @@ public class HarvestedCollection
      * @return a new HarvestInstance object
      */
     public static HarvestedCollection create(Context c, int collectionId) throws SQLException {
-    	TableRow row = DatabaseManager.create(c, "harvested_collection");
+    	TableRow row = DatabaseManager.row("harvested_collection");
     	row.setColumn("collection_id", collectionId);
     	row.setColumn("harvest_type", 0);
-    	DatabaseManager.update(c, row);
+    	DatabaseManager.insert(c, row);
     	
     	return new HarvestedCollection(c, row);    	
     }
@@ -171,7 +136,9 @@ public class HarvestedCollection
     public boolean isReady() throws SQLException 
     {
     	if (this.isHarvestable() &&	(this.getHarvestStatus() == HarvestedCollection.STATUS_READY || this.getHarvestStatus() == HarvestedCollection.STATUS_OAI_ERROR))
-    		return true;
+        {
+            return true;
+        }
 
     	return false;   
     }
@@ -205,10 +172,16 @@ public class HarvestedCollection
     public static List<Integer> findReady(Context c) throws SQLException 
     {
     	int harvestInterval = ConfigurationManager.getIntProperty("harvester.harvestFrequency");
-    	if (harvestInterval == 0) harvestInterval = 720;
+    	if (harvestInterval == 0)
+        {
+            harvestInterval = 720;
+        }
     	
     	int expirationInterval = ConfigurationManager.getIntProperty("harvester.threadTimeout");
-    	if (expirationInterval == 0) expirationInterval = 24;
+    	if (expirationInterval == 0)
+        {
+            expirationInterval = 24;
+        }
 
     	Date startTime;
         Date expirationTime;
@@ -241,7 +214,7 @@ public class HarvestedCollection
     /**
      * Find all collections with the specified status flag 
      * @param c
-     * @param status, see HarvestInstance.STATUS_...
+     * @param status see HarvestInstance.STATUS_...
      * @return
      * @throws SQLException
      */
@@ -267,16 +240,22 @@ public class HarvestedCollection
     	String query = "select collection_id from harvested_collection where harvest_type > ? and harvest_status = ? order by last_harvested asc limit 1"; 
         
     	if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-    	    query = "select collection_id from harvested_collection where harvest_type > ? and harvest_status = ? and rownum <= 1  order by last_harvested asc"; 
+        {
+            query = "select collection_id from harvested_collection where harvest_type > ? and harvest_status = ? and rownum <= 1  order by last_harvested asc";
+        }
     	    
         TableRowIterator tri = DatabaseManager.queryTable(c, "harvested_collection", 
     			query, 0, 0);
     	TableRow row = tri.next();
     	
     	if (row != null)
-    		return row.getIntColumn("collection_id");
+        {
+            return row.getIntColumn("collection_id");
+        }
     	else
-    		return -1;
+        {
+            return -1;
+        }
     }
     
     /** Find the collection that was harvested most recently. 
@@ -286,16 +265,22 @@ public class HarvestedCollection
         String query = "select collection_id from harvested_collection where harvest_type > ? and harvest_status = ? order by last_harvested desc limit 1"; 
         
         if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        {
             query = "select collection_id from harvested_collection where harvest_type > ? and harvest_status = ? and rownum <= 1 order by last_harvested desc";
+        }
         
     	TableRowIterator tri = DatabaseManager.queryTable(c, "harvested_collection", 
     			query , 0, 0);
     	TableRow row = tri.next();
 		
     	if (row != null)
-    		return row.getIntColumn("collection_id");
+        {
+            return row.getIntColumn("collection_id");
+        }
     	else
-    		return -1;
+        {
+            return -1;
+        }
     }
     
     
@@ -309,10 +294,9 @@ public class HarvestedCollection
     	setHarvestMetadataConfig(mdConfigId);
     }     
 
-    /* Setters for the appropriate harverting-related columns */
+    /* Setters for the appropriate harvesting-related columns */
     public void setHarvestType(int type) {
     	harvestRow.setColumn("harvest_type",type);
-    	modified = true;
     }
     
     /** 
@@ -322,7 +306,6 @@ public class HarvestedCollection
      */
     public void setHarvestStatus(int status) {
     	harvestRow.setColumn("harvest_status",status);
-    	modified = true;
     }
 
     public void setOaiSource(String oaiSource) {
@@ -332,7 +315,6 @@ public class HarvestedCollection
     	else {
     		harvestRow.setColumn("oai_source",oaiSource);
     	}
-    	modified = true;
     }
 
     public void setOaiSetId(String oaiSetId) {
@@ -342,7 +324,6 @@ public class HarvestedCollection
     	else {
     		harvestRow.setColumn("oai_set_id",oaiSetId);
     	}
-    	modified = true;
     }
 
     public void setHarvestMetadataConfig(String mdConfigId) {
@@ -352,7 +333,6 @@ public class HarvestedCollection
     	else {
     		harvestRow.setColumn("metadata_config_id",mdConfigId);
     	}
-    	modified = true;    	 
     }
 
     public void setHarvestResult(Date date, String message) {
@@ -367,7 +347,6 @@ public class HarvestedCollection
     	} else {
     		harvestRow.setColumn("harvest_message", message);
     	}
-    	modified = true;
     }
 
     public void setHarvestMessage(String message) {
@@ -376,7 +355,6 @@ public class HarvestedCollection
     	} else {
     		harvestRow.setColumn("harvest_message", message);
     	}
-    	modified = true;
     }
     
     public void setHarvestStartTime(Date date) {
@@ -385,11 +363,10 @@ public class HarvestedCollection
     	} else {
     		harvestRow.setColumn("harvest_start_time", date);
     	}
-    	modified = true;
     }
     
 
-    /* Getting for the appropriate harverting-related columns */
+    /* Getting for the appropriate harvesting-related columns */
     public int getCollectionId() {
     	return harvestRow.getIntColumn("collection_id");
     }

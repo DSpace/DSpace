@@ -32,13 +32,26 @@
 
 			<map:generate/>
 
+            <!--Make sure that the home page also receives statistics-->
+            <map:match pattern="">
+                <map:match type="StatisticsAuthorizedMatcher" pattern="READ">
+                    <map:transform type="Navigation"/>
+                </map:match>
+            </map:match>
+
+            <!--Home page statistics-->
+            <map:match pattern="statistics-home">
+                <map:match type="StatisticsAuthorizedMatcher" pattern="READ">
+                    <map:transform type="StatisticsTransformer"/>
+                </map:match>
+            </map:match>
+
             <!--Only show the stats link if we have read rights-->
             <map:match pattern="handle/*/**">
                 <map:match type="StatisticsAuthorizedMatcher" pattern="READ">
                     <map:transform type="Navigation"/>
                 </map:match>
             </map:match>
-
 
             <!--Match our statistics-->
             <map:match pattern="handle/*/*/statistics">
@@ -63,9 +76,6 @@
                 </map:match>
             </map:match>
 
-            <map:match pattern="">
-                <map:transform type="StatisticsTransformer"/>
-            </map:match>
 
 			<map:serialize type="xml"/>
 

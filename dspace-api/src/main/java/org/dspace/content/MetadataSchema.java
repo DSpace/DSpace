@@ -1,43 +1,12 @@
-/*
- * MetadataSchema.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3761 $
- *
- * Date: $Date: 2009-05-07 00:18:02 -0400 (Thu, 07 May 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.content;
 
-import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -45,6 +14,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -64,8 +34,9 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * </p>
  *
  * @author Martin Hald
- * @version $Revision: 3761 $
- * @see org.dspace.content.MetadataValue, org.dspace.content.MetadataField
+ * @version $Revision: 6027 $
+ * @see org.dspace.content.MetadataValue
+ * @see org.dspace.content.MetadataField
  */
 public class MetadataSchema
 {
@@ -86,10 +57,10 @@ public class MetadataSchema
     private String name;
 
     // cache of schema by ID (Integer)
-    private static HashMap id2schema = null;
+    private static Map<Integer, MetadataSchema> id2schema = null;
 
     // cache of schema by short name
-    private static HashMap name2schema = null;
+    private static Map<String, MetadataSchema> name2schema = null;
 
 
     /**
@@ -140,6 +111,40 @@ public class MetadataSchema
             this.row = row;
         }
     }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj == null)
+        {
+            return false;
+        }
+        if (getClass() != obj.getClass())
+        {
+            return false;
+        }
+        final MetadataSchema other = (MetadataSchema) obj;
+        if (this.schemaID != other.schemaID)
+        {
+            return false;
+        }
+        if ((this.namespace == null) ? (other.namespace != null) : !this.namespace.equals(other.namespace))
+        {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 5;
+        hash = 67 * hash + this.schemaID;
+        hash = 67 * hash + (this.namespace != null ? this.namespace.hashCode() : 0);
+        return hash;
+    }
+
+
 
     /**
      * Get the schema namespace.
@@ -226,10 +231,10 @@ public class MetadataSchema
 
 
         // Create a table row and update it with the values
-        row = DatabaseManager.create(context, "MetadataSchemaRegistry");
+        row = DatabaseManager.row("MetadataSchemaRegistry");
         row.setColumn("namespace", namespace);
         row.setColumn("short_id", name);
-        DatabaseManager.update(context, row);
+        DatabaseManager.insert(context, row);
 
         // invalidate our fast-find cache.
         decache();
@@ -271,7 +276,9 @@ public class MetadataSchema
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         if (row == null)
@@ -347,6 +354,7 @@ public class MetadataSchema
                 "metadata_schema_id=" + getSchemaID()));
 
         DatabaseManager.delete(context, row);
+        decache();
     }
 
     /**
@@ -358,7 +366,7 @@ public class MetadataSchema
      */
     public static MetadataSchema[] findAll(Context context) throws SQLException
     {
-        List schemas = new ArrayList();
+        List<MetadataSchema> schemas = new ArrayList<MetadataSchema>();
 
         // Get all the metadataschema rows
         TableRowIterator tri = DatabaseManager.queryTable(context, "MetadataSchemaRegistry",
@@ -376,7 +384,9 @@ public class MetadataSchema
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         // Convert list into an array
@@ -501,14 +511,20 @@ public class MetadataSchema
     public static MetadataSchema find(Context context, int id)
             throws SQLException
     {
-        initCache(context);
-        Integer iid = new Integer(id);
+        if (!isCacheInitialized())
+        {
+            initCache(context);
+        }
+        
+        Integer iid = Integer.valueOf(id);
 
         // sanity check
         if (!id2schema.containsKey(iid))
+        {
             return null;
+        }
 
-        return (MetadataSchema) id2schema.get(iid);
+        return id2schema.get(iid);
     }
 
     /**
@@ -526,14 +542,21 @@ public class MetadataSchema
     {
         // If we are not passed a valid schema name then return
         if (shortName == null)
+        {
             return null;
+        }
 
-        initCache(context);
+        if (!isCacheInitialized())
+        {
+            initCache(context);
+        }
 
         if (!name2schema.containsKey(shortName))
+        {
             return null;
+        }
 
-        return (MetadataSchema) name2schema.get(shortName);
+        return name2schema.get(shortName);
     }
 
     // invalidate the cache e.g. after something modifies DB state.
@@ -543,44 +566,45 @@ public class MetadataSchema
         name2schema = null;
     }
 
-    // load caches if necessary
-    private static void initCache(Context context) throws SQLException
+    private static boolean isCacheInitialized()
     {
-        if (id2schema != null && name2schema != null)
-            return;
+        return (id2schema != null && name2schema != null);
+    }
 
-        synchronized (MetadataSchema.class)
+    // load caches if necessary
+    private static synchronized void initCache(Context context) throws SQLException
+    {
+        if (!isCacheInitialized())
         {
-            if (id2schema == null && name2schema == null)
+            log.info("Loading schema cache for fast finds");
+            Map<Integer, MetadataSchema> new_id2schema = new HashMap<Integer, MetadataSchema>();
+            Map<String, MetadataSchema> new_name2schema = new HashMap<String, MetadataSchema>();
+
+            TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataSchemaRegistry",
+                    "SELECT * from MetadataSchemaRegistry");
+
+            try
             {
-                log.info("Loading schema cache for fast finds");
-                HashMap new_id2schema = new HashMap();
-                HashMap new_name2schema = new HashMap();
-
-                TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataSchemaRegistry",
-                        "SELECT * from MetadataSchemaRegistry");
-
-                try
+                while (tri.hasNext())
                 {
-                    while (tri.hasNext())
-                    {
-                        TableRow row = tri.next();
+                    TableRow row = tri.next();
 
-                        MetadataSchema s = new MetadataSchema(row);
-                        new_id2schema.put(new Integer(s.schemaID), s);
-                        new_name2schema.put(s.name, s);
-                    }
+                    MetadataSchema s = new MetadataSchema(row);
+                    new_id2schema.put(Integer.valueOf(s.schemaID), s);
+                    new_name2schema.put(s.name, s);
                 }
-                finally
-                {
-                    // close the TableRowIterator to free up resources
-                    if (tri != null)
-                        tri.close();
-                }
-
-                id2schema = new_id2schema;
-                name2schema = new_name2schema;
             }
+            finally
+            {
+                // close the TableRowIterator to free up resources
+                if (tri != null)
+                {
+                    tri.close();
+                }
+            }
+
+            id2schema = new_id2schema;
+            name2schema = new_name2schema;
         }
     }
 }

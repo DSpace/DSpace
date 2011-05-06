@@ -43,7 +43,7 @@ Initial version to be compliant with the SWORD 1.2 standard.
 Configuration
 =============
 
-The configuration supplied in sword.cfg must be included into dspace.cfg for the sword server to behave correctly
+The SWORD interface is configured within the main dspace.cfg file.
 
 Testing
 =======

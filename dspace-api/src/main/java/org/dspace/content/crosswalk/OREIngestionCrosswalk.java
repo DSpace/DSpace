@@ -1,95 +1,40 @@
-/*
- * OREIngestionCrosswalk.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 1 $
- *
- * Date: $Date: 2007-07-30 12:26:50 -0500 (Mon, 30 Jul 2007) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.content.crosswalk;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.ConnectException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.sql.SQLException;
-import java.text.DateFormat;
 import java.text.NumberFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.Stack;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
-import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
-import org.dspace.content.packager.PackageDisseminator;
-import org.dspace.content.packager.PackageException;
-import org.dspace.content.packager.PackageParameters;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Utils;
 import org.jdom.Attribute;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 import org.jdom.xpath.XPath;
 
 /**
@@ -122,17 +67,16 @@ public class OREIngestionCrosswalk
 
     
 
-	public void ingest(Context context, DSpaceObject dso, List metadata) throws CrosswalkException, IOException, SQLException, AuthorizeException {
+	public void ingest(Context context, DSpaceObject dso, List<Element> metadata) throws CrosswalkException, IOException, SQLException, AuthorizeException {
 
 		// If this list contains only the root already, just pass it on
-		List<Element> elements = metadata;
-		if (elements.size() == 1) {
-			ingest(context, dso, elements.get(0));
+        if (metadata.size() == 1) {
+			ingest(context, dso, metadata.get(0));
 		}
 		// Otherwise, wrap them up 
 		else {
-			Element wrapper = new Element("wrap",elements.get(0).getNamespace());
-			wrapper.addContent(elements);
+			Element wrapper = new Element("wrap", metadata.get(0).getNamespace());
+			wrapper.addContent(metadata);
 
 			ingest(context,dso,wrapper);
 		}
@@ -145,7 +89,9 @@ public class OREIngestionCrosswalk
 		Date timeStart = new Date();
 		
 		if (dso.getType() != Constants.ITEM)
+        {
             throw new CrosswalkObjectNotSupported("OREIngestionCrosswalk can only crosswalk an Item.");
+        }
         Item item = (Item)dso;
         
         if (root == null) {
@@ -168,7 +114,7 @@ public class OREIngestionCrosswalk
 	        xpathLinks.addNamespace(ATOM_NS);
 	        entryId = ((Attribute)xpathLinks.selectSingleNode(doc)).getValue();
 		} catch (JDOMException e) {
-			throw new CrosswalkException("JDOM exception occured while ingesting the ORE");
+			throw new CrosswalkException("JDOM exception occured while ingesting the ORE", e);
 		}
 
 		// Next for each resource, create a bitstream
@@ -177,19 +123,15 @@ public class OREIngestionCrosswalk
 		nf.setGroupingUsed(false);
 		nf.setMinimumIntegerDigits(4);  
 		
-    	int countInt=0;
-    	String count;
         for (Element resource : aggregatedResources) 
         {
-        	countInt++;
-        	count = nf.format((long)countInt);
-        	String href = resource.getAttributeValue("href"); 
+        	String href = resource.getAttributeValue("href");
         	log.debug("ORE processing: " + href);
         	
         	String bundleName;
         	Element desc = null;
         	try {
-        		xpathDesc = XPath.newInstance("/atom:entry/oreatom:triples/rdf:Description[@rdf:about=\"" + this.URLencode(href) + "\"][1]");
+        		xpathDesc = XPath.newInstance("/atom:entry/oreatom:triples/rdf:Description[@rdf:about=\"" + this.encodeForURL(href) + "\"][1]");
         		xpathDesc.addNamespace(ATOM_NS);
         		xpathDesc.addNamespace(ORE_ATOM);
         		xpathDesc.addNamespace(RDF_NS);
@@ -226,7 +168,7 @@ public class OREIngestionCrosswalk
         	if (href != null) {
         		try {
 		        	// Make sure the url string escapes all the oddball characters
-        			String processedURL = URLencode(href);
+        			String processedURL = encodeForURL(href);
         			// Generate a requeset for the aggregated resource
         			ARurl = new URL(processedURL);
 		        	in = ARurl.openStream();
@@ -274,7 +216,7 @@ public class OREIngestionCrosswalk
      * Helper method to escape all chaacters that are not part of the canon set 
      * @param sourceString source unescaped string
      */
-    private String URLencode(String sourceString) {
+    private String encodeForURL(String sourceString) {
     	Character lowalpha[] = {'a' , 'b' , 'c' , 'd' , 'e' , 'f' , 'g' , 'h' , 'i' ,
 				'j' , 'k' , 'l' , 'm' , 'n' , 'o' , 'p' , 'q' , 'r' ,
 				's' , 't' , 'u' , 'v' , 'w' , 'x' , 'y' , 'z'};
@@ -294,18 +236,18 @@ public class OREIngestionCrosswalk
 		URLcharsSet.addAll(Arrays.asList(mark));
 		URLcharsSet.addAll(Arrays.asList(reserved));
 		
-		String processedString = new String();
+        StringBuilder processedString = new StringBuilder();
 		for (int i=0; i<sourceString.length(); i++) {
 			char ch = sourceString.charAt(i);
 			if (URLcharsSet.contains(ch)) {
-				processedString += ch;
+				processedString.append(ch);
 			}
 			else {
-				processedString += "%" + Integer.toHexString((int)ch);
+				processedString.append("%").append(Integer.toHexString((int)ch));
 			}
 		}
 		
-		return processedString;
+		return processedString.toString();
     }
 	
 }

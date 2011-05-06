@@ -1,51 +1,16 @@
-/*
- * MARC21InitialArticleWord.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3738 $
- *
- * Date: $Date: 2009-04-24 00:32:12 -0400 (Fri, 24 Apr 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.text.filter;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import java.io.Serializable;
+import java.util.*;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.dspace.core.ConfigurationManager;
 
@@ -78,25 +43,29 @@ public class MARC21InitialArticleWord extends InitialArticleWord
     {
         // No language - no words
         if (StringUtils.isEmpty(lang))
+        {
             return defaultWords;
+        }
 
         Language l = Language.getLanguage(lang);
         
-        // Is the lanugage in our map?
+        // Is the language in our map?
         if (l != null && ianaArticleMap.containsKey(l.IANA))
         {
             // Get the list of words for this language
-            ArticlesForLang articles = (ArticlesForLang)ianaArticleMap.get(l.IANA);
+            ArticlesForLang articles = ianaArticleMap.get(l.IANA);
             
             if (articles != null)
+            {
                 return articles.words;
+            }
         }
         
         return null;
     }
     
     // Mapping of IANA codes to article word lists
-    private static Map ianaArticleMap = new HashMap();
+    private static Map<String, ArticlesForLang> ianaArticleMap = new HashMap<String, ArticlesForLang>();
 
     private static String[] defaultWords = null;
 
@@ -252,14 +221,14 @@ public class MARC21InitialArticleWord extends InitialArticleWord
         };
 
         // Initialize the lang -> article map
-        ianaArticleMap = new HashMap();
+        ianaArticleMap = new HashMap<String, ArticlesForLang>();
 
         int wordIdx = 0;
         int langIdx = 0;
 
         // Iterate through word/language array
         // Generate temporary language map
-        Map langWordMap = new HashMap();
+        Map<Language, List<String>> langWordMap = new HashMap<Language, List<String>>();
         for (wordIdx = 0; wordIdx < articleWordArray.length; wordIdx++)
         {
             for (langIdx = 1; langIdx < articleWordArray[wordIdx].length; langIdx++)
@@ -268,38 +237,41 @@ public class MARC21InitialArticleWord extends InitialArticleWord
 
                 if (lang != null && lang.IANA.length() > 0)
                 {
-                    List words = (List)langWordMap.get(lang);
+                    List<String> words = langWordMap.get(lang);
                     
                     if (words == null)
                     {
-                        words = new ArrayList();
+                        words = new ArrayList<String>();
                         langWordMap.put(lang, words);
                     }
                     
                     // Add language to list if we haven't done so already
                     if (!words.contains(articleWordArray[wordIdx][0]))
-                        words.add(articleWordArray[wordIdx][0]);
+                    {
+                        words.add((String)articleWordArray[wordIdx][0]);
+                    }
                 }
             }
         }
         
         // Iterate through languages
-        Iterator langIter = langWordMap.keySet().iterator();
-        while (langIter.hasNext())
+        for (Map.Entry<Language, List<String>> langToWord : langWordMap.entrySet())
         {
-            Language lang = (Language)langIter.next();
-            List wordList = (List)langWordMap.get(lang);
+            Language lang = langToWord.getKey();
+            List<String> wordList = langToWord.getValue();
 
             // Convert the list into an array of strings
             String[] words = new String[wordList.size()];
-            
+
             for (int idx = 0; idx < wordList.size(); idx++)
-                words[idx] = (String)wordList.get(idx);
+            {
+                words[idx] = wordList.get(idx);
+            }
 
             // Sort the array into length order - longest to shortest
             // This ensures maximal matching on the article words
             Arrays.sort(words, new MARC21InitialArticleWord.InverseLengthComparator() );
-            
+
             // Add language/article entry to map
             ianaArticleMap.put(lang.IANA, new MARC21InitialArticleWord.ArticlesForLang(lang, words));
         }
@@ -319,7 +291,7 @@ public class MARC21InitialArticleWord extends InitialArticleWord
                     Language l = Language.getLanguage(langArr[idx]);
                     if (l != null && ianaArticleMap.containsKey(l.IANA))
                     {
-                        afl[idx] = (ArticlesForLang)ianaArticleMap.get(l.IANA);
+                        afl[idx] = ianaArticleMap.get(l.IANA);
                         if (afl[idx] != null)
                         {
                             wordCount += afl[idx].words.length;
@@ -353,12 +325,12 @@ public class MARC21InitialArticleWord extends InitialArticleWord
         ArticlesForLang(Language lang, String[] words)
         {
            this.lang  = lang;
-           this.words = words;
+           this.words = (String[]) ArrayUtils.clone(words);
         }
     }
     
     // Compare strings according to their length - longest to shortest
-    private static class InverseLengthComparator implements Comparator
+    private static class InverseLengthComparator implements Comparator, Serializable
     {
         public int compare(Object arg0, Object arg1)
         {

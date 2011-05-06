@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+
+	<map:components>
+
+        <map:readers>
+            <map:reader name="JSONSolrSearcher" src="org.dspace.app.xmlui.aspect.discovery.json.JSONSolrSearcher"/>
+        </map:readers>
+
+        <map:serializers>
+            <map:serializer name="text" src="org.apache.cocoon.serialization.TextSerializer" mime-type="text/plain" logger="sitemap.serializer.text" />
+        </map:serializers>
+    </map:components>
+
+    <map:pipelines>
+
+		<map:pipeline>
+
+            <map:match pattern="**">
+                <map:match pattern="searchSolr">
+                    <map:read type="JSONSolrSearcher" />
+                </map:match>
+
+
+
+                <map:serialize type="text"/>
+                <!--<map:serialize type="xml"/>-->
+            </map:match>
+        </map:pipeline>
+    </map:pipelines>
+
+</map:sitemap>

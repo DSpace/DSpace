@@ -1,39 +1,9 @@
-/*
- * METSExport.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3739 $
- *
- * Date: $Date: 2009-04-27 18:26:36 -0400 (Mon, 27 Apr 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.mets;
 
@@ -101,7 +71,11 @@ import edu.harvard.hul.ois.mets.helper.PreformedXML;
  * Tool for exporting DSpace AIPs with the metadata serialised in METS format
  * 
  * @author Robert Tansley
- * @version $Revision: 3739 $
+ * @version $Revision: 5844 $
+ * @deprecated Please use METS Packager to import/export METS files
+ * @see org.dspace.content.packager.DSpaceMETSDisseminator
+ * @see org.dspace.content.packager.DSpaceMETSIngester
+ * @see org.dspace.app.packager.Packager
  */
 public class METSExport
 {
@@ -216,7 +190,9 @@ public class METSExport
         finally
         {
             if (items != null)
+            {
                 items.close();
+            }
         }
         
         context.abort();
@@ -257,7 +233,15 @@ public class METSExport
         finally
         {
             if (is != null)
-                try { is.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    is.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
         }
     }
 
@@ -289,10 +273,19 @@ public class METSExport
         }
 
         // Write the METS file
-        FileOutputStream out = new FileOutputStream(aipDir.toString()
-                + java.io.File.separator + "mets.xml");
-        writeMETS(context, item, out, false);
-        out.close();
+        FileOutputStream out = null;
+        try
+        {
+            out = new FileOutputStream(aipDir.toString() + java.io.File.separator + "mets.xml");
+            writeMETS(context, item, out, false);
+        }
+        finally
+        {
+            if (out != null)
+            {
+                out.close();
+            }
+        }
 
         // Write bitstreams
         Bundle[] bundles = item.getBundles();
@@ -557,7 +550,7 @@ public class METSExport
             // We don't pass up a MetsException, so callers don't need to
             // know the details of the METS toolkit
             e.printStackTrace();
-            throw new IOException(e.getMessage());
+            throw new IOException(e.getMessage(), e);
         }
     }
 
@@ -583,13 +576,10 @@ public class METSExport
             // Assume license will be in its own bundle
             Bitstream[] bitstreams = bundles[i].getBitstreams();
 
-            if (bitstreams.length > 0)
+            if (bitstreams.length > 0 && bitstreams[0].getFormat().getID() == licenseFormat)
             {
-                if (bitstreams[0].getFormat().getID() == licenseFormat)
-                {
-                    // Read the license into a string
-                    return bitstreams[0].retrieve();
-                }
+                // Read the license into a string
+                return bitstreams[0].retrieve();
             }
         }
 

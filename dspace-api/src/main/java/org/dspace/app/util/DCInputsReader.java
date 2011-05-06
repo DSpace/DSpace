@@ -1,55 +1,18 @@
-/*
- * DCInputsReader.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4365 $
- *
- * Date: $Date: 2009-10-05 19:52:42 -0400 (Mon, 05 Oct 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.util;
 
 import java.io.File;
-import java.util.List;
-import java.util.Vector;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
+
 import org.xml.sax.SAXException;
 import org.w3c.dom.*;
 import javax.xml.parsers.*;
-
-import org.apache.log4j.Logger;
 
 import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
@@ -73,7 +36,7 @@ import org.dspace.core.ConfigurationManager;
  * selected from a choice list.
  *
  * @author  Brian S. Hughes
- * @version $Revision: 4365 $
+ * @version $Revision: 5844 $
  */
 
 public class DCInputsReader
@@ -90,9 +53,6 @@ public class DCInputsReader
     /** Keyname for storing dropdown value-pair set name */
     static final String PAIR_TYPE_NAME = "value-pairs-name";
 
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(DCInputsReader.class);
-
     /** The fully qualified pathname of the form definition XML file */
     private String defsFile = ConfigurationManager.getProperty("dspace.dir")
             + File.separator + "config" + File.separator + FORM_DEF_FILE;
@@ -101,24 +61,18 @@ public class DCInputsReader
      * Reference to the collections to forms map, computed from the forms
      * definition file
      */
-    private HashMap whichForms = null;
+    private Map<String, String> whichForms = null;
 
     /**
      * Reference to the forms definitions map, computed from the forms
      * definition file
      */
-    private HashMap formDefns  = null;
+    private Map<String, List<List<Map<String, String>>>> formDefns  = null;
 
     /**
-     * Reference to the forms which allow, disallow or mandate files to be
-     * uploaded.
+     * Reference to the value-pairs map, computed from the forms definition file
      */
-    private HashMap formFileUploadDefns = null;
-
-    /**
-     * Reference to the value-pairs map, computed from the forms defition file
-     */
-    private HashMap valuePairs = null;    // Holds display/storage pairs
+    private Map<String, List<String>> valuePairs = null;    // Holds display/storage pairs
     
     /**
      * Mini-cache of last DCInputSet requested. If submissions are not typically
@@ -151,9 +105,9 @@ public class DCInputsReader
     private void buildInputs(String fileName)
          throws DCInputsReaderException
     {
-        whichForms = new HashMap();
-        formDefns  = new HashMap();
-        valuePairs = new HashMap();
+        whichForms = new HashMap<String, String>();
+        formDefns  = new HashMap<String, List<List<Map<String, String>>>>();
+        valuePairs = new HashMap<String, List<String>>();
 
         String uri = "file:" + new File(fileName).getAbsolutePath();
 
@@ -179,14 +133,14 @@ public class DCInputsReader
         }
     }
    
-    public Iterator getPairsNameIterator()
+    public Iterator<String> getPairsNameIterator()
     {
         return valuePairs.keySet().iterator();
     }
 
-    public List getPairs(String name)
+    public List<String> getPairs(String name)
     {
-        return (Vector)valuePairs.get(name);
+        return valuePairs.get(name);
     }
 
     /**
@@ -202,10 +156,10 @@ public class DCInputsReader
     public DCInputSet getInputs(String collectionHandle)
                 throws DCInputsReaderException
     {
-        String formName = (String)whichForms.get(collectionHandle);
+        String formName = whichForms.get(collectionHandle);
         if (formName == null)
         {
-                formName = (String)whichForms.get(DEFAULT_COLLECTION);
+                formName = whichForms.get(DEFAULT_COLLECTION);
         }
         if (formName == null)
         {
@@ -217,7 +171,7 @@ public class DCInputsReader
                 return lastInputSet;
         }
         // cache miss - construct new DCInputSet
-        Vector pages = (Vector)formDefns.get(formName);
+        List<List<Map<String, String>>> pages = formDefns.get(formName);
         if ( pages == null )
         {
                 throw new DCInputsReaderException("Missing the " + formName  + " form");
@@ -351,7 +305,7 @@ public class DCInputsReader
                         {
                                 throw new SAXException("form element has no name attribute");
                         }
-                        Vector pages = new Vector(); // the form contains pages
+                        List<List<Map<String, String>>> pages = new ArrayList<List<Map<String, String>>>(); // the form contains pages
                         formDefns.put(formName, pages);
                         NodeList pl = nd.getChildNodes();
                         int lenpg = pl.getLength();
@@ -366,7 +320,7 @@ public class DCInputsReader
                                         {
                                                 throw new SAXException("Form " + formName + " has no identified pages");
                                         }
-                                        Vector page = new Vector();
+                                        List<Map<String, String>> page = new ArrayList<Map<String, String>>();
                                         pages.add(page);
                                         NodeList flds = npg.getChildNodes();
                                         int lenflds = flds.getLength();
@@ -376,7 +330,7 @@ public class DCInputsReader
                                                 if ( nfld.getNodeName().equals("field") )
                                                 {
                                                         // process each field definition
-                                                        HashMap field = new HashMap();
+                                                        Map<String, String> field = new HashMap<String, String>();
                                                         page.add(field);
                                                         processPageParts(formName, pgNum, nfld, field);
                                                         String error = checkForDups(formName, field, pages);
@@ -407,7 +361,7 @@ public class DCInputsReader
      * 'twobox' are marked repeatable. Complain if dc-element, label,
      * or input-type are missing.
      */
-    private void processPageParts(String formName, String page, Node n, HashMap field)
+    private void processPageParts(String formName, String page, Node n, Map<String, String> field)
         throws SAXException
     {
         NodeList nl = n.getChildNodes();
@@ -465,10 +419,10 @@ public class DCInputsReader
                 String msg = "Required field " + missing + " missing on page " + page + " of form " + formName;
                 throw new SAXException(msg);
         }
-        String type = (String)field.get("input-type");
+        String type = field.get("input-type");
         if (type.equals("twobox") || type.equals("qualdrop_value"))
         {
-                String rpt = (String)field.get("repeatable");
+                String rpt = field.get("repeatable");
                 if ((rpt == null) ||
                                 ((!rpt.equalsIgnoreCase("yes")) &&
                                                 (!rpt.equalsIgnoreCase("true"))))
@@ -483,13 +437,13 @@ public class DCInputsReader
      * Check that this is the only field with the name dc-element.dc-qualifier
      * If there is a duplicate, return an error message, else return null;
      */
-    private String checkForDups(String formName, HashMap field, Vector pages)
+    private String checkForDups(String formName, Map<String, String> field, List<List<Map<String, String>>> pages)
     {
         int matches = 0;
         String err = null;
-        String schema = (String)field.get("dc-schema");
-        String elem = (String)field.get("dc-element");
-        String qual = (String)field.get("dc-qualifier");
+        String schema = field.get("dc-schema");
+        String elem = field.get("dc-element");
+        String qual = field.get("dc-qualifier");
         if ((schema == null) || (schema.equals("")))
         {
             schema = MetadataSchema.DC_SCHEMA;
@@ -498,25 +452,25 @@ public class DCInputsReader
         
         for (int i = 0; i < pages.size(); i++)
         {
-            Vector pg = (Vector)pages.get(i);
+            List<Map<String, String>> pg = pages.get(i);
             for (int j = 0; j < pg.size(); j++)
             {
-                HashMap fld = (HashMap)pg.get(j);
+                Map<String, String> fld = pg.get(j);
                 if ((fld.get("dc-schema") == null) ||
-                    (((String)fld.get("dc-schema")).equals("")))
+                    ((fld.get("dc-schema")).equals("")))
                 {
                     schemaTest = MetadataSchema.DC_SCHEMA;
                 }
                 else
                 {
-                    schemaTest = (String)fld.get("dc-schema");
+                    schemaTest = fld.get("dc-schema");
                 }
                 
                 // Are the schema and element the same? If so, check the qualifier
-                if ((((String)fld.get("dc-element")).equals(elem)) &&
+                if (((fld.get("dc-element")).equals(elem)) &&
                     (schemaTest.equals(schema)))
                 {
-                    String ql = (String)fld.get("dc-qualifier");
+                    String ql = fld.get("dc-qualifier");
                     if (qual != null)
                     {
                         if ((ql != null) && ql.equals(qual))
@@ -575,7 +529,7 @@ public class DCInputsReader
                                 throw new SAXException(errString);
 
                         }
-                        Vector pairs = new Vector();
+                        List<String> pairs = new ArrayList<String>();
                         valuePairs.put(pairsName, pairs);
                         NodeList cl = nd.getChildNodes();
                         int lench = cl.getLength();
@@ -626,25 +580,25 @@ public class DCInputsReader
                 throws DCInputsReaderException
     {
         // Step through every field of every page of every form
-        Iterator ki = formDefns.keySet().iterator();
+        Iterator<String> ki = formDefns.keySet().iterator();
         while (ki.hasNext())
         {
-                String idName = (String)ki.next();
-                Vector pages = (Vector)formDefns.get(idName);
+                String idName = ki.next();
+                List<List<Map<String, String>>> pages = formDefns.get(idName);
                 for (int i = 0; i < pages.size(); i++)
                 {
-                        Vector page = (Vector)pages.get(i);
+                        List<Map<String, String>> page = pages.get(i);
                         for (int j = 0; j < page.size(); j++)
                         {
-                                HashMap fld = (HashMap)page.get(j);
+                                Map<String, String> fld = page.get(j);
                                 // verify reference in certain input types
-                                String type = (String)fld.get("input-type");
+                                String type = fld.get("input-type");
                     if (type.equals("dropdown")
                             || type.equals("qualdrop_value")
                             || type.equals("list"))
                                 {
-                                        String pairsName = (String)fld.get(PAIR_TYPE_NAME);
-                                        Vector v = (Vector)valuePairs.get(pairsName);
+                                        String pairsName = fld.get(PAIR_TYPE_NAME);
+                                        List<String> v = valuePairs.get(pairsName);
                                         if (v == null)
                                         {
                                                 String errString = "Cannot find value pairs for " + pairsName;
@@ -652,13 +606,13 @@ public class DCInputsReader
                                         }
                                 }
                                 // if visibility restricted, make sure field is not required
-                                String visibility = (String)fld.get("visibility");
+                                String visibility = fld.get("visibility");
                                 if (visibility != null && visibility.length() > 0 )
                                 {
-                                        String required = (String)fld.get("required");
+                                        String required = fld.get("required");
                                         if (required != null && required.length() > 0)
                                         {
-                                                String errString = "Field '" + (String)fld.get("label") +
+                                                String errString = "Field '" + fld.get("label") +
                                                                         "' is required but invisible";
                                                 throw new DCInputsReaderException(errString);
                                         }

@@ -1,41 +1,10 @@
-/*
- * Field.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4365 $
- *
- * Date: $Date: 2009-10-05 19:52:42 -0400 (Mon, 05 Oct 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.xmlui.wing.element;
 
 /**
@@ -241,7 +210,7 @@ public abstract class Field extends AbstractWingElement implements
      * Set this field to either be required or not required as determined by the
      * required parameter.
      *
-     * @param requeired
+     * @param required
      *            Determine if the field is required or not.
      */
     public void setRequired(boolean required)
@@ -325,7 +294,7 @@ public abstract class Field extends AbstractWingElement implements
      * Set the kind of UI presentation requested for this choice, e.g.
      * select vs. suggest.  Value must match one of the PRESENTATIONS.
      *
-     * @param fieldKey pre-determined metadata field key
+     * @param value pre-determined metadata field key
      */
     public void setChoicesPresentation(String value)
         throws WingException
@@ -494,8 +463,12 @@ public abstract class Field extends AbstractWingElement implements
     {
         List<Value> found = new ArrayList<Value>();
         for (Value value : values)
+        {
             if (value.getType().equals(removeType))
+            {
                 found.add(value);
+            }
+        }
 
         for (Value remove : found)
         {
@@ -528,37 +501,59 @@ public abstract class Field extends AbstractWingElement implements
         attributes.put(A_ID, this.context.generateID(E_FIELD, this.name));
         attributes.put(A_FIELD_TYPE, this.type);
         if (this.disabled)
+        {
             attributes.put(A_DISABLED, this.disabled);
+        }
         if (this.required)
+        {
             attributes.put(A_REQUIRED, this.required);
+        }
         if (this.rend != null)
+        {
             attributes.put(A_RENDER, this.rend);
+        }
 
         startElement(contentHandler, namespaces, E_FIELD, attributes);
 
         if (params != null)
+        {
             params.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
 
         if (label != null)
-                label.toSAX(contentHandler, lexicalHandler, namespaces);
+        {
+            label.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
         
         if (help != null)
+        {
             help.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
 
         for (Error error : errors)
+        {
             error.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
         
         for (Field field : fields)
+        {
             field.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
 
         for (Option option : options)
+        {
             option.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
         
         for (Value value : values)
+        {
             value.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
         
         for (Instance instance : instances)
+        {
             instance.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
 
         endElement(contentHandler, namespaces, E_FIELD);
     }
@@ -569,39 +564,64 @@ public abstract class Field extends AbstractWingElement implements
     public void dispose()
     {
         if (params != null)
+        {
             params.dispose();
+        }
 
         if (label != null)
+        {
             label.dispose();
+        }
         
         if (help != null)
+        {
             help.dispose();
+        }
 
-        for (Error error : errors)
-            error.dispose();
         if (errors != null)
+        {
+            for (Error error : errors)
+            {
+                error.dispose();
+            }
             errors.clear();
+        }
 
-        for (Field field : fields)
-            field.dispose();
         if (fields != null)
+        {
+            for (Field field : fields)
+            {
+                field.dispose();
+            }
             fields.clear();
+        }
         
-        for (Option option : options)
-            option.dispose();
         if (options != null)
+        {
+            for (Option option : options)
+            {
+                option.dispose();
+            }
             options.clear();
+        }
         
-        for (Value value : values)
-            value.dispose();
         if (values != null)
+        {
+            for (Value value : values)
+            {
+                value.dispose();
+            }
             values.clear();
+        }
 
-        for (Instance instance : instances)
-            instance.dispose();
         if (instances != null)
+        {
+            for (Instance instance : instances)
+            {
+                instance.dispose();
+            }
             instances.clear();
-        
+        }
 
         params = null;
         label = null;

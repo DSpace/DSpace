@@ -1,41 +1,9 @@
-/*
- * ItemAdapter.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4713 $
- *
- * Date: $Date: 2010-01-19 23:28:03 -0500 (Tue, 19 Jan 2010) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.objectmanager;
 
@@ -64,10 +32,8 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+
 import org.dspace.content.DSpaceObject;
 
 
@@ -109,7 +75,7 @@ public class ItemAdapter extends AbstractAdapter
     
     /** A hashmap of all Files and their corresponding space separated list of
         administrative metadata sections */
-    private HashMap<String,StringBuffer> fileAmdSecIDs = new HashMap<String,StringBuffer>();
+    private Map<String,StringBuffer> fileAmdSecIDs = new HashMap<String,StringBuffer>();
 
     // DSpace DB context
     private Context context;
@@ -153,7 +119,9 @@ public class ItemAdapter extends AbstractAdapter
     protected String getMETSOBJID()
     {
         if (item.getHandle() != null)
-                return contextPath+"/handle/" + item.getHandle();
+        {
+            return contextPath + "/handle/" + item.getHandle();
+        }
         return null;
     }
 
@@ -171,9 +139,13 @@ public class ItemAdapter extends AbstractAdapter
     protected String getMETSID()
     {
         if (item.getHandle() == null)
-                return "item:"+item.getID();
+        {
+            return "item:" + item.getID();
+        }
         else
-                return "hdl:"+item.getHandle();
+        {
+            return "hdl:" + item.getHandle();
+        }
     }
 
     /**
@@ -214,9 +186,13 @@ public class ItemAdapter extends AbstractAdapter
     protected String getAmdSecID(String admSecName, String mdType, DSpaceObject dso)
     {
         if (dso.getType() == Constants.BITSTREAM)
-          return admSecName + "_" + getFileID((Bitstream)dso) + "_" + mdType;
+        {
+            return admSecName + "_" + getFileID((Bitstream) dso) + "_" + mdType;
+        }
         else
-          return admSecName + "_" + dso.getID() + "_" + mdType;
+        {
+            return admSecName + "_" + dso.getID() + "_" + mdType;
+        }
     }
 
     /**
@@ -248,7 +224,7 @@ public class ItemAdapter extends AbstractAdapter
                 // Metadata element's ID
                 String dmdID = getGenericID("dmd_");
                 // Keep track of all descriptive sections
-            dmdSecIDS.append("" + dmdID);
+            dmdSecIDS.append(dmdID);
                 
                         ////////////////////////////////
                         // Start a metadata wrapper
@@ -274,7 +250,9 @@ public class ItemAdapter extends AbstractAdapter
                         attributes = new AttributeMap();
                         attributes.put("dspaceType", Constants.typeText[item.getType()]);
             if (item.isWithdrawn())
+            {
                 attributes.put("withdrawn", "y");
+            }
             startElement(DIM,"dim",attributes);
                         
                 DCValue[] dcvs = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
@@ -288,9 +266,13 @@ public class ItemAdapter extends AbstractAdapter
                         attributes.put("mdschema",dcv.schema);
                         attributes.put("element", dcv.element);
                         if (dcv.qualifier != null)
-                                attributes.put("qualifier", dcv.qualifier);
+                        {
+                            attributes.put("qualifier", dcv.qualifier);
+                        }
                         if (dcv.language != null)
-                                attributes.put("language", dcv.language);
+                        {
+                            attributes.put("language", dcv.language);
+                        }
                         if (dcv.authority != null || dcv.confidence != Choices.CF_UNSET)
                         {
                                 attributes.put("authority", dcv.authority);
@@ -321,16 +303,20 @@ public class ItemAdapter extends AbstractAdapter
                 // If DIM was requested then it was generated above without using
                 // the crosswalk API. So we can skip this one.
                 if ("DIM".equals(dmdType))
-                        continue;
+                {
+                    continue;
+                }
                 
                 DisseminationCrosswalk crosswalk = getDisseminationCrosswalk(dmdType);
                 
                 if (crosswalk == null)
-                        continue;
+                {
+                    continue;
+                }
                 
                 String dmdID = getGenericID("dmd_");
                  // Add our id to the list.
-                dmdSecIDS.append(" " + dmdID);
+                dmdSecIDS.append(" ").append(dmdID);
                 
                 ////////////////////////////////
                 // Start a metadata wrapper
@@ -409,7 +395,9 @@ public class ItemAdapter extends AbstractAdapter
                         Bitstream bitstream = bundle.getBitstreamByName("MODS.xml");
         
                         if (bitstream == null)
-                                continue;
+                        {
+                            continue;
+                        }
                         
                         
                         String dmdID = getGenericID("dmd_");
@@ -512,7 +500,9 @@ public class ItemAdapter extends AbstractAdapter
 
             //skip, if we cannot find this crosswalk in config file
             if (crosswalk == null)
-              continue;
+            {
+                continue;
+            }
 
             //First, check if this crosswalk can handle disseminating Item-level Administrative metadata
             if(crosswalk.canDisseminate(item))
@@ -583,17 +573,25 @@ public class ItemAdapter extends AbstractAdapter
           // Add this to our list of each file's administrative section IDs
           String fileID = getFileID((Bitstream) dso);
           if(fileAmdSecIDs.containsKey(fileID))
-            fileAmdSecIDs.get(fileID).append(" " + amdSecID);
+          {
+              fileAmdSecIDs.get(fileID).append(" " + amdSecID);
+          }
           else
-            fileAmdSecIDs.put(fileID, new StringBuffer(amdSecID));
+          {
+              fileAmdSecIDs.put(fileID, new StringBuffer(amdSecID));
+          }
         }//else if an Item
         else if (dso.getType() == Constants.ITEM)
         {
            //Add this to our list of item's administrative section IDs
            if(amdSecIDS==null)
-             amdSecIDS = new StringBuffer(amdSecID);
+           {
+               amdSecIDS = new StringBuffer(amdSecID);
+           }
            else
-             amdSecIDS.append(" " + amdSecID);
+           {
+               amdSecIDS.append(" ").append(amdSecID);
+           }
         }
 
         ////////////////////////////////
@@ -717,13 +715,17 @@ public class ItemAdapter extends AbstractAdapter
                 
                 Bitstream originalBitstream = null;
                 if (isDerivedBundle)
-                        originalBitstream = findOriginalBitstream(item, bitstream);
+                {
+                    originalBitstream = findOriginalBitstream(item, bitstream);
+                }
                 String groupID = getGroupFileID((originalBitstream == null) ? bitstream : originalBitstream );
 
                 //Check if there were administrative metadata sections corresponding to this file
                 String admIDs = null;
                 if(fileAmdSecIDs.containsKey(fileID))
-                  admIDs = fileAmdSecIDs.get(fileID).toString();
+                {
+                    admIDs = fileAmdSecIDs.get(fileID).toString();
+                }
   
                 // Render the actual file & flocate elements.
                 renderFile(item, bitstream, fileID, groupID, admIDs);
@@ -734,7 +736,9 @@ public class ItemAdapter extends AbstractAdapter
                 {
                     contentBitstreams.add(bitstream);
                     if (bundle.getPrimaryBitstreamID() == bitstream.getID())
+                    {
                         primaryBitstream = bitstream;
+                    }
                 }
             }
             
@@ -779,10 +783,14 @@ public class ItemAdapter extends AbstractAdapter
         attributes.put("TYPE", "DSpace Item");
         // add references to the Descriptive metadata
         if (dmdSecIDS != null)
-                attributes.put("DMDID", dmdSecIDS.toString());
+        {
+            attributes.put("DMDID", dmdSecIDS.toString());
+        }
         // add references to the Administrative metadata
         if (amdSecIDS != null)
-                attributes.put("AMDID", amdSecIDS.toString());
+        {
+            attributes.put("AMDID", amdSecIDS.toString());
+        }
         startElement(METS,"div",attributes);
         
         // add a fptr pointer to the primary bitstream.
@@ -841,7 +849,9 @@ public class ItemAdapter extends AbstractAdapter
     {
         Boolean include = ConfigurationManager.getBooleanProperty("xmlui.bitstream.mets");
         if (!include)
-                return;
+        {
+            return;
+        }
                 
                 
         Bundle[] bundles = item.getBundles("METADATA");
@@ -851,7 +861,9 @@ public class ItemAdapter extends AbstractAdapter
                 Bitstream bitstream = bundle.getBitstreamByName("METS.xml");
 
                 if (bitstream == null)
-                        continue;
+                {
+                    continue;
+                }
 
                 // ///////////////////////////////
                 // Send the actual XML content
@@ -891,7 +903,9 @@ public class ItemAdapter extends AbstractAdapter
         // the all bundles.
         List<Bundle> bundles;
         if (fileGrpTypes.size() == 0)
-                bundles = Arrays.asList(item.getBundles());
+        {
+            bundles = Arrays.asList(item.getBundles());
+        }
         else
         {
                 bundles = new ArrayList<Bundle>();

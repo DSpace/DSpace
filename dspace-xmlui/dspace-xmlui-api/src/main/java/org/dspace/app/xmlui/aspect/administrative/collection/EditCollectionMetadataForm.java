@@ -1,41 +1,9 @@
-/*
- * EditCollectionMetadataForm.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4695 $
- *
- * Date: $Date: 2010-01-15 12:06:30 -0500 (Fri, 15 Jan 2010) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.administrative.collection;
 
@@ -46,7 +14,6 @@ import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Button;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.List;
@@ -74,7 +41,7 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	private static final Message T_options_metadata = message("xmlui.administrative.collection.general.options_metadata");	
 	private static final Message T_options_roles = message("xmlui.administrative.collection.general.options_roles");
 	private static final Message T_options_harvest = message("xmlui.administrative.collection.GeneralCollectionHarvestingForm.options_harvest");
-	
+        private static final Message T_options_curate = message("xmlui.administrative.collection.general.options_curate");	
 	private static final Message T_submit_return = message("xmlui.general.return");
 	
 	private static final Message T_title = message("xmlui.administrative.collection.EditCollectionMetadataForm.title");
@@ -102,8 +69,6 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	private static final Message T_submit_delete_logo = message("xmlui.administrative.collection.EditCollectionMetadataForm.submit_delete_logo");
 	private static final Message T_submit_delete = message("xmlui.administrative.collection.EditCollectionMetadataForm.submit_delete");
 	private static final Message T_submit_save = message("xmlui.administrative.collection.EditCollectionMetadataForm.submit_save");
-	
-	private static final Message T_sysadmins_only = message("xmlui.administrative.collection.EditCollectionMetadataForm.sysadmins_only");
 	
 	public void addPageMeta(PageMeta pageMeta) throws WingException
     {
@@ -135,6 +100,7 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	    options.addItem().addHighlight("bold").addXref(baseURL+"&submit_metadata",T_options_metadata);
 	    options.addItem().addXref(baseURL+"&submit_roles",T_options_roles);
 	    options.addItem().addXref(baseURL+"&submit_harvesting",T_options_harvest);
+            options.addItem().addXref(baseURL+"&submit_curate",T_options_curate);
 	    
 	    
 	    // The grand list of metadata options
@@ -151,32 +117,40 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	    Text short_description = metadataList.addItem().addText("short_description");
 	    short_description.setValue(thisCollection.getMetadata("short_description"));
 	    short_description.setSize(40);
-	    if (short_description_error != null) 
-	    	short_description.addError(short_description_error);
+	    if (short_description_error != null)
+        {
+            short_description.addError(short_description_error);
+        }
 	    
 	    // introductory text
 	    metadataList.addLabel(T_label_introductory_text);
 	    TextArea introductory_text = metadataList.addItem().addTextArea("introductory_text");
 	    introductory_text.setValue(thisCollection.getMetadata("introductory_text"));
 	    introductory_text.setSize(6, 40);
-	    if (introductory_text_error != null) 
-	    	introductory_text.addError(introductory_text_error);
+	    if (introductory_text_error != null)
+        {
+            introductory_text.addError(introductory_text_error);
+        }
 	    
 	    // copyright text
 	    metadataList.addLabel(T_label_copyright_text);
 	    TextArea copyright_text = metadataList.addItem().addTextArea("copyright_text");
 	    copyright_text.setValue(thisCollection.getMetadata("copyright_text"));
 	    copyright_text.setSize(6, 40);
-	    if (copyright_text_error != null) 
-	    	copyright_text.addError(copyright_text_error);
+	    if (copyright_text_error != null)
+        {
+            copyright_text.addError(copyright_text_error);
+        }
 	    
 	    // legacy sidebar text; may or may not be used for news 
 	    metadataList.addLabel(T_label_side_bar_text);
 	    TextArea side_bar_text = metadataList.addItem().addTextArea("side_bar_text");
 	    side_bar_text.setValue(thisCollection.getMetadata("side_bar_text"));
 	    side_bar_text.setSize(6, 40);
-	    if (side_bar_text_error != null) 
-	    	side_bar_text.addError(side_bar_text_error);
+	    if (side_bar_text_error != null)
+        {
+            side_bar_text.addError(side_bar_text_error);
+        }
 	    
 	    // license text
 	    metadataList.addLabel(T_label_license);
@@ -208,7 +182,9 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	    item = metadataList.addItem();
 	    
 	    if (thisCollection.getTemplateItem() == null)
-	    	item.addButton("submit_create_template").setValue(T_submit_create_template);
+        {
+            item.addButton("submit_create_template").setValue(T_submit_create_template);
+        }
 	    else 
 	    {
 	    	item.addButton("submit_edit_template").setValue(T_submit_edit_template);

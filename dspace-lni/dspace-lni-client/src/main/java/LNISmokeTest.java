@@ -1,43 +1,10 @@
-/*
- * LNISmokeTest.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -58,6 +25,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
 import org.dspace.app.dav.client.LNIClientUtils;
 import org.dspace.app.dav.client.LNISoapServlet;
 import org.dspace.app.dav.client.LNISoapServletServiceLocator;
@@ -84,10 +52,11 @@ import org.jdom.output.XMLOutputter;
  * http://user:passwd@mydsapce.edu/dspace-lni/DSpaceLNI \ -f 123.45/67
  * 
  * @author Larry Stone
- * @version $Revision: 3705 $
+ * @version $Revision: 5845 $
  */
 public class LNISmokeTest
 {
+    private static final Logger log = Logger.getLogger(LNISmokeTest.class);
 
     /** 
      * The Constant NS_DAV. 
@@ -99,9 +68,6 @@ public class LNISmokeTest
      * The Constant NS_DSPACE. 
      * DSpace's XML namespace
      */
-    private static final Namespace NS_DSPACE = Namespace.getNamespace("dspace",
-            "http://www.dspace.org/xmlns/dspace");
-
     /** The output pretty. */
     private static XMLOutputter outputPretty = new XMLOutputter(Format
             .getPrettyFormat());
@@ -129,13 +95,13 @@ public class LNISmokeTest
     private static final String specificPropSuffix = "/></prop></propfind>";
 
     /**
-     * Usage. prints usage info to System.out & dies.
+     * usage. prints usage info to System.out & dies.
      * 
      * @param options the options
      * @param status the status
      * @param msg the msg
      */
-    private static void Usage(Options options, int status, String msg)
+    private static void usage(Options options, int status, String msg)
     {
         HelpFormatter hf = new HelpFormatter();
         if (msg != null)
@@ -205,14 +171,14 @@ public class LNISmokeTest
             CommandLine line = (new PosixParser()).parse(options, argv);
             if (line.hasOption("h"))
             {
-                Usage(options, 0, null);
+                usage(options, 0, null);
             }
 
             // get SOAP client connection, using the endpoint URL
             String endpoint = line.getOptionValue("e");
             if (endpoint == null)
             {
-                Usage(options, 2, "Missing the required -e endpoint argument");
+                usage(options, 2, "Missing the required -e endpoint argument");
             }
             LNISoapServletServiceLocator loc = new LNISoapServletServiceLocator();
             LNISoapServlet lni = loc.getDSpaceLNI(new URL(endpoint));
@@ -245,7 +211,7 @@ public class LNISmokeTest
                 }
                 else
                 {
-                    Usage(options, 13,
+                    usage(options, 13,
                             "Missing required args: -N <name> -V <value>n");
                 }
             }
@@ -261,7 +227,7 @@ public class LNISmokeTest
                 }
                 else
                 {
-                    Usage(options, 13,
+                    usage(options, 13,
                             "Missing required args after -s: -P <packager> -i <file>");
                 }
             }
@@ -277,7 +243,7 @@ public class LNISmokeTest
                 }
                 else
                 {
-                    Usage(options, 13,
+                    usage(options, 13,
                             "Missing required args after -d: -P <packager> -o <file>");
                 }
             }
@@ -292,19 +258,19 @@ public class LNISmokeTest
                 }
                 else
                 {
-                    Usage(options, 13,
+                    usage(options, 13,
                             "Missing required args after -c: -C <collection>\n");
                 }
             }
             else
             {
-                Usage(options, 14, "Missing command option.\n");
+                usage(options, 14, "Missing command option.\n");
             }
 
         }
         catch (ParseException pe)
         {
-            Usage(options, 1, "Error in arguments: " + pe.toString());
+            usage(options, 1, "Error in arguments: " + pe.toString());
             
         }
         catch (java.rmi.RemoteException de)
@@ -358,7 +324,7 @@ public class LNISmokeTest
         }
 
         // hack: parse "handle bitstream" syntax of handle.
-        if (handle.indexOf(" ") >= 0 && bitstream == null)
+        if (handle.indexOf(' ') >= 0 && bitstream == null)
         {
             String h[] = handle.split("\\s+");
             handle = h[0];
@@ -433,7 +399,7 @@ public class LNISmokeTest
                             {
                                 value = outputPretty.outputString(kids);
                             }
-                            if (value.indexOf("\n") >= 0)
+                            if (value.indexOf('\n') >= 0)
                             {
                                 value = "\n" + value;
                             }
@@ -550,13 +516,36 @@ public class LNISmokeTest
         fixBasicAuth(url, conn);
         conn.connect();
 
-        InputStream in = new FileInputStream(source);
-        OutputStream out = conn.getOutputStream();
+        InputStream in = null;
+        OutputStream out = null;
         try {
+            in = new FileInputStream(source);
+            out = conn.getOutputStream();
             copyStream(in, out);
         } finally {
-            in.close();
-            out.close();
+            if (in != null)
+            {
+                try
+                {
+                    in.close();
+                }
+                catch (IOException e)
+                {
+                    log.error("Unable to close input stream", e);
+                }
+            }
+            
+            if (out!= null)
+            {
+                try
+                {
+                    out.close();
+                }
+                catch (IOException e)
+                {
+                    log.error("Unable to close output stream", e);
+                }
+            }
         }
 
         int status = conn.getResponseCode();

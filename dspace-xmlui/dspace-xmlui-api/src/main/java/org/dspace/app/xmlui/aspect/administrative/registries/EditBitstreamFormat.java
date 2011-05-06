@@ -1,41 +1,9 @@
-/*
- * EditBitstreamFormat.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.administrative.registries;
 
@@ -134,13 +102,19 @@ public class EditBitstreamFormat extends AbstractDSpaceTransformer
 		BitstreamFormat format = null;
 		
 		if (formatID >= 0)
-			format = BitstreamFormat.find(context,formatID);
+        {
+            format = BitstreamFormat.find(context, formatID);
+        }
 	
 		String errorString = parameters.getParameter("errors",null);
 		ArrayList<String> errors = new ArrayList<String>();
 		if (errorString != null)
-			for (String error : errorString.split(","))
-				errors.add(error);
+        {
+            for (String error : errorString.split(","))
+            {
+                errors.add(error);
+            }
+        }
 		
 		Request request = ObjectModelHelper.getRequest(objectModel);
         String mimetypeValue = request.getParameter("mimetype");
@@ -153,23 +127,39 @@ public class EditBitstreamFormat extends AbstractDSpaceTransformer
         
         // Remove leading periods from file extensions.
         for (int i = 0; i < extensionValues.length; i++)
+        {
         	if (extensionValues[i].startsWith("."))
-        		extensionValues[i] = extensionValues[i].substring(1);
+            {
+                extensionValues[i] = extensionValues[i].substring(1);
+            }
+        }
         
         if (format != null)
         {
         	if (mimetypeValue == null)
-        		mimetypeValue = format.getMIMEType();
+            {
+                mimetypeValue = format.getMIMEType();
+            }
         	if (nameValue == null)
-        		nameValue = format.getShortDescription();
+            {
+                nameValue = format.getShortDescription();
+            }
         	if (descriptionValue == null)
-        		descriptionValue = format.getDescription();
+            {
+                descriptionValue = format.getDescription();
+            }
         	if (supportLevelValue == null)
-        		supportLevelValue = String.valueOf(format.getSupportLevel());
+            {
+                supportLevelValue = String.valueOf(format.getSupportLevel());
+            }
         	if (request.getParameter("mimetype") == null)
-        		internalValue = format.isInternal() ? "true" : null;
+            {
+                internalValue = format.isInternal() ? "true" : null;
+            }
         	if (request.getParameter("extensions") == null)
-        		extensionValues = format.getExtensions();
+            {
+                extensionValues = format.getExtensions();
+            }
         }
 		
         
@@ -178,9 +168,13 @@ public class EditBitstreamFormat extends AbstractDSpaceTransformer
         // DIVISION: edit-bitstream-format
 		Division main = body.addInteractiveDivision("edit-bitstream-format",contextPath+"/admin/format-registry",Division.METHOD_POST,"primary administrative format-registry");
 		if (formatID == -1)
-			main.setHead(T_head1);
+        {
+            main.setHead(T_head1);
+        }
 		else
-			main.setHead(T_head2.parameterize(nameValue));
+        {
+            main.setHead(T_head2.parameterize(nameValue));
+        }
 		main.addPara(T_para1);
 	
 		List form = main.addList("edit-bitstream-format",List.TYPE_FORM);
@@ -192,7 +186,9 @@ public class EditBitstreamFormat extends AbstractDSpaceTransformer
 		name.setValue(nameValue);
 		name.setSize(35);
 		if (errors.contains("short_description"))
-			name.addError(T_name_error);
+        {
+            name.addError(T_name_error);
+        }
 		
 		Text mimeType = form.addItem().addText("mimetype");
 		mimeType.setLabel(T_mimetype);
@@ -202,7 +198,9 @@ public class EditBitstreamFormat extends AbstractDSpaceTransformer
 		
 		// Do not allow anyone to change the name of the unknown format.
 		if (format != null && format.getID() == 1)
-			name.setDisabled(); 
+        {
+            name.setDisabled();
+        }
 
 		TextArea description = form.addItem().addTextArea("description");
 		description.setLabel(T_description);

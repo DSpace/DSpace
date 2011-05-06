@@ -1,39 +1,9 @@
-/*
- * Bundle.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4309 $
- *
- * Date: $Date: 2009-09-30 15:20:07 -0400 (Wed, 30 Sep 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.content;
 
@@ -50,6 +20,7 @@ import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -67,7 +38,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * removing bitstreams has instant effect in the database.
  * 
  * @author Robert Tansley
- * @version $Revision: 4309 $
+ * @version $Revision: 5844 $
  */
 public class Bundle extends DSpaceObject
 {
@@ -102,13 +73,32 @@ public class Bundle extends DSpaceObject
         ourContext = context;
         bundleRow = row;
         bitstreams = new ArrayList<Bitstream>();
+        String bitstreamOrderingField  = ConfigurationManager.getProperty("webui.bitstream.order.field");
+        String bitstreamOrderingDirection   = ConfigurationManager.getProperty("webui.bitstream.order.direction");
+
+        if (bitstreamOrderingField == null)
+        {
+            bitstreamOrderingField = "sequence_id";
+        }
+
+        if (bitstreamOrderingDirection == null)
+        {
+            bitstreamOrderingDirection = "ASC";
+        }
+        
+        StringBuilder query = new StringBuilder();
+        query.append("SELECT bitstream.* FROM bitstream, bundle2bitstream WHERE");
+        query.append(" bundle2bitstream.bitstream_id=bitstream.bitstream_id AND");
+        query.append(" bundle2bitstream.bundle_id= ?");
+        query.append(" ORDER BY bitstream.");
+        query.append(bitstreamOrderingField);
+        query.append(" ");
+        query.append(bitstreamOrderingDirection);
 
         // Get bitstreams
         TableRowIterator tri = DatabaseManager.queryTable(
                 ourContext, "bitstream",
-                "SELECT bitstream.* FROM bitstream, bundle2bitstream WHERE "
-                        + "bundle2bitstream.bitstream_id=bitstream.bitstream_id AND "
-                        + "bundle2bitstream.bundle_id= ? ",
+                query.toString(),
                 bundleRow.getIntColumn("bundle_id"));
 
         try
@@ -135,13 +125,16 @@ public class Bundle extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         // Cache ourselves
         context.cache(this, row.getIntColumn("bundle_id"));
 
-        modified = modifiedMetadata = false;
+        modified = false;
+        modifiedMetadata = false;
     }
 
     /**
@@ -363,7 +356,9 @@ public class Bundle extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         Item[] itemArray = new Item[items.size()];
@@ -455,11 +450,10 @@ public class Bundle extends DSpaceObject
         AuthorizeManager.inheritPolicies(ourContext, this, b);
 
         // Add the mapping row to the database
-        TableRow mappingRow = DatabaseManager.create(ourContext,
-                "bundle2bitstream");
+        TableRow mappingRow = DatabaseManager.row("bundle2bitstream");
         mappingRow.setColumn("bundle_id", getID());
         mappingRow.setColumn("bitstream_id", b.getID());
-        DatabaseManager.update(ourContext, mappingRow);
+        DatabaseManager.insert(ourContext, mappingRow);
     }
 
     /**
@@ -530,7 +524,9 @@ public class Bundle extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
     }
 
@@ -657,6 +653,24 @@ public class Bundle extends DSpaceObject
         // change bundle policies
         AuthorizeManager.removeAllPolicies(ourContext, this);
         AuthorizeManager.addPolicies(ourContext, newpolicies, this);
+    }
+
+    public List<ResourcePolicy> getBundlePolicies() throws SQLException
+    {
+        return AuthorizeManager.getPolicies(ourContext, this);
+    }
+
+    public List<ResourcePolicy> getBitstreamPolicies() throws SQLException
+    {
+        List<ResourcePolicy> list = new ArrayList<ResourcePolicy>();
+        if (bitstreams != null && bitstreams.size() > 0)
+        {
+            for (Bitstream bs : bitstreams)
+            {
+                list.addAll(AuthorizeManager.getPolicies(ourContext, bs));
+            }
+        }
+        return list;
     }
     
     public DSpaceObject getAdminObject(int action) throws SQLException

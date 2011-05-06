@@ -1,41 +1,9 @@
-/*
- * AbstractSearch.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4260 $
- *
- * Date: $Date: 2009-09-14 06:29:24 -0400 (Mon, 14 Sep 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
@@ -44,7 +12,6 @@ import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
@@ -84,7 +51,7 @@ import org.xml.sax.SAXException;
 
 /**
  * This is an abstract search page. It is a collection of search methods that
- * are common between diffrent search implementation. An implementer must
+ * are common between different search implementation. An implementer must
  * implement at least three methods: addBody(), getQuery(), and generateURL().
  * 
  * See the two implementors: SimpleSearch and AdvancedSearch.
@@ -123,13 +90,13 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
     private static final Message T_sort_by_relevance =
         message("xmlui.ArtifactBrowser.AbstractSearch.sort_by.relevance");
 
-    private final static Message T_sort_by = message("xmlui.ArtifactBrowser.AbstractSearch.sort_by");
+    private static final Message T_sort_by = message("xmlui.ArtifactBrowser.AbstractSearch.sort_by");
 
-    private final static Message T_order      = message("xmlui.ArtifactBrowser.AbstractSearch.order");
-    private final static Message T_order_asc  = message("xmlui.ArtifactBrowser.AbstractSearch.order.asc");
-    private final static Message T_order_desc = message("xmlui.ArtifactBrowser.AbstractSearch.order.desc");
+    private static final Message T_order      = message("xmlui.ArtifactBrowser.AbstractSearch.order");
+    private static final Message T_order_asc  = message("xmlui.ArtifactBrowser.AbstractSearch.order.asc");
+    private static final Message T_order_desc = message("xmlui.ArtifactBrowser.AbstractSearch.order.desc");
 
-    private final static Message T_rpp = message("xmlui.ArtifactBrowser.AbstractSearch.rpp");
+    private static final Message T_rpp = message("xmlui.ArtifactBrowser.AbstractSearch.rpp");
     
     /** The options for results per page */
     private static final int[] RESULTS_PER_PAGE_PROGRESSION = {5,10,20,40,60,80,100};
@@ -154,7 +121,6 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             String key = "";
             
             // Page Parameter
-            Request request = ObjectModelHelper.getRequest(objectModel);
             key += "-" + getParameterPage();
             key += "-" + getParameterRpp();
             key += "-" + getParameterSortBy();
@@ -164,12 +130,18 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
             // What scope the search is at
             DSpaceObject scope = getScope();
             if (scope != null)
+            {
                 key += "-" + scope.getHandle();
+            }
             
-            // The actualy search query.
+            // The actual search query.
             key += "-" + getQuery();
 
             return HashUtil.hash(key);
+        }
+        catch (RuntimeException re)
+        {
+            throw re;
         }
         catch (Exception e)
         {
@@ -208,9 +180,13 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
 	            
 	            this.validity = validity.complete();
             }
+            catch (RuntimeException re)
+            {
+                throw re;
+            }
 	        catch (Exception e)
 	        {
-	            // Just ignore all errors and return an invalid cache.
+	            this.validity = null;
 	        }
 
             // add log message that we are viewing the item
@@ -241,7 +217,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
         if (getQuery().length() > 0)
         {
 
-            // Preform the actual search
+            // Perform the actual search
             performSearch();
             DSpaceObject searchScope = getScope();
             
@@ -278,7 +254,9 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
                 int lastItemIndex = queryResults.getStart()
                         + queryResults.getPageSize();
                 if (itemsTotal < lastItemIndex)
+                {
                     lastItemIndex = itemsTotal;
+                }
                 int currentPage = (queryResults.getStart() / queryResults
                         .getPageSize()) + 1;
                 int pagesTotal = ((queryResults.getHitCount() - 1) / queryResults
@@ -333,7 +311,9 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
                                     ReferenceSet.TYPE_SUMMARY_LIST,null,"repository-search-results");
                             // Only set a heading if there are both containers and items.
                             if (resultsContainsBothContainersAndItems)
-                            	referenceSet.setHead(T_head3);  
+                            {
+                                referenceSet.setHead(T_head3);
+                            }
                         }
                         referenceSet.addReference(resultDSO);
                     }
@@ -413,13 +393,13 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
     /**
      * Query DSpace for a list of all items / collections / or communities that
      * match the given search query.
-     * 
-     * @return The associated query results.
      */
     protected void performSearch() throws SQLException, IOException, UIException
     {
         if (queryResults != null)
+        {
             return;
+        }
         
         Context context = ContextUtil.obtainContext(objectModel);
         String query = getQuery();
@@ -440,9 +420,13 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
 
         queryArgs.setQuery(query);
         if (page > 1)
+        {
             queryArgs.setStart((Integer.valueOf(page) - 1) * queryArgs.getPageSize());
+        }
         else
+        {
             queryArgs.setStart(0);
+        }
 
         QueryResults qResults = null;
         if (scope instanceof Community)
@@ -476,11 +460,15 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
         // Are we in a community or collection?
         DSpaceObject dso;
         if (scopeString == null || "".equals(scopeString))
+        {
             // get the search scope from the url handle
             dso = HandleUtil.obtainHandle(objectModel);
+        }
         else
+        {
             // Get the search scope from the location parameter
             dso = HandleManager.resolveToObject(context, scopeString);
+        }
 
         return dso;
     }
@@ -554,10 +542,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
      */
     protected boolean variableScope() throws SQLException
     {
-        if (HandleUtil.obtainHandle(objectModel) == null)
-            return true;
-        else 
-            return false;
+        return (HandleUtil.obtainHandle(objectModel) == null);
     }
     
     /**
@@ -566,7 +551,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
      * 
      * @return The query string.
      */
-    abstract protected String getQuery() throws UIException;
+    protected abstract String getQuery() throws UIException;
 
     /**
      * Generate a url to the given search implementation with the associated
@@ -575,7 +560,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
      * @param parameters
      * @return The post URL
      */
-    abstract protected String generateURL(Map<String, String> parameters)
+    protected abstract String generateURL(Map<String, String> parameters)
             throws UIException;
 
     
@@ -656,16 +641,13 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
         int countCollections = 0;
         int countItems       = 0;
 
-        for (Object type : queryResults.getHitTypes())
+        for (Integer type : queryResults.getHitTypes())
         {
-            if (type instanceof Integer)
+            switch (type.intValue())
             {
-                switch (((Integer)type).intValue())
-                {
-                case Constants.ITEM:       countItems++;        break;
-                case Constants.COLLECTION: countCollections++;  break;
-                case Constants.COMMUNITY:  countCommunities++;  break;
-                }
+            case Constants.ITEM:       countItems++;        break;
+            case Constants.COLLECTION: countCollections++;  break;
+            case Constants.COMMUNITY:  countCommunities++;  break;
             }
         }
 

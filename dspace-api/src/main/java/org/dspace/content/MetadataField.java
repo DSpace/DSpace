@@ -1,39 +1,9 @@
-/*
- * MetadataField.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3761 $
- *
- * Date: $Date: 2009-05-07 00:18:02 -0400 (Thu, 07 May 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.content;
 
@@ -45,6 +15,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -61,8 +32,9 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * metadata element belongs in a field.
  *
  * @author Martin Hald
- * @version $Revision: 3761 $
- * @see org.dspace.content.MetadataValue, org.dspace.content.MetadataSchema
+ * @version $Revision: 5844 $
+ * @see org.dspace.content.MetadataValue
+ * @see org.dspace.content.MetadataSchema
  */
 public class MetadataField
 {
@@ -79,7 +51,7 @@ public class MetadataField
     private TableRow row;
 
     // cache of field by ID (Integer)
-    private static HashMap id2field = null;
+    private static Map<Integer, MetadataField> id2field = null;
 
 
     /**
@@ -100,7 +72,7 @@ public class MetadataField
     }
 
     /**
-     * Full contructor for new metadata field elements.
+     * Full constructor for new metadata field elements.
      *
      * @param schema schema to which the field belongs
      * @param element element of the field
@@ -117,10 +89,10 @@ public class MetadataField
     }
 
     /**
-     * Full construtor for existing metadata field elements.
+     * Full constructor for existing metadata field elements.
      *
      * @param schemaID schema to which the field belongs
-     * @param fieldID dataabse ID of field.
+     * @param fieldID database ID of field.
      * @param element element of the field
      * @param qualifier qualifier of the field
      * @param scopeNote scope note of the field
@@ -330,7 +302,9 @@ public class MetadataField
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         if (row == null)
@@ -352,7 +326,7 @@ public class MetadataField
      */
     public static MetadataField[] findAll(Context context) throws SQLException
     {
-        List fields = new ArrayList();
+        List<MetadataField> fields = new ArrayList<MetadataField>();
 
         // Get all the metadatafieldregistry rows
         TableRowIterator tri = DatabaseManager.queryTable(context, "MetadataFieldRegistry",
@@ -370,7 +344,9 @@ public class MetadataField
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         // Convert list into an array
@@ -389,7 +365,7 @@ public class MetadataField
     public static MetadataField[] findAllInSchema(Context context, int schemaID)
             throws SQLException
     {
-        List fields = new ArrayList();
+        List<MetadataField> fields = new ArrayList<MetadataField>();
 
         // Get all the metadatafieldregistry rows
         TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataFieldRegistry",
@@ -408,7 +384,9 @@ public class MetadataField
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         // Convert list into an array
@@ -619,14 +597,19 @@ public class MetadataField
     public static MetadataField find(Context context, int id)
             throws SQLException
     {
-        initCache(context);
+        if (!isCacheInitialized())
+        {
+            initCache(context);
+        }
 
         // 'sanity check' first.
-        Integer iid = new Integer(id);
+        Integer iid = Integer.valueOf(id);
         if (!id2field.containsKey(iid))
+        {
             return null;
+        }
 
-        return (MetadataField) id2field.get(iid);
+        return id2field.get(iid);
     }
 
     // invalidate the cache e.g. after something modifies DB state.
@@ -635,41 +618,84 @@ public class MetadataField
         id2field = null;
     }
 
-    // load caches if necessary
-    private static void initCache(Context context) throws SQLException
+    private static boolean isCacheInitialized()
     {
-        if (id2field != null)
-            return;
-
-        synchronized (MetadataField.class)
+        return id2field != null;
+    }
+    
+    // load caches if necessary
+    private static synchronized void initCache(Context context) throws SQLException
+    {
+        if (!isCacheInitialized())
         {
-            if (id2field == null)
+            Map<Integer, MetadataField> new_id2field = new HashMap<Integer, MetadataField>();
+            log.info("Loading MetadataField elements into cache.");
+
+            // Grab rows from DB
+            TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataFieldRegistry",
+                    "SELECT * from MetadataFieldRegistry");
+
+            try
             {
-                HashMap new_id2field = new HashMap();
-                log.info("Loading MetadataField elements into cache.");
-
-                // Grab rows from DB
-                TableRowIterator tri = DatabaseManager.queryTable(context,"MetadataFieldRegistry",
-                        "SELECT * from MetadataFieldRegistry");
-
-                try
+                while (tri.hasNext())
                 {
-                    while (tri.hasNext())
-                    {
-                        TableRow row = tri.next();
-                        int fieldID = row.getIntColumn("metadata_field_id");
-                        new_id2field.put(new Integer(fieldID), new MetadataField(row));
-                    }
+                    TableRow row = tri.next();
+                    int fieldID = row.getIntColumn("metadata_field_id");
+                    new_id2field.put(Integer.valueOf(fieldID), new MetadataField(row));
                 }
-                finally
-                {
-                    // close the TableRowIterator to free up resources
-                    if (tri != null)
-                        tri.close();
-                }
-
-                id2field = new_id2field;
             }
+            finally
+            {
+                // close the TableRowIterator to free up resources
+                if (tri != null)
+                {
+                    tri.close();
+                }
+            }
+
+            id2field = new_id2field;
         }
+    }
+
+    /**
+     * Return <code>true</code> if <code>other</code> is the same MetadataField
+     * as this object, <code>false</code> otherwise
+     *
+     * @param other
+     *            object to compare to
+     *
+     * @return <code>true</code> if object passed in represents the same
+     *         MetadataField as this object
+     */
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj == null)
+        {
+            return false;
+        }
+        if (getClass() != obj.getClass())
+        {
+            return false;
+        }
+        final MetadataField other = (MetadataField) obj;
+        if (this.fieldID != other.fieldID)
+        {
+            return false;
+        }
+        if (this.schemaID != other.schemaID)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 7;
+        hash = 47 * hash + this.fieldID;
+        hash = 47 * hash + this.schemaID;
+        return hash;
     }
 }

@@ -1,4 +1,11 @@
 /**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+/**
  * LNIRemoteException.java
  *
  * This file was auto-generated from WSDL
@@ -64,18 +71,23 @@ public class LNIRemoteException  extends org.apache.axis.AxisFault  implements j
 
     private java.lang.Object __equalsCalc = null;
     public synchronized boolean equals(java.lang.Object obj) {
-        if (!(obj instanceof LNIRemoteException)) return false;
+        if (!(obj instanceof LNIRemoteException))
+        {
+            return false;
+        }
         LNIRemoteException other = (LNIRemoteException) obj;
-        if (this == obj) return true;
+        if (this == obj)
+        {
+            return true;
+        }
         if (__equalsCalc != null) {
-            return (__equalsCalc == obj);
+            return (__equalsCalc.equals(obj));
         }
         __equalsCalc = obj;
         boolean _equals;
-        _equals = true && 
-            ((this.cause1==null && other.getCause1()==null) || 
-             (this.cause1!=null &&
-              this.cause1.equals(other.getCause1()))) &&
+        _equals = ((this.cause1 == null && other.getCause1() == null) ||
+                (this.cause1 != null &&
+                        this.cause1.equals(other.getCause1()))) &&
             ((this.message1==null && other.getMessage1()==null) || 
              (this.message1!=null &&
               this.message1.equals(other.getMessage1())));

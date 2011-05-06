@@ -1,39 +1,9 @@
-/*
- * CreativeCommons.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4566 $
- *
- * Date: $Date: 2009-11-25 22:20:34 -0500 (Wed, 25 Nov 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.license;
 
@@ -42,6 +12,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.SQLException;
@@ -80,7 +51,7 @@ public class CreativeCommons
 
     private static final String BSN_LICENSE_RDF = "license_rdf";
 
-    protected static Templates templates = null;
+    protected static final Templates templates;
     
     private static boolean enabled_p;
 
@@ -114,7 +85,7 @@ public class CreativeCommons
         }
         catch (TransformerConfigurationException e)
         {
-            throw new RuntimeException(e.getMessage(),e);
+            throw new IllegalStateException(e.getMessage(),e);
         }
        
         
@@ -185,11 +156,11 @@ public class CreativeCommons
 
         // set the format
         BitstreamFormat bs_format;
-        if (mimeType.equalsIgnoreCase("text/xml"))
+        if ("text/xml".equalsIgnoreCase(mimeType))
         {
             bs_format = BitstreamFormat.findByShortDescription(context, "CC License");
         }
-        else if (mimeType.equalsIgnoreCase("text/rdf")) {
+        else if ("text/rdf".equalsIgnoreCase(mimeType)) {
             bs_format = BitstreamFormat.findByShortDescription(context, "RDF XML");
         }
         else {
@@ -310,7 +281,7 @@ public class CreativeCommons
         }
         catch (TransformerException e)
         {
-            throw new RuntimeException(e.getMessage(),e);
+            throw new IllegalStateException(e.getMessage(),e);
         }
 
         return result.getBuffer().toString();
@@ -437,7 +408,11 @@ public class CreativeCommons
 
             return bytes;
         }
-        catch (Exception exc)
+        catch (MalformedURLException e)
+        {
+            return null;
+        }
+        catch (IOException e)
         {
             return null;
         }

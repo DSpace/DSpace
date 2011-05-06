@@ -1,33 +1,9 @@
-/*
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.checker;
 
@@ -38,7 +14,6 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.dspace.core.I18nUtil;
 
 /**
@@ -53,17 +28,6 @@ import org.dspace.core.I18nUtil;
  */
 public class SimpleReporterImpl implements SimpleReporter
 {
-    /** log4j logger. */
-    private static Logger LOG = Logger.getLogger(SimpleReporterImpl.class);
-
-    /** Utility date format which includes hours minutes and seconds. */
-    private static final DateFormat DATE_FORMAT_MAX = DateFormat
-            .getDateInstance(DateFormat.MEDIUM);
-
-    /** Utility date format which only includes Month/day/year. */
-    private static final DateFormat DATE_FORMAT_MIN = DateFormat
-            .getDateInstance(DateFormat.SHORT);
-
     /** The reporter access object to be used. */
     private ReporterDAO reporter = null;
 
@@ -74,9 +38,6 @@ public class SimpleReporterImpl implements SimpleReporter
 
     /**
      * Main Constructor.
-     * 
-     * @param reporter
-     *            reporter to select the information
      */
     public SimpleReporterImpl()
     {
@@ -84,7 +45,7 @@ public class SimpleReporterImpl implements SimpleReporter
     }
 
     /**
-     * Sends the Deleteted bitstream report to an administrator. for the
+     * Sends the Deleted bitstream report to an administrator. for the
      * specified date range.
      * 
      * @param startDate
@@ -103,16 +64,16 @@ public class SimpleReporterImpl implements SimpleReporter
             OutputStreamWriter osw) throws IOException
     {
         // get all the bitstreams marked deleted for today
-        List history = reporter.getBitstreamResultTypeReport(startDate,
+        List<ChecksumHistory> history = reporter.getBitstreamResultTypeReport(startDate,
                 endDate, ChecksumCheckResults.BITSTREAM_MARKED_DELETED);
 
         osw.write("\n");
         osw.write(msg("deleted-bitstream-intro"));
-        osw.write(DATE_FORMAT_MIN.format(startDate));
+        osw.write(applyDateFormatShort(startDate));
         osw.write(" ");
         osw.write(msg("date-range-to"));
         osw.write(" ");
-        osw.write(DATE_FORMAT_MIN.format(endDate));
+        osw.write(applyDateFormatShort(endDate));
         osw.write("\n\n\n");
 
         if (history.size() == 0)
@@ -148,18 +109,18 @@ public class SimpleReporterImpl implements SimpleReporter
             OutputStreamWriter osw) throws IOException
     {
         // get all the bitstreams marked deleted for today
-        List history = reporter.getBitstreamResultTypeReport(startDate,
+        List<ChecksumHistory> history = reporter.getBitstreamResultTypeReport(startDate,
                 endDate, ChecksumCheckResults.CHECKSUM_NO_MATCH);
 
         osw.write("\n");
         osw.write(msg("checksum-did-not-match"));
         osw.write(" ");
         osw.write("\n");
-        osw.write(DATE_FORMAT_MIN.format(startDate));
+        osw.write(applyDateFormatShort(startDate));
         osw.write(" ");
         osw.write(msg("date-range-to"));
         osw.write(" ");
-        osw.write(DATE_FORMAT_MIN.format(endDate));
+        osw.write(applyDateFormatShort(endDate));
         osw.write("\n\n\n");
 
         if (history.size() == 0)
@@ -195,16 +156,16 @@ public class SimpleReporterImpl implements SimpleReporter
             OutputStreamWriter osw) throws IOException
     {
         // get all the bitstreams marked deleted for today
-        List history = reporter.getBitstreamResultTypeReport(startDate,
+        List<ChecksumHistory> history = reporter.getBitstreamResultTypeReport(startDate,
                 endDate, ChecksumCheckResults.BITSTREAM_NOT_FOUND);
 
         osw.write("\n");
         osw.write(msg("bitstream-not-found-report"));
-        osw.write(DATE_FORMAT_MIN.format(startDate));
+        osw.write(applyDateFormatShort(startDate));
         osw.write(" ");
         osw.write(msg("date-range-to"));
         osw.write(" ");
-        osw.write(DATE_FORMAT_MIN.format(endDate));
+        osw.write(applyDateFormatShort(endDate));
         osw.write("\n\n\n");
 
         if (history.size() == 0)
@@ -241,17 +202,17 @@ public class SimpleReporterImpl implements SimpleReporter
             OutputStreamWriter osw) throws IOException
     {
         // get all the bitstreams marked deleted for today
-        List history = reporter.getNotProcessedBitstreamsReport(startDate,
+        List<ChecksumHistory> history = reporter.getNotProcessedBitstreamsReport(startDate,
                 endDate);
 
         osw.write("\n");
         osw.write(msg("bitstream-will-no-longer-be-processed"));
         osw.write(" ");
-        osw.write(DATE_FORMAT_MIN.format(startDate));
+        osw.write(applyDateFormatShort(startDate));
         osw.write(" ");
         osw.write(msg("date-range-to"));
         osw.write(" ");
-        osw.write(DATE_FORMAT_MIN.format(endDate));
+        osw.write(applyDateFormatShort(endDate));
         osw.write("\n\n\n");
 
         if (history.size() == 0)
@@ -283,11 +244,11 @@ public class SimpleReporterImpl implements SimpleReporter
             throws IOException
     {
         // get all the bitstreams marked deleted for today
-        List bitstreams = reporter.getUnknownBitstreams();
+        List<DSpaceBitstreamInfo> bitstreams = reporter.getUnknownBitstreams();
 
         osw.write("\n");
         osw.write(msg("unchecked-bitstream-report"));
-        osw.write(DATE_FORMAT_MIN.format(new Date()));
+        osw.write(applyDateFormatShort(new Date()));
         osw.write("\n\n\n");
 
         if (bitstreams.size() == 0)
@@ -317,22 +278,22 @@ public class SimpleReporterImpl implements SimpleReporter
      * @throws IOException
      *             if io error occurs
      */
-    private void printHistoryRecords(List history, OutputStreamWriter osw)
+    private void printHistoryRecords(List<ChecksumHistory> history, OutputStreamWriter osw)
             throws IOException
     {
-        Iterator iter = history.iterator();
+        Iterator<ChecksumHistory> iter = history.iterator();
         while (iter.hasNext())
         {
-            ChecksumHistory historyInfo = (ChecksumHistory) iter.next();
+            ChecksumHistory historyInfo = iter.next();
             StringBuffer buf = new StringBuffer(1000);
             buf.append("------------------------------------------------ \n");
             buf.append(msg("bitstream-id")).append(" = ").append(
                     historyInfo.getBitstreamId()).append("\n");
             buf.append(msg("process-start-date")).append(" = ").append(
-                    DATE_FORMAT_MAX.format(historyInfo.getProcessStartDate()))
+                    applyDateFormatLong(historyInfo.getProcessStartDate()))
                     .append("\n");
             buf.append(msg("process-end-date")).append(" = ").append(
-                    DATE_FORMAT_MAX.format(historyInfo.getProcessEndDate()))
+                    applyDateFormatLong(historyInfo.getProcessEndDate()))
                     .append("\n");
             buf.append(msg("checksum-expected")).append(" = ").append(
                     historyInfo.getChecksumExpected()).append("\n");
@@ -356,14 +317,14 @@ public class SimpleReporterImpl implements SimpleReporter
      * @throws IOException
      *             if io error occurs
      */
-    private void printDSpaceInfoRecords(List bitstreams, OutputStreamWriter osw)
+    private void printDSpaceInfoRecords(List<DSpaceBitstreamInfo> bitstreams, OutputStreamWriter osw)
             throws IOException
     {
-        Iterator iter = bitstreams.iterator();
+        Iterator<DSpaceBitstreamInfo> iter = bitstreams.iterator();
 
         while (iter.hasNext())
         {
-            DSpaceBitstreamInfo info = (DSpaceBitstreamInfo) iter.next();
+            DSpaceBitstreamInfo info = iter.next();
             StringBuffer buf = new StringBuffer(1000);
             buf.append("------------------------------------------------ \n");
             buf.append(msg("format-id")).append(" =  ").append(
@@ -391,5 +352,15 @@ public class SimpleReporterImpl implements SimpleReporter
             buf.append("----------------------------------------------- \n\n");
             osw.write(buf.toString());
         }
+    }
+
+    private String applyDateFormatLong(Date thisDate)
+    {
+        return DateFormat.getDateInstance(DateFormat.MEDIUM).format(thisDate);
+    }
+
+    private String applyDateFormatShort(Date thisDate)
+    {
+        return DateFormat.getDateInstance(DateFormat.SHORT).format(thisDate); 
     }
 }

@@ -1,41 +1,9 @@
-/*
- * DSQuery.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.search;
 
@@ -123,9 +91,9 @@ public class DSQuery
     {
         String querystring = args.getQuery();
         QueryResults qr = new QueryResults();
-        List hitHandles = new ArrayList();
-        List hitIds     = new ArrayList();
-        List hitTypes   = new ArrayList();
+        List<String> hitHandles = new ArrayList<String>();
+        List<Integer> hitIds     = new ArrayList<Integer>();
+        List<Integer> hitTypes   = new ArrayList<Integer>();
 
         // set up the QueryResults object
         qr.setHitHandles(hitHandles);
@@ -219,15 +187,15 @@ public class DSQuery
                     switch (Integer.parseInt( resourceType != null ? resourceType : handleType))
                     {
                         case Constants.ITEM:
-                            hitTypes.add(new Integer(Constants.ITEM));
+                            hitTypes.add(Integer.valueOf(Constants.ITEM));
                             break;
 
                         case Constants.COLLECTION:
-                            hitTypes.add(new Integer(Constants.COLLECTION));
+                            hitTypes.add(Integer.valueOf(Constants.COLLECTION));
                             break;
 
                         case Constants.COMMUNITY:
-                            hitTypes.add(new Integer(Constants.COMMUNITY));
+                            hitTypes.add(Integer.valueOf(Constants.COMMUNITY));
                             break;
                     }
 
@@ -285,7 +253,7 @@ public class DSQuery
         // Lucene currently has a bug which breaks wildcard
         // searching when you have uppercase characters.
         // Here we substitute the boolean operators -- which
-        // have to be uppercase -- before tranforming the
+        // have to be uppercase -- before transforming the
         // query string to lowercase.
         return myquery.replaceAll(" AND ", " && ")
                       .replaceAll(" OR ", " || ")
@@ -302,7 +270,7 @@ public class DSQuery
 
     static String stripAsterisk(String myquery)
     {
-        // query strings (or words) begining with "*" cause a null pointer error
+        // query strings (or words) beginning with "*" cause a null pointer error
         return myquery.replaceAll("^\\*", "")
                       .replaceAll("\\s\\*", " ")
                       .replaceAll("\\(\\*", "(")
@@ -330,8 +298,7 @@ public class DSQuery
 
         String location = "l" + (coll.getID());
 
-        String newquery = new String("+(" + querystring + ") +location:\""
-                + location + "\"");
+        String newquery = "+(" + querystring + ") +location:\"" + location + "\"";
 
         args.setQuery(newquery);
 
@@ -359,8 +326,7 @@ public class DSQuery
 
         String location = "m" + (comm.getID());
 
-        String newquery = new String("+(" + querystring + ") +location:\""
-                + location + "\"");
+        String newquery = "+(" + querystring + ") +location:\"" + location + "\"";
 
         args.setQuery(newquery);
 
@@ -408,7 +374,7 @@ public class DSQuery
     /**
      * Close any IndexSearcher that is currently open.
      */
-    public static void close()
+    public static synchronized void close()
     {
         if (searcher != null)
         {
@@ -480,18 +446,26 @@ public class DSQuery
         {
             // So, open a new searcher
             lastModified = IndexReader.getCurrentVersion(indexDir);
-            searcher = new IndexSearcher(indexDir){
-            	/* 
-            	 * TODO: Has Lucene fixed this bug yet?
-            	 * Lucene doesn't release read locks in 
-            	 * windows properly on finalize. Our hack
-            	 * extend IndexSearcher to force close().
-            	 */
-                protected void finalize() throws Throwable {
-            		this.close();
-            		super.finalize();
-            	}
-            };
+            String osName = System.getProperty("os.name");
+            if (osName != null && osName.toLowerCase().contains("windows"))
+            {
+                searcher = new IndexSearcher(indexDir){
+                    /*
+                     * TODO: Has Lucene fixed this bug yet?
+                     * Lucene doesn't release read locks in
+                     * windows properly on finalize. Our hack
+                     * extend IndexSearcher to force close().
+                     */
+                    protected void finalize() throws Throwable {
+                        this.close();
+                        super.finalize();
+                    }
+                };
+            }
+            else
+            {
+                searcher = new IndexSearcher(indexDir);
+            }
         }
 
         return searcher;

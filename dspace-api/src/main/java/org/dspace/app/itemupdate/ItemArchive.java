@@ -1,39 +1,9 @@
-/*
- * ItemArchive.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3984 $
- *
- * Date: $Date: 2009-06-29 22:33:25 -0400 (Mon, 29 Jun 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.itemupdate;
 
@@ -59,14 +29,11 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.TransformerConfigurationException;
 
-import org.dspace.storage.rdbms.DatabaseManager;
+import org.apache.log4j.Logger;
 import org.dspace.content.ItemIterator;
-import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 
@@ -78,8 +45,9 @@ import org.w3c.dom.Document;
  *
  */
 public class ItemArchive {
+    private static final Logger log = Logger.getLogger(ItemArchive.class); 
 
-	static public final String DUBLIN_CORE_XML = "dublin_core.xml"; 
+	public static final String DUBLIN_CORE_XML = "dublin_core.xml";
 	
     private static DocumentBuilder builder = null;
     private static Transformer transformer = null;
@@ -117,8 +85,19 @@ public class ItemArchive {
 		ItemArchive itarch = new ItemArchive(); 
 		itarch.dir = dir;
 		itarch.dirname = dir.getName();
-		InputStream is = new FileInputStream(new File(dir, DUBLIN_CORE_XML));
-		itarch.dtomList = MetadataUtilities.loadDublinCore(getDocumentBuilder(), is);  
+        InputStream is = null;
+        try
+        {
+            is = new FileInputStream(new File(dir, DUBLIN_CORE_XML));
+            itarch.dtomList = MetadataUtilities.loadDublinCore(getDocumentBuilder(), is);
+        }
+        finally
+        {
+            if (is != null)
+            {
+                is.close();
+            }
+        }
 		ItemUpdate.pr("Loaded metadata with " + itarch.dtomList.size() + " fields");
 		
 		if (itemField == null)
@@ -325,30 +304,45 @@ public class ItemArchive {
 	{
 		// create directory for item
 		File dir = new File(undoDir, dirname);
-		dir.mkdir();
-		
-		OutputStream out = new FileOutputStream(new File(dir, "dublin_core.xml"));
-        Document doc = MetadataUtilities.writeDublinCore(getDocumentBuilder(), undoDtomList);
-        MetadataUtilities.writeDocument(doc, getTransformer(), out);
-		
-		// if undo has delete bitstream
-        if (undoAddContents.size() > 0)
+		if (!dir.exists() && !dir.mkdir())
         {
-        	PrintWriter pw = null;
-        	try
-        	{
-	        	File f = new File(dir, ItemUpdate.DELETE_CONTENTS_FILE);
-	        	pw = new PrintWriter(new BufferedWriter(new FileWriter(f)));
-	        	for (Integer i : undoAddContents)
-	        	{
-	        		pw.println(i);
-	        	}
-        	}
-        	finally
-        	{
-        		pw.close();
-        	}
-        }        
+            log.error("Unable to create undo directory");
+        }
+		
+		OutputStream out = null;
+
+        try
+        {
+            out = new FileOutputStream(new File(dir, "dublin_core.xml"));
+            Document doc = MetadataUtilities.writeDublinCore(getDocumentBuilder(), undoDtomList);
+            MetadataUtilities.writeDocument(doc, getTransformer(), out);
+
+            // if undo has delete bitstream
+            if (undoAddContents.size() > 0)
+            {
+                PrintWriter pw = null;
+                try
+                {
+                    File f = new File(dir, ItemUpdate.DELETE_CONTENTS_FILE);
+                    pw = new PrintWriter(new BufferedWriter(new FileWriter(f)));
+                    for (Integer i : undoAddContents)
+                    {
+                        pw.println(i);
+                    }
+                }
+                finally
+                {
+                    pw.close();
+                }
+            }
+        }
+        finally
+        {
+            if (out != null)
+            {
+                out.close();
+            }
+        }
 	}
 	
 } //end class

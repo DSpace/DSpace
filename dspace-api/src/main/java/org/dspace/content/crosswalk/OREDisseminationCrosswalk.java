@@ -1,61 +1,22 @@
-/*
- * OREDisseminationCrosswalk.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 2108 $
- *
- * Date: $Date: 2007-07-30 12:26:50 -0500 (Mon, 30 Jul 2007) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.content.crosswalk;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
+import org.apache.commons.lang.ArrayUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
@@ -63,23 +24,11 @@ import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataSchema;
-import org.dspace.content.packager.PackageDisseminator;
-import org.dspace.content.packager.PackageException;
-import org.dspace.content.packager.PackageParameters;
 import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.core.PluginManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Utils;
-//import org.dspace.core.Utils;
-import org.jdom.Attribute;
-import org.jdom.Document;
 import org.jdom.Element;
-import org.jdom.JDOMException;
 import org.jdom.Namespace;
-import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 
 /**
  * ORE dissemination crosswalk
@@ -92,9 +41,6 @@ import org.jdom.output.XMLOutputter;
 public class OREDisseminationCrosswalk
     implements DisseminationCrosswalk
 {
-    /** log4j category */
-    private static Logger log = Logger.getLogger(OREDisseminationCrosswalk.class);
-
     /* Schema for Atom only available in Relax NG format */
     public static final String ATOM_RNG = "http://tweety.lanl.gov/public/schemas/2008-06/atom-tron.sch";
     
@@ -117,7 +63,7 @@ public class OREDisseminationCrosswalk
     
     public Namespace[] getNamespaces()
     {
-        return namespaces;
+        return (Namespace[]) ArrayUtils.clone(namespaces);
     }
 
     /* There is (and currently can be) no XSD schema that validates Atom feeds, only RNG */ 
@@ -141,13 +87,19 @@ public class OREDisseminationCrosswalk
         String dsUrl = ConfigurationManager.getProperty("dspace.url");
         
         String remSource = ConfigurationManager.getProperty("ore.authoritative.source");
-    	if (remSource == null || remSource.equalsIgnoreCase("oai")) 
-    		oaiUrl = ConfigurationManager.getProperty("dspace.oai.url");
+    	if (remSource == null || remSource.equalsIgnoreCase("oai"))
+        {
+            oaiUrl = ConfigurationManager.getProperty("dspace.oai.url");
+        }
     	else if (remSource.equalsIgnoreCase("xmlui") || remSource.equalsIgnoreCase("manakin"))
-    		oaiUrl = dsUrl;
+        {
+            oaiUrl = dsUrl;
+        }
     	
     	if (oaiUrl == null)
-    		throw new CrosswalkInternalException("Base uri for the ore generator has not been set. Check the ore.authoritative.source setting.");
+        {
+            throw new CrosswalkInternalException("Base uri for the ore generator has not been set. Check the ore.authoritative.source setting.");
+        }
         
     	String uriA = oaiUrl + "/metadata/handle/" + item.getHandle() + "/ore.xml";
     	
@@ -203,9 +155,13 @@ public class OREDisseminationCrosswalk
         Element aggTitle = new Element("title",ATOM_NS);
         DCValue[] titles = item.getMetadata(MetadataSchema.DC_SCHEMA, "title", null, Item.ANY);
         if (titles != null && titles.length>0)
-        	aggTitle.addContent(titles[0].value);
+        {
+            aggTitle.addContent(titles[0].value);
+        }
         else
-        	aggTitle.addContent("");
+        {
+            aggTitle.addContent("");
+        }
         aggregation.addContent(aggTitle);
         
         Element aggAuthor;
@@ -263,14 +219,16 @@ public class OREDisseminationCrosswalk
         {
         	// Omit the special "ORE" bitstream
         	if (bundle.getName().equals("ORE"))
-        		continue;
+            {
+                continue;
+            }
         	
         	bitstreams = bundle.getBitstreams();
         	for (Bitstream bs : bitstreams) 
         	{
         		arLink = new Element("link",ATOM_NS);
         		arLink.setAttribute("rel", ORE_NS.getURI()+"aggregates");
-        		arLink.setAttribute("href",dsUrl + "/bitstream/handle/" + item.getHandle() + "/" + URLencode(bs.getName()) + "?sequence=" + bs.getSequenceID());
+        		arLink.setAttribute("href",dsUrl + "/bitstream/handle/" + item.getHandle() + "/" + encodeForURL(bs.getName()) + "?sequence=" + bs.getSequenceID());
         		arLink.setAttribute("title",bs.getName());
         		arLink.setAttribute("type",bs.getFormat().getMIMEType());
         		arLink.setAttribute("length",Long.toString(bs.getSize()));
@@ -279,7 +237,7 @@ public class OREDisseminationCrosswalk
         		
         		// metadata about the bitstream
                 rdfDescription = new Element("Description", RDF_NS);
-                rdfDescription.setAttribute("about", dsUrl + "/bitstream/handle/" + item.getHandle() + "/" + URLencode(bs.getName()) + "?sequence=" + bs.getSequenceID(), RDF_NS);
+                rdfDescription.setAttribute("about", dsUrl + "/bitstream/handle/" + item.getHandle() + "/" + encodeForURL(bs.getName()) + "?sequence=" + bs.getSequenceID(), RDF_NS);
                 
                 rdfType = new Element("type", RDF_NS);
                 rdfType.setAttribute("resource", DS_NS.getURI()+"DSpaceBitstream", RDF_NS);
@@ -353,7 +311,7 @@ public class OREDisseminationCrosswalk
      * Helper method to escape all chaacters that are not part of the canon set 
      * @param sourceString source unescaped string
      */
-    private String URLencode(String sourceString) {
+    private String encodeForURL(String sourceString) {
     	Character lowalpha[] = {'a' , 'b' , 'c' , 'd' , 'e' , 'f' , 'g' , 'h' , 'i' ,
 				'j' , 'k' , 'l' , 'm' , 'n' , 'o' , 'p' , 'q' , 'r' ,
 				's' , 't' , 'u' , 'v' , 'w' , 'x' , 'y' , 'z'};
@@ -373,24 +331,24 @@ public class OREDisseminationCrosswalk
 		URLcharsSet.addAll(Arrays.asList(mark));
 		//URLcharsSet.addAll(Arrays.asList(reserved));
 		
-		String processedString = new String();
+        StringBuilder processedString = new StringBuilder();
 		for (int i=0; i<sourceString.length(); i++) {
 			char ch = sourceString.charAt(i);
 			if (URLcharsSet.contains(ch)) {
-				processedString += ch;
+				processedString.append(ch);
 			}
 			else {
-				processedString += "%" + Integer.toHexString((int)ch);
+				processedString.append("%").append(Integer.toHexString((int)ch));
 			}
 		}
 		
-		return processedString;
+		return processedString.toString();
     }
     
    
-    public List disseminateList(DSpaceObject dso) throws CrosswalkException, IOException, SQLException, AuthorizeException
+    public List<Element> disseminateList(DSpaceObject dso) throws CrosswalkException, IOException, SQLException, AuthorizeException
 	{
-	    List result = new ArrayList(1);
+	    List<Element> result = new ArrayList<Element>(1);
 	    result.add(disseminateElement(dso));
 	    return result;
 	}
@@ -398,10 +356,7 @@ public class OREDisseminationCrosswalk
     /* Only interested in disseminating items at this time */
     public boolean canDisseminate(DSpaceObject dso)
     {
-    	if (dso.getType() == Constants.ITEM || dso.getType() == Constants.COLLECTION || dso.getType() == Constants.COMMUNITY)
-    		return true;
-    	else
-    		return false;
+    	return (dso.getType() == Constants.ITEM || dso.getType() == Constants.COLLECTION || dso.getType() == Constants.COMMUNITY);
     }
 
     public boolean preferList()

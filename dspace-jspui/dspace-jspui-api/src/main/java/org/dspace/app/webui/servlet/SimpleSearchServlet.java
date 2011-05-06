@@ -1,41 +1,9 @@
-/*
- * SimpleSearchServlet.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4231 $
- *
- * Date: $Date: 2009-08-24 23:17:33 -0400 (Mon, 24 Aug 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.webui.servlet;
 
@@ -44,9 +12,8 @@ import java.io.PrintWriter;
 import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -71,7 +38,6 @@ import org.dspace.search.DSQuery;
 import org.dspace.search.QueryArgs;
 import org.dspace.search.QueryResults;
 import org.dspace.sort.SortOption;
-import org.dspace.browse.*;
 
 /**
  * Servlet for handling a simple search.
@@ -108,7 +74,6 @@ public class SimpleSearchServlet extends DSpaceServlet
         String order = request.getParameter("order");
         int rpp = UIUtil.getIntParameter(request, "rpp");
         String advancedQuery = "";
-        HashMap queryHash = new HashMap();
 
         // can't start earlier than 0 in the results!
         if (start < 0)
@@ -129,7 +94,9 @@ public class SimpleSearchServlet extends DSpaceServlet
         SortOption sortOption = null;
 
         if (request.getParameter("etal") != null)
+        {
             qArgs.setEtAl(UIUtil.getIntParameter(request, "etal"));
+        }
 
         try
         {
@@ -178,7 +145,6 @@ public class SimpleSearchServlet extends DSpaceServlet
 
         // Get the location parameter, if any
         String location = request.getParameter("location");
-        String newURL;
 
         // If there is a location parameter, we should redirect to
         // do the search with the correct location.
@@ -256,7 +222,7 @@ public class SimpleSearchServlet extends DSpaceServlet
         // now instantiate the results and put them in their buckets
         for (int i = 0; i < qResults.getHitTypes().size(); i++)
         {
-            Integer myType = (Integer) qResults.getHitTypes().get(i);
+            Integer myType = qResults.getHitTypes().get(i);
 
             // add the handle to the appropriate lists
             switch (myType.intValue())
@@ -286,9 +252,9 @@ public class SimpleSearchServlet extends DSpaceServlet
 
         for (int i = 0; i < qResults.getHitTypes().size(); i++)
         {
-            Integer myId    = (Integer) qResults.getHitIds().get(i);
-            String myHandle = (String) qResults.getHitHandles().get(i);
-            Integer myType  = (Integer) qResults.getHitTypes().get(i);
+            Integer myId    = qResults.getHitIds().get(i);
+            String myHandle = qResults.getHitHandles().get(i);
+            Integer myType  = qResults.getHitTypes().get(i);
 
             // add the handle to the appropriate lists
             switch (myType.intValue())
@@ -376,10 +342,10 @@ public class SimpleSearchServlet extends DSpaceServlet
         request.setAttribute("communities", resultsCommunities);
         request.setAttribute("collections", resultsCollections);
 
-        request.setAttribute("pagetotal", new Integer(pageTotal));
-        request.setAttribute("pagecurrent", new Integer(pageCurrent));
-        request.setAttribute("pagelast", new Integer(pageLast));
-        request.setAttribute("pagefirst", new Integer(pageFirst));
+        request.setAttribute("pagetotal", Integer.valueOf(pageTotal));
+        request.setAttribute("pagecurrent", Integer.valueOf(pageCurrent));
+        request.setAttribute("pagelast", Integer.valueOf(pageLast));
+        request.setAttribute("pagefirst", Integer.valueOf(pageFirst));
 
         request.setAttribute("queryresults", qResults);
 
@@ -392,7 +358,7 @@ public class SimpleSearchServlet extends DSpaceServlet
         if (AuthorizeManager.isAdmin(context))
         {
             // Set a variable to create admin buttons
-            request.setAttribute("admin_button", new Boolean(true));
+            request.setAttribute("admin_button", Boolean.TRUE);
         }
         
         if ((fromAdvanced != null) && (qResults.getHitCount() == 0))
@@ -402,16 +368,14 @@ public class SimpleSearchServlet extends DSpaceServlet
             request.setAttribute("communities", communities);
             request.setAttribute("no_results", "yes");
 
-            queryHash = qArgs.buildQueryHash(request);
+            Map<String, String> queryHash = qArgs.buildQueryMap(request);
 
-            Iterator i = queryHash.keySet().iterator();
-
-            while (i.hasNext())
+            if (queryHash != null)
             {
-                String key = (String) i.next();
-                String value = (String) queryHash.get(key);
-
-                request.setAttribute(key, value);
+                for (Map.Entry<String, String> entry : queryHash.entrySet())
+                {
+                    request.setAttribute(entry.getKey(), entry.getValue());
+                }
             }
 
             JSPManager.showJSP(request, response, "/search/advanced.jsp");
@@ -442,7 +406,7 @@ public class SimpleSearchServlet extends DSpaceServlet
         log.info(LogManager.getHeader(context, "metadataexport", "exporting_search"));
 
         // Export a search view
-        ArrayList iids = new ArrayList();
+        List<Integer> iids = new ArrayList<Integer>();
         for (Item item : items)
         {
             iids.add(item.getID());

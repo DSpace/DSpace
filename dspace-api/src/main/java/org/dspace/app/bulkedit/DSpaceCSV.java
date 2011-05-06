@@ -1,46 +1,16 @@
-/*
- * DSpaceCSV.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision$
- *
- * Date: $Date$
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.bulkedit;
 
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 
 import java.util.*;
 import java.util.regex.Pattern;
@@ -50,15 +20,24 @@ import java.io.*;
 /**
  * Utility class to read and write CSV files
  *
+ * **************
+ * Important Note
+ * **************
+ *
+ * This class has been made serializable, as it is stored in a Session.
+ * Is it wise to:
+ *    a) be putting this into a user's session?
+ *    b) holding an entire CSV upload in memory?
+ *
  * @author Stuart Lewis
  */
-public class DSpaceCSV
+public class DSpaceCSV implements Serializable
 {
     /** The headings of the CSV file */
-    private ArrayList<String> headings;
+    private List<String> headings;
 
     /** An array list of CSV lines */
-    private ArrayList<DSpaceCSVLine> lines;
+    private List<DSpaceCSVLine> lines;
 
     /** A counter of how many CSV lines this object holds */
     private int counter;
@@ -67,7 +46,7 @@ public class DSpaceCSV
     protected static String valueSeparator;
 
     /** The value separator in an escaped form for using in regexs */
-    protected static String escpaedValueSeparator;
+    protected static String escapedValueSeparator;
 
     /** The field separator (defaults to comma) */
     protected static String fieldSeparator;
@@ -79,7 +58,7 @@ public class DSpaceCSV
     private boolean exportAll;
 
     /** A list of metadata elements to ignore */
-    private Hashtable ignore;
+    private Map<String, String> ignore;
 
 
     /**
@@ -89,10 +68,10 @@ public class DSpaceCSV
      */
     public DSpaceCSV(boolean exportAll)
     {
-        // Initalise the class
+        // Initialise the class
         init();
 
-        // Stoee the exportAll setting
+        // Store the exportAll setting
         this.exportAll = exportAll;
     }
 
@@ -100,57 +79,132 @@ public class DSpaceCSV
      * Create a new instance, reading the lines in from file
      *
      * @param f The file to read from
+     * @param c The DSpace Context
      *
      * @throws Exception thrown if there is an error reading or processing the file
      */
-    public DSpaceCSV(File f) throws Exception
+    public DSpaceCSV(File f, Context c) throws Exception
     {
-        // Initalise the class
+        // Initialise the class
         init();
 
         // Open the CSV file
-        BufferedReader input = new BufferedReader(new InputStreamReader(new FileInputStream(f),"UTF8"));
-
-        // Read the heading line
-        String head = input.readLine();
-        String[] headingElements = head.split(escapedFieldSeparator);
-        for (String element : headingElements)
+        BufferedReader input = null;
+        try
         {
-            // Remove surrounding quotes if there are any
-            if ((element.startsWith("\"")) && (element.endsWith("\"")))
+            input = new BufferedReader(new InputStreamReader(new FileInputStream(f),"UTF-8"));
+
+            // Read the heading line
+            String head = input.readLine();
+            String[] headingElements = head.split(escapedFieldSeparator);
+            for (String element : headingElements)
             {
-                element = element.substring(1, element.length() - 1);
+                // Remove surrounding quotes if there are any
+                if ((element.startsWith("\"")) && (element.endsWith("\"")))
+                {
+                    element = element.substring(1, element.length() - 1);
+                }
+
+                // Store the heading
+                if ("collection".equals(element))
+                {
+                    // Store the heading
+                    headings.add(element);
+                }
+                else if (!"id".equals(element))
+                {
+                    // Verify that the heading is valid in the metadata registry
+                    String[] clean = element.split("\\[");
+                    String[] parts = clean[0].split("\\.");
+                    String metadataSchema = parts[0];
+                    String metadataElement = parts[1];
+                    String metadataQualifier = null;
+                    if (parts.length > 2) {
+                        metadataQualifier = parts[2];
+                    }
+
+                    // Check that the scheme exists
+                    MetadataSchema foundSchema = MetadataSchema.find(c, metadataSchema);
+                    if (foundSchema == null) {
+                        throw new MetadataImportInvalidHeadingException(clean[0],
+                                                                        MetadataImportInvalidHeadingException.SCHEMA);
+                    }
+
+                    // Check that the metadata element exists in the schema
+                    int schemaID = foundSchema.getSchemaID();
+                    MetadataField foundField = MetadataField.findByElement(c, schemaID, metadataElement, metadataQualifier);
+                    if (foundField == null) {
+                        throw new MetadataImportInvalidHeadingException(clean[0],
+                                                                        MetadataImportInvalidHeadingException.ELEMENT);
+                    }
+
+                    // Store the heading
+                    headings.add(element);
+                }
             }
 
-            if (!"id".equals(element))
+            // Read each subsequent line
+            StringBuilder lineBuilder = new StringBuilder();
+            String lineRead;
+
+            while ((lineRead = input.readLine()) != null)
             {
-                // Store the heading
-                headings.add(element);
+                if (lineBuilder.length() > 0) {
+                    // Already have a previously read value - add this line
+                    lineBuilder.append("\n").append(lineRead);
+
+                    // Count the number of quotes in the buffer
+                    int quoteCount = 0;
+                    for (int pos = 0; pos < lineBuilder.length(); pos++) {
+                        if (lineBuilder.charAt(pos) == '"') {
+                            quoteCount++;
+                        }
+                    }
+
+                    if (quoteCount % 2 == 0) {
+                        // Number of quotes is a multiple of 2, add the item
+                        addItem(lineBuilder.toString());
+                        lineBuilder = new StringBuilder();
+                    }
+                } else if (lineRead.indexOf('"') > -1) {
+                    // Get the number of quotes in the line
+                    int quoteCount = 0;
+                    for (int pos = 0; pos < lineRead.length(); pos++) {
+                        if (lineRead.charAt(pos) == '"') {
+                            quoteCount++;
+                        }
+                    }
+
+                    if (quoteCount % 2 == 0) {
+                        // Number of quotes is a multiple of 2, add the item
+                        addItem(lineRead);
+                    } else {
+                        // Uneven quotes - add to the buffer and leave for later
+                        lineBuilder.append(lineRead);
+                    }
+                } else {
+                    // No previously read line, and no quotes in the line - add item
+                    addItem(lineRead);
+                }
             }
         }
-
-        // Read each subsequent line
-        String line;
-        while ((line = input.readLine()) != null){
-            // Are there an odd number of quotes?
-            while (((" " + line + " ").split("\"").length)%2 == 0)
+        finally
+        {
+            if (input != null)
             {
-                line = line + "\n" + input.readLine();
+                input.close();
             }
-
-            // Parse the item metadata
-            addItem(line);
         }
     }
 
     /**
-     * Initalise this class with values from dspace.cfg
+     * Initialise this class with values from dspace.cfg
      */
     private void init()
     {
         // Set the value separator
         setValueSeparator();
-        
+
         // Set the field separator
         setFieldSeparator();
 
@@ -160,17 +214,17 @@ public class DSpaceCSV
         // Create the blank list of items
         lines = new ArrayList<DSpaceCSVLine>();
 
-        // Initalise the counter
+        // Initialise the counter
         counter = 0;
 
         // Set the metadata fields to ignore
-        ignore = new Hashtable();
+        ignore = new HashMap<String, String>();
         String toIgnore = ConfigurationManager.getProperty("bulkedit.ignore-on-export");
         if ((toIgnore == null) || ("".equals(toIgnore.trim())))
         {
             // Set a default value
-            toIgnore = "dc.date.accession, dc.date.available, " +
-                       "dc.description.provenance";
+            toIgnore = "dc.date.accessioned, dc.date.available, " +
+                       "dc.date.updated, dc.description.provenance";
         }
         String[] toIgnoreArray = toIgnore.split(",");
         for (String toIgnoreString : toIgnoreArray)
@@ -205,7 +259,7 @@ public class DSpaceCSV
         // Now store the escaped version
         Pattern spchars = Pattern.compile("([\\\\*+\\[\\](){}\\$.?\\^|])");
         Matcher match = spchars.matcher(valueSeparator);
-        escpaedValueSeparator = match.replaceAll("\\\\$1");
+        escapedValueSeparator = match.replaceAll("\\\\$1");
     }
 
     /**
@@ -260,7 +314,7 @@ public class DSpaceCSV
      *
      * @throws Exception if something goes wrong with adding the Item
      */
-    public void addItem(Item i) throws Exception
+    public final void addItem(Item i) throws Exception
     {
         // Create the CSV line
         DSpaceCSVLine line = new DSpaceCSVLine(i.getID());
@@ -276,7 +330,7 @@ public class DSpaceCSV
             // Only add if it is not the owning collection
             if (!c.getHandle().equals(owningCollectionHandle))
             {
-                line.add("collection", c.getHandle());   
+                line.add("collection", c.getHandle());
             }
         }
 
@@ -287,7 +341,7 @@ public class DSpaceCSV
             // Get the key (schema.element)
             String key = value.schema + "." + value.element;
 
-            // Add the qualifer if there is one (schema.element.qualifier)
+            // Add the qualifier if there is one (schema.element.qualifier)
             if (value.qualifier != null)
             {
                 key = key + "." + value.qualifier;
@@ -320,7 +374,7 @@ public class DSpaceCSV
      * @param line The line of elements
      * @throws Exception Thrown if an error occurs when adding the item
      */
-    public void addItem(String line) throws Exception
+    public final void addItem(String line) throws Exception
     {
         // Check to see if the last character is a field separator, which hides the last empy column
         boolean last = false;
@@ -330,7 +384,7 @@ public class DSpaceCSV
             last = true;
             line += " ";
         }
-        
+
         // Split up on field separator
         String[] parts = line.split(escapedFieldSeparator);
         ArrayList<String> bits = new ArrayList<String>();
@@ -345,7 +399,7 @@ public class DSpaceCSV
             for (String part : bits)
             {
                 int bitcounter = part.length() - part.replaceAll("\"", "").length();
-                if ((part.startsWith("\"")) && ((!part.endsWith("\"")) || ((bitcounter %2) == 1)))
+                if ((part.startsWith("\"")) && ((!part.endsWith("\"")) || ((bitcounter & 1) == 1)))
                 {
                     found = true;
                     String add = bits.get(i) + fieldSeparator + bits.get(i + 1);
@@ -386,7 +440,7 @@ public class DSpaceCSV
         // Add elements to a DSpaceCSVLine
         String id = parts[0].replaceAll("\"", "");
         DSpaceCSVLine csvLine;
-                
+
         // Is this an existing item, or a new item (where id = '+')
         if ("+".equals(id))
         {
@@ -401,7 +455,7 @@ public class DSpaceCSV
             catch (NumberFormatException nfe)
             {
                 System.err.println("Invalid item identifier: " + id);
-                System.err.println("Please check your CSV file for informaton. " +
+                System.err.println("Please check your CSV file for information. " +
                                    "Item id must be numeric, or a '+' to add a new item");
                 throw(nfe);
             }
@@ -421,7 +475,7 @@ public class DSpaceCSV
 
                 // Make sure we register that this column was there
                 csvLine.add(headings.get(i - 1), null);
-                String[] elements = part.split(escpaedValueSeparator);
+                String[] elements = part.split(escapedValueSeparator);
                 for (String element : elements)
                 {
                     if ((element != null) && (!"".equals(element)))
@@ -441,7 +495,7 @@ public class DSpaceCSV
      *
      * @return The lines
      */
-    public ArrayList<DSpaceCSVLine> getCSVLines()
+    public final List<DSpaceCSVLine> getCSVLines()
     {
         // Return the lines
         return lines;
@@ -452,7 +506,7 @@ public class DSpaceCSV
      *
      * @return the array of CSV formatted Strings
      */
-    public String[] getCSVLinesAsStringArray()
+    public final String[] getCSVLinesAsStringArray()
     {
         // Create the headings line
         String[] csvLines = new String[counter + 1];
@@ -480,12 +534,12 @@ public class DSpaceCSV
      *
      * @throws IOException Thrown if an error occurs when writing the file
      */
-    public void save(String filename) throws IOException
+    public final void save(String filename) throws IOException
     {
         // Save the file
         BufferedWriter out = new BufferedWriter(
                              new OutputStreamWriter(
-                             new FileOutputStream(filename), "UTF8"));
+                             new FileOutputStream(filename), "UTF-8"));
         for (String csvLine : getCSVLinesAsStringArray()) {
             out.write(csvLine + "\n");
         }
@@ -502,7 +556,7 @@ public class DSpaceCSV
      * @param md The DCValue to examine
      * @return Whether or not it is OK to export this element
      */
-    private boolean okToExport(DCValue md)
+    private final boolean okToExport(DCValue md)
     {
         // First check the metadata format, and K all non DC elements
         if (!"dc".equals(md.schema))
@@ -525,11 +579,21 @@ public class DSpaceCSV
     }
 
     /**
+     * Get the headings used in this CSV file
+     *
+     * @return The headings
+     */
+    public List<String> getHeadings()
+    {
+        return headings;
+    }
+
+    /**
      * Return the csv file as one long formatted string
      *
      * @return The formatted String as a csv
      */
-    public String toString()
+    public final String toString()
     {
         // Return the csv as one long string
         StringBuffer csvLines = new StringBuffer();
@@ -539,47 +603,5 @@ public class DSpaceCSV
             csvLines.append(line).append("\n");
         }
         return csvLines.toString();
-    }
-
-    /**
-     * Test main method to check the marshalling and unmarshalling of strings in and out of CSV format
-     *
-     * @param args Not used
-     * @throws Exception Thrown if something goes wrong
-     */
-    public static void main(String[] args) throws Exception
-    {
-        // Test the CSV parsing
-        String[] csv = {"id,\"dc.title\",dc.contributor.author,dc.description.abstract",
-                        "1,Easy line,\"Lewis, Stuart\",A nice short abstract",
-                        "2,Two authors,\"Lewis, Stuart||Bloggs, Joe\",Two people wrote this item",
-                        "3,Three authors,\"Lewis, Stuart||Bloggs, Joe||Loaf, Meat\",Three people wrote this item",
-                        "4,\"Two line\ntitle\",\"Lewis, Stuart\",abstract",
-                        "5,\"\"\"Embedded quotes\"\" here\",\"Lewis, Stuart\",\"Abstract with\ntwo\nnew lines\"",
-                        "6,\"\"\"Unbalanced embedded\"\" quotes\"\" here\",\"Lewis, Stuart\",\"Abstract with\ntwo\nnew lines\"",};
-
-        // Write the string to a file
-        String filename = "test.csv";
-        BufferedWriter out = new BufferedWriter(
-                             new OutputStreamWriter(
-                             new FileOutputStream(filename), "UTF8"));
-        for (String csvLine : csv) {
-            out.write(csvLine + "\n");
-        }
-        out.flush();
-        out.close();
-        System.gc();
-
-        // test the CSV parsing
-        DSpaceCSV dcsv = new DSpaceCSV(new File(filename));
-        String[] lines = dcsv.getCSVLinesAsStringArray();
-        for (String line : lines)
-        {
-            System.out.println(line);          
-        }
-
-        // Delete the test file
-        File toDelete = new File(filename);
-        toDelete.delete();
     }
 }

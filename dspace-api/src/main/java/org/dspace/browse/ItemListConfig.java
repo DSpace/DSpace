@@ -1,35 +1,9 @@
-/*
- * ItemListConfig.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.browse;
 
@@ -49,10 +23,10 @@ import org.dspace.core.ConfigurationManager;
 public class ItemListConfig
 {
 	/** a map of column number to metadata value */
-	private Map metadata = new HashMap();
+	private Map<Integer, String[]> metadata = new HashMap<Integer, String[]>();
 	
 	/** a map of column number to data type */
-	private Map types = new HashMap();
+	private Map<Integer, Integer> types = new HashMap<Integer, Integer>();
 	
 	/** constant for a DATE column */
 	private static final int DATE = 1;
@@ -83,18 +57,18 @@ public class ItemListConfig
 			int i = 1;
 			while (st.hasMoreTokens())
 			{
-				Integer key = new Integer(i);
+				Integer key = Integer.valueOf(i);
 				String token = st.nextToken();
 				
 				// find out if the field is a date
 				if (token.indexOf("(date)") > 0)
 				{
 					token = token.replaceAll("\\(date\\)", "");
-					types.put(key, new Integer(ItemListConfig.DATE));
+					types.put(key, Integer.valueOf(ItemListConfig.DATE));
 				}
 				else
 				{
-					types.put(key, new Integer(ItemListConfig.TEXT));
+					types.put(key, Integer.valueOf(ItemListConfig.TEXT));
 				}
 				
 				String[] mdBits = interpretField(token.trim(), null);
@@ -128,7 +102,7 @@ public class ItemListConfig
 	 */
 	public String[] getMetadata(int col)
 	{
-		return (String[]) metadata.get(new Integer(col));
+		return metadata.get(Integer.valueOf(col));
 	}
 	
 	/**
@@ -141,7 +115,7 @@ public class ItemListConfig
      * @param init	the default value of the array elements
      * @return	a three element array with schema, element and qualifier respectively
      */
-    public String[] interpretField(String mfield, String init)
+    public final String[] interpretField(String mfield, String init)
     	throws IOException
     {
     	StringTokenizer sta = new StringTokenizer(mfield, ".");

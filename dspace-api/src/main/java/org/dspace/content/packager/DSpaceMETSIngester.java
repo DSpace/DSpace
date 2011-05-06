@@ -1,57 +1,28 @@
-/*
- * DSpaceMETSIngester
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4575 $
- *
- * Date: $Date: 2009-11-30 16:37:44 -0500 (Mon, 30 Nov 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.content.packager;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
-import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.MetadataValidationException;
 import org.dspace.core.Context;
-import org.dspace.license.CreativeCommons;
+import org.dspace.core.Constants;
+import org.dspace.core.PluginManager;
+import org.dspace.app.mediafilter.MediaFilter;
+
 import org.jdom.Element;
 
 /**
@@ -66,38 +37,34 @@ import org.jdom.Element;
  * for more information about the DSpace METS SIP profile.
  *
  * @author Larry Stone
- * @version $Revision: 4575 $
+ * @author Tim Donohue
+ * @version $Revision: 5844 $
  * @see org.dspace.content.packager.METSManifest
+ * @see AbstractMETSIngester
+ * @see AbstractPackageIngester
+ * @see PackageIngester
  */
 public class DSpaceMETSIngester
        extends AbstractMETSIngester
 {
-    /** log4j category */
-    private static Logger log = Logger.getLogger(DSpaceMETSIngester.class);
-
     // first part of required mets@PROFILE value
-    private final static String PROFILE_START = "DSpace METS SIP Profile";
+    private static final String PROFILE_START = "DSpace METS SIP Profile";
 
     // just check the profile name.
+    @Override
     void checkManifest(METSManifest manifest)
         throws MetadataValidationException
     {
         String profile = manifest.getProfile();
         if (profile == null)
+        {
             throw new MetadataValidationException("Cannot accept METS with no PROFILE attribute!");
+        }
         else if (!profile.startsWith(PROFILE_START))
-            throw new MetadataValidationException("METS has unacceptable PROFILE value, profile="+profile);
+        {
+            throw new MetadataValidationException("METS has unacceptable PROFILE value, profile=" + profile);
+        }
     }
-
-    // nothing needed.
-    public void checkPackageFiles(Set packageFiles, Set missingFiles,
-                                  METSManifest manifest)
-        throws PackageValidationException, CrosswalkException
-    {
-        // This is where a subclass would arrange to use or ignore
-        // any "extra" files added to its type of package.
-    }
-
 
     /**
      * Choose DMD section(s) to crosswalk.
@@ -109,11 +76,12 @@ public class DSpaceMETSIngester
      *    same GROUPID<br>
      * 4. Crosswalk remaining DMDs not eliminated already.
      */
-    public void chooseItemDmd(Context context, Item item,
+    @Override
+    public void crosswalkObjectDmd(Context context, DSpaceObject dso,
                               METSManifest manifest,
-                              AbstractMETSIngester.MdrefManager callback,
+                              MdrefManager callback,
                               Element dmds[], PackageParameters params)
-        throws CrosswalkException,
+        throws CrosswalkException, PackageValidationException,
                AuthorizeException, SQLException, IOException
     {
         int found = -1;
@@ -121,38 +89,52 @@ public class DSpaceMETSIngester
         // Check to see what dmdSec the user specified in the 'dmd' parameter
         String userDmd = null;
         if (params != null)
+        {
             userDmd = params.getProperty("dmd");
+        }
         if (userDmd != null && userDmd.length() > 0)
         {
             for (int i = 0; i < dmds.length; ++i)
+            {
                 if (userDmd.equalsIgnoreCase(manifest.getMdType(dmds[i])))
+                {
                     found = i;
+                }
+            }
         }
 
         // MODS is preferred, if nothing specified by user
         if (found == -1)
         {
             for (int i = 0; i < dmds.length; ++i)
+            {
                 //NOTE: METS standard actually says this should be MODS (all uppercase). But,
                 // just in case, we're going to be a bit more forgiving.
                 if ("MODS".equalsIgnoreCase(manifest.getMdType(dmds[i])))
+                {
                     found = i;
+                }
+            }
         }
 
         // DC acceptable if no MODS
         if (found == -1)
         {
             for (int i = 0; i < dmds.length; ++i)
+            {
                 //NOTE: METS standard actually says this should be DC (all uppercase). But,
                 // just in case, we're going to be a bit more forgiving.
                 if ("DC".equalsIgnoreCase(manifest.getMdType(dmds[i])))
+                {
                     found = i;
+                }
+            }
         }
 
         String groupID = null;
         if (found >= 0)
         {
-            manifest.crosswalkItem(context, item, dmds[found], callback);
+            manifest.crosswalkItemDmd(context, params, dso, dmds[found], callback);
             groupID = dmds[found].getAttributeValue("GROUPID");
 
             if (groupID != null)
@@ -161,17 +143,20 @@ public class DSpaceMETSIngester
                 {
                     String g = dmds[i].getAttributeValue("GROUPID");
                     if (g != null && !g.equals(groupID))
-                        manifest.crosswalkItem(context, item, dmds[i], callback);
+                    {
+                        manifest.crosswalkItemDmd(context, params, dso, dmds[i], callback);
+                    }
                 }
             }
         }
-
-        // otherwise take the first.  Don't xwalk more than one because
-        // each xwalk _adds_ metadata, and could add duplicate fields.
         else
         {
+            // otherwise take the first.  Don't xwalk more than one because
+            // each xwalk _adds_ metadata, and could add duplicate fields.
             if (dmds.length > 0)
-                manifest.crosswalkItem(context, item, dmds[0], callback);
+            {
+                manifest.crosswalkItemDmd(context, params, dso, dmds[0], callback);
+            }
         }
     }
 
@@ -182,52 +167,117 @@ public class DSpaceMETSIngester
      * default deposit license.
      * For Creative Commons, look for a rightsMd containing a CC license.
      */
-    public void addLicense(Context context, Collection collection,
-                           Item item, METSManifest manifest,
-                           AbstractMETSIngester.MdrefManager callback,
-                           String license)
-        throws PackageValidationException, CrosswalkException,
+    @Override
+    public void addLicense(Context context, Item item, String license,
+                                    Collection collection, PackageParameters params)
+        throws PackageValidationException,
                AuthorizeException, SQLException, IOException
     {
-        PackageUtils.addDepositLicense(context, license, item, collection);
-
-        // If package includes a Creative Commons license, add that:
-        Element rmds[] = manifest.getItemRightsMD();
-        for (int i = 0; i < rmds.length; ++i)
+        if (PackageUtils.findDepositLicense(context, item) == null)
         {
-            String type = manifest.getMdType(rmds[i]);
-            if (type != null && type.equals("Creative Commons"))
-            {
-                log.debug("Got Creative Commons license in rightsMD");
-                CreativeCommons.setLicense(context, item,
-                            manifest.getMdContentAsStream(rmds[i], callback),
-                            manifest.getMdContentMimeType(rmds[i]));
+            PackageUtils.addDepositLicense(context, license, item, collection);
+        }
+    }
 
-                // if there was a bitstream, get rid of it, since
-                // it's just an artifact now that the CC license is installed.
-                Element mdRef = rmds[i].getChild("mdRef", METSManifest.metsNS);
-                if (mdRef != null)
+    @Override
+    public void finishObject(Context context, DSpaceObject dso,
+                             PackageParameters params)
+        throws PackageValidationException, CrosswalkException,
+         AuthorizeException, SQLException, IOException
+    {
+        // nothing to do.
+    }
+
+    @Override
+    public int getObjectType(METSManifest manifest)
+        throws PackageValidationException
+    {
+        return Constants.ITEM;
+    }
+
+    // return name of derived file as if MediaFilter created it, or null
+    // only needed when importing a SIP without canonical DSpace derived file naming.
+    private String makeDerivedFilename(String bundleName, String origName)
+    {
+        // get the MediaFilter that would create this bundle:
+        String mfNames[] = PluginManager.getAllPluginNames(MediaFilter.class);
+
+        for (int i = 0; i < mfNames.length; ++i)
+        {
+            MediaFilter mf = (MediaFilter)PluginManager.getNamedPlugin(MediaFilter.class, mfNames[i]);
+            if (bundleName.equals(mf.getBundleName()))
+            {
+                return mf.getFilteredName(origName);
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Take a second pass over files to correct names of derived files
+     * (e.g. thumbnails, extracted text) to what DSpace expects:
+     */
+    @Override
+    public void finishBitstream(Context context,
+                                                Bitstream bs,
+                                                Element mfile,
+                                                METSManifest manifest,
+                                                PackageParameters params)
+        throws MetadataValidationException, SQLException, AuthorizeException, IOException
+    {
+        String bundleName = METSManifest.getBundleName(mfile);
+        if (!bundleName.equals(Constants.CONTENT_BUNDLE_NAME))
+        {
+            String opath = manifest.getOriginalFilePath(mfile);
+            if (opath != null)
+            {
+                // String ofileId = origFile.getAttributeValue("ID");
+                // Bitstream obs = (Bitstream)fileIdToBitstream.get(ofileId);
+
+                String newName = makeDerivedFilename(bundleName, opath);
+
+                if (newName != null)
                 {
-                    Bitstream bs = callback.getBitstreamForMdRef(mdRef);
-                    if (bs != null)
-                    {
-                        Bundle parent[] = bs.getBundles();
-                        if (parent.length > 0)
-                        {
-                            parent[0].removeBitstream(bs);
-                            parent[0].update();
-                        }
-                    }
+                    //String mfileId = mfile.getAttributeValue("ID");
+                    //Bitstream bs = (Bitstream)fileIdToBitstream.get(mfileId);
+                    bs.setName(newName);
+                    bs.update();
                 }
             }
         }
     }
 
-    // last change to fix up Item.
-    public void finishItem(Context context, Item item)
-        throws PackageValidationException, CrosswalkException,
-         AuthorizeException, SQLException, IOException
+    @Override
+    public String getConfigurationName()
     {
-        // nothing to do.
+        return "dspaceSIP";
+    }
+
+
+    public boolean probe(Context context, InputStream in, PackageParameters params)
+    {
+        throw new UnsupportedOperationException("PDF package ingester does not implement probe()");
+    }
+
+    /**
+     * Returns a user help string which should describe the
+     * additional valid command-line options that this packager
+     * implementation will accept when using the <code>-o</code> or
+     * <code>--option</code> flags with the Packager script.
+     *
+     * @return a string describing additional command-line options available
+     * with this packager
+     */
+    @Override
+    public String getParameterHelp()
+    {
+        String parentHelp = super.getParameterHelp();
+
+        //Return superclass help info, plus the extra parameter/option that this class supports
+        return parentHelp +
+                "\n\n" +
+                "* dmd=[dmdSecType]      " +
+                   "Type of the METS <dmdSec> which should be used for primary item metadata (defaults to MODS, then DC)";
     }
 }

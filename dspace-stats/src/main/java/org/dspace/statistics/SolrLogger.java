@@ -1,12 +1,9 @@
 /**
- * $Id: SolrLogger.java 4959 2010-05-15 05:22:06Z mdiggory $
- * $URL: http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-stats/src/main/java/org/dspace/statistics/SolrLogger.java $
- * *************************************************************************
- * Copyright (c) 2002-2009, DuraSpace.  All rights reserved
- * Licensed under the DuraSpace Foundation License.
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * A copy of the DuraSpace License has been included in this
- * distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
+ * http://www.dspace.org/license/
  */
 package org.dspace.statistics;
 
@@ -39,8 +36,9 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
- * Static SolrLogger used to hold HttpSolrClient connection pool to issue
- * usage logging events to Solr from DSpace libraries.
+ * Static holder for a HttpSolrClient connection pool to issue
+ * usage logging events to Solr from DSpace libraries, and some static query
+ * composers.
  * 
  * @author ben at atmire.com
  * @author kevinvandevelde at atmire.com
@@ -61,7 +59,7 @@ public class SolrLogger
 
     private static final boolean useProxies;
 
-    private static Map metadataStorageInfo;
+    private static Map<String, String> metadataStorageInfo;
 
     static
     {
@@ -110,13 +108,17 @@ public class SolrLogger
         locationService = service;
 
         if ("true".equals(ConfigurationManager.getProperty("useProxies")))
+        {
             useProxies = true;
+        }
         else
+        {
             useProxies = false;
+        }
 
         log.info("useProxies=" + useProxies);
 
-        metadataStorageInfo = new HashMap();
+        metadataStorageInfo = new HashMap<String, String>();
         int count = 1;
         String metadataVal;
         while ((metadataVal = ConfigurationManager.getProperty("solr.metadata.item." + count)) != null)
@@ -130,11 +132,20 @@ public class SolrLogger
         }
     }
 
+    /**
+     * Store a usage event into Solr.
+     * 
+     * @param dspaceObject the object used.
+     * @param request the current request context.
+     * @param currentUser the current session's user.
+     */
     public static void post(DSpaceObject dspaceObject, HttpServletRequest request,
             EPerson currentUser)
     {
         if (solr == null || locationService == null)
+        {
             return;
+        }
 
         boolean isSpiderBot = SpiderDetector.isSpider(request);
 
@@ -174,10 +185,11 @@ public class SolrLogger
             doc1.addField("id", dspaceObject.getID());
             doc1.addField("type", dspaceObject.getType());
             // Save the current time
-            doc1.addField("time", DateFormatUtils.format(new Date(),
-                    DATE_FORMAT_8601));
+            doc1.addField("time", DateFormatUtils.format(new Date(), DATE_FORMAT_8601));
             if (currentUser != null)
+            {
                 doc1.addField("epersonid", currentUser.getID());
+            }
 
             try
             {
@@ -214,7 +226,9 @@ public class SolrLogger
                 doc1.addField("isBot",isSpiderBot);
 
                 if(request.getHeader("User-Agent") != null)
+                {
                     doc1.addField("userAgent", request.getHeader("User-Agent"));
+                }
             }
             
             if (dspaceObject instanceof Item)
@@ -223,7 +237,7 @@ public class SolrLogger
                 // Store the metadata
                 for (Object storedField : metadataStorageInfo.keySet())
                 {
-                    String dcField = (String) metadataStorageInfo
+                    String dcField = metadataStorageInfo
                             .get(storedField);
 
                     DCValue[] vals = item.getMetadata(dcField.split("\\.")[0],
@@ -243,26 +257,36 @@ public class SolrLogger
             storeParents(doc1, dspaceObject);
 
             solr.add(doc1);
-            // TODO: requires further load testing, very fast commits might cause issues
-            solr.commit(false, false);
+            //commits are executed automatically using the solr autocommit
+//            solr.commit(false, false);
    
-        } catch (Exception e) {
+        }
+        catch (RuntimeException re)
+        {
+            throw re;
+        }
+        catch (Exception e)
+        {
         	log.error(e.getMessage(), e);
         }
     }
 
-    public static Map getMetadataStorageInfo()
+    public static Map<String, String> getMetadataStorageInfo()
     {
         return metadataStorageInfo;
     }
 
     /**
-     * Method just used to log the parents Community log: owning comms
-     * Collection log: owning comms & their comms Item log: owning colls/comms
-     * Bitstream log: owning item/colls/comms
+     * Method just used to log the parents.
+     * <ul>
+     *  <li>Community log: owning comms.</li>
+     *  <li>Collection log: owning comms & their comms.</li>
+     *  <li>Item log: owning colls/comms.</li>
+     *  <li>Bitstream log: owning item/colls/comms.</li>
+     * </ul>
      * 
      * @param doc1
-     *            the current solrinputdoc
+     *            the current SolrInputDocument
      * @param dso
      *            the current dspace object we want to log
      * @throws java.sql.SQLException
@@ -321,6 +345,13 @@ public class SolrLogger
         return useProxies;
     }
 
+    /**
+     * Delete data from the index, as described by a query.
+     * 
+     * @param query description of the records to be deleted.
+     * @throws IOException
+     * @throws SolrServerException
+     */
     public static void removeIndex(String query) throws IOException,
             SolrServerException
     {
@@ -343,7 +374,9 @@ public class SolrLogger
             QueryResponse response = solr.query(solrParams);
             // Make sure we at least got a document
             if (response.getResults().getNumFound() == 0)
+            {
                 return currentValsStored;
+            }
 
             // We have at least one document good
             SolrDocument document = response.getResults().get(0);
@@ -411,7 +444,7 @@ public class SolrLogger
         }
 
         /**
-         * Overide to manage individual documents
+         * Override to manage individual documents
          * @param doc
          */
         public void process(SolrDocument doc) throws IOException, SolrServerException {
@@ -512,7 +545,6 @@ public class SolrLogger
             List<String> fieldNames, List<List<Object>> fieldValuesList)
             throws SolrServerException, IOException
     {
-        long start = new Date().getTime();
         // Since there is NO update
         // We need to get our documents
         // QueryResponse queryResponse = solr.query()//query(query, null, -1,
@@ -544,7 +576,9 @@ public class SolrLogger
                 if (action.equals("addOne") || action.equals("replace"))
                 {
                     if (action.equals("replace"))
+                    {
                         solrDocument.removeFields(fieldName);
+                    }
 
                     for (Object fieldValue : fieldValues)
                     {
@@ -582,7 +616,7 @@ public class SolrLogger
     }
 
     /**
-     * Query used to get values grouped by the given facetfield
+     * Query used to get values grouped by the given facet field.
      * 
      * @param query
      *            the query to be used
@@ -592,7 +626,7 @@ public class SolrLogger
      *            the max number of values given back (in case of 10 the top 10
      *            will be given)
      * @param showTotal
-     *            a boolean determening whether the total amount should be given
+     *            a boolean determining whether the total amount should be given
      *            back as the last element of the array
      * @return an array containing our results
      * @throws SolrServerException
@@ -605,7 +639,9 @@ public class SolrLogger
         QueryResponse queryResponse = query(query, filterQuery, facetField,
                 max, null, null, null, facetQueries);
         if (queryResponse == null)
+        {
             return new ObjectCount[0];
+        }
 
         FacetField field = queryResponse.getFacetField(facetField);
         // At least make sure we have one value
@@ -639,7 +675,7 @@ public class SolrLogger
     }
 
     /**
-     * Query used to get values grouped by the date
+     * Query used to get values grouped by the date.
      * 
      * @param query
      *            the query to be used
@@ -655,7 +691,7 @@ public class SolrLogger
      *            the end date stop Format (-2, +1, ..) the date is calculated
      *            relatively on today
      * @param showTotal
-     *            a boolean determening whether the total amount should be given
+     *            a boolean determining whether the total amount should be given
      *            back as the last element of the array
      * @return and array containing our results
      * @throws SolrServerException
@@ -668,7 +704,9 @@ public class SolrLogger
         QueryResponse queryResponse = query(query, filterQuery, null, max,
                 dateType, dateStart, dateEnd, null);
         if (queryResponse == null)
+        {
             return new ObjectCount[0];
+        }
 
         FacetField dateFacet = queryResponse.getFacetDate("time");
         // TODO: check if this cannot crash I checked it, it crashed!!!
@@ -765,7 +803,9 @@ public class SolrLogger
             SimpleDateFormat simpleFormat = new SimpleDateFormat(
                     dateformatString);
             if (date != null)
+            {
                 name = simpleFormat.format(date);
+            }
 
         }
         return name;
@@ -777,7 +817,9 @@ public class SolrLogger
             throws SolrServerException
     {
         if (solr == null)
+        {
             return null;
+        }
 
         // System.out.println("QUERY");
         SolrQuery solrQuery = new SolrQuery().setRows(0).setQuery(query)
@@ -806,15 +848,21 @@ public class SolrLogger
                 solrQuery.addFacetQuery(facetQuery);
             }
             if (0 < facetQueries.size())
+            {
                 solrQuery.setFacet(true);
+            }
         }
 
         if (facetField != null)
+        {
             solrQuery.addFacetField(facetField);
+        }
 
         // Set the top x of if present
         if (max != -1)
+        {
             solrQuery.setFacetLimit(max);
+        }
 
         // A filter is used instead of a regular query to improve
         // performance and ensure the search result ordering will
@@ -822,15 +870,21 @@ public class SolrLogger
 
         // Choose to filter by the Legacy spider IP list (may get too long to properly filter all IP's
         if(ConfigurationManager.getBooleanProperty("solr.statistics.query.filter.spiderIp",false))
+        {
             solrQuery.addFilterQuery(getIgnoreSpiderIPs());
+        }
 
         // Choose to filter by isBot field, may be overriden in future
         // to allow views on stats based on bots.
         if(ConfigurationManager.getBooleanProperty("solr.statistics.query.filter.isBot",true))
+        {
             solrQuery.addFilterQuery("-isBot:true");
+        }
 
         if (filterQuery != null)
+        {
             solrQuery.addFilterQuery(filterQuery);
+        }
 
         QueryResponse response = null;
         try
@@ -857,21 +911,41 @@ public class SolrLogger
      */
     public static String getIgnoreSpiderIPs() {
         if (filterQuery == null) {
-            String query = "";
+            StringBuilder query = new StringBuilder();
             boolean first = true;
             for (String ip : SpiderDetector.getSpiderIpAddresses()) {
                 if (first) {
-                    query += " AND ";
+                    query.append(" AND ");
                     first = false;
                 }
 
-                query += " NOT(ip: " + ip + ")";
+                query.append(" NOT(ip: ").append(ip).append(")");
             }
-            filterQuery = query;
+            filterQuery = query.toString();
         }
 
         return filterQuery;
 
     }
     
+    /**
+     * Maintenance to keep a SOLR index efficient.
+     * Note: This might take a long time.
+     */
+    public static void optimizeSOLR() {
+        try {
+            long start = System.currentTimeMillis();
+            System.out.println("SOLR Optimize -- Process Started:"+start);
+            solr.optimize();
+            long finish = System.currentTimeMillis();
+            System.out.println("SOLR Optimize -- Process Finished:"+finish);
+            System.out.println("SOLR Optimize -- Total time taken:"+(finish-start) + " (ms).");
+        } catch (SolrServerException sse) {
+            System.err.println(sse.getMessage());
+        } catch (IOException ioe) {
+            System.err.println(ioe.getMessage());
+        }
+    }
+    
 }
+

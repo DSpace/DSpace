@@ -1,41 +1,9 @@
-/*
- * MyDSpaceServlet.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.webui.servlet;
 
@@ -77,7 +45,7 @@ import org.dspace.workflow.WorkflowManager;
  * 
  * @author Robert Tansley
  * @author Jay Paz
- * @version $Id: MyDSpaceServlet.java 3705 2009-04-11 17:02:24Z mdiggory $
+ * @version $Id: MyDSpaceServlet.java 5845 2010-11-12 05:34:07Z mdiggory $
  */
 public class MyDSpaceServlet extends DSpaceServlet
 {
@@ -292,7 +260,7 @@ public class MyDSpaceServlet extends DSpaceServlet
             }
         }
 
-        if (ok == false)
+        if (!ok)
         {
             log.warn(LogManager.getHeader(context, "integrity_error", UIUtil
                     .getRequestLogInfo(request)));
@@ -730,14 +698,12 @@ public class MyDSpaceServlet extends DSpaceServlet
         EPerson currentUser = context.getCurrentUser();
 
         // FIXME: WorkflowManager should return arrays
-        List ownedList = WorkflowManager.getOwnedTasks(context, currentUser);
-        WorkflowItem[] owned = new WorkflowItem[ownedList.size()];
-        owned = (WorkflowItem[]) ownedList.toArray(owned);
+        List<WorkflowItem> ownedList = WorkflowManager.getOwnedTasks(context, currentUser);
+        WorkflowItem[] owned = ownedList.toArray(new WorkflowItem[ownedList.size()]);
 
         // Pooled workflow items
-        List pooledList = WorkflowManager.getPooledTasks(context, currentUser);
-        WorkflowItem[] pooled = new WorkflowItem[pooledList.size()];
-        pooled = (WorkflowItem[]) pooledList.toArray(pooled);
+        List<WorkflowItem> pooledList = WorkflowManager.getPooledTasks(context, currentUser);
+        WorkflowItem[] pooled = pooledList.toArray(new WorkflowItem[pooledList.size()]);
 
         // User's WorkflowItems
         WorkflowItem[] workflowItems = WorkflowItem.findByEPerson(context, currentUser);
@@ -770,7 +736,7 @@ public class MyDSpaceServlet extends DSpaceServlet
         request.setAttribute("workflow.owned", owned);
         request.setAttribute("workflow.pooled", pooled);
         request.setAttribute("group.memberships", memberships);
-        request.setAttribute("display.groupmemberships", new Boolean(displayMemberships));
+        request.setAttribute("display.groupmemberships", Boolean.valueOf(displayMemberships));
         request.setAttribute("supervised.items", supervisedItems);
         request.setAttribute("export.archives", exportArchives);
 
@@ -794,7 +760,7 @@ public class MyDSpaceServlet extends DSpaceServlet
             AuthorizeException
     {
         // Turn the iterator into a list
-        List subList = new LinkedList();
+        List<Item> subList = new LinkedList<Item>();
         ItemIterator subs = Item.findBySubmitter(context, context
                 .getCurrentUser());
 
@@ -808,14 +774,16 @@ public class MyDSpaceServlet extends DSpaceServlet
         finally
         {
             if (subs != null)
+            {
                 subs.close();
+            }
         }
 
         Item[] items = new Item[subList.size()];
 
         for (int i = 0; i < subList.size(); i++)
         {
-            items[i] = (Item) subList.get(i);
+            items[i] = subList.get(i);
         }
 
         log.info(LogManager.getHeader(context, "view_own_submissions", "count="

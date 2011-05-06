@@ -1,43 +1,10 @@
-/*
- * PageNotFoundTransformer.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4209 $
- *
- * Date: $Date: 2009-08-12 13:14:24 -0400 (Wed, 12 Aug 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.xmlui.aspect.general;
 
 import java.io.IOException;
@@ -145,14 +112,11 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
             this.bodyEvent = null;
         }
         
-        if (WingConstants.DRI.URI.equals(namespaceURI))
+        if (WingConstants.DRI.URI.equals(namespaceURI) && Body.E_BODY.equals(localName))
         {
-            if (Body.E_BODY.equals(localName))
-            {
-                // Save the element and see if there is anything inside the body.
-                this.bodyEvent = SAXEvent.startElement(namespaceURI,localName,qName,attributes);
-                return;
-            }
+            // Save the element and see if there is anything inside the body.
+            this.bodyEvent = SAXEvent.startElement(namespaceURI,localName,qName,attributes);
+            return;
         }
 
        super.startElement(namespaceURI, localName, qName, attributes);
@@ -165,27 +129,21 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
     public void endElement(String namespaceURI, String localName, String qName)
             throws SAXException
     {
-        if (WingConstants.DRI.URI.equals(namespaceURI))
+        if (this.bodyEvent != null && WingConstants.DRI.URI.equals(namespaceURI) && Body.E_BODY.equals(localName))
         {
-            if (Body.E_BODY.equals(localName))
-            {
-                if (this.bodyEvent != null)
-                {
-                    // If we are recieving an endElement event for body while we
-                    // still have a startElement body event recorded then
-                    // the body element must have been empty. In this case, record
-                    // that the body is empty, and send both the start and end body events.
-                    
-                    this.bodyEmpty = true;
-                    // Sending the body will trigger the Wing framework to ask 
-                    // us if we want to add a body to the page.
-                    sendEvent(this.bodyEvent);
-                    this.bodyEvent = null;
-                }
-            }
-        } 
-        
-      super.endElement(namespaceURI, localName, qName);
+            // If we are recieving an endElement event for body while we
+            // still have a startElement body event recorded then
+            // the body element must have been empty. In this case, record
+            // that the body is empty, and send both the start and end body events.
+
+            this.bodyEmpty = true;
+            // Sending the body will trigger the Wing framework to ask
+            // us if we want to add a body to the page.
+            sendEvent(this.bodyEvent);
+            this.bodyEvent = null;
+        }
+
+        super.endElement(namespaceURI, localName, qName);
     } 
   
     

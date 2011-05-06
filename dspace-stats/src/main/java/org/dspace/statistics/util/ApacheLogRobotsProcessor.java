@@ -1,12 +1,9 @@
 /**
- * $Id: $
- * $URL: $
- * *************************************************************************
- * Copyright (c) 2002-2009, DuraSpace.  All rights reserved
- * Licensed under the DuraSpace Foundation License.
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * A copy of the DuraSpace License has been included in this
- * distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
+ * http://www.dspace.org/license/
  */
 package org.dspace.statistics.util;
 
@@ -17,8 +14,12 @@ import org.apache.commons.cli.PosixParser;
 
 import java.io.*;
 import java.util.HashSet;
+import java.util.Set;
 
 /**
+ * Commandline utility to create a file of spider addresses from an Apache
+ * log file.
+ * 
  * @author Mark Diggory (mdiggory at atmire.com)
  * @author kevinvandevelde at atmire.com
  * @author ben at atmire.com
@@ -27,7 +28,7 @@ public class ApacheLogRobotsProcessor {
 
 
     /**
-     * Creates a file containing spiders based on an apache logfile
+     * Creates a file containing spiders based on an Apache logfile
      * by analyzing users of the robots.txt file
      *
      * @param args
@@ -35,37 +36,46 @@ public class ApacheLogRobotsProcessor {
      */
 
     public static void main(String[] args) throws Exception {
-        // create an options object and populate it
+        // create an Options object and populate it
         CommandLineParser parser = new PosixParser();
 
         Options options = new Options();
         options.addOption("l", "logfile", true, "type: Input log file");
-        options.addOption("s", "spiderfile", true, "type: Spider ip file");
+        options.addOption("s", "spiderfile", true, "type: Spider IP file");
 
         CommandLine line = parser.parse(options, args);
 
         String logFileLoc;
         String spiderIpPath;
         if (line.hasOption("l"))
+        {
             logFileLoc = line.getOptionValue("l");
+        }
         else {
             System.out.println("We need our log file");
             return;
         }
         if (line.hasOption("s"))
+        {
             spiderIpPath = line.getOptionValue("s");
+        }
         else {
-            System.out.println("We need a spider ip output file");
+            System.out.println("We need a spider IP output file");
             return;
         }
 
         File spiderIpFile = new File(spiderIpPath);
 
-        //Get the ip's already added in our file
-        HashSet<String> logSpiders = new HashSet<String>();
+        //Get the IPs already added in our file
+        Set<String> logSpiders;
         if (spiderIpFile.exists())
+        {
             logSpiders = SpiderDetector.readIpAddresses(spiderIpFile);
-
+        }
+        else
+        {
+            logSpiders = new HashSet<String>();
+        }
 
         //First read in our log file line per line
         BufferedReader in = new BufferedReader(new FileReader(logFileLoc));
@@ -74,20 +84,20 @@ public class ApacheLogRobotsProcessor {
             //Currently only check if robot.txt is present in our line
             if (logLine.contains("robots.txt")) {
                 //We got a robots.txt so we got a bot
-                String ip = logLine.substring(0, logLine.indexOf("-")).trim();
-                //Only add single ip addresses once we got it in it is enough
+                String ip = logLine.substring(0, logLine.indexOf('-')).trim();
+                //Only add single IP addresses once we got it in it is enough
                 logSpiders.add(ip);
             }
         }
         in.close();
 
-        //Last but not least add the ips to our file
+        //Last but not least add the IPs to our file
         BufferedWriter output = new BufferedWriter(new FileWriter(spiderIpFile));
 
-        //Second write the new ips
+        //Second write the new IPs
         for (String ip : logSpiders) {
             System.out.println("Adding new ip: " + ip);
-            //Write each new ip on a seperate line
+            //Write each new IP on a separate line
             output.write(ip + "\n");
         }
 

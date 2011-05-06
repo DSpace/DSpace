@@ -1,45 +1,15 @@
-/*
- * MetadataImportServlet.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision$
- *
- * Date: $Date$
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.webui.servlet;
 
 import java.io.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -47,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import org.apache.log4j.Logger;
+import org.dspace.app.bulkedit.MetadataImportInvalidHeadingException;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.bulkedit.MetadataImport;
@@ -104,8 +75,8 @@ public class MetadataImportServlet extends DSpaceServlet
             {
                 // Get the changes
                 log.info(LogManager.getHeader(context, "metadataimport", "loading file"));
-                ArrayList<BulkEditChange> changes = processUpload(context, request);
-                log.debug(LogManager.getHeader(context, "metadataimport", changes.size() + " items with changes identifed"));                
+                List<BulkEditChange> changes = processUpload(context, request);
+                log.debug(LogManager.getHeader(context, "metadataimport", changes.size() + " items with changes identified"));                
 
                 // Were there any changes detected?
                 if (changes.size() != 0)
@@ -134,10 +105,16 @@ public class MetadataImportServlet extends DSpaceServlet
                     JSPManager.showJSP(request, response, "/dspace-admin/metadataimport.jsp");
                 }
             }
+            catch (MetadataImportInvalidHeadingException mihe) {
+                request.setAttribute("message", mihe.getBadHeader());
+                request.setAttribute("badheading", mihe.getType());
+                log.info(LogManager.getHeader(context, "metadataimport", "Error encountered while looking for changes: " + mihe.getMessage()));                
+                JSPManager.showJSP(request, response, "/dspace-admin/metadataimport-error.jsp");
+            }
             catch (Exception e)
             {
                 request.setAttribute("message", e.getMessage());
-                log.debug(LogManager.getHeader(context, "metadataimport", "Error encountered while looking for changes: " + e.getMessage()));                
+                log.info(LogManager.getHeader(context, "metadataimport", "Error encountered while looking for changes: " + e.getMessage()));                
                 JSPManager.showJSP(request, response, "/dspace-admin/metadataimport-error.jsp");
             }
         }
@@ -150,7 +127,7 @@ public class MetadataImportServlet extends DSpaceServlet
             try
             {
                 MetadataImport mImport = new MetadataImport(context, csv.getCSVLines());
-                ArrayList<BulkEditChange> changes = mImport.runImport(true, false, false, false);
+                List<BulkEditChange> changes = mImport.runImport(true, false, false, false);
 
                 // Commit the changes
                 context.commit();
@@ -218,7 +195,7 @@ public class MetadataImportServlet extends DSpaceServlet
      * @return The response object
      * @throws Exception Thrown if an error occurs
      */
-    private ArrayList<BulkEditChange> processUpload(Context context,
+    private List<BulkEditChange> processUpload(Context context,
                                                     HttpServletRequest request) throws Exception
     {
         // Wrap multipart request to get the submission info
@@ -226,16 +203,19 @@ public class MetadataImportServlet extends DSpaceServlet
         File f = wrapper.getFile("file");
 
         // Run the import
-        DSpaceCSV csv = new DSpaceCSV(f);
+        DSpaceCSV csv = new DSpaceCSV(f, context);
         MetadataImport mImport = new MetadataImport(context, csv.getCSVLines());
-        ArrayList<BulkEditChange> changes = mImport.runImport(false, false, false, false);
+        List<BulkEditChange> changes = mImport.runImport(false, false, false, false);
 
         // Store the csv lines in the session
         HttpSession session = request.getSession(true);
         session.setAttribute("csv", csv);
 
         // Remove temp file
-        f.delete();
+        if (!f.delete())
+        {
+            log.error("Unable to delete upload file");
+        }
 
         // Return the changes
         return changes;

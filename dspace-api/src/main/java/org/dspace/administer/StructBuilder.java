@@ -1,37 +1,10 @@
-/*
- * StructBuilder.java
- * 
- * Copyright (c) 2006, Imperial College.  All rights reserved.
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of Imperial College nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.administer;
 
 import java.io.BufferedWriter;
@@ -39,8 +12,8 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -96,10 +69,10 @@ public class StructBuilder
     private static org.jdom.Document xmlOutput = new org.jdom.Document(new Element("imported_structure"));
     
     /** a hashtable to hold metadata for the collection being worked on */
-    private static Hashtable collectionMap = new Hashtable();
+    private static Map<String, String> collectionMap = new HashMap<String, String>();
     
     /** a hashtable to hold metadata for the community being worked on */
-    private static Hashtable communityMap = new Hashtable();
+    private static Map<String, String> communityMap = new HashMap<String, String>();
     
     /**
      * Main method to be run from the command line to import a structure into
@@ -213,7 +186,7 @@ public class StructBuilder
     private static void usage()
     {
         System.out.println("Usage: java StructBuilder -f <source XML file> -o <output file> -e <eperson email>");
-        System.out.println("Communitities will be created from the top level, and a map of communities to handles will be returned in the output file");
+        System.out.println("Communities will be created from the top level, and a map of communities to handles will be returned in the output file");
         return;
     }
     
@@ -398,7 +371,7 @@ public class StructBuilder
      * to the relevant methods in this class for sub-communities and collections
      * 
      * @param context the context of the request
-     * @param communities a nodelist of communities to create along with their subjstructures
+     * @param communities a nodelist of communities to create along with their sub-structures
      * @param parent the parent community of the nodelist of communities to create
      * 
      * @return an element array containing additional information regarding the 
@@ -429,16 +402,12 @@ public class StructBuilder
             
             // now update the metadata
             Node tn = communities.item(i);
-            Enumeration keys = communityMap.keys();
-            while (keys.hasMoreElements())
+            for (Map.Entry<String, String> entry : communityMap.entrySet())
             {
-                Node node = null;
-                String key = (String) keys.nextElement();
-                NodeList nl = XPathAPI.selectNodeList(tn, key);
+                NodeList nl = XPathAPI.selectNodeList(tn, entry.getKey());
                 if (nl.getLength() == 1)
                 {
-                    node = nl.item(0);
-                    community.setMetadata((String) communityMap.get(key), getStringValue(node));
+                    community.setMetadata(entry.getValue(), getStringValue(nl.item(0)));
                 }
             }
             
@@ -544,16 +513,12 @@ public class StructBuilder
             
             // import the rest of the metadata
             Node tn = collections.item(i);
-            Enumeration keys = collectionMap.keys();
-            while (keys.hasMoreElements())
+            for (Map.Entry<String, String> entry : collectionMap.entrySet())
             {
-                Node node = null;
-                String key = (String) keys.nextElement();
-                NodeList nl = XPathAPI.selectNodeList(tn, key);
+                NodeList nl = XPathAPI.selectNodeList(tn, entry.getKey());
                 if (nl.getLength() == 1)
                 {
-                    node = nl.item(0);
-                    collection.setMetadata((String) collectionMap.get(key), getStringValue(node));
+                    collection.setMetadata(entry.getValue(), getStringValue(nl.item(0)));
                 }
             }
             

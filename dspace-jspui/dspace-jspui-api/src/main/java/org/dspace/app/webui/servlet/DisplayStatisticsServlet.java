@@ -1,83 +1,25 @@
-/*
- * DisplayStatisticsServlet.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: $
- *
- * Date: $Date: 2009-12-03 09:00:23 +1300 (Wed, 07 Oct 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
 import java.util.List;
-import java.net.URLEncoder;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.MissingResourceException;
-import java.util.StringTokenizer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
 import org.dspace.authorize.AuthorizeException;
-import javax.servlet.jsp.JspException;
-import javax.servlet.jsp.JspWriter;
-import javax.servlet.jsp.jstl.fmt.LocaleSupport;
-import javax.servlet.jsp.tagext.TagSupport;
 
 import org.apache.log4j.Logger;
-import org.dspace.app.util.MetadataExposure;
-import org.dspace.app.webui.util.StyleSelection;
-import org.dspace.app.webui.util.UIUtil;
-import org.dspace.browse.BrowseException;
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
-import org.dspace.content.Item;
-import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
-import org.dspace.core.I18nUtil;
-import org.dspace.core.LogManager;
-import org.dspace.core.PluginManager;
-import org.dspace.core.Utils;
 import org.dspace.eperson.Group;
 
 import org.dspace.content.DSpaceObject;
@@ -136,6 +78,13 @@ public class DisplayStatisticsServlet extends DSpaceServlet
 
         String handle = request.getParameter("handle");
         DSpaceObject dso = HandleManager.resolveToObject(context, handle);
+
+	if(dso == null) {
+		response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+	        JSPManager.showJSP(request, response, "/error/404.jsp");
+                return;
+	}
+
         boolean isItem = false;
 
         StatisticsBean statsVisits = new StatisticsBean();

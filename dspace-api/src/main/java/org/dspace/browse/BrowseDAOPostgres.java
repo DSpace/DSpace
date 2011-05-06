@@ -1,46 +1,18 @@
-/*
- * BrowseDAOPostgres.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4365 $
- *
- * Date: $Date: 2009-10-05 19:52:42 -0400 (Mon, 05 Oct 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.browse;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -132,8 +104,8 @@ public class BrowseDAOPostgres implements BrowseDAO
     // administrative attributes for this class
 
     /** a cache of the actual query to be executed */
-    private String    querySql    = "";
-    private ArrayList queryParams = new ArrayList();
+    private String querySql    = "";
+    private List<Serializable> queryParams = new ArrayList<Serializable>();
 
     /** whether the query (above) needs to be regenerated */
     private boolean rebuildQuery = true;
@@ -216,7 +188,7 @@ public class BrowseDAOPostgres implements BrowseDAO
         {
             String query = "SELECT max(" + column + ") FROM " + table + " WHERE item_id = ?";
 
-            Object[] params = { new Integer(itemID) };
+            Object[] params = { Integer.valueOf(itemID) };
             tri = DatabaseManager.query(context, query, params);
 
             TableRow row;
@@ -252,11 +224,13 @@ public class BrowseDAOPostgres implements BrowseDAO
         TableRowIterator tri = null;
 
         if (column == null || value == null)
+        {
             return 0;
+        }
 
         try
         {
-            List paramsList = new ArrayList();
+            List<Serializable> paramsList = new ArrayList<Serializable>();
             StringBuffer queryBuf = new StringBuffer();
 
             queryBuf.append("COUNT(").append(column).append(") AS offset ");
@@ -315,7 +289,7 @@ public class BrowseDAOPostgres implements BrowseDAO
 
         try
         {
-            List paramsList = new ArrayList();
+            List<Serializable> paramsList = new ArrayList<Serializable>();
             StringBuffer queryBuf = new StringBuffer();
 
             queryBuf.append("COUNT(").append(column).append(") AS offset ");
@@ -367,7 +341,7 @@ public class BrowseDAOPostgres implements BrowseDAO
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseDAO#doQuery()
      */
-    public List doQuery()
+    public List<BrowseItem> doQuery()
         throws BrowseException
     {
         String query = getQuery();
@@ -385,7 +359,7 @@ public class BrowseDAOPostgres implements BrowseDAO
             tri = DatabaseManager.query(context, query, params);
 
             // go over the query results and process
-            List results = new ArrayList();
+            List<BrowseItem> results = new ArrayList<BrowseItem>();
             while (tri.hasNext())
             {
                 TableRow row = tri.next();
@@ -414,7 +388,7 @@ public class BrowseDAOPostgres implements BrowseDAO
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseDAO#doValueQuery()
      */
-    public List doValueQuery()
+    public List<String[]> doValueQuery()
         throws BrowseException
     {
         String query = getQuery();
@@ -429,7 +403,7 @@ public class BrowseDAOPostgres implements BrowseDAO
             tri = DatabaseManager.query(context, query, params);
 
             // go over the query results and process
-            List results = new ArrayList();
+            List<String[]> results = new ArrayList<String[]>();
             while (tri.hasNext())
             {
                 TableRow row = tri.next();
@@ -483,7 +457,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      */
     public String[] getCountValues()
     {
-        return this.countValues;
+        return (String[]) ArrayUtils.clone(this.countValues);
     }
 
     /* (non-Javadoc)
@@ -531,7 +505,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      */
     public String[] getSelectValues()
     {
-        return selectValues;
+        return (String[]) ArrayUtils.clone(selectValues);
     }
 
     /* (non-Javadoc)
@@ -615,7 +589,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      */
     public void setCountValues(String[] fields)
     {
-        this.countValues = fields;
+        this.countValues = (String[]) ArrayUtils.clone(fields);
         this.rebuildQuery = true;
     }
 
@@ -687,7 +661,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      */
     public void setSelectValues(String[] selectValues)
     {
-        this.selectValues = selectValues;
+        this.selectValues = (String[]) ArrayUtils.clone(selectValues);
         this.rebuildQuery = true;
     }
 
@@ -767,7 +741,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      * @return      the query to be executed
      * @throws BrowseException
      */
-    private String buildDistinctQuery(List params)
+    private String buildDistinctQuery(List<Serializable> params)
         throws BrowseException
     {
         StringBuffer queryBuf = new StringBuffer();
@@ -783,7 +757,7 @@ public class BrowseDAOPostgres implements BrowseDAO
         buildSelectStatementDistinct(queryBuf, params);
         buildWhereClauseOpReset();
 
-        // assemble the focus clase if we are to have one
+        // assemble the focus clause if we are to have one
         // it will look like one of the following, for example
         //     sort_value <= myvalue
         //     sort_1 >= myvalue
@@ -808,7 +782,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      * @return      the query to be executed
      * @throws BrowseException
      */
-    private String buildQuery(List params)
+    private String buildQuery(List<Serializable> params)
         throws BrowseException
     {
         StringBuffer queryBuf = new StringBuffer();
@@ -824,7 +798,7 @@ public class BrowseDAOPostgres implements BrowseDAO
         buildSelectStatement(queryBuf, params);
         buildWhereClauseOpReset();
 
-        // assemble the focus clase if we are to have one
+        // assemble the focus clause if we are to have one
         // it will look like one of the following, for example
         //     sort_value <= myvalue
         //     sort_1 >= myvalue
@@ -883,14 +857,14 @@ public class BrowseDAOPostgres implements BrowseDAO
      *
      * @return  the limit clause
      */
-    private void buildRowLimitAndOffset(StringBuffer queryBuf, List params)
+    private void buildRowLimitAndOffset(StringBuffer queryBuf, List<Serializable> params)
     {
         // prepare the LIMIT clause
         if (limit > 0)
         {
             queryBuf.append(" LIMIT ? ");
 
-            params.add(new Integer(limit));
+            params.add(Integer.valueOf(limit));
         }
 
         // prepare the OFFSET clause
@@ -898,7 +872,7 @@ public class BrowseDAOPostgres implements BrowseDAO
         {
             queryBuf.append(" OFFSET ? ");
 
-            params.add(new Integer(offset));
+            params.add(Integer.valueOf(offset));
         }
     }
 
@@ -908,11 +882,11 @@ public class BrowseDAOPostgres implements BrowseDAO
      * @param queryBuf
      * @param params
      */
-    private void buildFocusedSelectClauses(StringBuffer queryBuf, List params)
+    private void buildFocusedSelectClauses(StringBuffer queryBuf, List<Serializable> params)
     {
         if (tableMap != null && tableDis != null)
         {
-            queryBuf.append(tableMap).append(".distinct_id=").append(tableDis).append(".distinct_id");
+            queryBuf.append(tableMap).append(".distinct_id=").append(tableDis).append(".id");
             queryBuf.append(" AND ");
             if (authority == null)
             {
@@ -959,7 +933,9 @@ public class BrowseDAOPostgres implements BrowseDAO
             if (tableMap != null)
             {
                 if (tableDis != null)
+                {
                     queryBuf.append(" AND ");
+                }
 
                 queryBuf.append(tableMap).append(".item_id=")
                         .append(containerTable).append(".item_id AND ");
@@ -968,7 +944,7 @@ public class BrowseDAOPostgres implements BrowseDAO
             queryBuf.append(containerTable).append(".").append(containerIDField);
             queryBuf.append("=? ");
 
-            params.add(new Integer(containerID));
+            params.add(Integer.valueOf(containerID));
         }
     }
 
@@ -987,12 +963,16 @@ public class BrowseDAOPostgres implements BrowseDAO
         if (tableMap != null)
         {
             if (containerTable != null)
+            {
                 queryBuf.append(", ");
+            }
 
             queryBuf.append(tableMap);
 
             if (tableDis != null)
+            {
                 queryBuf.append(", ").append(tableDis);
+            }
         }
     }
 
@@ -1076,7 +1056,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      * @param queryBuf  the string value obtained from distinctClause, countClause or selectValues
      * @return  the SELECT part of the query
      */
-    private void buildSelectStatement(StringBuffer queryBuf, List params) throws BrowseException
+    private void buildSelectStatement(StringBuffer queryBuf, List<Serializable> params) throws BrowseException
     {
         if (queryBuf.length() == 0)
         {
@@ -1097,8 +1077,15 @@ public class BrowseDAOPostgres implements BrowseDAO
         queryBuf.append(table);
         if (containerTable != null || (value != null && valueField != null && tableDis != null && tableMap != null))
         {
-            queryBuf.append(", (SELECT " + (containerTable != null ? "" : "DISTINCT "));
-            queryBuf.append(containerTable != null ? containerTable : tableMap).append(".item_id");
+            queryBuf.append(", (SELECT ");
+            if (containerTable != null)
+            {
+                queryBuf.append(containerTable).append(".item_id");
+            }
+            else
+            {
+                queryBuf.append("DISTINCT ").append(tableMap).append(".item_id");
+            }
             queryBuf.append(" FROM ");
             buildFocusedSelectTables(queryBuf);
             queryBuf.append(" WHERE ");
@@ -1119,7 +1106,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      * @param queryBuf  the string value obtained from distinctClause, countClause or selectValues
      * @return  the SELECT part of the query
      */
-    private void buildSelectStatementDistinct(StringBuffer queryBuf, List params) throws BrowseException
+    private void buildSelectStatementDistinct(StringBuffer queryBuf, List<Serializable> params) throws BrowseException
     {
         if (queryBuf.length() == 0)
         {
@@ -1162,7 +1149,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      *
      * @return  the sub-query
      */
-    private void buildWhereClauseDistinctConstraints(StringBuffer queryBuf, List params)
+    private void buildWhereClauseDistinctConstraints(StringBuffer queryBuf, List<Serializable> params)
     {
         // add the constraint to community or collection if necessary
         // and desired
@@ -1189,13 +1176,13 @@ public class BrowseDAOPostgres implements BrowseDAO
      *
      * @return  the focus clause
      */
-    private void buildWhereClauseJumpTo(StringBuffer queryBuf, List params)
+    private void buildWhereClauseJumpTo(StringBuffer queryBuf, List<Serializable> params)
     {
         // get the operator (<[=] | >[=]) which the focus of the browse will
         // be matched using
         String focusComparator = getFocusComparator();
 
-        // assemble the focus clase if we are to have one
+        // assemble the focus clause if we are to have one
         // it will look like one of the following
         // - sort_value <= myvalue
         // - sort_1 >= myvalue
@@ -1230,7 +1217,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      *
      * @return  the constraint clause
      */
-    private void buildWhereClauseFullConstraints(StringBuffer queryBuf, List params)
+    private void buildWhereClauseFullConstraints(StringBuffer queryBuf, List<Serializable> params)
     {
         // add the constraint to community or collection if necessary
         // and desired
@@ -1260,7 +1247,7 @@ public class BrowseDAOPostgres implements BrowseDAO
      *
      * @return  the value clause
      */
-    private void buildWhereClauseFilterValue(StringBuffer queryBuf, List params)
+    private void buildWhereClauseFilterValue(StringBuffer queryBuf, List<Serializable> params)
     {
         // assemble the value clause if we are to have one
         if (value != null && valueField != null)

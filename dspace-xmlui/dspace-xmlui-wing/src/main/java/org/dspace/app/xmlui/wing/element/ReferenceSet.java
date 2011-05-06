@@ -1,43 +1,10 @@
-/*
- * ReferenceSet.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.xmlui.wing.element;
 
 import java.util.ArrayList;
@@ -105,13 +72,11 @@ public class ReferenceSet extends AbstractWingElement implements
      * @param context
      *            (Required) The context this element is contained in, such as
      *            where to route SAX events and what i18n catalogue to use.
+     * @param childreference
+     *            Whether this is a child reference (not requiring a name).
      * @param name
      *            (May be null) a local identifier used to differentiate the
      *            element from its siblings.
-     * @param informationModel
-     *            (May be null) The information model the enclosed objects
-     *            follow. If no model is given then the default information
-     *            model is used. (INFORMATION_MODEL_DEFAULT)
      * @param type
      *            (Required) The type of reference set which determines the level
      *            of detail for the metadata rendered. See TYPES for a list of
@@ -128,7 +93,9 @@ public class ReferenceSet extends AbstractWingElement implements
         super(context);
         // Names are only required for parent reference sets.
         if (!childreference)
+        {
             require(name, "The 'name' parameter is required for reference sets.");
+        }
         restrict(
                 type,
                 TYPES,
@@ -142,9 +109,6 @@ public class ReferenceSet extends AbstractWingElement implements
 
     /**
      * Set the head element which is the label associated with this referenceset.
-     * 
-     * @param characters
-     *            (May be null) Unprocessed characters to be referenced
      */
     public Head setHead() throws WingException
     {
@@ -180,7 +144,7 @@ public class ReferenceSet extends AbstractWingElement implements
     }
 
     /**
-     * Add an object refrence.
+     * Add an object reference.
      * 
      * @param object
      *            (Required) The referenced object.
@@ -211,20 +175,30 @@ public class ReferenceSet extends AbstractWingElement implements
     {
         AttributeMap attributes = new AttributeMap();
         if (name != null)
+        {
             attributes.put(A_NAME, name);
+        }
         if (name != null)
+        {
             attributes.put(A_ID, context.generateID(E_REFERENCE_SET, name));
+        }
 
         attributes.put(A_TYPE, type);
         if (orderBy != null)
+        {
             attributes.put(A_ORDER_BY, orderBy);
+        }
         if (rend != null)
+        {
             attributes.put(A_RENDER, rend);
+        }
 
         startElement(contentHandler, namespaces, E_REFERENCE_SET, attributes);
 
         if (head != null)
+        {
             head.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
 
         for (AbstractWingElement content : contents)
         {
@@ -239,10 +213,14 @@ public class ReferenceSet extends AbstractWingElement implements
      */
     public void dispose()
     {
-        for (AbstractWingElement content : contents)
-            content.dispose();
         if (contents != null)
+        {
+            for (AbstractWingElement content : contents)
+            {
+                content.dispose();
+            }
             contents.clear();
+        }
         contents = null;
         super.dispose();
     }

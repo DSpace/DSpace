@@ -1,45 +1,15 @@
-/*
- * EPerson.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4742 $
- *
- * Date: $Date: 2010-02-05 07:11:05 -0500 (Fri, 05 Feb 2010) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.eperson;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -59,7 +29,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * Class representing an e-person.
  * 
  * @author David Stuve
- * @version $Revision: 4742 $
+ * @version $Revision: 5844 $
  */
 public class EPerson extends DSpaceObject
 {
@@ -108,9 +78,60 @@ public class EPerson extends DSpaceObject
 
         // Cache ourselves
         context.cache(this, row.getIntColumn("eperson_id"));
-        modified = modifiedMetadata = false;
+        modified = false;
+        modifiedMetadata = false;
         clearDetails();
     }
+
+    /**
+     * Return true if this object equals obj, false otherwise.
+     * 
+     * @param obj
+     * @return true if ResourcePolicy objects are equal
+     */
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj == null)
+        {
+            return false;
+        }
+        if (getClass() != obj.getClass())
+        {
+            return false;
+        }
+        final EPerson other = (EPerson) obj;
+        if (this.getID() != other.getID())
+        {
+            return false;
+        }
+        if (!this.getEmail().equals(other.getEmail()))
+        {
+            return false;
+        }
+        if (!this.getFullName().equals(other.getFullName()))
+        {
+            return false;
+        }
+        return true;
+    }
+
+    /**
+     * Return a hash code for this object.
+     *
+     * @return int hash of object
+     */
+    @Override
+    public int hashCode()
+    {
+        int hash = 5;
+        hash = 89 * hash + this.getID();
+        hash = 89 * hash + (this.getEmail() != null? this.getEmail().hashCode():0);
+        hash = 89 * hash + (this.getFullName() != null? this.getFullName().hashCode():0);
+        return hash;
+    }
+
+
 
     /**
      * Get an EPerson from the database.
@@ -145,9 +166,9 @@ public class EPerson extends DSpaceObject
     }
 
     /**
-     * Find the eperson by their email address
+     * Find the eperson by their email address.
      * 
-     * @return EPerson
+     * @return EPerson, or {@code null} if none such exists.
      */
     public static EPerson findByEmail(Context context, String email)
             throws SQLException, AuthorizeException
@@ -183,7 +204,7 @@ public class EPerson extends DSpaceObject
     }
 
     /**
-     * Find the eperson by their netid
+     * Find the eperson by their netid.
      * 
      * @param context
      *            DSpace context
@@ -196,10 +217,11 @@ public class EPerson extends DSpaceObject
             throws SQLException
     {
         if (netid == null)
+        {
             return null;
+        }
 
-        TableRow row = DatabaseManager.findByUnique(context, "eperson",
-                "netid", netid);
+        TableRow row = DatabaseManager.findByUnique(context, "eperson", "netid", netid);
 
         if (row == null)
         {
@@ -223,7 +245,7 @@ public class EPerson extends DSpaceObject
     }
 
     /**
-     * Find the epeople that match the search query across firstname, lastname or email
+     * Find the epeople that match the search query across firstname, lastname or email.
      * 
      * @param context
      *            DSpace context
@@ -277,7 +299,9 @@ public class EPerson extends DSpaceObject
                 queryBuf.append("rec WHERE rownum<=? ");
                 // If we also have an offset, then convert the limit into the maximum row number
                 if (offset > 0)
+                {
                     limit += offset;
+                }
             }
 
             // Return only the records after the specified offset (row number)
@@ -290,10 +314,14 @@ public class EPerson extends DSpaceObject
         else
         {
             if (limit > 0)
+            {
                 queryBuf.append(" LIMIT ? ");
+            }
 
             if (offset > 0)
+            {
                 queryBuf.append(" OFFSET ? ");
+            }
         }
 
         String dbquery = queryBuf.toString();
@@ -304,23 +332,30 @@ public class EPerson extends DSpaceObject
 			int_param = Integer.valueOf(query);
 		}
 		catch (NumberFormatException e) {
-			int_param = new Integer(-1);
+			int_param = Integer.valueOf(-1);
 		}
 
         // Create the parameter array, including limit and offset if part of the query
         Object[] paramArr = new Object[] {int_param,params,params,params};
         if (limit > 0 && offset > 0)
-            paramArr = new Object[] {int_param,params,params,params,limit,offset};
+        {
+            paramArr = new Object[]{int_param, params, params, params, limit, offset};
+        }
         else if (limit > 0)
-            paramArr = new Object[] {int_param,params,params,params,limit};
+        {
+            paramArr = new Object[]{int_param, params, params, params, limit};
+        }
         else if (offset > 0)
-            paramArr = new Object[] {int_param,params,params,params,offset};
+        {
+            paramArr = new Object[]{int_param, params, params, params, offset};
+        }
 
         // Get all the epeople that match the query
-		TableRowIterator rows = DatabaseManager.query(context, dbquery, paramArr);
+		TableRowIterator rows = DatabaseManager.queryTable(context, "eperson",
+		        dbquery, paramArr);
 		try
         {
-            List epeopleRows = rows.toList();
+            List<TableRow> epeopleRows = rows.toList();
             EPerson[] epeople = new EPerson[epeopleRows.size()];
 
             for (int i = 0; i < epeopleRows.size(); i++)
@@ -346,7 +381,9 @@ public class EPerson extends DSpaceObject
         finally
         {
             if (rows != null)
+            {
                 rows.close();
+            }
         }
     }
 
@@ -359,7 +396,7 @@ public class EPerson extends DSpaceObject
      * @param query
      *            The search string
      * 
-     * @return the number of epeople mathching the query
+     * @return the number of epeople matching the query
      */
     public static int searchResultCount(Context context, String query)
     	throws SQLException
@@ -373,7 +410,7 @@ public class EPerson extends DSpaceObject
 			int_param = Integer.valueOf(query);
 		}
 		catch (NumberFormatException e) {
-			int_param = new Integer(-1);
+			int_param = Integer.valueOf(-1);
 		}
 		
 		// Get all the epeople that match the query
@@ -385,11 +422,11 @@ public class EPerson extends DSpaceObject
 		// use getIntColumn for Oracle count data
         if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
         {
-            count = new Long(row.getIntColumn("epcount"));
+            count = Long.valueOf(row.getIntColumn("epcount"));
         }
         else  //getLongColumn works for postgres
         {
-            count = new Long(row.getLongColumn("epcount"));
+            count = Long.valueOf(row.getLongColumn("epcount"));
         }
         
 		return count.intValue();
@@ -434,14 +471,14 @@ public class EPerson extends DSpaceObject
             s = "lastname";
         }
 
-        // NOTE: The use of 's' in the order by clause can not cause an sql 
+        // NOTE: The use of 's' in the order by clause can not cause an SQL 
         // injection because the string is derived from constant values above.
-        TableRowIterator rows = DatabaseManager.query(context,
+        TableRowIterator rows = DatabaseManager.queryTable(context, "eperson",
                 "SELECT * FROM eperson ORDER BY "+s);
 
         try
         {
-            List epeopleRows = rows.toList();
+            List<TableRow> epeopleRows = rows.toList();
 
             EPerson[] epeople = new EPerson[epeopleRows.size()];
 
@@ -468,7 +505,9 @@ public class EPerson extends DSpaceObject
         finally
         {
             if (rows != null)
+            {
                 rows.close();
+            }
         }
     }
 
@@ -517,7 +556,7 @@ public class EPerson extends DSpaceObject
 
         // check for presence of eperson in tables that
         // have constraints on eperson_id
-        Vector constraintList = getDeleteConstraints();
+        List<String> constraintList = getDeleteConstraints();
 
         // if eperson exists in tables that have constraints
         // on eperson, throw an exception
@@ -576,7 +615,7 @@ public class EPerson extends DSpaceObject
      * Locale specification of the form {language} or {language}_{territory},
      * e.g. "en", "en_US", "pt_BR" (the latter is Brazilian Portugese).
      * 
-     * @param s
+     * @param language
      *            language
      */
      public void setLanguage(String language)
@@ -827,6 +866,27 @@ public class EPerson extends DSpaceObject
     }
 
     /**
+     * Set the EPerson's password hash
+     * 
+     * @param s
+     *          hash of the password
+     */
+    public void setPasswordHash(String s)
+    {
+        myRow.setColumn("password", s);
+        modified = true;
+    }
+
+    /**
+     * Return the EPerson's password hash
+     * @return hash of the password
+     */
+    public String getPasswordHash()
+    {
+        return myRow.getStringColumn("password");
+    }
+
+    /**
      * Check EPerson's password
      * 
      * @param attempt
@@ -873,26 +933,6 @@ public class EPerson extends DSpaceObject
     }
 
     /**
-     * Return <code>true</code> if <code>other</code> is the same EPerson as
-     * this object, <code>false</code> otherwise
-     * 
-     * @param other
-     *            object to compare to
-     * 
-     * @return <code>true</code> if object passed in represents the same
-     *         eperson as this object
-     */
-    public boolean obsolete_equals(Object other)
-    {
-        if (!(other instanceof EPerson))
-        {
-            return false;
-        }
-
-        return (getID() == ((EPerson) other).getID());
-    }
-
-    /**
      * return type found in Constants
      */
     public int getType()
@@ -908,14 +948,14 @@ public class EPerson extends DSpaceObject
      * An EPerson cannot be deleted if it exists in the item, workflowitem, or
      * tasklistitem tables.
      * 
-     * @return Vector of tables that contain a reference to the eperson.
+     * @return List of tables that contain a reference to the eperson.
      */
-    public Vector<String> getDeleteConstraints() throws SQLException
+    public List<String> getDeleteConstraints() throws SQLException
     {
-        Vector<String> tableList = new Vector<String>();
+        List<String> tableList = new ArrayList<String>();
 
         // check for eperson in item table
-        TableRowIterator tri = DatabaseManager.query(myContext,
+        TableRowIterator tri = DatabaseManager.queryTable(myContext, "item",
                 "SELECT * from item where submitter_id= ? ",
                 getID());
 
@@ -930,11 +970,13 @@ public class EPerson extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         // check for eperson in workflowitem table
-        tri = DatabaseManager.query(myContext,
+        tri = DatabaseManager.queryTable(myContext, "workflowitem",
                 "SELECT * from workflowitem where owner= ? ",
                 getID());
 
@@ -949,11 +991,13 @@ public class EPerson extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         // check for eperson in tasklistitem table
-        tri = DatabaseManager.query(myContext,
+        tri = DatabaseManager.queryTable(myContext, "tasklistitem",
                 "SELECT * from tasklistitem where eperson_id= ? ",
                 getID());
 
@@ -968,7 +1012,9 @@ public class EPerson extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
         
         // the list of tables can be used to construct an error message

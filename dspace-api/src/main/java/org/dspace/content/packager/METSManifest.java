@@ -1,41 +1,10 @@
-/*
- * METSManifest.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3761 $
- *
- * Date: $Date: 2009-05-07 00:18:02 -0400 (Thu, 07 May 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.content.packager;
 
 import java.io.ByteArrayInputStream;
@@ -53,16 +22,18 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
+import org.dspace.content.crosswalk.AbstractPackagerWrappingCrosswalk;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.CrosswalkObjectNotSupported;
 import org.dspace.content.crosswalk.MetadataValidationException;
 import org.dspace.content.crosswalk.IngestionCrosswalk;
+import org.dspace.content.crosswalk.StreamIngestionCrosswalk;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.jdom.Document;
+import org.jdom.Content;
 import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.Namespace;
@@ -136,43 +107,44 @@ public class METSManifest
          *
          * @param mdRef JDOM element of mdRef in the METS manifest.
          * @return stream containing the metadata mentioned in mdRef.
-         * @throw MetadataValidationException if the mdRef is unacceptable or missing required information.
-         * @throw IOException if it is returned by services called by this method.
-         * @throw SQLException if it is returned by services called by this method.
-         * @throw AuthorizeException if it is returned by services called by this method.
+         * @throws MetadataValidationException if the mdRef is unacceptable or missing required information.
+         * @throws IOException if it is returned by services called by this method.
+         * @throws SQLException if it is returned by services called by this method.
+         * @throws AuthorizeException if it is returned by services called by this method.
          */
         public InputStream getInputStream(Element mdRef)
-            throws MetadataValidationException, IOException, SQLException, AuthorizeException;
+            throws MetadataValidationException, PackageValidationException,
+                   IOException, SQLException, AuthorizeException;
     }
 
     /** log4j category */
-    private static Logger log = Logger.getLogger(METSManifest.class);
+    private static final Logger log = Logger.getLogger(METSManifest.class);
 
     /** Canonical filename of METS manifest within a package or as a bitstream. */
-    public final static String MANIFEST_FILE = "mets.xml";
+    public static final String MANIFEST_FILE = "mets.xml";
 
     /** Prefix of DSpace configuration lines that map METS metadata type to
      * crosswalk plugin names.
      */
-    private final static String CONFIG_METADATA_PREFIX = "mets.submission.crosswalk.";
+    public static final String CONFIG_METS_PREFIX = "mets.";
 
     /** prefix of config lines identifying local XML Schema (XSD) files */
-    private final static String CONFIG_XSD_PREFIX = "mets.xsd.";
+    private static final String CONFIG_XSD_PREFIX = CONFIG_METS_PREFIX+"xsd.";
 
     /** Dublin core element namespace */
-    private static Namespace dcNS = Namespace
+    private static final Namespace dcNS = Namespace
             .getNamespace("http://purl.org/dc/elements/1.1/");
 
     /** Dublin core term namespace (for qualified DC) */
-    private static Namespace dcTermNS = Namespace
+    private static final Namespace dcTermNS = Namespace
             .getNamespace("http://purl.org/dc/terms/");
 
     /** METS namespace -- includes "mets" prefix for use in XPaths */
-    public static Namespace metsNS = Namespace
+    public static final Namespace metsNS = Namespace
             .getNamespace("mets", "http://www.loc.gov/METS/");
 
     /** XLink namespace -- includes "xlink" prefix prefix for use in XPaths */
-    private static Namespace xlinkNS = Namespace
+    public static final Namespace xlinkNS = Namespace
             .getNamespace("xlink", "http://www.w3.org/1999/xlink");
 
     /** root element of the current METS manifest. */
@@ -181,11 +153,14 @@ public class METSManifest
     /** all mdRef elements in the manifest */
     private List mdFiles = null;
 
-    /** <file> elements in "original" filegroup (bundle) */
-    private List contentFiles = null;
+    /** <file> elements in "original" file group (bundle) */
+    private List<Element> contentFiles = null;
 
     /** builder to use for mdRef streams, inherited from create() */
     private SAXBuilder parser = null;
+
+    /** name of packager who created this manifest object, for looking up configuration entries. */
+    private String configName;
 
     // Create list of local schemas at load time, since it depends only
     // on the DSpace configuration.
@@ -196,7 +171,7 @@ public class METSManifest
         File xsdPath1 = new File(dspace_dir+"/config/schemas/");
         File xsdPath2 = new File(dspace_dir+"/config/");
 
-        Enumeration pe = ConfigurationManager.propertyNames();
+        Enumeration<String> pe = (Enumeration<String>)ConfigurationManager.propertyNames();
         StringBuffer result = new StringBuffer();
         while (pe.hasMoreElements())
         {
@@ -205,7 +180,7 @@ public class METSManifest
             // e.g.
             //  mets.xsd.dc =  http://purl.org/dc/elements/1.1/ dc.xsd
             // (filename is relative to {dspace_dir}/config/schemas/)
-            String key = (String)pe.nextElement();
+            String key = pe.nextElement();
             if (key.startsWith(CONFIG_XSD_PREFIX))
             {
                 String spec  = ConfigurationManager.getProperty(key);
@@ -214,16 +189,22 @@ public class METSManifest
                 {
                     File xsd = new File(xsdPath1, val[1]);
                     if (!xsd.exists())
-                         xsd = new File(xsdPath2, val[1]);
+                    {
+                        xsd = new File(xsdPath2, val[1]);
+                    }
                     if (!xsd.exists())
-                        log.warn("Schema file not found for config entry=\""+spec+"\"");
+                    {
+                        log.warn("Schema file not found for config entry=\"" + spec + "\"");
+                    }
                     else
                     {
                         try
                         {
                             String u = xsd.toURL().toString();
                             if (result.length() > 0)
+                            {
                                 result.append(" ");
+                            }
                             result.append(val[0]).append(" ").append(u);
                         }
                         catch (java.net.MalformedURLException e)
@@ -233,11 +214,16 @@ public class METSManifest
                     }
                 }
                 else
-                    log.warn("Schema config entry has wrong format, entry=\""+spec+"\"");
+                {
+                    log.warn("Schema config entry has wrong format, entry=\"" + spec + "\"");
+                }
             }
         }
         localSchemas = result.toString();
-        log.debug("Got local schemas = \""+localSchemas+"\"");
+        if (log.isDebugEnabled())
+        {
+            log.debug("Got local schemas = \"" + localSchemas + "\"");
+        }
     }
 
     /**
@@ -245,11 +231,12 @@ public class METSManifest
      * @param builder XML parser (for parsing mdRef'd files and binData)
      * @param mets parsed METS document
      */
-    private METSManifest(SAXBuilder builder, Element mets)
+    private METSManifest(SAXBuilder builder, Element mets, String configName)
     {
         super();
         this.mets = mets;
         parser = builder;
+        this.configName = configName;
     }
 
     /**
@@ -262,23 +249,26 @@ public class METSManifest
      *          or validating the METS.
      * @return new METSManifest object.
      */
-    public static METSManifest create(InputStream is, boolean validate)
+    public static METSManifest create(InputStream is, boolean validate, String configName)
             throws IOException,
             MetadataValidationException
     {
         SAXBuilder builder = new SAXBuilder(validate);
 
+        builder.setIgnoringElementContentWhitespace(true);
+
         // Set validation feature
         if (validate)
-            builder.setFeature("http://apache.org/xml/features/validation/schema",
-                    true);
+        {
+            builder.setFeature("http://apache.org/xml/features/validation/schema", true);
+        }
 
         // Tell the parser where local copies of schemas are, to speed up
         // validation.  Local XSDs are identified in the configuration file.
         if (localSchemas.length() > 0)
-            builder.setProperty(
-                    "http://apache.org/xml/properties/schema/external-schemaLocation",
-                    localSchemas);
+        {
+            builder.setProperty("http://apache.org/xml/properties/schema/external-schemaLocation", localSchemas);
+        }
 
         // Parse the METS file
         Document metsDocument;
@@ -287,12 +277,13 @@ public class METSManifest
         {
             metsDocument = builder.build(is);
 
-            // XXX for temporary debugging
-            /*
-            XMLOutputter outputPretty = new XMLOutputter(Format.getPrettyFormat());
-            log.debug("Got METS DOCUMENT:");
-            log.debug(outputPretty.outputString(metsDocument));
-              */
+            /*** XXX leave commented out except if needed for
+             *** viewing the METS document that actually gets read.
+             *
+             * XMLOutputter outputPretty = new XMLOutputter(Format.getPrettyFormat());
+             * log.debug("Got METS DOCUMENT:");
+             * log.debug(outputPretty.outputString(metsDocument));
+             ****/
         }
         catch (JDOMException je)
         {
@@ -300,7 +291,7 @@ public class METSManifest
                     + is.toString(),  je);
         }
 
-        return new METSManifest(builder, metsDocument.getRootElement());
+        return new METSManifest(builder, metsDocument.getRootElement(), configName);
     }
 
     /**
@@ -313,30 +304,44 @@ public class METSManifest
     }
 
     /**
+     * Return the OBJID attribute of the METS manifest.
+     * This is where the Handle URI/URN of the object can be found.
+     *
+     * @return OBJID attribute of METS manifest
+     */
+    public String getObjID()
+    {
+        return mets.getAttributeValue("OBJID");
+    }
+
+    /**
      * Gets all <code>file</code> elements which make up
      *   the item's content.
      * @return a List of <code>Element</code>s.
      */
-    public List getContentFiles()
+    public List<Element> getContentFiles()
         throws MetadataValidationException
     {
         if (contentFiles != null)
-            return contentFiles;
-
-        Element fileSec = mets.getChild("fileSec", metsNS);
-        if (fileSec == null)
-            throw new MetadataValidationException("Invalid METS Manifest: DSpace requires a fileSec element, but it is missing.");
-
-        contentFiles = new ArrayList();
-        Iterator fgi = fileSec.getChildren("fileGrp", metsNS).iterator();
-        while (fgi.hasNext())
         {
-            Element fg = (Element)fgi.next();
-            Iterator fi = fg.getChildren("file", metsNS).iterator();
-            while (fi.hasNext())
+            return contentFiles;
+        }
+
+        contentFiles = new ArrayList<Element>();
+        Element fileSec = mets.getChild("fileSec", metsNS);
+
+        if (fileSec != null)
+        {   
+            Iterator fgi = fileSec.getChildren("fileGrp", metsNS).iterator();
+            while (fgi.hasNext())
             {
-                Element f = (Element)fi.next();
-                contentFiles.add(f);
+                Element fg = (Element)fgi.next();
+                Iterator fi = fg.getChildren("file", metsNS).iterator();
+                while (fi.hasNext())
+                {
+                    Element f = (Element)fi.next();
+                    contentFiles.add(f);
+                }
             }
         }
         return contentFiles;
@@ -379,13 +384,15 @@ public class METSManifest
      * attribute is peculiar to the DSpace METS SIP profile, and may not be
      * generally useful with other sorts of METS documents.
      * @param file METS file element of derived file
-     * @return file Element of original or null if none found.
+     * @return file path of original or null if none found.
      */
-    public Element getOriginalFile(Element file)
+    public String getOriginalFilePath(Element file)
     {
         String groupID = file.getAttributeValue("GROUPID");
         if (groupID == null || groupID.equals(""))
+        {
             return null;
+        }
 
         try
         {
@@ -395,10 +402,16 @@ public class METSManifest
             List oFiles = xpath.selectNodes(mets);
             if (oFiles.size() > 0)
             {
-                log.debug("Got ORIGINAL file for derived="+file.toString());
-                return (Element)oFiles.get(0);
+                if (log.isDebugEnabled())
+                {
+                    log.debug("Got ORIGINAL file for derived=" + file.toString());
+                }
+                Element flocat = ((Element)oFiles.get(0)).getChild("FLocat", metsNS);
+                if (flocat != null)
+                {
+                    return flocat.getAttributeValue("href", xlinkNS);
+                }
             }
-            else
                 return null;
         }
         catch (JDOMException je)
@@ -413,14 +426,20 @@ public class METSManifest
     private static String normalizeBundleName(String in)
     {
         if (in.equals("CONTENT"))
+        {
             return Constants.CONTENT_BUNDLE_NAME;
+        }
         else if (in.equals("MANIFESTMD"))
+        {
             return Constants.METADATA_BUNDLE_NAME;
+        }
         return in;
     }
 
     /**
-     * Get the DSpace bundle name corresponding to the <code>USE</code> attribute of the file group enclosing this <code>file</code> element.
+     * Get the DSpace bundle name corresponding to the <code>USE</code>
+     * attribute of the file group enclosing this <code>file</code> element.
+     * 
      * @return DSpace bundle name
      * @throws MetadataValidationException when there is no USE attribute on the enclosing fileGrp.
      */
@@ -430,7 +449,9 @@ public class METSManifest
         Element fg = file.getParentElement();
         String fgUse = fg.getAttributeValue("USE");
         if (fgUse == null)
+        {
             throw new MetadataValidationException("Invalid METS Manifest: every fileGrp element must have a USE attribute.");
+        }
         return normalizeBundleName(fgUse);
     }
 
@@ -454,21 +475,31 @@ public class METSManifest
             {
                 // check for forbidden FContent child first:
                 if (file.getChild("FContent", metsNS) == null)
+                {
                     throw new MetadataValidationException("Invalid METS Manifest: Every file element must have FLocat child.");
+                }
                 else
+                {
                     throw new MetadataValidationException("Invalid METS Manifest: file element has forbidden FContent child, only FLocat is allowed.");
+                }
             }
         }
         else if (file.getName().equals("mdRef"))
+        {
             ref = file;
+        }
         else
-            throw new MetadataValidationException("getFileName() called with recognized element type: "+file.toString());
+        {
+            throw new MetadataValidationException("getFileName() called with recognized element type: " + file.toString());
+        }
         String loctype = ref.getAttributeValue("LOCTYPE");
         if (loctype != null && loctype.equals("URL"))
         {
             String result = ref.getAttributeValue("href", xlinkNS);
             if (result == null)
+            {
                 throw new MetadataValidationException("Invalid METS Manifest: FLocat/mdRef is missing the required xlink:href attribute.");
+            }
             return result;
         }
         throw new MetadataValidationException("Invalid METS Manifest: FLocat/mdRef does not have LOCTYPE=\"URL\" attribute.");
@@ -476,28 +507,35 @@ public class METSManifest
 
     /**
      * Returns file element corresponding to primary bitstream.
-     * There is <i>ONLY</i> a primary bitstream if the first <code>div</code> under
-     * first </code>structMap</code> has an </code>fptr</code>.
+     * There is <i>ONLY</i> a primary bitstream if the first {@code div} under
+     * first {@code structMap} has an {@code fptr}.
      *
      * @return file element of Item's primary bitstream, or null if there is none.
      */
-    public Element getPrimaryBitstream()
+    public Element getPrimaryOrLogoBitstream()
         throws MetadataValidationException
     {
-        Element firstDiv = getFirstDiv();
-        Element fptr = firstDiv.getChild("fptr", metsNS);
+        Element objDiv = getObjStructDiv();
+        Element fptr = objDiv.getChild("fptr", metsNS);
         if (fptr == null)
+        {
             return null;
+        }
         String id = fptr.getAttributeValue("FILEID");
         if (id == null)
+        {
             throw new MetadataValidationException("fptr for Primary Bitstream is missing the required FILEID attribute.");
+        }
         Element result = getElementByXPath("descendant::mets:file[@ID=\""+id+"\"]", false);
         if (result == null)
-            throw new MetadataValidationException("Cannot find file element for Primary Bitstream: looking for ID="+id);
+        {
+            throw new MetadataValidationException("Cannot find file element for Primary Bitstream: looking for ID=" + id);
+        }
         return result;
     }
 
-    /** Get the metadata type from within a *mdSec element.
+    /**
+     * Get the metadata type from within a *mdSec element.
      * @return metadata type name.
      */
     public String getMdType(Element mdSec)
@@ -505,14 +543,22 @@ public class METSManifest
     {
         Element md = mdSec.getChild("mdRef", metsNS);
         if (md == null)
+        {
             md = mdSec.getChild("mdWrap", metsNS);
+        }
         if (md == null)
+        {
             throw new MetadataValidationException("Invalid METS Manifest: ?mdSec element has neither mdRef nor mdWrap child.");
+        }
         String result = md.getAttributeValue("MDTYPE");
         if (result != null && result.equals("OTHER"))
+        {
             result = md.getAttributeValue("OTHERMDTYPE");
+        }
         if (result == null)
-            throw new MetadataValidationException("Invalid METS Manifest: "+md.getName()+" has no MDTYPE or OTHERMDTYPE attribute.");
+        {
+            throw new MetadataValidationException("Invalid METS Manifest: " + md.getName() + " has no MDTYPE or OTHERMDTYPE attribute.");
+        }
         return result;
     }
 
@@ -528,27 +574,50 @@ public class METSManifest
         {
             String mimeType = mdWrap.getAttributeValue("MIMETYPE");
             if (mimeType == null && mdWrap.getChild("xmlData", metsNS) != null)
-            mimeType = "text/xml";
+            {
+                mimeType = "text/xml";
+            }
             return mimeType;
         }
         Element mdRef = mdSec.getChild("mdRef", metsNS);
         if (mdRef != null)
+        {
             return mdRef.getAttributeValue("MIMETYPE");
+        }
         return null;
     }
 
     /**
      * Return contents of *md element as List of XML Element objects.
-     * Gets content, dereferecing mdRef if necessary, or decoding and parsing
+     * Gets content, dereferencing mdRef if necessary, or decoding and parsing
      * a binData that contains XML.
      * @return contents of metadata section, or empty list if no XML content is available.
      * @throws MetadataValidationException if METS is invalid, or there is an error parsing the XML.
      */
-    public List getMdContentAsXml(Element mdSec, Mdref callback)
-        throws MetadataValidationException, IOException, SQLException, AuthorizeException
+    public List<Element> getMdContentAsXml(Element mdSec, Mdref callback)
+        throws MetadataValidationException, PackageValidationException,
+               IOException, SQLException, AuthorizeException
     {
         try
         {
+            // XXX sanity check: if this has more than one child, consider it
+            // an error since we cannot deal with more than one mdRef|mdWrap
+            // child.  This may be considered a bug and need to be fixed,
+            // so it's best to bring it to the attention of users.
+            List mdc = mdSec.getChildren();
+            if (mdc.size() > 1)
+            {
+                // XXX scaffolding for debugging diagnosis; at least one
+                //  XML parser stupidly includes newlines in prettyprinting
+                //  as text content objects..
+                String id = mdSec.getAttributeValue("ID");
+                StringBuffer sb = new StringBuffer();
+                for (Iterator mi = mdc.iterator(); mi.hasNext();)
+                {
+                    sb.append(", ").append(((Content)mi.next()).toString());
+                }
+                throw new MetadataValidationException("Cannot parse METS with "+mdSec.getQualifiedName()+" element that contains more than one child, size="+String.valueOf(mdc.size())+", ID="+id+"Kids="+sb.toString());
+            }
             Element mdRef = null;
             Element mdWrap = mdSec.getChild("mdWrap", metsNS);
             if (mdWrap != null)
@@ -558,7 +627,9 @@ public class METSManifest
                 {
                     Element bin = mdWrap.getChild("binData", metsNS);
                     if (bin == null)
+                    {
                         throw new MetadataValidationException("Invalid METS Manifest: mdWrap element with neither xmlData nor binData child.");
+                    }
 
                     // if binData is actually XML, return it; otherwise ignore.
                     else
@@ -568,14 +639,14 @@ public class METSManifest
                         {
                             byte value[] = Base64.decodeBase64(bin.getText().getBytes());
                             Document mdd = parser.build(new ByteArrayInputStream(value));
-                            List result = new ArrayList(1);
+                            List<Element> result = new ArrayList<Element>(1);
                             result.add(mdd.getRootElement());
                             return result;
                         }
                         else
                         {
                             log.warn("Ignoring binData section because MIMETYPE is not XML, but: "+mimeType);
-                            return new ArrayList(0);
+                            return new ArrayList<Element>(0);
                         }
                    }
                 }
@@ -584,24 +655,31 @@ public class METSManifest
                     return xmlData.getChildren();
                 }
             }
-            else if ((mdRef = mdSec.getChild("mdRef", metsNS)) != null)
+            else
             {
-                String mimeType = mdRef.getAttributeValue("MIMETYPE");
-                if (mimeType != null && mimeType.equalsIgnoreCase("text/xml"))
+                mdRef = mdSec.getChild("mdRef", metsNS);
+                if (mdRef != null)
                 {
-                    Document mdd = parser.build(callback.getInputStream(mdRef));
-                    List result = new ArrayList(1);
-                    result.add(mdd.getRootElement());
-                    return result;
+                    String mimeType = mdRef.getAttributeValue("MIMETYPE");
+                    if (mimeType != null && mimeType.equalsIgnoreCase("text/xml"))
+                    {
+                        Document mdd = parser.build(callback.getInputStream(mdRef));
+                        List<Element> result = new ArrayList<Element>(1);
+                        result.add(mdd.getRootElement());
+                        return result;
+                    }
+                    else
+                    {
+                        log.warn("Ignoring mdRef section because MIMETYPE is not XML, but: "+mimeType);
+                        return new ArrayList<Element>(0);
+                    }
+
                 }
                 else
                 {
-                    log.warn("Ignoring mdRef section because MIMETYPE is not XML, but: "+mimeType);
-                    return new ArrayList(0);
+                    throw new MetadataValidationException("Invalid METS Manifest: ?mdSec element with neither mdRef nor mdWrap child.");
                 }
             }
-            else
-                throw new MetadataValidationException("Invalid METS Manifest: ?mdSec element with neither mdRef nor mdWrap child.");
         }
         catch (JDOMException je)
         {
@@ -612,13 +690,14 @@ public class METSManifest
 
     /**
      * Return contents of *md element as stream.
-     * Gets content, dereferecing mdRef if necessary, or decoding
+     * Gets content, dereferencing mdRef if necessary, or decoding
      * a binData element if necessary.
      * @return Stream containing contents of metadata section.  Never returns null.
      * @throws MetadataValidationException if METS format does not contain any metadata.
      */
     public InputStream getMdContentAsStream(Element mdSec, Mdref callback)
-        throws MetadataValidationException, IOException, SQLException, AuthorizeException
+        throws MetadataValidationException, PackageValidationException,
+               IOException, SQLException, AuthorizeException
     {
         Element mdRef = null;
         Element mdWrap = mdSec.getChild("mdWrap", metsNS);
@@ -629,7 +708,9 @@ public class METSManifest
             {
                 Element bin = mdWrap.getChild("binData", metsNS);
                 if (bin == null)
+                {
                     throw new MetadataValidationException("Invalid METS Manifest: mdWrap element with neither xmlData nor binData child.");
+                }
 
                 else
                 {
@@ -644,53 +725,175 @@ public class METSManifest
                         outputPretty.outputString(xmlData.getChildren()).getBytes());
             }
         }
-        else if ((mdRef = mdSec.getChild("mdRef", metsNS)) != null)
-        {
-            return callback.getInputStream(mdRef);
-        }
         else
-            throw new MetadataValidationException("Invalid METS Manifest: ?mdSec element with neither mdRef nor mdWrap child.");
-    }
-
-
-    // special call to crosswalk the guts of a metadata *Sec (dmdSec, amdSec)
-    // because mdRef and mdWrap have to be handled differently.
-    // It's a lot like getMdContentAsXml but cannot use that because xwalk
-    // should be called with root element OR list depending on what was given.
-    private void crosswalkMdContent(Element mdSec, Mdref callback,
-                IngestionCrosswalk xwalk, Context context, DSpaceObject dso)
-        throws CrosswalkException, IOException, SQLException, AuthorizeException
-    {
-        List xml = getMdContentAsXml(mdSec,callback);
-
-        // if we get inappropriate metadata, e.g. PREMIS for Item, let it go.
-        try
         {
-            xwalk.ingest(context, dso, xml);
-        }
-        catch (CrosswalkObjectNotSupported e)
-        {
-            log.warn("Skipping metadata for inappropriate type of object: Object="+dso.toString()+", error="+e.toString());
+            mdRef = mdSec.getChild("mdRef", metsNS);
+            if (mdRef != null)
+            {
+                return callback.getInputStream(mdRef);
+            }
+            else
+            {
+                throw new MetadataValidationException("Invalid METS Manifest: ?mdSec element with neither mdRef nor mdWrap child.");
+            }
         }
     }
 
-    // return first <div> of first <structMap>;
-    // in DSpace profile, this is where item-wide dmd and other metadata
-    // lives as IDrefs.
-    private Element getFirstDiv()
+
+    /**
+     * Return the {@code <div>} which describes this DSpace Object (and its contents)
+     * from the {@code <structMap>}.  In all cases, this is the first {@code <div>}
+     * in the first {@code <structMap>}.
+     *
+     * @return Element which is the DSpace Object Contents {@code <div>}
+     * @throws MetadataValidationException
+     */
+    public Element getObjStructDiv()
         throws MetadataValidationException
     {
+        //get first <structMap>
         Element sm = mets.getChild("structMap", metsNS);
         if (sm == null)
+        {
             throw new MetadataValidationException("METS document is missing the required structMap element.");
+        }
 
+        //get first <div>
         Element result = sm.getChild("div", metsNS);
         if (result == null)
+        {
             throw new MetadataValidationException("METS document is missing the required first div element in first structMap.");
+        }
 
-        log.debug("Got firstDiv result="+result.toString());
+        if (log.isDebugEnabled())
+        {
+            log.debug("Got getObjStructDiv result=" + result.toString());
+        }
+        
         return (Element)result;
     }
+
+    /**
+     * Get an array of child object {@code <div>}s from the METS Manifest {@code <structMap>}.
+     * These {@code <div>}s reference the location of any child objects METS manifests.
+     * 
+     * @return a List of {@code Element}s, each a {@code <div>}.  May be empty but NOT null.
+     * @throws MetadataValidationException
+     */
+    public List getChildObjDivs()
+            throws MetadataValidationException
+    {
+        //get the <div> in <structMap> which describes the current object's contents
+        Element objDiv = getObjStructDiv();
+
+        //get the child <div>s -- these should reference the child METS manifest
+        return objDiv.getChildren("div", metsNS);
+    }
+
+    /**
+     * Retrieve the file paths for the children objects' METS Manifest files.
+     * These file paths are located in the {@code <mptr>} where @LOCTYPE=URL
+     *
+     * @return a list of Strings, corresponding to relative file paths of children METS manifests
+     * @throws MetadataValidationException
+     */
+    public String[] getChildMetsFilePaths()
+            throws MetadataValidationException
+    {
+        //get our child object <div>s
+        List childObjDivs = getChildObjDivs();
+
+        List<String> childPathList = new ArrayList<String>();
+
+        if(childObjDivs != null && !childObjDivs.isEmpty())
+        {
+            Iterator childIterator = childObjDivs.iterator();
+            //For each Div, we want to find the underlying <mptr> with @LOCTYPE=URL
+            while(childIterator.hasNext())
+            {
+                Element childDiv = (Element) childIterator.next();
+                //get all child <mptr>'s
+                List childMptrs = childDiv.getChildren("mptr", metsNS);
+
+                if(childMptrs!=null && !childMptrs.isEmpty())
+                {
+                     Iterator mptrIterator = childMptrs.iterator();
+                     //For each mptr, we want to find the one with @LOCTYPE=URL
+                     while(mptrIterator.hasNext())
+                     {
+                         Element mptr = (Element) mptrIterator.next();
+                         String locType = mptr.getAttributeValue("LOCTYPE");
+                         //if @LOCTYPE=URL, then capture @xlink:href as the METS Manifest file path
+                         if (locType!=null && locType.equals("URL"))
+                         {
+                            String filePath = mptr.getAttributeValue("href", xlinkNS);
+                            if(filePath!=null && filePath.length()>0)
+                            {
+                                childPathList.add(filePath);
+                            }
+                         }
+                     }//end <mptr> loop
+                }//end if <mptr>'s exist
+            }//end child <div> loop
+        }//end if child <div>s exist
+
+        String[] childPaths = new String[childPathList.size()];
+        childPaths = (String[]) childPathList.toArray(childPaths);
+        return childPaths;
+    }
+
+    /**
+     * Return the reference to the Parent Object from the "Parent" {@code <structMap>}.
+     * This parent object is the owner of current object.
+     *
+     * @return Link to the Parent Object (this is the Handle of that Parent)
+     * @throws MetadataValidationException
+     */
+    public String getParentOwnerLink()
+        throws MetadataValidationException
+    {
+        
+        //get a list of our structMaps
+        List<Element> childStructMaps = mets.getChildren("structMap", metsNS);
+        Element parentStructMap = null;
+
+        // find the <structMap LABEL='Parent'>
+        if(!childStructMaps.isEmpty())
+        {
+            for (Element structMap : childStructMaps)
+            {
+                String label = structMap.getAttributeValue("LABEL");
+                if(label!=null && label.equalsIgnoreCase("Parent"))
+                {
+                    parentStructMap = structMap;
+                    break;
+                }
+            }
+        }
+
+        if (parentStructMap == null)
+        {
+            throw new MetadataValidationException("METS document is missing the required structMap[@LABEL='Parent'] element.");
+        }
+
+        //get first <div>
+        Element linkDiv = parentStructMap.getChild("div", metsNS);
+        if (linkDiv == null)
+        {
+            throw new MetadataValidationException("METS document is missing the required first div element in structMap[@LABEL='Parent'].");
+        }
+
+        //the link is in the <mptr> in the @xlink:href attribute
+        Element mptr = linkDiv.getChild("mptr", metsNS);
+        if (mptr != null)
+        {
+            return mptr.getAttributeValue("href", xlinkNS);
+        }
+        
+        //return null if we couldn't find the link
+        return null;
+    }
+
 
     // return a single Element node found by one-off path.
     // use only when path varies each time you call it.
@@ -704,11 +907,17 @@ public class METSManifest
             xpath.addNamespace(xlinkNS);
             Object result = xpath.selectSingleNode(mets);
             if (result == null && nullOk)
+            {
                 return null;
+            }
             else if (result instanceof Element)
-                return (Element)result;
+            {
+                return (Element) result;
+            }
             else
-                throw new MetadataValidationException("METSManifest: Failed to resolve XPath, path=\""+path+"\"");
+            {
+                throw new MetadataValidationException("METSManifest: Failed to resolve XPath, path=\"" + path + "\"");
+            }
         }
         catch (JDOMException je)
         {
@@ -717,18 +926,28 @@ public class METSManifest
     }
 
     // Find crosswalk for the indicated metadata type (e.g. "DC", "MODS")
-    // The crosswalk plugin name MAY be indirected in config file,
-    // through an entry like
-    //  mets.submission.crosswalk.{mdType} = {pluginName}
-    //   e.g.
-    //  mets.submission.crosswalk.DC = mysite-QDC
-    private IngestionCrosswalk getCrosswalk(String type)
+    private Object getCrosswalk(String type, Class clazz)
     {
-        String xwalkName = ConfigurationManager.getProperty(CONFIG_METADATA_PREFIX + type);
+        /**
+         * Allow DSpace Config to map the metadata type to a
+         * different crosswalk name either per-packager or for METS
+         * in general.  First, look for config key like:
+         *   mets.<packagerName>.ingest.crosswalk.MDNAME = XWALKNAME
+         * then try
+         *   mets.default.ingest.crosswalk.MDNAME = XWALKNAME
+         */
+        String xwalkName = ConfigurationManager.getProperty(
+            CONFIG_METS_PREFIX+configName+".ingest.crosswalk."+type);
         if (xwalkName == null)
-            xwalkName = type;
-        return (IngestionCrosswalk)
-          PluginManager.getNamedPlugin(IngestionCrosswalk.class, xwalkName);
+        {
+            xwalkName = ConfigurationManager.getProperty(
+              CONFIG_METS_PREFIX+"default.ingest.crosswalk."+type);
+            if (xwalkName == null)
+            {
+                xwalkName = type;
+            }
+        }
+        return PluginManager.getNamedPlugin(clazz, xwalkName);
     }
 
     /**
@@ -742,17 +961,45 @@ public class METSManifest
         throws MetadataValidationException
     {
         // div@DMDID is actually IDREFS, a space-separated list of IDs:
-        Element firstDiv = getFirstDiv();
-        String dmds = firstDiv.getAttributeValue("DMDID");
+        Element objDiv = getObjStructDiv();
+        String dmds = objDiv.getAttributeValue("DMDID");
         if (dmds == null)
+        {
             throw new MetadataValidationException("Invalid METS: Missing reference to Item descriptive metadata, first div on first structmap must have a DMDID attribute.");
-        String dmdID[] = dmds.split("\\s+");
-        Element result[] = new Element[dmdID.length];
-
-        for (int i = 0; i < dmdID.length; ++i)
-            result[i] = getElementByXPath("mets:dmdSec[@ID=\""+dmdID[i]+"\"]", false);
-        return result;
+        }
+        
+        return getDmdElements(dmds);
     }
+
+
+    /**
+     * Gets all dmdSec elements from a space separated list
+     *
+     * @param dmdList space-separated list of DMDIDs
+     * @return array of Elements, each a dmdSec.  May be empty but NOT null.
+     * @throws MetadataValidationException if the METS is missing a reference to item-wide
+     *          DMDs in the correct place.
+     */
+    public Element[] getDmdElements(String dmdList)
+        throws MetadataValidationException
+    {
+        if(dmdList!=null && !dmdList.isEmpty())
+        {
+            String dmdID[] = dmdList.split("\\s+");
+            Element result[] = new Element[dmdID.length];
+
+            for (int i = 0; i < dmdID.length; ++i)
+            {
+                result[i] = getElementByXPath("mets:dmdSec[@ID=\""+dmdID[i]+"\"]", false);
+            }
+            return result;
+        }
+        else
+        {
+            return new Element[0];
+        }
+    }
+
 
     /**
      * Return rights metadata section(s) relevant to item as a whole.
@@ -763,57 +1010,246 @@ public class METSManifest
         throws MetadataValidationException
     {
         // div@ADMID is actually IDREFS, a space-separated list of IDs:
-        Element firstDiv = getFirstDiv();
-        String amds = firstDiv.getAttributeValue("ADMID");
+        Element objDiv = getObjStructDiv();
+        String amds = objDiv.getAttributeValue("ADMID");
         if (amds == null)
         {
-            log.debug("getItemRightsMD: No ADMID references found.");
+            if (log.isDebugEnabled())
+            {
+                log.debug("getItemRightsMD: No ADMID references found.");
+            }
             return new Element[0];
         }
         String amdID[] = amds.split("\\s+");
-        List resultList = new ArrayList();
+        List<Element> resultList = new ArrayList<Element>();
         for (int i = 0; i < amdID.length; ++i)
         {
             List rmds = getElementByXPath("mets:amdSec[@ID=\""+amdID[i]+"\"]", false).
                             getChildren("rightsMD", metsNS);
             if (rmds.size() > 0)
+            {
                 resultList.addAll(rmds);
+            }
         }
-        return (Element[])resultList.toArray(new Element[resultList.size()]);
+        return resultList.toArray(new Element[resultList.size()]);
     }
 
     /**
      * Invokes appropriate crosswalks on Item-wide descriptive metadata.
      */
-    public void crosswalkItem(Context context, Item item, Element dmd, Mdref callback)
-        throws MetadataValidationException,
+    public void crosswalkItemDmd(Context context, PackageParameters params,
+                                DSpaceObject dso,
+                                Element dmdSec, Mdref callback)
+        throws MetadataValidationException, PackageValidationException,
                CrosswalkException, IOException, SQLException, AuthorizeException
     {
-        String type = getMdType(dmd);
-        IngestionCrosswalk xwalk = getCrosswalk(type);
+        crosswalkXmd(context, params, dso, dmdSec, callback);
+    }
 
-        if (xwalk == null)
-            throw new MetadataValidationException("Cannot process METS Manifest: "+
-                "No crosswalk found for MDTYPE="+type);
-        crosswalkMdContent(dmd, callback, xwalk, context, item);
+    /**
+     * Crosswalk all technical and source metadata sections that belong
+     * to the whole object.
+     * @throws MetadataValidationException if METS is invalid, e.g. referenced amdSec is missing.
+     */
+    public void crosswalkObjectOtherAdminMD(Context context, PackageParameters params,
+                                      DSpaceObject dso, Mdref callback)
+        throws MetadataValidationException, PackageValidationException,
+               CrosswalkException, IOException, SQLException, AuthorizeException
+    {
+        for (String amdID : getAmdIDs())
+        {
+            Element amdSec = getElementByXPath("mets:amdSec[@ID=\""+amdID+"\"]", false);
+            for (Iterator ti = amdSec.getChildren("techMD", metsNS).iterator(); ti.hasNext();)
+            {
+                crosswalkXmd(context, params, dso, (Element)ti.next(), callback);
+            }
+            for (Iterator ti = amdSec.getChildren("digiprovMD", metsNS).iterator(); ti.hasNext();)
+            {
+                crosswalkXmd(context, params, dso, (Element)ti.next(), callback);
+            }
+            for (Iterator ti = amdSec.getChildren("rightsMD", metsNS).iterator(); ti.hasNext();)
+            {
+                crosswalkXmd(context, params, dso, (Element)ti.next(), callback);
+            }
+        }
+    }
+
+    /**
+     * Just crosswalk the sourceMD sections; used to set the handle and parent of AIP.
+     * @return true if any metadata section was actually crosswalked, false otherwise
+     */
+    public boolean crosswalkObjectSourceMD(Context context, PackageParameters params,
+                                        DSpaceObject dso, Mdref callback)
+        throws MetadataValidationException, PackageValidationException,
+               CrosswalkException, IOException, SQLException, AuthorizeException
+    {
+        boolean result = false;
+
+        for (String amdID : getAmdIDs())
+        {
+            Element amdSec = getElementByXPath("mets:amdSec[@ID=\""+amdID+"\"]", false);
+            for (Iterator ti = amdSec.getChildren("sourceMD", metsNS).iterator(); ti.hasNext();)
+            {
+                crosswalkXmd(context, params, dso, (Element)ti.next(), callback);
+                result = true;
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Get an aray of all AMDID values for this object
+     * 
+     * @return
+     * @throws MetadataValidationException
+     */
+    private String[] getAmdIDs()
+        throws MetadataValidationException
+    {
+        // div@ADMID is actually IDREFS, a space-separated list of IDs:
+        Element objDiv = getObjStructDiv();
+        String amds = objDiv.getAttributeValue("ADMID");
+        if (amds == null)
+        {
+            if (log.isDebugEnabled())
+            {
+                log.debug("crosswalkObjectTechMD: No ADMID references found.");
+            }
+            return new String[0];
+        }
+        return amds.split("\\s+");
+    }
+
+    // Crosswalk *any* kind of metadata section - techMD, rightsMD, etc.
+    private void crosswalkXmd(Context context, PackageParameters params,
+                              DSpaceObject dso,
+                              Element xmd, Mdref callback)
+        throws MetadataValidationException, PackageValidationException,
+               CrosswalkException, IOException, SQLException, AuthorizeException
+    {
+        String type = getMdType(xmd);
+
+        //First, try to find the IngestionCrosswalk to use
+        IngestionCrosswalk xwalk = (IngestionCrosswalk)getCrosswalk(type, IngestionCrosswalk.class);
+
+        // If metadata is not simply applicable to object,
+        // let it go with a warning.
+        try
+        {
+            // If we found the IngestionCrosswalk, crosswalk our XML-based content
+            if (xwalk != null)
+            {
+                // Check if our Crosswalk actually wraps another Packager Plugin
+                if(xwalk instanceof AbstractPackagerWrappingCrosswalk)
+                {
+                    // If this crosswalk wraps another Packager Plugin, we can pass it our Packaging Parameters
+                    // (which essentially allow us to customize the ingest process of the crosswalk)
+                    AbstractPackagerWrappingCrosswalk wrapper = (AbstractPackagerWrappingCrosswalk) xwalk;
+                    wrapper.setPackagingParameters(params);
+                }
+
+                xwalk.ingest(context, dso, getMdContentAsXml(xmd,callback));
+            }
+            // Otherwise, try stream-based crosswalk
+            else
+            {
+                StreamIngestionCrosswalk sxwalk =
+                  (StreamIngestionCrosswalk)getCrosswalk(type, StreamIngestionCrosswalk.class);
+
+                if (sxwalk != null)
+                {
+                    // Check if our Crosswalk actually wraps another Packager Plugin
+                    if(sxwalk instanceof AbstractPackagerWrappingCrosswalk)
+                    {
+                        // If this crosswalk wraps another Packager Plugin, we can pass it our Packaging Parameters
+                        // (which essentially allow us to customize the ingest process of the crosswalk)
+                        AbstractPackagerWrappingCrosswalk wrapper = (AbstractPackagerWrappingCrosswalk) sxwalk;
+                        wrapper.setPackagingParameters(params);
+                    }
+
+                    // If we found a Stream-based crosswalk that matches, we now want to
+                    // locate the stream we are crosswalking.  This stream should be
+                    // references in METS via an <mdRef> element
+                    // (which is how METS references external files)
+                    Element mdRef = xmd.getChild("mdRef", metsNS);
+                    if (mdRef != null)
+                    {
+                        InputStream in = null;
+                        try
+                        {
+                            in = callback.getInputStream(mdRef);
+                            sxwalk.ingest(context, dso, in,
+                                          mdRef.getAttributeValue("MIMETYPE"));
+                        }
+                        finally
+                        {
+                            if (in != null)
+                            {
+                                in.close();
+                            }
+                        }
+                    } // If we couldn't find an <mdRef>, then we'll try an <mdWrap> 
+                      // with a <binData> element instead.
+                      // (this is how METS wraps embedded base64-encoded content streams)
+                    else
+                    {
+                        Element mdWrap = xmd.getChild("mdWrap", metsNS);
+                        if (mdWrap != null)
+                        {
+                            Element bin = mdWrap.getChild("binData", metsNS);
+                            if (bin == null)
+                            {
+                                throw new MetadataValidationException("Invalid METS Manifest: mdWrap element for streaming crosswalk without binData child.");
+                            }
+                            else
+                            {
+                                byte value[] = Base64.decodeBase64(bin.getText().getBytes());
+                                sxwalk.ingest(context, dso,
+                                              new ByteArrayInputStream(value),
+                                              mdWrap.getAttributeValue("MIMETYPE"));
+                            }
+                        }
+                        else
+                        {
+                            throw new MetadataValidationException("Cannot process METS Manifest: " +
+                                    "Metadata of type=" + type + " requires a reference to a stream (mdRef), which was not found in " + xmd.getName());
+                        }
+                    }
+                }
+                else
+                {
+                    throw new MetadataValidationException("Cannot process METS Manifest: " +
+                            "No crosswalk found for contents of " + xmd.getName() + " element, MDTYPE=" + type);
+                }
+            }
+        }
+        catch (CrosswalkObjectNotSupported e)
+        {
+            log.warn("Skipping metadata section "+xmd.getName()+", type="+type+" inappropriate for this type of object: Object="+dso.toString()+", error="+e.toString());
+        }
     }
 
     /**
      * Crosswalk the metadata associated with a particular <code>file</code>
      * element into the bitstream it corresponds to.
      * @param context a dspace context.
-     * @param bs bitstream target of the crosswalk
+     * @param params any PackageParameters which may affect how bitstreams are crosswalked
+     * @param bitstream bitstream target of the crosswalk
      * @param fileId value of ID attribute in the file element responsible
      *  for the contents of that bitstream.
+     *  @param callback ???
      */
-    public void crosswalkBitstream(Context context, Bitstream bitstream,
+    public void crosswalkBitstream(Context context, PackageParameters params,
+                                   Bitstream bitstream,
                                    String fileId, Mdref callback)
-        throws MetadataValidationException,
+        throws MetadataValidationException, PackageValidationException,
                CrosswalkException, IOException, SQLException, AuthorizeException
     {
         Element file = getElementByXPath("descendant::mets:file[@ID=\""+fileId+"\"]", false);
         if (file == null)
-            throw new MetadataValidationException("Failed in Bitstream crosswalk, Could not find file element with ID="+fileId);
+        {
+            throw new MetadataValidationException("Failed in Bitstream crosswalk, Could not find file element with ID=" + fileId);
+        }
 
         // In DSpace METS SIP spec, admin metadata is only "highly
         // recommended", not "required", so it is OK if there is no ADMID.
@@ -826,47 +1262,36 @@ public class METSManifest
         String amdID[] = amds.split("\\s+");
         for (int i = 0; i < amdID.length; ++i)
         {
-            List techMDs = getElementByXPath("mets:amdSec[@ID=\""+amdID[i]+"\"]", false).
-                                 getChildren("techMD", metsNS);
-            Iterator ti = techMDs.iterator();
-            while (ti.hasNext())
+            Element amdSec = getElementByXPath("mets:amdSec[@ID=\""+amdID[i]+"\"]", false);
+            for (Iterator ti = amdSec.getChildren("techMD", metsNS).iterator(); ti.hasNext();)
             {
-                Element techMD = (Element)ti.next();
-                if (techMD != null)
-                {
-                    String type = getMdType(techMD);
-                    IngestionCrosswalk xwalk = getCrosswalk(type);
-                    log.debug("Got bitstream techMD of type="+type+", for file ID="+fileId);
-                     
-                    if (xwalk == null)
-                        throw new MetadataValidationException("Cannot process METS Manifest: "+
-                            "No crosswalk found for techMD MDTYPE="+type);
-                    crosswalkMdContent(techMD, callback, xwalk, context, bitstream);
-                }
+                crosswalkXmd(context, params, bitstream, (Element)ti.next(), callback);
+            }
+            for (Iterator ti = amdSec.getChildren("sourceMD", metsNS).iterator(); ti.hasNext();)
+            {
+                crosswalkXmd(context, params, bitstream, (Element)ti.next(), callback);
             }
         }
     }
 
     /**
-     * Find Handle (if any) identifier labelling this manifest.
-     * @return handle (never null)
-     * @throws MetadataValidationException if no handle available.
+     * @return root element of METS document.
      */
-    public String getHandle()
-        throws MetadataValidationException
+    public Element getMets()
     {
-        // TODO: XXX Make configurable? Handle optionally passed in?
-        // FIXME: Not sure if OBJID is really the right place
+        return mets;
+    }
 
-        String handle = mets.getAttributeValue("OBJID");
+    /**
+     * Return entire METS document as an inputStream
+     * 
+     * @return entire METS document as a stream
+     */
+    public InputStream getMetsAsStream()
+    {
+        XMLOutputter outputPretty = new XMLOutputter(Format.getPrettyFormat());
 
-        if (handle != null && handle.startsWith("hdl:"))
-        {
-            return handle.substring(4);
-        }
-        else
-        {
-            throw new MetadataValidationException("Item has no valid Handle (OBJID)");
-        }
+        return new ByteArrayInputStream(
+                        outputPretty.outputString(mets).getBytes());
     }
 }

@@ -1,41 +1,10 @@
-/*
- * PackageException.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3761 $
- *
- * Date: $Date: 2009-05-07 00:18:02 -0400 (Thu, 07 May 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.content.packager;
 
 import java.io.PrintWriter;
@@ -50,24 +19,31 @@ import org.apache.log4j.Logger;
  * exceptions. This class is intended for declarations and catch clauses.
  *
  * @author Larry Stone
- * @version $Revision: 3761 $
+ * @version $Revision: 5844 $
  */
 public class PackageException extends Exception
 {
     /**
-     * Create a new exception with the given message.
-     * @param s - diagnostic message.
+     * Create a new exception with no message.
      */
     public PackageException()
     {
         super();
     }
 
+    /**
+     * Create a new exception with the given message.
+     * @param message - message text.
+     */
     public PackageException(String message)
     {
         super(message);
     }
 
+    /**
+     * Create a new exception wrapping the given underlying cause.
+     * @param cause - exception specifying the cause of this failure.
+     */
     public PackageException(Throwable cause)
     {
         super(cause);
@@ -75,7 +51,8 @@ public class PackageException extends Exception
 
     /**
      * Create a new exception wrapping it around another exception.
-     * @param e - exception specifying the cause of this failure.
+     * @param message - message text.
+     * @param cause - exception specifying the cause of this failure.
      */
     public PackageException(String message, Throwable cause)
     {
@@ -94,7 +71,9 @@ public class PackageException extends Exception
         if (cause != null)
         {
             if (cause.getCause() != null)
+            {
                 cause = cause.getCause();
+            }
             StringWriter sw = new StringWriter();
             cause.printStackTrace(new PrintWriter(sw));
             log.error(sw.toString());

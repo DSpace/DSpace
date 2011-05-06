@@ -1,9 +1,9 @@
 --
 -- database_schema.sql (ORACLE version!)
 --
--- Version: $Revision: 4719 $
+-- Version: $Revision: 5682 $
 --
--- Date:    $Date: 2010-01-22 13:37:13 -0500 (Fri, 22 Jan 2010) $
+-- Date:    $Date: 2010-10-28 11:52:41 -0400 (Thu, 28 Oct 2010) $
 --
 -- Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
 --
@@ -46,7 +46,6 @@ CREATE SEQUENCE item_seq;
 CREATE SEQUENCE bundle_seq;
 CREATE SEQUENCE item2bundle_seq;
 CREATE SEQUENCE bundle2bitstream_seq;
-CREATE SEQUENCE dctyperegistry_seq;
 CREATE SEQUENCE dcvalue_seq;
 CREATE SEQUENCE community_seq;
 CREATE SEQUENCE collection_seq;

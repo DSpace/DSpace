@@ -1,39 +1,9 @@
-/*
- * Collection.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4309 $
- *
- * Date: $Date: 2009-09-30 15:20:07 -0400 (Wed, 30 Sep 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.content;
 
@@ -43,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.MissingResourceException;
 
@@ -81,7 +52,7 @@ import org.dspace.workflow.WorkflowItem;
  * effect.
  * 
  * @author Robert Tansley
- * @version $Revision: 4309 $
+ * @version $Revision: 5844 $
  */
 public class Collection extends DSpaceObject
 {
@@ -173,7 +144,8 @@ public class Collection extends DSpaceObject
         // Cache ourselves
         context.cache(this, row.getIntColumn("collection_id"));
 
-        modified = modifiedMetadata = false;
+        modified = false;
+        modifiedMetadata = false;
         clearDetails();
     }
 
@@ -236,9 +208,48 @@ public class Collection extends DSpaceObject
     static Collection create(Context context) throws SQLException,
             AuthorizeException
     {
+        return create(context, null);
+    }
+
+    /**
+     * Create a new collection, with a new ID. This method is not public, and
+     * does not check authorisation.
+     *
+     * @param context
+     *            DSpace context object
+     *
+     * @param handle the pre-determined Handle to assign to the new community
+     * @return the newly created collection
+     * @throws SQLException
+     * @throws AuthorizeException
+     */
+    static Collection create(Context context, String handle) throws SQLException,
+            AuthorizeException
+    {
         TableRow row = DatabaseManager.create(context, "collection");
         Collection c = new Collection(context, row);
-        c.handle = HandleManager.createHandle(context, c);
+
+        try
+        {
+            c.handle = (handle == null) ?
+                       HandleManager.createHandle(context, c) :
+                       HandleManager.createHandle(context, c, handle);
+        }
+        catch(IllegalStateException ie)
+        {
+            //If an IllegalStateException is thrown, then an existing object is already using this handle
+            //Remove the collection we just created -- as it is incomplete
+            try
+            {
+                if(c!=null)
+                {
+                    c.delete();
+                }
+            } catch(Exception e) { }
+
+            //pass exception on up the chain
+            throw ie;
+        }
 
         // create the default authorization policy for collections
         // of 'anonymous' READ
@@ -313,7 +324,9 @@ public class Collection extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         Collection[] collectionArray = new Collection[collections.size()];
@@ -513,8 +526,7 @@ public class Collection extends DSpaceObject
 
             // now create policy for logo bitstream
             // to match our READ policy
-            List policies = AuthorizeManager.getPoliciesActionFilter(
-                    ourContext, this, Constants.READ);
+            List<ResourcePolicy> policies = AuthorizeManager.getPoliciesActionFilter(ourContext, this, Constants.READ);
             AuthorizeManager.addPolicies(ourContext, policies, newLogo);
 
             log.info(LogManager.getHeader(ourContext, "set_logo",
@@ -651,7 +663,9 @@ public class Collection extends DSpaceObject
 
         // just return if there is no administrative group.
         if (submitters == null)
-        	return; 
+        {
+            return;
+        }
 
         // Remove the link to the collection table.
         collectionRow.setColumnNull("submitter");
@@ -725,7 +739,9 @@ public class Collection extends DSpaceObject
 
         // just return if there is no administrative group.
         if (admins == null)
-        	return; 
+        {
+            return;
+        }
 
         // Remove the link to the collection table.
         collectionRow.setColumnNull("admin");
@@ -863,16 +879,20 @@ public class Collection extends DSpaceObject
 
         collectionRow.setColumnNull("template_item_id");
         DatabaseManager.update(ourContext, collectionRow);
-
+        
         if (template != null)
         {
             log.info(LogManager.getHeader(ourContext, "remove_template_item",
                     "collection_id=" + getID() + ",template_item_id="
                             + template.getID()));
-
+            // temporary turn off auth system, we have already checked the permission on the top of the method
+            // check it again will fail because we have already broken the relation between the collection and the item
+            ourContext.turnOffAuthorisationSystem();
             template.delete();
+            ourContext.restoreAuthSystemState();
             template = null;
         }
+        
         ourContext.addEvent(new Event(Event.MODIFY, Constants.COLLECTION, getID(), "remove_template_item"));
     }
 
@@ -896,12 +916,12 @@ public class Collection extends DSpaceObject
                 + getID() + ",item_id=" + item.getID()));
 
         // Create mapping
-        TableRow row = DatabaseManager.create(ourContext, "collection2item");
+        TableRow row = DatabaseManager.row("collection2item");
 
         row.setColumn("collection_id", getID());
         row.setColumn("item_id", item.getID());
 
-        DatabaseManager.update(ourContext, row);
+        DatabaseManager.insert(ourContext, row);
 
         ourContext.addEvent(new Event(Event.ADD, Constants.COLLECTION, getID(), Constants.ITEM, item.getID(), item.getHandle()));
     }
@@ -1085,12 +1105,14 @@ public class Collection extends DSpaceObject
         catch (BrowseException e)
         {
         	log.error("caught exception: ", e);
-        	throw new IOException(e.getMessage());
+        	throw new IOException(e.getMessage(), e);
         }
         finally
         {
             if (items != null)
+            {
                 items.close();
+            }
         }
 
         // Delete bitstream logo
@@ -1130,8 +1152,11 @@ public class Collection extends DSpaceObject
         {
         	// FIXME: upside down exception handling due to lack of good
         	// exception framework
-        	throw new RuntimeException(e.getMessage(), e);
+        	throw new IllegalStateException(e.getMessage(), e);
         }
+
+        // Remove any Handle
+        HandleManager.unbindHandle(ourContext, this);
         
         // Delete collection row
         DatabaseManager.delete(ourContext, collectionRow);
@@ -1214,18 +1239,16 @@ public class Collection extends DSpaceObject
 
                 // now add any parent communities
                 Community[] parents = owner.getAllParents();
-
-                for (int i = 0; i < parents.length; i++)
-                {
-                    communities.add(parents[i]);
-                }
+                communities.addAll(Arrays.asList(parents));
             }
         }
         finally
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         Community[] communityArray = new Community[communities.size()];
@@ -1291,15 +1314,34 @@ public class Collection extends DSpaceObject
      * @return <code>true</code> if object passed in represents the same
      *         collection as this object
      */
-    public boolean equals(Object other)
-    {
-        if (!(other instanceof Collection))
-        {
-            return false;
-        }
+     @Override
+     public boolean equals(Object other)
+     {
+         if (other == null)
+         {
+             return false;
+         }
+         if (getClass() != other.getClass())
+         {
+             return false;
+         }
+         final Collection otherCollection = (Collection) other;
+         if (this.getID() != otherCollection.getID())
+         {
+             return false;
+         }
 
-        return (getID() == ((Collection) other).getID());
-    }
+         return true;
+     }
+
+     @Override
+     public int hashCode()
+     {
+         int hash = 7;
+         hash = 89 * hash + (this.collectionRow != null ? this.collectionRow.hashCode() : 0);
+         return hash;
+     }
+
 
     /**
      * Utility method for reading in a group from a group ID in a column. If the

@@ -1,41 +1,9 @@
-/*
- * EditItemStatus.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.administrative.item;
 
@@ -47,16 +15,13 @@ import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Button;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.ReferenceSet;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
-import org.dspace.core.ConfigurationManager;
 
 /**
  * Display basic meta-meta information about the item and allow the user to
@@ -83,6 +48,8 @@ public class ViewItem extends AbstractDSpaceTransformer {
 	private static final Message T_option_metadata = message("xmlui.administrative.item.general.option_metadata");
 
 	private static final Message T_option_view = message("xmlui.administrative.item.general.option_view");
+        
+        private static final Message T_option_curate = message("xmlui.administrative.item.general.option_curate");
 
 	private static final Message T_title = message("xmlui.administrative.item.ViewItem.title");
 
@@ -108,7 +75,9 @@ public class ViewItem extends AbstractDSpaceTransformer {
         String show = request.getParameter("show");
         boolean showFullItem = false;
         if (show != null && show.length() > 0)
-        	showFullItem =  true;
+        {
+            showFullItem = true;
+        }
         
 		int itemID = parameters.getParameterAsInteger("itemID", -1);
 		Item item = Item.find(context, itemID);
@@ -132,6 +101,7 @@ public class ViewItem extends AbstractDSpaceTransformer {
 		options.addItem().addXref(baseURL + "&submit_metadata",
 				T_option_metadata);
 		options.addItem().addHighlight("bold").addXref(tabLink, T_option_view);
+                options.addItem().addXref(baseURL + "&submit_curate", T_option_curate);
 
 		// item
 		

@@ -1,48 +1,19 @@
-/*
- * DAVCollection.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.dav;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
@@ -55,15 +26,17 @@ import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
-import org.dspace.content.WorkspaceItem;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.packager.PackageException;
 import org.dspace.content.packager.PackageIngester;
 import org.dspace.content.packager.PackageParameters;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
+import org.dspace.core.Utils;
 import org.dspace.handle.HandleManager;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
@@ -82,6 +55,10 @@ class DAVCollection extends DAVDSpaceObject
 
     /** The collection. */
     private Collection collection = null;
+
+    /** The temporary upload directory. */
+    private static String tempDirectory = ConfigurationManager
+            .getProperty("upload.temp.dir");
 
     /** The Constant short_descriptionProperty. */
     private static final Element short_descriptionProperty = new Element(
@@ -112,7 +89,7 @@ class DAVCollection extends DAVDSpaceObject
             DAV.NS_DSPACE);
 
     /** The all props. */
-    private static List allProps = new Vector(commonProps);
+    private static List<Element> allProps = new ArrayList<Element>(commonProps);
     static
     {
         allProps.add(logoProperty);
@@ -147,7 +124,7 @@ class DAVCollection extends DAVDSpaceObject
      * @see org.dspace.app.dav.DAVResource#getAllProperties()
      */
     @Override
-    protected List getAllProperties()
+    protected List<Element> getAllProperties()
     {
         return allProps;
     }
@@ -172,7 +149,9 @@ class DAVCollection extends DAVDSpaceObject
         finally
         {
             if (ii != null)
+            {
                 ii.close();
+            }
         }
         
         return (DAVResource[]) result.toArray(new DAVResource[result.size()]);
@@ -214,13 +193,15 @@ class DAVCollection extends DAVDSpaceObject
         else if (elementsEqualIsh(property, logoProperty))
         {
             Bitstream lbs = this.collection.getLogo();
-            Element le;
-            if (lbs != null
-                    && (le = DAVBitstream.makeXmlBitstream(lbs, this)) != null)
+            if (lbs != null)
             {
-                Element p = new Element("logo", DAV.NS_DSPACE);
-                p.addContent(le);
-                return p;
+                Element le = DAVBitstream.makeXmlBitstream(lbs, this);
+                if (le != null)
+                {
+                    Element p = new Element("logo", DAV.NS_DSPACE);
+                    p.addContent(le);
+                    return p;
+                }
             }
         }
 
@@ -371,7 +352,7 @@ class DAVCollection extends DAVDSpaceObject
      * a problem in the Servlet container's input stream which will try to read
      * past the end of the request body.
      */
-    private class CountedInputStream extends FilterInputStream
+    private static class CountedInputStream extends FilterInputStream
     {
         
         /** The count. */
@@ -502,28 +483,64 @@ class DAVCollection extends DAVDSpaceObject
                 log.debug("put: Using CountedInputStream, length="
                         + String.valueOf(contentLength));
             }
-            WorkspaceItem wi = sip.ingest(this.context, this.collection, pis,
-                    PackageParameters.create(this.request), null);
-            WorkflowItem wfi = WorkflowManager.startWithoutNotify(this.context, wi);
+
+            // Write to temporary file (so that SIP ingester can process it)
+            File tempDir = new File(tempDirectory);
+            File tempFile = File.createTempFile("davUpload" + pis.hashCode(), null, tempDir);
+            log.debug("Storing temporary file at " + tempFile.getCanonicalPath());
+
+            FileOutputStream fos = new FileOutputStream(tempFile);
+            Utils.copy(pis, fos);
+            fos.close();
+            pis.close();
+
+            // Initialize parameters to packager
+            PackageParameters params = PackageParameters.create(this.request);
+            // Force package ingester to respect Collection workflows (i.e. start workflow automatically as needed)
+            params.setWorkflowEnabled(true);
+
+            //ingest from the temp file to create the new DSpaceObject
+            DSpaceObject ingestedDso = sip.ingest(this.context, this.collection, tempFile,
+                    params, null);
+            Item item = (Item) ingestedDso;
+
+            //schedule temp file for deletion
+            tempFile.deleteOnExit();
+
+            //get the new workflowitem (if it exists)
+            WorkflowItem wfi = WorkflowItem.findByItem(context, item);
+
+            //Get status of item
+            //  if we found a WorkflowItem, then it is still in-process
+            //  if we didn't find one, item is already in archive
+            int state;
+            if(wfi!=null)
+            {
+                state = wfi.getState();
+            }
+            else
+            {
+                state = WorkflowManager.WFSTATE_ARCHIVE;
+            }
 
             // get new item's location: if workflow completed, then look
             // for handle (but be ready for disappointment); otherwise,
             // return the workflow item's resource.
-            int state = wfi.getState();
             String location = null;
             if (state == WorkflowManager.WFSTATE_ARCHIVE)
             {
-                Item ni = wfi.getItem();
-                String handle = HandleManager.findHandle(this.context, ni);
+                // Item is already in the archive
+                String handle = HandleManager.findHandle(this.context, item);
                 String end = (handle != null) ? DAVDSpaceObject
-                        .getPathElt(handle) : DAVItem.getPathElt(ni);
+                        .getPathElt(handle) : DAVItem.getPathElt(item);
                 DAVItem newItem = new DAVItem(this.context, this.request, this.response,
-                        makeChildPath(end), ni);
+                        makeChildPath(end), item);
                 location = newItem.hrefURL();
             }
             else if (state == WorkflowManager.WFSTATE_SUBMIT
                     || state == WorkflowManager.WFSTATE_STEP1POOL)
             {
+                // Item is still in-process in the workflow
                 location = hrefPrefix() + DAVWorkflow.getPath(wfi);
             }
             else
@@ -543,7 +560,7 @@ class DAVCollection extends DAVDSpaceObject
         {
             pe.log(log);
             throw new DAVStatusException(
-                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR, pe.toString());
+                    HttpServletResponse.SC_INTERNAL_SERVER_ERROR, pe.toString(), pe);
         }
         catch (CrosswalkException ie)
         {
@@ -555,7 +572,7 @@ class DAVCollection extends DAVDSpaceObject
             log.error(ie.toString() + reason);
             throw new DAVStatusException(
                     HttpServletResponse.SC_INTERNAL_SERVER_ERROR, ie.toString()
-                            + reason);
+                            + reason, ie);
         }
     }
 
@@ -581,10 +598,12 @@ class DAVCollection extends DAVDSpaceObject
     {
         Community[] ca = this.collection.getCommunities();
         if (ca != null)
+        {
             for (Community element : ca)
             {
                 element.removeCollection(this.collection);
             }
+        }
         // collection.delete();
         return HttpServletResponse.SC_OK; // HTTP OK
     }

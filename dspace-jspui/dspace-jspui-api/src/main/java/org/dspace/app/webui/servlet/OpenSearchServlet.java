@@ -1,41 +1,10 @@
-/*
- * OpenSearchServlet.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 1.20 $
- *
- * Date: $Date: 2005/08/25 17:20:27 $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
- 
 package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
@@ -55,10 +24,6 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.TransformerException;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.util.OpenSearch;
@@ -211,12 +176,16 @@ public class OpenSearchServlet extends DSpaceServlet
             logInfo = "community_id=" + container.getID() + ",";
             qResults = DSQuery.doQuery(context, qArgs, (Community)container);
         }
+        else
+        {
+            throw new IllegalStateException("Invalid container for search context");
+        }
         
         // now instantiate the results
         DSpaceObject[] results = new DSpaceObject[qResults.getHitHandles().size()];
         for (int i = 0; i < qResults.getHitHandles().size(); i++)
         {
-            String myHandle = (String)qResults.getHitHandles().get(i);
+            String myHandle = qResults.getHitHandles().get(i);
             DSpaceObject dso = HandleManager.resolveToObject(context, myHandle);
             if (dso == null)
             {
@@ -227,22 +196,21 @@ public class OpenSearchServlet extends DSpaceServlet
         }
 
         // Log
-        log.info(LogManager.getHeader(context, "search", logInfo + "query=\""
-                + query + "\",results=(" + results.length + ")"));
-        
+        log.info(LogManager.getHeader(context, "search", logInfo + "query=\"" + query + "\",results=(" + results.length + ")"));
+
         // format and return results
         Map<String, String> labelMap = getLabels(request);
         Document resultsDoc = OpenSearch.getResultsDoc(format, query, qResults, container, results, labelMap);
         try
         {
             Transformer xf = TransformerFactory.newInstance().newTransformer();
-        response.setContentType(OpenSearch.getContentType(format));
+            response.setContentType(OpenSearch.getContentType(format));
             xf.transform(new DOMSource(resultsDoc), new StreamResult(response.getWriter()));
-    }
+        }
         catch (TransformerException e)
         {
             log.error(e);
-            throw new ServletException(e.toString());
+            throw new ServletException(e.toString(), e);
         }
     }
     

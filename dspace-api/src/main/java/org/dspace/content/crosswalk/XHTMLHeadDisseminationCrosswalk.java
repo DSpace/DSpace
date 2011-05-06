@@ -1,41 +1,10 @@
-/*
- * XHTMLHeadDisseminationCrosswalk.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3761 $
- *
- * Date: $Date: 2009-05-07 00:18:02 -0400 (Thu, 07 May 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.content.crosswalk;
 
 import org.apache.log4j.Logger;
@@ -77,7 +46,7 @@ import java.util.*;
  * TODO: This may usefully be extended later to work with communities and
  * collections.
  *
- * @version $Revision: 3761 $
+ * @version $Revision: 5844 $
  * @author Robert Tansley
  */
 public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
@@ -96,7 +65,7 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
             + "crosswalks"
             + File.separator + "xhtml-head-item.properties";
 
-    private final String XHTML_NAMESPACE = "http://www.w3.org/1999/xhtml";
+    private static final String XHTML_NAMESPACE = "http://www.w3.org/1999/xhtml";
 
     /**
      * Maps DSpace metadata field to name to use in XHTML head element, e.g.
@@ -126,7 +95,15 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
         finally
         {
             if (fis != null)
-                try { fis.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    fis.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
         }
 
         Enumeration e = crosswalkProps.keys();
@@ -181,7 +158,7 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
      * Return &lt;meta&gt; elements that can be put in the &lt;head&gt; element
      * of an XHTML document.
      */
-    public List disseminateList(DSpaceObject dso) throws CrosswalkException,
+    public List<Element> disseminateList(DSpaceObject dso) throws CrosswalkException,
             IOException, SQLException, AuthorizeException
     {
         if (dso.getType() != Constants.ITEM)
@@ -245,7 +222,7 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
                                     : handle) + " field " + originalKey);
                }
             }
-            else if (provenance != true)
+            else if (!provenance)
             {
                 Element e = new Element("meta", XHTML_NAMESPACE);
                 e.setAttribute("name", name);
@@ -261,7 +238,7 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
                     {
                         // TODO: Check valid encoding?  We assume UTF-8
                         // TODO: Check escaping "<>&
-                        e.setAttribute("content", v.value == null ? "" : v.value);
+                        e.setAttribute("content", v.value);
                     }
                     else
                     {
@@ -271,7 +248,9 @@ public class XHTMLHeadDisseminationCrosswalk extends SelfNamedPlugin implements
                         // Strip any characters that we can, and if the result is valid, output it
                         String simpleText = v.value.replaceAll("\\p{Cntrl}", "");
                         if (Verifier.checkCharacterData(simpleText) == null)
+                        {
                             e.setAttribute("content", simpleText);
+                        }
                     }
                 }
                 if (v.language != null && !v.language.equals(""))

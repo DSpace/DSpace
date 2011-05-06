@@ -1,41 +1,9 @@
-/*
- * EditCommunitiesServlet.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4309 $
- *
- * Date: $Date: 2009-09-30 15:20:07 -0400 (Wed, 30 Sep 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.webui.servlet.admin;
 
@@ -49,6 +17,7 @@ import java.sql.SQLException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
 
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
@@ -77,7 +46,7 @@ import org.dspace.eperson.Group;
  * creation, and metadata editing
  * 
  * @author Robert Tansley
- * @version $Revision: 4309 $
+ * @version $Revision: 6158 $
  */
 public class EditCommunitiesServlet extends DSpaceServlet
 {
@@ -318,37 +287,37 @@ public class EditCommunitiesServlet extends DSpaceServlet
         try 
         {
             AuthorizeUtil.authorizeManageAdminGroup(context, community);                
-            request.setAttribute("admin_create_button", new Boolean(true));
+            request.setAttribute("admin_create_button", Boolean.TRUE);
         }
         catch (AuthorizeException authex) {
-            request.setAttribute("admin_create_button", new Boolean(false));
+            request.setAttribute("admin_create_button", Boolean.FALSE);
         }
         
         try 
         {
             AuthorizeUtil.authorizeRemoveAdminGroup(context, community);                
-            request.setAttribute("admin_remove_button", new Boolean(true));
+            request.setAttribute("admin_remove_button", Boolean.TRUE);
         }
         catch (AuthorizeException authex) {
-            request.setAttribute("admin_remove_button", new Boolean(false));
+            request.setAttribute("admin_remove_button", Boolean.FALSE);
         }
         
         if (AuthorizeManager.authorizeActionBoolean(context, community, Constants.DELETE))
         {
-            request.setAttribute("delete_button", new Boolean(true));
+            request.setAttribute("delete_button", Boolean.TRUE);
         }
         else
         {
-            request.setAttribute("delete_button", new Boolean(false));
+            request.setAttribute("delete_button", Boolean.FALSE);
         }
         
         try 
         {
             AuthorizeUtil.authorizeManageCommunityPolicy(context, community);                
-            request.setAttribute("policy_button", new Boolean(true));
+            request.setAttribute("policy_button", Boolean.TRUE);
         }
         catch (AuthorizeException authex) {
-            request.setAttribute("policy_button", new Boolean(false));
+            request.setAttribute("policy_button", Boolean.FALSE);
         }        
     }
     
@@ -366,74 +335,74 @@ public class EditCommunitiesServlet extends DSpaceServlet
     {
         if (AuthorizeManager.isAdmin(context, collection))
         {
-            request.setAttribute("admin_collection", new Boolean(true));
+            request.setAttribute("admin_collection", Boolean.TRUE);
         }
         else
         {
-            request.setAttribute("admin_collection", new Boolean(false));
+            request.setAttribute("admin_collection", Boolean.FALSE);
         }
         
         try 
         {
             AuthorizeUtil.authorizeManageAdminGroup(context, collection);                
-            request.setAttribute("admin_create_button", new Boolean(true));
+            request.setAttribute("admin_create_button", Boolean.TRUE);
         }
         catch (AuthorizeException authex) {
-            request.setAttribute("admin_create_button", new Boolean(false));
+            request.setAttribute("admin_create_button", Boolean.FALSE);
         }
         
         try 
         {
             AuthorizeUtil.authorizeRemoveAdminGroup(context, collection);                
-            request.setAttribute("admin_remove_button", new Boolean(true));
+            request.setAttribute("admin_remove_button", Boolean.TRUE);
         }
         catch (AuthorizeException authex) {
-            request.setAttribute("admin_remove_button", new Boolean(false));
+            request.setAttribute("admin_remove_button", Boolean.FALSE);
         }
         
         try 
         {
             AuthorizeUtil.authorizeManageSubmittersGroup(context, collection);                
-            request.setAttribute("submitters_button", new Boolean(true));
+            request.setAttribute("submitters_button", Boolean.TRUE);
         }
         catch (AuthorizeException authex) {
-            request.setAttribute("submitters_button", new Boolean(false));
+            request.setAttribute("submitters_button", Boolean.FALSE);
         }
         
         try 
         {
             AuthorizeUtil.authorizeManageWorkflowsGroup(context, collection);                
-            request.setAttribute("workflows_button", new Boolean(true));
+            request.setAttribute("workflows_button", Boolean.TRUE);
         }
         catch (AuthorizeException authex) {
-            request.setAttribute("workflows_button", new Boolean(false));
+            request.setAttribute("workflows_button", Boolean.FALSE);
         }
         
         try 
         {
             AuthorizeUtil.authorizeManageTemplateItem(context, collection);                
-            request.setAttribute("template_button", new Boolean(true));
+            request.setAttribute("template_button", Boolean.TRUE);
         }
         catch (AuthorizeException authex) {
-            request.setAttribute("template_button", new Boolean(false));
+            request.setAttribute("template_button", Boolean.FALSE);
         }
         
         if (AuthorizeManager.authorizeActionBoolean(context, collection.getParentObject(), Constants.REMOVE))
         {
-            request.setAttribute("delete_button", new Boolean(true));
+            request.setAttribute("delete_button", Boolean.TRUE);
         }
         else
         {
-            request.setAttribute("delete_button", new Boolean(false));
+            request.setAttribute("delete_button", Boolean.FALSE);
         }
         
         try 
         {
             AuthorizeUtil.authorizeManageCollectionPolicy(context, collection);                
-            request.setAttribute("policy_button", new Boolean(true));
+            request.setAttribute("policy_button", Boolean.TRUE);
         }
         catch (AuthorizeException authex) {
-            request.setAttribute("policy_button", new Boolean(false));
+            request.setAttribute("policy_button", Boolean.FALSE);
         }        
     }
 
@@ -721,8 +690,10 @@ public class EditCommunitiesServlet extends DSpaceServlet
 		// First, if this is not a harvested collection (anymore), set the harvest type to 0; wipe harvest settings  
 		if (contentSource.equals("source_normal")) 
 		{
-			if (hc != null) 
-				hc.delete();
+			if (hc != null)
+            {
+                hc.delete();
+            }
 		}
 		else 
 		{
@@ -928,92 +899,93 @@ public class EditCommunitiesServlet extends DSpaceServlet
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
     {
-        // Wrap multipart request to get the submission info
-        FileUploadRequest wrapper = new FileUploadRequest(request);
+        try {
+            // Wrap multipart request to get the submission info
+            FileUploadRequest wrapper = new FileUploadRequest(request);
+            Community community = Community.find(context, UIUtil.getIntParameter(wrapper, "community_id"));
+            Collection collection = Collection.find(context, UIUtil.getIntParameter(wrapper, "collection_id"));
+            File temp = wrapper.getFile("file");
 
-        Community community = Community.find(context, UIUtil.getIntParameter(
-                wrapper, "community_id"));
-        Collection collection = Collection.find(context, UIUtil
-                .getIntParameter(wrapper, "collection_id"));
+            // Read the temp file as logo
+            InputStream is = new BufferedInputStream(new FileInputStream(temp));
+            Bitstream logoBS;
 
-        File temp = wrapper.getFile("file");
+            if (collection == null)
+            {
+                logoBS = community.setLogo(is);
+            }
+            else
+            {
+                logoBS = collection.setLogo(is);
+            }
 
-        // Read the temp file as logo
-        InputStream is = new BufferedInputStream(new FileInputStream(temp));
-        Bitstream logoBS;
+            // Strip all but the last filename. It would be nice
+            // to know which OS the file came from.
+            String noPath = wrapper.getFilesystemName("file");
 
-        if (collection == null)
+            while (noPath.indexOf('/') > -1)
+            {
+                noPath = noPath.substring(noPath.indexOf('/') + 1);
+            }
+
+            while (noPath.indexOf('\\') > -1)
+            {
+                noPath = noPath.substring(noPath.indexOf('\\') + 1);
+            }
+
+            logoBS.setName(noPath);
+            logoBS.setSource(wrapper.getFilesystemName("file"));
+
+            // Identify the format
+            BitstreamFormat bf = FormatIdentifier.guessFormat(context, logoBS);
+            logoBS.setFormat(bf);
+            AuthorizeManager.addPolicy(context, logoBS, Constants.WRITE, context.getCurrentUser());
+            logoBS.update();
+
+            String jsp;
+            DSpaceObject dso;
+            if (collection == null)
+            {
+                community.update();
+
+                // Show community edit page
+                request.setAttribute("community", community);
+                storeAuthorizeAttributeCommunityEdit(context, request, community);
+                dso = community;
+                jsp = "/tools/edit-community.jsp";
+            } 
+            else
+            {
+                collection.update();
+
+                // Show collection edit page
+                request.setAttribute("collection", collection);
+                request.setAttribute("community", community);
+                storeAuthorizeAttributeCollectionEdit(context, request, collection);
+                dso = collection;
+                jsp = "/tools/edit-collection.jsp";
+            }
+            
+            if (AuthorizeManager.isAdmin(context, dso))
+            {
+                // set a variable to show all buttons
+                request.setAttribute("admin_button", Boolean.TRUE);
+            }
+
+            JSPManager.showJSP(request, response, jsp);
+
+            // Remove temp file
+            if (!temp.delete())
+            {
+                log.error("Unable to delete temporary file");
+            }
+
+            // Update DB
+            context.complete();
+        } catch (FileSizeLimitExceededException ex)
         {
-            logoBS = community.setLogo(is);
+            log.warn("Upload exceeded upload.max");
+            JSPManager.showFileSizeLimitExceededError(request, response, ex.getMessage(), ex.getActualSize(), ex.getPermittedSize());
         }
-        else
-        {
-            logoBS = collection.setLogo(is);
-        }
-
-        // Strip all but the last filename. It would be nice
-        // to know which OS the file came from.
-        String noPath = wrapper.getFilesystemName("file");
-
-        while (noPath.indexOf('/') > -1)
-        {
-            noPath = noPath.substring(noPath.indexOf('/') + 1);
-        }
-
-        while (noPath.indexOf('\\') > -1)
-        {
-            noPath = noPath.substring(noPath.indexOf('\\') + 1);
-        }
-
-        logoBS.setName(noPath);
-        logoBS.setSource(wrapper.getFilesystemName("file"));
-
-        // Identify the format
-        BitstreamFormat bf = FormatIdentifier.guessFormat(context, logoBS);
-        logoBS.setFormat(bf);
-        AuthorizeManager.addPolicy(context, logoBS, Constants.WRITE, context
-                .getCurrentUser());
-        logoBS.update();
-
-        String jsp;
-        DSpaceObject dso;
-        if (collection == null)
-        {
-            community.update();
-
-            // Show community edit page
-            request.setAttribute("community", community);
-            CommunityGroup[] groups = CommunityGroup.findAll(context);
-            request.setAttribute("groups", groups);
-
-            storeAuthorizeAttributeCommunityEdit(context, request, community);
-            dso = community;
-            jsp = "/tools/edit-community.jsp";
-        }
-        else
-        {
-            collection.update();
-
-            // Show collection edit page
-            request.setAttribute("collection", collection);
-            request.setAttribute("community", community);
-            storeAuthorizeAttributeCollectionEdit(context, request, collection);
-            dso = collection;
-            jsp = "/tools/edit-collection.jsp";
-        }
-        
-        if (AuthorizeManager.isAdmin(context, dso))
-        {
-            // set a variable to show all buttons
-            request.setAttribute("admin_button", new Boolean(true));
-        }
-        
-        JSPManager.showJSP(request, response, jsp);
-
-        // Remove temp file
-        temp.delete();
-
-        // Update DB
-        context.complete();
     }
 }

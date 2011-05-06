@@ -1,50 +1,16 @@
-/*
- * SimpleHTMLFragment.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4695 $
- *
- * Date: $Date: 2010-01-15 12:06:30 -0500 (Fri, 15 Jan 2010) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.xmlui.wing.element;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -140,9 +106,11 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 
 			try {
 				translate(document.getRootElement());
-			} catch (Throwable t) {
+			} catch (RuntimeException e) {
+                throw e;
+            } catch (Exception e) {
 				throw new JDOMException(
-						"Error translating HTML fragment into DRI", t);
+						"Error translating HTML fragment into DRI", e);
 			}
 
 			SAXFilter filter = new SAXFilter(contentHandler, lexicalHandler,
@@ -172,13 +140,6 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 	}
 
 	/**
-	 * dispose
-	 */
-	public void dispose() {
-		super.dispose();
-	}
-
-	/**
 	 * Remove the given content from the Element.
 	 * 
 	 * If the content is an element then render it as text and include it's
@@ -195,32 +156,31 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 			if (element.getContent().size() == 0) {
 				// The element contains nothing, we can use shorthand notation
 				// for it.
-				String replacement = "<" + element.getName();
+				StringBuilder replacement = new StringBuilder().append("<").append(element.getName());
 
 				@SuppressWarnings("unchecked")
 				// This cast is correct
 				List<Attribute> attributes = element.getAttributes();
 				for (Attribute attribute : attributes) {
-					replacement += " " + attribute.getName() + "=\""
-							+ attribute.getValue() + "\"";
+					replacement .append(" ").append(attribute.getName()).append("=\"").append(attribute.getValue()).append("\"").toString();
 				}
-				replacement += "/>";
+				replacement.append("/>");
 
 				Element parent = element.getParentElement();
 				int index = parent.indexOf(element);
-				parent.setContent(index, new Text(replacement));
+				parent.setContent(index, new Text(replacement.toString()));
 			} else {
 				// The element contains data
-				String prepend = "<" + element.getName();
+				StringBuilder prepend = new StringBuilder();
+                prepend.append("<").append(element.getName());
 
 				@SuppressWarnings("unchecked")
 				// This cast is correct
 				List<Attribute> attributes = element.getAttributes();
 				for (Attribute attribute : attributes) {
-					prepend += " " + attribute.getName() + "=\""
-							+ attribute.getValue() + "\"";
+					prepend.append(" ").append(attribute.getName()).append("=\"").append(attribute.getValue()).append("\"");
 				}
-				prepend += ">";
+				prepend.append(">");
 
 				String postpend = "</" + element.getName() + ">";
 
@@ -229,7 +189,7 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 
 				parent.addContent(index, new Text(postpend));
 				parent.addContent(index, element.removeContent());
-				parent.addContent(index, new Text(prepend));
+				parent.addContent(index, new Text(prepend.toString()));
 				parent.removeContent(element);
 			}
 		} else {
@@ -258,24 +218,32 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 	private boolean paragraphWrap(Element parent, int index,
 			List<Content> contents) {
 		if (contents == null || contents.size() <= 0)
-			return false;
+        {
+            return false;
+        }
 
 		boolean empty = true;
 		for (Content content : contents) {
-			if (empty == false)
-				continue;
+			if (!empty)
+            {
+                continue;
+            }
 
 			if (content instanceof Text) {
 				Text text = (Text) content;
 				if (!"".equals(text.getTextNormalize()))
-					empty = false;
+                {
+                    empty = false;
+                }
 			} else {
 				empty = false;
 			}
 		}
 
-		if (empty == true)
-			return false;
+		if (empty)
+        {
+            return false;
+        }
 
 		// May be usefull for debugging:
 		// contents.add(0, new Text("("+index+") "));
@@ -283,9 +251,13 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 		Element para = new Element(Para.E_PARA);
 		para.addContent(contents);
 		if (index >= 0)
-			parent.addContent(index, para);
+        {
+            parent.addContent(index, para);
+        }
 		else
-			parent.addContent(para);
+        {
+            parent.addContent(para);
+        }
 
 		return true;
 	}
@@ -305,14 +277,15 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 		for (String name : names) {
 			String value = element.getAttributeValue(name);
 			if (value != null)
-				attributes.put(name, value);
+            {
+                attributes.put(name, value);
+            }
 		}
 
 		element.setAttributes(new ArrayList<Attributes>());
 
-		for (String name : attributes.keySet()) {
-			String value = attributes.get(name);
-			element.setAttribute(name, value);
+		for (Map.Entry<String, String> attr : attributes.entrySet()) {
+			element.setAttribute(attr.getKey(), attr.getValue());
 		}
 	}
 
@@ -329,7 +302,9 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 	private void moveAttribute(Element element, String oldName, String newName) {
 		Attribute attribute = element.getAttribute(oldName);
 		if (attribute != null)
-			attribute.setName(newName);
+        {
+            attribute.setName(newName);
+        }
 	}
 
 	/**
@@ -507,24 +482,19 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 						// FIXME: This may not work for windows people who
 						// insist on using \r\n for line breaks.
 						@SuppressWarnings("unchecked")
-						// This cast is correct
-						List<String> parts = new ArrayList(Arrays
-								.asList(rawText.split("\n\\s*\n")));
+                        String[] parts = rawText.split("\n\\s*\n");
+                        if (parts.length > 0) {
+                            for (int partIdx = 0; partIdx < parts.length - 1; partIdx++) {
+                                removed.add(new Text(parts[partIdx]));
 
-						if (parts.size() > 0) {
-							String lastPart = parts.remove(parts.size()-1);
+                                if (paragraphWrap(parent, i+1, removed)) {
+                                    removed.clear();
+                                    i++;// account for the field added
+                                }
+                            }
 
-							for (String part : parts) {
-								removed.add(new Text(part));
-
-								if (paragraphWrap(parent, i+1, removed)) {
-									removed.clear();
-									i++;// account for the field added
-								}
-							}
-
-							removed.add(new Text(lastPart));
-						}
+                            removed.add(new Text(parts[parts.length - 1]));
+                        }
 					} else {
 						removed.add(current);
 						parent.removeContent(current);
@@ -557,7 +527,7 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 	 * bug had not been patch at that time.
 	 * 
 	 */
-	public class SAXFilter implements ContentHandler, LexicalHandler {
+	public static class SAXFilter implements ContentHandler, LexicalHandler {
 
 		private final String URI = WingConstants.DRI.URI;
 
@@ -585,9 +555,13 @@ public class SimpleHTMLFragment extends AbstractWingElement {
 			String prefix = namespaces.getPrefix(URI);
 
 			if (prefix == null || prefix.equals(""))
-				return localName;
+            {
+                return localName;
+            }
 			else
-				return prefix + ":" + localName;
+            {
+                return prefix + ":" + localName;
+            }
 		}
 
 		/** ContentHandler methods: */

@@ -1,39 +1,9 @@
-/*
- * AbstractProcessingStep.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3738 $
- *
- * Date: $Date: 2009-04-24 00:32:12 -0400 (Fri, 24 Apr 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.submit;
 
@@ -80,29 +50,29 @@ import org.dspace.core.Context;
  * @see org.dspace.app.util.SubmissionStepConfig
  * 
  * @author Tim Donohue
- * @version $Revision: 3738 $
+ * @version $Revision: 5844 $
  */
 public abstract class AbstractProcessingStep
 {
     /***************************************************************************
      * Constant - Name of the "<-Previous" button
      **************************************************************************/
-    public static String PREVIOUS_BUTTON = "submit_prev";
+    public static final String PREVIOUS_BUTTON = "submit_prev";
 
     /***************************************************************************
      * Constant - Name of the "Next->" button
      **************************************************************************/
-    public static String NEXT_BUTTON = "submit_next";
+    public static final String NEXT_BUTTON = "submit_next";
 
     /***************************************************************************
      * Constant - Name of the "Cancel/Save" button
      **************************************************************************/
-    public static String CANCEL_BUTTON = "submit_cancel";
+    public static final String CANCEL_BUTTON = "submit_cancel";
 
     /***************************************************************************
      * Constant - Prefix of all buttons in the Progress Bar
      **************************************************************************/
-    public static String PROGRESS_BAR_PREFIX = "submit_jump_";
+    public static final String PROGRESS_BAR_PREFIX = "submit_jump_";
 
     /***************************************************************************
      * Flag which specifies that the LAST PAGE of a step has been reached. This
@@ -110,21 +80,18 @@ public abstract class AbstractProcessingStep
      * workspace) to specify that the LAST PAGE of the LAST STEP has already
      * been reached
      **************************************************************************/
-    public static int LAST_PAGE_REACHED = Integer.MAX_VALUE;
+    public static final int LAST_PAGE_REACHED = Integer.MAX_VALUE;
 
     /***************************************************************************
      * STATUS / ERROR FLAGS (returned by doProcessing() if an error occurs or
      * additional user interaction may be required)
      **************************************************************************/
-    public static int STATUS_COMPLETE = 0;
+    public static final int STATUS_COMPLETE = 0;
 
     /** Maps each status/error flag to a textual, human understandable message * */
-    private Map errorMessages = null;
+    private Map<Integer, String> errorMessages = null;
 
-    /** List of all user interface fields which had errors during processing * */
-    private List errorFields = null;
-    
-    private static String ERROR_FIELDS_ATTRIBUTE = "dspace.submit.error_fields";
+    private static final String ERROR_FIELDS_ATTRIBUTE = "dspace.submit.error_fields";
     
 
     /**
@@ -168,13 +135,13 @@ public abstract class AbstractProcessingStep
      *            current servlet request object
      * @return List of error fields (as Strings)
      */
-    public static final List getErrorFields(HttpServletRequest request)
+    public static final List<String> getErrorFields(HttpServletRequest request)
     {
-        return (List) request.getAttribute(ERROR_FIELDS_ATTRIBUTE);
+        return (List<String>) request.getAttribute(ERROR_FIELDS_ATTRIBUTE);
     }
     
     /**
-     * Sets th list of all UI fields which had errors that occurred during the
+     * Sets the list of all UI fields which had errors that occurred during the
      * step processing. This list is for usage in generating the appropriate
      * error message(s) in the UI.
      * <P>
@@ -187,12 +154,16 @@ public abstract class AbstractProcessingStep
      * @param errorFields
      *            List of all fields (as Strings) which had errors
      */
-    private static final void setErrorFields(HttpServletRequest request, List errorFields)
+    private static final void setErrorFields(HttpServletRequest request, List<String> errorFields)
     {
         if(errorFields==null)
+        {
             request.removeAttribute(ERROR_FIELDS_ATTRIBUTE);
+        }
         else
+        {
             request.setAttribute(ERROR_FIELDS_ATTRIBUTE, errorFields);
+        }
     }
 
     /**
@@ -209,11 +180,11 @@ public abstract class AbstractProcessingStep
     protected static final void addErrorField(HttpServletRequest request, String fieldName)
     {
         //get current list
-        List errorFields = getErrorFields(request);
+        List<String> errorFields = getErrorFields(request);
         
         if (errorFields == null)
         {
-            errorFields = new ArrayList();
+            errorFields = new ArrayList<String>();
         }
 
         //add this field
@@ -234,10 +205,12 @@ public abstract class AbstractProcessingStep
     protected static final void clearErrorFields(HttpServletRequest request)
     {
         //get current list
-        List errorFields = getErrorFields(request);
+        List<String> errorFields = getErrorFields(request);
         
         if (errorFields != null)
-            setErrorFields(request,null);
+        {
+            setErrorFields(request, null);
+        }
     }
 
     /**
@@ -258,9 +231,13 @@ public abstract class AbstractProcessingStep
     public final String getErrorMessage(int errorFlag)
     {
         if (this.errorMessages == null || this.errorMessages.size() == 0)
+        {
             return null;
+        }
         else
-            return (String) this.errorMessages.get(Integer.valueOf(errorFlag));
+        {
+            return this.errorMessages.get(Integer.valueOf(errorFlag));
+        }
     }
 
     /**
@@ -272,13 +249,17 @@ public abstract class AbstractProcessingStep
      * This is extremely useful to define the error message which will be logged
      * for a non-interactive step.
      * 
-     * @param fieldName
-     *            the name of the field which had an error
+     * @param errorFlag
+     *            the status value indicating the type of error
+     * @param errorMessage
+     *            text of the message to be added
      */
     protected final void addErrorMessage(int errorFlag, String errorMessage)
     {
         if (this.errorMessages == null)
-            this.errorMessages = new HashMap();
+        {
+            this.errorMessages = new HashMap<Integer, String>();
+        }
 
         errorMessages.put(Integer.valueOf(errorFlag), errorMessage);
     }
@@ -372,7 +353,7 @@ public abstract class AbstractProcessingStep
             int pageNumber)
     {
         // set info to request
-        request.setAttribute("submission.page", new Integer(pageNumber));
+        request.setAttribute("submission.page", Integer.valueOf(pageNumber));
     }
 
 }

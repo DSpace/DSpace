@@ -1,41 +1,9 @@
-/*
- * JSPStepManager.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.webui.submit;
 
@@ -70,7 +38,7 @@ import org.dspace.submit.AbstractProcessingStep;
  * @see org.dspace.app.webui.submit.JSPStep
  * 
  * @author Tim Donohue
- * @version $Revision: 3705 $
+ * @version $Revision: 5845 $
  */
 public class JSPStepManager
 {
@@ -312,7 +280,9 @@ public class JSPStepManager
         // first, do any pre-processing and get the JSP to display
         // (assuming that this step has an interface)
         if(stepJSPUI!=null)
-        	stepJSPUI.doPreProcessing(context, request, response, subInfo);
+        {
+            stepJSPUI.doPreProcessing(context, request, response, subInfo);
+        }
 
         // Complete this step, if this response has not already
         // been committed.
@@ -353,7 +323,9 @@ public class JSPStepManager
             return completeStep(context, request, response, subInfo);
         }
         else
+        {
             return false; // step not completed
+        }
     }
 
     /**
@@ -519,8 +491,10 @@ public class JSPStepManager
             return true;
         }
         else
+        {
             return false; // couldn't return to controller since response is
                             // committed
+        }
     }
 
     /**
@@ -543,14 +517,7 @@ public class JSPStepManager
     {
         int numberOfPages = stepProcessing.getNumberOfPages(request, subInfo);
 
-        if (pageNumber < numberOfPages)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return (pageNumber < numberOfPages);
     }
 
     /**
@@ -656,8 +623,8 @@ public class JSPStepManager
      * @param request
      *            current servlet request object
      * 
-     * @returns pathToJSP The context path to the JSP page (e.g.
-     *          "/submit/select-collection.jsp")
+     * @return pathToJSP The context path to the JSP page (e.g.
+     *         "/submit/select-collection.jsp")
      */
     public static final String getLastJSPDisplayed(HttpServletRequest request)
     {

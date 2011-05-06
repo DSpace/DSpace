@@ -1,39 +1,9 @@
-/*
- * ChoiceAuthorityManager.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.content.authority;
 
@@ -45,8 +15,6 @@ import java.util.Enumeration;
 import org.apache.log4j.Logger;
 
 import org.dspace.content.MetadataField;
-import org.dspace.content.Collection;
-import org.dspace.content.ItemIterator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.PluginManager;
 
@@ -69,7 +37,7 @@ import org.dspace.core.PluginManager;
  * @author Larry Stone
  * @see ChoiceAuthority
  */
-public class ChoiceAuthorityManager
+public final class ChoiceAuthorityManager
 {
     private static Logger log = Logger.getLogger(ChoiceAuthorityManager.class);
 
@@ -108,7 +76,7 @@ public class ChoiceAuthorityManager
                     }
 
                     // XXX FIXME maybe add sanity check, call
-                    // MetadataField.findByElement to maek sure it's a real field.
+                    // MetadataField.findByElement to make sure it's a real field.
                      
                     ChoiceAuthority ma = (ChoiceAuthority)
                         PluginManager.getNamedPlugin(ChoiceAuthority.class, ConfigurationManager.getProperty(key));
@@ -139,10 +107,12 @@ public class ChoiceAuthorityManager
                         log.warn("Skipping invalid ChoiceAuthority configuration property: "+key+": does not have schema.element.qualifier");
                         continue property;
                     }
-                    closed.put(fkey, new Boolean(ConfigurationManager.getBooleanProperty(key)));
+                    closed.put(fkey, Boolean.valueOf(ConfigurationManager.getBooleanProperty(key)));
                 }
                 else
-                    log.error("Illegal configuration property: "+key);
+                {
+                    log.error("Illegal configuration property: " + key);
+                }
             }
         }
     }
@@ -162,13 +132,15 @@ public class ChoiceAuthorityManager
     private String config2fkey(String field)
     {
         // field is expected to be "schema.element.qualifier"
-        int dot = field.indexOf(".");
+        int dot = field.indexOf('.');
         if (dot < 0)
+        {
             return null;
+        }
         String schema = field.substring(0, dot);
         String element = field.substring(dot+1);
         String qualifier = null;
-        dot = element.indexOf(".");
+        dot = element.indexOf('.');
         if (dot >= 0)
         {
             qualifier = element.substring(dot+1);
@@ -181,11 +153,11 @@ public class ChoiceAuthorityManager
      *  Wrapper that calls getMatches method of the plugin corresponding to
      *  the metadata field defined by schema,element,qualifier.
      *
-     * @see ChoiceAuthority.getMatches
+     * @see ChoiceAuthority#getMatches(String, String, int, int, int, String)
      * @param schema schema of metadata field
      * @param element element of metadata field
      * @param qualifier qualifier of metadata field
-     * @param text user's value to match
+     * @param query user's value to match
      * @param collection database ID of Collection for context (owner of Item)
      * @param start choice at which to start, 0 is first.
      * @param limit maximum number of choices to return, 0 for no limit.
@@ -193,49 +165,60 @@ public class ChoiceAuthorityManager
      * @return a Choices object (never null).
      */
     public Choices getMatches(String schema, String element, String qualifier,
-                                              String query, int collection, int start, int limit, String locale)
+            String query, int collection, int start, int limit, String locale)
     {
-        return getMatches(makeFieldKey(schema, element, qualifier), query, collection, start, limit, locale);
+        return getMatches(makeFieldKey(schema, element, qualifier), query,
+                collection, start, limit, locale);
     }
 
     /**
      *  Wrapper calls getMatches method of the plugin corresponding to
      *  the metadata field defined by single field key.
      *
-     * @see ChoiceAuthority.getMatches
+     * @see ChoiceAuthority#getMatches(String, String, int, int, int, String)
      * @param fieldKey single string identifying metadata field
-     * @param text user's value to match
+     * @param query user's value to match
      * @param collection database ID of Collection for context (owner of Item)
      * @param start choice at which to start, 0 is first.
      * @param limit maximum number of choices to return, 0 for no limit.
      * @param locale explicit localization key if available, or null
      * @return a Choices object (never null).
      */
-    public Choices getMatches(String fieldKey, String query, int collection, int start, int limit, String locale)
+    public Choices getMatches(String fieldKey, String query, int collection,
+            int start, int limit, String locale)
     {
         ChoiceAuthority ma = controller.get(fieldKey);
         if (ma == null)
-            throw new IllegalArgumentException("No choices plugin was configured for  field \""+fieldKey+"\".");
-        return ma.getMatches(query, collection, start, limit, locale);
+        {
+            throw new IllegalArgumentException(
+                    "No choices plugin was configured for  field \"" + fieldKey
+                            + "\".");
+        }
+        return ma.getMatches(fieldKey, query, collection, start, limit, locale);
     }
 
     /**
      *  Wrapper that calls getBestMatch method of the plugin corresponding to
      *  the metadata field defined by single field key.
      *
-     * @see ChoiceAuthority.getBestMatch
+     * @see ChoiceAuthority#getBestMatch(String, String, int, String)
      * @param fieldKey single string identifying metadata field
-     * @param text user's value to match
+     * @param query user's value to match
      * @param collection database ID of Collection for context (owner of Item)
      * @param locale explicit localization key if available, or null
      * @return a Choices object (never null) with 1 or 0 values.
      */
-    public Choices getBestMatch(String fieldKey, String query, int collection, String locale)
+    public Choices getBestMatch(String fieldKey, String query, int collection,
+            String locale)
     {
         ChoiceAuthority ma = controller.get(fieldKey);
         if (ma == null)
-            throw new IllegalArgumentException("No choices plugin was configured for  field \""+fieldKey+"\".");
-        return ma.getBestMatch(query, collection, locale);
+        {
+            throw new IllegalArgumentException(
+                    "No choices plugin was configured for  field \"" + fieldKey
+                            + "\".");
+        }
+        return ma.getBestMatch(fieldKey, query, collection, locale);
     }
 
     /**
@@ -256,8 +239,10 @@ public class ChoiceAuthorityManager
     {
         ChoiceAuthority ma = controller.get(fieldKey);
         if (ma == null)
-            throw new IllegalArgumentException("No choices plugin was configured for  field \""+fieldKey+"\".");
-        return ma.getLabel(authKey, locale);
+        {
+            throw new IllegalArgumentException("No choices plugin was configured for  field \"" + fieldKey + "\".");
+        }
+        return ma.getLabel(fieldKey, authKey, locale);
     }
 
     /**

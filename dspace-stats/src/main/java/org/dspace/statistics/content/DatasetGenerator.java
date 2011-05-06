@@ -1,12 +1,9 @@
 /**
- * $Id: DatasetGenerator.java 4440 2009-10-10 19:03:27Z mdiggory $
- * $URL: http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-stats/src/main/java/org/dspace/statistics/content/DatasetGenerator.java $
- * *************************************************************************
- * Copyright (c) 2002-2009, DuraSpace.  All rights reserved
- * Licensed under the DuraSpace Foundation License.
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * A copy of the DuraSpace License has been included in this
- * distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
+ * http://www.dspace.org/license/
  */
 package org.dspace.statistics.content;
 
@@ -23,16 +20,16 @@ package org.dspace.statistics.content;
 public abstract class DatasetGenerator {
     
     /** The type of generator can either be CATEGORY or SERIE **/
-    public int DatasetType;
+    protected int datasetType;
 
-    public boolean includeTotal = false;
+    protected boolean includeTotal = false;
 
     public int getDatasetType(){
-        return DatasetType;
+        return datasetType;
     }
 
     public void setDatasetType(int datasetType){
-        DatasetType = datasetType;
+        this.datasetType = datasetType;
     }
     
     public boolean isIncludeTotal() {

@@ -1,41 +1,9 @@
-/*
- * DatabaseManager.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4658 $
- *
- * Date: $Date: 2010-01-06 16:30:42 -0500 (Wed, 06 Jan 2010) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.storage.rdbms;
 
@@ -47,8 +15,6 @@ import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.Date;
-import java.sql.Driver;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -59,45 +25,61 @@ import java.sql.Time;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Pattern;
 
-import org.apache.commons.dbcp.ConnectionFactory;
-import org.apache.commons.dbcp.DriverManagerConnectionFactory;
-import org.apache.commons.dbcp.PoolableConnectionFactory;
-import org.apache.commons.dbcp.PoolingDriver;
-import org.apache.commons.pool.ObjectPool;
-import org.apache.commons.pool.impl.GenericKeyedObjectPool;
-import org.apache.commons.pool.impl.GenericKeyedObjectPoolFactory;
-import org.apache.commons.pool.impl.GenericObjectPool;
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.log4j.Level;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.core.LogManager;
 
 /**
  * Executes SQL queries.
  * 
  * @author Peter Breton
  * @author Jim Downing
- * @version $Revision: 4658 $
+ * @version $Revision: 6092 $
  */
 public class DatabaseManager
 {
     /** log4j category */
     private static Logger log = Logger.getLogger(DatabaseManager.class);
-    private static Logger logdbcp = Logger.getLogger(DatabaseManager.class.getName()+".dbcp");
 
     /** True if initialization has been done */
     private static boolean initialized = false;
+
+    private static Map<String, String> insertSQL = new HashMap<String, String>();
+
+    private static boolean isOracle = false;
+    private static boolean isPostgres = false;
+
+    static
+    {
+        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        {
+            isOracle = true;
+            isPostgres = false;
+        }
+        else
+        {
+            isOracle = false;
+            isPostgres = true;
+        }
+    }
+
+    /** DataSource (retrieved from jndi */
+    private static DataSource dataSource = null;
+    private static String sqlOnBorrow = null;
 
     /** Name to use for the pool */
     private static String poolName = "dspacepool";
@@ -118,18 +100,18 @@ public class DatabaseManager
      * A map of database column information. The key is the table name, a
      * String; the value is an array of ColumnInfo objects.
      */
-    private static Map info = new HashMap();
-
-    /**
-     * dbcp connection pool.
-     */
-    private static GenericObjectPool connectionPool = null;
+    private static Map<String, Map<String, ColumnInfo>> info = new HashMap<String, Map<String, ColumnInfo>>();
 
     /**
      * Protected Constructor to prevent instantiation except by derived classes.
      */
     protected DatabaseManager()
     {
+    }
+
+    public static boolean isOracle()
+    {
+        return isOracle;
     }
     
     /**
@@ -148,8 +130,7 @@ public class DatabaseManager
         try
         {
             statement = context.getDBConnection().createStatement();
-            statement
-                    .execute("SET CONSTRAINTS " + constraintName + " DEFERRED");
+            statement.execute("SET CONSTRAINTS " + constraintName + " DEFERRED");
             statement.close();
         }
         finally
@@ -183,8 +164,7 @@ public class DatabaseManager
         try
         {
             statement = context.getDBConnection().createStatement();
-            statement.execute("SET CONSTRAINTS " + constraintName
-                    + " IMMEDIATE");
+            statement.execute("SET CONSTRAINTS " + constraintName + " IMMEDIATE");
             statement.close();
         }
         finally
@@ -221,12 +201,11 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    public static TableRowIterator queryTable(Context context, String table,
-            String query, Object... parameters ) throws SQLException
+    public static TableRowIterator queryTable(Context context, String table, String query, Object... parameters ) throws SQLException
     {
         if (log.isDebugEnabled())
         {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder("Running query \"").append(query).append("\"  with parameters: ");
             for (int i = 0; i < parameters.length; i++)
             {
                 if (i > 0)
@@ -235,16 +214,15 @@ public class DatabaseManager
                }
                 sb.append(parameters[i].toString());
             }
-            log.debug("Running query \"" + query + "\"  with parameters: " + sb.toString());
+            log.debug(sb.toString());
         }
         
         PreparedStatement statement = context.getDBConnection().prepareStatement(query);
         try
         {
-            loadParameters(statement,parameters);
+            loadParameters(statement, parameters);
 
-            TableRowIterator retTRI = new TableRowIterator(statement.executeQuery(),
-                    canonicalize(table));
+            TableRowIterator retTRI = new TableRowIterator(statement.executeQuery(), canonicalize(table));
 
             retTRI.setStatement(statement);
             return retTRI;
@@ -252,7 +230,15 @@ public class DatabaseManager
         catch (SQLException sqle)
         {
             if (statement != null)
-                try { statement.close(); } catch (SQLException s) { }
+            {
+                try
+                {
+                    statement.close();
+                }
+                catch (SQLException s)
+                {
+                }
+            }
 
             throw sqle;
         }
@@ -303,53 +289,18 @@ public class DatabaseManager
         catch (SQLException sqle)
         {
             if (statement != null)
-                try { statement.close(); } catch (SQLException s) { }
+            {
+                try
+                {
+                    statement.close();
+                }
+                catch (SQLException s)
+                {
+                }
+            }
 
             throw sqle;
         }
-    }
-    
-    /**
-     * Return an iterator with the results of executing statement. The table
-     * parameter indicates the type of result. If table is null, the column
-     * names are read from the ResultSetMetaData. The context is that of the
-     * connection which was used to create the statement.
-     * 
-     * @param statement
-     *            The prepared statement to execute.
-     * @param table
-     *            The name of the table which results
-     * @return A TableRowIterator with the results of the query
-     * @exception SQLException
-     *                If a database error occurs
-     */
-    public static TableRowIterator queryPreparedTable(String table,
-            PreparedStatement statement) throws SQLException
-    {
-        TableRowIterator retTRI = new TableRowIterator(statement.executeQuery(),
-                canonicalize(table));
-
-        retTRI.setStatement(statement);
-        return retTRI;
-    }
-
-    /**
-     * Return an iterator with the results of executing statement. The context
-     * is that of the connection which was used to create the statement.
-     * 
-     * @param statement
-     *            The prepared statement to execute.
-     * @return A TableRowIterator with the results of the query
-     * @exception SQLException
-     *                If a database error occurs
-     */
-    public static TableRowIterator queryPrepared(PreparedStatement statement)
-            throws SQLException
-    {
-        TableRowIterator retTRI = new TableRowIterator(statement.executeQuery());
-
-        retTRI.setStatement(statement);
-        return retTRI;
     }
 
     /**
@@ -382,7 +333,9 @@ public class DatabaseManager
         finally
         {
             if (iterator != null)
+            {
                 iterator.close();
+            }
         }
 
         return (retRow);
@@ -419,7 +372,9 @@ public class DatabaseManager
         finally
         {
             if (iterator != null)
+            {
                 iterator.close();
+            }
         }
         return (retRow);
     }
@@ -440,14 +395,13 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    public static int updateQuery(Context context, String query,
-            Object... parameters) throws SQLException
+    public static int updateQuery(Context context, String query, Object... parameters) throws SQLException
     {
         PreparedStatement statement = null;
 
         if (log.isDebugEnabled())
         {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder("Running query \"").append(query).append("\"  with parameters: ");
             for (int i = 0; i < parameters.length; i++)
             {
                 if (i > 0)
@@ -456,13 +410,13 @@ public class DatabaseManager
                }
                 sb.append(parameters[i].toString());
             }
-            log.debug("Running query \"" + query + "\"  with parameters: " + sb.toString());
+            log.debug(sb.toString());
         }
 
         try
         {        	
         	statement = context.getDBConnection().prepareStatement(query);
-        	loadParameters(statement,parameters);
+        	loadParameters(statement, parameters);
         	
         	return statement.executeUpdate();
         }
@@ -480,7 +434,7 @@ public class DatabaseManager
             }
         }
     }
-    
+
     /**
      * Create a new row in the given table, and assigns a unique id.
      * 
@@ -520,7 +474,7 @@ public class DatabaseManager
         String ctable = canonicalize(table);
 
         return findByUnique(context, ctable, getPrimaryKeyColumn(ctable),
-                new Integer(id));
+                Integer.valueOf(id));
     }
 
     /**
@@ -547,14 +501,17 @@ public class DatabaseManager
         String ctable = canonicalize(table);
 
         if ( ! DB_SAFE_NAME.matcher(ctable).matches())
-        	throw new SQLException("Unable to execute select query because table name ("+ctable+") contains non alphanumeric characters.");
+        {
+            throw new SQLException("Unable to execute select query because table name (" + ctable + ") contains non alphanumeric characters.");
+        }
 
         if ( ! DB_SAFE_NAME.matcher(column).matches())
-        	throw new SQLException("Unable to execute select query because column name ("+column+") contains non alphanumeric characters.");
-        
-        String sql = "select * from " + ctable + " where "+ column +" = ? ";
+        {
+            throw new SQLException("Unable to execute select query because column name (" + column + ") contains non alphanumeric characters.");
+        }
 
-        return querySingleTable(context, ctable, sql, value);
+        StringBuilder sql = new StringBuilder("select * from ").append(ctable).append(" where ").append(column).append(" = ? ");
+        return querySingleTable(context, ctable, sql.toString(), value);
     }
 
     /**
@@ -577,7 +534,7 @@ public class DatabaseManager
         String ctable = canonicalize(table);
 
         return deleteByValue(context, ctable, getPrimaryKeyColumn(ctable),
-                new Integer(id));
+                Integer.valueOf(id));
     }
 
     /**
@@ -602,14 +559,17 @@ public class DatabaseManager
         String ctable = canonicalize(table);
 
         if ( ! DB_SAFE_NAME.matcher(ctable).matches())
-        	throw new SQLException("Unable to execute delete query because table name ("+ctable+") contains non alphanumeric characters.");
+        {
+            throw new SQLException("Unable to execute delete query because table name (" + ctable + ") contains non alphanumeric characters.");
+        }
 
         if ( ! DB_SAFE_NAME.matcher(column).matches())
-        	throw new SQLException("Unable to execute delete query because column name ("+column+") contains non alphanumeric characters.");
-        
-        String sql = "delete from "+ctable+" where "+column+" = ? ";
+        {
+            throw new SQLException("Unable to execute delete query because column name (" + column + ") contains non alphanumeric characters.");
+        }
 
-        return updateQuery(context, sql, value);
+        StringBuilder sql = new StringBuilder("delete from ").append(ctable).append(" where ").append(column).append(" = ? ");
+        return updateQuery(context, sql.toString(), value);
     }
 
     /**
@@ -624,20 +584,42 @@ public class DatabaseManager
     {
         initialize();
 
+        if (dataSource != null) {
+        	Connection conn = dataSource.getConnection();
+        	if (!StringUtils.isEmpty(sqlOnBorrow))
+        	{
+	        	PreparedStatement pstmt = conn.prepareStatement(sqlOnBorrow);
+	        	try
+	        	{
+	        		pstmt.execute();
+	        	}
+	        	finally
+	        	{
+	        		if (pstmt != null)
+                    {
+                        pstmt.close();
+                    }
+	        	}
+        	}
 
-        Connection c = DriverManager
-                .getConnection("jdbc:apache:commons:dbcp:" + poolName);
+        	return conn;
+        }
 
-        // logging
-        if (logdbcp.isDebugEnabled()) {
-            logdbcp.debug(LogManager.getHeader(null,
-                                               "getConnection",
-                                               "object=" + c.hashCode() +
-                                               ", active=" + connectionPool.getNumActive() + 
-                                               ", idle=" + connectionPool.getNumIdle()));
+        return null;
     }
 
-        return c;
+    public static DataSource getDataSource()
+    {
+        try
+        {
+            initialize();
+        }
+        catch (SQLException e)
+        {
+            throw new IllegalStateException(e.getMessage(), e);
+        }
+
+        return dataSource;
     }
 
     /**
@@ -652,23 +634,12 @@ public class DatabaseManager
         {
             if (c != null)
             {
-		// logging
-		if (logdbcp.isDebugEnabled()) {
-		    logdbcp.debug(LogManager.getHeader(null,
-						       "freeConnection",
-						       "object=" + c.hashCode() +
-						       ", active=" + connectionPool.getNumActive() + 
-						       ", idle=" + connectionPool.getNumIdle() +
-						       ", isClosed=" + c.isClosed()));
-		}
-        
                 c.close();
             }
         }
         catch (SQLException e)
         {
-            log.warn(e.getMessage());
-            e.printStackTrace();
+            log.warn(e.getMessage(), e);
         }
     }
 
@@ -685,7 +656,7 @@ public class DatabaseManager
     {
         return new TableRow(canonicalize(table), getColumnNames(table));
     }
-    
+
     /**
      * Insert a table row into the RDBMS.
      * 
@@ -696,74 +667,19 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    public static void insert(Context context, TableRow row)
-            throws SQLException
+    public static void insert(Context context, TableRow row) throws SQLException
     {
-        int newID = -1;
-        String table = canonicalize(row.getTable());
-        Statement statement = null;
-        ResultSet rs = null;
-
-        try
+        int newID;
+        if (isPostgres)
         {
-            // Get an ID (primary key) for this row by using the "getnextid"
-            // SQL function in Postgres, or directly with sequences in Oracle
-            String myQuery = "SELECT getnextid('" + table + "') AS result";
-
-            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-            {
-                myQuery = "SELECT " + table + "_seq" + ".nextval FROM dual";
-            }
-
-            statement = context.getDBConnection().createStatement();
-            rs = statement.executeQuery(myQuery);
-
-            rs.next();
-
-            newID = rs.getInt(1);
+            newID = doInsertPostgres(context, row);
         }
-        finally
+        else
         {
-            if (rs != null)
-            {
-                try { rs.close(); } catch (SQLException sqle) { }
-            }
-
-            if (statement != null)
-            {
-                try { statement.close(); } catch (SQLException sqle) { }
-            }
+            newID = doInsertGeneric(context, row);
         }
 
-        if (newID < 0)
-            throw new SQLException("Unable to retrieve sequence ID");
-
-        // Set the ID in the table row object
-        row.setColumn(getPrimaryKeyColumn(table), newID);
-
-        StringBuffer sql = new StringBuffer().append("INSERT INTO ").append(
-                table).append(" ( ");
-
-        ColumnInfo[] info = getColumnInfo(table);
-
-        for (int i = 0; i < info.length; i++)
-        {
-            sql.append((i == 0) ? "" : ",").append(info[i].getName());
-        }
-
-        sql.append(") VALUES ( ");
-
-        // Values to insert
-        for (int i = 0; i < info.length; i++)
-        {
-            sql.append((i == 0) ? "" : ",").append("?");
-        }
-
-        // Watch the syntax
-        sql.append(")");
-
-        execute(context.getDBConnection(), sql.toString(), Arrays.asList(info),
-                row);
+        row.setColumn(getPrimaryKeyColumn(row), newID);
     }
 
     /**
@@ -780,24 +696,27 @@ public class DatabaseManager
      */
     public static int update(Context context, TableRow row) throws SQLException
     {
-        String table = canonicalize(row.getTable());
+        String table = row.getTable();
 
-        StringBuffer sql = new StringBuffer().append("update ").append(table)
+        StringBuilder sql = new StringBuilder().append("update ").append(table)
                 .append(" set ");
 
-        List columns = new ArrayList();
+        List<ColumnInfo> columns = new ArrayList<ColumnInfo>();
         ColumnInfo pk = getPrimaryKeyColumnInfo(table);
-        ColumnInfo[] info = getNonPrimaryKeyColumns(table);
+        Collection<ColumnInfo> info = getColumnInfo(table);
 
-        String seperator = "";
-        for (int i = 0; i < info.length; i++)
+        String separator = "";
+        for (ColumnInfo col : info)
         {
             // Only update this column if it has changed
-            if (row.hasColumnChanged(info[i].getName()))
+            if (!col.isPrimaryKey())
             {
-                sql.append(seperator).append(info[i].getName()).append(" = ?");
-                columns.add(info[i]);
-                seperator = ", ";
+                if (row.hasColumnChanged(col.getName()))
+                {
+                    sql.append(separator).append(col.getName()).append(" = ?");
+                    columns.add(col);
+                    separator = ", ";
+                }
             }
         }
 
@@ -807,7 +726,7 @@ public class DatabaseManager
             sql.append(" where ").append(pk.getName()).append(" = ?");
             columns.add(pk);
 
-            return execute(context.getDBConnection(), sql.toString(), columns, row);
+            return executeUpdate(context.getDBConnection(), sql.toString(), columns, row);
         }
 
         return 1;
@@ -826,6 +745,11 @@ public class DatabaseManager
      */
     public static int delete(Context context, TableRow row) throws SQLException
     {
+        if (null == row.getTable())
+        {
+            throw new IllegalArgumentException("Row not associated with a table");
+        }
+
         String pk = getPrimaryKeyColumn(row);
 
         if (row.isColumnNull(pk))
@@ -845,18 +769,11 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    static ColumnInfo[] getColumnInfo(String table) throws SQLException
+    static Collection<ColumnInfo> getColumnInfo(String table) throws SQLException
     {
-        Map cinfo = getColumnInfoInternal(table);
+        Map<String, ColumnInfo> cinfo = getColumnInfoInternal(table);
 
-        if (cinfo == null)
-        {
-            return null;
-        }
-
-        Collection info = cinfo.values();
-
-        return (ColumnInfo[]) info.toArray(new ColumnInfo[info.size()]);
+        return (cinfo == null) ? null : cinfo.values();
     }
 
     /**
@@ -873,38 +790,9 @@ public class DatabaseManager
     static ColumnInfo getColumnInfo(String table, String column)
             throws SQLException
     {
-        Map info = getColumnInfoInternal(table);
+        Map<String, ColumnInfo> info = getColumnInfoInternal(table);
 
-        return (info == null) ? null : (ColumnInfo) info.get(column);
-    }
-
-    /**
-     * Return all the columns which are not primary keys.
-     * 
-     * @param table
-     *            The name of the table
-     * @return All the columns which are not primary keys, as an array of
-     *         ColumnInfo objects
-     * @exception SQLException
-     *                If a database error occurs
-     */
-    static ColumnInfo[] getNonPrimaryKeyColumns(String table)
-            throws SQLException
-    {
-        String pk = getPrimaryKeyColumn(table);
-        ColumnInfo[] info = getColumnInfo(table);
-        ColumnInfo[] results = new ColumnInfo[info.length - 1];
-        int rcount = 0;
-
-        for (int i = 0; i < info.length; i++)
-        {
-            if (!pk.equals(info[i].getName()))
-            {
-                results[rcount++] = info[i];
-            }
-        }
-
-        return results;
+        return (info == null) ? null : info.get(column);
     }
 
     /**
@@ -917,14 +805,14 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    protected static List getColumnNames(String table) throws SQLException
+    static List<String> getColumnNames(String table) throws SQLException
     {
-        List results = new ArrayList();
-        ColumnInfo[] info = getColumnInfo(table);
+        List<String> results = new ArrayList<String>();
+        Collection<ColumnInfo> info = getColumnInfo(table);
 
-        for (int i = 0; i < info.length; i++)
+        for (ColumnInfo col : info)
         {
-            results.add(info[i].getName());
+            results.add(col.getName());
         }
 
         return results;
@@ -940,10 +828,9 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    protected static List getColumnNames(ResultSetMetaData meta)
-            throws SQLException
+    static List<String> getColumnNames(ResultSetMetaData meta) throws SQLException
     {
-        List results = new ArrayList();
+        List<String> results = new ArrayList<String>();
         int columns = meta.getColumnCount();
 
         for (int i = 0; i < columns; i++)
@@ -964,7 +851,7 @@ public class DatabaseManager
     static String canonicalize(String table)
     {
         // Oracle expects upper-case table names
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        if (isOracle)
         {
             return (table == null) ? null : table.toUpperCase();
         }
@@ -1009,8 +896,8 @@ public class DatabaseManager
     public static void loadSql(Reader r) throws SQLException, IOException
     {
         BufferedReader reader = new BufferedReader(r);
-        StringBuffer sql = new StringBuffer();
-        String SQL = null;
+        StringBuilder sqlBuilder = new StringBuilder();
+        String sql = null;
 
         String line = null;
 
@@ -1030,8 +917,7 @@ public class DatabaseManager
                 // Look for comments
                 int commentStart = line.indexOf("--");
 
-                String input = (commentStart != -1) ? line.substring(0,
-                        commentStart) : line;
+                String input = (commentStart != -1) ? line.substring(0, commentStart) : line;
 
                 // Empty line, skip
                 if (input.trim().equals(""))
@@ -1040,11 +926,11 @@ public class DatabaseManager
                 }
 
                 // Put it on the SQL buffer
-                sql.append(input.replace(';', ' ')); // remove all semicolons
+                sqlBuilder.append(input.replace(';', ' ')); // remove all semicolons
                                                      // from sql file!
 
                 // Add a space
-                sql.append(" ");
+                sqlBuilder.append(" ");
 
                 // More to come?
                 // Look for quotes
@@ -1052,7 +938,7 @@ public class DatabaseManager
                 int count = 0;
                 int inputlen = input.length();
 
-                while ((index = input.indexOf("'", count)) != -1)
+                while ((index = input.indexOf('\'', count)) != -1)
                 {
                     // Flip the value of inquote
                     inquote = !inquote;
@@ -1075,25 +961,24 @@ public class DatabaseManager
                     continue;
                 }
 
-                int endMarker = input.indexOf(";", index);
+                int endMarker = input.indexOf(';', index);
 
                 if (endMarker == -1)
                 {
                     continue;
                 }
 
+                sql = sqlBuilder.toString();
                 if (log.isDebugEnabled())
                 {
                     log.debug("Running database query \"" + sql + "\"");
                 }
 
-                SQL = sql.toString();
-
                 try
                 {
                     // Use execute, not executeQuery (which expects results) or
                     // executeUpdate
-                    boolean succeeded = statement.execute(SQL);
+                    statement.execute(sql);
                 }
                 catch (SQLWarning sqlw)
                 {
@@ -1110,17 +995,16 @@ public class DatabaseManager
                     // These are Postgres-isms:
                     // There's no easy way to check if a table exists before
                     // creating it, so we always drop tables, then create them
-                    boolean isDrop = ((SQL != null) && (sqlmessage != null)
-                            && (SQL.toUpperCase().startsWith("DROP")) && (sqlmessage
-                            .indexOf("does not exist") != -1));
+                    boolean isDrop = ((sql != null) && (sqlmessage != null)
+                            && (sql.toUpperCase().startsWith("DROP"))
+                            && (sqlmessage.indexOf("does not exist") != -1));
 
                     // Creating a view causes a bogus warning
-                    boolean isNoResults = ((SQL != null)
+                    boolean isNoResults = ((sql != null)
                             && (sqlmessage != null)
-                            && ((SQL.toUpperCase().startsWith("CREATE VIEW")) || (SQL
-                                    .toUpperCase()
-                                    .startsWith("CREATE FUNCTION"))) && (sqlmessage
-                            .indexOf("No results were returned") != -1));
+                            && (sql.toUpperCase().startsWith("CREATE VIEW")
+                                    || sql.toUpperCase().startsWith("CREATE FUNCTION"))
+                            && (sqlmessage.indexOf("No results were returned") != -1));
 
                     // If the messages are bogus, give them a low priority
                     if (isDrop || isNoResults)
@@ -1141,13 +1025,16 @@ public class DatabaseManager
                 }
 
                 // Reset SQL buffer
-                sql = new StringBuffer();
-                SQL = null;
+                sqlBuilder = new StringBuilder();
+                sql = null;
             }
         }
         finally
         {
-            freeConnection(connection);
+            if (connection != null)
+            {
+                connection.close();
+            }
 
             if (statement != null)
             {
@@ -1171,15 +1058,32 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    static TableRow process(ResultSet results, String table)
-            throws SQLException
+    static TableRow process(ResultSet results, String table) throws SQLException
     {
-        String dbName =ConfigurationManager.getProperty("db.name");
+        return process(results, table, null);
+    }
+
+    /**
+     * Convert the current row in a ResultSet into a TableRow object.
+     *
+     * @param results
+     *            A ResultSet to process
+     * @param table
+     *            The name of the table
+     * @param pColumnNames
+     *            The name of the columns in this resultset
+     * @return A TableRow object with the data from the ResultSet
+     * @exception SQLException
+     *                If a database error occurs
+     */
+    static TableRow process(ResultSet results, String table, List<String> pColumnNames) throws SQLException
+    {
         ResultSetMetaData meta = results.getMetaData();
         int columns = meta.getColumnCount() + 1;
 
-        List columnNames = (table == null) ? getColumnNames(meta)
-                : getColumnNames(table);
+        // If we haven't been passed the column names try to generate them from the metadata / table
+        List<String> columnNames = pColumnNames != null ? pColumnNames :
+                                        ((table == null) ? getColumnNames(meta) : getColumnNames(table));
 
         TableRow row = new TableRow(canonicalize(table), columnNames);
 
@@ -1191,80 +1095,90 @@ public class DatabaseManager
             String name = meta.getColumnName(i);
             int jdbctype = meta.getColumnType(i);
 
-            if (jdbctype == Types.BIT)
+            switch (jdbctype)
             {
-                row.setColumn(name, results.getBoolean(i));
-            }
-            else if ((jdbctype == Types.INTEGER) || (jdbctype == Types.NUMERIC)
-                    || (jdbctype == Types.DECIMAL))
-            {
-                // If we are using oracle
-                if ("oracle".equals(dbName))
-                {
-                    // Test the value from the record set. If it can be represented using an int, do so.
-                    // Otherwise, store it as long
-                    long longValue = results.getLong(i);
-                    if (longValue <= (long)Integer.MAX_VALUE)
-                        row.setColumn(name, (int)longValue);
-                    else
-                        row.setColumn(name, longValue);
-                }
-                else
-                    row.setColumn(name, results.getInt(i));
-            }
-            else if (jdbctype == Types.BIGINT)
-            {
-                row.setColumn(name, results.getLong(i));
-            }
-            else if (jdbctype == Types.DOUBLE)
-            {
-                row.setColumn(name, results.getDouble(i));
-            }
-            else if (jdbctype == Types.CLOB && "oracle".equals(dbName))
-            {
-                // Support CLOBs in place of TEXT columns in Oracle
-                row.setColumn(name, results.getString(i));
-            }
-            else if (jdbctype == Types.VARCHAR)
-            {
-                try
-                {
-                    byte[] bytes = results.getBytes(i);
+                case Types.BIT:
+                    row.setColumn(name, results.getBoolean(i));
+                    break;
 
-                    if (bytes != null)
+                case Types.INTEGER:
+                case Types.NUMERIC:
+                    if (isOracle)
                     {
-                        String mystring = new String(results.getBytes(i),
-                                "UTF-8");
-                        row.setColumn(name, mystring);
+                        long longValue = results.getLong(i);
+                        if (longValue <= (long)Integer.MAX_VALUE)
+                        {
+                            row.setColumn(name, (int) longValue);
+                        }
+                        else
+                        {
+                            row.setColumn(name, longValue);
+                        }
                     }
                     else
+                    {
+                        row.setColumn(name, results.getInt(i));
+                    }
+                    break;
+
+                case Types.DECIMAL:
+                case Types.BIGINT:
+                    row.setColumn(name, results.getLong(i));
+                    break;
+
+                case Types.DOUBLE:
+                    row.setColumn(name, results.getDouble(i));
+                    break;
+
+                case Types.CLOB:
+                    if (isOracle)
                     {
                         row.setColumn(name, results.getString(i));
                     }
-                }
-                catch (UnsupportedEncodingException e)
-                {
-                    // do nothing, UTF-8 is built in!
-                }
-            }
-            else if (jdbctype == Types.DATE)
-            {
-                row.setColumn(name, results.getDate(i));
-            }
-            else if (jdbctype == Types.TIME)
-            {
-                row.setColumn(name, results.getTime(i));
-            }
-            else if (jdbctype == Types.TIMESTAMP)
-            {
-                row.setColumn(name, results.getTimestamp(i));
-            }
-            else
-            {
-                throw new IllegalArgumentException("Unsupported JDBC type: "
-                        + jdbctype);
+                    else
+                    {
+                        throw new IllegalArgumentException("Unsupported JDBC type: " + jdbctype);
+                    }
+                    break;
+
+                case Types.VARCHAR:
+                    try
+                    {
+                        byte[] bytes = results.getBytes(i);
+
+                        if (bytes != null)
+                        {
+                            String mystring = new String(results.getBytes(i), "UTF-8");
+                            row.setColumn(name, mystring);
+                        }
+                        else
+                        {
+                            row.setColumn(name, results.getString(i));
+                        }
+                    }
+                    catch (UnsupportedEncodingException e)
+                    {
+                        log.error("Unable to parse text from database", e);
+                    }
+                    break;
+
+                case Types.DATE:
+                    row.setColumn(name, results.getDate(i));
+                    break;
+
+                case Types.TIME:
+                    row.setColumn(name, results.getTime(i));
+                    break;
+
+                case Types.TIMESTAMP:
+                    row.setColumn(name, results.getTimestamp(i));
+                    break;
+
+                default:
+                    throw new IllegalArgumentException("Unsupported JDBC type: " + jdbctype);
             }
 
+            // Determines if the last column was null, and sets the tablerow accordingly
             if (results.wasNull())
             {
                 row.setColumnNull(name);
@@ -1326,12 +1240,10 @@ public class DatabaseManager
      */
     static ColumnInfo getPrimaryKeyColumnInfo(String table) throws SQLException
     {
-        ColumnInfo[] cinfo = getColumnInfo(canonicalize(table));
+        Collection<ColumnInfo> cinfo = getColumnInfo(canonicalize(table));
 
-        for (int i = 0; i < cinfo.length; i++)
+        for (ColumnInfo info : cinfo)
         {
-            ColumnInfo info = cinfo[i];
-
             if (info.isPrimaryKey())
             {
                 return info;
@@ -1357,10 +1269,8 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    private static int execute(Connection connection, String sql, List columns,
-            TableRow row) throws SQLException
+    private static void execute(Connection connection, String sql, Collection<ColumnInfo> columns, TableRow row) throws SQLException
     {
-        String dbName =ConfigurationManager.getProperty("db.name");
         PreparedStatement statement = null;
 
         if (log.isDebugEnabled())
@@ -1371,87 +1281,37 @@ public class DatabaseManager
         try
         {
             statement = connection.prepareStatement(sql);
-        	
-            int count = 0;
-
-            for (Iterator iterator = columns.iterator(); iterator.hasNext();)
+        	loadParameters(statement, columns, row);
+            statement.execute();
+        }
+        finally
+        {
+            if (statement != null)
             {
-                count++;
-
-                ColumnInfo info = (ColumnInfo) iterator.next();
-                String column = info.getName();
-                int jdbctype = info.getType();
-
-                if (row.isColumnNull(column))
+                try
                 {
-                    statement.setNull(count, jdbctype);
-
-                    continue;
+                    statement.close();
                 }
-                else if (jdbctype == Types.BIT)
+                catch (SQLException sqle)
                 {
-                    statement.setBoolean(count, row.getBooleanColumn(column));
-
-                    continue;
-                }
-                else if ((jdbctype == Types.INTEGER) || (jdbctype == Types.NUMERIC)
-                        || (jdbctype == Types.DECIMAL))
-                {
-                    // If we are using Oracle, we can pass in long values, so always do so.
-                    if ("oracle".equals(dbName))
-                        statement.setLong(count, row.getLongColumn(column));
-                    else
-                        statement.setInt(count, row.getIntColumn(column));
-
-                    continue;
-                }
-                else if (jdbctype == Types.BIGINT)
-                {
-                    statement.setLong(count, row.getLongColumn(column));
-                }
-                else if (jdbctype == Types.CLOB && "oracle".equals(dbName))
-                {
-                    // Support CLOBs in place of TEXT columns in Oracle
-                    statement.setString(count, row.getStringColumn(column));
-
-                    continue;
-                }
-                else if (jdbctype == Types.VARCHAR)
-                {
-                    statement.setString(count, row.getStringColumn(column));
-
-                    continue;
-                }
-                else if (jdbctype == Types.DATE)
-                {
-                    java.sql.Date d = new java.sql.Date(row.getDateColumn(
-                            column).getTime());
-                    statement.setDate(count, d);
-
-                    continue;
-                }
-                else if (jdbctype == Types.TIME)
-                {
-                    Time t = new Time(row.getDateColumn(column).getTime());
-                    statement.setTime(count, t);
-
-                    continue;
-                }
-                else if (jdbctype == Types.TIMESTAMP)
-                {
-                    Timestamp t = new Timestamp(row.getDateColumn(column)
-                            .getTime());
-                    statement.setTimestamp(count, t);
-
-                    continue;
-                }
-                else
-                {
-                    throw new IllegalArgumentException(
-                            "Unsupported JDBC type: " + jdbctype);
                 }
             }
+        }
+    }
 
+    private static int executeUpdate(Connection connection, String sql, Collection<ColumnInfo> columns, TableRow row) throws SQLException
+    {
+        PreparedStatement statement = null;
+
+        if (log.isDebugEnabled())
+        {
+            log.debug("Running query \"" + sql + "\"");
+        }
+
+        try
+        {
+            statement = connection.prepareStatement(sql);
+        	loadParameters(statement, columns, row);
             return statement.executeUpdate();
         }
         finally
@@ -1478,10 +1338,10 @@ public class DatabaseManager
      * @exception SQLException
      *                If a database error occurs
      */
-    private static Map getColumnInfoInternal(String table) throws SQLException
+    private static Map<String, ColumnInfo> getColumnInfoInternal(String table) throws SQLException
     {
         String ctable = canonicalize(table);
-        Map results = (Map) info.get(ctable);
+        Map<String, ColumnInfo> results = info.get(ctable);
 
         if (results != null)
         {
@@ -1505,7 +1365,7 @@ public class DatabaseManager
      *                If there is a problem retrieving information from the
      *                RDBMS.
      */
-    private static Map retrieveColumnInfo(String table) throws SQLException
+    private static Map<String, ColumnInfo> retrieveColumnInfo(String table) throws SQLException
     {
         Connection connection = null;
         ResultSet pkcolumns = null;
@@ -1516,7 +1376,7 @@ public class DatabaseManager
             String schema = ConfigurationManager.getProperty("db.schema");
             String catalog = null;
             
-            int dotIndex = table.indexOf("."); 
+            int dotIndex = table.indexOf('.'); 
             if (dotIndex > 0)
             {
                 catalog = table.substring(0, dotIndex);
@@ -1528,7 +1388,7 @@ public class DatabaseManager
             connection = getConnection();
 
             DatabaseMetaData metadata = connection.getMetaData();
-            HashMap results = new HashMap();
+            Map<String, ColumnInfo> results = new HashMap<String, ColumnInfo>();
 
             int max = metadata.getMaxTableNameLength();
             String tname = (table.length() >= max) ? table
@@ -1536,10 +1396,12 @@ public class DatabaseManager
             
             pkcolumns = metadata.getPrimaryKeys(catalog, schema, tname);
             
-            Set pks = new HashSet();
+            Set<String> pks = new HashSet<String>();
 
             while (pkcolumns.next())
+            {
                 pks.add(pkcolumns.getString(4));
+            }
 
             columns = metadata.getColumns(catalog, schema, tname, null);
 
@@ -1558,7 +1420,7 @@ public class DatabaseManager
                 results.put(column, cinfo);
             }
 
-            return results;
+            return Collections.unmodifiableMap(results);
         }
         finally
         {
@@ -1574,7 +1436,7 @@ public class DatabaseManager
 
             if (connection != null)
             {
-                try { freeConnection(connection); } catch (Exception sqle) { }
+                try { connection.close(); } catch (SQLException sqle) { }
             }
         }
     }
@@ -1587,13 +1449,8 @@ public class DatabaseManager
     {
         if (initialized)
         {
+            dataSource = null;
             initialized = false;
-            // Get the registered DBCP pooling driver
-            PoolingDriver driver = (PoolingDriver)DriverManager.getDriver("jdbc:apache:commons:dbcp:");
-
-            // Close the named pool
-            if (driver != null)
-                driver.closePool(poolName);
         }
     }
 
@@ -1609,119 +1466,53 @@ public class DatabaseManager
 
         try
         {
-            // Register basic JDBC driver
-            Class.forName(ConfigurationManager.getProperty("db.driver"));
-
-            // Register the DBCP driver
-            Class.forName("org.apache.commons.dbcp.PoolingDriver");
-
-            // Read pool configuration parameter or use defaults
-            // Note we check to see if property is null; getIntProperty returns
-            // '0' if the property is not set OR if it is actually set to zero.
-            // But 0 is a valid option...
-            int maxConnections = ConfigurationManager
-                    .getIntProperty("db.maxconnections");
-
-            if (ConfigurationManager.getProperty("db.maxconnections") == null)
+            String jndiName = ConfigurationManager.getProperty("db.jndi");
+            if (!StringUtils.isEmpty(jndiName))
             {
-                maxConnections = 30;
+                try
+                {
+                    javax.naming.Context ctx = new InitialContext();
+                    javax.naming.Context env = ctx == null ? null : (javax.naming.Context)ctx.lookup("java:/comp/env");
+                    dataSource = (DataSource)(env == null ? null : env.lookup(jndiName));
+                }
+                catch (Exception e)
+                {
+                    log.error("Error retrieving JNDI context: " + jndiName, e);
+                }
+
+                if (dataSource != null)
+                {
+                    if (isOracle)
+                    {
+                        sqlOnBorrow = "ALTER SESSION SET current_schema=" + ConfigurationManager.getProperty("db.username").trim().toUpperCase();
+                    }
+
+                    log.debug("Using JNDI dataSource: " + jndiName);
+                }
+                else
+                {
+                    log.info("Unable to locate JNDI dataSource: " + jndiName);
+                }
             }
 
-            int maxWait = ConfigurationManager.getIntProperty("db.maxwait");
-
-            if (ConfigurationManager.getProperty("db.maxwait") == null)
+            if (isOracle)
             {
-                maxWait = 5000;
+                if (!StringUtils.isEmpty(ConfigurationManager.getProperty("db.postgres.schema")))
+                {
+                    sqlOnBorrow = "SET SEARCH_PATH TO " + ConfigurationManager.getProperty("db.postgres.schema").trim();
+                }
             }
 
-            int maxIdle = ConfigurationManager.getIntProperty("db.maxidle");
-
-            if (ConfigurationManager.getProperty("db.maxidle") == null)
+            if (dataSource == null)
             {
-                maxIdle = -1;
+                if (!StringUtils.isEmpty(jndiName))
+                {
+                    log.info("Falling back to creating own Database pool");
+                }
+
+                dataSource = DataSourceInit.getDatasource();
             }
 
-            boolean useStatementPool = ConfigurationManager.getBooleanProperty("db.statementpool",true);
-
-            // Create object pool
-            connectionPool = new GenericObjectPool(null, // PoolableObjectFactory
-                    // - set below
-                    maxConnections, // max connections
-                    GenericObjectPool.WHEN_EXHAUSTED_BLOCK, maxWait, // don't
-                                                                     // block
-                    // more than 5
-                    // seconds
-                    maxIdle, // max idle connections (unlimited)
-                    true, // validate when we borrow connections from pool
-                    false // don't bother validation returned connections
-            );
-
-            // ConnectionFactory the pool will use to create connections.
-            ConnectionFactory connectionFactory = new DriverManagerConnectionFactory(
-                    ConfigurationManager.getProperty("db.url"),
-                    ConfigurationManager.getProperty("db.username"),
-                    ConfigurationManager.getProperty("db.password"));
-
-            //
-            // Now we'll create the PoolableConnectionFactory, which wraps
-            // the "real" Connections created by the ConnectionFactory with
-            // the classes that implement the pooling functionality.
-            //
-            String validationQuery = "SELECT 1";
-
-            // Oracle has a slightly different validation query
-            if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-            {
-                validationQuery = "SELECT 1 FROM DUAL";
-            }
-
-            GenericKeyedObjectPoolFactory statementFactory = null;
-            if (useStatementPool)
-            {
-	            // The statement Pool is used to pool prepared statements.
-	            GenericKeyedObjectPool.Config statementFactoryConfig = new GenericKeyedObjectPool.Config();
-	            // Just grow the pool size when needed. 
-	            // 
-	            // This means we will never block when attempting to 
-	            // create a query. The problem is unclosed statements, 
-	            // they can never be reused. So if we place a maximum 
-	            // cap on them, then we might reach a condition where 
-	            // a page can only be viewed X number of times. The 
-	            // downside of GROW_WHEN_EXHAUSTED is that this may 
-	            // allow a memory leak to exist. Both options are bad, 
-	            // but I'd prefer a memory leak over a failure.
-	            //
-	            // FIXME: Perhaps this decision should be derived from config parameters?
-	            statementFactoryConfig.whenExhaustedAction = GenericObjectPool.WHEN_EXHAUSTED_GROW;
-	
-	            statementFactory = new GenericKeyedObjectPoolFactory(null,statementFactoryConfig);
-            }
-            
-            PoolableConnectionFactory poolableConnectionFactory = new PoolableConnectionFactory(
-                    connectionFactory, connectionPool, statementFactory,
-                    validationQuery, // validation query
-                    false, // read only is not default for now
-                    false); // Autocommit defaults to none
-
-            // Obtain a poolName from the config, default is "dspacepool"
-            if (ConfigurationManager.getProperty("db.poolname") != null)
-            {
-                poolName = ConfigurationManager.getProperty("db.poolname");
-            }
-
-            //
-            // Finally, we get the PoolingDriver itself...
-            //
-            PoolingDriver driver = (PoolingDriver)DriverManager.getDriver("jdbc:apache:commons:dbcp:");
-
-            //
-            // ...and register our pool with it.
-            //
-            if (driver != null)
-                driver.registerPool(poolName, connectionPool);
-
-            // Old SimplePool init
-            //DriverManager.registerDriver(new SimplePool());
             initialized = true;
         }
         catch (SQLException se)
@@ -1734,7 +1525,7 @@ public class DatabaseManager
             // Need to be able to catch other exceptions. Pretend they are
             // SQLExceptions, but do log
             log.warn("Exception initializing DB pool", e);
-            throw new SQLException(e.toString());
+            throw new SQLException(e.toString(), e);
         }
     }
 
@@ -1747,71 +1538,348 @@ public class DatabaseManager
 	 * @param parameters
 	 * 			The parameters to be set on the statement.
 	 */
-	protected static void loadParameters(PreparedStatement statement, Object[] parameters) 
-	throws SQLException{
-		
+	protected static void loadParameters(PreparedStatement statement, Object[] parameters) throws SQLException
+    {
 		statement.clearParameters();
-		
-	    for(int i=0; i < parameters.length; i++)
-	    {	
-	    	// Select the object we are setting.
-	    	Object parameter = parameters[i];
-	    	int idx = i+1; // JDBC starts counting at 1.
-	    	
-	    	if (parameter == null)
-	    	{
-	    		throw new SQLException("Attempting to insert null value into SQL query.");
-	    	}
+
+        int idx = 1;
+        for (Object parameter : parameters)
+	    {
 	    	if (parameter instanceof String)
 	    	{
-	    		statement.setString(idx,(String) parameters[i]);
+	    		statement.setString(idx,(String) parameter);
 	    	}
+            else if (parameter instanceof Long)
+            {
+                statement.setLong(idx,((Long) parameter).longValue());
+            }
 	    	else if (parameter instanceof Integer)
 	    	{
-	    		int ii = ((Integer) parameter).intValue();
-	    		statement.setInt(idx,ii);
+	    		statement.setInt(idx,((Integer) parameter).intValue());
 	    	}
+            else if (parameter instanceof Short)
+            {
+                statement.setShort(idx,((Short) parameter).shortValue());
+            }
+            else if (parameter instanceof Date)
+            {
+                statement.setDate(idx,(Date) parameter);
+            }
+            else if (parameter instanceof Time)
+            {
+                statement.setTime(idx,(Time) parameter);
+            }
+            else if (parameter instanceof Timestamp)
+            {
+                statement.setTimestamp(idx,(Timestamp) parameter);
+            }
 	    	else if (parameter instanceof Double)
 	    	{
-	    		double d = ((Double) parameter).doubleValue();
-	    		statement.setDouble(idx,d);
+	    		statement.setDouble(idx,((Double) parameter).doubleValue());
 	    	}
 	    	else if (parameter instanceof Float)
 	    	{
-	    		float f = ((Float) parameter).floatValue();
-	    		statement.setFloat(idx,f);
+	    		statement.setFloat(idx,((Float) parameter).floatValue());
 	    	}
-	    	else if (parameter instanceof Short)
-	    	{
-	    		short s = ((Short) parameter).shortValue();
-	    		statement.setShort(idx,s);
-	    	}
-	    	else if (parameter instanceof Long)
-	    	{
-	    		long l = ((Long) parameter).longValue();
-	    		statement.setLong(idx,l);
-	    	}
-	    	else if (parameter instanceof Date)
-	    	{
-	    		Date date = (Date) parameter;
-	    		statement.setDate(idx,date);
-	    	}
-	    	else if (parameter instanceof Time)
-	    	{
-	    		Time time = (Time) parameter;
-	    		statement.setTime(idx,time);
-	    	}
-	    	else if (parameter instanceof Timestamp)
-	    	{
-	    		Timestamp timestamp = (Timestamp) parameter;
-	    		statement.setTimestamp(idx,timestamp);
-	    	}
+            else if (parameter == null)
+            {
+                throw new SQLException("Attempting to insert null value into SQL query.");
+            }
 	    	else
 	    	{
 	    		throw new SQLException("Attempting to insert unknown datatype ("+parameter.getClass().getName()+") into SQL statement.");
-	    	}        	
+	    	}
+
+            idx++;
 	    }
 	}
+
+    private static void loadParameters(PreparedStatement statement, Collection<ColumnInfo> columns, TableRow row) throws SQLException
+    {
+        int count = 0;
+        for (ColumnInfo info : columns)
+        {
+            count++;
+            String column = info.getCanonicalizedName();
+            int jdbctype = info.getType();
+
+            if (row.isColumnNull(column))
+            {
+                statement.setNull(count, jdbctype);
+            }
+            else
+            {
+                switch (jdbctype)
+                {
+                    case Types.BIT:
+                        statement.setBoolean(count, row.getBooleanColumn(column));
+                        break;
+
+                    case Types.INTEGER:
+                        if (isOracle)
+                        {
+                            statement.setLong(count, row.getLongColumn(column));
+                        }
+                        else
+                        {
+                            statement.setInt(count, row.getIntColumn(column));
+                        }
+                        break;
+
+                    case Types.NUMERIC:
+                    case Types.DECIMAL:
+                        statement.setLong(count, row.getLongColumn(column));
+                        // FIXME should be BigDecimal if TableRow supported that
+                        break;
+
+                    case Types.BIGINT:
+                        statement.setLong(count, row.getLongColumn(column));
+                        break;
+
+                    case Types.CLOB:
+                        if (isOracle)
+                        {
+                            // Support CLOBs in place of TEXT columns in Oracle
+                            statement.setString(count, row.getStringColumn(column));
+                        }
+                        else
+                        {
+                            throw new IllegalArgumentException("Unsupported JDBC type: " + jdbctype);
+                        }
+                        break;
+
+                    case Types.VARCHAR:
+                        statement.setString(count, row.getStringColumn(column));
+                        break;
+
+                    case Types.DATE:
+                        statement.setDate(count, new java.sql.Date(row.getDateColumn(column).getTime()));
+                        break;
+
+                    case Types.TIME:
+                        statement.setTime(count, new Time(row.getDateColumn(column).getTime()));
+                        break;
+
+                    case Types.TIMESTAMP:
+                        statement.setTimestamp(count, new Timestamp(row.getDateColumn(column).getTime()));
+                        break;
+
+                    default:
+                        throw new IllegalArgumentException("Unsupported JDBC type: " + jdbctype);
+                }
+            }
+        }
+    }
+
+    /**
+     * Postgres-specific row insert, combining getnextid() and insert into single statement for efficiency
+     * @param context
+     * @param row
+     * @return
+     * @throws SQLException
+     */
+    private static int doInsertPostgres(Context context, TableRow row) throws SQLException
+    {
+        String table = row.getTable();
+
+        Collection<ColumnInfo> info = getColumnInfo(table);
+        Collection<ColumnInfo> params = new ArrayList<ColumnInfo>();
+
+        String primaryKey = getPrimaryKeyColumn(table);
+        String sql = insertSQL.get(table);
+
+        boolean firstColumn = true;
+        boolean foundPrimaryKey = false;
+        if (sql == null)
+        {
+            // Generate SQL and filter parameter columns
+            StringBuilder insertBuilder = new StringBuilder("INSERT INTO ").append(table).append(" ( ");
+            StringBuilder valuesBuilder = new StringBuilder(") VALUES ( ");
+            for (ColumnInfo col : info)
+            {
+                if (firstColumn)
+                {
+                    firstColumn = false;
+                }
+                else
+                {
+                    insertBuilder.append(",");
+                    valuesBuilder.append(",");
+                }
+
+                insertBuilder.append(col.getName());
+
+                if (!foundPrimaryKey && col.isPrimaryKey())
+                {
+                    valuesBuilder.append("getnextid('").append(table).append("')");
+                    foundPrimaryKey = true;
+                }
+                else
+                {
+                    valuesBuilder.append('?');
+                    params.add(col);
+                }
+            }
+
+            sql = insertBuilder.append(valuesBuilder.toString()).append(") RETURNING ").append(getPrimaryKeyColumn(table)).toString();
+            insertSQL.put(table, sql);
+        }
+        else
+        {
+            // Already have SQL, just filter parameter columns
+            for (ColumnInfo col : info)
+            {
+                if (!foundPrimaryKey && col.isPrimaryKey())
+                {
+                    foundPrimaryKey = true;
+                }
+                else
+                {
+                    params.add(col);
+                }
+            }            
+        }
+
+        PreparedStatement statement = null;
+
+        if (log.isDebugEnabled())
+        {
+            log.debug("Running query \"" + sql + "\"");
+        }
+
+        ResultSet rs = null;
+        try
+        {
+            statement = context.getDBConnection().prepareStatement(sql);
+        	loadParameters(statement, params, row);
+            rs = statement.executeQuery();
+            rs.next();
+            return rs.getInt(1);
+        }
+        finally
+        {
+            if (rs != null)
+            {
+                try
+                {
+                    rs.close();
+                }
+                catch (SQLException sqle)
+                {
+                }
+            }
+
+            if (statement != null)
+            {
+                try
+                {
+                    statement.close();
+                }
+                catch (SQLException sqle)
+                {
+                }
+            }
+        }
+    }
+
+    /**
+     * Generic version of row insertion with separate id get / insert
+     * @param context
+     * @param row
+     * @return
+     * @throws SQLException
+     */
+    private static int doInsertGeneric(Context context, TableRow row) throws SQLException
+    {
+        int newID = -1;
+        String table = row.getTable();
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+
+        try
+        {
+            // Get an ID (primary key) for this row by using the "getnextid"
+            // SQL function in Postgres, or directly with sequences in Oracle
+            if (isOracle)
+            {
+                statement = context.getDBConnection().prepareStatement("SELECT " + table + "_seq" + ".nextval FROM dual");
+            }
+            else
+            {
+                statement = context.getDBConnection().prepareStatement("SELECT getnextid(?) AS result");
+                loadParameters(statement, new Object[] { table });
+            }
+            rs = statement.executeQuery();
+            rs.next();
+            newID = rs.getInt(1);
+        }
+        finally
+        {
+            if (rs != null)
+            {
+                try { rs.close(); } catch (SQLException sqle) { }
+            }
+
+            if (statement != null)
+            {
+                try { statement.close(); } catch (SQLException sqle) { }
+            }
+        }
+
+        if (newID < 0)
+        {
+            throw new SQLException("Unable to retrieve sequence ID");
+        }
+
+        // Set the ID in the table row object
+        row.setColumn(getPrimaryKeyColumn(table), newID);
+        Collection<ColumnInfo> info = getColumnInfo(table);
+
+        String sql = insertSQL.get(table);
+        if (sql == null)
+        {
+            StringBuilder sqlBuilder = new StringBuilder().append("INSERT INTO ").append(table).append(" ( ");
+
+            boolean firstColumn = true;
+            for (ColumnInfo col : info)
+            {
+                if (firstColumn)
+                {
+                    sqlBuilder.append(col.getName());
+                    firstColumn = false;
+                }
+                else
+                {
+                    sqlBuilder.append(",").append(col.getName());
+                }
+            }
+
+            sqlBuilder.append(") VALUES ( ");
+
+            // Values to insert
+            firstColumn = true;
+            for (int i = 0; i < info.size(); i++)
+            {
+                if (firstColumn)
+                {
+                    sqlBuilder.append("?");
+                    firstColumn = false;
+                }
+                else
+                {
+                    sqlBuilder.append(",").append("?");
+                }
+            }
+
+            // Watch the syntax
+            sqlBuilder.append(")");
+            sql = sqlBuilder.toString();
+            insertSQL.put(table, sql);
+        }
+
+        execute(context.getDBConnection(), sql, info, row);
+        return newID;
+    }
 
     /**
      * Main method used to perform tests on the database
@@ -1834,6 +1902,7 @@ public class DatabaseManager
         try
         {
             Connection connection = DatabaseManager.getConnection();
+            connection.close();
         }
         catch (SQLException sqle)
         {
@@ -1843,136 +1912,6 @@ public class DatabaseManager
             System.exit(1);
         }
 
-        System.out.println("Connected succesfully!\n");
-    }
-
-}
-
-/**
- * Represents a column in an RDBMS table.
- */
-
-class ColumnInfo
-{
-    /** The name of the column */
-    private String name;
-
-    /** The JDBC type of the column */
-    private int type;
-
-    /** True if this column is a primary key */
-    private boolean isPrimaryKey;
-
-    /**
-     * Constructor
-     */
-    ColumnInfo()
-    {
-    }
-
-    /**
-     * Constructor
-     */
-    ColumnInfo(String name, int type)
-    {
-        this.name = name;
-        this.type = type;
-    }
-
-    /**
-     * Return the column name.
-     * 
-     * @return - The column name
-     */
-    public String getName()
-    {
-        return name;
-    }
-
-    /**
-     * Set the column name
-     * 
-     * @param v -
-     *            The column name
-     */
-    void setName(String v)
-    {
-        name = v;
-    }
-
-    /**
-     * Return the JDBC type. This is one of the constants from java.sql.Types.
-     * 
-     * @return - The JDBC type
-     * @see java.sql.Types
-     */
-    public int getType()
-    {
-        return type;
-    }
-
-    /**
-     * Set the JDBC type. This should be one of the constants from
-     * java.sql.Types.
-     * 
-     * @param v -
-     *            The JDBC type
-     * @see java.sql.Types
-     */
-    void setType(int v)
-    {
-        type = v;
-    }
-
-    /**
-     * Return true if this column is a primary key.
-     * 
-     * @return True if this column is a primary key, false otherwise.
-     */
-    public boolean isPrimaryKey()
-    {
-        return isPrimaryKey;
-    }
-
-    /**
-     * Set whether this column is a primary key.
-     * 
-     * @param v
-     *            True if this column is a primary key.
-     */
-    void setIsPrimaryKey(boolean v)
-    {
-        this.isPrimaryKey = v;
-    }
-
-    /*
-     * Return true if this object is equal to other, false otherwise.
-     * 
-     * @return True if this object is equal to other, false otherwise.
-     */
-    public boolean equals(Object other)
-    {
-        if (!(other instanceof ColumnInfo))
-        {
-            return false;
-        }
-
-        ColumnInfo theOther = (ColumnInfo) other;
-
-        return ((name != null) ? name.equals(theOther.name)
-                : (theOther.name == null))
-                && (type == theOther.type)
-                && (isPrimaryKey == theOther.isPrimaryKey);
-    }
-
-    /*
-     * Return a hashCode for this object.
-     * 
-     * @return A hashcode for this object.
-     */
-    public int hashCode()
-    {
-        return new StringBuffer().append(name).append(type)
-                .append(isPrimaryKey).toString().hashCode();
+        System.out.println("Connected successfully!\n");
     }
 }

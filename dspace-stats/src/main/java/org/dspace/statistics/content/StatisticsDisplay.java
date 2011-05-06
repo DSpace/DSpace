@@ -1,12 +1,9 @@
 /**
- * $Id: StatisticsDisplay.java 4440 2009-10-10 19:03:27Z mdiggory $
- * $URL: http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-stats/src/main/java/org/dspace/statistics/content/StatisticsDisplay.java $
- * *************************************************************************
- * Copyright (c) 2002-2009, DuraSpace.  All rights reserved
- * Licensed under the DuraSpace Foundation License.
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * A copy of the DuraSpace License has been included in this
- * distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
+ * http://www.dspace.org/license/
  */
 package org.dspace.statistics.content;
 
@@ -94,23 +91,27 @@ public abstract class StatisticsDisplay {
     public void addCss(String style){
         if (style != null) {
             if (css == null)
+            {
                 css = new ArrayList<String>();
+            }
             css.add(style.trim());
         }
     }
 
     public String getCss() {
         if (css != null) {
-            String result = "";
+            StringBuilder result = new StringBuilder();
             for (String s : css) {
+                result.append(s);
                 if (!s.endsWith(";"))
-                    s += ";";
-                result += s;
+                {
+                    result.append(";");
+                }
             }
-            return result;
+            return result.toString();
         }
-        else
-            return "";
+
+        return "";
     }
 }
 

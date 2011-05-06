@@ -1,30 +1,43 @@
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
 <html>
 <head>
 <!--
   Author:   Peter Breton
   Author:	Richard Jones
-  Version:  $Revision: 3705 $
-  Date:     $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
+  Version:  $Revision: 5844 $
+  Date:     $Date: 2010-11-12 00:29:14 -0500 (Fri, 12 Nov 2010) $
 -->
 </head>
 <body bgcolor="white">
 <p>
-Provides classes and mehtods for browsing Items in DSpace by whatever
+Provides classes and methods for browsing Items in DSpace by whatever
 is specified in the configuration.  The standard method by which you 
 would perform a browse is as follows:
 </p>
 
 <ul>
-	<li>Create a <a href="BrowserScope.html">BrowserScope</a> object.  This object holds all of the parameters
-	of your browse request</li>
-	<li>Pass the <a href="BrowserScope.html">BrowserScope</a> object into the <a href="BrowseEngine.html">BrowseEngine</a> object.
-	This object should be invoked through either the browse() method or the browseMini() method</li>
-	<li>The <a href="BrowseEngine.html">BrowseEngine</a> will pass back a <a href="BrowseInfo.html">BrowseInfo</a> object which contains all the relevant details of your request</li>
+	<li>Create a <a href="BrowserScope.html">BrowserScope</a> object.
+	This object holds all of the parameters of your browse request</li>
+	<li>Pass the <a href="BrowserScope.html">BrowserScope</a> object
+	into the <a href="BrowseEngine.html">BrowseEngine</a> object. This
+	object should be invoked through either the browse() method or the
+	browseMini() method</li>
+	<li>The <a href="BrowseEngine.html">BrowseEngine</a> will pass
+	back a <a href="BrowseInfo.html">BrowseInfo</a> object which contains
+	all the relevant details of your request</li>
 </ul>
 
 <p>
-Browses only return archived Items; other Items (eg, those 
+Browses only return archived Items; other Items (e.g. those 
 in the workflow system) are ignored.
 </p>
 
@@ -32,6 +45,7 @@ in the workflow system) are ignored.
 
 <p>
 An example use of the Browse API is shown below:
+</p>
 <pre>
     // Create or obtain a context object
     Context context = new Context();
@@ -56,10 +70,10 @@ An example use of the Browse API is shown below:
 	BrowseEngine be = new BrowseEngine();
     BrowseInfo results = be.browse(scope);
 </pre>
-</p>
 
 <p>
 In this case, the results might be Items with titles like:
+</p>
 
 <pre>
 Tehran, City of the Ages
@@ -72,8 +86,6 @@ Thematic Alignment
 Thesis and Antithesis
 ...
 </pre>
-
-</p>
 
 <h2>Browse Indexes</h2>
 

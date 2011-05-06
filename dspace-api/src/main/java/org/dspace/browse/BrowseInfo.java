@@ -1,39 +1,9 @@
-/*
- * BrowseInfo.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4365 $
- *
- * Date: $Date: 2009-10-05 19:52:42 -0400 (Mon, 05 Oct 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.browse;
 
@@ -53,7 +23,7 @@ import org.dspace.sort.SortOption;
 /**
  * The results of a Browse, including all the contextual information about
  * the query, as well as the results and associated information to create
- * pagable navigation.
+ * pageable navigation.
  *
  * @author Richard Jones
  */
@@ -61,6 +31,7 @@ public class BrowseInfo
 {
     /**
      * The results of the browse.
+     * FIXME: Unable to generify due to mixed usage
      */
     private List results;
 
@@ -119,13 +90,13 @@ public class BrowseInfo
 	/** offset of the item at the top of the previous page */
 	private int prevOffset = -1;
 
-	/** the value upon which we are focussing */
+	/** the value upon which we are focusing */
 	private String focus;
 
-	/** number of resutls to display per page */
+	/** number of results to display per page */
 	private int resultsPerPage = -1;
 
-	/** database id of the item upon which we are focussing */
+	/** database id of the item upon which we are focusing */
 	private int focusItem = -1;
 
 	/** number of metadata elements to display before truncating using "et al" */
@@ -133,6 +104,7 @@ public class BrowseInfo
 
     /**
      * Constructor
+     * FIXME: Unable to generify due to mixed usage
      *
      * @param results
      *            A List of Browse results
@@ -340,7 +312,7 @@ public class BrowseInfo
     }
 
     /**
-     * @param id	the database id of the item at the top of the next page
+     * @param offset	the database id of the item at the top of the next page
      */
     public void setNextOffset(int offset)
     {
@@ -396,7 +368,7 @@ public class BrowseInfo
 	}
 
 	/**
-	 * @param prevItem The prevItem to set.
+	 * @param prevOffset The prevOffset to set.
 	 */
 	public void setPrevOffset(int prevOffset)
 	{
@@ -460,7 +432,7 @@ public class BrowseInfo
 	}
 
 	/**
-	 * @param value The authority key to set.
+	 * @param authority The authority key to set.
 	 */
 	public void setAuthority(String authority)
 	{
@@ -725,7 +697,7 @@ public class BrowseInfo
 
 	/**
 	 * Get an integer representing the number within the total set of results which
-	 * marks the poisition of the last result in the current sub-set
+	 * marks the position of the last result in the current sub-set
 	 *
 	 * @return	the end point of the browse page
 	 */
@@ -802,28 +774,28 @@ public class BrowseInfo
 
     			if (value != null)
     			{
-    				sb.append(" on value: " + value);
+    				sb.append(" on value: ").append(value);
     			}
 
     			if (isStartsWith())
     			{
-    				sb.append(" sort column starting with: " + focus);
+    				sb.append(" sort column starting with: ").append(focus);
     			}
     			else if (hasFocus())
     			{
-    				sb.append(" sort column focus: " + focus);
+    				sb.append(" sort column focus: ").append(focus);
     			}
     		}
     		else if (browseIndex.isMetadataIndex())
     		{
-    			sb.append("Listing single column: " + browseIndex.getMetadata());
+    			sb.append("Listing single column: ").append(browseIndex.getMetadata());
     			if (isStartsWith())
     			{
-    				sb.append(" sort column starting with: " + focus);
+    				sb.append(" sort column starting with: ").append(focus);
     			}
     			else if (hasFocus())
     			{
-    				sb.append(" sort column focus: " + focus);
+    				sb.append(" sort column focus: ").append(focus);
     			}
     		}
 
@@ -851,7 +823,7 @@ public class BrowseInfo
     		sb.append("Top of next page: ");
     		if (hasNextPage())
     		{
-				sb.append("offset: " + Integer.toString(this.nextOffset));
+				sb.append("offset: ").append(Integer.toString(this.nextOffset));
     		}
     		else
     		{
@@ -862,7 +834,7 @@ public class BrowseInfo
     		sb.append("Top of previous page: ");
     		if (hasPrevPage())
     		{
-				sb.append("offset: " + Integer.toString(this.prevOffset));
+				sb.append("offset: ").append(Integer.toString(this.prevOffset));
     		}
     		else
     		{

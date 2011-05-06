@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
 
 <!--
   template.xsl
 
-  Version: $Revision: 4913 $
+  Version: $Revision: 5845 $
  
-  Date: $Date: 2010-05-11 12:21:27 -0400 (Tue, 11 May 2010) $
+  Date: $Date: 2010-11-12 00:34:07 -0500 (Fri, 12 Nov 2010) $
 
 -->
 
@@ -239,7 +248,15 @@
                                 <xsl:attribute name="style">left: 218px;</xsl:attribute>
                             </xsl:if>
                             <i18n:translate>
-                                <i18n:text>xmlui.dri2xhtml.structural.pagination-info</i18n:text>
+                                <!--Filter out our total if we have no results-->
+                                <xsl:choose>
+                                    <xsl:when test="parent::node()/@itemsTotal = -1">
+                                        <i18n:text>xmlui.dri2xhtml.structural.pagination-info.nototal</i18n:text>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <i18n:text>xmlui.dri2xhtml.structural.pagination-info</i18n:text>
+                                    </xsl:otherwise>
+                                </xsl:choose>
                                 <i18n:param><xsl:value-of select="parent::node()/@firstItemIndex"/></i18n:param>
                                 <i18n:param><xsl:value-of select="parent::node()/@lastItemIndex"/></i18n:param>
                                 <i18n:param><xsl:value-of select="parent::node()/@itemsTotal"/></i18n:param>
@@ -277,7 +294,14 @@
                         </xsl:if>
                         <p class="pagination-info">
                             <i18n:translate>
-                                <i18n:text>xmlui.dri2xhtml.structural.pagination-info</i18n:text>
+                                <xsl:choose>
+                                    <xsl:when test="parent::node()/@itemsTotal = -1">
+                                        <i18n:text>xmlui.dri2xhtml.structural.pagination-info.nototal</i18n:text>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <i18n:text>xmlui.dri2xhtml.structural.pagination-info</i18n:text>
+                                    </xsl:otherwise>
+                                </xsl:choose>
                                 <i18n:param><xsl:value-of select="parent::node()/@firstItemIndex"/></i18n:param>
                                 <i18n:param><xsl:value-of select="parent::node()/@lastItemIndex"/></i18n:param>
                                 <i18n:param><xsl:value-of select="parent::node()/@itemsTotal"/></i18n:param>

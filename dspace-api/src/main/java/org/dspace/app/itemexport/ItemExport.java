@@ -1,39 +1,9 @@
-/*
- * ItemExport.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4505 $
- *
- * Date: $Date: 2009-11-05 08:26:45 -0500 (Thu, 05 Nov 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.itemexport;
 
@@ -51,10 +21,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -65,6 +35,7 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import org.dspace.content.Bitstream;
@@ -166,11 +137,11 @@ public class ItemExport
         {
             typeString = line.getOptionValue('t');
 
-            if (typeString.equals("ITEM"))
+            if ("ITEM".equals(typeString))
             {
                 myType = Constants.ITEM;
             }
-            else if (typeString.equals("COLLECTION"))
+            else if ("COLLECTION".equals(typeString))
             {
                 myType = Constants.COLLECTION;
             }
@@ -293,7 +264,9 @@ public class ItemExport
             ItemIterator items;
             if (myItem != null)
             {
-                items = new ItemIterator(c, new ArrayList(myItem.getID()));
+                List<Integer> myItems = new ArrayList<Integer>();
+                myItems.add(myItem.getID());
+                items = new ItemIterator(c, myItems);
             }
             else
             {
@@ -322,7 +295,9 @@ public class ItemExport
                 finally
                 {
                     if (i != null)
+                    {
                         i.close();
+                    }
                 }
             }
         }
@@ -355,7 +330,7 @@ public class ItemExport
         {
             if (SUBDIR_LIMIT > 0 && ++counter == SUBDIR_LIMIT)
             {
-                subdir = new Integer(subDirSuffix++).toString();
+                subdir = Integer.valueOf(subDirSuffix++).toString();
                 fullPath = destDirName + File.separatorChar + subdir;
                 counter = 0;
 
@@ -424,20 +399,16 @@ public class ItemExport
     private static void writeMetadata(Context c, Item i, File destDir, boolean migrate)
             throws Exception
     {
-        // Build a list of schemas for the item
-        HashMap map = new HashMap();
-        DCValue[] dcorevalues = i.getMetadata(Item.ANY, Item.ANY, Item.ANY,
-                Item.ANY);
-        for (int ii = 0; ii < dcorevalues.length; ii++)
+        Set<String> schemas = new HashSet<String>();
+        DCValue[] dcValues = i.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
+        for (DCValue dcValue : dcValues)
         {
-            map.put(dcorevalues[ii].schema, null);
+            schemas.add(dcValue.schema);
         }
 
         // Save each of the schemas into it's own metadata file
-        Iterator iterator = map.keySet().iterator();
-        while (iterator.hasNext())
+        for (String schema : schemas)
         {
-            String schema = (String) iterator.next();
             writeMetadata(c, schema, i, destDir, migrate);
         }
     }
@@ -508,26 +479,26 @@ public class ItemExport
 
                 if ((!migrate) ||
                     (migrate && !(
-                     (dcv.element.equals("date") && qualifier.equals("issued")) ||
-                     (dcv.element.equals("date") && qualifier.equals("accessioned")) ||
-                     (dcv.element.equals("date") && qualifier.equals("available")) ||
-                     (dcv.element.equals("identifier") && qualifier.equals("uri") &&
-                      (dcv.value.startsWith("http://hdl.handle.net/" +
-                       ConfigurationManager.getProperty("handle.prefix") + "/"))) ||
-                     (dcv.element.equals("description") && qualifier.equals("provenance")) ||
-                     (dcv.element.equals("format") && qualifier.equals("extent")) ||
-                     (dcv.element.equals("format") && qualifier.equals("mimetype")))))
+                     ("date".equals(dcv.element) && "issued".equals(qualifier)) ||
+                     ("date".equals(dcv.element) && "accessioned".equals(qualifier)) ||
+                     ("date".equals(dcv.element) && "available".equals(qualifier)) ||
+                     ("identifier".equals(dcv.element) && "uri".equals(qualifier) &&
+                      (dcv.value != null && dcv.value.startsWith("http://hdl.handle.net/" +
+                       HandleManager.getPrefix() + "/"))) ||
+                     ("description".equals(dcv.element) && "provenance".equals(qualifier)) ||
+                     ("format".equals(dcv.element) && "extent".equals(qualifier)) ||
+                     ("format".equals(dcv.element) && "mimetype".equals(qualifier)))))
                 {
                     out.write(utf8, 0, utf8.length);
                 }
 
-                // Store the date issued and assection to see if they are different
+                // Store the date issued and accession to see if they are different
                 // because we need to keep date.issued if they are, when migrating
-                if ((dcv.element.equals("date") && qualifier.equals("issued")))
+                if (("date".equals(dcv.element) && "issued".equals(qualifier)))
                 {
                     dateIssued = dcv.value;
                 }
-                if ((dcv.element.equals("date") && qualifier.equals("accessioned")))
+                if (("date".equals(dcv.element) && "accessioned".equals(qualifier)))
                 {
                     dateAccessioned = dcv.value;
                 }
@@ -626,7 +597,7 @@ public class ItemExport
                     String oldName = myName;
 
                     String description = b.getDescription();
-                    if ((description != null) && (!description.equals("")))
+                    if (!StringUtils.isEmpty(description))
                     {
                         description = "\tdescription:" + description;
                     } else
@@ -654,7 +625,10 @@ public class ItemExport
                                     .lastIndexOf(File.separator));
                             File fdirs = new File(destDir + File.separator
                                     + dirs);
-                            fdirs.mkdirs();
+                            if (!fdirs.exists() && !fdirs.mkdirs())
+                            {
+                                log.error("Unable to create destination directory");
+                            }
                         }
 
                         File fout = new File(destDir, myName);
@@ -725,15 +699,15 @@ public class ItemExport
                          zipFileName;
 
         File wkDir = new File(workDir);
-        if (!wkDir.exists())
+        if (!wkDir.exists() && !wkDir.mkdirs())
         {
-            wkDir.mkdirs();
+            log.error("Unable to create working direcory");
         }
 
         File dnDir = new File(destDirName);
-        if (!dnDir.exists())
+        if (!dnDir.exists() && !dnDir.mkdirs())
         {
-            dnDir.mkdirs();
+            log.error("Unable to create destination directory");
         }
 
         // export the items using normal export method
@@ -840,12 +814,13 @@ public class ItemExport
 
         // before we create a new export archive lets delete the 'expired'
         // archives
-        deleteOldExportArchives(eperson.getID());
+        //deleteOldExportArchives(eperson.getID());
+        deleteOldExportArchives();
 
         // keep track of the commulative size of all bitstreams in each of the
         // items
         // it will be checked against the config file entry
-        float size = 0;
+        double size = 0;
         final ArrayList<Integer> items = new ArrayList<Integer>();
         for (DSpaceObject dso : dsObjects)
         {
@@ -881,7 +856,9 @@ public class ItemExport
                     finally
                     {
                         if (iitems != null)
+                        {
                             iitems.close();
+                        }
                     }
                 }
             }
@@ -913,7 +890,9 @@ public class ItemExport
                 finally
                 {
                     if (iitems != null)
+                    {
                         iitems.close();
+                    }
                 }
             }
             else if (dso.getType() == Constants.ITEM)
@@ -955,13 +934,10 @@ public class ItemExport
                 // ignore...configuration entry may not be present
             }
 
-            if (maxSize > 0)
-            {
-                if (maxSize < (size / 1048576.00))
-                { // a megabyte
-                    throw new ItemExportException(ItemExportException.EXPORT_TOO_LARGE,
-                                                  "The overall size of this export is too large.  Please contact your administrator for more information.");
-                }
+            if (maxSize > 0 && maxSize < (size / 1048576.00))
+            { // a megabyte
+                throw new ItemExportException(ItemExportException.EXPORT_TOO_LARGE,
+                                              "The overall size of this export is too large.  Please contact your administrator for more information.");
             }
         }
 
@@ -991,15 +967,15 @@ public class ItemExport
                                 .getID());
 
                         File wkDir = new File(workDir);
-                        if (!wkDir.exists())
+                        if (!wkDir.exists() && !wkDir.mkdirs())
                         {
-                            wkDir.mkdirs();
+                            log.error("Unable to create working directory");
                         }
 
                         File dnDir = new File(downloadDir);
-                        if (!dnDir.exists())
+                        if (!dnDir.exists() && !dnDir.mkdirs())
                         {
-                            dnDir.mkdirs();
+                            log.error("Unable to create download directory");
                         }
 
                         // export the items using normal export method
@@ -1024,12 +1000,14 @@ public class ItemExport
                         {
                             // wont throw here
                         }
-                        throw new RuntimeException(e1);
+                        throw new IllegalStateException(e1);
                     }
                     finally
                     {
                         if (iitems != null)
+                        {
                             iitems.close();
+                        }
                         
                         // Make sure the database connection gets closed in all conditions.
                     	try {
@@ -1144,7 +1122,9 @@ public class ItemExport
             return new FileInputStream(file);
         }
         else
+        {
             return null;
+        }
     }
 
     /**
@@ -1286,12 +1266,63 @@ public class ItemExport
             {
                 if (file.lastModified() < now.getTimeInMillis())
                 {
-                    file.delete();
+                    if (!file.delete())
+                    {
+                        log.error("Unable to delete export file");
+                    }
                 }
             }
         }
 
     }
+
+    /**
+     * A clean up method that is ran before a new export archive is created. It
+     * uses the config file entry 'org.dspace.app.itemexport.life.span.hours' to
+     * determine if the current exports are too old and need purgeing
+     * Removes all old exports, not just those for the person doing the export.
+     *
+     * @throws Exception
+     */
+    public static void deleteOldExportArchives() throws Exception
+    {
+        int hours = ConfigurationManager.getIntProperty("org.dspace.app.itemexport.life.span.hours");
+        Calendar now = Calendar.getInstance();
+        now.setTime(new Date());
+        now.add(Calendar.HOUR, (-hours));
+        File downloadDir = new File(ConfigurationManager.getProperty("org.dspace.app.itemexport.download.dir"));
+        if (downloadDir.exists())
+        {
+            // Get a list of all the sub-directories, potentially one for each ePerson.
+            File[] dirs = downloadDir.listFiles();
+            for (File dir : dirs)
+            {
+                // For each sub-directory delete any old files.
+                File[] files = dir.listFiles();
+                for (File file : files)
+                {
+                    if (file.lastModified() < now.getTimeInMillis())
+                    {
+                        if (!file.delete())
+                        {
+                            log.error("Unable to delete old files");
+                        }
+                    }
+                }
+
+                // If the directory is now empty then we delete it too.
+                if (dir.listFiles().length == 0)
+                {
+                    if (!dir.delete())
+                    {
+                        log.error("Unable to delete directory");
+                    }
+                }
+            }
+        }
+
+    }
+
 
     /**
      * Since the archive is created in a new thread we are unable to communicate
@@ -1371,26 +1402,34 @@ public class ItemExport
                 return;
             }
             File targetFile = new File(tempFileName);
-            if (!targetFile.exists())
+            if (!targetFile.createNewFile())
             {
-                targetFile.createNewFile();
+                log.warn("Target file already exists: " + targetFile.getName());
             }
+
             FileOutputStream fos = new FileOutputStream(tempFileName);
             cpZipOutputStream = new ZipOutputStream(fos);
             cpZipOutputStream.setLevel(9);
             zipFiles(cpFile, strSource, tempFileName, cpZipOutputStream);
             cpZipOutputStream.finish();
             cpZipOutputStream.close();
+            cpZipOutputStream = null;
 
             // Fix issue on Windows with stale file handles open before trying to delete them
             System.gc();
 
             deleteDirectory(cpFile);
-            targetFile.renameTo(new File(target));
+            if (!targetFile.renameTo(new File(target)))
+            {
+                log.error("Unable to rename file");
+            }
         }
-        catch (Exception e)
+        finally
         {
-            throw e;
+            if (cpZipOutputStream != null)
+            {
+                cpZipOutputStream.close();
+            }
         }
     }
 
@@ -1400,7 +1439,7 @@ public class ItemExport
     {
         int byteCount;
         final int DATA_BLOCK_SIZE = 2048;
-        FileInputStream cpFileInputStream;
+        FileInputStream cpFileInputStream = null;
         if (cpFile.isDirectory())
         {
             File[] fList = cpFile.listFiles();
@@ -1423,7 +1462,8 @@ public class ItemExport
 
                 // byte[] b = new byte[ (int)(cpFile.length()) ];
 
-                cpFileInputStream = new FileInputStream(cpFile);
+                cpFileInputStream = new FileInputStream(cpFile);                
+
                 ZipEntry cpZipEntry = new ZipEntry(strZipEntryName);
                 cpZipOutputStream.putNextEntry(cpZipEntry);
 
@@ -1435,11 +1475,14 @@ public class ItemExport
                 }
 
                 // cpZipOutputStream.write(b, 0, (int)cpFile.length());
-                cpZipOutputStream.closeEntry();
             }
-            catch (Exception e)
+            finally
             {
-                throw e;
+                if (cpFileInputStream != null)
+                {
+                    cpFileInputStream.close();
+                }
+                cpZipOutputStream.closeEntry();
             }
         }
     }
@@ -1457,7 +1500,10 @@ public class ItemExport
                 }
                 else
                 {
-                    files[i].delete();
+                    if (!files[i].delete())
+                    {
+                        log.error("Unable to delete file: " + files[i].getName());
+                    }
                 }
             }
         }

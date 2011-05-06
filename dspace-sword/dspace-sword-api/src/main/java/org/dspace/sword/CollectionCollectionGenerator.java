@@ -1,39 +1,9 @@
-/* CollectionCollectionGenerator.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Copyright (c) 2007, Aberystwyth University
- *
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *  - Redistributions of source code must retain the above
- *    copyright notice, this list of conditions and the
- *    following disclaimer.
- *
- *  - Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- *  - Neither the name of the Centre for Advanced Software and
- *    Intelligent Systems (CASIS) nor the names of its
- *    contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
- * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.sword;
 
@@ -106,10 +76,6 @@ public class CollectionCollectionGenerator extends ATOMCollectionGenerator
 		// we just do support mediation
 		boolean mediation = swordConfig.isMediated();
 
-		// the list of mime types that we accept
-		// for the time being, we just take a zip, and we have to trust what's in it
-		String zip = "application/zip";
-
 		// load up the sword collection
 		scol.setLocation(location);
 
@@ -145,10 +111,9 @@ public class CollectionCollectionGenerator extends ATOMCollectionGenerator
 
 		// add the accept packaging values
 		Map<String, Float> aps = swordConfig.getAcceptPackaging(col);
-		for (String key : aps.keySet())
+		for (Map.Entry<String, Float> ap : aps.entrySet())
 		{
-			Float q = aps.get(key);
-			scol.addAcceptPackaging(key, q);
+			scol.addAcceptPackaging(ap.getKey(), ap.getValue());
 		}
 
 		// should we offer the items in the collection up as deposit

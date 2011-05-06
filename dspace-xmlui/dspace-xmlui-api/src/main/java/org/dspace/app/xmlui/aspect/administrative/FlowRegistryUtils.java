@@ -1,42 +1,11 @@
-/*
- * FlowRegistryUtils.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
- */package org.dspace.app.xmlui.aspect.administrative;
+ * http://www.dspace.org/license/
+ */
+package org.dspace.app.xmlui.aspect.administrative;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -44,7 +13,6 @@ import java.net.URLDecoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import org.apache.cocoon.environment.Request;
 import org.dspace.app.xmlui.utils.RequestUtils;
@@ -59,9 +27,7 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 
 /**
- * Utility methods to process actions on either the metadata registry 
- * or format registry.
- * @author scott phillips
+ * 
  */
 public class FlowRegistryUtils 
 {
@@ -111,16 +77,19 @@ public class FlowRegistryUtils
             throw new UIException(uee);
         }
 		
-		if (namespace == null || 
-			namespace.length() <= 0)
-			result.addError("namespace");
+		if (namespace == null || namespace.length() <= 0)
+        {
+            result.addError("namespace");
+        }
 		if (name == null || 
 			name.length() <= 0 ||
 			name.indexOf('.') != -1 ||
 			name.indexOf('_') != -1 ||
 			name.indexOf(' ') != -1)
-			// The name must not be empty nor contain dot, underscore or spaces.
-			result.addError("name");
+        {
+            // The name must not be empty nor contain dot, underscore or spaces.
+            result.addError("name");
+        }
 		
 		
 		if (result.getErrors() == null)
@@ -160,7 +129,9 @@ public class FlowRegistryUtils
 			// First remove and fields in the schema
 			MetadataField[] fields = MetadataField.findAllInSchema(context, schema.getSchemaID());
 			for (MetadataField field : fields)
+            {
 				field.delete(context);
+            }
 			
 			// Once all the fields are gone, then delete the schema.
 	        schema.delete(context);
@@ -212,7 +183,9 @@ public class FlowRegistryUtils
 		
 		// Make sure qualifier is null if blank.
 		if ("".equals(qualifier))
-			qualifier = null;
+        {
+            qualifier = null;
+        }
 		
 		if (result.getErrors() == null)
 		{
@@ -276,12 +249,16 @@ public class FlowRegistryUtils
 		
 		// Make sure qualifier is null if blank.
 		if ("".equals(qualifier))
-			qualifier = null;
+        {
+            qualifier = null;
+        }
 		
 		// Check to make sure the field is unique, sometimes the NonUniqueMetadataException is not thrown.
 		MetadataField possibleDuplicate = MetadataField.findByElement(context, schemaID, element, qualifier);
 		if (possibleDuplicate != null && possibleDuplicate.getFieldID() != fieldID)
-			result.addError("duplicate_field");
+        {
+            result.addError("duplicate_field");
+        }
 		
 		if (result.getErrors() == null)
 		{	
@@ -333,28 +310,38 @@ public class FlowRegistryUtils
 		if (element.indexOf('.') != -1 ||
 			element.indexOf('_') != -1 ||
 			element.indexOf(' ') != -1)
-			errors.add("element_badchar");
+        {
+            errors.add("element_badchar");
+        }
 		
 		// Is the element too long?
 		if (element.length() > 64)
-			errors.add("element_tolong");
+        {
+            errors.add("element_tolong");
+        }
 		
 
 		// The qualifier can be empty.
 		if (qualifier != null && qualifier.length() > 0)
 		{
 			if (qualifier.length() > 64)
-				errors.add("qualifier_tolong");
+            {
+                errors.add("qualifier_tolong");
+            }
 			
 			if (qualifier.indexOf('.') != -1 ||
 				qualifier.indexOf('_') != -1 ||
 				qualifier.indexOf(' ') != -1)
-				errors.add("qualifier_badchar");
+            {
+                errors.add("qualifier_badchar");
+            }
 		}
 		
 		// If there were no errors then just return null.
 		if (errors.size() == 0)
-			return null;
+        {
+            return null;
+        }
 		
 		return errors;
 	}
@@ -460,27 +447,41 @@ public class FlowRegistryUtils
         
         // Remove leading periods from file extensions.
         for (int i = 0; i < extensions.length; i++)
+        {
         	if (extensions[i].startsWith("."))
-        		extensions[i] = extensions[i].substring(1);
+            {
+                extensions[i] = extensions[i].substring(1);
+            }
+        }
         
         
         // Get or create the format
         BitstreamFormat format;
 		if (formatID >= 0)
-			format = BitstreamFormat.find(context, formatID);
+        {
+            format = BitstreamFormat.find(context, formatID);
+        }
 		else
-			format = BitstreamFormat.create(context);
+        {
+            format = BitstreamFormat.create(context);
+        }
         
 		// Update values
 		format.setMIMEType(mimeType);
 		if (formatID != 1) // don't change the unknow format.
-			format.setShortDescription(shortDescription);
+        {
+            format.setShortDescription(shortDescription);
+        }
 		format.setDescription(description);
 		format.setSupportLevel(Integer.valueOf(supportLevel));
 		if (internal == null)
-			format.setInternal(false);
+        {
+            format.setInternal(false);
+        }
 		else
-			format.setInternal(true);
+        {
+            format.setInternal(true);
+        }
 		format.setExtensions(extensions);
 
 		

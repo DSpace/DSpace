@@ -1,43 +1,10 @@
-/*
- * XMLUIConfiguration.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.xmlui.configuration;
 
 import java.io.File;
@@ -79,21 +46,24 @@ public class XMLUIConfiguration
      * supplied but only the first valid file (exists and readable) will
      * be used.
      * 
-     * @param configPath Multiple paths configuration paths may be specified
+     * @param configPaths Multiple paths configuration paths may be specified
      */
     public static void loadConfig(String ... configPaths) throws IOException,
             JDOMException
     {
         if (configPaths == null || configPaths.length == 0)
-            throw new IllegalStateException(
-                    "The xmlui configuration path must be defined.");
+        {
+            throw new IllegalStateException("The xmlui configuration path must be defined.");
+        }
 
         File configFile = null;
         
         for (String configPath : configPaths )
         {
         	if (configPath != null)
-        		configFile = new File(configPath);
+            {
+                configFile = new File(configPath);
+            }
         	
         	if (configFile != null && configFile.exists() && configFile.canRead())
         	{
@@ -108,16 +78,17 @@ public class XMLUIConfiguration
         
         if (configFile == null)
         {
-        	String allPaths = "";
-        	boolean first = true;
+        	StringBuilder allPaths = new StringBuilder();
         	for (String configPath : configPaths)
         	{
-        		if (first)
-        			first = false;
-        		else
-        			allPaths += ", ";
-        		allPaths += configPath;
+        		if (allPaths.length() > 0)
+                {
+        			allPaths.append(", ");
+                }
+                
+        		allPaths.append(configPath);
         	}
+            
         	throw new IllegalStateException("None of the xmlui configuration paths were valid: "+ allPaths);
         }
         
@@ -140,8 +111,9 @@ public class XMLUIConfiguration
             String name = aspectElement.getAttributeValue("name");
 
             if (path == null || path.length() == 0)
-                throw new IllegalStateException(
-                        "All aspects muth define a path");
+            {
+                throw new IllegalStateException("All aspects muth define a path");
+            }
             aspects.add(new Aspect(name, path));
             log.info("Aspect Installed: name='"+name+"', path='"+path+"'.");
         }
@@ -158,7 +130,9 @@ public class XMLUIConfiguration
             String handle = themeElement.getAttributeValue("handle");
 
             if (path == null || path.length() == 0)
+            {
                 throw new IllegalStateException("All themes muth define a path");
+            }
             themes.add(new Theme(name, path, id, regex, handle));
             log.info("Theme Installed: name='"+name+"', path='"+path+"', id='"+id+"', regex='"+regex+"', handle='"+handle+"'.");
         }

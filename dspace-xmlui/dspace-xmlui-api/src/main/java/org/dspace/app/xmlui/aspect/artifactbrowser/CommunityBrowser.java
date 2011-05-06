@@ -1,41 +1,9 @@
-/*
- * CommunityBrowser.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
@@ -113,7 +81,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
     /** What depth is the maximum depth of the tree */
     protected int depth = DEFAULT_DEPTH;
 
-    /** Cached version the community / collection hierarch */
+    /** Cached version the community / collection hierarchy */
     protected TreeNode root;
     
     /** cached validity object */
@@ -162,10 +130,8 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 	            Stack<TreeNode> stack = new Stack<TreeNode>();
 	            stack.push(root);
 	            
-	            int objectCount = 0;
 	            while (!stack.empty())
 	            {
-	            	objectCount++;
 	                TreeNode node = stack.pop();
 	                
 	                validity.add(node.getDSO());
@@ -179,7 +145,9 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 	            // Check if we are configured to assume validity.
 	            String assumeCacheValidity = ConfigurationManager.getProperty("xmlui.community-list.cache");
 	            if (assumeCacheValidity != null)
-	            	validity.setAssumedValidityDelay(assumeCacheValidity);
+                {
+                    validity.setAssumedValidityDelay(assumeCacheValidity);
+                }
 	            
 	            this.validity = validity.complete();
 	        } 
@@ -207,7 +175,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
     }
 
     /**
-     * Add a community-browser division that includes refrences to community and
+     * Add a community-browser division that includes references to community and
      * collection metadata.
      */
     public void addBody(Body body) throws SAXException, WingException,
@@ -226,7 +194,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 	        ReferenceSet referenceSet = division.addReferenceSet("community-browser",
 	                ReferenceSet.TYPE_SUMMARY_LIST,null,"hierarchy");
 	        
-	        ArrayList<TreeNode> rootNodes = root.getChildrenOfType(Constants.COMMUNITY);
+	        java.util.List<TreeNode> rootNodes = root.getChildrenOfType(Constants.COMMUNITY);
 	        
 	        for (TreeNode node : rootNodes)
 	        {
@@ -237,7 +205,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         {
         	List list = division.addList("comunity-browser");
         	
-        	ArrayList<TreeNode> rootNodes = root.getChildrenOfType(Constants.COMMUNITY);
+        	java.util.List<TreeNode> rootNodes = root.getChildrenOfType(Constants.COMMUNITY);
  	        
  	        for (TreeNode node : rootNodes)
  	        {
@@ -248,11 +216,11 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
     } 
     
     /**
-     * Recursively build an includeset of the community / collection hierarcher based upon
+     * Recursively build an includeset of the community / collection hierarchy based upon
      * the given NodeTree.
      * 
      * @param referenceSet The include set
-     * @param node The current node of the hierarch.
+     * @param node The current node of the hierarchy.
      */
     public void buildReferenceSet(ReferenceSet referenceSet, TreeNode node) throws WingException
     {
@@ -261,7 +229,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         Reference objectInclude = referenceSet.addReference(dso);
         
         // Add all the sub-collections;
-        ArrayList<TreeNode> collectionNodes = node.getChildrenOfType(Constants.COLLECTION);
+        java.util.List<TreeNode> collectionNodes = node.getChildrenOfType(Constants.COLLECTION);
         if (collectionNodes != null && collectionNodes.size() > 0)
         {
             ReferenceSet collectionSet = objectInclude.addReferenceSet(ReferenceSet.TYPE_SUMMARY_LIST);
@@ -273,7 +241,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         }
         
         // Add all the sub-communities
-        ArrayList<TreeNode> communityNodes = node.getChildrenOfType(Constants.COMMUNITY);
+        java.util.List<TreeNode> communityNodes = node.getChildrenOfType(Constants.COMMUNITY);
         if (communityNodes != null && communityNodes.size() > 0)
         {
             ReferenceSet communitySet = objectInclude.addReferenceSet(ReferenceSet.TYPE_SUMMARY_LIST);
@@ -286,11 +254,11 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
     }
     
     /**
-     * Recursively build a list of the community / collection hierarchery based upon
+     * Recursively build a list of the community / collection hierarchy based upon
      * the given NodeTree.
      * 
-     * @param List The parent list
-     * @param node The current node of the hierarch.
+     * @param list The parent list
+     * @param node The current node of the hierarchy.
      */
     public void buildList(List list, TreeNode node) throws WingException
     {
@@ -298,9 +266,13 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         
         String name = null;
         if (dso instanceof Community)
-        	name = ((Community) dso).getMetadata("name");
+        {
+            name = ((Community) dso).getMetadata("name");
+        }
         else if (dso instanceof Collection)
-        	name = ((Collection) dso).getMetadata("name");
+        {
+            name = ((Collection) dso).getMetadata("name");
+        }
         
         String url = contextPath + "/handle/"+dso.getHandle();
         list.addItem().addHighlight("bold").addXref(url, name);
@@ -308,7 +280,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         List subList = null;
         
         // Add all the sub-collections;
-        ArrayList<TreeNode> collectionNodes = node.getChildrenOfType(Constants.COLLECTION);
+        java.util.List<TreeNode> collectionNodes = node.getChildrenOfType(Constants.COLLECTION);
         if (collectionNodes != null && collectionNodes.size() > 0)
         {
         	subList = list.addList("sub-list-"+dso.getID());
@@ -323,11 +295,13 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         
         
         // Add all the sub-communities
-        ArrayList<TreeNode> communityNodes = node.getChildrenOfType(Constants.COMMUNITY);
+        java.util.List<TreeNode> communityNodes = node.getChildrenOfType(Constants.COMMUNITY);
         if (communityNodes != null && communityNodes.size() > 0)
         {
         	if (subList == null)
-        		subList = list.addList("sub-list-"+dso.getID());
+            {
+                subList = list.addList("sub-list-" + dso.getID());
+            }
             
             for (TreeNode communityNode : communityNodes)
             {
@@ -348,7 +322,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 
     /**
      * construct a tree structure of communities and collections. The results 
-     * of this hirarchy are cached so calling it multipletimes is acceptable.
+     * of this hierarchy are cached so calling it multiple times is acceptable.
      * 
      * @param communities The root level communities
      * @return A root level node.
@@ -356,7 +330,9 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
     private TreeNode buildTree(Community[] communities) throws SQLException
     {
         if (root != null)
+        {
             return root;
+        }
         
         TreeNode newRoot = new TreeNode();
 
@@ -364,7 +340,9 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         Stack<TreeNode> stack = new Stack<TreeNode>();
 
         for (Community community : communities)
+        {
             stack.push(newRoot.addChild(community));
+        }
 
         while (!stack.empty())
         {
@@ -372,7 +350,9 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 
             // Short circuit if we have reached our max depth.
             if (node.getLevel() >= this.depth)
+            {
                 continue;
+            }
 
             // Only communities nodes are pushed on the stack.
             Community community = (Community) node.getDSO();
@@ -404,11 +384,11 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         /** The object this node represents */
         private DSpaceObject dso;
 
-        /** The level in the hirarchy that this node is at. */
+        /** The level in the hierarchy that this node is at. */
         private int level;
 
         /** All children of this node */
-        private ArrayList<TreeNode> children = new ArrayList<TreeNode>();
+        private java.util.List<TreeNode> children = new ArrayList<TreeNode>();
 
         /** 
          * Construct a new root level node 
@@ -443,7 +423,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         }
 
         /**
-         * @return The current level in the hirarchy of this node.
+         * @return The current level in the hierarchy of this node.
          */
         public int getLevel()
         {
@@ -453,7 +433,7 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         /**
          * @return All children
          */
-        public ArrayList<TreeNode> getChildren()
+        public java.util.List<TreeNode> getChildren()
         {
             return children;
         }
@@ -461,13 +441,15 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
         /**
          * @return All children of the given @type.
          */
-        public ArrayList<TreeNode> getChildrenOfType(int type)
+        public java.util.List<TreeNode> getChildrenOfType(int type)
         {
-            ArrayList<TreeNode> results = new ArrayList<TreeNode>();
+            java.util.List<TreeNode> results = new ArrayList<TreeNode>();
             for (TreeNode node : children)
             {
                 if (node.dso.getType() == type)
+                {
                     results.add(node);
+                }
             }
             return results;
         }

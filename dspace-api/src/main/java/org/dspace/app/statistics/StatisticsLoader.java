@@ -1,41 +1,10 @@
-/*
- * StatisticsLoader.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3734 $
- *
- * Date: $Date: 2009-04-24 00:00:19 -0400 (Fri, 24 Apr 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.statistics;
 
 import org.apache.commons.lang.time.DateUtils;
@@ -135,19 +104,28 @@ public class StatisticsLoader
     protected static Date[] sortDatesDescending(Date[] dates)
     {
         Arrays.sort(dates, new Comparator<Date>() {
-            SimpleDateFormat sdf = monthlySDF;
             public int compare(Date d1, Date d2)
             {
                 if (d1 == null && d2 == null)
+                {
                     return 0;
+                }
                 else if (d1 == null)
+                {
                     return -1;
+                }
                 else if (d2 == null)
+                {
                     return 1;
+                }
                 else if (d1.before(d2))
+                {
                     return 1;
+                }
                 else if (d2.before(d1))
+                {
                     return -1;
+                }
 
                 return 0;
             }
@@ -200,7 +178,7 @@ public class StatisticsLoader
     }
 
     /**
-     * Syncronize the cached list of analysis / report files with the reports directory
+     * Synchronize the cached list of analysis / report files with the reports directory
      *
      * We synchronize if:
      *
@@ -214,11 +192,17 @@ public class StatisticsLoader
         File[] fileList = StatisticsLoader.getAnalysisAndReportFileList();
 
         if (fileList != null && fileList.length != fileCount)
+        {
             StatisticsLoader.loadFileList(fileList);
+        }
         else if (lastLoaded == null)
+        {
             StatisticsLoader.loadFileList(fileList);
+        }
         else if (DateUtils.addHours(lastLoaded, 1).before(new Date()))
+        {
             StatisticsLoader.loadFileList(fileList);
+        }
     }
 
     /**
@@ -233,7 +217,7 @@ public class StatisticsLoader
             fileList = StatisticsLoader.getAnalysisAndReportFileList();
         }
 
-        // Create new maps for the monthly analyis / reports
+        // Create new maps for the monthly analysis / reports
         Map<String, StatsFile> newMonthlyAnalysis = new HashMap<String, StatsFile>();
         Map<String, StatsFile> newMonthlyReports  = new HashMap<String, StatsFile>();
 
@@ -378,16 +362,24 @@ public class StatisticsLoader
         public boolean accept(File dir, String name)
         {
             if (analysisMonthlyPattern.matcher(name).matches())
+            {
                 return true;
+            }
 
             if (analysisGeneralPattern.matcher(name).matches())
+            {
                 return true;
+            }
 
             if (reportMonthlyPattern.matcher(name).matches())
+            {
                 return true;
+            }
             
             if (reportGeneralPattern.matcher(name).matches())
+            {
                 return true;
+            }
 
             return false;
         }

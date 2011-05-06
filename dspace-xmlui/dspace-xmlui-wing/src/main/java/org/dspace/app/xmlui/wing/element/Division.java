@@ -1,43 +1,10 @@
-/*
- * Division.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.xmlui.wing.element;
 
 /**
@@ -127,10 +94,10 @@ public class Division extends AbstractWingElement implements StructuralElement, 
     /** What method should this interactive division use for posting the result? */
     private String method;
 
-    /** Does this interactive division support the ajax behavior? */
+    /** Does this interactive division support the AJAX behavior? */
     private boolean behaviorAJAXenabled = false;
     
-    /** A list of fields which need to be handled specialy when using bhavior */
+    /** A list of fields which need to be handled specially when using behavior */
     private String behaviorSensitiveFields;
     
     /** Special rendering instructions */
@@ -148,7 +115,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      */
     private String paginationType;
 
-    /** Url to the previousPage. (used by simple pagination) */
+    /** URL to the previousPage. (used by simple pagination) */
     private String previousPage;
 
     /** URL to the nextPage. (used by simple pagination) */
@@ -161,30 +128,30 @@ public class Division extends AbstractWingElement implements StructuralElement, 
     private int itemsTotal;
 
     /**
-     * The index of the first item inculded in this div. (used by both
+     * The index of the first item included in this div. (used by both
      * pagination types)
      */
     private int firstItemIndex;
 
     /**
-     * The index of the first item inculded in this div. (used by both
+     * The index of the first item included in this div. (used by both
      * pagination types)
      */
     private int lastItemIndex;
 
     /**
-     * The index the current page being displayed. (used by maksed pagination
+     * The index the current page being displayed. (used by masked pagination
      * type)
      */
     private int currentPage;
 
     /**
-     * The total number of pages in the pagination set. (used by maksed
+     * The total number of pages in the pagination set. (used by masked
      * pagination type)
      */
     private int pagesTotal;
 
-    /** The pagination URL mask. (used by maksed pagination type) */
+    /** The pagination URL mask. (used by masked pagination type) */
     private String pageURLMask;
 
     /** The possible interactive division methods: get,post, or multipart. */
@@ -315,7 +282,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      * simple page paradigm.
      * 
      * @param itemsTotal
-     *            (Required) How many items exist accross all paginated divs.
+     *            (Required) How many items exist across all paginated divs.
      * @param firstItemIndex
      *            (Required) The index of the first item included in this div.
      * @param lastItemIndex
@@ -343,7 +310,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      * masked page paradigm.
      * 
      * @param itemsTotal
-     *            (Required) How many items exist accross all paginated divs.
+     *            (Required) How many items exist across all paginated divs.
      * @param firstItemIndex
      *            (Required) The index of the first item included in this div.
      * @param lastItemIndex
@@ -354,7 +321,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
      * @param pagesTotal
      *            (Required) How many pages the paginated div spans.
      * @param pageURLMask
-     *            (Required) The mask of a url to a particular within the
+     *            (Required) The mask of a URL to a particular within the
      *            paginated set. The destination page's number should replace
      *            the {pageNum} string in the URL mask to generate a full URL to
      *            that page.
@@ -374,9 +341,6 @@ public class Division extends AbstractWingElement implements StructuralElement, 
 
     /**
      * Set the head element which is the label associated with this division.
-     * 
-     * @param characters
-     *            (May be null) Unprocessed characters to be included
      */
     public Head setHead() throws WingException
     {
@@ -475,7 +439,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
 
     /**
      * Add an interactive sub division for further logical grouping of content
-     * without specifing special rendering instructions.
+     * without specifying special rendering instructions.
      * 
      * The valid values for method may be found in the static variable METHODS.
      * 
@@ -664,7 +628,7 @@ public class Division extends AbstractWingElement implements StructuralElement, 
     }
 
     /**
-     * Add a reference set for metadata refrences.
+     * Add a reference set for metadata references.
      * 
      * @param name
      *            (Required) a local identifier used to differentiate the
@@ -686,18 +650,13 @@ public class Division extends AbstractWingElement implements StructuralElement, 
     }
 
     /**
-     * Add a reference set for metadata refrences.
+     * Add a reference set for metadata references.
      * 
      * @param name
      *            (Required) a local identifier used to differentiate the
      *            element from its siblings.
      * @param type
      *            (Required) The include type, see IncludeSet.TYPES
-     * @param orderBy
-     *            (May be null) An statement of ordering within the include set.
-     * @param rend
-     *            (May be null) a rendering hint used to override the default
-     *            display of the element.
      */
     public ReferenceSet addReferenceSet(String name, String type)
             throws WingException
@@ -762,10 +721,14 @@ public class Division extends AbstractWingElement implements StructuralElement, 
     {
 
         if (!WingConstants.DRI.URI.equals(namespace))
+        {
             return false;
+        }
 
         if (!E_DIVISION.equals(localName))
+        {
             return false;
+        }
 
         context.getLogger().debug("Merding a division");
         
@@ -781,13 +744,17 @@ public class Division extends AbstractWingElement implements StructuralElement, 
         
         // The name must be identical (but id's can differ)
         if (!this.name.equals(name))
+        {
             return false;
+        }
 
         // Insure the render attributes are identical.
         if (this.rend == null)
         {
             if (render != null)
+            {
                 return false;
+            }
         }
         else if (!this.rend.equals(render))
         {
@@ -798,20 +765,30 @@ public class Division extends AbstractWingElement implements StructuralElement, 
         {
             // Insure all the interactive fields are identical.
             if (!"yes".equals(interactive))
+            {
                 return false;
+            }
             if (!this.action.equals(action))
+            {
                 return false;
+            }
             if (!this.method.equals(method))
+            {
                 return false;
+            }
             
             // For now lets just not merge divs that have behavior.
             if (!(behavior == null || behavior.equals("")))
+            {
                 return false;
+            }
             
         } else {
             // Else, insure that it is also not interactive.
             if (!(interactive == null || "no".equals(interactive)))
+            {
                 return false;
+            }
         }
 
         return true;
@@ -842,7 +819,9 @@ public class Division extends AbstractWingElement implements StructuralElement, 
                 WingMergeableElement candidate = (WingMergeableElement) content;
                 if (candidate.mergeEqual(namespace, localName, qName,
                         attributes))
+                {
                     found = candidate;
+                }
             }
         }
         contents.remove(found);
@@ -904,9 +883,13 @@ public class Division extends AbstractWingElement implements StructuralElement, 
 
                 divAttributes.put(A_PAGINATION, paginationType);
                 if (previousPage != null)
+                {
                     divAttributes.put(A_PREVIOUS_PAGE, previousPage);
+                }
                 if (nextPage != null)
+                {
                     divAttributes.put(A_NEXT_PAGE, nextPage);
+                }
                 divAttributes.put(A_ITEMS_TOTAL, itemsTotal);
                 divAttributes.put(A_FIRST_ITEM_INDEX, firstItemIndex);
                 divAttributes.put(A_LAST_ITEM_INDEX, lastItemIndex);
@@ -924,12 +907,16 @@ public class Division extends AbstractWingElement implements StructuralElement, 
             }
 
             if (rend != null)
+            {
                 divAttributes.put(A_RENDER, rend);
+            }
 
             startElement(contentHandler, namespaces, E_DIVISION, divAttributes);
 
             if (head != null)
+            {
                 head.toSAX(contentHandler, lexicalHandler, namespaces);
+            }
         }
         
         for (AbstractWingElement content : contents)
@@ -949,13 +936,19 @@ public class Division extends AbstractWingElement implements StructuralElement, 
     {
 
         if (head != null)
+        {
             head.dispose();
-        head = null;
-        for (AbstractWingElement content : contents)
-            content.dispose();
+            head = null;
+        }
         if (contents != null)
+        {
+            for (AbstractWingElement content : contents)
+            {
+                content.dispose();
+            }
             contents.clear();
-        contents = null;
+            contents = null;
+        }
         super.dispose();
     }
 }

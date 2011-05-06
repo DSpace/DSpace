@@ -1,64 +1,20 @@
-/*
- * StatisticsImporter.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4754 $
- *
- * Date: $Date: 2010-02-09 02:36:43 -0500 (Tue, 09 Feb 2010) $
- *
- * Copyright (c) 2002-2010, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.statistics.util;
 
-import com.maxmind.geoip.Location;
-import com.maxmind.geoip.LookupService;
 import org.apache.commons.cli.*;
-import org.apache.commons.lang.time.DateFormatUtils;
-import org.apache.solr.client.solrj.SolrServerException;
-import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
-import org.apache.solr.common.SolrInputDocument;
+import org.apache.log4j.Logger;
 import org.apache.tools.ant.taskdefs.Get;
-import org.dspace.content.*;
-import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
-import org.dspace.core.Context;
-import org.dspace.eperson.EPerson;
 import org.dspace.statistics.SolrLogger;
 
 import java.io.*;
 import java.net.URL;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 /**
  * Class to load intermediate statistics files into solr
@@ -67,6 +23,8 @@ import java.util.*;
  */
 public class StatisticsClient
 {
+    private static final Logger log = Logger.getLogger(StatisticsClient.class);
+
     /**
      * Print the help message
      *
@@ -97,9 +55,10 @@ public class StatisticsClient
                 "Update Spider IP Files from internet into " +
                         ConfigurationManager.getProperty("dspace.dir") + "/config/spiders");
 
-        options.addOption("m", "mark-spiders", false, "Update isBog Flag in Solr");
+        options.addOption("m", "mark-spiders", false, "Update isBot Flag in Solr");
         options.addOption("f", "delete-spiders-by-flag", false, "Delete Spiders in Solr By isBot Flag");
         options.addOption("i", "delete-spiders-by-ip", false, "Delete Spiders in Solr By IP Address");
+        options.addOption("o", "optimize", false, "Run maintenance on the SOLR index");
         options.addOption("h", "help", false, "help");
 
 		CommandLine line = parser.parse(options, args);
@@ -125,6 +84,10 @@ public class StatisticsClient
         else if(line.hasOption('i'))
         {
             SolrLogger.deleteRobotsByIP();
+        }
+        else if(line.hasOption('o'))
+        {
+            SolrLogger.optimizeSOLR();
         }
         else
         {
@@ -152,8 +115,10 @@ public class StatisticsClient
             // Get the location of spiders directory
             File spiders = new File(ConfigurationManager.getProperty("dspace.dir"),"config/spiders");
 
-            if(!spiders.exists())
-                spiders.mkdirs();
+            if (!spiders.exists() && !spiders.mkdirs())
+            {
+                log.error("Unable to create spiders directory");
+            }
 
             String[] values = urls.split(",");
             for (String value : values)

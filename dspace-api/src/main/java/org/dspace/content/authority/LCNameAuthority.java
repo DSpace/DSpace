@@ -1,55 +1,15 @@
-/*
- * LCNameAuthority.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.content.authority;
 
 import java.io.IOException;
-import java.io.FileNotFoundException;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.FileReader;
-import java.io.BufferedReader;
-import java.util.Enumeration;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.ParserConfigurationException;
@@ -58,7 +18,6 @@ import org.xml.sax.InputSource;
 import org.xml.sax.helpers.DefaultHandler;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.SAXNotRecognizedException;
 import org.xml.sax.SAXParseException;
 
 import org.apache.log4j.Logger;
@@ -117,32 +76,36 @@ public class LCNameAuthority implements ChoiceAuthority
 
             // sanity check
             if (url == null)
+            {
                 throw new IllegalStateException("Missing DSpace configuration keys for LCName Query");
+            }
         }
     }
 
     // punt!  this is a poor implementation..
-    public Choices getBestMatch(String text, int collection, String locale)
+    public Choices getBestMatch(String field, String text, int collection, String locale)
     {
-        return getMatches(text, collection, 0, 2, locale);
+        return getMatches(field, text, collection, 0, 2, locale);
     }
 
     /**
      * Match a proposed value against name authority records
      * Value is assumed to be in "Lastname, Firstname" format.
      */
-    public Choices getMatches(String text, int collection, int start, int limit, String locale)
+    public Choices getMatches(String field, String text, int collection, int start, int limit, String locale)
     {
-        boolean error = false;
         Choices result = queryPerson(text, start, limit);
         if (result == null)
+        {
             result = new Choices(true);
+        }
+        
         return result;
     }
 
     // punt; supposed to get the canonical display form of a metadata authority key
     // XXX FIXME implement this with a query on the authority key, cache results
-    public String getLabel(String key, String locale)
+    public String getLabel(String field, String key, String locale)
     {
         return key;
     }
@@ -155,7 +118,9 @@ public class LCNameAuthority implements ChoiceAuthority
     {
         // punt if there is no query text
         if (text == null || text.trim().length() == 0)
+        {
             return new Choices(true);
+        }
 
         // 1. build CQL query
         DCPersonName pn = new DCPersonName(text);
@@ -166,7 +131,9 @@ public class LCNameAuthority implements ChoiceAuthority
 
         // XXX arbitrary default limit - should be configurable?
         if (limit == 0)
+        {
             limit = 50;
+        }
 
         NameValuePair args[] = new NameValuePair[6];
         args[0] = new NameValuePair("operation", "searchRetrieve");
@@ -201,8 +168,10 @@ public class LCNameAuthority implements ChoiceAuthority
 
                 // this probably just means more results available..
                 if (handler.hits != handler.result.size())
-                    log.warn("Discrepency in results, result.length="+handler.result.size()+
-                          ", yet expected results="+handler.hits);
+                {
+                    log.warn("Discrepency in results, result.length=" + handler.result.size() +
+                            ", yet expected results=" + handler.hits);
+                }
                 boolean more = handler.hits > (start + handler.result.size());
 
                 // XXX add non-auth option; perhaps the UI should do this?
@@ -212,11 +181,17 @@ public class LCNameAuthority implements ChoiceAuthority
 
                 int confidence;
                 if (handler.hits == 0)
+                {
                     confidence = Choices.CF_NOTFOUND;
+                }
                 else if (handler.hits == 1)
+                {
                     confidence = Choices.CF_UNCERTAIN;
+                }
                 else
+                {
                     confidence = Choices.CF_AMBIGUOUS;
+                }
                 return new Choices(handler.result.toArray(new Choice[handler.result.size()]),
                                    start, handler.hits, confidence, more);
             }
@@ -262,8 +237,6 @@ public class LCNameAuthority implements ChoiceAuthority
         private int hits = -1;
         private String textValue = null;
         private String name = null;
-        private String oname = null;
-        private String bname = null;
         private String lccn = null;
         private String lastTag = null;
         private String lastCode = null;
@@ -280,9 +253,13 @@ public class LCNameAuthority implements ChoiceAuthority
             if (newValue.length() > 0)
             {
                 if (textValue == null)
+                {
                     textValue = newValue;
+                }
                 else
+                {
                     textValue += newValue;
+                }
             }
         }
 
@@ -310,34 +287,41 @@ public class LCNameAuthority implements ChoiceAuthority
                 {
                     // HACK: many LC name entries end with ',' ...trim it.
                     if (name.endsWith(","))
-                        name = name.substring(0, name.length()-1);
+                    {
+                        name = name.substring(0, name.length() - 1);
+                    }
 
                     // XXX DEBUG
                     // log.debug("Got result, name="+name+", lccn="+lccn);
                     result.add(new Choice(lccn, name, name));
                 }
                 else
-                    log.warn("Got anomalous result, at least one of these null: lccn="+lccn+", name="+name);
+                {
+                    log.warn("Got anomalous result, at least one of these null: lccn=" + lccn + ", name=" + name);
+                }
                 name = null;
                 lccn = null;
             }
 
-            else if (localName.equals("subfield") &&
-                     namespaceURI.equals(NS_MX))
+            else if (localName.equals("subfield") && namespaceURI.equals(NS_MX))
             {
                 if (lastTag != null && lastCode != null)
                 {
-                    // 010.a is lccn, "authority code"
                     if (lastTag.equals("010") && lastCode.equals("a"))
+                    {
+                        // 010.a is lccn, "authority code"
                         lccn = textValue;
-                     
-                    // 100.a is the personal name
+                    }
                     else if (lastTag.equals("100") && lastCode.equals("a"))
+                    {
+                        // 100.a is the personal name
                         name = textValue;
+                    }
 
-                        if (lastTag.equals("100") && lastCode.equals("d") && (name != null)) 
-                        name = name+"  "+textValue; 
-                         
+                    if (lastTag.equals("100") && lastCode.equals("d") && (name != null))
+                    {
+                        name = name + "  " + textValue;
+                    }
                 }
             }
         }
@@ -354,14 +338,18 @@ public class LCNameAuthority implements ChoiceAuthority
             {
                 lastTag = atts.getValue("tag");
                 if (lastTag == null)
+                {
                     log.warn("MARC datafield without tag attribute!");
+                }
             }
             else if (localName.equals("subfield") &&
                      namespaceURI.equals(NS_MX))
             {
                 lastCode = atts.getValue("code");
                 if (lastCode == null)
+                {
                     log.warn("MARC subfield without code attribute!");
+                }
             }
         }
 

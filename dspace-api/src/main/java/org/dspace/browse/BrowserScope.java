@@ -1,35 +1,9 @@
-/*
- * BrowserScope.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.browse;
 
@@ -39,7 +13,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.sort.SortOption;
 import org.dspace.sort.SortException;
-import org.apache.log4j.Logger;
 
 /**
  * A class which represents the initial request to the browse system.
@@ -51,9 +24,6 @@ import org.apache.log4j.Logger;
  */
 public class BrowserScope
 {
-    /** the logger for this class */
-    private static Logger log = Logger.getLogger(BrowserScope.class);
-
     /** the DSpace context */
     private Context context;
 
@@ -339,11 +309,15 @@ public class BrowserScope
     public String getOrder()
     {
         if (order != null)
+        {
             return order;
+        }
 
         BrowseIndex bi = getBrowseIndex();
         if (bi != null)
+        {
             return bi.getDefaultOrder();
+        }
 
         return SortOption.ASCENDING;
     }
@@ -381,7 +355,9 @@ public class BrowserScope
     public void setResultsPerPage(int resultsPerPage)
     {
         if (resultsPerPage > -1)
+        {
             this.resultsPerPage = resultsPerPage;
+        }
     }
 
     /**
@@ -428,45 +404,43 @@ public class BrowserScope
     {
         try
         {
-            // If a sortOption hasn't been set, work out the default
-            if (sortOption == null)
+            // If a sortOption hasn't been set, work out the default, providing we have an index
+            if (sortOption == null && browseIndex != null)
             {
-                // We need a browse index first though
-                if (browseIndex != null)
+                // If a sorting hasn't been specified, and it's a metadata browse
+                if (sortBy <= 0 && browseIndex.isMetadataIndex())
                 {
-                    // If a sorting hasn't been specified, and it's a metadata browse
-                    if (sortBy <= 0 && browseIndex.isMetadataIndex())
+                    // Create a dummy sortOption for the metadata sort
+                    String dataType = browseIndex.getDataType();
+                    String type = ("date".equals(dataType) ? "date" : "text");
+                    sortOption = new SortOption(0, browseIndex.getName(), browseIndex.getMetadata(0), type);
+                }
+                else
+                {
+                    // If a sorting hasn't been specified
+                    if (sortBy <= 0)
                     {
-                        // Create a dummy sortOption for the metadata sort
-                        String dataType = browseIndex.getDataType();
-                        String type = ("date".equals(dataType) ? "date" : "text");
-                        sortOption = new SortOption(0, browseIndex.getName(), browseIndex.getMetadata(0), type);
+                        // Get the sort option from the index
+                        sortOption = browseIndex.getSortOption();
+
+                        if (sortOption == null)
+                        {
+                            // No sort option, so default to the first one defined in the config
+                            for (SortOption so : SortOption.getSortOptions())
+                            {
+                                sortOption = so;
+                                break;
+                            }
+                        }
                     }
                     else
                     {
-                        // If a sorting hasn't been specified
-                        if (sortBy <= 0)
+                        // A sorting has been specified, so get it from the configured sort columns
+                        for (SortOption so : SortOption.getSortOptions())
                         {
-                            // Get the sort option from the index
-                            sortOption = browseIndex.getSortOption();
-
-                            if (sortOption == null)
+                            if (so.getNumber() == sortBy)
                             {
-                                // No sort option, so default to the first one defined in the config
-                                for (SortOption so : SortOption.getSortOptions())
-                                {
-                                    sortOption = so;
-                                    break;
-                                }
-                            }
-                        }
-                        else
-                        {
-                            // A sorting has been specified, so get it from the configured sort columns
-                            for (SortOption so : SortOption.getSortOptions())
-                            {
-                                if (so.getNumber() == sortBy)
-                                    sortOption = so;
+                                sortOption = so;
                             }
                         }
                     }
@@ -593,7 +567,9 @@ public class BrowserScope
         BrowseIndex bi = getBrowseIndex();
 
         if (bi != null && SortOption.DESCENDING.equalsIgnoreCase(bi.getDefaultOrder()))
+        {
             return false;
+        }
 
         return true;
     }

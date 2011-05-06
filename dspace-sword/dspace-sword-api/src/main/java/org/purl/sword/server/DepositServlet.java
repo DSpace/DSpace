@@ -1,44 +1,13 @@
 /**
- * Copyright (c) 2008, Aberystwyth University
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions 
- * are met:
- * 
- *  - Redistributions of source code must retain the above 
- *    copyright notice, this list of conditions and the 
- *    following disclaimer.
- *  
- *  - Redistributions in binary form must reproduce the above copyright 
- *    notice, this list of conditions and the following disclaimer in 
- *    the documentation and/or other materials provided with the 
- *    distribution.
- *    
- *  - Neither the name of the Centre for Advanced Software and 
- *    Intelligent Systems (CASIS) nor the names of its 
- *    contributors may be used to endorse or promote products derived 
- *    from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON 
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR 
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF 
- * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF 
- * SUCH DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.purl.sword.server;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -116,7 +85,7 @@ public class DepositServlet extends HttpServlet {
 								+ className);
 				throw new ServletException(
 						"Unable to instantiate class from 'sword-server-class': "
-								+ className);
+								+ className, e);
 			}
 		}
 
@@ -153,13 +122,11 @@ public class DepositServlet extends HttpServlet {
         }
 		File tempDir = new File(tempDirectory);
 		log.info("Upload temporary directory set to: " + tempDir);
-		if (!tempDir.exists()) {
-			if (!tempDir.mkdirs()) {
-				throw new ServletException(
-						"Upload directory did not exist and I can't create it. "
-								+ tempDir);
-			}
-		}
+		if (!tempDir.exists() && !tempDir.mkdirs()) {
+            throw new ServletException(
+                    "Upload directory did not exist and I can't create it. "
+                            + tempDir);
+        }
 		if (!tempDir.isDirectory()) {
 			log.fatal("Upload temporary directory is not a directory: "
 					+ tempDir);
@@ -196,7 +163,7 @@ public class DepositServlet extends HttpServlet {
 		// Are there any authentication details?
 		String usernamePassword = getUsernamePassword(request);
 		if ((usernamePassword != null) && (!usernamePassword.equals(""))) {
-			int p = usernamePassword.indexOf(":");
+			int p = usernamePassword.indexOf(':');
 			if (p != -1) {
 				d.setUsername(usernamePassword.substring(0, p));
 				d.setPassword(usernamePassword.substring(p + 1));
@@ -210,9 +177,7 @@ public class DepositServlet extends HttpServlet {
 		
 		// Set up some variables
 		String filename = null;
-		File f = null;
-		FileInputStream fis = null;
-
+		
 		// Do the processing
 		try {
 			// Write the file to the temp directory
@@ -266,10 +231,8 @@ public class DepositServlet extends HttpServlet {
 				log.debug("Bad MD5 for file. Aborting with appropriate error message");
 				return;
 			} else {
-				// Set the file
-				f = new File(filename);
-				fis = new FileInputStream(f);
-				d.setFile(fis);
+				// Set the file to be deposited
+				d.setFile(file);
 
 				// Set the X-On-Behalf-Of header
                 String onBehalfOf = request.getHeader(HttpHeaders.X_ON_BEHALF_OF.toString());
@@ -381,15 +344,13 @@ public class DepositServlet extends HttpServlet {
 		}
 		
 		finally {
-			// Close the input stream if it still open
-			if (fis != null) {
-				fis.close();
-			}
-
 			// Try deleting the temp file
 			if (filename != null) {
-				f = new File(filename);
-				f.delete();
+				File f = new File(filename);
+				if (f != null && !f.delete())
+                {
+                    log.error("Unable to delete file: " + filename);
+                }
 			}
 		}
 	}
@@ -463,11 +424,7 @@ public class DepositServlet extends HttpServlet {
 	 * @return if HTTP Basic authentication is in use or not
 	 */
 	protected boolean authenticateWithBasic() {
-		if (authN.equalsIgnoreCase("Basic")) {
-			return true;
-		} else {
-			return false;
-		}
+		return (authN.equalsIgnoreCase("Basic"));
 	}
 
 	/**

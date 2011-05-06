@@ -40,6 +40,14 @@
             <class>org.dspace.administer.CreateAdministrator</class>
         </step>
     </command>
+    
+    <command>
+        <name>curate</name>
+        <description>Perform curation tasks on DSpace objects</description>
+        <step>
+            <class>org.dspace.curate.CurationCli</class>
+        </step>
+    </command>
 
     <command>
         <name>dsprop</name>
@@ -243,7 +251,7 @@
 
     <command>
         <name>stat-report-initial</name>
-        <description>Create the general statistics report</description>
+        <description>Create the initial statistics report</description>
         <step passuserargs="false">
             <class>org.dspace.app.statistics.CreateStatReport</class>
             <argument>-r</argument>
@@ -292,7 +300,7 @@
             <class>org.dspace.administer.StructBuilder</class>
         </step>
     </command>
-
+    
     <command>
         <name>sub-daily</name>
         <description>Send daily subscription notices</description>
@@ -324,5 +332,14 @@
             <class>org.dspace.handle.UpdateHandlePrefix</class>
         </step>
     </command>
+
+    <command>
+		<name>update-discovery-index</name>
+		<description>Update Discovery Solr Search Index</description>
+		<step>
+			<class>org.dspace.discovery.IndexClient</class>
+		</step>
+	</command>
+
 
 </commands>

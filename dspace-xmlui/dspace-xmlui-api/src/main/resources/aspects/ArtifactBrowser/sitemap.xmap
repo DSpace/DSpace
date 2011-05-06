@@ -2,9 +2,9 @@
 <!--
   sitemap.xmap
 
-  Version: $Revision: 4417 $
+  Version: $Revision: 5529 $
  
-  Date: $Date: 2009-10-07 19:09:53 -0400 (Wed, 07 Oct 2009) $
+  Date: $Date: 2010-10-21 12:28:37 -0400 (Thu, 21 Oct 2010) $
  
   Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
   Institute of Technology.  All rights reserved.
@@ -40,6 +40,8 @@
 -->
 
 <!--
+@deprecated: the Artifact Browser has been devided into ViewArtifacts,
+            BrowseArtifacts, SearchArtifacts
 
 The ArtifactBrowser Aspect is responsible for browsing communities /
 collections / items / and bitstreams, viewing an individual item,

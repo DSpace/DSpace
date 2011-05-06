@@ -1,41 +1,10 @@
-/*
- * ScriptLauncher.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision$
- *
- * Date: $Date$
- *
- * Copyright (c) 2002-2009, Duraspace.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of Duraspace nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.launcher;
 
 import org.dspace.core.ConfigurationManager;
@@ -63,7 +32,6 @@ public class ScriptLauncher
      * Execute the DSpace script launcher
      *
      * @param args Any parameters required to be passed to the scripts it executes
-     * @throws Exception
      */
     public static void main(String[] args)
     {
@@ -75,7 +43,7 @@ public class ScriptLauncher
             System.exit(1);
         }
 
-        // Initalise the service manager kernel
+        // Initialise the service manager kernel
         try {
             kernelImpl = DSpaceKernelInit.getKernel(null);
             if (!kernelImpl.isRunning())
@@ -95,7 +63,7 @@ public class ScriptLauncher
             }
             String message = "Failure during filter init: " + e.getMessage();
             System.err.println(message + ":" + e);
-            throw new RuntimeException(message, e);
+            throw new IllegalStateException(message, e);
         }
 
         // Parse the configuration file looking for the command entered
@@ -159,7 +127,10 @@ public class ScriptLauncher
                         // The number of arguments to ignore
                         // If dsrun is the command, ignore the next, as it is the class name not an arg
                         int x = 1;
-                        if ("dsrun".equals(request)) x = 2;
+                        if ("dsrun".equals(request))
+                        {
+                            x = 2;
+                        }
                         String[] argsnew = new String[useargs.length - x];
                         for (int i = x; i < useargs.length; i++)
                         {
@@ -209,12 +180,10 @@ public class ScriptLauncher
                         System.out.println("");**/
 
                         Method main = target.getMethod("main", argTypes);
-                        Object output = main.invoke(null, arguments);
+                        main.invoke(null, arguments);
 
                         // ensure we close out the request (happy request)
                         requestService.endRequest(null);
-
-
                     }
                     catch (Exception e)
                     {
@@ -243,6 +212,7 @@ public class ScriptLauncher
                     kernelImpl = null;
                 }
 
+                // Everything completed OK
                 System.exit(0);
             }
         }

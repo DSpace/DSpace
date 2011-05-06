@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.app.xmlui.aspect.eperson;
 
 import java.io.IOException;
@@ -19,11 +26,11 @@ import org.dspace.authorize.AuthorizeException;
 import org.xml.sax.SAXException;
 
 public class FailedAuthentication extends AbstractDSpaceTransformer {
-	private final static String SESSION_ATTRIBUTE_NAME = "xmlui.Eperson.FailedAuthentication.message";
+	private static final String SESSION_ATTRIBUTE_NAME = "xmlui.Eperson.FailedAuthentication.message";
 	
-	public final static Message BAD_CREDENTIALS = message("xmlui.EPerson.FailedAuthentication.BadCreds");
-	public final static Message BAD_ARGUMENTS   = message("xmlui.EPerson.FailedAuthentication.BadArgs");
-	public final static Message NO_SUCH_USER    = message("xmlui.EPerson.FailedAuthentication.NoSuchUser");
+	public static final Message BAD_CREDENTIALS = message("xmlui.EPerson.FailedAuthentication.BadCreds");
+	public static final Message BAD_ARGUMENTS   = message("xmlui.EPerson.FailedAuthentication.BadArgs");
+	public static final Message NO_SUCH_USER    = message("xmlui.EPerson.FailedAuthentication.NoSuchUser");
 	
 	
 	/**language strings */

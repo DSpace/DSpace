@@ -1,45 +1,14 @@
-/*
- * CreateStatReport.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Date: $Date: 2008-01-08 
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.statistics;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -266,29 +235,30 @@ public class CreateStatReport {
 		Calendar reportEndDate = new GregorianCalendar( calendar.get(Calendar.YEAR),
 				  										calendar.get(Calendar.MONTH),
 				  										calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
-		
-		while(reportStartDate.before(reportEndDate)) {
+
+        Calendar currentMonth = (Calendar)reportStartDate.clone();
+		while(currentMonth.before(reportEndDate)) {
 									
-			Calendar start = new GregorianCalendar( reportStartDate.get(Calendar.YEAR),
-													reportStartDate.get(Calendar.MONTH),
-													reportStartDate.getActualMinimum(Calendar.DAY_OF_MONTH));
+			Calendar start = new GregorianCalendar( currentMonth.get(Calendar.YEAR),
+													currentMonth.get(Calendar.MONTH),
+													currentMonth.getActualMinimum(Calendar.DAY_OF_MONTH));
 			myStartDate = start.getTime();
 
-			Calendar end = new GregorianCalendar( reportStartDate.get(Calendar.YEAR),
-												  reportStartDate.get(Calendar.MONTH),
-												  reportStartDate.getActualMaximum(Calendar.DAY_OF_MONTH));
+			Calendar end = new GregorianCalendar( currentMonth.get(Calendar.YEAR),
+												  currentMonth.get(Calendar.MONTH),
+												  currentMonth.getActualMaximum(Calendar.DAY_OF_MONTH));
 			myEndDate = end.getTime();
 			
 			myOutFile = new StringBuffer(outputLogDirectory);
 	        myOutFile.append(outputPrefix);
-	        myOutFile.append(reportStartDate.get(Calendar.YEAR));
+	        myOutFile.append(currentMonth.get(Calendar.YEAR));
 	        myOutFile.append("-");
-	        myOutFile.append(reportStartDate.get(Calendar.MONTH)+1);
+	        myOutFile.append(currentMonth.get(Calendar.MONTH)+1);
 	        myOutFile.append(outputSuffix); 
 	        	        
 	        LogAnalyser.processLogs(context, myLogDir, myFileTemplate, myConfigFile, myOutFile.toString(), myStartDate, myEndDate, myLookUp);
 	        
-			reportStartDate.add(Calendar.MONTH, 1);	
+			currentMonth.add(Calendar.MONTH, 1);
 		}
 	}
 	
@@ -351,26 +321,28 @@ public class CreateStatReport {
 				  										calendar.get(Calendar.MONTH),
 				  										calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
 		
-		while(reportStartDate.before(reportEndDate)) {
+        Calendar currentMonth = (Calendar)reportStartDate.clone();
+
+		while(currentMonth.before(reportEndDate)) {
 			
 			myInput = new StringBuffer(outputLogDirectory);
 	        myInput.append(inputPrefix);
-	        myInput.append(reportStartDate.get(Calendar.YEAR));
+	        myInput.append(currentMonth.get(Calendar.YEAR));
 	        myInput.append("-");
-	        myInput.append(reportStartDate.get(Calendar.MONTH)+1);
+	        myInput.append(currentMonth.get(Calendar.MONTH)+1);
 	        myInput.append(outputSuffix); 
 	        
 	        myOutput = new StringBuffer(outputReportDirectory);
 	        myOutput.append(outputPrefix);
-	        myOutput.append(reportStartDate.get(Calendar.YEAR));
+	        myOutput.append(currentMonth.get(Calendar.YEAR));
 	        myOutput.append("-");
-	        myOutput.append(reportStartDate.get(Calendar.MONTH)+1);
+	        myOutput.append(currentMonth.get(Calendar.MONTH)+1);
 	        myOutput.append(".");
 	        myOutput.append(myFormat);			
 			
 			ReportGenerator.processReport(context, myFormat, myInput.toString(), myOutput.toString(), myMap);
 			
-			reportStartDate.add(Calendar.MONTH, 1);
+			currentMonth.add(Calendar.MONTH, 1);
 		}	
 	}
 	

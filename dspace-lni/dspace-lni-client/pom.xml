@@ -12,30 +12,13 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-lni</artifactId>
-      <version>1.6.2</version>
+      <version>1.7.1</version>
    </parent>
 
-   <repositories>
-      <repository>
-         <id>maven.dspace.org-snapshot</id>
-         <name>DSpace Maven Snapshot Repository</name>
-         <url>http://maven.dspace.org/snapshot</url>
-         <releases>
-            <enabled>false</enabled>
-            <checksumPolicy>fail</checksumPolicy>
-         </releases>
-         <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-            <checksumPolicy>fail</checksumPolicy>
-         </snapshots>
-      </repository>
-   </repositories>
-
    <scm>
-      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-lni/dspace-lni-client</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-lni/dspace-lni-client</url>
+      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.1</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.1</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.1</url>
    </scm>
 
    <profiles>

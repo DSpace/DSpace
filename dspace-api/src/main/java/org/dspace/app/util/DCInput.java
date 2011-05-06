@@ -1,41 +1,10 @@
-/*
- * DCInput.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3823 $
- *
- * Date: $Date: 2009-05-19 14:09:05 -0400 (Tue, 19 May 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.util;
 
 import java.util.List;
@@ -82,7 +51,7 @@ public class DCInput
     private String valueListName = null;
 
     /** if input list-controlled, the list itself */
-    private List valueList = null;
+    private List<String> valueList = null;
 
     /** if non-null, visibility scope restriction */
     private String visibility = null;
@@ -100,52 +69,53 @@ public class DCInput
      * The scope of the input sets, this restricts hidden metadata fields from 
      * view during workflow processing. 
      */
-    public static String WORKFLOW_SCOPE = "workflow";
+    public static final String WORKFLOW_SCOPE = "workflow";
 
     /** 
      * The scope of the input sets, this restricts hidden metadata fields from 
      * view by the end user during submission. 
      */
-    public static String SUBMISSION_SCOPE = "submit";
+    public static final String SUBMISSION_SCOPE = "submit";
     
     /**
      * Class constructor for creating a DCInput object based on the contents of
      * a HashMap
      * 
-     * @param row
-     *            the corresponding row in the table
+     * @param fieldMap
+     *            ???
+     * @param listMap
      */
-    public DCInput(Map fieldMap, Map listMap)
+    public DCInput(Map<String, String> fieldMap, Map<String, List<String>> listMap)
     {
-        dcElement = (String) fieldMap.get("dc-element");
-        dcQualifier = (String) fieldMap.get("dc-qualifier");
+        dcElement = fieldMap.get("dc-element");
+        dcQualifier = fieldMap.get("dc-qualifier");
 
         // Default the schema to dublin core
-        dcSchema = (String) fieldMap.get("dc-schema");
+        dcSchema = fieldMap.get("dc-schema");
         if (dcSchema == null)
         {
             dcSchema = MetadataSchema.DC_SCHEMA;
         }
 
-        String repStr = (String) fieldMap.get("repeatable");
+        String repStr = fieldMap.get("repeatable");
         repeatable = "true".equalsIgnoreCase(repStr)
                 || "yes".equalsIgnoreCase(repStr);
-        label = (String) fieldMap.get("label");
-        inputType = (String) fieldMap.get("input-type");
+        label = fieldMap.get("label");
+        inputType = fieldMap.get("input-type");
         // these types are list-controlled
         if ("dropdown".equals(inputType) || "qualdrop_value".equals(inputType)
                 || "list".equals(inputType))
         {
-            valueListName = (String) fieldMap.get("value-pairs-name");
-            valueList = (List) listMap.get(valueListName);
+            valueListName = fieldMap.get("value-pairs-name");
+            valueList = listMap.get(valueListName);
         }
-        hint = (String) fieldMap.get("hint");
-        warning = (String) fieldMap.get("required");
+        hint = fieldMap.get("hint");
+        warning = fieldMap.get("required");
         required = (warning != null && warning.length() > 0);
-        visibility = (String) fieldMap.get("visibility");
-        readOnly = (String) fieldMap.get("readonly");
-        vocabulary = (String) fieldMap.get("vocabulary");
-        String closedVocabularyStr = (String) fieldMap.get("closedVocabulary");
+        visibility = fieldMap.get("visibility");
+        readOnly = fieldMap.get("readonly");
+        vocabulary = fieldMap.get("vocabulary");
+        String closedVocabularyStr = fieldMap.get("closedVocabulary");
         closedVocabulary = "true".equalsIgnoreCase(closedVocabularyStr)
                             || "yes".equalsIgnoreCase(closedVocabularyStr);
     }
@@ -339,11 +309,9 @@ public class DCInput
      * Gets the display string that corresponds to the passed storage string in
      * a particular display-storage pair set.
      * 
-     * @param allPairs
-     *            HashMap of all display-storage pair sets
      * @param pairTypeName
      *            Name of display-storage pair set to search
-     * @param storageString
+     * @param storedString
      *            the string that gets stored
      * 
      * @return the displayed string whose selection causes storageString to be
@@ -351,13 +319,13 @@ public class DCInput
      */
     public String getDisplayString(String pairTypeName, String storedString)
     {
-        if (valueList != null)
+        if (valueList != null && storedString != null)
         {
             for (int i = 0; i < valueList.size(); i += 2)
             {
-                if (((String) valueList.get(i + 1)).equals(storedString))
+                if (storedString.equals(valueList.get(i + 1)))
                 {
-                    return (String) valueList.get(i);
+                    return valueList.get(i);
                 }
             }
         }
@@ -368,11 +336,9 @@ public class DCInput
      * Gets the stored string that corresponds to the passed display string in a
      * particular display-storage pair set.
      * 
-     * @param allPairs
-     *            HashMap of all display-storage pair sets
      * @param pairTypeName
      *            Name of display-storage pair set to search
-     * @param displayString
+     * @param displayedString
      *            the string that gets displayed
      * 
      * @return the string that gets stored when displayString gets selected,
@@ -380,13 +346,13 @@ public class DCInput
      */
     public String getStoredString(String pairTypeName, String displayedString)
     {
-        if (valueList != null)
+        if (valueList != null && displayedString != null)
         {
             for (int i = 0; i < valueList.size(); i += 2)
             {
-                if (((String) valueList.get(i)).equals(displayedString))
+                if (displayedString.equals(valueList.get(i)))
                 {
-                    return (String) valueList.get(i + 1);
+                    return valueList.get(i + 1);
                 }
             }
         }

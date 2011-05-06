@@ -1,12 +1,9 @@
 /**
- * $Id: $
- * $URL: $
- * *************************************************************************
- * Copyright (c) 2002-2009, DuraSpace.  All rights reserved
- * Licensed under the DuraSpace Foundation License.
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * A copy of the DuraSpace License has been included in this
- * distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
+ * http://www.dspace.org/license/
  */
 package org.dspace.statistics.util;
 
@@ -17,15 +14,15 @@ import java.util.Set;
 
 /**
  * A Spare v4 IPTable implementation that uses nested HashMaps
- * TO optimize IP Address matching over ranges of IP Addresses.
+ * to optimize IP Address matching over ranges of IP Addresses.
  *
- * @author: mdiggory at atmire.com
+ * @author mdiggory at atmire.com
  */
 public class IPTable {
 
     /* A lookup tree for IP Addresses and SubnetRanges */
-    private HashMap<String, HashMap<String, HashMap<String, HashSet<String>>>> map =
-            new HashMap<String, HashMap<String, HashMap<String, HashSet<String>>>>();
+    private Map<String, Map<String, Map<String, Set<String>>>> map =
+            new HashMap<String, Map<String, Map<String, Set<String>>>>();
 
     /**
      * Can be full v4 IP, subnet or range string
@@ -46,7 +43,9 @@ public class IPTable {
             end = range[1].trim().split("/")[0].split("\\.");
 
             if (start.length != 4 || end.length != 4)
+            {
                 throw new IPFormatException(ip + " - Ranges need to be full IPv4 Addresses");
+            }
 
             if (!(start[0].equals(end[0]) && start[1].equals(end[1]) && start[2].equals(end[2]))) {
                 throw new IPFormatException(ip + " - Ranges can only be across the last subnet x.y.z.0 - x.y.z.254");
@@ -70,22 +69,22 @@ public class IPTable {
         if (start.length >= 3) {
 
 
-            HashMap<String, HashMap<String, HashSet<String>>> first = map.get(start[0]);
+            Map<String, Map<String, Set<String>>> first = map.get(start[0]);
 
             if (first == null) {
-                first = new HashMap<String, HashMap<String, HashSet<String>>>();
+                first = new HashMap<String, Map<String, Set<String>>>();
                 map.put(start[0], first);
             }
 
-            HashMap<String, HashSet<String>> second = first.get(start[1]);
+            Map<String, Set<String>> second = first.get(start[1]);
 
 
             if (second == null) {
-                second = new HashMap<String, HashSet<String>>();
+                second = new HashMap<String, Set<String>>();
                 first.put(start[1], second);
             }
 
-            HashSet<String> third = second.get(start[2]);
+            Set<String> third = second.get(start[2]);
 
             if (third == null) {
                 third = new HashSet<String>();
@@ -112,46 +111,63 @@ public class IPTable {
         }
     }
 
+    /** Check whether a given address is contained in this netblock.
+     * 
+     * @param ip the address to be tested
+     * @return true if {@code ip} is within this table's limits
+     * @throws IPFormatException
+     */
     public boolean contains(String ip) throws IPFormatException {
 
         String[] subnets = ip.split("\\.");
 
         if (subnets.length != 4)
+        {
             throw new IPFormatException("needs to be single IP Address");
+        }
 
-        HashMap<String, HashMap<String, HashSet<String>>> first = map.get(subnets[0]);
+        Map<String, Map<String, Set<String>>> first = map.get(subnets[0]);
 
-        if (first == null) return false;
+        if (first == null)
+        {
+            return false;
+        }
 
-        HashMap<String, HashSet<String>> second = first.get(subnets[1]);
+        Map<String, Set<String>> second = first.get(subnets[1]);
 
-        if (second == null) return false;
+        if (second == null)
+        {
+            return false;
+        }
 
-        HashSet<String> third = second.get(subnets[2]);
+        Set<String> third = second.get(subnets[2]);
 
-        if (third == null) return false;
+        if (third == null)
+        {
+            return false;
+        }
 
         return third.contains(subnets[3]) || third.contains("*");
 
     }
 
-    /**
-     * @return
+    /** Convert to a Set.
+     * @return this table's content as a Set
      */
     public Set<String> toSet() {
         HashSet<String> set = new HashSet<String>();
 
-        for (Map.Entry<String, HashMap<String, HashMap<String, HashSet<String>>>> first : map.entrySet()) {
+        for (Map.Entry<String, Map<String, Map<String, Set<String>>>> first : map.entrySet()) {
             String firstString = first.getKey();
-            HashMap<String, HashMap<String, HashSet<String>>> secondMap = first.getValue();
+            Map<String, Map<String, Set<String>>> secondMap = first.getValue();
 
-            for (Map.Entry<String, HashMap<String, HashSet<String>>> second : secondMap.entrySet()) {
+            for (Map.Entry<String, Map<String, Set<String>>> second : secondMap.entrySet()) {
                 String secondString = second.getKey();
-                HashMap<String, HashSet<String>> thirdMap = second.getValue();
+                Map<String, Set<String>> thirdMap = second.getValue();
 
-                for (Map.Entry<String, HashSet<String>> third : thirdMap.entrySet()) {
+                for (Map.Entry<String, Set<String>> third : thirdMap.entrySet()) {
                     String thirdString = third.getKey();
-                    HashSet<String> fourthSet = third.getValue();
+                    Set<String> fourthSet = third.getValue();
 
                     if (fourthSet.contains("*")) {
                         set.add(firstString + "." + secondString + "." + thirdString);
@@ -172,7 +188,7 @@ public class IPTable {
     /**
      * Exception Class to deal with IPFormat errors.
      */
-    public class IPFormatException extends Exception {
+    public static class IPFormatException extends Exception {
         public IPFormatException(String s) {
             super(s);
         }
@@ -180,5 +196,3 @@ public class IPTable {
 
 
 }
-
-

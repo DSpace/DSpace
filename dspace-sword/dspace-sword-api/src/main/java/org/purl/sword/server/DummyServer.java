@@ -1,42 +1,14 @@
 /**
- * Copyright (c) 2009, Aberystwyth University
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions 
- * are met:
- * 
- *  - Redistributions of source code must retain the above 
- *    copyright notice, this list of conditions and the 
- *    following disclaimer.
- *  
- *  - Redistributions in binary form must reproduce the above copyright 
- *    notice, this list of conditions and the following disclaimer in 
- *    the documentation and/or other materials provided with the 
- *    distribution.
- *    
- *  - Neither the name of the Centre for Advanced Software and 
- *    Intelligent Systems (CASIS) nor the names of its 
- *    contributors may be used to endorse or promote products derived 
- *    from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON 
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR 
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF 
- * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF 
- * SUCH DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.purl.sword.server;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -95,12 +67,14 @@ public class DummyServer implements SWORDServer {
 	 * an anonymous workspace and collection, and one personalised
 	 * for the onBehalfOf user.
 	 * 
-	 * @param onBehalfOf The user that the client is acting on behalf of
+	 * @param sdr The request
 	 * @throws SWORDAuthenticationException If the credentials are bad
 	 * @throws SWORDErrorException If something goes wrong, such as 
 	 */
-	public ServiceDocument doServiceDocument(ServiceDocumentRequest sdr) 
-	                           throws SWORDAuthenticationException, SWORDErrorException, SWORDException {
+	public ServiceDocument doServiceDocument(ServiceDocumentRequest sdr)
+            throws SWORDAuthenticationException, SWORDErrorException,
+            SWORDException
+    {
 		// Authenticate the user
 		String username = sdr.getUsername();
 		String password = sdr.getPassword();
@@ -248,15 +222,30 @@ public class DummyServer implements SWORDServer {
 		if (deposit.getSlug() != null) {
 			filenames.append("(slug = " + deposit.getSlug() + ") ");
 		}
+
+        ZipInputStream zip = null;
 		try {
-			ZipInputStream zip = new ZipInputStream(deposit.getFile());
-			ZipEntry ze;
-			while ((ze = zip.getNextEntry()) != null) {
-				filenames.append(" " + ze.toString());
-			}
+            File depositFile = deposit.getFile();
+			zip = new ZipInputStream(new FileInputStream(depositFile));
+            ZipEntry ze;
+            while ((ze = zip.getNextEntry()) != null) {
+                filenames.append(" ").append(ze.toString());
+            }
 		} catch (IOException ioe) {
-			throw new SWORDException("Failed to open deposited zip file", null, ErrorCodes.ERROR_CONTENT);
-		}
+			throw new SWORDException("Failed to open deposited zip file", ioe, ErrorCodes.ERROR_CONTENT);
+		} finally {
+            if (zip != null)
+            {
+                try
+                {
+                    zip.close();
+                }
+                catch (IOException e)
+                {
+                    log.error("Unable to close zip stream", e);
+                }
+            }
+        }
 		
 		// Handle the deposit
 		if (!deposit.isNoOp()) {

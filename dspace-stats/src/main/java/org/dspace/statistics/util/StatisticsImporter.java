@@ -1,48 +1,19 @@
-/*
- * StatisticsImporter.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4882 $
- *
- * Date: $Date: 2010-05-04 22:03:35 -0400 (Tue, 04 May 2010) $
- *
- * Copyright (c) 2002-2010, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.statistics.util;
 
 import org.apache.commons.cli.*;
 import org.apache.commons.lang.time.DateFormatUtils;
+import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrInputDocument;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.client.solrj.SolrServerException;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.core.Context;
@@ -51,8 +22,8 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.statistics.SolrLogger;
 
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
+import java.sql.SQLException;
+import java.text.*;
 import java.io.*;
 import java.util.*;
 
@@ -66,6 +37,8 @@ import com.maxmind.geoip.Location;
  */
 public class StatisticsImporter
 {
+    private static final Logger log = Logger.getLogger(StatisticsImporter.class);
+
     /** Date format (for solr) */
     private static SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
@@ -76,22 +49,22 @@ public class StatisticsImporter
     private static LookupService geoipLookup;
 
     /** Metadata storage information */
-    private static Map metadataStorageInfo;
+    private static Map<String, String> metadataStorageInfo;
 
     /** Whether to skip the DNS reverse lookup or not */
     private static boolean skipReverseDNS = false;
 
     /** Local items */
-    private Vector<Integer> localItems;
+    private List<Integer> localItems;
 
     /** Local collections */
-    private Vector<Integer> localCollections;
+    private List<Integer> localCollections;
 
     /** Local communities */
-    private Vector<Integer> localCommunities;
+    private List<Integer> localCommunities;
 
     /** Local bitstreams */
-    private Vector<Integer> localBitstreams;
+    private List<Integer> localBitstreams;
 
     /** Whether or not to replace item IDs with local values (for testing) */
     private boolean useLocal;
@@ -113,7 +86,7 @@ public class StatisticsImporter
                 System.out.print("Loading local communities... ");
                 Context c = new Context();
                 Community[] communities = Community.findAll(c);
-                localCommunities = new Vector<Integer>();
+                localCommunities = new ArrayList<Integer>();
                 for (Community community : communities)
                 {
                     localCommunities.add(community.getID());
@@ -122,7 +95,7 @@ public class StatisticsImporter
 
                 System.out.print("Loading local collections... ");
                 Collection[] collections = Collection.findAll(c);
-                localCollections = new Vector<Integer>();
+                localCollections = new ArrayList<Integer>();
                 for (Collection collection : collections)
                 {
                     localCollections.add(collection.getID());
@@ -131,7 +104,7 @@ public class StatisticsImporter
 
                 System.out.print("Loading local items... ");
                 ItemIterator items = Item.findAll(c);
-                localItems = new Vector<Integer>();
+                localItems = new ArrayList<Integer>();
                 Item i;
                 while (items.hasNext())
                 {
@@ -142,7 +115,7 @@ public class StatisticsImporter
 
                 System.out.print("Loading local bitstreams... ");
                 Bitstream[] bitstreams = Bitstream.findAll(c);
-                localBitstreams = new Vector<Integer>();
+                localBitstreams = new ArrayList<Integer>();
                 for (Bitstream bitstream : bitstreams)
                 {
                     if (bitstream.getName() != null)
@@ -183,7 +156,7 @@ public class StatisticsImporter
             BufferedReader input =  new BufferedReader(new FileReader(new File(filename)));
 
             String line;
-            String uuid;
+//            String uuid;
             String action;
             String id;
             Date date;
@@ -208,9 +181,12 @@ public class StatisticsImporter
                 String data = "";
                 counter++;
                 errors++;
-                if (verbose) System.out.println("Line:" + line);
+                if (verbose)
+                {
+                    System.out.println("Line:" + line);
+                }
                 String[] parts = line.split(",");
-                uuid = parts[0];
+//                uuid = parts[0];
                 action = parts[1];
                 id = parts[2];
                 date = dateFormat.parse(parts[3]);
@@ -246,7 +222,10 @@ public class StatisticsImporter
                     (dns.endsWith(".crawl.yahoo.net.")) ||
                     (dns.endsWith(".search.msn.com.")))
                 {
-                    if (verbose) System.out.println(data + ", IGNORE (search engine)");
+                    if (verbose)
+                    {
+                        System.out.println(data + ", IGNORE (search engine)");
+                    }
                     errors--;
                     searchengines++;
                     continue;
@@ -269,7 +248,10 @@ public class StatisticsImporter
                     try {
                         continent = LocationUtils.getContinentCode(countryCode);
                     } catch (Exception e) {
-                        if (verbose) System.out.println("Unknown country code: " + countryCode);
+                        if (verbose)
+                        {
+                            System.out.println("Unknown country code: " + countryCode);
+                        }
                         continue;
                     }
                 } catch (Exception e) {
@@ -314,14 +296,20 @@ public class StatisticsImporter
                 DSpaceObject dso = DSpaceObject.find(context, type, Integer.parseInt(id));
                 if (dso == null)
                 {
-                    if (verbose) System.err.println(" - DSO with ID '" + id + "' is no longer in the system");
+                    if (verbose)
+                    {
+                        System.err.println(" - DSO with ID '" + id + "' is no longer in the system");
+                    }
                     continue;
                 }
 
                 // Get the eperson details
                 EPerson eperson = EPerson.findByEmail(context, user);
                 int epersonId = 0;
-                if (eperson != null) eperson.getID();
+                if (eperson != null)
+                {
+                    eperson.getID();
+                }
 
                 // Save it in our server
                 SolrInputDocument sid = new SolrInputDocument();
@@ -336,16 +324,19 @@ public class StatisticsImporter
                 sid.addField("latitude", latitude);
                 sid.addField("longitude", longitude);
                 if (epersonId > 0)
+                {
                     sid.addField("epersonid", epersonId);
+                }
                 if (dns != null)
+                {
                     sid.addField("dns", dns.toLowerCase());
+                }
 
                 if (dso instanceof Item) {
                     Item item = (Item) dso;
                     // Store the metadata
-                    for (Object storedField : metadataStorageInfo.keySet()) {
-                        String dcField = (String) metadataStorageInfo
-                                .get(storedField);
+                    for (String storedField : metadataStorageInfo.keySet()) {
+                        String dcField = metadataStorageInfo.get(storedField);
 
                         DCValue[] vals = item.getMetadata(dcField.split("\\.")[0],
                                 dcField.split("\\.")[1], dcField.split("\\.")[2],
@@ -364,10 +355,15 @@ public class StatisticsImporter
                 errors--;
             }
 
-        } catch (Exception e)
+        }
+        catch (RuntimeException re)
+        {
+            throw re;
+        }
+        catch (Exception e)
         {
             System.err.println(e.getMessage());
-            e.printStackTrace();
+            log.error(e.getMessage(), e);
         }
 
         DecimalFormat percentage = new DecimalFormat("##.###");
@@ -468,7 +464,10 @@ public class StatisticsImporter
 
         // Find our solrserver
         String sserver = ConfigurationManager.getProperty("solr.log.server");
-        if (verbose) System.out.println("Writing to solr server at: " + sserver);
+        if (verbose)
+        {
+            System.out.println("Writing to solr server at: " + sserver);
+        }
 		solr = new CommonsHttpSolrServer(sserver);
 
 		metadataStorageInfo = SolrLogger.getMetadataStorageInfo();
@@ -508,7 +507,7 @@ public class StatisticsImporter
      * @param <K>
      * @param <V>
      */
-    class DNSCache<K,V> extends LinkedHashMap<K,V>
+    static class DNSCache<K,V> extends LinkedHashMap<K,V>
     {
         private int maxCapacity;
 

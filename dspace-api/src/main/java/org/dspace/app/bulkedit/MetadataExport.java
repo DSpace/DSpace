@@ -1,44 +1,13 @@
-/*
- * MetadataExport.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision$
- *
- * Date: $Date$
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.bulkedit;
 
 import org.apache.commons.cli.*;
-import org.apache.log4j.Logger;
 
 import org.dspace.content.*;
 import org.dspace.core.Constants;
@@ -47,6 +16,7 @@ import org.dspace.handle.HandleManager;
 
 import java.util.ArrayList;
 import java.sql.SQLException;
+import java.util.List;
 
 /**
  * Metadata exporter to allow the batch export of metadata into a file
@@ -55,17 +25,11 @@ import java.sql.SQLException;
  */
 public class MetadataExport
 {
-    /** The Context */
-    private Context c;
-
     /** The items to export */
     private ItemIterator toExport;
 
     /** Whether to export all metadata, or just normally edited metadata */
     private boolean exportAll;
-
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(MetadataExport.class);
 
     /**
      * Set up a new metadata export
@@ -77,13 +41,12 @@ public class MetadataExport
     public MetadataExport(Context c, ItemIterator toExport, boolean exportAll)
     {
         // Store the export settings
-        this.c = c;
         this.toExport = toExport;
         this.exportAll = exportAll;
     }
 
     /**
-     * Method to export a community (and sub-communites and collections)
+     * Method to export a community (and sub-communities and collections)
      *
      * @param c The Context
      * @param toExport The Community to export
@@ -94,8 +57,7 @@ public class MetadataExport
         try
         {
             // Try to export the community
-            this.c = c;
-            this.toExport = new ItemIterator(c, buildFromCommunity(toExport, new ArrayList(), 0));
+            this.toExport = new ItemIterator(c, buildFromCommunity(toExport, new ArrayList<Integer>(), 0));
             this.exportAll = exportAll;
         }
         catch (SQLException sqle)
@@ -111,19 +73,23 @@ public class MetadataExport
      * Build an array list of item ids that are in a community (include sub-communities and collections)
      *
      * @param community The community to build from
-     * @param itemIDs The itemID (used for recuriosn - use an empty ArrayList)
+     * @param itemIDs The itemID (used for recursion - use an empty ArrayList)
      * @param indent How many spaces to use when writing out the names of items added
      * @return The list of item ids
      * @throws SQLException
      */
-    private ArrayList buildFromCommunity(Community community, ArrayList itemIDs, int indent)
+    private List<Integer> buildFromCommunity(Community community, List<Integer> itemIDs, int indent)
                                                                                throws SQLException
     {
         // Add all the collections
         Collection[] collections = community.getCollections();
         for (Collection collection : collections)
         {
-            for (int i = 0; i < indent; i++) System.out.print(" ");
+            for (int i = 0; i < indent; i++)
+            {
+                System.out.print(" ");
+            }
+
             ItemIterator items = collection.getAllItems();
             while (items.hasNext())
             {
@@ -140,7 +106,10 @@ public class MetadataExport
         Community[] communities = community.getSubcommunities();
         for (Community subCommunity : communities)
         {
-            for (int i = 0; i < indent; i++) System.out.print(" ");
+            for (int i = 0; i < indent; i++)
+            {
+                System.out.print(" ");
+            }
             buildFromCommunity(subCommunity, itemIDs, indent + 1);
         }
 
@@ -261,7 +230,7 @@ public class MetadataExport
             if (dso.getType() == Constants.ITEM)
             {
                 System.out.println("Exporting item '" + dso.getName() + "' (" + handle + ")");
-                ArrayList item = new ArrayList();
+                List<Integer> item = new ArrayList<Integer>();
                 item.add(dso.getID());
                 exporter = new MetadataExport(c, new ItemIterator(c, item), exportAll);
             }
@@ -290,7 +259,7 @@ public class MetadataExport
         // Save the files to the file
         csv.save(filename);        
 
-        // Finsh off and tidy up
+        // Finish off and tidy up
         c.restoreAuthSystemState();
         c.complete();
     }

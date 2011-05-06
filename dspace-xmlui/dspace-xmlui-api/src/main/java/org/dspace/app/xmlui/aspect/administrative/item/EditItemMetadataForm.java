@@ -1,42 +1,13 @@
-/*
- * EditItemMetadataForm.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4365 $
- *
- * Date: $Date: 2009-10-05 19:52:42 -0400 (Mon, 05 Oct 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.administrative.item;
 
+import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -69,7 +40,6 @@ import org.dspace.content.MetadataField;
 import org.dspace.content.MetadataSchema;
 import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.content.authority.ChoiceAuthorityManager;
-import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.Choices;
 
 /**
@@ -93,6 +63,7 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
         private static final Message T_option_bitstreams = message("xmlui.administrative.item.general.option_bitstreams");
         private static final Message T_option_metadata = message("xmlui.administrative.item.general.option_metadata");
         private static final Message T_option_view = message("xmlui.administrative.item.general.option_view");
+        private static final Message T_option_curate = message("xmlui.administrative.item.general.option_curate");
 
         private static final Message T_title = message("xmlui.administrative.item.EditItemMetadataForm.title");
         private static final Message T_trail = message("xmlui.administrative.item.EditItemMetadataForm.trail");
@@ -152,37 +123,39 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
         {
             Item templateItem = templateCollection.getTemplateItem();
             if (templateItem != null && templateItem.getID() == itemID)
+            {
                 editingTemplateItem = true;
+            }
         }
 
-                // DIVISION: main
-                Division main = body.addInteractiveDivision("edit-item-status", contextPath+"/admin/item", Division.METHOD_POST,"primary administrative item");
-                if (editingTemplateItem)
+        // DIVISION: main
+        Division main = body.addInteractiveDivision("edit-item-status", contextPath+"/admin/item", Division.METHOD_POST,"primary administrative item");
+        if (editingTemplateItem)
         {
-                    main.setHead(T_template_head.parameterize(templateCollection.getName()));
-                }
+            main.setHead(T_template_head.parameterize(templateCollection.getName()));
+        }
         else
         {
-                main.setHead(T_option_head);
-                }
+            main.setHead(T_option_head);
+        }
 
-                Collection owner = item.getOwningCollection();
-                int collectionID = (owner == null) ? -1 : owner.getID();
+        Collection owner = item.getOwningCollection();
+        int collectionID = (owner == null) ? -1 : owner.getID();
                 
-                
-                // LIST: options
-                if (!editingTemplateItem)
+        // LIST: options
+        if (!editingTemplateItem)
         {
-                  List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
-                  options.addItem().addXref(baseURL+"&submit_status",T_option_status);
-                  options.addItem().addXref(baseURL+"&submit_bitstreams",T_option_bitstreams);
-                  options.addItem().addHighlight("bold").addXref(baseURL+"&submit_metadata",T_option_metadata);
-                  options.addItem().addXref(baseURL + "&view_item", T_option_view);
-                }
+          List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
+          options.addItem().addXref(baseURL+"&submit_status",T_option_status);
+          options.addItem().addXref(baseURL+"&submit_bitstreams",T_option_bitstreams);
+          options.addItem().addHighlight("bold").addXref(baseURL+"&submit_metadata",T_option_metadata);
+          options.addItem().addXref(baseURL + "&view_item", T_option_view);
+          options.addItem().addXref(baseURL + "&submit_curate", T_option_curate);
+        }
 
-                // LIST: add new metadata
-                List addForm = main.addList("addItemMetadata",List.TYPE_FORM);
-                addForm.setHead(T_head1);
+        // LIST: add new metadata
+        List addForm = main.addList("addItemMetadata",List.TYPE_FORM);
+        addForm.setHead(T_head1);
 
                 Select addName = addForm.addItem().addSelect("field");
                 addName.setLabel(T_name_label);
@@ -193,12 +166,16 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
                         MetadataSchema schema = MetadataSchema.find(context, field.getSchemaID());
                         String name = schema.getName() +"."+field.getElement();
                         if (field.getQualifier() != null)
-                                name += "."+field.getQualifier();
+                        {
+                            name += "." + field.getQualifier();
+                        }
 
                         addName.addOption(fieldID, name);
                 }
                 if (previousFieldID != null)
-                        addName.setOptionSelected(previousFieldID);
+                {
+                    addName.setOptionSelected(previousFieldID);
+                }
 
 
                 Composite addComposite = addForm.addItem().addComposite("value");
@@ -242,7 +219,9 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
                 {
                         String name = value.schema + "_" + value.element;
                         if (value.qualifier != null)
-                                name += "_" + value.qualifier;
+                        {
+                            name += "_" + value.qualifier;
+                        }
 
                         Row row = table.addRow(name,Row.ROLE_DATA,"metadata-value");
 
@@ -266,7 +245,9 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
                             mdSelect.setSize(1);
                             Choices cs = cmgr.getMatches(fieldKey, value.value, collectionID, 0, 0, null);
                             if (cs.defaultSelected < 0)
+                            {
                                 mdSelect.addOption(true, value.value, value.value);
+                            }
                             for (int i = 0; i < cs.values.length; ++i)
                             {
                                 mdSelect.addOption(i == cs.defaultSelected, cs.values[i].value, cs.values[i].label);
@@ -319,7 +300,7 @@ public class EditItemMetadataForm extends AbstractDSpaceTransformer {
         /**
          * Compare two metadata element's name so that they may be sorted.
          */
-        class DCValueComparator implements Comparator{
+        static class DCValueComparator implements Comparator, Serializable {
                 public int compare(Object arg0, Object arg1) {
                         final DCValue o1 = (DCValue)arg0;
                         final DCValue o2 = (DCValue)arg1;

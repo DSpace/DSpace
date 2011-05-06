@@ -1,47 +1,17 @@
-/*
- * ConceptSearchServlet.java
- * 
- * Version: $Revision: 3705 $
- * 
- * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
- * 
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts Institute of
- * Technology. All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met: -
- * Redistributions of source code must retain the above copyright notice, this
- * list of conditions and the following disclaimer. - Redistributions in binary
- * form must reproduce the above copyright notice, this list of conditions and
- * the following disclaimer in the documentation and/or other materials provided
- * with the distribution. - Neither the name of the Hewlett-Packard Company nor
- * the name of the Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from this
- * software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS ``AS IS''
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
-import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Vector;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -67,7 +37,7 @@ import org.dspace.search.QueryResults;
  * controlled vocabulary as a basis for selecting the search keywords.
  * 
  * @author Miguel Ferreira
- * @version $Revision: 3705 $
+ * @version $Revision: 5845 $
  */
 public class ControlledVocabularySearchServlet extends DSpaceServlet
 {
@@ -94,7 +64,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
 
         if (action.equals("search"))
         {
-            List keywords = extractKeywords(request);
+            List<String> keywords = extractKeywords(request);
             String query = join(keywords, " or ");
             doSearch(context, request, query);
             JSPManager.showJSP(request, response, RESULTS_JSP);
@@ -119,9 +89,9 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
      *            The HttpServletRequest
      * @return A Vector with the selected terms from the taxonomy.
      */
-    private List extractKeywords(HttpServletRequest request)
+    private List<String> extractKeywords(HttpServletRequest request)
     {
-        List keywords = new Vector();
+        List<String> keywords = new ArrayList<String>();
         Enumeration enumeration = request.getParameterNames();
         while (enumeration.hasMoreElements())
         {
@@ -153,9 +123,6 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         // String query = request.getParameter("query");
         int start = UIUtil.getIntParameter(request, "start");
         String advanced = request.getParameter("advanced");
-        String fromAdvanced = request.getParameter("from_advanced");
-        String advancedQuery = "";
-        HashMap queryHash = new HashMap();
 
         // can't start earlier than 0 in the results!
         if (start < 0)
@@ -163,9 +130,9 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
             start = 0;
         }
 
-        List itemHandles = new ArrayList();
-        List collectionHandles = new ArrayList();
-        List communityHandles = new ArrayList();
+        List<String> itemHandles = new ArrayList<String>();
+        List<String> collectionHandles = new ArrayList<String>();
+        List<String> communityHandles = new ArrayList<String>();
 
         Item[] resultsItems;
         Collection[] resultsCollections;
@@ -179,7 +146,6 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         if (advanced != null)
         {
             query = qArgs.buildQuery(request);
-            advancedQuery = qArgs.buildHTTPQuery(request);
         }
 
         // Ensure the query is non-null
@@ -187,10 +153,6 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         {
             query = "";
         }
-
-        // Get the location parameter, if any
-        String location = request.getParameter("location");
-        String newURL;
 
         // Build log information
         String logInfo = "";
@@ -240,8 +202,8 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         // now instantiate the results and put them in their buckets
         for (int i = 0; i < qResults.getHitHandles().size(); i++)
         {
-            String myHandle = (String) qResults.getHitHandles().get(i);
-            Integer myType = (Integer) qResults.getHitTypes().get(i);
+            String myHandle = qResults.getHitHandles().get(i);
+            Integer myType = qResults.getHitTypes().get(i);
 
             // add the handle to the appropriate lists
             switch (myType.intValue())
@@ -274,7 +236,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
 
         for (int i = 0; i < numItems; i++)
         {
-            String myhandle = (String) itemHandles.get(i);
+            String myhandle = itemHandles.get(i);
 
             Object o = HandleManager.resolveToObject(context, myhandle);
 
@@ -289,7 +251,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
 
         for (int i = 0; i < collectionHandles.size(); i++)
         {
-            String myhandle = (String) collectionHandles.get(i);
+            String myhandle = collectionHandles.get(i);
 
             Object o = HandleManager.resolveToObject(context, myhandle);
 
@@ -304,7 +266,7 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
 
         for (int i = 0; i < communityHandles.size(); i++)
         {
-            String myhandle = (String) communityHandles.get(i);
+            String myhandle = communityHandles.get(i);
 
             Object o = HandleManager.resolveToObject(context, myhandle);
 
@@ -342,10 +304,10 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
         request.setAttribute("communities", resultsCommunities);
         request.setAttribute("collections", resultsCollections);
 
-        request.setAttribute("pagetotal", new Integer(pageTotal));
-        request.setAttribute("pagecurrent", new Integer(pageCurrent));
-        request.setAttribute("pagelast", new Integer(pageLast));
-        request.setAttribute("pagefirst", new Integer(pageFirst));
+        request.setAttribute("pagetotal", Integer.valueOf(pageTotal));
+        request.setAttribute("pagecurrent", Integer.valueOf(pageCurrent));
+        request.setAttribute("pagelast", Integer.valueOf(pageLast));
+        request.setAttribute("pagefirst", Integer.valueOf(pageFirst));
 
         request.setAttribute("queryresults", qResults);
 
@@ -364,17 +326,20 @@ public class ControlledVocabularySearchServlet extends DSpaceServlet
      * @return A string with all the elements concatened and separated by the
      *         provided connector
      */
-    public static String join(List list, String separator)
+    public static String join(List<String> list, String separator)
     {
-        String result = "";
-        Iterator iterator = list.listIterator();
-        while (iterator.hasNext())
+        StringBuilder result = new StringBuilder();
+        for (String entry : list)
         {
-            result += iterator.next().toString();
-            if (iterator.hasNext())
-                result += separator;
+            if (result.length() > 0)
+            {
+                result.append(separator);
+            }
+
+            result.append(entry);
         }
-        return result;
+
+        return result.toString();
     }
 
     /**

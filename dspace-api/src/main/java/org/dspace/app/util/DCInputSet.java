@@ -1,53 +1,21 @@
-/*
- * DCInputSet.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3734 $
- *
- * Date: $Date: 2009-04-24 00:00:19 -0400 (Fri, 24 Apr 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Vector;
 import java.util.Map;
 
 /**
  * Class representing all DC inputs required for a submission, organized into pages
  *
  * @author Brian S. Hughes, based on work by Jenny Toves, OCLC
- * @version $Revision: 3734 $
+ * @version $Revision: 5844 $
  */
 
 public class DCInputSet
@@ -58,17 +26,17 @@ public class DCInputSet
 	private DCInput[][] inputPages = null;
 	
 	/** constructor */
-	public DCInputSet(String formName, Vector pages, Map listMap)
+	public DCInputSet(String formName, List<List<Map<String, String>>> pages, Map<String, List<String>> listMap)
 	{
 		this.formName = formName;
 		inputPages = new DCInput[pages.size()][];
 		for ( int i = 0; i < inputPages.length; i++ )
 		{
-			Vector page = (Vector)pages.get(i);
+			List<Map<String, String>> page = pages.get(i);
 			inputPages[i] = new DCInput[page.size()];
 			for ( int j = 0; j < inputPages[i].length; j++ )
 			{
-				inputPages[i][j] = new DCInput((Map)page.get(j), listMap);
+				inputPages[i][j] = new DCInput(page.get(j), listMap);
 			}
 		}
 	}
@@ -104,7 +72,7 @@ public class DCInputSet
 	public DCInput[] getPageRows(int pageNum, boolean addTitleAlternative,
 		      					 boolean addPublishedBefore)
 	{
-		List filteredInputs = new ArrayList();
+		List<DCInput> filteredInputs = new ArrayList<DCInput>();
 		if ( pageNum < inputPages.length )
 		{
 			for (int i = 0; i < inputPages[pageNum].length; i++ )
@@ -119,7 +87,7 @@ public class DCInputSet
 
 		// Convert list into an array
 		DCInput[] inputArray = new DCInput[filteredInputs.size()];
-		return (DCInput[])filteredInputs.toArray(inputArray);
+		return filteredInputs.toArray(inputArray);
 	}
 	
     /**

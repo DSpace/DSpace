@@ -1,47 +1,17 @@
-/*
- * DSpaceCSVLine.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision$
- *
- * Date: $Date$
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.bulkedit;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Enumeration;
-import java.util.Iterator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Utility class to store a line from a CSV file
@@ -54,18 +24,18 @@ public class DSpaceCSVLine
     private int id;
 
     /** The elements in this line in a hashtable, keyed by the metadata type */
-    private Hashtable<String, ArrayList> items;
+    private Map<String, ArrayList> items;
 
     /**
      * Create a new CSV line
      *
      * @param id The item ID of the line
      */
-    public DSpaceCSVLine(int id)
+    public DSpaceCSVLine(int itemId)
     {
-        // Store the ID + separator, and initalise the hashtable
-        this.id = id;
-        items = new Hashtable<String, ArrayList>();
+        // Store the ID + separator, and initialise the hashtable
+        this.id = itemId;
+        items = new HashMap<String, ArrayList>();
     }
 
     /**
@@ -73,9 +43,9 @@ public class DSpaceCSVLine
      */
     public DSpaceCSVLine()
     {
-        // Set the ID to be -1, and initalise the hashtable
+        // Set the ID to be -1, and initialise the hashtable
         this.id = -1;
-        this.items = new Hashtable<String, ArrayList>();
+        this.items = new HashMap<String, ArrayList>();
     }
 
     /**
@@ -116,7 +86,7 @@ public class DSpaceCSVLine
      * @param key The metadata key
      * @return All the elements that match
      */
-    public ArrayList<String> get(String key)
+    public List<String> get(String key)
     {
         // Return any relevant values
         return items.get(key);
@@ -127,10 +97,10 @@ public class DSpaceCSVLine
      *
      * @return An enumeration of all the keys
      */
-    public Enumeration<String> keys()
+    public Set<String> keys()
     {
         // Return the keys
-        return items.keys();
+        return items.keySet();
     }
 
     /**
@@ -139,29 +109,26 @@ public class DSpaceCSVLine
      * @param headings The headings which define the order the elements must be presented in
      * @return The CSV formatted String
      */
-    protected String toCSV(ArrayList<String> headings)
+    protected String toCSV(List<String> headings)
     {
+        StringBuilder bits = new StringBuilder();
+
         // Add the id
-        String bits = "\"" + id + "\"" + DSpaceCSV.fieldSeparator;
-        bits += valueToCSV(items.get("collection")) + DSpaceCSV.fieldSeparator;
+        bits.append("\"").append(id).append("\"").append(DSpaceCSV.fieldSeparator);
+        bits.append(valueToCSV(items.get("collection")));
 
         // Add the rest of the elements
-        Iterator<String> i = headings.iterator();
-        String key;
-        while (i.hasNext())
+        for (String heading : headings)
         {
-            key = i.next();
-            if ((items.get(key) != null) && (!"collection".equals(key)))
+            bits.append(DSpaceCSV.fieldSeparator);
+            List<String> values = items.get(heading);
+            if (values != null && !"collection".equals(heading))
             {
-                bits = bits + valueToCSV(items.get(key));
-            }
-
-            if (i.hasNext())
-            {
-                bits = bits + DSpaceCSV.fieldSeparator;
+                bits.append(valueToCSV(values));
             }
         }
-        return bits;
+
+        return bits.toString();
     }
 
     /**
@@ -170,43 +137,40 @@ public class DSpaceCSVLine
      * @param values The values to create the string from
      * @return The line as a CSV formatted String
      */
-    private String valueToCSV(ArrayList<String> values)
+    protected String valueToCSV(List<String> values)
     {
-        // Concatenate any fields together 
-        String s = "";
-
         // Check there is some content
         if (values == null)
         {
-            return s;
+            return "";
         }
 
         // Get on with the work
+        String s;
         if (values.size() == 1)
         {
             s = values.get(0);
         }
         else
         {
-            Iterator i = values.iterator();
-            while (i.hasNext())
+            // Concatenate any fields together
+            StringBuilder str = new StringBuilder();
+
+            for (String value : values)
             {
-                s = s + i.next();
-                if (i.hasNext())
+                if (str.length() > 0)
                 {
-                    s = s + DSpaceCSV.valueSeparator;
+                    str.append(DSpaceCSV.valueSeparator);
                 }
+
+                str.append(value);
             }
+
+            s = str.toString();
         }
 
         // Replace internal quotes with two sets of quotes
-        s = s.replaceAll("\"", "\"\"");
-
-        // Wrap in quotes
-        s = "\"" + s + "\"";
-
-        // Return the csv formatted string
-        return s;
+        return "\"" + s.replaceAll("\"", "\"\"") + "\"";
     }
 }
 

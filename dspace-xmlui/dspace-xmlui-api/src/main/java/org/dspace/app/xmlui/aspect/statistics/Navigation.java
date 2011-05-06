@@ -1,29 +1,21 @@
 /**
- * $Id: $
- * $URL: $
- * *************************************************************************
- * Copyright (c) 2002-2009, DuraSpace.  All rights reserved
- * Licensed under the DuraSpace Foundation License.
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * A copy of the DuraSpace License has been included in this
- * distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.statistics;
 
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.app.xmlui.wing.element.List;
-import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
-import org.dspace.content.Item;
-import org.dspace.core.Constants;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
@@ -79,6 +71,11 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             statistics.setHead(T_statistics_head);
             statistics.addItemXref(contextPath + "/handle/" + dso.getHandle() + "/statistics", T_statistics_view);
 
+        }else{
+            // This Navigation is only called either on a DSO related page, or the homepage
+            // If on the home page: add statistics link for the home page
+            statistics.setHead(T_statistics_head);
+            statistics.addItemXref(contextPath + "/statistics-home", T_statistics_view);
         }
 
 

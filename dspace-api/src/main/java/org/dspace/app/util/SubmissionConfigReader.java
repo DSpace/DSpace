@@ -1,48 +1,14 @@
-/*
- * SubmissionConfigReader.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3734 $
- *
- * Date: $Date: 2009-04-24 00:00:19 -0400 (Fri, 24 Apr 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.util;
 
 import java.io.File;
-import java.util.Vector;
-import java.util.HashMap;
-import java.util.Map;
-import java.lang.Exception;
+import java.util.*;
 import javax.servlet.ServletException;
 import org.xml.sax.SAXException;
 import org.w3c.dom.*;
@@ -55,7 +21,7 @@ import org.dspace.core.ConfigurationManager;
 /**
  * Item Submission configuration generator for DSpace. Reads and parses the
  * installed submission process configuration file, item-submission.xml, from
- * the configuration directory. This submission process definiton details the
+ * the configuration directory. This submission process definition details the
  * ordering of the steps (and number of steps) that occur during the Item
  * Submission Process. There may be multiple Item Submission processes defined,
  * where each definition is assigned a unique name.
@@ -70,7 +36,7 @@ import org.dspace.core.ConfigurationManager;
  * @see org.dspace.app.util.SubmissionStepConfig
  * 
  * @author Tim Donohue based on DCInputsReader by Brian S. Hughes
- * @version $Revision: 3734 $
+ * @version $Revision: 5844 $
  */
 
 public class SubmissionConfigReader
@@ -99,19 +65,19 @@ public class SubmissionConfigReader
      * which collection, computed from the item submission config file
      * (specifically, the 'submission-map' tag)
      */
-    private HashMap collectionToSubmissionConfig = null;
+    private Map<String, String> collectionToSubmissionConfig = null;
 
     /**
      * Reference to the global submission step definitions defined in the
      * "step-definitions" section
      */
-    private HashMap stepDefns = null;
+    private Map<String, Map<String, String>> stepDefns = null;
 
     /**
      * Reference to the item submission definitions defined in the
      * "submission-definitions" section
      */
-    private HashMap submitDefns = null;
+    private Map<String, List<Map<String, String>>> submitDefns = null;
 
     /**
      * Mini-cache of last SubmissionConfig object requested (so that we don't
@@ -141,8 +107,8 @@ public class SubmissionConfigReader
      */
     private void buildInputs(String fileName) throws ServletException
     {
-        collectionToSubmissionConfig = new HashMap();
-        submitDefns = new HashMap();
+        collectionToSubmissionConfig = new HashMap<String, String>();
+        submitDefns = new HashMap<String, List<Map<String, String>>>();
 
         String uri = "file:" + new File(fileName).getAbsolutePath();
 
@@ -188,11 +154,11 @@ public class SubmissionConfigReader
             boolean isWorkflow) throws ServletException
     {
         // get the name of the submission process config for this collection
-        String submitName = (String) collectionToSubmissionConfig
+        String submitName = collectionToSubmissionConfig
                 .get(collectionHandle);
         if (submitName == null)
         {
-            submitName = (String) collectionToSubmissionConfig
+            submitName = collectionToSubmissionConfig
                     .get(DEFAULT_COLLECTION);
         }
         if (submitName == null)
@@ -216,7 +182,7 @@ public class SubmissionConfigReader
         }
 
         // cache miss - construct new SubmissionConfig
-        Vector steps = (Vector) submitDefns.get(submitName);
+        List<Map<String, String>> steps = submitDefns.get(submitName);
 
         if (steps == null)
         {
@@ -258,10 +224,12 @@ public class SubmissionConfigReader
         if (stepDefns != null)
         {
             // retreive step info
-            Map stepInfo = (Map) stepDefns.get(stepID);
+            Map<String, String> stepInfo = stepDefns.get(stepID);
 
             if (stepInfo != null)
+            {
                 return new SubmissionStepConfig(stepInfo);
+            }
         }
 
         return null;
@@ -374,8 +342,7 @@ public class SubmissionConfigReader
     private void processStepDefinition(Node e) throws SAXException,
             ServletException
     {
-        int numStepDefns = 0;
-        stepDefns = new HashMap();
+        stepDefns = new HashMap<String, Map<String, String>>();
 
         NodeList nl = e.getChildNodes();
         int len = nl.getLength();
@@ -385,7 +352,6 @@ public class SubmissionConfigReader
             // process each step definition
             if (nd.getNodeName().equals("step"))
             {
-                numStepDefns++;
                 String stepID = getAttribute(nd, "id");
                 if (stepID == null)
                 {
@@ -398,7 +364,7 @@ public class SubmissionConfigReader
                             "There are two step elements with the id '" + stepID + "' in 'item-submission.xml'");
                 }
 
-                HashMap stepInfo = processStepChildNodes("step-definition", nd);
+                Map<String, String> stepInfo = processStepChildNodes("step-definition", nd);
 
                 stepDefns.put(stepID, stepInfo);
             } // ignore any child that is not a 'step'
@@ -444,7 +410,7 @@ public class SubmissionConfigReader
             ServletException
     {
         int numSubmitProcesses = 0;
-        Vector submitNames = new Vector();
+        List<String> submitNames = new ArrayList<String>();
 
         // find all child nodes of the 'submission-definition' node and loop
         // through
@@ -473,17 +439,15 @@ public class SubmissionConfigReader
                 submitNames.add(submitName);
 
                 // the 'submission-process' definition contains steps
-                Vector steps = new Vector();
+                List<Map<String, String>> steps = new ArrayList<Map<String, String>>();
                 submitDefns.put(submitName, steps);
 
                 // loop through all the 'step' nodes of the 'submission-process'
-                int stepNum = 0;
                 NodeList pl = nd.getChildNodes();
                 int lenStep = pl.getLength();
                 for (int j = 0; j < lenStep; j++)
                 {
                     Node nStep = pl.item(j);
-                    stepNum++;
 
                     // process each 'step' definition
                     if (nStep.getNodeName().equals("step"))
@@ -491,7 +455,7 @@ public class SubmissionConfigReader
                         // check for an 'id' attribute
                         String stepID = getAttribute(nStep, "id");
 
-                        HashMap stepInfo;
+                        Map<String, String> stepInfo;
 
                         // if this step has an id, load its information from the
                         // step-definition section
@@ -501,7 +465,7 @@ public class SubmissionConfigReader
                             {
                                 // load the step information from the
                                 // step-definition
-                                stepInfo = (HashMap) stepDefns.get(stepID);
+                                stepInfo = stepDefns.get(stepID);
                             }
                             else
                             {
@@ -542,7 +506,7 @@ public class SubmissionConfigReader
                 // (from the 'step-definition' section)
                 // Note: we already did a sanity check that this "collection"
                 // step exists.
-                steps.add(0, (HashMap) stepDefns
+                steps.add(0, stepDefns
                         .get(SubmissionStepConfig.SELECT_COLLECTION_STEP));
 
                 // ALL Item Submission processes MUST END with the
@@ -551,7 +515,7 @@ public class SubmissionConfigReader
                 // (from the 'step-definition' section)
                 // Note: we already did a sanity check that this "complete"
                 // step exists.
-                steps.add((HashMap) stepDefns
+                steps.add(stepDefns
                         .get(SubmissionStepConfig.COMPLETE_STEP));
 
             }
@@ -569,11 +533,11 @@ public class SubmissionConfigReader
      * and the value is the field value.
      * 
      */
-    private HashMap processStepChildNodes(String configSection, Node nStep)
+    private Map<String, String> processStepChildNodes(String configSection, Node nStep)
             throws SAXException, ServletException
     {
         // initialize the HashMap of step Info
-        HashMap stepInfo = new HashMap();
+        Map<String, String> stepInfo = new HashMap<String, String>();
 
         NodeList flds = nStep.getChildNodes();
         int lenflds = flds.getLength();

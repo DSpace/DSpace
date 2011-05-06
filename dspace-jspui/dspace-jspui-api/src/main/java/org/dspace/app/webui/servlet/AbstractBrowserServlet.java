@@ -1,41 +1,9 @@
-/*
- * AbstractBrowserServlet.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4365 $
- *
- * Date: $Date: 2009-10-05 19:52:42 -0400 (Mon, 05 Oct 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.webui.servlet;
 
@@ -81,7 +49,7 @@ import org.dspace.core.LogManager;
  * - etal: integer number to limit multiple value items specified in config to
  *
  * @author Richard Jones
- * @version $Revision: 4365 $
+ * @version $Revision: 5845 $
  */
 public abstract class AbstractBrowserServlet extends DSpaceServlet
 {
@@ -148,9 +116,13 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             if (bi == null)
             {
                 if (sortBy > 0)
+                {
                     bi = BrowseIndex.getBrowseIndex(SortOption.getSortOption(sortBy));
+                }
                 else
+                {
                     bi = BrowseIndex.getBrowseIndex(SortOption.getDefaultSortOption());
+                }
             }
 
             // If we don't have a sort column
@@ -171,7 +143,7 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
                 // This is so that we can then highlight the correct option in the navigation
                 SortOption bso = bi.getSortOption();
                 SortOption so = SortOption.getSortOption(sortBy);
-                if ( bso != null && bso != so)
+                if ( bso != null && bso.equals(so))
                 {
                     BrowseIndex newBi = BrowseIndex.getBrowseIndex(so);
                     if (newBi != null)
@@ -346,7 +318,7 @@ public abstract class AbstractBrowserServlet extends DSpaceServlet
             if (AuthorizeManager.isAdmin(context))
             {
                 // Set a variable to create admin buttons
-                request.setAttribute("admin_button", new Boolean(true));
+                request.setAttribute("admin_button", Boolean.TRUE);
             }
 
             if (binfo.hasResults())

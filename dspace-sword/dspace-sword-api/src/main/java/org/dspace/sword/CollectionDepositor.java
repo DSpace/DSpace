@@ -1,39 +1,9 @@
-/* CollectionDepositor.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Copyright (c) 2007, Aberystwyth University
- *
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *  - Redistributions of source code must retain the above
- *    copyright notice, this list of conditions and the
- *    following disclaimer.
- *
- *  - Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- *  - Neither the name of the Centre for Advanced Software and
- *    Intelligent Systems (CASIS) nor the names of its
- *    contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
- * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.sword;
 
@@ -45,7 +15,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Utils;
 import org.dspace.authorize.AuthorizeException;
 import org.purl.sword.base.Deposit;
 
@@ -55,9 +24,7 @@ import org.apache.log4j.Logger;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.sql.SQLException;
 
 /**
@@ -137,40 +104,6 @@ public class CollectionDepositor extends Depositor
 					"Unacceptable packaging type in deposit request: " + deposit.getPackaging());
 		}
 
-		String tempDir = swordConfig.getTempDir();
-		String tempFile = tempDir + "/" + swordService.getTempFilename();
-		log.debug("Storing temporary file at " + tempFile);
-
-		if (swordConfig.isKeepOriginal())
-		{
-			try
-			{
-				swordService.message("DSpace will store an original copy of the deposit, " +
-						"as well as ingesting the item into the archive");
-
-				// first, store the temp file
-				InputStream is = deposit.getFile();
-				FileOutputStream fos = new FileOutputStream(tempFile);
-				Utils.copy(is, fos);
-				fos.close();
-				is.close();
-
-				// now create an input stream from that temp file to ingest
-				InputStream fis = new FileInputStream(tempFile);
-				deposit.setFile(fis);
-			}
-			catch (FileNotFoundException e)
-			{
-				log.error("caught exception: ", e);
-				throw new DSpaceSWORDException(e);
-			}
-			catch (IOException e)
-			{
-				log.error("caught exception: ", e);
-				throw new DSpaceSWORDException(e);
-			}
-		}
-
 		// Obtain the relevant ingester from the factory
 		SWORDIngester si = SWORDIngesterFactory.getInstance(context, deposit, collection);
 		swordService.message("Loaded ingester: " + si.getClass().getName());
@@ -185,6 +118,9 @@ public class CollectionDepositor extends Depositor
 		{
 			if (swordConfig.isKeepOriginal())
 			{
+                                swordService.message("DSpace will store an original copy of the deposit, " +
+						"as well as ingesting the item into the archive");
+
 				// in order to be allowed to add the file back to the item, we need to ignore authorisations
 				// for a moment
 				boolean ignoreAuth = context.ignoreAuthorization();
@@ -209,20 +145,34 @@ public class CollectionDepositor extends Depositor
 
 				String fn = swordService.getFilename(context, deposit, true);
 
-				FileInputStream fis = new FileInputStream(tempFile);
-				Bitstream bitstream = swordBundle.createBitstream(fis);
-				bitstream.setName(fn);
-				bitstream.setDescription("SWORD deposit package");
+                Bitstream bitstream;
+				FileInputStream fis = null;
+                try
+                {
+                    fis = new FileInputStream(deposit.getFile());
+                    bitstream = swordBundle.createBitstream(fis);
+                }
+                finally
+                {
+                    if (fis != null)
+                    {
+                        fis.close();
+                    }
+                }
 
-				BitstreamFormat bf = BitstreamFormat.findByMIMEType(context, deposit.getContentType());
-				if (bf != null)
-				{
-					bitstream.setFormat(bf);
-				}
+                bitstream.setName(fn);
+                bitstream.setDescription("SWORD deposit package");
 
-				bitstream.update();
-				swordBundle.update();
-				item.update();
+                BitstreamFormat bf = BitstreamFormat.findByMIMEType(context, deposit.getContentType());
+                if (bf != null)
+                {
+                    bitstream.setFormat(bf);
+                }
+
+                bitstream.update();
+
+                swordBundle.update();
+                item.update();
 
 				swordService.message("Original package stored as " + fn + ", in item bundle " + swordBundle);
 

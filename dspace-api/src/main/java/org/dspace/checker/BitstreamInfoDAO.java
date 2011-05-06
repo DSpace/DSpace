@@ -1,33 +1,9 @@
-/*
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.checker;
 
@@ -62,7 +38,7 @@ public final class BitstreamInfoDAO extends DAOSupport
      * This value should be returned by <code>next()</code> to indicate that
      * there are no more values.
      */
-    public static int SENTINEL = -1;
+    public static final int SENTINEL = -1;
 
     /** Query that gets bitstream information for a specified ID. */
     private static final String FIND_BY_BITSTREAM_ID = "select bitstream.deleted, bitstream.store_number, bitstream.size_bytes, "
@@ -233,8 +209,7 @@ public final class BitstreamInfoDAO extends DAOSupport
         catch (SQLException e)
         {
             LOG.error("Problem updating checksum row. " + e.getMessage(), e);
-            throw new RuntimeException("Problem updating checksum row. "
-                    + e.getMessage(), e);
+            throw new IllegalStateException("Problem updating checksum row. " + e.getMessage(), e);
         }
         finally
         {
@@ -311,9 +286,13 @@ public final class BitstreamInfoDAO extends DAOSupport
             LOG.debug("updating missing bitstreams");
             conn = DatabaseManager.getConnection();
             if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+            {
                 stmt = conn.prepareStatement(INSERT_MISSING_CHECKSUM_BITSTREAMS_ORACLE);
+            }
             else
-            	stmt = conn.prepareStatement(INSERT_MISSING_CHECKSUM_BITSTREAMS);
+            {
+                stmt = conn.prepareStatement(INSERT_MISSING_CHECKSUM_BITSTREAMS);
+            }
             stmt.setTimestamp(1, new java.sql.Timestamp(new Date().getTime()));
             stmt.setTimestamp(2, new java.sql.Timestamp(new Date().getTime()));
             stmt.executeUpdate();
@@ -323,11 +302,8 @@ public final class BitstreamInfoDAO extends DAOSupport
         }
         catch (SQLException e)
         {
-            LOG.error(
-                    "Problem inserting missing bitstreams. " + e.getMessage(),
-                    e);
-            throw new RuntimeException("Problem inserting missing bitstreams. "
-                    + e.getMessage(), e);
+            LOG.error("Problem inserting missing bitstreams. " + e.getMessage(), e);
+            throw new IllegalStateException("Problem inserting missing bitstreams. " + e.getMessage(), e);
         }
         finally
         {
@@ -369,8 +345,7 @@ public final class BitstreamInfoDAO extends DAOSupport
         catch (SQLException e)
         {
             LOG.error("Problem deleting bitstream. " + e.getMessage(), e);
-            throw new RuntimeException("Problem deleting bitstream. "
-                    + e.getMessage(), e);
+            throw new IllegalStateException("Problem deleting bitstream. " + e.getMessage(), e);
         }
         finally
         {
@@ -395,8 +370,7 @@ public final class BitstreamInfoDAO extends DAOSupport
         catch (SQLException e)
         {
             LOG.error("Problem deleting bitstream. " + e.getMessage(), e);
-            throw new RuntimeException("Problem deleting bitstream. "
-                    + e.getMessage(), e);
+            throw new IllegalStateException("Problem deleting bitstream. " + e.getMessage(), e);
         }
         finally
         {
@@ -425,9 +399,13 @@ public final class BitstreamInfoDAO extends DAOSupport
 
             conn = DatabaseManager.getConnection();
             if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-            	prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM_ORACLE);
+            {
+                prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM_ORACLE);
+            }
             else
-            	prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM);
+            {
+                prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM);
+            }
             rs = prepStmt.executeQuery();
             if (rs.next())
             {
@@ -441,8 +419,7 @@ public final class BitstreamInfoDAO extends DAOSupport
         catch (SQLException e)
         {
             LOG.error("Problem with get oldest bitstream " + e.getMessage(), e);
-            throw new RuntimeException("Oldest bitstream error. "
-                    + e.getMessage(), e);
+            throw new IllegalStateException("Oldest bitstream error. " + e.getMessage(), e);
 
         }
         finally
@@ -469,9 +446,13 @@ public final class BitstreamInfoDAO extends DAOSupport
         {
             conn = DatabaseManager.getConnection();
             if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-            	prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM_DATE_ORACLE);
+            {
+                prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM_DATE_ORACLE);
+            }
             else
-            	prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM_DATE);
+            {
+                prepStmt = conn.prepareStatement(GET_OLDEST_BITSTREAM_DATE);
+            }
             prepStmt.setTimestamp(1, lessThanDate);
             rs = prepStmt.executeQuery();
             if (rs.next())
@@ -487,8 +468,7 @@ public final class BitstreamInfoDAO extends DAOSupport
         {
             LOG.error("get oldest bitstream less than date " + e.getMessage(),
                     e);
-            throw new RuntimeException("get oldest bitstream less than date. "
-                    + e.getMessage(), e);
+            throw new IllegalStateException("get oldest bitstream less than date. " + e.getMessage(), e);
 
         }
         finally
@@ -504,9 +484,9 @@ public final class BitstreamInfoDAO extends DAOSupport
      * @param itemId
      * @return the list of bitstream ids for this item
      */
-    public List getItemBitstreams(int itemId)
+    public List<Integer> getItemBitstreams(int itemId)
     {
-        List ids = new ArrayList();
+        List<Integer> ids = new ArrayList<Integer>();
 
         Connection conn = null;
         PreparedStatement ps = null;
@@ -522,15 +502,14 @@ public final class BitstreamInfoDAO extends DAOSupport
 
             while (rs.next())
             {
-                ids.add(new Integer(rs.getInt(1)));
+                ids.add(Integer.valueOf(rs.getInt(1)));
             }
 
         }
         catch (SQLException e)
         {
             LOG.error("get item bitstreams " + e.getMessage(), e);
-            throw new RuntimeException(
-                    "get item bitstreams. " + e.getMessage(), e);
+            throw new IllegalStateException("get item bitstreams. " + e.getMessage(), e);
 
         }
         finally
@@ -547,9 +526,9 @@ public final class BitstreamInfoDAO extends DAOSupport
      * @param collectionId The id of the collection
      * @return the list of bitstream ids for this item
      */
-    public List getCollectionBitstreams(int collectionId)
+    public List<Integer> getCollectionBitstreams(int collectionId)
     {
-        List ids = new ArrayList();
+        List<Integer> ids = new ArrayList<Integer>();
 
         Connection conn = null;
         PreparedStatement ps = null;
@@ -565,15 +544,13 @@ public final class BitstreamInfoDAO extends DAOSupport
 
             while (rs.next())
             {
-                ids.add(new Integer(rs.getInt(1)));
+                ids.add(Integer.valueOf(rs.getInt(1)));
             }
-
         }
         catch (SQLException e)
         {
             LOG.error("get item bitstreams " + e.getMessage(), e);
-            throw new RuntimeException(
-                    "get item bitstreams. " + e.getMessage(), e);
+            throw new IllegalStateException("get item bitstreams. " + e.getMessage(), e);
 
         }
         finally
@@ -590,9 +567,9 @@ public final class BitstreamInfoDAO extends DAOSupport
      * @param communityId the community id
      * @return the list of bitstream ids for this item
      */
-    public List getCommunityBitstreams(int communityId)
+    public List<Integer> getCommunityBitstreams(int communityId)
     {
-        List ids = new ArrayList();
+        List<Integer> ids = new ArrayList<Integer>();
 
         Connection conn = null;
         PreparedStatement ps = null;
@@ -608,15 +585,14 @@ public final class BitstreamInfoDAO extends DAOSupport
 
             while (rs.next())
             {
-                ids.add(new Integer(rs.getInt(1)));
+                ids.add(Integer.valueOf(rs.getInt(1)));
             }
 
         }
         catch (SQLException e)
         {
             LOG.error("get item bitstreams " + e.getMessage(), e);
-            throw new RuntimeException(
-                    "get item bitstreams. " + e.getMessage(), e);
+            throw new IllegalStateException("get item bitstreams. " + e.getMessage(), e);
 
         }
         finally

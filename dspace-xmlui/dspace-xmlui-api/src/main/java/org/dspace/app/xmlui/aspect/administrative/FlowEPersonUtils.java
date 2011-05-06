@@ -1,43 +1,10 @@
-/*
- * FlowEPersonUtils.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4400 $
- *
- * Date: $Date: 2009-10-07 04:29:12 -0400 (Wed, 07 Oct 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.xmlui.aspect.administrative;
 
 import java.io.IOException;
@@ -51,8 +18,8 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.http.HttpEnvironment;
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
-import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -62,7 +29,7 @@ import org.dspace.eperson.EPersonDeletionException;
 
 /**
  * Utility methods to processes actions on EPeople. These methods are used
- * exclusivly from the administrative flow scripts.
+ * exclusively from the administrative flow scripts.
  * 
  * @author scott phillips
  */
@@ -86,8 +53,8 @@ public class FlowEPersonUtils {
 	
 	/**
 	 * Add a new eperson. This method will check that the email address, 
-	 * first name, and last name are non empty. Also a check is preformed 
-	 * to see if the requested email address is allready in use by another
+	 * first name, and last name are non empty. Also a check is performed 
+	 * to see if the requested email address is already in use by another
 	 * user.
 	 * 
 	 * @param context The current DSpace context
@@ -109,12 +76,18 @@ public class FlowEPersonUtils {
 		boolean certificate = (request.getParameter("certificate") != null) ? true : false;
 		
 		// If we have errors, the form needs to be resubmitted to fix those problems
-	    if (email.length() == 0) 
-			result.addError("email_address"); 
-		if (first.length() == 0) 
-			result.addError("first_name");
-		if (last.length() == 0) 
-			result.addError("last_name");
+	    if (StringUtils.isEmpty(email))
+        {
+            result.addError("email_address");
+        }
+		if (StringUtils.isEmpty(first))
+        {
+            result.addError("first_name");
+        }
+		if (StringUtils.isEmpty(last))
+        {
+            result.addError("last_name");
+        }
 	    
 	    
 		// Check if the email address is all ready being used.	        		
@@ -153,15 +126,17 @@ public class FlowEPersonUtils {
 	/**
 	 * Edit an eperson's metadata, the email address, first name, and last name are all
 	 * required. The user's email address can be updated but it must remain unique, if
-	 * the email address allready exists then the an error is produced.
+	 * the email address already exists then the an error is produced.
 	 * 
 	 * @param context The current DSpace context
 	 * @param request The HTTP request parameters
-	 * @param objectModel Cocoon's object model
+	 * @param ObjectModel Cocoon's object model
 	 * @param epersonID The unique id of the eperson being edited.
 	 * @return A process result's object.
 	 */
-	public static FlowResult processEditEPerson(Context context, Request request, Map ObjectModel, int epersonID) throws SQLException, AuthorizeException 
+	public static FlowResult processEditEPerson(Context context,
+            Request request, Map ObjectModel, int epersonID)
+            throws SQLException, AuthorizeException 
 	{
 
 		FlowResult result = new FlowResult();
@@ -177,12 +152,18 @@ public class FlowEPersonUtils {
 		
 		
 		// If we have errors, the form needs to be resubmitted to fix those problems
-	    if (email.length() == 0) 
-			result.addError("email_address"); 
-		if (first.length() == 0) 
-			result.addError("first_name");
-		if (last.length() == 0) 
-			result.addError("last_name");
+	    if (StringUtils.isEmpty(email))
+        {
+            result.addError("email_address");
+        }
+		if (StringUtils.isEmpty(first))
+        {
+            result.addError("first_name");
+        }
+		if (StringUtils.isEmpty(last))
+        {
+            result.addError("last_name");
+        }
 		
 		
 	    // No errors, so we edit the EPerson with the data provided
@@ -201,7 +182,7 @@ public class FlowEPersonUtils {
         		{
         			personModified.setEmail(email);
         		} 
-        		else if (potentialDupicate != personModified) 
+        		else if (potentialDupicate.equals(personModified)) 
         		{	       
         			// set a special field in error so that the transformer can display a pretty error.
         			result.addError("eperson_email_key");
@@ -262,8 +243,8 @@ public class FlowEPersonUtils {
 	
 	/**
 	 * Log this user in as another user. If the operation failed then the flow result
-	 * will be set to failure with it's mesage set correctly. Note that after logging out
-	 * the user may not have sufficent priveleges to continue.
+	 * will be set to failure with it's message set correctly. Note that after logging out
+	 * the user may not have sufficient privileges to continue.
 	 * 
 	 * @param context The current DSpace context.
 	 * @param objectModel Object model to obtain the HTTP request from.
@@ -287,7 +268,7 @@ public class FlowEPersonUtils {
 		{
 			// give the exception error as a notice.
 			result.setOutcome(false);
-			result.setCharacters(ae.getMessage());
+			result.setMessage(new Message(null,ae.getMessage()));
 		}
 		
 		return result;
@@ -295,7 +276,7 @@ public class FlowEPersonUtils {
 	
 	/**
 	 * Delete the epeople specified by the epeopleIDs parameter. This assumes that the
-	 * detetion has been confirmed.
+	 * deletion has been confirmed.
 	 * 
 	 * @param context The current DSpace context
 	 * @param epeopleIDs The unique id of the eperson being edited.
@@ -330,9 +311,13 @@ public class FlowEPersonUtils {
     		for(String unable : unableList )
     		{
     			if (characters == null)
-    				characters = unable;
+                {
+                    characters = unable;
+                }
     			else
-    				characters += ", "+unable;
+                {
+                    characters += ", " + unable;
+                }
     		}
     		
     		result.setCharacters(characters);

@@ -1,39 +1,9 @@
-/*
- * AuthorizeManager.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4309 $
- *
- * Date: $Date: 2009-09-30 15:20:07 -0400 (Wed, 30 Sep 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.authorize;
 
@@ -41,12 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.dspace.content.Bitstream;
-import org.dspace.content.Bundle;
-import org.dspace.content.Collection;
-import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
@@ -311,8 +276,6 @@ public class AuthorizeManager
     private static boolean authorize(Context c, DSpaceObject o, int action,
             EPerson e, boolean useInheritance) throws SQLException
     {
-        int userid;
-
         // return FALSE if there is no DSpaceObject
         if (o == null)
         {
@@ -326,11 +289,8 @@ public class AuthorizeManager
         }
 
         // is eperson set? if not, userid = 0 (anonymous)
-        if (e == null)
-        {
-            userid = 0;
-        }
-        else
+	int userid = 0;
+        if (e != null)
         {
             userid = e.getID();
 
@@ -388,21 +348,30 @@ public class AuthorizeManager
      *         given DSpace object
      */
     public static boolean isAdmin(Context c, DSpaceObject o) throws SQLException {
-		if (isAdmin(c))
-		{
-			return true;
-		}
-		
-		if (o == null)
-		{
-		    return false;
-		}
+
+	// return true if user is an Administrator
+	if (isAdmin(c))
+	{
+	    return true;
+	}
+
+	if (o == null)
+	{
+	    return false;
+	}
+
+        // is eperson set? if not, userid = 0 (anonymous)
+	int userid = 0;
+	EPerson e = c.getCurrentUser();
+	if(e != null)
+	{
+            userid = e.getID();
+	}
 
         //
         // First, check all Resource Policies directly on this object
         //
-		List<ResourcePolicy> policies = getPoliciesActionFilter(c, o, Constants.ADMIN);
-        int userid = c.getCurrentUser().getID();
+	List<ResourcePolicy> policies = getPoliciesActionFilter(c, o, Constants.ADMIN);
         
         for (ResourcePolicy rp : policies)
         {
@@ -435,7 +404,7 @@ public class AuthorizeManager
         }
 	
 		return false;
-	}
+    }
 
    
     /**
@@ -543,7 +512,7 @@ public class AuthorizeManager
                 "SELECT * FROM resourcepolicy WHERE resource_type_id= ? AND resource_id= ? ",
                 o.getType(),o.getID());
 
-        List<ResourcePolicy> policies = new ArrayList();
+        List<ResourcePolicy> policies = new ArrayList<ResourcePolicy>();
 
         try
         {
@@ -568,7 +537,9 @@ public class AuthorizeManager
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         return policies;
@@ -614,7 +585,9 @@ public class AuthorizeManager
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         return policies;
@@ -665,7 +638,9 @@ public class AuthorizeManager
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         return policies;
@@ -884,7 +859,9 @@ public class AuthorizeManager
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         Group[] groupArray = new Group[groups.size()];

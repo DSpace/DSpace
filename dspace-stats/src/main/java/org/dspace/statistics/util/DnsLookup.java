@@ -1,19 +1,16 @@
 /**
- * $Id: DnsLookup.java 4410 2009-10-07 16:17:40Z benbosman $
- * $URL: http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-stats/src/main/java/org/dspace/statistics/util/DnsLookup.java $
- * *************************************************************************
- * Copyright (c) 2002-2009, DuraSpace.  All rights reserved
- * Licensed under the DuraSpace Foundation License.
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * A copy of the DuraSpace License has been included in this
- * distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
+ * http://www.dspace.org/license/
  */
 package org.dspace.statistics.util;
 
+import org.dspace.core.ConfigurationManager;
 import org.xbill.DNS.*;
 
 import java.io.IOException;
-import java.net.InetAddress;
 
 /**
  * XBill DNS resolver to retrieve hostnames for client IP addresses.
@@ -24,9 +21,11 @@ import java.net.InetAddress;
 public class DnsLookup {
 
     public static String reverseDns(String hostIp) throws IOException {
-         Record opt = null;
          Resolver res = new ExtendedResolver();
-         res.setTimeout(0, 20);
+         
+         // set the timeout, defaults to 200 milliseconds
+         int timeout = ConfigurationManager.getIntProperty("solr.resolver.timeout", 200);
+         res.setTimeout(0, timeout);
 
          Name name = ReverseMap.fromAddress(hostIp);
          int type = Type.PTR;
@@ -37,8 +36,12 @@ public class DnsLookup {
 
          Record[] answers = response.getSectionArray(Section.ANSWER);
          if (answers.length == 0)
-            return hostIp;
+         {
+             return hostIp;
+         }
          else
-            return answers[0].rdataToString();
+         {
+             return answers[0].rdataToString();
+         }
    }
 }

@@ -1,42 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  sitemap.xmap
+  The contents of this file are subject to the license and copyright
+  detailed in the LICENSE and NOTICE files at the root of the source
+  tree and available online at
 
-  Version: $Revision$
- 
-  Date: $Date$
- 
-  Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
-  Institute of Technology.  All rights reserved.
- 
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are
-  met:
- 
-  - Redistributions of source code must retain the above copyright
-  notice, this list of conditions and the following disclaimer.
- 
-  - Redistributions in binary form must reproduce the above copyright
-  notice, this list of conditions and the following disclaimer in the
-  documentation and/or other materials provided with the distribution.
- 
-  - Neither the name of the Hewlett-Packard Company nor the name of the
-  Massachusetts Institute of Technology nor the names of their
-  contributors may be used to endorse or promote products derived from
-  this software without specific prior written permission.
- 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-  HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
-  OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
-  TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
-  USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
-  DAMAGE.
+  http://www.dspace.org/license/
 -->
 <map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
         <map:components>
@@ -56,43 +24,43 @@
                 </map:generators>
                 <map:serializers default="xml">
                         <map:serializer logger="sitemap.serializer.xml" mime-type="text/xml; charset=utf-8" name="xml"
-                                src="org.apache.cocoon.serialization.XMLSerializer">
-                                <indent>yes</indent>
-                                <encoding>UTF-8</encoding>
+                            src="org.apache.cocoon.serialization.XMLSerializer">
+                            <indent>yes</indent>
+                            <encoding>UTF-8</encoding>
                         </map:serializer>
                         <map:serializer name="rss" logger="sitemap.serializer.rss" mime-type="application/rss+xml; charset=utf-8"
-                                src="org.apache.cocoon.serialization.XMLSerializer">
-                                <indent>yes</indent>
-                                <encoding>UTF-8</encoding>
+                            src="org.apache.cocoon.serialization.XMLSerializer">
+                            <indent>yes</indent>
+                            <encoding>UTF-8</encoding>
                         </map:serializer>
                         <map:serializer name="atom" logger="sitemap.serializer.atom" mime-type="application/atom+xml; charset=utf-8"
-                                src="org.apache.cocoon.serialization.XMLSerializer">
-                                <indent>yes</indent>
-                                <encoding>UTF-8</encoding>
+                            src="org.apache.cocoon.serialization.XMLSerializer">
+                            <indent>yes</indent>
+                            <encoding>UTF-8</encoding>
                         </map:serializer>
                         <map:serializer name="opensearch" logger="sitemap.serializer.opensearch" mime-type="application/opensearchdescription+xml; charset=utf-8"
-                                src="org.apache.cocoon.serialization.XMLSerializer">
-                                <indent>yes</indent>
-                                <encoding>UTF-8</encoding>
+                            src="org.apache.cocoon.serialization.XMLSerializer">
+                            <indent>yes</indent>
+                            <encoding>UTF-8</encoding>
                         </map:serializer>
                         <map:serializer name="xhtml" logger="sitemap.serializer.xhtml"
                              src="org.apache.cocoon.serialization.XMLSerializer"
-                                 mime-type="text/html; charset=utf-8"
+                             mime-type="text/html; charset=utf-8"
                              pool-grow="2" pool-max="64" pool-min="2">
-                             <doctype-public>-//W3C//DTD XHTML 1.0 Strict//EN</doctype-public>
-                 <doctype-system>http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd</doctype-system>
-                 <encoding>UTF-8</encoding>
-                 <indent>yes</indent>
+                            <doctype-public>-//W3C//DTD XHTML 1.0 Strict//EN</doctype-public>
+                            <doctype-system>http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd</doctype-system>
+                            <encoding>UTF-8</encoding>
+                            <indent>yes</indent>
                         </map:serializer>
-                    <map:serializer name="html" logger="sitemap.serializer.html"
+                        <map:serializer name="html" logger="sitemap.serializer.html"
                              src="org.apache.cocoon.serialization.HTMLSerializer"
-                         mime-type="text/html; charset=utf-8"
+                             mime-type="text/html; charset=utf-8"
                              pool-grow="2" pool-max="64" pool-min="2">
-                             <doctype-public>-//W3C//DTD XHTML 1.0 Transitional//EN</doctype-public>
-                 <doctype-system>http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd</doctype-system>
-                 <encoding>UTF-8</encoding>
-                 <indent>yes</indent>
-            </map:serializer>
+                            <doctype-public>-//W3C//DTD XHTML 1.0 Transitional//EN</doctype-public>
+                            <doctype-system>http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd</doctype-system>
+                            <encoding>UTF-8</encoding>
+                            <indent>yes</indent>
+                        </map:serializer>
                 </map:serializers>
                 <map:transformers default="xslt">
                         <map:transformer logger="sitemap.transformer.xslt" name="xslt" pool-max="32"
@@ -172,14 +140,31 @@
                                 <browser name="spider" useragent="yacybot"/>
 
                                 <!-- Interactive browsers -->
+                                <browser name="opera" useragent="Opera"/>
+                                <browser name="opera8" useragent="Opera/8."/>
+                                <browser name="opera9" useragent="Opera/9."/>
+                                <!-- Yes, Opera 10, really identifies itself as "9.8" -->
+                                <browser name="opera10" useragent="Opera/9.8"/>
                                 <browser name="explorer" useragent="MSIE"/>
                                 <browser name="explorer6" useragent="MSIE 6"/>
                                 <browser name="explorer7" useragent="MSIE 7"/>
+                                <browser name="explorer8" useragent="MSIE 8"/>
+                                <browser name="explorer9" useragent="MSIE 9"/>
+                                <browser name="chrome" useragent="Chrome"/>
+                                <browser name="chrome4" useragent="Chrome/4."/>
+                                <browser name="chrome5" useragent="Chrome/5."/>
+                                <browser name="chrome6" useragent="Chrome/6."/>
+                                <browser name="safari" useragent="Safari"/>
                                 <browser name="safari2" useragent="(KHTML, like Gecko) Safari"/>
                                 <browser name="safari3" useragent="(KHTML, like Gecko) Version/3"/>
+                                <browser name="safari4" useragent="(KHTML, like Gecko) Version/4"/>
+                                <browser name="safari5" useragent="(KHTML, like Gecko) Version/5"/>
                                 <browser name="firefox" useragent="Firefox"/>
                                 <browser name="firefox1" useragent="Firefox/1."/>
                                 <browser name="firefox2" useragent="Firefox/2."/>
+                                <browser name="firefox3" useragent="Firefox/3."/>
+                                <browser name="firefox4" useragent="Firefox/4."/>
+                                <browser name="konqueror" useragent="Konqueror/"/>
                         </map:selector>
                         <map:selector name="parameter" src="org.apache.cocoon.selection.ParameterSelector"/>
                         <map:selector logger="sitemap.selector.exception" name="exception" src="org.apache.cocoon.selection.ExceptionSelector">
@@ -190,15 +175,17 @@
                         </map:selector>
                 </map:selectors>
                 <map:readers default="resource">
-                        <map:reader name="resource" src="org.apache.cocoon.reading.ResourceReader"
-                                logger="sitemap.reader.resource" pool-max="32">
-                                <expires>3600000</expires> <!-- 1000 * 60 * 60 = 3600000 = One hour -->
-                        </map:reader>
-                        <map:reader name="BitstreamReader" src="org.dspace.app.xmlui.cocoon.BitstreamReader"/>
-                        <map:reader name="ExportReader" src="org.dspace.app.xmlui.cocoon.ItemExportDownloadReader"/>
-                        <map:reader name="MetadataExportReader" src="org.dspace.app.xmlui.cocoon.MetadataExportReader"/>
-            <map:reader name="OpenURLReader" src="org.dspace.app.xmlui.cocoon.OpenURLReader"/>
-            <map:reader name="SitemapReader" src="org.dspace.app.xmlui.cocoon.SitemapReader"/>
+                    <map:reader name="resource" src="org.apache.cocoon.reading.ResourceReader"
+                            logger="sitemap.reader.resource" pool-max="32">
+                            <expires>3600000</expires> <!-- 1000 * 60 * 60 = 3600000 = One hour -->
+                    </map:reader>
+                    <map:reader name="BitstreamReader" src="org.dspace.app.xmlui.cocoon.BitstreamReader"/>
+                    <map:reader name="ExportReader" src="org.dspace.app.xmlui.cocoon.ItemExportDownloadReader"/>
+                    <map:reader name="MetadataExportReader" src="org.dspace.app.xmlui.cocoon.MetadataExportReader"/>
+                    <map:reader name="OpenURLReader" src="org.dspace.app.xmlui.cocoon.OpenURLReader"/>
+                    <map:reader name="SitemapReader" src="org.dspace.app.xmlui.cocoon.SitemapReader"/>
+                    <map:reader name="ConcatenationReader" src="org.dspace.app.xmlui.cocoon.ConcatenationReader"/>
+                    <map:reader name="JQueryLoaderReader" src="org.dspace.app.xmlui.utils.JQueryLoaderReader"/>
                 </map:readers>
                 <map:actions>
                         <map:action name="locale" src="org.dspace.app.xmlui.cocoon.DSpaceLocaleAction"/>
@@ -213,10 +200,10 @@
                         </map:pipe>
                 </map:pipes>
         </map:components>
-        
+
         <map:resources>
-                
-                
+
+
                 <map:resource name="i18n-transformer">
                         <map:act type="locale">
                                 <map:transform type="i18n">
@@ -224,14 +211,14 @@
                                 </map:transform>
                         </map:act>
                 </map:resource>
-                
+
         </map:resources>
 
 
         <!-- =========================== Pipelines ================================= -->
         <map:pipelines>
-                
-                
+
+
                 <!-- Bitstream pipeline -->
                 <map:pipeline type="noncaching">
                         <map:parameter name="outputBufferSize" value="8192"/>
@@ -242,7 +229,7 @@
                                 Bitstreams for items that have a handle assigned. If the
                                 sequence parameter is given then that will be used to resolve the
                                 bitstream, other wise the name will attempt to be matched.
-                                
+
                                 /bitstream/handle/[handlePrefix]/[handlePostfix]/[name]?sequence=[sequence]
 
                                 NOTE: When user-agent was identified as a spider (crawler robot), pass
@@ -285,12 +272,12 @@
                                   </map:otherwise>
                                 </map:select>
                         </map:match>
-                        
+
                         <!--
                                 Bitstreams for items that do not have a handle assigned. If the
                                 sequence parameter is given then that will be used to resolve the
                                 bitstream, other wise the name will attempt to be matched.
-                                
+
                                 /bitstream/item/[itemID]/[name]?sequence=[sequence]
                         -->
                         <map:match pattern="bitstream/item/*/**">
@@ -329,7 +316,7 @@
                                   </map:otherwise>
                                 </map:select>
                         </map:match>
-                        
+
                         <!--
                                 Bitstreams not attached to to items (community / collection logos)
                                 
@@ -350,13 +337,14 @@
                                   </map:otherwise>
                                 </map:select>
                         </map:match>
-                        
-                        
+
+
                         <!--
                                 For URL compatability with the JSPUI, redirect these old url to their new locations.
-                                
+
                                 /bitstream/[handlePrefix]/[handlePostfix]/[sequence]/[name]
                                 /html/[handlePrefix]/[handePostfix]/[name]
+                                /retrieve/[bitstreamID]
                         -->
                         <map:match pattern="bitstream/*/*/*/**">
                                 <map:redirect-to uri="{request:contextPath}/bitstream/handle/{1}/{2}/{4}?sequence={3}" permanent="yes"/>
@@ -364,8 +352,11 @@
                         <map:match pattern="html/*/*/**">
                                 <map:redirect-to uri="{request:contextPath}/bitstream/handle/{1}/{2}/{3}" permanent="yes"/>
                         </map:match>
-      <!--Redirect /handle/[handleprefix]/[handlePostfix]/ to the same path but without a trailing slash-->
-      <map:match pattern="handle/*/*/">
+                        <map:match pattern="retrieve/**">
+                                <map:redirect-to uri="{request:contextPath}/bitstream/id/{1}/" permanent="yes"/>
+                        </map:match>
+                        <!--Redirect /handle/[handleprefix]/[handlePostfix]/ to the same path but without a trailing slash-->
+                        <map:match pattern="handle/*/*/">
                                 <map:redirect-to uri="{request:contextPath}/handle/{1}/{2}" permanent="yes"/>
                         </map:match>
                         <!--
@@ -382,9 +373,13 @@
                                     <map:parameter name="handle" value="{1}/{2}" />
                                 </map:read>
                         </map:match>
-                        
+
+                        <map:match pattern="JSON/discovery/**">
+                            <map:mount check-reload="no" src="aspects/json-solr.xmap" uri-prefix="JSON/discovery/"/>
+                        </map:match>
+
                 </map:pipeline>
-                
+
                 <!-- new AJAX menu (choices) responses for metadata authority control -->
                 <map:pipeline type="noncaching">
                   <map:match pattern="choices/*">
@@ -404,88 +399,90 @@
                          -->
                   </map:match>
                 </map:pipeline>
-                
-                
-                
-                
+
+
+
+
                 <!-- non-bitstream pipeline -->
                 <map:pipeline>
                         <!--<map:parameter name="expires" value="now"/>-->
 
-                <map:match pattern="openURL">
-            <map:read type="OpenURLReader"/>
-        </map:match>
+                    <map:match pattern="openURL">
+                        <map:read type="OpenURLReader"/>
+                    </map:match>
 
-         <!--
-            catch mydspace uri's and immediately redirect
-            to "submissions" this is a fix to catch approval
-            emails "mydspace" linking from Workflow system.
-         -->
-         <map:match pattern="mydspace">
-            <map:redirect-to uri="submissions" permanent="yes" />
-         </map:match>
+                    <!--
+                        catch mydspace uri's and immediately redirect
+                        to "submissions" this is a fix to catch approval
+                        emails "mydspace" linking from Workflow system.
+                    -->
+                    <map:match pattern="mydspace">
+                        <map:redirect-to uri="submissions" permanent="yes" />
+                    </map:match>
 
-                        <!-- Theme pipeline -->
-                        <map:match pattern="DRI/**">
-                                <map:mount check-reload="no" src="aspects/aspects.xmap" uri-prefix="DRI/"/>
-                        </map:match>
-                        
-                        
-                        <map:match pattern="metadata/**">
-                                <map:match pattern="metadata/handle/*/*/mets.xml">
-                                        <map:generate type="DSpaceMETSGenerator">
-                                                <map:parameter name="handle" value="{1}/{2}"/>
-                                                <!--<map:parameter name="extra" value="{3}"/>-->
-                                        </map:generate>
-                                        <map:serialize type="xml"/>
-                                </map:match>
-                                <map:match pattern="metadata/internal/*/*/mets.xml">
-                                        <map:generate type="DSpaceMETSGenerator">
-                                                <map:parameter name="internal" value="{1}:{2}"/>
-                                                <!--<map:parameter name="extra" value="{3}"/>-->
-                                        </map:generate>
-                                        <map:serialize type="xml"/>
-                                </map:match>
-                                
-                                <map:match pattern="metadata/handle/*/*/ore.xml**">
-                                        <map:generate type="DSpaceOREGenerator">
-                                                <map:parameter name="handle" value="{1}/{2}"/>
-                                                <map:parameter name="extra" value="{3}"/>
-                                        </map:generate>
-                                        <map:serialize type="xml"/>
-                                </map:match>
-                                <map:match pattern="metadata/internal/*/*/ore.xml**">
-                                        <map:generate type="DSpaceOREGenerator">
-                                                <map:parameter name="internal" value="{1}:{2}"/>
-                                                <map:parameter name="extra" value="{3}"/>
-                                        </map:generate>
-                                        <map:serialize type="xml"/>
-                                </map:match>
-                        </map:match>
-                        
-                        <!-- Syndication feeds for whole repo or community/collection -->
-                        <map:match pattern="feed/*/**">
-                                <map:generate type="DSpaceFeedGenerator">
-               <map:parameter name="feedFormat" value="{1}"/>
-                                        <map:parameter name="handle" value="{2}"/>
+                    <!-- Theme pipeline -->
+                    <map:match pattern="DRI/**">
+                        <map:mount check-reload="no" src="aspects/aspects.xmap" uri-prefix="DRI/"/>
+                    </map:match>
+
+
+                    <map:match pattern="metadata/**">
+                        <map:match pattern="metadata/handle/*/*/mets.xml">
+                                <map:generate type="DSpaceMETSGenerator">
+                                        <map:parameter name="handle" value="{1}/{2}"/>
+                                        <!--<map:parameter name="extra" value="{3}"/>-->
                                 </map:generate>
-                                <map:act type="locale">
-                                        <map:transform type="i18n">
-                                                <map:parameter name="locale" value="{locale}"/>
-                                        </map:transform>
-                                </map:act>
                                 <map:serialize type="xml"/>
                         </map:match>
-                        
-                        <!-- OpenSearch results for whole repo or community/collection -->
-                        <map:match pattern="open-search/**">
-                          <map:match pattern="open-search/description.xml">
+                        <map:match pattern="metadata/internal/*/*/mets.xml">
+                                <map:generate type="DSpaceMETSGenerator">
+                                        <map:parameter name="internal" value="{1}:{2}"/>
+                                        <!--<map:parameter name="extra" value="{3}"/>-->
+                                </map:generate>
+                                <map:serialize type="xml"/>
+                        </map:match>
+
+                        <map:match pattern="metadata/handle/*/*/ore.xml**">
+                                <map:generate type="DSpaceOREGenerator">
+                                        <map:parameter name="handle" value="{1}/{2}"/>
+                                        <map:parameter name="extra" value="{3}"/>
+                                </map:generate>
+                                <map:serialize type="xml"/>
+                        </map:match>
+                        <map:match pattern="metadata/internal/*/*/ore.xml**">
+                                <map:generate type="DSpaceOREGenerator">
+                                        <map:parameter name="internal" value="{1}:{2}"/>
+                                        <map:parameter name="extra" value="{3}"/>
+                                </map:generate>
+                                <map:serialize type="xml"/>
+                        </map:match>
+                    </map:match>
+
+                    <!-- Syndication feeds for whole repo or community/collection -->
+                    <map:match pattern="feed/*/**">
+                        <map:generate type="DSpaceFeedGenerator">
+                            <map:parameter name="feedFormat" value="{1}"/>
+                            <map:parameter name="handle" value="{2}"/>
+                        </map:generate>
+                        <map:act type="locale">
+                            <map:transform type="i18n">
+                                    <map:parameter name="locale" value="{locale}"/>
+                            </map:transform>
+                        </map:act>
+                        <map:serialize type="xml"/>
+                    </map:match>
+
+                    <!-- OpenSearch results for whole repo or community/collection -->
+                    <map:match pattern="open-search/**">
+
+                        <map:match pattern="open-search/description.xml">
                             <map:generate type="OpenSearchGenerator">
-                              <map:parameter name="type" value="description"/>
+                                <map:parameter name="type" value="description"/>
                             </map:generate>
                             <map:serialize type="opensearch"/>
-                          </map:match>
-                          <map:match pattern="open-search/**">
+                        </map:match>
+
+                        <map:match pattern="open-search/**">
                             <map:generate type="OpenSearchGenerator"/>
                             <map:act type="locale">
                                   <map:transform type="i18n">
@@ -493,90 +490,146 @@
                                   </map:transform>
                             </map:act>
                             <map:select type="request-parameter">
-                              <map:parameter name="parameter-name" value="format"/>
-                              <map:when test="rss">
-                                <map:serialize type="rss"/>
-                              </map:when>
-                              <map:when test="atom">
-                                <map:serialize type="atom"/>
-                              </map:when>
-                              <map:otherwise>
-                                <map:serialize type="html"/>
-                              </map:otherwise>
+                                <map:parameter name="parameter-name" value="format"/>
+                                <map:when test="rss">
+                                    <map:serialize type="rss"/>
+                                </map:when>
+                                <map:when test="atom">
+                                    <map:serialize type="atom"/>
+                                </map:when>
+                                <map:otherwise>
+                                    <map:serialize type="html"/>
+                                </map:otherwise>
                             </map:select>
-                          </map:match>
                         </map:match>
-                        
-      <!-- HTML Sitemaps and Sitemaps.org Sitemaps for whole repo -->
-      <map:match pattern="htmlmap">
-        <map:read type="SitemapReader">
-                                        <map:parameter name="type" value="html"/>
-                                </map:read>
-      </map:match>
-      <map:match pattern="sitemap">
-        <map:read type="SitemapReader">
-                                        <map:parameter name="type" value="sitemaps.org"/>
-                                </map:read>
-      </map:match>
+                    </map:match>
 
-                        <!-- handle common theme resources, such as dri2xhtml -->
-                        <map:match pattern="themes/*">
-                                <map:read src="themes/{1}"/>
-                        </map:match>
-                        
-                        <!-- handle theme specific resources static or dynamic -->
-                        <map:match pattern="themes/*/**">
-               <map:mount check-reload="no" src="themes/{1}/sitemap.xmap" uri-prefix=""/>
-                        </map:match>
+                    <!-- HTML Sitemaps and Sitemaps.org Sitemaps for whole repo -->
+                    <map:match pattern="htmlmap">
+                        <map:read type="SitemapReader">
+                            <map:parameter name="type" value="html"/>
+                        </map:read>
+                    </map:match>
+                    <map:match pattern="sitemap">
+                        <map:read type="SitemapReader">
+                            <map:parameter name="type" value="sitemaps.org"/>
+                        </map:read>
+                    </map:match>
 
-      <!-- Load globally static content (*.txt or *.html) when requested.
-           This is specifically for global HTML files or robots.txt files,
-           either of which can be placed in the 'static/' directory.-->
-      <map:match pattern="*.txt">
-        <map:read src="static/{1}.txt"/>
-      </map:match>
-      <map:match pattern="*.html">
-        <map:read src="static/{1}.html"/>
-      </map:match>
-      <!-- Also, allow reference to globally static content via the /static path.
-           This will allow your globally static HTML docs to load static CSS or images. -->
-                        <map:match pattern="static/*/**">
-         <map:read src="static/{1}/{2}"/>
-                </map:match>
+                    <map:match pattern="loadJQuery.js">
+                        <map:read type="JQueryLoaderReader"/>
+                    </map:match>
+
+                    <!-- handle static js and css -->
+                    <map:match pattern="themes/*.js">
+                            <map:read type="ConcatenationReader" src="{1}.js">
+                                <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                            </map:read>
+                    </map:match>
+                    <map:match pattern="themes/*.css">
+                            <map:read type="ConcatenationReader" src="{1}.css">
+                                <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                            </map:read>
+                    </map:match>
+                    <map:match pattern="themes/*.json">
+                            <map:read type="ConcatenationReader" src="{1}.json">
+                                <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                            </map:read>
+                    </map:match>
+
+                    <!-- handle static js and css -->
+                    <map:match pattern="static/**.js">
+                            <map:read type="ConcatenationReader" src="static/{1}.js">
+                                <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                            </map:read>
+                    </map:match>
+                    <map:match pattern="static/**.css">
+                            <map:read type="ConcatenationReader" src="static/{1}.css">
+                                <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                            </map:read>
+                    </map:match>
+                    <map:match pattern="static/**.json">
+                            <map:read type="ConcatenationReader" src="static/{1}.json">
+                                <map:parameter name="requestQueryString" value="{request:queryString}"/>
+                            </map:read>
+                    </map:match>
+
+
+                    <!-- handle common theme resources, such as dri2xhtml -->
+                    <map:match pattern="themes/*">
+                        <map:read src="themes/{1}"/>
+                    </map:match>
+
+                    <!-- handle theme specific resources static or dynamic -->
+                    <map:match pattern="themes/*/**">
+                        <map:mount check-reload="no" src="themes/{1}/sitemap.xmap" uri-prefix=""/>
+                    </map:match>
+
+                    <!-- Load globally static content (*.txt or *.html) when requested.
+                       This is specifically for global HTML files or robots.txt files,
+                       either of which can be placed in the 'static/' directory.-->
+                    <map:match pattern="*.txt">
+                        <map:read src="static/{1}.txt"/>
+                    </map:match>
+                    <map:match pattern="*.html">
+                        <map:read src="static/{1}.html"/>
+                    </map:match>
+                    <!-- Also, allow reference to globally static content via the /static path.
+                        This will allow your globally static HTML docs to load static CSS or images. -->
+                    <map:match pattern="static/*/**">
+                        <map:read src="static/{1}/{2}"/>
+                    </map:match>
 
                 </map:pipeline>
+
+                
                 <map:pipeline>
                         <!--<map:match pattern="**">-->
                         <map:mount check-reload="no" src="themes/themes.xmap" uri-prefix=""/>
                         <!--</map:match>-->
                 </map:pipeline>
-                
+
                 <map:handle-errors>
                         <map:select type="exception">
-                                
+
                                 <map:when test="not-found">
                                         <map:generate type="exception"/>
                                         <map:transform src="exception2html.xslt">
                                                 <map:parameter name="contextPath" value="{request:contextPath}"/>
                                                 <map:parameter name="pageTitle" value="Resource not found"/>
                                         </map:transform>
+                                        <map:act type="locale">
+                                            <map:transform type="i18n">
+                                                    <map:parameter name="locale" value="{locale}"/>
+                                            </map:transform>
+                                        </map:act>
                                         <map:serialize type="xhtml" status-code="404"/>
                                 </map:when>
-                                
+
                                 <map:when test="invalid-continuation">
                                         <map:generate type="exception"/>
                                         <map:transform src="exception2html.xslt">
                                                 <map:parameter name="contextPath" value="{request:contextPath}"/>
-                                                <map:parameter name="pageTitle" value="Invalid Continuation"/>
+                                                <map:parameter name="pageTitle" value="Your Session has Expired"/>
                                         </map:transform>
+                                        <map:act type="locale">
+                                            <map:transform type="i18n">
+                                                    <map:parameter name="locale" value="{locale}"/>
+                                            </map:transform>
+                                        </map:act>
                                         <map:serialize type="xhtml" status-code="404"/>
                                 </map:when>
-                                
+
                                 <map:otherwise>
                                         <map:generate type="exception"/>
                                         <map:transform src="exception2html.xslt">
                                                 <map:parameter name="contextPath" value="{request:contextPath}"/>
                                         </map:transform>
+                                        <map:act type="locale">
+                                            <map:transform type="i18n">
+                                                    <map:parameter name="locale" value="{locale}"/>
+                                            </map:transform>
+                                        </map:act>
                                         <map:serialize type="xhtml" status-code="500"/>
                                 </map:otherwise>
                         </map:select>

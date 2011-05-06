@@ -1,12 +1,9 @@
 /**
- * $Id: $
- * $URL: $
- * *************************************************************************
- * Copyright (c) 2002-2009, DuraSpace.  All rights reserved
- * Licensed under the DuraSpace Foundation License.
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * A copy of the DuraSpace License has been included in this
- * distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.statistics;
 
@@ -20,9 +17,6 @@ import org.dspace.core.Constants;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Community;
-import org.dspace.content.Collection;
-import org.dspace.content.Item;
 import org.dspace.authorize.AuthorizeManager;
 
 import java.util.Map;
@@ -59,23 +53,25 @@ public class StatisticsAuthorizedMatcher extends AbstractLogEnabled implements M
             Context context = ContextUtil.obtainContext(objectModel);
             DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
-            if (dso == null)
-            	return null;
-
-            boolean authorized = AuthorizeManager.authorizeActionBoolean(context, dso, action, false);
+            //We have always got rights to view stats on the home page (admin rights will be checked later)
+            boolean authorized = dso == null || AuthorizeManager.authorizeActionBoolean(context, dso, action, false);
             //If we are authorized check for any other authorization actions present
             if(authorized && ConfigurationManager.getBooleanProperty("statistics.item.authorization.admin"))
             {
                 //If we have no user, we cannot be admin
                 if(context.getCurrentUser() == null)
+                {
                     authorized = false;
+                }
 
                 if(authorized){
                     //Check for admin
                     authorized = AuthorizeManager.isAdmin(context);
                     if(!authorized)
+                    {
                         //Check if we have authorization for the owning colls, comms, ...
                         authorized = AuthorizeManager.isAdmin(context, dso);
+                    }
                 }
             }
 

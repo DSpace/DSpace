@@ -1,12 +1,9 @@
 /**
- * $Id: Dataset.java 4922 2010-05-13 01:09:48Z peterdietz $
- * $URL: http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-stats/src/main/java/org/dspace/statistics/Dataset.java $
- * *************************************************************************
- * Copyright (c) 2002-2009, DuraSpace.  All rights reserved
- * Licensed under the DuraSpace Foundation License.
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * A copy of the DuraSpace License has been included in this
- * distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
+ * http://www.dspace.org/license/
  */
 package org.dspace.statistics;
 
@@ -20,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.Ostermiller.util.ExcelCSVPrinter;
+import org.apache.commons.lang.ArrayUtils;
 
 /**
  * 
@@ -58,10 +56,12 @@ public class Dataset {
     }
 
     public Dataset(float[][] matrix){
-        this.matrix = matrix;
+        this.matrix = (float[][]) ArrayUtils.clone(matrix);
         nbRows = matrix.length;
         if(0 < matrix.length && 0 < matrix[0].length)
+        {
             nbCols = matrix[0].length;
+        }
         initColumnLabels(nbCols);
         initRowLabels(nbRows);
     }
@@ -147,7 +147,7 @@ public class Dataset {
     }
 
     public float[][] getMatrix() {
-        return matrix;
+        return (float[][]) ArrayUtils.clone(matrix);
     }
 
     public int getNbRows() {
@@ -200,7 +200,9 @@ public class Dataset {
             for (float[] vector : matrix) {
                 for (float v : vector) {
                     if (v != 0)
+                    {
                         return true;
+                    }
                 }
             }
         }

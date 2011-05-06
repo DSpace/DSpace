@@ -1,41 +1,9 @@
-/*
- * ContextUtil.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4500 $
- *
- * Date: $Date: 2009-11-02 21:15:38 -0500 (Mon, 02 Nov 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.utils;
 
@@ -48,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.log4j.Logger;
 import org.dspace.authenticate.AuthenticationManager;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
 /**
@@ -60,12 +29,16 @@ import org.dspace.core.Context;
  */
 public class ContextUtil
 {
+    /** Whether to look for x-forwarded headers for logging IP addresses */
+    private static Boolean useProxies;
 
+    /** The log4j logger */
     private static final Logger log = Logger.getLogger(ContextUtil.class);
     
     /** Where the context is stored on an HTTP Request object */
-    public final static String DSPACE_CONTEXT = "dspace.context";
+    public static final String DSPACE_CONTEXT = "dspace.context";
 
+    
     /**
      * Obtain a new context object. If a context object has already been created
      * for this HTTP request, it is re-used, otherwise it is created.
@@ -114,7 +87,22 @@ public class ContextUtil
             }
 
             // Set the session ID and IP address
-            context.setExtraLogInfo("session_id=" + request.getSession().getId() + ":ip_addr=" + request.getRemoteAddr());
+            String ip = request.getRemoteAddr();
+            if (useProxies == null) {
+                useProxies = ConfigurationManager.getBooleanProperty("useProxies", false);
+            }
+            if(useProxies && request.getHeader("X-Forwarded-For") != null)
+            {
+                /* This header is a comma delimited list */
+	            for(String xfip : request.getHeader("X-Forwarded-For").split(","))
+                {
+                    if(!request.getHeader("X-Forwarded-For").contains(ip))
+                    {
+                        ip = xfip.trim();
+                    }
+                }
+	        }
+            context.setExtraLogInfo("session_id=" + request.getSession().getId() + ":ip_addr=" + ip);
 
             // Store the context in the request
             request.setAttribute(DSPACE_CONTEXT, context);

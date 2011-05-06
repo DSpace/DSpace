@@ -1,42 +1,11 @@
-package org.dspace.app.mediafilter;
-
-/*
- * $HeadURL: $
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: $
- *
- * Date: $Date: $
- *
-  * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
+package org.dspace.app.mediafilter;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
@@ -116,7 +85,9 @@ public class XPDF2Text extends MediaFilter
         {
             pdftotextPath = ConfigurationManager.getProperty("xpdf.path.pdftotext");
             if (pdftotextPath == null)
+            {
                 throw new IllegalStateException("No value for key \"xpdf.path.pdftotext\" in DSpace configuration!  Should be path to XPDF pdftotext executable.");
+            }
         }
 
         File sourceTmp = File.createTempFile("DSfilt",".pdf");
@@ -147,11 +118,17 @@ public class XPDF2Text extends MediaFilter
             status = pdfProc.waitFor();
             String msg = null;
             if (status == 1)
-                msg = "pdftotext failed opening input: file="+sourceTmp.toString();
+            {
+                msg = "pdftotext failed opening input: file=" + sourceTmp.toString();
+            }
             else if (status == 3)
-                msg = "pdftotext permission failure (perhaps copying of text from this document is not allowed - check PDF file's internal permissions): file="+sourceTmp.toString();
+            {
+                msg = "pdftotext permission failure (perhaps copying of text from this document is not allowed - check PDF file's internal permissions): file=" + sourceTmp.toString();
+            }
             else if (status != 0)
-                msg = "pdftotext failed, maybe corrupt PDF? status="+String.valueOf(status);
+            {
+                msg = "pdftotext failed, maybe corrupt PDF? status=" + String.valueOf(status);
+            }
 
             if (msg != null)
             {
@@ -168,9 +145,14 @@ public class XPDF2Text extends MediaFilter
         }
         finally
         {
-            sourceTmp.delete();
+            if (!sourceTmp.delete())
+            {
+                log.error("Unable to delete temporary file");
+            }
             if (status != 0)
-                log.error("PDF conversion proc failed, returns="+status+", file="+sourceTmp);
+            {
+                log.error("PDF conversion proc failed, returns=" + status + ", file=" + sourceTmp);
+            }
         }
     }
 }

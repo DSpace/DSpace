@@ -1,39 +1,9 @@
-/*
- * AuthorizeUtil.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3980 $
- *
- * Date: $Date: 2009-06-26 19:07:25 +0200 (ven, 26 giu 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.util;
 
@@ -53,7 +23,7 @@ import org.dspace.core.Context;
 
 /**
  * This class is an addition to the AuthorizeManager that perform authorization
- * check on not crud (ADD, WRITE, etc.) actions.
+ * check on not CRUD (ADD, WRITE, etc.) actions.
  * 
  * @author bollini
  * 
@@ -307,7 +277,7 @@ public class AuthorizeUtil
                     : null;
             AuthorizeManager.authorizeAction(context, parent, Constants.ADMIN);
         }
-        else if (!AuthorizeManager.isAdmin(context))
+        else if (!isAuthorized && !AuthorizeManager.isAdmin(context)) 
         {
             throw new AuthorizeException(
                     "You are not authorized to create a template item for the collection");
@@ -522,7 +492,7 @@ public class AuthorizeUtil
     /**
      * Can the current user remove or edit the supplied policy?
      * 
-     * @param context
+     * @param c
      *            the DSpace Context Object
      * @param rp
      *            a resource policy
@@ -607,7 +577,7 @@ public class AuthorizeUtil
     }
 
     /**
-    * Can the current user reistate the item?
+    * Can the current user reinstate the item?
     * 
     * @param context
     *            the DSpace Context Object
@@ -617,7 +587,7 @@ public class AuthorizeUtil
     *             if a db error occur
     * @throws AuthorizeException
     *             if the current user is not allowed to perform the item
-    *             reistate
+    *             reinstatement
     */
     public static void authorizeReinstateItem(Context context, Item item)
             throws SQLException, AuthorizeException

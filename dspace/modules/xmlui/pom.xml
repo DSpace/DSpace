@@ -13,29 +13,13 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>1.6.2</version>
+      <version>1.7.1</version>
    </parent>
 
-   <repositories>
-      <repository>
-         <id>maven.dspace.org-snapshot</id>
-         <name>DSpace Maven Snapshot Repository</name>
-         <url>http://maven.dspace.org/snapshot</url>
-         <releases>
-            <enabled>false</enabled>
-            <checksumPolicy>fail</checksumPolicy>
-         </releases>
-         <snapshots>
-            <enabled>true</enabled>
-            <checksumPolicy>fail</checksumPolicy>
-         </snapshots>
-      </repository>
-   </repositories>
-
    <scm>
-      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace/modules/xmlui</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace/modules/xmlui</url>
+      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.1</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.1</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.1</url>
    </scm>
 
    <build>
@@ -134,7 +118,7 @@
          <dependencies>
             <dependency>
                <groupId>com.oracle</groupId>
-               <artifactId>ojdbc14</artifactId>
+               <artifactId>ojdbc6</artifactId>
             </dependency>
          </dependencies>
       </profile>
@@ -155,6 +139,20 @@
          <artifactId>dspace-xmlui-webapp</artifactId>
          <type>war</type>
       </dependency>
+
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-discovery-xmlui-api</artifactId>
+         <version>1.7.1</version>
+      </dependency>
+
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-discovery-xmlui-webapp</artifactId>
+         <version>1.7.1</version>
+         <type>war</type>
+      </dependency>
+
 
       <!-- DSpace XMLUI API -->
       <dependency>

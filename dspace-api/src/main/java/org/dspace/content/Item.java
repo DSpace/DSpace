@@ -1,54 +1,24 @@
-/*
- * Item.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4644 $
- *
- * Date: $Date: 2009-12-22 16:10:30 -0500 (Tue, 22 Dec 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.content;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.authorize.AuthorizeConfiguration;
@@ -57,7 +27,6 @@ import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.IndexBrowse;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -84,17 +53,17 @@ import org.dspace.storage.rdbms.TableRowIterator;
  *
  * @author Robert Tansley
  * @author Martin Hald
- * @version $Revision: 4644 $
+ * @version $Revision: 6107 $
  */
 public class Item extends DSpaceObject
 {
     /**
      * Wild card for Dublin Core metadata qualifiers/languages
      */
-    public final static String ANY = "*";
+    public static final String ANY = "*";
 
     /** log4j category */
-    private static Logger log = Logger.getLogger(Item.class);
+    private static final Logger log = Logger.getLogger(Item.class);
 
     /** Our context */
     private Context ourContext;
@@ -108,8 +77,8 @@ public class Item extends DSpaceObject
     /** The bundles in this item - kept in sync with DB */
     private List<Bundle> bundles;
 
-    /** The Dublin Core metadata - a list of DCValue objects. */
-    private List<DCValue> dublinCore;
+    /** The Dublin Core metadata - inner class for lazy loading */
+    MetadataCache dublinCore = new MetadataCache();
 
     /** Handle, if any */
     private String handle;
@@ -141,54 +110,7 @@ public class Item extends DSpaceObject
         itemRow = row;
         dublinCoreChanged = false;
         modified = false;
-        dublinCore = new ArrayList<DCValue>();
         clearDetails();
- 
-        // Get Dublin Core metadata
-        TableRowIterator tri = retrieveMetadata();
-
-        try
-        {
-            while (tri.hasNext())
-            {
-                TableRow resultRow = tri.next();
-
-                // Get the associated metadata field and schema information
-                int fieldID = resultRow.getIntColumn("metadata_field_id");
-                MetadataField field = MetadataField.find(context, fieldID);
-
-                if (field == null)
-                {
-                    log.error("Loading item - cannot found metadata field "
-                            + fieldID);
-                }
-                else
-                {
-                    MetadataSchema schema = MetadataSchema.find(
-                            context, field.getSchemaID());
-
-                    // Make a DCValue object
-                    DCValue dcv = new DCValue();
-                        dcv.element = field.getElement();
-                        dcv.qualifier = field.getQualifier();
-                    dcv.value = resultRow.getStringColumn("text_value");
-                    dcv.language = resultRow.getStringColumn("text_lang");
-                        //dcv.namespace = schema.getNamespace();
-                        dcv.schema = schema.getName();
-                    dcv.authority = resultRow.getStringColumn("authority");
-                    dcv.confidence = resultRow.getIntColumn("confidence");
-
-                    // Add it to the list
-                    dublinCore.add(dcv);
-                }
-            }
-        }
-        finally
-        {
-            // close the TableRowIterator to free up resources
-            if (tri != null)
-                tri.close();
-        }
 
         // Get our Handle if any
         handle = HandleManager.findHandle(context, this);
@@ -532,7 +454,7 @@ public class Item extends DSpaceObject
     {
         // Build up list of matching values
         List<DCValue> values = new ArrayList<DCValue>();
-        for (DCValue dcv : dublinCore)
+        for (DCValue dcv : getMetadata())
         {
             if (match(schema, element, qualifier, lang, dcv))
             {
@@ -572,7 +494,7 @@ public class Item extends DSpaceObject
         int i = 0;
         while(dcf.hasMoreTokens())
         {
-            tokens[i] = dcf.nextToken().toLowerCase().trim();
+            tokens[i] = dcf.nextToken().trim();
             i++;
         }
         String schema = tokens[0];
@@ -604,7 +526,7 @@ public class Item extends DSpaceObject
      * @param element
      *            the Dublin Core element
      * @param qualifier
-     *            the Dublin Core qualifer, or <code>null</code> for
+     *            the Dublin Core qualifier, or <code>null</code> for
      *            unqualified
      * @param lang
      *            the ISO639 language code, optionally followed by an underscore
@@ -627,7 +549,7 @@ public class Item extends DSpaceObject
      * @param element
      *            the Dublin Core element
      * @param qualifier
-     *            the Dublin Core qualifer, or <code>null</code> for
+     *            the Dublin Core qualifier, or <code>null</code> for
      *            unqualified
      * @param lang
      *            the ISO639 language code, optionally followed by an underscore
@@ -657,7 +579,7 @@ public class Item extends DSpaceObject
      * @param element
      *            the metadata element name
      * @param qualifier
-     *            the metadata qualifer name, or <code>null</code> for
+     *            the metadata qualifier name, or <code>null</code> for
      *            unqualified
      * @param lang
      *            the ISO639 language code, optionally followed by an underscore
@@ -684,7 +606,9 @@ public class Item extends DSpaceObject
             addMetadata(schema, element, qualifier, lang, values, authorities, confidences);
         }
         else
+        {
             addMetadata(schema, element, qualifier, lang, values, null, null);
+        }
     }
 
     /**
@@ -697,7 +621,7 @@ public class Item extends DSpaceObject
      * @param element
      *            the metadata element name
      * @param qualifier
-     *            the metadata qualifer name, or <code>null</code> for
+     *            the metadata qualifier name, or <code>null</code> for
      *            unqualified
      * @param lang
      *            the ISO639 language code, optionally followed by an underscore
@@ -705,16 +629,16 @@ public class Item extends DSpaceObject
      *            value has no language (for example, a date).
      * @param values
      *            the values to add.
-     * @param authority
+     * @param authorities
      *            the external authority key for this value (or null)
-     * @param confidence
+     * @param confidences
      *            the authority confidence (default 0)
      */
     public void addMetadata(String schema, String element, String qualifier, String lang,
             String[] values, String authorities[], int confidences[])
     {
-        MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();
-        ChoiceAuthorityManager cam = ChoiceAuthorityManager.getManager();
+        List<DCValue> dublinCore = getMetadata();
+        MetadataAuthorityManager mam = MetadataAuthorityManager.getManager();        
         boolean authorityControlled = mam.isAuthorityControlled(schema, element, qualifier);
         boolean authorityRequired = mam.isAuthorityRequired(schema, element, qualifier);
         String fieldName = schema+"."+element+((qualifier==null)? "": "."+qualifier);
@@ -727,7 +651,7 @@ public class Item extends DSpaceObject
             dcv.schema = schema;
             dcv.element = element;
             dcv.qualifier = qualifier;
-            dcv.language = lang;
+            dcv.language = (lang == null ? null : lang.trim());
 
             // Logic to set Authority and Confidence:
             //  - normalize an empty string for authority to NULL.
@@ -750,7 +674,9 @@ public class Item extends DSpaceObject
                 // authority sanity check: if authority is required, was it supplied?
                 // XXX FIXME? can't throw a "real" exception here without changing all the callers to expect it, so use a runtime exception
                 if (authorityRequired && (dcv.authority == null || dcv.authority.length() == 0))
-                    throw new IllegalArgumentException("The metadata field \""+fieldName+"\" requires an authority key but none was provided. Vaue=\""+dcv.value+"\"");
+                {
+                    throw new IllegalArgumentException("The metadata field \"" + fieldName + "\" requires an authority key but none was provided. Vaue=\"" + dcv.value + "\"");
+                }
             }
             if (values[i] != null)
             {
@@ -793,7 +719,7 @@ public class Item extends DSpaceObject
      * @param element
      *            the metadata element name
      * @param qualifier
-     *            the metadata qualifer, or <code>null</code> for
+     *            the metadata qualifier, or <code>null</code> for
      *            unqualified
      * @param lang
      *            the ISO639 language code, optionally followed by an underscore
@@ -821,7 +747,7 @@ public class Item extends DSpaceObject
      * @param element
      *            the metadata element name
      * @param qualifier
-     *            the metadata qualifer, or <code>null</code> for
+     *            the metadata qualifier, or <code>null</code> for
      *            unqualified
      * @param lang
      *            the ISO639 language code, optionally followed by an underscore
@@ -903,7 +829,7 @@ public class Item extends DSpaceObject
     {
         // We will build a list of values NOT matching the values to clear
         List<DCValue> values = new ArrayList<DCValue>();
-        for (DCValue dcv : dublinCore)
+        for (DCValue dcv : getMetadata())
         {
             if (!match(schema, element, qualifier, lang, dcv))
             {
@@ -912,7 +838,7 @@ public class Item extends DSpaceObject
         }
 
         // Now swap the old list of values for the new, unremoved values
-        dublinCore = values;
+        setMetadata(values);
         dublinCoreChanged = true;
     }
 
@@ -921,7 +847,7 @@ public class Item extends DSpaceObject
      * method will return <code>true</code> if the given schema,
      * element, qualifier and language match the schema, element,
      * qualifier and language of the <code>DCValue</code> object passed
-     * in.  Any or all of the elemenent, qualifier and language passed
+     * in.  Any or all of the element, qualifier and language passed
      * in can be the <code>Item.ANY</code> wildcard.
      *
      * @param schema
@@ -982,7 +908,8 @@ public class Item extends DSpaceObject
                 return false;
             }
         }
-        else if (!schema.equals(Item.ANY))
+
+        if (!schema.equals(Item.ANY))
         {
             if (dcv.schema != null && !dcv.schema.equals(schema))
             {
@@ -1035,6 +962,22 @@ public class Item extends DSpaceObject
     }
 
     /**
+     * See whether this Item is contained by a given Collection.
+     * @param collection
+     * @return true if {@code collection} contains this Item.
+     * @throws SQLException
+     */
+    public boolean isIn(Collection collection) throws SQLException
+    {
+        TableRow tr = DatabaseManager.querySingle(ourContext,
+                "SELECT COUNT(*) AS count" +
+                " FROM collection2item" +
+                " WHERE collection_id = ? AND item_id = ?",
+                collection.getID(), itemRow.getIntColumn("item_id"));
+        return tr.getLongColumn("count") > 0;
+    }
+
+    /**
      * Get the collections this item is in. The order is indeterminate.
      *
      * @return the collections this item is in, if any.
@@ -1075,7 +1018,9 @@ public class Item extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         Collection[] collectionArray = new Collection[collections.size()];
@@ -1122,18 +1067,16 @@ public class Item extends DSpaceObject
 
                 // now add any parent communities
                 Community[] parents = owner.getAllParents();
-
-                for (int i = 0; i < parents.length; i++)
-                {
-                    communities.add(parents[i]);
-                }
+                communities.addAll(Arrays.asList(parents));
             }
         }
         finally
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         Community[] communityArray = new Community[communities.size()];
@@ -1183,7 +1126,9 @@ public class Item extends DSpaceObject
             {
                 // close the TableRowIterator to free up resources
                 if (tri != null)
+                {
                     tri.close();
+                }
             }
         }
         
@@ -1285,10 +1230,10 @@ public class Item extends DSpaceObject
         bundles.add(b);
 
         // Insert the mapping
-        TableRow mappingRow = DatabaseManager.create(ourContext, "item2bundle");
+        TableRow mappingRow = DatabaseManager.row("item2bundle");
         mappingRow.setColumn("item_id", getID());
         mappingRow.setColumn("bundle_id", b.getID());
-        DatabaseManager.update(ourContext, mappingRow);
+        DatabaseManager.insert(ourContext, mappingRow);
 
         ourContext.addEvent(new Event(Event.ADD, Constants.ITEM, getID(), Constants.BUNDLE, b.getID(), b.getName()));
     }
@@ -1362,7 +1307,9 @@ public class Item extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
     }
 
@@ -1437,10 +1384,7 @@ public class Item extends DSpaceObject
             }
         }
 
-        Bitstream[] bsArray = new Bitstream[bitstreamList.size()];
-        bsArray = (Bitstream[]) bitstreamList.toArray(bsArray);
-
-        return bsArray;
+        return bitstreamList.toArray(new Bitstream[bitstreamList.size()]);
     }
 
     /**
@@ -1546,11 +1490,6 @@ public class Item extends DSpaceObject
         log.info(LogManager.getHeader(ourContext, "update_item", "item_id="
                 + getID()));
 
-        // Set the last modified date
-	if (bLastModified) {
-        itemRow.setColumn("last_modified", new Date());
-	}
-
         // Set sequence IDs for bitstreams in item
         int sequence = 0;
         Bundle[] bunds = getBundles();
@@ -1583,19 +1522,9 @@ public class Item extends DSpaceObject
                     streams[k].setSequenceID(sequence);
                     sequence++;
                     streams[k].update();
+                    modified = true;
                 }
             }
-        }
-
-        // Make sure that withdrawn and in_archive are non-null
-        if (itemRow.isColumnNull("in_archive"))
-        {
-            itemRow.setColumn("in_archive", false);
-        }
-
-        if (itemRow.isColumnNull("withdrawn"))
-        {
-            itemRow.setColumn("withdrawn", false);
         }
 
         // Map counting number of values for each element/qualifier.
@@ -1604,20 +1533,20 @@ public class Item extends DSpaceObject
         // element/qualifier
         Map<String,Integer> elementCount = new HashMap<String,Integer>();
 
-        DatabaseManager.update(ourContext, itemRow);
-
         // Redo Dublin Core if it's changed
         if (dublinCoreChanged)
         {
+            dublinCoreChanged = false;
+
             // Arrays to store the working information required
-            int[]     placeNum = new int[dublinCore.size()];
-            boolean[] storedDC = new boolean[dublinCore.size()];
-            MetadataField[] dcFields = new MetadataField[dublinCore.size()];
+            int[]     placeNum = new int[getMetadata().size()];
+            boolean[] storedDC = new boolean[getMetadata().size()];
+            MetadataField[] dcFields = new MetadataField[getMetadata().size()];
 
             // Work out the place numbers for the in memory DC
-            for (int dcIdx = 0; dcIdx < dublinCore.size(); dcIdx++)
+            for (int dcIdx = 0; dcIdx < getMetadata().size(); dcIdx++)
             {
-                DCValue dcv = dublinCore.get(dcIdx);
+                DCValue dcv = getMetadata().get(dcIdx);
 
                 // Work out the place number for ordering
                 int current = 0;
@@ -1643,7 +1572,7 @@ public class Item extends DSpaceObject
                     // Bad DC field, log and throw exception
                     log.warn(LogManager
                             .getHeader(ourContext, "bad_dc",
-                                    "Bad DC field. schema="+String.valueOf(dcv.schema)
+                                    "Bad DC field. schema="+dcv.schema
                                             + ", element: \""
                                             + ((dcv.element == null) ? "null"
                                                     : dcv.element)
@@ -1675,32 +1604,42 @@ public class Item extends DSpaceObject
                         boolean removeRow = true;
 
                         // Go through the in-memory metadata, unless we've already decided to keep this row
-                        for (int dcIdx = 0; dcIdx < dublinCore.size() && removeRow; dcIdx++)
+                        for (int dcIdx = 0; dcIdx < getMetadata().size() && removeRow; dcIdx++)
                         {
                             // Only process if this metadata has not already been matched to something in the DB
                             if (!storedDC[dcIdx])
                             {
                                 boolean matched = true;
-                                DCValue dcv   = dublinCore.get(dcIdx);
+                                DCValue dcv   = getMetadata().get(dcIdx);
 
                                 // Check the metadata field is the same
                                 if (matched && dcFields[dcIdx].getFieldID() != tr.getIntColumn("metadata_field_id"))
+                                {
                                     matched = false;
+                                }
 
                                 // Check the place is the same
                                 if (matched && placeNum[dcIdx] != tr.getIntColumn("place"))
+                                {
                                     matched = false;
+                                }
 
                                 // Check the text is the same
                                 if (matched)
                                 {
                                     String text = tr.getStringColumn("text_value");
                                     if (dcv.value == null && text == null)
+                                    {
                                         matched = true;
+                                    }
                                     else if (dcv.value != null && dcv.value.equals(text))
+                                    {
                                         matched = true;
+                                    }
                                     else
+                                    {
                                         matched = false;
+                                    }
                                 }
 
                                 // Check the language is the same
@@ -1708,11 +1647,17 @@ public class Item extends DSpaceObject
                                 {
                                     String lang = tr.getStringColumn("text_lang");
                                     if (dcv.language == null && lang == null)
+                                    {
                                         matched = true;
+                                    }
                                     else if (dcv.language != null && dcv.language.equals(lang))
+                                    {
                                         matched = true;
+                                    }
                                     else
+                                    {
                                         matched = false;
+                                    }
                                 }
 
                                 // check that authority and confidence match
@@ -1723,7 +1668,9 @@ public class Item extends DSpaceObject
                                     if (!((dcv.authority == null && auth == null) ||
                                       (dcv.authority != null && auth != null && dcv.authority.equals(auth))
                                      && dcv.confidence == conf))
+                                    {
                                         matched = false;
+                                    }
                                 }
 
                                 // If the db record is identical to the in memory values
@@ -1743,6 +1690,8 @@ public class Item extends DSpaceObject
                         if (removeRow)
                         {
                             DatabaseManager.delete(ourContext, tr);
+                            dublinCoreChanged = true;
+                            modified = true;
                         }
                     }
                 }
@@ -1753,12 +1702,12 @@ public class Item extends DSpaceObject
             }
 
             // Add missing in-memory DC
-            for (int dcIdx = 0; dcIdx < dublinCore.size(); dcIdx++)
+            for (int dcIdx = 0; dcIdx < getMetadata().size(); dcIdx++)
             {
                 // Only write values that are not already in the db
                 if (!storedDC[dcIdx])
                 {
-                    DCValue dcv = dublinCore.get(dcIdx);
+                    DCValue dcv = getMetadata().get(dcIdx);
 
                     // Write DCValue
                     MetadataValue metadata = new MetadataValue();
@@ -1770,25 +1719,65 @@ public class Item extends DSpaceObject
                     metadata.setAuthority(dcv.authority);
                     metadata.setConfidence(dcv.confidence);
                     metadata.create(ourContext);
+                    dublinCoreChanged = true;
+                    modified = true;
                 }
             }
-
-            ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.ITEM, getID(), getDetails()));
-            dublinCoreChanged = false;
-            clearDetails();
         }
 
-        if (modified)
+        if (dublinCoreChanged || modified)
         {
+            // Set the last modified date
+            itemRow.setColumn("last_modified", new Date());
+
+            // Make sure that withdrawn and in_archive are non-null
+            if (itemRow.isColumnNull("in_archive"))
+            {
+                itemRow.setColumn("in_archive", false);
+            }
+
+            if (itemRow.isColumnNull("withdrawn"))
+            {
+                itemRow.setColumn("withdrawn", false);
+            }
+
+            DatabaseManager.update(ourContext, itemRow);
+
+            if (dublinCoreChanged)
+            {
+                ourContext.addEvent(new Event(Event.MODIFY_METADATA, Constants.ITEM, getID(), getDetails()));
+                clearDetails();
+                dublinCoreChanged = false;
+            }
+
             ourContext.addEvent(new Event(Event.MODIFY, Constants.ITEM, getID(), null));
             modified = false;
         }
     }
 
+    private transient MetadataField[] allMetadataFields = null;
     private MetadataField getMetadataField(DCValue dcv) throws SQLException, AuthorizeException
     {
-        return MetadataField.findByElement(ourContext,
-                        getMetadataSchemaID(dcv), dcv.element, dcv.qualifier);
+        if (allMetadataFields == null)
+        {
+            allMetadataFields = MetadataField.findAll(ourContext);
+        }
+
+        if (allMetadataFields != null)
+        {
+            int schemaID = getMetadataSchemaID(dcv);
+            for (MetadataField field : allMetadataFields)
+            {
+                if (field.getSchemaID() == schemaID &&
+                        StringUtils.equals(field.getElement(), dcv.element) &&
+                        StringUtils.equals(field.getQualifier(), dcv.qualifier))
+                {
+                    return field;
+                }
+            }
+        }
+
+        return null;
     }
 
     private int getMetadataSchemaID(DCValue dcv) throws SQLException
@@ -1816,20 +1805,28 @@ public class Item extends DSpaceObject
      */
     public void withdraw() throws SQLException, AuthorizeException, IOException
     {
-        String timestamp = DCDate.getCurrent().toString();
-
         // Check permission. User either has to have REMOVE on owning collection
         // or be COLLECTION_EDITOR of owning collection
         AuthorizeUtil.authorizeWithdrawItem(ourContext, this);
-        
+
+        String timestamp = DCDate.getCurrent().toString();
+
+        // Add suitable provenance - includes user, date, collections +
+        // bitstream checksums
+        EPerson e = ourContext.getCurrentUser();
+
         // Build some provenance data while we're at it.
-        String collectionProv = "";
+        StringBuilder prov = new StringBuilder();
+
+        prov.append("Item withdrawn by ").append(e.getFullName()).append(" (")
+                .append(e.getEmail()).append(") on ").append(timestamp).append("\n")
+                .append("Item was in collections:\n");
+
         Collection[] colls = getCollections();
 
         for (int i = 0; i < colls.length; i++)
         {
-            collectionProv = collectionProv + colls[i].getMetadata("name")
-                    + " (ID: " + colls[i].getID() + ")\n";
+            prov.append(colls[i].getMetadata("name")).append(" (ID: ").append(colls[i].getID()).append(")\n");
         }
 
         // Set withdrawn flag. timestamp will be set; last_modified in update()
@@ -1838,15 +1835,9 @@ public class Item extends DSpaceObject
         // in_archive flag is now false
         itemRow.setColumn("in_archive", false);
 
-        // Add suitable provenance - includes user, date, collections +
-        // bitstream checksums
-        EPerson e = ourContext.getCurrentUser();
-        String prov = "Item withdrawn by " + e.getFullName() + " ("
-                + e.getEmail() + ") on " + timestamp + "\n"
-                + "Item was in collections:\n" + collectionProv
-                + InstallItem.getBitstreamProvenanceMessage(this);
+        prov.append(InstallItem.getBitstreamProvenanceMessage(this));
 
-        addDC("description", "provenance", "en", prov);
+        addDC("description", "provenance", "en", prov.toString());
 
         // Update item in DB
         update();
@@ -1872,20 +1863,26 @@ public class Item extends DSpaceObject
     public void reinstate() throws SQLException, AuthorizeException,
             IOException
     {
+        // check authorization
+        AuthorizeUtil.authorizeReinstateItem(ourContext, this);
+
         String timestamp = DCDate.getCurrent().toString();
 
         // Check permission. User must have ADD on all collections.
         // Build some provenance data while we're at it.
-        String collectionProv = "";
         Collection[] colls = getCollections();
 
-        // check authorization
-        AuthorizeUtil.authorizeReinstateItem(ourContext, this);
-        
+        // Add suitable provenance - includes user, date, collections +
+        // bitstream checksums
+        EPerson e = ourContext.getCurrentUser();
+        StringBuilder prov = new StringBuilder();
+        prov.append("Item reinstated by ").append(e.getFullName()).append(" (")
+                .append(e.getEmail()).append(") on ").append(timestamp).append("\n")
+                .append("Item was in collections:\n");
+
         for (int i = 0; i < colls.length; i++)
         {
-            collectionProv = collectionProv + colls[i].getMetadata("name")
-                    + " (ID: " + colls[i].getID() + ")\n";
+            prov.append(colls[i].getMetadata("name")).append(" (ID: ").append(colls[i].getID()).append(")\n");
         }
         
         // Clear withdrawn flag
@@ -1896,13 +1893,9 @@ public class Item extends DSpaceObject
 
         // Add suitable provenance - includes user, date, collections +
         // bitstream checksums
-        EPerson e = ourContext.getCurrentUser();
-        String prov = "Item reinstated by " + e.getFullName() + " ("
-                + e.getEmail() + ") on " + timestamp + "\n"
-                + "Item was in collections:\n" + collectionProv
-                + InstallItem.getBitstreamProvenanceMessage(this);
+        prov.append(InstallItem.getBitstreamProvenanceMessage(this));
 
-        addDC("description", "provenance", "en", prov);
+        addDC("description", "provenance", "en", prov.toString());
 
         // Update item in DB
         update();
@@ -1935,6 +1928,11 @@ public class Item extends DSpaceObject
      */
     void delete() throws SQLException, AuthorizeException, IOException
     {
+        // Check authorisation here. If we don't, it may happen that we remove the
+        // metadata but when getting to the point of removing the bundles we get an exception
+        // leaving the database in an inconsistent state
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.REMOVE);
+
         ourContext.addEvent(new Event(Event.DELETE, Constants.ITEM, getID(), getHandle()));
 
         log.info(LogManager.getHeader(ourContext, "delete_item", "item_id="
@@ -1959,14 +1957,14 @@ public class Item extends DSpaceObject
 //               FIXME: there is an exception handling problem here
         try
         {
-//               Remove from indicies
+//               Remove from indices
             IndexBrowse ib = new IndexBrowse(ourContext);
             ib.itemRemoved(this);
         }
         catch (BrowseException e)
         {
             log.error("caught exception: ", e);
-            throw new SQLException(e.getMessage());
+            throw new SQLException(e.getMessage(), e);
         }
 
         // Delete the Dublin Core
@@ -1984,13 +1982,7 @@ public class Item extends DSpaceObject
         AuthorizeManager.removeAllPolicies(ourContext, this);
         
         // Remove any Handle
-        // FIXME: HandleManager should provide a way of doing this.
-        // Plus, deleting a Handle may have ramifications
-        // that need considering.
-        DatabaseManager.updateQuery(ourContext,
-                "DELETE FROM handle WHERE resource_type_id= ? " +
-                "AND resource_id= ? ",
-                Constants.ITEM,getID());
+        HandleManager.unbindHandle(ourContext, this);
         
         // Finally remove item row
         DatabaseManager.delete(ourContext, itemRow);
@@ -2029,23 +2021,45 @@ public class Item extends DSpaceObject
      * Return <code>true</code> if <code>other</code> is the same Item as
      * this object, <code>false</code> otherwise
      *
-     * @param other
+     * @param obj
      *            object to compare to
      * @return <code>true</code> if object passed in represents the same item
      *         as this object
      */
-    public boolean equals(DSpaceObject other)
-    {
-        if (this.getType() == other.getType())
-        {
-            if (this.getID() == other.getID())
-            {
-                return true;
-            }
-        }
+     @Override
+     public boolean equals(Object obj)
+     {
+         if (obj == null)
+         {
+             return false;
+         }
+         if (getClass() != obj.getClass())
+         {
+             return false;
+         }
+         final Item other = (Item) obj;
+         if (this.getType() != other.getType())
+         {
+             return false;
+         }
+         if (this.getID() != other.getID())
+         {
+             return false;
+         }
 
-        return false;
-    }
+         return true;
+     }
+
+     @Override
+     public int hashCode()
+     {
+         int hash = 5;
+         hash = 71 * hash + (this.itemRow != null ? this.itemRow.hashCode() : 0);
+         return hash;
+     }
+
+
+
 
     /**
      * Return true if this Collection 'owns' this item
@@ -2100,7 +2114,7 @@ public class Item extends DSpaceObject
      * @throws SQLException
      * @throws AuthorizeException
      */
-    public void replaceAllItemPolicies(List newpolicies) throws SQLException,
+    public void replaceAllItemPolicies(List<ResourcePolicy> newpolicies) throws SQLException,
             AuthorizeException
     {
         // remove all our policies, add new ones
@@ -2118,7 +2132,7 @@ public class Item extends DSpaceObject
      * @throws SQLException
      * @throws AuthorizeException
      */
-    public void replaceAllBitstreamPolicies(List newpolicies)
+    public void replaceAllBitstreamPolicies(List<ResourcePolicy> newpolicies)
             throws SQLException, AuthorizeException
     {
         // remove all policies from bundles, add new ones
@@ -2156,8 +2170,6 @@ public class Item extends DSpaceObject
 
             for (int j = 0; j < bs.length; j++)
             {
-                Bitstream mybitstream = bs[j];
-
                 // remove bitstream policies
                 AuthorizeManager.removeGroupPolicies(ourContext, bs[j], g);
             }
@@ -2184,50 +2196,45 @@ public class Item extends DSpaceObject
     {
         // remove the submit authorization policies
         // and replace them with the collection's default READ policies
-        List policies = AuthorizeManager.getPoliciesActionFilter(ourContext, c,
-                Constants.DEFAULT_ITEM_READ);
+        List<ResourcePolicy> policies = AuthorizeManager.getPoliciesActionFilter(ourContext, c, Constants.DEFAULT_ITEM_READ);
+
+        // MUST have default policies
+        if (policies.size() < 1)
+        {
+            throw new java.sql.SQLException("Collection " + c.getID()
+                   + " has no default item READ policies");
+        }
 
         // change the action to just READ
         // just don't call update on the resourcepolicies!!!
-        Iterator i = policies.iterator();
-
-        // MUST have default policies
-        if (!i.hasNext())
+        for (ResourcePolicy rp : policies)
         {
-            throw new java.sql.SQLException("Collection " + c.getID()
-                    + " has no default item READ policies");
-        }
-
-        while (i.hasNext())
-        {
-            ResourcePolicy rp = (ResourcePolicy) i.next();
             rp.setAction(Constants.READ);
         }
 
         replaceAllItemPolicies(policies);
 
-        policies = AuthorizeManager.getPoliciesActionFilter(ourContext, c,
-                Constants.DEFAULT_BITSTREAM_READ);
+        policies = AuthorizeManager.getPoliciesActionFilter(ourContext, c, Constants.DEFAULT_BITSTREAM_READ);
 
-        // change the action to just READ
-        // just don't call update on the resourcepolicies!!!
-        i = policies.iterator();
-
-        if (!i.hasNext())
+        if (policies.size() < 1)
         {
             throw new java.sql.SQLException("Collection " + c.getID()
                     + " has no default bitstream READ policies");
         }
 
-        while (i.hasNext())
+        // change the action to just READ
+        // just don't call update on the resourcepolicies!!!
+        for (ResourcePolicy rp : policies)
         {
-            ResourcePolicy rp = (ResourcePolicy) i.next();
             rp.setAction(Constants.READ);
         }
 
         replaceAllBitstreamPolicies(policies);
+
+        log.debug(LogManager.getHeader(ourContext, "item_inheritCollectionDefaultPolicies",
+                                                   "item_id=" + getID()));
     }
-    
+
     /**
      * Moves the item from one collection to another one
      *
@@ -2236,6 +2243,19 @@ public class Item extends DSpaceObject
      * @throws IOException
      */
     public void move (Collection from, Collection to) throws SQLException, AuthorizeException, IOException
+    {
+        // Use the normal move method, and default to not inherit permissions
+        this.move(from, to, false);
+    }
+
+    /**
+     * Moves the item from one collection to another one
+     *
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
+     */
+    public void move (Collection from, Collection to, boolean inheritDefaultPolicies) throws SQLException, AuthorizeException, IOException
     {
         // Check authorisation on the item before that the move occur
         // otherwise we will need edit permission on the "target collection" to archive our goal
@@ -2252,10 +2272,25 @@ public class Item extends DSpaceObject
         // If we are moving from the owning collection, update that too
         if (isOwningCollection(from))
         {
-                setOwningCollection(to);
-                ourContext.turnOffAuthorisationSystem();
-                update();
-                ourContext.restoreAuthSystemState();
+            // Update the owning collection
+            log.info(LogManager.getHeader(ourContext, "move_item",
+                                          "item_id=" + getID() + ", from " +
+                                          "collection_id=" + from.getID() + " to " +
+                                          "collection_id=" + to.getID()));
+            setOwningCollection(to);
+
+            // If applicable, update the item policies
+            if (inheritDefaultPolicies)
+            {
+                log.info(LogManager.getHeader(ourContext, "move_item",
+                         "Updating item with inherited policies"));
+                inheritCollectionDefaultPolicies(to);
+            }
+
+            // Update the item
+            ourContext.turnOffAuthorisationSystem();
+            update();
+            ourContext.restoreAuthSystemState();
         }
         else
         {
@@ -2273,7 +2308,6 @@ public class Item extends DSpaceObject
     /**
      * Check the bundle ORIGINAL to see if there are any uploaded files
      *
-     * @param item
      * @return true if there is a bundle named ORIGINAL with one or more
      *         bitstreams inside
      * @throws SQLException
@@ -2446,9 +2480,9 @@ public class Item extends DSpaceObject
      * those matching the passed value, if value is not Item.ANY
      *
      * @param context DSpace context object
-     * @param schema metdata field schema
-     * @param element metdata field element
-     * @param qualifier metdata field qualifier
+     * @param schema metadata field schema
+     * @param element metadata field element
+     * @param qualifier metadata field qualifier
      * @param value field value or Item.ANY to match any value
      * @return an iterator over the items matching that authority value
      * @throws SQLException, AuthorizeException, IOException
@@ -2460,11 +2494,15 @@ public class Item extends DSpaceObject
     {
         MetadataSchema mds = MetadataSchema.find(context, schema);
         if (mds == null)
-            throw new IllegalArgumentException("No such metadata schema: "+schema);
+        {
+            throw new IllegalArgumentException("No such metadata schema: " + schema);
+        }
         MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), element, qualifier);
         if (mdf == null)
+        {
             throw new IllegalArgumentException(
-            "No such metadata field: schema="+schema+", element="+element+", qualifier="+qualifier);
+                    "No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
+        }
         
         String query = "SELECT item.* FROM metadatavalue,item WHERE item.in_archive='1' "+
                        "AND item.item_id = metadatavalue.item_id AND metadata_field_id = ?";
@@ -2514,7 +2552,7 @@ public class Item extends DSpaceObject
         switch (action)
         {
             case Constants.ADD:
-                // ADD a cc license is less general then add a bitstream but we can't/wan't
+                // ADD a cc license is less general than add a bitstream but we can't/won't
                 // add complex logic here to know if the ADD action on the item is required by a cc or
                 // a generic bitstream so simply we ignore it.. UI need to enforce the requirements.
                 if (AuthorizeConfiguration.canItemAdminPerformBitstreamCreation())
@@ -2610,8 +2648,7 @@ public class Item extends DSpaceObject
                        "WHERE template_item_id = ?",getID());
             if (qResult != null)
             {
-                Collection collection = Collection.find(ourContext,qResult.getIntColumn("collection_id"));
-                return collection;
+                return Collection.find(ourContext,qResult.getIntColumn("collection_id"));
             }
             return null;
         }
@@ -2622,9 +2659,9 @@ public class Item extends DSpaceObject
      * in the indicated metadata field.
      *
      * @param context DSpace context object
-     * @param schema metdata field schema
-     * @param element metdata field element
-     * @param qualifier metdata field qualifier
+     * @param schema metadata field schema
+     * @param element metadata field element
+     * @param qualifier metadata field qualifier
      * @param value the value of authority key to look for
      * @return an iterator over the items matching that authority value
      * @throws SQLException, AuthorizeException, IOException
@@ -2635,16 +2672,128 @@ public class Item extends DSpaceObject
     {
         MetadataSchema mds = MetadataSchema.find(context, schema);
         if (mds == null)
-            throw new IllegalArgumentException("No such metadata schema: "+schema);
+        {
+            throw new IllegalArgumentException("No such metadata schema: " + schema);
+        }
         MetadataField mdf = MetadataField.findByElement(context, mds.getSchemaID(), element, qualifier);
         if (mdf == null)
-            throw new IllegalArgumentException("No such metadata field: schema="+schema+", element="+element+", qualifier="+qualifier);
+        {
+            throw new IllegalArgumentException("No such metadata field: schema=" + schema + ", element=" + element + ", qualifier=" + qualifier);
+        }
 
         TableRowIterator rows = DatabaseManager.queryTable(context, "item",
             "SELECT item.* FROM metadatavalue,item WHERE item.in_archive='1' "+
             "AND item.item_id = metadatavalue.item_id AND metadata_field_id = ? AND authority = ?",
             mdf.getFieldID(), value);
         return new ItemIterator(context, rows);
+    }
+
+
+    private List<DCValue> getMetadata()
+    {
+        try
+        {
+            return dublinCore.get(ourContext, getID(), log);
+        }
+        catch (SQLException e)
+        {
+            log.error("Loading item - cannot load metadata");
+        }
+
+        return new ArrayList<DCValue>();
+    }
+
+    private void setMetadata(List<DCValue> metadata)
+    {
+        dublinCore.set(metadata);
+        dublinCoreChanged = true;
+    }
+
+    class MetadataCache
+    {
+        List<DCValue> metadata = null;
+
+        List<DCValue> get(Context c, int itemId, Logger log) throws SQLException
+        {
+            if (metadata == null)
+            {
+                metadata = new ArrayList<DCValue>();
+
+                // Get Dublin Core metadata
+                TableRowIterator tri = retrieveMetadata(itemId);
+
+                if (tri != null)
+                {
+                    try
+                    {
+                        while (tri.hasNext())
+                        {
+                            TableRow resultRow = tri.next();
+
+                            // Get the associated metadata field and schema information
+                            int fieldID = resultRow.getIntColumn("metadata_field_id");
+                            MetadataField field = MetadataField.find(c, fieldID);
+
+                            if (field == null)
+                            {
+                                log.error("Loading item - cannot find metadata field " + fieldID);
+                            }
+                            else
+                            {
+                                MetadataSchema schema = MetadataSchema.find(c, field.getSchemaID());
+                                if (schema == null)
+                                {
+                                    log.error("Loading item - cannot find metadata schema " + field.getSchemaID() + ", field " + fieldID);
+                                }
+                                else
+                                {
+                                    // Make a DCValue object
+                                    DCValue dcv = new DCValue();
+                                    dcv.element = field.getElement();
+                                    dcv.qualifier = field.getQualifier();
+                                    dcv.value = resultRow.getStringColumn("text_value");
+                                    dcv.language = resultRow.getStringColumn("text_lang");
+                                    //dcv.namespace = schema.getNamespace();
+                                    dcv.schema = schema.getName();
+                                    dcv.authority = resultRow.getStringColumn("authority");
+                                    dcv.confidence = resultRow.getIntColumn("confidence");
+
+                                    // Add it to the list
+                                    metadata.add(dcv);
+                                }
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        // close the TableRowIterator to free up resources
+                        if (tri != null)
+                        {
+                            tri.close();
+                        }
+                    }
+                }
+            }
+
+            return metadata;
+        }
+
+        void set(List<DCValue> m)
+        {
+            metadata = m;
+        }
+
+        TableRowIterator retrieveMetadata(int itemId) throws SQLException
+        {
+            if (itemId > 0)
+            {
+                return DatabaseManager.queryTable(ourContext, "MetadataValue",
+                        "SELECT * FROM MetadataValue WHERE item_id= ? ORDER BY metadata_field_id, place",
+                        itemId);
+            }
+
+            return null;
+        }
     }
 }
 

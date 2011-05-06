@@ -1,47 +1,13 @@
-/*
- * EditCollectionHarvestingForm.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 1.0 $
- *
- * Date: $Date: 2006/07/13 23:20:54 $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.administrative.collection;
 
 import java.sql.SQLException;
-import org.apache.cocoon.environment.ObjectModelHelper;
-import org.apache.cocoon.environment.Request;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -72,6 +38,7 @@ public class EditCollectionHarvestingForm extends AbstractDSpaceTransformer
 	private static final Message T_collection_trail = message("xmlui.administrative.collection.general.collection_trail");
 	private static final Message T_options_metadata = message("xmlui.administrative.collection.general.options_metadata");	
 	private static final Message T_options_roles = message("xmlui.administrative.collection.general.options_roles");
+        private static final Message T_options_curate = message("xmlui.administrative.collection.general.options_curate");
 	private static final Message T_main_head = message("xmlui.administrative.collection.EditCollectionMetadataForm.main_head");
 	
 	private static final Message T_options_harvest = message("xmlui.administrative.collection.GeneralCollectionHarvestingForm.options_harvest");
@@ -124,7 +91,6 @@ public class EditCollectionHarvestingForm extends AbstractDSpaceTransformer
 		int collectionID = parameters.getParameterAsInteger("collectionID", -1);
 		Collection thisCollection = Collection.find(context, collectionID);
 		HarvestedCollection hc = HarvestedCollection.find(context, collectionID);
-		Request request = ObjectModelHelper.getRequest(objectModel);
 				
 		String baseURL = contextPath + "/admin/collection?administrative-continue=" + knot.getId();
 		
@@ -142,6 +108,7 @@ public class EditCollectionHarvestingForm extends AbstractDSpaceTransformer
 	    options.addItem().addXref(baseURL+"&submit_metadata",T_options_metadata);
 	    options.addItem().addXref(baseURL+"&submit_roles",T_options_roles);
 	    options.addItem().addHighlight("bold").addXref(baseURL+"&submit_harvesting",T_options_harvest);
+            options.addItem().addXref(baseURL+"&submit_curate",T_options_curate);
 	    
 	    
 	    // The top-level, all-setting, countent source radio button
@@ -149,8 +116,8 @@ public class EditCollectionHarvestingForm extends AbstractDSpaceTransformer
 	    
 	    harvestSource.addLabel(T_label_source);
 	    Radio source = harvestSource.addItem().addRadio("source");
-    	source.addOption(hc == null, "source_normal", T_source_normal);
-    	source.addOption(hc != null, "source_harvested", T_source_harvested);
+    	source.addOption(false, "source_normal", T_source_normal);      // was hc == null - always false
+    	source.addOption(true, "source_harvested", T_source_harvested); // was hc != null - always true
 	    
 	    List settings = main.addList("harvestSettings", "form");
 	    settings.setHead(T_main_settings_head);
@@ -169,9 +136,13 @@ public class EditCollectionHarvestingForm extends AbstractDSpaceTransformer
 
 	    String displayName;
     	if (metadataString.indexOf(',') != -1)
-    		displayName = metadataString.substring(metadataString.indexOf(',') + 1);
+        {
+            displayName = metadataString.substring(metadataString.indexOf(',') + 1);
+        }
     	else
-    		displayName = metadataFormatValue + "(" + metadataString + ")";
+        {
+            displayName = metadataFormatValue + "(" + metadataString + ")";
+        }
     	    	
     	settings.addItem(displayName);
     	

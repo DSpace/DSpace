@@ -40,8 +40,8 @@
     - The XMLUI (Manakin Release) configuration file
     -
     - Authors: Scott Phillips
-    - Version: $Revision: 5899 $
-    - Date:    $Date: 2010-11-24 04:54:40 -0500 (Wed, 24 Nov 2010) $
+    - Version: $Revision: 5689 $
+    - Date:    $Date: 2010-10-29 12:16:34 -0400 (Fri, 29 Oct 2010) $
 -->
 
 <xmlui>
@@ -59,12 +59,26 @@
         /xmlui/cocoon/aspects/ directory followed by a slash.
     -->
     <aspects>
-        <aspect name="Artifact Browser" path="resource://aspects/ArtifactBrowser/" />
+        <!--
+            @deprecated: the Artifact Browser has been devided into ViewArtifacts,
+            BrowseArtifacts, SearchArtifacts
+            <aspect name="Artifact Browser" path="resource://aspects/ArtifactBrowser/" />
+        -->
+        <aspect name="Displaying Artifacts" path="resource://aspects/ViewArtifacts/" />
+        <aspect name="Browsing Artifacts" path="resource://aspects/BrowseArtifacts/" />
+        <aspect name="Searching Artifacts" path="resource://aspects/SearchArtifacts/" />
         <aspect name="Administration" path="resource://aspects/Administrative/" />
         <aspect name="E-Person" path="resource://aspects/EPerson/" />
         <aspect name="Submission and Workflow" path="resource://aspects/Submission/" />
-	<aspect name="Statistics" path="resource://aspects/Statistics/" />
-        <!-- 
+	    <aspect name="Statistics" path="resource://aspects/Statistics/" />
+        <!--
+            To enable Discovery, uncomment this Aspect that will enable it
+            within your existing XMLUI
+            Also make sure to comment the SearchArtifacts aspect
+            as leaving it on together with discovery will cause UI overlap issues
+            <aspect name="Discovery" path="resource://aspects/Discovery/" />
+        -->
+        <!--
             This aspect tests the various possible DRI features, 
             it helps a theme developer create themes 
         -->
@@ -104,6 +118,9 @@
 
         <!-- Default theme -->
         <theme name="Default Reference Theme" regex=".*" path="Reference/" />
+
+        <!-- Mirage theme, @mire contribution of new theme to support easier development and branding -->
+        <!-- <theme name="Atmire Mirage Theme" regex=".*" path="Mirage/" /> -->
 
         <!-- Classic theme, inspired by the JSP UI -->
         <!-- <theme name="Classic" regex=".*" path="Classic/" /> -->

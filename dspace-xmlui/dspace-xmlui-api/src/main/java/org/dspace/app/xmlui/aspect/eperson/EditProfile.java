@@ -1,43 +1,10 @@
-/*
- * EditProfile.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4517 $
- *
- * Date: $Date: 2009-11-10 17:57:37 -0500 (Tue, 10 Nov 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.xmlui.aspect.eperson;
 
 import java.io.IOException;
@@ -190,7 +157,7 @@ public class EditProfile extends AbstractDSpaceTransformer
             {
                 return a.getDisplayName().compareTo(b.getDisplayName());
             }
-            public boolean equals(Object o) { return false; }});
+        });
     }
     
     /** The email address of the user registering for the first time.*/
@@ -217,28 +184,42 @@ public class EditProfile extends AbstractDSpaceTransformer
         
         String errors = parameters.getParameter("errors","");
         if (errors.length() > 0)
+        {
             this.errors = Arrays.asList(errors.split(","));
+        }
         else
+        {
             this.errors = new ArrayList<String>();
+        }
         
         // Ensure that the email variable is set.
         if (eperson != null)
+        {
             this.email = eperson.getEmail();
+        }
     }
        
     public void addPageMeta(PageMeta pageMeta) throws WingException
     {
         // Set the page title
         if (registering)
+        {
             pageMeta.addMetadata("title").addContent(T_title_create);
+        }
         else
+        {
             pageMeta.addMetadata("title").addContent(T_title_update);
+        }
         
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         if (registering)
+        {
             pageMeta.addTrail().addContent(T_trail_new_registration);
+        }
         else
+        {
             pageMeta.addTrail().addContent(T_trail_update);
+        }
     }
     
     
@@ -268,9 +249,13 @@ public class EditProfile extends AbstractDSpaceTransformer
        
        String action = contextPath;
        if (registering)
+       {
            action += "/register";
+       }
        else
+       {
            action += "/profile";
+       }
        
        
        
@@ -279,13 +264,19 @@ public class EditProfile extends AbstractDSpaceTransformer
                action,Division.METHOD_POST,"primary");
        
        if (registering)
+       {
            profile.setHead(T_head_create);
+       }
        else
+       {
            profile.setHead(T_head_update);
+       }
        
        // Add the progress list if we are registering a new user
        if (registering)
-           EPersonUtils.registrationProgressList(profile,2);
+       {
+           EPersonUtils.registrationProgressList(profile, 2);
+       }
        
        
        
@@ -310,7 +301,9 @@ public class EditProfile extends AbstractDSpaceTransformer
            firstName.addError(T_error_required);
        }
        if (!registering && !ConfigurationManager.getBooleanProperty("xmlui.user.editmetadata", true))
+       {
            firstName.setDisabled();
+       }
        
        // Last name
        Text lastName = identity.addItem().addText("last_name");
@@ -322,7 +315,9 @@ public class EditProfile extends AbstractDSpaceTransformer
            lastName.addError(T_error_required);
        }
        if (!registering &&!ConfigurationManager.getBooleanProperty("xmlui.user.editmetadata", true))
+       {
            lastName.setDisabled();
+       }
        
        // Phone
        Text phone = identity.addItem().addText("phone");
@@ -333,7 +328,9 @@ public class EditProfile extends AbstractDSpaceTransformer
            phone.addError(T_error_required);
        }
        if (!registering && !ConfigurationManager.getBooleanProperty("xmlui.user.editmetadata", true))
+       {
            phone.setDisabled();
+       }
         
        // Language
        Select lang = identity.addItem().addSelect("language");
@@ -352,7 +349,9 @@ public class EditProfile extends AbstractDSpaceTransformer
        lang.setOptionSelected((defaultLanguage == null || defaultLanguage.equals("")) ?
                               I18nUtil.DEFAULTLOCALE.toString() : defaultLanguage);
        if (!registering && !ConfigurationManager.getBooleanProperty("xmlui.user.editmetadata", true))
+       {
            lang.setDisabled();
+       }
 
        // Subscriptions
        if (!registering)
@@ -374,14 +373,18 @@ public class EditProfile extends AbstractDSpaceTransformer
            subscriptions.addOption(-1,T_select_collection);
            for (Collection possible : possibleList)
            {
-                   String name = possible.getMetadata("name");
-                   if (name.length() > 50)
-                           name = name.substring(0, 47) + "...";
-                   subscriptions.addOption(possible.getID(), name);
+               String name = possible.getMetadata("name");
+               if (name.length() > 50)
+               {
+                   name = name.substring(0, 47) + "...";
+               }
+               subscriptions.addOption(possible.getID(), name);
            }
                    
            for (Collection collection: currentList)
-                   subscriptions.addInstance().setOptionSelected(collection.getID());
+           {
+               subscriptions.addInstance().setOptionSelected(collection.getID());
+           }
        }
        
        
@@ -403,7 +406,9 @@ public class EditProfile extends AbstractDSpaceTransformer
            Field password = security.addItem().addPassword("password");
            password.setLabel(T_password);
            if (registering)
-                   password.setRequired();
+           {
+               password.setRequired();
+           }
            if (errors.contains("password"))
            {
                password.addError(T_error_invalid_password);
@@ -412,7 +417,9 @@ public class EditProfile extends AbstractDSpaceTransformer
            Field passwordConfirm = security.addItem().addPassword("password_confirm");
            passwordConfirm.setLabel(T_confirm_password);
            if (registering)
-                   passwordConfirm.setRequired();
+           {
+               passwordConfirm.setRequired();
+           }
            if (errors.contains("password_confirm"))
            {
                passwordConfirm.addError(T_error_unconfirmed_password);
@@ -421,9 +428,13 @@ public class EditProfile extends AbstractDSpaceTransformer
        
        Button submit = form.addItem().addButton("submit");
        if (registering)
+       {
            submit.setValue(T_submit_update);
+       }
        else
+       {
            submit.setValue(T_submit_create);
+       }
        
        profile.addHidden("eperson-continue").setValue(knot.getId());
        
@@ -437,7 +448,9 @@ public class EditProfile extends AbstractDSpaceTransformer
                 
                         // Not a member of any groups then don't do anything.
                         if (!(memberships.length > 0))
-                                return;
+                        {
+                            return;
+                        }
                         
                         List list = profile.addList("memberships");
                         list.setHead(T_head_auth);

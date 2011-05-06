@@ -1,12 +1,9 @@
 /**
- * $Id: DatasetTimeGenerator.java 4440 2009-10-10 19:03:27Z mdiggory $
- * $URL: http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-stats/src/main/java/org/dspace/statistics/content/DatasetTimeGenerator.java $
- * *************************************************************************
- * Copyright (c) 2002-2009, DuraSpace.  All rights reserved
- * Licensed under the DuraSpace Foundation License.
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * A copy of the DuraSpace License has been included in this
- * distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
+ * http://www.dspace.org/license/
  */
 package org.dspace.statistics.content;
 
@@ -36,11 +33,13 @@ public class DatasetTimeGenerator extends DatasetGenerator {
     }
 
     /**
-     * Sets the date interval
-     * For example if you wish to see the data from today to six months ago give the following params:
+     * Sets the date interval.
+     * For example if you wish to see the data from today to six months ago give
+     * the following parameters:
      * datatype = "month"
      * start = "-6"
-     * end = "+1" the +1 indicates this month also 
+     * end = "+1" // the +1 indicates this month also
+     * 
      * @param dateType type can be days, months, years
      * @param start the start of the interval
      * @param end the end of the interval
@@ -52,23 +51,33 @@ public class DatasetTimeGenerator extends DatasetGenerator {
 
     }
 
-    public void setDateInterval(String dateType, Date start, Date end) throws IllegalArgumentException{
-        actualStartDate = (Date) start.clone();
-        actualEndDate = (Date) end.clone();
+    public void setDateInterval(String dateType, Date start, Date end)
+            throws IllegalArgumentException
+    {
+        actualStartDate = (start == null ? null : new Date(start.getTime()));
+        actualEndDate = (end == null ? null : new Date(end.getTime()));
         
         this.dateType = dateType;
 
         //Check if end comes before start
         Calendar startCal1 = Calendar.getInstance();
-        startCal1.setTime(start);
-
         Calendar endCal1 = Calendar.getInstance();
+
+        if (startCal1 == null || endCal1 == null)
+        {
+            throw new IllegalStateException("Unable to create calendar instances");    
+        }
+
+        startCal1.setTime(start);
         endCal1.setTime(end);
         if(endCal1.before(startCal1))
+        {
             throw new IllegalArgumentException();
+        }
 
-        //TODO: ensure future dates are tested. Although we normally do not have visits from the future
-        //Depending on our dateType check if we need to use days/months/years
+        // TODO: ensure future dates are tested. Although we normally do not
+        // have visits from the future.
+        //Depending on our dateType check if we need to use days/months/years.
         int type = -1;
         if("year".equalsIgnoreCase(dateType)){
             type = Calendar.YEAR;
@@ -94,7 +103,9 @@ public class DatasetTimeGenerator extends DatasetGenerator {
             endPos = true;
         }else
         if(0 < difEnd)
+        {
             endPos = true;
+        }
         else{
             difEnd++;
         }
@@ -125,19 +136,19 @@ public class DatasetTimeGenerator extends DatasetGenerator {
     }
 
     public Date getActualStartDate() {
-        return actualStartDate;
+        return actualStartDate == null ? null : new Date(actualStartDate.getTime());
     }
 
     public void setActualStartDate(Date actualStartDate) {
-        this.actualStartDate = actualStartDate;
+        this.actualStartDate = (actualStartDate == null ? null : new Date(actualStartDate.getTime()));
     }
 
     public Date getActualEndDate() {
-        return actualEndDate;
+        return actualEndDate == null ? null : new Date(actualEndDate.getTime());
     }
 
     public void setActualEndDate(Date actualEndDate) {
-        this.actualEndDate = actualEndDate;
+        this.actualEndDate = (actualEndDate == null ? null : new Date(actualEndDate.getTime()));
     }
 
     public void setDateType(String dateType) {
@@ -152,11 +163,15 @@ public class DatasetTimeGenerator extends DatasetGenerator {
         this.type = type;
     }
 
-    /**
+    /** Get the difference between two Dates in terms of a given interval.
+     * That is:  if you specify the difference in months, you get back the
+     * number of months between the dates.
      *
      * @param date1 the first date
-     * @param date2
-     * @param type
+     * @param date2 the other date
+     * @param type Calendar.HOUR or .DATE or .MONTH
+     * @return number of {@code type} intervals between {@code date1} and
+     *  {@code date2}
      */
     private int getTimeDifference(Date date1, Date date2, int type){
         int toAdd;
@@ -200,7 +215,9 @@ public class DatasetTimeGenerator extends DatasetGenerator {
             cal2 = backup;
             toAdd = 1;
         }else
+        {
             toAdd = -1;
+        }
 
 
         

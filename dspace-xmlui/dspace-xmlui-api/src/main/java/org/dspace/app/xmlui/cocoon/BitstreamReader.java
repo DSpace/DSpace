@@ -1,43 +1,10 @@
-/*
- * BitsreamReader.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4465 $
- *
- * Date: $Date: 2009-10-23 22:46:21 -0400 (Fri, 23 Oct 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.xmlui.cocoon;
 
 import java.io.IOException;
@@ -131,16 +98,15 @@ import org.dspace.core.LogManager;
 
 public class BitstreamReader extends AbstractReader implements Recyclable
 {
-
-        private static Logger log = Logger.getLogger(BitstreamReader.class);
+    private static Logger log = Logger.getLogger(BitstreamReader.class);
         
     /**
      * Messages to be sent when the user is not authorized to view
      * a particular bitstream. They will be redirected to the login
      * where this message will be displayed.
      */
-        private final static String AUTH_REQUIRED_HEADER = "xmlui.BitstreamReader.auth_header";
-        private final static String AUTH_REQUIRED_MESSAGE = "xmlui.BitstreamReader.auth_message";
+    private static final String AUTH_REQUIRED_HEADER = "xmlui.BitstreamReader.auth_header";
+    private static final String AUTH_REQUIRED_MESSAGE = "xmlui.BitstreamReader.auth_message";
         
     /**
      * How big of a buffer should we use when reading from the bitstream before
@@ -268,9 +234,13 @@ public class BitstreamReader extends AbstractReader implements Recyclable
 
                     //build redirect URL based on whether item has a handle assigned yet
                     if(item.getHandle()!=null && item.getHandle().length()>0)
-                      redirectURL = request.getContextPath() + "/bitstream/handle/" + item.getHandle();
+                    {
+                        redirectURL = request.getContextPath() + "/bitstream/handle/" + item.getHandle();
+                    }
                     else
-                      redirectURL = request.getContextPath() + "/bitstream/item/" + item.getID();
+                    {
+                        redirectURL = request.getContextPath() + "/bitstream/item/" + item.getID();
+                    }
 
                         redirectURL += "/" + name + "?sequence=" + bitstream.getSequenceID();
 
@@ -348,14 +318,16 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 for (ResourcePolicy rp : AuthorizeManager.getPoliciesActionFilter(context, bitstream, Constants.READ))
                 {
                     if (rp.getGroupID() == 0)
+                    {
                         this.isAnonymouslyReadable = true;
+                    }
                 }
             }
 
             // Trim any path information from the bitstream
             if (bitstreamName != null && bitstreamName.length() >0 )
             {
-                        int finalSlashIndex = bitstreamName.lastIndexOf("/");
+                        int finalSlashIndex = bitstreamName.lastIndexOf('/');
                         if (finalSlashIndex > 0)
                         {
                                 bitstreamName = bitstreamName.substring(finalSlashIndex+1);
@@ -375,6 +347,9 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                                                 ObjectModelHelper.getRequest(objectModel),
                                                 ContextUtil.obtainContext(ObjectModelHelper.getRequest(objectModel)),
                                                 bitstream));
+            
+            // Force close of database connection in case sending a large file 
+            context.complete();
 
         }
         catch (SQLException sqle)
@@ -401,7 +376,9 @@ public class BitstreamReader extends AbstractReader implements Recyclable
     private Bitstream findBitstreamBySequence(Item item, int sequence) throws SQLException
     {
         if (item == null)
-                return null;
+        {
+            return null;
+        }
         
         Bundle[] bundles = item.getBundles();
         for (Bundle bundle : bundles)
@@ -432,12 +409,16 @@ public class BitstreamReader extends AbstractReader implements Recyclable
     private Bitstream findBitstreamByName(Item item, String name) throws SQLException
     {
         if (name == null || item == null)
-                return null;
+        {
+            return null;
+        }
     
         // Determine our the maximum number of directories that will be removed for a path.
         int maxDepthPathSearch = 3;
         if (ConfigurationManager.getProperty("xmlui.html.max-depth-guess") != null)
-                maxDepthPathSearch = ConfigurationManager.getIntProperty("xmlui.html.max-depth-guess");
+        {
+            maxDepthPathSearch = ConfigurationManager.getIntProperty("xmlui.html.max-depth-guess");
+        }
         
         // Search for the named bitstream on this item. Each time through the loop
         // a directory is removed from the name until either our maximum depth is
@@ -466,9 +447,11 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 int indexOfSlash = name.indexOf('/');
                 
                 if (indexOfSlash < 0)
-                        // No more directories to remove from the path, so return null for no
-                        // bitstream found.
-                        return null;
+                {
+                    // No more directories to remove from the path, so return null for no
+                    // bitstream found.
+                    return null;
+                }
                
                 name = name.substring(indexOfSlash+1);
                 
@@ -478,7 +461,9 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 {
                         int indexOfLastSlash = name.lastIndexOf('/');
                         if (indexOfLastSlash > -1)
-                                name = name.substring(indexOfLastSlash+1);
+                        {
+                            name = name.substring(indexOfLastSlash + 1);
+                        }
                 }
                 
         }
@@ -507,7 +492,9 @@ public class BitstreamReader extends AbstractReader implements Recyclable
             ProcessingException
     {
         if (this.bitstreamInputStream == null)
-                return;
+        {
+            return;
+        }
         
         // Only allow If-Modified-Since protocol if request is from a spider
         // since response headers would encourage a browser to cache results
@@ -550,8 +537,9 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         // Only encourage caching if this is not a restricted resource, i.e.
         // if it is accessed anonymously or is readable by Anonymous:
         if (isAnonymouslyReadable)
-            response.setDateHeader("Expires", System.currentTimeMillis()
-                    + expires);
+        {
+            response.setDateHeader("Expires", System.currentTimeMillis() + expires);
+        }
         
         // If this is a large bitstream then tell the browser it should treat it as a download.
         int threshold = ConfigurationManager.getIntProperty("xmlui.content_disposition_threshold");
@@ -563,9 +551,13 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 try {
                         String agent = request.getHeader("USER-AGENT");
                         if (agent != null && agent.contains("MSIE"))
-                                name = URLEncoder.encode(name,"UTF8");
+                        {
+                            name = URLEncoder.encode(name, "UTF8");
+                        }
                         else if (agent != null && agent.contains("Mozilla"))
-                                name = MimeUtility.encodeText(name, "UTF8", "B");
+                        {
+                            name = MimeUtility.encodeText(name, "UTF8", "B");
+                        }
                 }
                 catch (UnsupportedEncodingException see)
                 {
@@ -574,85 +566,101 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                 response.setHeader("Content-Disposition", "attachment;filename=" + name);
         }
 
+        ByteRange byteRange = null;
+
         // Turn off partial downloads, they cause problems
         // and are only rarely used. Specifically some windows pdf
-        // viewers are incapable of handling this request. By
-        // uncommenting the following two lines you will turn this feature back on.
-        // response.setHeader("Accept-Ranges", "bytes");
-        // String ranges = request.getHeader("Range");
-        String ranges = null;
-        
+        // viewers are incapable of handling this request. You can
+        // uncomment the following lines to turn this feature back on.
 
-        ByteRange byteRange = null;
-        if (ranges != null)
+//        response.setHeader("Accept-Ranges", "bytes");
+//        String ranges = request.getHeader("Range");
+//        if (ranges != null)
+//        {
+//            try
+//            {
+//                ranges = ranges.substring(ranges.indexOf('=') + 1);
+//                byteRange = new ByteRange(ranges);
+//            }
+//            catch (NumberFormatException e)
+//            {
+//                byteRange = null;
+//                if (response instanceof HttpResponse)
+//                {
+//                    // Respond with status 416 (Request range not
+//                    // satisfiable)
+//                    response.setStatus(416);
+//                }
+//            }
+//        }
+
+        try
         {
-            try
+            if (byteRange != null)
             {
-                ranges = ranges.substring(ranges.indexOf('=') + 1);
-                byteRange = new ByteRange(ranges);
-            }
-            catch (NumberFormatException e)
-            {
-                byteRange = null;
+                String entityLength;
+                String entityRange;
+                if (this.bitstreamSize != -1)
+                {
+                    entityLength = "" + this.bitstreamSize;
+                    entityRange = byteRange.intersection(
+                            new ByteRange(0, this.bitstreamSize)).toString();
+                }
+                else
+                {
+                    entityLength = "*";
+                    entityRange = byteRange.toString();
+                }
+
+                response.setHeader("Content-Range", entityRange + "/" + entityLength);
                 if (response instanceof HttpResponse)
                 {
-                    // Respond with status 416 (Request range not
-                    // satisfiable)
-                    ((HttpResponse) response).setStatus(416);
+                    // Response with status 206 (Partial content)
+                    response.setStatus(206);
                 }
-            }
-        }
 
-        if (byteRange != null)
-        {
-            String entityLength;
-            String entityRange;
-            if (this.bitstreamSize != -1)
-            {
-                entityLength = "" + this.bitstreamSize;
-                entityRange = byteRange.intersection(
-                        new ByteRange(0, this.bitstreamSize)).toString();
+                int pos = 0;
+                int posEnd;
+                while ((length = this.bitstreamInputStream.read(buffer)) > -1)
+                {
+                    posEnd = pos + length - 1;
+                    ByteRange intersection = byteRange.intersection(new ByteRange(pos, posEnd));
+                    if (intersection != null)
+                    {
+                        out.write(buffer, (int) intersection.getStart() - pos, (int) intersection.length());
+                    }
+                    pos += length;
+                }
             }
             else
             {
-                entityLength = "*";
-                entityRange = byteRange.toString();
-            }
+                response.setHeader("Content-Length", String.valueOf(this.bitstreamSize));
 
-            response.setHeader("Content-Range", entityRange + "/"
-                    + entityLength);
-            if (response instanceof HttpResponse)
-            {
-                // Response with status 206 (Partial content)
-                ((HttpResponse) response).setStatus(206);
-            }
-
-            int pos = 0;
-            int posEnd;
-            while ((length = this.bitstreamInputStream.read(buffer)) > -1)
-            {
-                posEnd = pos + length - 1;
-                ByteRange intersection = byteRange
-                        .intersection(new ByteRange(pos, posEnd));
-                if (intersection != null)
+                while ((length = this.bitstreamInputStream.read(buffer)) > -1)
                 {
-                    out.write(buffer, (int) intersection.getStart()
-                            - pos, (int) intersection.length());
+                    out.write(buffer, 0, length);
                 }
-                pos += length;
+                out.flush();
             }
         }
-        else
+        finally
         {
-            response.setHeader("Content-Length", String
-                    .valueOf(this.bitstreamSize));
-
-            while ((length = this.bitstreamInputStream.read(buffer)) > -1)
+            try
             {
-                out.write(buffer, 0, length);
+                // Close the bitstream input stream so that we don't leak a file descriptor
+                this.bitstreamInputStream.close();
+                
+                // Close the output stream as per Cocoon docs: http://cocoon.apache.org/2.2/core-modules/core/2.2/681_1_1.html
+                out.close();
+            } 
+            catch (IOException ioe)
+            {
+                // Closing the stream threw an IOException but do we want this to propagate up to Cocoon?
+                // No point since the user has already got the bitstream contents.
+                log.warn("Caught IO exception when closing a stream: " + ioe.getMessage());
             }
-            out.flush();
         }
+
     }
 
     /**

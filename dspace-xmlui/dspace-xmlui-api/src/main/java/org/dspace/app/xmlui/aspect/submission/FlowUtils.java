@@ -1,43 +1,10 @@
-/*
- * FlowUtils.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.xmlui.aspect.submission;
 
 import java.io.IOException;
@@ -74,7 +41,7 @@ import org.dspace.workflow.WorkflowManager;
 /**
  * This is a utility class to aid in the submission flow scripts. 
  * Since data validation is cumbersome inside a flow script this 
- * is a collection of methods to preform processing at each step 
+ * is a collection of methods to perform processing at each step 
  * of the flow, the flow script will ties these operations 
  * together in a meaningful order but all actually processing 
  * is done through these various processes.
@@ -85,10 +52,10 @@ import org.dspace.workflow.WorkflowManager;
 
 public class FlowUtils {
 
-    private static Logger log = Logger.getLogger(FlowUtils.class);
+    private static final Logger log = Logger.getLogger(FlowUtils.class);
     
     /** Where the submissionInfo is stored on an HTTP Request object */
-    private final static String DSPACE_SUBMISSION_INFO = "dspace.submission.info";
+    private static final String DSPACE_SUBMISSION_INFO = "dspace.submission.info";
 
 	/**
 	 * Return the InProgressSubmission, either workspaceItem or workflowItem, 
@@ -130,7 +97,9 @@ public class FlowUtils {
 	{
 		InProgressSubmission submission = findSubmission(context, inProgressSubmissionID);
 		if (submission instanceof WorkspaceItem)
-			return (WorkspaceItem) submission;
+        {
+            return (WorkspaceItem) submission;
+        }
 		return null;
 	}
 	
@@ -147,7 +116,9 @@ public class FlowUtils {
 	{
 		InProgressSubmission submission = findSubmission(context, inProgressSubmissionID);
 		if (submission instanceof WorkflowItem)
-			return (WorkflowItem) submission;
+        {
+            return (WorkflowItem) submission;
+        }
 		return null;
 	}
 	
@@ -195,7 +166,7 @@ public class FlowUtils {
             }
             catch(Exception e)
             {
-                throw new SQLException("Error loading Submission Info: " + e.getMessage());
+                throw new SQLException("Error loading Submission Info: " + e.getMessage(), e);
             }
         }    
         else if(subInfo==null && submission==null)
@@ -284,7 +255,9 @@ public class FlowUtils {
 			WorkspaceItem workspaceItem = (WorkspaceItem) submission;
 			int stage = workspaceItem.getStageReached();
 			if (stage < 0)
-				stage = 0;
+            {
+                stage = 0;
+            }
 			return stage;
 		}
 		
@@ -309,7 +282,9 @@ public class FlowUtils {
 			WorkspaceItem workspaceItem = (WorkspaceItem) submission;
 			int page = workspaceItem.getPageReached();
 			if (page < 0)
-				page = 0;
+            {
+                page = 0;
+            }
 			return page;
 		}
 		
@@ -394,21 +369,14 @@ public class FlowUtils {
 
         context.commit();
         
-        if (handle != null)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return (handle != null);
 	}
 	
 	
 	
 	/**
 	 * Return the given task back to the pool of unclaimed tasks for another user
-	 * to select and preform.
+	 * to select and perform.
 	 * 
 	 * @param context The current DSpace content
 	 * @param id The unique ID of the current workflow
@@ -432,7 +400,7 @@ public class FlowUtils {
 	
 	/**
 	 * Claim this task from the pool of unclaimed task so that this user may
-	 * preform the task by either approving or rejecting it.
+	 * perform the task by either approving or rejecting it.
 	 * 
 	 * @param context The current DSpace content
 	 * @param id The unique ID of the current workflow
@@ -532,10 +500,6 @@ public class FlowUtils {
      * Retrieves a list of all steps and pages within the
      * current submission process.
      * <P>
-     * This returns an array of Doubles of the form "#.#"
-     * where the former number is the step number, and the
-     * latter is the page number.
-     * <P>
      * This list may differ from the list of steps in the
      * progress bar if the current submission process includes
      * non-interactive steps which do not appear in the progress bar!
@@ -549,9 +513,9 @@ public class FlowUtils {
      *            the current SubmissionInfo object
      *  
      */
-    public static Double[] getListOfAllSteps(HttpServletRequest request, SubmissionInfo subInfo)
+    public static StepAndPage[] getListOfAllSteps(HttpServletRequest request, SubmissionInfo subInfo)
     {
-        ArrayList listStepNumbers = new ArrayList();
+        ArrayList<StepAndPage> listStepNumbers = new ArrayList<StepAndPage>();
 
         // loop through all steps
         for (int i = 0; i < subInfo.getSubmissionConfig().getNumberOfSteps(); i++)
@@ -559,8 +523,7 @@ public class FlowUtils {
             // get the current step info
             SubmissionStepConfig currentStep = subInfo.getSubmissionConfig()
                     .getStep(i);
-            String stepNumber = Integer.toString(currentStep
-                    .getStepNumber());
+            int stepNumber = currentStep.getStepNumber();
             
             //Skip over the "Select Collection" step, since
             // a user is never allowed to return to that step or jump from that step
@@ -576,7 +539,7 @@ public class FlowUtils {
             {
                 // load the processing class for this step
                 ClassLoader loader = subInfo.getClass().getClassLoader();
-                Class stepClass = loader.loadClass(currentStep.getProcessingClassName());
+                Class<?> stepClass = loader.loadClass(currentStep.getProcessingClassName());
    
                 // call the "getNumberOfPages()" method of the class 
                 // to get it's number of pages
@@ -596,15 +559,13 @@ public class FlowUtils {
             // save each of the step's pages to the progress bar
             for (int j = 1; j <= numPages; j++)
             {
-                String stepAndPage = stepNumber + "." + j;
-
-                Double stepAndPageNum = Double.valueOf(stepAndPage);
+                StepAndPage stepAndPageNum = new StepAndPage(stepNumber,j);
                 
                 listStepNumbers.add(stepAndPageNum);
             }// end for each page
         }// end for each step
 
-        //convert into an array of Doubles
-        return (Double[]) listStepNumbers.toArray(new Double[listStepNumbers.size()]);
+        //convert into an array and return that
+        return listStepNumbers.toArray(new StepAndPage[listStepNumbers.size()]);
     }
 }

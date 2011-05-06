@@ -1,12 +1,9 @@
 /**
- * $Id: StatisticsDataGenerator.java 4413 2009-10-07 16:25:08Z benbosman $
- * $URL: http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-stats/src/main/java/org/dspace/statistics/util/StatisticsDataGenerator.java $
- * *************************************************************************
- * Copyright (c) 2002-2009, DuraSpace.  All rights reserved
- * Licensed under the DuraSpace Foundation License.
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * A copy of the DuraSpace License has been included in this
- * distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
+ * http://www.dspace.org/license/
  */
 package org.dspace.statistics.util;
 
@@ -25,9 +22,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.statistics.SolrLogger;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Iterator;
 import java.text.SimpleDateFormat;
 
 import com.maxmind.geoip.LookupService;
@@ -82,7 +77,9 @@ public class StatisticsDataGenerator {
 		long epersonEndId;
 
 		if (line.hasOption("n"))
-			nrLogs = Integer.parseInt(line.getOptionValue("n"));
+        {
+            nrLogs = Integer.parseInt(line.getOptionValue("n"));
+        }
 		else {
 			System.out
 					.println("We need to know how many logs we need to create");
@@ -91,53 +88,97 @@ public class StatisticsDataGenerator {
 		if (line.hasOption("s")) {
 			startDate = getDateInMiliseconds(line.getOptionValue("s"));
 		} else
-			startDate = getDateInMiliseconds("01/01/2006");
+        {
+            startDate = getDateInMiliseconds("01/01/2006");
+        }
 		if (line.hasOption("e")) {
 			endDate = getDateInMiliseconds(line.getOptionValue("e"));
 		} else
-			endDate = new Date().getTime();
+        {
+            endDate = new Date().getTime();
+        }
 
 		if (line.hasOption("a"))
-			commStartId = Long.parseLong(line.getOptionValue("a"));
+        {
+            commStartId = Long.parseLong(line.getOptionValue("a"));
+        }
 		else
-			return;
+        {
+            return;
+        }
 
 		if (line.hasOption("b"))
-			commEndId = Long.parseLong(line.getOptionValue("b"));
+        {
+            commEndId = Long.parseLong(line.getOptionValue("b"));
+        }
 		else
-			return;
+        {
+            return;
+        }
 		if (line.hasOption("c"))
-			collStartId = Long.parseLong(line.getOptionValue("c"));
+        {
+            collStartId = Long.parseLong(line.getOptionValue("c"));
+        }
 		else
-			return;
+        {
+            return;
+        }
 		if (line.hasOption("d"))
-			collEndId = Long.parseLong(line.getOptionValue("d"));
+        {
+            collEndId = Long.parseLong(line.getOptionValue("d"));
+        }
 		else
-			return;
+        {
+            return;
+        }
 		if (line.hasOption("f"))
-			itemStartId = Long.parseLong(line.getOptionValue("f"));
+        {
+            itemStartId = Long.parseLong(line.getOptionValue("f"));
+        }
 		else
-			return;
+        {
+            return;
+        }
 		if (line.hasOption("g"))
-			itemEndId = Long.parseLong(line.getOptionValue("g"));
+        {
+            itemEndId = Long.parseLong(line.getOptionValue("g"));
+        }
 		else
-			return;
+        {
+            return;
+        }
 		if (line.hasOption("h"))
-			bitStartId = Long.parseLong(line.getOptionValue("h"));
+        {
+            bitStartId = Long.parseLong(line.getOptionValue("h"));
+        }
 		else
-			return;
+        {
+            return;
+        }
 		if (line.hasOption("i"))
-			bitEndId = Long.parseLong(line.getOptionValue("i"));
+        {
+            bitEndId = Long.parseLong(line.getOptionValue("i"));
+        }
 		else
-			return;
+        {
+            return;
+        }
 		if (line.hasOption("j"))
-			epersonStartId = Long.parseLong(line.getOptionValue("j"));
+        {
+            epersonStartId = Long.parseLong(line.getOptionValue("j"));
+        }
 		else
-			return;
+        {
+            return;
+        }
 		if (line.hasOption("k"))
-			epersonEndId = Long.parseLong(line.getOptionValue("k"));
+        {
+            epersonEndId = Long.parseLong(line.getOptionValue("k"));
+        }
 		else
-			return;
+        {
+            return;
+        }
 
 		// Get the max id range
 		long maxIdTotal = Math.max(commEndId, collEndId);
@@ -155,7 +196,7 @@ public class StatisticsDataGenerator {
 		solr.deleteByQuery("*:*");
 		solr.commit();
 
-		Map metadataStorageInfo = SolrLogger.getMetadataStorageInfo();
+		Map<String, String> metadataStorageInfo = SolrLogger.getMetadataStorageInfo();
 
 		String prevIp = null;
 		String dbfile = ConfigurationManager.getProperty("solr.dbfile");
@@ -166,18 +207,22 @@ public class StatisticsDataGenerator {
 			String ip = "";
 			Date time;
 			String continent;
-			String country = "";
 			String countryCode;
 			float longitude;
 			float latitude;
 			String city;
 
 			// 1. Generate an ip for our user
+            StringBuilder ipBuilder = new StringBuilder();
 			for (int j = 0; j < 4; j++) {
-				ip += getRandomNumberInRange(0, 254);
+				ipBuilder.append(getRandomNumberInRange(0, 254));
 				if (j != 3)
-					ip += ".";
+                {
+                    ipBuilder.append(".");
+                }
 			}
+            ip = ipBuilder.toString();
+            
 			// 2 Depending on our ip get all the location info
 			Location location;
 			try {
@@ -189,13 +234,14 @@ public class StatisticsDataGenerator {
 				// If we haven't got a prev ip this is pretty useless so move on
 				// to the next one
 				if (prevIp == null)
-					continue;
+                {
+                    continue;
+                }
 				ip = prevIp;
 				location = cl.getLocation(ip);
 			}
 
 			city = location.city;
-			country = location.countryName;
 			countryCode = location.countryCode;
 			longitude = location.longitude;
 			latitude = location.latitude;
@@ -219,7 +265,9 @@ public class StatisticsDataGenerator {
 			// we can log but it is used so our item gets move traffic)
 			int type = (int) getRandomNumberInRange(0, 8);
 			if (type == Constants.BUNDLE || type >= 5)
-				type = Constants.ITEM;
+            {
+                type = Constants.ITEM;
+            }
 
 			int dsoId = -1;
 			// Now we need to find a valid id
@@ -251,12 +299,18 @@ public class StatisticsDataGenerator {
 				// If our dsoId gets higher then our maxIdtotal we need to lower
 				// to find a valid id
 				if (dsoId == maxIdTotal)
-					substract = true;
+                {
+                    substract = true;
+                }
 
 				if (substract)
-					dsoId--;
+                {
+                    dsoId--;
+                }
 				else
-					dsoId++;
+                {
+                    dsoId++;
+                }
 
 				dso = DSpaceObject.find(context, type, dsoId);
 				if (dso instanceof Bitstream) {
@@ -268,11 +322,12 @@ public class StatisticsDataGenerator {
 				// System.out.println("REFIND");
 			}
 			// Find the person who is visting us
-			int epersonId = (int) getRandomNumberInRange(epersonStartId,
-					epersonEndId);
+			int epersonId = (int) getRandomNumberInRange(epersonStartId, epersonEndId);
 			EPerson eperson = EPerson.find(context, epersonId);
 			if (eperson == null)
-				epersonId = -1;
+            {
+                epersonId = -1;
+            }
 
 			// System.out.println(ip);
 			// System.out.println(country + " " +
@@ -303,25 +358,28 @@ public class StatisticsDataGenerator {
 			doc1.addField("latitude", latitude);
 			doc1.addField("longitude", longitude);
 			if (epersonId > 0)
-				doc1.addField("epersonid", epersonId);
+            {
+                doc1.addField("epersonid", epersonId);
+            }
 			if (dns != null)
-				doc1.addField("dns", dns.toLowerCase());
+            {
+                doc1.addField("dns", dns.toLowerCase());
+            }
 
 			if (dso instanceof Item) {
 				Item item = (Item) dso;
 				// Store the metadata
-				for (Object storedField : metadataStorageInfo.keySet()) {
-					String dcField = (String) metadataStorageInfo
-							.get(storedField);
+                for (Map.Entry<String, String> entry : metadataStorageInfo.entrySet())
+				{
+					String dcField = entry.getValue();
 
 					DCValue[] vals = item.getMetadata(dcField.split("\\.")[0],
 							dcField.split("\\.")[1], dcField.split("\\.")[2],
 							Item.ANY);
 					for (DCValue val1 : vals) {
 						String val = val1.value;
-						doc1.addField(String.valueOf(storedField), val);
-						doc1.addField(String.valueOf(storedField + "_search"),
-								val.toLowerCase());
+						doc1.addField(entry.getKey(), val);
+						doc1.addField(entry.getKey() + "_search", val.toLowerCase());
 					}
 				}
 			}

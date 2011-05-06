@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.statistics.content.filter;
 
 import org.dspace.statistics.SolrLogger;
@@ -7,11 +14,11 @@ import java.util.Date;
 import java.util.Calendar;
 
 /**
+ * Encapsulate a range of dates for Solr query filtering.
  * Created by IntelliJ IDEA.
  * User: kevinvandevelde
  * Date: 13-mrt-2009
  * Time: 13:14:14
- * To change this template use File | Settings | File Templates.
  */
 public class StatisticsSolrDateFilter implements StatisticsFilter {
     private Date startDate;
@@ -24,29 +31,46 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
     public StatisticsSolrDateFilter() {
     }
 
+    /** Set the start date as a string expression.
+     * Must be paired with {@link #setEndStr(String)}.
+     */
     public void setStartStr(String startStr) {
         this.startStr = startStr;
     }
 
+    /** Set the end date as a string expression.
+     * Must be paired with {@link #setStartStr(String)}.
+     */
     public void setEndStr(String endStr) {
         this.endStr = endStr;
     }
 
+    /** Set the range granularity:  DAY, MONTH, or YEAR. */
     public void setTypeStr(String typeStr) {
         this.typeStr = typeStr;
     }
 
+    /** Set the start date as a Date object.
+     * Must be paired with {@link #setEndDate(Date)}.
+     */
     public void setStartDate(Date startDate) {
-        this.startDate = startDate;
+        this.startDate = (startDate == null ? null : new Date(startDate.getTime()));
     }
 
+    /** Set the end date as a Date object.
+     * Must be paired with {@link #setStartDate(Date)}.
+     */
     public void setEndDate(Date endDate) {
-        this.endDate = endDate;
+        this.endDate = (endDate == null ? null : new Date(endDate.getTime()));
     }
 
+    /** Convert the date range to a filter expression.
+     * @return Solr date filter expression
+     */
     public String toQuery() {
-        if(startDate == null && endDate == null){
-            //We have got a strings instead of dates so calculate our dates out of these strings
+        if(startDate == null || endDate == null){
+            // We have got strings instead of dates so calculate our dates out
+            // of these strings
             Calendar startCal = Calendar.getInstance();
 
             startCal.clear(Calendar.MILLISECOND);
@@ -65,24 +89,36 @@ public class StatisticsSolrDateFilter implements StatisticsFilter {
                 startCal.set(Calendar.DATE, 1);
                 dateType = Calendar.YEAR;
             } else
+            {
                 return "";
+            }
 
             Calendar endCal = (Calendar) startCal.clone();
 
-            if(startStr.startsWith("+"))
-                startStr = startStr.substring(startStr.indexOf("+") + 1);
+            if (startDate == null)
+            {
+                if(startStr.startsWith("+"))
+                {
+                    startStr = startStr.substring(startStr.indexOf('+') + 1);
+                }
 
-            if(endStr.startsWith("+"))
-                endStr = endStr.substring(endStr.indexOf("+") + 1);
+                startCal.add(dateType, Integer.parseInt(startStr));
+                startDate = startCal.getTime();
+            }
 
-            startCal.add(dateType, Integer.parseInt(startStr));
-            endCal.add(dateType, Integer.parseInt(endStr));
+            if (endDate == null)
+            {
+                if(endStr.startsWith("+"))
+                {
+                    endStr = endStr.substring(endStr.indexOf('+') + 1);
+                }
 
-            startDate = startCal.getTime();
-            endDate = endCal.getTime();
+                endCal.add(dateType, Integer.parseInt(endStr));
+                endDate = endCal.getTime();
+            }
         }
 
-        //Parse them dates
+        //Parse the dates
         SimpleDateFormat formatter = new SimpleDateFormat(SolrLogger.DATE_FORMAT_8601);
         String startDateParsed = formatter.format(startDate);
         String endDateParsed = formatter.format(endDate);

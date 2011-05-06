@@ -1,43 +1,10 @@
-/*
- * FeedServlet.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4511 $
- *
- * Date: $Date: 2009-11-05 23:26:26 -0500 (Thu, 05 Nov 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
@@ -52,7 +19,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.StringTokenizer;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -70,11 +36,9 @@ import org.dspace.browse.BrowseInfo;
 import org.dspace.browse.BrowserScope;
 import org.dspace.sort.SortOption;
 import org.dspace.sort.SortException;
-import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
@@ -85,12 +49,7 @@ import org.dspace.handle.HandleManager;
 import org.dspace.search.Harvest;
 import org.dspace.eperson.Group;
 
-import com.sun.syndication.feed.rss.Channel;
-import com.sun.syndication.feed.rss.Description;
-import com.sun.syndication.feed.rss.Image;
-import com.sun.syndication.feed.rss.TextInput;
 import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.WireFeedOutput;
 
 /**
  * Servlet for handling requests for a syndication feed. The Handle of the collection
@@ -98,7 +57,7 @@ import com.sun.syndication.io.WireFeedOutput;
  * Currently supports only RSS feed formats.
  * 
  * @author Ben Bosman, Richard Rodgers
- * @version $Revision: 4511 $
+ * @version $Revision: 5845 $
  */
 public class FeedServlet extends DSpaceServlet
 {
@@ -117,50 +76,44 @@ public class FeedServlet extends DSpaceServlet
     // number of DSpace items per feed
     private static int itemCount = 0;
     // optional cache of feeds
-    private static Map feedCache = null;
+    private static Map<String, CacheFeed> feedCache = null;
     // maximum size of cache - 0 means caching disabled
     private static int cacheSize = 0;
     // how many days to keep a feed in cache before checking currency
     private static int cacheAge = 0;
     // supported syndication formats
-    private static List formats = null;
+    private static List<String> formats = null;
     // Whether to include private items or not
     private static boolean includeAll = true;
-    
-    //default fields to display in item description
-    private static String defaultDescriptionFields = "dc.title, dc.contributor.author, dc.contributor.editor, dc.description.abstract, dc.description";
-
     
     static
     {
     	enabled = ConfigurationManager.getBooleanProperty("webui.feed.enable");
+
+        // read rest of config info if enabled
+        if (enabled)
+        {
+            String fmtsStr = ConfigurationManager.getProperty("webui.feed.formats");
+            if ( fmtsStr != null )
+            {
+                formats = new ArrayList<String>();
+                String[] fmts = fmtsStr.split(",");
+                for (int i = 0; i < fmts.length; i++)
+                {
+                    formats.add(fmts[i]);
+                }
+            }
+
+            itemCount = ConfigurationManager.getIntProperty("webui.feed.items");
+            cacheSize = ConfigurationManager.getIntProperty("webui.feed.cache.size");
+            if (cacheSize > 0)
+            {
+                feedCache = new HashMap<String, CacheFeed>();
+                cacheAge = ConfigurationManager.getIntProperty("webui.feed.cache.age");
+            }
+        }
     }
     
-    public void init()
-    {
-    	// read rest of config info if enabled
-    	if (enabled)
-    	{
-    		String fmtsStr = ConfigurationManager.getProperty("webui.feed.formats");
-    		if ( fmtsStr != null )
-    		{
-    			formats = new ArrayList();
-    			String[] fmts = fmtsStr.split(",");
-    			for (int i = 0; i < fmts.length; i++)
-    			{
-    				formats.add(fmts[i]);
-    			}
-    		}
-    		itemCount = ConfigurationManager.getIntProperty("webui.feed.items");
-    		cacheSize = ConfigurationManager.getIntProperty("webui.feed.cache.size");
-    		if (cacheSize > 0)
-    		{
-    			feedCache = new HashMap();
-    	   		cacheAge = ConfigurationManager.getIntProperty("webui.feed.cache.age");
-    		}
-    	}
-    }
-
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
@@ -187,7 +140,7 @@ public class FeedServlet extends DSpaceServlet
         {
             // substring(1) is to remove initial '/'
             path = path.substring(1);
-            int split = path.indexOf("/");
+            int split = path.indexOf('/');
             if (split != -1)
             {
             	feedType = path.substring(0,split);
@@ -248,7 +201,7 @@ public class FeedServlet extends DSpaceServlet
         SyndicationFeed feed = null;
         if (feedCache != null)
         {
-                CacheFeed cFeed = (CacheFeed)feedCache.get(cacheKey);
+                CacheFeed cFeed = feedCache.get(cacheKey);
         	if (cFeed != null)  // cache hit, but...
         	{
         		// Is the feed current?
@@ -291,7 +244,7 @@ public class FeedServlet extends DSpaceServlet
         }
         catch( FeedException fex )
         {
-        	throw new IOException(fex.getMessage());
+        	throw new IOException(fex.getMessage(), fex);
         }
     }
        
@@ -339,12 +292,16 @@ public class FeedServlet extends DSpaceServlet
     		BrowserScope scope = new BrowserScope(context);
     		scope.setBrowseIndex(bix);
                 if (dso != null)
+                {
                     scope.setBrowseContainer(dso);
+                }
 
             for (SortOption so : SortOption.getSortOptions())
             {
                 if (so.getName().equals(idx))
+                {
                     scope.setSortBy(so.getNumber());
+                }
             }
             scope.setOrder(SortOption.DESCENDING);
     		scope.setResultsPerPage(itemCount);
@@ -382,12 +339,12 @@ public class FeedServlet extends DSpaceServlet
         catch (SortException se)
         {
             log.error("caught exception: ", se);
-            throw new IOException(se.getMessage());
+            throw new IOException(se.getMessage(), se);
         }
     	catch (BrowseException e)
     	{
     		log.error("caught exception: ", e);
-    		throw new IOException(e.getMessage());
+    		throw new IOException(e.getMessage(), e);
     	}
     }
     
@@ -414,11 +371,11 @@ public class FeedServlet extends DSpaceServlet
 	    	CacheFeed minFeed = null;
 	    	CacheFeed maxFeed = null;
 	    	
-	    	Iterator iter = feedCache.keySet().iterator();
+	    	Iterator<String> iter = feedCache.keySet().iterator();
 	    	while (iter.hasNext())
 	    	{
-	    		String key = (String)iter.next();
-	    		CacheFeed feed = (CacheFeed)feedCache.get(key);
+	    		String key = iter.next();
+	    		CacheFeed feed = feedCache.get(key);
 	    		if (minKey != null)
 	    		{
 	    			if (feed.hits < minFeed.hits)
@@ -434,7 +391,8 @@ public class FeedServlet extends DSpaceServlet
 	    		else
 	    		{
 	    			minKey = key;
-	    			minFeed = maxFeed = feed;
+	    			minFeed = feed;
+                    maxFeed = feed;
 	    		}
 	    		total += feed.hits;
 	    	}
@@ -454,7 +412,7 @@ public class FeedServlet extends DSpaceServlet
     /**
      * Class to instrument accesses & currency of a given feed in cache
      */  
-    private class CacheFeed
+    private static class CacheFeed
 	{
     	// currency timestamp
     	public long timeStamp = 0L;

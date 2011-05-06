@@ -1,76 +1,34 @@
-/*
- * OpenSearchGenerator.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 1.4 $
- *
- * Date: $Date: 2006/01/10 04:28:19 $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.xmlui.cocoon;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URLDecoder;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 
 import org.apache.avalon.excalibur.pool.Recyclable;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.avalon.framework.parameters.ParameterException;
 import org.apache.cocoon.ProcessingException;
-import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
-import org.apache.cocoon.environment.http.HttpRequest;
 import org.apache.cocoon.generation.AbstractGenerator;
 import org.apache.cocoon.util.HashUtil;
 
 import org.apache.cocoon.xml.dom.DOMStreamer;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.ExpiresValidity;
-import org.apache.log4j.Logger;
 
 import org.dspace.app.util.OpenSearch;
-import org.dspace.app.util.SyndicationFeed;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.FeedUtils;
 import org.dspace.search.DSQuery;
@@ -81,14 +39,10 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 /**
@@ -120,8 +74,6 @@ import org.xml.sax.SAXException;
 public class OpenSearchGenerator extends AbstractGenerator
                 implements CacheableProcessingComponent, Recyclable
 {
-    private static final Logger log = Logger.getLogger(OpenSearchGenerator.class);
-            
     /** Cache of this object's validity */
     private ExpiresValidity validity = null;
     
@@ -152,9 +104,15 @@ public class OpenSearchGenerator extends AbstractGenerator
     public Serializable getKey()
     {
         StringBuffer key = new StringBuffer("key:");
-        if (scope != null) key.append(scope);
+        if (scope != null)
+        {
+            key.append(scope);
+        }
         key.append(query);
-        if (format != null) key.append(format);
+        if (format != null)
+        {
+            key.append(format);
+        }
         key.append(sort);
         key.append(start);
         key.append(rpp);
@@ -171,7 +129,7 @@ public class OpenSearchGenerator extends AbstractGenerator
         if (this.validity == null)
         {
                 long expiry = System.currentTimeMillis() +
-                ConfigurationManager.getIntProperty("websvc.opensearch.validity") * 60 * 60 * 1000;
+                    ConfigurationManager.getLongProperty("websvc.opensearch.validity") * 60 * 60 * 1000;
                 this.validity = new ExpiresValidity(expiry);
         }
         return this.validity;
@@ -188,10 +146,16 @@ public class OpenSearchGenerator extends AbstractGenerator
         
         Request request = ObjectModelHelper.getRequest(objectModel);
         this.query = request.getParameter("query");
-        if (query == null) query = "";
+        if (query == null)
+        {
+            query = "";
+        }
         query = URLDecoder.decode(query, "UTF-8");
         this.format = request.getParameter("format");
-        if (format == null || format.length() == 0) format = "atom";
+        if (format == null || format.length() == 0)
+        {
+            format = "atom";
+        }
         this.scope = request.getParameter("scope");
         String srt = request.getParameter("sort_by");
         this.sort = (srt == null || srt.length() == 0) ? 0 : Integer.valueOf(srt);
@@ -285,12 +249,16 @@ public class OpenSearchGenerator extends AbstractGenerator
                 {
                     qResults = DSQuery.doQuery(context, qArgs, (Community)container);
                 }
+                else
+                {
+                    throw new IllegalStateException("Invalid container for search context");
+                }
                 
                 // now instantiate the results
                 DSpaceObject[] results = new DSpaceObject[qResults.getHitHandles().size()];
                 for (int i = 0; i < qResults.getHitHandles().size(); i++)
                 {
-                    String myHandle = (String)qResults.getHitHandles().get(i);
+                    String myHandle = qResults.getHitHandles().get(i);
                     DSpaceObject dso = HandleManager.resolveToObject(context, myHandle);
                     if (dso == null)
                     {

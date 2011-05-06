@@ -1,43 +1,10 @@
-/*
- * List.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.xmlui.wing.element;
 
 /**
@@ -174,10 +141,6 @@ public class List extends AbstractWingElement implements WingMergeableElement,
      * Set the head element which is the label associated with this list. This
      * method should be called before any other elements have been added to the
      * list.
-     * 
-     * @param characters
-     *            (May be null) Untranslated character data to be included as
-     *            the list's head.
      */
     public Head setHead() throws WingException
     {
@@ -454,14 +417,22 @@ public class List extends AbstractWingElement implements WingMergeableElement,
     {
         // Check if it's in our name space and an options element.
         if (!WingConstants.DRI.URI.equals(namespace))
+        {
             return false;
+        }
         if (!E_LIST.equals(localName))
+        {
             return false;
+        }
         String name = attributes.getValue(A_NAME);
         if (name == null)
+        {
             return false;
+        }
         if (!name.equals(this.name))
+        {
             return false;
+        }
         return true;
     }
 
@@ -496,7 +467,9 @@ public class List extends AbstractWingElement implements WingMergeableElement,
                 WingMergeableElement candidate = (WingMergeableElement) content;
                 if (candidate.mergeEqual(namespace, localName, qName,
                         attributes))
+                {
                     found = candidate;
+                }
             }
         }
         contents.remove(found);
@@ -541,28 +514,38 @@ public class List extends AbstractWingElement implements WingMergeableElement,
             NamespaceSupport namespaces) throws SAXException
     {
 
-        if (this.merged == false)
+        if (!this.merged)
         {
             AttributeMap attributes = new AttributeMap();
             attributes.put(A_NAME, this.name);
             attributes.put(A_ID, this.context.generateID(E_LIST, this.name));
             if (this.type != null)
+            {
                 attributes.put(A_TYPE, this.type);
+            }
             if (this.rend != null)
+            {
                 attributes.put(A_RENDER, this.rend);
+            }
 
             startElement(contentHandler, namespaces, E_LIST, attributes);
             
         }
             
-        if (childMerged == false && head != null)
-        	head.toSAX(contentHandler, lexicalHandler, namespaces);
+        if (!childMerged && head != null)
+        {
+            head.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
 
         for (AbstractWingElement content : contents)
-            content.toSAX(contentHandler, lexicalHandler,  namespaces);
+        {
+            content.toSAX(contentHandler, lexicalHandler, namespaces);
+        }
 
-        if (this.merged == false)
+        if (!this.merged)
+        {
             endElement(contentHandler, namespaces, E_LIST);
+        }
     }
 
     /**
@@ -571,10 +554,14 @@ public class List extends AbstractWingElement implements WingMergeableElement,
     public void dispose()
     {
         if (head != null)
+        {
             head.dispose();
+        }
         head = null;
         for (AbstractWingElement content : contents)
+        {
             content.dispose();
+        }
         contents.clear();
         contents = null;
         super.dispose();

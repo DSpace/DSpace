@@ -1,44 +1,14 @@
-/*
- * Util.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4743 $
- *
- * Date: $Date: 2010-02-06 19:35:14 -0500 (Sat, 06 Feb 2010) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.util;
 
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Enumeration;
@@ -56,7 +26,7 @@ import org.dspace.core.Constants;
  *
  * @author Robert Tansley
  * @author Mark Diggory
- * @version $Revision: 4743 $
+ * @version $Revision: 5844 $
  */
 public class Util {
         // cache for source version result
@@ -194,7 +164,7 @@ public class Util {
           *
           *  The numbers are formatted using java Locales
           *
-          * @param in The number to covnert
+          * @param in The number to convert
           * @return the file size as a String
           */
         public static String formatFileSize(double in) {
@@ -351,16 +321,29 @@ public class Util {
         {
             Properties constants = new Properties();
 
+            InputStream cis = null;
             try
             {
-                InputStream cis = Util.class.getResourceAsStream
-                    ("/META-INF/maven/org.dspace/dspace-api/pom.properties");
-
+                cis = Util.class.getResourceAsStream("/META-INF/maven/org.dspace/dspace-api/pom.properties");
                 constants.load(cis);
             }
             catch(Exception e)
             {
                 log.error(e.getMessage(),e);
+            }
+            finally
+            {
+                if (cis != null)
+                {
+                    try
+                    {
+                        cis.close();
+                    }
+                    catch (IOException e)
+                    {
+                        log.error("Unable to close input stream", e);
+                    }
+                }
             }
 
             sourceVersion = constants.getProperty("version", "none");

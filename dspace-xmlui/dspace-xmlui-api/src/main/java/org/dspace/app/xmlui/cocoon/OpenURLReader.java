@@ -1,48 +1,15 @@
-/*
- * OpenURLReader.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.cocoon;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -60,7 +27,6 @@ import org.apache.cocoon.reading.AbstractReader;
 import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
@@ -75,7 +41,7 @@ import org.xml.sax.SAXException;
  * 
  * @author Robert Tansley
  * @author Mark Diggory (mdiggory at mire.be)
- * @version $Revision: 3705 $
+ * @version $Revision: 5845 $
  */
 public class OpenURLReader extends AbstractReader implements Recyclable {
 
@@ -289,23 +255,21 @@ public class OpenURLReader extends AbstractReader implements Recyclable {
 		/**
 		 * Otherwise, attempt to full text search for the item
 		 */
-		String query = "";
+		StringBuilder queryBuilder = new StringBuilder();
 
 		Enumeration<String> e = request.getParameterNames();
 
-		boolean error = true;
-		
 		while (e.hasMoreElements()) {
 			String name = e.nextElement();
 			if (name.startsWith("rft.")) {
 				for (String value : request.getParameterValues(name)) {
-					query += value + " ";
-					error = false;
+					queryBuilder.append(value).append(" ");
 				}
 			}
 		}
-		
-		if(query.trim().length() == 0)
+
+        String query = queryBuilder.toString().trim();
+		if(query.length() == 0)
 		{
 			httpResponse.sendError(httpResponse.SC_BAD_REQUEST, "OpenURL Request requires a valid rtf_id, rtf.identifier or other rtf.<dublincore> search fields" );
 		}

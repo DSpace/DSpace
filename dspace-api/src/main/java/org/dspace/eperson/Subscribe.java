@@ -1,39 +1,9 @@
-/*
- * Subscribe.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3762 $
- *
- * Date: $Date: 2009-05-07 00:36:47 -0400 (Thu, 07 May 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.eperson;
 
@@ -44,7 +14,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
@@ -80,7 +49,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * Class defining methods for sending new item e-mail alerts to users
  * 
  * @author Robert Tansley
- * @version $Revision: 3762 $
+ * @version $Revision: 5844 $
  */
 public class Subscribe
 {
@@ -117,10 +86,10 @@ public class Subscribe
                 if (!r.hasNext())
                 {
                     // Not subscribed, so add them
-                    TableRow row = DatabaseManager.create(context, "subscription");
+                    TableRow row = DatabaseManager.row("subscription");
                     row.setColumn("eperson_id", eperson.getID());
                     row.setColumn("collection_id", collection.getID());
-                    DatabaseManager.update(context, row);
+                    DatabaseManager.insert(context, row);
 
                     log.info(LogManager.getHeader(context, "subscribe",
                             "eperson_id=" + eperson.getID() + ",collection_id="
@@ -131,7 +100,9 @@ public class Subscribe
             {
                 // close the TableRowIterator to free up resources
                 if (r != null)
+                {
                     r.close();
+                }
             }
         }
         else
@@ -203,7 +174,7 @@ public class Subscribe
                 "SELECT collection_id FROM subscription WHERE eperson_id= ? ",
                 eperson.getID());
 
-        List collections = new ArrayList();
+        List<Collection> collections = new ArrayList<Collection>();
 
         try
         {
@@ -219,7 +190,9 @@ public class Subscribe
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
         
         Collection[] collArray = new Collection[collections.size()];
@@ -254,7 +227,9 @@ public class Subscribe
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
     }
 
@@ -283,7 +258,7 @@ public class Subscribe
                 "SELECT * FROM subscription ORDER BY eperson_id");
 
         EPerson currentEPerson = null;
-        List collections = null; // List of Collections
+        List<Collection> collections = null; // List of Collections
 
         try
         {
@@ -315,7 +290,7 @@ public class Subscribe
 
                     currentEPerson = EPerson.find(context, row
                             .getIntColumn("eperson_id"));
-                    collections = new ArrayList();
+                    collections = new ArrayList<Collection>();
                 }
 
                 collections.add(Collection.find(context, row
@@ -326,7 +301,9 @@ public class Subscribe
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
         
         // Process the last person
@@ -359,7 +336,7 @@ public class Subscribe
      * @param test 
      */
     public static void sendEmail(Context context, EPerson eperson,
-            List collections, boolean test) throws IOException, MessagingException,
+            List<Collection> collections, boolean test) throws IOException, MessagingException,
             SQLException
     {
         // Check for restricted eperson list
@@ -395,13 +372,13 @@ public class Subscribe
 
         for (int i = 0; i < collections.size(); i++)
         {
-            Collection c = (Collection) collections.get(i);
+            Collection c = collections.get(i);
 
             try {
                 boolean includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.subscription", true);
                 
                 // we harvest all the changed item from yesterday until now
-                List itemInfos = Harvest.harvest(context, c, startDate, null, 0, // Limit
+                List<HarvestedItemInfo> itemInfos = Harvest.harvest(context, c, startDate, null, 0, // Limit
                                                                                     // and
                                                                                     // offset
                                                                                     // zero,
@@ -556,7 +533,9 @@ public class Subscribe
         boolean test = line.hasOption("t");
 
         if(test)
+        {
             log.setLevel(Level.DEBUG);
+        }
         
         Context context = null;
 
@@ -580,11 +559,11 @@ public class Subscribe
         }
     }
     
-    private static List filterOutToday(List completeList)
+    private static List<HarvestedItemInfo> filterOutToday(List<HarvestedItemInfo> completeList)
     {
         log.debug("Filtering out all today item to leave new items list size="
                 + completeList.size());
-        List filteredList = new ArrayList();
+        List<HarvestedItemInfo> filteredList = new ArrayList<HarvestedItemInfo>();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String today = sdf.format(new Date());
@@ -593,10 +572,8 @@ public class Subscribe
                 - (24 * 60 * 60 * 1000));
         String yesterday = sdf.format(thisTimeYesterday);
 
-        for (Iterator iter = completeList.iterator(); iter.hasNext();)
+        for (HarvestedItemInfo infoObject : completeList)
         {
-            HarvestedItemInfo infoObject = (HarvestedItemInfo) iter.next();
-
             Date lastUpdate = infoObject.item.getLastModified();
             String lastUpdateStr = sdf.format(lastUpdate);
 
@@ -647,10 +624,10 @@ public class Subscribe
         return filteredList;
     }
 
-    private static List filterOutModified(List completeList)
+    private static List<HarvestedItemInfo> filterOutModified(List<HarvestedItemInfo> completeList)
     {
         log.debug("Filtering out all modified to leave new items list size="+completeList.size());
-        List filteredList = new ArrayList();
+        List<HarvestedItemInfo> filteredList = new ArrayList<HarvestedItemInfo>();
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         // Get the start and end dates for yesterday
@@ -658,9 +635,8 @@ public class Subscribe
                 - (24 * 60 * 60 * 1000));
         String yesterday = sdf.format(thisTimeYesterday);
         
-        for (Iterator iter = completeList.iterator(); iter.hasNext();)
+        for (HarvestedItemInfo infoObject : completeList)
         {
-            HarvestedItemInfo infoObject = (HarvestedItemInfo) iter.next();
             DCValue[] dateAccArr = infoObject.item.getMetadata("dc", "date", "accessioned", Item.ANY);
             
             if (dateAccArr != null && dateAccArr.length > 0)

@@ -1,19 +1,15 @@
 /**
- * $Id: SolrLoggerUsageEventListener.java 4745 2010-02-07 17:44:17Z mdiggory $
- * $URL: http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.6.2/dspace-stats/src/main/java/org/dspace/statistics/SolrLoggerUsageEventListener.java $
- * *************************************************************************
- * Copyright (c) 2002-2009, DuraSpace.  All rights reserved
- * Licensed under the DuraSpace Foundation License.
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * A copy of the DuraSpace License has been included in this
- * distribution and is available at: http://scm.dspace.org/svn/repo/licenses/LICENSE.txt
+ * http://www.dspace.org/license/
  */
 package org.dspace.statistics;
 
 import org.apache.log4j.Logger;
 import org.dspace.eperson.EPerson;
 import org.dspace.services.model.Event;
-import org.dspace.statistics.util.SpiderDetector;
 import org.dspace.usage.AbstractUsageEventListener;
 import org.dspace.usage.UsageEvent;
 

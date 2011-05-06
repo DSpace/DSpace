@@ -1,107 +1,34 @@
-/*
- * Harvest.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 1 $
- *
- * Date: $Date: 2007-11-28 15:07:34 -0600 (Wed, 28 Nov 2007) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.harvest;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.FilenameFilter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.StringTokenizer;
-import java.util.Vector;
 import java.util.List;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
-import org.apache.xpath.XPathAPI;
-import org.dspace.app.itemimport.ItemImport;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.authorize.ResourcePolicy;
 import org.dspace.browse.IndexBrowse;
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.FormatIdentifier;
 import org.dspace.harvest.HarvestedCollection;
-import org.dspace.content.InstallItem;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
-import org.dspace.content.MetadataField;
-import org.dspace.content.MetadataSchema;
 import org.dspace.harvest.OAIHarvester;
-import org.dspace.content.WorkspaceItem;
 import org.dspace.harvest.OAIHarvester.HarvestingException;
-import org.dspace.content.crosswalk.CrosswalkException;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
-import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
-import org.dspace.workflow.WorkflowManager;
-import org.w3c.dom.Document;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
 
 /**
  *  Test class for harvested collections.
@@ -120,7 +47,7 @@ public class Harvest
         Options options = new Options();
 
         options.addOption("p", "purge", false, "delete all items in the collection");
-        options.addOption("r", "run", false, "run the standrad harvest procedure");
+        options.addOption("r", "run", false, "run the standard harvest procedure");
         options.addOption("g", "ping", false, "test the OAI server and set");
         options.addOption("o", "once", false, "run the harvest procedure with specified parameters");
         options.addOption("s", "setup", false, "Set the collection up for harvesting");
@@ -235,7 +162,7 @@ public class Harvest
             System.exit(1);
         }
         // Run a single harvest cycle on a collection using saved settings.
-        else if (command.equals("run"))
+        else if ("run".equals(command))
         {
             if (collection == null || eperson == null)
             {
@@ -248,17 +175,17 @@ public class Harvest
             harvester.runHarvest(collection, eperson);
         }
         // start the harvest loop
-        else if (command.equals("start")) 
+        else if ("start".equals(command))
         {
         	startHarvester();
         }
         // reset harvesting status
-        else if (command.equals("reset")) 
+        else if ("reset".equals(command))
         {
         	resetHarvesting();
         }
         // purge all collections that are set up for harvesting (obviously for testing purposes only)
-        else if (command.equals("purgeAll")) 
+        else if ("purgeAll".equals(command))
         {
         	if (eperson == null)
             {
@@ -277,7 +204,7 @@ public class Harvest
 	    	context.complete();
         }
         // Delete all items in a collection. Useful for testing fresh harvests.
-        else if (command.equals("purge"))
+        else if ("purge".equals(command))
         {
             if (collection == null || eperson == null)
             {
@@ -293,7 +220,7 @@ public class Harvest
             //TODO: implement this... remove all items and remember to unset "last-harvested" settings
         }
         // Configure a collection with the three main settings 
-        else if (command.equals("config"))
+        else if ("config".equals(command))
         {
             if (collection == null)
             {
@@ -316,7 +243,7 @@ public class Harvest
             
             harvester.configureCollection(collection, harvestType, oaiSource, oaiSetID, metadataKey);
         }
-        else if (command.equals("ping"))
+        else if ("ping".equals(command))
         {
             if (oaiSource == null || oaiSetID == null)
             {
@@ -325,27 +252,6 @@ public class Harvest
                 System.exit(1);
             }
         }
-    }
-    
-    
-    /**
-     * check 
-     * @param collectionID
-     * @return
-     */
-    private Collection checkCollection(String collectionID) 
-    {
-    	Collection collection = resolveCollection(collectionID);
-    	try {
-    		HarvestedCollection hc = HarvestedCollection.find(context, collection.getID());
-	        if (!hc.isHarvestable()) {
-	        	System.out.println("Collection '"+ collection.getName() +"' is not set up for harvesting");
-	            System.exit(1);
-	        }
-    	} catch (SQLException se) {
-    		se.printStackTrace();
-    	}
-    	return collection;
     }
     
     /*
@@ -359,30 +265,37 @@ public class Harvest
     	
     	try {
 	    	// is the ID a handle?
-	        if (collectionID.indexOf('/') != -1)
-	        {
-	            // string has a / so it must be a handle - try and resolve it
-	            dso = HandleManager.resolveToObject(context, collectionID);
-	
-	            // resolved, now make sure it's a collection
-	            if (dso == null || dso.getType() != Constants.COLLECTION)
-	                targetCollection = null;
-	            else
-	            	targetCollection = (Collection)dso;
-	        }
-	        // not a handle, try and treat it as an integer collection
-	        // database ID
-	        else if (collectionID != null)
-	        {
-	        	System.out.println("Looking up by id: " + collectionID + ", parsed as '" + Integer.parseInt(collectionID) + "', " + "in context: " + context);
-	            targetCollection = Collection.find(context, Integer.parseInt(collectionID));
-	        }
-	        // was the collection valid?
-	        if (targetCollection == null)
-	        {
-	        	System.out.println("Cannot resolve " + collectionID + " to collection");
-	            System.exit(1);
-	        }
+	        if (collectionID != null)
+            {
+                if (collectionID.indexOf('/') != -1)
+                {
+                    // string has a / so it must be a handle - try and resolve it
+                    dso = HandleManager.resolveToObject(context, collectionID);
+
+                    // resolved, now make sure it's a collection
+                    if (dso == null || dso.getType() != Constants.COLLECTION)
+                    {
+                        targetCollection = null;
+                    }
+                    else
+                    {
+                        targetCollection = (Collection) dso;
+                    }
+                }
+                // not a handle, try and treat it as an integer collection
+                // database ID
+                else
+                {
+                    System.out.println("Looking up by id: " + collectionID + ", parsed as '" + Integer.parseInt(collectionID) + "', " + "in context: " + context);
+                    targetCollection = Collection.find(context, Integer.parseInt(collectionID));
+                }
+            }
+            // was the collection valid?
+            if (targetCollection == null)
+            {
+                System.out.println("Cannot resolve " + collectionID + " to collection");
+                System.exit(1);
+            }
     	}
     	catch (SQLException se) {
     		se.printStackTrace();
@@ -417,7 +330,10 @@ public class Harvest
     		System.exit(1);
     	}
     	finally {
-    		context.restoreAuthSystemState();
+            if (context != null)
+            {
+    		    context.restoreAuthSystemState();
+            }
     	}
     }
     
@@ -429,7 +345,7 @@ public class Harvest
      * @param email
      */
     private void purgeCollection(String collectionID, String email) {
-    	System.out.println("Purging collection of all items and reseting last_harvested and harvest_message: " + collectionID);
+    	System.out.println("Purging collection of all items and resetting last_harvested and harvest_message: " + collectionID);
     	Collection collection = resolveCollection(collectionID);
    	
     	try 
@@ -492,10 +408,11 @@ public class Harvest
     	catch (HarvestingException hex) {
     		System.out.print("failed. ");
     		System.out.println(hex.getMessage());
-    		System.exit(1);
+    		throw new IllegalStateException("Unable to harvest", hex);
     	} catch (SQLException se) {
-			// TODO Auto-generated catch block
-			se.printStackTrace();
+            System.out.print("failed. ");
+            System.out.println(se.getMessage());
+            throw new IllegalStateException("Unable to access database", se);
 		}
     	    	
     	try {
@@ -506,12 +423,17 @@ public class Harvest
     		harvester.runHarvest();
     		context.complete();
     	}
-    	catch (Exception e) {
-			// Not much else we can do at this point
-			e.printStackTrace();
-			System.exit(1);
-		}
-    	System.out.println("Harvest complete. ");
+        catch (SQLException e) {
+            throw new IllegalStateException("Failed to run harvester", e);
+        }
+        catch (AuthorizeException e) {
+            throw new IllegalStateException("Failed to run harvester", e);
+        }
+        catch (IOException e) {
+            throw new IllegalStateException("Failed to run harvester", e);
+        }
+
+        System.out.println("Harvest complete. ");
     }
     
     

@@ -1,44 +1,14 @@
-/*
- * ClassicDSpaceLogConverter.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision:$
- *
- * Date: $Date:$
- *
- * Copyright (c) 2002-2010, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.statistics.util;
 
 import org.apache.commons.cli.*;
+import org.apache.log4j.Logger;
 import org.dspace.app.statistics.LogAnalyser;
 import org.dspace.app.statistics.LogLine;
 import org.dspace.content.*;
@@ -47,8 +17,6 @@ import org.dspace.core.Context;
 
 import java.io.*;
 import java.sql.SQLException;
-import java.util.Hashtable;
-import java.util.Vector;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.text.SimpleDateFormat;
@@ -62,6 +30,7 @@ import java.text.ParsePosition;
  * @author Stuart Lewis
  */
 public class ClassicDSpaceLogConverter {
+    private Logger log = Logger.getLogger(ClassicDSpaceLogConverter.class);
 
     /** A DSpace context */
     private Context context;
@@ -123,134 +92,147 @@ public class ClassicDSpaceLogConverter {
         LogAnalyser.setRegex(in);
 
         // Open the file and read it line by line
-        try
-        {
-            BufferedReader input =  new BufferedReader(new FileReader(new File(in)));
-            Writer output = new BufferedWriter(new FileWriter(new File(out)));
+        BufferedReader input = null;
+        Writer output = null;
 
-            try {
-                String line;
-                LogLine lline;
-                String lout;
-                String id;
-                String handle;
-                String ip;
-                String date;
-                DSpaceObject dso;
-                String uid;
-                String lastLine = "";
-                while ((line = input.readLine()) != null)
+        try {
+            String line;
+            LogLine lline;
+            String lout;
+            String id;
+            String handle;
+            String ip;
+            String date;
+            DSpaceObject dso;
+            String uid;
+            String lastLine = "";
+
+            input =  new BufferedReader(new FileReader(new File(in)));
+            output = new BufferedWriter(new FileWriter(new File(out)));
+
+            while ((line = input.readLine()) != null)
+            {
+                // Read inthe line and covnert it to a LogLine
+                lines++;
+                if (verbose)
                 {
-                    // Read inthe line and covnert it to a LogLine
-                    lines++;
-                    if (verbose) System.out.println("  - IN: " + line);
-                    lline = LogAnalyser.getLogLine(line);
+                    System.out.println("  - IN: " + line);
+                }
+                lline = LogAnalyser.getLogLine(line);
 
-                    // Get rid of any lines that aren't INFO
-                    if ((lline == null) || (!lline.isLevel("INFO")))
+                // Get rid of any lines that aren't INFO
+                if ((lline == null) || (!lline.isLevel("INFO")))
+                {
+                    if (verbose)
                     {
-                        if (verbose) System.out.println("   - IGNORED!");
-                        continue;
+                        System.out.println("   - IGNORED!");
                     }
+                    continue;
+                }
 
-                    // Get the IP address of the user
-                    Matcher matcher = ipaddrPattern.matcher(line);
-                    if (matcher.find())
+                // Get the IP address of the user
+                Matcher matcher = ipaddrPattern.matcher(line);
+                if (matcher.find())
+                {
+                    ip = matcher.group(1);
+                }
+                else
+                {
+                    ip = "unknown";
+                }
+
+                // Get and format the date
+                // We can use lline.getDate() as this strips the time element
+                date = dateFormatOut.format(
+                       dateFormatIn.parse(line.substring(0, line.indexOf(',')),
+                                             new ParsePosition(0)));
+
+                // Generate a UID for the log line
+                // - based on the date/time
+                uid = dateFormatOutUID.format(
+                       dateFormatInUID.parse(line.substring(0, line.indexOf(' ', line.indexOf(' ') + 1)),
+                                             new ParsePosition(0)));
+
+                try
+                {
+                    // What sort of view is it?
+                    // (ignore lines from org.dspace.usage.LoggerUsageEventListener which is 1.6 code)
+                    if ((lline.getAction().equals("view_bitstream")) &&
+                        (!lline.getParams().contains("invalid_bitstream_id")) &&
+                        (!lline.getParams().contains("withdrawn")) &&
+                        ((!line.contains("org.dspace.usage.LoggerUsageEventListener")) || newEvents))
                     {
-                        ip = matcher.group(1);
+                        id = lline.getParams().substring(13);
+                    }
+                    else if ((lline.getAction().equals("view_item")) &&
+                            ((!line.contains("org.dspace.usage.LoggerUsageEventListener")) || newEvents))
+                    {
+                        handle = lline.getParams().substring(7);
+                        dso = HandleManager.resolveToObject(context, handle);
+                        id = "" + dso.getID();
+                    }
+                    else if ((lline.getAction().equals("view_collection")) &&
+                             ((!line.contains("org.dspace.usage.LoggerUsageEventListener")) || newEvents))
+                    {
+                        id = lline.getParams().substring(14);
+                    }
+                    else if ((lline.getAction().equals("view_community")) &&
+                             ((!line.contains("org.dspace.usage.LoggerUsageEventListener")) || newEvents))
+                    {
+                        id = lline.getParams().substring(13);
                     }
                     else
                     {
-                        ip = "unknown";
-                    }
-
-                    // Get and format the date
-                    // We can use lline.getDate() as this strips the time element
-                    date = dateFormatOut.format(
-                           dateFormatIn.parse(line.substring(0, line.indexOf(',')),
-                                                 new ParsePosition(0)));
-
-                    // Generate a UID for the log line
-                    // - based on the date/time
-                    uid = dateFormatOutUID.format(
-                           dateFormatInUID.parse(line.substring(0, line.indexOf(' ', line.indexOf(' ') + 1)),
-                                                 new ParsePosition(0)));
-
-                    try
-                    {
-                        // What sort of view is it?
-                        // (ignore lines from org.dspace.usage.LoggerUsageEventListener which is 1.6 code)
-                        if ((lline.getAction().equals("view_bitstream")) &&
-                            (!lline.getParams().contains("invalid_bitstream_id")) &&
-                            (!lline.getParams().contains("withdrawn")) &&
-                            ((!line.contains("org.dspace.usage.LoggerUsageEventListener")) || newEvents))
-                        {
-                            id = lline.getParams().substring(13);
-                        }
-                        else if ((lline.getAction().equals("view_item")) &&
-                                ((!line.contains("org.dspace.usage.LoggerUsageEventListener")) || newEvents))
-                        {
-                            handle = lline.getParams().substring(7);
-                            dso = HandleManager.resolveToObject(context, handle);
-                            id = "" + dso.getID();
-                        }
-                        else if ((lline.getAction().equals("view_collection")) &&
-                                 ((!line.contains("org.dspace.usage.LoggerUsageEventListener")) || newEvents))
-                        {
-                            id = lline.getParams().substring(14);
-                        }
-                        else if ((lline.getAction().equals("view_community")) &&
-                                 ((!line.contains("org.dspace.usage.LoggerUsageEventListener")) || newEvents))
-                        {
-                            id = lline.getParams().substring(13);
-                        }
-                        else
-                        {
-                            //if (verbose) System.out.println("   - IGNORED!");
-                            continue;
-                        }
-
-                        // Construct the log line
-                        lout = uid + "," +
-                               lline.getAction() + "," +
-                               id + "," +
-                               date + "," +
-                               lline.getUser() + "," +
-                               ip + "\n";
-                    }
-                    catch (Exception e)
-                    {
-                        if (verbose) System.out.println("  - IN: " + line);
-                        if (verbose) System.err.println("Error with log line! " + e.getMessage());
+                        //if (verbose) System.out.println("   - IGNORED!");
                         continue;
                     }
 
-                    if ((verbose) && (!"".equals(lout)))
+                    // Construct the log line
+                    lout = uid + "," +
+                           lline.getAction() + "," +
+                           id + "," +
+                           date + "," +
+                           lline.getUser() + "," +
+                           ip + "\n";
+                }
+                catch (Exception e)
+                {
+                    if (verbose)
                     {
                         System.out.println("  - IN: " + line);
-                        System.out.println("  - OUT: " + lout);
                     }
-
-                    // Write the output line
-                    if ((!"".equals(lout)) && (!lout.equals(lastLine)))
+                    if (verbose)
                     {
-                        output.write(lout);
-                        counter++;
-                        lastLine = lout;
+                        System.err.println("Error with log line! " + e.getMessage());
                     }
+                    continue;
+                }
+
+                if ((verbose) && (!"".equals(lout)))
+                {
+                    System.out.println("  - IN: " + line);
+                    System.out.println("  - OUT: " + lout);
+                }
+
+                // Write the output line
+                if ((!"".equals(lout)) && (!lout.equals(lastLine)))
+                {
+                    output.write(lout);
+                    counter++;
+                    lastLine = lout;
                 }
             }
-            finally
-            {
-                // Clean up the input and output streams
-                input.close();
-                output.flush();
-                output.close();
-            }
         }
-        catch (Exception ex)
+        catch (IOException e)
         {
-            ex.printStackTrace();
+            log.error("File access problem", e);
+        }
+        finally
+        {
+            // Clean up the input and output streams
+            try { input.close();  } catch (IOException e) { log.error(e.getMessage(), e); }
+            try { output.flush(); } catch (IOException e) { log.error(e.getMessage(), e); }
+            try { output.close(); } catch (IOException e) { log.error(e.getMessage(), e); }
         }
 
         // Tell the user what we have done
@@ -351,11 +333,11 @@ public class ClassicDSpaceLogConverter {
         // Set up the log analyser
         try
         {
-            LogAnalyser.readConfig(LogAnalyser.configFile);
+            LogAnalyser.readConfig();
         }
         catch (IOException ioe)
         {
-            System.err.println("Unable to read config file: " + LogAnalyser.configFile);
+            System.err.println("Unable to read config file: " + LogAnalyser.getConfigFile());
             System.exit(1);
         }
 
@@ -379,15 +361,14 @@ public class ClassicDSpaceLogConverter {
                 String out = line.getOptionValue('o') +
                              (dir.getAbsolutePath() +
                               System.getProperty("file.separator") + in).substring(line.getOptionValue('i').length());
-                int count = converter.convert(dir.getAbsolutePath() + System.getProperty("file.separator") + in,
-                                              out);
+
+                converter.convert(dir.getAbsolutePath() + System.getProperty("file.separator") + in, out);
             }
         }
         else
         {
             // Just convert the one file
-            int count = converter.convert(line.getOptionValue('i'),
-                                          line.getOptionValue('o'));
+            converter.convert(line.getOptionValue('i'), line.getOptionValue('o'));
         }
 
         // Clean everything up

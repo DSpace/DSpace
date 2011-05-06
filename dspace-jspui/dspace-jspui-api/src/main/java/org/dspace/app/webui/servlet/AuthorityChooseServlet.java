@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 /*
  *
  */
@@ -5,22 +12,17 @@
 package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.io.Writer;
 import java.util.Properties;
 import java.sql.SQLException;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.xml.sax.SAXException;
-import org.apache.commons.digester.plugins.PluginAssertionFailure;
 import org.dspace.app.webui.util.UIUtil;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
-import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.content.authority.ChoicesXMLGenerator;
 import org.dspace.core.Context;
 
@@ -94,7 +96,7 @@ public class AuthorityChooseServlet extends DSpaceServlet {
         }
         catch(SAXException e)
         {
-            throw new IOException(e.toString());
+            throw new IOException(e.toString(), e);
         }
         finally
         {

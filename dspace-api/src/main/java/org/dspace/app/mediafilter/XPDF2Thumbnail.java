@@ -1,42 +1,11 @@
-package org.dspace.app.mediafilter;
-
-/*
- * $HeadURL: $
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: $
- *
- * Date: $Date: $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
+package org.dspace.app.mediafilter;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -122,7 +91,7 @@ public class XPDF2Thumbnail extends MediaFilter
     private int maxwidth = 0;
 
     // backup default for size, on the large side.
-    final private int DEFAULT_MAXWIDTH = 500;
+    private static final int DEFAULT_MAXWIDTH = 500;
 
     public String getFilteredName(String oldFilename)
     {
@@ -154,12 +123,18 @@ public class XPDF2Thumbnail extends MediaFilter
             pdftoppmPath = ConfigurationManager.getProperty("xpdf.path.pdftoppm");
             pdfinfoPath = ConfigurationManager.getProperty("xpdf.path.pdfinfo");
             if (pdftoppmPath == null)
+            {
                 throw new IllegalStateException("No value for key \"xpdf.path.pdftoppm\" in DSpace configuration!  Should be path to XPDF pdftoppm executable.");
+            }
             if (pdfinfoPath == null)
+            {
                 throw new IllegalStateException("No value for key \"xpdf.path.pdfinfo\" in DSpace configuration!  Should be path to XPDF pdfinfo executable.");
+            }
             maxwidth = ConfigurationManager.getIntProperty("thumbnail.maxwidth");
             if (maxwidth == 0)
+            {
                 maxwidth = DEFAULT_MAXWIDTH;
+            }
         }
 
         // make local file copy of source PDF since the PDF tools
@@ -190,22 +165,27 @@ public class XPDF2Thumbnail extends MediaFilter
             String pdfinfoCmd[] = XPDF_PDFINFO_COMMAND.clone();
             pdfinfoCmd[0] = pdfinfoPath;
             pdfinfoCmd[pdfinfoCmd.length-1] = sourceTmp.toString();
+            BufferedReader lr = null;
             try
             {
                 MatchResult mediaBox = null;
                 Process pdfProc = Runtime.getRuntime().exec(pdfinfoCmd);
-                BufferedReader lr = new BufferedReader(new InputStreamReader(pdfProc.getInputStream()));
+                lr = new BufferedReader(new InputStreamReader(pdfProc.getInputStream()));
                 String line;
                 for (line = lr.readLine(); line != null; line = lr.readLine())
                 {
                     // if (line.matches(MEDIABOX_PATT))
                     Matcher mm = MEDIABOX_PATT.matcher(line);
                     if (mm.matches())
+                    {
                         mediaBox = mm.toMatchResult();
+                    }
                 }
                 int istatus = pdfProc.waitFor();
                 if (istatus != 0)
-                    log.error("XPDF pdfinfo proc failed, exit status="+istatus+", file="+sourceTmp);
+                {
+                    log.error("XPDF pdfinfo proc failed, exit status=" + istatus + ", file=" + sourceTmp);
+                }
                 if (mediaBox == null)
                 {
                     log.error("Sanity check: Did not find \"MediaBox\" line in output of XPDF pdfinfo, file="+sourceTmp);
@@ -213,10 +193,10 @@ public class XPDF2Thumbnail extends MediaFilter
                 }
                 else
                 {
-                    float x0 = Float.parseFloat(mediaBox.group(1));
-                    float y0 = Float.parseFloat(mediaBox.group(2));
-                    float x1 = Float.parseFloat(mediaBox.group(3));
-                    float y1 = Float.parseFloat(mediaBox.group(4));
+                    double x0 = Double.parseDouble(mediaBox.group(1));
+                    double y0 = Double.parseDouble(mediaBox.group(2));
+                    double x1 = Double.parseDouble(mediaBox.group(3));
+                    double y1 = Double.parseDouble(mediaBox.group(4));
                     int maxdim = (int)Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0));
                     dpi = Math.min(MAX_DPI, (MAX_PX * 72 / maxdim));
                     log.debug("DPI: pdfinfo method got dpi="+dpi+" for max dim="+maxdim+" (points, 1/72\")");
@@ -232,13 +212,23 @@ public class XPDF2Thumbnail extends MediaFilter
                 log.error("Failed interpreting pdfinfo results, check regexp: ",e);
                 throw new IllegalArgumentException("Failed transforming file for thumbnail: ",e);
             }
+            finally
+            {
+                if (lr != null)
+                {
+                    lr.close();
+                }
+            }
 
             // Render page 1 using xpdf's pdftoppm
             // Requires Sun JAI imageio additions to read ppm directly.
             // this will get "-000001.ppm" appended to it by pdftoppm
             File outPrefixF = File.createTempFile("prevu","out");
             String outPrefix = outPrefixF.toString();
-            outPrefixF.delete();
+            if (!outPrefixF.delete())
+            {
+                log.error("Unable to delete output file");
+            }
             String pdfCmd[] = XPDF_PDFTOPPM_COMMAND.clone();
             pdfCmd[0] = pdftoppmPath;
             pdfCmd[pdfCmd.length-3] = String.valueOf(dpi);
@@ -260,18 +250,29 @@ public class XPDF2Thumbnail extends MediaFilter
             }
             finally
             {
-                outf.delete();
+                if (!outf.delete())
+                {
+                    log.error("Unable to delete file");
+                }
             }
         }
         finally
         {
-            sourceTmp.delete();
+            if (!sourceTmp.delete())
+            {
+                log.error("Unable to delete temporary source");
+            }
+            
             if (status != 0)
-                log.error("PDF conversion proc failed, exit status="+status+", file="+sourceTmp);
+            {
+                log.error("PDF conversion proc failed, exit status=" + status + ", file=" + sourceTmp);
+            }
         }
 
         if (source == null)
+        {
             throw new IOException("Unknown failure while transforming file to preview: no image produced.");
+        }
 
         // Scale image and return in-memory stream
         BufferedImage toenail = scaleImage(source, maxwidth*3/4, maxwidth);
@@ -294,7 +295,9 @@ public class XPDF2Thumbnail extends MediaFilter
         // ALSO pass through if min and max are both 0
         if ((min == 0 && max == 0) ||
             (msize >= min && Math.min(xsize, ysize) <= max))
+        {
             return source;
+        }
         else
         {
             int xnew = xsize * max / msize;

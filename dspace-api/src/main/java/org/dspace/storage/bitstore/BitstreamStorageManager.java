@@ -1,41 +1,9 @@
-/*
- * BitstreamStorageManager.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 4519 $
- *
- * Date: $Date: 2009-11-11 19:53:09 -0500 (Wed, 11 Nov 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.storage.bitstore;
 
@@ -92,7 +60,7 @@ import edu.sdsc.grid.io.srb.SRBFileSystem;
  * be notified of BitstreamStorageManager actions.</p> 
  *
  * @author Peter Breton, Robert Tansley, David Little, Nathan Sarr
- * @version $Revision: 4519 $
+ * @version $Revision: 5844 $
  */
 public class BitstreamStorageManager
 {
@@ -143,7 +111,7 @@ public class BitstreamStorageManager
     /* Read in the asset stores from the config. */
     static
     {
-        ArrayList stores = new ArrayList();
+        List<Object> stores = new ArrayList<Object>();
 
 		// 'assetstore.dir' is always store number 0
 		String sAssetstoreDir = ConfigurationManager
@@ -292,7 +260,7 @@ public class BitstreamStorageManager
         {
             tempContext = new Context();
 
-            bitstream = DatabaseManager.create(tempContext, "Bitstream");
+            bitstream = DatabaseManager.row("Bitstream");
             bitstream.setColumn("deleted", true);
             bitstream.setColumn("internal_id", id);
 
@@ -303,7 +271,7 @@ public class BitstreamStorageManager
              */
             bitstream.setColumn("store_number", incoming);
 
-            DatabaseManager.update(tempContext, bitstream);
+            DatabaseManager.insert(tempContext, bitstream);
 
             tempContext.complete();
         }
@@ -362,15 +330,15 @@ public class BitstreamStorageManager
         bitstream.setColumn("deleted", false);
         DatabaseManager.update(context, bitstream);
 
-        int bitstream_id = bitstream.getIntColumn("bitstream_id");
+        int bitstreamId = bitstream.getIntColumn("bitstream_id");
 
         if (log.isDebugEnabled())
         {
-            log.debug("Stored bitstream " + bitstream_id + " in file "
+            log.debug("Stored bitstream " + bitstreamId + " in file "
                     + file.getAbsolutePath());
         }
 
-        return bitstream_id;
+        return bitstreamId;
     }
 
 	/**
@@ -400,11 +368,11 @@ public class BitstreamStorageManager
 		try {
 			tempContext = new Context();
 
-			bitstream = DatabaseManager.create(tempContext, "Bitstream");
+			bitstream = DatabaseManager.row("Bitstream");
 			bitstream.setColumn("deleted", true);
 			bitstream.setColumn("internal_id", sInternalId);
 			bitstream.setColumn("store_number", assetstore);
-			DatabaseManager.update(tempContext, bitstream);
+			DatabaseManager.insert(tempContext, bitstream);
 
 			tempContext.complete();
 		} catch (SQLException sqle) {
@@ -448,7 +416,7 @@ public class BitstreamStorageManager
 			catch (NoSuchAlgorithmException e) 
 			{
 				log.warn("Caught NoSuchAlgorithmException", e);
-				throw new IOException("Invalid checksum algorithm");
+				throw new IOException("Invalid checksum algorithm", e);
 			}
 			catch (IOException e) 
 			{
@@ -491,7 +459,7 @@ public class BitstreamStorageManager
 			catch (NoSuchAlgorithmException e) 
 			{
 				log.error("Caught NoSuchAlgorithmException", e);
-				throw new IOException("Invalid checksum algorithm");
+				throw new IOException("Invalid checksum algorithm", e);
 			}
 			bitstream.setColumn("checksum", 
 					Utils.toHex(md.digest(sFilename.getBytes())));
@@ -507,13 +475,13 @@ public class BitstreamStorageManager
 		bitstream.setColumn("deleted", false);
 		DatabaseManager.update(context, bitstream);
 
-		int bitstream_id = bitstream.getIntColumn("bitstream_id");
+		int bitstreamId = bitstream.getIntColumn("bitstream_id");
 		if (log.isDebugEnabled()) 
 		{
-			log.debug("Stored bitstream " + bitstream_id + " in file "
+			log.debug("Stored bitstream " + bitstreamId + " in file "
 					+ file.getAbsolutePath());
 		}
-		return bitstream_id;
+		return bitstreamId;
 	}
 
 	/**
@@ -579,6 +547,10 @@ public class BitstreamStorageManager
     public static void delete(Context context, int id) throws SQLException
     {
         DatabaseManager.updateQuery(context,
+                "update Bundle set primary_bitstream_id=null where primary_bitstream_id = ? ",
+                id);
+
+        DatabaseManager.updateQuery(context,
                         "update Bitstream set deleted = '1' where bitstream_id = ? ",
                         id);
     }
@@ -599,7 +571,7 @@ public class BitstreamStorageManager
     {
         Context context = null;
         BitstreamInfoDAO bitstreamInfoDAO = new BitstreamInfoDAO();
-        int commit_counter = 0;
+        int commitCounter = 0;
 
         try
         {
@@ -607,12 +579,12 @@ public class BitstreamStorageManager
 
             String myQuery = "select * from Bitstream where deleted = '1'";
 
-            List storage = DatabaseManager.queryTable(context, "Bitstream", myQuery)
+            List<TableRow> storage = DatabaseManager.queryTable(context, "Bitstream", myQuery)
                     .toList();
 
-            for (Iterator iterator = storage.iterator(); iterator.hasNext();)
+            for (Iterator<TableRow> iterator = storage.iterator(); iterator.hasNext();)
             {
-                TableRow row = (TableRow) iterator.next();
+                TableRow row = iterator.next();
                 int bid = row.getIntColumn("bitstream_id");
 
 				GeneralFile file = getFile(row);
@@ -624,9 +596,15 @@ public class BitstreamStorageManager
                     if (deleteDbRecords)
                     {
                         log.debug("deleting record");
-                        if (verbose) System.out.println(" - Deleting bitstream information (ID: " + bid + ")");
+                        if (verbose)
+                        {
+                            System.out.println(" - Deleting bitstream information (ID: " + bid + ")");
+                        }
                         bitstreamInfoDAO.deleteBitstreamInfoWithHistory(bid);
-                        if (verbose) System.out.println(" - Deleting bitstream record from database (ID: " + bid + ")");
+                        if (verbose)
+                        {
+                            System.out.println(" - Deleting bitstream record from database (ID: " + bid + ")");
+                        }
                         DatabaseManager.delete(context, "Bitstream", bid);
                     }
                     continue;
@@ -643,9 +621,15 @@ public class BitstreamStorageManager
                 if (deleteDbRecords)
                 {
                     log.debug("deleting db record");
-                    if (verbose) System.out.println(" - Deleting bitstream information (ID: " + bid + ")");
+                    if (verbose)
+                    {
+                        System.out.println(" - Deleting bitstream information (ID: " + bid + ")");
+                    }
                     bitstreamInfoDAO.deleteBitstreamInfoWithHistory(bid);
-                    if (verbose) System.out.println(" - Deleting bitstream record from database (ID: " + bid + ")");
+                    if (verbose)
+                    {
+                        System.out.println(" - Deleting bitstream record from database (ID: " + bid + ")");
+                    }
                     DatabaseManager.delete(context, "Bitstream", bid);
                 }
 
@@ -662,7 +646,10 @@ public class BitstreamStorageManager
                 {
                     log.debug(message);
                 }
-                if (verbose) System.out.println(message);
+                if (verbose)
+                {
+                    System.out.println(message);
+                }
 
                 // if the file was deleted then
                 // try deleting the parents
@@ -680,8 +667,8 @@ public class BitstreamStorageManager
                 // iterations. Otherwise you risk losing the entire transaction
                 // if we hit an exception, which isn't useful at all for large
                 // amounts of bitstreams.
-                commit_counter++;
-                if (commit_counter % 100 == 0)
+                commitCounter++;
+                if (commitCounter % 100 == 0)
                 {
                 	System.out.print("Committing changes to the database...");
                     context.commit();
@@ -696,13 +683,19 @@ public class BitstreamStorageManager
         // time around will be a no-op.
         catch (SQLException sqle)
         {
-            if (verbose) System.err.println("Error: " + sqle.getMessage());
+            if (verbose)
+            {
+                System.err.println("Error: " + sqle.getMessage());
+            }
             context.abort();
             throw sqle;
         }
         catch (IOException ioe)
         {
-            if (verbose) System.err.println("Error: " + ioe.getMessage());
+            if (verbose)
+            {
+                System.err.println("Error: " + ioe.getMessage());
+            }
             context.abort();
             throw ioe;
         }
@@ -739,7 +732,7 @@ public class BitstreamStorageManager
      * @param file
      *            The file with parent directories to delete
      */
-    private synchronized static void deleteParents(GeneralFile file)
+    private static synchronized void deleteParents(GeneralFile file)
     {
         if (file == null )
         {
@@ -820,7 +813,9 @@ public class BitstreamStorageManager
 			// prefix.  The internal-ID is supposed to be just a
 			// filename, so this will not affect normal operation.
 			if (sInternalId.indexOf(File.separator) != -1)
-				sInternalId = sInternalId.substring(sInternalId.lastIndexOf(File.separator)+1);
+            {
+                sInternalId = sInternalId.substring(sInternalId.lastIndexOf(File.separator) + 1);
+            }
 			
 			sIntermediatePath = getIntermediatePath(sInternalId);
 		}

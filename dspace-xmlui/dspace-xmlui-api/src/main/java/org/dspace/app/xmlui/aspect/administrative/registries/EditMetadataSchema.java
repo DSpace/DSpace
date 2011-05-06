@@ -1,41 +1,9 @@
-/*
- * EditMetadataSchema.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.administrative.registries;
 
@@ -161,7 +129,9 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 		if (errorString != null)
 		{
 			for (String error : errorString.split(","))
+            {
 				errors.add(error);
+            }
 		}
 		
 	
@@ -173,11 +143,15 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 		
 		// DIVISION: add or updating a metadata field
 		if (updateID >= 0)
-			// Updating an existing field
-			addUpdateFieldForm(main, schemaName, updateID,  errors);
+        {
+            // Updating an existing field
+            addUpdateFieldForm(main, schemaName, updateID, errors);
+        }
 		else
-			// Add a new field
-			addNewFieldForm(main, schemaName, errors);
+        {
+            // Add a new field
+            addNewFieldForm(main, schemaName, errors);
+        }
 		
 		
 		
@@ -201,11 +175,15 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 			
 			String fieldName = schemaName +"."+ fieldElement;
 			if (fieldQualifier != null && fieldQualifier.length() > 0)
-				fieldName += "."+fieldQualifier;
+            {
+                fieldName += "." + fieldQualifier;
+            }
 				
 			boolean highlight = false;
 			if (field.getFieldID() == highlightID)
-				highlight = true;
+            {
+                highlight = true;
+            }
 			
 			String fieldScopeNote = field.getScopeNote();
 			
@@ -213,9 +191,13 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 			
 			Row row;
 			if (highlight)
-				row = table.addRow(null,null,"highlight");
+            {
+                row = table.addRow(null, null, "highlight");
+            }
 			else
-				row = table.addRow();
+            {
+                row = table.addRow();
+            }
 			
 			CheckBox select = row.addCell().addCheckBox("select_field");
 			select.setLabel(id);
@@ -238,7 +220,9 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 			Para actions = main.addPara();
 			actions.addButton("submit_delete").setValue(T_submit_delete);
 			if (MetadataSchema.findAll(context).length > 1)
-				actions.addButton("submit_move").setValue(T_submit_move);	
+            {
+                actions.addButton("submit_move").setValue(T_submit_move);
+            }
 			actions.addButton("submit_return").setValue(T_submit_return);
 		}
 		
@@ -254,7 +238,7 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 	 * @param schemaName The schemaName currently being operated on.
 	 * @param errors A list of errors from previous attempts at adding new fields.
 	 */
-	public void addNewFieldForm(Division div, String schemaName, ArrayList<String> errors) throws WingException
+	public void addNewFieldForm(Division div, String schemaName, java.util.List<String> errors) throws WingException
 	{
 		Request request = ObjectModelHelper.getRequest(objectModel);
 		String elementValue = request.getParameter("newElement");
@@ -300,7 +284,7 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 	 * @param fieldID The id of the field being updated.
 	 * @param errors A list of errors from previous attempts at updaating the field.
 	 */
-	public void addUpdateFieldForm(Division div, String schemaName, int fieldID, ArrayList<String> errors) throws WingException, SQLException
+	public void addUpdateFieldForm(Division div, String schemaName, int fieldID, java.util.List<String> errors) throws WingException, SQLException
 	{
 		
 		MetadataField field = MetadataField.find(context, fieldID);
@@ -311,11 +295,17 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 		String noteValue = request.getParameter("updateNote");
 		
 		if (elementValue == null)
-			elementValue = field.getElement();
+        {
+            elementValue = field.getElement();
+        }
 		if (qualifierValue == null)
-			qualifierValue = field.getQualifier();
+        {
+            qualifierValue = field.getQualifier();
+        }
 		if (noteValue == null)
-			noteValue = field.getScopeNote();
+        {
+            noteValue = field.getScopeNote();
+        }
 		
 		
 		Division newField = div.addDivision("edit-schema-update-field");
@@ -363,7 +353,7 @@ public class EditMetadataSchema extends AbstractDSpaceTransformer
 	 * @param errors A list of errors.
 	 */
 	
-	public void addFieldErrors(List form, ArrayList<String> errors) throws WingException 
+	public void addFieldErrors(List form, java.util.List<String> errors) throws WingException 
 	{
 		if (errors.contains("duplicate_field"))
 		{

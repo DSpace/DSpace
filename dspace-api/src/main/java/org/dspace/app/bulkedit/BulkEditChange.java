@@ -1,41 +1,10 @@
-/*
- * BulkEditChange.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision$
- *
- * Date: $Date$
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.bulkedit;
 
 import org.dspace.content.Item;
@@ -43,6 +12,7 @@ import org.dspace.content.DCValue;
 import org.dspace.content.Collection;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Utility class to store changes to item that may occur during a batch edit.
@@ -54,23 +24,23 @@ public class BulkEditChange
     /** The item these changes relate to */
     private Item item;
 
-    /** The ArrayList of hashtables with the new elements */
-    private ArrayList<DCValue> adds;
+    /** The List of hashtables with the new elements */
+    private List<DCValue> adds;
 
-    /** The ArrayList of hashtables with the removed elements */
-    private ArrayList<DCValue> removes;
+    /** The List of hashtables with the removed elements */
+    private List<DCValue> removes;
 
-    /** The ArrayList of hashtablles with the unchanged elements */
-    private ArrayList<DCValue> constant;
+    /** The List of hashtables with the unchanged elements */
+    private List<DCValue> constant;
 
-    /** The ArrayList of the complete set of new values (constant + adds) */
-    private ArrayList<DCValue> complete;
+    /** The List of the complete set of new values (constant + adds) */
+    private List<DCValue> complete;
 
-    /** The Arraylist of old collections the item used to be mapped to */
-    private ArrayList<Collection> oldMappedCollections;
+    /** The list of old collections the item used to be mapped to */
+    private List<Collection> oldMappedCollections;
 
-    /** The Arraylist of new collections the item has been mapped into */
-    private ArrayList<Collection> newMappedCollections;
+    /** The list of new collections the item has been mapped into */
+    private List<Collection> newMappedCollections;
 
     /** The old owning collection */
     private Collection oldOwningCollection;
@@ -86,7 +56,7 @@ public class BulkEditChange
 
 
     /**
-     * Initalise a change holder for a new item 
+     * Initialise a change holder for a new item 
      */
     public BulkEditChange()
     {
@@ -107,7 +77,7 @@ public class BulkEditChange
     }
 
     /**
-     * Initalise a new change holder for an existing item
+     * Initialise a new change holder for an existing item
      *
      * @param i The Item to store
      */
@@ -118,7 +88,7 @@ public class BulkEditChange
         newItem = false;
         empty = true;
 
-        // Initalise the arrays
+        // Initialise the arrays
         adds = new ArrayList<DCValue>();
         removes = new ArrayList<DCValue>();
         constant = new ArrayList<DCValue>();
@@ -262,7 +232,7 @@ public class BulkEditChange
      *
      * @return the list of elements and their values that have been added.
      */
-    public ArrayList<DCValue> getAdds()
+    public List<DCValue> getAdds()
     {
         // Return the array
         return adds;
@@ -273,7 +243,7 @@ public class BulkEditChange
      *
      * @return the list of elements and their values that have been removed.
      */
-    public ArrayList<DCValue> getRemoves()
+    public List<DCValue> getRemoves()
     {
         // Return the array
         return removes;
@@ -284,7 +254,7 @@ public class BulkEditChange
      *
      * @return the list of unchanged values
      */
-    public ArrayList<DCValue> getConstant()
+    public List<DCValue> getConstant()
     {
         // Return the array
         return constant;
@@ -295,7 +265,7 @@ public class BulkEditChange
      *
      * @return the list of all values
      */
-    public ArrayList<DCValue> getComplete()
+    public List<DCValue> getComplete()
     {
         // Return the array
         return complete;
@@ -306,7 +276,7 @@ public class BulkEditChange
      *
      * @return the list of new mapped collections
      */
-    public ArrayList<Collection> getNewMappedCollections()
+    public List<Collection> getNewMappedCollections()
     {
         // Return the array
         return newMappedCollections;
@@ -317,7 +287,7 @@ public class BulkEditChange
      *
      * @return the list of old mapped collections
      */
-    public ArrayList<Collection> getOldMappedCollections()
+    public List<Collection> getOldMappedCollections()
     {
         // Return the array
         return oldMappedCollections;
