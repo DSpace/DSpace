@@ -14,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
@@ -33,6 +34,9 @@ import edu.umd.lib.dspace.authenticate.Ldap;
  */
 public class EPersonAdminServlet extends DSpaceServlet
 {
+    /** log4j category */
+    private static Logger log = Logger.getLogger(DSpaceServlet.class);
+
     protected void doDSGet(Context context, HttpServletRequest request,
             HttpServletResponse response) throws ServletException, IOException,
             SQLException, AuthorizeException
