@@ -782,7 +782,7 @@ public class EditItemServlet extends DSpaceServlet
             checkEditAuthorization(context, item);
 
             // do we already have an ORIGINAL bundle?
-            Bundle[] bundles = item.getBundles("ORIGINAL");
+            Bundle[] bundles = item.getBundles(bundleName);
 
             if (bundles.length < 1)
             {
