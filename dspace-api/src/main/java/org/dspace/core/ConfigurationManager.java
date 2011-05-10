@@ -921,6 +921,21 @@ public class ConfigurationManager
                 is = url.openStream();
                 properties.load(is);
 
+                // Load in dspace-local.cfg file
+                try {
+                    File localFile = new File(getProperty("dspace.dir") + File.separator
+                                              + "config" + File.separator + "dspace-local.cfg");
+                    if (localFile.exists()) {
+                        is = new FileInputStream(localFile);
+                        properties.load(is);
+                        is.close();
+                    }
+                }
+                catch (IOException e)
+                {
+                    fatal("Eror loading dspace-local.cfg");
+                }
+
                 // walk values, interpolating any embedded references.
                 for (Enumeration<?> pe = properties.propertyNames(); pe.hasMoreElements(); )
                 {
@@ -954,21 +969,6 @@ public class ConfigurationManager
                 {                   
                 }
             }
-        }
-
-        // Load in dspace-local.cfg file
-        try {
-            File localFile = new File(getProperty("dspace.dir") + File.separator
-                                      + "config" + File.separator + "dspace-local.cfg");
-            if (localFile.exists()) {
-                is = new FileInputStream(localFile);
-                properties.load(is);
-                is.close();
-            }
-        }
-        catch (IOException e)
-        {
-            fatal("Eror loading dspace-local.cfg");
         }
 
         // Load in default license
