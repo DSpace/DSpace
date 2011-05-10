@@ -4,7 +4,7 @@
 
 <%@ page import="java.util.Enumeration" %>
 <%@ page import="org.apache.commons.pool.impl.GenericObjectPool" %>
-<%@ page import="org.apache.commons.dbcp.PoolingDriver" %>
+<%-- page import="org.apache.commons.dbcp.PoolingDriver" --%>
 
 <%
 // this space intentionally left blank
@@ -19,8 +19,8 @@
     <h1>Resource Statistics</h1>
 
 <% 
-  PoolingDriver driver = new PoolingDriver();
-  GenericObjectPool pool = (GenericObjectPool)driver.getPool("dspacepool");
+  //PoolingDriver driver = new PoolingDriver();
+  //GenericObjectPool pool = (GenericObjectPool)driver.getPool("dspacepool");
 %>
 
 <table>
@@ -51,9 +51,16 @@
     <td>maxMemory</td>
     <td><%= (rt.maxMemory() / 1024 / 1024)%> Mb</td>
   </td>
+
   <tr>
     <td colspan="3">JDBC Pooled Connections</td>
   </tr>
+  <tr>
+  	<td></td>
+    <td><em>temporarily disabled</em></td>
+    <td></td>
+  </tr>
+<%-- 
   <tr>
     <td></td>
     <td>num active</td>
@@ -79,7 +86,7 @@
     <td>max wait</td>
     <td><%= pool.getMaxWait() %> ms</td>
   </tr>
-
+--%>
   <tr>
     <td colspan="3">HttpSession Attributes</td>
   </tr>
