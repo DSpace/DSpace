@@ -179,6 +179,8 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                 }
                 
                 BrowseInfo info = getBrowseInfo();
+                validity.add("total:"+info.getTotal());
+                validity.add("start:"+info.getStart());
                 
                 // Are we browsing items, or unique metadata?
                 if (isItemBrowse(info))

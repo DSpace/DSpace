@@ -150,6 +150,8 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
                 SolrDocumentList results = this.queryResults.getResults();
 
                 if (results != null) {
+                    validity.add("total:"+results.getNumFound());
+                    validity.add("start:"+results.getStart());
                     validity.add("size:" + results.size());
 
                     for (SolrDocument result : results) {
