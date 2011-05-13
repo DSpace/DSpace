@@ -28,6 +28,7 @@ import org.dspace.content.FormatIdentifier;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.curate.Curator;
 import org.dspace.submit.AbstractProcessingStep;
 
 /**
@@ -77,6 +78,12 @@ public class UploadStep extends AbstractProcessingStep
 
     // format of uploaded file is unknown
     public static final int STATUS_UNKNOWN_FORMAT = 10;
+
+    // virus checker unavailable ?
+    public static final int STATUS_VIRUS_CHECKER_UNAVAILABLE = 14;
+
+    // file failed virus check
+    public static final int STATUS_CONTAINS_VIRUS = 16;
 
     // edit file information
     public static final int STATUS_EDIT_BITSTREAM = 20;
@@ -472,120 +479,129 @@ public class UploadStep extends AbstractProcessingStep
                 {
                     return STATUS_UPLOAD_ERROR;
                 }
-                
-                if (subInfo != null)
-                {
-                    // Create the bitstream
-                    Item item = subInfo.getSubmissionItem().getItem();
-        
-                    // do we already have a bundle?
-                    Bundle[] bundles = item.getBundles("ORIGINAL");
-        
-                    if (bundles.length < 1)
-                    {
-                        // set bundle's name to ORIGINAL
-                        b = item.createSingleBitstream(fileInputStream, "ORIGINAL");
-                    }
-                    else
-                    {
-                        // we have a bundle already, just add bitstream
-                        b = bundles[0].createBitstream(fileInputStream);
-                    }
-        
-                    // Strip all but the last filename. It would be nice
-                    // to know which OS the file came from.
-                    String noPath = filePath;
-        
-                    while (noPath.indexOf('/') > -1)
-                    {
-                        noPath = noPath.substring(noPath.indexOf('/') + 1);
-                    }
-        
-                    while (noPath.indexOf('\\') > -1)
-                    {
-                        noPath = noPath.substring(noPath.indexOf('\\') + 1);
-                    }
-        
-                    b.setName(noPath);
-                    b.setSource(filePath);
-                    b.setDescription(fileDescription);
-        
-                    // Identify the format
-                    bf = FormatIdentifier.guessFormat(context, b);
-                    b.setFormat(bf);
-        
-                    // Update to DB
-                    b.update();
-                    item.update();
-        
-                    if (bf == null || !bf.isInternal())
-                    {
-                        fileOK = true;
-                    }
-                    else
-                    {
-                        log.warn("Attempt to upload file format marked as internal system use only");
-                        
-                        // remove bitstream from bundle..
-                        // delete bundle if it's now empty
-                        Bundle[] bnd = b.getBundles();
 
-                        bnd[0].removeBitstream(b);
-
-                        Bitstream[] bitstreams = bnd[0].getBitstreams();
-
-                        // remove bundle if it's now empty
-                        if (bitstreams.length < 1)
-                        {
-                            item.removeBundle(bnd[0]);
-                            item.update();
-                        }
-
-                        subInfo.setBitstream(null);
-                    }
-                }// if subInfo not null
-                else
+                if (subInfo == null)
                 {
                     // In any event, if we don't have the submission info, the request
                     // was malformed
                     return STATUS_INTEGRITY_ERROR;
                 }
-        
-                // as long as everything completed ok, commit changes. Otherwise show
-                // error page.
-                if (fileOK)
+
+
+                // Create the bitstream
+                Item item = subInfo.getSubmissionItem().getItem();
+
+                // do we already have a bundle?
+                Bundle[] bundles = item.getBundles("ORIGINAL");
+
+                if (bundles.length < 1)
                 {
-                    context.commit();
-        
-                    // save this bitstream to the submission info, as the
-                    // bitstream we're currently working with
-                    subInfo.setBitstream(b);
-        
-                    //if format was not identified
-                    if (bf == null)
-                    {
-                        // the bitstream format is unknown!
-                        formatKnown=false;
-                    }
+                    // set bundle's name to ORIGINAL
+                    b = item.createSingleBitstream(fileInputStream, "ORIGINAL");
                 }
                 else
                 {
-                    // if we get here there was a problem uploading the file!
+                    // we have a bundle already, just add bitstream
+                    b = bundles[0].createBitstream(fileInputStream);
+                }
+
+                // Strip all but the last filename. It would be nice
+                // to know which OS the file came from.
+                String noPath = filePath;
+
+                while (noPath.indexOf('/') > -1)
+                {
+                    noPath = noPath.substring(noPath.indexOf('/') + 1);
+                }
+
+                while (noPath.indexOf('\\') > -1)
+                {
+                    noPath = noPath.substring(noPath.indexOf('\\') + 1);
+                }
+
+                b.setName(noPath);
+                b.setSource(filePath);
+                b.setDescription(fileDescription);
+
+                // Identify the format
+                bf = FormatIdentifier.guessFormat(context, b);
+                b.setFormat(bf);
+
+                // Update to DB
+                b.update();
+                item.update();
+
+                if ((bf != null) && (bf.isInternal()))
+                {
+                    log.warn("Attempt to upload file format marked as internal system use only");
+                    backoutBitstream(subInfo, b, item);
                     return STATUS_UPLOAD_ERROR;
                 }
+
+                // Check for virus
+                if (ConfigurationManager.getBooleanProperty("submission-curation", "virus-scan"))
+                {
+                    Curator curator = new Curator();
+                    curator.addTask("vscan").curate(item);
+                    int status = curator.getStatus("vscan");
+                    if (status == Curator.CURATE_ERROR)
+                    {
+                        backoutBitstream(subInfo, b, item);
+                        return STATUS_VIRUS_CHECKER_UNAVAILABLE;
+                    }
+                    else if (status == Curator.CURATE_FAIL)
+                    {
+                        backoutBitstream(subInfo, b, item);
+                        return STATUS_CONTAINS_VIRUS;
+                    }
+                }
+
+                // If we got this far then everything is more or less ok.
+
+                // Comment - not sure if this is the right place for a commit here
+                // but I'm not brave enough to remove it - Robin.
+                context.commit();
+
+                // save this bitstream to the submission info, as the
+                // bitstream we're currently working with
+                subInfo.setBitstream(b);
+
+                //if format was not identified
+                if (bf == null)
+                {
+                    return STATUS_UNKNOWN_FORMAT;
+                }
+
             }//end if attribute ends with "-path"
         }//end while
         
-        if(!formatKnown)
-        {
-            //return that the bitstream format is unknown!
-            return STATUS_UNKNOWN_FORMAT;
-        }
-        else
-        {
-            return STATUS_COMPLETE;
-        }
+
+        return STATUS_COMPLETE;
+
               
+    }
+
+    /*
+      If we created a new Bitstream but now realised there is a problem then remove it.
+     */
+    private void backoutBitstream(SubmissionInfo subInfo, Bitstream b, Item item) throws SQLException, AuthorizeException, IOException
+    {
+        // remove bitstream from bundle..
+        // delete bundle if it's now empty
+        Bundle[] bnd = b.getBundles();
+
+        bnd[0].removeBitstream(b);
+
+        Bitstream[] bitstreams = bnd[0].getBitstreams();
+
+        // remove bundle if it's now empty
+        if (bitstreams.length < 1)
+        {
+            item.removeBundle(bnd[0]);
+            item.update();
+        }
+
+        subInfo.setBitstream(null);
     }
 
     /**
@@ -674,4 +690,5 @@ public class UploadStep extends AbstractProcessingStep
 
         return STATUS_COMPLETE;
     }
+
 }

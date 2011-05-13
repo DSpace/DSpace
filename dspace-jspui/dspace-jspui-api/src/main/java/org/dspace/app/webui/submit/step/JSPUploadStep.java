@@ -83,6 +83,12 @@ public class JSPUploadStep extends JSPStep
 
     /** JSP to show any upload errors * */
     private static final String UPLOAD_ERROR_JSP = "/submit/upload-error.jsp";
+
+    /** JSP to show any upload errors * */
+    private static final String VIRUS_CHECKER_ERROR_JSP = "/submit/virus-checker-error.jsp";
+
+    /** JSP to show any upload errors * */
+    private static final String VIRUS_ERROR_JSP = "/submit/virus-error.jsp";
     
     /** JSP to review uploaded files * */
     private static final String REVIEW_JSP = "/submit/review-upload.jsp";
@@ -252,6 +258,46 @@ public class JSPUploadStep extends JSPStep
                     }
                     JSPStepManager.showJSP(request, response, subInfo, UPLOAD_ERROR_JSP);
                 }
+            }
+            else if (status == UploadStep.STATUS_VIRUS_CHECKER_UNAVAILABLE)
+            {
+                // We need to show the file upload error page
+                if (subInfo != null)
+                {
+                    try
+                    {
+                        Collection c = subInfo.getSubmissionItem().getCollection();
+                        DCInputsReader inputsReader = new DCInputsReader();
+                        request.setAttribute("submission.inputs", inputsReader
+                                .getInputs(c.getHandle()));
+                    }
+                    catch (DCInputsReaderException e)
+                    {
+                        throw new ServletException(e);
+                    }
+
+                }
+                JSPStepManager.showJSP(request, response, subInfo, VIRUS_CHECKER_ERROR_JSP);
+            }
+            else if (status == UploadStep.STATUS_CONTAINS_VIRUS)
+            {
+                // We need to show the file upload error page
+                if (subInfo != null)
+                {
+                    try
+                    {
+                        Collection c = subInfo.getSubmissionItem().getCollection();
+                        DCInputsReader inputsReader = new DCInputsReader();
+                        request.setAttribute("submission.inputs", inputsReader
+                                .getInputs(c.getHandle()));
+                    }
+                    catch (DCInputsReaderException e)
+                    {
+                        throw new ServletException(e);
+                    }
+
+                }
+                JSPStepManager.showJSP(request, response, subInfo, VIRUS_ERROR_JSP);
             }
             else if (status == UploadStep.STATUS_UNKNOWN_FORMAT)
             {
