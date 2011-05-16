@@ -204,6 +204,7 @@ public class CommunityRecentSubmissions extends AbstractDSpaceTransformer implem
     @Override
     public void recycle() {
         this.recentSubmittedItems = null;
+        this.validity = null;
         super.recycle();
     }
 }
