@@ -167,10 +167,11 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer
 	            
 	            DSpaceObject scope = getScope();
 	            validity.add(scope);
-                validity.add("total:"+queryResults.getHitCount());
-                validity.add("start:"+queryResults.getStart());
 	            
 	            performSearch();
+
+                validity.add("total:"+queryResults.getHitCount());
+                validity.add("start:"+queryResults.getStart());
 	            
 	            @SuppressWarnings("unchecked") // This cast is correct
 	            java.util.List<String> handles = queryResults.getHitHandles();
