@@ -7,15 +7,7 @@
  */
 package org.dspace.app.webui.submit.step;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
-
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.app.webui.servlet.SubmissionController;
@@ -30,6 +22,12 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.license.CreativeCommons;
 import org.dspace.submit.step.LicenseStep;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * License step for DSpace JSP-UI. Presents the user with license information
@@ -62,11 +60,8 @@ import org.dspace.submit.step.LicenseStep;
  * @author Tim Donohue
  * @version $Revision$
  */
-public class JSPLicenseStep extends JSPStep
+public class JSPCCLicenseStep extends JSPStep
 {
-    /** JSP which displays default license information * */
-    private static final String LICENSE_JSP = "/submit/show-license.jsp";
-
     /** JSP which displays Creative Commons license information * */
     private static final String CC_LICENSE_JSP = "/submit/creative-commons.jsp";
 
@@ -74,7 +69,7 @@ public class JSPLicenseStep extends JSPStep
     private static final String LICENSE_REJECT_JSP = "/submit/license-rejected.jsp";
 
     /** log4j logger */
-    private static Logger log = Logger.getLogger(JSPLicenseStep.class);
+    private static Logger log = Logger.getLogger(JSPCCLicenseStep.class);
 
     /**
      * Do any pre-processing to determine which JSP (if any) is used to generate
@@ -104,15 +99,12 @@ public class JSPLicenseStep extends JSPStep
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
+        // Do we already have a CC license?
+        Item item = subInfo.getSubmissionItem().getItem();
+        boolean exists = CreativeCommons.hasLicense(context, item);
+        request.setAttribute("cclicense.exists", Boolean.valueOf(exists));
 
-        String license = LicenseUtils.getLicenseText(
-                context.getCurrentLocale(), subInfo.getSubmissionItem()
-                        .getCollection(),
-                subInfo.getSubmissionItem().getItem(), subInfo
-                        .getSubmissionItem().getSubmitter());
-        request.setAttribute("license", license);
-
-        JSPStepManager.showJSP(request, response, subInfo, LICENSE_JSP);
+        JSPStepManager.showJSP(request, response, subInfo, CC_LICENSE_JSP);
 
     }
 
@@ -172,7 +164,7 @@ public class JSPLicenseStep extends JSPStep
 
     }
 
-
+    
     /**
      * Return the URL path (e.g. /submit/review-metadata.jsp) of the JSP
      * which will review the information that was gathered in this Step.

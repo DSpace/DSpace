@@ -217,8 +217,20 @@
 		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.ReviewStep</xmlui-binding>
 		<workflow-editable>true</workflow-editable>
       </step>
-     
-      <!--Step 5 will be to Sign off on the License-->
+
+      <!--Step 5 will be to select a Creative Commons License-->
+      <!-- Uncomment this step to allow the user to select a Creative Commons license -->
+       <!--
+      <step>
+        <heading>submit.progressbar.CClicense</heading>
+        <processing-class>org.dspace.submit.step.CCLicenseStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPCCLicenseStep</jspui-binding>
+		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.CCLicenseStep</xmlui-binding>
+		<workflow-editable>false</workflow-editable>
+      </step>
+      -->
+
+      <!--Step 6 will be to Sign off on the License-->
       <step>
         <heading>submit.progressbar.license</heading>
         <processing-class>org.dspace.submit.step.LicenseStep</processing-class>
@@ -226,6 +238,8 @@
 		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.LicenseStep</xmlui-binding>
 		<workflow-editable>false</workflow-editable>
       </step>
+
+
      
    </submission-process>
 

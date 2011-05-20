@@ -7,15 +7,7 @@
  */
 package org.dspace.submit.step;
 
-import java.io.IOException;
-import java.sql.SQLException;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.log4j.Logger;
-
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
@@ -26,6 +18,12 @@ import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.license.CreativeCommons;
 import org.dspace.submit.AbstractProcessingStep;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * License step for DSpace Submission Process. Processes the
@@ -43,7 +41,7 @@ import org.dspace.submit.AbstractProcessingStep;
  * @author Tim Donohue
  * @version $Revision$
  */
-public class LicenseStep extends AbstractProcessingStep
+public class CCLicenseStep extends AbstractProcessingStep
 {
     /***************************************************************************
      * STATUS / ERROR FLAGS (returned by doProcessing() if an error occurs or
@@ -56,7 +54,7 @@ public class LicenseStep extends AbstractProcessingStep
     public static final int STATUS_LICENSE_REJECTED = 1;
 
     /** log4j logger */
-    private static Logger log = Logger.getLogger(LicenseStep.class);
+    private static Logger log = Logger.getLogger(CCLicenseStep.class);
 
 
     /**
@@ -87,63 +85,32 @@ public class LicenseStep extends AbstractProcessingStep
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
-        String buttonPressed = Util.getSubmitButton(request, CANCEL_BUTTON);
+        String buttonPressed = Util.getSubmitButton(request, NEXT_BUTTON);
 
-        boolean licenseGranted = false;
+        // RLR hack - need to distinguish between progress bar real submission
+        // (if cc_license_url exists, then users has accepted the CC License)
+        String ccLicenseUrl = request.getParameter("cc_license_url");
 
-        // For Manakin:
-        // Accepting the license means checking a box and clicking Next
-        String decision = request.getParameter("decision");
-        if (decision != null && decision.equalsIgnoreCase("accept")
-                && buttonPressed.equals(NEXT_BUTTON))
+        if (buttonPressed.equals("submit_no_cc"))
         {
-            licenseGranted = true;
+            // Skipping the CC license - remove any existing license selection
+            CreativeCommons.removeLicense(context, subInfo.getSubmissionItem()
+                    .getItem());
         }
-        // For JSP-UI: User just needed to click "I Accept" button
-        else if (buttonPressed.equals("submit_grant"))
+        else if ((ccLicenseUrl != null) && (ccLicenseUrl.length() > 0))
         {
-            licenseGranted = true;
-        }// JSP-UI: License was explicitly rejected
-        else if (buttonPressed.equals("submit_reject"))
-        {
-            licenseGranted = false;
-        }// Manakin UI: user didn't make a decision and clicked Next->
-        else if (buttonPressed.equals(NEXT_BUTTON))
-        {
-            // no decision made (this will cause Manakin to display an error)
-            return STATUS_LICENSE_REJECTED;
-        }
-
-        if (licenseGranted
-                && (buttonPressed.equals("submit_grant") || buttonPressed
-                        .equals(NEXT_BUTTON)))
-        {
-            // License granted
-            log.info(LogManager.getHeader(context, "accept_license",
-                    subInfo.getSubmissionLogInfo()));
-
-            // Add the license to the item
             Item item = subInfo.getSubmissionItem().getItem();
-            EPerson submitter = context.getCurrentUser();
 
-            // remove any existing DSpace license (just in case the user
-            // accepted it previously)
-            item.removeDSpaceLicense();
-
-            String license = LicenseUtils.getLicenseText(context
-                    .getCurrentLocale(), subInfo.getSubmissionItem()
-                    .getCollection(), item, submitter);
-
-            LicenseUtils.grantLicense(context, item, license);
-
-            // commit changes
-            context.commit();
+            // save the CC license
+            CreativeCommons.setLicense(context, item, ccLicenseUrl);
         }
+
+        // commit changes
+        context.commit();
 
         // completed without errors
         return STATUS_COMPLETE;
     }
-
 
     /**
      * Retrieves the number of pages that this "step" extends over. This method
