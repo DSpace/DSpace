@@ -29,6 +29,7 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
  *
  * @author Aaron Zeckoski (azeckoski @ gmail.com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
+ * @author Mark Diggory (mdiggory at atmire dot com)
  */
 public final class DSpaceConfigurationService implements ConfigurationService {
 
@@ -378,7 +379,7 @@ public final class DSpaceConfigurationService implements ConfigurationService {
                 pushPropsToMap(configMap, prefix, readPropertyStream(resource.getInputStream()));
             }
         }catch (Exception e){
-            e.printStackTrace();
+            log.error("Failed to retrieve properties from classpath: " + e.getMessage(), e);
 
         }
         //Attempt to load up all the config files in the modules directory
@@ -560,7 +561,6 @@ public final class DSpaceConfigurationService implements ConfigurationService {
             if(propertyFile.exists()){
                 props.load(new FileInputStream(propertyFile));
                 log.info("Loaded"+props.size() + " config properties from file: " + propertyFile.getName());
-                System.out.println("Loaded"+props.size() + " config properties from file: " + propertyFile.getName());
             }
 
         } catch (Exception e){
