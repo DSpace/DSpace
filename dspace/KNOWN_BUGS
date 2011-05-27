@@ -11,6 +11,9 @@ KNOWN BUGS
 A definitive and up to date list of bugs affecting each version of
 DSpace software can be found in our JIRA issue tracker.
 
+ - Known Issues in DSpace 1.7.2:
+   https://jira.duraspace.org/secure/IssueNavigator.jspa?reset=true&jqlQuery=project+=+DS+AND+affectedVersion+=+"1.7.2"+AND+fixVersion+!=+"1.7.2"
+
  - Known Issues in DSpace 1.7.1:
    https://jira.duraspace.org/secure/IssueNavigator.jspa?reset=true&jqlQuery=project+=+DS+AND+affectedVersion+=+"1.7.1"+AND+fixVersion+!=+"1.7.1"
 
