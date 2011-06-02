@@ -12,13 +12,13 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-lni</artifactId>
-      <version>1.8.0-SNAPSHOT</version>
+      <version>1.8.0.ASYNC-SNAPSHOT</version>
    </parent>
 
    <scm>
-      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-lni/dspace-lni-webapp</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-lni/dspace-lni-webapp</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-lni/dspace-lni-webapp</url>
+      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/branches/dspace-async-release</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/branches/dspace-async-release/dspace-lni/dspace-lni-webapp</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/branches/dspace-async-release/dspace-lni/dspace-lni-webapp</url>
    </scm>
 
    <build>

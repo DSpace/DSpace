@@ -10,7 +10,7 @@
 	<parent>
 		<groupId>org.dspace</groupId>
 		<artifactId>modules</artifactId>
-		<version>1.8.0-SNAPSHOT</version>
+		<version>1.8.0.ASYNC-SNAPSHOT</version>
 	</parent>
 
 	<profiles>
@@ -73,9 +73,9 @@
 	</profiles>
 
 	<scm>
-		<connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/jspui</connection>
-		<developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/jspui</developerConnection>
-		<url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/jspui</url>
+		<connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/branches/dspace-async-release</connection>
+		<developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/branches/dspace-async-release/dspace/modules/jspui</developerConnection>
+		<url>http://scm.dspace.org/svn/repo/dspace/branches/dspace-async-release/dspace/modules/jspui</url>
 	</scm>
 
 	<build>

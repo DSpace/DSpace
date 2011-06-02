@@ -16,7 +16,7 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
-        <version>1.8.0-SNAPSHOT</version>
+        <version>1.8.0.ASYNC-SNAPSHOT</version>
     </parent>
 
     <!--
@@ -25,9 +25,9 @@
          into the snapshot repository below.
     -->
     <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace</connection>
-        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace</developerConnection>
-        <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace</url>
+        <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/branches/dspace-async-release/dspace</connection>
+        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/branches/dspace-async-release/dspace</developerConnection>
+        <url>http://scm.dspace.org/svn/repo/dspace/branches/dspace-async-release/dspace</url>
     </scm>
 
     <profiles>
