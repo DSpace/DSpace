@@ -13,14 +13,14 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-xmlui</artifactId>
-        <version>1.8.0.ASYNC-SNAPSHOT</version>
+        <version>1.8.0-SNAPSHOT</version>
     </parent>
 
     <scm>
-        <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/branches/dspace-async-release</connection>
-        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/branches/dspace-async-release/dspace-xmlui/dspace-xmlui-api
+        <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui/dspace-xmlui-api</connection>
+        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui/dspace-xmlui-api
         </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/dspace/branches/dspace-async-release/dspace-xmlui/dspace-xmlui-api</url>
+        <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui/dspace-xmlui-api/</url>
     </scm>
 
     <dependencies>
