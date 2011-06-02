@@ -186,10 +186,6 @@ public class Curator
 
     /**
      * Performs all configured tasks upon DSpace object 
-     * (Community, Collection or Item).
-     * <P>
-     * Note: Site-wide tasks can only be performed via the
-     * curate(Context,String) method.
      * 
      * @param dso the DSpace object
      * @throws IOException
