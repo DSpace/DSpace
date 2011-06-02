@@ -1119,12 +1119,23 @@ public class FlowContainerUtils
 	{
                 String task = request.getParameter("curate_task");
                 Curator curator = FlowCurationUtils.getCurator(task);
-                Collection collection = Collection.find(context, dsoID);
-                if (collection != null)
+               
+                try
                 {
-                    curator.curate(collection);
+                    Collection collection = Collection.find(context, dsoID);
+                    if (collection != null)
+                    {
+                        curator.curate(collection);
+                       
+                    }
+                    return FlowCurationUtils.getRunFlowResult(task, curator, true);
                 }
-                return FlowCurationUtils.getRunFlowResult(task, curator);
+		catch (Exception e) 
+                {
+                    curator.setResult(task, e.getMessage());
+                    return FlowCurationUtils.getRunFlowResult(task, curator, false);
+		}
+                
 	}
 
         /**
@@ -1171,12 +1182,20 @@ public class FlowContainerUtils
 	{
                 String task = request.getParameter("curate_task");
 		Curator curator = FlowCurationUtils.getCurator(task);
-                Community community = Community.find(context, dsoID);
-                if (community != null)
+                try
                 {
-                    curator.curate(community);
+                    Community community = Community.find(context, dsoID);
+                    if (community != null)
+                    {
+                        curator.curate(community);
+                    }
+                    return FlowCurationUtils.getRunFlowResult(task, curator, true);
                 }
-                return FlowCurationUtils.getRunFlowResult(task, curator);
+                catch (Exception e) 
+                {
+                    curator.setResult(task, e.getMessage());
+                    return FlowCurationUtils.getRunFlowResult(task, curator, false);
+		}
 	}
 
         /**

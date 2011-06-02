@@ -185,7 +185,12 @@ public class Curator
     }
 
     /**
-     * Performs all configured tasks upon DSpace object.
+     * Performs all configured tasks upon DSpace object 
+     * (Community, Collection or Item).
+     * <P>
+     * Note: Site-wide tasks can only be performed via the
+     * curate(Context,String) method.
+     * 
      * @param dso the DSpace object
      * @throws IOException
      */
@@ -193,8 +198,7 @@ public class Curator
     {
         if (dso == null)
         {
-            log.error("curate - null dso");
-            return;
+            throw new IOException("Cannot perform curation task(s) on a null DSpaceObject!");
         }
         int type = dso.getType();
         for (String taskName : perfList)
@@ -213,7 +217,7 @@ public class Curator
             else if (type == Constants.COMMUNITY)
             {
                 doCommunity(tr, (Community)dso);
-            }
+            }  
         }
     }
     
@@ -317,6 +321,13 @@ public class Curator
                 dso.getType() == Constants.COLLECTION);
     }
 
+    /**
+     * Run task for Community along with all sub-communities and collections.
+     * @param tr TaskRunner
+     * @param comm Community
+     * @return true if successful, false otherwise
+     * @throws IOException 
+     */
     private boolean doCommunity(TaskRunner tr, Community comm) throws IOException
     {
         try
@@ -347,6 +358,13 @@ public class Curator
         return true;
     }
 
+    /**
+     * Run task for Collection along with all Items in that collection.
+     * @param tr TaskRunner
+     * @param coll Collection
+     * @return true if successful, false otherwise
+     * @throws IOException 
+     */
     private boolean doCollection(TaskRunner tr, Collection coll) throws IOException
     {
         try
@@ -389,22 +407,44 @@ public class Curator
         
         public boolean run(DSpaceObject dso) throws IOException
         {
-            if (dso == null)
-            {
-                throw new IOException("DSpaceObject is null");
+            try
+            {    
+                if (dso == null)
+                {
+                    throw new IOException("DSpaceObject is null");
+                }
+                statusCode = task.perform(dso);
+                log.info(logMessage(dso.getHandle()));
+
+                return ! suspend(statusCode);
             }
-            statusCode = task.perform(dso);
-            return ! suspend(statusCode);
+            catch(IOException ioe)
+            {
+                //log error & pass exception upwards
+                log.error("Error executing curation task '" + taskName + "'", ioe);
+                throw ioe;
+            }
         }
         
         public boolean run(Context c, String id) throws IOException
         {
-            if (c == null || id == null)
+            try
             {
-                throw new IOException("Context or identifier is null");
+                if (c == null || id == null)
+                {
+                    throw new IOException("Context or identifier is null");
+                }
+                statusCode = task.perform(c, id);
+                log.info(logMessage(id));
+
+                return ! suspend(statusCode);
             }
-            statusCode = task.perform(c, id);
-            return ! suspend(statusCode);
+            catch(IOException ioe)
+            {
+                //log error & pass exception upwards
+                log.error("Error executing curation task '" + taskName + "'", ioe);
+                throw ioe;
+            }
         }
 
         public void setResult(String result)
@@ -435,6 +475,24 @@ public class Curator
                 }
             }
             return false;
+        }
+        
+        /**
+         * Builds a useful log message for a curation task.
+         * @param id ID of DSpace Object
+         * @return log message text
+         */
+        private String logMessage(String id) 
+        {
+            StringBuilder mb = new StringBuilder();
+            mb.append("Curation task: ").append(taskName).
+               append(" performed on: ").append(id).
+               append(" with status: ").append(statusCode);
+            if (result != null)
+            {
+                mb.append(". Result: '").append(result).append("'");
+            }
+            return mb.toString();
         }
     }
 }

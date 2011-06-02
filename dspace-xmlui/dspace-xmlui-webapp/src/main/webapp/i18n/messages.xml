@@ -749,7 +749,11 @@
 
 	<!-- action-generated messages. These are referenced from the sitemap rather than a transformer -->
 
-	<message key="xmlui.administrative.FlowEPersonUtils.add_eperson_success_notice">The user was added successfully.</message>
+        <message key="xmlui.administrative.FlowCurationUtils.curate_success_notice">The task was completed successfully.</message>
+        <message key="xmlui.administrative.FlowCurationUtils.curate_failed_notice">The task exited unexpectedly or failed. For more information, please contact the site administrator or check your system logs.</message>
+        <message key="xmlui.administrative.FlowCurationUtils.queue_success_notice">The task was queued successfully.</message>
+        <message key="xmlui.administrative.FlowCurationUtils.queue_failed_notice">The task could not be queued. An error occurred. For more information, please contact the site administrator or check your system logs.</message>
+        <message key="xmlui.administrative.FlowEPersonUtils.add_eperson_success_notice">The user was added successfully.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.edit_eperson_success_notice">The user was edited successfully.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.reset_password_success_notice">An email message has been sent to the user containing a token that may be used to choose a new password.</message>
 	<message key="xmlui.administrative.FlowEPersonUtils.delete_eperson_success_notice">The user(s) were deleted successfully.</message>
@@ -1730,7 +1734,7 @@
 	<message key="xmlui.administrative.NotAuthorized.para1b">system administrators</message>
 	<message key="xmlui.administrative.NotAuthorized.para1c">.</message>
 	<message key="xmlui.administrative.NotAuthorized.para2">Login as another user</message>
-
+        
 
     <!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 

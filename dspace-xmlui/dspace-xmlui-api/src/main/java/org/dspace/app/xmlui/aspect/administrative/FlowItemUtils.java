@@ -685,12 +685,20 @@ public class FlowItemUtils
 	{
                 String task = request.getParameter("curate_task");
 		Curator curator = FlowCurationUtils.getCurator(task);
-                Item item = Item.find(context, itemID);
-                if (item != null)
+                try
                 {
-                    curator.curate(item);
+                    Item item = Item.find(context, itemID);
+                    if (item != null)
+                    {
+                        curator.curate(item);
+                    }
+                    return FlowCurationUtils.getRunFlowResult(task, curator, true);
                 }
-                return FlowCurationUtils.getRunFlowResult(task, curator);
+                catch (Exception e) 
+                {
+                    curator.setResult(task, e.getMessage());
+                    return FlowCurationUtils.getRunFlowResult(task, curator, false);
+		}
 	}
 
       /**
@@ -715,7 +723,7 @@ public class FlowItemUtils
                     }
                     catch (IOException ioe)
                     {
-                        // no-op
+                        // no-op (the Curator should have already logged any error that occurred)
                     }
                 }
                 return FlowCurationUtils.getQueueFlowResult(task, status, objId, taskQueueName);
