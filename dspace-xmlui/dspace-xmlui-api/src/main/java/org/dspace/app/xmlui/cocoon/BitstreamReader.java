@@ -166,6 +166,13 @@ public class BitstreamReader extends AbstractReader implements Recyclable
         {
             this.request = ObjectModelHelper.getRequest(objectModel);
             this.response = ObjectModelHelper.getResponse(objectModel);
+            
+            // Check to see if a context is allready existing or not. We may
+            // have been aggregated into an http request by the XSL document
+            // pulling in an XML based bitstream. In this case the context has
+            // allready been created and we should leave it open because the
+            // normal processes will close it.
+            boolean BistreamReaderOpenedContext = !ContextUtil.isContextAvailable(objectModel);
             Context context = ContextUtil.obtainContext(objectModel);
             
             // Get our parameters that identify the bitstream
@@ -348,9 +355,9 @@ public class BitstreamReader extends AbstractReader implements Recyclable
                                                 ContextUtil.obtainContext(ObjectModelHelper.getRequest(objectModel)),
                                                 bitstream));
             
-            // Force close of database connection in case sending a large file 
-            context.complete();
-
+            // If we created the database connection close it, otherwise leave it open.
+            if (BistreamReaderOpenedContext)
+            	context.complete();
         }
         catch (SQLException sqle)
         {

@@ -14,6 +14,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
+import org.apache.cocoon.environment.Request;
 import org.apache.log4j.Logger;
 import org.dspace.authenticate.AuthenticationManager;
 import org.dspace.core.ConfigurationManager;
@@ -51,6 +52,22 @@ public class ContextUtil
     public static Context obtainContext(Map objectModel) throws SQLException
     {
         return obtainContext(ObjectModelHelper.getRequest(objectModel));
+    }
+    
+    /** 
+     * Inspection method to check if a DSpace context has been created for this request.
+     * 
+     * @param objectModel The cocoon ObjectModel
+     * @return True if a context has previously been created, false otherwise.
+     */
+    public static boolean isContextAvailable(Map objectModel) {
+    	Request request = ObjectModelHelper.getRequest(objectModel);
+    	Object object = request.getAttribute(DSPACE_CONTEXT);
+    	
+    	if (object instanceof Context)
+    		return true;
+    	else
+    		return false;
     }
     
     /**
