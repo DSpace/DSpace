@@ -35,7 +35,7 @@ behaviour for coping with this.
     <td><strong>Collection</strong></td>
     <td>Collections are groupings of related content.  Each collection may
     have an associated <em>workflow</em>; this is the review process that
-    submissions go through before being included in the archive.<td>
+    submissions go through before being included in the archive.</td>
   </tr>
   <tr>
     <td><strong>Item</strong></td>
@@ -64,14 +64,14 @@ support level.
 
 Submissions are created as <strong>Workspace Items</strong>.  A Workspace Item
 is an Item in progress.  Once item assembly is complete, one of two things may
-happen:
+happen:</P>
 
 <ul>
   <li>If the Collection being submitted to has an associated workflow, it is
   started.  At this point the Workspace Item becomes a <strong>Workflow
-  Item</strong>.
+  Item</strong>.</li>
   <li>If the Collection has no associated workflow, the Workspace Item is
-  removed and the assembled Item is included in the Collection.
+  removed and the assembled Item is included in the Collection.</li>
 </ul>
 
 Workspace Items and Workflow Items may both be manipulated as In Progress
@@ -89,20 +89,25 @@ represent the corresponding logical objects stored in the system.  When the
 reading or manipulating is done, the Context may either be <em>aborted</em>, in
 which case any changes made are discarded, or <em>completed</em>, in which case
 any changes made are committed to main DSpace storage.
+</P>
 <P>
 If any error occurs if you are making changes, you should <em>abort</em> the
 current context, since the in-memory snapshots might be in an inconsistent
 state.
+</P>
 <P>
 Typically, when changing a particular object in the system, the changes will
 not be written to main DSpace storage unless <code>update</code> is called on
 the object prior to Context completion.  Where this is not the case, it is
 stated in the method documentation.
+</P>
 <P>
 Instances of the classes in this package are tied to that Context; when the
 Context has been finished with the objects essentially become invalid.
+</P>
 <P>
 An example use of the Content Management API is shown below:
+</P>
 
 <pre>
 try
