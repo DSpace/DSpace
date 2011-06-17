@@ -177,6 +177,15 @@ public abstract class AbstractMETSDisseminator
     {
         return prefix + "_" + String.valueOf(idCounter++);
     }
+    
+    /**
+     * Resets the unique ID counter used by gensym() method to
+     * determine the @ID values of METS tags.
+     */
+    protected synchronized void resetCounter()
+    {
+        idCounter = 1;
+    }
 
     @Override
     public String getMIMEType(PackageParameters params)
@@ -212,6 +221,11 @@ public abstract class AbstractMETSDisseminator
                             PackageParameters params, File pkgFile)
         throws PackageValidationException, CrosswalkException, AuthorizeException, SQLException, IOException
     {
+        // Reset our 'unique' ID counter back to 1 (in case a previous dissemination was run)
+        // This ensures that the @ID attributes of METS tags always begin at '1', which
+        // also ensures that the Checksums don't change because of accidental @ID value changes.
+        resetCounter();
+        
         FileOutputStream outStream = null;
         try
         {
