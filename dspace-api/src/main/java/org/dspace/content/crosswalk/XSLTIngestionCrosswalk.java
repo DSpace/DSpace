@@ -332,7 +332,7 @@ public class XSLTIngestionCrosswalk
                 {
                     System.err.println("DIM Error, Cannot find metadata schema for: schema=\""+schema+
                         "\" (... element=\""+element+"\", qualifier=\""+qualifier+"\")");
-    }
+                }
                 else
                 {
                     if (qualifier != null && qualifier.equals(""))
@@ -356,6 +356,8 @@ public class XSLTIngestionCrosswalk
                 throw new MetadataValidationException("Got unexpected element in DIM list: "+elt.toString());
             }
         }
+        //complete & close Context
+        context.complete();
     }
 
 }

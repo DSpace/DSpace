@@ -119,6 +119,7 @@ public class METSDisseminationCrosswalk
             // Disseminate METS to temp file
             Context context = new Context();
             dip.disseminate(context, item, pparams, tempFile);
+            context.complete();
 
             try
             {

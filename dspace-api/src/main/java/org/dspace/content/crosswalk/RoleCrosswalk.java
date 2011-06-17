@@ -200,7 +200,8 @@ public class RoleCrosswalk
             //actually disseminate to our temp file.
             Context context = new Context();
             dip.disseminate(context, dso, pparams, tempFile);
-
+            context.complete();
+            
             // if we ended up with a Zero-length output file,
             // this means dissemination was successful but had no results
             if(tempFile.exists() && tempFile.length()==0)
