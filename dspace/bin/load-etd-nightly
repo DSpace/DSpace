@@ -21,7 +21,7 @@ set marcdir = $datadir/marc
 set marcfile = `date '+%Y%m%d'`.dat
 set csvdir = $datadir/csv
 set csvfile = `date '+%Y%m%d'`.csv
-set transfermarc = `$bindir/dspace dsrun org.dspace.core.ConfigurationManager -property etdloader.transfermarc`;
+set transfermarc = `$bindir/dspace dsprop -property etdloader.transfermarc`;
 
 # Check for incoming files
 ls $incomingdir/etdadmin_upload_*.zip >& /dev/null

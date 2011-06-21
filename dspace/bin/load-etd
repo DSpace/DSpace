@@ -38,9 +38,6 @@ $ENV{JAVA_OPTS} .= " -Detdloader.csvfile=$csvfile" if (defined $csvfile);
 #print (join ' ',@cmd) . "\n";
 system(@cmd);
 
-$exit_status = $? >> 8;
-die "Error loading" if ($exit_status != 0);
-
 exit 0;
 
 

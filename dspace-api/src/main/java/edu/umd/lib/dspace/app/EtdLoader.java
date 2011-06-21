@@ -271,7 +271,6 @@ public class EtdLoader
 
     catch (Exception e) {
       log.error("Uncaught exception: " + ErrorHandling.getStackTrace(e));
-      System.exit(1);
     }
 
     finally {
@@ -288,8 +287,6 @@ public class EtdLoader
                "Records written: " + lWritten + "\n" +
                "Embargoes:       " + lEmbargo);
     }
-
-    System.exit(0);
   }
 
 
