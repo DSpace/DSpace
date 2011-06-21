@@ -539,6 +539,12 @@ public class Ldap {
     this.context = context;
   }
 
+  
+  public String toString() {
+	  if (entry == null) return "null";
+	  
+	  return strUid + " (" + entry.getName() + ")";
+  }
 
 }
 
