@@ -61,7 +61,7 @@
         <%-- <title>Select Collections</title> --%>
         <title><fmt:message key="jsp.tools.collection-select-list.title"/></title>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
-        <link rel="stylesheet" href="<%= request.getContextPath() %>/styles.css.jsp" type="text/css"/>
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/styles.css" type="text/css"/>
         <link rel="shortcut icon" href="<%= request.getContextPath() %>/favicon.ico" type="image/x-icon"/>
 
 <script type="text/javascript">
