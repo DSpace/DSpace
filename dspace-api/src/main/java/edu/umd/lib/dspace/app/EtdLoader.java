@@ -211,10 +211,6 @@ public class EtdLoader
       String strEPerson    = ConfigurationManager.getProperty("etdloader.eperson");
       String strCollection = ConfigurationManager.getProperty("etdloader.collection");
 
-      // logging (log4j.defaultInitOverride needs to be set or
-      // config/log4j.properties will be read and used additionally)
-      PropertyConfigurator.configure(strDspace + "/config/log4j-etdloader.properties");
-
       // the transformers
       TransformerFactory tFactory = TransformerFactory.newInstance();
       tDC = tFactory.newTransformer(new StreamSource(new File(strDspace + "/config/load/etd2dc.xsl")));        
