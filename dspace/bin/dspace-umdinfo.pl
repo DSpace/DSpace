@@ -70,7 +70,7 @@ my $dspace_dir = cwd();
 
 # pgsql port
 
-my $port = `${dspace_dir}/bin/dsrun org.dspace.core.ConfigurationManager -property db.port`;
+my $port = `${dspace_dir}/bin/dspace dsprop -property db.port`;
 chomp $port;
 
 #where is the DATA for the database tables stored?
@@ -339,7 +339,7 @@ sub GetConfigParameter
     my $dirname = shift;
     my $return_value = "";
 
-    $return_value = `${dspace_dir}/bin/dsrun org.dspace.core.ConfigurationManager -property ${dirname}`;
+    $return_value = `${dspace_dir}/bin/dspace dsprop -property ${dirname}`;
     chomp $return_value;
 
     return $return_value;

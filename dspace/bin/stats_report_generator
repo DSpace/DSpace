@@ -21,7 +21,7 @@ $temp_file = "/tmp/dspace_log";
 $epeople_table = $statspath."/epeople_table";
 $views_table = $statspath."/views_table";
 $psql_queries = $configpath."/stats/queries.txt";
-chomp($port = `${dspace_dir}/bin/dsrun org.dspace.core.ConfigurationManager -property db.port`);
+chomp($port = `${dspace_dir}/bin/dspace dsprop -property db.port`);
 
 
 sub execute {
