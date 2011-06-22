@@ -54,7 +54,14 @@ JARS=`echo $DSPACEDIR/lib/*.jar | sed 's/ /\:/g'`
 #   Any existing classpath
 #   The JARs (WEB-INF/lib/*.jar)
 #   The WEB-INF/classes directory
-FULLPATH=$CLASSPATH:$JARS:$DSPACEDIR/config
+if [ "$CLASSPATH" = "" ]; then
+    FULLPATH=$JARS:$DSPACEDIR/config
+else
+    FULLPATH=$CLASSPATH:$JARS:$DSPACEDIR/config
+fi
+
+
+
 
 #Allow user to specify java options through JAVA_OPTS variable
 if [ "$JAVA_OPTS" = "" ]; then

@@ -21,13 +21,13 @@
     <packaging>war</packaging>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-discovery-xmlui-webapp</artifactId>
-    <version>1.7.1</version>
+    <version>1.7.2</version>
     <name>DSpace Discovery :: Discovery XMLUI Webapp</name>
 
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>discovery-modules</artifactId>
-        <version>1.7.1</version>
+        <version>1.7.2</version>
    </parent>
 
     <dependencies>
@@ -46,7 +46,7 @@
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-discovery-xmlui-api</artifactId>
-            <version>1.7.1</version>
+            <version>1.7.2</version>
         </dependency>
 
             <!-- external -->
@@ -145,11 +145,11 @@
        and releases snapshots into the snapshot repository below.
     -->
     <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.1</connection>
+        <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2</connection>
         <developerConnection>
-            scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.1
+            scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2
         </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.1</url>
+        <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2</url>
     </scm>
 
 </project>

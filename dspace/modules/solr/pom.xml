@@ -15,7 +15,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>1.7.1</version>
+      <version>1.7.2</version>
    </parent>
    
    <!--
@@ -24,9 +24,9 @@
       and releases snapshots into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.7.1</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.7.1</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.7.1</url>
+      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.7.2</connection>
+      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.7.2</developerConnection>
+      <url>http://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.7.2</url>
    </scm>
 
    <build>

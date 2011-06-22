@@ -351,7 +351,7 @@ public class EPerson extends DSpaceObject
         }
 
         // Get all the epeople that match the query
-		TableRowIterator rows = DatabaseManager.queryTable(context, "eperson",
+		TableRowIterator rows = DatabaseManager.query(context, 
 		        dbquery, paramArr);
 		try
         {
@@ -473,7 +473,7 @@ public class EPerson extends DSpaceObject
 
         // NOTE: The use of 's' in the order by clause can not cause an SQL 
         // injection because the string is derived from constant values above.
-        TableRowIterator rows = DatabaseManager.queryTable(context, "eperson",
+        TableRowIterator rows = DatabaseManager.query(context, 
                 "SELECT * FROM eperson ORDER BY "+s);
 
         try
@@ -955,7 +955,7 @@ public class EPerson extends DSpaceObject
         List<String> tableList = new ArrayList<String>();
 
         // check for eperson in item table
-        TableRowIterator tri = DatabaseManager.queryTable(myContext, "item",
+        TableRowIterator tri = DatabaseManager.query(myContext, 
                 "SELECT * from item where submitter_id= ? ",
                 getID());
 
@@ -976,7 +976,7 @@ public class EPerson extends DSpaceObject
         }
 
         // check for eperson in workflowitem table
-        tri = DatabaseManager.queryTable(myContext, "workflowitem",
+        tri = DatabaseManager.query(myContext, 
                 "SELECT * from workflowitem where owner= ? ",
                 getID());
 
@@ -997,7 +997,7 @@ public class EPerson extends DSpaceObject
         }
 
         // check for eperson in tasklistitem table
-        tri = DatabaseManager.queryTable(myContext, "tasklistitem",
+        tri = DatabaseManager.query(myContext, 
                 "SELECT * from tasklistitem where eperson_id= ? ",
                 getID());
 

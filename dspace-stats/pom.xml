@@ -3,14 +3,14 @@
 	<parent>
 		<artifactId>dspace-parent</artifactId>
 		<groupId>org.dspace</groupId>
-		<version>1.7.1</version>
+		<version>1.7.2</version>
 	</parent>
 	
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.dspace</groupId>
 	<artifactId>dspace-stats</artifactId>
 	<name>DSpace Solr Statistics Logging Client Library</name>
-	<version>1.7.1</version>
+	<version>1.7.2</version>
 	<description>Library of Shared UsageEvent and EventConsumer Tools for Logging to Solr.</description>
 
 	<!--
@@ -19,9 +19,9 @@
 		releases snapshots into the snapshot repository below.
 	-->
 	<scm>
-		<connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.1</connection>
-		<developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.1</developerConnection>
-		<url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.1</url>
+		<connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2</connection>
+		<developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2</developerConnection>
+		<url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2</url>
 	</scm>
 
 	<developers>

@@ -222,6 +222,7 @@ public class CollectionRecentSubmissions extends AbstractDSpaceTransformer imple
     {
         // Clear out our item's cache.
         this.recentSubmissionItems = null;
+        this.validity = null;
         super.recycle();
     }
 }
