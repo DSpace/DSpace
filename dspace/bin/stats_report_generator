@@ -13,7 +13,7 @@ chdir "$binpath/.." || die "$!\n";
 $dspace_dir = cwd();
 
 $statspath = "${dspace_dir}/stats";
-$dispstatspath = "${dspace_dir}/webapps/jspui/stats";
+$dispstatspath = "${dspace_dir}/stats/monthly";
 $configpath = "${dspace_dir}/config";
 $info = $binpath."/dspace-umdinfo.pl";
 $logreader = $binpath."/UMlog-reporter";
