@@ -9,10 +9,12 @@ package org.dspace.app.bulkedit;
 
 import org.apache.commons.cli.*;
 
+import org.apache.log4j.Logger;
 import org.dspace.content.*;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowManager;
@@ -37,6 +39,10 @@ public class MetadataImport
 
     /** The lines to import */
     List<DSpaceCSVLine> toImport;
+
+    /** Logger */
+    private static final Logger log = Logger.getLogger(MetadataImport.class);
+
 
     /**
      * Create an instance of the metadata importer. Requires a context and an array of CSV lines
@@ -65,9 +71,9 @@ public class MetadataImport
      * @throws MetadataImportException if something goes wrong
      */
     public List<BulkEditChange> runImport(boolean change,
-                                               boolean useWorkflow,
-                                               boolean workflowNotify,
-                                               boolean useTemplate) throws MetadataImportException
+                                          boolean useWorkflow,
+                                          boolean workflowNotify,
+                                          boolean useTemplate) throws MetadataImportException
     {
         // Store the changes
         ArrayList<BulkEditChange> changes = new ArrayList<BulkEditChange>();
@@ -288,6 +294,16 @@ public class MetadataImport
     private void compare(Item item, String[] fromCSV, boolean change,
                          String md, BulkEditChange changes) throws SQLException, AuthorizeException
     {
+        // Log what metadata element we're looking at
+        String all = "";
+        for (String part : fromCSV)
+        {
+            all += part + ",";
+        }
+        all = all.substring(0, all.length());
+        log.debug(LogManager.getHeader(c, "metadata_import",
+                                       "item_id=" + item.getID() + ",fromCSV=" + all));
+
         // Don't compare collections
         if ("collection".equals(md))
         {
@@ -321,6 +337,12 @@ public class MetadataImport
                 qualifier = qualifier.substring(0, qualifier.indexOf('['));
             }
         }
+        log.debug(LogManager.getHeader(c, "metadata_import",
+                                       "item_id=" + item.getID() + ",fromCSV=" + all +
+                                       ",looking_for_schema=" + schema +
+                                       ",looking_for_element=" + element +
+                                       ",looking_for_qualifier=" + qualifier +
+                                       ",looking_for_language=" + language));
         DCValue[] current = item.getMetadata(schema, element, qualifier, language);
         
         String[] dcvalues = new String[current.length];
@@ -329,6 +351,9 @@ public class MetadataImport
         {
             dcvalues[i] = dcv.value;
             i++;
+            log.debug(LogManager.getHeader(c, "metadata_import",
+                                           "item_id=" + item.getID() + ",fromCSV=" + all +
+                                           ",found=" + dcv.value));
         }
 
         // Compare from csv->current
@@ -344,6 +369,12 @@ public class MetadataImport
             if ((value != null) && (!"".equals(value)) && (!contains(value, fromCSV)))
             {
                 // Remove it
+                log.debug(LogManager.getHeader(c, "metadata_import",
+                                               "item_id=" + item.getID() + ",fromCSV=" + all +
+                                               ",removing_schema=" + schema +
+                                               ",removing_element=" + element +
+                                               ",removing_qualifier=" + qualifier +
+                                               ",removing_language=" + language));
                 changes.registerRemove(dcv);
             }
             else
@@ -587,7 +618,7 @@ public class MetadataImport
      * @param md The element to compare
      * @param changes The changes object to populate
      *
-     * @throws SQLException when an SQL error has occured (querying DSpace)
+     * @throws SQLException when an SQL error has occurred (querying DSpace)
      * @throws AuthorizeException If the user can't make the changes
      */
     private void add(String[] fromCSV, String md, BulkEditChange changes)
@@ -985,6 +1016,12 @@ public class MetadataImport
         try
         {
             csv = new DSpaceCSV(new File(filename), c);
+        }
+        catch (MetadataImportInvalidHeadingException miihe)
+        {
+            System.err.println(miihe.getMessage());
+            System.exit(1);
+            return;
         }
         catch (Exception e)
         {

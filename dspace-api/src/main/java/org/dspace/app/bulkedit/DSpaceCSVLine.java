@@ -29,7 +29,7 @@ public class DSpaceCSVLine
     /**
      * Create a new CSV line
      *
-     * @param id The item ID of the line
+     * @param itemId The item ID of the line
      */
     public DSpaceCSVLine(int itemId)
     {

@@ -97,8 +97,11 @@ public class DSpaceCSV implements Serializable
             // Read the heading line
             String head = input.readLine();
             String[] headingElements = head.split(escapedFieldSeparator);
+            int columnCounter = 0;
             for (String element : headingElements)
             {
+                columnCounter++;
+
                 // Remove surrounding quotes if there are any
                 if ((element.startsWith("\"")) && (element.endsWith("\"")))
                 {
@@ -116,6 +119,13 @@ public class DSpaceCSV implements Serializable
                     // Verify that the heading is valid in the metadata registry
                     String[] clean = element.split("\\[");
                     String[] parts = clean[0].split("\\.");
+
+                    if (parts.length < 2) {
+                        throw new MetadataImportInvalidHeadingException(element,
+                                                                        MetadataImportInvalidHeadingException.ENTRY,
+                                                                        columnCounter);
+                    }
+
                     String metadataSchema = parts[0];
                     String metadataElement = parts[1];
                     String metadataQualifier = null;
@@ -127,7 +137,8 @@ public class DSpaceCSV implements Serializable
                     MetadataSchema foundSchema = MetadataSchema.find(c, metadataSchema);
                     if (foundSchema == null) {
                         throw new MetadataImportInvalidHeadingException(clean[0],
-                                                                        MetadataImportInvalidHeadingException.SCHEMA);
+                                                                        MetadataImportInvalidHeadingException.SCHEMA,
+                                                                        columnCounter);
                     }
 
                     // Check that the metadata element exists in the schema
@@ -135,7 +146,8 @@ public class DSpaceCSV implements Serializable
                     MetadataField foundField = MetadataField.findByElement(c, schemaID, metadataElement, metadataQualifier);
                     if (foundField == null) {
                         throw new MetadataImportInvalidHeadingException(clean[0],
-                                                                        MetadataImportInvalidHeadingException.ELEMENT);
+                                                                        MetadataImportInvalidHeadingException.ELEMENT,
+                                                                        columnCounter);
                     }
 
                     // Store the heading
@@ -474,6 +486,11 @@ public class DSpaceCSV implements Serializable
                 }
 
                 // Make sure we register that this column was there
+                if (headings.size() < i) {
+                    throw new MetadataImportInvalidHeadingException("",
+                                                                    MetadataImportInvalidHeadingException.MISSING,
+                                                                    i + 1);
+                }
                 csvLine.add(headings.get(i - 1), null);
                 String[] elements = part.split(escapedValueSeparator);
                 for (String element : elements)
