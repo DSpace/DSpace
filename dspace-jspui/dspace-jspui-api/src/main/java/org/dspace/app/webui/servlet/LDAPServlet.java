@@ -96,7 +96,7 @@ public class LDAPServlet extends DSpaceServlet
 		}
         else
 		{
-			jsp = "/login/incorrect.jsp";
+			jsp = "/login/ldap-incorrect.jsp";
 		}
 
 		// If we reach here, supplied email/password was duff.
