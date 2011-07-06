@@ -73,7 +73,7 @@ public class DIDLCrosswalk extends Crosswalk
        
         StringBuffer metadata = new StringBuffer();
         String itemhandle=item.getHandle();
-        String strMaxSize = ConfigurationManager.getProperty("oai.didl.maxresponse");
+        String strMaxSize = ConfigurationManager.getProperty("oai", "didl.maxresponse");
         int maxsize = MAXRESPONSE_INLINE_BITSTREAM;
         if (strMaxSize != null)
         {

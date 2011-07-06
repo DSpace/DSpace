@@ -63,7 +63,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
     public static final String OAI_ID_PREFIX = "oai:" + ConfigurationManager.getProperty("dspace.hostname") + ":";
 
     /** Maximum number of records returned by one request */
-    private final int MAX_RECORDS = ConfigurationManager.getIntProperty("oai.response.max-records", 100);
+    private final int MAX_RECORDS = ConfigurationManager.getIntProperty("oai","response.max-records", 100);
 
     public DSpaceOAICatalog(Properties properties)
     {
@@ -207,7 +207,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
 
             // Get the relevant OAIItemInfo objects to make headers
             DSpaceObject scope = resolveSet(context, set);
-            boolean includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.oai", true);
+            boolean includeAll = ConfigurationManager.getBooleanProperty("oai", "harvest.includerestricted.oai", true);
             // Warning: In large repositories, setting harvest.includerestricted.oai to false may cause
             // performance problems as all items will need to have their authorization permissions checked,
             // but because we haven't implemented resumption tokens in ListIdentifiers, ALL items will
@@ -343,7 +343,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
                 throw new IdDoesNotExistException(identifier);
             }
             
-            boolean includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.oai", true);
+            boolean includeAll = ConfigurationManager.getBooleanProperty("oai", "harvest.includerestricted.oai", true);
 
             if (!includeAll)
             {
@@ -560,7 +560,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
 
             // Get the relevant HarvestedItemInfo objects to make headers
             DSpaceObject scope = resolveSet(context, set);
-            boolean includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.oai", true);
+            boolean includeAll = ConfigurationManager.getBooleanProperty("oai", "harvest.includerestricted.oai", true);
             List<HarvestedItemInfo> itemInfos = Harvest.harvest(context, scope, from, until,
                     offset, MAX_RECORDS, // Limit amount returned from one
                                          // request
