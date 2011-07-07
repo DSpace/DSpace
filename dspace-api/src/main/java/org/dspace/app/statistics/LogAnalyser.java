@@ -1195,7 +1195,13 @@ public class LogAnalyser
                           " FROM metadatafieldregistry " +
                           " WHERE element = 'date' " +
                           " AND qualifier = 'accessioned') ");
-      
+
+        // Verifies that the metadata contains a valid date, otherwise the
+        // postgres queries blow up when doing the ::timestamp cast.
+        if (!oracle && startDate != null || endDate != null) {
+        	dateQuery.append(" AND text_value LIKE '____-__-__T__:__:__Z' ");
+        }
+        
         if (startDate != null)
         {
             if (oracle)
