@@ -191,11 +191,19 @@ public class LDAPAuthentication
                 log.info(LogManager.getHeader(context,
                                 "autoregister", "netid=" + netid));
 
-                if ((ldap.ldapEmail!=null)&&(!ldap.ldapEmail.equals("")))
+                // If there is no email and the email  domain is set, add it to the netid
+				String email = ldap.ldapEmail;
+                if (((email == null) || ("".equals(email))) &&
+                    (!"".equals(ConfigurationManager.getProperty("ldap.netid_email_domain"))))
                 {
+                    email = netid + ConfigurationManager.getProperty("ldap.netid_email_domain");
+                }
+
+                if ((email != null) && (!"".equals(email)))
+				{
                     try
                     {
-                        eperson = EPerson.findByEmail(context, ldap.ldapEmail);
+                        eperson = EPerson.findByEmail(context, email);
 	                    if (eperson!=null)
 	                    {
 	                        log.info(LogManager.getHeader(context,
@@ -217,14 +225,10 @@ public class LDAPAuthentication
 	                            {
 	                                context.setIgnoreAuthorization(true);
 	                                eperson = EPerson.create(context);
-	                                if ((ldap.ldapEmail!=null)&&(!ldap.ldapEmail.equals("")))
-                                    {
-                                        eperson.setEmail(ldap.ldapEmail);
-                                    }
-	                                else
-                                    {
-                                        eperson.setEmail(netid);
-                                    }
+	                                if ((email != null) && (!"".equals(email)))
+									{
+										eperson.setEmail(email);
+									}
 	                                if ((ldap.ldapGivenName!=null)&&(!ldap.ldapGivenName.equals("")))
                                     {
                                         eperson.setFirstName(ldap.ldapGivenName);

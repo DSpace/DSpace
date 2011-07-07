@@ -28,11 +28,11 @@
                     </tr>
                     <tr>
             		<td class="standard" align="right"><strong><fmt:message key="jsp.components.ldap-form.password"/></strong></td>
-                        <td><input type="password" name="login_password"></td>
+                        <td><input tabindex="2" type="password" name="login_password"></td>
                     </tr>
                     <tr>
                         <td align="center" colspan="2">
-			    <input type="submit" name="login_submit" value="<fmt:message key="jsp.components.ldap-form.login.button"/>">
+			                <input type="submit" tabindex="3" name="login_submit" value="<fmt:message key="jsp.components.ldap-form.login.button"/>">
                         </td>
                     </tr>
                 </table>
