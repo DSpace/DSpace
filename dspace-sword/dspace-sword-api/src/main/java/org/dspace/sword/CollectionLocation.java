@@ -111,7 +111,7 @@ public class CollectionLocation
 	private String getBaseUrl()
 		throws DSpaceSWORDException
 	{
-		String depositUrl = ConfigurationManager.getProperty("sword.deposit.url");
+		String depositUrl = ConfigurationManager.getProperty("sword-server", "deposit.url");
 		if (depositUrl == null || "".equals(depositUrl))
 		{
 			String dspaceUrl = ConfigurationManager.getProperty("dspace.baseUrl");

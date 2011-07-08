@@ -93,7 +93,7 @@ public class ServiceDocumentManager
 			workspace.setTitle(ws);
 
 			// next thing to do is determine whether the default is communities or collections
-			boolean swordCommunities = ConfigurationManager.getBooleanProperty("sword.expose-communities");
+			boolean swordCommunities = ConfigurationManager.getBooleanProperty("sword-server", "expose-communities");
 
 			if (swordCommunities)
 			{
@@ -170,7 +170,7 @@ public class ServiceDocumentManager
      */
     private void addGenerator(Service service)
     {
-        boolean identify = ConfigurationManager.getBooleanProperty("sword.identify-version", false);
+        boolean identify = ConfigurationManager.getBooleanProperty("sword-server", "identify-version", false);
         SWORDUrlManager urlManager = swordService.getUrlManager();
         String softwareUri = urlManager.getGeneratorUrl();
         if (identify)

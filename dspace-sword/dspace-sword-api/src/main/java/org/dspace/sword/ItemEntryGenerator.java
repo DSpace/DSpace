@@ -80,8 +80,8 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 
 				if (handle != null && !"".equals(handle))
 				{
-					boolean keepOriginal = ConfigurationManager.getBooleanProperty("sword.keep-original-package");
-					String swordBundle = ConfigurationManager.getProperty("sword.bundle.name");
+					boolean keepOriginal = ConfigurationManager.getBooleanProperty("sword-server", "keep-original-package");
+					String swordBundle = ConfigurationManager.getProperty("sword-server", "bundle.name");
 					if (swordBundle == null || "".equals(swordBundle))
 					{
 						swordBundle = "SWORD";
@@ -336,7 +336,7 @@ public class ItemEntryGenerator extends DSpaceATOMEntry
 	 */
 	protected void addLastUpdatedDate()
 	{
-		String config = ConfigurationManager.getProperty("sword.updated.field");
+		String config = ConfigurationManager.getProperty("sword-server", "updated.field");
 		DCValue[] dcv = item.getMetadata(config);
 		if (dcv != null && dcv.length == 1)
         {

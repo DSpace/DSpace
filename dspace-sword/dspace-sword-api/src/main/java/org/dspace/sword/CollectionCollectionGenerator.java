@@ -118,7 +118,7 @@ public class CollectionCollectionGenerator extends ATOMCollectionGenerator
 
 		// should we offer the items in the collection up as deposit
 		// targets?
-		boolean itemService = ConfigurationManager.getBooleanProperty("sword.expose-items");
+		boolean itemService = ConfigurationManager.getBooleanProperty("sword-server", "expose-items");
 		if (itemService)
 		{
 			String subService = urlManager.constructSubServiceUrl(col);

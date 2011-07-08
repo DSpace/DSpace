@@ -46,7 +46,7 @@ public class SWORDIngesterFactory
     {
 		if (dso instanceof Collection)
 		{
-			SWORDIngester ingester = (SWORDIngester) PluginManager.getNamedPlugin(SWORDIngester.class, deposit.getPackaging());
+			SWORDIngester ingester = (SWORDIngester) PluginManager.getNamedPlugin("sword-server", SWORDIngester.class, deposit.getPackaging());
 			if (ingester == null)
 			{
 				throw new SWORDErrorException(ErrorCodes.ERROR_CONTENT, "No ingester configured for this package type");
@@ -55,7 +55,7 @@ public class SWORDIngesterFactory
 		}
 		else if (dso instanceof Item)
 		{
-			SWORDIngester ingester = (SWORDIngester) PluginManager.getNamedPlugin(SWORDIngester.class, "SimpleFileIngester");
+			SWORDIngester ingester = (SWORDIngester) PluginManager.getNamedPlugin("sword-server", SWORDIngester.class, "SimpleFileIngester");
 			if (ingester == null)
 			{
 				throw new DSpaceSWORDException("SimpleFileIngester is not configured in plugin manager");

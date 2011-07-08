@@ -126,7 +126,7 @@ public class CollectionDepositor extends Depositor
 				boolean ignoreAuth = context.ignoreAuthorization();
 				context.setIgnoreAuthorization(true);
 
-				String bundleName = ConfigurationManager.getProperty("sword.bundle.name");
+				String bundleName = ConfigurationManager.getProperty("sword-server", "bundle.name");
 				if (bundleName == null || "".equals(bundleName))
 				{
 					bundleName = "SWORD";

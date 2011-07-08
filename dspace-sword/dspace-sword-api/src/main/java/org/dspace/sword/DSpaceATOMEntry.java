@@ -196,7 +196,7 @@ public abstract class DSpaceATOMEntry
 	 */
 	protected void addGenerator()
 	{
-		boolean identify = ConfigurationManager.getBooleanProperty("sword.identify-version");
+		boolean identify = ConfigurationManager.getBooleanProperty("sword-server", "identify-version");
 		SWORDUrlManager urlManager = swordService.getUrlManager();
 		String softwareUri = urlManager.getGeneratorUrl();
 		if (identify)

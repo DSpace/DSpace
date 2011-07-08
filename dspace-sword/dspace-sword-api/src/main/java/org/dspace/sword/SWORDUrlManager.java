@@ -50,7 +50,7 @@ public class SWORDUrlManager
 	 */
 	public String getGeneratorUrl()
 	{
-		String cfg = ConfigurationManager.getProperty("sword.generator.url");
+		String cfg = ConfigurationManager.getProperty("sword-server", "generator.url");
 		if (cfg == null || "".equals(cfg))
 		{
 			return SWORDProperties.SOFTWARE_URI;
@@ -311,7 +311,7 @@ public class SWORDUrlManager
 	public String getBaseServiceDocumentUrl()
 			throws DSpaceSWORDException
 	{
-		String depositUrl = ConfigurationManager.getProperty("sword.servicedocument.url");
+		String depositUrl = ConfigurationManager.getProperty("sword-server", "servicedocument.url");
 		if (depositUrl == null || "".equals(depositUrl))
 		{
 			String dspaceUrl = ConfigurationManager.getProperty("dspace.baseUrl");
@@ -356,7 +356,7 @@ public class SWORDUrlManager
 	public String getBaseDepositUrl()
 		throws DSpaceSWORDException
 	{
-		String depositUrl = ConfigurationManager.getProperty("sword.deposit.url");
+		String depositUrl = ConfigurationManager.getProperty("sword-server", "deposit.url");
 		if (depositUrl == null || "".equals(depositUrl))
 		{
 			String dspaceUrl = ConfigurationManager.getProperty("dspace.baseUrl");
@@ -472,14 +472,14 @@ public class SWORDUrlManager
 	public String getBaseMediaLinkUrl()
 			throws DSpaceSWORDException
 	{
-		String mlUrl = ConfigurationManager.getProperty("sword.media-link.url");
+		String mlUrl = ConfigurationManager.getProperty("sword-server", "media-link.url");
 		if (mlUrl == null || "".equals(mlUrl))
 		{
 			String dspaceUrl = ConfigurationManager.getProperty("dspace.baseUrl");
 			if (dspaceUrl == null || "".equals(dspaceUrl))
 			{
 				throw new DSpaceSWORDException("Unable to construct media-link urls, due to missing/invalid config in " +
-						"sword.media-link.url and/or dspace.baseUrl");
+						"media-link.url and/or dspace.baseUrl");
 			}
 
             try

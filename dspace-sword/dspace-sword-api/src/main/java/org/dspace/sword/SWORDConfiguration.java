@@ -80,33 +80,33 @@ public class SWORDConfiguration
 	public SWORDConfiguration()
 	{
 		// set the max upload size
-		int mus = ConfigurationManager.getIntProperty("sword.max-upload-size");
+		int mus = ConfigurationManager.getIntProperty("sword-server", "max-upload-size");
 		if (mus > 0)
 		{
 			this.maxUploadSize = mus;
 		}
 
 		// set the mediation value
-		this.mediated = ConfigurationManager.getBooleanProperty("sword.on-behalf-of.enable");
+		this.mediated = ConfigurationManager.getBooleanProperty("sword-server", "on-behalf-of.enable");
 
 		// find out if we keep the original as bitstream
-		this.keepOriginal = ConfigurationManager.getBooleanProperty("sword.keep-original-package");
+		this.keepOriginal = ConfigurationManager.getBooleanProperty("sword-server", "keep-original-package");
 
 		// get the sword bundle
-		String bundle = ConfigurationManager.getProperty("sword.bundle.name");
+		String bundle = ConfigurationManager.getProperty("sword-server", "bundle.name");
 		if (bundle != null && "".equals(bundle))
 		{
 			this.swordBundle = bundle;
 		}
 
         // find out if we keep the package as a file in specified directory
-        this.keepPackageOnFailedIngest = ConfigurationManager.getBooleanProperty("sword.keep-package-on-fail", false);
+        this.keepPackageOnFailedIngest = ConfigurationManager.getBooleanProperty("sword-server", "keep-package-on-fail", false);
  
         // get directory path and name
-        this.failedPackageDir = ConfigurationManager.getProperty("sword.failed-package.dir");
+        this.failedPackageDir = ConfigurationManager.getProperty("sword-server", "failed-package.dir");
 
         // Get the accepted formats
-        String acceptsProperty = ConfigurationManager.getProperty("sword.accepts");
+        String acceptsProperty = ConfigurationManager.getProperty("sword-server", "accepts");
         swordaccepts = new ArrayList<String>();
         if (acceptsProperty == null)
         {
@@ -343,11 +343,11 @@ public class SWORDConfiguration
 		String handle = col.getHandle();
 
 		// build the holding maps of identifiers and q values
-        Properties props = ConfigurationManager.getProperties();
+        Properties props = ConfigurationManager.getProperties("sword-server");
         Set keyset = props.keySet();
         for (Object keyObj : keyset)
         {
-			String sw = "sword.accept-packaging.";
+			String sw = "accept-packaging.";
 
             if (!(keyObj instanceof String))
             {
