@@ -215,11 +215,16 @@ public class Harvest
                  */
                 if ((!nonAnon) && (index < offset))
                 {
+                    boolean added = false;
                     HarvestedItemInfo itemInfo = new HarvestedItemInfo();
                     itemInfo.itemID = row.getIntColumn("resource_id");
+                    itemInfo.withdrawn = row.getBooleanColumn("withdrawn");
+                    if (withdrawn && itemInfo.withdrawn)
+                    {
+                        added = true;
+                    }
                     itemInfo.item = Item.find(context, itemInfo.itemID);
                     Group[] authorizedGroups = AuthorizeManager.getAuthorizedGroups(context, itemInfo.item, Constants.READ);
-                        boolean added = false;
                         for (int i = 0; i < authorizedGroups.length; i++)
                         {
                             if ((authorizedGroups[i].getID() == 0) && (!added))
