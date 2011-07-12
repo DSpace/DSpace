@@ -57,6 +57,8 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
 	private static final Message T_para2 = message("xmlui.administrative.item.EditBitstreamForm.para2");
 	private static final Message T_user_label = message("xmlui.administrative.item.EditBitstreamForm.user_label");
 	private static final Message T_user_help = message("xmlui.administrative.item.EditBitstreamForm.user_help");
+    private static final Message T_filename_label = message("xmlui.administrative.item.EditBitstreamForm.name_label");
+    private static final Message T_filename_help = message("xmlui.administrative.item.EditBitstreamForm.name_help");
 
 
 
@@ -107,10 +109,13 @@ public class EditBitstreamForm extends AbstractDSpaceTransformer
 
 		// LIST: edit form
 		List edit = div.addList("edit-bitstream-list", List.TYPE_FORM);
+        edit.addLabel(T_file_label);
+        edit.addItem().addXref(fileUrl, fileName);
 
-		edit.addLabel(T_file_label);
-		edit.addItem().addXref(fileUrl, fileName);
-
+        Text bitstreamName = edit.addItem().addText("bitstreamName");
+        bitstreamName.setLabel(T_filename_label);
+        bitstreamName.setHelp(T_filename_help);
+        bitstreamName.setValue(fileName);
 		
 		Select primarySelect = edit.addItem().addSelect("primary");
 		primarySelect.setLabel(T_primary_label);

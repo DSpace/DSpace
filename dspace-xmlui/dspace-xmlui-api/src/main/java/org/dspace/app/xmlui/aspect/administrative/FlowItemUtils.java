@@ -542,7 +542,7 @@ public class FlowItemUtils
 	 * @param userFormat Any user supplied formats.
 	 * @return A flow result object.
 	 */
-	public static FlowResult processEditBitstream(Context context, int itemID, int bitstreamID, String primary, String description, int formatID, String userFormat) throws SQLException, AuthorizeException 
+	public static FlowResult processEditBitstream(Context context, int itemID, int bitstreamID, String bitstreamName, String primary, String description, int formatID, String userFormat) throws SQLException, AuthorizeException
 	{
 		FlowResult result = new FlowResult();
 		result.setContinue(false);
@@ -551,11 +551,16 @@ public class FlowItemUtils
 		BitstreamFormat currentFormat = bitstream.getFormat();
 
 		//Step 1:
-		// Update the bitstream's description
+		// Update the bitstream's description and name
 		if (description != null)
 		{
 			bitstream.setDescription(description);
 		}
+
+        if (bitstreamName != null)
+        {
+            bitstream.setName(bitstreamName);
+        }
 		
 		//Step 2:
 		// Check if the primary bitstream status has changed

@@ -1745,8 +1745,9 @@ function doEditBitstream(itemID, bitstreamID)
             var description = cocoon.request.get("description");
             var formatID = cocoon.request.get("formatID");
             var userFormat = cocoon.request.get("user_format");
+            var bitstreamName = cocoon.request.get("bitstreamName");
 
-            result = FlowItemUtils.processEditBitstream(getDSContext(),itemID,bitstreamID,primary,description,formatID,userFormat);
+            result = FlowItemUtils.processEditBitstream(getDSContext(),itemID,bitstreamID,bitstreamName,primary,description,formatID,userFormat);
         }
     } while (result == null || ! result.getContinue())
 
