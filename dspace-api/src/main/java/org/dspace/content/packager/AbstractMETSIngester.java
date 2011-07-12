@@ -1358,6 +1358,8 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
      * override this method if your METS manifest specifies the handle in
      * another location.
      * 
+     * If no handle was found then null is returned.
+     * 
      * @param manifest
      *            METS manifest
      * @returns handle as a string (or null, if not found)
@@ -1374,11 +1376,6 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
         // decode this URI (by removing the 'hdl:' prefix)
         String handle = decodeHandleURN(handleURI);
 
-        if (handle == null || handle.length() == 0)
-        {
-            throw new PackageValidationException(
-                    "The DSpace Object handle required to ingest this package could not be resolved in manifest. The <mets OBJID='hdl:xxxx'> is missing.");
-        }
 
         return handle;
     }
