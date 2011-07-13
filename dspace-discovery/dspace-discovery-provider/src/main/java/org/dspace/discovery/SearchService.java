@@ -7,15 +7,14 @@
  */
 package org.dspace.discovery;
 
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.response.QueryResponse;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 
+import java.sql.SQLException;
 import java.util.List;
 
 /**
- * Search interface that discovery to search in solr
+ * Search interface that discovery uses
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)
@@ -23,9 +22,33 @@ import java.util.List;
  */
 public interface SearchService {
 
-    QueryResponse search(SolrQuery query) throws SearchServiceException;
+    DiscoverResult search(Context context, DiscoverQuery query) throws SearchServiceException;
 
-    List<DSpaceObject> search(Context context, String query, int offset, int max, String... filterquery);
+    DiscoverResult search(Context context, DSpaceObject dso, DiscoverQuery query) throws SearchServiceException;
+
+    String searchJSON(DiscoverQuery query, String jsonIdentifier) throws SearchServiceException;
+
+
 
     List<DSpaceObject> search(Context context, String query, String orderfield, boolean ascending, int offset, int max, String... filterquery);
+
+
+    /**
+     * Transforms the given string into a filter query
+     * @param context the DSpace context
+     * @param filterQuery the filter query
+     * @return a filter query object
+     * @throws java.sql.SQLException ...
+     */
+    DiscoverFilterQuery toFilterQuery(Context context, String filterQuery) throws SQLException;
+
+    /**
+     * Transforms the given string field and value into a filter query
+     * @param context the DSpace context
+     * @param field the field of the filter query
+     * @param value the filter query value
+     * @return a filter query
+     * @throws SQLException ...
+     */
+    DiscoverFilterQuery toFilterQuery(Context context, String field, String value) throws SQLException;
 }

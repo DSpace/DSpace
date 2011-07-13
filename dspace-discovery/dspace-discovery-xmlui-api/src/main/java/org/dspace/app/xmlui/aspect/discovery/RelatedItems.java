@@ -9,14 +9,9 @@ package org.dspace.app.xmlui.aspect.discovery;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
-import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.apache.solr.common.util.NamedList;
-import org.apache.solr.common.util.SimpleOrderedMap;
-import org.apache.solr.common.SolrDocumentList;
-import org.apache.solr.common.SolrDocument;
+import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.WingException;
@@ -24,7 +19,8 @@ import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.core.LogManager;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.DiscoverResult;
 import org.dspace.discovery.SearchUtils;
 import org.xml.sax.SAXException;
 import org.dspace.discovery.SearchServiceException;
@@ -36,8 +32,17 @@ import org.dspace.discovery.SearchServiceException;
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
  */
-public class RelatedItems extends AbstractFiltersTransformer
+public class RelatedItems extends AbstractDSpaceTransformer
 {
+    /**
+     * Cached query results
+     */
+    protected DiscoverResult queryResults;
+
+    /**
+     * Cached query arguments
+     */
+    protected DiscoverQuery queryArgs;
 
     private static final Logger log = Logger.getLogger(RelatedItems.class);
     
@@ -65,7 +70,8 @@ public class RelatedItems extends AbstractFiltersTransformer
 
 
         if (this.queryResults != null) {
-
+//            TODO: develop this !
+            /*
             NamedList nList = this.queryResults.getResponse();
 
             SimpleOrderedMap<SolrDocumentList> mlt = (SimpleOrderedMap<SolrDocumentList>)nList.get("moreLikeThis");
@@ -118,20 +124,20 @@ public class RelatedItems extends AbstractFiltersTransformer
                     }
                 }
             }
+            */
 
             }
         }
 
-    @Override
     public void performSearch(DSpaceObject dso) throws SearchServiceException {
 
         if(queryResults != null)
         {
             return;
         }
-
+        /*
         this.queryArgs = prepareDefaultFilters(getView());
-        this.queryArgs.setRows(1);
+        this.queryArgs.setMaxResults(1);
         this.queryArgs.add("fl","author,handle");
         this.queryArgs.add("mlt","true");
         this.queryArgs.add("mlt.fl","author,handle");
@@ -139,8 +145,8 @@ public class RelatedItems extends AbstractFiltersTransformer
         this.queryArgs.add("mlt.mintf","1");
         this.queryArgs.setQuery("handle:" + dso.getHandle());
         this.queryArgs.setRows(1);
-
-        queryResults = getSearchService().search(queryArgs);
+        */
+        queryResults = SearchUtils.getSearchService().search(context, queryArgs);
 
     }
 

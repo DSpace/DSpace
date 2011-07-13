@@ -17,8 +17,7 @@ AjaxSolr.AutocompleteWidget = AjaxSolr.AbstractFacetWidget.extend({
 
     var callback = function (response) {
       var list = [];
-      for (var i = 0; i < self.fields.length; i++) {
-        var field = self.fields[i];
+      for (var field in response.facet_counts.facet_fields) {
         for (var facet in response.facet_counts.facet_fields[field]) {
           list.push({
             field: field,

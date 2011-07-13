@@ -6,7 +6,7 @@
 	<map:components>
 
         <map:readers>
-            <map:reader name="JSONSolrSearcher" src="org.dspace.app.xmlui.aspect.discovery.json.JSONSolrSearcher"/>
+            <map:reader name="JSONDiscoverySearcher" src="org.dspace.app.xmlui.aspect.discovery.json.JSONDiscoverySearcher"/>
         </map:readers>
 
         <map:serializers>
@@ -19,8 +19,8 @@
 		<map:pipeline>
 
             <map:match pattern="**">
-                <map:match pattern="searchSolr">
-                    <map:read type="JSONSolrSearcher" />
+                <map:match pattern="search">
+                    <map:read type="JSONDiscoverySearcher" />
                 </map:match>
 
 

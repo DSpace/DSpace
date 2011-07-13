@@ -10,9 +10,6 @@ package org.dspace.app.xmlui.aspect.discovery;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import org.apache.log4j.Logger;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.common.SolrDocument;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
@@ -23,8 +20,6 @@ import org.dspace.app.xmlui.wing.element.ReferenceSet;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.Constants;
-import org.dspace.discovery.SearchUtils;
 import org.xml.sax.SAXException;
 
 /**
@@ -34,19 +29,13 @@ import org.xml.sax.SAXException;
  * @author Mark Diggory (markd at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
  */
-public class CommunityRecentSubmissions extends AbstractFiltersTransformer
-{
-
-    private static final Logger log = Logger.getLogger(CommunityRecentSubmissions.class);
+public class CommunityRecentSubmissions extends AbstractRecentSubmissionTransformer {
 
     private static final Message T_head_recent_submissions =
-            message("xmlui.ArtifactBrowser.CollectionViewer.head_recent_submissions");
-
-
+            message("xmlui.ArtifactBrowser.CommunityViewer.head_recent_submissions");
 
     /**
-     * Display a single community (and refrence any sub communites or
-     * collections)
+     * Displays the recent submissions for this community
      */
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
@@ -61,7 +50,13 @@ public class CommunityRecentSubmissions extends AbstractFiltersTransformer
         // Build the community viewer division.
         Division home = body.addDivision("community-home", "primary repository community");
 
-        performSearch(dso);
+        getRecentlySubmittedItems(dso);
+
+        //Only attempt to render our result if we have one.
+        if(queryResults == null)
+        {
+            return;
+        }
 
         Division lastSubmittedDiv = home
                 .addDivision("community-recent-submission", "secondary recent-submission");
@@ -72,56 +67,13 @@ public class CommunityRecentSubmissions extends AbstractFiltersTransformer
                 "community-last-submitted", ReferenceSet.TYPE_SUMMARY_LIST,
                 null, "recent-submissions");
 
-        for (SolrDocument doc : queryResults.getResults()) {
-            lastSubmitted.addReference(SearchUtils.findDSpaceObject(context, doc));
+        for (DSpaceObject resultObject : queryResults.getDspaceObjects()) {
+            lastSubmitted.addReference(resultObject);
         }
-    }
-
-
-    /**
-     * Get the recently submitted items for the given community or collection.
-     *
-     * @param scope The comm/collection.
-     * @return the response of the query
-     */
-    public void performSearch(DSpaceObject scope) {
-
-
-        if(queryResults != null)
-        {
-            return;
-        }// queryResults;
-
-        queryArgs = prepareDefaultFilters(getView());
-
-        queryArgs.setQuery("search.resourcetype:" + Constants.ITEM);
-
-        queryArgs.setRows(SearchUtils.getConfig().getInt("solr.recent-submissions.size", 5));
-
-        String sortField = SearchUtils.getConfig().getString("recent.submissions.sort-option");
-        if(sortField != null){
-            queryArgs.setSortField(
-                    sortField,
-                    SolrQuery.ORDER.desc
-            );
-        }
-        /* Set the communities facet filters */
-        queryArgs.setFilterQueries("location:m" + scope.getID());
-
-        try {
-            queryResults =  getSearchService().search(queryArgs);
-        } catch (RuntimeException e) {
-            log.error(e.getMessage(),e);
-        } catch (Exception e) {
-            log.error(e.getMessage(),e);
-        }
-
-
     }
 
     public String getView()
     {
         return "community";
     }
-
 }

@@ -475,6 +475,20 @@
         </analyzer>
     </fieldType>
 
+
+    <!--This field is used for auto complete features in the discovery search-->
+    <fieldType name="dspaceAutoCompleteFull" class="solr.TextField" sortMissingLast="true" omitNorms="true">
+        <analyzer>
+            <!--Split everything up by space-->
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
+
+            <!--Lower cases our values-->
+            <filter class="solr.LowerCaseFilterFactory" />
+            <!-- The TrimFilter removes any leading or trailing whitespace -->
+            <filter class="solr.TrimFilterFactory" />
+        </analyzer>
+    </fieldType>
+
     <fieldType name="dspaceFilter" class="solr.TextField" sortMissingLast="true" omitNorms="true">
         <analyzer>
             <!--Treats the entire field as a single token, regardless of its content-->
@@ -546,6 +560,7 @@
 
      <!--Dynamic field used for search autocompletion-->
     <dynamicField name="*_ac" type="dspaceAutoComplete" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
+    <dynamicField name="*_ac.full" type="dspaceAutoCompleteFull" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
 
      <!--Dynamic field used for sidebar filters-->
      <dynamicField name="*_filter" type="dspaceFilter" indexed="true" stored="true" multiValued="true" omitNorms="true" />

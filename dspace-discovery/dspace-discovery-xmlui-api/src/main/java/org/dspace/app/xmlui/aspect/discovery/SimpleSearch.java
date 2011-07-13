@@ -10,7 +10,6 @@ package org.dspace.app.xmlui.aspect.discovery;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.Collection;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,10 +26,12 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.discovery.DiscoverFilterQuery;
+import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchUtils;
+import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 import org.dspace.discovery.SearchServiceException;
-import org.dspace.discovery.SolrServiceImpl;
 
 /**
  * Preform a simple search of the repository. The user provides a simple one
@@ -65,6 +66,14 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
     private static final Message T_FILTER_HEAD = message("xmlui.Discovery.SimpleSearch.filter_head");
     private static final Message T_FILTERS_SELECTED = message("xmlui.ArtifactBrowser.SimpleSearch.filter.selected");
 
+    private SearchService searchService = null;
+
+    public SimpleSearch() {
+        DSpace dspace = new DSpace();
+        searchService = dspace.getServiceManager().getServiceByName(SearchService.class.getName(),SearchService.class);
+    }
+
+
     /**
      * Add Page metadata.
      */
@@ -73,7 +82,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-        if ((dso instanceof Collection) || (dso instanceof Community)) {
+        if ((dso instanceof org.dspace.content.Collection) || (dso instanceof Community)) {
             HandleUtil.buildHandleTrail(dso, pageMeta, contextPath);
         }
 
@@ -97,9 +106,9 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 //        String searchUrl = SearchUtils.getConfig().getString("solr.search.server");
 //        if(searchUrl != null && !searchUrl.endsWith("/"))
 //            searchUrl += "/";
-        String searchUrl = ConfigurationManager.getProperty("dspace.url") + "/JSON/discovery/searchSolr";
+        String searchUrl = ConfigurationManager.getProperty("dspace.url") + "/JSON/discovery/search";
 
-        search.addHidden("solr-search-url").setValue(searchUrl);
+        search.addHidden("discovery-json-search-url").setValue(searchUrl);
         search.addHidden("contextpath").setValue(contextPath);
 
         String[] fqs = getParameterFilterQueries();
@@ -132,47 +141,26 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
             CheckBox box = composite.addCheckBox("fq");
 
-            for(String name : fqs){
+            for(String filterQuery : fqs){
             //for(Map.Entry<String, Integer> filter : filters.entrySet()){
                 //String name = filter.getKey();
                 //long count = filter.getValue();
 
+                DiscoverFilterQuery fq = searchService.toFilterQuery(context, filterQuery);
 
-                String field = name;
-                String value = name;
 
-                if(name.contains(":"))
-                {
-                    field = name.split(":")[0];
-                    value = name.split(":")[1];
-                }else{
-                    //We have got no field, so we are using everything
-                    field = "*";
-                }
-
-                value = value.replace("\\", "");
-                if("*".equals(field))
-                {
+                Option option = box.addOption(true,fq.getFilterQuery());
+                String field = fq.getField();
+                //If no field specified, then all is used.
+                if(field == null || field.equals("") || field.equals("*") || field.equals("all_ac")){
                     field = "all";
                 }
-                if(name.startsWith("*:"))
-                {
-                    name = name.substring(name.indexOf(":") + 1, name.length());
-                }
-
-                Option option = box.addOption(true,name);
                 option.addContent(message("xmlui.ArtifactBrowser.SimpleSearch.filter." + field));
 
-                if(field.equals("location.comm") || field.equals("location.coll")){
-                    //We have a community/collection, resolve it to a dspaceObject
-                    value = SolrServiceImpl.locationToName(context, field, value);
-                } else
-                if(field.endsWith("_filter")){
-                    value = SearchUtils.getFilterQueryDisplay(value);
-                }
+                //We have a filter query get the display value
                 //Check for a range query
                 Pattern pattern = Pattern.compile("\\[(.*? TO .*?)\\]");
-                Matcher matcher = pattern.matcher(value);
+                Matcher matcher = pattern.matcher(fq.getDisplayedValue());
                 boolean hasPattern = matcher.find();
                 if(hasPattern){
                     String[] years = matcher.group(0).replace("[", "").replace("]", "").split(" TO ");
@@ -180,9 +168,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
                     continue;
                 }
 
-
-                option.addContent(": " + value);
-
+                option.addContent(": " + fq.getDisplayedValue());
             }
         }
         
@@ -199,7 +185,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
             Select select = filterComp.addSelect("filtertype");
             //First of all add a default filter
-            select.addOption("*", message("xmlui.ArtifactBrowser.SimpleSearch.filter.all"));
+            select.addOption("all_ac", message("xmlui.ArtifactBrowser.SimpleSearch.filter.all"));
             //For each field found (at least one) add options
 
             for (String field : filterFields) {
@@ -246,17 +232,17 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         //Have we added a filter using the UI
         if(request.getParameter("filter") != null && !"".equals(request.getParameter("filter")) && request.getParameter("submit_search-filter-controls_add") != null)
         {
-            fqs.add((request.getParameter("filtertype").equals("*") ? "" : request.getParameter("filtertype") + ":") + request.getParameter("filter"));
+            fqs.add((request.getParameter("filtertype")) + ":" + request.getParameter("filter"));
         }
         return fqs.toArray(new String[fqs.size()]);
     }
 
     /**
-     * Returns all the filter queries for use by solr
+     * Returns all the filter queries for use by discovery
      *  This method returns more expanded filter queries then the getParameterFilterQueries
      * @return an array containing the filter queries
      */
-    protected String[] getSolrFilterQueries() {
+    protected String[] getFilterQueries() {
         try {
             java.util.List<String> allFilterQueries = new ArrayList<String>();
             Request request = ObjectModelHelper.getRequest(objectModel);
@@ -271,20 +257,12 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
             String value = request.getParameter("filter");
 
             if(value != null && !value.equals("") && request.getParameter("submit_search-filter-controls_add") != null){
-                String exactFq = (type.equals("*") ? "" : type + ":") + value;
-                fqs.add(exactFq + " OR " + exactFq + "*");
+                allFilterQueries.add(searchService.toFilterQuery(context, (type.equals("*") ? "" : type), value).getFilterQuery());
             }
 
-
+            //Add all the previous filters also
             for (String fq : fqs) {
-                //Do not put a wildcard after a range query
-                if (fq.matches(".*\\:\\[.* TO .*\\](?![a-z 0-9]).*")) {
-                    allFilterQueries.add(fq);
-                }
-                else
-                {
-                    allFilterQueries.add(fq.endsWith("*") ? fq : fq + " OR " + fq + "*");
-                }
+                allFilterQueries.add(searchService.toFilterQuery(context, fq).getFilterQuery());
             }
 
             return allFilterQueries.toArray(new String[allFilterQueries.size()]);

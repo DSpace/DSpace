@@ -8,7 +8,7 @@
 package org.dspace.discovery;
 
 /**
- * Exception used by discovery when solr exceptions occur
+ * Exception used by discovery when discovery search exceptions occur
  *
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Mark Diggory (markd at atmire dot com)

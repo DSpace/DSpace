@@ -11,7 +11,7 @@ var defaultFacets = new Array();
 
 (function ($) {
     $(function () {
-        var searchUrl = $("input[name='solr-search-url']").val();
+        var searchUrl = $("input[name='discovery-json-search-url']").val();
         Manager = new AjaxSolr.Manager({
             solrUrl: searchUrl
         });
@@ -82,9 +82,9 @@ var defaultFacets = new Array();
             if($(this).val() != '*'){
                 var facetVal = $(this).val();
                 //Only facet on autocomplete fields
-                if(!facetVal.match(/.year$/)){
-                    facetVal += '_ac';
-                }
+//                if(!facetVal.match(/.year$/)){
+//                    facetVal += '_ac';
+//                }
                 facetFields = [facetVal];
             } else {
                 facetFields = defaultFacets;

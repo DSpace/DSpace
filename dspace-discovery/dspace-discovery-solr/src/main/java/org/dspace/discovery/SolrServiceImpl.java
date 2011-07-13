@@ -7,17 +7,21 @@
  */
 package org.dspace.discovery;
 
-import org.apache.commons.collections.ExtendedProperties;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
 import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
+import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
+import org.apache.solr.common.params.CommonParams;
+import org.apache.solr.common.params.FacetParams;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
@@ -32,6 +36,7 @@ import org.springframework.beans.factory.annotation.Required;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -665,6 +670,8 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     continue;
                 }
 
+                indexItemFieldCustom(doc, item, field, value);
+
                 //Add the field to all for autocomplete so our autocomplete works for all fields
                 doc.addField("all_ac", value);
 
@@ -696,6 +703,9 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 if(SearchUtils.getSearchFilters().contains(field) || SearchUtils.getSearchFilters().contains(unqualifiedField + "." + Item.ANY)){
                     //Add a dynamic fields for autocomplete in search
                     doc.addField(field + "_ac", value);
+                    if(SearchUtils.isNonTokenizedSearchFilter(field) || SearchUtils.isNonTokenizedSearchFilter(unqualifiedField + "." + Item.ANY)){
+                        doc.addField(field + "_ac.full", value);
+                    }
                 }
 
                 if(SearchUtils.getAllFacets().contains(field) || SearchUtils.getAllFacets().contains(unqualifiedField + "." + Item.ANY)){
@@ -815,6 +825,18 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
     /**
+     * Method that can be overriden to handle special metadata indexing tasks
+     * @param doc the solr input document
+     * @param item the DSpace item that is beeing indexed
+     * @param field the metadata field which we are indexing
+     * @param value the metadata value which we are indexing
+     * @return whether or not to continue indexing the metadata value
+     */
+    public boolean indexItemFieldCustom(SolrInputDocument doc, Item item, String field, String value) {
+        return true;
+    }
+
+    /**
      * Create Lucene document with all the shared fields initialized.
      *
      * @param type      Type of DSpace Object
@@ -931,16 +953,319 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
     //******** SearchService implementation
-    public QueryResponse search(SolrQuery query) throws SearchServiceException {
+    public DiscoverResult search(Context context, DSpaceObject dso, DiscoverQuery discoveryQuery) throws SearchServiceException {
+        if(dso != null){
+            if (dso instanceof Community) {
+                discoveryQuery.addFilterQueries("location:m" + dso.getID());
+            } else if (dso instanceof Collection) {
+                discoveryQuery.addFilterQueries("location:l" + dso.getID());
+            } else if (dso instanceof Item){
+                discoveryQuery.addFilterQueries("handle:" + dso.getHandle());
+            }
+        }
+        return  search(context, discoveryQuery);
+
+    }
+
+
+    public DiscoverResult search(Context context, DiscoverQuery discoveryQuery) throws SearchServiceException {
         try {
-            return getSolr().query(query);
+            SolrQuery solrQuery = new SolrQuery();
+
+            String query = "*:*";
+            if(discoveryQuery.getQuery() != null){
+                query = discoveryQuery.getQuery();
+            }
+
+            solrQuery.setQuery(query);
+
+            for (int i = 0; i < discoveryQuery.getFilterQueries().size(); i++) {
+                String filterQuery = discoveryQuery.getFilterQueries().get(i);
+                solrQuery.addFilterQuery(prepareFilterQuery(filterQuery));
+            }
+            if(discoveryQuery.getDSpaceObjectFilter() != -1){
+                solrQuery.addFilterQuery("search.resourcetype:" + discoveryQuery.getDSpaceObjectFilter());
+            }
+
+            for (int i = 0; i < discoveryQuery.getFieldPresentQueries().size(); i++) {
+                String filterQuery = discoveryQuery.getFieldPresentQueries().get(i);
+                solrQuery.addFilterQuery(filterQuery + ":[* TO *]");
+            }
+
+            if(discoveryQuery.getStart() != -1){
+                solrQuery.setStart(discoveryQuery.getStart());
+            }
+
+            if(discoveryQuery.getMaxResults() != -1){
+                solrQuery.setRows(discoveryQuery.getMaxResults());
+            }
+
+            if(discoveryQuery.getSortField() != null){
+                SolrQuery.ORDER order = SolrQuery.ORDER.asc;
+                if(discoveryQuery.getSortOrder().equals(DiscoverQuery.SORT_ORDER.desc))
+                    order = SolrQuery.ORDER.desc;
+
+                solrQuery.addSortField(discoveryQuery.getSortField(), order);
+            }
+
+            for(String property : discoveryQuery.getProperties().keySet()){
+                List<String> values = discoveryQuery.getProperties().get(property);
+                solrQuery.add(property, values.toArray(new String[values.size()]));
+            }
+
+            List<FacetFieldConfig> facetFields = discoveryQuery.getFacetFields();
+            if(0 < facetFields.size()){
+                //Only add facet information if there are any facets
+                for (FacetFieldConfig facetFieldConfig : facetFields) {
+                    solrQuery.addFacetField(facetFieldConfig.getField());
+                    if(facetFieldConfig.getPrefix() != null){
+                        solrQuery.setFacetPrefix(facetFieldConfig.getField(), facetFieldConfig.getPrefix());
+                    }
+                }
+
+                List<String> facetQueries = discoveryQuery.getFacetQueries();
+                for (String facetQuery : facetQueries) {
+                    solrQuery.addFacetQuery(facetQuery);
+                }
+
+                if(discoveryQuery.getFacetLimit() != -1){
+                    solrQuery.setFacetLimit(discoveryQuery.getFacetLimit());
+                }
+
+                if(discoveryQuery.getFacetMinCount() != -1){
+                    solrQuery.setFacetMinCount(discoveryQuery.getFacetMinCount());
+                }
+
+                solrQuery.setParam(FacetParams.FACET_OFFSET, String.valueOf(discoveryQuery.getFacetOffset()));
+
+                if(discoveryQuery.getFacetSort() == DiscoverQuery.FACET_SORT.COUNT){
+                    solrQuery.setFacetSort(FacetParams.FACET_SORT_COUNT);
+                } else {
+                    solrQuery.setFacetSort(FacetParams.FACET_SORT_INDEX);
+                }
+            }
+
+
+            QueryResponse queryResponse = getSolr().query(solrQuery);
+            return retrieveResult(context, discoveryQuery, queryResponse);
+
         } catch (Exception e) {
             throw new org.dspace.discovery.SearchServiceException(e.getMessage(),e);
         }
     }
 
+    public String searchJSON(DiscoverQuery query, String jsonIdentifier) throws SearchServiceException {
+        Map<String, String> params = new HashMap<String, String>();
+
+        String solrRequestUrl = solr.getBaseURL() + "/select";
+
+        //Add our default parameters
+        params.put(CommonParams.ROWS, "0");
+        params.put(CommonParams.WT, "json");
+        //We uwe json as out output type
+        params.put("json.nl", "map");
+        params.put("json.wrf", jsonIdentifier);
+        params.put(FacetParams.FACET, Boolean.TRUE.toString());
+
+        //Generate our json out of the given params
+        try
+        {
+            params.put(CommonParams.Q, URLEncoder.encode(query.getQuery(), org.dspace.constants.Constants.DEFAULT_ENCODING));
+        }
+        catch (UnsupportedEncodingException uee)
+        {
+            //Should never occur
+            return null;
+        }
+
+        if(query.getFacetSort() == DiscoverQuery.FACET_SORT.COUNT){
+            params.put(FacetParams.FACET_SORT, FacetParams.FACET_SORT_COUNT);
+        } else {
+            params.put(FacetParams.FACET_SORT, FacetParams.FACET_SORT_INDEX);
+        }
+
+        params.put(FacetParams.FACET_LIMIT, String.valueOf(query.getFacetLimit()));
+
+        params.put(FacetParams.FACET_MINCOUNT, String.valueOf(query.getFacetMinCount()));
+
+        solrRequestUrl = generateURL(solrRequestUrl, params);
+        if (query.getFacetFields() != null || query.getFilterQueries() != null) {
+            StringBuilder urlBuilder = new StringBuilder(solrRequestUrl);
+            if(query.getFacetFields() != null){
+
+                //Add our facet fields
+                for (FacetFieldConfig facetFieldConfig : query.getFacetFields()) {
+                    urlBuilder.append("&").append(FacetParams.FACET_FIELD).append("=");
+
+                    //This class can only be used for autocomplete facet fields
+                    if(!facetFieldConfig.getField().endsWith(".year") && !facetFieldConfig.getField().endsWith("_ac"))
+                    {
+                        try {
+                            String field;
+                            if(SearchUtils.isNonTokenizedSearchFilter(facetFieldConfig.getField())){
+                                field = facetFieldConfig.getField() + "_ac.full";
+                            }else{
+                                field = facetFieldConfig.getField() + "_ac";
+                            }
+
+                            urlBuilder.append(URLEncoder.encode(field, org.dspace.constants.Constants.DEFAULT_ENCODING));
+                        } catch (UnsupportedEncodingException e) {
+                            //Ignore this
+                        }
+                    }
+                    else
+                    {
+                        try {
+                            urlBuilder.append(URLEncoder.encode(facetFieldConfig.getField(), org.dspace.constants.Constants.DEFAULT_ENCODING));
+                        } catch (UnsupportedEncodingException e) {
+                            //Ignore this
+                        }
+                    }
+                }
+
+            }
+            if(query.getFilterQueries() != null){
+                for (String filterQuery : query.getFilterQueries()) {
+                    try {
+                        urlBuilder.append("&").append(CommonParams.FQ).append("=").append(URLEncoder.encode(filterQuery, org.dspace.constants.Constants.DEFAULT_ENCODING));
+                    } catch (UnsupportedEncodingException e) {
+                        //Ignore this
+                    }
+                }
+            }
+
+            solrRequestUrl = urlBuilder.toString();
+        }
+
+        try {
+            GetMethod get = new GetMethod(solrRequestUrl);
+            new HttpClient().executeMethod(get);
+            return get.getResponseBodyAsString();
+
+        } catch (Exception e) {
+            log.error("Error while getting json solr result for discovery search recommendation", e);
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private String generateURL(String baseURL, Map<String, String> parameters)
+    {
+        boolean first = true;
+        for (String key : parameters.keySet())
+        {
+            if (first)
+            {
+                baseURL += "?";
+                first = false;
+            }
+            else
+            {
+                baseURL += "&";
+            }
+
+            baseURL += key + "=" + parameters.get(key);
+        }
+
+        return baseURL;
+    }
+
+    private String prepareFilterQuery(String filterQuery) {
+        //Ensure that range queries or specified field queries do not get a wildcard at the end
+        if(!filterQuery.matches(".*\\:\\[.* TO .*\\](?![a-z 0-9]).*") && !filterQuery.matches(".*:\".*\"$") && !filterQuery.endsWith("*")){
+            filterQuery = filterQuery + " OR " + filterQuery + "*";
+        }
+        return filterQuery;
+    }
+
+
+    private DiscoverResult retrieveResult(Context context, DiscoverQuery query, QueryResponse solrQueryResponse) throws SQLException {
+        DiscoverResult result = new DiscoverResult();
+
+        if(solrQueryResponse != null){
+            result.setStart(query.getStart());
+            result.setMaxResults(query.getMaxResults());
+            result.setTotalSearchResults(solrQueryResponse.getResults().getNumFound());
+
+            List<String> searchFields = query.getSearchFields();
+            for (SolrDocument doc : solrQueryResponse.getResults()) {
+                DSpaceObject dso = findDSpaceObject(context, doc);
+
+                if(dso != null){
+                    result.addDSpaceObject(dso);
+                } else {
+                    //TODO: Log this !
+                    continue;
+                }
+
+                DiscoverResult.SearchDocument resultDoc = new DiscoverResult.SearchDocument();
+                //Add information about our search fields
+                for (String field : searchFields){
+                    List<String> valuesAsString = new ArrayList<String>();
+                    for (Object o : doc.getFieldValues(field)) {
+                        valuesAsString.add(String.valueOf(o));
+                    }
+                    resultDoc.addSearchField(field, valuesAsString.toArray(new String[valuesAsString.size()]));
+                }
+                result.addSearchDocument(dso, resultDoc);
+            }
+
+            //Resolve our facet field values
+            List<FacetField> facetFields = solrQueryResponse.getFacetFields();
+            if(facetFields != null){
+                for (FacetField facetField : facetFields) {
+                    List<FacetField.Count> facetValues = facetField.getValues();
+                    if(facetValues != null){
+                        for (FacetField.Count facetValue : facetValues) {
+                            String displayedValue = transformDisplayedValue(context, facetField.getName(), facetValue.getName());
+                            result.addFacetResult(facetField.getName(), new DiscoverResult.FacetResult(facetValue.getAsFilterQuery(), displayedValue, facetValue.getCount()));
+                        }
+                    }
+                }
+            }
+
+            if(solrQueryResponse.getFacetQuery() != null){
+                //TODO: do not sort when not a date, just retrieve the facets in the order they where requested !
+                //At the moment facet queries are only used for dates so we need to sort our results
+                TreeMap<String, Integer> sortedFacetQueries = new TreeMap<String, Integer>(solrQueryResponse.getFacetQuery());
+                for(String facetQuery : sortedFacetQueries.descendingKeySet()){
+                    //TODO: do not assume this, people may want to use it for other ends, use a regex to make sure
+                    //We have a facet query, the values looks something like: dateissued.year:[1990 TO 2000] AND -2000
+                    //Prepare the string from {facet.field.name}:[startyear TO endyear] to startyear - endyear
+                    String facetField = facetQuery.substring(0, facetQuery.indexOf(":"));
+                    String name = facetQuery.substring(facetQuery.indexOf('[') + 1);
+                    name = name.substring(0, name.lastIndexOf(']')).replaceAll("TO", "-");
+                    Integer count = sortedFacetQueries.get(facetQuery);
+
+                    //No need to show empty years
+                    if(0 < count){
+                        result.addFacetResult(facetField, new DiscoverResult.FacetResult(facetQuery, name, count));
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
+    private static DSpaceObject findDSpaceObject(Context context, SolrDocument doc) throws SQLException {
+
+        Integer type = (Integer) doc.getFirstValue("search.resourcetype");
+        Integer id = (Integer) doc.getFirstValue("search.resourceid");
+        String handle = (String) doc.getFirstValue("handle");
+
+        if (type != null && id != null) {
+            return DSpaceObject.find(context, type, id);
+        } else if (handle != null) {
+            return HandleManager.resolveToObject(context, handle);
+        }
+
+        return null;
+    }
+
+
     /** Simple means to return the search result as an InputStream */
-    public java.io.InputStream searchAsInputStream(SolrQuery query) throws SearchServiceException, java.io.IOException {
+    public java.io.InputStream searchAsInputStream(DiscoverQuery query) throws SearchServiceException, java.io.IOException {
         try {
             org.apache.commons.httpclient.methods.GetMethod method =
                 new org.apache.commons.httpclient.methods.GetMethod(getSolr().getHttpClient().getHostConfiguration().getHostURL() + "");
@@ -998,4 +1323,70 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 		}
     }
 
+    public DiscoverFilterQuery toFilterQuery(Context context, String filterQuery) throws SQLException {
+        DiscoverFilterQuery result = new DiscoverFilterQuery();
+
+        //TODO: what if user enters something with a ":" in it
+        String field = filterQuery;
+        String value = filterQuery;
+
+        if(filterQuery.contains(":"))
+        {
+            field = filterQuery.substring(0, filterQuery.indexOf(":"));
+            value = filterQuery.substring(filterQuery.indexOf(":") + 1, filterQuery.length());
+        }else{
+            //We have got no field, so we are using everything
+            field = "*";
+        }
+
+        value = value.replace("\\", "");
+        if("*".equals(field))
+        {
+            field = "all";
+        }
+        if(filterQuery.startsWith("*:") || filterQuery.startsWith(":"))
+        {
+            filterQuery = filterQuery.substring(filterQuery.indexOf(":") + 1, filterQuery.length());
+        }
+
+        value = transformDisplayedValue(context, field, value);
+
+        result.setField(field);
+        result.setFilterQuery(filterQuery);
+        result.setDisplayedValue(value);
+
+        return result;
+    }
+
+    public DiscoverFilterQuery toFilterQuery(Context context, String field, String value) throws SQLException{
+        DiscoverFilterQuery result = new DiscoverFilterQuery();
+
+        result.setField(field);
+        result.setDisplayedValue(transformDisplayedValue(context, field, value));
+//        TODO: solr escape of value ?
+        result.setFilterQuery((field == null || field.equals("") ? "" : field + ":") +  "\"" + value + "\"");
+
+
+        return result;
+    }
+
+    private String transformDisplayedValue(Context context, String field, String value) throws SQLException {
+        if(field.equals("location.comm") || field.equals("location.coll")){
+            value = locationToName(context, field, value);
+        }else
+        if(field.endsWith("_filter")){
+            //We have a filter make sure we split !
+            String separator = SearchUtils.getConfig().getString("solr.facets.split.char", SearchUtils.FILTER_SEPARATOR);
+            //Escape any regex chars
+            separator = java.util.regex.Pattern.quote(separator);
+            String[] fqParts = value.split(separator);
+            StringBuffer valueBuffer = new StringBuffer();
+            int start = fqParts.length / 2;
+            for(int i = start; i < fqParts.length; i++){
+                valueBuffer.append(fqParts[i]);
+            }
+            value = valueBuffer.toString();
+        }
+        return value;
+    }
 }

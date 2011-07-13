@@ -34,7 +34,6 @@ public class IndexClient {
      * @param args the command-line arguments, none used
      * @throws java.io.IOException
      * @throws java.sql.SQLException
-     * @throws org.apache.solr.client.solrj.SolrServerException
      *
      */
     public static void main(String[] args) throws SQLException, IOException, SearchServiceException {
@@ -78,7 +77,7 @@ public class IndexClient {
                 "print this help message").create("h"));
 
         options.addOption(OptionBuilder.isRequired(false).withDescription(
-                "optimize search solr core").create("o"));
+                "optimize search core").create("o"));
 
         try {
             line = new PosixParser().parse(options, args);

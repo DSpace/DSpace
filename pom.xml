@@ -281,6 +281,11 @@
               <artifactId>dspace-discovery-provider</artifactId>
               <version>1.8.0-SNAPSHOT</version>
           </dependency>
+          <dependency>
+              <groupId>org.dspace</groupId>
+              <artifactId>dspace-discovery-solr</artifactId>
+              <version>1.8.0-SNAPSHOT</version>
+          </dependency>
          <!-- DSpace third Party Dependencies -->
 
                  <!-- Explicitly Specify Latest Version of Spring -->

@@ -16,6 +16,7 @@
     
     <modules>
         <module>dspace-discovery-provider</module>
+        <module>dspace-discovery-solr</module>
         <module>dspace-discovery-xmlui-api</module>
         <module>dspace-discovery-xmlui-webapp</module>
     </modules>

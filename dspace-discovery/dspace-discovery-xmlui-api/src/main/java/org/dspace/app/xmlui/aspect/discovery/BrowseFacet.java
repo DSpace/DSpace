@@ -26,13 +26,8 @@ import org.apache.cocoon.util.HashUtil;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.excalibur.source.SourceValidity;
-import org.apache.solr.client.solrj.response.QueryResponse;
-import org.apache.solr.client.solrj.response.FacetField;
-import org.apache.solr.client.solrj.SolrQuery;
-import org.apache.solr.client.solrj.util.ClientUtils;
-import org.apache.solr.common.SolrDocument;
-import org.apache.solr.common.params.FacetParams;
 import org.apache.log4j.Logger;
+import org.dspace.core.Context;
 import org.dspace.discovery.*;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
@@ -42,8 +37,6 @@ import java.io.Serializable;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
-import java.text.SimpleDateFormat;
-import java.text.DateFormat;
 import java.net.URLEncoder;
 import java.util.List;
 
@@ -63,7 +56,7 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
     /**
      * The cache of recently submitted items
      */
-    protected QueryResponse queryResults;
+    protected DiscoverResult queryResults;
     /**
      * Cached validity object
      */
@@ -72,7 +65,7 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
     /**
      * Cached query arguments
      */
-    protected SolrQuery queryArgs;
+    protected DiscoverQuery queryArgs;
 
     private int DEFAULT_PAGE_SIZE = 10;
 
@@ -134,23 +127,20 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
                 }
 
                 // add reciently submitted items, serialize solr query contents.
-                QueryResponse response = getQueryResponse(dso);
+                DiscoverResult response = getQueryResponse(dso);
 
-                validity.add("numFound:" + response.getResults().getNumFound());
+                validity.add("numFound:" + response.getDspaceObjects().size());
 
-                for (SolrDocument doc : response.getResults()) {
-                    validity.add(doc.toString());
+                for (DSpaceObject resultDso : response.getDspaceObjects()) {
+                    validity.add(resultDso);
                 }
 
-                for (SolrDocument doc : response.getResults()) {
-                    validity.add(doc.toString());
-                }
+                for (String facetField : response.getFacetResults().keySet()) {
+                    validity.add(facetField);
 
-                for (FacetField field : response.getFacetFields()) {
-                    validity.add(field.getName());
-
-                    for (FacetField.Count count : field.getValues()) {
-                        validity.add(count.getName() + count.getCount());
+                    List<DiscoverResult.FacetResult> facetValues = response.getFacetResults().get(facetField);
+                    for (DiscoverResult.FacetResult facetValue : facetValues) {
+                        validity.add(facetValue.getAsFilterQuery() + facetValue.getCount());
                     }
                 }
 
@@ -171,7 +161,7 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
      *
      * @param scope The collection.
      */
-    protected QueryResponse getQueryResponse(DSpaceObject scope) {
+    protected DiscoverResult getQueryResponse(DSpaceObject scope) {
 
 
         Request request = ObjectModelHelper.getRequest(objectModel);
@@ -181,24 +171,24 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
             return queryResults;
         }
 
-        queryArgs = new SolrQuery();
+        queryArgs = new DiscoverQuery();
 
         //Make sure we add our default filters
-        queryArgs.addFilterQuery(SearchUtils.getDefaultFilters("browse"));
+        queryArgs.addFilterQueries(SearchUtils.getDefaultFilters("browse"));
 
 
         queryArgs.setQuery("search.resourcetype: " + Constants.ITEM + ((request.getParameter("query") != null && !"".equals(request.getParameter("query"))) ? " AND (" + request.getParameter("query") + ")" : ""));
 //        queryArgs.setQuery("search.resourcetype:" + Constants.ITEM);
 
-        queryArgs.setRows(0);
+        queryArgs.setMaxResults(0);
 
 
 //        TODO: change this !
         queryArgs.setSortField(
                 ConfigurationManager.getProperty("recent.submissions.sort-option"),
-                SolrQuery.ORDER.asc
+                DiscoverQuery.SORT_ORDER.asc
         );
-        queryArgs.addFilterQuery(getParameterFacetQueries());
+        queryArgs.addFilterQueries(getParameterFacetQueries());
 
 
         //Set the default limit to 11
@@ -207,85 +197,26 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
 
         //sort
         //TODO: why this kind of sorting ? Should the sort not be on how many times the value appears like we do in the filter by sidebar ?
-        queryArgs.setFacetSort(config.getPropertyAsType("solr.browse.sort","lex"));
+//        queryArgs.setFacetSort(config.getPropertyAsType("solr.browse.sort","lex"));
 
-        queryArgs.setFacet(true);
+//        queryArgs.setFacet(true);
 
         int offset = RequestUtils.getIntParameter(request, OFFSET);
         if (offset == -1)
         {
             offset = 0;
         }
-        queryArgs.setParam(FacetParams.FACET_OFFSET, String.valueOf(offset));
+        queryArgs.setFacetOffset(offset);
 
         //We add +1 so we can use the extra one to make sure that we need to show the next page
-        queryArgs.setParam(FacetParams.FACET_LIMIT, String.valueOf(DEFAULT_PAGE_SIZE + 1));
-
-
-        if (scope != null) /* top level search / community */ {
-            if (scope instanceof Community) {
-                queryArgs.setFilterQueries("location:m" + scope.getID());
-            } else if (scope instanceof Collection) {
-                queryArgs.setFilterQueries("location:l" + scope.getID());
-            }
-        }
-
-
-        String facetField = request.getParameter(FACET_FIELD);
-        boolean isDate = false;
-        if(facetField.endsWith("_dt")){
-            facetField = facetField.split("_")[0];
-            isDate = true;
-        }
-
-        if (isDate) {
-
-            queryArgs.setParam(FacetParams.FACET_DATE,new String[]{facetField});
-            queryArgs.setParam(FacetParams.FACET_DATE_GAP,"+1YEAR");
-
-            Date lowestDate = getLowestDateValue(queryArgs.getQuery(), facetField, queryArgs.getFilterQueries());
-            int thisYear = Calendar.getInstance().get(Calendar.YEAR);
-
-            DateFormat formatter = new SimpleDateFormat("yyyy");
-            int maxEndYear = Integer.parseInt(formatter.format(lowestDate));
-
-            //Since we have a date, we need to find the last year
-            String startDate = "NOW/YEAR-" + SearchUtils.getConfig().getString("solr.date.gap", "10") + "YEARS";
-            String endDate =  "NOW";
-            int startYear =  thisYear - (offset + DEFAULT_PAGE_SIZE);
-            // We shouldn't go lower then our max bottom year
-            // Make sure to substract one so the bottom year is also counted !
-            if(startYear < maxEndYear)
-            {
-                startYear = maxEndYear - 1;
-            }
-
-            if(0 < offset){
-                //Say that we have an offset of 10 years
-                //we need to go back 10 years (2010 - (2010 - 10))
-                //(add one to compensate for the NOW in the start)
-                int endYear = thisYear - offset + 1;
-
-                endDate = "NOW/YEAR-" + (thisYear - endYear) + "YEARS";
-                //Add one to the startyear to get one more result
-                //When we select NOW, the current year is also used (so auto+1)
-            }
-            startDate = "NOW/YEAR-" + (thisYear - startYear) + "YEARS";
-
-            queryArgs.setParam(FacetParams.FACET_DATE_START, startDate);
-            queryArgs.setParam(FacetParams.FACET_DATE_END, endDate);
-
-            System.out.println(startDate);
-            System.out.println(endDate);
+        queryArgs.setFacetLimit(DEFAULT_PAGE_SIZE + 1);
 
 
 
-        } else {
-            queryArgs.addFacetField(new String[]{facetField});
-        }
-        
+        queryArgs.addFacetField(new FacetFieldConfig(request.getParameter(FACET_FIELD), false));
+
         try {
-            queryResults = searchService.search(queryArgs);
+            queryResults = searchService.search(context, scope, queryArgs);
         } catch (SearchServiceException e) {
             log.error(e.getMessage(), e);
         }
@@ -300,21 +231,20 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
      * @param filterquery the filterqueries
      * @return the lowest date found, in a date object
      */
-    private Date getLowestDateValue(String query, String dateField, String... filterquery){
+    private Date getLowestDateValue(Context context, String query, String dateField, String... filterquery){
 
 
         try {
-            SolrQuery solrQuery = new SolrQuery();
-            solrQuery.setQuery(query);
-            solrQuery.setFields(dateField);
-            solrQuery.setRows(1);
-            solrQuery.setSortField(dateField, SolrQuery.ORDER.asc);
-            solrQuery.setFilterQueries(filterquery);
+            DiscoverQuery discoverQuery = new DiscoverQuery();
+            discoverQuery.setQuery(query);
+            discoverQuery.setMaxResults(1);
+            discoverQuery.setSortField(dateField, DiscoverQuery.SORT_ORDER.asc);
+            discoverQuery.addFilterQueries(filterquery);
 
-            QueryResponse rsp = searchService.search(solrQuery);
-            if(0 < rsp.getResults().getNumFound()){
-                return (Date) rsp.getResults().get(0).getFieldValue(dateField);
-            }
+            DiscoverResult rsp = searchService.search(context, discoverQuery);
+//            if(0 < rsp.getResults().getNumFound()){
+//                return (Date) rsp.getResults().get(0).getFieldValue(dateField);
+//            }
         }catch (Exception e){
             log.error("Unable to get lowest date", e);
         }
@@ -358,37 +288,30 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
         queryResults = getQueryResponse(dso);
         if (this.queryResults != null) {
 
-            java.util.List<FacetField> facetFields = this.queryResults.getFacetFields();
+            Map<String, List<DiscoverResult.FacetResult>> facetFields = this.queryResults.getFacetResults();
             if (facetFields == null)
             {
-                facetFields = new ArrayList<FacetField>();
+                facetFields = new LinkedHashMap<String, List<DiscoverResult.FacetResult>>();
             }
 
-            facetFields.addAll(this.queryResults.getFacetDates());
+//            facetFields.addAll(this.queryResults.getFacetDates());
 
 
             if (facetFields.size() > 0) {
-                FacetField field = facetFields.get(0);
-                java.util.List<FacetField.Count> values = field.getValues();
-                if(field.getGap() != null){
-                    //We are dealing with dates so flip em, top date comes first
-                    Collections.reverse(values);
-
-                }
+                String facetField = String.valueOf(facetFields.keySet().toArray(new String[facetFields.size()])[0]);
+                java.util.List<DiscoverResult.FacetResult> values = facetFields.get(facetField);
 
                 if (values != null && 0 < values.size()) {
 
 
-                    Division results = body.addDivision("browse-by-" + field + "-results", "primary");
+                    Division results = body.addDivision("browse-by-" + facetField + "-results", "primary");
 
                     results.setHead(message("xmlui.ArtifactBrowser.AbstractSearch.type_" + request.getParameter(FACET_FIELD) + "_browse"));
 
                     // Find our faceting offset
-                    int offSet = 0;
-                    try {
-                        offSet = Integer.parseInt(queryArgs.get(FacetParams.FACET_OFFSET));
-                    } catch (NumberFormatException e) {
-                        //Ignore
+                    int offSet = queryArgs.getFacetOffset();
+                    if(offSet == -1){
+                        offSet = 0;
                     }
 
                     //Only show the nextpageurl if we have at least one result following our current results
@@ -398,11 +321,11 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
                         nextPageUrl = getNextPageURL(request);
                     }
 
-                    results.setSimplePagination((int) queryResults.getResults().getNumFound(), offSet + 1,
+                    results.setSimplePagination((int) queryResults.getDspaceObjects().size(), offSet + 1,
                             (offSet + (values.size() - 1)), getPreviousPageURL(request), nextPageUrl);
 
 
-                    Table singleTable = results.addTable("browse-by-" + field + "-results", (int) (queryResults.getResults().getNumFound() + 1), 1);
+                    Table singleTable = results.addTable("browse-by-" + facetField + "-results", (int) (queryResults.getDspaceObjects().size() + 1), 1);
 
                     List<String> filterQueries = new ArrayList<String>();
                     if(request.getParameterValues("fq") != null)
@@ -410,20 +333,17 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
                         filterQueries = Arrays.asList(request.getParameterValues("fq"));
                     }
                     for (int i = 0; i < values.size(); i++) {
-                        FacetField.Count value = values.get(i);
+                        DiscoverResult.FacetResult value = values.get(i);
 
-                        String displayedValue = value.getName();
+                        String displayedValue = value.getDisplayedValue();
                         String filterQuery = value.getAsFilterQuery();
-                        if (field.getName().equals("location.comm") || field.getName().equals("location.coll")) {
-                            //We have a community/collection, resolve it to a dspaceObject
-                            displayedValue = SolrServiceImpl.locationToName(context, field.getName(), displayedValue);
-                        }
-                        if(field.getGap() != null){
-                            //We have a date get the year so we can display it
-                            DateFormat simpleDateformat = new SimpleDateFormat("yyyy");
-                            displayedValue = simpleDateformat.format(SolrServiceImpl.toDate(displayedValue));
-                            filterQuery = ClientUtils.escapeQueryChars(value.getFacetField().getName()) + ":" + displayedValue + "*";
-                        }
+
+//                        if(field.getGap() != null){
+//                            //We have a date get the year so we can display it
+//                            DateFormat simpleDateformat = new SimpleDateFormat("yyyy");
+//                            displayedValue = simpleDateformat.format(SolrServiceImpl.toDate(displayedValue));
+//                            filterQuery = ClientUtils.escapeQueryChars(value.getFacetField().getName()) + ":" + displayedValue + "*";
+//                        }
 
                         Cell cell = singleTable.addRow().addCell();
 
@@ -468,9 +388,9 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
     private String getNextPageURL(Request request) {
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put(FACET_FIELD, request.getParameter(FACET_FIELD));
-        if (queryArgs.get(FacetParams.FACET_OFFSET) != null)
+        if (queryArgs.getFacetOffset() != -1)
         {
-            parameters.put(OFFSET, String.valueOf(Integer.parseInt(queryArgs.get(FacetParams.FACET_OFFSET)) + DEFAULT_PAGE_SIZE));
+            parameters.put(OFFSET, String.valueOf(queryArgs.getFacetOffset() + DEFAULT_PAGE_SIZE));
         }
 
         // Add the filter queries
@@ -490,16 +410,16 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
 
     private String getPreviousPageURL(Request request) {
         //If our offset should be 0 then we shouldn't be able to view a previous page url
-        if ("0".equals(queryArgs.get(FacetParams.FACET_OFFSET)))
+        if (0 == queryArgs.getFacetOffset())
         {
             return null;
         }
 
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.put(FACET_FIELD, request.getParameter(FACET_FIELD));
-        if (queryArgs.get(FacetParams.FACET_OFFSET) != null)
+        if (queryArgs.getFacetOffset() != -1)
         {
-            parameters.put(OFFSET, String.valueOf(Integer.parseInt(queryArgs.get(FacetParams.FACET_OFFSET)) - DEFAULT_PAGE_SIZE));
+            parameters.put(OFFSET, String.valueOf(queryArgs.getFacetOffset() - DEFAULT_PAGE_SIZE));
         }
 
         // Add the filter queries

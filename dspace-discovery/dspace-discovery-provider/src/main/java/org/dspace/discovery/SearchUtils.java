@@ -9,16 +9,12 @@ package org.dspace.discovery;
 
 import org.apache.commons.collections.ExtendedProperties;
 import org.apache.log4j.Logger;
-import org.apache.solr.common.SolrDocument;
-import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Context;
-import org.dspace.handle.HandleManager;
+import org.dspace.utils.DSpace;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -34,17 +30,23 @@ public class SearchUtils {
 
     private static ExtendedProperties props = null;
 
-    private static Map<String, SolrFacetConfig[]> solrFacets = new HashMap<String, SolrFacetConfig[]>();
+    private static Map<String, FacetFieldConfig[]> fieldFacets = new HashMap<String, FacetFieldConfig[]>();
 
     private static List<String> allFacets = new ArrayList<String>();
 
     private static List<String> searchFilters = new ArrayList<String>();
+
+    private static List<String> searchFiltersFullAutocomplete = new ArrayList<String>();
 
     private static List<String> sortFields = new ArrayList<String>();
 
     private static List<String> dateIndexableFields = new ArrayList<String>();
 
     public static final String FILTER_SEPARATOR = "|||";
+
+
+    /** Cached search service **/
+    private static SearchService searchService;
 
     static {
 
@@ -61,7 +63,7 @@ public class SearchUtils {
             } else {
                 InputStream is = null;
                 try {
-                    is = SolrServiceImpl.class.getResourceAsStream("dspace-solr-search.cfg");
+                    is = SearchUtils.class.getResourceAsStream("dspace-solr-search.cfg");
                     ExtendedProperties defaults = new ExtendedProperties();
                     defaults.load(is);
                     props.combine(defaults);
@@ -87,30 +89,39 @@ public class SearchUtils {
                     log.info("loading scope, " + propName);
 
                     allFacets.addAll(Arrays.asList(propVals));
-                    List<SolrFacetConfig> facets = new ArrayList<SolrFacetConfig>();
+                    List<FacetFieldConfig> facets = new ArrayList<FacetFieldConfig>();
                     for (String propVal : propVals) {
                         if (propVal.endsWith("_dt") || propVal.endsWith(".year")) {
-                            facets.add(new SolrFacetConfig(propVal.replace("_dt", ".year"), true));
+                            facets.add(new FacetFieldConfig(propVal.replace("_dt", ".year"), true));
 
                             log.info("value, " + propVal);
 
                         } else {
-                            facets.add(new SolrFacetConfig(propVal + "_filter", false));
+                            facets.add(new FacetFieldConfig(propVal + "_filter", false));
 
                             log.info("value, " + propVal);
                         }
                     }
 
                     //All the values are split into date & facetfields, so now store em
-                    solrFacets.put(propName.replace("solr.facets.", ""), facets.toArray(new SolrFacetConfig[facets.size()]));
+                    fieldFacets.put(propName.replace("solr.facets.", ""), facets.toArray(new FacetFieldConfig[facets.size()]));
 
-                    log.info("solrFacets size: " + solrFacets.size());
+                    log.info("fieldFacets size: " + fieldFacets.size());
                 }
             }
 
             String[] filterFieldsProps = SearchUtils.getConfig().getStringArray("solr.search.filters");
             if (filterFieldsProps != null) {
-                searchFilters.addAll(Arrays.asList(filterFieldsProps));
+                for (String filterProp : filterFieldsProps) {
+                    if(filterProp.endsWith(":full")){
+                        String field = filterProp.substring(0, filterProp.lastIndexOf(":"));
+                        searchFiltersFullAutocomplete.add(field);
+                        searchFilters.add(field);
+                    }else{
+                        searchFilters.add(filterProp);
+                    }
+
+                }
             }
 
             String[] sortFieldProps = SearchUtils.getConfig().getStringArray("solr.search.sort");
@@ -131,8 +142,8 @@ public class SearchUtils {
         return props;
     }
 
-    public static SolrFacetConfig[] getFacetsForType(String type) {
-        return solrFacets.get(type);
+    public static FacetFieldConfig[] getFacetsForType(String type) {
+        return fieldFacets.get(type);
     }
 
     public static List<String> getAllFacets() {
@@ -143,24 +154,14 @@ public class SearchUtils {
         return searchFilters;
     }
 
+    public static boolean isNonTokenizedSearchFilter(String field){
+        return searchFiltersFullAutocomplete.contains(field);
+    }
+
     public static List<String> getSortFields() {
         return sortFields;
     }
 
-    public static DSpaceObject findDSpaceObject(Context context, SolrDocument doc) throws SQLException {
-
-        Integer type = (Integer) doc.getFirstValue("search.resourcetype");
-        Integer id = (Integer) doc.getFirstValue("search.resourceid");
-        String handle = (String) doc.getFirstValue("handle");
-
-        if (type != null && id != null) {
-            return DSpaceObject.find(context, type, id);
-        } else if (handle != null) {
-            return HandleManager.resolveToObject(context, handle);
-        }
-
-        return null;
-    }
 
 
     public static String[] getDefaultFilters(String scope) {
@@ -192,37 +193,14 @@ public class SearchUtils {
         return dateIndexableFields;
     }
 
-    public static String getFilterQueryDisplay(String filterQuery){
-        String separator = SearchUtils.getConfig().getString("solr.facets.split.char", SearchUtils.FILTER_SEPARATOR);
-        //Escape any regex chars
-        separator = java.util.regex.Pattern.quote(separator);
-        String[] fqParts = filterQuery.split(separator);
-        String result = "";
-        int start = fqParts.length / 2;
-        for(int i = start; i < fqParts.length; i++){
-            result += fqParts[i];
+    public static SearchService getSearchService()
+    {
+        if(searchService ==  null){
+            DSpace dspace = new DSpace();
+            org.dspace.kernel.ServiceManager manager = dspace.getServiceManager() ;
+            searchService = manager.getServiceByName(SearchService.class.getName(),SearchService.class);
         }
-
-        return result;
-    }
-
-    public static class SolrFacetConfig {
-
-        private String facetField;
-        private boolean isDate;
-
-        public SolrFacetConfig(String facetField, boolean date) {
-            this.facetField = facetField;
-            isDate = date;
-        }
-
-        public String getFacetField() {
-            return facetField;
-        }
-
-        public boolean isDate() {
-            return isDate;
-        }
+        return searchService;
     }
 
 }
