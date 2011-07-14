@@ -16,7 +16,6 @@ import java.util.List;
 import org.apache.commons.lang.ArrayUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.content.packager.PackageDisseminator;
 import org.dspace.content.packager.PackageException;
 import org.dspace.content.packager.PackageParameters;
@@ -35,7 +34,7 @@ import org.jdom.input.SAXBuilder;
  * <p>
  * Produces a METS manifest for the DSpace item as a metadata
  * description -- intended to work within an application like the
- * OAI server.
+ * OAI-PMH server.
  *
  * @author Larry Stone
  * @version $Revision$
@@ -69,16 +68,19 @@ public class METSDisseminationCrosswalk
     private static final String schemaLocation =
         METS_NS.getURI()+" "+METS_XSD;
 
+    @Override
     public Namespace[] getNamespaces()
     {
         return (Namespace[]) ArrayUtils.clone(namespaces);
     }
 
+    @Override
     public String getSchemaLocation()
     {
         return schemaLocation;
     }
 
+    @Override
     public List<Element> disseminateList(DSpaceObject dso)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
@@ -88,16 +90,16 @@ public class METSDisseminationCrosswalk
         return result;
     }
 
+    @Override
     public Element disseminateElement(DSpaceObject dso)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
-        if (dso.getType() != Constants.ITEM)
+        if (!canDisseminate(dso))
         {
-            throw new CrosswalkObjectNotSupported("METSDisseminationCrosswalk can only crosswalk an Item.");
+            throw new CrosswalkObjectNotSupported("METSDisseminationCrosswalk cannot disseminate a DSpaceObject of type: " + Constants.typeText[dso.getType()]);
         }
-        Item item = (Item)dso;
-
+        
         PackageDisseminator dip = (PackageDisseminator)
           PluginManager.getNamedPlugin(PackageDisseminator.class, METS_PACKAGER_PLUGIN);
         if (dip == null)
@@ -107,22 +109,23 @@ public class METSDisseminationCrosswalk
 
         try
         {
-            // Set the manifestOnly=true param so we just get METS document
+            // Set the manifestOnly=true param so we just get METS document (and not content files, etc)
             PackageParameters pparams = new PackageParameters();
             pparams.put("manifestOnly", "true");
 
             // Create a temporary file to disseminate into
             String tempDirectory = ConfigurationManager.getProperty("upload.temp.dir");
-            File tempFile = File.createTempFile("METSDissemination" + item.hashCode(), null, new File(tempDirectory));
+            File tempFile = File.createTempFile("METSDissemination" + dso.hashCode(), null, new File(tempDirectory));
             tempFile.deleteOnExit();
 
             // Disseminate METS to temp file
             Context context = new Context();
-            dip.disseminate(context, item, pparams, tempFile);
+            dip.disseminate(context, dso, pparams, tempFile);
             context.complete();
 
             try
             {
+                //Return just the root Element of the METS file
                 SAXBuilder builder = new SAXBuilder();
                 Document metsDocument = builder.build(tempFile);
                 return metsDocument.getRootElement();
@@ -138,11 +141,22 @@ public class METSDisseminationCrosswalk
         }
     }
 
+    @Override
     public boolean canDisseminate(DSpaceObject dso)
     {
-        return true;
+        //can disseminate most types of DSpaceObjects (Site, Community, Collection, Item)
+        if(dso.getType()==Constants.SITE || 
+           dso.getType()==Constants.COMMUNITY ||
+           dso.getType()==Constants.COLLECTION ||
+           dso.getType()==Constants.ITEM)
+        {    
+            return true;
+        }
+        else
+            return false;
     }
 
+    @Override
     public boolean preferList()
     {
         return false;

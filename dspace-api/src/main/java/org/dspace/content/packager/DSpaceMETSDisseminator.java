@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.ArrayList;
 
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -190,14 +189,6 @@ public class DSpaceMETSDisseminator
         throws SQLException, IOException, AuthorizeException
         {
         return new String[0];
-    }
-
-    @Override
-    public String makeBitstreamURL(Bitstream bitstream, PackageParameters params)
-        {
-        String base = "bitstream_"+String.valueOf(bitstream.getID());
-        String ext[] = bitstream.getFormat().getExtensions();
-        return (ext.length > 0) ? base+"."+ext[0] : base;
     }
 
     /**

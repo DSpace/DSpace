@@ -7,14 +7,19 @@
  */
 package org.dspace.app.oai;
 
-import java.io.ByteArrayOutputStream;
 import java.util.Properties;
 
-import org.dspace.app.mets.METSExport;
-import org.dspace.search.HarvestedItemInfo;
+import org.apache.log4j.Logger;
 
 import ORG.oclc.oai.server.crosswalk.Crosswalk;
 import ORG.oclc.oai.server.verb.CannotDisseminateFormatException;
+import org.dspace.content.crosswalk.DisseminationCrosswalk;
+import org.dspace.core.PluginManager;
+import org.dspace.search.HarvestedItemInfo;
+
+import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
 /**
  * OAICat crosswalk to allow METS to be harvested.
@@ -23,21 +28,29 @@ import ORG.oclc.oai.server.verb.CannotDisseminateFormatException;
  * 
  * @author Li XiaoYu (Rita)
  * @author Robert Tansley
+ * @author Tim Donohue (rewrite to use METS DisseminationCrosswalk)
  */
 public class METSCrosswalk extends Crosswalk
 {
+    private static final Logger log = Logger.getLogger(METSCrosswalk.class);
+    
+    // JDOM xml output writer - indented format for readability.
+    private static XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+    
     public METSCrosswalk(Properties properties)
     {
         super(
                 "http://www.loc.gov/METS/ http://www.loc.gov/standards/mets/mets.xsd");
     }
 
+    @Override
     public boolean isAvailableFor(Object nativeItem)
     {
         // We have METS for everything
         return true;
     }
 
+    @Override
     public String createMetadata(Object nativeItem)
             throws CannotDisseminateFormatException
     {
@@ -45,26 +58,29 @@ public class METSCrosswalk extends Crosswalk
 
         try
         {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-            METSExport.writeMETS(hii.context, hii.item, baos, true);
-
-            // FIXME: Nasty hack to remove <?xml...?> header that METS toolkit
-            // puts there.  Hopefully the METS toolkit itself can be updated
-            // to fix this
-            String fullXML = baos.toString("UTF-8");
-            String head = "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\"?>\n";
-            int pos = fullXML.indexOf(head);
-            if (pos != -1)
-            {
-                fullXML = fullXML.substring(pos + head.length());
-            }
+            //Get a reference to our DSpace METS DisseminationCrosswalk
+            // (likely this is org.dspace.content.crosswalk.METSDisseminationCrosswalk)
+            DisseminationCrosswalk xwalk = (DisseminationCrosswalk)PluginManager.
+                                        getNamedPlugin(DisseminationCrosswalk.class, "METS");
             
-            return fullXML;
+            //if no crosswalk found, thrown an error
+            if(xwalk==null)
+                throw new CannotDisseminateFormatException("DSpace cannot disseminate METS format, as no DisseminationCrosswalk is configured which supports 'METS'");
+            
+            if(xwalk.canDisseminate(hii.item))
+            {    
+                //disseminate the object to METS
+                Element rootElement = xwalk.disseminateElement(hii.item); 
+                
+                //Return XML results as a formatted String
+                return outputter.outputString(rootElement);
+            }
+            else
+                return null; // cannot disseminate this type of object
         }
         catch (Exception e)
         {
-            e.printStackTrace();
+            log.error("OAI-PMH METSCrosswalk error", e);
             return null;
         }
 
