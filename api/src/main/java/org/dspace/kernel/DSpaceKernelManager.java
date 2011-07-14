@@ -179,8 +179,15 @@ public final class DSpaceKernelManager {
             try {
                 mbs.unregisterMBean(new ObjectName(checkedMBeanName));
                 return true;
-            } catch (Exception e) {
-                log.error("WARN Failed to unregister the MBean: " + checkedMBeanName);
+            }  
+            catch (InstanceNotFoundException ie) {
+                //If this exception is thrown, the specified MBean is not currently registered
+                //So, we'll ignore the error and return true
+                return true;
+            }
+            catch (Exception e) {
+                //log this issue as a System Warning. Also log the underlying error message.
+                log.warn("Failed to unregister the MBean: " + checkedMBeanName, e);
                 return false;
             }
         }
