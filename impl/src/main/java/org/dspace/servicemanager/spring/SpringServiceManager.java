@@ -83,6 +83,7 @@ public final class SpringServiceManager implements ServiceManagerSystem {
     public static final String configPath = "spring/spring-dspace-applicationContext.xml";
     public static final String coreResourcePath = "classpath*:spring/spring-dspace-core-services.xml";
     public static final String addonResourcePath = "classpath*:spring/spring-dspace-addon-*-services.xml";
+    public static final String localResourcePath = "/config/spring/*.xml";
 
     @SuppressWarnings("unchecked")
     public <T> T getServiceByName(String name, Class<T> type) {
@@ -174,10 +175,19 @@ public final class SpringServiceManager implements ServiceManagerSystem {
         if (configPaths != null) {
             pathList.addAll(Arrays.asList(configPaths));
         }
+        if(testMode){
+            log.warn("TEST Spring Service Manager running in test mode, no dspace home spring files will be loaded");
+        } else {
+            //Add the dspace home dir config so that local files can override classpath spring files
+            String dspaceHome = configurationService.getProperty("dspace.dir");
+            if(dspaceHome != null){
+                pathList.add("file:" + dspaceHome + localResourcePath);
+            }
+        }
         String[] allPaths = pathList.toArray(new String[pathList.size()]);
         applicationContext = new ClassPathXmlApplicationContext(allPaths, false);
-        // disable poor practices
-        applicationContext.setAllowBeanDefinitionOverriding(false);
+        // Make sure that the spring files from the config directoy can override the spring files from our jars
+        applicationContext.setAllowBeanDefinitionOverriding(true);
         applicationContext.setAllowCircularReferences(false);
         //applicationContext.registerShutdownHook(); // this interferes with the kernel shutdown hook
         // add the config interceptors (partially done in the xml)
