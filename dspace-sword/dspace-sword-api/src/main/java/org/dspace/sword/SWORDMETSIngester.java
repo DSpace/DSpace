@@ -1,44 +1,13 @@
-/* SWORDMETSIngester.java
- * 
- * Copyright (c) 2007, Aberystwyth University
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *  - Redistributions of source code must retain the above
- *    copyright notice, this list of conditions and the
- *    following disclaimer.
- *
- *  - Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- *  - Neither the name of the Centre for Advanced Software and
- *    Intelligent Systems (CASIS) nor the names of its
- *    contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
- * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- */ 
-
+ * http://www.dspace.org/license/
+ */
 package org.dspace.sword;
 
-import java.io.InputStream;
+import java.io.File;
 import java.util.Date;
 import java.util.StringTokenizer;
 
@@ -49,15 +18,12 @@ import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.WorkspaceItem;
 import org.dspace.content.packager.PackageIngester;
 import org.dspace.content.packager.PackageParameters;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
 import org.dspace.handle.HandleManager;
-import org.dspace.workflow.WorkflowItem;
-import org.dspace.workflow.WorkflowManager;
 
 import org.purl.sword.base.Deposit;
 import org.purl.sword.base.SWORDErrorException;
@@ -67,7 +33,7 @@ public class SWORDMETSIngester implements SWORDIngester
 	private SWORDService swordService;
 
 	/** Log4j logger */
-	public static Logger log = Logger.getLogger(SWORDMETSIngester.class);
+	public static final Logger log = Logger.getLogger(SWORDMETSIngester.class);
 
 	/* (non-Javadoc)
 	 * @see org.dspace.sword.SWORDIngester#ingest(org.dspace.core.Context, org.purl.sword.base.Deposit)
@@ -90,8 +56,8 @@ public class SWORDMETSIngester implements SWORDIngester
 			// get the things out of the service that we need
 			Context context = swordService.getContext();
 
-			// the DSpaceMETSIngester requires an input stream
-			InputStream is = deposit.getFile();
+			// get deposited file as InputStream
+			File depositFile = deposit.getFile();
 
 			// load the plugin manager for the required configuration
 			String cfg = ConfigurationManager.getProperty("sword.mets-ingester.package-ingester");
@@ -108,23 +74,32 @@ public class SWORDMETSIngester implements SWORDIngester
 			// it's none of our business here
 			String licence = null;
 			
-			// We don't need to include any parameters
+			// Initialize parameters to packager
 			PackageParameters params = new PackageParameters();
+                        // Force package ingester to respect Collection workflows
+                        params.setWorkflowEnabled(true);
 			
-			// ingest the item
-			WorkspaceItem wsi = pi.ingest(context, collection, is, params, licence);
-			if (wsi == null)
+			// ingest the item from the temp file
+			DSpaceObject ingestedObject = pi.ingest(context, collection, depositFile, params, licence);
+			if (ingestedObject == null)
 			{
 				swordService.message("Failed to ingest the package; throwing exception");
 				throw new SWORDErrorException(DSpaceSWORDErrorCodes.UNPACKAGE_FAIL, "METS package ingester failed to unpack package");
 			}
-			
-			// now we can inject the newly constructed item into the workflow
-			WorkflowItem wfi = WorkflowManager.startWithoutNotify(context, wsi);
-			swordService.message("Workflow process started");
-			
-			// pull the item out so that we can report on it
-			Item installedItem = wfi.getItem();
+                        
+                        //Verify we have an Item as a result -- SWORD can only ingest Items
+                        if (!(ingestedObject instanceof Item))
+			{
+                            throw new DSpaceSWORDException("DSpace Ingester returned wrong object type -- not an Item result.");
+			}
+                        else
+                        {
+                            //otherwise, we have an item, and a workflow should have already been started for it.
+                            swordService.message("Workflow process started");
+                        }
+                        
+			// get reference to item so that we can report on it
+			Item installedItem = (Item)ingestedObject;
 			
 			// update the item metadata to inclue the current time as
 			// the updated date
@@ -165,12 +140,17 @@ public class SWORDMETSIngester implements SWORDIngester
 			
 			return dr;
 		}
-		catch (Exception e)
-		{
-			log.error("caught exception: ", e);
-			throw new DSpaceSWORDException(e);
-		}
-	}
+        catch (RuntimeException re)
+        {
+            log.error("caught exception: ", re);
+            throw re;
+        }
+        catch (Exception e)
+        {
+            log.error("caught exception: ", e);
+            throw new DSpaceSWORDException(e);
+        }
+    }
 
 	/**
 	 * Add the current date to the item metadata.  This looks up

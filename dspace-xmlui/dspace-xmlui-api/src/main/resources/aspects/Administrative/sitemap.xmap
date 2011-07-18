@@ -2,9 +2,9 @@
 <!--
   sitemap.xmap
 
-  Version: $Revision: 3705 $
+  Version: $Revision: 5829 $
  
-  Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+  Date: $Date: 2010-11-11 16:16:20 -0500 (Thu, 11 Nov 2010) $
  
   Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
   Institute of Technology.  All rights reserved.
@@ -78,21 +78,34 @@ to administer DSpace.
 			<map:transformer name="AddBitstreamForm" src="org.dspace.app.xmlui.aspect.administrative.item.AddBitstreamForm"/>
 			<map:transformer name="EditBitstreamForm" src="org.dspace.app.xmlui.aspect.administrative.item.EditBitstreamForm"/>
 			<map:transformer name="DeleteBitstreamsConfirm" src="org.dspace.app.xmlui.aspect.administrative.item.DeleteBitstreamsConfirm"/>
+			<map:transformer name="MoveItemForm" src="org.dspace.app.xmlui.aspect.administrative.item.MoveItemForm"/>
+                        <map:transformer name="CurateItemForm" src="org.dspace.app.xmlui.aspect.administrative.item.CurateItemForm"/>
 			
 			<map:transformer name="MapperMain" src="org.dspace.app.xmlui.aspect.administrative.mapper.MapperMain"/>
 			<map:transformer name="BrowseItemForm" src="org.dspace.app.xmlui.aspect.administrative.mapper.BrowseItemForm"/>
 			<map:transformer name="SearchItemForm" src="org.dspace.app.xmlui.aspect.administrative.mapper.SearchItemForm"/>
-			
+
+                        <map:transformer name="MetadataImportMain" src="org.dspace.app.xmlui.aspect.administrative.metadataimport.MetadataImportMain"/>
+                        <map:transformer name="MetadataImportUpload" src="org.dspace.app.xmlui.aspect.administrative.metadataimport.MetadataImportUpload"/>
+                        <map:transformer name="MetadataImportConfirm" src="org.dspace.app.xmlui.aspect.administrative.metadataimport.MetadataImportConfirm"/>
+
 			<map:transformer name="EditCollectionMetadataForm" src="org.dspace.app.xmlui.aspect.administrative.collection.EditCollectionMetadataForm"/>
+			<map:transformer name="ToggleCollectionHarvestingForm" src="org.dspace.app.xmlui.aspect.administrative.collection.ToggleCollectionHarvestingForm"/>
+			<map:transformer name="SetupCollectionHarvestingForm" src="org.dspace.app.xmlui.aspect.administrative.collection.SetupCollectionHarvestingForm"/>
+			<map:transformer name="EditCollectionHarvestingForm" src="org.dspace.app.xmlui.aspect.administrative.collection.EditCollectionHarvestingForm"/>
 			<map:transformer name="AssignCollectionRoles" src="org.dspace.app.xmlui.aspect.administrative.collection.AssignCollectionRoles"/>
 			<map:transformer name="DeleteCollectionRoleConfirm" src="org.dspace.app.xmlui.aspect.administrative.collection.DeleteCollectionRoleConfirm"/>
 			<map:transformer name="DeleteCollectionConfirm" src="org.dspace.app.xmlui.aspect.administrative.collection.DeleteCollectionConfirm"/>
 			<map:transformer name="CreateCollectionForm" src="org.dspace.app.xmlui.aspect.administrative.collection.CreateCollectionForm"/>
-			
+                        <map:transformer name="CurateCollectionForm" src="org.dspace.app.xmlui.aspect.administrative.collection.CurateCollectionForm"/>
+
 			<map:transformer name="EditCommunityMetadataForm" src="org.dspace.app.xmlui.aspect.administrative.community.EditCommunityMetadataForm"/>
+                        <map:transformer name="AssignCommunityRoles" src="org.dspace.app.xmlui.aspect.administrative.community.AssignCommunityRoles"/>
+			<map:transformer name="DeleteCommunityRoleConfirm" src="org.dspace.app.xmlui.aspect.administrative.community.DeleteCommunityRoleConfirm"/>
 			<map:transformer name="DeleteCommunityConfirm" src="org.dspace.app.xmlui.aspect.administrative.community.DeleteCommunityConfirm"/>
 			<map:transformer name="CreateCommunityForm" src="org.dspace.app.xmlui.aspect.administrative.community.CreateCommunityForm"/>
-			
+			<map:transformer name="CurateCommunityForm" src="org.dspace.app.xmlui.aspect.administrative.community.CurateCommunityForm"/>
+
 			<map:transformer name="AuthorizationMain" src="org.dspace.app.xmlui.aspect.administrative.authorization.AuthorizationMain"/>
 			<map:transformer name="EditContainerPolicies" src="org.dspace.app.xmlui.aspect.administrative.authorization.EditContainerPolicies"/>
 			<map:transformer name="EditItemPolicies" src="org.dspace.app.xmlui.aspect.administrative.authorization.EditItemPolicies"/>
@@ -106,6 +119,7 @@ to administer DSpace.
 			<map:transformer name="ControlPanel" src="org.dspace.app.xmlui.aspect.administrative.ControlPanel" />
             <map:transformer name="WithdrawnItems" src="org.dspace.app.xmlui.aspect.administrative.WithdrawnItems" />
             <map:transformer name="ItemExport" src="org.dspace.app.xmlui.aspect.administrative.ItemExport"/>
+                        <map:transformer name="ChoiceLookup" src="org.dspace.app.xmlui.aspect.general.ChoiceLookupTransformer"/>
 		</map:transformers>
 		
 		<map:matchers default="wildcard">
@@ -208,7 +222,22 @@ to administer DSpace.
 							<map:call function="startMapItems"/>
 						</map:match>
 					</map:match>
-					
+
+					<!--
+						This is the general entry / resume point for the
+						batch metadata editor
+					-->
+					<map:match pattern="admin/metadataimport">
+						<map:match type="request" pattern="administrative-continue">
+							<map:call continuation="{1}"/>
+						</map:match>
+                                                
+						<map:call function="startMetadataImport"/>
+						
+					</map:match>
+
+
+
 					<!--
 						These are the general entry / resume points for the
 						editing of communities and collections pages
@@ -292,21 +321,22 @@ to administer DSpace.
 		        			describe the notice, if they are present then we add them to the DRI document 
 		        			before all other flow pages.
 		        			-->
-		        		<map:match type="WildcardParameterMatcher" pattern="true">
-		        			<map:parameter name="parameter-name" value="notice"/>
-		        			<map:parameter name="notice" value="{flow-attribute:notice}"/>
-			        		<map:transform type="notice">
-			        			<map:parameter name="outcome" value="{flow-attribute:outcome}"/>
-			        			<map:parameter name="header" value="{flow-attribute:header}"/>
-			        			<map:parameter name="message" value="{flow-attribute:message}"/>
-			        			<map:parameter name="characters" value="{flow-attribute:characters}"/>
-			        		</map:transform>
-			        	</map:match>
-		        		
+                                        <map:match pattern="admin/**">
+                                            <map:match type="WildcardParameterMatcher" pattern="true">
+                                                    <map:parameter name="parameter-name" value="notice"/>
+                                                    <map:parameter name="notice" value="{flow-attribute:notice}"/>
+                                                    <map:transform type="notice">
+                                                            <map:parameter name="outcome" value="{flow-attribute:outcome}"/>
+                                                            <map:parameter name="header" value="{flow-attribute:header}"/>
+                                                            <map:parameter name="message" value="{flow-attribute:message}"/>
+                                                            <map:parameter name="characters" value="{flow-attribute:characters}"/>
+                                                    </map:transform>
+                                            </map:match>
+		        		</map:match>
 		        		
 		        		<map:match pattern="admin/not-authorized">
 		        			<map:transform type="NotAuthorized"/>
-		        		</map:match>
+		        	</map:match>
 		        		
 		        		
 		        	<!-- EPeople management pages -->
@@ -517,6 +547,7 @@ to administer DSpace.
 		        		<map:match pattern="admin/item/metadata">
 		        			<map:transform type="EditItemMetadataForm">
 		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+		        				<map:parameter name="templateCollectionID" value="{flow-attribute:templateCollectionID}"/>
 		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
 		        			</map:transform>
 		        		</map:match>
@@ -526,6 +557,13 @@ to administer DSpace.
 		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
 		        			</map:transform>
 		        		</map:match>
+
+                                        <!-- Curation options -->
+		        		<map:match pattern="admin/item/curateItem">
+                                            <map:transform type="CurateItemForm">
+                                                <map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+                                            </map:transform>
+                                        </map:match>
 		        		
 		        		<!--
 		        			Upload a new bitstream
@@ -585,6 +623,17 @@ to administer DSpace.
 		        			</map:transform>
 		        		</map:match>
 		        		
+		        		<!--
+		        			Move the item to another collection
+		        			-->
+		        		<map:match pattern="admin/item/move">
+		        			<map:transform type="MoveItemForm">
+		        				<map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+		        				<map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
+                                <map:parameter name="inheritPolicies" value="{flow-attribute:inheritPolicies}"/>                                
+		        			</map:transform>
+		        		</map:match>
+
 		        	<!-- Item Mapper -->
 		        	
 		        		<map:match pattern="admin/mapper/main">
@@ -605,6 +654,23 @@ to administer DSpace.
 		        				<map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
 		        			</map:transform>
 		        		</map:match>
+
+                               <!-- Batch Metadata Editor -->
+
+		        		<map:match pattern="admin/metadataimport/main">
+		        			<map:transform type="MetadataImportMain">
+                                                </map:transform>
+		        		</map:match>
+
+		        		<map:match pattern="admin/metadataimport/upload">
+		        			<map:transform type="MetadataImportUpload">
+		        			</map:transform>
+		        		</map:match>
+
+                                        <map:match pattern="admin/metadataimport/confirm">
+		        			<map:transform type="MetadataImportConfirm">
+		        			</map:transform>
+		        		</map:match>
 		        		
 		        	<!-- Collection edit pages -->
 		        		
@@ -621,6 +687,38 @@ to administer DSpace.
 		        				<map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
 		        			</map:transform>
 		        		</map:match>
+		        		
+		        		<!-- Harvesting options setup form, used for collections that are being edited or set up 
+		        			for the first time -->
+		        		<map:match pattern="admin/collection/setupHarvesting">
+		        			<map:transform type="SetupCollectionHarvestingForm">
+		        				<map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
+		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+		        				<map:parameter name="oaiProviderValue" value="{flow-attribute:oaiProviderValue}"/>
+		        				<map:parameter name="oaiSetAll" value="{flow-attribute:oaiSetAll}"/>
+		        				<map:parameter name="oaiSetIdValue" value="{flow-attribute:oaiSetIdValue}"/>
+		        				<map:parameter name="metadataFormatValue" value="{flow-attribute:metadataFormatValue}"/>
+		        				<map:parameter name="harvestLevelValue" value="{flow-attribute:harvestLevelValue}"/>
+		        			</map:transform>
+		        		</map:match> 
+		        		
+		        		<!-- Harvesting options setup form, used for collections that are being edited or set up 
+		        			for the first time -->
+		        		<map:match pattern="admin/collection/editHarvesting">
+		        			<map:transform type="EditCollectionHarvestingForm">
+		        				<map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
+		        				<map:parameter name="errors" value="{flow-attribute:errors}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		<!-- Initial toggle -->
+		        		<map:match pattern="admin/collection/toggleHarvesting">
+		        			<map:transform type="ToggleCollectionHarvestingForm">
+		        				<map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
+		        			</map:transform>
+		        		</map:match>
+		        		
+		        		 
 		        		
 		        		<!-- Confirmation screen for deleteing one of the standard authorization groups -->
 		        		<map:match pattern="admin/collection/deleteRole">
@@ -644,7 +742,13 @@ to administer DSpace.
 		        				<map:parameter name="communityID" value="{flow-attribute:communityID}"/>
 		        			</map:transform>
 		        		</map:match> 		
-		        		
+
+                                        <!-- Curation options -->
+		        		<map:match pattern="admin/collection/curateCollection">
+                                            <map:transform type="CurateCollectionForm">
+                                                <map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
+                                            </map:transform>
+                                        </map:match>
 		        		
 		        		
 		        		
@@ -652,12 +756,28 @@ to administer DSpace.
 					<!-- Community edit pages -->
 						
 						<!-- Main metadata edit form, accessible by the community admin -->
-						<map:match pattern="admin/community/editMetadata">
+                                        <map:match pattern="admin/community/editMetadata">
 		        			<map:transform type="EditCommunityMetadataForm">
 		        				<map:parameter name="communityID" value="{flow-attribute:communityID}"/>
 		        			</map:transform>
 		        		</map:match>
 		        		
+		        		<!-- Community Authorization options -->
+                                        <map:match pattern="admin/community/assignRoles">
+                                            <map:transform type="AssignCommunityRoles">
+                                                <map:parameter name="communityID" value="{flow-attribute:communityID}"/>
+                                            </map:transform>
+                                        </map:match>
+
+		        		<!-- Confirmation screen for deleting one of the standard authorization groups -->
+		        		<map:match pattern="admin/community/deleteRole">
+		        			<map:transform type="DeleteCommunityRoleConfirm">
+		        				<map:parameter name="communityID" value="{flow-attribute:communityID}"/>
+		        				<map:parameter name="role" value="{flow-attribute:role}"/>
+		        				<map:parameter name="groupID" value="{flow-attribute:groupID}"/>
+		        			</map:transform>
+		        		</map:match>
+
 		        		<!-- Confirmation screen for deleting a community -->
 		        		<map:match pattern="admin/community/delete">
 		        			<map:transform type="DeleteCommunityConfirm">
@@ -672,8 +792,12 @@ to administer DSpace.
 		        			</map:transform>
 		        		</map:match>
       		
-      		
-		        		
+                                        <!-- Curation options -->
+		        		<map:match pattern="admin/community/curateCommunity">
+                                            <map:transform type="CurateCommunityForm">
+                                                <map:parameter name="communityID" value="{flow-attribute:communityID}"/>
+                                            </map:transform>
+                                        </map:match>
 		        	<!-- Authorization pages -->
 		        		
 		        		
@@ -769,6 +893,9 @@ to administer DSpace.
 		    		<map:match pattern="admin/mapper">
 		    			<map:act type="StartAuthentication"/>
 		    		</map:match>
+                                <map:match pattern="admin/metadataimport">
+		    			<map:act type="StartAuthentication"/>
+		    		</map:match>
 		    		<map:match pattern="admin/collection">
 		    			<map:act type="StartAuthentication"/>
 		    		</map:match>
@@ -820,6 +947,34 @@ to administer DSpace.
                     </map:otherwise>
                 </map:select>
             </map:match>
+
+            <!-- choice value lookup popup  -->
+            <map:match pattern="admin/lookup">
+              <map:transform type="ChoiceLookup">
+                <map:parameter name="field" value="{request-param:field}"/>
+                <map:parameter name="formID" value="{request-param:formID}"/>
+                <map:parameter name="value" value="{request-param:value}"/>
+                <map:parameter name="valueInput" value="{request-param:valueInput}"/>
+                <map:parameter name="authorityInput" value="{request-param:authorityInput}"/>
+                <map:parameter name="isName" value="{request-param:isName}"/>
+                <map:parameter name="isRepeating" value="{request-param:isRepeating}"/>
+                <map:parameter name="confIndicatorID" value="{request-param:confIndicatorID}"/>
+                <map:parameter name="start" value="{request-param:start}"/>
+                <map:parameter name="limit" value="{request-param:limit}"/>
+                <map:parameter name="collection" value="{request-param:collection}"/>
+              </map:transform>
+            </map:match>
+
+                  <map:match pattern="admin/**">
+                    <map:transform type="IncludePageMeta">
+                      <!-- javascript libraries and utils for the choice and authority-control -->
+                      <map:parameter name="javascript.static#1" value="static/js/scriptaculous/prototype.js"/>
+                      <map:parameter name="javascript.static#2" value="static/js/scriptaculous/effects.js"/>
+                      <map:parameter name="javascript.static#3" value="static/js/scriptaculous/builder.js"/>
+                      <map:parameter name="javascript.static#4" value="static/js/scriptaculous/controls.js"/>
+                      <map:parameter name="javascript.static#5" value="static/js/choice-support.js"/>
+                    </map:transform>
+                  </map:match>
 
 			<map:serialize type="xml"/>
 		</map:pipeline>

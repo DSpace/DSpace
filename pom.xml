@@ -3,81 +3,68 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-parent</artifactId>
    <packaging>pom</packaging>
-   <version>1.5.2</version>
+   <version>1.7.2</version>
    <name>DSpace Parent Project</name>
    <url>http://projects.dspace.org</url>
 
    <organization>
-      <name>The DSpace Foundation</name>
+      <name>DuraSpace</name>
       <url>http://www.dspace.org</url>
    </organization>
 
+   <parent>
+     <artifactId>dspace-pom</artifactId>
+     <groupId>org.dspace</groupId>
+     <version>10</version>
+   </parent>
+
    <build>
       <plugins>
-         <!-- 
-            Java 1.5 is our officially endorsed build target
-            platform.  
-         -->
          <plugin>
-			<artifactId>maven-release-plugin</artifactId>
-			<configuration>
-				<!--
-					During release:perform, enable the "addons" profile
-				-->
-				<releaseProfiles>addons</releaseProfiles>
-				<goals>deploy</goals>
-			</configuration>
-		 </plugin>
-         <plugin>
-            <artifactId>maven-compiler-plugin</artifactId>
+            <artifactId>maven-release-plugin</artifactId>
+            <!-- Because of below bug, we are forced to use version 2.0-beta-9
+                 http://jira.codehaus.org/browse/MRELEASE-620 -->
+            <version>2.0-beta-9</version>
             <configuration>
-               <source>1.5</source>
-               <target>1.5</target>
+                <!-- During release:perform, enable the "addons" profile -->
+                <releaseProfiles>addons</releaseProfiles>
+                <goals>deploy</goals>
+                <!-- Auto-Version all modules the same as the parent module -->
+                <autoVersionSubmodules>true</autoVersionSubmodules>
             </configuration>
          </plugin>
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-jar-plugin</artifactId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <!-- tests whose name starts by Abstract will be ignored -->
             <configuration>
-               <archive>
-                  <manifest>
-                     <addDefaultImplementationEntries>
-                        true
-                     </addDefaultImplementationEntries>
-                     <addDefaultSpecificationEntries>
-                        true
-                     </addDefaultSpecificationEntries>
-                  </manifest>
-               </archive>
+	        <excludes>
+	            <exclude>**/Abstract*</exclude>
+	        </excludes>
+                <!-- required when running JMockit under Java 1.5 -->
+                <argLine>-javaagent:"${settings.localRepository}"/org/dspace/dependencies/jmockit/dspace-jmockit/0.999.4/dspace-jmockit-0.999.4.jar</argLine>
             </configuration>
          </plugin>
          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-war-plugin</artifactId>
-            <configuration>
-               <archive>
-                  <manifest>
-                     <addDefaultImplementationEntries>
-                        true
-                     </addDefaultImplementationEntries>
-                     <addDefaultSpecificationEntries>
-                        true
-                     </addDefaultSpecificationEntries>
-                  </manifest>
-               </archive>
-            </configuration>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <!-- We'd rather this be an open-ended range of versions.
+                     But, because of a Maven bug, we must force a specific version:
+                     http://jira.codehaus.org/browse/MNG-2742
+                     Once the bug is fixed, we should put open-ended range in dspace-pom -->
+                <version>2.1.1</version>
          </plugin>
       </plugins>
    </build>
 
    <profiles>
-   
-      <!-- 
-         ========================================================
-         These are admiistrative profiles used by release manager
-         To complete release tasks.
-         ========================================================
-         
+
+      <!--
+         =========================================================
+         These are administrative profiles used by release manager
+         to complete release tasks.
+         =========================================================
+
          Use 'mvn release:prepare -Pall' for tagging the release.
       -->
       <profile>
@@ -87,6 +74,8 @@
          </activation>
          <modules>
             <module>dspace-api</module>
+            <module>dspace-stats</module>
+            <module>dspace-discovery</module>
             <module>dspace-jspui</module>
             <module>dspace-xmlui</module>
             <module>dspace-lni</module>
@@ -95,11 +84,11 @@
             <module>dspace</module>
          </modules>
       </profile>
-      
-      
-      <!-- 
+
+
+      <!--
          Use 'mvn deploy -Paddons' while doing Continuous Integration
-         and deploying addons to the Maven repository. 
+         and deploying addons to the Maven repository.
        -->
       <profile>
          <id>addons</id>
@@ -108,6 +97,8 @@
          </activation>
          <modules>
             <module>dspace-api</module>
+            <module>dspace-stats</module>
+            <module>dspace-discovery</module>
             <module>dspace-jspui</module>
             <module>dspace-xmlui</module>
             <module>dspace-lni</module>
@@ -115,9 +106,9 @@
             <module>dspace-sword</module>
          </modules>
       </profile>
-      
-      <!-- 
-         Use 'mvn package -Pdistributions' to create distributions 
+
+      <!--
+         Use 'mvn package -Pdistributions' to create distributions
          to upload to S.F.
        -->
       <profile>
@@ -159,27 +150,22 @@
          </build>
       </profile>
 
+      <!-- skip tests by default, but allow override
+      on command line by setting property "-Dmaven.test.skip"-->
+      <!-- Disabled by default, change activeByDefault to true to enable -->
+      <profile>
+        <id>skiptests</id>
+        <activation>
+            <activeByDefault>true</activeByDefault>
+         </activation>
+        <properties>
+         <maven.test.skip>true</maven.test.skip>
+        </properties>
+      </profile>
    </profiles>
 
-   <repositories>
-      <repository>
-         <id>maven.dspace.org-snapshot</id>
-         <name>DSpace Maven Snapshot Repository</name>
-         <url>http://maven.dspace.org/snapshot</url>
-         <releases>
-            <enabled>false</enabled>
-            <checksumPolicy>fail</checksumPolicy>
-         </releases>
-         <snapshots>
-            <enabled>true</enabled>
-            <updatePolicy>daily</updatePolicy>
-            <checksumPolicy>fail</checksumPolicy>
-         </snapshots>
-      </repository>
-   </repositories>
-
-   <!-- 
-      Distribution management provides a means to control which
+   <!--
+      Dependency management provides a means to control which
       versions of dependency jars are used for compilation
       and packaging into the distribution.  Rather than placing
       a version in your dependencies, look here first to see if
@@ -191,85 +177,110 @@
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
-            <version>${project.version}</version>
+            <version>1.7.2</version>
          </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-sword-api</artifactId>
-              <version>${project.version}</version>
+              <version>1.7.2</version>
           </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-sword-webapp</artifactId>
-              <version>${project.version}</version>
+              <version>1.7.2</version>
               <type>war</type>
           </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui-api</artifactId>
-            <version>${project.version}</version>
+            <version>1.7.2</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui-webapp</artifactId>
-            <version>${project.version}</version>
+            <version>1.7.2</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai-api</artifactId>
-            <version>${project.version}</version>
+            <version>1.7.2</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai-webapp</artifactId>
-            <version>${project.version}</version>
+            <version>1.7.2</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-core</artifactId>
-            <version>${project.version}</version>
+            <version>1.7.2</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-client</artifactId>
-            <version>${project.version}</version>
+            <version>1.7.2</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-webapp</artifactId>
-            <version>${project.version}</version>
+            <version>1.7.2</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-api</artifactId>
-            <version>${project.version}</version>
+            <version>1.7.2</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-webapp</artifactId>
-            <version>${project.version}</version>
+            <version>1.7.2</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-wing</artifactId>
-            <version>${project.version}</version>
+            <version>1.7.2</version>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-services-impl</artifactId>
+            <version>2.0.3</version>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-services-api</artifactId>
+            <version>2.0.3</version>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-services-utils</artifactId>
+            <version>2.0.3</version>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-stats</artifactId>
+            <version>1.7.2</version>
          </dependency>
          <!-- DSpace Localization Packages -->
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api-lang</artifactId>
-            <version>[1.5.0.0,1.6.0.0)</version>
+            <version>[1.7.0.1,1.7.9.9)</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-lang</artifactId>
-            <version>[1.5.0.0,1.6.0.0)</version>
+            <version>[1.7.0.1,1.7.9.9)</version>
             <type>war</type>
          </dependency>
+          <dependency>
+              <groupId>org.dspace</groupId>
+              <artifactId>dspace-discovery-provider</artifactId>
+              <version>1.7.2</version>
+          </dependency>
          <!-- DSpace third Party Dependencies -->
          <dependency>
             <groupId>org.apache.ant</groupId>
@@ -279,13 +290,13 @@
          <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-core</artifactId>
-            <version>2.3.0</version>
+            <version>2.9.3</version>
          </dependency>
          <dependency>
             <groupId>org.apache.lucene</groupId>
             <artifactId>lucene-analyzers</artifactId>
-            <version>2.3.0</version>
-         </dependency>         
+            <version>2.9.3</version>
+         </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>handle</artifactId>
@@ -307,9 +318,9 @@
             <version>1.5.48</version>
          </dependency>
          <dependency>
-            <groupId>org.textmining</groupId>
-            <artifactId>tm-extractors</artifactId>
-            <version>0.4</version>
+            <groupId>org.dspace.dependencies</groupId>
+            <artifactId>dspace-tm-extractors</artifactId>
+            <version>1.0.1</version>
          </dependency>
          <dependency>
             <groupId>commons-cli</groupId>
@@ -330,7 +341,7 @@
          <dependency>
             <groupId>commons-dbcp</groupId>
             <artifactId>commons-dbcp</artifactId>
-            <version>1.2.2</version>
+            <version>1.4</version>
          </dependency>
          <dependency>
             <groupId>commons-discovery</groupId>
@@ -377,7 +388,6 @@
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>2.3</version>
-            <scope>provided</scope>
          </dependency>
 
          <dependency>
@@ -407,29 +417,54 @@
             <version>2.0.8</version>
          </dependency>
          <dependency>
-            <groupId>pdfbox</groupId>
+            <groupId>org.apache.pdfbox</groupId>
             <artifactId>pdfbox</artifactId>
-            <version>0.7.3</version>
+            <version>1.2.1</version>
          </dependency>
          <dependency>
-            <groupId>org.fontbox</groupId>
+            <groupId>org.apache.pdfbox</groupId>
             <artifactId>fontbox</artifactId>
-            <version>0.1.0</version>
+            <version>1.2.1</version>
          </dependency>
          <dependency>
-            <groupId>org.jempbox</groupId>
+            <groupId>org.apache.pdfbox</groupId>
             <artifactId>jempbox</artifactId>
-            <version>0.2.0</version>
+            <version>1.2.1</version>
          </dependency>
          <dependency>
-            <groupId>poi</groupId>
-            <artifactId>poi</artifactId>
-            <version>2.5.1-final-20040804</version>
+	        <groupId>org.bouncycastle</groupId>
+	        <artifactId>bcprov-jdk15</artifactId>
+	        <version>1.44</version>
+	    </dependency>
+	    <dependency>
+	        <groupId>org.bouncycastle</groupId>
+	        <artifactId>bcmail-jdk15</artifactId>
+	        <version>1.44</version>
+	    </dependency>
+         <dependency>
+           <groupId>org.apache.poi</groupId>
+           <artifactId>poi</artifactId>
+           <version>3.6</version>
+         </dependency>
+         <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-scratchpad</artifactId>
+            <version>3.6</version>
+         </dependency>
+         <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>3.6</version>
+         </dependency>
+         <dependency>
+            <groupId>net.java.dev.rome</groupId>
+            <artifactId>rome</artifactId>
+            <version>1.0.0</version>
          </dependency>
          <dependency>
             <groupId>rome</groupId>
-            <artifactId>rome</artifactId>
-            <version>0.8</version>
+            <artifactId>opensearch</artifactId>
+            <version>0.1</version>
          </dependency>
          <dependency>
             <groupId>xalan</groupId>
@@ -482,7 +517,7 @@
          <dependency>
             <groupId>com.ibm.icu</groupId>
             <artifactId>icu4j</artifactId>
-            <version>3.4.4</version>
+            <version>3.8</version>
          </dependency>
          <dependency>
             <groupId>postgresql</groupId>
@@ -491,8 +526,8 @@
          </dependency>
          <dependency>
             <groupId>com.oracle</groupId>
-            <artifactId>ojdbc14</artifactId>
-            <version>10.2.0.2.0</version>
+            <artifactId>ojdbc6</artifactId>
+            <version>11.2.0.2.0</version>
          </dependency>
          <dependency>
             <groupId>edu.umd.lib</groupId>
@@ -515,6 +550,40 @@
             <artifactId>casclient</artifactId>
             <version>2.1.1</version>
          </dependency>
+         <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>oclc-harvester2</artifactId>
+            <version>0.1.12</version>
+         </dependency>
+         <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+            <version>3.1</version>
+         </dependency>
+         <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.8.1</version>
+            <scope>test</scope>
+         </dependency>
+         <dependency>
+            <groupId>org.dspace.dependencies.jmockit</groupId>
+            <artifactId>dspace-jmockit</artifactId>
+            <version>0.999.4</version>
+            <scope>test</scope>
+         </dependency>
+         <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.2.137</version>
+            <scope>test</scope>
+         </dependency>
+         <dependency>
+            <groupId>org.databene</groupId>
+            <artifactId>contiperf</artifactId>
+            <version>1.06</version>
+            <scope>test</scope>
+        </dependency>
       </dependencies>
    </dependencyManagement>
 
@@ -562,16 +631,16 @@
          </archive>
       </mailingList>
       <mailingList>
-         <name>DSpace Manakin List</name>
+         <name>DSpace General Issues List</name>
          <subscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-manakin
+            http://lists.sourceforge.net/mailman/listinfo/dspace-general
          </subscribe>
          <unsubscribe>
-            http://lists.sourceforge.net/mailman/listinfo/dspace-manakin
+            http://lists.sourceforge.net/mailman/listinfo/dspace-general
          </unsubscribe>
-         <post>dspace-manakin AT lists.sourceforge.net</post>
+         <post>dspace-general AT lists.sourceforge.net</post>
          <archive>
-            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-manakin
+            http://sourceforge.net/mailarchive/forum.php?forum_name=dspace-general
          </archive>
       </mailingList>
       <mailingList>
@@ -602,15 +671,24 @@
          <timezone>+1</timezone>
       </developer>
       <developer>
+         <name>Ben Bosman</name>
+         <email>benbosman at atmire.com</email>
+         <organization>@mire NV</organization>
+         <organizationUrl>http://www.atmire.com</organizationUrl>
+          <roles>
+            <role>commiter</role>
+         </roles>
+      </developer>
+      <developer>
          <name>Mark Diggory</name>
-         <email>mdiggory at mit.edu</email>
-         <url>http://www.linkedin.com/in/mdiggory</url>
-         <organization>MIT Libraries</organization>
-         <organizationUrl>http://libraries.mit.edu</organizationUrl>
+         <email>mdiggory at atmire.com</email>
+         <url>http://purl.org/net/mdiggory/homepage</url>
+         <organization>@mire NV</organization>
+         <organizationUrl>http://www.atmire.com</organizationUrl>
          <roles>
             <role>commiter</role>
          </roles>
-         <timezone>-5</timezone>
+         <timezone>-8</timezone>
       </developer>
       <developer>
          <name>Tim Donohue</name>
@@ -642,10 +720,14 @@
       </developer>
       <developer>
          <name>Stuart Lewis</name>
-         <email>stuartlewis at users.sourceforge.net</email>
+         <email>stuart at stuartlewis.com</email>
+         <url>http://stuartlewis.com/</url>
+         <organization>University of Auckland Library</organization>
+         <organizationUrl>http://www.library.auckland.ac.nz/</organizationUrl>
          <roles>
             <role>commiter</role>
          </roles>
+         <timezone>+12</timezone>
       </developer>
       <developer>
          <name>Gabriela Mircea</name>
@@ -676,6 +758,26 @@
          </roles>
       </developer>
       <developer>
+          <name>Kim Shepherd</name>
+          <email>kims at waikato.ac.nz</email>
+          <organization>Library Consortium of New Zealand</organization>
+          <organizationUrl>http://www.lconz.ac.nz/</organizationUrl>
+          <roles>
+              <role>commiter</role>
+          </roles>
+          <timezone>+12</timezone>
+      </developer>
+      <developer>
+         <name>Larry Stone</name>
+         <email>lcs at mit.edu</email>
+         <organization>MIT Libraries</organization>
+         <organizationUrl>http://libraries.mit.edu</organizationUrl>
+         <roles>
+            <role>commiter</role>
+         </roles>
+         <timezone>-5</timezone>
+      </developer>
+      <developer>
          <name>Robert Tansley</name>
          <email>rtansley at users.sourceforge.net</email>
          <roles>
@@ -688,6 +790,13 @@
          <roles>
             <role>commiter</role>
          </roles>
+      </developer>
+      <developer>
+         <name>Jeffrey Trimble</name>
+         <email />
+         <roles>
+           <role>commiter</role>
+        </roles>
       </developer>
       <developer>
          <name>Mark H. Wood</name>
@@ -718,6 +827,17 @@
          <timezone>0</timezone>
       </contributor>
       <contributor>
+         <name>Pere Villega</name>
+         <email>pere.villega@gmail.com</email>
+         <url>http://www.perevillega.com</url>
+         <organization />
+         <organizationUrl />
+         <roles>
+            <role>developer</role>
+         </roles>
+         <timezone>0</timezone>
+      </contributor>
+      <contributor>
          <name>Sands Fish</name>
          <email>sands at mit.edu</email>
          <organization>MIT Libraries</organization>
@@ -727,53 +847,18 @@
          </roles>
          <timezone>-5</timezone>
       </contributor>
-      <contributor>
-         <name>Larry Stone</name>
-         <email>lcs at mit.edu</email>
-         <organization>MIT Libraries</organization>
-         <organizationUrl>http://libraries.mit.edu</organizationUrl>
-         <roles>
-            <role>developer</role>
-         </roles>
-         <timezone>-5</timezone>
-      </contributor>
    </contributors>
 
-   <!-- 
+   <!--
       The Subversion repository location is used by Continuum to update against
-      when changes have occured, this spawns a new build cycle and releases snapshots
-      into the snapshot repository below.
+      when changes have occurred.  This spawns a new build cycle and releases
+      snapshots into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/viewvc/dspace/tags/dspace-1.5.2</url>
+      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2</url>
    </scm>
-
-   <!-- 
-      Distribution Management is currently used by the Continuum server
-      to update snapshots it generates. This will also be used on 
-      release to deploy release versions to the repository by the
-      release manager.
-   -->
-   <distributionManagement>
-      <repository>
-         <id>maven.dspace.org/release</id>
-         <name>DSpace Maven Repository</name>
-         <url>scp://maven.dspace.org/var/maven/release</url>
-      </repository>
-      <snapshotRepository>
-         <id>maven.dspace.org-snapshot</id>
-         <name>DSpace Maven Repository</name>
-         <url>scp://maven.dspace.org/var/maven/snapshot</url>
-      </snapshotRepository>
-      <site>
-         <id>website</id>
-         <url>
-            scp://projects.dspace.org/var/www/projects.dspace.org/htdocs
-         </url>
-      </site>
-   </distributionManagement>
 
    <reporting>
       <excludeDefaults>true</excludeDefaults>
@@ -792,7 +877,7 @@
                   <link>
                      http://projects.dspace.org/dspace-oai/apidocs
                   </link>
-                  <link>http://java.sun.com/j2se/1.5.0/docs/api</link>
+                  <link>http://java.sun.com/j2se/6/docs/api</link>
                   <link>
                      http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/
                   </link>
@@ -832,6 +917,49 @@
             <artifactId>jdepend-maven-plugin</artifactId>
             <version>2.0-beta-1</version>
          </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-report-plugin</artifactId>
+            <version>2.5</version>
+         </plugin>
+         <plugin>
+            <groupId>com.google.testability-explorer</groupId>
+            <artifactId>maven-testability-plugin</artifactId>
+            <version>1.3.3</version>
+         </plugin>
+         <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-pmd-plugin</artifactId>
+            <version>2.4</version>
+            <configuration>
+                <targetJdk>${dspace.java.target}</targetJdk>
+            </configuration>
+         </plugin>
+         <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>findbugs-maven-plugin</artifactId>
+            <version>2.3</version>
+            <configuration>
+                    <xmlOutput>true</xmlOutput>
+                    <effort>Max</effort>
+            </configuration>
+        </plugin>
+        <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>taglist-maven-plugin</artifactId>
+            <version>2.4</version>
+            <configuration>
+                <aggregate>true</aggregate>
+                <tags>
+                    <tag>TODO</tag>
+                    <tag>FIXME</tag>
+                    <tag>@todo</tag>
+                    <tag>XXX</tag>
+                </tags>
+            </configuration>
+        </plugin>
+
+
       </plugins>
    </reporting>
 

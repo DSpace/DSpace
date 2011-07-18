@@ -1,43 +1,10 @@
-/*
- * DSpaceCocoonServlet.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.xmlui.cocoon;
 
 import java.io.File;
@@ -54,10 +21,12 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.configuration.XMLUIConfiguration;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.harvest.OAIHarvester;
 
 /**
  * This is a wrapper servlet around the cocoon servlet that prefroms two functions, 1) it 
@@ -68,6 +37,7 @@ import org.dspace.core.ConfigurationManager;
  */
 public class DSpaceCocoonServletFilter implements Filter 
 {
+    private static final Logger LOG = Logger.getLogger(DSpaceCocoonServletFilter.class);
 	
 	private static final long serialVersionUID = 1L;
 	
@@ -100,7 +70,9 @@ public class DSpaceCocoonServletFilter implements Filter
         {
             String osName = System.getProperty("os.name");
             if (osName != null)
+            {
                 osName = osName.toLowerCase();
+            }
 
             if (osName != null && osName.contains("windows"))
             {
@@ -109,17 +81,21 @@ public class DSpaceCocoonServletFilter implements Filter
                 urlConn.setDefaultUseCaches(false);
             }
         }
-        catch (Throwable t)
+        // Any errors thrown in disabling the caches aren't significant to
+        // the normal execution of the application, so we ignore them
+        catch (RuntimeException e)
         {
-            // Any errors thrown in disabling the caches aren't significant to
-            // the normal execution of the application, so we ignore them
+            LOG.error(e.getMessage(), e);
+        }
+        catch (Exception e)
+        {
+            LOG.error(e.getMessage(), e);
         }
         
         /**
          * Previous stages moved to shared ServletListener available in dspace-api
          */
         String dspaceConfig = null;
-        String log4jConfig  = null;
         
         /**
          * Stage 1
@@ -130,7 +106,9 @@ public class DSpaceCocoonServletFilter implements Filter
         // first check the local per webapp parameter, then check the global parameter.
         dspaceConfig = arg0.getInitParameter(DSPACE_CONFIG_PARAMETER);
         if (dspaceConfig == null)
+        {
             dspaceConfig = arg0.getServletContext().getInitParameter(DSPACE_CONFIG_PARAMETER);
+        }
         
         // Finaly, if no config parameter found throw an error
         if (dspaceConfig == null || "".equals(dspaceConfig))
@@ -159,7 +137,11 @@ public class DSpaceCocoonServletFilter implements Filter
             
             
         }
-        catch (Throwable t)
+        catch (RuntimeException e)
+        {
+            throw e;
+        }
+        catch (Exception e)
         {
             throw new ServletException(
                     "\n\nDSpace has failed to initialize, during stage 2. Error while attempting to read the \n" +
@@ -167,7 +149,7 @@ public class DSpaceCocoonServletFilter implements Filter
                     "This has likely occurred because either the file does not exist, or it's permissions \n" +
                     "are set incorrectly, or the path to the configuration file is incorrect. The path to \n" +
                     "the DSpace configuration file is stored in a context variable, 'dspace-config', in \n" +
-                    "either the local servlet or global context.\n\n",t);
+                    "either the local servlet or global context.\n\n",e);
         }
     }
     
@@ -201,7 +183,11 @@ public class DSpaceCocoonServletFilter implements Filter
     		
 	        XMLUIConfiguration.loadConfig(webappConfigPath,installedConfigPath);
     	}   
-    	catch (Throwable t)
+    	catch (RuntimeException e)
+        {
+            throw e;
+        }
+        catch (Exception e)
     	{
     		throw new ServletException(
     				"\n\nDSpace has failed to initialize, during stage 3. Error while attempting to read \n" +
@@ -209,9 +195,23 @@ public class DSpaceCocoonServletFilter implements Filter
     				"This has likely occurred because either the file does not exist, or it's permissions \n" +
     				"are set incorrectly, or the path to the configuration file is incorrect. The XML UI \n" +
     				"configuration file should be named \"xmlui.xconf\" and located inside the standard \n" +
-    				"DSpace configuration directory. \n\n",t);
+    				"DSpace configuration directory. \n\n",e);
     	}
    
+		if (ConfigurationManager.getBooleanProperty("harvester.autoStart")) 
+    	{
+    		try {
+    			OAIHarvester.startNewScheduler();
+    		}
+            catch (RuntimeException e)
+            {
+                LOG.error(e.getMessage(), e);
+            }
+    		catch (Exception e)
+    		{
+                LOG.error(e.getMessage(), e);
+    		}
+    	}
     	
     }
     
@@ -226,25 +226,36 @@ public class DSpaceCocoonServletFilter implements Filter
     
 		HttpServletRequest realRequest = (HttpServletRequest)request;
 		HttpServletResponse realResponse = (HttpServletResponse) response;
-    	// Check if there is a request to be resumed.
-        realRequest = AuthenticationUtil.resumeRequest(realRequest);
 
-        // Send the real request or the resumed request off to
-        // cocoon....
+		try {
+	    	// Check if there is a request to be resumed.
+	        realRequest = AuthenticationUtil.resumeRequest(realRequest);
+	
+	        // Send the real request or the resumed request off to
+	        // cocoon....
+	
+	        // if force ssl is on and the user has authenticated and the request is not secure redirect to https
+	        if ((ConfigurationManager.getBooleanProperty("xmlui.force.ssl")) && (realRequest.getSession().getAttribute("dspace.current.user.id")!=null) && (!realRequest.isSecure())) {
+	                StringBuffer location = new StringBuffer("https://");
+	                location.append(ConfigurationManager.getProperty("dspace.hostname")).append(realRequest.getContextPath()).append(realRequest.getServletPath()).append(
+	                        realRequest.getQueryString() == null ? ""
+	                                : ("?" + realRequest.getQueryString()));
+	                realResponse.sendRedirect(location.toString());
+	        }
+	
+	        arg2.doFilter(realRequest, realResponse);
 
-        // if force ssl is on and the user has authenticated and the request is not secure redirect to https
-        if ((ConfigurationManager.getBooleanProperty("xmlui.force.ssl")) && (realRequest.getSession().getAttribute("dspace.current.user.id")!=null) && (!realRequest.isSecure())) {
-                StringBuffer location = new StringBuffer("https://");
-                location.append(ConfigurationManager.getProperty("dspace.hostname")).append(realRequest.getContextPath()).append(realRequest.getServletPath()).append(
-                        realRequest.getQueryString() == null ? ""
-                                : ("?" + realRequest.getQueryString()));
-                realResponse.sendRedirect(location.toString());
-        }
-
-        arg2.doFilter(realRequest, realResponse);
-
-        // Close out the DSpace context no matter what.
-        ContextUtil.closeContext(realRequest);
+        } catch (RuntimeException e) {
+            ContextUtil.abortContext(realRequest);
+            LOG.error("Serious Runtime Error Occurred Processing Request!", e);
+            throw e;
+	} catch (Exception e) {
+	    ContextUtil.abortContext(realRequest);
+            LOG.error("Serious Error Occurred Processing Request!", e);
+	} finally {
+	    // Close out the DSpace context no matter what.
+	    ContextUtil.completeContext(realRequest);
+	}
     }
 
 	public void destroy() {

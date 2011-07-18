@@ -1,43 +1,10 @@
-/*
- * WithdrawnItems.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.xmlui.aspect.administrative;
 
 import java.io.IOException;
@@ -53,6 +20,7 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
@@ -98,44 +66,42 @@ import org.xml.sax.SAXException;
 public class WithdrawnItems extends AbstractDSpaceTransformer implements
         CacheableProcessingComponent
 {
+    private static final Logger log = Logger.getLogger(WithdrawnItems.class);
+
     /**
      * Static Messages for common text
      */
-    private final static Message T_dspace_home = message("xmlui.general.dspace_home");
+    private static final Message T_dspace_home = message("xmlui.general.dspace_home");
 
-    private final static Message T_go = message("xmlui.general.go");
+    private static final Message T_go = message("xmlui.general.go");
 
-    private final static Message T_update = message("xmlui.general.update");
+    private static final Message T_update = message("xmlui.general.update");
 
-    private final static Message T_choose_month = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.choose_month");
+    private static final Message T_choose_month = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.choose_month");
 
-    private final static Message T_choose_year = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.choose_year");
+    private static final Message T_choose_year = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.choose_year");
 
-    private final static Message T_jump_year = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_year");
+    private static final Message T_jump_year = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_year");
 
-    private final static Message T_jump_year_help = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_year_help");
+    private static final Message T_jump_year_help = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_year_help");
 
-    private final static Message T_jump_select = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_select");
+    private static final Message T_jump_select = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_select");
 
-    private final static Message T_starts_with = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.starts_with");
+    private static final Message T_starts_with = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.starts_with");
 
-    private final static Message T_starts_with_help = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.starts_with_help");
+    private static final Message T_starts_with_help = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.starts_with_help");
 
-    private final static Message T_sort_by = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.sort_by");
+    private static final Message T_sort_by = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.sort_by");
 
-    private final static Message T_order = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.order");
+    private static final Message T_order = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.order");
 
-    private final static Message T_rpp = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.rpp");
+    private static final Message T_rpp = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.rpp");
 
-    private final static Message T_etal = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.etal");
+    private static final Message T_order_asc = message("xmlui.ArtifactBrowser.ConfigurableBrowse.order.asc");
 
-    private final static Message T_etal_all = message("xmlui.ArtifactBrowser.ConfigurableBrowse.etal.all");
+    private static final Message T_order_desc = message("xmlui.ArtifactBrowser.ConfigurableBrowse.order.desc");
 
-    private final static Message T_order_asc = message("xmlui.ArtifactBrowser.ConfigurableBrowse.order.asc");
-
-    private final static Message T_order_desc = message("xmlui.ArtifactBrowser.ConfigurableBrowse.order.desc");
-
-    private final static String WITHDRAWN_URL_BASE = "withdrawn";
+    private static final String WITHDRAWN_URL_BASE = "withdrawn";
 
     /**
      * These variables dictate when the drop down list of years is to break from
@@ -171,14 +137,20 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
             {
                 DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
                 if (dso != null)
+                {
                     key += "-" + dso.getHandle();
+                }
 
                 return HashUtil.hash(key);
             }
         }
-        catch (Exception e)
+        catch (SQLException e)
         {
-            // Ignore all errors and just don't cache.
+            log.error("Database error", e);
+        }
+        catch (UIException e)
+        {
+            log.error("UI error", e);
         }
 
         return "0";
@@ -190,11 +162,13 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
         {
             try
             {
-                DSpaceValidity validity = new DSpaceValidity();
+                DSpaceValidity newValidity = new DSpaceValidity();
                 DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
                 if (dso != null)
-                    validity.add(dso);
+                {
+                    newValidity.add(dso);
+                }
 
                 BrowseInfo info = getBrowseInfo();
 
@@ -204,21 +178,27 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
                     // Add the browse items to the validity
                     for (BrowseItem item : (java.util.List<BrowseItem>) info.getResults())
                     {
-                        validity.add(item);
+                        newValidity.add(item);
                     }
                 }
                 else
                 {
                     // Add the metadata to the validity
-                    for (String singleEntry : browseInfo.getStringResults())
+                    for (String[] singleEntry : browseInfo.getStringResults())
                     {
-                        validity.add(singleEntry);
+                        newValidity.add(singleEntry[0]+"#"+singleEntry[1]);
                     }
                 }
+
+                validity = newValidity;
             }
-            catch (Exception e)
+            catch (SQLException e)
             {
-                // Just ignore all errors and return an invalid cache.
+                log.error("Database error", e);
+            }
+            catch (UIException e)
+            {
+                log.error("UI error", e);
             }
 
         }
@@ -234,16 +214,15 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
     {
         BrowseInfo info = getBrowseInfo();
 
-        // Get the name of the index
-        String type = info.getBrowseIndex().getName();
-
         pageMeta.addMetadata("title").addContent(getTitleMessage(info));
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
         if (dso != null)
+        {
             HandleUtil.buildHandleTrail(dso, pageMeta, contextPath);
+        }
 
         pageMeta.addTrail().addContent(getTrailMessage(info));
     }
@@ -310,16 +289,24 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
                     message("xmlui.ArtifactBrowser.ConfigurableBrowse." + type + ".column_heading"));
 
             // Iterate each result
-            for (String singleEntry : browseInfo.getStringResults())
+            for (String[] singleEntry : browseInfo.getStringResults())
             {
                 // Create a Map of the query parameters for the link
                 Map<String, String> queryParams = new HashMap<String, String>();
-                queryParams.put(BrowseParams.TYPE, URLEncode(type));
-                queryParams.put(BrowseParams.FILTER_VALUE, URLEncode(singleEntry));
-
+                queryParams.put(BrowseParams.TYPE, encodeForURL(type));
+                if (singleEntry[1] != null)
+                {
+                    queryParams.put(BrowseParams.FILTER_VALUE[1], encodeForURL(
+                        singleEntry[1]));
+                }
+                else
+                {
+                    queryParams.put(BrowseParams.FILTER_VALUE[0], encodeForURL(
+                        singleEntry[0]));
+                }
                 // Create an entry in the table, and a linked entry
                 Cell cell = singleTable.addRow().addCell();
-                cell.addXref(super.generateURL(WITHDRAWN_URL_BASE, queryParams), singleEntry);
+                cell.addXref(super.generateURL(WITHDRAWN_URL_BASE, queryParams), singleEntry[0]);
             }
         }
     }
@@ -348,9 +335,6 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
     private void addBrowseJumpNavigation(Division div, BrowseInfo info, BrowseParams params)
             throws WingException
     {
-        // Get the name of the index
-        String type = info.getBrowseIndex().getName();
-
         // Prepare a Map of query parameters required for all links
         Map<String, String> queryParams = new HashMap<String, String>();
         queryParams.putAll(params.getCommonParameters());
@@ -361,8 +345,10 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
                 Division.METHOD_POST, "secondary navigation");
 
         // Add all the query parameters as hidden fields on the form
-        for (String key : queryParams.keySet())
-            jump.addHidden(key).setValue(queryParams.get(key));
+        for (Map.Entry<String, String> param : queryParams.entrySet())
+        {
+            jump.addHidden(param.getKey()).setValue(param.getValue());
+        }
 
         // If this is a date based browse, render the date navigation
         if (isSortedByDate(info))
@@ -394,11 +380,17 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
                 year.addOption(false, String.valueOf(i), String.valueOf(i));
 
                 if (i <= fiveYearBreak)
+                {
                     i -= 10;
+                }
                 else if (i <= oneYearBreak)
+                {
                     i -= 5;
+                }
                 else
+                {
                     i--;
+                }
             }
             while (i > tenYearBreak);
 
@@ -450,8 +442,10 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
                 Division.METHOD_POST, "browse controls");
 
         // Add all the query parameters as hidden fields on the form
-        for (String key : queryParams.keySet())
-            controls.addHidden(key).setValue(queryParams.get(key));
+        for (Map.Entry<String, String> param : queryParams.entrySet())
+        {
+            controls.addHidden(param.getKey()).setValue(param.getValue());
+        }
 
         Para controlsForm = controls.addPara();
 
@@ -527,7 +521,9 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
     {
         // Don't create a previous page link if this is the first page
         if (info.isFirst())
+        {
             return null;
+        }
 
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.putAll(params.getCommonParameters());
@@ -535,7 +531,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
 
         if (info.hasPrevPage())
         {
-            parameters.put(BrowseParams.OFFSET, URLEncode(String.valueOf(info.getPrevOffset())));
+            parameters.put(BrowseParams.OFFSET, encodeForURL(String.valueOf(info.getPrevOffset())));
         }
 
         return super.generateURL(WITHDRAWN_URL_BASE, parameters);
@@ -553,7 +549,9 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
     {
         // Don't create a next page link if this is the last page
         if (info.isLast())
+        {
             return null;
+        }
 
         Map<String, String> parameters = new HashMap<String, String>();
         parameters.putAll(params.getCommonParameters());
@@ -561,7 +559,7 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
 
         if (info.hasNextPage())
         {
-            parameters.put(BrowseParams.OFFSET, URLEncode(String.valueOf(info.getNextOffset())));
+            parameters.put(BrowseParams.OFFSET, encodeForURL(String.valueOf(info.getNextOffset())));
         }
 
         return super.generateURL(WITHDRAWN_URL_BASE, parameters);
@@ -577,7 +575,9 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
     private BrowseParams getUserParams() throws SQLException, UIException
     {
         if (this.userParams != null)
+        {
             return this.userParams;
+        }
 
         Context context = ContextUtil.obtainContext(objectModel);
         Request request = ObjectModelHelper.getRequest(objectModel);
@@ -593,9 +593,13 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
         // Are we in a community or collection?
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (dso instanceof Community)
+        {
             params.scope.setCommunity((Community) dso);
+        }
         if (dso instanceof Collection)
+        {
             params.scope.setCollection((Collection) dso);
+        }
 
         try
         {
@@ -623,14 +627,25 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
             params.scope.setResultsPerPage(RequestUtils.getIntParameter(request,
                     BrowseParams.RESULTS_PER_PAGE));
             params.scope.setStartsWith(request.getParameter(BrowseParams.STARTS_WITH));
-            params.scope.setFilterValue(request.getParameter(BrowseParams.FILTER_VALUE));
+            String filterValue = request.getParameter(BrowseParams.FILTER_VALUE[0]);
+            if (filterValue == null)
+            {
+                filterValue = request.getParameter(BrowseParams.FILTER_VALUE[1]);
+            }
+            else
+            {
+                params.scope.setAuthorityValue(filterValue);
+            }
+            params.scope.setFilterValue(filterValue);
             params.scope.setJumpToValue(request.getParameter(BrowseParams.JUMPTO_VALUE));
             params.scope.setJumpToValueLang(request.getParameter(BrowseParams.JUMPTO_VALUE_LANG));
             params.scope.setFilterValueLang(request.getParameter(BrowseParams.FILTER_VALUE_LANG));
 
             // Filtering to a value implies this is a second level browse
             if (params.scope.getFilterValue() != null)
+            {
                 params.scope.setBrowseLevel(1);
+            }
 
             // if year and perhaps month have been selected, we translate these
             // into "startsWith"
@@ -686,7 +701,9 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
     private BrowseInfo getBrowseInfo() throws SQLException, UIException
     {
         if (this.browseInfo != null)
+        {
             return this.browseInfo;
+        }
 
         Context context = ContextUtil.obtainContext(objectModel);
 
@@ -767,9 +784,13 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
             String scopeName = "";
 
             if (info.getBrowseContainer() != null)
+            {
                 scopeName = info.getBrowseContainer().getName();
+            }
             else
+            {
                 scopeName = "";
+            }
 
             if (bix.isMetadataIndex())
             {
@@ -801,23 +822,27 @@ public class WithdrawnItems extends AbstractDSpaceTransformer implements
             String scopeName = "";
 
             if (info.getBrowseContainer() != null)
+            {
                 scopeName = info.getBrowseContainer().getName();
+            }
             else
+            {
                 scopeName = "";
+            }
 
             if (bix.isMetadataIndex())
             {
-                titleMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata." + bix.getName())
+                trailMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.trail.metadata." + bix.getName())
                         .parameterize(scopeName);
             }
             else if (info.getSortOption() != null)
             {
-                titleMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.trail.item." + info.getSortOption().getName())
+                trailMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.trail.item." + info.getSortOption().getName())
                         .parameterize(scopeName);
             }
             else
             {
-                titleMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.trail.item." + bix.getSortOption().getName())
+                trailMessage = message("xmlui.ArtifactBrowser.ConfigurableBrowse.trail.item." + bix.getSortOption().getName())
                         .parameterize(scopeName);
             }
         }
@@ -839,33 +864,33 @@ class BrowseParams
 
     BrowserScope scope;
 
-    final static String MONTH = "month";
+    static final String MONTH = "month";
 
-    final static String YEAR = "year";
+    static final String YEAR = "year";
 
-    final static String ETAL = "etal";
+    static final String ETAL = "etal";
 
-    final static String TYPE = "type";
+    static final String TYPE = "type";
 
-    final static String JUMPTO_ITEM = "focus";
+    static final String JUMPTO_ITEM = "focus";
 
-    final static String JUMPTO_VALUE = "vfocus";
+    static final String JUMPTO_VALUE = "vfocus";
 
-    final static String JUMPTO_VALUE_LANG = "vfocus_lang";
+    static final String JUMPTO_VALUE_LANG = "vfocus_lang";
 
-    final static String ORDER = "order";
+    static final String ORDER = "order";
 
-    final static String OFFSET = "offset";
+    static final String OFFSET = "offset";
 
-    final static String RESULTS_PER_PAGE = "rpp";
+    static final String RESULTS_PER_PAGE = "rpp";
 
-    final static String SORT_BY = "sort_by";
+    static final String SORT_BY = "sort_by";
 
-    final static String STARTS_WITH = "starts_with";
+    static final String STARTS_WITH = "starts_with";
 
-    final static String FILTER_VALUE = "value";
+    static final String[] FILTER_VALUE = new String[]{"value","authority"};
 
-    final static String FILTER_VALUE_LANG = "value_lang";
+    static final String FILTER_VALUE_LANG = "value_lang";
 
     /*
      * Creates a map of the browse options common to all pages (type / value /
@@ -877,13 +902,15 @@ class BrowseParams
 
         if (scope.getFilterValue() != null)
         {
-            paramMap.put(BrowseParams.FILTER_VALUE, AbstractDSpaceTransformer.URLEncode(
+            paramMap.put(scope.getAuthorityValue() != null?
+                    BrowseParams.FILTER_VALUE[1]:BrowseParams.FILTER_VALUE[0],
+                    AbstractDSpaceTransformer.encodeForURL(
                     scope.getFilterValue()));
         }
 
         if (scope.getFilterValueLang() != null)
         {
-            paramMap.put(BrowseParams.FILTER_VALUE_LANG, AbstractDSpaceTransformer.URLEncode(
+            paramMap.put(BrowseParams.FILTER_VALUE_LANG, AbstractDSpaceTransformer.encodeForURL(
                     scope.getFilterValueLang()));
         }
 
@@ -899,7 +926,7 @@ class BrowseParams
         Map<String, String> paramMap = new HashMap<String, String>();
 
         paramMap.put(BrowseParams.SORT_BY, Integer.toString(this.scope.getSortBy()));
-        paramMap.put(BrowseParams.ORDER, AbstractDSpaceTransformer.URLEncode(this.scope.getOrder()));
+        paramMap.put(BrowseParams.ORDER, AbstractDSpaceTransformer.encodeForURL(this.scope.getOrder()));
         paramMap.put(BrowseParams.RESULTS_PER_PAGE, Integer
                 .toString(this.scope.getResultsPerPage()));
         paramMap.put(BrowseParams.ETAL, Integer.toString(this.etAl));
@@ -930,7 +957,7 @@ class BrowseParams
 
             return key;
         }
-        catch (Exception e)
+        catch (BrowseException e)
         {
             return null; // ignore exception and return no key
         }

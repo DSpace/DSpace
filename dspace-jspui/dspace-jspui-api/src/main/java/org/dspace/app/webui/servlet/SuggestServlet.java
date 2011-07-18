@@ -1,48 +1,15 @@
-/*
- * SuggestServlet.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.sql.SQLException;
-import java.util.Date;
 import java.util.MissingResourceException;
 import javax.mail.MessagingException;
 import javax.servlet.ServletException;
@@ -50,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 
 import org.dspace.app.webui.util.JSPManager;
@@ -70,7 +38,7 @@ import org.dspace.content.DCValue;
  * Servlet for handling user email recommendations
  *
  * @author  Arnaldo Dantas
- * @version $Revision: 3705 $
+ * @version $Revision: 5845 $
  */
 public class SuggestServlet extends DSpaceServlet
 {
@@ -81,6 +49,32 @@ public class SuggestServlet extends DSpaceServlet
     					   HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
     {
+        // Obtain information from request
+        // The page where the user came from
+        String fromPage = request.getHeader("Referer");
+
+        // Prevent spammers and splogbots from poisoning the feedback page
+        String host = ConfigurationManager.getProperty("dspace.hostname");
+
+        String basicHost = "";
+        if (host.equals("localhost") || host.equals("127.0.0.1")
+                || host.equals(InetAddress.getLocalHost().getHostAddress()))
+        {
+            basicHost = host;
+        }
+        else
+        {
+            // cut off all but the hostname, to cover cases where more than one URL
+            // arrives at the installation; e.g. presence or absence of "www"
+            int lastDot = host.lastIndexOf('.');
+            basicHost = host.substring(host.substring(0, lastDot).lastIndexOf("."));
+        }
+
+        if (fromPage == null || fromPage.indexOf(basicHost) == -1)
+        {
+            throw new AuthorizeException();
+        }
+
         // Obtain information from request
         String handle = request.getParameter("handle");
         
@@ -137,7 +131,7 @@ public class SuggestServlet extends DSpaceServlet
             {
                 log.info(LogManager.getHeader(context, "show_suggest_form",
                     	 "problem=true"));
-                request.setAttribute("suggest.problem", new Boolean(true));
+                request.setAttribute("suggest.problem", Boolean.TRUE);
                 JSPManager.showJSP(request, response, "/suggest/suggest.jsp");
                 return;
             }
@@ -176,13 +170,10 @@ public class SuggestServlet extends DSpaceServlet
             	}
             }
             String senderAddr = request.getParameter("sender_email");
-            if (senderAddr == null || "".equals(senderAddr) )
+            if (StringUtils.isEmpty(senderAddr) && authEmail != null)
             {
             	// use authEmail if available
-            	if (authEmail != null)
-            	{
-            		senderAddr = authEmail;
-            	}
+                senderAddr = authEmail;
             }
             String itemUri = HandleManager.getCanonicalForm(handle);
             String itemUrl = HandleManager.resolveToURL(context,handle);

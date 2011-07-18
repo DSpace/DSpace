@@ -1,41 +1,9 @@
-/*
- * AuthorizationMain.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.administrative.authorization;
 
@@ -141,9 +109,6 @@ public class EditItemPolicies extends AbstractDSpaceTransformer
 		
 		ArrayList<ResourcePolicy> itemPolicies = (ArrayList<ResourcePolicy>)AuthorizeManager.getPolicies(context, item);
 		
-		ArrayList<ResourcePolicy> bundlePolicies = new ArrayList<ResourcePolicy>();
-		ArrayList<ResourcePolicy> bitstreamPolicies = new ArrayList<ResourcePolicy>();
-
 		// DIVISION: main
 		Division main = body.addInteractiveDivision("edit-item-policies",contextPath+"/admin/authorize",Division.METHOD_POST,"primary administrative authorization");
 		main.setHead(T_main_head.parameterize(item.getHandle(),item.getID()));
@@ -172,7 +137,7 @@ public class EditItemPolicies extends AbstractDSpaceTransformer
     		subheader.addCell(null, null, 1, 4, "indent").addHighlight("bold").addContent(T_subhead_bundle.parameterize(bundle.getName(),bundle.getID()));
     		subheader.addCell().addHighlight("bold").addXref(baseURL + "&submit_add_bundle_" + bundle.getID(), T_add_bundlePolicy_link);
 
-    		bundlePolicies = (ArrayList<ResourcePolicy>)AuthorizeManager.getPolicies(context, bundle);
+    		ArrayList<ResourcePolicy> bundlePolicies = (ArrayList<ResourcePolicy>)AuthorizeManager.getPolicies(context, bundle);
     		this.rowBuilder(baseURL, table, bundlePolicies, bundle.getID(), Constants.BUNDLE, highlightID);
     		
     		// And eventually to the bundle's bitstreams
@@ -182,7 +147,7 @@ public class EditItemPolicies extends AbstractDSpaceTransformer
         		subheader.addCell(null, null, 1, 4, "doubleIndent").addContent(T_subhead_bitstream.parameterize(bitstream.getName(),bitstream.getID()));
         		subheader.addCell().addXref(baseURL + "&submit_add_bitstream_" + bitstream.getID(), T_add_bitstreamPolicy_link);
 
-        		bitstreamPolicies = (ArrayList<ResourcePolicy>)AuthorizeManager.getPolicies(context, bitstream);
+        		ArrayList<ResourcePolicy> bitstreamPolicies = (ArrayList<ResourcePolicy>)AuthorizeManager.getPolicies(context, bitstream);
         		this.rowBuilder(baseURL, table, bitstreamPolicies, bitstream.getID(), Constants.BITSTREAM, highlightID);    			
     		}
     	}
@@ -196,7 +161,7 @@ public class EditItemPolicies extends AbstractDSpaceTransformer
    }
 	
 	
-	private void rowBuilder(String baseURL, Table table, ArrayList<ResourcePolicy> policies, int objectID, int objectType, int highlightID) throws WingException, SQLException 
+	private void rowBuilder(String baseURL, Table table, java.util.List<ResourcePolicy> policies, int objectID, int objectType, int highlightID) throws WingException, SQLException 
 	{
 		// If the list of policies is empty, say so
 		if (policies == null || policies.size() == 0) {
@@ -208,17 +173,27 @@ public class EditItemPolicies extends AbstractDSpaceTransformer
 	    	{
 				Row row;
 				if (policy.getID() == highlightID)
-					row = table.addRow(null, null, "highlight");
+                {
+                    row = table.addRow(null, null, "highlight");
+                }
 				else
-					row = table.addRow();
+                {
+                    row = table.addRow();
+                }
 				
 				Cell cell;
 				if (objectType == Constants.BUNDLE)
-					cell = row.addCell(null, null, "indent");
+                {
+                    cell = row.addCell(null, null, "indent");
+                }
 				else if (objectType == Constants.BITSTREAM)
-					cell = row.addCell(null, null, "doubleIndent");
+                {
+                    cell = row.addCell(null, null, "doubleIndent");
+                }
 				else
-					cell = row.addCell();
+                {
+                    cell = row.addCell();
+                }
 	    		
 				
 	    		CheckBox select = cell.addCheckBox("select_policy");

@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
 <!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
 <!--
  - lni-web.xml
  -
- - Version: $Revision: 3705 $
+ - Version: $Revision: 6176 $
  -
- - Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+ - Date: $Date: 2011-03-23 03:11:41 -0400 (Wed, 23 Mar 2011) $
  -
  - Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
  - Institute of Technology.  All rights reserved.
@@ -72,6 +81,11 @@
    <!-- 
    Listener to initialise DSpace configuration and clean up the application 
    -->
+    <listener>
+      <listener-class>
+         org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener
+      </listener-class>
+   </listener>
    <listener>
       <listener-class>
          org.dspace.app.util.DSpaceContextListener

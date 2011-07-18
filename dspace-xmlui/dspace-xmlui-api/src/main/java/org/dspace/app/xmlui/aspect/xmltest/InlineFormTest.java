@@ -1,41 +1,9 @@
-/*
- * InlineFormTest.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.xmltest;
 
@@ -92,23 +60,35 @@ public class InlineFormTest extends AbstractDSpaceTransformer
     	Request request = ObjectModelHelper.getRequest(objectModel);
 		boolean help = false, error = false;
 		if (request.getParameter("help") != null)
-			help = true;
+        {
+            help = true;
+        }
 		if (request.getParameter("error") != null)
-			error = true;
+        {
+            error = true;
+        }
 		
         Division div = body.addInteractiveDivision("test", "", "post", "primary");
         div.setHead("Inline form test");
         div.addPara("There are two options you can use to control how this page is generated. First is the help parameter, if this is present then help text will be provided for all fields. Next is the error parameter, if it is provided then all fields will be generated in error conditions.");
 		
 		if (help)
-			div.addPara().addXref(makeURL(false,error),"Turn help OFF");
-		else 
-			div.addPara().addXref(makeURL(true,error),"Turn help ON");
+        {
+            div.addPara().addXref(makeURL(false, error), "Turn help OFF");
+        }
+		else
+        {
+            div.addPara().addXref(makeURL(true, error), "Turn help ON");
+        }
 			
 		if (error)
-			div.addPara().addXref(makeURL(help,false),"Turn errors OFF");
-		else 
-			div.addPara().addXref(makeURL(help,true),"Turn errors ON");
+        {
+            div.addPara().addXref(makeURL(help, false), "Turn errors OFF");
+        }
+		else
+        {
+            div.addPara().addXref(makeURL(help, true), "Turn errors ON");
+        }
 		
 		
 		Division suited = body.addDivision("suited");
@@ -122,9 +102,13 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         Text text = p.addText("text");
         text.setLabel("Text");
         if (help)
-        	text.setHelp("This is helpfull text.");
+        {
+            text.setHelp("This is helpfull text.");
+        }
         if (error)
-        	text.addError("This field is in error.");
+        {
+            text.addError("This field is in error.");
+        }
         text.setValue("Current raw value");
         p.addContent(", embedded in a paragraph.");
         
@@ -133,9 +117,13 @@ public class InlineFormTest extends AbstractDSpaceTransformer
 		p.addContent("This is a singe 'CheckBox' field, ");
         CheckBox checkBox = p.addCheckBox("yes-or-no");
         if (help)
-        	checkBox.setHelp("Select either yes or no.");
+        {
+            checkBox.setHelp("Select either yes or no.");
+        }
         if (error)
-        	checkBox.addError("You are incorrect, try again.");
+        {
+            checkBox.addError("You are incorrect, try again.");
+        }
         checkBox.setLabel("Yes or no");
         checkBox.addOption("yes");
         p.addContent(", embedded in a paragraph.");
@@ -146,9 +134,13 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         File file = p.addFile("file");
         file.setLabel("File");
         if (help)
-        	file.setHelp("Upload a file.");
+        {
+            file.setHelp("Upload a file.");
+        }
         if (error)
-        	file.addError("This field is in error.");
+        {
+            file.addError("This field is in error.");
+        }
         p.addContent(", embedded in a paragraph.");
         
         // Select (single)
@@ -157,9 +149,13 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         Select select = p.addSelect("select");
         select.setLabel("Select (single)");
         if (help)
-        	select.setHelp("Select one of the options");
+        {
+            select.setHelp("Select one of the options");
+        }
         if (error)
-        	select.addError("This field is in error.");
+        {
+            select.addError("This field is in error.");
+        }
         select.addOption("one","uno");
         select.addOption("two","dos");
         select.addOption("three","tres");
@@ -175,9 +171,13 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         button.setLabel("Button");
         button.setValue("When you touch me I do things, lots of things");
         if (help)
-        	button.setHelp("Submit buttons allow the user to submit the form.");
+        {
+            button.setHelp("Submit buttons allow the user to submit the form.");
+        }
         if (error)
-        	button.addError("This button is in error.");
+        {
+            button.addError("This button is in error.");
+        }
         p.addContent(", embedded in a paragraph.");
         
         
@@ -194,9 +194,13 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         TextArea textArea = p.addTextArea("textarea");
         textArea.setLabel("Text Area");
         if (help)
-        	textArea.setHelp("This is helpfull text.");
+        {
+            textArea.setHelp("This is helpfull text.");
+        }
         if (error)
-        	textArea.addError("This field is in error.");
+        {
+            textArea.addError("This field is in error.");
+        }
         textArea.setValue("This is the raw value");
         p.addContent(", embedded in a paragraph.");
         
@@ -205,9 +209,13 @@ public class InlineFormTest extends AbstractDSpaceTransformer
 		p.addContent("This is a multi-option 'CheckBox' field, ");
         checkBox = p.addCheckBox("fruit");
         if (help)
-        	checkBox.setHelp("Select all the fruits that you like to eat");
+        {
+            checkBox.setHelp("Select all the fruits that you like to eat");
+        }
         if (error)
-        	checkBox.addError("You are incorrect you actualy do like Tootse Rolls.");
+        {
+            checkBox.addError("You are incorrect you actualy do like Tootse Rolls.");
+        }
         checkBox.setLabel("fruits");
         checkBox.addOption("apple","Apples");
         checkBox.addOption(true,"orange","Oranges");
@@ -222,9 +230,13 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         Radio radio = p.addRadio("sex");
         radio.setLabel("Football colors");         
         if (help)
-        	radio.setHelp("Select the colors of the best (college) football team.");
+        {
+            radio.setHelp("Select the colors of the best (college) football team.");
+        }
         if (error)
-        	radio.addError("Error, Maroon & White is the only acceptable answer.");
+        {
+            radio.addError("Error, Maroon & White is the only acceptable answer.");
+        }
         radio.addOption("ut","Burnt Orange & White");
         radio.addOption(true,"tamu","Maroon & White");
         radio.addOption("ttu","Tech Red & Black");
@@ -241,9 +253,13 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         select.setMultiple();
         select.setSize(4);
         if (help)
-        	select.setHelp("Select one or more options");
+        {
+            select.setHelp("Select one or more options");
+        }
         if (error)
-        	select.addError("This field is in error.");
+        {
+            select.addError("This field is in error.");
+        }
         select.addOption("one","uno");
         select.addOption("two","dos");
         select.addOption("three","tres");
@@ -260,19 +276,27 @@ public class InlineFormTest extends AbstractDSpaceTransformer
         Composite composite = p.addComposite("composite-2text");
         composite.setLabel("Composite (two text fields)");
         if (help)
-        	composite.setHelp("I am the help for the entire composite");
+        {
+            composite.setHelp("I am the help for the entire composite");
+        }
         if (error)
-        	composite.addError("Just the composite is in error");
+        {
+            composite.addError("Just the composite is in error");
+        }
         text = composite.addText("partA");
         text.setLabel("Part A");
         text.setValue("Value for part A");
         if (help)
-        	text.setHelp("Part A");
+        {
+            text.setHelp("Part A");
+        }
         text = composite.addText("partB");
         text.setLabel("Part B");
         text.setValue("Value for part B");
         if (help)
-        	text.setHelp("Part B");
+        {
+            text.setHelp("Part B");
+        }
         p.addContent(", embedded in a paragraph.");
         
         
@@ -286,13 +310,19 @@ public class InlineFormTest extends AbstractDSpaceTransformer
     private String makeURL(boolean help, boolean error)
 	{
 		if (help && error)
-			return "?help&error";
+        {
+            return "?help&error";
+        }
 		
 		if (help)
-			return "?help";
+        {
+            return "?help";
+        }
 		
 		if (error)
-			return "?error";
+        {
+            return "?error";
+        }
 		
 		return "?neither";
 	}

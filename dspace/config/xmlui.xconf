@@ -4,8 +4,7 @@
 <!--
     - xmlui.xconf
     -
-    - Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
-    - Institute of Technology.  All rights reserved.
+    - Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
     - 
     - Redistribution and use in source and binary forms, with or without
     - modification, are permitted provided that the following conditions are
@@ -18,8 +17,7 @@
     - notice, this list of conditions and the following disclaimer in the
     - documentation and/or other materials provided with the distribution.
     - 
-    - - Neither the name of the Hewlett-Packard Company nor the name of the
-    - Massachusetts Institute of Technology nor the names of their
+    - Neither the name of the DSpace Foundation nor the names of its
     - contributors may be used to endorse or promote products derived from
     - this software without specific prior written permission.
     - 
@@ -42,8 +40,8 @@
     - The XMLUI (Manakin Release) configuration file
     -
     - Authors: Scott Phillips
-    - Version: $Revision: 3705 $
-    - Date:    $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+    - Version: $Revision: 5689 $
+    - Date:    $Date: 2010-10-29 12:16:34 -0400 (Fri, 29 Oct 2010) $
 -->
 
 <xmlui>
@@ -61,12 +59,26 @@
         /xmlui/cocoon/aspects/ directory followed by a slash.
     -->
     <aspects>
-        <aspect name="Artifact Browser" path="resource://aspects/ArtifactBrowser/" />
+        <!--
+            @deprecated: the Artifact Browser has been devided into ViewArtifacts,
+            BrowseArtifacts, SearchArtifacts
+            <aspect name="Artifact Browser" path="resource://aspects/ArtifactBrowser/" />
+        -->
+        <aspect name="Displaying Artifacts" path="resource://aspects/ViewArtifacts/" />
+        <aspect name="Browsing Artifacts" path="resource://aspects/BrowseArtifacts/" />
+        <aspect name="Searching Artifacts" path="resource://aspects/SearchArtifacts/" />
         <aspect name="Administration" path="resource://aspects/Administrative/" />
         <aspect name="E-Person" path="resource://aspects/EPerson/" />
         <aspect name="Submission and Workflow" path="resource://aspects/Submission/" />
-
-        <!-- 
+	    <aspect name="Statistics" path="resource://aspects/Statistics/" />
+        <!--
+            To enable Discovery, uncomment this Aspect that will enable it
+            within your existing XMLUI
+            Also make sure to comment the SearchArtifacts aspect
+            as leaving it on together with discovery will cause UI overlap issues
+            <aspect name="Discovery" path="resource://aspects/Discovery/" />
+        -->
+        <!--
             This aspect tests the various possible DRI features, 
             it helps a theme developer create themes 
         -->
@@ -106,6 +118,9 @@
 
         <!-- Default theme -->
         <theme name="Default Reference Theme" regex=".*" path="Reference/" />
+
+        <!-- Mirage theme, @mire contribution of new theme to support easier development and branding -->
+        <!-- <theme name="Atmire Mirage Theme" regex=".*" path="Mirage/" /> -->
 
         <!-- Classic theme, inspired by the JSP UI -->
         <!-- <theme name="Classic" regex=".*" path="Classic/" /> -->

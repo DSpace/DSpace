@@ -1,42 +1,13 @@
-/* SimpleFileIngester.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Copyright (c) 2007, Aberystwyth University
- *
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *  - Redistributions of source code must retain the above
- *    copyright notice, this list of conditions and the
- *    following disclaimer.
- *
- *  - Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- *  - Neither the name of the Centre for Advanced Software and
- *    Intelligent Systems (CASIS) nor the names of its
- *    contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
- * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.sword;
 
+import java.io.FileInputStream;
 import org.purl.sword.base.Deposit;
 import org.purl.sword.base.SWORDErrorException;
 import org.dspace.content.Bitstream;
@@ -46,10 +17,8 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.authorize.AuthorizeException;
-import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
-import java.io.InputStream;
 import java.io.IOException;
 
 /**
@@ -61,13 +30,8 @@ import java.io.IOException;
  */
 public class SimpleFileIngester implements SWORDIngester
 {
-	/** logger */
-	private static Logger log = Logger.getLogger(SimpleFileIngester.class);
 
-	/** sword service implementation */
-	private SWORDService swordService;
-
-	/**
+    /**
 	 * perform the ingest using the given deposit object onto the specified
 	 * target dspace object, using the sword service implementation
 	 *
@@ -90,7 +54,7 @@ public class SimpleFileIngester implements SWORDIngester
 			Item item = (Item) target;
 
 			// now set the sword service
-			swordService = service;
+            SWORDService swordService = service;
 
 			// get the things out of the service that we need
 			Context context = swordService.getContext();
@@ -107,8 +71,21 @@ public class SimpleFileIngester implements SWORDIngester
 				original = item.createBundle("ORIGINAL");
 			}
 
-			InputStream is = deposit.getFile();
-			Bitstream bs = original.createBitstream(is);
+            Bitstream bs;
+			FileInputStream fis = null;
+
+            try
+            {
+                fis = new FileInputStream(deposit.getFile());
+                bs = original.createBitstream(fis);
+            }
+            finally
+            {
+                if (fis != null)
+                {
+                    fis.close();
+                }
+            }
 
 			String fn = swordService.getFilename(context, deposit, false);
 			bs.setName(fn);

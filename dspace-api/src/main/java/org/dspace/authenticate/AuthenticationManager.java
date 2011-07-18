@@ -1,62 +1,21 @@
-/*
- * AuthenticationManager.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.authenticate;
 
-import java.io.IOException;
-
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Iterator;
-import java.util.StringTokenizer;
+import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
-import org.dspace.core.LogManager;
 import org.dspace.eperson.EPerson;
 
 /**
@@ -84,13 +43,10 @@ import org.dspace.eperson.EPerson;
  * @see AuthenticationMethod
  *
  * @author Larry Stone
- * @version $Revision: 3705 $
+ * @version $Revision: 5844 $
  */
 public class AuthenticationManager
 {
-    /** log4j category */
-    private static Logger log = Logger.getLogger(AuthenticationManager.class);
-
     /** List of authentication methods, highest precedence first. */
     private static AuthenticationMethod methodStack[] =
         (AuthenticationMethod[])PluginManager.getPluginSequence(AuthenticationMethod.class);
@@ -203,9 +159,13 @@ public class AuthenticationManager
                     ret = AuthenticationMethod.NO_SUCH_USER;
                 }
                 if (ret == AuthenticationMethod.SUCCESS)
+                {
                     return ret;
+                }
                 if (ret < bestRet)
+                {
                     bestRet = ret;
+                }
             }
         }
         return bestRet;
@@ -230,8 +190,12 @@ public class AuthenticationManager
         throws SQLException
     {
         for (int i = 0; i < methodStack.length; ++i)
+        {
             if (methodStack[i].canSelfRegister(context, request, username))
+            {
                 return true;
+            }
+        }
         return false;
     }
 
@@ -254,8 +218,12 @@ public class AuthenticationManager
         throws SQLException
     {
         for (int i = 0; i < methodStack.length; ++i)
+        {
             if (methodStack[i].allowSetPassword(context, request, username))
+            {
                 return true;
+            }
+        }
         return false;
     }
 
@@ -277,8 +245,10 @@ public class AuthenticationManager
                                    EPerson eperson)
         throws SQLException
     {
-        for (int i = 0; i < methodStack.length; ++i)
-            methodStack[i].initEPerson(context, request, eperson);
+        for (AuthenticationMethod method : methodStack)
+        {
+            method.initEPerson(context, request, eperson);
+        }
     }
 
     /**
@@ -300,7 +270,7 @@ public class AuthenticationManager
                                          HttpServletRequest request)
         throws SQLException
     {
-        ArrayList gll = new ArrayList();
+        List<int[]> gll = new ArrayList<int[]>();
         int totalLen = 0;
 
         for (int i = 0; i < methodStack.length; ++i)
@@ -317,9 +287,13 @@ public class AuthenticationManager
         // request, and most sites will only have 0 or 1 auth methods
         // actually returning groups, so it pays..
         if (totalLen == 0)
+        {
             return new int[0];
+        }
         else if (gll.size() == 1)
-            return (int [])gll.get(0);
+        {
+            return gll.get(0);
+        }
         else
         {
             // Have to do it this painful way since list.toArray() doesn't
@@ -328,9 +302,11 @@ public class AuthenticationManager
             int k = 0;
             for (int i = 0; i < gll.size(); ++i)
             {
-                int gl[] = (int [])gll.get(i);
-                for (int j = 0; j < gl.length; ++j)
-                    result[k++] = gl[j];
+                int gl[] = gll.get(i);
+                for (int aGl : gl)
+                {
+                    result[k++] = aGl;
+                }
             }
             return result;
         }
@@ -343,7 +319,7 @@ public class AuthenticationManager
      *
      * @return Iterator object.
      */
-    public static Iterator authenticationMethodIterator()
+    public static Iterator<AuthenticationMethod> authenticationMethodIterator()
     {
         return Arrays.asList(methodStack).iterator();
     }

@@ -1,41 +1,9 @@
-/*
- * EditCollectionMetadataForm.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.administrative.collection;
 
@@ -46,7 +14,6 @@ import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Button;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.List;
@@ -73,7 +40,8 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	private static final Message T_collection_trail = message("xmlui.administrative.collection.general.collection_trail");
 	private static final Message T_options_metadata = message("xmlui.administrative.collection.general.options_metadata");	
 	private static final Message T_options_roles = message("xmlui.administrative.collection.general.options_roles");
-	
+	private static final Message T_options_harvest = message("xmlui.administrative.collection.GeneralCollectionHarvestingForm.options_harvest");
+        private static final Message T_options_curate = message("xmlui.administrative.collection.general.options_curate");	
 	private static final Message T_submit_return = message("xmlui.general.return");
 	
 	private static final Message T_title = message("xmlui.administrative.collection.EditCollectionMetadataForm.title");
@@ -102,8 +70,6 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	private static final Message T_submit_delete = message("xmlui.administrative.collection.EditCollectionMetadataForm.submit_delete");
 	private static final Message T_submit_save = message("xmlui.administrative.collection.EditCollectionMetadataForm.submit_save");
 	
-	private static final Message T_sysadmins_only = message("xmlui.administrative.collection.EditCollectionMetadataForm.sysadmins_only");
-	
 	public void addPageMeta(PageMeta pageMeta) throws WingException
     {
         pageMeta.addMetadata("title").addContent(T_title);
@@ -119,14 +85,12 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 		Collection thisCollection = Collection.find(context, collectionID);
 		
 		String baseURL = contextPath + "/admin/collection?administrative-continue=" + knot.getId();
-		
-		String short_description_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadata("short_description"));
+
+            //Check that all HTML input fields contain valid XHTML
+            String short_description_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadata("short_description"));
 	    String introductory_text_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadata("introductory_text"));
 	    String copyright_text_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadata("copyright_text"));
 	    String side_bar_text_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadata("side_bar_text"));
-	    String license_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadata("license"));
-	    String provenance_description_error = FlowContainerUtils.checkXMLFragment(thisCollection.getMetadata("provenance_description"));
-		
 	    
 		// DIVISION: main
 	    Division main = body.addInteractiveDivision("collection-metadata-edit",contextPath+"/admin/collection",Division.METHOD_MULTIPART,"primary administrative collection");
@@ -135,6 +99,8 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	    List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
 	    options.addItem().addHighlight("bold").addXref(baseURL+"&submit_metadata",T_options_metadata);
 	    options.addItem().addXref(baseURL+"&submit_roles",T_options_roles);
+	    options.addItem().addXref(baseURL+"&submit_harvesting",T_options_harvest);
+            options.addItem().addXref(baseURL+"&submit_curate",T_options_curate);
 	    
 	    
 	    // The grand list of metadata options
@@ -151,48 +117,52 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	    Text short_description = metadataList.addItem().addText("short_description");
 	    short_description.setValue(thisCollection.getMetadata("short_description"));
 	    short_description.setSize(40);
-	    if (short_description_error != null) 
-	    	short_description.addError(short_description_error);
+	    if (short_description_error != null)
+        {
+            short_description.addError(short_description_error);
+        }
 	    
 	    // introductory text
 	    metadataList.addLabel(T_label_introductory_text);
 	    TextArea introductory_text = metadataList.addItem().addTextArea("introductory_text");
 	    introductory_text.setValue(thisCollection.getMetadata("introductory_text"));
 	    introductory_text.setSize(6, 40);
-	    if (introductory_text_error != null) 
-	    	introductory_text.addError(introductory_text_error);
+	    if (introductory_text_error != null)
+        {
+            introductory_text.addError(introductory_text_error);
+        }
 	    
 	    // copyright text
 	    metadataList.addLabel(T_label_copyright_text);
 	    TextArea copyright_text = metadataList.addItem().addTextArea("copyright_text");
 	    copyright_text.setValue(thisCollection.getMetadata("copyright_text"));
 	    copyright_text.setSize(6, 40);
-	    if (copyright_text_error != null) 
-	    	copyright_text.addError(copyright_text_error);
+	    if (copyright_text_error != null)
+        {
+            copyright_text.addError(copyright_text_error);
+        }
 	    
 	    // legacy sidebar text; may or may not be used for news 
 	    metadataList.addLabel(T_label_side_bar_text);
 	    TextArea side_bar_text = metadataList.addItem().addTextArea("side_bar_text");
 	    side_bar_text.setValue(thisCollection.getMetadata("side_bar_text"));
 	    side_bar_text.setSize(6, 40);
-	    if (side_bar_text_error != null) 
-	    	side_bar_text.addError(side_bar_text_error);
+	    if (side_bar_text_error != null)
+        {
+            side_bar_text.addError(side_bar_text_error);
+        }
 	    
 	    // license text
 	    metadataList.addLabel(T_label_license);
 	    TextArea license = metadataList.addItem().addTextArea("license");
 	    license.setValue(thisCollection.getMetadata("license"));
 	    license.setSize(6, 40);
-	    if (license_error != null) 
-	    	license.addError(license_error);
 	    
 	    // provenance description
 	    metadataList.addLabel(T_label_provenance_description);
 	    TextArea provenance_description = metadataList.addItem().addTextArea("provenance_description");
 	    provenance_description.setValue(thisCollection.getMetadata("provenance_description"));
 	    provenance_description.setSize(6, 40);
-	    if (provenance_description_error != null) 
-	    	provenance_description.addError(provenance_description_error);
 	    	    
 	    // the row to upload a new logo 
 	    metadataList.addLabel(T_label_logo);
@@ -212,31 +182,25 @@ public class EditCollectionMetadataForm extends AbstractDSpaceTransformer
 	    item = metadataList.addItem();
 	    
 	    if (thisCollection.getTemplateItem() == null)
-	    	addAdministratorOnlyButton(item, "submit_create_template", T_submit_create_template);
+        {
+            item.addButton("submit_create_template").setValue(T_submit_create_template);
+        }
 	    else 
 	    {
 	    	item.addButton("submit_edit_template").setValue(T_submit_edit_template);
-	    	addAdministratorOnlyButton(item, "submit_delete_template", T_submit_delete_template);
+	    	item.addButton("submit_delete_template").setValue(T_submit_delete_template);
 	    }
 	    
 		Para buttonList = main.addPara();
 	    buttonList.addButton("submit_save").setValue(T_submit_save);
+        //Only System Admins can Delete Collections
 	    if (AuthorizeManager.isAdmin(context))
+        {
 	    	buttonList.addButton("submit_delete").setValue(T_submit_delete);
+        }
 	    buttonList.addButton("submit_return").setValue(T_submit_return);
 	    
     	main.addHidden("administrative-continue").setValue(knot.getId());
     }
 	
-	private void addAdministratorOnlyButton(Item item, String buttonName, Message buttonLabel) throws WingException, SQLException
-	{
-    	Button button = item.addButton(buttonName);
-    	button.setValue(buttonLabel);
-    	if (!AuthorizeManager.isAdmin(context))
-    	{
-    		// Only admins can create or delete
-    		button.setDisabled();
-    		item.addHighlight("fade").addContent(T_sysadmins_only);
-    	}
-	}
 }

@@ -1,41 +1,9 @@
-/*
- * GroupEditForm.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.administrative.group;
 
@@ -43,6 +11,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 import org.dspace.app.xmlui.aspect.administrative.FlowGroupUtils;
@@ -60,6 +29,7 @@ import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
+import org.dspace.content.Community;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
@@ -91,6 +61,9 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	
 	private static final Message T_collection_para = 
 		message("xmlui.administrative.group.EditGroupForm.collection_para");
+
+    private static final Message T_community_para = 
+        message("xmlui.administrative.group.EditGroupForm.community_para");
 
 	private static final Message T_label_name = 
 		message("xmlui.administrative.group.EditGroupForm.label_name");
@@ -219,48 +192,64 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	{		
 		// Find the group in question
 		int groupID = parameters.getParameterAsInteger("groupID",-1);
-		String currentName = URLDecode(parameters.getParameter("groupName",null));
+		String currentName = decodeFromURL(parameters.getParameter("groupName",null));
 		if (currentName == null || currentName.length() == 0)
-			currentName = FlowGroupUtils.getName(context, groupID);
+        {
+            currentName = FlowGroupUtils.getName(context, groupID);
+        }
 		
 		Group group = null;
 		if (groupID >= 0)
-			group = Group.find(context,groupID);
-			
-		
-		// Find the collection if applicable
+        {
+            group = Group.find(context, groupID);
+        }
+
+		// Find the collection or community if applicable
 		Collection collection = null;
+		Community community = null;
 		if (group != null)
 		{
 			int collectionID = FlowGroupUtils.getCollectionId(group.getName());
-			if(collectionID > -1)
-				collection = Collection.find(context, collectionID);
-			// If the collectionID was not found then reset the id back to -1. This 
-			// happens when collections are deleted.
-			if (collection == null)
-				collectionID = -1;
-		}	
+			if (collectionID > -1)
+            {
+                collection = Collection.find(context, collectionID);
+            }
+			else
+			{
+			    int communityID = FlowGroupUtils.getCommunityId(group.getName());
+			    if (communityID > -1)
+                {
+                    community = Community.find(context, communityID);
+                }
+		    }
+		}
 		
 		// Get list of member groups
 		String memberGroupIDsString = parameters.getParameter("memberGroupIDs",null);
-		ArrayList<Integer> memberGroupIDs = new ArrayList<Integer>();
+		List<Integer> memberGroupIDs = new ArrayList<Integer>();
 		if (memberGroupIDsString != null)
 		{
 			for (String id : memberGroupIDsString.split(","))
 			{
 				if (id.length() > 0)
-					memberGroupIDs.add(Integer.valueOf(id));
+                {
+                    memberGroupIDs.add(Integer.valueOf(id));
+                }
 			}
 		}
 	    
 		// Get list of member epeople
 		String memberEPeopleIDsString = parameters.getParameter("memberEPeopleIDs",null);
-		ArrayList<Integer> memberEPeopleIDs = new ArrayList<Integer>();
+		List<Integer> memberEPeopleIDs = new ArrayList<Integer>();
 		if (memberEPeopleIDsString != null)
 		{
 			for (String id : memberEPeopleIDsString.split(","))
+            {
 				if (id.length() > 0)
+                {
 					memberEPeopleIDs.add(Integer.valueOf(id));
+                }
+            }
 		}
 		
 		// Get highlight parameters
@@ -268,25 +257,31 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 		int highlightGroupID = parameters.getParameterAsInteger("highlightGroupID",-1);
 		
 		// Get search parameters
-	    String query = URLDecode(parameters.getParameter("query",null));
+	    String query = decodeFromURL(parameters.getParameter("query",null));
 	    int page     = parameters.getParameterAsInteger("page",0);
 	    String type  = parameters.getParameter("type",null);
 	    
 	    // Get any errors
 	    String errorString = parameters.getParameter("errors",null);
-		ArrayList<String> errors = new ArrayList<String>();
+		List<String> errors = new ArrayList<String>();
 		if (errorString != null)
+        {
 			for (String error : errorString.split(","))
+            {
 				errors.add(error);
-	    
-    
+            }
+        }
 	    
 	    //DIVISION: group-edit
 	    Division main = body.addInteractiveDivision("group-edit",contextPath+"/admin/groups",Division.METHOD_POST,"primary administrative groups");
 	    if (group == null)
-		    main.setHead(T_main_head_new);
+        {
+            main.setHead(T_main_head_new);
+        }
 	    else
-	    	main.setHead(T_main_head.parameterize(group.getName(),groupID));
+        {
+            main.setHead(T_main_head.parameterize(group.getName(), groupID));
+        }
 	 
 	    
 	    if(collection != null)
@@ -295,23 +290,30 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	    	para.addContent(T_collection_para);
 	    	para.addXref(contextPath+"/handle/"+collection.getHandle(), collection.getMetadata("name"));
 	    }
+	    else if(community != null)
+        {
+            Para para = main.addPara();
+            para.addContent(T_community_para);
+            para.addXref(contextPath+"/handle/"+community.getHandle(), community.getMetadata("name"));
+        }
 	   
-
 	    // DIVISION: group-actions
 	    Division actions = main.addDivision("group-edit-actions");
 	    Para groupName = actions.addPara();
         groupName.addContent(T_label_name);
         Text groupText = groupName.addText("group_name");
         groupText.setValue(currentName);
-        if(collection != null)
+        if(collection != null || community != null)
         {
-        	// If this group is associated with a collection then it is special,
+        	// If this group is associated with a collection or community then it is special,
         	// thus they shouldn't be able to update it.
         	groupText.setDisabled();
         	groupText.setHelp(T_label_instructions);
         }
         else if (errors.contains("group_name") || errors.contains("group_name_duplicate"))
-        	groupText.addError("");
+        {
+            groupText.addError("");
+        }
         
 
         Para searchBoxes = actions.addPara();
@@ -339,7 +341,9 @@ public class EditGroupForm extends AbstractDSpaceTransformer
                      
         boolean changes = false;
         if (group != null)
-        	changes = addMemberList(main,group,memberGroupIDs,memberEPeopleIDs,highlightEPersonID,highlightGroupID);
+        {
+            changes = addMemberList(main, group, memberGroupIDs, memberEPeopleIDs, highlightEPersonID, highlightGroupID);
+        }
         
                
     	Para buttons = main.addPara();
@@ -347,7 +351,9 @@ public class EditGroupForm extends AbstractDSpaceTransformer
     	buttons.addButton("submit_cancel").setValue(T_submit_cancel);
        
     	if (changes)
-    		main.addPara().addHighlight("warn").addContent(T_pending_warn);
+        {
+            main.addPara().addHighlight("warn").addContent(T_pending_warn);
+        }
     	
         
         main.addHidden("administrative-continue").setValue(knot.getId());
@@ -358,7 +364,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	/**
 	 * Search for epeople to add to this group.
 	 */
-	private void addEPeopleSearch(Division div, String query, int page, Group group, ArrayList<Integer> memberEPeopleIDs) throws SQLException, WingException
+	private void addEPeopleSearch(Division div, String query, int page, Group group, List<Integer> memberEPeopleIDs) throws SQLException, WingException
 	{
 		int resultCount = EPerson.searchResultCount(context, query);
         EPerson[] epeople = EPerson.search(context, query, page*RESULTS_PER_PAGE, RESULTS_PER_PAGE);
@@ -374,9 +380,13 @@ public class EditGroupForm extends AbstractDSpaceTransformer
        
         	String nextURL = null, prevURL = null;
         	if (page < (resultCount / RESULTS_PER_PAGE))
-        		nextURL = baseURL+"&page="+(page+1);
+            {
+                nextURL = baseURL + "&page=" + (page + 1);
+            }
         	if (page > 0)
-        		prevURL = baseURL+"&page="+(page-1);
+            {
+                prevURL = baseURL + "&page=" + (page - 1);
+            }
         	
 			results.setSimplePagination(resultCount,firstIndex,lastIndex,prevURL, nextURL);
 		}
@@ -409,9 +419,13 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 			{
 				// Check if they really members or just pending members
 				if (group != null && group.isMember(person))
-					personData.addCellContent(T_member);
+                {
+                    personData.addCellContent(T_member);
+                }
 				else
-					personData.addCell().addHighlight("warn").addContent(T_pending);
+                {
+                    personData.addCell().addHighlight("warn").addContent(T_pending);
+                }
 			}
 			else
 			{
@@ -431,7 +445,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	/**
 	 * Search for groups to add to this group.
 	 */
-	private void addGroupSearch(Division div, Group sourceGroup, String query, int page, Group parent, ArrayList<Integer> memberGroupIDs) throws WingException, SQLException
+	private void addGroupSearch(Division div, Group sourceGroup, String query, int page, Group parent, List<Integer> memberGroupIDs) throws WingException, SQLException
 	{
 		int resultCount = Group.searchResultCount(context, query);
         Group[] groups = Group.search(context, query, page*RESULTS_PER_PAGE, RESULTS_PER_PAGE);
@@ -447,9 +461,13 @@ public class EditGroupForm extends AbstractDSpaceTransformer
        
         	String nextURL = null, prevURL = null;
         	if (page < (resultCount / RESULTS_PER_PAGE))
-        		nextURL = baseURL+"&page="+(page+1);
+            {
+                nextURL = baseURL + "&page=" + (page + 1);
+            }
         	if (page > 0)
-        		prevURL = baseURL+"&page="+(page-1);
+            {
+                prevURL = baseURL + "&page=" + (page - 1);
+            }
         	
 			results.setSimplePagination(resultCount,firstIndex,lastIndex,prevURL, nextURL);
 		}
@@ -474,9 +492,13 @@ public class EditGroupForm extends AbstractDSpaceTransformer
         	row.addCell().addContent(groupID);
         	if (AuthorizeManager.isAdmin(context))
         		// Only administrators can edit other groups.
-        		row.addCell().addXref(url,name);
+            {
+                row.addCell().addXref(url, name);
+            }
         	else
-        		row.addCell().addContent(name);
+            {
+                row.addCell().addContent(name);
+            }
         	
         	
         	
@@ -491,9 +513,13 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	        		String collectionName = collection.getMetadata("name");
 	        		
 	        		if (collectionName == null)
-	        			collectionName = "";
+                    {
+                        collectionName = "";
+                    }
 	        		else if (collectionName.length() > MAX_COLLECTION_NAME)
-	        			collectionName = collectionName.substring(0,MAX_COLLECTION_NAME-3) + "...";
+                    {
+                        collectionName = collectionName.substring(0, MAX_COLLECTION_NAME - 3) + "...";
+                    }
 	        		
 	        		cell.addContent(collectionName+" ");
 	        		
@@ -510,9 +536,13 @@ public class EditGroupForm extends AbstractDSpaceTransformer
         	{
         		// Check if they really members or just pending members
 				if (parent != null && parent.isMember(group))
-					row.addCellContent(T_member);
+                {
+                    row.addCellContent(T_member);
+                }
 				else
-					row.addCell().addHighlight("warn").addContent(T_pending);
+                {
+                    row.addCell().addHighlight("warn").addContent(T_pending);
+                }
         	}
         	else if (isDescendant(sourceGroup, group, memberGroupIDs)) 
         	{
@@ -539,7 +569,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	 * parent. This is used to avoid creating cycles like A->B, B->C, C->D, D->A which leads 
 	 * all the groups involved to essentially include themselves.  
 	 */
-	private boolean isDescendant(Group descendant, Group ancestor, ArrayList<Integer> memberGroupIDs) throws SQLException 
+	private boolean isDescendant(Group descendant, Group ancestor, List<Integer> memberGroupIDs) throws SQLException
 	{
 		Queue<Group> toVisit = new LinkedList<Group>();
 		Group currentGroup;
@@ -558,7 +588,9 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 			currentGroup = toVisit.poll();
 			
 			// 2. See if it's the descendant we're looking for
-			if (currentGroup.equals(descendant)) return true;
+			if (currentGroup.equals(descendant)) {
+                return true;
+            }
 			
 			// 3. If not, add that group's children to the queue
 			for (Group nextBatch : currentGroup.getMemberGroups()) {
@@ -577,7 +609,7 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 	 * Add a table with all the current group's members to the specified division.
 	 * @throws SQLException 
 	 */
-	private boolean addMemberList(Division div, Group parent, ArrayList<Integer> memberGroupIDs, ArrayList<Integer> memberEPeopleIDs, int highlightEPersonID, int highlightGroupID) throws WingException, SQLException
+	private boolean addMemberList(Division div, Group parent, List<Integer> memberGroupIDs, List<Integer> memberEPeopleIDs, int highlightEPersonID, int highlightGroupID) throws WingException, SQLException
 	{
 		// Flag to remember if there are any pending changes.
         boolean changes = false;
@@ -595,11 +627,13 @@ public class EditGroupForm extends AbstractDSpaceTransformer
         
         // get all group members, pend or actual
         @SuppressWarnings("unchecked") // the cast is correct
-        ArrayList<Integer> allMemberGroupIDs = (ArrayList<Integer>) memberGroupIDs.clone();
+        List<Integer> allMemberGroupIDs = new ArrayList<Integer>(memberGroupIDs);
         for (Group group : parent.getMemberGroups())
         {
         	if (!allMemberGroupIDs.contains(group.getID()))
-        		allMemberGroupIDs.add(group.getID());
+            {
+                allMemberGroupIDs.add(group.getID());
+            }
         }
         // Sort them to a consistent ordering
         Collections.sort(allMemberGroupIDs);
@@ -614,17 +648,21 @@ public class EditGroupForm extends AbstractDSpaceTransformer
         	addMemberRow(table, group, highlight,pendingAddition,pendingRemoval);   
         	
         	if (pendingAddition || pendingRemoval)
-        		changes = true;
+            {
+                changes = true;
+            }
         }
         
         
         // get all members, pend or actual
         @SuppressWarnings("unchecked") // the cast is correct
-        ArrayList<Integer> allMemberEPeopleIDs = (ArrayList<Integer>) memberEPeopleIDs.clone();
+        List<Integer> allMemberEPeopleIDs = new ArrayList<Integer>(memberEPeopleIDs);
         for (EPerson eperson : parent.getMembers())
         {
         	if (!allMemberEPeopleIDs.contains(eperson.getID()))
-        		allMemberEPeopleIDs.add(eperson.getID());
+            {
+                allMemberEPeopleIDs.add(eperson.getID());
+            }
         }
         // Sort them to a consistent ordering
         Collections.sort(allMemberEPeopleIDs);
@@ -638,7 +676,9 @@ public class EditGroupForm extends AbstractDSpaceTransformer
         	addMemberRow(table,eperson,highlight,pendingAddition,pendingRemoval);
         	
         	if (pendingAddition || pendingRemoval)
-        		changes = true;
+            {
+                changes = true;
+            }
         }
     
         if (allMemberGroupIDs.size() <= 0 && allMemberEPeopleIDs.size() <= 0)
@@ -671,9 +711,13 @@ public class EditGroupForm extends AbstractDSpaceTransformer
     	// Mark if this member is pending or not.
     	Cell nameCell = groupData.addCell();
     	if (AuthorizeManager.isAdmin(context))
-    		nameCell.addHighlight("bold").addXref(url,T_members_group_name.parameterize(name));
+        {
+            nameCell.addHighlight("bold").addXref(url, T_members_group_name.parameterize(name));
+        }
     	else
-    		nameCell.addHighlight("bold").addContent(T_members_group_name.parameterize(name));
+        {
+            nameCell.addHighlight("bold").addContent(T_members_group_name.parameterize(name));
+        }
     	
     	if (pendingAddition)
     	{
@@ -684,9 +728,13 @@ public class EditGroupForm extends AbstractDSpaceTransformer
     	groupData.addCell().addContent("-");
     	
     	if (pendingRemoval)
-    		groupData.addCell().addHighlight("warn").addContent(T_pending);
+        {
+            groupData.addCell().addHighlight("warn").addContent(T_pending);
+        }
     	else
-    		groupData.addCell().addButton("submit_remove_group_"+group.getID()).setValue(T_submit_remove);
+        {
+            groupData.addCell().addButton("submit_remove_group_" + group.getID()).setValue(T_submit_remove);
+        }
 	}
 	
 	/**
@@ -720,8 +768,12 @@ public class EditGroupForm extends AbstractDSpaceTransformer
 		personData.addCell().addXref(url, email);
 		
 		if (pendingRemoval)
-			personData.addCell().addHighlight("warn").addContent(T_pending);
+        {
+            personData.addCell().addHighlight("warn").addContent(T_pending);
+        }
 		else
-			personData.addCell().addButton("submit_remove_eperson_"+eperson.getID()).setValue(T_submit_remove);
+        {
+            personData.addCell().addButton("submit_remove_eperson_" + eperson.getID()).setValue(T_submit_remove);
+        }
 	}
 }

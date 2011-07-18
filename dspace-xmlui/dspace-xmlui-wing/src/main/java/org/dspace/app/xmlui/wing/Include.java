@@ -1,43 +1,10 @@
-/*
- * Include.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.xmlui.wing;
 
 import java.io.IOException;
@@ -90,7 +57,7 @@ public class Include extends AbstractTransformer implements CacheableProcessingC
      * the value is a list of all attributes that the element must match on to
      * be considered the same element.
      */
-    private final static Map<String, String[]> mergeableMap;
+    private static final Map<String, String[]> mergeableMap;
 
     /** Construct the mergeableMap from constant data */
     static
@@ -137,7 +104,7 @@ public class Include extends AbstractTransformer implements CacheableProcessingC
      * Read in the given src path into an internal DOM for later processing when
      * needed.
      * 
-     * @param sourceResolver
+     * @param resolver
      *            Resolver for cocoon pipelines.
      * @param objectModel
      *            The pipelines's object model.
@@ -177,17 +144,23 @@ public class Include extends AbstractTransformer implements CacheableProcessingC
         {
         	if (source.exists())
         		// The file exists so return it's validity.
-        		return source.getValidity();
+            {
+                return source.getValidity();
+            }
         	else
+            {
         		// The file does not exist so we will just return always valid. This
         		// will have an nastly side effect that if a file is removed from a
         		// running system the cache will remain valid. However if the other
         		// option is to always invalidate the cache if the file is not present
         		// which is not desirable either.
-        		return NOPValidity.SHARED_INSTANCE;
+                return NOPValidity.SHARED_INSTANCE;
+            }
         }
         else
+        {
             return null;
+        }
     }
     
     
@@ -253,18 +226,26 @@ public class Include extends AbstractTransformer implements CacheableProcessingC
         	// or not found in startDocument()
         }
         else if (stack.size() == 0)
+        {
             stack.push(w3cDocument.getDocumentElement());
+        }
         else
         {
             Element peek = stack.peek();
 
             Element foundChild = null;
             for (Element child : getElementList(peek))
+            {
                 if (isEqual(child, uri, localName, qName, attributes))
+                {
                     foundChild = child;
+                }
+            }
 
             if (foundChild != null)
+            {
                 peek.removeChild(foundChild);
+            }
 
             stack.push(foundChild);
         }
@@ -304,7 +285,9 @@ public class Include extends AbstractTransformer implements CacheableProcessingC
 	            //getLogger().debug("startElement: streaming");
 	
 	            for (Node node : getNodeList(poped))
+                {
 	                streamer.stream(node);
+                }
 	        }
         }
 
@@ -346,16 +329,24 @@ public class Include extends AbstractTransformer implements CacheableProcessingC
             String qName, Attributes attributes)
     {
         if (child == null)
+        {
             return false;
+        }
 
         if (uri != null && !uri.equals(child.getNamespaceURI()))
+        {
             return false;
+        }
 
         if (localName != null && !localName.equals(child.getLocalName()))
+        {
             return false;
+        }
 
         if (!mergeableMap.containsKey(localName))
+        {
             return false;
+        }
 
         String[] attributeIdentities = mergeableMap.get(localName);
 
@@ -367,10 +358,14 @@ public class Include extends AbstractTransformer implements CacheableProcessingC
                 String childIdentity = child.getAttribute(attributeIdentity);
 
                 if (childIdentity != null && childIdentity.equals(testIdentity))
+                {
                     continue;
+                }
 
                 if (childIdentity == null && testIdentity == null)
+                {
                     continue;
+                }
 
                 return false;
             }
@@ -389,7 +384,9 @@ public class Include extends AbstractTransformer implements CacheableProcessingC
     private static List<Element> getElementList(Element element)
     {
         if (element == null)
+        {
             return new ArrayList<Element>();
+        }
 
         NodeList nodeList = element.getChildNodes();
 
@@ -397,7 +394,9 @@ public class Include extends AbstractTransformer implements CacheableProcessingC
         for (int i = 0; i < nodeList.getLength(); i++)
         {
             if (nodeList.item(i).getNodeType() == Node.ELEMENT_NODE)
+            {
                 resultList.add((Element) nodeList.item(i));
+            }
         }
 
         return resultList;
@@ -413,7 +412,9 @@ public class Include extends AbstractTransformer implements CacheableProcessingC
     private static List<Node> getNodeList(Element element)
     {
         if (element == null)
+        {
             return new ArrayList<Node>();
+        }
 
         NodeList nodeList = element.getChildNodes();
 

@@ -1,43 +1,10 @@
-/*
- * DSpaceContextListener.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.util;
 
 import org.dspace.core.ConfigurationManager;
@@ -88,11 +55,15 @@ public class DSpaceContextListener implements ServletContextListener
                 urlConn.setDefaultUseCaches(false);
             }
         }
-        catch (Throwable t)
+        // Any errors thrown in disabling the caches aren't significant to
+        // the normal execution of the application, so we ignore them
+        catch (RuntimeException e)
         {
-            log.error(t.getMessage(), t);
-            // Any errors thrown in disabling the caches aren't significant to
-            // the normal execution of the application, so we ignore them
+            log.error(e.getMessage(), e);
+        }
+        catch (Exception e)
+        {
+            log.error(e.getMessage(), e);
         }
 
         // Paths to the various config files
@@ -107,10 +78,10 @@ public class DSpaceContextListener implements ServletContextListener
         // first check the local per webapp parameter, then check the global parameter.
         dspaceConfig = event.getServletContext().getInitParameter(DSPACE_CONFIG_PARAMETER);
         
-        // Finaly, if no config parameter found throw an error
+        // Finally, if no config parameter found throw an error
         if (dspaceConfig == null || "".equals(dspaceConfig))
         {
-            throw new RuntimeException(
+            throw new IllegalStateException(
                     "\n\nDSpace has failed to initialize. This has occurred because it was unable to determine \n" +
                     "where the dspace.cfg file is located. The path to the configuration file should be stored \n" +
                     "in a context variable, '"+DSPACE_CONFIG_PARAMETER+"', in the global context. \n" +
@@ -128,15 +99,19 @@ public class DSpaceContextListener implements ServletContextListener
         {
             ConfigurationManager.loadConfig(dspaceConfig);
         }
-        catch (Throwable t)
+        catch (RuntimeException e)
         {
-            throw new RuntimeException(
+            throw e;
+        }
+        catch (Exception e)
+        {
+            throw new IllegalStateException(
                     "\n\nDSpace has failed to initialize, during stage 2. Error while attempting to read the \n" +
                     "DSpace configuration file (Path: '"+dspaceConfig+"'). \n" +
                     "This has likely occurred because either the file does not exist, or it's permissions \n" +
                     "are set incorrectly, or the path to the configuration file is incorrect. The path to \n" +
                     "the DSpace configuration file is stored in a context variable, 'dspace-config', in \n" +
-                    "either the local servlet or global context.\n\n",t);
+                    "either the local servlet or global context.\n\n",e);
         }
 
     }
@@ -166,7 +141,11 @@ public class DSpaceContextListener implements ServletContextListener
                 }
             }
         }
-        catch (Throwable e)
+        catch (RuntimeException e)
+        {
+            log.error("Failed to cleanup ClassLoader for webapp", e);
+        }
+        catch (Exception e)
         {
             log.error("Failed to cleanup ClassLoader for webapp", e);
         }

@@ -1,41 +1,9 @@
-/*
- * AuthorizationMain.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.administrative.authorization;
 
@@ -125,14 +93,18 @@ public class AdvacedAuthorizationsForm extends AbstractDSpaceTransformer
         groupSelect.setMultiple(true);
         groupSelect.setSize(15);
         for (Group group : Group.findAll(context, Group.NAME))
-       		groupSelect.addOption(false, group.getID(), group.getName());
+        {
+            groupSelect.addOption(false, group.getID(), group.getName());
+        }
         
         // Grant the ability to perform the following action...
         actionsList.addItem().addContent(T_actions_actionSentence);
         actionsList.addLabel(T_actions_policyAction);
         Select actionSelect = actionsList.addItem().addSelect("action_id");
         for( int i = 0; i < Constants.actionText.length; i++ )
+        {
             actionSelect.addOption(i, Constants.actionText[i]);
+        }
         
         // For all following object types...
         actionsList.addItem().addContent(T_actions_resourceSentence);
@@ -148,7 +120,9 @@ public class AdvacedAuthorizationsForm extends AbstractDSpaceTransformer
         collectionsSelect.setMultiple(true);
         collectionsSelect.setSize(15);
         for (Collection collection : Collection.findAll(context))
-        	collectionsSelect.addOption(false, collection.getID(), collection.getMetadata("name"));
+        {
+            collectionsSelect.addOption(false, collection.getID(), collection.getMetadata("name"));
+        }
         
         
     	Para buttons = main.addPara();

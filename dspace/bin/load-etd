@@ -25,20 +25,18 @@ GetCmdLine();
 # Get directories
 chomp($bindir = `dirname $0`);
 
-@cmd = ("$bindir/dsrun",
-   "-Ddspace.log.init.disable=true",
-	"-Detdloader.zipfile=$zipfile"
-);
-push @cmd, "-Detdloader.marcfile=$marcfile" if (defined $marcfile);
-push @cmd, "-Detdloader.singleitem=$item" if (defined $item);
-push @cmd, "-Detdloader.csvfile=$csvfile" if (defined $csvfile);
-push @cmd, "edu.umd.lib.dspace.app.EtdLoader";
+$ENV{JAVA_OPTS}  = " -Dlog4j.configuration=log4j-etdloader.properties";
+$ENV{JAVA_OPTS} .= " -Ddspace.log.init.disable=true";
+$ENV{JAVA_OPTS} .= " -Detdloader.zipfile=$zipfile";
+$ENV{JAVA_OPTS} .= " -Detdloader.marcfile=$marcfile" if (defined $marcfile);
+$ENV{JAVA_OPTS} .= " -Detdloader.singleitem=$item" if (defined $item);
+$ENV{JAVA_OPTS} .= " -Detdloader.csvfile=$csvfile" if (defined $csvfile);
 
+@cmd = ("$bindir/dspace", "dsrun", "edu.umd.lib.dspace.app.EtdLoader");
+
+#print $ENV{JAVA_OPTS};
 #print (join ' ',@cmd) . "\n";
 system(@cmd);
-
-$exit_status = $? >> 8;
-die "Error loading" if ($exit_status != 0);
 
 exit 0;
 

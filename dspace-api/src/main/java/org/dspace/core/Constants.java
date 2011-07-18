@@ -1,41 +1,9 @@
-/*
- * Constants.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.core;
 
@@ -44,7 +12,7 @@ package org.dspace.core;
  * must never be changed!!
  * 
  * @author David Stuve
- * @version $Revision: 3705 $
+ * @version $Revision: 5844 $
  */
 public class Constants
 {
@@ -80,7 +48,7 @@ public class Constants
      * lets you look up type names from the type IDs
      */
     public static final String[] typeText = { "BITSTREAM", "BUNDLE", "ITEM",
-            "COLLECTION", "COMMUNITY", "SITE", "GROUP", "EPERSON", };
+            "COLLECTION", "COMMUNITY", "SITE", "GROUP", "EPERSON" };
 
     /**
      * Special Bundle and Bitstream Names:
@@ -154,11 +122,15 @@ public class Constants
     public static final int DEFAULT_ITEM_READ = 10;
 
     /**
-     * collection admin -- metadata, logo, item metadata, submitters, withdraw
-     * items, etc.
+     * @deprecated As of DSpace 1.6, replaced by Constants.ADMIN
      */
     public static final int COLLECTION_ADMIN = 11;
 
+    /**
+     * Administrative actions - System Admin, Community Admin, Collection Admin
+     */
+    public static final int ADMIN = 11;
+    
     /** Position of front page news item -- top box */
     public static final int NEWS_TOP = 0;
 
@@ -171,7 +143,7 @@ public class Constants
     public static final String[] actionText = { "READ", "WRITE",
             "OBSOLETE (DELETE)", "ADD", "REMOVE", "WORKFLOW_STEP_1",
             "WORKFLOW_STEP_2", "WORKFLOW_STEP_3", "WORKFLOW_ABORT",
-            "DEFAULT_BITSTREAM_READ", "DEFAULT_ITEM_READ", "COLLECTION_ADMIN" };
+            "DEFAULT_BITSTREAM_READ", "DEFAULT_ITEM_READ", "ADMIN" };
 
     /**
      * constants for the relevance array generating dynamicallis is simple: just
@@ -207,7 +179,7 @@ public class Constants
             0, // 8 - WORKFLOW_ABORT
             RCOLLECTION, // 9 - DEFAULT_BITSTREAM_READ
             RCOLLECTION, // 10 - DEFAULT_ITEM_READ
-            RCOLLECTION // 11 - COLLECTION_ADMIN
+            RITEM | RCOLLECTION | RCOMMUNITY // 11 - ADMIN
     };
 
     public static final String DEFAULT_ENCODING = "UTF-8";

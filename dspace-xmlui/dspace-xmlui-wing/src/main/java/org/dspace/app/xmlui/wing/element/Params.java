@@ -1,49 +1,16 @@
-/*
- * Params.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.xmlui.wing.element;
 
 /**
- * A class represented parameters to fields. The parameter element is basicaly a
- * grab bag of attributes associated with varios fields.
- * 
+ * A class represented parameters to fields. The parameter element is basically a
+ * grab bag of attributes associated with various fields.
+ *
  * @author Scott Phillips
  */
 
@@ -54,6 +21,7 @@ import org.xml.sax.ContentHandler;
 import org.xml.sax.SAXException;
 import org.xml.sax.ext.LexicalHandler;
 import org.xml.sax.helpers.NamespaceSupport;
+import java.util.Arrays;
 
 public class Params extends AbstractWingElement implements StructuralElement
 {
@@ -81,6 +49,22 @@ public class Params extends AbstractWingElement implements StructuralElement
     /** The name of the cols attribute */
     public static final String A_COLS = "cols";
 
+    /** True if this field is authority-controlled */
+    public static final String A_AUTHORITY_CONTROLLED = "authorityControlled";
+
+    /** True if an authority value is required */
+    public static final String A_AUTHORITY_REQUIRED = "authorityRequired";
+
+    /** The name of the field to use for a list of choices */
+    public static final String A_CHOICES = "choices";
+
+    /** Type of presentation recommended for showing choices to user */
+    /** See PRESENTATION_*   */
+    public static final String A_CHOICES_PRESENTATION = "choicesPresentation";
+
+    /** The name of the field to use for a list of choices */
+    public static final String A_CHOICES_CLOSED = "choicesClosed";
+
     /** Possible operations */
     public static final String OPERATION_ADD = "add";
 
@@ -88,6 +72,14 @@ public class Params extends AbstractWingElement implements StructuralElement
 
     public static final String[] OPERATIONS = { OPERATION_ADD, OPERATION_DELETE };
     
+    /** Possible UI presentation values */
+    public static final String PRESENTATION_SELECT = "select";
+    public static final String PRESENTATION_SUGGEST = "suggest";
+    public static final String PRESENTATION_LOOKUP = "lookup";
+    public static final String PRESENTATION_NONE = "none";
+    public static final String[] PRESENTATIONS = { PRESENTATION_SELECT, PRESENTATION_SUGGEST, PRESENTATION_LOOKUP, PRESENTATION_NONE };
+
+
     /** *********** Parameter Attributes *************** */
 
     /** The supported operations for this field */
@@ -112,13 +104,28 @@ public class Params extends AbstractWingElement implements StructuralElement
     /** The number of cols the field should span */
     protected int cols = -1;
 
+    /** Value of the AuthorityControlled attribute */
+    protected boolean authority = false;
+
+    /** Value of the Authority_Required attribute */
+    protected boolean authority_required = false;
+
+    /** Value of the Choices attribute */
+    protected String choices = null;
+
+    /** Value of the Choices Presentation attribute */
+    protected String presentation = null;
+
+    /** Value of choicesClosed option */
+    protected boolean choicesClosed = false;
+
     /**
      * Construct a new parameter's element
-     * 
+     *
      * @param context
      *            (Required) The context this element is contained in, such as
      *            where to route SAX events and what i18n catalogue to use.
-     * 
+     *
      */
     protected Params(WingContext context) throws WingException
     {
@@ -128,7 +135,7 @@ public class Params extends AbstractWingElement implements StructuralElement
     /**
      * Enable the add operation for this field set. When this is enabled the
      * front end will add a button to add more items to the field.
-     * 
+     *
      */
     public void enableAddOperation() throws WingException
     {
@@ -139,7 +146,7 @@ public class Params extends AbstractWingElement implements StructuralElement
      * Enable the delete operation for this field set. When this is enabled then
      * the front end will provide a way for the user to select fields (probably
      * checkboxes) along with a submit button to delete the selected fields.
-     * 
+     *
      */
     public void enableDeleteOperation()throws WingException
     {
@@ -148,9 +155,9 @@ public class Params extends AbstractWingElement implements StructuralElement
 
     /**
      * Set the size of the field.
-     * 
+     *
      * This applies to text, password, and select fields.
-     * 
+     *
      * @param size
      *            (Required) The size of the field.
      */
@@ -161,9 +168,9 @@ public class Params extends AbstractWingElement implements StructuralElement
 
     /**
      * Set the maximum length of the field.
-     * 
+     *
      * This applies to text, password, and textarea fields.
-     * 
+     *
      * @param maxlength
      *            (Required) The maximum length of the field.
      */
@@ -174,9 +181,9 @@ public class Params extends AbstractWingElement implements StructuralElement
 
     /**
      * Set the number of rows of this field.
-     * 
+     *
      * The applies only to textarea fields.
-     * 
+     *
      * @param rows
      *            (Required) The number of rows.
      */
@@ -187,9 +194,9 @@ public class Params extends AbstractWingElement implements StructuralElement
 
     /**
      * Set the number of columns of this field.
-     * 
+     *
      * The applies only to textarea fields.
-     * 
+     *
      * @param cols
      *            (Required) The number of columns.
      */
@@ -200,9 +207,9 @@ public class Params extends AbstractWingElement implements StructuralElement
 
     /**
      * The returned value for this field if it is checked (or selected).
-     * 
+     *
      * The applies to radio and checkbox fields.
-     * 
+     *
      * @param returnValue
      *            (Required) The value to be returned if this field is checked.
      */
@@ -213,9 +220,9 @@ public class Params extends AbstractWingElement implements StructuralElement
 
     /**
      * Determine if this field can accept multiple values.
-     * 
+     *
      * The applies only to select fields.
-     * 
+     *
      * @param multiple
      *            (Required) whether the field can accept multiple values.
      */
@@ -225,9 +232,91 @@ public class Params extends AbstractWingElement implements StructuralElement
     }
 
     /**
+     * Set this field to be authority-controlled.
+     *
+     */
+    public void setAuthorityControlled()
+    {
+        this.authority = true;
+    }
+
+    /**
+     * Set this field to be authority-controlled.
+     *
+     * @param value true if authority-controlled.
+     */
+    public void setAuthorityControlled(boolean value)
+    {
+        this.authority = value;
+    }
+
+    /**
+     * Set this field as authority_required.
+     */
+    public void setAuthorityRequired()
+    {
+        this.authority_required = true;
+    }
+
+    /**
+     * Set this field to either be required or not required as determined by the
+     * required parameter.
+     *
+     * @param value
+     *          Determine if the authority control is required or not on this field.
+     */
+    public void setAuthorityRequired(boolean value)
+    {
+        this.authority_required = value;
+    }
+
+    /**
+     *
+     * @param fieldKey pre-determined metadata field key
+     */
+    public void setChoices(String fieldKey)
+    {
+        this.choices = fieldKey;
+    }
+
+    /**
+     * Set the kind of UI presentation requested for this choice, e.g.
+     * select vs. suggest.  Value must match one of the PRESENTATIONS.
+     *
+     * @param value pre-determined metadata field key
+     */
+    public void setChoicesPresentation(String value)
+        throws WingException
+    {
+        restrict(value, PRESENTATIONS,
+                "The 'presentation' parameter must be one of these values: "+Arrays.deepToString(PRESENTATIONS));
+        this.presentation = value;
+    }
+
+    /**
+     * Sets whether choices are "closed" to the set returned by plugin.
+     *
+     * @param value pre-determined metadata field key
+     */
+    public void setChoicesClosed(boolean value)
+    {
+        this.choicesClosed = value;
+    }
+
+    /**
+     * Sets whether choices are "closed" to the set returned by plugin.
+     */
+    public void setChoicesClosed()
+    {
+        this.choicesClosed = true;
+    }
+
+
+
+    /**
      * Translate this element and all contained elements into SAX events. The
      * events should be routed to the contentHandler found in the WingContext.
-     * 
+     *
      * @param contentHandler
      *            (Required) The registered contentHandler where SAX events
      *            should be routed too.
@@ -249,19 +338,29 @@ public class Params extends AbstractWingElement implements StructuralElement
         if (addOperation )
         {
             if (operations == null)
+            {
                 operations = OPERATION_ADD;
+            }
             else
+            {
                 operations += " " + OPERATION_ADD;
+            }
         }
         if (addOperation)
         {
             if (operations == null)
+            {
                 operations = OPERATION_DELETE;
+            }
             else
+            {
                 operations += " " + OPERATION_DELETE;
+            }
         }
         if (operations != null)
+        {
             attributes.put(A_OPERATIONS, operations);
+        }
 
         
         
@@ -280,7 +379,7 @@ public class Params extends AbstractWingElement implements StructuralElement
             attributes.put(A_MAX_LENGTH, this.maxlength);
         }
 
-        if (this.multiple == true)
+        if (this.multiple)
         {
             attributes.put(A_MULTIPLE, this.multiple);
         }
@@ -295,15 +394,28 @@ public class Params extends AbstractWingElement implements StructuralElement
             attributes.put(A_COLS, this.cols);
         }
 
+        if (this.authority)
+        {
+            attributes.put(A_AUTHORITY_CONTROLLED, this.authority);
+        }
+        if (this.authority_required)
+        {
+            attributes.put(A_AUTHORITY_REQUIRED, this.authority_required);
+        }
+        if (this.choices != null)
+        {
+            attributes.put(A_CHOICES, this.choices);
+        }
+        if (this.presentation != null)
+        {
+            attributes.put(A_CHOICES_PRESENTATION, this.presentation);
+        }
+        if (this.choicesClosed)
+        {
+            attributes.put(A_CHOICES_CLOSED, true);
+        }
+
         startElement(contentHandler, namespaces, E_PARAMS, attributes);
         endElement(contentHandler, namespaces, E_PARAMS);
-    }
-
-    /**
-     * Dispose
-     */
-    public void dispose()
-    {
-        super.dispose();
     }
 }

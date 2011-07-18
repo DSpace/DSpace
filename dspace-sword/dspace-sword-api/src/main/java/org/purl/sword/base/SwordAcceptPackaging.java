@@ -1,42 +1,14 @@
 /**
- * Copyright (c) 2008-2009, Aberystwyth University
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * All rights reserved.
- * 
- * Redistribution and use in source and binary forms, with or without 
- * modification, are permitted provided that the following conditions 
- * are met:
- * 
- *  - Redistributions of source code must retain the above 
- *    copyright notice, this list of conditions and the 
- *    following disclaimer.
- *  
- *  - Redistributions in binary form must reproduce the above copyright 
- *    notice, this list of conditions and the following disclaimer in 
- *    the documentation and/or other materials provided with the 
- *    distribution.
- *    
- *  - Neither the name of the Centre for Advanced Software and 
- *    Intelligent Systems (CASIS) nor the names of its 
- *    contributors may be used to endorse or promote products derived 
- *    from this software without specific prior written permission.
- * 
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT 
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, 
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT 
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, 
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON 
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR 
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF 
- * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF 
- * SUCH DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.purl.sword.base;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import nu.xom.Attribute;
 import nu.xom.Element;
@@ -100,14 +72,14 @@ implements SwordElementInterface
         return XML_NAME;
     }
 
-    protected void initialise()
+    protected final void initialise()
     {
         qualityValue = null;
         content = null; 
     }
 
 	/**
-	 * Marshall the data in this object to an Element object. 
+	 * Marshal the data in this object to an Element object. 
 	 * 
 	 * @return The data expressed in an Element. 
 	 */
@@ -128,21 +100,22 @@ implements SwordElementInterface
    }
 
    /**
-    * Unmarshall the text element into this object.
+    * Unmarshal the text element into this object.
     * 
     * This unmarshaller only handles plain text content, although it can 
     * recognise the three different type elements of text, html and xhtml. This
     * is an area that can be improved in a future implementation, if necessary. 
     * 
-    * @param text The text element. 
+    * @param acceptPackaging The text element.
+    * @param validationProperties
     * 
     * @throws UnmarshallException If the specified element is not of
     *                             the correct type, where the localname is used
     *                             to specify the valid name. Also thrown 
     *                             if there is an issue accessing the data. 
     */
-   public SwordValidationInfo unmarshall(Element acceptPackaging, Properties validationProperties)
-   throws UnmarshallException
+   public SwordValidationInfo unmarshall(Element acceptPackaging,
+            Properties validationProperties) throws UnmarshallException
    {
 	   if( ! isInstanceOf(acceptPackaging, xmlName) )
 	   {
@@ -243,8 +216,8 @@ implements SwordElementInterface
     * @param attributeItems
     * @return
     */
-   protected SwordValidationInfo validate(ArrayList<SwordValidationInfo> existing,
-           ArrayList<SwordValidationInfo> attributeItems,
+   protected SwordValidationInfo validate(List<SwordValidationInfo> existing,
+           List<SwordValidationInfo> attributeItems,
            Properties validationContext)
    {
       SwordValidationInfo result = new SwordValidationInfo(xmlName); 
@@ -278,7 +251,7 @@ implements SwordElementInterface
     * 
     * @return The content, expressed as a string. 
     */
-   public String getContent() {
+   public final String getContent() {
 	   return content;
    }
 
@@ -287,7 +260,7 @@ implements SwordElementInterface
     *  
     * @param content The content. 
     */
-   public void setContent(String content) 
+   public final void setContent(String content)
    {
 	   this.content = content;
 	}
@@ -297,7 +270,7 @@ implements SwordElementInterface
     * 
     * @return The type. 
     */
-   public QualityValue getQualityValue()
+   public final QualityValue getQualityValue()
    {
       return qualityValue;
    }
@@ -305,9 +278,9 @@ implements SwordElementInterface
    /**
     * Set the type. 
     * 
-    * @param type The type. 
+    * @param value The type.
     */
-   public void setQualityValue(QualityValue value)
+   public final void setQualityValue(QualityValue value)
    {
       this.qualityValue = value;
    }

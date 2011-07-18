@@ -1,47 +1,14 @@
-/*
- * AuthorizeManager.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.authorize;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.dspace.content.DSpaceObject;
@@ -131,6 +98,30 @@ public class AuthorizeManager
     public static void authorizeAction(Context c, DSpaceObject o, int action)
             throws AuthorizeException, SQLException
     {
+        authorizeAction(c, o, action, true);
+    }
+
+    /**
+     * Checks that the context's current user can perform the given action on
+     * the given object. Throws an exception if the user is not authorized,
+     * otherwise the method call does nothing.
+     * 
+     * @param c
+     *            context
+     * @param o
+     *            a DSpaceObject
+     * @param useInheritance
+     *            flag to say if ADMIN action on the current object or parent
+     *            object can be used
+     * @param action
+     *            action to perform from <code>org.dspace.core.Constants</code>
+     * 
+     * @throws AuthorizeException
+     *             if the user is denied
+     */
+    public static void authorizeAction(Context c, DSpaceObject o, int action, boolean useInheritance)
+            throws AuthorizeException, SQLException
+    {
         if (o == null)
         {
             // action can be -1 due to a null entry
@@ -162,7 +153,7 @@ public class AuthorizeManager
                             + actionText + " by user " + userid);
         }
 
-        if (!authorize(c, o, action, c.getCurrentUser()))
+        if (!authorize(c, o, action, c.getCurrentUser(), useInheritance))
         {
             // denied, assemble and throw exception
             int otype = o.getType();
@@ -217,6 +208,30 @@ public class AuthorizeManager
     public static boolean authorizeActionBoolean(Context c, DSpaceObject o,
             int a) throws SQLException
     {
+        return authorizeActionBoolean(c, o, a, true);
+    }
+    
+    /**
+     * same authorize, returns boolean for those who don't want to deal with
+     * catching exceptions.
+     * 
+     * @param c
+     *            DSpace context, containing current user
+     * @param o
+     *            DSpaceObject
+     * @param a
+     *            action being attempted, from
+     *            <code>org.dspace.core.Constants</code>
+     * @param useInheritance
+     *            flag to say if ADMIN action on the current object or parent
+     *            object can be used            
+     * 
+     * @return <code>true</code> if the current user in the context is
+     *         authorized to perform the given action on the given object
+     */
+    public static boolean authorizeActionBoolean(Context c, DSpaceObject o,
+            int a, boolean useInheritance) throws SQLException
+    {
         boolean isAuthorized = true;
 
         if (o == null)
@@ -226,7 +241,7 @@ public class AuthorizeManager
 
         try
         {
-            authorizeAction(c, o, a);
+            authorizeAction(c, o, a, useInheritance);
         }
         catch (AuthorizeException e)
         {
@@ -251,15 +266,16 @@ public class AuthorizeManager
      *            <code>org.dspace.core.Constants</code>
      * @param e
      *            user attempting action
+     * @param useInheritance
+     *            flag to say if ADMIN action on the current object or parent
+     *            object can be used
      * @return <code>true</code> if user is authorized to perform the given
      *         action, <code>false</code> otherwise
      * @throws SQLException
      */
     private static boolean authorize(Context c, DSpaceObject o, int action,
-            EPerson e) throws SQLException
+            EPerson e, boolean useInheritance) throws SQLException
     {
-        int userid;
-
         // return FALSE if there is no DSpaceObject
         if (o == null)
         {
@@ -273,17 +289,16 @@ public class AuthorizeManager
         }
 
         // is eperson set? if not, userid = 0 (anonymous)
-        if (e == null)
-        {
-            userid = 0;
-        }
-        else
+	int userid = 0;
+        if (e != null)
         {
             userid = e.getID();
 
-            // perform isadmin check since user
-            // is user part of admin group?
-            if (isAdmin(c))
+            // perform isAdmin check to see
+            // if user is an Admin on this object
+            DSpaceObject testObject = useInheritance?o.getAdminObject(action):null;
+            
+            if (isAdmin(c, testObject))
             {
                 return true;
             }
@@ -318,7 +333,82 @@ public class AuthorizeManager
     ///////////////////////////////////////////////
 
     /**
-     * Check to see if the current user is an admin. Always return
+     * Check to see if the current user is an Administrator of a given object
+     * within DSpace. Always return <code>true</code> if the user is a System
+     * Admin
+     * 
+     * @param c
+     *            current context
+     * @param o
+     *            current DSpace Object, if <code>null</code> the call will be
+     *            equivalent to a call to the <code>isAdmin(Context c)</code>
+     *            method
+     * 
+     * @return <code>true</code> if user has administrative privileges on the
+     *         given DSpace object
+     */
+    public static boolean isAdmin(Context c, DSpaceObject o) throws SQLException {
+
+	// return true if user is an Administrator
+	if (isAdmin(c))
+	{
+	    return true;
+	}
+
+	if (o == null)
+	{
+	    return false;
+	}
+
+        // is eperson set? if not, userid = 0 (anonymous)
+	int userid = 0;
+	EPerson e = c.getCurrentUser();
+	if(e != null)
+	{
+            userid = e.getID();
+	}
+
+        //
+        // First, check all Resource Policies directly on this object
+        //
+	List<ResourcePolicy> policies = getPoliciesActionFilter(c, o, Constants.ADMIN);
+        
+        for (ResourcePolicy rp : policies)
+        {
+            // check policies for date validity
+            if (rp.isDateValid())
+            {
+                if ((rp.getEPersonID() != -1) && (rp.getEPersonID() == userid))
+                {
+                    return true; // match
+                }
+
+                if ((rp.getGroupID() != -1)
+                        && (Group.isMember(c, rp.getGroupID())))
+                {
+                    // group was set, and eperson is a member
+                    // of that group
+                    return true;
+                }
+            }
+        }
+
+        // If user doesn't have specific Admin permissions on this object,
+        // check the *parent* objects of this object.  This allows Admin
+        // permissions to be inherited automatically (e.g. Admin on Community
+        // is also an Admin of all Collections/Items in that Community)
+        DSpaceObject parent = o.getParentObject();
+        if (parent != null)
+        {
+            return isAdmin(c, parent);
+        }
+	
+		return false;
+    }
+
+   
+    /**
+     * Check to see if the current user is a System Admin. Always return
      * <code>true</code> if c.ignoreAuthorization is set. Anonymous users
      * can't be Admins (EPerson set to NULL)
      * 
@@ -422,7 +512,7 @@ public class AuthorizeManager
                 "SELECT * FROM resourcepolicy WHERE resource_type_id= ? AND resource_id= ? ",
                 o.getType(),o.getID());
 
-        List<ResourcePolicy> policies = new ArrayList();
+        List<ResourcePolicy> policies = new ArrayList<ResourcePolicy>();
 
         try
         {
@@ -447,7 +537,9 @@ public class AuthorizeManager
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         return policies;
@@ -493,7 +585,9 @@ public class AuthorizeManager
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         return policies;
@@ -544,7 +638,9 @@ public class AuthorizeManager
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         return policies;
@@ -569,7 +665,16 @@ public class AuthorizeManager
         // find all policies for the source object
         List<ResourcePolicy> policies = getPolicies(c, src);
 
-        addPolicies(c, policies, dest);
+        //Only inherit non-ADMIN policies (since ADMIN policies are automatically inherited)
+        List<ResourcePolicy> nonAdminPolicies = new ArrayList<ResourcePolicy>();
+        for (ResourcePolicy rp : policies)
+        {
+        	if (rp.getAction() != Constants.ADMIN)
+        	{
+        		nonAdminPolicies.add(rp);
+            }
+        }
+        addPolicies(c, nonAdminPolicies, dest);
     }
 
     /**
@@ -754,7 +859,9 @@ public class AuthorizeManager
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         Group[] groupArray = new Group[groups.size()];

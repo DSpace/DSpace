@@ -1,41 +1,9 @@
-/*
- * SubmissionController.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.webui.servlet;
 
@@ -51,11 +19,11 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
 import org.apache.log4j.Logger;
 
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.SubmissionStepConfig;
-import org.dspace.app.util.Util;
 import org.dspace.app.webui.submit.JSPStepManager;
 import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
@@ -68,7 +36,6 @@ import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.workflow.WorkflowItem;
 import org.dspace.submit.AbstractProcessingStep;
-import org.dspace.submit.step.UploadStep;
 
 /**
  * Submission Manager servlet for DSpace. Handles the initial submission of
@@ -117,7 +84,7 @@ import org.dspace.submit.step.UploadStep;
  * @see org.dspace.app.webui.submit.JSPStepManager
  * 
  * @author Tim Donohue
- * @version $Revision: 3705 $
+ * @version $Revision: 6158 $
  */
 public class SubmissionController extends DSpaceServlet
 {
@@ -133,7 +100,7 @@ public class SubmissionController extends DSpaceServlet
     public static final int WORKFLOW_FIRST_STEP = 0;
     
     /** path to the JSP shown once the submission is completed */
-    private static String COMPLETE_JSP = "/submit/complete.jsp";
+    private static final String COMPLETE_JSP = "/submit/complete.jsp";
 
     /** log4j logger */
     private static Logger log = Logger
@@ -253,7 +220,14 @@ public class SubmissionController extends DSpaceServlet
         if ((contentType != null)
                 && (contentType.indexOf("multipart/form-data") != -1))
         {
-            request = wrapMultipartRequest(request);
+            try
+            {
+                request = wrapMultipartRequest(request);
+            } catch (FileSizeLimitExceededException e)
+            {
+                log.warn("Upload exceeded upload.max");
+                JSPManager.showFileSizeLimitExceededError(request, response, e.getMessage(), e.getActualSize(), e.getPermittedSize());
+            }
             
             //also, upload any files and save their contents to Request (for later processing by UploadStep)
             uploadFiles(context, request);
@@ -521,22 +495,6 @@ public class SubmissionController extends DSpaceServlet
     {
         int result = doSaveCurrentState(context, request, response, subInfo, currentStepConfig);
         
-        int currStep=currentStepConfig.getStepNumber();
-        int currPage=AbstractProcessingStep.getCurrentPage(request);
-        double currStepAndPage = Float.parseFloat(currStep+"."+currPage);
-        // default value if we are in workflow
-        double stepAndPageReached = -1;
-        
-        if (!subInfo.isInWorkflow())
-        {
-            stepAndPageReached = Float.parseFloat(getStepReached(subInfo)+"."+JSPStepManager.getPageReached(subInfo));
-        }
-        
-        if (result != AbstractProcessingStep.STATUS_COMPLETE && currStepAndPage != stepAndPageReached)
-        {
-            doStep(context, request, response, subInfo, currStep);
-        }
-        
         // find current Step number
         int currentStepNum;
         if (currentStepConfig == null)
@@ -548,7 +506,22 @@ public class SubmissionController extends DSpaceServlet
             currentStepNum = currentStepConfig.getStepNumber();
         }
 
-        //Check to see if we are actually just going to a 
+        int currPage=AbstractProcessingStep.getCurrentPage(request);
+        double currStepAndPage = Double.parseDouble(currentStepNum+"."+currPage);
+        // default value if we are in workflow
+        double stepAndPageReached = -1;
+        
+        if (!subInfo.isInWorkflow())
+        {
+            stepAndPageReached = Float.parseFloat(getStepReached(subInfo)+"."+JSPStepManager.getPageReached(subInfo));
+        }
+        
+        if (result != AbstractProcessingStep.STATUS_COMPLETE && currStepAndPage != stepAndPageReached)
+        {
+            doStep(context, request, response, subInfo, currentStepNum);
+        }
+        
+        //Check to see if we are actually just going to a
         //previous PAGE within the same step.
         int currentPageNum = AbstractProcessingStep.getCurrentPage(request);
         
@@ -576,27 +549,19 @@ public class SubmissionController extends DSpaceServlet
         else if (currentStepNum > FIRST_STEP)
         {
             
-            //need to find a previous step that is VISIBLE to the user!
-            while(currentStepNum>FIRST_STEP)
+            currentStepConfig = getPreviousVisibleStep(request, subInfo);
+            
+            if(currentStepConfig != null)
             {
-                // update the current step & do this previous step
-                currentStepNum--;
-            
-                //get previous step
-                currentStepConfig = subInfo.getSubmissionConfig().getStep(currentStepNum);
-            
-                if(currentStepConfig.isVisible())
-                {
-                    foundPrevious = true;
-                    break;
-                }
+                currentStepNum = currentStepConfig.getStepNumber();
+                foundPrevious = true;
             }
                 
             if(foundPrevious)
             {    
                 //flag to JSPStepManager that we are going backwards
                 //an entire step
-                request.setAttribute("step.backwards", new Boolean(true));
+                request.setAttribute("step.backwards", Boolean.TRUE);
                 
                 // flag that we are going back to the start of this step (for JSPStepManager class)
                 setBeginningOfStep(request, true);
@@ -1091,7 +1056,7 @@ public class SubmissionController extends DSpaceServlet
     }
 
     /**
-     * Checks if the current step is also the first step in the item submission
+     * Checks if the current step is also the first "visibile" step in the item submission
      * process.
      * 
      * @param request
@@ -1106,14 +1071,45 @@ public class SubmissionController extends DSpaceServlet
     {
         SubmissionStepConfig step = getCurrentStepConfig(request, si);
 
-        if ((step != null) && (step.getStepNumber() == FIRST_STEP))
+        return ((step != null) && (getPreviousVisibleStep(request, si) == null));
+    }
+    
+    /**
+     * Return the previous "visibile" step in the item submission
+     * process if any, <code>null</code> otherwise.
+     * 
+     * @param request
+     *            HTTP request
+     * @param si
+     *            The current Submission Info
+     * 
+     * @return the previous step in the item submission process if any
+     */
+    public static SubmissionStepConfig getPreviousVisibleStep(HttpServletRequest request,
+            SubmissionInfo si)
+    {
+        SubmissionStepConfig step = getCurrentStepConfig(request, si);
+
+        SubmissionStepConfig currentStepConfig, previousStep = null;
+
+        int currentStepNum = step.getStepNumber();
+        
+        //need to find a previous step that is VISIBLE to the user!
+        while(currentStepNum>FIRST_STEP)
         {
-            return true;
+            // update the current step & do this previous step
+            currentStepNum--;
+        
+            //get previous step
+            currentStepConfig = si.getSubmissionConfig().getStep(currentStepNum);
+        
+            if(currentStepConfig.isVisible())
+            {
+                previousStep = currentStepConfig;
+                break;
+            }
         }
-        else
-        {
-            return false;
-        }
+        return previousStep;
     }
 
     /**
@@ -1156,7 +1152,7 @@ public class SubmissionController extends DSpaceServlet
     public static void setBeginningOfStep(HttpServletRequest request,
             boolean beginningOfStep)
     {
-        request.setAttribute("step.start", new Boolean(beginningOfStep));
+        request.setAttribute("step.start", Boolean.valueOf(beginningOfStep));
     }
 
     
@@ -1196,7 +1192,7 @@ public class SubmissionController extends DSpaceServlet
      */
     private static void setCancellationInProgress(HttpServletRequest request, boolean cancellationInProgress)
     {
-        request.setAttribute("submission.cancellation", new Boolean(cancellationInProgress));
+        request.setAttribute("submission.cancellation", Boolean.valueOf(cancellationInProgress));
     }
     
     
@@ -1362,7 +1358,7 @@ public class SubmissionController extends DSpaceServlet
      *             if there are no more pages in this step
      */
     private HttpServletRequest wrapMultipartRequest(HttpServletRequest request)
-            throws ServletException
+            throws ServletException, FileSizeLimitExceededException
     {
         HttpServletRequest wrappedRequest;
 
@@ -1381,6 +1377,10 @@ public class SubmissionController extends DSpaceServlet
             { // already wrapped
                 return request;
             }
+        }
+        catch (FileSizeLimitExceededException e)
+        {
+            throw new FileSizeLimitExceededException(e.getMessage(),e.getActualSize(),e.getPermittedSize());
         }
         catch (Exception e)
         {
@@ -1436,7 +1436,10 @@ public class SubmissionController extends DSpaceServlet
                     filePath = wrapper.getFilesystemName(fileName);
                 
                     // cleanup our temp file
-                    temp.delete();
+                    if (!temp.delete())
+                    {
+                        log.error("Unable to delete temporary file");
+                    }
                     
                     //save this file's info to request (for UploadStep class)
                     request.setAttribute(fileName + "-path", filePath);

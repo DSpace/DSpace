@@ -1,46 +1,11 @@
-/*
- * LogAnalyser.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.statistics;
-
-import org.dspace.app.statistics.LogLine;
 
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -49,9 +14,6 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 
 import java.sql.SQLException;
-
-import java.lang.Long;
-import java.lang.StringBuffer;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -98,19 +60,19 @@ public class LogAnalyser
     /////////////////
     
     /** aggregator for all actions performed in the system */
-    private static Map actionAggregator;
+    private static Map<String, Integer> actionAggregator;
     
     /** aggregator for all searches performed */
-    private static Map searchAggregator;
+    private static Map<String, Integer> searchAggregator;
     
     /** aggregator for user logins */
-    private static Map userAggregator;
+    private static Map<String, Integer> userAggregator;
     
     /** aggregator for item views */
-    private static Map itemAggregator;
+    private static Map<String, Integer> itemAggregator;
     
     /** aggregator for current archive state statistics */
-    private static Map archiveStats;
+    private static Map<String, Integer> archiveStats;
     
     /** warning counter */
     private static int warnCount = 0;
@@ -123,19 +85,19 @@ public class LogAnalyser
     //////////////////
     
     /** list of actions to be included in the general summary */
-    private static List generalSummary;
+    private static List<String> generalSummary;
     
     /** list of words not to be aggregated */
-    private static List excludeWords;
+    private static List<String> excludeWords;
     
     /** list of search types to be ignored, such as "author:" */
-    private static List excludeTypes;
+    private static List<String> excludeTypes;
     
     /** list of characters to be excluded */
-    private static List excludeChars;
+    private static List<String> excludeChars;
     
     /** list of item types to be reported on in the current state */
-    private static List itemTypes;
+    private static List<String> itemTypes;
     
     /** bottom limit to output for search word analysis */
     private static int searchFloor;
@@ -246,11 +208,7 @@ public class LogAnalyser
         
    /** the end date of the report as obtained from the log files */
    private static Date logEndDate = null;
-   
-   /** are we looking stuff up in the database */
-   private static boolean lookUp = false;
-        
-   
+
     /**
      * main method to be run from command line.  See usage information for
      * details as to how to use the command line flags (-help)
@@ -349,18 +307,18 @@ public class LogAnalyser
         startTime = new GregorianCalendar();
                 
         //instantiate aggregators
-        actionAggregator = new HashMap();
-        searchAggregator = new HashMap();
-        userAggregator = new HashMap();
-        itemAggregator = new HashMap();
-        archiveStats = new HashMap();
+        actionAggregator = new HashMap<String, Integer>();
+        searchAggregator = new HashMap<String, Integer>();
+        userAggregator = new HashMap<String, Integer>();
+        itemAggregator = new HashMap<String, Integer>();
+        archiveStats = new HashMap<String, Integer>();
         
         //instantiate lists
-        generalSummary = new ArrayList();
-        excludeWords = new ArrayList();
-        excludeTypes = new ArrayList();
-        excludeChars = new ArrayList();
-        itemTypes = new ArrayList();
+        generalSummary = new ArrayList<String>();
+        excludeWords = new ArrayList<String>();
+        excludeTypes = new ArrayList<String>();
+        excludeChars = new ArrayList<String>();
+        itemTypes = new ArrayList<String>();
               
         // set the parameters for this analysis
         setParameters(myLogDir, myFileTemplate, myConfigFile, myOutFile, myStartDate, myEndDate, myLookUp);
@@ -423,12 +381,12 @@ public class LogAnalyser
                     {
                         // first find out if we are constraining by date and 
                         // if so apply the restrictions
-                        if (logLine.beforeDate(startDate))
+                        if ((startDate != null) && (!logLine.afterDate(startDate)))
                         {
                             continue;
                         }
                         
-                        if (logLine.afterDate(endDate))
+                        if ((endDate !=null) && (!logLine.beforeDate(endDate)))
                         {
                             break;
                         }
@@ -510,9 +468,7 @@ public class LogAnalyser
                             
                             // strip the item id string
                             Matcher matchItem = itemRX.matcher(handle);
-                            handle = matchItem.replaceAll("");
-
-                            handle.trim();
+                            handle = matchItem.replaceAll("").trim();
 
                             // either add the handle to the aggregator or
                             // increment its counter
@@ -539,7 +495,7 @@ public class LogAnalyser
         archiveStats.put("All Items", getNumItems(context));
         for (i = 0; i < itemTypes.size(); i++)
         {
-            archiveStats.put(itemTypes.get(i), getNumItems(context, (String) itemTypes.get(i)));
+            archiveStats.put(itemTypes.get(i), getNumItems(context, itemTypes.get(i)));
         }
         
         // now do the host name and url lookup
@@ -552,14 +508,13 @@ public class LogAnalyser
         }
         
         // do the average views analysis
-        if (((Integer) archiveStats.get("All Items")).intValue() != 0)
+        if ((archiveStats.get("All Items")).intValue() != 0)
         {
             // FIXME: this is dependent on their being a query on the db, which
             // there might not always be if it becomes configurable
-            Double avg = new Double(
-                        Math.ceil(
-                            ((Integer) actionAggregator.get("view_item")).intValue() / 
-                            ((Integer) archiveStats.get("All Items")).intValue()));
+            Double avg = Math.ceil(
+                            (actionAggregator.get("view_item")).doubleValue() /
+                            (archiveStats.get("All Items")).doubleValue());
             views = avg.intValue();
         }
         
@@ -606,17 +561,12 @@ public class LogAnalyser
         
         if (myStartDate != null)
         {
-            startDate = myStartDate;
+            startDate = new Date(myStartDate.getTime());
         }
         
         if (myEndDate != null)
         {
-            endDate = myEndDate;
-        }
-        
-        if (myLogDir != null)
-        {
-            lookUp = myLookUp;
+            endDate = new Date(myEndDate.getTime());
         }
         
         if (myOutFile != null)
@@ -637,7 +587,7 @@ public class LogAnalyser
         StringBuffer summary = new StringBuffer();
         
         // define an iterator that will be used to go over the hashmap keys
-        Iterator keys = null;
+        Iterator<String> keys = null;
         
         // output the number of lines parsed
         summary.append("log_lines=" + Integer.toString(lineCount) + "\n");
@@ -682,7 +632,7 @@ public class LogAnalyser
         keys = archiveStats.keySet().iterator();
         while (keys.hasNext())
         {
-            String key = (String) keys.next();
+            String key = keys.next();
             summary.append("archive." + key + "=" + archiveStats.get(key) + "\n");
         }
         
@@ -690,7 +640,7 @@ public class LogAnalyser
         keys = actionAggregator.keySet().iterator();
         while (keys.hasNext())
         {
-            String key = (String) keys.next();
+            String key = keys.next();
             summary.append("action." + key + "=" + actionAggregator.get(key) + "\n");
         }
         
@@ -705,7 +655,7 @@ public class LogAnalyser
         // FIXME: the users reporting should also have a floor value
         while (keys.hasNext())
         {
-            String key = (String) keys.next();
+            String key = keys.next();
             summary.append("user.");
             if (userEmail.equals("on"))
             {
@@ -726,8 +676,8 @@ public class LogAnalyser
         keys = searchAggregator.keySet().iterator();
         while (keys.hasNext())
         {
-            String key = (String) keys.next();
-            if (((Integer) searchAggregator.get(key)).intValue() >= searchFloor)
+            String key = keys.next();
+            if ((searchAggregator.get(key)).intValue() >= searchFloor)
             {
                 summary.append("search." + key + "=" + searchAggregator.get(key) + "\n");
             }
@@ -749,8 +699,8 @@ public class LogAnalyser
         keys = itemAggregator.keySet().iterator();
         while (keys.hasNext())
         {
-            String key = (String) keys.next();
-            if (((Integer) itemAggregator.get(key)).intValue() >= itemFloor)
+            String key = keys.next();
+            if ((itemAggregator.get(key)).intValue() >= itemFloor)
             {
                 summary.append("item." + key + "=" + itemAggregator.get(key) + "\n");
             }
@@ -825,7 +775,7 @@ public class LogAnalyser
         charRegEx.append("[");
         for (int i = 0; i < excludeChars.size(); i++)
         {
-            charRegEx.append("\\" + (String) excludeChars.get(i));
+            charRegEx.append("\\").append(excludeChars.get(i));
         }
         charRegEx.append("]");
         excludeCharRX = Pattern.compile(charRegEx.toString());
@@ -869,7 +819,7 @@ public class LogAnalyser
             {
                 typeRXString.append("|");
             }
-            typeRXString.append((String) excludeTypes.get(i));
+            typeRXString.append(excludeTypes.get(i));
         }
         typeRXString.append(")");
         typeRX = Pattern.compile(typeRXString.toString());
@@ -883,27 +833,58 @@ public class LogAnalyser
             {
                 wordRXString.append("|");
             }
-            wordRXString.append(" " + (String) excludeWords.get(i) + " ");
+            wordRXString.append(" " + excludeWords.get(i) + " ");
             wordRXString.append("|");
-            wordRXString.append("^" + (String) excludeWords.get(i) + " ");
+            wordRXString.append("^" + excludeWords.get(i) + " ");
             wordRXString.append("|");
-            wordRXString.append(" " + (String) excludeWords.get(i) + "$");
+            wordRXString.append(" " + excludeWords.get(i) + "$");
         }
         wordRXString.append(")");
         wordRX = Pattern.compile(wordRXString.toString());
         
         return;
     }
-    
-    
+
+    /**
+     * get the current config file name
+     * @return The name of the config file
+     */
+    public static String getConfigFile()
+    {
+        return configFile;
+    }
+
     /**
      * read in the given config file and populate the class globals
      *
      * @param   configFile  the config file to read in
      */
-    public static void readConfig(String configFile)
-        throws IOException
+    public static void readConfig() throws IOException
     {
+        readConfig(configFile);
+    }
+
+    /**
+     * read in the given config file and populate the class globals
+     *
+     * @param   configFile  the config file to read in
+     */
+    public static void readConfig(String configFile) throws IOException
+    {
+        //instantiate aggregators
+        actionAggregator = new HashMap<String, Integer>();
+        searchAggregator = new HashMap<String, Integer>();
+        userAggregator = new HashMap<String, Integer>();
+        itemAggregator = new HashMap<String, Integer>();
+        archiveStats = new HashMap<String, Integer>();
+
+        //instantiate lists
+        generalSummary = new ArrayList<String>();
+        excludeWords = new ArrayList<String>();
+        excludeTypes = new ArrayList<String>();
+        excludeChars = new ArrayList<String>();
+        itemTypes = new ArrayList<String>();
+
         // prepare our standard file readers and buffered readers
         FileReader fr = null;
         BufferedReader br = null;
@@ -938,7 +919,7 @@ public class LogAnalyser
                 // documentation for more info on config params)
                 if (key.equals("general.summary"))
                 {
-                    actionAggregator.put(value, new Integer(0));
+                    actionAggregator.put(value, Integer.valueOf(0));
                     generalSummary.add(value);
                 }
                 
@@ -999,17 +980,17 @@ public class LogAnalyser
      *
      * @return          an integer object containing the new value
      */
-    public static Integer increment(Map map, String key)
+    public static Integer increment(Map<String, Integer> map, String key)
     {
         Integer newValue = null;
         if (map.containsKey(key))
         {
             // FIXME: this seems like a ridiculous way to add Integers
-            newValue = new Integer(((Integer) map.get(key)).intValue() + 1);
+            newValue = Integer.valueOf((map.get(key)).intValue() + 1);
         }
         else
         {
-            newValue = new Integer(1);
+            newValue = Integer.valueOf(1);
         }
         return newValue;
     }
@@ -1270,13 +1251,13 @@ public class LogAnalyser
         Integer numItems;
         if (oracle)
         {
-            numItems = new Integer(row.getIntColumn("num"));
+            numItems = Integer.valueOf(row.getIntColumn("num"));
         }
         else
         {
             // for some reason the number column is of "long" data type!
-            Long count = new Long(row.getLongColumn("num"));
-            numItems = new Integer(count.intValue());
+            Long count = Long.valueOf(row.getLongColumn("num"));
+            numItems = Integer.valueOf(count.intValue());
         }
         return numItems;
     }

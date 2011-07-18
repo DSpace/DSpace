@@ -1,43 +1,10 @@
-/*
- * PackageParameters.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.content.packager;
 
 import java.util.Enumeration;
@@ -54,7 +21,7 @@ import javax.servlet.ServletRequest;
  * allow many different metadata segments.
  *
  * @author Larry Stone
- * @version $Revision: 3705 $
+ * @version $Revision: 5844 $
  */
 
 public class PackageParameters extends Properties
@@ -92,16 +59,22 @@ public class PackageParameters extends Properties
             String name = (String)pe.nextElement();
             String v[] = request.getParameterValues(name);
             if (v.length == 0)
+            {
                 result.setProperty(name, "");
+            }
             else if (v.length == 1)
+            {
                 result.setProperty(name, v[0]);
+            }
             else
             {
                 StringBuffer sb = new StringBuffer();
                 for (int i = 0; i < v.length; ++i)
                 {
                     if (i > 0)
+                    {
                         sb.append(SEPARATOR);
+                    }
                     sb.append(v[i]);
                 }
                 result.setProperty(name, sb.toString());
@@ -124,9 +97,13 @@ public class PackageParameters extends Properties
     {
         String oldVal = getProperty(key);
         if (oldVal == null)
+        {
             setProperty(key, value);
+        }
         else
+        {
             setProperty(key, oldVal + SEPARATOR + value);
+        }
         return oldVal;
     }
 
@@ -140,15 +117,19 @@ public class PackageParameters extends Properties
     {
         String val = getProperty(key);
         if (val == null)
+        {
             return null;
+        }
         else
+        {
             return val.split(SEPARATOR_REGEX);
+        }
     }
 
     /**
      * Returns boolean form of property with selectable default
      * @param key the key to look for in this property list.
-     * @param default default to return if there is no such property
+     * @param defaultAnswer default to return if there is no such property
      * @return the boolean derived from the value of property, or default
      *   if it was not specified.
      */
@@ -157,10 +138,210 @@ public class PackageParameters extends Properties
         String stringValue = getProperty(key);
 
         if (stringValue == null)
+        {
             return defaultAnswer;
+        }
         else
+        {
             return stringValue.equalsIgnoreCase("true") ||
-                   stringValue.equalsIgnoreCase("on") ||
-                   stringValue.equalsIgnoreCase("yes");
+                    stringValue.equalsIgnoreCase("on") ||
+                    stringValue.equalsIgnoreCase("yes");
+        }
     }
+
+
+    /**
+     * Utility method to tell if workflow is enabled for Item ingestion.
+     * Checks the Packager parameters.
+     * <p>
+     * Defaults to 'true' if previously unset, as by default all
+     * DSpace Workflows should be enabled.
+     *
+     * @return boolean result
+     */
+    public boolean workflowEnabled()
+    {
+        return getBooleanProperty("useWorkflow", true);
+    }
+
+    /***
+     * Utility method to enable/disable workflow for Item ingestion.
+     *
+     * @param value boolean value (true = workflow enabled, false = workflow disabled)
+     * @return boolean result
+     */
+    public void setWorkflowEnabled(boolean value)
+    {
+        addProperty("useWorkflow", String.valueOf(value));
+    }
+
+
+    /***
+     * Utility method to tell if restore mode is enabled.
+     * Checks the Packager parameters.
+     * <p>
+     * Restore mode attempts to restore an missing/deleted object completely
+     * (including handle), based on contents of a package.
+     * <p>
+     * NOTE: restore mode should throw an error if it attempts to restore an
+     * object which already exists.  Use 'keep-existing' or 'replace' mode to
+     * either skip-over (keep) or replace existing objects.
+     * <p>
+     * Defaults to 'false' if previously unset. NOTE: 'replace' mode and 
+     * 'keep-existing' mode are special types of "restores".  So, when either
+     * replaceModeEnabled() or keepExistingModeEnabled() is true, this method
+     * should also return true.
+     *
+     * @return boolean result
+     */
+    public boolean restoreModeEnabled()
+    {
+        return (getBooleanProperty("restoreMode", false) ||
+           replaceModeEnabled() ||
+           keepExistingModeEnabled());
+    }
+
+    /***
+     * Utility method to enable/disable restore mode.
+     * <p>
+     * Restore mode attempts to restore an missing/deleted object completely
+     * (including handle), based on a given package's contents.
+     * <p>
+     * NOTE: restore mode should throw an error if it attempts to restore an
+     * object which already exists.  Use 'keep-existing' or 'replace' mode to
+     * either skip-over (keep) or replace existing objects.
+     *
+     * @param value boolean value (true = restore enabled, false = restore disabled)
+     * @return boolean result
+     */
+    public void setRestoreModeEnabled(boolean value)
+    {
+        addProperty("restoreMode", String.valueOf(value));
+    }
+
+    /***
+     * Utility method to tell if replace mode is enabled.
+     * Checks the Packager parameters.
+     * <p>
+     * Replace mode attempts to overwrite an existing object and replace it
+     * with the contents of a package. Replace mode is considered a special type
+     * of "restore", where the current object is being restored to a previous state.
+     * <p>
+     * Defaults to 'false' if previously unset.
+     *
+     * @return boolean result
+     */
+    public boolean replaceModeEnabled()
+    {
+        return getBooleanProperty("replaceMode", false);
+    }
+
+    /***
+     * Utility method to enable/disable replace mode.
+     * <p>
+     * Replace mode attempts to overwrite an existing object and replace it
+     * with the contents of a package. Replace mode is considered a special type
+     * of "restore", where the current object is being restored to a previous state.
+     *
+     * @param value boolean value (true = replace enabled, false = replace disabled)
+     * @return boolean result
+     */
+    public void setReplaceModeEnabled(boolean value)
+    {
+        addProperty("replaceMode", String.valueOf(value));
+    }
+
+    /***
+     * Utility method to tell if 'keep-existing' mode is enabled.
+     * Checks the Packager parameters.
+     * <p>
+     * Keep-Existing mode is identical to 'restore' mode, except that it
+     * skips over any objects which are found to already be existing. It
+     * essentially restores all missing objects, but keeps existing ones intact.
+     * <p>
+     * Defaults to 'false' if previously unset.
+     *
+     * @return boolean result
+     */
+    public boolean keepExistingModeEnabled()
+    {
+        return getBooleanProperty("keepExistingMode", false);
+    }
+
+    /***
+     * Utility method to enable/disable 'keep-existing' mode.
+     * <p>
+     * Keep-Existing mode is identical to 'restore' mode, except that it
+     * skips over any objects which are found to already be existing. It
+     * essentially restores all missing objects, but keeps existing ones intact.
+     *
+     * @param value boolean value (true = replace enabled, false = replace disabled)
+     * @return boolean result
+     */
+    public void setKeepExistingModeEnabled(boolean value)
+    {
+        addProperty("keepExistingMode", String.valueOf(value));
+    }
+
+    /***
+     * Utility method to tell if Items should use a Collection's template
+     * when they are created.
+     * <p>
+     * Defaults to 'false' if previously unset.
+     *
+     * @return boolean result
+     */
+    public boolean useCollectionTemplate()
+    {
+        return getBooleanProperty("useCollectionTemplate", false);
+    }
+
+    /***
+     * Utility method to enable/disable Collection Template for Item ingestion.
+     * <p>
+     * When enabled, the Item will be installed using the parent collection's
+     * Item Template
+     *
+     * @param value boolean value (true = template enabled, false = template disabled)
+     * @return boolean result
+     */
+    public void setUseCollectionTemplate(boolean value)
+    {
+        addProperty("useCollectionTemplate", String.valueOf(value));
+    }
+
+
+    /***
+     * Utility method to tell if recursive mode is enabled.
+     * Checks the Packager parameters.
+     * <p>
+     * Recursive mode should be enabled anytime one of the *All() methods
+     * is called (e.g. ingestAll(), replaceAll() or disseminateAll()). It
+     * recursively performs the same action on all related objects.
+     * <p>
+     * Defaults to 'false' if previously unset.
+     *
+     * @return boolean result
+     */
+    public boolean recursiveModeEnabled()
+    {
+        return getBooleanProperty("recursiveMode", false);
+    }
+
+    /***
+     * Utility method to enable/disable recursive mode.
+     * <p>
+     * Recursive mode should be enabled anytime one of the *All() methods
+     * is called (e.g. ingestAll(), replaceAll() or disseminateAll()).  It
+     * recursively performs the same action on all related objects.
+     *
+     * @param value boolean value (true = recursion enabled, false = recursion disabled)
+     * @return boolean result
+     */
+    public void setRecursiveModeEnabled(boolean value)
+    {
+        addProperty("recursiveMode", String.valueOf(value));
+    }
+
+
 }

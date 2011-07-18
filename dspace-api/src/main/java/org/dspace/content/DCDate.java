@@ -1,323 +1,111 @@
-/*
- * DCDate.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.content;
 
 import java.text.DateFormatSymbols;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.Locale;
-import java.util.TimeZone;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 
-// FIXME: No tests
 // FIXME: Not very robust - assumes dates will always be valid
 
 /**
  * Dublin Core date utility class
  * <P>
  * Dates in the DSpace database are held in the ISO 8601 format. They are always
- * stored in UTC, converting to and from the current time zone.
+ * stored in UTC, converting to and from the current time zone. In practice only dates
+ * with a time component need to be converted.
  * <P>
  * <code>YYYY-MM-DDThh:mm:ss</code>
  * <P>
  * There are four levels of granularity, depending on how much date information
- * is available.
+ * is available: year, month, day, time.
  * <P>
  * Examples: <code>1994-05-03T15:30:24</code>,<code>1995-10-04</code>,
  * <code>2001-10</code>,<code>1975</code>
- * 
+ *
  * @author Robert Tansley
- * @version $Revision: 3705 $
+ * @author Larry Stone
+ * @version $Revision: 5911 $
  */
 public class DCDate
 {
     /** Logger */
-    private static Logger cat = Logger.getLogger(DCDate.class);
+    private static Logger log = Logger.getLogger(DCDate.class);
 
-    /** The year, or -1 if none */
-    private int year;
+    // UTC timezone
+    private static final TimeZone utcZone = TimeZone.getTimeZone("UTC");
 
-    /** The month, or -1 if none */
-    private int month;
+    // components of time in UTC
+    private GregorianCalendar calendar = null;
 
-    /** The day, or -1 if none */
-    private int day;
+    // components of time in local zone
+    private GregorianCalendar localCalendar = null;
 
-    /** Hours, -1 if none */
-    private int hours;
+    private enum DateGran { YEAR, MONTH, DAY, TIME }
+    DateGran granularity = null;
 
-    /** Minutes, -1 if none */
-    private int minutes;
+    // Full ISO 8601 is e.g. "2009-07-16T13:59:21Z"
+    private final SimpleDateFormat fullIso = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-    /** seconds, -1 if none */
-    private int seconds;
+    // without Z
+    private final SimpleDateFormat fullIso2 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
 
-    /**
-     * Calendar object for timezone conversion. Only used if the date has a time
-     * component.
-     */
-    private GregorianCalendar localGC;
+    // without seconds
+    private final SimpleDateFormat fullIso3 = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
 
-   /**
-    * DateFormatSymbols for locale monthsname
-     */
-	private static DateFormatSymbols dfs = null;
-	
-   /**
-     * note the session locale
-     */
-	private static Locale langMonth = null;
+    // without minutes
+    private final SimpleDateFormat fullIso4 = new SimpleDateFormat("yyyy-MM-dd'T'HH");
+
+    // Date-only ISO 8601 is e.g. "2009-07-16"
+    private final SimpleDateFormat dateIso = new SimpleDateFormat("yyyy-MM-dd");
+
+    // Year-Month-only ISO 8601 is e.g. "2009-07"
+    private final SimpleDateFormat yearMonthIso = new SimpleDateFormat("yyyy-MM");
+
+    // just year, "2009"
+    private final SimpleDateFormat yearIso = new SimpleDateFormat("yyyy");
     
-	
-	private final Pattern fullDateTimePattern = Pattern.compile("(\\d*)-(\\d{2})-(\\d{2})T(\\d{2}):(\\d{2}):(\\d{2})Z");
-	private final Pattern datePattern = Pattern.compile("(\\d*)-(\\d{2})-(\\d{2})");
-	private final Pattern yearMonthPattern = Pattern.compile("(\\d*)-(\\d{2})");
-    
-    /**
-     * Construct a clean date
-     */
-    public DCDate()
-    {
-        // Set all fields to unknown
-        year = month = day = hours = minutes = seconds = -1;
-        localGC = null;
-    }
-
-    /**
-     * Construct a date from a Dublin Core value
-     * 
-     * @param fromDC
-     *            the date string, in ISO 8601 (no timezone, always use UTC/GMT)
-     */
-    public DCDate(String fromDC)
-    {
-        // Set all fields to unknown
-        year = month = day = hours = minutes = seconds = -1;
-        localGC = null;
-
-        // An empty date is OK
-        if ((fromDC == null) || fromDC.equals(""))
-        {
-            return;
-        }
-
-        try
-        {
-         
-            Matcher fullDateTimeMatcher = fullDateTimePattern.matcher(fromDC);
-            Matcher dateMatcher = datePattern.matcher(fromDC);
-            Matcher yearMonthMatcher = yearMonthPattern.matcher(fromDC);
-            
-            if (fullDateTimeMatcher.matches())
-            {
-                year = Integer.parseInt(fullDateTimeMatcher.group(1));
-                month = Integer.parseInt(fullDateTimeMatcher.group(2));
-                day = Integer.parseInt(fullDateTimeMatcher.group(3));
-                
-                hours = Integer.parseInt(fullDateTimeMatcher.group(4));
-                minutes = Integer.parseInt(fullDateTimeMatcher.group(5));
-                seconds = Integer.parseInt(fullDateTimeMatcher.group(6));
-                  
-            }
-            else if (dateMatcher.matches())
-            {
-                year = Integer.parseInt(dateMatcher.group(1));
-                month = Integer.parseInt(dateMatcher.group(2));
-                day = Integer.parseInt(dateMatcher.group(3));
-            }
-            else if (yearMonthMatcher.matches())
-            {
-                year = Integer.parseInt(yearMonthMatcher.group(1));
-                month = Integer.parseInt(yearMonthMatcher.group(2));
-            }
-            else
-            { // only the year
-                year = Integer.parseInt(fromDC);
-            }
-        }
-        catch (NumberFormatException e)
-        {
-            // Mangled date
-            cat.warn("Mangled date: " + fromDC + "  Exception: " + e);
-            year = month = day = hours = minutes = seconds = -1;
-        }
-    }
+    private static Map<Locale, DateFormatSymbols> dfsLocaleMap = new HashMap<Locale, DateFormatSymbols>();
 
     /**
      * Construct a date object from a Java <code>Date</code> object.
-     * 
+     *
      * @param date
      *            the Java <code>Date</code> object.
      */
     public DCDate(Date date)
     {
-        Calendar calendar = Calendar.getInstance();
+        setUTCForFormatting();
 
+        if (date == null)
+        {
+            return;
+        }
+
+        // By definition a Date has a time component so always set the granularity to TIME.
+        granularity = DateGran.TIME;
+
+        // Set the local calendar.
+        localCalendar = new GregorianCalendar();
+        localCalendar.setTime(date);
+        
+        // Now set the UTC equivalent.
+        calendar = new GregorianCalendar(utcZone);
         calendar.setTime(date);
-
-        // Set all fields
-        setDateLocal(calendar.get(Calendar.YEAR),
-
-        // Uses 1 to 12 implementation below instead of Java's
-                // 0 to 11 convention
-                calendar.get(Calendar.MONTH) + 1, calendar
-                        .get(Calendar.DAY_OF_MONTH), calendar
-                        .get(Calendar.HOUR_OF_DAY), calendar
-                        .get(Calendar.MINUTE), calendar.get(Calendar.SECOND));
-    }
+     }
 
     /**
-     * Get a date representing the current instant in time.
-     * 
-     * @return a DSpaceDate object representing the current instant.
-     */
-    public static DCDate getCurrent()
-    {
-        return (new DCDate(new Date()));
-    }
-
-    /**
-     * Get the date as a string to put back in the Dublin Core
-     * 
-     * @return The date as a string.
-     */
-    public String toString()
-    {
-        StringBuffer sb = new StringBuffer();
-
-        if (year > 0)
-        {
-            sb.append(year);
-        }
-
-        if (month > 0)
-        {
-            sb.append('-').append(fleshOut(month));
-        }
-
-        if (day > 0)
-        {
-            sb.append('-').append(fleshOut(day));
-        }
-
-        if (hours >= 0)
-        {
-            sb.append("T").append(fleshOut(hours)).append(':').append(
-                    fleshOut(minutes)).append(':').append(fleshOut(seconds))
-                    .append("Z");
-        }
-
-        return (sb.toString());
-    }
-
-    /**
-     * Get the date as a Java Date object
-     * 
-     * @return a Date object
-     */
-    public Date toDate()
-    {
-        int tmpmonth;
-        int tmpday;
-        int tmphours;
-        int tmpmin;
-        int tmpsec;
-
-        if (month < 0) {
-            // Month is unknown and set to -1
-            // but GregorianCalendar will interpret this as a rollback
-            // to December of the previous year
-            tmpmonth = 0;
-        }
-        else {
-            // Month is known, but GC calendar is 0 - 11, not 1 - 12
-            // so we'll do subtraction here
-            tmpmonth = month - 1;
-        }
-
-        if (day < 0) {
-            tmpday = 1;
-        }
-        else {
-            tmpday = day;
-        }
-
-        if (hours < 0) {
-            tmphours = 0;
-        }
-        else {
-            tmphours = hours;
-        }
-
-        if (minutes < 0) {
-            tmpmin = 0;
-        }
-        else {
-            tmpmin = minutes;
-        }
-
-        if (seconds < 0) {
-            tmpsec = 0;
-        }
-        else {
-            tmpsec = seconds;
-        }
-
-        GregorianCalendar utcGC = new GregorianCalendar(TimeZone
-                         .getTimeZone("UTC"));
-
-        utcGC.set(year, tmpmonth, tmpday, tmphours, tmpmin, tmpsec);
-
-        return utcGC.getTime();
-
-    }
-
-    /**
-     * Set the date. The date passed in is assumed to be in the current time
-     * zone, and is adjusting to fit the current time zone. Unknown values
-     * should be given as -1.
-     * 
+     * Construct a date object from a bunch of component parts. The date passed in is assumed to be in the current
+     *  time zone. Unknown values should be given as -1.
+     *
      * @param yyyy
      *            the year
      * @param mm
@@ -331,267 +119,517 @@ public class DCDate
      * @param ss
      *            the seconds
      */
-    public void setDateLocal(int yyyy, int mm, int dd, int hh, int mn, int ss)
+    public DCDate(int yyyy, int mm, int dd, int hh, int mn, int ss)
     {
-        year = month = day = hours = minutes = seconds = -1;
+        setUTCForFormatting();
+
+        // default values
+        int lyear = 0;
+        int lhours = 0;
+        int lminutes = 0;
+        int lseconds = 0;
+        int lmonth = 1;
+        int lday = 1;
 
         if (yyyy > 0)
         {
-            year = yyyy;
+            lyear = yyyy;
+            granularity = DateGran.YEAR;
         }
-        else
-        {
-            return;
-        }
-
         if (mm > 0)
         {
-            month = mm;
+            lmonth = mm;
+            granularity = DateGran.MONTH;
         }
-        else
-        {
-            return;
-        }
-
         if (dd > 0)
         {
-            day = dd;
+            lday = dd;
+            granularity = DateGran.DAY;
+        }
+        if (hh >= 0)
+        {
+            lhours = hh;
+            granularity = DateGran.TIME;
+        }
+        if (mn >= 0)
+        {
+            lminutes = mn;
+            granularity = DateGran.TIME;
+        }
+        if (ss >= 0)
+        {
+            lseconds = ss;
+            granularity = DateGran.TIME;
+        }
+
+        // Set the local calendar.
+        localCalendar = new GregorianCalendar(lyear, lmonth - 1, lday,
+                                                 lhours, lminutes, lseconds);
+
+        if (granularity == DateGran.TIME)
+        {
+            // Now set the UTC equivalent.
+            calendar = new GregorianCalendar(utcZone);
+            calendar.setTime(localCalendar.getTime());
         }
         else
         {
-            return;
+            // No Time component so just set the UTC date to be the same as the local Year, Month, and Day.
+            calendar = new GregorianCalendar(localCalendar.get(Calendar.YEAR), localCalendar.get(Calendar.MONTH), localCalendar.get(Calendar.DAY_OF_MONTH));
         }
-
-        if (hh == -1)
-        {
-            return;
-        }
-
-        // We have a time, so we need to do a timezone adjustment
-        localGC = new GregorianCalendar(year, month - 1, day, hh, mn, ss);
-
-        // Adjust to UTC
-        GregorianCalendar utcGC = new GregorianCalendar(TimeZone
-                .getTimeZone("UTC"));
-
-        utcGC.setTime(localGC.getTime());
-
-        year = utcGC.get(Calendar.YEAR);
-
-        // Notation
-        month = utcGC.get(Calendar.MONTH) + 1;
-        day = utcGC.get(Calendar.DAY_OF_MONTH);
-        hours = utcGC.get(Calendar.HOUR_OF_DAY);
-        minutes = utcGC.get(Calendar.MINUTE);
-        seconds = utcGC.get(Calendar.SECOND);
     }
 
     /**
-     * Get the date as an array of ints, adjusted for the current timezone
-     * 
-     * @return the date an an array: ( year, month, day, hour, minute, seconds) -
-     *         unset fields are given a value of -1.
+     * Construct a date from a Dublin Core value
+     *
+     * @param fromDC
+     *            the date string, in ISO 8601 (no timezone, always use UTC)
      */
-    private int[] getDateLocal()
+    public DCDate(String fromDC)
     {
-        // Handle simple date cases first - no timezone adjustment
-        if (hours == -1)
+        setUTCForFormatting();
+
+        // An empty date is OK
+        if ((fromDC == null) || fromDC.equals(""))
         {
-            return new int[] { year, month, day, -1, -1, -1 };
+            return;
         }
 
-        // We have a full time, adjust to current timezone
-        if (localGC == null)
+        // default granularity
+        granularity = DateGran.TIME;
+        Date date = tryParse(fullIso, fromDC);
+        if (date == null)
         {
-            GregorianCalendar utcGC = new GregorianCalendar(TimeZone
-                    .getTimeZone("UTC"));
-
-            utcGC.set(year, month - 1, day, hours, minutes, seconds);
-            localGC = new GregorianCalendar();
-            localGC.setTime(utcGC.getTime());
+            date = tryParse(fullIso2, fromDC);
+        }
+        if (date == null)
+        {
+            date = tryParse(fullIso3, fromDC);
+        }
+        if (date == null)
+        {
+            date = tryParse(fullIso4, fromDC);
+        }
+        if (date == null)
+        {
+            // Seems there is no time component to the date.
+            date = tryParse(dateIso, fromDC);
+            if (date != null)
+            {
+                granularity = DateGran.DAY;
+            }
+        }
+        if (date == null)
+        {
+            date = tryParse(yearMonthIso, fromDC);
+            if (date != null)
+            {
+                granularity = DateGran.MONTH;
+            }
+        }
+        if (date == null)
+        {
+            date = tryParse(yearIso, fromDC);
+            if (date != null)
+            {
+                granularity = DateGran.YEAR;
+            }
         }
 
-        return new int[] { localGC.get(Calendar.YEAR),
-                localGC.get(Calendar.MONTH) + 1,
-                localGC.get(Calendar.DAY_OF_MONTH),
-                localGC.get(Calendar.HOUR_OF_DAY),
-                localGC.get(Calendar.MINUTE), localGC.get(Calendar.SECOND) };
+        if (date == null)
+        {
+            log.warn("Mangled date: " + fromDC + "  ..failed all attempts to parse as date.");
+        }
+        else
+        {
+            // Set the UTC time.
+            calendar = new GregorianCalendar(utcZone);
+            calendar.setTime(date);
+
+            // Now set the local equivalent.
+            if (granularity == DateGran.TIME)
+            {
+                localCalendar = new GregorianCalendar();
+                localCalendar.setTime(date);
+            }
+            else
+            {
+                // No Time component so just set the local date to be the same as the UTC  Year, Month, and Day.
+                localCalendar = new GregorianCalendar(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
+            }
+        }
     }
 
+    /**
+     * Set all the formatters to use UTC. SimpleDateFormat is not thread-safe which
+     * is why they are not static variables initialised once.
+     */
+    private void setUTCForFormatting()
+    {
+        fullIso.setTimeZone(utcZone);
+        fullIso2.setTimeZone(utcZone);
+        fullIso3.setTimeZone(utcZone);
+        fullIso4.setTimeZone(utcZone);
+        dateIso.setTimeZone(utcZone);
+        yearMonthIso.setTimeZone(utcZone);
+        yearIso.setTimeZone(utcZone);
+    }
+
+    // Attempt to parse, swallowing errors; return null for failure.
+    private synchronized Date tryParse(SimpleDateFormat sdf,  String source)
+    {
+        try
+        {
+            return sdf.parse(source);
+        }
+        catch (ParseException pe)
+        {
+            return null;
+        }
+    }
+    
     /**
      * Get the year, adjusting for current time zone.
-     * 
+     *
      * @return the year
      */
     public int getYear()
     {
-        return (getDateLocal())[0];
+        return (!withinGranularity(DateGran.YEAR)) ? -1 : localCalendar.get(Calendar.YEAR);
     }
 
     /**
      * Get the month, adjusting for current time zone.
-     * 
+     *
      * @return the month
      */
     public int getMonth()
     {
-        return (getDateLocal())[1];
+        return (!withinGranularity(DateGran.MONTH)) ? -1 : localCalendar.get(Calendar.MONTH) + 1;
     }
 
     /**
      * Get the day, adjusting for current time zone.
-     * 
+     *
      * @return the day
      */
     public int getDay()
     {
-        return (getDateLocal())[2];
+        return (!withinGranularity(DateGran.DAY)) ? -1 : localCalendar.get(Calendar.DAY_OF_MONTH);
     }
 
     /**
      * Get the hour, adjusting for current time zone.
-     * 
+     *
      * @return the hour
      */
     public int getHour()
     {
-        return (getDateLocal())[3];
+        return  (!withinGranularity(DateGran.TIME)) ? -1 : localCalendar.get(Calendar.HOUR_OF_DAY);
     }
 
     /**
      * Get the minute, adjusting for current time zone.
-     * 
+     *
      * @return the minute
      */
     public int getMinute()
     {
-        return (getDateLocal())[4];
+        return (!withinGranularity(DateGran.TIME)) ? -1 : localCalendar.get(Calendar.MINUTE);
     }
 
     /**
      * Get the second, adjusting for current time zone.
-     * 
+     *
      * @return the second
      */
     public int getSecond()
     {
-        return (getDateLocal())[5];
+        return (!withinGranularity(DateGran.TIME)) ? -1 : localCalendar.get(Calendar.SECOND);
     }
 
     /**
-     * Get the date as an array of ints in GMT
-     * 
-     * @return the date an an array: ( year, month, day, hour, minute, seconds) -
-     *         unset fields are given a value of -1.
-     */
-    private int[] getDateGMT()
-    {
-        return new int[] { year, month, day, hours, minutes, seconds };
-    }
-
-    /**
-     * Get the year in GMT.
-     * 
+     * Get the year in UTC.
+     *
      * @return the year
      */
-    public int getYearGMT()
+    public int getYearUTC()
     {
-        return (getDateGMT())[0];
+        return (!withinGranularity(DateGran.YEAR)) ? -1 : calendar.get(Calendar.YEAR);
     }
 
     /**
-     * Get the month in GMT.
-     * 
+     * Get the month in UTC.
+     *
      * @return the month
      */
-    public int getMonthGMT()
+    public int getMonthUTC()
     {
-        return (getDateGMT())[1];
+        return (!withinGranularity(DateGran.MONTH)) ? -1 : calendar.get(Calendar.MONTH) + 1;
     }
 
     /**
-     * Get the day in GMT.
-     * 
+     * Get the day in UTC.
+     *
      * @return the day
      */
-    public int getDayGMT()
+    public int getDayUTC()
     {
-        return (getDateGMT())[2];
+        return (!withinGranularity(DateGran.DAY)) ? -1 : calendar.get(Calendar.DAY_OF_MONTH);
     }
 
     /**
-     * Get the hour in GMT.
-     * 
+     * Get the hour in UTC.
+     *
      * @return the hour
      */
-    public int getHourGMT()
+    public int getHourUTC()
     {
-        return (getDateGMT())[3];
+        return (!withinGranularity(DateGran.TIME)) ? -1 : calendar.get(Calendar.HOUR_OF_DAY);
     }
 
     /**
-     * Get the minute in GMT.
-     * 
+     * Get the minute in UTC.
+     *
      * @return the minute
      */
-    public int getMinuteGMT()
+    public int getMinuteUTC()
     {
-        return (getDateGMT())[4];
+        return (!withinGranularity(DateGran.TIME)) ? -1 : calendar.get(Calendar.MINUTE);
     }
 
     /**
-     * Get the second in GMT.
-     * 
+     * Get the second in UTC.
+     *
      * @return the second
      */
-    public int getSecondGMT()
+    public int getSecondUTC()
     {
-        return (getDateGMT())[5];
+        return (!withinGranularity(DateGran.TIME)) ? -1 : calendar.get(Calendar.SECOND);
     }
 
+
     /**
-     * Flesh out a number to two digits
-     * 
-     * @param n
-     *            the number
-     * @return the number as a two-digit string
+     * Get the date as a string to put back in the Dublin Core. Use the UTC/GMT calendar version.
+     *
+     * @return The date as a string.
      */
-    private String fleshOut(int n)
+    public String toString()
     {
-        if (n < 10)
+        if (calendar == null)
         {
-            return "0" + n;
+            return "null";
+        }
+        return toStringInternal();
+    }
+
+    private synchronized String toStringInternal()
+    {
+        if (granularity == DateGran.YEAR)
+        {
+            return String.format("%4d", getYearUTC());
+        }
+        else if (granularity == DateGran.MONTH)
+        {
+            return String.format("%4d-%02d", getYearUTC(), getMonthUTC());
+        }
+        else if (granularity == DateGran.DAY)
+        {
+            return String.format("%4d-%02d-%02d", getYearUTC(), getMonthUTC(), getDayUTC());
         }
         else
         {
-            return String.valueOf(n);
+            return fullIso.format(calendar.getTime());
         }
     }
 
     /**
+     * Get the date as a Java Date object.
+     *
+     * @return a Date object
+     */
+    public Date toDate()
+    {
+        if (calendar == null)
+        {
+            return null;
+        }
+        else
+        {
+            return calendar.getTime();
+        }
+    }
+
+    /**
+     * Format a human-readable version of the DCDate, with optional time.
+     * This needs to be in DCDate because it depends on the granularity of
+     * the original time.
+     *
+     * FIXME: This should probably be replaced with a localized DateFormat.
+     *
+     * @param showTime
+     *            if true, display the time with the date
+     * @param isLocalTime
+     *            if true, adjust for local time zone, otherwise UTC
+     * @param locale
+     *            locale of the user
+     *
+     * @return String with the date in a human-readable form.
+     */
+    public String displayDate(boolean showTime, boolean isLocalTime, Locale locale)
+    {
+        if (isLocalTime)
+        {
+            return displayLocalDate(showTime, locale);
+        }
+        else
+        {
+            return displayUTCDate(showTime, locale);
+        }
+    }
+
+    public String displayLocalDate(boolean showTime, Locale locale)
+    {
+          // forcibly truncate month name to 3 chars -- XXX FIXME?
+        String monthName = getMonthName(getMonth(), locale);
+        if (monthName.length() > 2)
+            monthName = monthName.substring(0, 3);
+
+        // display date and time
+        if (showTime && granularity == DateGran.TIME)
+        {
+            return String.format("%d-%s-%4d %02d:%02d:%02d", getDay(), monthName, getYear(), getHour(), getMinute(), getSecond());
+        }
+        else if (granularity == DateGran.YEAR)
+        {
+            return String.format("%4d", getYear());
+        }
+        else if (granularity == DateGran.MONTH)
+        {
+            return String.format("%s-%4d", monthName, getYear());
+        }
+        else
+        {
+            return String.format("%d-%s-%4d", getDay(), monthName, getYear());
+        }
+    }
+
+    public String displayUTCDate(boolean showTime, Locale locale)
+    {
+          // forcibly truncate month name to 3 chars -- XXX FIXME?
+        String monthName = getMonthName(getMonthUTC(), locale);
+        if (monthName.length() > 2)
+            monthName = monthName.substring(0, 3);
+
+        // display date and time
+        if (showTime && granularity == DateGran.TIME)
+        {
+            return String.format("%d-%s-%4d %02d:%02d:%02d", getDayUTC(), monthName, getYearUTC(), getHourUTC(), getMinuteUTC(), getSecondUTC());
+        }
+        else if (granularity == DateGran.YEAR)
+        {
+            return String.format("%4d", getYearUTC());
+        }
+        else if (granularity == DateGran.MONTH)
+        {
+            return String.format("%s-%4d", monthName, getYearUTC());
+        }
+        else
+        {
+            return String.format("%d-%s-%4d", getDayUTC(), monthName, getYearUTC());
+        }
+    }
+
+    /**
+      * Test if the requested level of granularity is within that of the date.
+      *
+      * @param dg
+      *              The requested level of granularity.
+      * @return
+      *              true or false.
+      *
+      */
+     private boolean withinGranularity(DateGran dg)
+     {
+         if (granularity == DateGran.TIME)
+         {
+             if ((dg == DateGran.TIME) || (dg == DateGran.DAY) || (dg == DateGran.MONTH) || (dg == DateGran.YEAR))
+             {
+                 return true;
+             }
+         }
+
+         if (granularity == DateGran.DAY)
+         {
+             if ((dg == DateGran.DAY) || (dg == DateGran.MONTH) || (dg == DateGran.YEAR))
+             {
+                 return true;
+             }
+         }
+
+         if (granularity == DateGran.MONTH)
+         {
+             if ((dg == DateGran.MONTH) || (dg == DateGran.YEAR))
+             {
+                 return true;
+             }
+         }
+
+         if (granularity == DateGran.YEAR)
+         {
+             if (dg == DateGran.YEAR)
+             {
+                 return true;
+             }
+         }
+
+         return false;
+     }
+
+
+
+    /**************  Some utility methods ******************/
+
+    /**
+     * Get a date representing the current instant in time.
+     *
+     * @return a DSpaceDate object representing the current instant.
+
+     */
+    public static DCDate getCurrent()
+    {
+        return (new DCDate(new Date()));
+    }
+
+       /**
      * Get a month's name for a month between 1 and 12. Any invalid month value
      * (e.g. 0 or -1) will return a value of "Unspecified".
-     * 
+     *
      * @param m
      *            the month number
-     * 
-     * @return the month name.
+     *
+     * @param locale
+        * 
+        * @return the month name.
      */
     public static String getMonthName(int m, Locale locale)
     {
         if ((m > 0) && (m < 13))
         {
-            if (dfs == null || !langMonth.equals(locale))
-       		{
-          		dfs = new DateFormatSymbols(locale);
-          		langMonth = locale;
-       		}
+            DateFormatSymbols dfs = dfsLocaleMap.get(locale);
+            if (dfs == null)
+            {
+                dfs = new DateFormatSymbols(locale);
+                dfsLocaleMap.put(locale, dfs);
+            }
+
            return dfs.getMonths()[m-1];
         }
         else
         {
             return "Unspecified";
-        }    
+        }
 
     }
+
 }

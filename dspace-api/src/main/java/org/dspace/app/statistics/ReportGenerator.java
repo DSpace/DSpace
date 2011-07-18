@@ -1,52 +1,16 @@
-/*
- * ReportGenerator.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.statistics;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.PrintWriter;
 import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -88,19 +52,19 @@ public class ReportGenerator
     /////////////////
     
     /** aggregator for all actions performed in the system */
-    private static Map actionAggregator;
+    private static Map<String, String> actionAggregator;
     
     /** aggregator for all searches performed */
-    private static Map searchAggregator;
+    private static Map<String, String> searchAggregator;
     
     /** aggregator for user logins */
-    private static Map userAggregator;
+    private static Map<String, String> userAggregator;
     
     /** aggregator for item views */
-    private static Map itemAggregator;
+    private static Map<String, String> itemAggregator;
     
     /** aggregator for current archive state statistics */
-    private static Map archiveStats;
+    private static Map<String, String> archiveStats;
     
     
     //////////////////
@@ -147,7 +111,7 @@ public class ReportGenerator
     private static int warnings;
     
     /** the list of results to be displayed in the general summary */
-    private static List generalSummary;
+    private static List<String> generalSummary;
     
     //////////////////
     // regular expressions
@@ -164,7 +128,7 @@ public class ReportGenerator
    private static Calendar startTime = null;
    
    /** a map from log file action to human readable action */
-   private static Map actionMap = null;
+   private static Map<String, String> actionMap = null;
    
     /////////////////
     // report generator config data
@@ -245,6 +209,11 @@ public class ReportGenerator
                                      String myMap)
         throws Exception, SQLException
     {
+        if (myMap != null)
+        {
+            map = myMap;
+        }
+
         // create the relevant report type
         // FIXME: at the moment we only support HTML report generation
         Report report = null;
@@ -254,9 +223,9 @@ public class ReportGenerator
             ((HTMLReport)report).setOutput(myOutput);
         }
 
-        if (myMap != null)
+        if (report == null)
         {
-            map = myMap;
+            throw new IllegalStateException("Must specify a valid report format");
         }
 
         ReportGenerator.processReport(context, report, myInput);
@@ -274,22 +243,18 @@ public class ReportGenerator
         startTime = new GregorianCalendar();
              
         /** instantiate aggregators */
-        actionAggregator = new HashMap();
-        searchAggregator = new HashMap();
-        userAggregator = new HashMap();
-        itemAggregator = new HashMap();
-        archiveStats = new HashMap();
-        actionMap = new HashMap();
+        actionAggregator = new HashMap<String, String>();
+        searchAggregator = new HashMap<String, String>();
+        userAggregator = new HashMap<String, String>();
+        itemAggregator = new HashMap<String, String>();
+        archiveStats = new HashMap<String, String>();
+        actionMap = new HashMap<String, String>();
         
         /** instantite lists */
-        generalSummary = new ArrayList();
+        generalSummary = new ArrayList<String>();
                 
         // set the parameters for this analysis
         setParameters(myInput);
-        
-        // pre prepare our standard file readers and buffered readers
-        FileReader fr = null;
-        BufferedReader br = null;
         
         // read the input file
         readInput(input);
@@ -303,7 +268,7 @@ public class ReportGenerator
         
         // define our standard variables for re-use
         // FIXME: we probably don't need these once we've finished re-factoring
-        Iterator keys = null;
+        Iterator<String> keys = null;
         int i = 0;
         String explanation = null;
         int value;
@@ -315,13 +280,13 @@ public class ReportGenerator
         
         overview.setSectionHeader("General Overview");
         
-        Iterator summaryEntries = generalSummary.iterator();
+        Iterator<String> summaryEntries = generalSummary.iterator();
         while (summaryEntries.hasNext())
         {
-            String entry = (String) summaryEntries.next();
+            String entry = summaryEntries.next();
             if (actionAggregator.containsKey(entry))
             {
-                int count = Integer.parseInt((String) actionAggregator.get(entry));
+                int count = Integer.parseInt(actionAggregator.get(entry));
                 overview.add(new Stat(translate(entry), count));
             }
         }
@@ -353,9 +318,9 @@ public class ReportGenerator
         i = 0;
         while (keys.hasNext())
         {
-            String key = (String) keys.next();
+            String key = keys.next();
             String link = url + "handle/" + key;
-            value = Integer.parseInt((String) itemAggregator.get(key));
+            value = Integer.parseInt(itemAggregator.get(key));
             items[i] = new Stat(key, value, link);
             i++;
         }
@@ -456,7 +421,7 @@ public class ReportGenerator
         // get the display processing time information
         Calendar endTime = new GregorianCalendar();
         long timeInMillis = (endTime.getTimeInMillis() - startTime.getTimeInMillis());
-        int outputProcessTime = (new Long(timeInMillis).intValue() / 1000);
+        int outputProcessTime = (int) (timeInMillis / 1000);
         
         // prepare the processing information statistics
         Statistics process = new Statistics("Operation", "");
@@ -492,17 +457,16 @@ public class ReportGenerator
      *
      * @return      a Statistics object containing all the relevant information
      */
-    public static Statistics prepareStats(Map aggregator, boolean sort, boolean translate)
+    public static Statistics prepareStats(Map<String, String> aggregator, boolean sort, boolean translate)
     {
         Stat[] stats = new Stat[aggregator.size()];
         if (aggregator.size() > 0)
         {
-            Iterator keys = aggregator.keySet().iterator();
             int i = 0;
-            while (keys.hasNext())
+            for (Map.Entry<String, String> aggregatorEntry : aggregator.entrySet())
             {
-                String key = (String) keys.next();
-                int value = Integer.parseInt((String) aggregator.get(key));
+                String key = aggregatorEntry.getKey();
+                int value = Integer.parseInt(aggregatorEntry.getValue());
                 if (translate)
                 {
                     stats[i] = new Stat(translate(key), value);
@@ -542,7 +506,7 @@ public class ReportGenerator
     {
         if (actionMap.containsKey(text))
         {
-            return (String) actionMap.get(text);
+            return actionMap.get(text);
         }
         else
         {
@@ -593,10 +557,26 @@ public class ReportGenerator
         finally
         {
             if (br != null)
-                try { br.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    br.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
 
             if (fr != null)
-                try { fr.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    fr.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
         }
     }
     
@@ -697,47 +677,47 @@ public class ReportGenerator
             
             // if the line is real, then we carry on
             // read the analysis contents in
-            if (section.equals("archive"))
+            if ("archive".equals(section))
             {
                 archiveStats.put(key, value);
             }
-            else if (section.equals("action"))
+            else if ("action".equals(section))
             {
                 actionAggregator.put(key, value);
             }
-            else if (section.equals("user"))
+            else if ("user".equals(section))
             {
                 userAggregator.put(key, value);
             }
-            else if (section.equals("search"))
+            else if ("search".equals(section))
             {
                 searchAggregator.put(key, value);
             }
-            else if (section.equals("item"))
+            else if ("item".equals(section))
             {
                 itemAggregator.put(key, value);
             }
-            else if (section.equals("user_email"))
+            else if ("user_email".equals(section))
             {
                 userEmail = value;
             }
-            else if (section.equals("item_floor"))
+            else if ("item_floor".equals(section))
             {
                 itemFloor = Integer.parseInt(value);
             }
-            else if (section.equals("search_floor"))
+            else if ("search_floor".equals(section))
             {
                 searchFloor = Integer.parseInt(value);
             }
-            else if (section.equals("host_url"))
+            else if ("host_url".equals(section))
             {
                 url = value;
             }
-            else if (section.equals("item_lookup"))
+            else if ("item_lookup".equals(section))
             {
                 itemLookup = Integer.parseInt(value);
             }
-            else if (section.equals("avg_item_views"))
+            else if ("avg_item_views".equals(section))
             {
                 try 
                 {
@@ -748,35 +728,35 @@ public class ReportGenerator
                     avgItemViews = 0;
                 }
             }
-            else if (section.equals("server_name"))
+            else if ("server_name".equals(section))
             {
                 serverName = value;
             }
-            else if (section.equals("service_name"))
+            else if ("service_name".equals(section))
             {
                 name = value;
             }
-            else if (section.equals("start_date"))
+            else if ("start_date".equals(section))
             {
                 startDate = sdf.parse(value);
             }
-            else if (section.equals("end_date"))
+            else if ("end_date".equals(section))
             {
                 endDate = sdf.parse(value);
             }
-            else if (section.equals("analysis_process_time"))
+            else if ("analysis_process_time".equals(section))
             {
                 processTime = Integer.parseInt(value);
             }
-            else if (section.equals("general_summary"))
+            else if ("general_summary".equals(section))
             {
                 generalSummary.add(value);
             }
-            else if (section.equals("log_lines"))
+            else if ("log_lines".equals(section))
             {
                 logLines = Integer.parseInt(value);
             }
-            else if (section.equals("warnings"))
+            else if ("warnings".equals(section))
             {
                 warnings = Integer.parseInt(value);
             }

@@ -1,52 +1,22 @@
-/*
- * Authenticate.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.webui.util;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.Iterator;
+import java.util.Locale;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.jsp.jstl.core.Config;
 
 import org.apache.log4j.Logger;
 import org.dspace.authenticate.AuthenticationManager;
@@ -54,6 +24,7 @@ import org.dspace.authenticate.AuthenticationMethod;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
 
 /**
@@ -62,7 +33,7 @@ import org.dspace.eperson.EPerson;
  * the <code>org.dspace.eperson.AuthenticationMethod</code> interface.
  * 
  * @author Robert Tansley
- * @version $Revision: 3705 $
+ * @version $Revision: 5845 $
  */
 public class Authenticate
 {
@@ -148,7 +119,7 @@ public class Authenticate
         {
             // Set the flag in the session, so that when the redirect is
             // followed, we'll know to resume the interrupted request
-            session.setAttribute("resuming.request", new Boolean(true));
+            session.setAttribute("resuming.request", Boolean.TRUE);
         }
 
         // Send the redirect
@@ -223,16 +194,21 @@ public class Authenticate
             {
                 String s;
                 am = (AuthenticationMethod)ai.next();
-                if ((s = am.loginPageURL(context, request, response)) != null)
+                s = am.loginPageURL(context, request, response);
+                if (s != null)
                 {
                     url = s;
                     ++count;
                 }
             }
             if (count == 1)
+            {
                 response.sendRedirect(url);
+            }
             else
+            {
                 JSPManager.showJSP(request, response, "/login/chooser.jsp");
+            }
         }
         return false;
     }
@@ -247,10 +223,45 @@ public class Authenticate
      * @param eperson
      *            the eperson logged in
      */
-    public static void loggedIn(Context context, HttpServletRequest request,
-            EPerson eperson)
+    public static void loggedIn(Context context,
+                                HttpServletRequest request,
+                                EPerson eperson)
     {
         HttpSession session = request.getSession();
+
+        // For security reasons after login, give the user a new session
+        if ((!session.isNew()) && (session.getAttribute("dspace.current.user.id") == null))
+        {
+            // Keep the user's locale setting if set
+            Locale sessionLocale = UIUtil.getSessionLocale(request);
+
+            // Get info about the interrupted request, if set
+            RequestInfo requestInfo = (RequestInfo) session.getAttribute("interrupted.request.info");
+
+            // Get the original URL of interrupted request, if set
+            String requestUrl = (String) session.getAttribute("interrupted.request.url");
+
+            // Invalidate session unless dspace.cfg says not to
+            if(ConfigurationManager.getBooleanProperty("webui.session.invalidate", true))
+            {
+               session.invalidate();
+            }
+
+            // Give the user a new session
+            session = request.getSession();
+
+            // Restore the session locale
+            if (sessionLocale != null)
+            {
+                Config.set(request.getSession(), Config.FMT_LOCALE, sessionLocale);
+            }
+
+            // Restore interrupted request information and url to new session
+            if (requestInfo != null && requestUrl != null) {
+                session.setAttribute("interrupted.request.info", requestInfo);
+                session.setAttribute("interrupted.request.url", requestUrl);
+            }
+        }
 
         context.setCurrentUser(eperson);
         
@@ -266,16 +277,14 @@ public class Authenticate
         }
         finally 
         {
-            request.setAttribute("is.admin", new Boolean(isAdmin));
+            request.setAttribute("is.admin", Boolean.valueOf(isAdmin));
         }
-    
 
         // We store the current user in the request as an EPerson object...
         request.setAttribute("dspace.current.user", eperson);
 
         // and in the session as an ID
-        session.setAttribute("dspace.current.user.id", new Integer(eperson
-                .getID()));
+        session.setAttribute("dspace.current.user.id", Integer.valueOf(eperson.getID()));
 
         // and the remote IP address to compare against later requests
         // so we can detect session hijacking.
@@ -301,5 +310,21 @@ public class Authenticate
         request.removeAttribute("dspace.current.user");
         session.removeAttribute("dspace.current.user.id");
         session.removeAttribute("dspace.current.user.ldap");
+
+        // Keep the user's locale setting if set
+        Locale sessionLocale = UIUtil.getSessionLocale(request);
+
+        // Invalidate session unless dspace.cfg says not to
+        if(ConfigurationManager.getBooleanProperty("webui.session.invalidate", true))
+        {
+            session.invalidate();
+        }
+
+
+        // Restore the session locale
+        if (sessionLocale != null)
+        {
+            Config.set(request.getSession(), Config.FMT_LOCALE, sessionLocale);
+        }
     }
 }

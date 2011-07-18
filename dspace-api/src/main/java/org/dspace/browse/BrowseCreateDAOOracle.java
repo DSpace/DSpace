@@ -1,49 +1,21 @@
-/*
- * BrowseCreateDAOOracle.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.browse;
 
+import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.dspace.core.Context;
@@ -162,7 +134,9 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
             array.add("CREATE INDEX " + table + "_item_id_idx ON " + table + "(item_id)");
     
             if (value)
+            {
                 array.add("CREATE INDEX " + table + "_value_idx ON " + table + "(sort_value)");
+            }
     
             for (Integer i : sortCols)
             {
@@ -247,21 +221,18 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#updateDistinctMapping(java.lang.String, int, int)
      */
-    public boolean updateDistinctMappings(String table, int itemID, int[] distinctIDs) throws BrowseException
+    public MappingResults updateDistinctMappings(String table, int itemID, Set<Integer> distinctIDs) throws BrowseException
     {
+        BrowseMappingResults results = new BrowseMappingResults();
         try
         {
-            // Remove (set to -1) any duplicate distinctIDs
-            for (int i = 0; i < distinctIDs.length; i++)
-            {
-                if (!isFirstOccurrence(distinctIDs, i))
-                    distinctIDs[i] = -1;
-            }
+            Set<Integer> addDistinctIDs = null;
 
             // Find all existing mappings for this item
             TableRowIterator tri = DatabaseManager.queryTable(context, table, "SELECT * FROM " + table + " WHERE item_id=?", itemID);
             if (tri != null)
             {
+                addDistinctIDs = (Set<Integer>)((HashSet<Integer>)distinctIDs).clone();
                 try
                 {
                     while (tri.hasNext())
@@ -271,20 +242,21 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
                         // Check the item mappings to see if it contains this mapping
                         boolean itemIsMapped = false;
                         int trDistinctID = tr.getIntColumn("distinct_id");
-                        for (int i = 0; i < distinctIDs.length; i++)
+                        if (distinctIDs.contains(trDistinctID))
                         {
                             // Found this mapping
-                            if (distinctIDs[i] == trDistinctID)
-                            {
-                                // Flag it, and remove (-1) from the item mappings
-                                itemIsMapped = true;
-                                distinctIDs[i] = -1;
-                            }
+                            results.addRetainedDistinctId(trDistinctID);
+                            // Flag it, and remove (-1) from the item mappings
+                            itemIsMapped = true;
+                            addDistinctIDs.remove(trDistinctID);
                         }
 
                         // The item is no longer mapped to this community, so remove the database record
                         if (!itemIsMapped)
+                        {
+                            results.addRemovedDistinctId(trDistinctID);
                             DatabaseManager.delete(context, tr);
+                        }
                     }
                 }
                 finally
@@ -292,16 +264,21 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
                     tri.close();
                 }
             }
+            else
+            {
+                addDistinctIDs = distinctIDs;
+            }
 
             // Any remaining mappings need to be added to the database
-            for (int i = 0; i < distinctIDs.length; i++)
+            for (int distinctID : addDistinctIDs)
             {
-                if (distinctIDs[i] > -1)
+                if (distinctID > -1)
                 {
-                    TableRow row = DatabaseManager.create(context, table);
+                    TableRow row = DatabaseManager.row(table);
                     row.setColumn("item_id", itemID);
-                    row.setColumn("distinct_id", distinctIDs[i]);
-                    DatabaseManager.update(context, row);
+                    row.setColumn("distinct_id", distinctID);
+                    DatabaseManager.insert(context, row);
+                    results.addAddedDistinctId(distinctID);
                 }
             }
         }
@@ -312,7 +289,7 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
             throw new BrowseException(msg, e);
         }
 
-        return false;
+        return results;
     }
 
     /* (non-Javadoc)
@@ -324,10 +301,11 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
         {
             String create = "CREATE TABLE " + table + " (" +
                             "id INTEGER PRIMARY KEY, " + 
+                            "authority VARCHAR2(100), " +
                             "value " + getValueColumnDefinition() + ", " +
                             "sort_value " + getSortColumnDefinition() +
                             ")";
-            
+
             if (execute)
             {
                 DatabaseManager.updateQuery(context, create);
@@ -341,7 +319,7 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
         }
     }
 
-    public String createPrimaryTable(String table, List sortCols, boolean execute) throws BrowseException
+    public String createPrimaryTable(String table, List<Integer> sortCols, boolean execute) throws BrowseException
     {
         try
         {
@@ -402,7 +380,7 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
     {
         try
         {
-            Object[] params = { new Integer(itemID) };
+            Object[] params = { Integer.valueOf(itemID) };
             String dquery = "DELETE FROM " + table + " WHERE item_id=?";
             DatabaseManager.updateQuery(context, dquery, params);
         }
@@ -422,7 +400,7 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
     {
         try
         {
-            Object[] params = { new Integer(itemID) };
+            Object[] params = { Integer.valueOf(itemID) };
             String dquery = "DELETE FROM Communities2Item WHERE item_id = ?";
             DatabaseManager.updateQuery(context, dquery, params);
         }
@@ -509,40 +487,59 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#getDistinctID(java.lang.String, java.lang.String, java.lang.String)
      */
-    public int getDistinctID(String table, String value, String sortValue) throws BrowseException
+    public int getDistinctID(String table, String value, String authority, String sortValue) throws BrowseException
     {
         TableRowIterator tri = null;
         
         if (log.isDebugEnabled())
         {
-            log.debug("getDistinctID: table=" + table + ",value=" + value + ",sortValue=" + sortValue);
+            log.debug("getDistinctID: table=" + table + ",value=" + value + ",authority=" + authority + ",sortValue=" + sortValue);
         }
         
         try
         {
-            Object[] params = { value };
+            Object[] params;
             String select = "SELECT id FROM " + table;
             
             if (ConfigurationManager.getBooleanProperty("webui.browse.metadata.case-insensitive", false))
             {
                 if (isValueColumnClob())
+                {
                     select = select + " WHERE UPPER(TO_CHAR(value))=UPPER(?)";
+                }
                 else
+                {
                     select = select + " WHERE UPPER(value)=UPPER(?)";
+                }
             }
             else
             {
                 if (isValueColumnClob())
+                {
                     select = select + " WHERE TO_CHAR(value)=?";
+                }
                 else
+                {
                     select = select + " WHERE value=?";
+                }
             }
-               
+            
+			if (authority != null)
+            {
+                select += " AND authority = ?";
+                params = new Object[]{ value, authority };
+            }
+   			else
+            {
+                select += " AND authority IS NULL";
+                params = new Object[]{ value };
+            }
+
             tri = DatabaseManager.query(context, select, params);
             int distinctID = -1;
             if (!tri.hasNext())
             {
-                distinctID = insertDistinctRecord(table, value, sortValue);
+                distinctID = insertDistinctRecord(table, value, authority, sortValue);
             }
             else
             {
@@ -564,7 +561,9 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
     }
 
@@ -582,7 +581,9 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
             for (int i = 0; i < commID.length; i++)
             {
                 if (!isFirstOccurrence(commID, i))
+                {
                     commID[i] = -1;
+                }
             }
 
             // Find all existing mappings for this item
@@ -611,7 +612,9 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
 
                         // The item is no longer mapped to this community, so remove the database record
                         if (!itemIsMapped)
+                        {
                             DatabaseManager.delete(context, tr);
+                        }
                     }
                 }
                 finally
@@ -625,10 +628,10 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
             {
                 if (commID[i] > -1)
                 {
-                    TableRow row = DatabaseManager.create(context, "Communities2Item");
+                    TableRow row = DatabaseManager.row("Communities2Item");
                     row.setColumn("item_id", itemID);
                     row.setColumn("community_id", commID[i]);
-                    DatabaseManager.update(context, row);
+                    DatabaseManager.insert(context, row);
                 }
             }
         }
@@ -642,7 +645,7 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#insertDistinctRecord(java.lang.String, java.lang.String, java.lang.String)
      */
-    public int insertDistinctRecord(String table, String value, String sortValue) throws BrowseException
+    public int insertDistinctRecord(String table, String value, String authority, String sortValue) throws BrowseException
     {
         if (log.isDebugEnabled())
         {
@@ -651,17 +654,17 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
         
         try
         {
-            TableRow dr = DatabaseManager.create(context, table);
+            TableRow dr = DatabaseManager.row(table);
             dr.setColumn("value", utils.truncateValue(value));
             dr.setColumn("sort_value", utils.truncateSortValue(sortValue));
-            DatabaseManager.update(context, dr);
+            if (authority != null)
+            {
+                dr.setColumn("authority", utils.truncateValue(authority,100));
+            }
+            DatabaseManager.insert(context, dr);
             int distinctID = dr.getIntColumn("id");
             
-            if (log.isDebugEnabled())
-            {
-                log.debug("insertDistinctRecord: return=" + distinctID);
-            }
-            
+            log.debug("insertDistinctRecord: return=" + distinctID);
             return distinctID;
         }
         catch (SQLException e)
@@ -671,27 +674,24 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
         }
     }
 
-    public void insertIndex(String table, int itemID, Map sortCols)
+    public void insertIndex(String table, int itemID, Map<Integer, String> sortCols)
             throws BrowseException
     {
         try
         {
             // create us a row in the index
-            TableRow row = DatabaseManager.create(context, table);
+            TableRow row = DatabaseManager.row(table);
             
             // set the primary information for the index
             row.setColumn("item_id", itemID);
             
             // now set the columns for the other sort values
-            Iterator itra = sortCols.keySet().iterator();
-            while (itra.hasNext())
+            for (Map.Entry<Integer,  String> sortCol : sortCols.entrySet())
             {
-                Integer key = (Integer) itra.next();
-                String nValue = (String) sortCols.get(key);
-                row.setColumn("sort_" + key.toString(), utils.truncateSortValue(nValue));
+                row.setColumn("sort_" + sortCol.getKey().toString(), utils.truncateSortValue(sortCol.getValue()));
             }
             
-            DatabaseManager.update(context, row);
+            DatabaseManager.insert(context, row);
         }
         catch (SQLException e)
         {
@@ -703,7 +703,7 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
     /* (non-Javadoc)
      * @see org.dspace.browse.BrowseCreateDAO#updateIndex(java.lang.String, int, java.util.Map)
      */
-    public boolean updateIndex(String table, int itemID, Map sortCols)
+    public boolean updateIndex(String table, int itemID, Map<Integer, String> sortCols)
             throws BrowseException
     {
         try
@@ -713,23 +713,24 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
 
             // If the item does not exist in the table, return that it couldn't be found
             if (row == null)
+            {
                 return false;
+            }
 
             // Iterate through all the sort values
-            Iterator itra = sortCols.keySet().iterator();
-            while (itra.hasNext())
+            for (Map.Entry<Integer, String> sortCol : sortCols.entrySet())
             {
-                Integer key = (Integer) itra.next();
-
                 // Generate the appropriate column name
-                String column = "sort_" + key.toString();
+                String column = "sort_" + sortCol.getKey().toString();
 
                 // Create the value that will be written in to the column
-                String newValue = utils.truncateSortValue( (String) sortCols.get(key) );
+                String newValue = utils.truncateSortValue( sortCol.getValue() );
 
                 // Check the column exists - if it doesn't, something has gone seriously wrong
                 if (!row.hasColumn(column))
+                {
                     throw new BrowseException("Column '" + column + "' does not exist in table " + table);
+                }
 
                 // Get the existing value from the column
                 String oldValue = row.getStringColumn(column);
@@ -749,7 +750,9 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
 
             // We've updated the row, so save it back to the database
             if (rowUpdated)
+            {
                 DatabaseManager.update(context, row);
+            }
         }
         catch (SQLException e)
         {
@@ -761,46 +764,75 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
         return true;
     }
 
-    /* (non-Javadoc)
-     * @see org.dspace.browse.BrowseCreateDAO#pruneDistinct(java.lang.String, java.lang.String)
-     */
-    public void pruneDistinct(String table, String map) throws BrowseException
+    public List<Integer> deleteMappingsByItemID(String mapTable, int itemID) throws BrowseException
     {
+        List<Integer> distinctIds = new ArrayList<Integer>();
+        TableRowIterator tri = null;
         try
         {
-            String query = "DELETE FROM " + table + 
-                            " WHERE id IN (SELECT id FROM " + table +
-                            " MINUS SELECT distinct_id AS id FROM " + map + ")";
-            
-            DatabaseManager.updateQuery(context, query);
+            tri = DatabaseManager.queryTable(context, mapTable, "SELECT * FROM " + mapTable + " WHERE item_id=?", itemID);
+            if (tri != null)
+            {
+                while (tri.hasNext())
+                {
+                    TableRow tr = tri.next();
+                    distinctIds.add(tr.getIntColumn("distinct_id"));
+                    DatabaseManager.delete(context, tr);
+                }
+            }
         }
         catch (SQLException e)
         {
             log.error("caught exception: ", e);
             throw new BrowseException(e);
         }
+        finally
+        {
+            if (tri != null)
+            {
+                tri.close();
+            }
+        }
+
+        return distinctIds;
     }
 
     /* (non-Javadoc)
-     * @see org.dspace.browse.BrowseCreateDAO#pruneExcess(java.lang.String, java.lang.String)
+     * @see org.dspace.browse.BrowseCreateDAO#pruneDistinct(java.lang.String, java.lang.String)
      */
-    public void pruneExcess(String table, String map, boolean withdrawn) throws BrowseException
+    public void pruneDistinct(String table, String map, List<Integer> distinctIds) throws BrowseException
     {
         try
         {
-            String itemQuery = "SELECT item_id FROM item WHERE ";
-            if (withdrawn)
-                itemQuery += "withdrawn = 1";
-            else
-                itemQuery += "in_archive = 1 AND withdrawn = 0";
-            
-            String delete         = "DELETE FROM " + table + " WHERE item_id IN ( SELECT item_id FROM " + table + " MINUS " + itemQuery + ")";
-            DatabaseManager.updateQuery(context, delete);
+            StringBuilder query = new StringBuilder();
+            query.append("DELETE FROM ").append(table).append(" WHERE NOT EXISTS (SELECT 1 FROM ");
+            query.append(map).append(" WHERE ").append(map).append(".distinct_id = ").append(table).append(".id)");
 
-            if (map != null)
+            if (distinctIds != null && distinctIds.size() > 0)
             {
-                String deleteDistinct = "DELETE FROM " + map   + " WHERE item_id IN ( SELECT item_id FROM " + map   + " MINUS " + itemQuery + ")";
-                DatabaseManager.updateQuery(context, deleteDistinct);
+                query.append(" AND ").append(table).append(".id=?");
+                PreparedStatement stmt = null;
+                try
+                {
+                    stmt = context.getDBConnection().prepareStatement(query.toString());
+                    for (Integer distinctId : distinctIds)
+                    {
+                        stmt.setInt(1, distinctId);
+                        stmt.execute();
+                        stmt.clearParameters();
+                    }
+                }
+                finally
+                {
+                    if (stmt != null)
+                    {
+                        stmt.close();
+                    }
+                }
+            }
+            else
+            {
+                DatabaseManager.updateQuery(context, query.toString());
             }
         }
         catch (SQLException e)
@@ -811,9 +843,92 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
     }
 
     /* (non-Javadoc)
-     * @see org.dspace.browse.BrowseCreateDAO#testTableExistance(java.lang.String)
+     * @see org.dspace.browse.BrowseCreateDAO#pruneExcess(java.lang.String, boolean)
      */
-    public boolean testTableExistance(String table) throws BrowseException
+    public void pruneExcess(String table, boolean withdrawn) throws BrowseException
+    {
+        try
+        {
+            StringBuilder query = new StringBuilder();
+
+            query.append("DELETE FROM ").append(table).append(" WHERE NOT EXISTS (SELECT 1 FROM item WHERE item.item_id=");
+            query.append(table).append(".item_id AND ");
+            if (withdrawn)
+            {
+                query.append("item.withdrawn = 1");
+            }
+            else
+            {
+                query.append("item.in_archive = 1 AND item.withdrawn = 0");
+            }
+            query.append(")");
+            DatabaseManager.updateQuery(context, query.toString());
+        }
+        catch (SQLException e)
+        {
+            log.error("caught exception: ", e);
+            throw new BrowseException(e);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.browse.BrowseCreateDAO#pruneMapExcess(java.lang.String, boolean)
+     */
+    public void pruneMapExcess(String map, boolean withdrawn, List<Integer> distinctIds) throws BrowseException
+    {
+        try
+        {
+            StringBuilder query = new StringBuilder();
+
+            query.append("DELETE FROM ").append(map).append(" WHERE NOT EXISTS (SELECT 1 FROM item WHERE item.item_id=");
+            query.append(map).append(".item_id AND ");
+            if (withdrawn)
+            {
+                query.append("item.withdrawn = 1");
+            }
+            else
+            {
+                query.append("item.in_archive = 1 AND item.withdrawn = 0");
+            }
+            query.append(")");
+            if (distinctIds != null && distinctIds.size() > 0)
+            {
+                query.append(" AND ").append(map).append(".distinct_id=?");
+                PreparedStatement stmt = null;
+                try
+                {
+                    stmt = context.getDBConnection().prepareStatement(query.toString());
+                    for (Integer distinctId : distinctIds)
+                    {
+                        stmt.setInt(1, distinctId);
+                        stmt.execute();
+                        stmt.clearParameters();
+                    }
+                }
+                finally
+                {
+                    if (stmt != null)
+                    {
+                        stmt.close();
+                    }
+                }
+            }
+            else
+            {
+                DatabaseManager.updateQuery(context, query.toString());
+            }
+        }
+        catch (SQLException e)
+        {
+            log.error("caught exception: ", e);
+            throw new BrowseException(e);
+        }
+    }
+
+    /* (non-Javadoc)
+     * @see org.dspace.browse.BrowseCreateDAO#testTableExistence(java.lang.String)
+     */
+    public boolean testTableExistence(String table) throws BrowseException
     {
         // this method can kill the db connection, so we start up
         // our own private context to do it
@@ -963,7 +1078,9 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         // Need to iterate the array as toArray will produce an array Integers,
@@ -1002,7 +1119,9 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         return null;
@@ -1019,15 +1138,56 @@ public class BrowseCreateDAOOracle implements BrowseCreateDAO
     private boolean isFirstOccurrence(int[] ids, int pos)
     {
         if (pos < 0 || pos >= ids.length)
+        {
             return false;
+        }
 
         int id = ids[pos];
         for (int i = 0; i < pos; i++)
         {
             if (id == ids[i])
+            {
                 return false;
+            }
         }
 
         return true;
+    }
+
+    private static class BrowseMappingResults implements MappingResults
+    {
+        private List<Integer> addedDistinctIds    = new ArrayList<Integer>();
+        private List<Integer> retainedDistinctIds = new ArrayList<Integer>();
+        private List<Integer> removedDistinctIds  = new ArrayList<Integer>();
+
+        private void addAddedDistinctId(int id)
+        {
+            addedDistinctIds.add(id);
+        }
+
+        private void addRetainedDistinctId(int id)
+        {
+            retainedDistinctIds.add(id);
+        }
+
+        private void addRemovedDistinctId(int id)
+        {
+            removedDistinctIds.add(id);
+        }
+
+        public List<Integer> getAddedDistinctIds()
+        {
+            return addedDistinctIds;
+        }
+
+        public List<Integer> getRetainedDistinctIds()
+        {
+            return retainedDistinctIds;
+        }
+
+        public List<Integer> getRemovedDistinctIds()
+        {
+            return Collections.unmodifiableList(removedDistinctIds);
+        }
     }
 }

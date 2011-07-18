@@ -1,43 +1,10 @@
-/*
- * ItemExportDownlaodReader.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.xmlui.cocoon;
 
 import java.io.IOException;
@@ -75,8 +42,8 @@ public class ItemExportDownloadReader extends AbstractReader implements Recyclab
      * a particular bitstream. They will be redirected to the login
      * where this message will be displayed.
      */
-	private final static String AUTH_REQUIRED_HEADER = "xmlui.ItemExportDownloadReader.auth_header";
-	private final static String AUTH_REQUIRED_MESSAGE = "xmlui.ItemExportDownloadReader.auth_message";
+	private static final String AUTH_REQUIRED_HEADER = "xmlui.ItemExportDownloadReader.auth_header";
+	private static final String AUTH_REQUIRED_MESSAGE = "xmlui.ItemExportDownloadReader.auth_message";
 	
     /**
      * How big of a buffer should we use when reading from the bitstream before
@@ -130,7 +97,7 @@ public class ItemExportDownloadReader extends AbstractReader implements Recyclab
             // Is there a User logged in and does the user have access to read it?
             if (!ItemExport.canDownload(context, fileName))
             {
-            	if(this.request.getSession().getAttribute("dspace.current.user.id")!=null){
+                if(context.getCurrentUser()!=null){
             		// A user is logged in, but they are not authorized to read this bitstream, 
             		// instead of asking them to login again we'll point them to a friendly error 
             		// message that tells them the bitstream is restricted.
@@ -187,7 +154,9 @@ public class ItemExportDownloadReader extends AbstractReader implements Recyclab
             ProcessingException
     {
     	if (this.compressedExportInputStream == null)
-	    	return;
+        {
+            return;
+        }
     	
         byte[] buffer = new byte[BUFFER_SIZE];
         int length = -1;
@@ -195,34 +164,34 @@ public class ItemExportDownloadReader extends AbstractReader implements Recyclab
         response.setDateHeader("Expires", System.currentTimeMillis()
                 + expires);
         response.setHeader("Content-disposition","attachement; filename=" + this.compressedExportName );
-        // Turn off partial downloads, they cause problems
-        // and are only rarely used. Specifically some windows pdf
-        // viewers are incapable of handling this request. By
-        // uncommenting the following two lines you will turn this feature back on.
-        // response.setHeader("Accept-Ranges", "bytes");
-        // String ranges = request.getHeader("Range");
-        String ranges = null;
-        
 
         ByteRange byteRange = null;
-        if (ranges != null)
-        {
-            try
-            {
-                ranges = ranges.substring(ranges.indexOf('=') + 1);
-                byteRange = new ByteRange(ranges);
-            }
-            catch (NumberFormatException e)
-            {
-                byteRange = null;
-                if (response instanceof HttpResponse)
-                {
-                    // Respond with status 416 (Request range not
-                    // satisfiable)
-                    ((HttpResponse) response).setStatus(416);
-                }
-            }
-        }
+
+        // Turn off partial downloads, they cause problems
+        // and are only rarely used. Specifically some windows pdf
+        // viewers are incapable of handling this request. You can
+        // uncomment the following lines to turn this feature back on.
+
+//        response.setHeader("Accept-Ranges", "bytes");
+//        String ranges = request.getHeader("Range");
+//        if (ranges != null)
+//        {
+//            try
+//            {
+//                ranges = ranges.substring(ranges.indexOf('=') + 1);
+//                byteRange = new ByteRange(ranges);
+//            }
+//            catch (NumberFormatException e)
+//            {
+//                byteRange = null;
+//                if (response instanceof HttpResponse)
+//                {
+//                    // Respond with status 416 (Request range not
+//                    // satisfiable)
+//                    response.setStatus(416);
+//                }
+//            }
+//        }
 
         if (byteRange != null)
         {

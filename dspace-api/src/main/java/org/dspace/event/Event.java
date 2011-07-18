@@ -1,53 +1,20 @@
-/*
- * Event.java
- * 
- * Version: $Revision: 3705 $
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.event;
 
 import java.io.Serializable;
 import java.sql.SQLException;
 import java.util.BitSet;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
@@ -67,19 +34,23 @@ import org.dspace.core.Context;
  * Note that the type of the event itself is actually descriptive of the
  * <em>action</em> it performs: ADD, MODIFY, etc. The most significant
  * elements of the event are:
- * <p>
- * <br> - (Action) Type <br> - Subject -- DSpace object to which the action
- * applies, e.g. the Collection to which an ADD adds a member. <br> - Object --
- * optional, when present it is the other object effected by an action, e.g. the
- * Item ADDed to a Collection by an ADD. <br> - detail -- a textual summary of
- * what changed, content and its significance varies by the combination of
- * action and subject type. <br> - timestamp -- exact millisecond timestamp at
- * which event was logged.
+ * <ul>
+ * <li>(Action) Type</li>
+ * <li>Subject -- DSpace object to which the action applies, e.g. the Collection
+ * to which an ADD adds a member.</li>
+ * <li>Object -- optional, when present it is the other object effected by an
+ * action, e.g. the Item ADDed to a Collection by an ADD.</li>
+ * <li>detail -- a textual summary of what changed.  Content and its
+ * significance varies by the combination of action and subject type.</li>
+ * <li> - timestamp -- exact millisecond timestamp at which event was logged.</li>
+ * </ul>
  * 
- * @version $Revision: 3705 $
+ * @version $Revision: 5844 $
  */
 public class Event implements Serializable
 {
+    private static final long serialVersionUID = 1L;
+
     /** ---------- Constants ------------- * */
 
     /** Event (Action) types */
@@ -94,6 +65,8 @@ public class Event implements Serializable
     public static final int REMOVE = 1 << 4; // remove content from container
 
     public static final int DELETE = 1 << 5; // destroy object
+    
+    public static final int INSTALL = 1 << 6; // object exits workspace/flow
 
     /** Index of filter parts in their array: */
     public static final int SUBJECT_MASK = 0; // mask of subject types
@@ -102,7 +75,7 @@ public class Event implements Serializable
 
     // XXX NOTE: keep this up to date with any changes to event (action) types.
     private static final String eventTypeText[] = { "CREATE", "MODIFY",
-            "MODIFY_METADATA", "ADD", "REMOVE", "DELETE" };
+            "MODIFY_METADATA", "ADD", "REMOVE", "DELETE", "INSTALL" };
 
     /** XXX NOTE: These constants must be kept synchronized * */
     /** XXX NOTE: with ALL_OBJECTS_MASK *AND* objTypeToMask hash * */
@@ -132,35 +105,29 @@ public class Event implements Serializable
     private static Map<Integer, Integer> objMaskToType = new HashMap<Integer, Integer>();
     static
     {
-        objTypeToMask.put(new Integer(Constants.BITSTREAM), new Integer(
-                BITSTREAM));
-        objMaskToType.put(new Integer(BITSTREAM), new Integer(
-                Constants.BITSTREAM));
+        objTypeToMask.put(Constants.BITSTREAM, BITSTREAM);
+        objMaskToType.put(BITSTREAM, Constants.BITSTREAM);
 
-        objTypeToMask.put(new Integer(Constants.BUNDLE), new Integer(BUNDLE));
-        objMaskToType.put(new Integer(BUNDLE), new Integer(Constants.BUNDLE));
+        objTypeToMask.put(Constants.BUNDLE, BUNDLE);
+        objMaskToType.put(BUNDLE, Constants.BUNDLE);
 
-        objTypeToMask.put(new Integer(Constants.ITEM), new Integer(ITEM));
-        objMaskToType.put(new Integer(ITEM), new Integer(Constants.ITEM));
+        objTypeToMask.put(Constants.ITEM, ITEM);
+        objMaskToType.put(ITEM, Constants.ITEM);
 
-        objTypeToMask.put(new Integer(Constants.COLLECTION), new Integer(
-                COLLECTION));
-        objMaskToType.put(new Integer(COLLECTION), new Integer(
-                Constants.COLLECTION));
+        objTypeToMask.put(Constants.COLLECTION, COLLECTION);
+        objMaskToType.put(COLLECTION, Constants.COLLECTION);
 
-        objTypeToMask.put(new Integer(Constants.COMMUNITY), new Integer(
-                COMMUNITY));
-        objMaskToType.put(new Integer(COMMUNITY), new Integer(
-                Constants.COMMUNITY));
+        objTypeToMask.put(Constants.COMMUNITY, COMMUNITY);
+        objMaskToType.put(COMMUNITY, Constants.COMMUNITY);
 
-        objTypeToMask.put(new Integer(Constants.SITE), new Integer(SITE));
-        objMaskToType.put(new Integer(SITE), new Integer(Constants.SITE));
+        objTypeToMask.put(Constants.SITE, SITE);
+        objMaskToType.put(SITE, Constants.SITE);
 
-        objTypeToMask.put(new Integer(Constants.GROUP), new Integer(GROUP));
-        objMaskToType.put(new Integer(GROUP), new Integer(Constants.GROUP));
+        objTypeToMask.put(Constants.GROUP, GROUP);
+        objMaskToType.put(GROUP, Constants.GROUP);
 
-        objTypeToMask.put(new Integer(Constants.EPERSON), new Integer(EPERSON));
-        objMaskToType.put(new Integer(EPERSON), new Integer(Constants.EPERSON));
+        objTypeToMask.put(Constants.EPERSON, EPERSON);
+        objMaskToType.put(EPERSON, Constants.EPERSON);
     }
 
     /** ---------- Event Fields ------------- * */
@@ -199,12 +166,12 @@ public class Event implements Serializable
     /** unique key to bind together events from one context's transaction */
     private String transactionID;
 
-    /** identity of authenticated user, i.e. context.getCurrentUser() */
-    /** only needed in the event for marshalling for asynch event messages */
+    /** identity of authenticated user, i.e. context.getCurrentUser(). */
+    /** Only needed in the event for marshalling for asynch event messages */
     private int currentUser = -1;
 
-    /** copy of context's "extraLogInfo" filed, used only for */
-    /** marshalling for asynch event messages */
+    /** copy of context's "extraLogInfo" field.  Used only for */
+    /** marshalling for asynch event messages. */
     private String extraLogInfo = null;
 
     private BitSet consumedBy = new BitSet();
@@ -216,7 +183,7 @@ public class Event implements Serializable
      * Constructor.
      * 
      * @param eventType
-     *            action type, e.g. Event.ADD
+     *            action type, e.g. Event.ADD.
      * @param subjectType
      *            DSpace Object Type of subject e.g. Constants.ITEM.
      * @param subjectID
@@ -237,7 +204,7 @@ public class Event implements Serializable
      * Constructor.
      * 
      * @param eventType
-     *            action type, e.g. Event.ADD
+     *            action type, e.g. Event.ADD.
      * @param subjectType
      *            DSpace Object Type of subject e.g. Constants.ITEM.
      * @param subjectID
@@ -248,7 +215,6 @@ public class Event implements Serializable
      *            database ID of object instance.
      * @param detail
      *            detail information that depends on context.
-     * @param
      */
     public Event(int eventType, int subjectType, int subjectID, int objectType,
             int objectID, String detail)
@@ -268,17 +234,34 @@ public class Event implements Serializable
      * 
      * @param other
      *            the event to compare this one to
-     * @returns true if events are "equal", false otherwise.
+     * @return true if events are "equal", false otherwise.
      */
-    public boolean equals(Event other)
+    public boolean equals(Object other)
     {
-        return (this.detail == null ? other.detail == null : this.detail
-                .equals(other.detail))
-                && this.eventType == other.eventType
-                && this.subjectType == other.subjectType
-                && this.subjectID == other.subjectID
-                && this.objectType == other.objectType
-                && this.objectID == other.objectID;
+        if (other instanceof Event)
+        {
+            Event otherEvent = (Event)other;
+            return (this.detail == null ? otherEvent.detail == null : this.detail
+                    .equals(otherEvent.detail))
+                    && this.eventType == otherEvent.eventType
+                    && this.subjectType == otherEvent.subjectType
+                    && this.subjectID == otherEvent.subjectID
+                    && this.objectType == otherEvent.objectType
+                    && this.objectID == otherEvent.objectID;
+        }
+
+        return false;
+    }
+
+    public int hashCode()
+    {
+        return new HashCodeBuilder().append(this.detail)
+                                    .append(eventType)
+                                    .append(subjectType)
+                                    .append(subjectID)
+                                    .append(objectType)
+                                    .append(objectID)
+                                    .toHashCode();
     }
 
     /**
@@ -295,43 +278,55 @@ public class Event implements Serializable
     // translate a "core.Constants" object type value to local bitmask value.
     private static int coreTypeToMask(int core)
     {
-        Integer mask = (Integer) objTypeToMask.get(new Integer(core));
+        Integer mask = objTypeToMask.get(core);
         if (mask == null)
+        {
             return -1;
+        }
         else
+        {
             return mask.intValue();
+        }
     }
 
     // translate bitmask object-type to "core.Constants" object type.
     private static int maskTypeToCore(int mask)
     {
-        Integer core = (Integer) objMaskToType.get(new Integer(mask));
+        Integer core = objMaskToType.get(mask);
         if (core == null)
+        {
             return -1;
+        }
         else
+        {
             return core.intValue();
+        }
     }
 
     /**
      * Get the DSpace object which is the "object" of an event.
      * 
-     * @returns DSpaceObject or null if none can be found or no object was set.
+     * @return DSpaceObject or null if none can be found or no object was set.
      */
     public DSpaceObject getObject(Context context) throws SQLException
     {
         int type = getObjectType();
         int id = getObjectID();
         if (type < 0 || id < 0)
+        {
             return null;
+        }
         else
+        {
             return DSpaceObject.find(context, type, id);
+        }
     }
 
     /**
      * Syntactic sugar to get the DSpace object which is the "subject" of an
      * event.
      * 
-     * @returns DSpaceObject or null if none can be found.
+     * @return DSpaceObject or null if none can be found.
      */
     public DSpaceObject getSubject(Context context) throws SQLException
     {
@@ -339,7 +334,7 @@ public class Event implements Serializable
     }
 
     /**
-     * @returns database ID of subject of this event.
+     * @return database ID of subject of this event.
      */
     public int getSubjectID()
     {
@@ -347,7 +342,7 @@ public class Event implements Serializable
     }
 
     /**
-     * @returns database ID of object of this event, or -1 if none was set.
+     * @return database ID of object of this event, or -1 if none was set.
      */
     public int getObjectID()
     {
@@ -355,7 +350,7 @@ public class Event implements Serializable
     }
 
     /**
-     * @returns type number (e.g. Constants.ITEM) of subject of this event.
+     * @return type number (e.g. Constants.ITEM) of subject of this event.
      */
     public int getSubjectType()
     {
@@ -363,7 +358,7 @@ public class Event implements Serializable
     }
 
     /**
-     * @returns type number (e.g. Constants.ITEM) of object of this event, or -1
+     * @return type number (e.g. Constants.ITEM) of object of this event, or -1
      *          if none was set.
      */
     public int getObjectType()
@@ -372,27 +367,35 @@ public class Event implements Serializable
     }
 
     /**
-     * @returns type of subject of this event as a String, e.g. for logging.
+     * @return type of subject of this event as a String, e.g. for logging.
      */
     public String getSubjectTypeAsString()
     {
         int i = log2(subjectType);
         if (i >= 0 && i < Constants.typeText.length)
+        {
             return Constants.typeText[i];
+        }
         else
+        {
             return "(Unknown)";
+        }
     }
 
     /**
-     * @returns type of object of this event as a String, e.g. for logging.
+     * @return type of object of this event as a String, e.g. for logging.
      */
     public String getObjectTypeAsString()
     {
         int i = log2(objectType);
         if (i >= 0 && i < Constants.typeText.length)
+        {
             return Constants.typeText[i];
+        }
         else
+        {
             return "(Unknown)";
+        }
     }
 
     /**
@@ -402,23 +405,27 @@ public class Event implements Serializable
      * 
      * @param s
      *            text name of object type.
-     * @returns numeric value of object type or 0 for error.
+     * @return numeric value of object type or 0 for error.
      */
     public static int parseObjectType(String s)
     {
         if ("*".equals(s) || "all".equalsIgnoreCase(s))
+        {
             return ALL_OBJECTS_MASK;
+        }
         else
         {
             int id = Constants.getTypeID(s.toUpperCase());
             if (id >= 0)
+            {
                 return 1 << id;
+            }
         }
         return 0;
     }
 
     /**
-     * @returns event-type (i.e. action) this event, one of the masks like
+     * @return event-type (i.e. action) this event, one of the masks like
      *          Event.ADD defined above.
      */
     public int getEventType()
@@ -429,24 +436,28 @@ public class Event implements Serializable
     /**
      * Get the text name of event (action) type.
      * 
-     * @returns event-type (i.e. action) this event as a String, e.g. for
+     * @return event-type (i.e. action) this event as a String, e.g. for
      *          logging.
      */
     public String getEventTypeAsString()
     {
         int i = log2(eventType);
         if (i >= 0 && i < eventTypeText.length)
+        {
             return eventTypeText[i];
+        }
         else
+        {
             return "(Unknown)";
+        }
     }
 
     /**
      * Interpret named event type.
      * 
-     * @param text
+     * @param s
      *            name of event type.
-     * @returns numeric value of event type or 0 for error.
+     * @return numeric value of event type or 0 for error.
      */
     public static int parseEventType(String s)
     {
@@ -454,19 +465,25 @@ public class Event implements Serializable
         {
             int result = 0;
             for (int i = 0; i < eventTypeText.length; ++i)
+            {
                 result |= (1 << i);
+            }
             return result;
         }
 
         for (int i = 0; i < eventTypeText.length; ++i)
+        {
             if (eventTypeText[i].equalsIgnoreCase(s))
+            {
                 return 1 << i;
+            }
+        }
         return 0;
     }
 
     /**
-     * @returns timestamp at which event occurred, as a count of milliseconds
-     *          since the epoch (standard Java format).
+     * @return timestamp at which event occurred, as a count of milliseconds
+     *         since the epoch (standard Java format).
      */
     public long getTimeStamp()
     {
@@ -474,8 +491,8 @@ public class Event implements Serializable
     }
 
     /**
-     * @returns hashcode identifier of name of Dispatcher which first dispatched
-     *          this event. (Needed by asynch dispatch code.)
+     * @return hashcode identifier of name of Dispatcher which first dispatched
+     *         this event. (Needed by asynch dispatch code.)
      */
     public int getDispatcher()
     {
@@ -483,7 +500,7 @@ public class Event implements Serializable
     }
 
     /**
-     * @returns value of detail element of the event.
+     * @return value of detail element of the event.
      */
     public String getDetail()
     {
@@ -491,7 +508,7 @@ public class Event implements Serializable
     }
 
     /**
-     * @returns value of transactionID element of the event.
+     * @return value of transactionID element of the event.
      */
     public String getTransactionID()
     {
@@ -530,28 +547,32 @@ public class Event implements Serializable
     }
 
     /**
+     * Test whether this event would pass through a list of filters.
+     * 
      * @param filters
      *            list of filter masks; each one is an Array of two ints.
-     * @returns true if this event would be passed through the given filter
-     *          list.
+     * @return true if this event would be passed through the given filter
+     *         list.
      */
-    public boolean pass(List filters)
+    public boolean pass(List<int[]> filters)
     {
         boolean result = false;
 
-        for (Iterator fi = filters.iterator(); fi.hasNext();)
+        for (int filter[] : filters)
         {
-            int filter[] = (int[]) fi.next();
-            if ((subjectType & filter[SUBJECT_MASK]) != 0
-                    && (eventType & filter[EVENT_MASK]) != 0)
+            if ((subjectType & filter[SUBJECT_MASK]) != 0 && (eventType & filter[EVENT_MASK]) != 0)
+            {
                 result = true;
+            }
         }
 
         if (log.isDebugEnabled())
+        {
             log.debug("Filtering event: " + "eventType="
                     + String.valueOf(eventType) + ", subjectType="
                     + String.valueOf(subjectType) + ", result="
                     + String.valueOf(result));
+        }
 
         return result;
     }
@@ -560,10 +581,16 @@ public class Event implements Serializable
     private static int log2(int n)
     {
         for (int i = 0; i < 32; ++i)
+        {
             if (n == 1)
+            {
                 return i;
+            }
             else
+            {
                 n = n >> 1;
+            }
+        }
         return -1;
     }
 
@@ -577,16 +604,18 @@ public class Event implements Serializable
     public void setBitSet(String consumerName)
     {
         consumedBy.set(EventManager.getConsumerIndex(consumerName));
-
     }
 
+    /**
+     * @return the set of consumers which have consumed this Event.
+     */
     public BitSet getBitSet()
     {
         return consumedBy;
     }
 
     /**
-     * @returns Detailed string representation of contents of this event, to
+     * @return Detailed string representation of contents of this event, to
      *          help in logging and debugging.
      */
     public String toString()

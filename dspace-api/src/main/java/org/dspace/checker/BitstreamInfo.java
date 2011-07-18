@@ -1,35 +1,9 @@
-/*
- * Copyright (c) 2004-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.checker;
 
@@ -55,7 +29,7 @@ public final class BitstreamInfo
     private DSpaceBitstreamInfo dspaceBitstream;
 
     /**
-     * Indicates the bitstream info (metdata) was found in the database.
+     * Indicates the bitstream info (metadata) was found in the database.
      * 
      * @todo Is this actually used for anything?
      */
@@ -84,7 +58,6 @@ public final class BitstreamInfo
      */
     private BitstreamInfo()
     {
-        ;
     }
 
     /**
@@ -151,9 +124,9 @@ public final class BitstreamInfo
                 nm, "");
 
         this.deleted = del;
-        this.processEndDate = procEndDate;
+        this.processEndDate = (processEndDate == null ? null : new Date(procEndDate.getTime()));
         this.toBeProcessed = toBeProc;
-        this.processStartDate = procStartDate;
+        this.processStartDate = (processStartDate == null ? null : new Date(procStartDate.getTime()));
         this.infoFound = true;
     }
 
@@ -532,7 +505,7 @@ public final class BitstreamInfo
      */
     public Date getProcessStartDate()
     {
-        return this.processStartDate;
+        return this.processStartDate == null ? null : new Date(this.processStartDate.getTime());
     }
 
     /**
@@ -543,7 +516,7 @@ public final class BitstreamInfo
      */
     public void setProcessStartDate(Date startDate)
     {
-        this.processStartDate = startDate;
+        this.processStartDate = startDate == null ? null : new Date(startDate.getTime());
     }
 
     /**
@@ -553,7 +526,7 @@ public final class BitstreamInfo
      */
     public Date getProcessEndDate()
     {
-        return this.processEndDate;
+        return this.processEndDate == null ? null : new Date(this.processEndDate.getTime());
     }
 
     /**
@@ -564,6 +537,6 @@ public final class BitstreamInfo
      */
     public void setProcessEndDate(Date endDate)
     {
-        this.processEndDate = endDate;
+        this.processEndDate = endDate == null ? null : new Date(endDate.getTime());
     }
 }

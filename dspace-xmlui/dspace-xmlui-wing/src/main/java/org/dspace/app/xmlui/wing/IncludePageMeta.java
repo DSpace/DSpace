@@ -1,51 +1,11 @@
-/*
- * IncludePageMeta.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.wing;
-
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.avalon.framework.parameters.ParameterException;
 import org.apache.avalon.framework.parameters.Parameters;
@@ -56,33 +16,44 @@ import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.wing.element.PageMeta;
+import org.dspace.core.ConfigurationManager;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Include metadata in the resulting DRI document as derived from the sitemap
  * parameters.
- * 
- * Parameters should consist of a dublin core name and value. The format for 
+ *
+ * Parameters should consist of a dublin core name and value. The format for
  * a parameter name must follow the form: "<element>.<qualifier>.<language>#order"
  * The qualifier, language, and order are all optional components. The order
- * component is an integer and is needed to insure that parameter names are 
+ * component is an integer and is needed to insure that parameter names are
  * unique. Since Cocoon's parameters are Hashes duplicate names are not allowed
- * the order syntax allows the sitemap programer to specify an order in which 
+ * the order syntax allows the sitemap programer to specify an order in which
  * these metadata values should be placed inside the document.
- * 
+ *
  * The following are a valid examples:
- * 
+ *
  * <map:parameter name="theme.name.en" value="My Theme"/>
- * 
+ *
  * <map:parameter name="theme.path" value="/MyTheme/"/>
- * 
+ *
  * <map:parameter name="theme.css#1" value="style.css"/>
- * 
+ *
  * <map:parameter name="theme.css#2" value="style.css-ie"/>
- * 
+ *
  * <map:parameter name="theme.css#2" value="style.css-ff"/>
- * 
+ *
  * @author Scott Phillips
+ * @author Roel Van Reeth (roel at atmire dot com)
+ * @author Art Lowel (art dot lowel at atmire dot com)
+ * @author Ben Bosman (ben at atmire dot com)
  */
 public class IncludePageMeta extends AbstractWingTransformer implements CacheableProcessingComponent
 {
@@ -99,7 +70,7 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
     public Serializable getKey()
     {
         String key = "";
-     
+
         for (Metadata metadata : metadataList)
         {
             key = "-" + metadata.getName() + "=" + metadata.getValue();
@@ -117,9 +88,9 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
     {
         return NOPValidity.SHARED_INSTANCE;
     }
-    
-    
-    
+
+
+
     /**
      * Extract the metadata name value pairs from the sitemap parameters.
      */
@@ -134,7 +105,7 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
             for (String name : names)
             {
             	String[] nameParts = name.split("#");
-            	
+
             	String dcName = null;
             	int order = -1;
             	if (nameParts.length == 1)
@@ -151,7 +122,7 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
             	{
             		throw new ProcessingException("Unable to parse page metadata name, '" + name + "', into parts.");
             	}
-            	
+
                 String[] dcParts = dcName.split("\\.");
                 String element = null;
                 String qualifier = null;
@@ -175,20 +146,20 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
                 {
                     throw new ProcessingException("Unable to parse page metadata name, '" + name + "', into parts.");
                 }
-            	
+
                 String value = parameters.getParameter(name);
-                
+
                 Metadata metadata = new Metadata(element,qualifier,language,order,value);
                 metadataList.add(metadata);
             }
-            
+
             Collections.sort(metadataList);
         }
         catch (ParameterException pe)
         {
             throw new ProcessingException(pe);
         }
-        
+
         // Initialize the Wing framework.
         try
         {
@@ -198,14 +169,129 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
         {
             throw new ProcessingException(we);
         }
+
+        // concatenation
+        if (ConfigurationManager.getBooleanProperty("xmlui.theme.enableConcatenation",false)) {
+            metadataList = enableConcatenation();
+        }
     }
 
+    /**
+     * Alters the URL to CSS, JS or JSON files to concatenate them.
+     * Enable the ConcatenationReader in the theme sitemap for
+     * concatenation to work correctly
+     */
+    private List<Metadata> enableConcatenation() {
+        Metadata last = null;
+        List<Metadata> newMetadataList = new ArrayList<Metadata>();
+
+        for (Metadata metadata : metadataList)
+        {
+            // only try to concatenate css and js
+            String curfile = metadata.getValue();
+            if (curfile.lastIndexOf('?') != -1) {
+                curfile = curfile.substring(0, curfile.lastIndexOf('?'));
+            }
+            if (curfile.endsWith(".css") || curfile.endsWith(".js") || curfile.endsWith(".json")) {
+                String curval = metadata.getValue();
+                // check if this metadata and the last one are compatible
+                if(last != null && checkConcatenateMerge(last, metadata)) {
+                    // merge
+                    String lastval = last.getValue();
+                    curval = metadata.getValue();
+                    String newval = lastval.substring(0,lastval.lastIndexOf('.')) + ",";
+                    newval += curval.substring(curval.lastIndexOf('/')+1,curval.lastIndexOf('.'));
+                    newval += lastval.substring(lastval.lastIndexOf('.'));
+                    last.value = newval;
+                } else {
+                    // no merge, so add to list
+                    newMetadataList.add(metadata);
+                    // handle query string cases
+                    if(curval.lastIndexOf('?') != -1) {
+                        if(curval.substring(curval.lastIndexOf('?')).equals("?nominify")) {
+                            // concat should still be possible, so set last
+                            last = metadata;
+                        } else if(curval.substring(curval.lastIndexOf('?')).equals("?noconcat")) {
+                            // no concat should be possible so set last to null
+                            last = null;
+                            // query string can be removed
+                            curval = curval.substring(0, curval.lastIndexOf('?'));
+                            metadata.value = curval;
+                        } else {
+                            // no concat should be possible so set last to null
+                            last = null;
+                            // query string should be set to "nominify"
+                            curval = curval.substring(0, curval.lastIndexOf('?')) + "?nominify";
+                            metadata.value = curval;
+                        }
+                    } else {
+                        // multiple possibilities:
+                        // * last == null, so set it
+                        // * no merge is possible, so change last to this metadata
+                        // no query string, so concat and merge should be possible later on
+                        last = metadata;
+                    }
+                }
+            } else {
+                // wrong extension
+                newMetadataList.add(metadata);
+            }
+        }
+        return newMetadataList;
+    }
+
+    private boolean checkConcatenateMerge(Metadata last, Metadata current) {
+        // check if elements are equal
+        if(last.getElement() == null) {
+            if(current.getElement() != null) {
+                return false;
+            }
+        } else if(!last.getElement().equals(current.getElement())) {
+            return false;
+        }
+        // check if qualifiers are equal
+        if(last.getQualifier() == null) {
+            if(current.getQualifier() != null) {
+                return false;
+            }
+        } else if(!last.getQualifier().equals(current.getQualifier())) {
+            return false;
+        }
+        // check if languages are equal
+        if(last.getLanguage() == null) {
+            if(current.getLanguage() != null) {
+                return false;
+            }
+        } else if(!last.getLanguage().equals(current.getLanguage())) {
+            return false;
+        }
+
+
+        String curval = current.getValue();
+        String lastval = last.getValue();
+        // check if extensions and query strings are equal
+        if(!lastval.substring(lastval.lastIndexOf('.')).equals(curval.substring(curval.lastIndexOf('.')))) {
+            return false;
+        }
+        // check if paths are equal
+        if(!lastval.substring(0,lastval.lastIndexOf('/')+1).equals(curval.substring(0,curval.lastIndexOf('/')+1))) {
+            return false;
+        }
+
+        // only valid nonempty query string is "nominify"
+        if(curval.lastIndexOf('?') != -1
+                && !"?nominify".equals(curval.substring(curval.lastIndexOf('?')))) {
+            return false;
+        }
+
+        return true;
+
+    }
     /**
      * Include the metadata in the page metadata.
      */
     public void addPageMeta(PageMeta pageMeta) throws WingException
     {
-
         for (Metadata metadata : metadataList)
         {
         	String element = metadata.getElement();
@@ -218,19 +304,19 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
                     .addContent(value);
         }
     }
-    
-    
+
+
     /**
      * Private class to keep track of metadata name/value pairs.
      */
-    class Metadata implements Comparable<Metadata> {
-    	
+    static class Metadata implements Comparable<Metadata> {
+
     	private String element;
     	private String qualifier;
     	private String language;
     	private int order;
     	private String value;
-    	
+
     	public Metadata(String element,String qualifier, String language, int order, String value)
     	{
     		this.element = element;
@@ -239,27 +325,27 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
     		this.order = order;
     		this.value = value;
     	}
-    	
+
     	public String getElement()
     	{
     		return this.element;
     	}
-    	
+
     	public String getQualifier()
     	{
     		return this.qualifier;
     	}
-    	
+
     	public String getLanguage()
     	{
     		return this.language;
     	}
-    	
+
     	public int getOrder()
     	{
     		return this.order;
     	}
-    	
+
     	public String getName()
     	{
     		String name = this.element;
@@ -271,22 +357,22 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
     				name += "." + this.language;
     			}
     		}
-    		
+
     		name += "#" + order;
     		return name;
     	}
-    	
+
     	public String getValue()
     	{
     		return this.value;
     	}
-    	
-    	
-    	public int compareTo(Metadata other) 
+
+
+    	public int compareTo(Metadata other)
     	{
     		String myName = this.element     + "." +this.qualifier   + "." + this.language;
     		String otherName = other.element + "." + other.qualifier + "." + other.language;
-    		
+
     		int result = myName.compareTo(otherName);
     		if (result == 0)
     		{
@@ -298,14 +384,14 @@ public class IncludePageMeta extends AbstractWingTransformer implements Cacheabl
     			{
     				result = 1; // The other metadata element belongs AFTER this element.
     			}
-    			else 
+    			else
     			{
     				result = -1; // The other metadata element belongs BEFORE this element.
     			}
     		}
-    		
+
     		return result;
     	}
     }
-  
+
 }

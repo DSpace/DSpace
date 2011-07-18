@@ -1,43 +1,10 @@
-/*
- * StatisticsServlet.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.webui.servlet;
 
 import java.io.BufferedReader;
@@ -59,7 +26,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.log4j.Logger;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.ConfigurationManager;
@@ -71,14 +37,10 @@ import org.dspace.eperson.Group;
  * repository
  *
  * @author   Richard Jones
- * @version  $Revision: 3705 $
+ * @version  $Revision: 5845 $
  */
 public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServlet
 {
-
-    /** log4j category */
-    private static Logger log = Logger.getLogger(StatisticsServlet.class);
-    
     protected void doDSGet(Context c, 
         HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException, SQLException, AuthorizeException
@@ -95,7 +57,7 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
         boolean publicise = ConfigurationManager.getBooleanProperty("report.public");
         
         // determine the navigation bar to be displayed
-        String navbar = (publicise == false ? "admin" : "default");
+        String navbar = (!publicise ? "admin" : "default");
         request.setAttribute("navbar", navbar);
         
         // is the user a member of the Administrator (1) group
@@ -126,7 +88,7 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
         String date = (String) request.getParameter("date");
         request.setAttribute("date", date);
         
-        request.setAttribute("general", new Boolean(false));
+        request.setAttribute("general", Boolean.FALSE);
         
         File reportDir = new File(ConfigurationManager.getProperty("report.dir"));
         
@@ -139,7 +101,7 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
 
         try
         {
-            List monthsList = new ArrayList();
+            List<Date> monthsList = new ArrayList<Date>();
 
             Pattern monthly = Pattern.compile("report-([0-9][0-9][0-9][0-9]-[0-9]+)\\.html");
             Pattern general = Pattern.compile("report-general-([0-9]+-[0-9]+-[0-9]+)\\.html");
@@ -151,7 +113,7 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
             // report
             if (date == null)
             {
-                request.setAttribute("general", new Boolean(true));
+                request.setAttribute("general", Boolean.TRUE);
 
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy'-'M'-'dd");
                 Date mostRecentDate = null;
@@ -235,35 +197,62 @@ public class StatisticsServlet extends org.dspace.app.webui.servlet.DSpaceServle
 
             request.setAttribute("months", months);
 
-            try
+            if (reportFile != null)
             {
-                fir = new FileInputStream(reportFile.getPath());
-                ir = new InputStreamReader(fir, "UTF-8");
-                br = new BufferedReader(ir);
-            }
-            catch (IOException e)
-            {
-                // FIXME: no error handing yet
-                throw new RuntimeException(e.getMessage(),e);
-            }
+                try
+                {
+                    fir = new FileInputStream(reportFile.getPath());
+                    ir = new InputStreamReader(fir, "UTF-8");
+                    br = new BufferedReader(ir);
+                }
+                catch (IOException e)
+                {
+                    // FIXME: no error handing yet
+                    throw new IllegalStateException(e.getMessage(),e);
+                }
 
-            // FIXME: there's got to be a better way of doing this
-            String line = null;
-            while ((line = br.readLine()) != null)
-            {
-                report.append(line);
+                // FIXME: there's got to be a better way of doing this
+                String line = null;
+                while ((line = br.readLine()) != null)
+                {
+                    report.append(line);
+                }
             }
         }
         finally
         {
             if (br != null)
-                try { br.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    br.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
 
             if (ir != null)
-                try { ir.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    ir.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
 
             if (fir != null)
-                try { fir.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    fir.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
         }
         // set the report to be displayed
         request.setAttribute("report", report.toString());

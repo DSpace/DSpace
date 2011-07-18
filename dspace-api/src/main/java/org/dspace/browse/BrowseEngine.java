@@ -1,47 +1,13 @@
-/*
- * BrowseEngine.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.browse;
 
 import java.sql.SQLException;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -163,7 +129,7 @@ public class BrowseEngine
         // tell the browse query whether we are ascending or descending on the value
         dao.setAscending(scope.isAscending());
 
-        // define a clause for the WHERE clause which will allow us to constraine
+        // define a clause for the WHERE clause which will allow us to constrain
         // our browse to a specified community or collection
         if (scope.inCollection() || scope.inCommunity())
         {
@@ -195,7 +161,7 @@ public class BrowseEngine
         dao.setOrderField(orderBy);
 
         // now run the query
-        List results = dao.doQuery();
+        List<BrowseItem> results = dao.doQuery();
 
         // construct the mostly empty BrowseInfo object to pass back
         BrowseInfo browseInfo = new BrowseInfo(results, 0, scope.getResultsPerPage(), 0);
@@ -254,9 +220,19 @@ public class BrowseEngine
                 value = OrderFormat.makeSortString(value, scope.getFilterValueLang(),
                             scope.getBrowseIndex().getDataType());
 
+                dao.setAuthorityValue(scope.getAuthorityValue());
+
                 // set the values in the Browse Query
-                dao.setFilterValueField("sort_value");
-                dao.setFilterValue(value);
+                if (scope.isSecondLevel())
+                {
+                    dao.setFilterValueField("value");
+                    dao.setFilterValue(rawValue);    
+                }
+                else
+                {
+	                dao.setFilterValueField("sort_value");
+	                dao.setFilterValue(value);
+                }
                 dao.setFilterValuePartial(scope.getFilterValuePartial());
 
                 // to apply the filtering, we need the distinct and map tables for the index
@@ -264,7 +240,7 @@ public class BrowseEngine
                                            browseIndex.getMapTableName());
             }
 
-            // define a clause for the WHERE clause which will allow us to constraine
+            // define a clause for the WHERE clause which will allow us to constrain
             // our browse to a specified community or collection
             if (scope.inCollection() || scope.inCommunity())
             {
@@ -308,13 +284,6 @@ public class BrowseEngine
 
                 log.debug("browsing using focus: " + focusValue);
 
-                // Now we have a value to focus on, we need to find out where it is
-                String focusField = browseIndex.getSortField(scope.isSecondLevel());
-                if (scope.getSortBy() > 0)
-                {
-                    focusField = "sort_" + Integer.toString(scope.getSortBy());
-                }
-
                 // Convert the focus value into an offset
                 offset = getOffsetForValue(focusValue);
             }
@@ -325,7 +294,7 @@ public class BrowseEngine
             dao.setLimit(scope.getResultsPerPage());
 
             // Holder for the results
-            List results = null;
+            List<BrowseItem> results = null;
 
             // Does this browse have any contents?
             if (total > 0)
@@ -341,7 +310,9 @@ public class BrowseEngine
                     // In this case, we will calculate a new offset for the last page of results
                     offset = total - scope.getResultsPerPage();
                     if (offset < 0)
+                    {
                         offset = 0;
+                    }
 
                     // And rerun the query
                     dao.setOffset(offset);
@@ -351,7 +322,7 @@ public class BrowseEngine
             else
             {
                 // No records, so make an empty list
-                results = new ArrayList();
+                results = new ArrayList<BrowseItem>();
             }
 
             // construct the BrowseInfo object to pass back
@@ -382,6 +353,9 @@ public class BrowseEngine
 
             // set the browse value if there is one
             browseInfo.setValue(rawValue);
+
+            // set the browse authority key if there is one
+            browseInfo.setAuthority(scope.getAuthorityValue());
 
             // set the focus value if there is one
             browseInfo.setFocus(rawFocusValue);
@@ -469,7 +443,7 @@ public class BrowseEngine
             // set the ordering field (there is only one option)
             dao.setOrderField("sort_value");
 
-            // assemble the focus clase if we are to have one
+            // assemble the focus clause if we are to have one
             // it will look like one of the following
             // - sort_value < myvalue
             // = sort_1 > myvalue
@@ -495,7 +469,7 @@ public class BrowseEngine
             dao.setLimit(scope.getResultsPerPage());
 
             // Holder for the results
-            List results = null;
+            List<String[]> results = null;
 
             // Does this browse have any contents?
             if (total > 0)
@@ -511,7 +485,9 @@ public class BrowseEngine
                     // In this case, we will calculate a new offset for the last page of results
                     offset = total - scope.getResultsPerPage();
                     if (offset < 0)
+                    {
                         offset = 0;
+                    }
 
                     // And rerun the query
                     dao.setOffset(offset);
@@ -521,7 +497,7 @@ public class BrowseEngine
             else
             {
                 // No records, so make an empty list
-                results = new ArrayList();
+                results = new ArrayList<String[]>();
             }
 
             // construct the BrowseInfo object to pass back
@@ -616,7 +592,9 @@ public class BrowseEngine
         if (so == null || so.getNumber() == 0)
         {
             if (browseIndex.getSortOption() != null)
+            {
                 so = browseIndex.getSortOption();
+            }
         }
 
         String col = "sort_1";
@@ -645,11 +623,6 @@ public class BrowseEngine
     private int getOffsetForValue(String value)
         throws BrowseException
     {
-        // get the table name.  We don't really need to care about whether we are in a
-        // community or collection at this point.  This is only for full or second
-        // level browse, so there is no need to worry about distinct value browsing
-        String tableName = browseIndex.getTableName();
-
         // we need to make sure that we select from the correct column.  If the sort option
         // is the 0th option then we use sort_value, but if it is one of the others we have
         // to select from that column instead.  Otherwise, we end up missing the focus value
@@ -659,7 +632,9 @@ public class BrowseEngine
         if (so == null || so.getNumber() == 0)
         {
             if (browseIndex.getSortOption() != null)
+            {
                 so = browseIndex.getSortOption();
+            }
         }
 
         String col = "sort_1";
@@ -684,12 +659,9 @@ public class BrowseEngine
         throws BrowseException
     {
         if (!browseIndex.isMetadataIndex())
+        {
             throw new IllegalArgumentException("getOffsetForDistinctValue called when not a metadata index");
-
-        // get the table name.  We don't really need to care about whether we are in a
-        // community or collection at this point.  This is only for full or second
-        // level browse, so there is no need to worry about distinct value browsing
-        String tableName = browseIndex.getTableName();
+        }
 
         // now get the DAO to do the query for us, returning the highest
         // string value in the given column in the given table for the
@@ -790,257 +762,5 @@ public class BrowseEngine
         log.debug(LogManager.getHeader(context, "get_total_results_return", "return=" + count));
 
         return count;
-    }
-
-    /**
-     * Get the position of the current start point of the browse in the field of total
-     * objects relevant to this browse.  This is integrally related to how results are
-     * presented in pages to the User Interface.  The argument tells us whether this
-     * is a distinct browse or not, as this has an impact on how results are calculated
-     *
-     * @param distinct      is this a distinct browse
-     * @return              the offset of the first result from the start of the set
-     * @throws SQLException
-     * @throws BrowseException
-     */
-    private int getPosition(boolean distinct)
-        throws SQLException, BrowseException
-    {
-        log.debug(LogManager.getHeader(context, "get_position", "distinct=" + distinct));
-
-        // if there isn't a focus then we are at the start
-        if (dao.getJumpToValue() == null)
-        {
-            log.debug(LogManager.getHeader(context, "get_position_return", "return=0"));
-            return 0;
-        }
-
-        // get the table name that we are going to be getting our data from
-        String tableName = browseIndex.getTableName(distinct, scope.inCommunity(), scope.inCollection());
-
-        // ensure that the select is set to "*"
-        String[] select = { "*" };
-        dao.setCountValues(select);
-
-        // FIXME: it would be nice to have a good way of doing this in the DAO
-        // now reset all of the fields that we don't want to have constraining
-        // our count, storing them locally to reinstate later
-        boolean isAscending = dao.isAscending();
-        boolean useEquals = dao.useEqualsComparator();
-        String orderField = dao.getOrderField();
-        int limit = dao.getLimit();
-        int offset = dao.getOffset();
-
-        // reverse the direction of the query, and remove the equal comparator
-        // (if it exists), as well as nullifying a few other unnecessary parameters
-        dao.setAscending(!isAscending);
-        dao.setEqualsComparator(false);
-        dao.setOrderField(null);
-        dao.setLimit(-1);
-        dao.setOffset(-1);
-
-        // perform the query and get the result
-        int count = dao.doCountQuery();
-
-        // now put back the values we removed for this method
-        dao.setAscending(isAscending);
-        dao.setEqualsComparator(useEquals);
-        dao.setOrderField(orderField);
-        dao.setLimit(limit);
-        dao.setOffset(offset);
-
-        log.debug(LogManager.getHeader(context, "get_position_return", "return=" + count));
-
-        return count;
-    }
-
-    /**
-     * Get the database id of the item at the top of what will be the previous page
-     * of results.  This is so that a "back" button can be generated by the User
-     * Interface when paging through results.  The callback argument is there so that
-     * if the caller wishes the actual results from the previous page can also be returned
-     * (this is useful, for example, if you are on the very last page of results, and need
-     * some previous results to pad out the full number of results per page).  If the
-     * callback is null, then no results are kept
-     *
-     * @param callback  A List object for holding BrowseItem objects indexed numerically in the correct order
-     * @return          the database id of the top of the previous page
-     * @throws SQLException
-     * @throws BrowseException
-     */
-    private int getPreviousPageID(List callback)
-        throws SQLException, BrowseException
-    {
-        log.debug(LogManager.getHeader(context, "get_previous_page_id", ""));
-
-        // do we want to capture the results?
-        boolean capture = false;
-        if (callback != null)
-        {
-            capture = true;
-        }
-
-        // the only thing we need to do is reverse the direction
-        // of the query, and set it to not use the "=" part of the
-        // comparator (i.e. < and > not <= and >=).
-        boolean isAscending = dao.isAscending();
-        dao.setAscending(!isAscending);
-
-        boolean useEquals = dao.useEqualsComparator();
-        dao.setEqualsComparator(false);
-
-        // store in local scope the things that we are going to change
-        // during this method
-        int resultLimit = dao.getLimit();
-
-        // if the database supports it (postgres does), we use limit
-        // and offset to minimise the work it has to do.
-
-        // the limit will be the size of a page, or double the size of the
-        // page if we are capturing the result set (because the first page's worth
-        // will be the results, so the previous link will need to come from the
-        // page *before* that)
-        int limit = scope.getResultsPerPage();
-        if (capture)
-        {
-            limit *= 2;
-        }
-        dao.setLimit(limit);
-
-        // now we have a query which is exactly the opposite of the
-        // original query.  So lets execute it:
-        List results = dao.doQuery();
-
-        // before we continue, put back the variables we messed with
-        dao.setAscending(isAscending);
-        dao.setEqualsComparator(useEquals);
-        dao.setLimit(resultLimit);
-
-        Iterator itr = results.iterator();
-
-        // work our way through the list, capturing if necessary, and finally
-        // having the last result, which will be the top of the previous page
-        int i = 0;
-        BrowseItem prev = null;
-        while (itr.hasNext())
-        {
-            BrowseItem browseItem = (BrowseItem) itr.next();
-
-            // we need to copy this, because of the scoping vs by-reference issue
-            prev = browseItem;
-
-            // if we need to capture the results in the call back, do it here.
-            // Note that since the results will come in backwards, we place
-            // each one at the start of the array so that it displaces the others
-            // in the right direction.  By the end, they should be sorted correctly
-            // we use the index i to be sure that we only grab one page's worth
-            // of results (see note above about limit)
-            if (capture && i < scope.getResultsPerPage())
-            {
-                callback.add(0, browseItem);
-                i++;
-            }
-        }
-
-        if (prev != null)
-        {
-            return prev.getID();
-        }
-        else
-        {
-            return -1;
-        }
-    }
-
-    /**
-     * Get the value (for single value browses) for the result that appears at the top
-     * of the previous page, for when the User Interface is performing result set paging.
-     * The callback argument allows for this method to populate the List with the results
-     * obtained from the query, which can be useful when, for example, reaching the final
-     * browse page and needing additional results to pad up to the number of results per
-     * page
-     *
-     * @param callback      A List object for holding String objects indexed numerically in the correct order
-     * @return              the value of the top of the previous page
-     * @throws SQLException
-     * @throws BrowseException
-     */
-    private String getPreviousPageValue(List callback)
-        throws SQLException, BrowseException
-    {
-        // do we want to capture the results?
-        boolean capture = false;
-        if (callback != null)
-        {
-            capture = true;
-        }
-
-        log.debug(LogManager.getHeader(context, "get_previous_page_value", "capture_results=" + capture));
-
-        // the only thing we need to do is reverse the direction
-        // of the query, and set it to not use the "=" part of the
-        // comparator (i.e. < and > not <= and >=).
-        boolean isAscending = dao.isAscending();
-        dao.setAscending(!isAscending);
-
-        boolean useEquals = dao.useEqualsComparator();
-        dao.setEqualsComparator(false);
-
-        // store in local scope the things that we are going to change
-        // during this method
-        int resultLimit = dao.getLimit();
-
-        // if the database supports it (postgres does), we use limit
-        // and offset to minimise the work it has to do.
-
-        // the limit will be the size of a page, or double the size of the
-        // page if we are capturing the result set (because the first page's worth
-        // will be the results, so the previous link will need to come from the
-        // page *before* that)
-        int limit = scope.getResultsPerPage();
-        if (capture)
-        {
-            limit *= 2;
-        }
-        dao.setLimit(limit);
-
-        // now we have a query which is exactly the opposite of the
-        // original query.  So lets execute it:
-        List results = dao.doValueQuery();
-
-        // before we continue, put back the variables we messed with
-        dao.setAscending(isAscending);
-        dao.setEqualsComparator(useEquals);
-        dao.setLimit(resultLimit);
-
-        Iterator itr = results.iterator();
-
-        // work our way through the list, capturing if necessary, and finally
-        // having the last result, which will be the top of the previous page
-        int i = 0;
-        String prev = null;
-        while (itr.hasNext())
-        {
-            String value = (String) itr.next();
-
-            // we need to copy this, because of the scoping vs by-reference issue
-            prev = value;
-
-            // if we need to capture the results in the call back, do it here.
-            // Note that since the results will come in backwards, we place
-            // each one at the start of the array so that it displaces the others
-            // in the right direction.  By the end, they should be sorted correctly
-            // we use the index i to be sure that we only grab one page's worth
-            // of results (see note above about limit)
-            if (capture && i < scope.getResultsPerPage())
-            {
-                callback.add(0, value);
-                i++;
-            }
-        }
-
-        log.debug(LogManager.getHeader(context, "get_previous_page_value_return", "return=" + prev));
-
-        return prev;
     }
 }

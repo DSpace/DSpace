@@ -1,48 +1,22 @@
-/*
- * FlowContainerUtils.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
- */package org.dspace.app.xmlui.aspect.administrative;
+ * http://www.dspace.org/license/
+ */
+package org.dspace.app.xmlui.aspect.administrative;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
+
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.servlet.multipart.Part;
@@ -51,18 +25,27 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.browse.BrowseException;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
+import org.dspace.harvest.HarvestedCollection;
 import org.dspace.content.Item;
+import org.dspace.content.ItemIterator;
+import org.dspace.harvest.OAIHarvester;
+import org.dspace.harvest.OAIHarvester.HarvestScheduler;
+import org.dspace.content.crosswalk.CrosswalkException;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.curate.Curator;
 import org.dspace.eperson.Group;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
+import org.xml.sax.SAXException;
 
 /**
- * Utility methods to processes actions on Communities and Collections. 
- * 
+ * Utility methods to processes actions on Communities and Collections.
+ *
  * @author scott phillips
  */
 public class FlowContainerUtils 
@@ -105,21 +88,35 @@ public class FlowContainerUtils
 		
 		// If they don't have a name then make it untitled.
 		if (name == null || name.length() == 0)
-			name = "Untitled";
+        {
+            name = "Untitled";
+        }
 
 		// If empty, make it null.
 		if (shortDescription != null && shortDescription.length() == 0)
-			shortDescription = null;
+        {
+            shortDescription = null;
+        }
 		if (introductoryText != null && introductoryText.length() == 0)
-			introductoryText = null;
+        {
+            introductoryText = null;
+        }
 		if (copyrightText != null && copyrightText.length() == 0)
-			copyrightText = null;
+        {
+            copyrightText = null;
+        }
 		if (sideBarText != null && sideBarText.length() == 0)
-			sideBarText = null;
+        {
+            sideBarText = null;
+        }
 		if (license != null && license.length() == 0)
-			license = null;
+        {
+            license = null;
+        }
 		if (provenanceDescription != null && provenanceDescription.length() == 0)
-			provenanceDescription = null;
+        {
+            provenanceDescription = null;
+        }
 		
 		// Save the metadata
 		collection.setMetadata("name", name);
@@ -143,7 +140,9 @@ public class FlowContainerUtils
     		Object object = request.get("logo");
     		Part filePart = null;
     		if (object instanceof Part)
-    			filePart = (Part) object;
+            {
+                filePart = (Part) object;
+            }
 
     		if (filePart != null && filePart.getSize() > 0)
     		{
@@ -164,6 +163,227 @@ public class FlowContainerUtils
 		return result;
 	}
 	
+	/**
+	 * Process the collection harvesting options form.
+	 * 
+	 * @param context The current DSpace context.
+	 * @param collectionID The collection id.
+	 * @param request the Cocoon request object
+	 * @return A process result's object.
+	 */
+	public static FlowResult processSetupCollectionHarvesting(Context context, int collectionID, Request request) throws SQLException, IOException, AuthorizeException
+	{
+		FlowResult result = new FlowResult();
+		HarvestedCollection hc = HarvestedCollection.find(context, collectionID);
+
+		String contentSource = request.getParameter("source");
+
+		// First, if this is not a harvested collection (anymore), set the harvest type to 0; possibly also wipe harvest settings  
+		if (contentSource.equals("source_normal")) 
+		{
+			if (hc != null)
+            {
+                hc.delete();
+            }
+			
+			result.setContinue(true);
+		}
+		else 
+		{
+			FlowResult subResult = testOAISettings(context, request);
+			
+			// create a new harvest instance if all the settings check out
+			if (hc == null) {
+				hc = HarvestedCollection.create(context, collectionID);
+			}
+			
+			// if the supplied options all check out, set the harvesting parameters on the collection
+			if (subResult.getErrors().isEmpty()) {
+				String oaiProvider = request.getParameter("oai_provider");
+				boolean oaiAllSets = "all".equals(request.getParameter("oai-set-setting"));
+                String oaiSetId;
+                if(oaiAllSets)
+                {
+                    oaiSetId = "all";
+                }
+                else
+                {
+                    oaiSetId = request.getParameter("oai_setid");
+                }
+
+
+				String metadataKey = request.getParameter("metadata_format");
+				String harvestType = request.getParameter("harvest_level");
+				
+				hc.setHarvestParams(Integer.parseInt(harvestType), oaiProvider, oaiSetId, metadataKey);
+				hc.setHarvestStatus(HarvestedCollection.STATUS_READY);
+			}
+			else {
+				result.setErrors(subResult.getErrors());
+				result.setContinue(false);
+				return result;
+			}
+			
+			hc.update();
+		}
+		        
+        // Save everything
+        context.commit();
+        
+        // No notice...
+        //result.setMessage(new Message("default","Harvesting options successfully modified."));
+        result.setOutcome(true);
+        result.setContinue(true);
+		
+		return result;
+	}
+	
+	
+	/**
+	 * Use the collection's harvest settings to immediately perform a harvest cycle.
+	 * 
+	 * @param context The current DSpace context.
+	 * @param collectionID The collection id.
+	 * @param request the Cocoon request object
+	 * @return A process result's object.
+	 * @throws TransformerException 
+	 * @throws SAXException 
+	 * @throws ParserConfigurationException 
+	 * @throws CrosswalkException 
+	 */
+	public static FlowResult processRunCollectionHarvest(Context context, int collectionID, Request request) throws SQLException, IOException, AuthorizeException, CrosswalkException, ParserConfigurationException, SAXException, TransformerException
+	{
+		FlowResult result = new FlowResult();
+		OAIHarvester harvester;
+		List<String> testErrors = new ArrayList<String>();
+		Collection collection = Collection.find(context, collectionID);
+		HarvestedCollection hc = HarvestedCollection.find(context, collectionID);
+
+		//TODO: is there a cleaner way to do this?
+		try {
+			if (!HarvestScheduler.hasStatus(HarvestScheduler.HARVESTER_STATUS_STOPPED)) {
+				synchronized(HarvestScheduler.lock) {
+					HarvestScheduler.setInterrupt(HarvestScheduler.HARVESTER_INTERRUPT_INSERT_THREAD, collectionID);
+					HarvestScheduler.lock.notify();
+				}
+			}
+			else {
+				harvester = new OAIHarvester(context, collection, hc);
+				harvester.runHarvest();
+			}
+		}
+		catch (Exception e) {
+			testErrors.add(e.getMessage());
+			result.setErrors(testErrors);
+			result.setContinue(false);
+			return result;
+		}
+		
+        result.setContinue(true);
+		
+		return result;
+	}
+	
+	
+	/**
+	 * Purge the collection of all items, then run a fresh harvest cycle.
+	 * 
+	 * @param context The current DSpace context.
+	 * @param collectionID The collection id.
+	 * @param request the Cocoon request object
+	 * @return A process result's object.
+	 * @throws TransformerException 
+	 * @throws SAXException 
+	 * @throws ParserConfigurationException 
+	 * @throws CrosswalkException 
+	 * @throws BrowseException 
+	 */
+	public static FlowResult processReimportCollection(Context context, int collectionID, Request request) throws SQLException, IOException, AuthorizeException, CrosswalkException, ParserConfigurationException, SAXException, TransformerException, BrowseException 
+	{
+		Collection collection = Collection.find(context, collectionID);
+		HarvestedCollection hc = HarvestedCollection.find(context, collectionID);
+		
+		ItemIterator it = collection.getAllItems();
+		//IndexBrowse ib = new IndexBrowse(context);
+		while (it.hasNext()) {
+			Item item = it.next();
+			//System.out.println("Deleting: " + item.getHandle());
+			//ib.itemRemoved(item);
+			collection.removeItem(item);
+		}
+		hc.setHarvestResult(null,"");
+		hc.update();
+		collection.update();
+		context.commit();
+		
+		return processRunCollectionHarvest(context, collectionID, request);
+	}
+	
+	
+	/**
+	 * Test the supplied OAI settings. 
+	 * 
+	 * @param context
+	 * @param request
+	 * @return
+	 */
+	public static FlowResult testOAISettings(Context context, Request request)  
+	{
+		FlowResult result  = new FlowResult();
+		
+		String oaiProvider = request.getParameter("oai_provider");
+		String oaiSetId = request.getParameter("oai_setid");
+        oaiSetId = request.getParameter("oai-set-setting");
+        if(!"all".equals(oaiSetId))
+        {
+            oaiSetId = request.getParameter("oai_setid");
+        }
+		String metadataKey = request.getParameter("metadata_format");
+		String harvestType = request.getParameter("harvest_level");
+		int harvestTypeInt = 0;
+		
+		if (oaiProvider == null || oaiProvider.length() == 0)
+        {
+            result.addError("oai_provider");
+        }
+		if (oaiSetId == null || oaiSetId.length() == 0)
+        {
+            result.addError("oai_setid");
+        }
+		if (metadataKey == null || metadataKey.length() == 0)
+        {
+            result.addError("metadata_format");
+        }
+		if (harvestType == null || harvestType.length() == 0)
+        {
+            result.addError("harvest_level");
+        }
+		else
+        {
+            harvestTypeInt = Integer.parseInt(harvestType);
+        }
+			
+		
+		if (result.getErrors() == null) {
+			List<String> testErrors = OAIHarvester.verifyOAIharvester(oaiProvider, oaiSetId, metadataKey, (harvestTypeInt>1));
+			result.setErrors(testErrors);
+		}
+		
+		if (result.getErrors() == null || result.getErrors().isEmpty()) {
+			result.setOutcome(true);
+			// On a successful test we still want to stay in the loop, not continue out of it
+			//result.setContinue(true);
+			result.setMessage(new Message("default","Harvesting settings are valid."));
+		}
+		else {
+			result.setOutcome(false);
+			result.setContinue(false);
+			// don't really need a message when the errors are highlighted already
+			//result.setMessage(new Message("default","Harvesting is not properly configured."));
+		}
+
+		return result;
+	}
 	
 	/**
 	 * Look up the id of the template item for a given collection.
@@ -196,7 +416,7 @@ public class FlowContainerUtils
 	
 	/**
 	 * Look up the id of a group authorized for one of the given roles. If no group is currently 
-	 * authorized to preform this role then a new group will be created and assigned the role.
+	 * authorized to perform this role then a new group will be created and assigned the role.
 	 * 
 	 * @param context The current DSpace context.
 	 * @param collectionID The collection id.
@@ -213,32 +433,42 @@ public class FlowContainerUtils
 		{
 			role = collection.getAdministrators();
 			if (role == null)
-				role = collection.createAdministrators();
+            {
+                role = collection.createAdministrators();
+            }
 		} 
 		else if (ROLE_SUBMIT.equals(roleName))
 		{
 			role = collection.getSubmitters();
 			if (role == null)
-				role = collection.createSubmitters();
+            {
+                role = collection.createSubmitters();
+            }
 		}
 		else if (ROLE_WF_STEP1.equals(roleName))
 		{	
 			role = collection.getWorkflowGroup(1);
 			if (role == null)
-				role = collection.createWorkflowGroup(1);
+            {
+                role = collection.createWorkflowGroup(1);
+            }
 			
 		}
 		else if (ROLE_WF_STEP2.equals(roleName))
 		{
 			role = collection.getWorkflowGroup(2);
 			if (role == null)
-				role = collection.createWorkflowGroup(2);
+            {
+                role = collection.createWorkflowGroup(2);
+            }
 		}
 		else if (ROLE_WF_STEP3.equals(roleName))
 		{
 			role = collection.getWorkflowGroup(3);
 			if (role == null)
-				role = collection.createWorkflowGroup(3);
+            {
+                role = collection.createWorkflowGroup(3);
+            }
 			
 		}
 		
@@ -248,7 +478,9 @@ public class FlowContainerUtils
 		
 		// If the role name was valid then role should be non null,
 		if (role != null)
-			return role.getID();
+        {
+            return role.getID();
+        }
 		
 		return -1;
 	}
@@ -293,7 +525,7 @@ public class FlowContainerUtils
 			
 		}
 		
-		// Second, remove all outhorizations for this role by searching for all policies that this 
+		// Second, remove all authorizations for this role by searching for all policies that this 
 		// group has on the collection and remove them otherwise the delete will fail because 
 		// there are dependencies.
 		@SuppressWarnings("unchecked") // the cast is correct
@@ -301,7 +533,9 @@ public class FlowContainerUtils
 		for (ResourcePolicy policy : policies)
 		{
 			if (policy.getGroupID() == groupID)
-				policy.delete();
+            {
+                policy.delete();
+            }
 		}
 		
 		// Finally, Delete the role's actual group.
@@ -318,12 +552,11 @@ public class FlowContainerUtils
 	
 	/**
 	 * Look up the id of a group authorized for one of the given roles. If no group is currently 
-	 * authorized to preform this role then a new group will be created and assigned the role.
+	 * authorized to perform this role then a new group will be created and assigned the role.
 	 * 
 	 * @param context The current DSpace context.
 	 * @param collectionID The collection id.
-	 * @param roleName ADMIN, WF_STEP1,	WF_STEP2, WF_STEP3,	SUBMIT, DEFAULT_READ.
-	 * @return The id of the group associated with that particular role.
+	 * @return The id of the group associated with that particular role or -1
 	 */
 	public static int getCollectionDefaultRead(Context context, int collectionID) throws SQLException, AuthorizeException
 	{
@@ -332,27 +565,37 @@ public class FlowContainerUtils
 		Group[] itemGroups = AuthorizeManager.getAuthorizedGroups(context, collection, Constants.DEFAULT_ITEM_READ);
 		Group[] bitstreamGroups = AuthorizeManager.getAuthorizedGroups(context, collection, Constants.DEFAULT_BITSTREAM_READ);
 		
-		if (itemGroups.length != 1 && bitstreamGroups.length != 1)
-			// If there are more than one groups assigned either of these privleges then this role based method will not work.
-			// The user will need to go to the authorization section to manualy straight this out.
-			return -1;
-		
-		Group itemGroup = itemGroups[0];
-		Group bitstreamGroup = bitstreamGroups[0];
-		
-		if (itemGroup.getID() != bitstreamGroup.getID())
-			// If the same group is not assigned both of these priveleges then this role based method will not work. The user 
-			// will need to go to the authorization section to manualy straighten this out.
-			return -1;
-		
-		
-		
-		return itemGroup.getID();
+       int itemGroupID = -1;
+        
+		// If there are more than one groups assigned either of these privileges then this role based method will not work.
+        // The user will need to go to the authorization section to manually straighten this out.		
+		if (itemGroups.length != 1 || bitstreamGroups.length != 1)
+		{
+		    // do nothing the itemGroupID is already set to -1
+		}
+		else
+		{
+	        Group itemGroup = itemGroups[0];
+	        Group bitstreamGroup = bitstreamGroups[0];
+	        
+            // If the same group is not assigned both of these privileges then this role based method will not work. The user 
+            // will need to go to the authorization section to manually straighten this out.
+	        if (itemGroup.getID() != bitstreamGroup.getID())
+	        {
+	            // do nothing the itemGroupID is already set to -1
+	        }
+	        else
+	        {
+	            itemGroupID = itemGroup.getID();
+	        }
+		}
+
+		return itemGroupID;
 	}
 	
 	/**
-	 * Change default privleges from the anonymous group to a new group that will be created and
-	 * approrpate privleges assigned. The id of this new group will be returned.
+	 * Change default privileges from the anonymous group to a new group that will be created and
+	 * appropriate privileges assigned. The id of this new group will be returned.
 	 * 
 	 * @param context The current DSpace context.
 	 * @param collectionID The collection id.
@@ -363,21 +606,23 @@ public class FlowContainerUtils
 		int roleID = getCollectionDefaultRead(context, collectionID);
 		
 		if (roleID != 0)
-			throw new UIException("Unable to create a new default read group because either the group allready exists or multiple groups are assigned the default privleges.");
+        {
+            throw new UIException("Unable to create a new default read group because either the group allready exists or multiple groups are assigned the default privleges.");
+        }
 		
 		Collection collection = Collection.find(context,collectionID);
 		Group role = Group.create(context);
 		role.setName("COLLECTION_"+collection.getID() +"_DEFAULT_READ");
 		
-		// Remove existing privleges from the anynomous group.
+		// Remove existing privileges from the anonymous group.
 		AuthorizeManager.removePoliciesActionFilter(context, collection, Constants.DEFAULT_ITEM_READ);
 		AuthorizeManager.removePoliciesActionFilter(context, collection, Constants.DEFAULT_BITSTREAM_READ);
 		
-		// Grant our new role the default privleges.
+		// Grant our new role the default privileges.
 		AuthorizeManager.addPolicy(context, collection, Constants.DEFAULT_ITEM_READ,      role);
 		AuthorizeManager.addPolicy(context, collection, Constants.DEFAULT_BITSTREAM_READ, role);
 		
-		// Committ the changes
+		// Commit the changes
 		role.update();
 		context.commit();
 		
@@ -385,7 +630,7 @@ public class FlowContainerUtils
 	}
 	
 	/**
-	 * Change the default read priveleges to the anonymous group.
+	 * Change the default read privileges to the anonymous group.
 	 * 
 	 * If getCollectionDefaultRead() returns -1 or the anonymous group then nothing 
 	 * is done. 
@@ -409,7 +654,7 @@ public class FlowContainerUtils
 		Group role = Group.find(context, roleID);
 		Group anonymous = Group.find(context,0);
 		
-		// Delete the old role, this will remove the default privleges.
+		// Delete the old role, this will remove the default privileges.
 		role.delete();
 		
 		// Set anonymous as the default read group.
@@ -481,21 +726,35 @@ public class FlowContainerUtils
 		
 		// If they don't have a name then make it untitled.
 		if (name == null || name.length() == 0)
-			name = "Untitled";
+        {
+            name = "Untitled";
+        }
 
 		// If empty, make it null.
 		if (shortDescription != null && shortDescription.length() == 0)
-			shortDescription = null;
+        {
+            shortDescription = null;
+        }
 		if (introductoryText != null && introductoryText.length() == 0)
-			introductoryText = null;
+        {
+            introductoryText = null;
+        }
 		if (copyrightText != null && copyrightText.length() == 0)
-			copyrightText = null;
+        {
+            copyrightText = null;
+        }
 		if (sideBarText != null && sideBarText.length() == 0)
-			sideBarText = null;
+        {
+            sideBarText = null;
+        }
 		if (license != null && license.length() == 0)
-			license = null;
+        {
+            license = null;
+        }
 		if (provenanceDescription != null && provenanceDescription.length() == 0)
-			provenanceDescription = null;
+        {
+            provenanceDescription = null;
+        }
 		
 		// Save the metadata
 		newCollection.setMetadata("name", name);
@@ -511,7 +770,9 @@ public class FlowContainerUtils
     	Object object = request.get("logo");
     	Part filePart = null;
 		if (object instanceof Part)
-			filePart = (Part) object;
+        {
+            filePart = (Part) object;
+        }
 
 		if (filePart != null && filePart.getSize() > 0)
 		{
@@ -553,9 +814,13 @@ public class FlowContainerUtils
 		Community newCommunity;
 		
 		if (parent != null)
-			newCommunity = parent.createSubcommunity();
+        {
+            newCommunity = parent.createSubcommunity();
+        }
 		else
-			newCommunity = Community.create(null, context);
+        {
+            newCommunity = Community.create(null, context);
+        }
 		
 		String name = request.getParameter("name");
 		String shortDescription = request.getParameter("short_description");
@@ -565,17 +830,27 @@ public class FlowContainerUtils
 
 		// If they don't have a name then make it untitled.
 		if (name == null || name.length() == 0)
-			name = "Untitled";
+        {
+            name = "Untitled";
+        }
 
 		// If empty, make it null.
 		if (shortDescription != null && shortDescription.length() == 0)
-			shortDescription = null;
+        {
+            shortDescription = null;
+        }
 		if (introductoryText != null && introductoryText.length() == 0)
-			introductoryText = null;
+        {
+            introductoryText = null;
+        }
 		if (copyrightText != null && copyrightText.length() == 0)
-			copyrightText = null;
+        {
+            copyrightText = null;
+        }
 		if (sideBarText != null && sideBarText.length() == 0)
-			sideBarText = null;
+        {
+            sideBarText = null;
+        }
 		
 		newCommunity.setMetadata("name", name);
 		newCommunity.setMetadata("short_description", shortDescription);
@@ -587,7 +862,9 @@ public class FlowContainerUtils
 		Object object = request.get("logo");
 		Part filePart = null;
 		if (object instanceof Part)
-			filePart = (Part) object;
+        {
+            filePart = (Part) object;
+        }
 
 		if (filePart != null && filePart.getSize() > 0)
 		{
@@ -632,17 +909,27 @@ public class FlowContainerUtils
 
 		// If they don't have a name then make it untitled.
 		if (name == null || name.length() == 0)
-			name = "Untitled";
+        {
+            name = "Untitled";
+        }
 
 		// If empty, make it null.
 		if (shortDescription != null && shortDescription.length() == 0)
-			shortDescription = null;
+        {
+            shortDescription = null;
+        }
 		if (introductoryText != null && introductoryText.length() == 0)
-			introductoryText = null;
+        {
+            introductoryText = null;
+        }
 		if (copyrightText != null && copyrightText.length() == 0)
-			copyrightText = null;
+        {
+            copyrightText = null;
+        }
 		if (sideBarText != null && sideBarText.length() == 0)
-			sideBarText = null;
+        {
+            sideBarText = null;
+        }
 		
 		// Save the data
 		community.setMetadata("name", name);
@@ -662,7 +949,9 @@ public class FlowContainerUtils
     		Object object = request.get("logo");
     		Part filePart = null;
     		if (object instanceof Part)
-    			filePart = (Part) object;
+            {
+                filePart = (Part) object;
+            }
 
     		if (filePart != null && filePart.getSize() > 0)
     		{
@@ -706,8 +995,219 @@ public class FlowContainerUtils
 		return result;
 	}
 	
+	/**
+     * Look up the id of a group authorized for one of the given roles. If no group is currently 
+     * authorized to perform this role then a new group will be created and assigned the role.
+     * 
+     * @param context The current DSpace context.
+     * @param communityID The collection id.
+     * @param roleName ADMIN.
+     * @return The id of the group associated with that particular role, or -1 if the role was not found.
+     */
+    public static int getCommunityRole(Context context, int communityID, String roleName) throws SQLException, AuthorizeException, IOException
+    {
+        Community community = Community.find(context, communityID);
 	
+        // Determine the group based upon which role we are looking for.
+        Group role = null;
+        if (ROLE_ADMIN.equals(roleName))
+        {
+            role = community.getAdministrators();
+            if (role == null)
+            {
+                role = community.createAdministrators();
+            }
+        } 
 	
+        // In case we needed to create a group, save our changes
+        community.update();
+        context.commit();
+        
+        // If the role name was valid then role should be non null,
+        if (role != null)
+        {
+            return role.getID();
+        }
+        
+        return -1;
+    }
+
+	/**
+     * Delete one of a community's roles
+     * 
+     * @param context The current DSpace context.
+     * @param communityID The community id.
+     * @param roleName ADMIN.
+     * @param groupID The id of the group associated with this role.
+     * @return A process result's object.
+     */
+    public static FlowResult processDeleteCommunityRole(Context context, int communityID, String roleName, int groupID) throws SQLException, UIException, IOException, AuthorizeException
+    {
+        FlowResult result = new FlowResult();
+        
+        Community community = Community.find(context, communityID);
+        Group role = Group.find(context, groupID);
+        
+        // First, unregister the role
+        if (ROLE_ADMIN.equals(roleName))
+        {
+            community.removeAdministrators();
+        }
+        
+        // Second, remove all authorizations for this role by searching for all policies that this 
+        // group has on the collection and remove them otherwise the delete will fail because 
+        // there are dependencies.
+        @SuppressWarnings("unchecked") // the cast is correct
+        List<ResourcePolicy> policies = AuthorizeManager.getPolicies(context, community);
+        for (ResourcePolicy policy : policies)
+        {
+            if (policy.getGroupID() == groupID)
+            {
+                policy.delete();
+            }
+        }
+        
+        // Finally, delete the role's actual group.
+        community.update();
+        role.delete();
+        context.commit();
+    
+        result.setContinue(true);
+        result.setOutcome(true);
+        result.setMessage(new Message("default","The role was successfully deleted."));
+        return result;
+    }
+    
+    /**
+     * Delete a collection's template item (which is not a member of the collection).
+     * 
+     * @param context
+     * @param collectionID
+     * @return
+     * @throws SQLException
+     * @throws AuthorizeException
+     * @throws IOException
+     */
+    public static FlowResult processDeleteTemplateItem(Context context, int collectionID) throws SQLException, AuthorizeException, IOException
+    {
+        FlowResult result = new FlowResult();
+        
+        Collection collection = Collection.find(context, collectionID);
+        
+        collection.removeTemplateItem();
+        context.commit();
+        
+        result.setContinue(true);
+        result.setOutcome(true);
+        return result;
+    }
+	
+    
+        /**
+     * processCurateCollection
+     *
+     * Utility method to process curation tasks
+     * submitted via the DSpace GUI
+     *
+     * @param context
+     * @param dsoID
+     * @param request
+     *
+     */
+        public static FlowResult processCurateCollection(Context context, int dsoID, Request request)
+                                                                throws AuthorizeException, IOException, SQLException, Exception
+	{
+                String task = request.getParameter("curate_task");
+                Curator curator = FlowCurationUtils.getCurator(task);
+                Collection collection = Collection.find(context, dsoID);
+                if (collection != null)
+                {
+                    curator.curate(collection);
+                }
+                return FlowCurationUtils.getRunFlowResult(task, curator);
+	}
+
+        /**
+         * queues curation tasks
+         */
+        public static FlowResult processQueueCollection(Context context, int dsoID, Request request)
+                                                                throws AuthorizeException, IOException, SQLException, Exception
+	{
+                String task = request.getParameter("curate_task");
+                Curator curator = FlowCurationUtils.getCurator(task);
+                String objId = String.valueOf(dsoID);
+                String taskQueueName = ConfigurationManager.getProperty("curate", "ui.queuename");
+                boolean status = false;
+                Collection collection = Collection.find(context, dsoID);
+                if (collection != null)
+                {
+                    objId = collection.getHandle();
+                    try
+                    {
+                        curator.queue(context, objId, taskQueueName);
+                        status = true;
+                    }
+                    catch (IOException ioe)
+                    {
+                        // no-op
+                    }
+                }
+                return FlowCurationUtils.getQueueFlowResult(task, status, objId, taskQueueName);
+	}
+
+    /** 
+     * processCurateCommunity
+     *
+     * Utility method to process curation tasks
+     * submitted via the DSpace GUI
+     *
+     * @param context
+     * @param dsoID
+     * @param request
+     *
+     */
+        public static FlowResult processCurateCommunity(Context context, int dsoID, Request request)
+                                                                throws AuthorizeException, IOException, SQLException, Exception
+	{
+                String task = request.getParameter("curate_task");
+		Curator curator = FlowCurationUtils.getCurator(task);
+                Community community = Community.find(context, dsoID);
+                if (community != null)
+                {
+                    curator.curate(community);
+                }
+                return FlowCurationUtils.getRunFlowResult(task, curator);
+	}
+
+        /**
+         * queues curation tasks
+         */
+        public static FlowResult processQueueCommunity(Context context, int dsoID, Request request)
+                                                                throws AuthorizeException, IOException, SQLException, Exception
+	{
+                String task = request.getParameter("curate_task");
+                Curator curator = FlowCurationUtils.getCurator(task);
+                String objId = String.valueOf(dsoID);
+                String taskQueueName = ConfigurationManager.getProperty("curate", "ui.queuename");
+                boolean status = false;
+                Community community = Community.find(context, dsoID);
+                if (community != null)
+                {
+                    objId = community.getHandle();
+                    try
+                    {
+                        curator.queue(context, objId, taskQueueName);
+                        status = true;
+                    }
+                    catch (IOException ioe)
+                    {
+                        // no-op
+                    }
+                }
+                return FlowCurationUtils.getQueueFlowResult(task, status, objId, taskQueueName);
+	}
+	
+    
 	/**
 	 * Check whether this metadata value is a proper XML fragment. If the value is not 
 	 * then an error message will be returned that might (sometimes not) tell the user how
@@ -721,10 +1221,16 @@ public class FlowContainerUtils
 		// escape the ampersand correctly;
 		value = escapeXMLEntities(value);
 		
-		// Try and parse the XML into a mini-dom
-    	String xml = "<fragment>"+value+"</fragment>";
+		// Try and parse the XML into a mini-DOM
+    	String xml = "<?xml version='1.0' encoding='UTF-8'?><fragment>"+value+"</fragment>";
  	   
- 	   	ByteArrayInputStream inputStream = new ByteArrayInputStream(xml.getBytes());
+ 	   	ByteArrayInputStream inputStream = null;
+        try {
+            inputStream = new ByteArrayInputStream(xml.getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            inputStream = new ByteArrayInputStream(xml.getBytes()); //not supposed to happen, but never hurts
+
+        }
  	   
  	    SAXBuilder builder = new SAXBuilder();
 		try 
@@ -739,7 +1245,7 @@ public class FlowContainerUtils
 		} 
 		catch (IOException ioe) 
 		{
-			// This shouldn't ever occure because we are parsing
+			// This shouldn't ever occur because we are parsing
 			// an in-memory string, but in case it does we'll just return
 			// it as a normal error.
 			return ioe.getMessage();
@@ -749,18 +1255,20 @@ public class FlowContainerUtils
 	}
 	
     /** 
-     * Sanatize any XML that was inputed by the user, this will clean up
+     * Sanitize any XML that was inputed by the user, this will clean up
      * any unescaped characters so that they can be stored as proper XML.
      * These are errors that in general we want to take care of on behalf
      * of the user.
      * 
-     * @param value The unsantized value
-     * @return A sanatized value
+     * @param value The unsanitized value
+     * @return A sanitized value
      */
 	public static String escapeXMLEntities(String value)
 	{
 		if (value == null)
-			return null;
+        {
+            return null;
+        }
 		
 		// Escape any XML entities
     	int amp = -1;
@@ -768,27 +1276,39 @@ public class FlowContainerUtils
     	{
     		// Is it an xml entity named by number?
     		if (substringCompare(value,amp+1,'#'))
-    			continue;
+            {
+                continue;
+            }
     		
     		// &amp;
     		if (substringCompare(value,amp+1,'a','m','p',';'))
-    			continue;
+            {
+                continue;
+            }
     		
     		// &apos;
     		if (substringCompare(value,amp+1,'a','p','o','s',';'))
-    			continue;
+            {
+                continue;
+            }
     		
     		// &quot;
     		if (substringCompare(value,amp+1,'q','u','o','t',';'))
-    			continue;
+            {
+                continue;
+            }
     			
     		// &lt;
     		if (substringCompare(value,amp+1,'l','t',';'))
-    			continue;
+            {
+                continue;
+            }
     		
     		// &gt;
     		if (substringCompare(value,amp+1,'g','t',';'))
-    			continue;
+            {
+                continue;
+            }
     		
     		// Replace the ampersand with an XML entity.
     		value = value.substring(0,amp) + "&amp;" + value.substring(amp+1);
@@ -810,13 +1330,17 @@ public class FlowContainerUtils
     {
     	// Is the string long enough?
     	if (string.length() <= index + characters.length)
-    		return false;
+        {
+            return false;
+        }
     	
     	// Do all the characters match?
     	for (char character : characters)
     	{
     		if (string.charAt(index) != character)
-    			return false;
+            {
+                return false;
+            }
     		index++;
     	}
     	

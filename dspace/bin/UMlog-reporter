@@ -115,7 +115,7 @@ if (defined $help)
 my $bindir = dirname $0;
 
 # Get the DSpace log directory
-my $logdir = `$bindir/dsrun org.dspace.core.ConfigurationManager -property log.dir`;
+my $logdir = `$bindir/dspace dsprop -property log.dir`;
 chomp $logdir;
 
 

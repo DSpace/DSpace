@@ -31,9 +31,9 @@ chomp($bindir = `dirname $0`);
 
 
 %mail = ();
-chomp($mail{To} = `$bindir/dsrun org.dspace.core.ConfigurationManager -property mail.etdmarc.recipient`);
-chomp($mail{From} = `$bindir/dsrun org.dspace.core.ConfigurationManager -property mail.from.address`);
-chomp($mail{Smtp} = `$bindir/dsrun org.dspace.core.ConfigurationManager -property mail.server`);
+chomp($mail{To} =   `$bindir/dspace dsprop -property mail.etdmarc.recipient`);
+chomp($mail{From} = `$bindir/dspace dsprop -property mail.from.address`);
+chomp($mail{Smtp} = `$bindir/dspace dsprop -property mail.server`);
 $mail{Subject} = "ETD MARC records are available";
 $mail{Message} = "$count ETD MARC records are available in $file";
 

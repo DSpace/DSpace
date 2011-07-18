@@ -1,41 +1,9 @@
-/*
- * QueryArgs.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.search;
 
@@ -44,6 +12,8 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.StringTokenizer;
 import javax.servlet.http.HttpServletRequest;
 
@@ -192,11 +162,14 @@ public class QueryArgs
         String newquery = "(";
         String numFieldStr = request.getParameter("num_search_field");
         // for backward compatibility
-        if (numFieldStr == null) numFieldStr ="3";
+        if (numFieldStr == null)
+        {
+            numFieldStr = "3";
+        }
         int numField = Integer.parseInt(numFieldStr);
-        ArrayList query = new ArrayList();
-        ArrayList field = new ArrayList();
-        ArrayList conjunction = new ArrayList();
+        List<String> query = new ArrayList<String>();
+        List<String> field = new ArrayList<String>();
+        List<String> conjunction = new ArrayList<String>();
         
         for (int i = 1; i <= numField; i++)
         {
@@ -215,10 +188,14 @@ public class QueryArgs
             if (tmp_query != null && !tmp_query.equals(""))
         	{
         		query.add(tmp_query.trim());
-        		if (tmp_field == null)        		        			
-        			field.add("ANY");
-        		else  			
-        			field.add(tmp_field.trim());
+        		if (tmp_field == null)
+                {
+                    field.add("ANY");
+                }
+        		else
+                {
+                    field.add(tmp_field.trim());
+                }
         		if (i != numField)
             	{
             		conjunction.add(request.getParameter("conjunction"+i) != null?
@@ -226,19 +203,19 @@ public class QueryArgs
             	}
         	}
         }
-        Iterator iquery = query.iterator();
-        Iterator ifield = field.iterator();
-        Iterator iconj = conjunction.iterator();
+        Iterator<String> iquery = query.iterator();
+        Iterator<String> ifield = field.iterator();
+        Iterator<String> iconj = conjunction.iterator();
         
         String conj_curr = "";
         while (iquery.hasNext())
         {	newquery = newquery + conj_curr;
-        	String query_curr = (String) iquery.next();
-        	String field_curr = (String) ifield.next();
+        	String query_curr = iquery.next();
+        	String field_curr = ifield.next();
         	newquery = newquery + buildQueryPart(query_curr,field_curr);
         	if (iconj.hasNext())
         	{
-        		conj_curr = " " + (String)iconj.next() + " ";        	    
+        		conj_curr = " " + iconj.next() + " ";
         	}
         }
         
@@ -342,33 +319,33 @@ public class QueryArgs
      *
      * @return the created HashMap
      */
-    public HashMap buildQueryHash(HttpServletRequest request)
+    public Map<String, String> buildQueryMap(HttpServletRequest request)
     {
-        HashMap queryHash = new HashMap();
+        Map<String, String> queryMap = new HashMap<String, String>();
         String numFieldStr = request.getParameter("num_search_field");
         // for backward compatibility
-        if (numFieldStr == null) numFieldStr = "3"; 
+        if (numFieldStr == null)
+        {
+            numFieldStr = "3";
+        }
         int numField = Integer.parseInt(numFieldStr);
         for (int i = 1; i < numField; i++)
         {
-        	queryHash.put("query"+i, (request.getParameter("query"+i) == null) ? ""
-                    : request.getParameter("query"+i));
-        	queryHash.put("field"+i,
-                    (request.getParameter("field"+i) == null) ? "ANY" : request
-                            .getParameter("field"+i));
-            queryHash.put("conjunction"+i,
-                    (request.getParameter("conjunction"+i) == null) ? "AND"
-                            : request.getParameter("conjunction"+i));            
+            String queryStr = "query" + i;
+            String fieldStr = "field" + i;
+            String conjunctionStr = "conjunction" + i;
+
+        	queryMap.put(queryStr, StringUtils.defaultString(request.getParameter(queryStr), ""));
+        	queryMap.put(fieldStr, StringUtils.defaultString(request.getParameter(fieldStr), "ANY"));
+            queryMap.put(conjunctionStr, StringUtils.defaultString(request.getParameter(conjunctionStr), "AND"));
         }
         
-        queryHash.put("query"+numField, (request.getParameter("query"+numField) == null) ? ""
-                : request.getParameter("query"+numField));
+        String queryStr = "query" + numField;
+        String fieldStr = "field" + numField;
+        queryMap.put(queryStr, StringUtils.defaultString(request.getParameter(queryStr), ""));
+        queryMap.put(fieldStr, StringUtils.defaultString(request.getParameter(fieldStr), "ANY"));
         
-        queryHash.put("field"+numField,
-                (request.getParameter("field"+numField) == null) ? "ANY" 
-                : request.getParameter("field"+numField));
-        
-        return (queryHash);
+        return (queryMap);
     }
 
     /**
@@ -396,25 +373,23 @@ public class QueryArgs
     public String buildHTTPQuery(HttpServletRequest request)
             throws UnsupportedEncodingException
     {
-        String querystring = "";
-        HashMap queryHash = buildQueryHash(request);
+        StringBuilder queryString = new StringBuilder();
+        Map<String, String> queryMap = buildQueryMap(request);
 
-        Iterator i = queryHash.keySet().iterator();
-
-        while (i.hasNext())
+        for (Map.Entry<String, String> query : queryMap.entrySet())
         {
-            String key = (String) i.next();
-            String value = (String) queryHash.get(key);
-
-            querystring = querystring + "&" + key + "="
-                    + URLEncoder.encode(value, Constants.DEFAULT_ENCODING);
+            queryString.append("&")
+                       .append(query.getKey())
+                       .append("=")
+                       .append(URLEncoder.encode(query.getValue(), Constants.DEFAULT_ENCODING));
         }
+
         if (request.getParameter("num_search_field") != null)
         {
-        	querystring = querystring + "&num_search_field="+request.getParameter("num_search_field");	
-        }        
+            queryString.append("&num_search_field=").append(request.getParameter("num_search_field"));
+        }
 
         // return the result with the leading "&" removed
-        return (querystring.substring(1));
+        return queryString.substring(1);
     }
 }

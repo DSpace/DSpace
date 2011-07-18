@@ -1,60 +1,21 @@
-/*
- * FileUploadRequest.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.webui.util;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
-import org.apache.commons.fileupload.DiskFileUpload;
 import org.apache.commons.fileupload.FileItem;
+import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededException;
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
 import org.dspace.core.ConfigurationManager;
@@ -66,19 +27,15 @@ import org.dspace.core.ConfigurationManager;
  * allowable upload size.
  * 
  * @author Robert Tansley
- * @version $Revision: 3705 $
+ * @version $Revision: 6158 $
  */
 public class FileUploadRequest extends HttpServletRequestWrapper
 {
+    private Map<String, String> parameters = new HashMap<String, String>();
 
-    /** Multipart request */
-    private List items = null;
+    private Map<String, FileItem> fileitems = new HashMap<String, FileItem>();
 
-    private HashMap parameters = new HashMap();
-
-    private HashMap fileitems = new HashMap();
-
-    private Vector filenames = new Vector();
+    private List<String> filenames = new ArrayList<String>();
 
     private String tempDir = null;
 
@@ -91,14 +48,14 @@ public class FileUploadRequest extends HttpServletRequestWrapper
      * @param req
      *            the original request
      */
-    public FileUploadRequest(HttpServletRequest req) throws IOException
+    public FileUploadRequest(HttpServletRequest req) throws IOException, FileSizeLimitExceededException
     {
         super(req);
 
         original = req;
 
         tempDir = ConfigurationManager.getProperty("upload.temp.dir");
-        int maxSize = ConfigurationManager.getIntProperty("upload.max");
+        long maxSize = ConfigurationManager.getLongProperty("upload.max");
 
         // Create a factory for disk-based file items
         DiskFileItemFactory factory = new DiskFileItemFactory();
@@ -110,14 +67,12 @@ public class FileUploadRequest extends HttpServletRequestWrapper
         try
         {
             upload.setSizeMax(maxSize);
-            items = upload.parseRequest(req);
-            for (Iterator i = items.iterator(); i.hasNext();)
+            List<FileItem> items = upload.parseRequest(req);
+            for (FileItem item : items)
             {
-                FileItem item = (FileItem) i.next();
                 if (item.isFormField())
                 {
-                    parameters
-                            .put(item.getFieldName(), item.getString("UTF-8"));
+                    parameters.put(item.getFieldName(), item.getString("UTF-8"));
                 }
                 else
                 {
@@ -136,32 +91,40 @@ public class FileUploadRequest extends HttpServletRequestWrapper
         }
         catch (Exception e)
         {
-            IOException t = new IOException(e.getMessage());
-            t.initCause(e);
-            throw t;
+            if(e.getMessage().contains("exceeds the configured maximum"))
+            {
+                // ServletFileUpload is not throwing the correct error, so this is workaround
+                // the request was rejected because its size (11302) exceeds the configured maximum (536)
+                int startFirstParen = e.getMessage().indexOf("(")+1;
+                int endFirstParen = e.getMessage().indexOf(")");
+                String uploadedSize = e.getMessage().substring(startFirstParen, endFirstParen).trim();
+                Long actualSize = Long.parseLong(uploadedSize);
+                throw new FileSizeLimitExceededException(e.getMessage(), actualSize, maxSize);
+            }
+            throw new IOException(e.getMessage(), e);
         }
     }
 
     // Methods to replace HSR methods
     public Enumeration getParameterNames()
     {
-        Collection c = parameters.keySet();
+        Collection<String> c = parameters.keySet();
         return Collections.enumeration(c);
     }
 
     public String getParameter(String name)
     {
-        return (String) parameters.get(name);
+        return parameters.get(name);
     }
 
     public String[] getParameterValues(String name)
     {
-        return (String[]) parameters.values().toArray();
+        return parameters.values().toArray(new String[parameters.values().size()]);
     }
 
     public Map getParameterMap()
     {
-        Map map = new HashMap();
+        Map<String, String[]> map = new HashMap<String, String[]>();
         Enumeration eNum = getParameterNames();
 
         while (eNum.hasMoreElements())
@@ -175,19 +138,19 @@ public class FileUploadRequest extends HttpServletRequestWrapper
 
     public String getFilesystemName(String name)
     {
-        String filename = getFilename(((FileItem) fileitems.get(name))
+        String filename = getFilename((fileitems.get(name))
                 .getName());
         return tempDir + File.separator + filename;
     }
 
     public String getContentType(String name)
     {
-        return ((FileItem) fileitems.get(name)).getContentType();
+        return (fileitems.get(name)).getContentType();
     }
 
     public File getFile(String name)
     {
-        FileItem temp = (FileItem) fileitems.get(name);
+        FileItem temp = fileitems.get(name);
         String tempName = temp.getName();
         String filename = getFilename(tempName);
         if ("".equals(filename.trim()))
@@ -197,15 +160,15 @@ public class FileUploadRequest extends HttpServletRequestWrapper
         return new File(tempDir + File.separator + filename);
     }
 
-    public Enumeration getFileParameterNames()
+    public Enumeration<String> getFileParameterNames()
     {
-        Collection c = fileitems.keySet();
+        Collection<String> c = fileitems.keySet();
         return Collections.enumeration(c);
     }
     
-    public Enumeration getFileNames()
+    public Enumeration<String> getFileNames()
     {
-        return filenames.elements();
+        return Collections.enumeration(filenames);
     }
 
     /**

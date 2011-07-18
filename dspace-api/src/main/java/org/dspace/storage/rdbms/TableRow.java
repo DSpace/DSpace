@@ -1,41 +1,9 @@
-/*
- * TableRow.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.storage.rdbms;
 
@@ -44,13 +12,11 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.dspace.core.ConfigurationManager;
-
 /**
  * Represents a database row.
  * 
  * @author Peter Breton
- * @version $Revision: 3705 $
+ * @version $Revision: 5844 $
  */
 public class TableRow
 {
@@ -65,9 +31,9 @@ public class TableRow
      * the column name; the value is an Object, either an Integer, Boolean,
      * Date, or String. If the value is NULL_OBJECT, then the column was NULL.
      */
-    private Map data = new HashMap();
+    private Map<String, Object> data = new HashMap<String, Object>();
 
-    private Map changed = new HashMap();
+    private Map<String, Boolean> changed = new HashMap<String, Boolean>();
 
     /**
      * Constructor
@@ -80,11 +46,16 @@ public class TableRow
      *            to access a column not in the list will cause an
      *            IllegalArgumentException to be thrown.
      */
-    public TableRow(String table, List columns)
+    public TableRow(String table, List<String> columns)
     {
         this.table = table;
-        nullColumns(columns);
-        resetChanged(columns);
+
+        for (String column : columns)
+        {
+            String canonicalized = ColumnInfo.canonicalize(column);
+            data.put(canonicalized, NULL_OBJECT);
+            changed.put(canonicalized, Boolean.TRUE);
+        }
     }
 
     /**
@@ -107,7 +78,14 @@ public class TableRow
      */
     public boolean hasColumn(String column)
     {
-        return data.get(canonicalize(column)) != null;
+        try
+        {
+            return canonicalizeAndCheck(column) != null;
+        }
+        catch (IllegalArgumentException e)
+        {
+            return false;
+        }
     }
 
     /**
@@ -119,7 +97,12 @@ public class TableRow
      */
     public boolean hasColumnChanged(String column)
     {
-        return changed.get(canonicalize(column)) == Boolean.TRUE;
+        return hasColumnChangedCanonicalized(ColumnInfo.canonicalize(column));
+    }
+
+    boolean hasColumnChangedCanonicalized(String column)
+    {
+        return changed.get(column) == Boolean.TRUE;
     }
 
     /**
@@ -131,14 +114,14 @@ public class TableRow
      */
     public boolean isColumnNull(String column)
     {
-        if (!hasColumn(column))
-        {
-            throw new IllegalArgumentException("No such column " + column);
-        }
-
-        return data.get(canonicalize(column)) == NULL_OBJECT;
+        return isColumnNullCanonicalized(canonicalizeAndCheck(column));
     }
-    
+
+    boolean isColumnNullCanonicalized(String column)
+    {
+        return data.get(column) == NULL_OBJECT;
+    }
+
     /**
      * Return the integer value of column.
      * 
@@ -152,30 +135,22 @@ public class TableRow
      */
     public int getIntColumn(String column)
     {
-        if (!hasColumn(column))
-        {
-            throw new IllegalArgumentException("No such column " + column);
-        }
-
-        String name = canonicalize(column);
-
-        if (isColumnNull(name))
+        String canonicalized = canonicalizeAndCheck(column);
+        if (isColumnNullCanonicalized(canonicalized))
         {
             return -1;
         }
 
-        Object value = data.get(name);
+        Object value = data.get(canonicalized);
 
         if (value == null)
         {
-            throw new IllegalArgumentException("Column " + column
-                    + " not present");
+            throw new IllegalArgumentException("Column " + column + " not present");
         }
 
         if (!(value instanceof Integer))
         {
-            throw new IllegalArgumentException("Value for " + column
-                    + " is not an integer");
+            throw new IllegalArgumentException("Value for " + column + " is not an integer");
         }
 
         return ((Integer) value).intValue();
@@ -193,24 +168,17 @@ public class TableRow
      */
     public long getLongColumn(String column)
     {
-        if (!hasColumn(column))
-        {
-            throw new IllegalArgumentException("No such column " + column);
-        }
-
-        String name = canonicalize(column);
-
-        if (isColumnNull(name))
+        String canonicalized = canonicalizeAndCheck(column);
+        if (isColumnNullCanonicalized(canonicalized))
         {
             return -1;
         }
 
-        Object value = data.get(name);
+        Object value = data.get(canonicalized);
 
         if (value == null)
         {
-            throw new IllegalArgumentException("Column " + column
-                    + " not present");
+            throw new IllegalArgumentException("Column " + column + " not present");
         }
 
         // If the value is an integer, it can be represented without error as a long
@@ -222,11 +190,43 @@ public class TableRow
         
         if (!(value instanceof Long))
         {
-            throw new IllegalArgumentException("Value for " + column
-                    + " is not a long");
+            throw new IllegalArgumentException("Value for " + column + " is not a long");
         }
 
         return ((Long) value).longValue();
+    }
+
+    /**
+     * Return the double value of column.
+     * 
+     * If the column's type is not an float, or the column does not exist, an
+     * IllegalArgumentException is thrown.
+     * 
+     * @param column
+     *            The column name (case-insensitive)
+     * @return The double value of the column, or -1 if the column is an SQL null.
+     */
+    public double getDoubleColumn(String column)
+    {
+        String canonicalized = canonicalizeAndCheck(column);
+        if (isColumnNullCanonicalized(canonicalized))
+        {
+            return -1;
+        }
+
+        Object value = data.get(canonicalized);
+
+        if (value == null)
+        {
+            throw new IllegalArgumentException("Column " + column + " not present");
+        }
+        
+        if (!(value instanceof Double))
+        {
+            throw new IllegalArgumentException("Value for " + column + " is not a double");
+        }
+
+        return ((Double) value).doubleValue();
     }
 
     /**
@@ -242,24 +242,17 @@ public class TableRow
      */
     public String getStringColumn(String column)
     {
-        if (!hasColumn(column))
-        {
-            throw new IllegalArgumentException("No such column " + column);
-        }
-
-        String name = canonicalize(column);
-
-        if (isColumnNull(name))
+        String canonicalized = canonicalizeAndCheck(column);
+        if (isColumnNullCanonicalized(canonicalized))
         {
             return null;
         }
 
-        Object value = data.get(name);
+        Object value = data.get(canonicalized);
 
         if (value == null)
         {
-            throw new IllegalArgumentException("Column " + column
-                    + " not present");
+            throw new IllegalArgumentException("Column " + column + " not present");
         }
 
         if (!(value instanceof String))
@@ -283,25 +276,18 @@ public class TableRow
      */
     public boolean getBooleanColumn(String column)
     {
-        if (!hasColumn(column))
-        {
-            throw new IllegalArgumentException("No such column " + column);
-        }
-
-        String name = canonicalize(column);
-
-        if (isColumnNull(name))
+        String canonicalized = canonicalizeAndCheck(column);
+        if (isColumnNullCanonicalized(canonicalized))
         {
             return false;
         }
 
-        Object value = data.get(name);
+        Object value = data.get(canonicalized);
 
         // make sure that we tolerate integers or booleans
         if (value == null)
         {
-            throw new IllegalArgumentException("Column " + column
-                    + " not present");
+            throw new IllegalArgumentException("Column " + column + " not present");
         }
 
         if ((value instanceof Boolean))
@@ -321,8 +307,7 @@ public class TableRow
         }
         else
         {
-            throw new IllegalArgumentException(
-                    "Value is not a boolean or an integer");
+            throw new IllegalArgumentException("Value is not a boolean or an integer");
         }
     }
 
@@ -339,24 +324,17 @@ public class TableRow
      */
     public java.util.Date getDateColumn(String column)
     {
-        if (!hasColumn(column))
-        {
-            throw new IllegalArgumentException("No such column " + column);
-        }
-
-        String name = canonicalize(column);
-
-        if (isColumnNull(name))
+        String canonicalized = canonicalizeAndCheck(column);
+        if (isColumnNullCanonicalized(canonicalized))
         {
             return null;
         }
 
-        Object value = data.get(name);
+        Object value = data.get(canonicalized);
 
         if (value == null)
         {
-            throw new IllegalArgumentException("Column " + column
-                    + " not present");
+            throw new IllegalArgumentException("Column " + column + " not present");
         }
 
         if (!(value instanceof java.util.Date))
@@ -377,14 +355,13 @@ public class TableRow
      */
     public void setColumnNull(String column)
     {
-        if (!hasColumn(column))
+        String canonicalized = canonicalizeAndCheck(column);
+        if (data.get(canonicalized) != NULL_OBJECT)
         {
-            throw new IllegalArgumentException("No such column " + column);
+            data.put(canonicalized, NULL_OBJECT);
+            changed.put(canonicalized, Boolean.TRUE);
         }
-
-        setColumnNullInternal(canonicalize(column));
     }
-
     /**
      * Set column to the boolean b.
      * 
@@ -397,30 +374,25 @@ public class TableRow
      */
     public void setColumn(String column, boolean b)
     {
-        if (!hasColumn(column))
-        {
-            throw new IllegalArgumentException("No such column " + column);
-        }
-
-        String canonName = canonicalize(column);
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        String canonicalized = canonicalizeAndCheck(column);
+        if (DatabaseManager.isOracle())
         {
             // if oracle, use 1 or 0 for true/false
-            Integer value = b ? new Integer(1) : new Integer(0);
-            if (!value.equals(data.get(canonName)))
+            Integer value = b ? Integer.valueOf(1) : Integer.valueOf(0);
+            if (!value.equals(data.get(canonicalized)))
             {
-                data.put(canonName, value);
-                changed.put(canonName, Boolean.TRUE);
+                data.put(canonicalized, value);
+                changed.put(canonicalized, Boolean.TRUE);
             }
         }
         else
         {
             // default to postgres true/false
             Boolean value = b ? Boolean.TRUE : Boolean.FALSE;
-            if (!value.equals(data.get(canonName)))
+            if (!value.equals(data.get(canonicalized)))
             {
-                data.put(canonName, value);
-                changed.put(canonName, Boolean.TRUE);
+                data.put(canonicalized, value);
+                changed.put(canonicalized, Boolean.TRUE);
             }
         }
     }
@@ -437,17 +409,12 @@ public class TableRow
      */
     public void setColumn(String column, String s)
     {
-        if (!hasColumn(column))
-        {
-            throw new IllegalArgumentException("No such column " + column);
-        }
-
-        String canonName = canonicalize(column);
+        String canonicalized = canonicalizeAndCheck(column);
         Object value = (s == null) ? NULL_OBJECT : s;
-        if (!value.equals(data.get(canonName)))
+        if (!value.equals(data.get(canonicalized)))
         {
-            data.put(canonName, value);
-            changed.put(canonName, Boolean.TRUE);
+            data.put(canonicalized, value);
+            changed.put(canonicalized, Boolean.TRUE);
         }
     }
 
@@ -463,17 +430,12 @@ public class TableRow
      */
     public void setColumn(String column, int i)
     {
-        if (!hasColumn(column))
+        String canonicalized = canonicalizeAndCheck(column);
+        Integer value = Integer.valueOf(i);
+        if (!value.equals(data.get(canonicalized)))
         {
-            throw new IllegalArgumentException("No such column " + column);
-        }
-
-        String canonName = canonicalize(column);
-        Integer value = new Integer(i);
-        if (!value.equals(data.get(canonName)))
-        {
-            data.put(canonName, value);
-            changed.put(canonName, Boolean.TRUE);
+            data.put(canonicalized, value);
+            changed.put(canonicalized, Boolean.TRUE);
         }
     }
 
@@ -489,17 +451,33 @@ public class TableRow
      */
     public void setColumn(String column, long l)
     {
-        if (!hasColumn(column))
+        String canonicalized = canonicalizeAndCheck(column);
+        Long value = Long.valueOf(l);
+        if (!value.equals(data.get(canonicalized)))
         {
-            throw new IllegalArgumentException("No such column " + column);
+            data.put(canonicalized, value);
+            changed.put(canonicalized, Boolean.TRUE);
         }
+    }
 
-        String canonName = canonicalize(column);
-        Long value = new Long(l);
-        if (!value.equals(data.get(canonName)))
+    /**
+     * Set column to the double d.
+     * 
+     * If the column does not exist, an IllegalArgumentException is thrown.
+     * 
+     * @param column
+     *            The column name (case-insensitive)
+     * @param d
+     *            The double value
+     */
+    public void setColumn(String column, double d)
+    {
+        String canonicalized = canonicalizeAndCheck(column);
+        Double value = new Double(d);
+        if (!value.equals(data.get(canonicalized)))
         {
-            data.put(canonName, value);
-            changed.put(canonName, Boolean.TRUE);
+            data.put(canonicalized, value);
+            changed.put(canonicalized, Boolean.TRUE);
         }
     }
 
@@ -516,17 +494,12 @@ public class TableRow
      */
     public void setColumn(String column, java.util.Date d)
     {
-        if (!hasColumn(column))
-        {
-            throw new IllegalArgumentException("No such column " + column);
-        }
-
-        String canonName = canonicalize(column);
+        String canonicalized = canonicalizeAndCheck(column);
         Object value = (d == null) ? NULL_OBJECT : d;
-        if (!value.equals(data.get(canonName)))
+        if (!value.equals(data.get(canonicalized)))
         {
-            data.put(canonName, value);
-            changed.put(canonName, Boolean.TRUE);
+            data.put(canonicalized, value);
+            changed.put(canonicalized, Boolean.TRUE);
         }
     }
 
@@ -537,7 +510,7 @@ public class TableRow
     /**
      * Return a String representation of this object.
      * 
-     * @return String representaton
+     * @return String representation
      */
     public String toString()
     {
@@ -592,46 +565,20 @@ public class TableRow
         return data.equals(((TableRow) obj).data);
     }
 
-    /**
-     * Return the canonical name for column.
-     * 
-     * @param column
-     *            The name of the column.
-     * @return The canonical name of the column.
-     */
-    static String canonicalize(String column)
+    private String canonicalizeAndCheck(String column)
     {
-        if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
+        if (data.containsKey(column))
         {
-            // oracle requires uppercase
-            return column.toUpperCase();
+            return column;
         }
 
-        // postgres default lowercase
-        return column.toLowerCase();
-    }
-
-    /**
-     * Set columns to null.
-     * 
-     * @param columns -
-     *            A list of the columns to set to null. Each element of the list
-     *            is a String.
-     */
-    private void nullColumns(List columns)
-    {
-        for (Iterator iterator = columns.iterator(); iterator.hasNext();)
+        String canonicalized = ColumnInfo.canonicalize(column);
+        if (data.containsKey(canonicalized))
         {
-            setColumnNullInternal((String) iterator.next());
+            return canonicalized;
         }
-    }
 
-    private void resetChanged(List columns)
-    {
-        for (Iterator iterator = columns.iterator(); iterator.hasNext();)
-        {
-            changed.put(canonicalize((String) iterator.next()), Boolean.FALSE);
-        }
+        throw new IllegalArgumentException("No such column " + canonicalized);
     }
 
     /**
@@ -643,25 +590,9 @@ public class TableRow
      */
     void resetChanged()
     {
-        for (Iterator iterator = changed.keySet().iterator(); iterator.hasNext();)
+        for (String column : changed.keySet())
         {
-            changed.put(canonicalize((String) iterator.next()), Boolean.FALSE);
-        }
-    }
-
-    /**
-     * Internal method to set column to null. The public method ensures that
-     * column actually exists.
-     * 
-     * @param column
-     */
-    private void setColumnNullInternal(String column)
-    {
-        String canonName = canonicalize(column);
-        if (data.get(canonName) != NULL_OBJECT)
-        {
-            data.put(canonName, NULL_OBJECT);
-            changed.put(canonName, Boolean.TRUE);
+            changed.put(column, Boolean.FALSE);
         }
     }
 }

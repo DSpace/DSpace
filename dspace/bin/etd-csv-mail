@@ -20,8 +20,8 @@ chomp($bindir = `dirname $0`);
 
 # Build headers
 %mail = ();
-chomp($mail{To} = `$bindir/dsrun org.dspace.core.ConfigurationManager -property mail.etd.recipient`);
-chomp($mail{From} = `$bindir/dsrun org.dspace.core.ConfigurationManager -property mail.from.address`);
+chomp($mail{To} =   `$bindir/dspace dsprop -property mail.etd.recipient`);
+chomp($mail{From} = `$bindir/dspace dsprop -property mail.from.address`);
 $mail{Subject} = "ETD records for $date";
 
 # Build the body

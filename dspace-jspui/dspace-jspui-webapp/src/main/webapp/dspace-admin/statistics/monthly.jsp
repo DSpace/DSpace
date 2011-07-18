@@ -1,6 +1,9 @@
+<%@page import="java.io.FilenameFilter"%>
+<%@page import="org.dspace.core.ConfigurationManager"%>
 <%@ page contentType="text/html;charset=UTF-8" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
 <%@ page import="java.io.File" %>
 
@@ -21,39 +24,49 @@
 <%
   String strMonth = request.getParameter("month");
 
+  String strDspace = ConfigurationManager.getProperty("dspace.dir");
+  File dir = new File(strDspace + "/stats/monthly");
+  
   if (strMonth == null) {
     out.write("<h1>Monthly Statistics</h1><p><table>");
 
-    // List the avaiable stat files
-    TreeSet sFiles = new TreeSet(new Comparator() {
-    	 public int compare(Object o1, Object o2) { return ((String)o1).compareTo((String)o2) * -1; }
-      public boolean equals(Object o) { return this.equals(o); }
+    // List the available stat files
+    File aFiles[] = dir.listFiles(new FilenameFilter() {
+    	public boolean accept(File dir, String name) {
+    		return (name.endsWith("_stats.txt") 
+    				&& !name.endsWith("current_stats.txt"));
+    	}    	
     });
     
-    sFiles.addAll(application.getResourcePaths("/stats"));
+   	java.util.Arrays.sort(aFiles, new Comparator() {
+    	public int compare(Object o1, Object o2) { 
+    		 String s1 = ((File)o1).getName();
+    		 String s2 = ((File)o2).getName();
+    		 return s1.compareTo(s2) * -1; 
+    	}
+    	 
+      	public boolean equals(Object o) { 
+      			return this.equals(o); 
+      	}
+    });
     
-    // Filter out non monthly stats
-    for (Iterator iFiles = sFiles.iterator(); iFiles.hasNext(); ) {
-      String strFile = (String)iFiles.next();
-    
-    	if (strFile.endsWith("_stats.txt") && !strFile.endsWith("current_stats.txt")) {
-        strMonth = strFile.substring(7,13);
-        out.write("<tr><td class=\"standard\">");
-        out.write("<a href=\"?month=" + strMonth + "\">");
-	     out.write(strMonth);
-        out.write("</a></td></tr>\n");
-      }
+    for (File f : aFiles) {
+      strMonth = f.getName().substring(0,6);
+      out.write("<tr><td class=\"standard\">");
+      out.write("<a href=\"?month=" + strMonth + "\">");
+	  out.write(strMonth);
+      out.write("</a></td></tr>\n");    	
     }
 
     out.write("</table></p>\n");
 
   } else {
-    String strFile = "/stats/" + strMonth + "_stats.txt";
+    String strFile = "file://" + dir.toString() + "/" + strMonth + "_stats.txt";
     %>
       <h1>Monthly Statistics: <%= strMonth %></h1>
-      
+
       <p><table><tr><td class="standard"><pre>
-<dspace:include page="<%= strFile%>" />
+      <c:import url="<%= strFile %>"/>
       </pre></td></tr></table></p>
     <%
   }

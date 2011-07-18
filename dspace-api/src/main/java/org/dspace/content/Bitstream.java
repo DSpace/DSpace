@@ -1,41 +1,9 @@
-/*
- * Bitstream.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.content;
 
@@ -69,7 +37,7 @@ import org.dspace.eperson.Group;
  * the contents of a bitstream; you need to create a new bitstream.
  * 
  * @author Robert Tansley
- * @version $Revision: 3705 $
+ * @version $Revision: 5844 $
  */
 public class Bitstream extends DSpaceObject
 {
@@ -118,14 +86,15 @@ public class Bitstream extends DSpaceObject
             // Panic if we can't find it
             if (bitstreamFormat == null)
             {
-                throw new IllegalStateException("No Unknown bitsream format");
+                throw new IllegalStateException("No Unknown bitstream format");
             }
         }
 
         // Cache ourselves
         context.cache(this, row.getIntColumn("bitstream_id"));
 
-        modified = modifiedMetadata = false;
+        modified = false;
+        modifiedMetadata = false;
         clearDetails();
     }
 
@@ -173,6 +142,48 @@ public class Bitstream extends DSpaceObject
         }
 
         return new Bitstream(context, row);
+    }
+
+    public static Bitstream[] findAll(Context context) throws SQLException
+    {
+        TableRowIterator tri = DatabaseManager.queryTable(context, "bitstream",
+                "SELECT * FROM bitstream");
+
+        List<Bitstream> bitstreams = new ArrayList<Bitstream>();
+
+        try
+        {
+            while (tri.hasNext())
+            {
+                TableRow row = tri.next();
+
+                // First check the cache
+                Bitstream fromCache = (Bitstream) context.fromCache(
+                        Bitstream.class, row.getIntColumn("bitstream_id"));
+
+                if (fromCache != null)
+                {
+                    bitstreams.add(fromCache);
+                }
+                else
+                {
+                    bitstreams.add(new Bitstream(context, row));
+                }
+            }
+        }
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+            {
+                tri.close();
+            }
+        }
+
+        Bitstream[] bitstreamArray = new Bitstream[bitstreams.size()];
+        bitstreamArray = bitstreams.toArray(bitstreamArray);
+
+        return bitstreamArray;
     }
 
     /**
@@ -552,6 +563,35 @@ public class Bitstream extends DSpaceObject
     }
 
     /**
+     * Bitstreams are only logically deleted (via a flag in the database).
+     * This method allows us to verify is the bitstream is still valid
+     *
+     * @return true if the bitstream has been deleted
+     */
+    boolean isDeleted() throws SQLException
+    {
+        String query = "select count(*) as mycount from Bitstream where deleted = '1' and bitstream_id = ? ";
+        TableRowIterator tri = DatabaseManager.query(bContext, query, bRow.getIntColumn("bitstream_id"));
+        long count = 0;
+
+        try
+        {
+            TableRow r = tri.next();
+            count = r.getLongColumn("mycount");
+        }
+        finally
+        {
+            // close the TableRowIterator to free up resources
+            if (tri != null)
+            {
+                tri.close();
+            }
+        }
+        
+        return count == 1;
+    }
+
+    /**
      * Retrieve the contents of the bitstream
      * 
      * @return a stream from which the bitstream can be read.
@@ -610,7 +650,9 @@ public class Bitstream extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         Bundle[] bundleArray = new Bundle[bundles.size()];
@@ -751,4 +793,49 @@ public class Bitstream extends DSpaceObject
         bRow.setColumn(field, value);
     }
 
+    
+    public DSpaceObject getParentObject() throws SQLException
+    {
+        Bundle[] bundles = getBundles();
+        if (bundles != null && (bundles.length > 0 && bundles[0] != null))
+        {
+            // the ADMIN action is not allowed on Bundle object so skip to the item
+            Item[] items = bundles[0].getItems();
+            if (items != null && items.length > 0)
+            {
+                return items[0];
+            }
+            else
+            {
+                return null;
+            }
+        }
+        else
+        {
+            // is the bitstream a logo for a community or a collection?
+            TableRow qResult = DatabaseManager.querySingle(bContext,
+                       "SELECT collection_id FROM collection " +
+                       "WHERE logo_bitstream_id = ?",getID());
+            if (qResult != null) 
+            {
+                return Collection.find(bContext,qResult.getIntColumn("collection_id"));
+            }
+            else
+            {   
+                // is the bitstream related to a community?
+                qResult = DatabaseManager.querySingle(bContext,
+                        "SELECT community_id FROM community " +
+                        "WHERE logo_bitstream_id = ?",getID());
+    
+                if (qResult != null)
+                {
+                    return Community.find(bContext,qResult.getIntColumn("community_id"));
+                }
+                else
+                {
+                    return null;
+                }
+            }                                   
+        }
+    }
 }

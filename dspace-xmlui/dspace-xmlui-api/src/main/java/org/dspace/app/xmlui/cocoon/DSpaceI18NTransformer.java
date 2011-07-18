@@ -1,43 +1,10 @@
-/*
- * DSpaceI18NTransformer.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 
 package org.dspace.app.xmlui.cocoon;
 
@@ -122,9 +89,13 @@ public class DSpaceI18NTransformer extends I18nTransformer {
         		String baseCatalogueLocationPath = DEFAULT_BASE_LOCATION;
         		Configuration baseCatalogueLocationConf = catalogueConf.getChild("location");
         		if (baseCatalogueLocationConf != null)
-        			baseCatalogueLocationPath = baseCatalogueLocationConf.getValue();
+                {
+                    baseCatalogueLocationPath = baseCatalogueLocationConf.getValue();
+                }
         		if (!baseCatalogueLocationPath.endsWith("/"))
-        			baseCatalogueLocationPath += "/"; // Add a trailing slash if one dosn't exist
+                {
+                    baseCatalogueLocationPath += "/";
+                } // Add a trailing slash if one dosn't exist
         			
         		String catalogueId = catalogueConf.getAttribute("id","unknown");
         		
@@ -138,8 +109,10 @@ public class DSpaceI18NTransformer extends I18nTransformer {
             		String baseLocationPath = aspect.getPath();
             		int idx = baseLocationPath.indexOf("://");
             		if (idx > 0)
-            			// remove the module directive from the aspect's path so it's just a normal path
-            			baseLocationPath = baseLocationPath.substring(idx+3, baseLocationPath.length());
+                    {
+                        // remove the module directive from the aspect's path so it's just a normal path
+                        baseLocationPath = baseLocationPath.substring(idx + 3, baseLocationPath.length());
+                    }
             		
             		// Now that the module directive has been removed from the path, add in the base i18npath
             		baseLocationPath = baseCatalogueLocationPath + baseLocationPath;
@@ -155,7 +128,9 @@ public class DSpaceI18NTransformer extends I18nTransformer {
             		// "resource://aspects/ArtifactBrowser/i18n/"
             		String aspectLocationPath = aspect.getPath();
             		if (!aspectLocationPath.endsWith("/"))
-            			aspectLocationPath += "/"; // Add a trailing slash if one dosn't exist
+                    {
+                        aspectLocationPath += "/"; // Add a trailing slash if one dosn't exist
+                    }
             		aspectLocationPath += "i18n/";
             		MutableConfiguration aspectLocation = new DefaultConfiguration("location");
             		aspectLocation.setValue(aspectLocationPath);

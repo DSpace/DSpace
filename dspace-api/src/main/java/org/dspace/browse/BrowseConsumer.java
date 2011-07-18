@@ -1,46 +1,15 @@
-/*
- * BrowseConsumer.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.browse;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -69,7 +38,7 @@ import org.dspace.event.Event;
  *
  * Recommended filter:  Item+Create|Modify|Modify_Metadata:Collection+Add|Remove
  *
- * @version $Revision: 3705 $
+ * @version $Revision: 5844 $
  */
 public class BrowseConsumer implements Consumer
 {
@@ -77,7 +46,7 @@ public class BrowseConsumer implements Consumer
     private static Logger log = Logger.getLogger(BrowseConsumer.class);
 
     // items to be updated in browse index
-    private Set<Item> toUpdate = null;
+    private Map<Integer, ItemHolder> toUpdate = null;
 
     public void initialize()
         throws Exception
@@ -90,7 +59,7 @@ public class BrowseConsumer implements Consumer
     {
         if(toUpdate == null)
         {
-            toUpdate = new HashSet<Item>();
+            toUpdate = new HashMap<Integer, ItemHolder>();
         }
         
         log.debug("consume() evaluating event: " + event.toString());
@@ -104,31 +73,36 @@ public class BrowseConsumer implements Consumer
 
         // If an Item is created or its metadata is modified..
         case Constants.ITEM:
-            if(et == Event.MODIFY_METADATA || et == Event.CREATE)
+            if (et == Event.MODIFY_METADATA || et == Event.CREATE)
             {
-                DSpaceObject subj = event.getSubject(ctx);
+                Item subj = (Item)event.getSubject(ctx);
                 if (subj != null)
                 {
                     log.debug("consume() adding event to update queue: " + event.toString());
-                    toUpdate.add((Item)subj);
+                    if (et == Event.CREATE || !toUpdate.containsKey(subj.getID()))
+                    {
+                        toUpdate.put(subj.getID(), new ItemHolder(subj, et == Event.CREATE));
+                    }
                 }
             }
             break;
         // track ADD and REMOVE from collections, that changes browse index.
         case Constants.COLLECTION:
-            if (event.getObjectType() == Constants.ITEM
-                    && (et == Event.ADD || et == Event.REMOVE))
+            if (event.getObjectType() == Constants.ITEM && (et == Event.ADD || et == Event.REMOVE))
             {
                 Item obj = (Item)event.getObject(ctx);
                 if (obj != null)
                 {
                     log.debug("consume() adding event to update queue: " + event.toString());
-                    toUpdate.add(obj);
+                    if (!toUpdate.containsKey(obj.getID()))
+                    {
+                        toUpdate.put(obj.getID(), new ItemHolder(obj, false));
+                    }
                 }
             }
             break;
         default:
-            log.debug("consume() ingnoring event: " + event.toString());
+            log.debug("consume() ignoring event: " + event.toString());
         }
         
     }
@@ -141,7 +115,7 @@ public class BrowseConsumer implements Consumer
         {
 
             // Update/Add items
-            for (Item i : toUpdate)
+            for (ItemHolder i : toUpdate.values())
             {
                 // FIXME: there is an exception handling problem here
                 try
@@ -149,7 +123,7 @@ public class BrowseConsumer implements Consumer
                     // Update browse indices
                     ctx.turnOffAuthorisationSystem();
                     IndexBrowse ib = new IndexBrowse(ctx);
-                    ib.indexItem(i);
+                    ib.indexItem(i.item, i.createEvent);
                     ctx.restoreAuthSystemState();
                 }
                 catch (BrowseException e)
@@ -159,9 +133,11 @@ public class BrowseConsumer implements Consumer
                 }
 
                 if (log.isDebugEnabled())
+                {
                     log.debug("Updated browse indices for Item id="
-                            + String.valueOf(i.getID()) + ", hdl="
-                            + i.getHandle());
+                            + String.valueOf(i.item.getID()) + ", hdl="
+                            + i.item.getHandle());
+                }
             }
 
             // NOTE: Removed items are necessarily handled inline (ugh).
@@ -177,5 +153,16 @@ public class BrowseConsumer implements Consumer
     
     public void finish(Context ctx) {
     	
+    }
+
+    private final class ItemHolder {
+        private Item item;
+        private boolean createEvent;
+
+        ItemHolder(Item pItem, boolean pCreateEvent)
+        {
+            item = pItem;
+            createEvent = pCreateEvent;
+        }
     }
 }

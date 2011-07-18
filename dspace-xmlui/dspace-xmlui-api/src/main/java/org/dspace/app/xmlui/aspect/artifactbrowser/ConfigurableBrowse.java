@@ -1,56 +1,22 @@
-/*
- * ConfigurableBrowse.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
+import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
@@ -85,61 +51,62 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DCDate;
 import org.dspace.content.DSpaceObject;
+import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.xml.sax.SAXException;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * Implements all the browse functionality (browse by title, subject, authors,
  * etc.) The types of browse available are configurable by the implementor. See
  * dspace.cfg and documentation for instructions on how to configure.
- * 
+ *
  * @author Graham Triggs
  */
 public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         CacheableProcessingComponent
 {
-    private final static Logger log = Logger.getLogger(ConfigurableBrowse.class);
+    private static final Logger log = Logger.getLogger(ConfigurableBrowse.class);
 
     /**
      * Static Messages for common text
      */
-    private final static Message T_dspace_home = message("xmlui.general.dspace_home");
+    private static final Message T_dspace_home = message("xmlui.general.dspace_home");
 
-    private final static Message T_go = message("xmlui.general.go");
+    private static final Message T_go = message("xmlui.general.go");
 
-    private final static Message T_update = message("xmlui.general.update");
+    private static final Message T_update = message("xmlui.general.update");
 
-    private final static Message T_choose_month = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.choose_month");
+    private static final Message T_choose_month = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.choose_month");
 
-    private final static Message T_choose_year = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.choose_year");
+    private static final Message T_choose_year = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.choose_year");
 
-    private final static Message T_jump_year = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_year");
+    private static final Message T_jump_year = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_year");
 
-    private final static Message T_jump_year_help = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_year_help");
+    private static final Message T_jump_year_help = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_year_help");
 
-    private final static Message T_jump_select = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_select");
+    private static final Message T_jump_select = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.jump_select");
 
-    private final static Message T_starts_with = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.starts_with");
+    private static final Message T_starts_with = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.starts_with");
 
-    private final static Message T_starts_with_help = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.starts_with_help");
+    private static final Message T_starts_with_help = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.starts_with_help");
 
-    private final static Message T_sort_by = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.sort_by");
+    private static final Message T_sort_by = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.sort_by");
 
-    private final static Message T_order = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.order");
+    private static final Message T_order = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.order");
 
-    private final static Message T_rpp = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.rpp");
+    private static final Message T_no_results= message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.no_results");
 
-    private final static Message T_etal = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.etal");
+    private static final Message T_rpp = message("xmlui.ArtifactBrowser.ConfigurableBrowse.general.rpp");
 
-    private final static Message T_etal_all = message("xmlui.ArtifactBrowser.ConfigurableBrowse.etal.all");
+    private static final Message T_order_asc = message("xmlui.ArtifactBrowser.ConfigurableBrowse.order.asc");
 
-    private final static Message T_order_asc = message("xmlui.ArtifactBrowser.ConfigurableBrowse.order.asc");
+    private static final Message T_order_desc = message("xmlui.ArtifactBrowser.ConfigurableBrowse.order.desc");
 
-    private final static Message T_order_desc = message("xmlui.ArtifactBrowser.ConfigurableBrowse.order.desc");
-
-    private final static String BROWSE_URL_BASE = "browse";
+    private static final String BROWSE_URL_BASE = "browse";
 
     /**
      * These variables dictate when the drop down list of years is to break from
@@ -178,14 +145,20 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             {
                 DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
                 if (dso != null)
-                    key += "-" + dso.getHandle();            
+                {
+                    key += "-" + dso.getHandle();
+                }
 
                 return HashUtil.hash(key);
             }
         }
+        catch (RuntimeException re)
+        {
+            throw re;    
+        }
         catch (Exception e)
         {
-            // Ignore all errors and just don't cache.
+            return "0";
         }
         
         return "0";
@@ -201,7 +174,9 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                 DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
                 if (dso != null)
+                {
                     validity.add(dso);
+                }
                 
                 BrowseInfo info = getBrowseInfo();
                 
@@ -217,20 +192,27 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                 else
                 {
                     // Add the metadata to the validity
-                    for (String singleEntry : browseInfo.getStringResults())
+                    for (String[] singleEntry : browseInfo.getStringResults())
                     {
-                        validity.add(singleEntry);
+                        validity.add(singleEntry[0]+"#"+singleEntry[1]);
                     }
                 }
 
                 this.validity =  validity.complete();
             }
+            catch (RuntimeException re)
+            {
+                throw re;
+            }
             catch (Exception e)
             {
-                // Just ignore all errors and return an invalid cache.
+                return null;
             }
-            
-            log.info(LogManager.getHeader(context, "browse", this.validity.toString()));
+
+            if (this.validity != null)
+            {
+                log.info(LogManager.getHeader(context, "browse", this.validity.toString()));
+            }
         }
         
         return this.validity;
@@ -244,16 +226,15 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
     {
         BrowseInfo info = getBrowseInfo();
 
-        // Get the name of the index
-        String type = info.getBrowseIndex().getName();
-        
         pageMeta.addMetadata("title").addContent(getTitleMessage(info));
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
         if (dso != null)
+        {
             HandleUtil.buildHandleTrail(dso, pageMeta, contextPath);
+        }
 
         pageMeta.addTrail().addContent(getTrailMessage(info));
     }
@@ -264,7 +245,16 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
     public void addBody(Body body) throws SAXException, WingException, UIException, SQLException,
             IOException, AuthorizeException
     {
-        BrowseParams params = getUserParams();
+        BrowseParams params = null;
+
+        try {
+            params = getUserParams();
+        } catch (ResourceNotFoundException e) {
+           HttpServletResponse response = (HttpServletResponse)objectModel
+		.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+	    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+        }
+
         BrowseInfo info = getBrowseInfo();
 
         String type = info.getBrowseIndex().getName();
@@ -283,47 +273,65 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         // This div will hold the browsing results
         Division results = div.addDivision("browse-by-" + type + "-results", "primary");
 
-        // Add the pagination
-        //results.setSimplePagination(itemsTotal, firstItemIndex, lastItemIndex, previousPage, nextPage)
-        results.setSimplePagination(info.getTotal(), browseInfo.getOverallPosition() + 1,
-                browseInfo.getOverallPosition() + browseInfo.getResultCount(), getPreviousPageURL(
-                        params, info), getNextPageURL(params, info));
-
-        // Reference all the browsed items
-        ReferenceSet referenceSet = results.addReferenceSet("browse-by-" + type,
-                ReferenceSet.TYPE_SUMMARY_LIST, type, null);
-
-        // Are we browsing items, or unique metadata?
-        if (isItemBrowse(info))
+        // If there are items to browse, add the pagination
+        int itemsTotal = info.getTotal();
+        if (itemsTotal > 0) 
         {
-            // Add the items to the browse results
-            for (BrowseItem item : (java.util.List<BrowseItem>) info.getResults())
+            //results.setSimplePagination(itemsTotal, firstItemIndex, lastItemIndex, previousPage, nextPage)
+            results.setSimplePagination(itemsTotal, browseInfo.getOverallPosition() + 1,
+                    browseInfo.getOverallPosition() + browseInfo.getResultCount(), getPreviousPageURL(
+                            params, info), getNextPageURL(params, info));
+
+            // Reference all the browsed items
+            ReferenceSet referenceSet = results.addReferenceSet("browse-by-" + type,
+                    ReferenceSet.TYPE_SUMMARY_LIST, type, null);
+
+            // Are we browsing items, or unique metadata?
+            if (isItemBrowse(info))
             {
-                referenceSet.addReference(item);
+                // Add the items to the browse results
+                for (BrowseItem item : (java.util.List<BrowseItem>) info.getResults())
+                {
+                    referenceSet.addReference(item);
+                }
+            }
+            else    // browsing a list of unique metadata entries
+            {
+                // Create a table for the results
+                Table singleTable = results.addTable("browse-by-" + type + "-results",
+                        browseInfo.getResultCount() + 1, 1);
+            
+                // Add the column heading
+                singleTable.addRow(Row.ROLE_HEADER).addCell().addContent(
+                        message("xmlui.ArtifactBrowser.ConfigurableBrowse." + type + ".column_heading"));
+
+                // Iterate each result
+                for (String[] singleEntry : browseInfo.getStringResults())
+                {
+                    // Create a Map of the query parameters for the link
+                    Map<String, String> queryParams = new HashMap<String, String>();
+                    queryParams.put(BrowseParams.TYPE, encodeForURL(type));
+                    if (singleEntry[1] != null)
+                    {
+                        queryParams.put(BrowseParams.FILTER_VALUE[1], encodeForURL(
+                            singleEntry[1]));
+                    }
+                    else
+                    {
+                        queryParams.put(BrowseParams.FILTER_VALUE[0], encodeForURL(
+                            singleEntry[0]));
+                    }
+
+                    // Create an entry in the table, and a linked entry
+                    Cell cell = singleTable.addRow().addCell();
+                    cell.addXref(super.generateURL(BROWSE_URL_BASE, queryParams),
+                          singleEntry[0]);
+                }  
             }
         }
-        else    // browsing a list of unique metadata entries
+        else 
         {
-            // Create a table for the results
-            Table singleTable = results.addTable("browse-by-" + type + "-results",
-                    browseInfo.getResultCount() + 1, 1);
-            
-            // Add the column heading
-            singleTable.addRow(Row.ROLE_HEADER).addCell().addContent(
-                    message("xmlui.ArtifactBrowser.ConfigurableBrowse." + type + ".column_heading"));
-
-            // Iterate each result
-            for (String singleEntry : browseInfo.getStringResults())
-            {
-                // Create a Map of the query parameters for the link
-                Map<String, String> queryParams = new HashMap<String, String>();
-                queryParams.put(BrowseParams.TYPE, URLEncode(type));
-                queryParams.put(BrowseParams.FILTER_VALUE, URLEncode(singleEntry));
-
-                // Create an entry in the table, and a linked entry
-                Cell cell = singleTable.addRow().addCell();
-                cell.addXref(super.generateURL(BROWSE_URL_BASE, queryParams), singleEntry);
-            }
+            results.addPara(T_no_results);
         }
     }
 
@@ -342,7 +350,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
     /**
      * Makes the jump-list navigation for the results
-     * 
+     *
      * @param div
      * @param info
      * @param params
@@ -351,21 +359,24 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
     private void addBrowseJumpNavigation(Division div, BrowseInfo info, BrowseParams params)
             throws WingException
     {
-        // Get the name of the index
-        String type = info.getBrowseIndex().getName();
-
         // Prepare a Map of query parameters required for all links
-        Map<String, String> queryParams = new HashMap<String, String>();
-        queryParams.putAll(params.getCommonParameters());
-        queryParams.putAll(params.getControlParameters());
+        Map<String, String> queryParamsGET = new HashMap<String, String>();
+        queryParamsGET.putAll(params.getCommonParametersEncoded());
+        queryParamsGET.putAll(params.getControlParameters());
+
+        Map<String, String> queryParamsPOST = new HashMap<String, String>();
+        queryParamsPOST.putAll(params.getCommonParameters());
+        queryParamsPOST.putAll(params.getControlParameters());
 
         // Navigation aid (really this is a poor version of pagination)
         Division jump = div.addInteractiveDivision("browse-navigation", BROWSE_URL_BASE,
                 Division.METHOD_POST, "secondary navigation");
 
         // Add all the query parameters as hidden fields on the form
-        for (String key : queryParams.keySet())
-            jump.addHidden(key).setValue(queryParams.get(key));
+        for (Map.Entry<String, String> param : queryParamsPOST.entrySet())
+        {
+            jump.addHidden(param.getKey()).setValue(param.getValue());
+        }
 
         // If this is a date based browse, render the date navigation
         if (isSortedByDate(info))
@@ -397,11 +408,17 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                 year.addOption(false, String.valueOf(i), String.valueOf(i));
 
                 if (i <= fiveYearBreak)
+                {
                     i -= 10;
+                }
                 else if (i <= oneYearBreak)
+                {
                     i -= 5;
+                }
                 else
+                {
                     i--;
+                }
             }
             while (i > tenYearBreak);
 
@@ -417,15 +434,20 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             // Create a clickable list of the alphabet
             List jumpList = jump.addList("jump-list", List.TYPE_SIMPLE, "alphabet");
             
-            Map<String, String> zeroQuery = new HashMap<String, String>(queryParams);
-            zeroQuery.put(BrowseParams.STARTS_WITH, "0");
-            jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, zeroQuery), "0-9");
+            // browse params for each letter are all the query params
+            // WITHOUT the second-stage browse value, and add STARTS_WITH.
+            Map<String, String> letterQuery = new HashMap<String, String>(queryParamsGET);
+            for (String valueKey : BrowseParams.FILTER_VALUE)
+            {
+                letterQuery.remove(valueKey);
+            }
+            letterQuery.put(BrowseParams.STARTS_WITH, "0");
+            jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), "0-9");
             
             for (char c = 'A'; c <= 'Z'; c++)
             {
-                Map<String, String> cQuery = new HashMap<String, String>(queryParams);
-                cQuery.put(BrowseParams.STARTS_WITH, Character.toString(c));
-                jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, cQuery), Character
+                letterQuery.put(BrowseParams.STARTS_WITH, Character.toString(c));
+                jumpList.addItemXref(super.generateURL(BROWSE_URL_BASE, letterQuery), Character
                         .toString(c));
             }
 
@@ -440,7 +462,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
     /**
      * Add the controls to changing sorting and display options.
-     * 
+     *
      * @param div
      * @param info
      * @param params
@@ -458,8 +480,10 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                 Division.METHOD_POST, "browse controls");
 
         // Add all the query parameters as hidden fields on the form
-        for (String key : queryParams.keySet())
-            controls.addHidden(key).setValue(queryParams.get(key));
+        for (Map.Entry<String, String> param : queryParams.entrySet())
+        {
+            controls.addHidden(param.getKey()).setValue(param.getValue());
+        }
 
         Para controlsForm = controls.addPara();
 
@@ -531,7 +555,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
     /**
      * The URL query string of of the previous page.
-     * 
+     *
      * Note: the query string does not start with a "?" or "&" those need to be
      * added as appropriate by the caller.
      */
@@ -540,15 +564,17 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
     {
         // Don't create a previous page link if this is the first page
         if (info.isFirst())
+        {
             return null;
+        }
 
         Map<String, String> parameters = new HashMap<String, String>();
-        parameters.putAll(params.getCommonParameters());
+        parameters.putAll(params.getCommonParametersEncoded());
         parameters.putAll(params.getControlParameters());
 
         if (info.hasPrevPage())
         {
-            parameters.put(BrowseParams.OFFSET, URLEncode(String.valueOf(info.getPrevOffset())));
+            parameters.put(BrowseParams.OFFSET, encodeForURL(String.valueOf(info.getPrevOffset())));
         }
 
         return super.generateURL(BROWSE_URL_BASE, parameters);
@@ -557,7 +583,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
     /**
      * The URL query string of of the next page.
-     * 
+     *
      * Note: the query string does not start with a "?" or "&" those need to be
      * added as appropriate by the caller.
      */
@@ -566,15 +592,17 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
     {
         // Don't create a next page link if this is the last page
         if (info.isLast())
+        {
             return null;
+        }
 
         Map<String, String> parameters = new HashMap<String, String>();
-        parameters.putAll(params.getCommonParameters());
+        parameters.putAll(params.getCommonParametersEncoded());
         parameters.putAll(params.getControlParameters());
 
         if (info.hasNextPage())
         {
-            parameters.put(BrowseParams.OFFSET, URLEncode(String.valueOf(info.getNextOffset())));
+            parameters.put(BrowseParams.OFFSET, encodeForURL(String.valueOf(info.getNextOffset())));
         }
 
         return super.generateURL(BROWSE_URL_BASE, parameters);
@@ -582,15 +610,17 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
     /**
      * Get the query parameters supplied to the browse.
-     * 
+     *
      * @return
      * @throws SQLException
      * @throws UIException
      */
-    private BrowseParams getUserParams() throws SQLException, UIException
-    {
+    private BrowseParams getUserParams() throws SQLException, UIException, ResourceNotFoundException, IllegalArgumentException {
+
         if (this.userParams != null)
+        {
             return this.userParams;
+        }
 
         Context context = ContextUtil.obtainContext(objectModel);
         Request request = ObjectModelHelper.getRequest(objectModel);
@@ -606,19 +636,33 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
         // Are we in a community or collection?
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         if (dso instanceof Community)
+        {
             params.scope.setCommunity((Community) dso);
+        }
         if (dso instanceof Collection)
+        {
             params.scope.setCollection((Collection) dso);
+        }
 
         try
         {
             String type   = request.getParameter(BrowseParams.TYPE);
             int    sortBy = RequestUtils.getIntParameter(request, BrowseParams.SORT_BY);
-            
+
+            if(!request.getParameters().containsKey("type"))
+            {
+                // default to first browse index.
+                String defaultBrowseIndex = ConfigurationManager.getProperty("webui.browse.index.1");
+                if(defaultBrowseIndex != null)
+                {
+                    type = defaultBrowseIndex.split(":")[0];
+                }
+            }
+
             BrowseIndex bi = BrowseIndex.getBrowseIndex(type);
             if (bi == null)
             {
-                throw new BrowseException("There is no browse index of the type: " + type);
+                throw new ResourceNotFoundException("Browse index " + type + " not found");
             }
             
             // If we don't have a sort column
@@ -626,7 +670,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             {
                 // Get the default one
                 SortOption so = bi.getSortOption();
-                if (so != null)
+                if (so != null)                             
                 {
                     sortBy = so.getNumber();
                 }
@@ -641,7 +685,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
                     // This is so that we can then highlight the correct option in the navigation
                     SortOption bso = bi.getSortOption();
                     SortOption so = SortOption.getSortOption(sortBy);
-                    if ( bso != null && bso != so)
+                    if ( bso != null && bso.equals(so))
                     {
                         BrowseIndex newBi = BrowseIndex.getBrowseIndex(so);
                         if (newBi != null)
@@ -664,17 +708,25 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             params.scope.setOrder(request.getParameter(BrowseParams.ORDER));
             int offset = RequestUtils.getIntParameter(request, BrowseParams.OFFSET);
             params.scope.setOffset(offset > 0 ? offset : 0);
-            params.scope.setResultsPerPage(RequestUtils.getIntParameter(request,
-                    BrowseParams.RESULTS_PER_PAGE));
-            params.scope.setStartsWith(URLDecode(request.getParameter(BrowseParams.STARTS_WITH)));
-            params.scope.setFilterValue(URLDecode(request.getParameter(BrowseParams.FILTER_VALUE)));
-            params.scope.setJumpToValue(URLDecode(request.getParameter(BrowseParams.JUMPTO_VALUE)));
-            params.scope.setJumpToValueLang(URLDecode(request.getParameter(BrowseParams.JUMPTO_VALUE_LANG)));
-            params.scope.setFilterValueLang(URLDecode(request.getParameter(BrowseParams.FILTER_VALUE_LANG)));
+            params.scope.setResultsPerPage(RequestUtils.getIntParameter(request, BrowseParams.RESULTS_PER_PAGE));
+            params.scope.setStartsWith(decodeFromURL(request.getParameter(BrowseParams.STARTS_WITH)));
+            String filterValue = request.getParameter(BrowseParams.FILTER_VALUE[0]);
+            if (filterValue == null)
+            {
+                filterValue = request.getParameter(BrowseParams.FILTER_VALUE[1]);
+                params.scope.setAuthorityValue(filterValue);
+            }
+            
+            params.scope.setFilterValue(filterValue);
+            params.scope.setJumpToValue(decodeFromURL(request.getParameter(BrowseParams.JUMPTO_VALUE)));
+            params.scope.setJumpToValueLang(decodeFromURL(request.getParameter(BrowseParams.JUMPTO_VALUE_LANG)));
+            params.scope.setFilterValueLang(decodeFromURL(request.getParameter(BrowseParams.FILTER_VALUE_LANG)));
 
             // Filtering to a value implies this is a second level browse
             if (params.scope.getFilterValue() != null)
+            {
                 params.scope.setBrowseLevel(1);
+            }
 
             // if year and perhaps month have been selected, we translate these
             // into "startsWith"
@@ -682,8 +734,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             if (params.year != null && !"".equals(params.year) && !"-1".equals(params.year))
             {
                 String startsWith = params.year;
-                if ((params.month != null) && !"-1".equals(params.month)
-                        && !"".equals(params.month))
+                if ((params.month != null) && !"-1".equals(params.month) && !"".equals(params.month))
                 {
                     // subtract 1 from the month, so the match works
                     // appropriately
@@ -722,7 +773,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
     /**
      * Get the results of the browse. If the results haven't been generated yet,
      * then this will perform the browse.
-     * 
+     *
      * @return
      * @throws SQLException
      * @throws UIException
@@ -730,13 +781,20 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
     private BrowseInfo getBrowseInfo() throws SQLException, UIException
     {
         if (this.browseInfo != null)
+        {
             return this.browseInfo;
+        }
 
         Context context = ContextUtil.obtainContext(objectModel);
 
         // Get the parameters we will use for the browse
         // (this includes a browse scope)
-        BrowseParams params = getUserParams();
+        BrowseParams params = null;
+        try {
+            params = getUserParams();
+        } catch (ResourceNotFoundException e) {
+            return null;
+        }
 
         try
         {
@@ -776,7 +834,7 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
 
     /**
      * Is this a browse on a list of items, or unique metadata values?
-     * 
+     *
      * @param info
      * @return
      */
@@ -805,15 +863,32 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             // For a second level browse (ie. items for author),
             // get the value we are focussing on (ie. author).
             // (empty string if none).
-            String value = (info.hasValue() ? "\"" + info.getValue() + "\"" : "");
+            String value = "";
+            if (info.hasValue())
+            {
+                if (bix.isAuthorityIndex())
+                {
+                    ChoiceAuthorityManager cm = ChoiceAuthorityManager.getManager();
+                    String fk = cm.makeFieldKey(bix.getMetadata(0));
+                    value = "\""+cm.getLabel(fk, info.getValue(), null)+"\"";
+                }
+                else
+                {
+                    value = "\"" + info.getValue() + "\"";
+                }
+            }
 
             // Get the name of any scoping element (collection / community)
             String scopeName = "";
             
             if (info.getBrowseContainer() != null)
+            {
                 scopeName = info.getBrowseContainer().getName();
+            }
             else
+            {
                 scopeName = "";
+            }
             
             if (bix.isMetadataIndex())
             {
@@ -845,9 +920,13 @@ public class ConfigurableBrowse extends AbstractDSpaceTransformer implements
             String scopeName = "";
             
             if (info.getBrowseContainer() != null)
+            {
                 scopeName = info.getBrowseContainer().getName();
+            }
             else
+            {
                 scopeName = "";
+            }
 
             if (bix.isMetadataIndex())
             {
@@ -883,33 +962,33 @@ class BrowseParams
 
     BrowserScope scope;
 
-    final static String MONTH = "month";
+    static final String MONTH = "month";
 
-    final static String YEAR = "year";
+    static final String YEAR = "year";
 
-    final static String ETAL = "etal";
+    static final String ETAL = "etal";
 
-    final static String TYPE = "type";
+    static final String TYPE = "type";
 
-    final static String JUMPTO_ITEM = "focus";
+    static final String JUMPTO_ITEM = "focus";
 
-    final static String JUMPTO_VALUE = "vfocus";
+    static final String JUMPTO_VALUE = "vfocus";
 
-    final static String JUMPTO_VALUE_LANG = "vfocus_lang";
+    static final String JUMPTO_VALUE_LANG = "vfocus_lang";
 
-    final static String ORDER = "order";
+    static final String ORDER = "order";
 
-    final static String OFFSET = "offset";
+    static final String OFFSET = "offset";
 
-    final static String RESULTS_PER_PAGE = "rpp";
+    static final String RESULTS_PER_PAGE = "rpp";
 
-    final static String SORT_BY = "sort_by";
+    static final String SORT_BY = "sort_by";
 
-    final static String STARTS_WITH = "starts_with";
+    static final String STARTS_WITH = "starts_with";
 
-    final static String FILTER_VALUE = "value";
+    static final String[] FILTER_VALUE = new String[]{"value","authority"};
 
-    final static String FILTER_VALUE_LANG = "value_lang";
+    static final String FILTER_VALUE_LANG = "value_lang";
 
     /*
      * Creates a map of the browse options common to all pages (type / value /
@@ -919,23 +998,35 @@ class BrowseParams
     {
         Map<String, String> paramMap = new HashMap<String, String>();
 
-        paramMap.put(BrowseParams.TYPE, AbstractDSpaceTransformer.URLEncode(
-                scope.getBrowseIndex().getName()));
+        paramMap.put(BrowseParams.TYPE, scope.getBrowseIndex().getName());
 
         if (scope.getFilterValue() != null)
         {
-            paramMap.put(BrowseParams.FILTER_VALUE, AbstractDSpaceTransformer.URLEncode(
-                    scope.getFilterValue()));
+            paramMap.put(scope.getAuthorityValue() != null?
+                    BrowseParams.FILTER_VALUE[1]:BrowseParams.FILTER_VALUE[0], scope.getFilterValue());
         }
 
         if (scope.getFilterValueLang() != null)
         {
-            paramMap.put(BrowseParams.FILTER_VALUE_LANG, AbstractDSpaceTransformer.URLEncode(
-                    scope.getFilterValueLang()));
+            paramMap.put(BrowseParams.FILTER_VALUE_LANG, scope.getFilterValueLang());
         }
 
         return paramMap;
     }
+
+    Map<String, String> getCommonParametersEncoded() throws UIException
+    {
+        Map<String, String> paramMap = getCommonParameters();
+        Map<String, String> encodedParamMap = new HashMap<String, String>();
+
+        for (Map.Entry<String, String> param : paramMap.entrySet())
+        {
+            encodedParamMap.put(param.getKey(), AbstractDSpaceTransformer.encodeForURL(param.getValue()));
+        }
+
+        return encodedParamMap;
+    }
+
 
     /*
      * Creates a Map of the browse control options (sort by / ordering / results
@@ -947,7 +1038,7 @@ class BrowseParams
 
         paramMap.put(BrowseParams.SORT_BY, Integer.toString(this.scope.getSortBy()));
         paramMap
-                .put(BrowseParams.ORDER, AbstractDSpaceTransformer.URLEncode(this.scope.getOrder()));
+                .put(BrowseParams.ORDER, AbstractDSpaceTransformer.encodeForURL(this.scope.getOrder()));
         paramMap.put(BrowseParams.RESULTS_PER_PAGE, Integer
                 .toString(this.scope.getResultsPerPage()));
         paramMap.put(BrowseParams.ETAL, Integer.toString(this.etAl));
@@ -978,10 +1069,13 @@ class BrowseParams
     
             return key;
         }
+        catch (RuntimeException re)
+        {
+            throw re;
+        }
         catch (Exception e)
         {
             return null; // ignore exception and return no key
         }
     }
 };
-

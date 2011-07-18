@@ -1,24 +1,52 @@
-DSpace Version 1.5-SNAPSHOT, $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
-
 Installation instructions are included in this release package under
 
-docs/install.html
+ - docs/html/index.html
+or
+ - docs/pdf/DSpace-Manual.pdf
 
-Documentation for the most recent stable release may be viewed online at
-dspace.org:
+DSpace version information can be found in this release package under
+ - docs/html/History.html
+or viewed online at
+ - https://wiki.duraspace.org/display/DSDOC/History
 
-http://dspace.org/technology/system-docs/
+Documentation for the most recent stable release(s) may be downloaded
+or viewed online at
+ - http://www.dspace.org/latest-release/
+ - http://wiki.duraspace.org/display/DSDOC/
 
-Installation instructions for other version may be different, so you
-are encouraged to obtain the corresponding documentation package from
-SourceForge, or to download the latest documentation snapshot from SVN
+Installation instructions for other versions may be different, so you
+are encouraged to obtain the appropriate version of the Documentation
+(from the links above or from SVN).
 
-Please also read the KNOWN_BUGS file.
+To obtain files from the SVN repository and build, please see:
 
-Please refer any further problems to the dspace-tech@lists.sourceforge.net 
+ - https://scm.dspace.org/svn/repo/dspace/tags/
+
+
+Please refer any further problems to the dspace-tech@lists.sourceforge.net
 mailing list. 
 
-http://sourceforge.net/mail/?group_id=19984
+ - http://sourceforge.net/mail/?group_id=19984
 
-Copyright (c) 2002-2006, Hewlett-Packard Company and Massachusetts
-Institute of Technology.  All rights reserved.
+
+Detailed Issue Tracking for DSpace is done on our JIRA Issue Tracker
+
+ - https://jira.duraspace.org/browse/DS
+
+
+To contribute to DSpace, please see:
+
+ - https://wiki.duraspace.org/display/DSPACE/How+to+Contribute+to+DSpace
+
+
+For more details about DSpace, including a list of service providers,
+places to seek help, news articles and lists of other users, please see:
+
+ - http://www.dspace.org/
+ 
+
+DSpace source code licensing information available online at:
+ - http://www.dspace.org/license/
+
+Copyright (c) 2002-2011, DuraSpace.  All rights reserved.
+

@@ -1,48 +1,15 @@
-/*
- * SubmissionInfo.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.util;
 
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.HashMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -60,7 +27,7 @@ import org.dspace.workflow.WorkflowItem;
  * Information about an item being editing with the submission UI
  * 
  * @author Robert Tansley
- * @version $Revision: 3705 $
+ * @version $Revision: 5844 $
  */
 public class SubmissionInfo
 {
@@ -88,7 +55,7 @@ public class SubmissionInfo
     * second page of Step 5) Values are the Headings to display for each step
     * (e.g. "Describe")
     **************************************************************************/
-    private HashMap progressBar = null;
+    private Map<String, String> progressBar = null;
     
     /** The element or element_qualifier to show more input boxes for */
     private String moreBoxesFor;
@@ -97,7 +64,7 @@ public class SubmissionInfo
     private String jumpToField;
 
     /** If non-empty, form-relative indices of missing fields */
-    private List missingFields;
+    private List<String> missingFields;
 
     /** Specific bundle we're dealing with */
     private Bundle bundle;
@@ -339,7 +306,7 @@ public class SubmissionInfo
      * 
      * @return a Hashmap of Progress Bar information.
      */
-    public Map getProgressBarInfo()
+    public Map<String, String> getProgressBarInfo()
     {
         return this.progressBar;
     }
@@ -396,7 +363,7 @@ public class SubmissionInfo
      * 
      * @return a List of empty fields which are required
      */
-    public List getMissingFields()
+    public List<String> getMissingFields()
     {
         return this.missingFields;
     }
@@ -408,7 +375,7 @@ public class SubmissionInfo
      * @param missing
      *            the List of empty fields which are required
      */
-    public void setMissingFields(List missing)
+    public void setMissingFields(List<String> missing)
     {
         this.missingFields = missing;
     }
@@ -479,21 +446,21 @@ public class SubmissionInfo
      * @param subInfo
      *            the SubmissionInfo object we are loading into
      * @param forceReload
-     *            If true, this method reloads from stratch (and overwrites
+     *            If true, this method reloads from scratch (and overwrites
      *            cached progress bar info)
      * 
      */
     private static void loadProgressBar(HttpServletRequest request,
             SubmissionInfo subInfo, boolean forceReload)
     {
-        LinkedHashMap progressBarInfo = null;
+        Map<String, String> progressBarInfo = null;
 
         log.debug("Loading Progress Bar Info");
 
         if (!forceReload)
         {
             // first, attempt to load from cache
-            progressBarInfo = (LinkedHashMap) loadProgressBarFromCache(request
+            progressBarInfo = loadProgressBarFromCache(request
                     .getSession());
         }
 
@@ -506,7 +473,7 @@ public class SubmissionInfo
         // if unable to load from cache, must load from scratch
         else
         {
-            progressBarInfo = new LinkedHashMap();
+            progressBarInfo = new LinkedHashMap<String, String>();
 
             // loop through all steps
             for (int i = 0; i < subInfo.submissionConfig.getNumberOfSteps(); i++)
@@ -530,13 +497,11 @@ public class SubmissionInfo
                         // load the processing class for this step
                         ClassLoader loader = subInfo.getClass()
                                 .getClassLoader();
-                        Class stepClass = loader.loadClass(currentStep
-                                .getProcessingClassName());
+                        Class<AbstractProcessingStep> stepClass = (Class<AbstractProcessingStep>)loader.loadClass(currentStep.getProcessingClassName());
 
                         // call the "getNumberOfPages()" method of the class
                         // to get it's number of pages
-                        AbstractProcessingStep step = (AbstractProcessingStep) stepClass
-                                .newInstance();
+                        AbstractProcessingStep step = stepClass.newInstance();
 
                         // get number of pages from servlet
                         numPages = step.getNumberOfPages(request, subInfo);
@@ -585,7 +550,7 @@ public class SubmissionInfo
      * 
      */
     private static void saveProgressBarToCache(HttpSession session,
-            HashMap progressBarInfo)
+            Map<String, String> progressBarInfo)
     {
         // cache progress bar info to Session
         session.setAttribute("submission.progressbar", progressBarInfo);
@@ -603,9 +568,9 @@ public class SubmissionInfo
      * @return progressBarInfo HashMap (if found), or null (if not)
      * 
      */
-    private static HashMap loadProgressBarFromCache(HttpSession session)
+    private static Map<String, String> loadProgressBarFromCache(HttpSession session)
     {
-        return (HashMap) session.getAttribute("submission.progressbar");
+        return (Map<String, String>) session.getAttribute("submission.progressbar");
     }
 
     /**
@@ -620,7 +585,7 @@ public class SubmissionInfo
      * @param subInfo
      *            the SubmissionInfo object we are loading into
      * @param forceReload
-     *            If true, this method reloads from stratch (and overwrites
+     *            If true, this method reloads from scratch (and overwrites
      *            cached SubmissionConfig)
      * 
      */
@@ -688,7 +653,7 @@ public class SubmissionInfo
         // and the collection it corresponds to
         session.setAttribute("submission.config", subConfig);
         session.setAttribute("submission.config.collection", collectionHandle);
-        session.setAttribute("submission.config.isWorkflow", new Boolean(
+        session.setAttribute("submission.config.isWorkflow", Boolean.valueOf(
                 isWorkflow));
     }
 

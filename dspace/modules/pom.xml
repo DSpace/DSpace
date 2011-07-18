@@ -10,30 +10,14 @@
 	<parent>
 		<groupId>org.dspace</groupId>
 		<artifactId>dspace-parent</artifactId>
-		<version>1.5.2</version>
+		<version>1.7.2</version>
 	</parent>
 
-	<repositories>
-		<repository>
-			<id>maven.dspace.org-snapshot</id>
-			<name>DSpace Maven Snapshot Repository</name>
-			<url>http://maven.dspace.org/snapshot</url>
-			<releases>
-				<enabled>false</enabled>
-				<checksumPolicy>fail</checksumPolicy>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-				<checksumPolicy>fail</checksumPolicy>
-			</snapshots>
-		</repository>
-	</repositories>
-
-   <scm>
-      <connection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2/dspace/modules</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2/dspace/modules</url>
-   </scm>
+    <scm>
+      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2</url>
+    </scm>
    
 	<modules>
 		<module>xmlui</module>
@@ -41,6 +25,7 @@
 		<module>oai</module>
 		<module>jspui</module>
 		<module>sword</module>
+		<module>solr</module>
 	</modules>
 	
 </project>

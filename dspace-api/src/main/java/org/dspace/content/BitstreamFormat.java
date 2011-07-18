@@ -1,41 +1,9 @@
-/*
- * BitstreamFormat.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.content;
 
@@ -46,7 +14,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.DatabaseManager;
@@ -60,7 +27,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * when <code>update</code> is called.
  * 
  * @author Robert Tansley
- * @version $Revision: 3705 $
+ * @version $Revision: 5844 $
  */
 public class BitstreamFormat
 {
@@ -85,6 +52,13 @@ public class BitstreamFormat
      */
     public static final int SUPPORTED = 2;
 
+
+    /** translate support-level ID to string.  MUST keep this table in sync
+     *  with support level definitions above.
+     */
+    private static final String supportLevelText[] =
+        { "UNKNOWN", "KNOWN", "SUPPORTED" };
+
     /** Our context */
     private Context bfContext;
 
@@ -92,7 +66,7 @@ public class BitstreamFormat
     private TableRow bfRow;
 
     /** File extensions for this format */
-    private List extensions;
+    private List<String> extensions;
 
     /**
      * Class constructor for creating a BitstreamFormat object based on the
@@ -108,7 +82,7 @@ public class BitstreamFormat
     {
         bfContext = context;
         bfRow = row;
-        extensions = new ArrayList();
+        extensions = new ArrayList<String>();
 
         TableRowIterator tri = DatabaseManager.query(context,
                 "SELECT * FROM fileextension WHERE bitstream_format_id= ? ",
@@ -125,7 +99,9 @@ public class BitstreamFormat
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         // Cache ourselves
@@ -205,7 +181,9 @@ public class BitstreamFormat
             mimeType);
 
         if (formatRow == null)
+        {
             return null;
+        }
         return findByFinish(context, formatRow);
     }
 
@@ -300,7 +278,7 @@ public class BitstreamFormat
     public static BitstreamFormat[] findAll(Context context)
             throws SQLException
     {
-        List formats = new ArrayList();
+        List<BitstreamFormat> formats = new ArrayList<BitstreamFormat>();
 
         TableRowIterator tri = DatabaseManager.queryTable(context, "bitstreamformatregistry",
                         "SELECT * FROM bitstreamformatregistry ORDER BY bitstream_format_id");
@@ -330,7 +308,9 @@ public class BitstreamFormat
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         // Return the formats as an array
@@ -354,7 +334,7 @@ public class BitstreamFormat
     public static BitstreamFormat[] findNonInternal(Context context)
             throws SQLException
     {
-        List formats = new ArrayList();
+        List<BitstreamFormat> formats = new ArrayList<BitstreamFormat>();
 
         String myQuery = "SELECT * FROM bitstreamformatregistry WHERE internal='0' "
                 + "AND short_description NOT LIKE 'Unknown' "
@@ -388,7 +368,9 @@ public class BitstreamFormat
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         // Return the formats as an array
@@ -433,7 +415,7 @@ public class BitstreamFormat
      * 
      * @return the internal identifier
      */
-    public int getID()
+    public final int getID()
     {
         return bfRow.getIntColumn("bitstream_format_id");
     }
@@ -443,7 +425,7 @@ public class BitstreamFormat
      * 
      * @return the short description
      */
-    public String getShortDescription()
+    public final String getShortDescription()
     {
         return bfRow.getStringColumn("short_description");
     }
@@ -454,11 +436,11 @@ public class BitstreamFormat
      * @param s
      *            the new short description
      */
-    public void setShortDescription(String s)
+    public final void setShortDescription(String s)
        throws SQLException
     {
         // You can not reset the unknown's registry's name
-        BitstreamFormat unknown = null;;
+        BitstreamFormat unknown = null;
 		try {
 			unknown = findUnknown(bfContext);
 		} catch (IllegalStateException e) {
@@ -482,7 +464,7 @@ public class BitstreamFormat
      * 
      * @return the description
      */
-    public String getDescription()
+    public final String getDescription()
     {
         return bfRow.getStringColumn("description");
     }
@@ -493,7 +475,7 @@ public class BitstreamFormat
      * @param s
      *            the new description
      */
-    public void setDescription(String s)
+    public final void setDescription(String s)
     {
         bfRow.setColumn("description", s);
     }
@@ -504,7 +486,7 @@ public class BitstreamFormat
      * 
      * @return the MIME type
      */
-    public String getMIMEType()
+    public final String getMIMEType()
     {
         return bfRow.getStringColumn("mimetype");
     }
@@ -515,7 +497,7 @@ public class BitstreamFormat
      * @param s
      *            the new MIME type
      */
-    public void setMIMEType(String s)
+    public final void setMIMEType(String s)
     {
         bfRow.setColumn("mimetype", s);
     }
@@ -526,9 +508,19 @@ public class BitstreamFormat
      * 
      * @return the support level
      */
-    public int getSupportLevel()
+    public final int getSupportLevel()
     {
         return bfRow.getIntColumn("support_level");
+    }
+
+    /**
+     * Get the support level text for this bitstream format - one of
+     * <code>UNKNOWN</code>,<code>KNOWN</code> or <code>SUPPORTED</code>.
+     *
+     * @return the support level
+     */
+    public String getSupportLevelText() {
+        return supportLevelText[getSupportLevel()];
     }
 
     /**
@@ -538,7 +530,7 @@ public class BitstreamFormat
      * @param sl
      *            the new support level
      */
-    public void setSupportLevel(int sl)
+    public final void setSupportLevel(int sl)
     {
         // Sanity check
         if ((sl < 0) || (sl > 2))
@@ -556,7 +548,7 @@ public class BitstreamFormat
      * 
      * @return <code>true</code> if the bitstream format is an internal type
      */
-    public boolean isInternal()
+    public final boolean isInternal()
     {
         return bfRow.getBooleanColumn("internal");
     }
@@ -568,7 +560,7 @@ public class BitstreamFormat
      *            pass in <code>true</code> if the bitstream format is an
      *            internal type
      */
-    public void setInternal(boolean b)
+    public final void setInternal(boolean b)
     {
         bfRow.setColumn("internal", b);
     }
@@ -599,11 +591,11 @@ public class BitstreamFormat
         // Rewrite extensions
         for (int i = 0; i < extensions.size(); i++)
         {
-            String s = (String) extensions.get(i);
-            TableRow r = DatabaseManager.create(bfContext, "fileextension");
+            String s = extensions.get(i);
+            TableRow r = DatabaseManager.row("fileextension");
             r.setColumn("bitstream_format_id", getID());
             r.setColumn("extension", s);
-            DatabaseManager.update(bfContext, r);
+            DatabaseManager.insert(bfContext, r);
         }
 
         DatabaseManager.update(bfContext, bfRow);
@@ -629,7 +621,9 @@ public class BitstreamFormat
         BitstreamFormat unknown = findUnknown(bfContext);
 
         if (unknown.getID() == getID())
-	     throw new IllegalArgumentException("The Unknown bitstream format may not be deleted."); 
+        {
+            throw new IllegalArgumentException("The Unknown bitstream format may not be deleted.");
+        }
 
         // Remove from cache
         bfContext.removeCached(this, getID());
@@ -674,11 +668,34 @@ public class BitstreamFormat
      */
     public void setExtensions(String[] exts)
     {
-        extensions = new ArrayList();
+        extensions = new ArrayList<String>();
 
         for (int i = 0; i < exts.length; i++)
         {
             extensions.add(exts[i]);
         }
+    }
+
+    /**
+     * If you know the support level string, look up the corresponding type ID
+     * constant.
+     *
+     * @param slevel
+     *            String with the name of the action (must be exact match)
+     *
+     * @return the corresponding action ID, or <code>-1</code> if the action
+     *         string is unknown
+     */
+    public static int getSupportLevelID(String slevel)
+    {
+        for (int i = 0; i < supportLevelText.length; i++)
+        {
+            if (supportLevelText[i].equals(slevel))
+            {
+                return i;
+            }
+        }
+
+        return -1;
     }
 }

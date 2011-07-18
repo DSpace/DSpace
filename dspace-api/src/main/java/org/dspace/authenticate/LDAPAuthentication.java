@@ -1,41 +1,9 @@
-/*
- * LDAPAuthentication.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.authenticate;
 
@@ -67,7 +35,7 @@ import org.dspace.eperson.Group;
  * all users are in the same unit.
  *
  * @author Larry Stone, Stuart Lewis
- * @version $Revision: 3705 $
+ * @version $Revision: 5844 $
  */
 public class LDAPAuthentication
     implements AuthenticationMethod {
@@ -172,7 +140,9 @@ public class LDAPAuthentication
 
         // Skip out when no netid or password is given.
         if (netid == null || password == null)
-        	return BAD_ARGS;
+        {
+            return BAD_ARGS;
+        }
 
         // Locate the eperson
         EPerson eperson = null;
@@ -183,7 +153,6 @@ public class LDAPAuthentication
         catch (SQLException e)
         {
         }
-        boolean loggedIn = false;
         SpeakerToLDAP ldap = new SpeakerToLDAP(log);
 
         // if they entered a netid that matches an eperson
@@ -191,19 +160,24 @@ public class LDAPAuthentication
         {
             // e-mail address corresponds to active account
             if (eperson.getRequireCertificate())
-                return CERT_REQUIRED;
-            else if (!eperson.canLogIn())
-                return BAD_ARGS;
             {
-                if (ldap.ldapAuthenticate(netid, password, context))
-                {
-                    context.setCurrentUser(eperson = EPerson.findByNetid(context, netid.toLowerCase()));
-                    log.info(LogManager
-                        .getHeader(context, "authenticate", "type=ldap"));
-                    return SUCCESS;
-                }
-                else
-                   return BAD_CREDENTIALS;
+                return CERT_REQUIRED;
+            }
+            else if (!eperson.canLogIn())
+            {
+                return BAD_ARGS;
+            }
+
+            if (ldap.ldapAuthenticate(netid, password, context))
+            {
+                eperson = EPerson.findByNetid(context, netid.toLowerCase());
+                context.setCurrentUser(eperson);
+                log.info(LogManager.getHeader(context, "authenticate", "type=ldap"));
+                return SUCCESS;
+            }
+            else
+            {
+                return BAD_CREDENTIALS;
             }
         }
 
@@ -243,11 +217,26 @@ public class LDAPAuthentication
 	                            {
 	                                context.setIgnoreAuthorization(true);
 	                                eperson = EPerson.create(context);
-	                                if ((ldap.ldapEmail!=null)&&(!ldap.ldapEmail.equals(""))) eperson.setEmail(ldap.ldapEmail);
-	                                else eperson.setEmail(netid);
-	                                if ((ldap.ldapGivenName!=null)&&(!ldap.ldapGivenName.equals(""))) eperson.setFirstName(ldap.ldapGivenName);
-	                                if ((ldap.ldapSurname!=null)&&(!ldap.ldapSurname.equals(""))) eperson.setLastName(ldap.ldapSurname);
-	                                if ((ldap.ldapPhone!=null)&&(!ldap.ldapPhone.equals(""))) eperson.setMetadata("phone", ldap.ldapPhone);
+	                                if ((ldap.ldapEmail!=null)&&(!ldap.ldapEmail.equals("")))
+                                    {
+                                        eperson.setEmail(ldap.ldapEmail);
+                                    }
+	                                else
+                                    {
+                                        eperson.setEmail(netid);
+                                    }
+	                                if ((ldap.ldapGivenName!=null)&&(!ldap.ldapGivenName.equals("")))
+                                    {
+                                        eperson.setFirstName(ldap.ldapGivenName);
+                                    }
+	                                if ((ldap.ldapSurname!=null)&&(!ldap.ldapSurname.equals("")))
+                                    {
+                                        eperson.setLastName(ldap.ldapSurname);
+                                    }
+	                                if ((ldap.ldapPhone!=null)&&(!ldap.ldapPhone.equals("")))
+                                    {
+                                        eperson.setMetadata("phone", ldap.ldapPhone);
+                                    }
 	                                eperson.setNetid(netid.toLowerCase());
 	                                eperson.setCanLogIn(true);
 	                                AuthenticationManager.initEPerson(context, request, eperson);
@@ -295,7 +284,7 @@ public class LDAPAuthentication
      * Internal class to manage LDAP query and results, mainly
      * because there are multiple values to return.
      */
-    public class SpeakerToLDAP {
+    private static class SpeakerToLDAP {
 
         private Logger log = null;
 
@@ -362,25 +351,37 @@ public class LDAPAuthentication
                             if (attlist[0]!=null)
                             {
                                     att = atts.get(attlist[0]);
-                                    if (att != null) ldapEmail = (String)att.get();
+                                    if (att != null)
+                                    {
+                                        ldapEmail = (String) att.get();
+                                    }
                             }
 
                             if (attlist[1]!=null)
                             {
                                     att = atts.get(attlist[1]);
-                                    if (att != null) ldapGivenName = (String)att.get();
+                                    if (att != null)
+                                    {
+                                        ldapGivenName = (String) att.get();
+                                    }
                             }
 
                             if (attlist[2]!=null)
                             {
                                     att = atts.get(attlist[2]);
-                                    if (att != null) ldapSurname = (String)att.get();
+                                    if (att != null)
+                                    {
+                                        ldapSurname = (String) att.get();
+                                    }
                             }
 
                             if (attlist[3]!=null)
                             {
                                     att = atts.get(attlist[3]);
-                                    if (att != null) ldapPhone = (String)att.get();
+                                    if (att != null)
+                                    {
+                                        ldapPhone = (String) att.get();
+                                    }
                             }
                         }
                     }
@@ -405,7 +406,9 @@ public class LDAPAuthentication
                     try
                     {
                         if (ctx != null)
+                        {
                             ctx.close();
+                        }
                     }
                     catch (NamingException e)
                     {

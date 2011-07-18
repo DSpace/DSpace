@@ -1,47 +1,15 @@
-/*
- * MetadataValue.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.content;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
@@ -55,11 +23,12 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * Database access class representing a Dublin Core metadata value.
  * It represents a value of a given <code>MetadataField</code> on an Item.
  * (The Item can have many values of the same field.)  It contains                                           element, qualifier, value and language.
- * the field (which names the schema, element, and qualifer), language,
+ * the field (which names the schema, element, and qualifier), language,
  * and a value.
  *
  * @author Martin Hald
- * @see org.dspace.content.MetadataSchema, org.dspace.content.MetadataField
+ * @see org.dspace.content.MetadataSchema
+ * @see org.dspace.content.MetadataField
  */
 public class MetadataValue
 {
@@ -80,6 +49,12 @@ public class MetadataValue
 
     /** The position of the record. */
     public int place = 1;
+
+    /** Authority key, if any */
+    public String authority = null;
+
+    /** Authority confidence value -- see Choices class for values */
+    public int confidence = 0;
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(MetadataValue.class);
@@ -102,6 +77,8 @@ public class MetadataValue
             value = row.getStringColumn("text_value");
             language = row.getStringColumn("text_lang");
             place = row.getIntColumn("place");
+            authority = row.getStringColumn("authority");
+            confidence = row.getIntColumn("confidence");
             this.row = row;
         }
     }
@@ -116,7 +93,7 @@ public class MetadataValue
     /**
      * Constructor to create a value for a given field.
      *
-     * @param field inital value for field
+     * @param field initial value for field
      */
     public MetadataValue(MetadataField field)
     {
@@ -234,6 +211,46 @@ public class MetadataValue
     }
 
     /**
+     * Get the metadata authority
+     *
+     * @return metadata authority
+     */
+    public String getAuthority ()
+    {
+        return authority ;
+    }
+
+    /**
+     * Set the metadata authority
+     *
+     * @param value new metadata authority
+     */
+    public void setAuthority (String value)
+    {
+        this.authority  = value;
+    }
+
+    /**
+     * Get the metadata confidence
+     *
+     * @return metadata confidence
+     */
+    public int getConfidence()
+    {
+        return confidence;
+    }
+
+    /**
+     * Set the metadata confidence
+     *
+     * @param value new metadata confidence
+     */
+    public void setConfidence(int value)
+    {
+        this.confidence = value;
+    }
+
+    /**
      * Creates a new metadata value.
      *
      * @param context
@@ -250,6 +267,8 @@ public class MetadataValue
         row.setColumn("text_value", value);
         row.setColumn("text_lang", language);
         row.setColumn("place", place);
+        row.setColumn("authority", authority);
+        row.setColumn("confidence", confidence);
         DatabaseManager.insert(context, row);
 
         // Remember the new row number
@@ -289,7 +308,9 @@ public class MetadataValue
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         if (row == null)
@@ -312,7 +333,7 @@ public class MetadataValue
      * @throws SQLException
      * @throws AuthorizeException
      */
-    public static java.util.Collection findByField(Context context, int fieldId)
+    public static List<MetadataValue> findByField(Context context, int fieldId)
             throws IOException, SQLException, AuthorizeException
     {
         // Grab rows from DB
@@ -321,7 +342,7 @@ public class MetadataValue
                 fieldId);
 
         TableRow row = null;
-        java.util.Collection ret = new ArrayList();
+        List<MetadataValue> ret = new ArrayList<MetadataValue>();
         try
         {
             while (tri.hasNext())
@@ -334,7 +355,9 @@ public class MetadataValue
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         return ret;
@@ -354,6 +377,8 @@ public class MetadataValue
         row.setColumn("text_value", value);
         row.setColumn("text_lang", language);
         row.setColumn("place", place);
+        row.setColumn("authority", authority);
+        row.setColumn("confidence", confidence);
         DatabaseManager.update(context, row);
 
         log.info(LogManager.getHeader(context, "update_metadatavalue",
@@ -372,5 +397,52 @@ public class MetadataValue
         log.info(LogManager.getHeader(context, "delete_metadata_value",
                 " metadata_value_id=" + getValueId()));
         DatabaseManager.delete(context, row);
+    }
+
+    /**
+     * Return <code>true</code> if <code>other</code> is the same MetadataValue
+     * as this object, <code>false</code> otherwise
+     *
+     * @param obj
+     *            object to compare to
+     *
+     * @return <code>true</code> if object passed in represents the same
+     *         MetadataValue as this object
+     */
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (obj == null)
+        {
+            return false;
+        }
+        if (getClass() != obj.getClass())
+        {
+            return false;
+        }
+        final MetadataValue other = (MetadataValue) obj;
+        if (this.fieldId != other.fieldId)
+        {
+            return false;
+        }
+        if (this.valueId != other.valueId)
+        {
+            return false;
+        }
+        if (this.itemId != other.itemId)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        int hash = 7;
+        hash = 47 * hash + this.fieldId;
+        hash = 47 * hash + this.valueId;
+        hash = 47 * hash + this.itemId;
+        return hash;
     }
 }

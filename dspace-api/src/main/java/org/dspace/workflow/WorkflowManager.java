@@ -1,41 +1,9 @@
-/*
- * WorkflowManager.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.workflow;
 
@@ -50,10 +18,11 @@ import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
 import javax.mail.MessagingException;
+
 import org.apache.log4j.Logger;
+
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.Bitstream;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
@@ -65,6 +34,7 @@ import org.dspace.core.Context;
 import org.dspace.core.Email;
 import org.dspace.core.I18nUtil;
 import org.dspace.core.LogManager;
+import org.dspace.curate.WorkflowCurator;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
@@ -125,7 +95,7 @@ public class WorkflowManager
                                                  // either
 
     /** Symbolic names of workflow steps. */
-    public static final String workflowText[] =
+    private static final String workflowText[] =
     {
         "SUBMIT",           // 0
         "STEP1POOL",        // 1
@@ -138,7 +108,7 @@ public class WorkflowManager
     };
 
     /* support for 'no notification' */
-    private static Map noEMail = new HashMap();
+    private static Map<Integer, Boolean> noEMail = new HashMap<Integer, Boolean>();
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(WorkflowManager.class);
@@ -154,8 +124,12 @@ public class WorkflowManager
     public static int getWorkflowID(String state)
     {
         for (int i = 0; i < workflowText.length; ++i)
+        {
             if (state.equalsIgnoreCase(workflowText[i]))
+            {
                 return i;
+            }
+        }
         return -1;
     }
 
@@ -184,9 +158,10 @@ public class WorkflowManager
         recordStart(c, myitem);
 
         // create the WorkflowItem
-        TableRow row = DatabaseManager.create(c, "workflowitem");
+        TableRow row = DatabaseManager.row("workflowitem");
         row.setColumn("item_id", myitem.getID());
         row.setColumn("collection_id", wsi.getCollection().getID());
+        DatabaseManager.insert(c, row);
 
         WorkflowItem wfi = new WorkflowItem(c, row);
 
@@ -202,8 +177,9 @@ public class WorkflowManager
         // remove the WorkspaceItem
         wsi.deleteWrapper();
 
-        // now get the worflow started
-        doState(c, wfi, WFSTATE_STEP1POOL, null);
+        // now get the workflow started
+        wfi.setState(WFSTATE_SUBMIT);
+        advance(c, wfi, null); 
 
         // Return the workflow item
         return wfi;
@@ -219,7 +195,7 @@ public class WorkflowManager
     {
         // make a hash table entry with item ID for no notify
         // notify code checks no notify hash for item id
-        noEMail.put(new Integer(wsi.getItem().getID()), new Boolean(true));
+        noEMail.put(Integer.valueOf(wsi.getItem().getID()), Boolean.TRUE);
 
         return start(c, wsi);
     }
@@ -232,10 +208,10 @@ public class WorkflowManager
      * @param e
      *            The EPerson we want to fetch owned tasks for.
      */
-    public static List getOwnedTasks(Context c, EPerson e)
+    public static List<WorkflowItem> getOwnedTasks(Context c, EPerson e)
             throws java.sql.SQLException
     {
-        ArrayList mylist = new ArrayList();
+        ArrayList<WorkflowItem> mylist = new ArrayList<WorkflowItem>();
 
         String myquery = "SELECT * FROM WorkflowItem WHERE owner= ? ";
 
@@ -252,7 +228,9 @@ public class WorkflowManager
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         return mylist;
@@ -265,9 +243,9 @@ public class WorkflowManager
      * @param e
      *            The Eperson we want to fetch the pooled tasks for.
      */
-    public static List getPooledTasks(Context c, EPerson e) throws SQLException
+    public static List<WorkflowItem> getPooledTasks(Context c, EPerson e) throws SQLException
     {
-        ArrayList mylist = new ArrayList();
+        ArrayList<WorkflowItem> mylist = new ArrayList<WorkflowItem>();
 
         String myquery = "SELECT workflowitem.* FROM workflowitem, TaskListItem" +
         		" WHERE tasklistitem.eperson_id= ? " +
@@ -286,7 +264,9 @@ public class WorkflowManager
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
         
         return mylist;
@@ -340,7 +320,7 @@ public class WorkflowManager
     }
 
     /**
-     * approveAction() sends an item forward in the workflow (reviewers,
+     * advance() sends an item forward in the workflow (reviewers,
      * approvers, and editors all do an 'approve' to move the item forward) if
      * the item arrives at the submit state, then remove the WorkflowItem and
      * call the archive() method to put it in the archive, and email notify the
@@ -356,16 +336,66 @@ public class WorkflowManager
     public static void advance(Context c, WorkflowItem wi, EPerson e)
             throws SQLException, IOException, AuthorizeException
     {
+        advance(c, wi, e, true, true);
+    }
+    
+    /**
+     * advance() sends an item forward in the workflow (reviewers,
+     * approvers, and editors all do an 'approve' to move the item forward) if
+     * the item arrives at the submit state, then remove the WorkflowItem and
+     * call the archive() method to put it in the archive, and email notify the
+     * submitter of a successful submission
+     * 
+     * @param c
+     *            Context
+     * @param wi
+     *            WorkflowItem do do the approval on
+     * @param e
+     *            EPerson doing the approval
+     * 
+     * @param curate
+     *            boolean indicating whether curation tasks should be done
+     * 
+     * @param record
+     *            boolean indicating whether to record action 
+     */
+    public static boolean advance(Context c, WorkflowItem wi, EPerson e,
+                                  boolean curate, boolean record)
+            throws SQLException, IOException, AuthorizeException
+    {
         int taskstate = wi.getState();
+        boolean archived = false;
+        
+        // perform curation tasks if needed
+        if (curate && WorkflowCurator.needsCuration(wi))
+        {
+            if (! WorkflowCurator.doCuration(c, wi)) {
+                // don't proceed - either curation tasks queued, or item rejected
+                log.info(LogManager.getHeader(c, "advance_workflow",
+                        "workflow_item_id=" + wi.getID() + ",item_id="
+                        + wi.getItem().getID() + ",collection_id="
+                        + wi.getCollection().getID() + ",old_state="
+                        + taskstate + ",doCuration=false"));
+                return archived;
+            }
+        }
 
         switch (taskstate)
         {
+        case WFSTATE_SUBMIT:
+            archived = doState(c, wi, WFSTATE_STEP1POOL, e);
+            
+            break;
+            
         case WFSTATE_STEP1:
 
             // authorize DSpaceActions.SUBMIT_REVIEW
             // Record provenance
-            recordApproval(c, wi, e);
-            doState(c, wi, WFSTATE_STEP2POOL, e);
+            if (record)
+            {
+                recordApproval(c, wi, e);
+            }
+            archived = doState(c, wi, WFSTATE_STEP2POOL, e);
 
             break;
 
@@ -373,8 +403,11 @@ public class WorkflowManager
 
             // authorize DSpaceActions.SUBMIT_STEP2
             // Record provenance
-            recordApproval(c, wi, e);
-            doState(c, wi, WFSTATE_STEP3POOL, e);
+            if (record)
+            {
+                recordApproval(c, wi, e);
+            }
+            archived = doState(c, wi, WFSTATE_STEP3POOL, e);
 
             break;
 
@@ -383,7 +416,7 @@ public class WorkflowManager
             // authorize DSpaceActions.SUBMIT_STEP3
             // We don't record approval for editors, since they can't reject,
             // and thus didn't actually make a decision
-            doState(c, wi, WFSTATE_ARCHIVE, e);
+            archived = doState(c, wi, WFSTATE_ARCHIVE, e);
 
             break;
 
@@ -395,6 +428,7 @@ public class WorkflowManager
                         + wi.getItem().getID() + ",collection_id="
                         + wi.getCollection().getID() + ",old_state="
                         + taskstate + ",new_state=" + wi.getState()));
+        return archived;
     }
 
     /**
@@ -477,7 +511,7 @@ public class WorkflowManager
                 + e.getID()));
 
         // convert into personal workspace
-        WorkspaceItem wsi = returnToWorkspace(c, wi);
+        returnToWorkspace(c, wi);
     }
 
     // returns true if archived
@@ -518,7 +552,8 @@ public class WorkflowManager
             else
             {
                 // no reviewers, skip ahead
-                archived = doState(c, wi, WFSTATE_STEP2POOL, null);
+                wi.setState(WFSTATE_STEP1);
+                archived = advance(c, wi, null, true, false);
             }
 
             break;
@@ -558,7 +593,8 @@ public class WorkflowManager
             else
             {
                 // no reviewers, skip ahead
-                archived = doState(c, wi, WFSTATE_STEP3POOL, null);
+                wi.setState(WFSTATE_STEP2);
+                archived = advance(c, wi, null, true, false);
             }
 
             break;
@@ -594,7 +630,8 @@ public class WorkflowManager
             else
             {
                 // no editors, skip ahead
-                archived = doState(c, wi, WFSTATE_ARCHIVE, newowner);
+                wi.setState(WFSTATE_STEP3);
+                archived = advance(c, wi, null, true, false);
             }
 
             break;
@@ -611,39 +648,41 @@ public class WorkflowManager
         case WFSTATE_ARCHIVE:
 
             // put in archive in one transaction
-            try
-            {
-                // remove workflow tasks
-                deleteTasks(c, wi);
+            // remove workflow tasks
+            deleteTasks(c, wi);
 
-                mycollection = wi.getCollection();
+            mycollection = wi.getCollection();
 
-                Item myitem = archive(c, wi);
+            Item myitem = archive(c, wi);
 
-                // now email notification
-                notifyOfArchive(c, myitem, mycollection);
-                archived = true;
-            }
-            catch (IOException e)
-            {
-                // indexer causes this
-                throw e;
-            }
-            catch (SQLException e)
-            {
-                // problem starting workflow
-                throw e;
-            }
+            // now email notification
+            notifyOfArchive(c, myitem, mycollection);
+            archived = true;
 
             break;
         }
 
-        if ((wi != null) && !archived)
+        if (!archived)
         {
             wi.update();
         }
 
         return archived;
+    }
+
+    /**
+     * Get the text representing the given workflow state
+     *
+     * @param state the workflow state
+     * @return the text representation
+     */
+    public static String getWorkflowText(int state)
+    {
+        if (state > -1 && state < workflowText.length) {
+            return workflowText[state];
+        }
+
+        throw new IllegalArgumentException("Invalid workflow state passed");
     }
 
     /**
@@ -740,10 +779,10 @@ public class WorkflowManager
         // FIXME: Remove license
         // FIXME: Provenance statement?
         // Create the new workspace item row
-        TableRow row = DatabaseManager.create(c, "workspaceitem");
+        TableRow row = DatabaseManager.row("workspaceitem");
         row.setColumn("item_id", myitem.getID());
         row.setColumn("collection_id", mycollection.getID());
-        DatabaseManager.update(c, row);
+        DatabaseManager.insert(c, row);
 
         int wsi_id = row.getIntColumn("workspace_item_id");
         WorkspaceItem wi = WorkspaceItem.find(c, wsi_id);
@@ -832,10 +871,10 @@ public class WorkflowManager
         {
             // can we get away without creating a tasklistitem class?
             // do we want to?
-            TableRow tr = DatabaseManager.create(c, "tasklistitem");
+            TableRow tr = DatabaseManager.row("tasklistitem");
             tr.setColumn("eperson_id", epa[i].getID());
             tr.setColumn("workflow_id", wi.getID());
-            DatabaseManager.update(c, tr);
+            DatabaseManager.insert(c, tr);
         }
     }
 
@@ -846,6 +885,43 @@ public class WorkflowManager
        
         DatabaseManager.updateQuery(c, myrequest, wi.getID());
     }
+    
+    // send notices of curation activity
+    public static void notifyOfCuration(Context c, WorkflowItem wi, EPerson[] epa,
+           String taskName, String action, String message) throws SQLException, IOException
+    {
+        try
+        {
+            // Get the item title
+            String title = getItemTitle(wi);
+
+            // Get the submitter's name
+            String submitter = getSubmitterName(wi);
+
+            // Get the collection
+            Collection coll = wi.getCollection();
+
+            for (int i = 0; i < epa.length; i++)
+            {
+                Locale supportedLocale = I18nUtil.getEPersonLocale(epa[i]);
+                Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale,
+                                                                                  "flowtask_notify"));
+                email.addArgument(title);
+                email.addArgument(coll.getMetadata("name"));
+                email.addArgument(submitter);
+                email.addArgument(taskName);
+                email.addArgument(message);
+                email.addArgument(action);
+                email.addRecipient(epa[i].getEmail());
+                email.send();
+            }
+        }
+        catch (MessagingException e)
+        {
+            log.warn(LogManager.getHeader(c, "notifyOfCuration", "cannot email users" + 
+                                          " of workflow_item_id" + wi.getID()));
+        }
+    }
 
     private static void notifyGroupOfTask(Context c, WorkflowItem wi,
             Group mygroup, EPerson[] epa) throws SQLException, IOException
@@ -853,7 +929,7 @@ public class WorkflowManager
         // check to see if notification is turned off
         // and only do it once - delete key after notification has
         // been suppressed for the first time
-        Integer myID = new Integer(wi.getItem().getID());
+        Integer myID = Integer.valueOf(wi.getItem().getID());
 
         if (noEMail.containsKey(myID))
         {
@@ -924,33 +1000,13 @@ public class WorkflowManager
             }
             catch (MessagingException e)
             {
+                String gid = (mygroup != null) ?
+                             String.valueOf(mygroup.getID()) : "none";
                 log.warn(LogManager.getHeader(c, "notifyGroupofTask",
-                        "cannot email user" + " group_id" + mygroup.getID()
+                        "cannot email user" + " group_id" + gid
                                 + " workflow_item_id" + wi.getID()));
             }
         }
-    }
-
-    /**
-     * Add all the specified people to the list of email recipients,
-     * and send it
-     * 
-     * @param c
-     *            Context
-     * @param epeople
-     *            Eperson[] of recipients
-     * @param email
-     *            Email object containing the message
-     */
-    private static void emailRecipients(Context c, EPerson[] epa, Email email)
-            throws SQLException, MessagingException
-    {
-        for (int i = 0; i < epa.length; i++)
-        {
-            email.addRecipient(epa[i].getEmail());
-        }
-
-        email.send();
     }
 
     private static String getMyDSpaceLink()
@@ -982,6 +1038,16 @@ public class WorkflowManager
             email.addArgument(getMyDSpaceLink());
 
             email.send();
+        }
+        catch (RuntimeException re)
+        {
+            // log this email error
+            log.warn(LogManager.getHeader(c, "notify_of_reject",
+                    "cannot email user" + " eperson_id" + e.getID()
+                            + " eperson_email" + e.getEmail()
+                            + " workflow_item_id" + wi.getID()));
+
+            throw re;
         }
         catch (Exception ex)
         {
@@ -1039,7 +1105,7 @@ public class WorkflowManager
     {
         String submitter = e.getFullName();
 
-        submitter = submitter + "(" + e.getEmail() + ")";
+        submitter = submitter + " (" + e.getEmail() + ")";
 
         return submitter;
     }
@@ -1072,9 +1138,6 @@ public class WorkflowManager
     private static void recordStart(Context c, Item myitem)
             throws SQLException, IOException, AuthorizeException
     {
-        // Get non-internal format bitstreams
-        Bitstream[] bitstreams = myitem.getNonInternalBitstreams();
-
         // get date
         DCDate now = DCDate.getCurrent();
 

@@ -1,41 +1,9 @@
-/*
- * Navigation.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.administrative;
 
@@ -92,7 +60,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_context_create_collection 	= message("xmlui.administrative.Navigation.context_create_collection");
     private static final Message T_context_create_subcommunity 	= message("xmlui.administrative.Navigation.context_create_subcommunity");
     private static final Message T_context_create_community 	= message("xmlui.administrative.Navigation.context_create_community");
-
+    private static final Message T_context_export_metadata      = message("xmlui.administrative.Navigation.context_export_metadata");
+    private static final Message T_administrative_import_metadata       = message("xmlui.administrative.Navigation.administrative_import_metadata");
     private static final Message T_administrative_head 				= message("xmlui.administrative.Navigation.administrative_head");
     private static final Message T_administrative_access_control 	= message("xmlui.administrative.Navigation.administrative_access_control");
     private static final Message T_administrative_people 			= message("xmlui.administrative.Navigation.administrative_people");
@@ -140,21 +109,22 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         {
             return "0";
         }
-                
-        String key;
-        if (context.getCurrentUser() != null)
+
+        if (context.getCurrentUser() == null)
         {
-        	key = context.getCurrentUser().getEmail();
-        	if(availableExports!=null && availableExports.size()>0){
-        		for(String fileName:availableExports){
-        			key+= ":"+fileName;
-        		}
-        	}
+            return HashUtil.hash("anonymous");
         }
-        else
-        	key = "anonymous";
-        
-        return HashUtil.hash(key);
+
+        if (availableExports != null && availableExports.size()>0) {
+            StringBuilder key = new StringBuilder(context.getCurrentUser().getEmail());
+            for(String fileName : availableExports){
+                key.append(":").append(fileName);
+            }
+
+            return HashUtil.hash(key.toString());
+        }
+
+        return HashUtil.hash(context.getCurrentUser().getEmail());
     }
 	
     /**
@@ -199,12 +169,18 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     
     public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException {
     	super.setup(resolver, objectModel, src, parameters);
-    	try{
-    		availableExports = ItemExport.getExportsAvailable(context.getCurrentUser());
-    	}
-    	catch (Exception e) {
-    		// nothing to do
-    	}
+        availableExports = null;
+        if (context.getCurrentUser() != null)
+        {
+            try
+            {
+                availableExports = ItemExport.getExportsAvailable(context.getCurrentUser());
+            }
+            catch (Exception e)
+            {
+                throw new ProcessingException("Error getting available exports", e);
+            }
+        }
     }
     
     
@@ -226,33 +202,41 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         if(availableExports!=null && availableExports.size()>0){
             account.addItem().addXref(contextPath+"/admin/export", T_account_export);
         }
-        
-        
+
+        //Check if a system administrator
+        boolean isSystemAdmin = AuthorizeManager.isAdmin(this.context);
+
         // Context Administrative options
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
     	if (dso instanceof Item)
     	{
-    		
     		Item item = (Item) dso;
     		if (item.canEdit())
     		{
-            	context.setHead(T_context_head);
-            	context.addItem().addXref(contextPath+"/admin/item?itemID="+item.getID(), T_context_edit_item);
-            	context.addItem().addXref(contextPath+"/admin/export?itemID="+item.getID(), T_context_export_item );
-    		}
+                    context.setHead(T_context_head);
+                    context.addItem().addXref(contextPath+"/admin/item?itemID="+item.getID(), T_context_edit_item);
+                    if (AuthorizeManager.isAdmin(this.context, dso))
+                    {
+                        context.addItem().addXref(contextPath+"/admin/export?itemID="+item.getID(), T_context_export_item );
+                        context.addItem().addXref(contextPath+ "/csv/handle/"+dso.getHandle(),T_context_export_metadata );
+                    }
+                }
     	}
     	else if (dso instanceof Collection)
     	{
     		Collection collection = (Collection) dso;
     		
-    		
     		// can they admin this collection?
-            if (AuthorizeManager.authorizeActionBoolean(this.context, collection, Constants.COLLECTION_ADMIN))
+            if (collection.canEditBoolean(true))
             {
             	context.setHead(T_context_head);
             	context.addItemXref(contextPath+"/admin/collection?collectionID=" + collection.getID(), T_context_edit_collection);            	
             	context.addItemXref(contextPath+"/admin/mapper?collectionID="+collection.getID(), T_context_item_mapper); 
-            	context.addItem().addXref(contextPath+"/admin/export?collectionID="+collection.getID(), T_context_export_collection );
+            	if (AuthorizeManager.isAdmin(this.context, dso))
+                {
+                    context.addItem().addXref(contextPath+"/admin/export?collectionID="+collection.getID(), T_context_export_collection );
+                    context.addItem().addXref(contextPath+ "/csv/handle/"+dso.getHandle(),T_context_export_metadata );
+                }
             }
     	}
     	else if (dso instanceof Community)
@@ -264,36 +248,32 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             {
             	context.setHead(T_context_head);
             	context.addItemXref(contextPath+"/admin/community?communityID=" + community.getID(), T_context_edit_community); 
-            	context.addItem().addXref(contextPath+"/admin/export?communityID="+community.getID(), T_context_export_community );
+            	if (AuthorizeManager.isAdmin(this.context, dso))
+                {
+                    context.addItem().addXref(contextPath + "/admin/export?communityID=" + community.getID(), T_context_export_community);
+                }
+                context.addItem().addXref(contextPath+ "/csv/handle/"+dso.getHandle(),T_context_export_metadata );
             }
             
             // can they add to this community?
             if (AuthorizeManager.authorizeActionBoolean(this.context, community,Constants.ADD))
             {
             	context.setHead(T_context_head);
-            	context.addItemXref(contextPath+"/admin/collection?createNew&communityID=" + community.getID(), T_context_create_collection);         	
-            }
-            
-            // Only administrators can create communities
-            if (AuthorizeManager.isAdmin(this.context))
-            {
-            	context.setHead(T_context_head);
-            	context.addItemXref(contextPath+"/admin/community?createNew&communityID=" + community.getID(), T_context_create_subcommunity);  	
+            	context.addItemXref(contextPath+"/admin/collection?createNew&communityID=" + community.getID(), T_context_create_collection);
+                context.addItemXref(contextPath+"/admin/community?createNew&communityID=" + community.getID(), T_context_create_subcommunity);      
             }
     	}
     	
-    	if ("community-list".equals(this.sitemapURI))
+    	if (isSystemAdmin && ("community-list".equals(this.sitemapURI) || "".equals(this.sitemapURI)))
     	{
-    		if (AuthorizeManager.isAdmin(this.context))
-            {
-            	context.setHead(T_context_head);
-    			context.addItemXref(contextPath+"/admin/community?createNew", T_context_create_community);    			
-            }
+            // Only System administrators can create top-level communities
+            context.setHead(T_context_head);
+            context.addItemXref(contextPath+"/admin/community?createNew", T_context_create_community);
     	}
         
         
         // System Administrator options!
-        if (AuthorizeManager.isAdmin(this.context))
+        if (isSystemAdmin)
         {
 	        admin.setHead(T_administrative_head);
 	                
@@ -313,6 +293,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             admin.addItemXref(contextPath+"/admin/withdrawn", T_administrative_withdrawn);	        
 	        admin.addItemXref(contextPath+"/admin/panel", T_administrative_control_panel);
             admin.addItemXref(contextPath+"/statistics", T_statistics);
+            admin.addItemXref(contextPath+ "/admin/metadataimport", T_administrative_import_metadata);
         }
     }
     
@@ -339,7 +320,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     		
     		
     		// can they admin this collection?
-            if (AuthorizeManager.authorizeActionBoolean(this.context, collection, Constants.COLLECTION_ADMIN))
+            if (AuthorizeManager.authorizeActionBoolean(this.context, collection, Constants.ADMIN))
             {            	
             	context.addItemXref(contextPath+"/admin/collection?collectionID=" + collection.getID(), T_context_edit_collection);
             	context.addItemXref(contextPath+"/admin/mapper?collectionID="+collection.getID(), T_context_item_mapper);            	
@@ -366,13 +347,10 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
             }
     	}
     	
-    	if ("community-list".equals(this.sitemapURI))
+    	if (("community-list".equals(this.sitemapURI) || "".equals(this.sitemapURI)) && AuthorizeManager.isAdmin(this.context))
     	{
-    		if (AuthorizeManager.isAdmin(this.context))
-            {
-    			context.addItemXref(contextPath+"/admin/community?createNew", T_context_create_community);
-    			options++;
-            }
+            context.addItemXref(contextPath+"/admin/community?createNew", T_context_create_community);
+            options++;
     	}
     	
     	return options;

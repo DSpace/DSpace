@@ -1,41 +1,9 @@
-/*
- * DAVServlet.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.dav;
 
@@ -45,8 +13,6 @@ import java.sql.SQLException;
 import java.util.Date;
 import java.util.StringTokenizer;
 
-import javax.servlet.GenericServlet;
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
@@ -70,7 +36,7 @@ import org.dspace.eperson.EPerson;
  * <P>
  * 
  * @author Larry Stone
- * @version $Revision: 3705 $
+ * @version $Revision: 5845 $
  */
 public class DAVServlet extends HttpServlet
 
@@ -94,12 +60,6 @@ public class DAVServlet extends HttpServlet
     /** The Constant METHOD_MOVE. */
     private static final String METHOD_MOVE = "MOVE";
 
-    /** The Constant METHOD_LOCK. */
-    private static final String METHOD_LOCK = "LOCK";
-
-    /** The Constant METHOD_UNLOCK. */
-    private static final String METHOD_UNLOCK = "UNLOCK";
-
     /** The Constant METHOD_DELETE. */
     private static final String METHOD_DELETE = "DELETE";
 
@@ -117,7 +77,7 @@ public class DAVServlet extends HttpServlet
             .getBooleanProperty("dav.access.anonymous");
 
     /** Guess at longest status text the servlet container will tolerate; Tomcat 5.0 handles this, but dies on longer messages. */
-    private final static int HTTP_STATUS_MESSAGE_MAX = 1000;
+    private static final int HTTP_STATUS_MESSAGE_MAX = 1000;
 
     /** A random secret to embed in cookies, generated fresh at every startup:. */
     private static final String cookieSecret = Utils.generateHexKey();
@@ -142,6 +102,7 @@ public class DAVServlet extends HttpServlet
     {
         Cookie cookies[] = request.getCookies();
         if (cookies != null)
+        {
             for (Cookie element : cookies)
             {
                 if (element.getName().equals(COOKIE_NAME))
@@ -149,6 +110,7 @@ public class DAVServlet extends HttpServlet
                     return element;
                 }
             }
+        }
         return null;
     }
 
@@ -346,11 +308,11 @@ public class DAVServlet extends HttpServlet
             {
                 String crud = ct.nextToken();
                 String dcrud = new String(Base64.decodeBase64(crud.getBytes()));
-                int colon = dcrud.indexOf(":");
+                int colon = dcrud.indexOf(':');
                 if (colon > 0)
                 {
-                    username = URLDecode(dcrud.substring(0, colon));
-                    password = URLDecode(dcrud.substring(colon + 1));
+                    username = decodeFromURL(dcrud.substring(0, colon));
+                    password = decodeFromURL(dcrud.substring(colon + 1));
                     log
                             .info(LogManager.getHeader(context, "auth",
                                     "Got username=\"" + username
@@ -668,7 +630,7 @@ public class DAVServlet extends HttpServlet
      * 
      * @return the string
      */
-    protected static String URLDecode(String in)
+    protected static String decodeFromURL(String in)
     {
         try
         {
@@ -679,29 +641,4 @@ public class DAVServlet extends HttpServlet
             return "";
         }
     }
-
-    // last servlet instance when put into service, set by init()
-    /** The servlet instance. */
-    private static GenericServlet servletInstance = null;
-
-    /* (non-Javadoc)
-     * @see javax.servlet.GenericServlet#init(javax.servlet.ServletConfig)
-     */
-    @Override
-    public void init(ServletConfig sc) throws ServletException
-    {
-        super.init(sc);
-        servletInstance = this;
-    }
-
-    /**
-     * Gets the servlet instance.
-     * 
-     * @return the servlet instance
-     */
-    public static GenericServlet getServletInstance()
-    {
-        return servletInstance;
-    }
-
 }

@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.checker;
 
 import java.sql.Connection;
@@ -5,7 +12,6 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -106,14 +112,16 @@ public class ChecksumHistoryDAO extends DAOSupport
         {
             conn = DatabaseManager.getConnection();
             if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-	            stmt = conn.prepareStatement(INSERT_HISTORY_ORACLE);
+            {
+                stmt = conn.prepareStatement(INSERT_HISTORY_ORACLE);
+            }
             else
-            	stmt = conn.prepareStatement(INSERT_HISTORY);
+            {
+                stmt = conn.prepareStatement(INSERT_HISTORY);
+            }
             stmt.setInt(1, info.getBitstreamId());
-            stmt.setTimestamp(2, new java.sql.Timestamp(info
-                    .getProcessStartDate().getTime()));
-            stmt.setTimestamp(3, new java.sql.Timestamp(info
-                    .getProcessEndDate().getTime()));
+            stmt.setTimestamp(2, new java.sql.Timestamp(info.getProcessStartDate().getTime()));
+            stmt.setTimestamp(3, new java.sql.Timestamp(info.getProcessEndDate().getTime()));
             stmt.setString(4, info.getStoredChecksum());
             stmt.setString(5, info.getCalculatedChecksum());
             stmt.setString(6, info.getChecksumCheckResult());
@@ -123,8 +131,7 @@ public class ChecksumHistoryDAO extends DAOSupport
         catch (SQLException e)
         {
             LOG.error("Problem updating checksum row. " + e.getMessage(), e);
-            throw new RuntimeException("Problem updating checksum row. "
-                    + e.getMessage(), e);
+            throw new IllegalStateException("Problem updating checksum row. " + e.getMessage(), e);
         }
         finally
         {
@@ -157,10 +164,8 @@ public class ChecksumHistoryDAO extends DAOSupport
         }
         catch (SQLException e)
         {
-            LOG.error("Problem with inserting missing bitstream. "
-                    + e.getMessage(), e);
-            throw new RuntimeException("Problem inserting missing bitstream. "
-                    + e.getMessage(), e);
+            LOG.error("Problem with inserting missing bitstream. " + e.getMessage(), e);
+            throw new IllegalStateException("Problem inserting missing bitstream. " + e.getMessage(), e);
         }
         finally
         {
@@ -179,16 +184,19 @@ public class ChecksumHistoryDAO extends DAOSupport
         try
         {
             if ("oracle".equals(ConfigurationManager.getProperty("db.name")))
-	            stmt = conn.prepareStatement(INSERT_MISSING_HISTORY_BITSTREAMS_ORACLE);
+            {
+                stmt = conn.prepareStatement(INSERT_MISSING_HISTORY_BITSTREAMS_ORACLE);
+            }
             else
-            	stmt = conn.prepareStatement(INSERT_MISSING_HISTORY_BITSTREAMS);
+            {
+                stmt = conn.prepareStatement(INSERT_MISSING_HISTORY_BITSTREAMS);
+            }
             stmt.executeUpdate();
         }
         catch (SQLException e)
         {
             LOG.error("Problem updating missing history. " + e.getMessage(), e);
-            throw new RuntimeException("Problem updating missing history. "
-                    + e.getMessage(), e);
+            throw new IllegalStateException("Problem updating missing history. " + e.getMessage(), e);
         }
         finally
         {
@@ -216,8 +224,7 @@ public class ChecksumHistoryDAO extends DAOSupport
 
         try
         {
-            update = conn
-                    .prepareStatement("DELETE FROM checksum_history WHERE process_end_date<? AND result=?");
+            update = conn.prepareStatement("DELETE FROM checksum_history WHERE process_end_date<? AND result=?");
             update.setTimestamp(1, new Timestamp(retentionDate.getTime()));
             update.setString(2, result);
             return update.executeUpdate();
@@ -235,10 +242,10 @@ public class ChecksumHistoryDAO extends DAOSupport
      * @param interests
      *            set of results and the duration of time before they are
      *            removed from the database
-     * 
+     *
      * @return number of bitstreams deleted
      */
-    public int prune(Map interests)
+    public int prune(Map<String, Long> interests)
     {
         Connection conn = null;
         try
@@ -246,12 +253,10 @@ public class ChecksumHistoryDAO extends DAOSupport
             conn = DatabaseManager.getConnection();
             long now = System.currentTimeMillis();
             int count = 0;
-            for (Iterator iter = interests.keySet().iterator(); iter.hasNext();)
+            for (Map.Entry<String, Long> interest : interests.entrySet())
             {
-                String result = (String) iter.next();
-                Long dur = (Long) interests.get(result);
-                count += deleteHistoryByDateAndCode(new Date(now
-                        - dur.longValue()), result, conn);
+                count += deleteHistoryByDateAndCode(new Date(now - interest.getValue().longValue()),
+                                                    interest.getKey(), conn);
                 conn.commit();
             }
             return count;
@@ -259,8 +264,7 @@ public class ChecksumHistoryDAO extends DAOSupport
         catch (SQLException e)
         {
             LOG.error("Problem pruning results: " + e.getMessage(), e);
-            throw new RuntimeException("Problem pruning results: "
-                    + e.getMessage(), e);
+            throw new IllegalStateException("Problem pruning results: " + e.getMessage(), e);
         }
         finally
         {

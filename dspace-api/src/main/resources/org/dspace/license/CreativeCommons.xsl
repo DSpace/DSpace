@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
 <xsl:stylesheet version="1.1"
    xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
    xmlns:cc="http://creativecommons.org/ns#"
@@ -9,9 +18,9 @@
    <!-- 
       CreativeCommons.xsl
       
-      Version: $Revision: 3705 $
+      Version: $Revision: 5844 $
       
-      Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+      Date: $Date: 2010-11-12 00:29:14 -0500 (Fri, 12 Nov 2010) $
       
       Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
       Institute of Technology.  All rights reserved.

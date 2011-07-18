@@ -1,41 +1,9 @@
-/*
- * ConfigurationManager.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.core;
 
@@ -52,10 +20,9 @@ import java.io.PrintWriter;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
-
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
 
 import org.apache.log4j.Category;
 import org.apache.log4j.Logger;
@@ -80,7 +47,7 @@ import org.apache.log4j.helpers.OptionConverter;
  * @author Robert Tansley
  * @author Larry Stone - Interpolated values.
  * @author Mark Diggory - General Improvements to detection, logging and loading.
- * @version $Revision: 3705 $
+ * @version $Revision: 5844 $
  */
 public class ConfigurationManager
 {
@@ -89,13 +56,21 @@ public class ConfigurationManager
 
     /** The configuration properties */
     private static Properties properties = null;
+    
+    /** module configuration properties */
+    private static Map<String, Properties> moduleProps = null;
 
     /** The default license */
     private static String license;
 
     // limit of recursive depth of property variable interpolation in
     // configuration; anything greater than this is very likely to be a loop.
-    private final static int RECURSION_LIMIT = 9;
+    private static final int RECURSION_LIMIT = 9;
+
+    protected ConfigurationManager()
+    {
+        
+    }
 
     /**
      * Identify if DSpace is properly configured
@@ -106,19 +81,83 @@ public class ConfigurationManager
         return properties != null;
     }
     
+    public static boolean isConfigured(String module)
+    {
+        return moduleProps.get(module) != null;
+    }
+
     /**
+     * REMOVED - Flushing the properties could be dangerous in the current DSpace state
+     * Need to consider how it will affect in-flight processes
+     *
+     * Discard all current properties - will force a reload from disk when
+     * any properties are requested.
+     */
+//    public static void flush()
+//    {
+//        properties = null;
+//    }
+    
+    /**
+     * REMOVED - Flushing the properties could be dangerous in the current DSpace state
+     * Need to consider how it will affect in-flight processes
+     *
+     * Discard properties for a module -  will force a reload from disk
+     * when any of module's properties are requested
      * 
+     * @param module the module name
+     */
+//    public static void flush(String module)
+//    {
+//        moduleProps.remove(module);
+//    }
+    
+    /**
+     * Returns all properties in main configuration
+     * 
+     * @return properties - all non-modular properties
      */
     public static Properties getProperties()
+    {
+        Properties props = getMutableProperties();
+        return props == null ? null : (Properties)props.clone();
+    }
+
+    private static Properties getMutableProperties()
     {
         if (properties == null)
         {
             loadConfig(null);
         }
-        
-        return (Properties)properties.clone();
+
+        return properties;
     }
-    
+
+    /**
+     * Returns all properties for a given module
+     * 
+     * @param module
+     *        the name of the module
+     * @return properties - all module's properties
+     */
+    public static Properties getProperties(String module)
+    {
+        Properties props = getMutableProperties(module);
+        return props == null ? null : (Properties)props.clone();
+    }
+
+    private static Properties getMutableProperties(String module)
+    {
+        Properties retProps = (module != null) ? moduleProps.get(module) : properties;
+        if (retProps == null)
+        {
+            loadModuleConfig(module);
+            retProps = moduleProps.get(module);
+        }
+
+        return retProps;
+    }
+
     /**
      * Get a configuration property
      * 
@@ -130,12 +169,45 @@ public class ConfigurationManager
      */
     public static String getProperty(String property)
     {
-        if (properties == null)
+        Properties props = getMutableProperties();
+        String value = props == null ? null : props.getProperty(property);
+        return (value != null) ? value.trim() : null;
+    }
+    
+    /**
+     * Get a module configuration property value.
+     * 
+     * @param module 
+     *      the name of the module, or <code>null</code> for regular configuration
+     *      property
+     * @param property
+     *      the name (key) of the property
+     * @return
+     *      the value of the property, or <code>null</code> if the
+     *      property does not exist
+     */
+    public static String getProperty(String module, String property)
+    {
+        if (module == null)
         {
-            loadConfig(null);
+            return getProperty(property);
+        }
+        
+        String value = null;
+        Properties modProps = getMutableProperties(module);
+
+        if (modProps != null)
+        {
+            value = modProps.getProperty(property);
         }
 
-        return properties.getProperty(property);
+        if (value == null)
+        {
+            // look in regular properties with module name prepended
+            value = getProperty(module + "." + property);
+        }
+
+        return (value != null) ? value.trim() : null;
     }
 
     /**
@@ -151,6 +223,24 @@ public class ConfigurationManager
     public static int getIntProperty(String property)
     {
         return getIntProperty(property, 0);
+    }
+    
+    /**
+     * Get a module configuration property as an integer
+     *
+     * @param module
+     *         the name of the module
+     * 
+     * @param property
+     *            the name of the property
+     * 
+     * @return the value of the property. <code>0</code> is returned if the
+     *         property does not exist. To differentiate between this case and
+     *         when the property actually is zero, use <code>getProperty</code>.
+     */
+    public static int getIntProperty(String module, String property)
+    {
+        return getIntProperty(module, property, 0);
     }
 
     /**
@@ -169,19 +259,124 @@ public class ConfigurationManager
      */
     public static int getIntProperty(String property, int defaultValue)
     {
-        if (properties == null)
-        {
-            loadConfig(null);
+        return getIntProperty(null, property, defaultValue);
+    }
+    
+    /**
+     * Get a module configuration property as an integer, with default
+     * 
+     * @param module
+     *         the name of the module
+     * 
+     * @param property
+     *            the name of the property
+     *            
+     * @param defaultValue
+     *            value to return if property is not found or is not an Integer.
+     *
+     * @return the value of the property. <code>default</code> is returned if
+     *         the property does not exist or is not an Integer. To differentiate between this case
+     *         and when the property actually is false, use
+     *         <code>getProperty</code>.
+     */
+    public static int getIntProperty(String module, String property, int defaultValue)
+    {
+       String stringValue = getProperty(module, property);
+       int intValue = defaultValue;
+
+       if (stringValue != null)
+       {
+           try
+           {
+               intValue = Integer.parseInt(stringValue.trim());
+           }
+           catch (NumberFormatException e)
+           {
+               warn("Warning: Number format error in property: " + property);
+           }
         }
 
-        String stringValue = properties.getProperty(property);
-        int intValue = defaultValue;
+        return intValue;
+    }
+
+    /**
+     * Get a configuration property as a long
+     *
+     * @param property
+     *            the name of the property
+     *
+     * @return the value of the property. <code>0</code> is returned if the
+     *         property does not exist. To differentiate between this case and
+     *         when the property actually is zero, use <code>getProperty</code>.
+     */
+    public static long getLongProperty(String property)
+    {
+        return getLongProperty(property, 0);
+    }
+    
+    /**
+     * Get a module configuration property as a long
+     *
+     * @param module
+     *         the name of the module    
+     * @param property
+     *            the name of the property
+     *
+     * @return the value of the property. <code>0</code> is returned if the
+     *         property does not exist. To differentiate between this case and
+     *         when the property actually is zero, use <code>getProperty</code>.
+     */
+    public static long getLongProperty(String module, String property)
+    {
+        return getLongProperty(module, property, 0);
+    }
+     
+   /**
+     * Get a configuration property as an long, with default
+     * 
+     *
+     * @param property
+     *            the name of the property
+     *
+     * @param defaultValue
+     *            value to return if property is not found or is not a Long.
+     *
+     * @return the value of the property. <code>default</code> is returned if
+     *         the property does not exist or is not an Integer. To differentiate between this case
+     *         and when the property actually is false, use
+     *         <code>getProperty</code>.
+     */
+    public static long getLongProperty(String property, int defaultValue)
+    {
+        return getLongProperty(null, property, defaultValue);
+    }
+
+    /**
+     * Get a configuration property as an long, with default
+     * 
+     * @param module  the module, or <code>null</code> for regular property
+     *
+     * @param property
+     *            the name of the property
+     *
+     * @param defaultValue
+     *            value to return if property is not found or is not a Long.
+     *
+     * @return the value of the property. <code>default</code> is returned if
+     *         the property does not exist or is not an Integer. To differentiate between this case
+     *         and when the property actually is false, use
+     *         <code>getProperty</code>.
+     */
+    public static long getLongProperty(String module, String property, int defaultValue)
+    {
+        String stringValue = getProperty(module, property);
+        long longValue = defaultValue;
 
         if (stringValue != null)
         {
             try
             {
-                intValue = Integer.parseInt(stringValue.trim());
+                longValue = Long.parseLong(stringValue.trim());
             }
             catch (NumberFormatException e)
             {
@@ -189,14 +384,14 @@ public class ConfigurationManager
             }
         }
 
-        return intValue;
+        return longValue;
     }
 
     /**
      * Get the License
      * 
      * @param
-     *         license file name
+     *         licenseFile   file name
      *  
      *  @return
      *         license text
@@ -225,21 +420,37 @@ public class ConfigurationManager
 
             // FIXME: Maybe something more graceful here, but with the
            // configuration we can't do anything
-            System.exit(1);
+            throw new IllegalStateException("Failed to read default license.", e);
         }
         finally
         {
             if (br != null)
-                try { br.close(); } catch (IOException ioe) { }
+            {
+                try
+                { 
+                    br.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
 
             if (fr != null)
-                try { fr.close(); } catch (IOException ioe) { }
+            {
+                try
+                { 
+                    fr.close();
+                }
+                catch (IOException ioe)
+                {
+                    
+                }
+            }
         }
 
         return license;
     }
      
-
     /**
      * Get a configuration property as a boolean. True is indicated if the value
      * of the property is <code>TRUE</code> or <code>YES</code> (case
@@ -257,8 +468,28 @@ public class ConfigurationManager
     {
         return getBooleanProperty(property, false);
     }
-
+    
     /**
+     * Get a module configuration property as a boolean. True is indicated if 
+     * the value of the property is <code>TRUE</code> or <code>YES</code> (case
+     * insensitive.)
+     * 
+     * @param module the module, or <code>null</code> for regular property   
+     * 
+     * @param property
+     *            the name of the property
+     * 
+     * @return the value of the property. <code>false</code> is returned if
+     *         the property does not exist. To differentiate between this case
+     *         and when the property actually is false, use
+     *         <code>getProperty</code>.
+     */
+    public static boolean getBooleanProperty(String module, String property)
+    {
+        return getBooleanProperty(module, property, false);
+    }
+    
+   /**
      * Get a configuration property as a boolean, with default.
      * True is indicated if the value
      * of the property is <code>TRUE</code> or <code>YES</code> (case
@@ -277,12 +508,31 @@ public class ConfigurationManager
      */
     public static boolean getBooleanProperty(String property, boolean defaultValue)
     {
-        if (properties == null)
-        {
-            loadConfig(null);
-        }
+        return getBooleanProperty(null, property, defaultValue);
+    }
 
-        String stringValue = properties.getProperty(property);
+    /**
+     * Get a module configuration property as a boolean, with default.
+     * True is indicated if the value
+     * of the property is <code>TRUE</code> or <code>YES</code> (case
+     * insensitive.)
+     * 
+     * @param module     module, or <code>null</code> for regular property   
+     *
+     * @param property
+     *            the name of the property
+     *
+     * @param defaultValue
+     *            value to return if property is not found.
+     *
+     * @return the value of the property. <code>default</code> is returned if
+     *         the property does not exist. To differentiate between this case
+     *         and when the property actually is false, use
+     *         <code>getProperty</code>.
+     */
+    public static boolean getBooleanProperty(String module, String property, boolean defaultValue)
+    {
+        String stringValue = getProperty(module, property);
 
         if (stringValue != null)
         {
@@ -301,12 +551,23 @@ public class ConfigurationManager
      * 
      * @return an enumeration of all the keys in the DSpace configuration
      */
-    public static Enumeration propertyNames()
+    public static Enumeration<?> propertyNames()
     {
-        if (properties == null)
-            loadConfig(null);
-
-        return properties.propertyNames();
+        return propertyNames(null);
+    }
+    
+    /**
+     * Returns an enumeration of all the keys in a module configuration
+     * 
+     * @param  module    module, or <code>null</code> for regular property  
+     * 
+     * @return an enumeration of all the keys in the module configuration,
+     *         or <code>null</code> if the module does not exist.
+     */
+    public static Enumeration<?> propertyNames(String module)
+    {
+        Properties props = getProperties(module);
+        return props == null ? null : props.propertyNames();
     }
 
     /**
@@ -377,7 +638,9 @@ public class ConfigurationManager
         email.setContent(contentBuffer.toString());
 
         if (charset != null)
+        {
             email.setCharset(charset);
+        }
 
         return email;
     }
@@ -412,9 +675,8 @@ public class ConfigurationManager
     /**
      * Reads news from a text file.
      * 
-     * @param position
-     *            a constant indicating which file (top or side) should be read
-     *            in.
+     * @param newsFile
+     *        name of the news file to read in, relative to the news file path.
      */
     public static String readNewsFile(String newsFile)
     {
@@ -422,7 +684,7 @@ public class ConfigurationManager
         
         fileName += newsFile;
         
-        String text = "";
+        StringBuilder text = new StringBuilder();
 
         try
         {
@@ -435,7 +697,7 @@ public class ConfigurationManager
 
             while ((lineIn = br.readLine()) != null)
             {
-                text += lineIn;
+                text.append(lineIn);
             }
 
             br.close();
@@ -445,16 +707,14 @@ public class ConfigurationManager
             warn("news_read: " + e.getLocalizedMessage());
         }
 
-        return text;
+        return text.toString();
     }
 
     /**
      * Writes news to a text file.
      * 
-     * @param position
-     *            a constant indicating which file (top or side) should be
-     *            written to.
-     * 
+     * @param newsFile
+     *        name of the news file to read in, relative to the news file path.
      * @param news
      *            the text to be written to the file.
      */
@@ -484,8 +744,9 @@ public class ConfigurationManager
     /**
      * Writes license to a text file.
      * 
-     * @param news
-     *            the text to be written to the file.
+     * @param licenseFile
+     *            name for the file int which license will be written, 
+     *            relative to the current directory.
      */
     public static void writeLicenseFile(String licenseFile, String newLicense)
     {
@@ -519,9 +780,64 @@ public class ConfigurationManager
     {
         // in case it hasn't been done yet.
         if (loadedFile == null)
+        {
             loadConfig(null);
+        }
 
         return loadedFile;
+    }
+
+    private static synchronized void loadModuleConfig(String module)
+    {
+        // try to find it in modules
+        File modFile = null;
+        try
+        {
+            modFile = new File(getProperty("dspace.dir") +
+                                File.separator + "config" +
+                                File.separator + "modules" +
+                                File.separator + module + ".cfg");
+
+            if (modFile.exists())
+            {
+                Properties modProps = new Properties();
+                InputStream modIS = null;
+                try
+                {
+                    modIS = new FileInputStream(modFile);
+                    modProps.load(modIS);
+                }
+                finally
+                {
+                    if (modIS != null)
+                    {
+                        modIS.close();
+                    }
+                }
+
+                for (Enumeration pe = modProps.propertyNames(); pe.hasMoreElements(); )
+                {
+                    String key = (String)pe.nextElement();
+                    String ival = interpolate(key, modProps.getProperty(key), 1);
+                    if (ival != null)
+                    {
+                        modProps.setProperty(key, ival);
+                    }
+                }
+                moduleProps.put(module, modProps);
+            }
+            else
+            {
+                // log invalid request
+                warn("Requested configuration module: " + module + " not found");
+            }
+        }
+        catch (IOException ioE)
+        {
+            fatal("Can't load configuration: " + (modFile == null ? "<unknown>" : modFile.getAbsolutePath()), ioE);
+        }
+
+        return;
     }
 
     /**
@@ -535,12 +851,10 @@ public class ConfigurationManager
      */
     public static synchronized void loadConfig(String configFile)
     {
-        
         if (properties != null)
         {
             return;
         }
-
 
         URL url = null;
         
@@ -558,13 +872,20 @@ public class ConfigurationManager
                 // This isn't really a fatal error though, so catch and ignore
                 log.warn("Unable to access system properties, ignoring.", se);
             }
-
-            if (configFile != null)
+            
+            // should only occur after a flush()
+            if (loadedFile != null)
+            {
+                info("Reloading current config file: " + loadedFile.getAbsolutePath());
+                
+                url = loadedFile.toURI().toURL();
+            }
+            else if (configFile != null)
             {
                 info("Loading provided config file: " + configFile);
                 
                 loadedFile = new File(configFile);
-                url = loadedFile.toURL();
+                url = loadedFile.toURI().toURL();
                 
             }
             // Has the default configuration location been overridden?
@@ -574,7 +895,7 @@ public class ConfigurationManager
                 
                 // Load the overriding configuration
                 loadedFile = new File(configProperty);
-                url = loadedFile.toURL();
+                url = loadedFile.toURI().toURL();
             }
             // Load configuration from default location
             else
@@ -591,21 +912,39 @@ public class ConfigurationManager
             if (url == null)
             {
                 fatal("Cannot find dspace.cfg");
-                throw new RuntimeException("Cannot find dspace.cfg");
+                throw new IllegalStateException("Cannot find dspace.cfg");
             }
             else
             {
                 properties = new Properties();
+                moduleProps = new HashMap<String, Properties>();
                 is = url.openStream();
                 properties.load(is);
 
+                // Load in dspace-local.cfg file
+                try {
+                    File localFile = new File(getProperty("dspace.dir") + File.separator
+                                              + "config" + File.separator + "dspace-local.cfg");
+                    if (localFile.exists()) {
+                        is = new FileInputStream(localFile);
+                        properties.load(is);
+                        is.close();
+                    }
+                }
+                catch (IOException e)
+                {
+                    fatal("Eror loading dspace-local.cfg");
+                }
+
                 // walk values, interpolating any embedded references.
-                for (Enumeration pe = properties.propertyNames(); pe.hasMoreElements(); )
+                for (Enumeration<?> pe = properties.propertyNames(); pe.hasMoreElements(); )
                 {
                     String key = (String)pe.nextElement();
-                    String value = interpolate(key, 1);
+                    String value = interpolate(key, properties.getProperty(key), 1);
                     if (value != null)
+                    {
                         properties.setProperty(key, value);
+                    }
                 }
             }
 
@@ -616,27 +955,20 @@ public class ConfigurationManager
 
             // FIXME: Maybe something more graceful here, but with the
             // configuration we can't do anything
-            throw new RuntimeException("Cannot load configuration: " + url, e);
+            throw new IllegalStateException("Cannot load configuration: " + url, e);
         }
         finally
         {
             if (is != null)
-                try { is.close(); } catch (IOException ioe) { }
-        }
-
-        // Load in dspace-local.cfg file
-        try {
-            File localFile = new File(getProperty("dspace.dir") + File.separator
-                                      + "config" + File.separator + "dspace-local.cfg");
-            if (localFile.exists()) {
-                is = new FileInputStream(localFile);
-                properties.load(is);
-                is.close();
+            {
+                try
+                { 
+                    is.close();
+                }
+                catch (IOException ioe)
+                {                   
+                }
             }
-        }
-        catch (IOException e)
-        {
-            fatal("Eror loading dspace-local.cfg");
         }
 
         // Load in default license
@@ -669,18 +1001,42 @@ public class ConfigurationManager
 
             // FIXME: Maybe something more graceful here, but with the
             // configuration we can't do anything
-            throw new RuntimeException("Cannot load license: " + licenseFile.toString(),e);
+            throw new IllegalStateException("Cannot load license: " + licenseFile.toString(),e);
         }
         finally
         {
             if (br != null)
-                try { br.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    br.close();
+                } 
+                catch (IOException ioe)
+                {                  
+                }
+            }
 
             if (ir != null)
-                try { ir.close(); } catch (IOException ioe) { }
+            {
+                try
+                { 
+                    ir.close();
+                } 
+                catch (IOException ioe)
+                {             
+                }
+            }
 
             if (fir != null)
-                try { fir.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    fir.close();
+                }
+                catch (IOException ioe)
+                {                
+                }
+            }
         }
 
         
@@ -718,7 +1074,7 @@ public class ConfigurationManager
                  * via classpath or system properties.
                  */
                 info("Using default log4j provided log configuration," +
-                        "if uninitended, check your dspace.cfg for (log.init.config)");
+                        "if unintended, check your dspace.cfg for (log.init.config)");
             }
             else
             {
@@ -731,8 +1087,9 @@ public class ConfigurationManager
                 {
                     info("Loading: " + dsLogConfiguration);
                     
-                    OptionConverter.selectAndConfigure(logConfigFile.toURL(), null,
-                            org.apache.log4j.LogManager.getLoggerRepository());
+                    OptionConverter.selectAndConfigure(logConfigFile.toURI()
+                            .toURL(), null, org.apache.log4j.LogManager
+                            .getLoggerRepository());
                 }
                 else
                 {
@@ -744,7 +1101,7 @@ public class ConfigurationManager
         catch (MalformedURLException e)
         {
             fatal("Can't load dspace provided log4j configuration", e);
-            throw new RuntimeException("Cannot load dspace provided log4j configuration",e);
+            throw new IllegalStateException("Cannot load dspace provided log4j configuration",e);
         }
         
     }
@@ -755,11 +1112,13 @@ public class ConfigurationManager
      * @return new value if it contains interpolations, or null
      *   if it had no variable references.
      */
-    private static String interpolate(String key, int level)
+    private static String interpolate(String key, String value, int level)
     {
         if (level > RECURSION_LIMIT)
-            throw new IllegalArgumentException("ConfigurationManager: Too many levels of recursion in configuration property variable interpolation, property="+key);
-        String value = (String)properties.get(key);
+        {
+            throw new IllegalArgumentException("ConfigurationManager: Too many levels of recursion in configuration property variable interpolation, property=" + key);
+        }
+        //String value = (String)properties.get(key);
         int from = 0;
         StringBuffer result = null;
         while (from < value.length())
@@ -767,24 +1126,32 @@ public class ConfigurationManager
             int start = value.indexOf("${", from);
             if (start >= 0)
             {
-                int end = value.indexOf("}", start);
+                int end = value.indexOf('}', start);
                 if (end < 0)
+                {
                     break;
+                }
                 String var = value.substring(start+2, end);
                 if (result == null)
+                {
                     result = new StringBuffer(value.substring(from, start));
+                }
                 else
+                {
                     result.append(value.substring(from, start));
+                }
                 if (properties.containsKey(var))
                 {
-                    String ivalue = interpolate(var, level+1);
+                    String ivalue = interpolate(var, properties.getProperty(var), level+1);
                     if (ivalue != null)
                     {
                         result.append(ivalue);
                         properties.setProperty(var, ivalue);
                     }
                     else
+                    {
                         result.append((String)properties.getProperty(var));
+                    }
                 }
                 else
                 {
@@ -794,10 +1161,14 @@ public class ConfigurationManager
                 from = end+1;
             }
             else
+            {
                 break;
+            }
         }
         if (result != null && from < value.length())
+        {
             result.append(value.substring(from));
+        }
         return (result == null) ? null : result.toString();
     }
 
@@ -830,10 +1201,26 @@ public class ConfigurationManager
 
             System.exit(0);
         }
+        else if ((argv.length == 4) && argv[0].equals("-module") &&
+                                        argv[2].equals("-property")) 
+        {
+            String val = getProperty(argv[1], argv[3]);
+
+            if (val != null)
+            {
+                System.out.println(val);
+            }
+            else
+            {
+                System.out.println("");
+            }
+
+            System.exit(0);
+        }
         else
         {
             System.err
-                    .println("Usage: ConfigurationManager OPTION\n  -property prop.name  get value of prop.name from dspace.cfg");
+                    .println("Usage: ConfigurationManager OPTION\n  [-module mod.name] -property prop.name  get value of prop.name from module or dspace.cfg");
         }
 
         System.exit(1);
@@ -894,7 +1281,7 @@ public class ConfigurationManager
      */
     private static boolean isLog4jConfigured()
     {
-        Enumeration en = org.apache.log4j.LogManager.getRootLogger()
+        Enumeration<?> en = org.apache.log4j.LogManager.getRootLogger()
                 .getAllAppenders();
 
         if (!(en instanceof org.apache.log4j.helpers.NullEnumeration))
@@ -903,12 +1290,14 @@ public class ConfigurationManager
         }
         else
         {
-            Enumeration cats = Category.getCurrentCategories();
+            Enumeration<?> cats = Category.getCurrentCategories();
             while (cats.hasMoreElements())
             {
                 Category c = (Category) cats.nextElement();
                 if (!(c.getAllAppenders() instanceof org.apache.log4j.helpers.NullEnumeration))
+                {
                     return true;
+                }
             }
         }
         return false;

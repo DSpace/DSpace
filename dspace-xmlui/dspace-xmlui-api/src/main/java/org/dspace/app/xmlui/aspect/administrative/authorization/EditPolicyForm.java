@@ -1,41 +1,9 @@
-/*
- * AuthorizationMain.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.administrative.authorization;
 
@@ -149,7 +117,7 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
         int groupID = parameters.getParameterAsInteger("groupID",-1);
         int actionID = parameters.getParameterAsInteger("actionID",-1);
         int page = parameters.getParameterAsInteger("page",0);
-        String query = URLDecode(parameters.getParameter("query","-1"));
+        String query = decodeFromURL(parameters.getParameter("query","-1"));
         
         // The current policy, if it exists (i.e. we are not creating a new one)
         ResourcePolicy policy = ResourcePolicy.find(context, policyID);
@@ -163,18 +131,25 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
         else if (policy != null) {
         	currentGroup = policy.getGroup();
         }
-        else currentGroup = null;
+        else
+        {
+            currentGroup = null;
+        }
         
         // Same for the current action; it can either blank (-1), manually set, or inherited from the current policy
         if (policy != null && actionID == -1)
-        	actionID = policy.getAction();
+        {
+            actionID = policy.getAction();
+        }
                 
         String errorString = parameters.getParameter("errors",null);
 		ArrayList<String> errors = new ArrayList<String>();
 		if (errorString != null)
 		{
 			for (String error : errorString.split(","))
+            {
 				errors.add(error);
+            }
 		}
 		
 		
@@ -199,7 +174,9 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
         	main.setHead(T_main_head_edit.parameterize(policyID,Constants.typeText[objectType],objectID));
         }
         else
-        	main.setHead(T_main_head_new.parameterize(Constants.typeText[objectType],objectID));
+        {
+            main.setHead(T_main_head_new.parameterize(Constants.typeText[objectType], objectID));
+        }
 		
 	    int resourceRelevance = 1 << objectType; 
 		
@@ -224,13 +201,19 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
             if( (Constants.actionTypeRelevance[i] & resourceRelevance) > 0)
             {
             	if (actionID == i)
-            		actionSelect.addOption(true, i, Constants.actionText[i]);
+                {
+                    actionSelect.addOption(true, i, Constants.actionText[i]);
+                }
             	else
-            		actionSelect.addOption(i, Constants.actionText[i]);
+                {
+                    actionSelect.addOption(i, Constants.actionText[i]);
+                }
             }
         }
         if (errors.contains("action_id"))
-        	actionSelect.addError(T_error_no_action);        
+        {
+            actionSelect.addError(T_error_no_action);
+        }
         
         
         // currently set group
@@ -240,20 +223,28 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
     	for (Group group : Group.findAll(context, Group.NAME))
     	{
     		if (group == currentGroup)
-    			groupSelect.addOption(true, group.getID(), group.getName());
+            {
+                groupSelect.addOption(true, group.getID(), group.getName());
+            }
     		else
-    			groupSelect.addOption(group.getID(), group.getName());
+            {
+                groupSelect.addOption(group.getID(), group.getName());
+            }
     	}
     	if (errors.contains("group_id"))
-    		groupSelect.addError(T_error_no_group);
+        {
+            groupSelect.addError(T_error_no_group);
+        }
     	
         
         // the search function
         actionsList.addLabel(T_label_search);
         Item searchItem = actionsList.addItem();
         Text searchText = searchItem.addText("query");
-        if (!query.equals(new String("-1")))
-        	searchText.setValue(query);
+        if (!query.equals("-1"))
+        {
+            searchText.setValue(query);
+        }
         searchItem.addButton("submit_search_groups").setValue(T_submit_search_groups);
         
         
@@ -264,7 +255,7 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
         
         
 	    // Display the search results table
-        if (!query.equals(new String("-1"))) {
+        if (!query.equals("-1")) {
         	Division groupsList = main.addDivision("edit-policy-groupsList");
             groupsList.setHead(T_groups_head);  
         	this.addGroupSearch(groupsList, currentGroup, dso, query, page);
@@ -292,9 +283,13 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
 			
 			String nextURL = null, prevURL = null;
         	if (page < ((totalResults - 1) / RESULTS_PER_PAGE))
-        		nextURL = baseURL+"&page="+(page+1);
+            {
+                nextURL = baseURL + "&page=" + (page + 1);
+            }
         	if (page > 0)
-        		prevURL = baseURL+"&page="+(page-1);
+            {
+                prevURL = baseURL + "&page=" + (page - 1);
+            }
         	
         	div.setSimplePagination(totalResults,firstIndex,lastIndex,prevURL, nextURL);
 		}
@@ -323,11 +318,11 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
         	row.addCell().addXref(url,name);
         	
         	// Iterate other other polices of our parent resource to see if any match the currently selected group
-        	String otherAuthorizations = new String();
+        	StringBuilder otherAuthorizations = new StringBuilder();
         	int groupsMatched = 0;
         	for (ResourcePolicy otherPolicy : otherPolicies) {
         		if (otherPolicy.getGroup() == group) {
-        			otherAuthorizations += otherPolicy.getActionText() + ", ";
+        			otherAuthorizations.append(otherPolicy.getActionText()).append(", ");
         			groupsMatched++;
         		}
         	}
@@ -335,13 +330,19 @@ public class EditPolicyForm extends AbstractDSpaceTransformer
         	if (groupsMatched > 0) {
         		row.addCell().addContent(otherAuthorizations.substring(0,otherAuthorizations.lastIndexOf(", ")));
         	}
-        	else 
-        		row.addCell().addContent("-");
+        	else
+            {
+                row.addCell().addContent("-");
+            }
         	
         	if (group != sourceGroup)
-    			row.addCell().addButton("submit_group_id_"+groupID).setValue(T_set_group);
+            {
+                row.addCell().addButton("submit_group_id_" + groupID).setValue(T_set_group);
+            }
     		else
-    			row.addCell().addContent(T_current_group);
+            {
+                row.addCell().addContent(T_current_group);
+            }
         	
         }
         if (groups.length <= 0) {

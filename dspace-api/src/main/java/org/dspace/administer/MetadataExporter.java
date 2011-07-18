@@ -1,3 +1,10 @@
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
 package org.dspace.administer;
 
 import java.io.BufferedWriter;
@@ -92,7 +99,7 @@ public class MetadataExporter
         xmlSerializer.startDocument();
         xmlSerializer.startElement("dspace-dc-types", null);
         
-        // Save the schema defintion(s)
+        // Save the schema definition(s)
         saveSchema(context, xmlSerializer, schema);
 
         MetadataField[] mdFields = null;
@@ -285,7 +292,7 @@ public class MetadataExporter
     private static String getSchemaName(Context context, MetadataField mdField) throws SQLException, RegistryExportException
     {
         // Get name from cache
-        String name = schemaMap.get(new Integer(mdField.getSchemaID()));
+        String name = schemaMap.get(Integer.valueOf(mdField.getSchemaID()));
 
         if (name == null)
         {
@@ -294,7 +301,7 @@ public class MetadataExporter
             if (mdSchema != null)
             {
                 name = mdSchema.getName();
-                schemaMap.put(new Integer(mdSchema.getSchemaID()), name);
+                schemaMap.put(Integer.valueOf(mdSchema.getSchemaID()), name);
             }
             else
             {

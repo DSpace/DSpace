@@ -1,49 +1,21 @@
-/*
- * SortOption.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.sort;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang.ArrayUtils;
+import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 
 /**
@@ -54,6 +26,8 @@ import org.dspace.core.ConfigurationManager;
  */
 public class SortOption
 {
+    private static final Logger log = Logger.getLogger(SortOption.class);
+
     public static final String ASCENDING  = "ASC";
     public static final String DESCENDING = "DESC";
 
@@ -77,8 +51,27 @@ public class SortOption
 
     /** the sort options available for this index */
     private static Set<SortOption> sortOptionsSet = null;
-    private static Map<Integer, SortOption> sortOptionsMap = null;
-	
+    static {
+        try
+        {
+            Set<SortOption> newSortOptionsSet = new HashSet<SortOption>();
+            int idx = 1;
+            String option;
+
+            while ( ((option = ConfigurationManager.getProperty("webui.itemlist.sort-option." + idx))) != null)
+            {
+                SortOption so = new SortOption(idx, option);
+                newSortOptionsSet.add(so);
+                idx++;
+            }
+
+            SortOption.sortOptionsSet = newSortOptionsSet;
+        }
+        catch (SortException se)
+        {
+            log.fatal("Unable to load SortOptions", se);
+        }
+    }
 	/**
 	 * Construct a new SortOption object with the given parameters
 	 * 
@@ -128,9 +121,13 @@ public class SortOption
         // If the option is configured to be hidden, then set the visible flag to false
         // otherwise, flag it as visible (true)
         if (matcher.groupCount() > 3 && "hide".equalsIgnoreCase(matcher.group(4)))
+        {
             visible = false;
+        }
         else
+        {
             visible = true;
+        }
 
         generateMdBits();
 	}
@@ -213,7 +210,7 @@ public class SortOption
 	 */
 	public String[] getMdBits()
     {
-    	return mdBits;
+    	return (String[]) ArrayUtils.clone(mdBits);
     }
     
 	/**
@@ -221,7 +218,7 @@ public class SortOption
 	 * 
 	 * @throws SortException
 	 */
-    public void generateMdBits()
+    private void generateMdBits()
     	throws SortException
     {
     	try
@@ -244,7 +241,7 @@ public class SortOption
      * @param init	the default value of the array elements
      * @return	a three element array with schema, element and qualifier respectively
      */
-    public String[] interpretField(String mfield, String init)
+    public final String[] interpretField(String mfield, String init)
     	throws IOException
     {
     	StringTokenizer sta = new StringTokenizer(mfield, ".");
@@ -273,13 +270,11 @@ public class SortOption
      */
     public boolean isDate()
     {
-    	if (type != null)
-    	{
-    		if ("date".equals(type))
-    		{
-    			return true;
-    		}
-    	}
+    	if ("date".equals(type))
+        {
+            return true;
+        }
+
     	return false;
     }
     
@@ -298,57 +293,15 @@ public class SortOption
     }
 
     /**
-     * @return	a map of the configured sort options
-     */
-    public static Map<Integer, SortOption> getSortOptionsMap() throws SortException
-    {
-        if (SortOption.sortOptionsMap != null)
-            return SortOption.sortOptionsMap;
-
-        synchronized (SortOption.class)
-        {
-            if (SortOption.sortOptionsMap == null)
-            {
-                Map<Integer, SortOption> newSortOptionsMap = new HashMap<Integer, SortOption>();
-                for (SortOption so : SortOption.getSortOptions())
-                {
-                    newSortOptionsMap.put(new Integer(so.getNumber()), so);
-                }
-
-                SortOption.sortOptionsMap = newSortOptionsMap;
-            }
-        }
-
-    	return SortOption.sortOptionsMap;
-    }
-
-    /**
      * Return all the configured sort options
      * @return
      * @throws SortException
      */
     public static Set<SortOption> getSortOptions() throws SortException
     {
-        if (SortOption.sortOptionsSet != null)
-            return SortOption.sortOptionsSet;
-        
-        synchronized (SortOption.class)
+        if (SortOption.sortOptionsSet == null)
         {
-            if (SortOption.sortOptionsSet == null)
-            {
-                Set<SortOption> newSortOptionsSet = new HashSet<SortOption>();
-                int idx = 1;
-                String option;
-
-                while ( ((option = ConfigurationManager.getProperty("webui.itemlist.sort-option." + idx))) != null)
-                {
-                    SortOption so = new SortOption(idx, option);
-                    newSortOptionsSet.add(so);
-                    idx++;
-                }
-
-                SortOption.sortOptionsSet = newSortOptionsSet;
-            }
+            throw new SortException("Sort options not loaded");
         }
 
         return SortOption.sortOptionsSet;
@@ -365,7 +318,9 @@ public class SortOption
         for (SortOption so : SortOption.getSortOptions())
         {
             if (so.getNumber() == number)
+            {
                 return so;
+            }
         }
         
         return null;
@@ -379,7 +334,9 @@ public class SortOption
     public static SortOption getDefaultSortOption() throws SortException
     {
         for (SortOption so : getSortOptions())
+        {
             return so;
+        }
         
         return null;
     }

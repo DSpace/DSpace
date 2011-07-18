@@ -1,41 +1,9 @@
-/*
- * IPAuthentication.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.authenticate;
 
@@ -64,9 +32,14 @@ import org.dspace.eperson.Group;
  * <P>
  * e.g. {@code authentication.ip.MIT = 18., 192.25.0.0/255.255.0.0}
  * <P>
+ * Negative matches can be included by prepending the range with a '-'. For example if you want
+ * to include all of a class B network except for users of a contained class c network, you could use:
+ * <P>
+ * 111.222,-111.222.333.
+ * <p>
  * For supported IP ranges see {@link org.dspace.authenticate.IPMatcher}.
  * 
- * @version $Revision: 3705 $
+ * @version $Revision: 5844 $
  * @author Robert Tansley
  */
 public class IPAuthentication implements AuthenticationMethod
@@ -74,9 +47,16 @@ public class IPAuthentication implements AuthenticationMethod
     /** Our logger */
     private static Logger log = Logger.getLogger(IPAuthentication.class);
 
+    /** Whether to look for x-forwarded headers for logging IP addresses */
+    private static Boolean useProxies;
+
     /** All the IP matchers */
     private List<IPMatcher> ipMatchers;
 
+    /** All the negative IP matchers */
+    private List<IPMatcher> ipNegativeMatchers;
+
+    
     /**
      * Maps IPMatchers to group names when we don't know group DB ID yet. When
      * the DB ID is known, the IPMatcher is moved to ipMatcherGroupIDs and then
@@ -94,6 +74,7 @@ public class IPAuthentication implements AuthenticationMethod
     public IPAuthentication()
     {
         ipMatchers = new ArrayList<IPMatcher>();
+        ipNegativeMatchers = new ArrayList<IPMatcher>();
         ipMatcherGroupIDs = new HashMap<IPMatcher, Integer>();
         ipMatcherGroupNames = new HashMap<IPMatcher, String>();
 
@@ -132,17 +113,26 @@ public class IPAuthentication implements AuthenticationMethod
     {
         String[] ranges = ipRanges.split("\\s*,\\s*");
 
-        for (int i = 0; i < ranges.length; i++)
+        for (String entry : ranges)
         {
             try
             {
-                IPMatcher ipm = new IPMatcher(ranges[i]);
-                ipMatchers.add(ipm);
+                IPMatcher ipm;
+                if (entry.startsWith("-"))
+                {
+                    ipm = new IPMatcher(entry.substring(1));
+                    ipNegativeMatchers.add(ipm);
+                }
+                else
+                {
+                    ipm = new IPMatcher(entry);
+                    ipMatchers.add(ipm);
+                }
                 ipMatcherGroupNames.put(ipm, groupName);
 
                 if (log.isDebugEnabled())
                 {
-                    log.debug("Configured " + ranges[i] + " for special group "
+                    log.debug("Configured " + entry + " for special group "
                             + groupName);
                 }
             }
@@ -179,21 +169,31 @@ public class IPAuthentication implements AuthenticationMethod
     public int[] getSpecialGroups(Context context, HttpServletRequest request)
             throws SQLException
     {
+        if (request == null)
+        {
+            return new int[0];
+        }
         List<Integer> groupIDs = new ArrayList<Integer>();
 
-        String addrForward = request.getHeader("x-forwarded-for");
-
-        String addr = (addrForward != null 
-                       ? addrForward 
-                       : request.getRemoteAddr());
-
-        log.debug(LogManager.getHeader(context, "",
-                                       "addrs="+request.getRemoteAddr()+","+addrForward+","+addr));
-
-        for (int i = 0; i < ipMatchers.size(); i++)
+        // Get the user's IP address
+        String addr = request.getRemoteAddr();
+        if (useProxies == null) {
+            useProxies = ConfigurationManager.getBooleanProperty("useProxies", false);
+        }
+        if (useProxies && request.getHeader("X-Forwarded-For") != null)
         {
-            IPMatcher ipm = ipMatchers.get(i);
+            /* This header is a comma delimited list */
+            for(String xfip : request.getHeader("X-Forwarded-For").split(","))
+            {
+                if(!request.getHeader("X-Forwarded-For").contains(addr))
+                {
+                    addr = xfip.trim();
+                }
+            }
+        }
 
+        for (IPMatcher ipm : ipMatchers)
+        {
             try
             {
                 if (ipm.match(addr))
@@ -215,11 +215,10 @@ public class IPAuthentication implements AuthenticationMethod
                             if (group != null)
                             {
                                 // Add ID so we won't have to do lookup again
-                                ipMatcherGroupIDs.put(ipm, new Integer(group
-                                        .getID()));
+                                ipMatcherGroupIDs.put(ipm, Integer.valueOf(group.getID()));
                                 ipMatcherGroupNames.remove(ipm);
 
-                                groupIDs.add(new Integer(group.getID()));
+                                groupIDs.add(Integer.valueOf(group.getID()));
                             }
                             else
                             {
@@ -238,6 +237,53 @@ public class IPAuthentication implements AuthenticationMethod
             }
         }
 
+        // Now remove any negative matches
+        for (IPMatcher ipm : ipNegativeMatchers)
+        {
+            try
+            {
+                if (ipm.match(addr))
+                {
+                    // Do we know group ID?
+                    Integer g = ipMatcherGroupIDs.get(ipm);
+                    if (g != null)
+                    {
+                        groupIDs.remove(g);
+                    }
+                    else
+                    {
+                        // See if we have a group name
+                        String groupName = ipMatcherGroupNames.get(ipm);
+
+                        if (groupName != null)
+                        {
+                            Group group = Group.findByName(context, groupName);
+                            if (group != null)
+                            {
+                                // Add ID so we won't have to do lookup again
+                                ipMatcherGroupIDs.put(ipm, Integer.valueOf(group.getID()));
+                                ipMatcherGroupNames.remove(ipm);
+
+                                groupIDs.remove(Integer.valueOf(group.getID()));
+                            }
+                            else
+                            {
+                                log.warn(LogManager.getHeader(context,
+                                        "configuration_error", "unknown_group="
+                                                + groupName));
+                            }
+                        }
+                    }
+                }
+            }
+            catch (IPMatcherException ipme)
+            {
+                log.warn(LogManager.getHeader(context, "configuration_error",
+                        "bad_ip=" + addr), ipme);
+            }
+        }
+
+
         int[] results = new int[groupIDs.size()];
         for (int i = 0; i < groupIDs.size(); i++)
         {
@@ -251,7 +297,9 @@ public class IPAuthentication implements AuthenticationMethod
             for (int i = 0; i < results.length; i++)
             {
                 if (i > 0)
+                {
                     gsb.append(",");
+                }
                 gsb.append(results[i]);
             }
 

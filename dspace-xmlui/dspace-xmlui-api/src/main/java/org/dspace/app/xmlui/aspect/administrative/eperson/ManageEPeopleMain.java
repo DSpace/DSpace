@@ -1,46 +1,13 @@
-/*
- * ManageEPeopleMain.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.administrative.eperson;
 
 import java.sql.SQLException;
-import java.util.Vector;
 
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
@@ -148,7 +115,7 @@ public class ManageEPeopleMain extends AbstractDSpaceTransformer
 		/* Get and setup our parameters */
         int page          = parameters.getParameterAsInteger("page",0);
         int highlightID   = parameters.getParameterAsInteger("highlightID",-1);
-        String query      = URLDecode(parameters.getParameter("query",null));
+        String query      = decodeFromURL(parameters.getParameter("query",null));
         String baseURL    = contextPath+"/admin/epeople?administrative-continue="+knot.getId();
         int resultCount   = EPerson.searchResultCount(context, query);	
         EPerson[] epeople = EPerson.search(context, query, page*PAGE_SIZE, PAGE_SIZE);
@@ -176,7 +143,9 @@ public class ManageEPeopleMain extends AbstractDSpaceTransformer
         org.dspace.app.xmlui.wing.element.Item actionItem = actionsList.addItem();
         Text queryField = actionItem.addText("query");
         if (query != null)
-        	queryField.setValue(query);
+        {
+            queryField.setValue(query);
+        }
         queryField.setHelp(T_search_help);
         actionItem.addButton("submit_search").setValue(T_go);
        
@@ -195,9 +164,13 @@ public class ManageEPeopleMain extends AbstractDSpaceTransformer
        
         	String nextURL = null, prevURL = null;
         	if (page < (resultCount / PAGE_SIZE))
-        		nextURL = baseURL+"&page="+(page+1);
+            {
+                nextURL = baseURL + "&page=" + (page + 1);
+            }
         	if (page > 0)
-        		prevURL = baseURL+"&page="+(page-1);
+            {
+                prevURL = baseURL + "&page=" + (page - 1);
+            }
         	
 			search.setSimplePagination(resultCount,firstIndex,lastIndex,prevURL, nextURL);
 		}
@@ -218,21 +191,27 @@ public class ManageEPeopleMain extends AbstractDSpaceTransformer
         	String fullName = person.getFullName();
         	String email = person.getEmail();
         	String url = baseURL+"&submit_edit&epersonID="+epersonID;
-        	Vector<String> deleteConstraints = person.getDeleteConstraints();
+        	java.util.List<String> deleteConstraints = person.getDeleteConstraints();
         	
         	
         	Row row;
         	if (person.getID() == highlightID)
-        		// This is a highlighted eperson
-        		row = table.addRow(null, null, "highlight");
+            {
+                // This is a highlighted eperson
+                row = table.addRow(null, null, "highlight");
+            }
         	else
-        		row = table.addRow();
+            {
+                row = table.addRow();
+            }
         	
         	selectEPerson = row.addCell().addCheckBox("select_eperson");
         	selectEPerson.setLabel(epersonID);
         	selectEPerson.addOption(epersonID);
         	if (deleteConstraints != null && deleteConstraints.size() > 0)
-        		selectEPerson.setDisabled();
+            {
+                selectEPerson.setDisabled();
+            }
         	
         	
         	row.addCellContent(epersonID);

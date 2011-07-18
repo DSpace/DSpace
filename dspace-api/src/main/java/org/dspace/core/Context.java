@@ -1,41 +1,9 @@
-/*
- * Context.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.core;
 
@@ -44,7 +12,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -73,7 +40,7 @@ import org.dspace.storage.rdbms.DatabaseManager;
  * The context object is also used as a cache for CM API objects.
  * 
  * 
- * @version $Revision: 3705 $
+ * @version $Revision: 5915 $
  */
 public class Context
 {
@@ -94,20 +61,20 @@ public class Context
     /** Indicates whether authorisation subsystem should be ignored */
     private boolean ignoreAuth;
 
-    /** A stack with the history of authoritation system check modify */
+    /** A stack with the history of authorisation system check modify */
     private Stack<Boolean> authStateChangeHistory;
 
     /**
-     * A stack with the name of the caller class that modify authoritation
+     * A stack with the name of the caller class that modify authorisation
      * system check
      */
     private Stack<String> authStateClassCallHistory;
 
     /** Object cache for this context */
-    private Map objectCache;
+    private Map<String, Object> objectCache;
 
     /** Group IDs of special groups user is a member of */
-    private List specialGroups;
+    private List<Integer> specialGroups;
 
     /** Content events */
     private List<Event> events = null;
@@ -133,8 +100,8 @@ public class Context
         extraLogInfo = "";
         ignoreAuth = false;
 
-        objectCache = new HashMap();
-        specialGroups = new ArrayList();
+        objectCache = new HashMap<String, Object>();
+        specialGroups = new ArrayList<Integer>();
 
         authStateChangeHistory = new Stack<Boolean>();
         authStateClassCallHistory = new Stack<String>();
@@ -187,7 +154,7 @@ public class Context
     /**
      * set the current Locale
      * 
-     * @param Locale
+     * @param locale
      *            the current Locale
      */
     public void setCurrentLocale(Locale locale)
@@ -217,7 +184,7 @@ public class Context
         {
             Thread currThread = Thread.currentThread();
             StackTraceElement[] stackTrace = currThread.getStackTrace();
-            String caller = stackTrace[3].getClassName();
+            String caller = stackTrace[stackTrace.length - 1].getClassName();
 
             authStateClassCallHistory.push(caller);
         }
@@ -246,13 +213,13 @@ public class Context
             log.warn(LogManager.getHeader(this, "restore_auth_sys_state",
                     "not previous state info available "
                             + ex.getLocalizedMessage()));
-            previousState = new Boolean(false);
+            previousState = Boolean.FALSE;
         }
         if (log.isDebugEnabled())
         {
             Thread currThread = Thread.currentThread();
             StackTraceElement[] stackTrace = currThread.getStackTrace();
-            String caller = stackTrace[3].getClassName();
+            String caller = stackTrace[stackTrace.length - 1].getClassName();
 
             String previousCaller = (String) authStateClassCallHistory.pop();
 
@@ -316,7 +283,7 @@ public class Context
 
     /**
      * Close the context object after all of the operations performed in the
-     * context have completed succesfully. Any transaction with the database is
+     * context have completed successfully. Any transaction with the database is
      * committed.
      * 
      * @exception SQLException
@@ -337,6 +304,7 @@ public class Context
             // Free the connection
             DatabaseManager.freeConnection(connection);
             connection = null;
+            clearCache();
         }
     }
 
@@ -417,6 +385,10 @@ public class Context
      * Get the current event list. If there is a separate list of events from
      * already-committed operations combine that with current list.
      * 
+     * TODO WARNING: events uses an ArrayList, a class not ready for concurrency.
+     * Read http://download.oracle.com/javase/6/docs/api/java/util/Collections.html#synchronizedList%28java.util.List%29
+     * on how to properly synchronize the class when calling this method
+     *
      * @return List of all available events.
      */
     public List<Event> getEvents()
@@ -436,25 +408,30 @@ public class Context
         try
         {
             if (!connection.isClosed())
+            {
                 connection.rollback();
+            }
         }
         catch (SQLException se)
         {
-            log.error(se.getMessage());
+            log.error(se.getMessage(), se);
         }
         finally
         {
             try
             {
                 if (!connection.isClosed())
+                {
                     DatabaseManager.freeConnection(connection);
+                }
             }
             catch (Exception ex)
             {
-                log.error(ex.getMessage());
+                log.error("Exception aborting context", ex);
             }
             connection = null;
             events = null;
+            clearCache();
         }
     }
 
@@ -483,7 +460,7 @@ public class Context
      * @return the object from the cache, or <code>null</code> if it's not
      *         cached.
      */
-    public Object fromCache(Class objectClass, int id)
+    public Object fromCache(Class<?> objectClass, int id)
     {
         String key = objectClass.getName() + id;
 
@@ -550,7 +527,7 @@ public class Context
      */
     public void setSpecialGroup(int groupID)
     {
-        specialGroups.add(new Integer(groupID));
+        specialGroups.add(Integer.valueOf(groupID));
 
         // System.out.println("Added " + groupID);
     }
@@ -564,7 +541,7 @@ public class Context
      */
     public boolean inSpecialGroup(int groupID)
     {
-        if (specialGroups.contains(new Integer(groupID)))
+        if (specialGroups.contains(Integer.valueOf(groupID)))
         {
             // System.out.println("Contains " + groupID);
             return true;
@@ -582,19 +559,16 @@ public class Context
      */
     public Group[] getSpecialGroups() throws SQLException
     {
-        List myGroups = new ArrayList();
-
-        Iterator i = specialGroups.iterator();
-
-        while (i.hasNext())
+        List<Group> myGroups = new ArrayList<Group>();
+        for (Integer groupId : specialGroups)
         {
-            myGroups.add(Group.find(this, ((Integer) i.next()).intValue()));
+            myGroups.add(Group.find(this, groupId.intValue()));
         }
 
-        return (Group[]) myGroups.toArray(new Group[0]);
+        return myGroups.toArray(new Group[myGroups.size()]);
     }
 
-    protected void finalize()
+    protected void finalize() throws Throwable
     {
         /*
          * If a context is garbage-collected, we roll back and free up the
@@ -604,5 +578,7 @@ public class Context
         {
             abort();
         }
+
+        super.finalize();
     }
 }

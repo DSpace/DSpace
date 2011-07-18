@@ -1,37 +1,9 @@
-/*
- * BrowseItemDAOOracle.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.browse;
 
@@ -52,7 +24,8 @@ public class BrowseItemDAOOracle implements BrowseItemDAO
     private String findAll = "SELECT item_id, in_archive, withdrawn FROM item WHERE in_archive = 1 OR withdrawn = 1";
 
     /** query to get the text value of a metadata element only (qualifier is NULL) */
-    private String getByMetadataElement = "SELECT text_value,text_lang,element,qualifier FROM metadatavalue, metadatafieldregistry, metadataschemaregistry " +
+    private String getByMetadataElement = "SELECT authority, confidence, text_value,text_lang,element,qualifier FROM metadatavalue, metadatafieldregistry, metadataschemaregistry " +
+
                                     "WHERE metadatavalue.item_id = ? " +
                                     " AND metadatavalue.metadata_field_id = metadatafieldregistry.metadata_field_id " +
                                     " AND metadatafieldregistry.element = ? " +
@@ -62,7 +35,7 @@ public class BrowseItemDAOOracle implements BrowseItemDAO
                                     " ORDER BY metadatavalue.metadata_field_id, metadatavalue.place";
 
     /** query to get the text value of a metadata element and qualifier */
-    private String getByMetadata = "SELECT text_value,text_lang,element,qualifier FROM metadatavalue, metadatafieldregistry, metadataschemaregistry " +
+    private String getByMetadata = "SELECT authority, confidence, text_value,text_lang,element,qualifier FROM metadatavalue, metadatafieldregistry, metadataschemaregistry " +
                                     "WHERE metadatavalue.item_id = ? " +
                                     " AND metadatavalue.metadata_field_id = metadatafieldregistry.metadata_field_id " +
                                     " AND metadatafieldregistry.element = ? " +
@@ -72,7 +45,7 @@ public class BrowseItemDAOOracle implements BrowseItemDAO
                                     " ORDER BY metadatavalue.metadata_field_id, metadatavalue.place";
 
     /** query to get the text value of a metadata element with the wildcard qualifier (*) */
-    private String getByMetadataAnyQualifier = "SELECT text_value,text_lang,element,qualifier FROM metadatavalue, metadatafieldregistry, metadataschemaregistry " +
+    private String getByMetadataAnyQualifier = "SELECT authority, confidence, text_value,text_lang,element,qualifier FROM metadatavalue, metadatafieldregistry, metadataschemaregistry " +
                                     "WHERE metadatavalue.item_id = ? " +
                                     " AND metadatavalue.metadata_field_id = metadatafieldregistry.metadata_field_id " +
                                     " AND metadatafieldregistry.element = ? " +
@@ -108,7 +81,9 @@ public class BrowseItemDAOOracle implements BrowseItemDAO
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         BrowseItem[] bis = new BrowseItem[items.size()];
@@ -125,17 +100,17 @@ public class BrowseItemDAOOracle implements BrowseItemDAO
         {
             if (qualifier == null)
             {
-                Object[] params = { new Integer(itemId), element, schema };
+                Object[] params = { Integer.valueOf(itemId), element, schema };
                 tri = DatabaseManager.query(context, getByMetadataElement, params);
             }
             else if (Item.ANY.equals(qualifier))
             {
-                Object[] params = { new Integer(itemId), element, schema };
+                Object[] params = { Integer.valueOf(itemId), element, schema };
                 tri = DatabaseManager.query(context, getByMetadataAnyQualifier, params);
             }
             else
             {
-                Object[] params = { new Integer(itemId), element, qualifier, schema };
+                Object[] params = { Integer.valueOf(itemId), element, qualifier, schema };
                 tri = DatabaseManager.query(context, getByMetadata, params);
             }
 
@@ -153,13 +128,17 @@ public class BrowseItemDAOOracle implements BrowseItemDAO
                 dcv.qualifier = tr.getStringColumn("qualifier");
                 dcv.language = tr.getStringColumn("text_lang");
                 dcv.value = tr.getStringColumn("text_value");
+                dcv.authority = tr.getStringColumn("authority");
+                dcv.confidence = tr.getIntColumn("confidence");
                 values.add(dcv);
             }
         }
         finally
         {
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         DCValue[] dcvs = new DCValue[values.size()];

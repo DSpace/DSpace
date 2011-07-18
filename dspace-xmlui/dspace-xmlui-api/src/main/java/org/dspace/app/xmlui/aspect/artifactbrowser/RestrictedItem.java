@@ -1,41 +1,9 @@
-/*
- * RestrictedItem.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
@@ -44,6 +12,7 @@ import java.sql.SQLException;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.utils.HandleUtil;
@@ -67,6 +36,8 @@ import org.xml.sax.SAXException;
  */
 public class RestrictedItem extends AbstractDSpaceTransformer //implements CacheableProcessingComponent
 {
+    private static final Logger log = Logger.getLogger(RestrictedItem.class);
+    
     /** language strings */
     private static final Message T_title =
         message("xmlui.ArtifactBrowser.RestrictedItem.title");
@@ -118,7 +89,9 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
                
         pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
         if (dso != null)
-        	HandleUtil.buildHandleTrail(dso,pageMeta,contextPath);
+        {
+            HandleUtil.buildHandleTrail(dso, pageMeta, contextPath);
+        }
         pageMeta.addTrail().addContent(T_trail);
         
     }
@@ -156,13 +129,14 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
         	{
         		String identifier = "unknown";
         		try {
-        			Bitstream bit = Bitstream.find(context, new Integer(request.getParameter("bitstreamId")));
+        			Bitstream bit = Bitstream.find(context, Integer.valueOf(request.getParameter("bitstreamId")));
 	        		if (bit != null) {
 	        			identifier = bit.getName();
 	        		}
         		}
         		catch(Exception e) {
         			// just forget it - and display the restricted message.
+                    log.trace("Caught exception", e);
         		}
         		unauthorized.setHead(T_head_bitstream);
                 unauthorized.addPara(T_para_bitstream.parameterize(identifier));

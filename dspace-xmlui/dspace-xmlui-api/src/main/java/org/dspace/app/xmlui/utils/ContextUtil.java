@@ -1,41 +1,9 @@
-/*
- * ContextUtil.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.utils;
 
@@ -46,10 +14,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.apache.cocoon.environment.ObjectModelHelper;
-import org.apache.cocoon.environment.Request;
-import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.log4j.Logger;
 import org.dspace.authenticate.AuthenticationManager;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 
 /**
@@ -62,12 +29,16 @@ import org.dspace.core.Context;
  */
 public class ContextUtil
 {
+    /** Whether to look for x-forwarded headers for logging IP addresses */
+    private static Boolean useProxies;
 
+    /** The log4j logger */
     private static final Logger log = Logger.getLogger(ContextUtil.class);
     
     /** Where the context is stored on an HTTP Request object */
-    public final static String DSPACE_CONTEXT = "dspace.context";
+    public static final String DSPACE_CONTEXT = "dspace.context";
 
+    
     /**
      * Obtain a new context object. If a context object has already been created
      * for this HTTP request, it is re-used, otherwise it is created.
@@ -79,7 +50,20 @@ public class ContextUtil
      */
     public static Context obtainContext(Map objectModel) throws SQLException
     {
-        Request request = ObjectModelHelper.getRequest(objectModel);
+        return obtainContext(ObjectModelHelper.getRequest(objectModel));
+    }
+    
+    /**
+     * Obtain a new context object. If a context object has already been created
+     * for this HTTP request, it is re-used, otherwise it is created.
+     * 
+     * @param request
+     *            the cocoon or servlet request object
+     * 
+     * @return a context object
+     */
+    public static Context obtainContext(HttpServletRequest request) throws SQLException
+    {
         Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
 
         if (context == null)
@@ -91,13 +75,10 @@ public class ContextUtil
             context.setExtraLogInfo("session_id="
                     + request.getSession().getId());
 
-            // Check if we've all ready been authenticated.
-            final HttpServletRequest httpRequest = (HttpServletRequest) objectModel
-                    .get(HttpEnvironment.HTTP_REQUEST_OBJECT);
-            AuthenticationUtil.resumeLogin(context, httpRequest);
+            AuthenticationUtil.resumeLogin(context, request);
 
             // Set any special groups - invoke the authentication mgr.
-            int[] groupIDs = AuthenticationManager.getSpecialGroups(context, httpRequest);
+            int[] groupIDs = AuthenticationManager.getSpecialGroups(context, request);
 
             for (int i = 0; i < groupIDs.length; i++)
             {
@@ -106,7 +87,22 @@ public class ContextUtil
             }
 
             // Set the session ID and IP address
-            context.setExtraLogInfo("session_id=" + request.getSession().getId() + ":ip_addr=" + request.getRemoteAddr());
+            String ip = request.getRemoteAddr();
+            if (useProxies == null) {
+                useProxies = ConfigurationManager.getBooleanProperty("useProxies", false);
+            }
+            if(useProxies && request.getHeader("X-Forwarded-For") != null)
+            {
+                /* This header is a comma delimited list */
+	            for(String xfip : request.getHeader("X-Forwarded-For").split(","))
+                {
+                    if(!request.getHeader("X-Forwarded-For").contains(ip))
+                    {
+                        ip = xfip.trim();
+                    }
+                }
+	        }
+            context.setExtraLogInfo("session_id=" + request.getSession().getId() + ":ip_addr=" + ip);
 
             // Store the context in the request
             request.setAttribute(DSPACE_CONTEXT, context);
@@ -115,25 +111,38 @@ public class ContextUtil
         return context;
     }
 
+    
     /**
      * Check if a context exists for this request, if so complete the context.
      * 
      * @param request
      *            The request object 
      */
-    public static void closeContext(HttpServletRequest request) throws ServletException
+    public static void completeContext(HttpServletRequest request) throws ServletException
     {
     	Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
 
     	if (context != null && context.isValid())
     	{
-    		try {
-    			context.complete();
-    		} catch (SQLException sqle) {
-    			throw new ServletException("Unable to close DSpace context.",sqle);
-    		}
+   			try
+			{
+				context.complete();
+			}
+			catch (SQLException e)
+			{
+				throw new ServletException(e);
+			}
     	}
-
     }
+
+	public static void abortContext(HttpServletRequest request)
+	{
+    	Context context = (Context) request.getAttribute(DSPACE_CONTEXT);
+
+    	if (context != null && context.isValid())
+    	{
+   			context.abort();
+    	}
+	}
 
 }

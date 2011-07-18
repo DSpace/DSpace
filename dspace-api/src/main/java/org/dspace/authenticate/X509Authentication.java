@@ -1,41 +1,9 @@
-/*
- * X509Authentication.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.authenticate;
 
@@ -125,7 +93,7 @@ import org.dspace.eperson.Group;
  * acceptable but there is no corresponding EPerson.
  * 
  * @author Larry Stone
- * @version $Revision: 3705 $
+ * @version $Revision: 5844 $
  */
 public class X509Authentication implements AuthenticationMethod
 {
@@ -168,14 +136,18 @@ public class X509Authentication implements AuthenticationMethod
 
         // backward-compatible kludge
         if (caCertPath == null)
+        {
             caCertPath = ConfigurationManager.getProperty("webui.cert.ca");
+        }
 
         // First look for keystore full of trusted certs.
         if (keystorePath != null)
         {
             FileInputStream fis = null;
             if (keystorePassword == null)
+            {
                 keystorePassword = "";
+            }
             try
             {
                 KeyStore ks = KeyStore.getInstance("JKS");
@@ -198,6 +170,7 @@ public class X509Authentication implements AuthenticationMethod
             finally
             {
                 if (fis != null)
+                {
                     try
                     {
                         fis.close();
@@ -205,6 +178,7 @@ public class X509Authentication implements AuthenticationMethod
                     catch (IOException ioe)
                     {
                     }
+                }
             }
         }
 
@@ -220,7 +194,9 @@ public class X509Authentication implements AuthenticationMethod
                 X509Certificate cert = (X509Certificate) CertificateFactory
                         .getInstance("X.509").generateCertificate(is);
                 if (cert != null)
+                {
                     caPublicKey = cert.getPublicKey();
+                }
             }
             catch (IOException e)
             {
@@ -236,6 +212,7 @@ public class X509Authentication implements AuthenticationMethod
             finally
             {
                 if (is != null)
+                {
                     try
                     {
                         is.close();
@@ -243,8 +220,10 @@ public class X509Authentication implements AuthenticationMethod
                     catch (IOException ioe)
                     {
                     }
+                }
 
                 if (fis != null)
+                {
                     try
                     {
                         fis.close();
@@ -252,6 +231,7 @@ public class X509Authentication implements AuthenticationMethod
                     catch (IOException ioe)
                     {
                     }
+                }
             }
         }
     }
@@ -274,11 +254,15 @@ public class X509Authentication implements AuthenticationMethod
         Principal principal = certificate.getSubjectDN();
 
         if (principal == null)
+        {
             return null;
+        }
 
         String dn = principal.getName();
         if (dn == null)
+        {
             return null;
+        }
 
         StringTokenizer tokenizer = new StringTokenizer(dn, ",");
         String token = null;
@@ -292,7 +276,9 @@ public class X509Authentication implements AuthenticationMethod
             {
                 // Make sure the token actually contains something
                 if (token.length() <= len)
+                {
                     return null;
+                }
 
                 return token.substring(len).toLowerCase();
             }
@@ -315,7 +301,9 @@ public class X509Authentication implements AuthenticationMethod
     private static boolean isValid(Context context, X509Certificate certificate)
     {
         if (certificate == null)
+        {
             return false;
+        }
 
         // This checks that current time is within cert's validity window:
         try
@@ -473,14 +461,14 @@ public class X509Authentication implements AuthenticationMethod
             if (email.substring(email.length() - emailDomain.length()).equals(
                     emailDomain))
             {
-                session.setAttribute("x509Auth", new Boolean(true));
+                session.setAttribute("x509Auth", Boolean.TRUE);
             }
         }
         else
         {
             // No configured email domain to verify. Just flag
             // as authenticated so special groups are granted.
-            session.setAttribute("x509Auth", new Boolean(true));
+            session.setAttribute("x509Auth", Boolean.TRUE);
         }
     }
 
@@ -488,8 +476,8 @@ public class X509Authentication implements AuthenticationMethod
      * Return special groups configured in dspace.cfg for X509 certificate
      * authentication.
      * 
-     * @param Context
-     * @param HttpServletRequest
+     * @param context
+     * @param request
      *            object potentially containing the cert
      * 
      * @return An int array of group IDs
@@ -498,6 +486,10 @@ public class X509Authentication implements AuthenticationMethod
     public int[] getSpecialGroups(Context context, HttpServletRequest request)
             throws SQLException
     {
+        if (request == null)
+        {
+            return new int[0];
+        }
 
         Boolean authenticated = false;
         HttpSession session = request.getSession(false);
@@ -506,25 +498,26 @@ public class X509Authentication implements AuthenticationMethod
 
         if (authenticated)
         {
-            List<String> groupNames = new ArrayList<String>();
+            List<String> groupNames = getX509Groups();
             List<Integer> groupIDs = new ArrayList<Integer>();
 
-            groupNames = getX509Groups();
-
-            for (String groupName : groupNames)
+            if (groupNames != null)
             {
-                if (groupName != null)
+                for (String groupName : groupNames)
                 {
-                    Group group = Group.findByName(context, groupName);
-                    if (group != null)
+                    if (groupName != null)
                     {
-                        groupIDs.add(new Integer(group.getID()));
-                    }
-                    else
-                    {
-                        log.warn(LogManager.getHeader(context,
-                                "configuration_error", "unknown_group="
-                                        + groupName));
+                        Group group = Group.findByName(context, groupName);
+                        if (group != null)
+                        {
+                            groupIDs.add(Integer.valueOf(group.getID()));
+                        }
+                        else
+                        {
+                            log.warn(LogManager.getHeader(context,
+                                    "configuration_error", "unknown_group="
+                                            + groupName));
+                        }
                     }
                 }
             }
@@ -542,7 +535,9 @@ public class X509Authentication implements AuthenticationMethod
                 for (int i = 0; i < results.length; i++)
                 {
                     if (i > 0)
+                    {
                         gsb.append(",");
+                    }
                     gsb.append(results[i]);
                 }
 
@@ -582,11 +577,15 @@ public class X509Authentication implements AuthenticationMethod
         // Obtain the certificate from the request, if any
         X509Certificate[] certs = null;
         if (request != null)
+        {
             certs = (X509Certificate[]) request
                     .getAttribute("javax.servlet.request.X509Certificate");
+        }
 
         if ((certs == null) || (certs.length == 0))
+        {
             return BAD_ARGS;
+        }
         else
         {
             // We have a cert -- check it and get username from it.
@@ -605,7 +604,9 @@ public class X509Authentication implements AuthenticationMethod
                 String email = getEmail(certs[0]);
                 EPerson eperson = null;
                 if (email != null)
+                {
                     eperson = EPerson.findByEmail(context, email);
+                }
                 if (eperson == null)
                 {
                     // Cert is valid, but no record.

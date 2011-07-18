@@ -1,41 +1,9 @@
-/*
- * HandleUtil.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.utils;
 
@@ -91,21 +59,27 @@ public class HandleUtil
             String uri = request.getSitemapURI();
 
             if (!uri.startsWith(HANDLE_PREFIX))
+            {
                 // Dosn't start with the prefix then no match
                 return null;
+            }
 
             String handle = uri.substring(HANDLE_PREFIX.length());
 
             int firstSlash = handle.indexOf('/');
             if (firstSlash < 0)
+            {
                 // If there is no first slash then no match
                 return null;
+            }
 
             int secondSlash = handle.indexOf('/', firstSlash + 1);
             if (secondSlash < 0)
+            {
                 // A trailing slash is not nesssary if there is nothing after
                 // the handle.
                 secondSlash = handle.length();
+            }
 
             handle = handle.substring(0, secondSlash);
 
@@ -138,7 +112,9 @@ public class HandleUtil
 
             // Check if the current object has the handle we are looking for.
             if (current.getHandle().equals(parent))
+            {
                 return true;
+            }
 
             if (current.getType() == Constants.ITEM)
             {
@@ -227,18 +203,26 @@ public class HandleUtil
             	Collection collection = (Collection) pop;
             	String name = collection.getMetadata("name");
             	if (name == null || name.length() == 0)
-            		pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), new Message("default","xmlui.general.untitled") );
+                {
+                    pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), new Message("default", "xmlui.general.untitled"));
+                }
             	else
-            		pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), name);
+                {
+                    pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), name);
+                }
             }
             else if (pop instanceof Community)
             {
             	Community community = (Community) pop;
             	String name = community.getMetadata("name");
             	if (name == null || name.length() == 0)
-            		pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), new Message("default","xmlui.general.untitled") );
+                {
+                    pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), new Message("default", "xmlui.general.untitled"));
+                }
             	else
-            		pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), name);
+                {
+                    pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), name);
+                }
             }
 
         }

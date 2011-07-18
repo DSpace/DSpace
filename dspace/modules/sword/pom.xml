@@ -16,24 +16,8 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>1.5.2</version>
+      <version>1.7.2</version>
    </parent>
-
-   <repositories>
-      <repository>
-         <id>maven.dspace.org-snapshot</id>
-         <name>DSpace Maven Snapshot Repository</name>
-         <url>http://maven.dspace.org/snapshot</url>
-         <releases>
-            <enabled>false</enabled>
-            <checksumPolicy>fail</checksumPolicy>
-         </releases>
-         <snapshots>
-            <enabled>true</enabled>
-            <checksumPolicy>fail</checksumPolicy>
-         </snapshots>
-      </repository>
-   </repositories>
 
    <!--
       The Subversion repository location is used by Continuum to update against
@@ -41,9 +25,9 @@
       into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2/dspace/modules/sword</connection>
-      <developerConnection>scm:svn:https://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2/dspace/modules/sword</developerConnection>
-      <url>http://dspace.svn.sourceforge.net/svnroot/dspace/tags/dspace-1.5.2/dspace/modules/sword</url>
+      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2</url>
    </scm>
 
    <build>
@@ -106,7 +90,7 @@
          <dependencies>
             <dependency>
                <groupId>com.oracle</groupId>
-               <artifactId>ojdbc14</artifactId>
+               <artifactId>ojdbc6</artifactId>
             </dependency>
          </dependencies>
       </profile>
@@ -135,6 +119,10 @@
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-sword-api</artifactId>
+      </dependency>
+      <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-discovery-provider</artifactId>
       </dependency>
       <dependency>
          <groupId>javax.servlet</groupId>

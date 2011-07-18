@@ -23,4 +23,6 @@ JARS=`echo $DSPACEDIR/lib/*.jar | sed 's/ /\:/g'`
 FULLPATH=$CLASSPATH:$JARS:$DSPACEDIR/config:$DSPACEDIR/groovy
 
 # Now invoke Groovy
+GROOVY_HOME=/usr/share/groovy
+export GROOVY_HOME
 /usr/bin/groovy -classpath $FULLPATH -Dlog4j.defaultInitOverride=true $DSPACEDIR/groovy/"$@"

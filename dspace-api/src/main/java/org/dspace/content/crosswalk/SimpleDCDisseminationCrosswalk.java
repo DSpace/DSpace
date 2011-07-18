@@ -1,43 +1,10 @@
-/*
- * SimpleDCDisseminationCrosswalk.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.content.crosswalk;
 
 import java.io.IOException;
@@ -45,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
@@ -61,7 +29,7 @@ import org.jdom.Namespace;
  * server.
  *
  * @author Larry Stone
- * @version $Revision: 3705 $
+ * @version $Revision: 5844 $
  */
 public class SimpleDCDisseminationCrosswalk extends SelfNamedPlugin
     implements DisseminationCrosswalk
@@ -84,11 +52,11 @@ public class SimpleDCDisseminationCrosswalk extends SelfNamedPlugin
     private static final Namespace namespaces[] =
         { DC_NS, XSI_NS };
 
-    private final static String aliases[] = { "SimpleDC", "DC" };
+    private static final String aliases[] = { "SimpleDC", "DC" };
 
     public static String[] getPluginNames()
     {
-        return aliases;
+        return (String[]) ArrayUtils.clone(aliases);
     }
 
     public Element disseminateElement(DSpaceObject dso)
@@ -106,24 +74,26 @@ public class SimpleDCDisseminationCrosswalk extends SelfNamedPlugin
      * Simple-minded copying of elements: convert contributor.author to
      * "creator" but otherwise just grab element name without qualifier.
      */
-    public List disseminateList(DSpaceObject dso)
+    public List<Element> disseminateList(DSpaceObject dso)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
         return disseminateListInternal(dso, true);
     }
 
-    public List disseminateListInternal(DSpaceObject dso, boolean addSchema)
+    public List<Element> disseminateListInternal(DSpaceObject dso, boolean addSchema)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
         if (dso.getType() != Constants.ITEM)
+        {
             throw new CrosswalkObjectNotSupported("SimpleDCDisseminationCrosswalk can only crosswalk an Item.");
+        }
 
         Item item = (Item)dso;
         DCValue[] allDC = item.getDC(Item.ANY, Item.ANY, Item.ANY);
 
-        List dcl = new ArrayList(allDC.length);
+        List<Element> dcl = new ArrayList<Element>(allDC.length);
 
         for (int i = 0; i < allDC.length; i++)
         {
@@ -137,13 +107,19 @@ public class SimpleDCDisseminationCrosswalk extends SelfNamedPlugin
                 if (allDC[i].element.equals("contributor")
                         && (allDC[i].qualifier != null)
                         && allDC[i].qualifier.equals("author"))
+                {
                     element = "creator";
+                }
                 else
+                {
                     element = allDC[i].element;
+                }
                 Element field = new Element(element, DC_NS);
                 field.addContent(allDC[i].value);
                 if (addSchema)
+                {
                     field.setAttribute("schemaLocation", schemaLocation, XSI_NS);
+                }
                 dcl.add(field);
             }
         }
@@ -152,7 +128,7 @@ public class SimpleDCDisseminationCrosswalk extends SelfNamedPlugin
 
     public Namespace[] getNamespaces()
     {
-        return namespaces;
+        return (Namespace[]) ArrayUtils.clone(namespaces);
     }
 
     public String getSchemaLocation()

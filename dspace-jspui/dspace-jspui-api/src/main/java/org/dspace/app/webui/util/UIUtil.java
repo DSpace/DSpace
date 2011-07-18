@@ -1,56 +1,31 @@
-/*
- * UIUtil.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.webui.util;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
+import javax.mail.internet.MimeUtility;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.jsp.jstl.core.Config;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.Util;
 import org.dspace.authenticate.AuthenticationManager;
@@ -68,12 +43,20 @@ import org.dspace.eperson.EPerson;
  * Miscellaneous UI utility methods
  * 
  * @author Robert Tansley
- * @version $Revision: 3705 $
+ * @version $Revision: 5845 $
  */
 public class UIUtil extends Util
 {
+    /** Whether to look for x-forwarded headers for logging IP addresses */
+    private static Boolean useProxies;
+
     /** log4j category */
-    public static Logger log = Logger.getLogger(UIUtil.class);
+    public static final Logger log = Logger.getLogger(UIUtil.class);
+    
+    /**
+	 * Pattern used to get file.ext from filename (which can be a path)
+	 */
+	private static Pattern p = Pattern.compile("[^/]*$");
 
     /**
      * Obtain a new context object. If a context object has already been created
@@ -98,7 +81,9 @@ public class UIUtil extends Util
         try
         {
             if(request.getCharacterEncoding()==null)
+            {
                 request.setCharacterEncoding(Constants.DEFAULT_ENCODING);
+            }
         }
         catch(Exception e)
         {
@@ -145,7 +130,22 @@ public class UIUtil extends Util
             }
 
             // Set the session ID and IP address
-            c.setExtraLogInfo("session_id=" + request.getSession().getId() + ":ip_addr=" + request.getRemoteAddr());
+            String ip = request.getRemoteAddr();
+            if (useProxies == null) {
+                useProxies = ConfigurationManager.getBooleanProperty("useProxies", false);
+            }
+            if(useProxies && request.getHeader("X-Forwarded-For") != null)
+            {
+                /* This header is a comma delimited list */
+	            for(String xfip : request.getHeader("X-Forwarded-For").split(","))
+                {
+                    if(!request.getHeader("X-Forwarded-For").contains(ip))
+                    {
+                        ip = xfip.trim();
+                    }
+                }
+	        }
+            c.setExtraLogInfo("session_id=" + request.getSession().getId() + ":ip_addr=" + ip);
 
             // Store the context in the request
             request.setAttribute("dspace.context", c);
@@ -267,88 +267,8 @@ public class UIUtil extends Util
      */
     public static String displayDate(DCDate d, boolean time, boolean localTime, HttpServletRequest request)
     {
-        StringBuffer sb = new StringBuffer();
-        Locale locale = ((Context)request.getAttribute("dspace.context")).getCurrentLocale();
-        if (locale == null) locale = I18nUtil.DEFAULTLOCALE;
-
-        if (d != null)
-        {
-            int year;
-            int month;
-            int day;
-            int hour;
-            int minute;
-            int second;
-
-            if (localTime)
-            {
-                year = d.getYear();
-                month = d.getMonth();
-                day = d.getDay();
-                hour = d.getHour();
-                minute = d.getMinute();
-                second = d.getSecond();
+        return d.displayDate(time, localTime, getSessionLocale(request));
             }
-            else
-            {
-                year = d.getYearGMT();
-                month = d.getMonthGMT();
-                day = d.getDayGMT();
-                hour = d.getHourGMT();
-                minute = d.getMinuteGMT();
-                second = d.getSecondGMT();
-            }
-
-            if (year > -1)
-            {
-                if (month > -1)
-                {
-                    if (day > -1)
-                    {
-                        sb.append(day + "-");
-                    }
-                    String monthName = DCDate.getMonthName(month, getSessionLocale(request));
-                    int monthLength = monthName.length();
-                    monthLength = monthLength > 2 ? 3 : monthLength;
-                    sb.append(monthName.substring(0, monthLength) + "-");
-                }
-
-                sb.append(year + " ");
-            }
-
-            if (time && (hour > -1))
-            {
-                String hr = String.valueOf(hour);
-
-                while (hr.length() < 2)
-                {
-                    hr = "0" + hr;
-                }
-
-                String mn = String.valueOf(minute);
-
-                while (mn.length() < 2)
-                {
-                    mn = "0" + mn;
-                }
-
-                String sc = String.valueOf(second);
-
-                while (sc.length() < 2)
-                {
-                    sc = "0" + sc;
-                }
-
-                sb.append(hr + ":" + mn + ":" + sc + " ");
-            }
-        }
-        else
-        {
-            sb.append("Unset");
-        }
-
-        return (sb.toString());
-    }
 
     /**
      * Return a string for logging, containing useful information about the
@@ -360,13 +280,13 @@ public class UIUtil extends Util
      */
     public static String getRequestLogInfo(HttpServletRequest request)
     {
-        String report;
+        StringBuilder report = new StringBuilder();
 
-        report = "-- URL Was: " + getOriginalURL(request) + "\n";
-        report = report + "-- Method: " + request.getMethod() + "\n";
+        report.append("-- URL Was: ").append(getOriginalURL(request)).append("\n").toString();
+        report.append("-- Method: ").append(request.getMethod()).append("\n").toString();
 
         // First write the parameters we had
-        report = report + "-- Parameters were:\n";
+        report.append("-- Parameters were:\n");
 
         Enumeration e = request.getParameterNames();
 
@@ -378,16 +298,16 @@ public class UIUtil extends Util
             {
                 // We don't want to write a clear text password
                 // to the log, even if it's wrong!
-                report = report + "-- " + name + ": *not logged*\n";
+                report.append("-- ").append(name).append(": *not logged*\n").toString();
             }
             else
             {
-                report = report + "-- " + name + ": \""
-                        + request.getParameter(name) + "\"\n";
+                report.append("-- ").append(name).append(": \"")
+                        .append(request.getParameter(name)).append("\"\n");
             }
         }
 
-        return report;
+        return report.toString();
     }
     
     
@@ -410,7 +330,7 @@ public class UIUtil extends Util
         Locale sessionLocale = null;
         Locale supportedLocale = null;
 
-        if (paramLocale != null && paramLocale != "")
+        if (!StringUtils.isEmpty(paramLocale))
         {
             /* get session locale according to user selection */
             sessionLocale = new Locale(paramLocale);
@@ -465,6 +385,8 @@ public class UIUtil extends Util
     {
         String logInfo = UIUtil.getRequestLogInfo(request);
         Context c = (Context) request.getAttribute("dspace.context");
+        Locale locale = getSessionLocale(request);
+        EPerson user = null;
 
         try
         {
@@ -473,8 +395,7 @@ public class UIUtil extends Util
 
             if (recipient != null)
             {
-                Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(c.getCurrentLocale(), "internal_error"));
-
+                Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(locale, "internal_error"));
                 email.addRecipient(recipient);
                 email.addArgument(ConfigurationManager
                         .getProperty("dspace.url"));
@@ -498,6 +419,24 @@ public class UIUtil extends Util
                 }
 
                 email.addArgument(stackTrace);
+                try
+                {
+                    user = c.getCurrentUser();
+                }
+                catch (Exception e)
+                {
+                    log.warn("No context, the database might be down or the connection pool exhausted.");
+                }
+                
+                if (user != null)
+                {
+                    email.addArgument(user.getFullName() + " (" + user.getEmail() + ")");
+                }
+                else
+                {
+                    email.addArgument("Anonymous");
+                }
+                email.addArgument(request.getRemoteAddr());
                 email.send();
             }
         }
@@ -507,4 +446,49 @@ public class UIUtil extends Util
             log.warn("Unable to send email alert", e);
         }
     }
+    
+    /**
+	 * Evaluate filename and client and encode appropriate disposition
+	 * 
+	 * @param filename
+	 * @param request
+	 * @param response
+	 * @throws UnsupportedEncodingException
+	 */
+	public static void setBitstreamDisposition(String filename, HttpServletRequest request,
+			HttpServletResponse response)
+	{
+		
+		String name = filename;
+		
+		Matcher m = p.matcher(name);
+		
+		if (m.find() && !m.group().equals(""))
+		{
+			name = m.group();
+		}
+
+		try 
+		{
+			String agent = request.getHeader("USER-AGENT");
+
+			if (null != agent && -1 != agent.indexOf("MSIE")) 
+			{
+				name = URLEncoder.encode(name, "UTF8");
+			} 
+			else if (null != agent && -1 != agent.indexOf("Mozilla")) 
+			{
+				name = MimeUtility.encodeText(name, "UTF8", "B");
+			} 
+
+		} 
+		catch (UnsupportedEncodingException e) 
+		{
+			log.error(e.getMessage(),e);
+		}
+		finally
+		{
+			response.setHeader("Content-Disposition", "attachment;filename=" + name);
+		}
+	}
 }

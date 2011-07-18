@@ -1,42 +1,11 @@
-/*
- * FlowGroupUtils.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
- */package org.dspace.app.xmlui.aspect.administrative;
+ * http://www.dspace.org/license/
+ */
+package org.dspace.app.xmlui.aspect.administrative;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -49,7 +18,6 @@ import java.util.List;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
@@ -59,7 +27,7 @@ import org.dspace.eperson.Group;
 /**
  * Utility methods to processes actions on Groups. These methods are used
  * exclusivly from the administrative flow scripts.
- * 
+ *
  * @author scott phillips
  */
 public class FlowGroupUtils {
@@ -81,12 +49,16 @@ public class FlowGroupUtils {
 	public static String getName(Context context, int groupID) throws SQLException
 	{
 		if (groupID < 0)
-			return "New Group";	
+        {
+            return "New Group";
+        }
 		
 		Group group = Group.find(context,groupID);
 		
 		if (group == null)
-			return "New Group";
+        {
+            return "New Group";
+        }
 		
 		return group.getName();
 	}
@@ -102,18 +74,24 @@ public class FlowGroupUtils {
 	{
 		// New group, just return an empty list
 		if (groupID < 0)
-			return new String[0];
+        {
+            return new String[0];
+        }
 		
 		Group group = Group.find(context,groupID);
 		
 		if (group == null)
-			return new String[0];
+        {
+            return new String[0];
+        }
 		
 		EPerson[] epeople = group.getMembers();
 		
 		String[] epeopleIDs = new String[epeople.length];
 		for (int i=0; i < epeople.length; i++)
+        {
 			epeopleIDs[i] = String.valueOf(epeople[i].getID());
+        }
 		
 		return epeopleIDs;
 	}
@@ -128,18 +106,24 @@ public class FlowGroupUtils {
 	public static String[] getGroupMembers(Context context, int groupID) throws SQLException
 	{
 		if (groupID < 0)
-			return new String[0];
+        {
+            return new String[0];
+        }
 		
 		Group group = Group.find(context,groupID);
 		
 		if (group == null)
-			return new String[0];
+        {
+            return new String[0];
+        }
 		
 		Group[] groups = group.getMemberGroups();
 		
 		String[] groupIDs = new String[groups.length];
 		for (int i=0; i < groups.length; i++)
+        {
 			groupIDs[i] = String.valueOf(groups[i].getID());
+        }
 		
 		return groupIDs;
 	}
@@ -271,10 +255,14 @@ public class FlowGroupUtils {
 		// Second, Prepare to check members by turning arrays into lists
 		List<Integer> newEPeopleIDs = new ArrayList<Integer>();
 		for (String epeopleID : newEPeopleIDsArray)
+        {
 			newEPeopleIDs.add(Integer.valueOf(epeopleID));
+        }
 		List<Integer> newGroupIDs = new ArrayList<Integer>();
 		for (String _groupID : newGroupIDsArray)
+        {
 			newGroupIDs.add(Integer.valueOf(_groupID));
+        }
 		
 		
 		// Third, check if there are any members to remove
@@ -466,23 +454,41 @@ public class FlowGroupUtils {
 				if (groupName.endsWith(suffix))
 				{
 					if (COLLECTION_SUFFIXES[0].equals(suffix))
-						return Role.Submitters;
+                    {
+                        return Role.Submitters;
+                    }
 					else if (COLLECTION_SUFFIXES[1].equals(suffix))
-						return Role.Administrators;
+                    {
+                        return Role.Administrators;
+                    }
 					else if (COLLECTION_SUFFIXES[2].equals(suffix))
-						return Role.WorkflowStep1;
+                    {
+                        return Role.WorkflowStep1;
+                    }
 					else if (COLLECTION_SUFFIXES[3].equals(suffix))
-						return Role.WorkflowStep1;
+                    {
+                        return Role.WorkflowStep1;
+                    }
 					else if (COLLECTION_SUFFIXES[4].equals(suffix))
-						return Role.WorkflowStep2;
+                    {
+                        return Role.WorkflowStep2;
+                    }
 					else if (COLLECTION_SUFFIXES[5].equals(suffix))
-						return Role.WorkflowStep2;
+                    {
+                        return Role.WorkflowStep2;
+                    }
 					else if (COLLECTION_SUFFIXES[6].equals(suffix))
-						return Role.WorkflowStep3;
+                    {
+                        return Role.WorkflowStep3;
+                    }
 					else if (COLLECTION_SUFFIXES[7].equals(suffix))
-						return Role.WorkflowStep3;
+                    {
+                        return Role.WorkflowStep3;
+                    }
 					else if (COLLECTION_SUFFIXES[8].equals(suffix))
-						return Role.DefaultRead;
+                    {
+                        return Role.DefaultRead;
+                    }
 					
 				} // if it ends with a proper suffix.
 			} // for each possible suffix
@@ -492,5 +498,106 @@ public class FlowGroupUtils {
 	}
 	
 	
+	
+    /**
+     * The community prefix: all groups which are specific to
+     * a community start with this.
+     */
+    private static final String COMMUNITY_PREFIX = "COMMUNITY_";
+    
+    /**
+     * These are the possible community suffixes. All groups which are
+     * specific to a collection will end with one of these. The collection
+     * id should be between the prefix and the suffix.
+     * 
+     * Note: the order of these suffixes are important, see getCollectionRole()
+     */
+    private static final String[] COMMUNITY_SUFFIXES = {"_ADMIN"};
+    
+    
+    /**
+     * Extracts the community id that may be embedded in the given group name.
+     * 
+     * @param groupName - the name of a group (ie group.getName())
+     * @return the integer community id or -1 if the group is not that of a community
+     */
+    public static int getCommunityId(String groupName)
+    {
+        if (groupName != null && groupName.startsWith(COMMUNITY_PREFIX))
+        {
+            for (String suffix : COMMUNITY_SUFFIXES)
+            {
+                if (groupName.endsWith(suffix))
+                {
+                    String idString = groupName.substring(COMMUNITY_PREFIX.length());
+                    idString = idString.substring(0, idString.length() - suffix.length());
+
+                    int communityID = -1;
+                    try {
+                        communityID = Integer.valueOf(idString); 
+                        
+                        return communityID;
+}
+                    catch (NumberFormatException nfe)
+                    {}
+                } // if it ends with a proper suffix.
+            } // for each possible suffix
+        } // if it starts with COLLECTION_
+        
+        return -1;
+    }
+    
+    public static Role getCommunityRole(String groupName)
+    {
+        if (groupName != null && groupName.startsWith(COMMUNITY_PREFIX))
+        {
+            for (String suffix : COMMUNITY_SUFFIXES)
+            {
+                if (groupName.endsWith(suffix))
+                {
+                    if (COLLECTION_SUFFIXES[0].equals(suffix))
+                    {
+                        return Role.Submitters;
+                    }
+                    else if (COLLECTION_SUFFIXES[1].equals(suffix))
+                    {
+                        return Role.Administrators;
+                    }
+                    else if (COLLECTION_SUFFIXES[2].equals(suffix))
+                    {
+                        return Role.WorkflowStep1;
+                    }
+                    else if (COLLECTION_SUFFIXES[3].equals(suffix))
+                    {
+                        return Role.WorkflowStep1;
+                    }
+                    else if (COLLECTION_SUFFIXES[4].equals(suffix))
+                    {
+                        return Role.WorkflowStep2;
+                    }
+                    else if (COLLECTION_SUFFIXES[5].equals(suffix))
+                    {
+                        return Role.WorkflowStep2;
+                    }
+                    else if (COLLECTION_SUFFIXES[6].equals(suffix))
+                    {
+                        return Role.WorkflowStep3;
+                    }
+                    else if (COLLECTION_SUFFIXES[7].equals(suffix))
+                    {
+                        return Role.WorkflowStep3;
+                    }
+                    else if (COLLECTION_SUFFIXES[8].equals(suffix))
+                    {
+                        return Role.DefaultRead;
+                    }
+                    
+                } // if it ends with a proper suffix.
+            } // for each possible suffix
+        } // if it starts with COMMUNITY_
+        
+        return Role.none;
+    }
+    
 	
 }

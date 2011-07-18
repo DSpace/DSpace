@@ -1,41 +1,9 @@
-/*
- * JSPManager.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.webui.util;
 
@@ -45,6 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.core.Context;
@@ -54,7 +23,7 @@ import org.dspace.core.LogManager;
  * Methods for displaying UI pages to the user.
  * 
  * @author Robert Tansley
- * @version $Revision: 3705 $
+ * @version $Revision: 6158 $
  */
 public class JSPManager
 {
@@ -163,14 +132,36 @@ public class JSPManager
             HttpServletResponse response, String badID, int type)
             throws ServletException, IOException
     {
-        request.setAttribute("bad.id", badID);
+        request.setAttribute("bad.id", StringEscapeUtils.escapeHtml(badID));
         response.setStatus(HttpServletResponse.SC_NOT_FOUND);
 
         if (type != -1)
         {
-            request.setAttribute("bad.type", new Integer(type));
+            request.setAttribute("bad.type", Integer.valueOf(type));
         }
 
         showJSP(request, response, "/error/invalid-id.jsp");
+    }
+
+    /**
+     * Display a "file upload was too large" error message. Passing in information
+     * about the size of the file uploaded, and the maximum file size limit so
+     * the user knows why they encountered an error.
+     * @param request
+     * @param response
+     * @param message
+     * @param actualSize
+     * @param permittedSize
+     * @throws ServletException
+     * @throws IOException
+     */
+    public static void showFileSizeLimitExceededError(HttpServletRequest request,
+            HttpServletResponse response, String message, long actualSize, long permittedSize) throws ServletException, IOException
+    {
+        request.setAttribute("error.message", message);
+        request.setAttribute("actualSize", actualSize);
+        request.setAttribute("permittedSize", permittedSize);
+        response.setStatus(HttpServletResponse.SC_REQUEST_ENTITY_TOO_LARGE);
+        showJSP(request, response, "/error/exceeded-size.jsp");
     }
 }

@@ -96,9 +96,6 @@ public class UpdateStats {
       // dspace dir
       String strDspace     = ConfigurationManager.getProperty("dspace.dir");
 
-      // logging (log4j.defaultInitOverride needs to be set or
-      // config/log4j.properties will be read and used additionally)
-      PropertyConfigurator.configure(strDspace + "/config/log4j-app.properties");
       // open the stat input file
       String strFile = strDspace + "/stats/views.txt";
       FileInputStream fis = new FileInputStream(new File(strFile));
@@ -211,13 +208,11 @@ public class UpdateStats {
       }
 
       log.error(ErrorHandling.getStackTrace(e));
-
-      System.exit(1);
     }
 
     finally {
       if (context != null) {
-	try { context.complete(); } catch (Exception e) {}
+        try { context.complete(); } catch (Exception e) {}
       }
       
       log.info("=====================================\n" +
@@ -225,8 +220,6 @@ public class UpdateStats {
 	       "Bitstreams updated: " + lBitstreams + "\n"
 	       );
     }
-
-    System.exit(0);
   }
 }
 

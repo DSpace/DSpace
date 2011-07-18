@@ -1,45 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
-  DS-METS-1.0.xsl
 
-  Version: $Revision: 3705 $
- 
-  Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- 
-  Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
-  Institute of Technology.  All rights reserved.
- 
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are
-  met:
- 
-  - Redistributions of source code must retain the above copyright
-  notice, this list of conditions and the following disclaimer.
- 
-  - Redistributions in binary form must reproduce the above copyright
-  notice, this list of conditions and the following disclaimer in the
-  documentation and/or other materials provided with the distribution.
- 
-  - Neither the name of the Hewlett-Packard Company nor the name of the
-  Massachusetts Institute of Technology nor the names of their
-  contributors may be used to endorse or promote products derived from
-  this software without specific prior written permission.
- 
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-  ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-  LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-  A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-  HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-  INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-  BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
-  OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
-  TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
-  USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
-  DAMAGE.
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
 -->
-
 <!--
     Author: Alexey Maslov
     Description: This stylesheet contains templates to perform tasks associated with metadata visualization
@@ -90,7 +58,11 @@
                 <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-size</i18n:text></th>
                 <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-format</i18n:text></th>
                 <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-view</i18n:text></th>
-            </tr>
+                <!-- Display header for 'Description' only if at least one bitstream contains a description -->
+                <xsl:if test="mets:file/mets:FLocat/@xlink:label != ''">
+                    <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-description</i18n:text></th>
+                </xsl:if>
+		    </tr>
             <xsl:choose>
                 <!-- If one exists and it's of text/html MIME type, only display the primary bitstream -->
                 <xsl:when test="mets:file[@ID=$primaryBitstream]/@MIMETYPE='text/html'">
@@ -101,8 +73,6 @@
                 <!-- Otherwise, iterate over and display all of them -->
                 <xsl:otherwise>
                     <xsl:apply-templates select="mets:file">
-                     	<xsl:sort data-type="number" select="boolean(./@ID=$primaryBitstream)" order="descending" />
-                        <xsl:sort select="mets:FLocat[@LOCTYPE='URL']/@xlink:title"/> 
                         <xsl:with-param name="context" select="$context"/>
                     </xsl:apply-templates>
                 </xsl:otherwise>
@@ -144,20 +114,20 @@
             <!-- File size always comes in bytes and thus needs conversion --> 
             <td>
                 <xsl:choose>
-                    <xsl:when test="@SIZE &lt; 1000">
+                    <xsl:when test="@SIZE &lt; 1024">
                         <xsl:value-of select="@SIZE"/>
                         <i18n:text>xmlui.dri2xhtml.METS-1.0.size-bytes</i18n:text>
                     </xsl:when>
-                    <xsl:when test="@SIZE &lt; 1000000">
-                        <xsl:value-of select="substring(string(@SIZE div 1000),1,5)"/>
+                    <xsl:when test="@SIZE &lt; 1024 * 1024">
+                        <xsl:value-of select="substring(string(@SIZE div 1024),1,5)"/>
                         <i18n:text>xmlui.dri2xhtml.METS-1.0.size-kilobytes</i18n:text>
                     </xsl:when>
-                    <xsl:when test="@SIZE &lt; 1000000000">
-                        <xsl:value-of select="substring(string(@SIZE div 1000000),1,5)"/>
+                    <xsl:when test="@SIZE &lt; 1024 * 1024 * 1024">
+                        <xsl:value-of select="substring(string(@SIZE div (1024 * 1024)),1,5)"/>
                         <i18n:text>xmlui.dri2xhtml.METS-1.0.size-megabytes</i18n:text>
                     </xsl:when>
                     <xsl:otherwise>
-                        <xsl:value-of select="substring(string(@SIZE div 1000000000),1,5)"/>
+                        <xsl:value-of select="substring(string(@SIZE div (1024 * 1024 * 1024)),1,5)"/>
                         <i18n:text>xmlui.dri2xhtml.METS-1.0.size-gigabytes</i18n:text>
                     </xsl:otherwise>
                 </xsl:choose>
@@ -178,7 +148,7 @@
             <td>
                 <xsl:choose>
                     <xsl:when test="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/
-                        mets:file[@GROUP_ID=current()/@GROUP_ID]">
+                        mets:file[@GROUPID=current()/@GROUPID]">
                         <a class="image-link">
                             <xsl:attribute name="href">
                                 <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
@@ -186,7 +156,7 @@
                             <img alt="Thumbnail">
                                 <xsl:attribute name="src">
                                     <xsl:value-of select="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/
-                                        mets:file[@GROUP_ID=current()/@GROUP_ID]/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
+                                        mets:file[@GROUPID=current()/@GROUPID]/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
                                 </xsl:attribute>
                             </img>
                         </a>
@@ -201,6 +171,13 @@
                     </xsl:otherwise>
                 </xsl:choose>                        
             </td>
+	    <!-- Display the contents of 'Description' as long as at least one bitstream contains a description -->
+	    <xsl:if test="$context/mets:fileSec/mets:fileGrp[@USE='CONTENT']/mets:file/mets:FLocat/@xlink:label != ''">
+	        <td>
+	            <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label"/>
+	        </td>
+	    </xsl:if>
+
         </tr>
     </xsl:template>
     

@@ -1,4 +1,11 @@
 /**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+/**
  * DSpaceLNISoapBindingStub.java
  *
  * This file was auto-generated from WSDL
@@ -7,20 +14,22 @@
 
 package org.dspace.app.dav.client;
 
+import javax.xml.namespace.QName;
+
 public class DSpaceLNISoapBindingStub extends org.apache.axis.client.Stub implements org.dspace.app.dav.client.LNISoapServlet {
-    private java.util.Vector cachedSerClasses = new java.util.Vector();
-    private java.util.Vector cachedSerQNames = new java.util.Vector();
-    private java.util.Vector cachedSerFactories = new java.util.Vector();
-    private java.util.Vector cachedDeserFactories = new java.util.Vector();
+    private java.util.List<Class<LNIRemoteException>> cachedSerClasses = new java.util.ArrayList<Class<LNIRemoteException>>();
+    private java.util.List<QName> cachedSerQNames = new java.util.ArrayList<QName>();
+    private java.util.List cachedSerFactories = new java.util.ArrayList();
+    private java.util.List cachedDeserFactories = new java.util.ArrayList();
 
     static org.apache.axis.description.OperationDesc [] _operations;
 
     static {
         _operations = new org.apache.axis.description.OperationDesc[4];
-        _initOperationDesc1();
+        initOperationDesc1();
     }
 
-    private static void _initOperationDesc1(){
+    private static void initOperationDesc1(){
         org.apache.axis.description.OperationDesc oper;
         org.apache.axis.description.ParameterDesc param;
         oper = new org.apache.axis.description.OperationDesc();
@@ -127,19 +136,10 @@ public class DSpaceLNISoapBindingStub extends org.apache.axis.client.Stub implem
             super.service = service;
         }
         ((org.apache.axis.client.Service)super.service).setTypeMappingVersion("1.2");
-            java.lang.Class cls;
+            Class<LNIRemoteException> cls;
             javax.xml.namespace.QName qName;
-            javax.xml.namespace.QName qName2;
             java.lang.Class beansf = org.apache.axis.encoding.ser.BeanSerializerFactory.class;
             java.lang.Class beandf = org.apache.axis.encoding.ser.BeanDeserializerFactory.class;
-            java.lang.Class enumsf = org.apache.axis.encoding.ser.EnumSerializerFactory.class;
-            java.lang.Class enumdf = org.apache.axis.encoding.ser.EnumDeserializerFactory.class;
-            java.lang.Class arraysf = org.apache.axis.encoding.ser.ArraySerializerFactory.class;
-            java.lang.Class arraydf = org.apache.axis.encoding.ser.ArrayDeserializerFactory.class;
-            java.lang.Class simplesf = org.apache.axis.encoding.ser.SimpleSerializerFactory.class;
-            java.lang.Class simpledf = org.apache.axis.encoding.ser.SimpleDeserializerFactory.class;
-            java.lang.Class simplelistsf = org.apache.axis.encoding.ser.SimpleListSerializerFactory.class;
-            java.lang.Class simplelistdf = org.apache.axis.encoding.ser.SimpleListDeserializerFactory.class;
             qName = new javax.xml.namespace.QName("http://dspace.org/xmlns/lni", "LNIRemoteException");
             cachedSerQNames.add(qName);
             cls = org.dspace.app.dav.client.LNIRemoteException.class;
@@ -186,9 +186,9 @@ public class DSpaceLNISoapBindingStub extends org.apache.axis.client.Stub implem
                     _call.setSOAPVersion(org.apache.axis.soap.SOAPConstants.SOAP11_CONSTANTS);
                     _call.setEncodingStyle(org.apache.axis.Constants.URI_SOAP11_ENC);
                     for (int i = 0; i < cachedSerFactories.size(); ++i) {
-                        java.lang.Class cls = (java.lang.Class) cachedSerClasses.get(i);
+                        Class<LNIRemoteException> cls = cachedSerClasses.get(i);
                         javax.xml.namespace.QName qName =
-                                (javax.xml.namespace.QName) cachedSerQNames.get(i);
+                                cachedSerQNames.get(i);
                         java.lang.Object x = cachedSerFactories.get(i);
                         if (x instanceof Class) {
                             java.lang.Class sf = (java.lang.Class)
@@ -227,7 +227,7 @@ public class DSpaceLNISoapBindingStub extends org.apache.axis.client.Stub implem
 
         setRequestHeaders(_call);
         setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {source, destination, new java.lang.Integer(depth), new java.lang.Boolean(overwrite), new java.lang.Boolean(keepProperties)});
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {source, destination, java.lang.Integer.valueOf(depth), java.lang.Boolean.valueOf(overwrite), java.lang.Boolean.valueOf(keepProperties)});
 
         if (_resp instanceof java.rmi.RemoteException) {
             throw (java.rmi.RemoteException)_resp;
@@ -305,7 +305,7 @@ public class DSpaceLNISoapBindingStub extends org.apache.axis.client.Stub implem
 
         setRequestHeaders(_call);
         setAttachments(_call);
- try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {uri, doc, new java.lang.Integer(depth), types});
+ try {        java.lang.Object _resp = _call.invoke(new java.lang.Object[] {uri, doc, java.lang.Integer.valueOf(depth), types});
 
         if (_resp instanceof java.rmi.RemoteException) {
             throw (java.rmi.RemoteException)_resp;

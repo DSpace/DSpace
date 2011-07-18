@@ -1,41 +1,9 @@
-/*
- * RepositoryAdapter.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.objectmanager;
 
@@ -50,11 +18,12 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.handle.HandleManager;
 import org.xml.sax.SAXException;
 
 /**
  * This is an an adapter which translates a DSpace repository into a METS 
- * document. Unfortunitaly there is no real definition of what this is. So
+ * document. Unfortunately there is no real definition of what this is. So
  * we just kind of made it up based upon what we saw for the item profile.
  * 
  * The basic structure is simply two parts, the descriptive metadata and a 
@@ -68,11 +37,11 @@ public class RepositoryAdapter extends AbstractAdapter
 {
 
 	/** MODS namespace */
-    public static String MODS_URI = "http://www.loc.gov/mods/v3";
-    public static Namespace MODS = new Namespace(MODS_URI);
+    public static final String MODS_URI = "http://www.loc.gov/mods/v3";
+    public static final Namespace MODS = new Namespace(MODS_URI);
 
 	
-    /** A space seperated list of descriptive metadata sections */
+    /** A space separated list of descriptive metadata sections */
     private String dmdSecIDS;
     
     /** Dspace context to be able to look up additional objects */
@@ -108,7 +77,7 @@ public class RepositoryAdapter extends AbstractAdapter
      */
     protected String getMETSID()
     {
-        return ConfigurationManager.getProperty("handle.prefix");
+        return HandleManager.getPrefix();
     }
     
 	/**
@@ -118,9 +87,13 @@ public class RepositoryAdapter extends AbstractAdapter
 	protected String getMETSOBJID() throws WingException {
 		
 		if (contextPath == null)
-			return "/";
+        {
+            return "/";
+        }
 		else
-			return contextPath + "/";
+        {
+            return contextPath + "/";
+        }
 	}
 
     /**
@@ -223,7 +196,7 @@ public class RepositoryAdapter extends AbstractAdapter
 		attributes.put("mdschema","dspace");
 		attributes.put("element", "handle");
 		startElement(DIM,"field",attributes);
-		sendCharacters(ConfigurationManager.getProperty("handle.prefix"));
+		sendCharacters(HandleManager.getPrefix());
 		endElement(DIM,"field");
 		
 		// Entry for default.language
@@ -249,7 +222,7 @@ public class RepositoryAdapter extends AbstractAdapter
     }
 
     /**
-     * Render the repository's structure map. This map will include a refrence to
+     * Render the repository's structure map. This map will include a reference to
      * all the community and collection objects showing how they are related to
      * one another. 
      */
@@ -270,7 +243,9 @@ public class RepositoryAdapter extends AbstractAdapter
         attributes.put("TYPE", "DSpace Repository");
         // add references to the Descriptive metadata
         if (dmdSecIDS != null)
+        {
             attributes.put("DMDID", dmdSecIDS);
+        }
         startElement(METS,"div",attributes);
 
         // Put each root level node into the document.
@@ -291,14 +266,14 @@ public class RepositoryAdapter extends AbstractAdapter
      * 
      * 
      * 
-     * private helpfull methods
+     * private helpful methods
      * 
      * 
      * 
      */
 
     /**
-     * Recursively the DSpace hirearchy rendering each container and subcontainers.
+     * Recursively the DSpace hierarchy rendering each container and subcontainers.
      *
      * @param dso
      *            The DSpace Object to be rendered.
@@ -311,9 +286,13 @@ public class RepositoryAdapter extends AbstractAdapter
         // Start the new div for this repository container
         attributes = new AttributeMap();
         if (dso instanceof Community)
-        	attributes.put("TYPE", "DSpace Community");
+        {
+            attributes.put("TYPE", "DSpace Community");
+        }
         else if (dso instanceof Collection)
-        	attributes.put("TYPE", "DSpace Collection");
+        {
+            attributes.put("TYPE", "DSpace Collection");
+        }
         startElement(METS,"div",attributes);
         
         // //////////////////////////////////
@@ -328,14 +307,18 @@ public class RepositoryAdapter extends AbstractAdapter
         endElement(METS,"mptr");
         
         // Recurse to insure that our children are also included even if this
-        // node allready existed in the div structure.
+        // node already existed in the div structure.
         if (dso instanceof Community)
         {
         	for (DSpaceObject child : ((Community)dso).getCollections())
-        		renderStructuralDiv(child);
+            {
+                renderStructuralDiv(child);
+            }
         	
         	for (DSpaceObject child : ((Community)dso).getSubcommunities())
-        		renderStructuralDiv(child);
+            {
+                renderStructuralDiv(child);
+            }
         }
         
         // ////////////////////

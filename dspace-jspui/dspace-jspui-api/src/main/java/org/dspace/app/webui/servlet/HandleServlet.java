@@ -1,73 +1,52 @@
-/*
- * HandleServlet.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.webui.servlet;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.net.URLEncoder;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.log4j.Logger;
-import org.dspace.app.statistics.AbstractUsageEvent;
+import org.dspace.app.util.GoogleMetadata;
 import org.dspace.app.webui.util.Authenticate;
 import org.dspace.app.webui.util.JSPManager;
 import org.dspace.app.webui.util.UIUtil;
-import org.dspace.app.webui.util.UsageEvent;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.*;
+import org.dspace.content.Collection;
+import org.dspace.content.Community;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
 import org.dspace.content.crosswalk.CrosswalkException;
 import org.dspace.content.crosswalk.DisseminationCrosswalk;
-import org.dspace.core.*;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.core.LogManager;
+import org.dspace.core.PluginManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.eperson.Subscribe;
 import org.dspace.handle.HandleManager;
 import org.dspace.plugin.CollectionHomeProcessor;
 import org.dspace.plugin.CommunityHomeProcessor;
+import org.dspace.usage.UsageEvent;
+import org.dspace.utils.DSpace;
 import org.jdom.Element;
+import org.jdom.Text;
 import org.jdom.output.XMLOutputter;
-
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.net.URLEncoder;
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * Servlet for handling requests within a community or collection. The Handle is
@@ -81,8 +60,9 @@ import java.util.List;
  * after the Handle, the community or collection home page is shown.
  * 
  * @author Robert Tansley
- * @version $Revision: 3705 $
+ * @version $Revision: 5845 $
  */
+@SuppressWarnings("deprecation")
 public class HandleServlet extends DSpaceServlet
 {
     /** log4j category */
@@ -149,7 +129,7 @@ public class HandleServlet extends DSpaceServlet
         {
             log.info(LogManager
                     .getHeader(context, "invalid_id", "path=" + path));
-            JSPManager.showInvalidIDError(request, response, path, -1);
+            JSPManager.showInvalidIDError(request, response, StringEscapeUtils.escapeHtml(path), -1);
 
             return;
         }
@@ -159,10 +139,13 @@ public class HandleServlet extends DSpaceServlet
         {
             Item item = (Item) dso;
 
-            UsageEvent ue = new UsageEvent();
-            ue.fire(request, context, AbstractUsageEvent.VIEW, Constants.ITEM,
-                    dso.getID());
-
+            new DSpace().getEventService().fireEvent(
+            		new UsageEvent(
+            				UsageEvent.Action.VIEW,
+            				request, 
+            				context, 
+            				dso));
+            
             // Only use last-modified if this is an anonymous access
             // - caching content that may be generated under authorisation
             //   is a security problem
@@ -196,9 +179,16 @@ public class HandleServlet extends DSpaceServlet
         {
             Collection c = (Collection) dso;
 
-            UsageEvent ue = new UsageEvent();
-            ue.fire(request, context, AbstractUsageEvent.VIEW,
-                    Constants.COLLECTION, dso.getID());
+            new DSpace().getEventService().fireEvent(
+            		new UsageEvent(
+            				UsageEvent.Action.VIEW,
+            				request, 
+            				context, 
+            				dso));
+            
+            //UsageEvent ue = new UsageEvent();
+            //ue.fire(request, context, AbstractUsageEvent.VIEW,
+            //        Constants.COLLECTION, dso.getID());
 
             // Store collection location in request
             request.setAttribute("dspace.collection", c);
@@ -235,9 +225,16 @@ public class HandleServlet extends DSpaceServlet
         {
             Community c = (Community) dso;
 
-            UsageEvent ue = new UsageEvent();
-            ue.fire(request, context, AbstractUsageEvent.VIEW,
-                    Constants.COMMUNITY, dso.getID());
+            new DSpace().getEventService().fireEvent(
+            		new UsageEvent(
+            				UsageEvent.Action.VIEW,
+            				request, 
+            				context, 
+            				dso));
+            
+            //UsageEvent ue = new UsageEvent();
+            //ue.fire(request, context, AbstractUsageEvent.VIEW,
+            //        Constants.COMMUNITY, dso.getID());
 
             // Store collection location in request
             request.setAttribute("dspace.community", c);
@@ -265,7 +262,7 @@ public class HandleServlet extends DSpaceServlet
             log.info(LogManager.getHeader(context,
                     "Handle not an item, collection or community", "handle="
                             + handle));
-            JSPManager.showInvalidIDError(request, response, path, -1);
+            JSPManager.showInvalidIDError(request, response, StringEscapeUtils.escapeHtml(path), -1);
 
             return;
         }
@@ -309,7 +306,7 @@ public class HandleServlet extends DSpaceServlet
         if (item.canEdit())
         {
             // set a variable to create an edit button
-            request.setAttribute("admin_button", new Boolean(true));
+            request.setAttribute("admin_button", Boolean.TRUE);
         }
 
         // Get the collections
@@ -342,18 +339,32 @@ public class HandleServlet extends DSpaceServlet
         // Produce <meta> elements for header from crosswalk
         try
         {
-            List l = xHTMLHeadCrosswalk.disseminateList(item);
+            List<Element> l = xHTMLHeadCrosswalk.disseminateList(item);
             StringWriter sw = new StringWriter();
 
             XMLOutputter xmlo = new XMLOutputter();
-            for (int i = 0; i < l.size(); i++)
+            xmlo.output(new Text("\n"), sw);
+            for (Element e : l)
             {
-                Element e = (Element) l.get(i);
                 // FIXME: we unset the Namespace so it's not printed.
                 // This is fairly yucky, but means the same crosswalk should
                 // work for Manakin as well as the JSP-based UI.
                 e.setNamespace(null);
                 xmlo.output(e, sw);
+                xmlo.output(new Text("\n"), sw);
+            }
+            boolean googleEnabled = ConfigurationManager.getBooleanProperty("google-metadata.enable", false);
+            if (googleEnabled)
+            {
+                // Add Google metadata field names & values
+                GoogleMetadata gmd = new GoogleMetadata(context, item);
+                xmlo.output(new Text("\n"), sw);
+
+                for (Element e: gmd.disseminateList())
+                {
+                    xmlo.output(e, sw);
+                    xmlo.output(new Text("\n"), sw);
+                }
             }
             headMetadata = sw.toString();
         }
@@ -386,8 +397,8 @@ public class HandleServlet extends DSpaceServlet
         }
         
         // Set attributes and display
-        request.setAttribute("suggest.enable", new Boolean(suggestEnable));
-        request.setAttribute("display.all", new Boolean(displayAll));
+        request.setAttribute("suggest.enable", Boolean.valueOf(suggestEnable));
+        request.setAttribute("display.all", Boolean.valueOf(displayAll));
         request.setAttribute("item", item);
         request.setAttribute("collections", collections);
         request.setAttribute("dspace.layout.head", headMetadata);
@@ -430,7 +441,7 @@ public class HandleServlet extends DSpaceServlet
             if (community.canEditBoolean())
             {
                 // set a variable to create an edit button
-                request.setAttribute("editor_button", new Boolean(true));
+                request.setAttribute("editor_button", Boolean.TRUE);
             }
 
             // can they add to this community?
@@ -438,7 +449,7 @@ public class HandleServlet extends DSpaceServlet
                     Constants.ADD))
             {
                 // set a variable to create an edit button
-                request.setAttribute("add_button", new Boolean(true));
+                request.setAttribute("add_button", Boolean.TRUE);
             }
 
             // can they remove from this community?
@@ -446,7 +457,7 @@ public class HandleServlet extends DSpaceServlet
                     Constants.REMOVE))
             {
                 // set a variable to create an edit button
-                request.setAttribute("remove_button", new Boolean(true));
+                request.setAttribute("remove_button", Boolean.TRUE);
             }
 
             // Forward to community home page
@@ -511,7 +522,9 @@ public class HandleServlet extends DSpaceServlet
                     !Authenticate
                             .startAuthentication(context, request, response))
 
+                {
                     return;
+                }
                 else
                 {
                     Subscribe.subscribe(context, context.getCurrentUser(),
@@ -542,17 +555,17 @@ public class HandleServlet extends DSpaceServlet
                 subscribed = Subscribe.isSubscribed(context, e, collection);
 
                 // is the user a COLLECTION_EDITOR?
-                if (collection.canEditBoolean())
+                if (collection.canEditBoolean(true))
                 {
                     // set a variable to create an edit button
-                    request.setAttribute("editor_button", new Boolean(true));
+                    request.setAttribute("editor_button", Boolean.TRUE);
                 }
 
                 // can they admin this collection?
                 if (AuthorizeManager.authorizeActionBoolean(context,
                         collection, Constants.COLLECTION_ADMIN))
                 {
-                    request.setAttribute("admin_button", new Boolean(true));
+                    request.setAttribute("admin_button", Boolean.TRUE);
 
                     // give them a button to manage submitter list
                     // what group is the submitter?
@@ -570,21 +583,21 @@ public class HandleServlet extends DSpaceServlet
                 {
                     request
                             .setAttribute("can_submit_button",
-                                    new Boolean(true));
+                                    Boolean.TRUE);
 
                 }
                 else
                 {
                     request.setAttribute("can_submit_button",
-                            new Boolean(false));
+                            Boolean.FALSE);
                 }
             }
 
             // Forward to collection home page
             request.setAttribute("collection", collection);
             request.setAttribute("community", community);
-            request.setAttribute("logged.in", new Boolean(e != null));
-            request.setAttribute("subscribed", new Boolean(subscribed));
+            request.setAttribute("logged.in", Boolean.valueOf(e != null));
+            request.setAttribute("subscribed", Boolean.valueOf(subscribed));
             JSPManager.showJSP(request, response, "/collection-home.jsp");
 
             if (updated)
@@ -674,63 +687,6 @@ public class HandleServlet extends DSpaceServlet
         }
 
         return false;
-    }
-
-    /**
-     * Utility method to obtain the titles for the Items in the given list.
-     * 
-     * @param List
-     *            of Items
-     * @return array of corresponding titles
-     */
-    private String[] getItemTitles(List items)
-    {
-        String[] titles = new String[items.size()];
-
-        for (int i = 0; i < items.size(); i++)
-        {
-            Item item = (Item) items.get(i);
-
-            // FIXME: Should probably check for preferred language?
-            DCValue[] titlesForThis = item.getDC("title", null, Item.ANY);
-
-            // Just use the first title, if any
-            if (titlesForThis.length == 0)
-            {
-                // No title at all!
-                titles[i] = null;
-            }
-            else
-            {
-                // Use first title
-                titles[i] = titlesForThis[0].value;
-            }
-        }
-
-        return titles;
-    }
-
-    /**
-     * Utility method obtain URLs for the most recent items
-     * 
-     * @param context
-     *            DSpace context
-     * @param items
-     *            the items to get URLs for
-     * @return an array of URLs (in Strings) corresponding to those items
-     */
-    private String[] getItemURLs(Context context, List items)
-            throws SQLException
-    {
-        String[] urls = new String[items.size()];
-
-        for (int i = 0; i < items.size(); i++)
-        {
-            Item item = (Item) items.get(i);
-            urls[i] = "/handle/" + item.getHandle();
-        }
-
-        return urls;
     }
 
     /**

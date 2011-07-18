@@ -1,41 +1,9 @@
-/*
- * UploadStep.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.submit.step;
 
@@ -75,7 +43,7 @@ import org.dspace.submit.AbstractProcessingStep;
  * @see org.dspace.submit.AbstractProcessingStep
  * 
  * @author Tim Donohue
- * @version $Revision: 3705 $
+ * @version $Revision: 5844 $
  */
 public class UploadStep extends AbstractProcessingStep
 {
@@ -171,7 +139,9 @@ public class UploadStep extends AbstractProcessingStep
 
             // if error occurred, return immediately
             if (status != STATUS_COMPLETE)
+            {
                 return status;
+            }
         }
             
         // if user pressed jump-to button in process bar,
@@ -254,7 +224,9 @@ public class UploadStep extends AbstractProcessingStep
 
                     // if error occurred, return immediately
                     if (status != STATUS_COMPLETE)
+                    {
                         return status;
+                    }
                 }
 
                 // remove current bitstream from Submission Info
@@ -270,7 +242,9 @@ public class UploadStep extends AbstractProcessingStep
 
             // if error occurred, return immediately
             if (status != STATUS_COMPLETE)
+            {
                 return status;
+            }
 
             // remove current bitstream from Submission Info
             subInfo.setBitstream(null);
@@ -289,7 +263,9 @@ public class UploadStep extends AbstractProcessingStep
 
             // if error occurred, return immediately
             if (status != STATUS_COMPLETE)
+            {
                 return status;
+            }
         }
 
         // ------------------------------------------
@@ -309,7 +285,9 @@ public class UploadStep extends AbstractProcessingStep
 
             // if error occurred, return immediately
             if (status != STATUS_COMPLETE)
+            {
                 return status;
+            }
         }
 
         // ---------------------------------------------------
@@ -318,9 +296,12 @@ public class UploadStep extends AbstractProcessingStep
         if (request.getParameter("primary_bitstream_id") != null)
         {
             Bundle[] bundles = item.getBundles("ORIGINAL");
-            bundles[0].setPrimaryBitstreamID(new Integer(request
+            if (bundles.length > 0)
+            {
+            	bundles[0].setPrimaryBitstreamID(Integer.valueOf(request
                     .getParameter("primary_bitstream_id")).intValue());
-            bundles[0].update();
+            	bundles[0].update();
+            }
         }
 
         // ---------------------------------------------------
@@ -476,19 +457,21 @@ public class UploadStep extends AbstractProcessingStep
                 
                 // Load the file's path and input stream and description
                 String filePath = (String) request.getAttribute(param + "-path");
-                InputStream fileInputStream = (InputStream) request
-                                    .getAttribute(param + "-inputstream");
+                InputStream fileInputStream = (InputStream) request.getAttribute(param + "-inputstream");
                 
                 //attempt to get description from attribute first, then direct from a parameter
-                String fileDescription =  (String) request
-                                    .getAttribute(param + "-description");
+                String fileDescription =  (String) request.getAttribute(param + "-description");
                 if(fileDescription==null ||fileDescription.length()==0)
+                {
                     request.getParameter("description");
+                }
                 
                 // if information wasn't passed by User Interface, we had a problem
                 // with the upload
                 if (filePath == null || fileInputStream == null)
+                {
                     return STATUS_UPLOAD_ERROR;
+                }
                 
                 if (subInfo != null)
                 {
@@ -599,7 +582,9 @@ public class UploadStep extends AbstractProcessingStep
             return STATUS_UNKNOWN_FORMAT;
         }
         else
+        {
             return STATUS_COMPLETE;
+        }
               
     }
 

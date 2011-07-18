@@ -1,50 +1,16 @@
-/*
- * AbstractStep.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.xmlui.aspect.submission;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -81,7 +47,7 @@ import org.xml.sax.SAXException;
  * @author Scott Phillips
  * @author Tim Donohue (updated for Configurable Submission)
  */
-abstract public class AbstractStep extends AbstractDSpaceTransformer 
+public abstract class AbstractStep extends AbstractDSpaceTransformer 
 {
 	private static Logger log = Logger.getLogger(AbstractStep.class);
 
@@ -152,12 +118,10 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
 	protected InProgressSubmission submission;
 	
 	/**
-	 * The current step and page's numeric value that it is at currently. This 
-	 * number is dynamic between submissions and is a double where the integer
-	 * value is the step #, and the decimal value is the page # 
-	 * (e.g. 1.2 is page 2 of step 1)
+	 * The current step and page's numeric values that it is at currently. This 
+	 * number is dynamic between submissions.
 	 */
-	protected double stepAndPage;
+	protected StepAndPage stepAndPage;
 	
 	/**
 	 * The handle being processed by the current step.
@@ -199,7 +163,8 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
 
 		try {
 			this.id = parameters.getParameter("id",null);
-			this.stepAndPage = Double.valueOf(parameters.getParameter("step","-1"));
+			this.stepAndPage = new StepAndPage(parameters.getParameter("step","-1.-1"));
+			log.debug("AbstractStep.setup:  step is " + parameters.getParameter("step","]defaulted[")); // FIXME mhw
 			this.handle = parameters.getParameter("handle",null);
 			this.errorFlag = Integer.valueOf(parameters.getParameter("error", String.valueOf(AbstractProcessingStep.STATUS_COMPLETE)));
 			this.errorFields = getErrorFields(parameters);
@@ -213,19 +178,29 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
 			
 			// Check required error conditions
 			if (this.requireSubmission && this.submission == null)
-				throw new ProcessingException("Unable to find submission for id: "+this.id);
+            {
+                throw new ProcessingException("Unable to find submission for id: " + this.id);
+            }
 			
 			if (this.requireWorkflow && !(submission instanceof WorkflowItem))
-				throw new ProcessingException("The submission is not a workflow, "+this.id);
+            {
+                throw new ProcessingException("The submission is not a workflow, " + this.id);
+            }
 			
 			if (this.requireWorkspace && !(submission instanceof WorkspaceItem))
-				throw new ProcessingException("The submission is not a workspace, "+this.id);
+            {
+                throw new ProcessingException("The submission is not a workspace, " + this.id);
+            }
 			
-			if (this.requireStep && stepAndPage < 0)
-				throw new ProcessingException("Step is a required parameter.");
+			if (this.requireStep && stepAndPage.getStep() < 0)
+            {
+                throw new ProcessingException("Step is a required parameter.");
+            }
 			
 			if (this.requireHandle && handle == null)
-				throw new ProcessingException("Handle is a required parameter.");
+            {
+                throw new ProcessingException("Handle is a required parameter.");
+            }
 			
 		} 
 		catch (SQLException sqle) 
@@ -287,21 +262,17 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
 		//get Map of progress bar information
 		//key: entry # (i.e. step & page), 
 		//value: entry name key (i.e. display name)
-		Map progBarInfo = this.submissionInfo.getProgressBarInfo();
-		
-		Iterator i = progBarInfo.keySet().iterator();
-		
+		Map<String, String> progBarInfo = this.submissionInfo.getProgressBarInfo();
+
 		//add each entry to progress bar
-		while(i.hasNext())
+		for (Map.Entry<String, String> progBarEntry : progBarInfo.entrySet())
 		{
-			String entryNum = (String) i.next();
-			
 			//Since we are using XML-UI, we need to prepend the heading key with "xmlui.Submission."
-			String entryNameKey = "xmlui.Submission." + (String) progBarInfo.get(entryNum);
+			String entryNameKey = "xmlui.Submission." + progBarEntry.getValue();
 			
 			//the value of entryNum is current step & page 
 			//(e.g. 1.2 is page 2 of step 1) 
-			double currentStepAndPage = Double.valueOf(entryNum).doubleValue();
+			StepAndPage currentStepAndPage = new StepAndPage(progBarEntry.getKey());
 			
             //add a button to progress bar for this step & page
             addJumpButton(progress, message(entryNameKey), currentStepAndPage);
@@ -328,11 +299,11 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
      *          The step and page (a double of the form 'step.page', e.g. 1.2)
      *          which this button will jump back to
      */
-    public void addJumpButton(List list, Message buttonText, double stepAndPage)
+    public void addJumpButton(List list, Message buttonText, StepAndPage stepAndPage)
         throws WingException
     {
         //Only add the button if we have button text and a valid step & page!
-        if(buttonText!=null && stepAndPage>0.0)
+        if(buttonText!=null && stepAndPage.isSet())
         {    
             //add a Jump To button for this section
             Button jumpButton = list.addItem("step_" + stepAndPage, renderJumpButton(stepAndPage))
@@ -347,7 +318,7 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
      * default control/paging buttons appear on each submission page.
      * <P>
      * Note: A given step may define its own buttons as necessary,
-     * and not call this method (since it must be explicitly envoked by
+     * and not call this method (since it must be explicitly invoked by
      * the step's addBody() method)
      *
      * @param controls
@@ -360,16 +331,22 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
         
         //only have "<-Previous" button if not first step
         if(!isFirstStep())
+        {
             actions.addButton(AbstractProcessingStep.PREVIOUS_BUTTON).setValue(T_previous);
+        }
         
         //always show "Save/Cancel"
         actions.addButton(AbstractProcessingStep.CANCEL_BUTTON).setValue(T_save);
         
         //If last step, show "Complete Submission"
         if(isLastStep())
+        {
             actions.addButton(AbstractProcessingStep.NEXT_BUTTON).setValue(T_complete);
+        }
         else //otherwise, show "Next->"
+        {
             actions.addButton(AbstractProcessingStep.NEXT_BUTTON).setValue(T_next);
+        }
     }
     
 	
@@ -380,7 +357,7 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
 	 */
 	public int getStep()
 	{
-		return FlowUtils.getStep(this.stepAndPage);
+		return this.stepAndPage.getStep();
 	}
 	
 	
@@ -391,7 +368,7 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
 	 */
 	public int getPage()
 	{
-		return FlowUtils.getPage(this.stepAndPage);
+		return this.stepAndPage.getPage();
 	}
     
     /**
@@ -407,15 +384,9 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
         Set submissionPagesSet = submissionInfo.getProgressBarInfo().keySet();
         String[] submissionPages = (String[]) submissionPagesSet.toArray(new String[submissionPagesSet.size()]);
         
-        double firstStepAndPage = Double.valueOf(submissionPages[0]).doubleValue();
-        
-        if((FlowUtils.getStep(firstStepAndPage)==getStep())
-                && (FlowUtils.getPage(firstStepAndPage)==getPage()))
-        {
-            return true;
-        }
-        else
-            return false;
+        StepAndPage firstStepAndPage = new StepAndPage(submissionPages[0]);
+
+        return firstStepAndPage.equals(stepAndPage);
     }
     
     
@@ -434,59 +405,54 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
         Set submissionPagesSet = submissionInfo.getProgressBarInfo().keySet();
         String[] submissionPages = (String[]) submissionPagesSet.toArray(new String[submissionPagesSet.size()]);
         
-        double lastStepAndPage;
+        StepAndPage lastStepAndPage;
         
         if(!inWorkflow)
         {
             // If not in Workflow,
             // Last step is considered the one *before* the Complete Step
-            lastStepAndPage = Double.valueOf(submissionPages[submissionPages.length-2]).doubleValue();
+            lastStepAndPage = new StepAndPage(submissionPages[submissionPages.length-2]);
         }
         else
         {   
-            lastStepAndPage = Double.valueOf(submissionPages[submissionPages.length-1]).doubleValue();
+            lastStepAndPage = new StepAndPage(submissionPages[submissionPages.length-1]);
         }
-        
-        if((FlowUtils.getStep(lastStepAndPage)==getStep())
-                && (FlowUtils.getPage(lastStepAndPage)==getPage()))
-        {
-            return true;
-        }
-        else
-            return false;
+
+        return lastStepAndPage.equals(stepAndPage);
     }
-    
+
     /**
      * Find the maximum step and page that the user has 
      * reached in the submission processes. 
      * If this submission is a workflow then return max-int.
-     * 
-     * @param context The current DSpace content
-     * @param id The unique ID of the current workflow/workspace
      */
-    public double getMaxStepAndPageReached() throws SQLException {
-        
+    public StepAndPage getMaxStepAndPageReached() throws SQLException {
+
         if (this.submission instanceof WorkspaceItem)
         {
             WorkspaceItem workspaceItem = (WorkspaceItem) submission;
-            
+
             int step = workspaceItem.getStageReached();
-            if(step<0) 
-                step=0;
+            if(step<0)
+            {
+                step = 0;
+            }
             
             int page = workspaceItem.getPageReached();
             if (page < 0)
+            {
                 page = 0;
-            
-            return Double.valueOf(step + "." + page).doubleValue();
+            }
+
+            return new StepAndPage(step, page);
         }
         
         // This is a workflow, return infinity.
-        return Double.MAX_VALUE;
+        return new StepAndPage(Integer.MAX_VALUE, Integer.MAX_VALUE);
     }
 	
 	/**
-	 * Retreive error fields from the list of parameters
+	 * Retrieve error fields from the list of parameters
 	 * and return a List of all fields which had errors
 	 *
 	 * @return java.util.List of field names with errors
@@ -499,10 +465,14 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
 		
 		if (errors!=null && errors.length() > 0)
 		{	
-			if(errors.indexOf(",") > 0)
-				fields = Arrays.asList(errors.split(","));
+			if(errors.indexOf(',') > 0)
+            {
+                fields = Arrays.asList(errors.split(","));
+            }
 			else//only one error field
-				fields.add(errors);
+            {
+                fields.add(errors);
+            }
 		}
 		
 		return fields;
@@ -519,20 +489,26 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
      * render it with "disabled" style.
 	 * 
 	 * @param givenStepAndPage 
-     *        This given step & page (e.g. "1.2")
+     *        This given step & page (e.g. (1,2))
 	 * @return
      *        render style for this button
 	 */
-	private String renderJumpButton(double givenStepAndPage)
+	private String renderJumpButton(StepAndPage givenStepAndPage)
 	{
         try
         {
-            if (Double.compare(givenStepAndPage, this.stepAndPage)==0)
-    			return "current";
-            else if (Double.compare(givenStepAndPage, getMaxStepAndPageReached())>0)
+            if (givenStepAndPage.equals(this.stepAndPage))
+            {
+                return "current";
+            }
+            else if (givenStepAndPage.compareTo(getMaxStepAndPageReached())>0)
+            {
                 return "disabled";
+            }
             else
-    			return null;
+            {
+                return null;
+            }
         }
         catch(Exception e)
         {
@@ -548,7 +524,7 @@ abstract public class AbstractStep extends AbstractDSpaceTransformer
 	{
 		this.id = null;
 		this.submission = null;
-		this.stepAndPage = -1;
+		this.stepAndPage = new StepAndPage();
 		this.handle = null;
 		this.errorFlag = 0;
 		this.errorFields = null;

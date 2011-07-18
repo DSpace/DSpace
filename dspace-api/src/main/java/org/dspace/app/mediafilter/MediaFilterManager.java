@@ -1,50 +1,17 @@
-/*
- * MediaFilterManager.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.mediafilter;
 
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.List;
 
@@ -57,6 +24,7 @@ import org.apache.commons.cli.OptionBuilder;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
@@ -87,37 +55,39 @@ import org.dspace.search.DSIndexer;
 public class MediaFilterManager
 {
 	//key (in dspace.cfg) which lists all enabled filters by name
-    public static String MEDIA_FILTER_PLUGINS_KEY = "filter.plugins";
+    public static final String MEDIA_FILTER_PLUGINS_KEY = "filter.plugins";
 	
     //prefix (in dspace.cfg) for all filter properties
-    public static String FILTER_PREFIX = "filter";
+    public static final String FILTER_PREFIX = "filter";
     
     //suffix (in dspace.cfg) for input formats supported by each filter
-    public static String INPUT_FORMATS_SUFFIX = "inputFormats";
+    public static final String INPUT_FORMATS_SUFFIX = "inputFormats";
     
-    public static boolean updateIndex = true; // default to updating index
+    static boolean updateIndex = true; // default to updating index
 
-    public static boolean isVerbose = false; // default to not verbose
+    static boolean isVerbose = false; // default to not verbose
 
-    public static boolean isForce = false; // default to not forced
+    static boolean isQuiet = false; // default is noisy
+
+    static boolean isForce = false; // default to not forced
     
-    public static String identifier = null; // object scope limiter
+    static String identifier = null; // object scope limiter
     
-    public static int max2Process = Integer.MAX_VALUE;  // maximum number items to process
+    static int max2Process = Integer.MAX_VALUE;  // maximum number items to process
     
-    public static int processed = 0;   // number items processed
+    static int processed = 0;   // number items processed
     
     private static Item currentItem = null;   // current item being processed
     
     private static FormatFilter[] filterClasses = null;
     
-    private static Map filterFormats = new HashMap();
+    private static Map<String, List<String>> filterFormats = new HashMap<String, List<String>>();
     
-    private static List skipList = null; //list of identifiers to skip during processing
+    private static List<String> skipList = null; //list of identifiers to skip during processing
     
     //separator in filterFormats Map between a filter class name and a plugin name,
     //for MediaFilters which extend SelfNamedPlugin (\034 is "file separator" char)
-    public static String FILTER_PLUGIN_SEPARATOR = "\034";
+    public static final String FILTER_PLUGIN_SEPARATOR = "\034";
     
     public static void main(String[] argv) throws Exception
     {
@@ -133,6 +103,8 @@ public class MediaFilterManager
         
         options.addOption("v", "verbose", false,
                 "print all extracted text and other details to STDOUT");
+        options.addOption("q", "quiet", false,
+                "do not print anything except in the event of errors.");
         options.addOption("f", "force", false,
                 "force all bitstreams to be processed");
         options.addOption("n", "noindex", false,
@@ -192,6 +164,8 @@ public class MediaFilterManager
             isVerbose = true;
         }
 
+        isQuiet = line.hasOption('q');
+
         if (line.hasOption('n'))
         {
             updateIndex = false;
@@ -241,7 +215,7 @@ public class MediaFilterManager
         }
                 
         //initialize an array of our enabled filters
-        List filterList = new ArrayList();
+        List<FormatFilter> filterList = new ArrayList<FormatFilter>();
                 
         //set up each filter
         for(int i=0; i< filterNames.length; i++)
@@ -301,10 +275,10 @@ public class MediaFilterManager
         if(isVerbose)
         {   
             System.out.println("The following MediaFilters are enabled: ");
-            java.util.Iterator i = filterFormats.keySet().iterator();
+            Iterator<String> i = filterFormats.keySet().iterator();
             while(i.hasNext())
             {
-                String filterName = (String) i.next();
+                String filterName = i.next();
                 System.out.println("Full Filter Name: " + filterName);
                 String pluginName = null;
                 if(filterName.contains(FILTER_PLUGIN_SEPARATOR))
@@ -384,8 +358,19 @@ public class MediaFilterManager
             // update search index?
             if (updateIndex)
             {
-                System.out.println("Updating search index:");
-                DSIndexer.updateIndex(c);
+                if (!isQuiet)
+                {
+                    System.out.println("Updating search index:");
+                }
+                DSIndexer.setBatchProcessingMode(true);
+                try
+                {
+                    DSIndexer.updateIndex(c);
+                }
+                finally
+                {
+                    DSIndexer.setBatchProcessingMode(false);
+                }
             }
 
             c.complete();
@@ -414,7 +399,9 @@ public class MediaFilterManager
             Community[] topLevelCommunities = Community.findAllTop(c);
           
             for(int i=0; i<topLevelCommunities.length; i++)
+            {
                 applyFiltersCommunity(c, topLevelCommunities[i]);
+            }
         }
         else 
         {
@@ -430,7 +417,9 @@ public class MediaFilterManager
             finally
             {
                 if (i != null)
+                {
                     i.close();
+                }
             }
         }
     }
@@ -471,7 +460,9 @@ public class MediaFilterManager
             finally
             {
                 if (i != null)
+                {
                     i.close();
+                }
             }
         }
     }
@@ -559,7 +550,7 @@ public class MediaFilterManager
     	    //  <class-name><separator><plugin-name>
     	    //For other MediaFilters, map key is just:
     	    //  <class-name>
-    	    List fmts = (List)filterFormats.get(filterClasses[i].getClass().getName() + 
+    	    List<String> fmts = filterFormats.get(filterClasses[i].getClass().getName() +
     	                       (pluginName!=null ? FILTER_PLUGIN_SEPARATOR + pluginName : ""));
     	   
     	    if (fmts.contains(myBitstream.getFormat().getShortDescription()))
@@ -578,7 +569,6 @@ public class MediaFilterManager
                 {
                 	String handle = myItem.getHandle();
                 	Bundle[] bundles = myBitstream.getBundles();
-                	String name = myBitstream.getName();
                 	long size = myBitstream.getSize();
                 	String checksum = myBitstream.getChecksum() + " ("+myBitstream.getChecksumAlgorithm()+")";
                 	int assetstore = myBitstream.getStoreNumber();
@@ -597,6 +587,80 @@ public class MediaFilterManager
                     e.printStackTrace();
                 }
     		}
+            else if (filterClasses[i] instanceof SelfRegisterInputFormats)
+            {
+                // Filter implements self registration, so check to see if it should be applied
+                // given the formats it claims to support
+                SelfRegisterInputFormats srif = (SelfRegisterInputFormats)filterClasses[i];
+                boolean applyFilter = false;
+
+                // Check MIME type
+                String[] mimeTypes = srif.getInputMIMETypes();
+                if (mimeTypes != null)
+                {
+                    for (String mimeType : mimeTypes)
+                    {
+                        if (mimeType.equalsIgnoreCase(myBitstream.getFormat().getMIMEType()))
+                        {
+                            applyFilter = true;
+                        }
+                    }
+                }
+
+                // Check description
+                if (!applyFilter)
+                {
+                    String[] descriptions = srif.getInputDescriptions();
+                    if (descriptions != null)
+                    {
+                        for (String desc : descriptions)
+                        {
+                            if (desc.equalsIgnoreCase(myBitstream.getFormat().getShortDescription()))
+                            {
+                                applyFilter = true;
+                            }
+                        }
+                    }
+                }
+
+                // Check extensions
+                if (!applyFilter)
+                {
+                    String[] extensions = srif.getInputExtensions();
+                    if (extensions != null)
+                    {
+                        for (String ext : extensions)
+                        {
+                            String[] formatExtensions = myBitstream.getFormat().getExtensions();
+                            if (formatExtensions != null && ArrayUtils.contains(formatExtensions, ext))
+                            {
+                                applyFilter = true;
+                            }
+                        }
+                    }
+                }
+
+                // Filter claims to handle this type of file, so attempt to apply it
+                if (applyFilter)
+                {
+                    try
+                    {
+                        // only update item if bitstream not skipped
+                        if (processBitstream(c, myItem, myBitstream, filterClasses[i]))
+                        {
+                               myItem.update(); // Make sure new bitstream has a sequence
+                                                 // number
+                               filtered = true;
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        System.out.println("ERROR filtering, skipping bitstream #"
+                                + myBitstream.getID() + " " + e);
+                        e.printStackTrace();
+                    }
+                }
+            }
     	}
         return filtered;
     }
@@ -625,7 +689,9 @@ public class MediaFilterManager
     {
         //do pre-processing of this bitstream, and if it fails, skip this bitstream!
     	if(!formatFilter.preProcessBitstream(c, item, source))
-        	return false;
+        {
+            return false;
+        }
         	
     	boolean overWrite = MediaFilterManager.isForce;
         
@@ -659,8 +725,11 @@ public class MediaFilterManager
         // if exists and overwrite = false, exit
         if (!overWrite && (existingBitstream != null))
         {
-            System.out.println("SKIPPED: bitstream " + source.getID()
-                    + " (item: " + item.getHandle() + ") because '" + newName + "' already exists");
+            if (!isQuiet)
+            {
+                System.out.println("SKIPPED: bitstream " + source.getID()
+                        + " (item: " + item.getHandle() + ") because '" + newName + "' already exists");
+            }
 
             return false;
         }
@@ -668,8 +737,11 @@ public class MediaFilterManager
         InputStream destStream = formatFilter.getDestinationStream(source.retrieve());
         if (destStream == null)
         {
-            System.out.println("SKIPPED: bitstream " + source.getID()
-                    + " (item: " + item.getHandle() + ") because filtering was unsuccessful");
+            if (!isQuiet)
+            {
+                System.out.println("SKIPPED: bitstream " + source.getID()
+                        + " (item: " + item.getHandle() + ") because filtering was unsuccessful");
+            }
 
             return false;
         }
@@ -711,8 +783,11 @@ public class MediaFilterManager
             targetBundle.removeBitstream(existingBitstream);
         }
 
-        System.out.println("FILTERED: bitstream " + source.getID()
-                + " (item: " + item.getHandle() + ") and created '" + newName + "'");
+        if (!isQuiet)
+        {
+            System.out.println("FILTERED: bitstream " + source.getID()
+                    + " (item: " + item.getHandle() + ") and created '" + newName + "'");
+        }
 
         //do post-processing of the generated bitstream
         formatFilter.postProcessBitstream(c, item, b);
@@ -748,11 +823,16 @@ public class MediaFilterManager
     {
         if(skipList!=null && skipList.contains(identifier))
         {
-            System.out.println("SKIP-LIST: skipped bitstreams within identifier " + identifier);
+            if (!isQuiet)
+            {
+                System.out.println("SKIP-LIST: skipped bitstreams within identifier " + identifier);
+            }
             return true;
         }    
         else
+        {
             return false;
+        }
     }
     
 }

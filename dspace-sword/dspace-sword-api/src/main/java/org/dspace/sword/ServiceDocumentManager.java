@@ -1,39 +1,9 @@
-/* ServiceDocumentManager.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Copyright (c) 2007, Aberystwyth University
- *
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *  - Redistributions of source code must retain the above
- *    copyright notice, this list of conditions and the
- *    following disclaimer.
- *
- *  - Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- *  - Neither the name of the Centre for Advanced Software and
- *    Intelligent Systems (CASIS) nor the names of its
- *    contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
- * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.sword;
 
@@ -41,20 +11,18 @@ import org.purl.sword.base.ServiceDocument;
 import org.purl.sword.base.SWORDErrorException;
 import org.purl.sword.base.Service;
 import org.purl.sword.base.Workspace;
+import org.purl.sword.atom.Generator;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.content.Community;
 import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.apache.log4j.Logger;
 
 import java.util.List;
 
 public class ServiceDocumentManager
 {
-	private static Logger log = Logger.getLogger(ServiceDocumentManager.class);
-
 	private SWORDService swordService;
 
 	private SWORDAuthenticator swordAuth;
@@ -110,6 +78,9 @@ public class ServiceDocumentManager
 
 		// set the max upload size
 		service.setMaxUploadSize(swordConfig.getMaxUploadSize());
+
+        // Set the generator
+        this.addGenerator(service);
 
 		//
 		if (url == null || urlManager.isBaseServiceDocumentUrl(url))
@@ -189,7 +160,25 @@ public class ServiceDocumentManager
 			}
 		}
 
-		ServiceDocument sd = new ServiceDocument(service);
-		return sd;
+        return new ServiceDocument(service);
 	}
+
+    /**
+     * Add the generator field content
+     *
+     * @param service The service document to add the generator to
+     */
+    private void addGenerator(Service service)
+    {
+        boolean identify = ConfigurationManager.getBooleanProperty("sword.identify-version", false);
+        SWORDUrlManager urlManager = swordService.getUrlManager();
+        String softwareUri = urlManager.getGeneratorUrl();
+        if (identify)
+        {
+            Generator generator = new Generator();
+            generator.setUri(softwareUri);
+            generator.setVersion(SWORDProperties.VERSION);
+            service.setGenerator(generator);
+        }
+    }
 }

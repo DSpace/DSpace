@@ -5,7 +5,7 @@
   -
   - Version:  $Revision: 3705 $
   -
-  - Date:     $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+  - Date:     $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
   -
   - Initial contents for Dublin Core type registry.  Once the registry has
   - been loaded, this file becomes obsolete; the current version of the
@@ -34,7 +34,7 @@
     <contributor.author>Rebecca Lubas</contributor.author>
     <contributor.author>Sarah Mitchell</contributor.author>
     <contributor.editor>$Author: mdiggory $</contributor.editor>
-    <date.created>$Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $</date.created>
+    <date.created>$Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $</date.created>
     <description>
       $Log$
       Revision 1.5  2006/10/18 15:38:34  cjuergen

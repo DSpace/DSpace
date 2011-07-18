@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
 
 <!--
   template.xsl
 
-  Version: $Revision: 3705 $
+  Version: $Revision: 5845 $
  
-  Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
+  Date: $Date: 2010-11-12 00:34:07 -0500 (Fri, 12 Nov 2010) $
 
 -->
 
@@ -239,7 +248,15 @@
                                 <xsl:attribute name="style">left: 218px;</xsl:attribute>
                             </xsl:if>
                             <i18n:translate>
-                                <i18n:text>xmlui.dri2xhtml.structural.pagination-info</i18n:text>
+                                <!--Filter out our total if we have no results-->
+                                <xsl:choose>
+                                    <xsl:when test="parent::node()/@itemsTotal = -1">
+                                        <i18n:text>xmlui.dri2xhtml.structural.pagination-info.nototal</i18n:text>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <i18n:text>xmlui.dri2xhtml.structural.pagination-info</i18n:text>
+                                    </xsl:otherwise>
+                                </xsl:choose>
                                 <i18n:param><xsl:value-of select="parent::node()/@firstItemIndex"/></i18n:param>
                                 <i18n:param><xsl:value-of select="parent::node()/@lastItemIndex"/></i18n:param>
                                 <i18n:param><xsl:value-of select="parent::node()/@itemsTotal"/></i18n:param>
@@ -277,7 +294,14 @@
                         </xsl:if>
                         <p class="pagination-info">
                             <i18n:translate>
-                                <i18n:text>xmlui.dri2xhtml.structural.pagination-info</i18n:text>
+                                <xsl:choose>
+                                    <xsl:when test="parent::node()/@itemsTotal = -1">
+                                        <i18n:text>xmlui.dri2xhtml.structural.pagination-info.nototal</i18n:text>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <i18n:text>xmlui.dri2xhtml.structural.pagination-info</i18n:text>
+                                    </xsl:otherwise>
+                                </xsl:choose>
                                 <i18n:param><xsl:value-of select="parent::node()/@firstItemIndex"/></i18n:param>
                                 <i18n:param><xsl:value-of select="parent::node()/@lastItemIndex"/></i18n:param>
                                 <i18n:param><xsl:value-of select="parent::node()/@itemsTotal"/></i18n:param>
@@ -800,24 +824,40 @@
                         </span>
                         <xsl:text>, </xsl:text>
                     </xsl:if>
+                    
                     <span class="date">
-                        <!--
-		    	<xsl:value-of select="substring(dim:field[@element='date' and @qualifier='issued']/node(),1,10)"/>
-			-->
-			<xsl:call-template name="month-name">
-				<xsl:with-param name="date-time" select = "dim:field[@element='date' and @qualifier='issued']/node()"/>					
-			</xsl:call-template>
-			<xsl:text> </xsl:text>
-			<xsl:call-template name="day-in-month">
-				<xsl:with-param name="date-time" select = "dim:field[@element='date' and @qualifier='issued']/node()"/>
-			</xsl:call-template>
-			<xsl:text>, </xsl:text>
-			<xsl:call-template name="year">
-				<xsl:with-param name="date-time" select = "dim:field[@element='date' and @qualifier='issued']/node()"/>
-			</xsl:call-template>				
+
+                        <xsl:variable name="month-issued" select= "substring(dim:field[@element='date' and @qualifier='issued']/node(),6,2)"/>
+                        <xsl:variable name="day-issued" select= "substring(dim:field[@element='date' and @qualifier='issued']/node(),9,2)"/>
+
+                        <xsl:if test="string-length($month-issued) > 0">
+
+                            <xsl:call-template name="month-name">
+                                <xsl:with-param name="date-time" select = "dim:field[@element='date' and @qualifier='issued']/node()"/>
+                            </xsl:call-template>
+
+                            <xsl:text> </xsl:text>
+
+                            <xsl:if test="string-length($day-issued) > 0">
+
+                                <xsl:call-template name="day-in-month">
+                                    <xsl:with-param name="date-time" select = "dim:field[@element='date' and @qualifier='issued']/node()"/>
+                                </xsl:call-template>
+
+                            </xsl:if>
+
+                            <xsl:text>, </xsl:text>
+
+                        </xsl:if>
+
+                        <xsl:call-template name="year">
+                            <xsl:with-param name="date-time" select = "dim:field[@element='date' and @qualifier='issued']/node()"/>
+                        </xsl:call-template>
+
                     </span>
                     <xsl:text>)</xsl:text>
                 </span>
+
             </div>
         </div>
     </xsl:template>

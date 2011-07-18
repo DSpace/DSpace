@@ -1,42 +1,14 @@
 /**
- * Copyright (c) 2007-2009, Aberystwyth University
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *  - Redistributions of source code must retain the above
- *    copyright notice, this list of conditions and the
- *    following disclaimer.
- *
- *  - Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- *  - Neither the name of the Centre for Advanced Software and
- *    Intelligent Systems (CASIS) nor the names of its
- *    contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
- * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.purl.sword.atom;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 import nu.xom.Attribute;
 import nu.xom.Element;
@@ -59,7 +31,7 @@ import org.purl.sword.base.XmlName;
 public class Generator extends XmlElement implements SwordElementInterface
 {
    /**
-    * Label for the uri attribute. 
+    * Label for the URI attribute. 
     */
    public static final String ATTRIBUTE_URI = "uri";
 	
@@ -115,7 +87,7 @@ public class Generator extends XmlElement implements SwordElementInterface
        return XML_NAME;
    }
 
-   protected void initialise()
+   protected final void initialise()
    {
        content = null;
        version = null;
@@ -123,7 +95,7 @@ public class Generator extends XmlElement implements SwordElementInterface
    }
 
    /**
-    * Marshall the data in the object to an Element object. 
+    * Marshal the data in the object to an Element object. 
     * 
     * @return The element. 
     */
@@ -153,7 +125,7 @@ public class Generator extends XmlElement implements SwordElementInterface
    }
 
    /**
-    * Unmarshall the specified Generator element into the data in this object. 
+    * Unmarshal the specified Generator element into the data in this object. 
     * 
     * @param generator The generator element. 
     * 
@@ -255,8 +227,8 @@ public class Generator extends XmlElement implements SwordElementInterface
     * @param attributeItems
     * @return
     */
-   public SwordValidationInfo validate(ArrayList<SwordValidationInfo> existing,
-           ArrayList<SwordValidationInfo> attributeItems,
+   public SwordValidationInfo validate(List<SwordValidationInfo> existing,
+           List<SwordValidationInfo> attributeItems,
            Properties validationContext)
    {
        boolean validateAll = (existing == null);
@@ -367,8 +339,6 @@ public class Generator extends XmlElement implements SwordElementInterface
    
    /**
     * Get a string representation. 
-    * 
-    * @param The string. 
     */
    public String toString()
    {

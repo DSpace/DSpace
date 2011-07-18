@@ -1,58 +1,32 @@
-/*
- * BrowserServlet.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.webui.servlet;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.Map;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.dspace.app.webui.util.JSPManager;
+import org.dspace.app.webui.util.UIUtil;
+import org.dspace.app.bulkedit.MetadataExport;
+import org.dspace.app.bulkedit.DSpaceCSV;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.browse.BrowseException;
-import org.dspace.browse.BrowserScope;
+import org.dspace.browse.*;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
+import org.dspace.content.ItemIterator;
+import org.apache.log4j.Logger;
 
 /**
  * Servlet for browsing through indices, as they are defined in 
@@ -72,10 +46,14 @@ import org.dspace.core.Context;
  * - etal: integer number to limit multiple value items specified in config to
  * 
  * @author Richard Jones
- * @version $Revision: 3705 $
+ * @version $Revision: 6164 $
  */
 public class BrowserServlet extends AbstractBrowserServlet
 {
+
+    /** log4j category */
+    private static Logger log = Logger.getLogger(AbstractBrowserServlet.class);
+
     /**
      * Do the usual DSpace GET method.  You will notice that browse does not currently
      * respond to POST requests.
@@ -91,9 +69,17 @@ public class BrowserServlet extends AbstractBrowserServlet
         {
             throw new ServletException("There is no browse index for the request");
         }
-        
-        // execute browse request
-        processBrowse(context, scope, request, response);
+
+        // Is this a request to export the metadata, or a normal browse request?
+        if ("submit_export_metadata".equals(UIUtil.getSubmitButton(request, "submit")))
+        {
+            exportMetadata(context, request, response, scope);
+        }
+        else
+        {
+            // execute browse request
+            processBrowse(context, scope, request, response);
+        }
     }
 
     
@@ -112,7 +98,7 @@ public class BrowserServlet extends AbstractBrowserServlet
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
-        JSPManager.showJSP(request, response, "/browse/error.jsp");
+        JSPManager.showInternalError(request, response);
     }
 
     /**
@@ -172,5 +158,59 @@ public class BrowserServlet extends AbstractBrowserServlet
     {
         
         JSPManager.showJSP(request, response, "/browse/full.jsp");
+    }
+
+    /**
+     * Export the metadata from a browse
+     *
+     * @param context The DSpace context
+     * @param request The request object
+     * @param response The response object
+     * @param scope The browse scope
+     * @throws IOException
+     * @throws ServletException
+     */
+    protected void exportMetadata(Context context, HttpServletRequest request,
+                                  HttpServletResponse response, BrowserScope scope)
+            throws IOException, ServletException
+    {
+        try
+        {
+            // Log the attempt
+            log.info(LogManager.getHeader(context, "metadataexport", "exporting_browse"));
+
+            // Ensure we export all results
+            scope.setOffset(0);
+            scope.setResultsPerPage(Integer.MAX_VALUE);
+
+            // Export a browse view
+            BrowseEngine be = new BrowseEngine(context);
+            BrowseInfo binfo = be.browse(scope);
+            List<Integer> iids = new ArrayList<Integer>();
+            for (BrowseItem bi : binfo.getBrowseItemResults())
+            {
+                iids.add(bi.getID());
+            }
+            ItemIterator ii = new ItemIterator(context, iids);
+            MetadataExport exporter = new MetadataExport(context, ii, false);
+
+            // Perform the export
+            DSpaceCSV csv = exporter.export();
+
+            // Return the csv file
+            response.setContentType("text/csv; charset=UTF-8");
+            response.setHeader("Content-Disposition", "attachment; filename=browse-result.csv");
+            PrintWriter out = response.getWriter();
+            out.write(csv.toString());
+            out.flush();
+            out.close();
+            log.info(LogManager.getHeader(context, "metadataexport", "exported_file:browse-results.csv"));
+            return;
+        }
+        catch (BrowseException be)
+        {
+            // Not sure what happended here!
+            JSPManager.showIntegrityError(request, response);
+        }
     }
 }

@@ -1,59 +1,26 @@
-/*
- * ControlPanel.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.administrative;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Enumeration;
 import java.util.HashMap;
 
 import org.apache.avalon.framework.service.ServiceException;
 import org.apache.avalon.framework.service.ServiceManager;
 import org.apache.avalon.framework.service.Serviceable;
-import org.apache.cocoon.components.flow.ContinuationsManager;
-import org.apache.cocoon.components.flow.WebContinuation;
-import org.apache.cocoon.components.flow.WebContinuationDataBean;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.commons.lang.StringUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
@@ -69,6 +36,8 @@ import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.app.xmlui.wing.element.TextArea;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.harvest.HarvestedCollection;
+import org.dspace.harvest.OAIHarvester.HarvestScheduler;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.EPerson;
 import org.xml.sax.SAXException;
@@ -152,6 +121,27 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 	private static final Message T_activity_anonymous 		= message("xmlui.administrative.ControlPanel.activity_anonymous");	
 	private static final Message T_activity_none			= message("xmlui.administrative.ControlPanel.activity_none");
 	private static final Message T_select_panel             = message("xmlui.administrative.ControlPanel.select_panel");
+	
+	private static final Message T_option_harvest  					= message("xmlui.administrative.ControlPanel.option_harvest");
+	private static final Message T_harvest_scheduler_head 			= message("xmlui.administrative.ControlPanel.harvest_scheduler_head");
+	private static final Message T_harvest_label_status 			= message("xmlui.administrative.ControlPanel.harvest_label_status");
+	private static final Message T_harvest_label_actions 			= message("xmlui.administrative.ControlPanel.harvest_label_actions");
+	private static final Message T_harvest_submit_start 			= message("xmlui.administrative.ControlPanel.harvest_submit_start");
+	private static final Message T_harvest_submit_reset 			= message("xmlui.administrative.ControlPanel.harvest_submit_reset");
+	private static final Message T_harvest_submit_resume 			= message("xmlui.administrative.ControlPanel.harvest_submit_resume");
+	private static final Message T_harvest_submit_pause 			= message("xmlui.administrative.ControlPanel.harvest_submit_pause");
+	private static final Message T_harvest_submit_stop 				= message("xmlui.administrative.ControlPanel.harvest_submit_stop");
+	private static final Message T_harvest_label_collections 		= message("xmlui.administrative.ControlPanel.harvest_label_collections");
+	private static final Message T_harvest_label_active 			= message("xmlui.administrative.ControlPanel.harvest_label_active");
+	private static final Message T_harvest_label_queued 			= message("xmlui.administrative.ControlPanel.harvest_label_queued");
+	private static final Message T_harvest_label_oai_errors 		= message("xmlui.administrative.ControlPanel.harvest_label_oai_errors");
+	private static final Message T_harvest_label_internal_errors 	= message("xmlui.administrative.ControlPanel.harvest_label_internal_errors");
+	private static final Message T_harvest_head_generator_settings 	= message("xmlui.administrative.ControlPanel.harvest_head_generator_settings");
+	private static final Message T_harvest_label_oai_url 			= message("xmlui.administrative.ControlPanel.harvest_label_oai_url");
+	private static final Message T_harvest_label_oai_source 		= message("xmlui.administrative.ControlPanel.harvest_label_oai_source");
+	private static final Message T_harvest_head_harvester_settings 	= message("xmlui.administrative.ControlPanel.harvest_head_harvester_settings");
+	
+	
     /** 
      * The service manager allows us to access the continuation's 
      * manager, it is obtained from the servicable API
@@ -159,9 +149,9 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
     private ServiceManager serviceManager;
     
     /**
-     * The four states that this page can be in.
+     * The five states that this page can be in.
      */
-    private enum OPTIONS {java, dspace, alerts, activity};
+    private enum OPTIONS {java, dspace, alerts, activity, harvest};
     
     /**
      * From the servicable api, give us a service manager.
@@ -184,18 +174,32 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 			UIException, SQLException, IOException, AuthorizeException {
 		
 		if (!AuthorizeManager.isAdmin(context))
-			throw new AuthorizeException("You are not authorized to view this page.");
+        {
+            throw new AuthorizeException("You are not authorized to view this page.");
+        }
 		
 		Request request = ObjectModelHelper.getRequest(objectModel);
 		OPTIONS option = null;
 		if (request.getParameter("java") != null)
-			option = OPTIONS.java;
+        {
+            option = OPTIONS.java;
+        }
 		if (request.getParameter("dspace") != null)
-			option = OPTIONS.dspace;
+        {
+            option = OPTIONS.dspace;
+        }
 		if (request.getParameter("alerts") != null)
-			option = OPTIONS.alerts;
+        {
+            option = OPTIONS.alerts;
+        }
 		if (request.getParameter("activity") != null)
-			option = OPTIONS.activity;
+        {
+            option = OPTIONS.activity;
+        }
+		if (request.getParameter("harvest") != null)
+        {
+            option = OPTIONS.harvest;
+        }
 		
 		Division div = body.addInteractiveDivision("control-panel", contextPath+"/admin/panel", Division.METHOD_POST, "primary administrative");
 		div.setHead(T_head);
@@ -205,38 +209,77 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 		
 		// our options, selected or not....
 		if (option == OPTIONS.java)
-			options.addItem().addHighlight("bold").addXref("?java",T_option_java);
+        {
+            options.addItem().addHighlight("bold").addXref("?java", T_option_java);
+        }
 		else
-			options.addItemXref("?java",T_option_java);
+        {
+            options.addItemXref("?java", T_option_java);
+        }
 		
 		if (option == OPTIONS.dspace)
-			options.addItem().addHighlight("bold").addXref("?dspace",T_option_dspace);
+        {
+            options.addItem().addHighlight("bold").addXref("?dspace", T_option_dspace);
+        }
 		else
-			options.addItemXref("?dspace",T_option_dspace);
+        {
+            options.addItemXref("?dspace", T_option_dspace);
+        }
 		
 		if (option == OPTIONS.alerts)
-			options.addItem().addHighlight("bold").addXref("?alerts",T_option_alerts);
+        {
+            options.addItem().addHighlight("bold").addXref("?alerts", T_option_alerts);
+        }
 		else
-			options.addItemXref("?alerts",T_option_alerts);
+        {
+            options.addItemXref("?alerts", T_option_alerts);
+        }
+		
+		if (option == OPTIONS.harvest)
+        {
+            options.addItem().addHighlight("bold").addXref("?harvest", T_option_harvest);
+        }
+		else
+        {
+            options.addItemXref("?harvest", T_option_harvest);
+        }
 		
 		String userSortTarget = "?activity";
 		if (request.getParameter("sortBy") != null)
-			userSortTarget += "&sortBy="+request.getParameter("sortBy");
+        {
+            userSortTarget += "&sortBy=" + request.getParameter("sortBy");
+        }
 		if (option == OPTIONS.activity)
-			options.addItem().addHighlight("bold").addXref(userSortTarget,"Current Activity");
+        {
+            options.addItem().addHighlight("bold").addXref(userSortTarget, "Current Activity");
+        }
 		else
-			options.addItemXref(userSortTarget,"Current Activity");
+        {
+            options.addItemXref(userSortTarget, "Current Activity");
+        }
 		
 		
 		// The main content:
 		if (option == OPTIONS.java)
-			addJavaInformation(div);
+        {
+            addJavaInformation(div);
+        }
 		else if (option == OPTIONS.dspace)
-			addDSpaceConfiguration(div);
+        {
+            addDSpaceConfiguration(div);
+        }
 		else if (option == OPTIONS.alerts)
-			addAlerts(div);
+        {
+            addAlerts(div);
+        }
 		else if (option == OPTIONS.activity)
-			addActivity(div);
+        {
+            addActivity(div);
+        }
+		else if (option == OPTIONS.harvest)
+        {
+            addHarvest(div);
+        }
 		else
 		{
 			div.addPara(T_select_panel);
@@ -361,9 +404,13 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 		message.setLabel(T_alerts_message_label);
 		message.setSize(5, 45);
 		if (SystemwideAlerts.getMessage() == null)
-			message.setValue(T_alerts_message_default);
+        {
+            message.setValue(T_alerts_message_default);
+        }
 		else
-			message.setValue(SystemwideAlerts.getMessage());
+        {
+            message.setValue(SystemwideAlerts.getMessage());
+        }
 		
 		Select countdown = form.addItem().addSelect("countdown");
 		countdown.setLabel(T_alerts_countdown_label);
@@ -376,9 +423,13 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 		
 		// Is there a current count down active?
 		if (SystemwideAlerts.isAlertActive() && SystemwideAlerts.getCountDownToo() - System.currentTimeMillis() > 0)
-			countdown.addOption(true,-1,T_alerts_countdown_keep);
+        {
+            countdown.addOption(true, -1, T_alerts_countdown_keep);
+        }
 		else
-			countdown.setOptionSelected(0);
+        {
+            countdown.setOptionSelected(0);
+        }
 		
 		Select restrictsessions = form.addItem().addSelect("restrictsessions");
 		restrictsessions.setLabel(T_alerts_session_label);
@@ -413,9 +464,13 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 		if (recordAnonymousString != null)
 		{
 			if ("ON".equals(recordAnonymousString))
-				CurrentActivityAction.setRecordAnonymousEvents(true);
+            {
+                CurrentActivityAction.setRecordAnonymousEvents(true);
+            }
 			if ("OFF".equals(recordAnonymousString))
-				CurrentActivityAction.setRecordAnonymousEvents(false);
+            {
+                CurrentActivityAction.setRecordAnonymousEvents(false);
+            }
 		}
 		
 		// Toggle bot recording
@@ -423,24 +478,38 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 		if (recordBotString != null)
 		{
 			if ("ON".equals(recordBotString))
-				CurrentActivityAction.setRecordBotEvents(true);
+            {
+                CurrentActivityAction.setRecordBotEvents(true);
+            }
 			if ("OFF".equals(recordBotString))
-				CurrentActivityAction.setRecordBotEvents(false);
+            {
+                CurrentActivityAction.setRecordBotEvents(false);
+            }
 		}		
 		
 		// 1) Determine how to sort
 		EventSort sortBy = EventSort.TIME;
 		String sortByString = request.getParameter("sortBy");
 		if (EventSort.TIME.toString().equals(sortByString))
-			sortBy = EventSort.TIME;
+        {
+            sortBy = EventSort.TIME;
+        }
 		if (EventSort.URL.toString().equals(sortByString))
-			sortBy = EventSort.URL;
+        {
+            sortBy = EventSort.URL;
+        }
 		if (EventSort.SESSION.toString().equals(sortByString))
-			sortBy = EventSort.SESSION;
+        {
+            sortBy = EventSort.SESSION;
+        }
 		if (EventSort.AGENT.toString().equals(sortByString))
-			sortBy = EventSort.AGENT;
+        {
+            sortBy = EventSort.AGENT;
+        }
 		if (EventSort.IP.toString().equals(sortByString))
-			sortBy = EventSort.IP;
+        {
+            sortBy = EventSort.IP;
+        }
 		
 		// 2) Sort the events by the requested sorting parameter
 		java.util.List<CurrentActivityAction.Event> events = CurrentActivityAction.getEvents();
@@ -449,14 +518,22 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         
         // 3) Toggle controls for anonymous and bot activity
         if (CurrentActivityAction.getRecordAnonymousEvents())
-        	div.addPara().addXref("?activity&sortBy="+sortBy+"&recordanonymous=OFF").addContent(T_stop_anonymous);
+        {
+            div.addPara().addXref("?activity&sortBy=" + sortBy + "&recordanonymous=OFF").addContent(T_stop_anonymous);
+        }
         else
-        	div.addPara().addXref("?activity&sortBy="+sortBy+"&recordanonymous=ON").addContent(T_start_anonymous);
+        {
+            div.addPara().addXref("?activity&sortBy=" + sortBy + "&recordanonymous=ON").addContent(T_start_anonymous);
+        }
         
         if (CurrentActivityAction.getRecordBotEvents())
-        	div.addPara().addXref("?activity&sortBy="+sortBy+"&recordbots=OFF").addContent(T_stop_bot);
+        {
+            div.addPara().addXref("?activity&sortBy=" + sortBy + "&recordbots=OFF").addContent(T_stop_bot);
+        }
         else
-        	div.addPara().addXref("?activity&sortBy="+sortBy+"&recordbots=ON").addContent(T_start_bot);
+        {
+            div.addPara().addXref("?activity&sortBy=" + sortBy + "&recordbots=ON").addContent(T_start_bot);
+        }
        	
         
 		// 4) Display the results Table
@@ -465,29 +542,49 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         activeUsers.setHead(T_activity_head.parameterize(CurrentActivityAction.MAX_EVENTS));
         Row row = activeUsers.addRow(Row.ROLE_HEADER);
         if (sortBy == EventSort.TIME)
-        	row.addCell().addHighlight("bold").addXref("?activity&sortBy="+EventSort.TIME).addContent(T_activity_sort_time);
+        {
+            row.addCell().addHighlight("bold").addXref("?activity&sortBy=" + EventSort.TIME).addContent(T_activity_sort_time);
+        }
         else
-        	row.addCell().addXref("?activity&sortBy="+EventSort.TIME).addContent(T_activity_sort_time);
+        {
+            row.addCell().addXref("?activity&sortBy=" + EventSort.TIME).addContent(T_activity_sort_time);
+        }
         
         if (sortBy == EventSort.SESSION)
-        	row.addCell().addHighlight("bold").addXref("?activity&sortBy="+EventSort.SESSION).addContent(T_activity_sort_user);
+        {
+            row.addCell().addHighlight("bold").addXref("?activity&sortBy=" + EventSort.SESSION).addContent(T_activity_sort_user);
+        }
         else
-        	row.addCell().addXref("?activity&sortBy="+EventSort.SESSION).addContent(T_activity_sort_user);
+        {
+            row.addCell().addXref("?activity&sortBy=" + EventSort.SESSION).addContent(T_activity_sort_user);
+        }
         
         if (sortBy == EventSort.IP)
-        	row.addCell().addHighlight("bold").addXref("?activity&sortBy="+EventSort.IP).addContent(T_activity_sort_ip);
+        {
+            row.addCell().addHighlight("bold").addXref("?activity&sortBy=" + EventSort.IP).addContent(T_activity_sort_ip);
+        }
         else
-        	row.addCell().addXref("?activity&sortBy="+EventSort.IP).addContent(T_activity_sort_ip);
+        {
+            row.addCell().addXref("?activity&sortBy=" + EventSort.IP).addContent(T_activity_sort_ip);
+        }
         
         if (sortBy == EventSort.URL)
-        	row.addCell().addHighlight("bold").addXref("?activity&sortBy="+EventSort.URL).addContent(T_activity_sort_url);
+        {
+            row.addCell().addHighlight("bold").addXref("?activity&sortBy=" + EventSort.URL).addContent(T_activity_sort_url);
+        }
         else
-        	row.addCell().addXref("?activity&sortBy="+EventSort.URL).addContent(T_activity_sort_url);
+        {
+            row.addCell().addXref("?activity&sortBy=" + EventSort.URL).addContent(T_activity_sort_url);
+        }
         
         if (sortBy == EventSort.AGENT)
-        	row.addCell().addHighlight("bold").addXref("?activity&sortBy="+EventSort.AGENT).addContent(T_activity_sort_agent);
+        {
+            row.addCell().addHighlight("bold").addXref("?activity&sortBy=" + EventSort.AGENT).addContent(T_activity_sort_agent);
+        }
         else
-        	row.addCell().addXref("?activity&sortBy="+EventSort.AGENT).addContent(T_activity_sort_agent);
+        {
+            row.addCell().addXref("?activity&sortBy=" + EventSort.AGENT).addContent(T_activity_sort_agent);
+        }
    
         // Keep track of how many individual anonymous users there are, each unique anonymous
         // user is assigned an index based upon the servlet session id.
@@ -498,7 +595,9 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 		for (CurrentActivityAction.Event event : events)
 		{	
 			if (event == null)
-				continue;
+            {
+                continue;
+            }
 			
 			shown++;
 			
@@ -506,11 +605,17 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         	long ago = System.currentTimeMillis() - event.getTimeStamp();
         	
         	if (ago > 2*60*60*1000)
-        		timeStampMessage = T_hours.parameterize((ago / (60*60*1000))); 
+            {
+                timeStampMessage = T_hours.parameterize((ago / (60 * 60 * 1000)));
+            }
         	else if (ago > 60*1000)
-        		timeStampMessage = T_minutes.parameterize((ago / (60*1000))); 
+            {
+                timeStampMessage = T_minutes.parameterize((ago / (60 * 1000)));
+            }
         	else
-        		timeStampMessage = T_seconds.parameterize((ago / (1000)));
+            {
+                timeStampMessage = T_seconds.parameterize((ago / (1000)));
+            }
         	
         	
 			Row eventRow = activeUsers.addRow();
@@ -527,7 +632,9 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 			{
 				// Is this a new anonymous user?
 				if (!anonymousHash.containsKey(event.getSessionID()))
-					anonymousHash.put(event.getSessionID(), anonymousCount++);
+                {
+                    anonymousHash.put(event.getSessionID(), anonymousCount++);
+                }
 				
 				eventRow.addCellContent(T_activity_anonymous.parameterize(anonymousHash.get(event.getSessionID())));
 			}
@@ -545,7 +652,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 	/**
 	 * Comparator to sort activity events by their access times.
 	 */
-	public static class ActivitySort<E extends CurrentActivityAction.Event> implements Comparator<E>
+	public static class ActivitySort<E extends CurrentActivityAction.Event> implements Comparator<E>, Serializable
 	{
 		// Sort parameter
 		private EventSort sortBy;
@@ -563,11 +670,17 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 		{
 			// Protect against null events while sorting
 			if (a != null && b == null)
-				return 1; // A > B
+            {
+                return 1; // A > B
+            }
 			else if (a == null && b != null)
-				return -1; // B > A
+            {
+                return -1; // B > A
+            }
 			else if (a == null && b == null)
-				return 0; // A == B
+            {
+                return 0; // A == B
+            }
 			
 			// Sort by the given ordering matrix
 			if (EventSort.URL == sortBy)
@@ -576,7 +689,9 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 				String bURL = b.getURL();
 				int cmp = aURL.compareTo(bURL);
 				if (cmp != 0)
-					return cmp;
+                {
+                    return cmp;
+                }
 			}
 			else if (EventSort.AGENT == sortBy)
 			{
@@ -584,7 +699,9 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 				String bAgent = b.getDectectedBrowser();
 				int cmp = aAgent.compareTo(bAgent);
 				if (cmp != 0)
-					return cmp;
+                {
+                    return cmp;
+                }
 			}
 			else if (EventSort.IP == sortBy)
 			{
@@ -592,7 +709,9 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 				String bIP = b.getIP();
 				int cmp = aIP.compareTo(bIP);
 				if (cmp != 0)
-					return cmp;
+                {
+                    return cmp;
+                }
 				
 			}
 			else if (EventSort.SESSION == sortBy)
@@ -602,24 +721,143 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 				// IDs. Unfortunitaly we can not compare eperson names because 
 				// we do not have access to a context object.
 				if (a.getEPersonID() > 0  && b.getEPersonID() < 0)
-					return 1; // A > B
+                {
+                    return 1; // A > B
+                }
 				else if (a.getEPersonID() < 0  && b.getEPersonID() > 0)
-					return -1; // B > A
+                {
+                    return -1; // B > A
+                }
 				
 				String aSession = a.getSessionID();
 				String bSession = b.getSessionID();
 				int cmp = aSession.compareTo(bSession);
 				if (cmp != 0)
-					return cmp;
+                {
+                    return cmp;
+                }
 			}
 			
 			// All ways fall back to sorting by time, when events are equal.
 			if (a.getTimeStamp() > b.getTimeStamp())
-				return 1;  // A > B
+            {
+                return 1;  // A > B
+            }
 			else if (a.getTimeStamp() > b.getTimeStamp())
-				return -1; // B > A
+            {
+                return -1; // B > A
+            }
 			return 0; // A == B
 		}
+	}
+	
+		
+	/**
+	 * Add a section that allows management of the OAI harvester.
+	 * @throws SQLException 
+	 */
+	private void addHarvest(Division div) throws WingException, SQLException 
+	{
+		// Remember we're in the harvest section
+		div.addHidden("harvest").setValue("true");
+						
+		List harvesterControls = div.addList("oai-harvester-controls",List.TYPE_FORM);
+		harvesterControls.setHead(T_harvest_scheduler_head);
+		harvesterControls.addLabel(T_harvest_label_status);
+		Item status = harvesterControls.addItem();
+		status.addContent(HarvestScheduler.getStatus());
+		status.addXref(contextPath + "/admin/panel?harvest", "(refresh)");
+		
+		harvesterControls.addLabel(T_harvest_label_actions);
+		Item actionsItem = harvesterControls.addItem();
+		if (HarvestScheduler.hasStatus(HarvestScheduler.HARVESTER_STATUS_STOPPED)) {
+			actionsItem.addButton("submit_harvest_start").setValue(T_harvest_submit_start);
+			actionsItem.addButton("submit_harvest_reset").setValue(T_harvest_submit_reset);
+		}
+		if (HarvestScheduler.hasStatus(HarvestScheduler.HARVESTER_STATUS_PAUSED))
+        {
+            actionsItem.addButton("submit_harvest_resume").setValue(T_harvest_submit_resume);
+        }
+		if (HarvestScheduler.hasStatus(HarvestScheduler.HARVESTER_STATUS_RUNNING) ||
+				HarvestScheduler.hasStatus(HarvestScheduler.HARVESTER_STATUS_SLEEPING))
+        {
+            actionsItem.addButton("submit_harvest_pause").setValue(T_harvest_submit_pause);
+        }
+		if (!HarvestScheduler.hasStatus(HarvestScheduler.HARVESTER_STATUS_STOPPED))
+        {
+            actionsItem.addButton("submit_harvest_stop").setValue(T_harvest_submit_stop);
+        }
+		
+		// Can be retrieved via "{context-path}/admin/collection?collectionID={id}"
+		String baseURL = contextPath + "/admin/collection?collectionID=";
+		
+		harvesterControls.addLabel(T_harvest_label_collections);
+		Item allCollectionsItem = harvesterControls.addItem();
+		java.util.List<Integer> allCollections =  HarvestedCollection.findAll(context);
+		for (Integer oaiCollection : allCollections) {
+			allCollectionsItem.addXref(baseURL + oaiCollection, oaiCollection.toString());
+		}
+		harvesterControls.addLabel(T_harvest_label_active);
+		Item busyCollectionsItem = harvesterControls.addItem();
+		java.util.List<Integer> busyCollections =  HarvestedCollection.findByStatus(context, HarvestedCollection.STATUS_BUSY);
+		for (Integer busyCollection : busyCollections) {
+			busyCollectionsItem.addXref(baseURL + busyCollection, busyCollection.toString());
+		}
+		harvesterControls.addLabel(T_harvest_label_queued);
+		Item queuedCollectionsItem = harvesterControls.addItem();
+		java.util.List<Integer> queuedCollections =  HarvestedCollection.findByStatus(context, HarvestedCollection.STATUS_QUEUED);
+		for (Integer queuedCollection : queuedCollections) {
+			queuedCollectionsItem.addXref(baseURL + queuedCollection, queuedCollection.toString());
+		}
+		harvesterControls.addLabel(T_harvest_label_oai_errors);
+		Item oaiErrorsItem = harvesterControls.addItem();
+		java.util.List<Integer> oaiErrors =  HarvestedCollection.findByStatus(context, HarvestedCollection.STATUS_OAI_ERROR);
+		for (Integer oaiError : oaiErrors) {
+			oaiErrorsItem.addXref(baseURL + oaiError, oaiError.toString());
+		}
+		harvesterControls.addLabel(T_harvest_label_internal_errors);
+		Item internalErrorsItem = harvesterControls.addItem();
+		java.util.List<Integer> internalErrors =  HarvestedCollection.findByStatus(context, HarvestedCollection.STATUS_UNKNOWN_ERROR);
+		for (Integer internalError : internalErrors) {
+			internalErrorsItem.addXref(baseURL + internalError, internalError.toString());
+		}
+		
+		// OAI Generator settings
+		List generatorSettings = div.addList("oai-generator-settings");
+		generatorSettings.setHead(T_harvest_head_generator_settings);
+		
+		generatorSettings.addLabel(T_harvest_label_oai_url);
+		String oaiUrl = ConfigurationManager.getProperty("dspace.oai.url");
+		if (!StringUtils.isEmpty(oaiUrl))
+        {
+            generatorSettings.addItem(oaiUrl);
+        }
+
+		generatorSettings.addLabel(T_harvest_label_oai_source);
+		String oaiAuthoritativeSource = ConfigurationManager.getProperty("ore.authoritative.source");
+		if (!StringUtils.isEmpty(oaiAuthoritativeSource))
+        {
+            generatorSettings.addItem(oaiAuthoritativeSource);
+        }
+		else
+        {
+            generatorSettings.addItem("oai");
+        }
+		
+		// OAI Harvester settings (just iterate over all the values that start with "harvester")
+		List harvesterSettings = div.addList("oai-harvester-settings");
+		harvesterSettings.setHead(T_harvest_head_harvester_settings);
+		
+		String metaString = "harvester.";
+        Enumeration pe = ConfigurationManager.propertyNames();
+        while (pe.hasMoreElements())
+        {
+            String key = (String)pe.nextElement();
+            if (key.startsWith(metaString)) {
+            	harvesterSettings.addLabel(key);
+            	harvesterSettings.addItem(ConfigurationManager.getProperty(key) + " ");
+            }
+        }
 	}
 	
 }

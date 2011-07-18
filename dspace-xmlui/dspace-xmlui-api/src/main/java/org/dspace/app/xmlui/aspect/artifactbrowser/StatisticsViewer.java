@@ -1,43 +1,10 @@
-/*
- * Statistics.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -66,7 +33,6 @@ import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.text.ParseException;
 
 /**
  * Transformer to display statistics data in XML UI.
@@ -76,18 +42,18 @@ import java.text.ParseException;
  */
 public class StatisticsViewer extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
-    private final static Logger log = Logger.getLogger(StatisticsViewer.class);
+    private static final Logger log = Logger.getLogger(StatisticsViewer.class);
 
-    private final static Message T_dspace_home = message("xmlui.general.dspace_home");
+    private static final Message T_dspace_home = message("xmlui.general.dspace_home");
 
-    private final static Message T_choose_report = message("xmlui.ArtifactBrowser.StatisticsViewer.choose_month");
-    private final static Message T_page_title    = message("xmlui.ArtifactBrowser.StatisticsViewer.report.title");
+    private static final Message T_choose_report = message("xmlui.ArtifactBrowser.StatisticsViewer.choose_month");
+    private static final Message T_page_title    = message("xmlui.ArtifactBrowser.StatisticsViewer.report.title");
 
-    private final static Message T_empty_title   = message("xmlui.ArtifactBrowser.StatisticsViewer.no_report.title");
-    private final static Message T_empty_text    = message("xmlui.ArtifactBrowser.StatisticsViewer.no_report.text");
+    private static final Message T_empty_title   = message("xmlui.ArtifactBrowser.StatisticsViewer.no_report.title");
+    private static final Message T_empty_text    = message("xmlui.ArtifactBrowser.StatisticsViewer.no_report.text");
 
-    private final static SimpleDateFormat sdfDisplay = new SimpleDateFormat("MM'/'yyyy");
-    private final static SimpleDateFormat sdfLink    = new SimpleDateFormat("yyyy'-'M");
+    private static final SimpleDateFormat sdfDisplay = new SimpleDateFormat("MM'/'yyyy");
+    private static final SimpleDateFormat sdfLink    = new SimpleDateFormat("yyyy'-'M");
 
     private boolean initialised = false;
     private String reportDate = null;
@@ -102,7 +68,9 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
         initialise();
 
         if (reportDate != null)
+        {
             return reportDate;
+        }
 
         return "general";
     }
@@ -141,9 +109,13 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
 
                     // Get a file for the report data
                     if (reportDate != null)
+                    {
                         analysisFile = StatisticsLoader.getAnalysisFor(reportDate);
+                    }
                     else
+                    {
                         analysisFile = StatisticsLoader.getGeneralAnalysis();
+                    }
 
                     if (analysisFile != null)
                     {
@@ -235,14 +207,20 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
 
         // Check that the reports are either public, or user is an administrator
         if (!publicise && !AuthorizeManager.isAdmin(context))
+        {
             throw new AuthorizeException();
+        }
 
         // Retrieve the report data to display
         File analysisFile;
         if (reportDate != null)
+        {
             analysisFile = StatisticsLoader.getAnalysisFor(reportDate);
+        }
         else
+        {
             analysisFile = StatisticsLoader.getGeneralAnalysis();
+        }
 
         // Create the renderer for the results
         Division div = body.addDivision("statistics", "primary");
@@ -297,9 +275,9 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
      * Note that all methods that return Strings return 'null' in this implementation, as
      * all the outputting is done directly using the Wing framework.
      */
-    class XMLUIReport implements Report
+    static class XMLUIReport implements Report
     {
-        private ArrayList<Statistics> blocks = new ArrayList<Statistics>();
+        private java.util.List<Statistics> blocks = new ArrayList<Statistics>();
 
         private String mainTitle = null;
         private String pageTitle = null;
@@ -433,7 +411,9 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
             {
                 int rows = stats.length;
                 if (content.getStatName() != null || content.getResultName() != null)
+                {
                     rows++;
+                }
 
                 Table block = currDiv.addTable("reportBlock", rows, 2);
 
@@ -557,7 +537,9 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
             mainTitle = "Statistics for " + name;
 
             if (ConfigurationManager.getBooleanProperty("report.show.server", true))
+            {
                 mainTitle += " on " + serverName;
+            }
             
             if (pageTitle == null)
             {
@@ -648,7 +630,9 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
     private static String entry(String entry) 
     {
     	if (entry != null && entry.length() > MAX_ENTRY_LENGTH)
-    		entry = entry.substring(0,MAX_ENTRY_LENGTH-3) + "...";
+        {
+            entry = entry.substring(0, MAX_ENTRY_LENGTH - 3) + "...";
+        }
     	return entry;
     }
     
@@ -656,7 +640,9 @@ public class StatisticsViewer extends AbstractDSpaceTransformer implements Cache
     private static String label(String label) 
     {
     	if (label != null && label.length() > MAX_LABEL_LENGTH)
-    		label = label.substring(0,MAX_LABEL_LENGTH-3) + "...";
+        {
+            label = label.substring(0, MAX_LABEL_LENGTH - 3) + "...";
+        }
     	return label;
     }
 }

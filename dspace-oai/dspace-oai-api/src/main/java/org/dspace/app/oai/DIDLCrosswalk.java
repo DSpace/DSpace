@@ -1,37 +1,10 @@
-/*
- * Copyright (c) 2004-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.oai;
 
 import java.io.BufferedInputStream;
@@ -42,11 +15,10 @@ import java.util.Date;
 import java.util.Properties;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
 import org.dspace.app.didl.UUIDFactory;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
-import org.dspace.content.DCDate;
-import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -69,12 +41,21 @@ import ORG.oclc.oai.server.verb.ServerVerb;
 
 public class DIDLCrosswalk extends Crosswalk
 {
-    /** default value if no oai.didl.maxresponse property is defined */
-    public static int MAXRESPONSE_INLINE_BITSTREAM = 0;
+    private static final Logger log = Logger.getLogger(DIDLCrosswalk.class);
     
+    /** default value if no oai.didl.maxresponse property is defined */
+    public static final int MAXRESPONSE_INLINE_BITSTREAM = 0;
+    
+    /** another crosswalk that will be used to generate the metadata section */
+    private Crosswalk metadataCrosswalk;
+
     public DIDLCrosswalk(Properties properties)
     {
     	super("urn:mpeg:mpeg21:2002:02-DIDL-NS http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/did/didl.xsd ");
+
+    	// FIXME this should be injected from the configuration... 
+    	// but it is better than duplicate the OAIDCCrosswalk code! 
+    	metadataCrosswalk = new OAIDCCrosswalk(properties);
     }
     
     
@@ -90,14 +71,7 @@ public class DIDLCrosswalk extends Crosswalk
     {
         Item item = ((HarvestedItemInfo) nativeItem).item;
        
-        Date d = ((HarvestedItemInfo) nativeItem).datestamp;
-        String ITEMDATE = new DCDate(d).toString();
-        
-        // Get all the DC
-        DCValue[] allDC = item.getDC(Item.ANY, Item.ANY, Item.ANY);
-        
         StringBuffer metadata = new StringBuffer();
-        StringBuffer metadata1 = new StringBuffer();
         String itemhandle=item.getHandle();
         String strMaxSize = ConfigurationManager.getProperty("oai.didl.maxresponse");
         int maxsize = MAXRESPONSE_INLINE_BITSTREAM;
@@ -119,66 +93,18 @@ public class DIDLCrosswalk extends Crosswalk
             .append("<didl:Item id=\"")
             .append("uuid-" + UUIDFactory.generateUUID().toString()+"\">");
         metadata.append("<didl:Descriptor>")
-            .append("<didl:Statement mimeType=\"application/xml; charset=utf-8\">")
-            .append("<dii:Identifier xmlns:dii=\"urn:mpeg:mpeg21:2002:01-DII-NS\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:mpeg:mpeg21:2002:01-DII-NS http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/dii/dii.xsd\">")
-            .append("urn:hdl:" + itemhandle)
+                .append("<didl:Statement mimeType=\"application/xml; charset=utf-8\">")
+                .append("<dii:Identifier xmlns:dii=\"urn:mpeg:mpeg21:2002:01-DII-NS\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"urn:mpeg:mpeg21:2002:01-DII-NS http://standards.iso.org/ittf/PubliclyAvailableStandards/MPEG-21_schema_files/dii/dii.xsd\">").append("urn:hdl:").append(itemhandle)
             .append("</dii:Identifier>")
             .append("</didl:Statement>")
             .append("</didl:Descriptor>");
         metadata.append("<didl:Descriptor>")
             .append("<didl:Statement mimeType=\"application/xml; charset=utf-8\">");
 					
-        for (int i = 0; i < allDC.length; i++)
-        {
-            // Do not include description.provenance
-            boolean description = allDC[i].element.equals("description");
-            boolean provenance = allDC[i].qualifier != null &&
-                                 allDC[i].qualifier.equals("provenance");
-
-            if (!(description && provenance))
-            {
-                // Escape XML chars <, > and &
-                String value = allDC[i].value;
-
-                // First do &'s - need to be careful not to replace the
-                // & in "&amp;" again!
-                int c = -1;
-                while ((c = value.indexOf("&", c + 1)) > -1)
-                {
-                    value = value.substring(0, c) +
-                        "&amp;" +
-                        value.substring(c + 1);
-                }
-
-                while ((c = value.indexOf("<")) > -1)
-                {
-                    value = value.substring(0, c) +
-                        "&lt;" +
-                        value.substring(c + 1);
-                }
-                
-                while ((c = value.indexOf(">")) > -1)
-                {
-                    value = value.substring(0, c) +
-                        "&gt;" +
-                        value.substring(c + 1);
-                }
-
-                metadata1.append("<dc:")
-                    .append(allDC[i].element)
-                    .append(">")
-                    .append(value)
-                    .append("</dc:")
-                    .append(allDC[i].element)
-                    .append(">");
-            }
-        }
+        // delegate the metadata section to another crosswalk
+        metadata.append(metadataCrosswalk.createMetadata(nativeItem));
         
-        metadata.append("<oai_dc:dc xmlns:oai_dc=\"http://www.openarchives.org/OAI/2.0/oai_dc/\" xmlns:dc=\"http://purl.org/dc/elements/1.1/\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.openarchives.org/OAI/2.0/oai_dc/ http://www.openarchives.org/OAI/2.0/oai_dc.xsd\">");
-        				
-        metadata.append(metadata1);
-        
-        metadata.append("</oai_dc:dc>")
+        metadata
             .append("</didl:Statement>")
             .append("</didl:Descriptor>");				
         
@@ -191,12 +117,8 @@ public class DIDLCrosswalk extends Crosswalk
         {
             Bundle[] bundles= item.getBundles("ORIGINAL");    
             
-            if (bundles.length == 0)
+            if (bundles.length != 0)
             {
-                metadata.append("<P>There are no files associated with this item.</P>");
-            }
-            else
-            {  
             	/**cycle bundles**/
                 for (int i = 0; i < bundles.length; i++)
                 { 
@@ -226,7 +148,6 @@ public class DIDLCrosswalk extends Crosswalk
                            }
                            else
                            {    
-                            
                                 try
                                 {
                                     metadata.append("<didl:Resource mimeType=\"");
@@ -246,15 +167,31 @@ public class DIDLCrosswalk extends Crosswalk
                                     BufferedInputStream bis = new BufferedInputStream(is);
                                     try
                                     {
-                                        int size=bis.read(buffer);
+                                        bis.read(buffer);
                                     }
                                     finally
                                     {
                                         if (bis != null)
-                                            try { bis.close(); } catch (IOException ioe) { }
+                                        {
+                                            try
+                                            {
+                                                bis.close();
+                                            }
+                                            catch (IOException ioe)
+                                            {
+                                            }
+                                        }
 
                                         if (is != null)
-                                            try { is.close(); } catch (IOException ioe) { }
+                                        {
+                                            try
+                                            {
+                                                is.close();
+                                            }
+                                            catch (IOException ioe)
+                                            {
+                                            }
+                                        }
                                     }
 
                                     contextl.complete();
@@ -264,9 +201,13 @@ public class DIDLCrosswalk extends Crosswalk
                                 }
                                 catch (Exception ex)
                                 {
-                                    ex.printStackTrace();                       
+                                    log.error("Error creating resource didl", ex);
                                     
-                                    metadata.append("<didl:Resource ref=\""+ConfigurationManager.getProperty("dspace.url")+"/bitstream/"+itemhandle+"/"+bitstreams[k].getSequenceID()+"/"+bitstreams[k].getName() );
+                                    metadata.append("<didl:Resource ref=\"")
+                                            .append(ConfigurationManager.getProperty("dspace.url"))
+                                            .append("/bitstream/")
+                                            .append(itemhandle).append("/").append(bitstreams[k].getSequenceID())
+                                            .append("/").append(bitstreams[k].getName());
                                     metadata.append("\" mimeType=\"");
                                     metadata.append(bitstreams[k].getFormat().getMIMEType());
                                     metadata.append("\">");
@@ -285,7 +226,7 @@ public class DIDLCrosswalk extends Crosswalk
         catch (SQLException sqle)
         {
             System.err.println("Caught exception:"+sqle.getCause());
-            sqle.printStackTrace();
+            log.error("Database error", sqle);
         }
     		
         //**END CYCLE HERE **//		

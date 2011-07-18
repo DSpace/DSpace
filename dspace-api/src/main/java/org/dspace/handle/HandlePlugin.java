@@ -1,41 +1,9 @@
-/*
- * HandlePlugin.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.handle;
 
@@ -73,7 +41,7 @@ import org.dspace.core.Context;
  * </p>
  * 
  * @author Peter Breton
- * @version $Revision: 3705 $
+ * @version $Revision: 5844 $
  */
 public class HandlePlugin implements HandleStorage
 {
@@ -277,7 +245,7 @@ public class HandlePlugin implements HandleStorage
             value.setAnyoneCanRead(true);
             value.setAnyoneCanWrite(false);
 
-            List values = new LinkedList();
+            List<HandleValue> values = new LinkedList<HandleValue>();
 
             values.add(value);
 
@@ -285,7 +253,7 @@ public class HandlePlugin implements HandleStorage
 
             for (int i = 0; i < values.size(); i++)
             {
-                HandleValue hvalue = (HandleValue) values.get(i);
+                HandleValue hvalue = values.get(i);
 
                 rawValues[i] = new byte[Encoder.calcStorageSize(hvalue)];
                 Encoder.encodeHandleValue(rawValues[i], 0, hvalue);
@@ -304,6 +272,7 @@ public class HandlePlugin implements HandleStorage
                 log.debug("Exception in getRawHandleValues", e);
             }
 
+            // Stack loss as exception does not support cause
             throw new HandleException(HandleException.INTERNAL_ERROR);
         }
         finally
@@ -358,10 +327,9 @@ public class HandlePlugin implements HandleStorage
         // resolvable.
         if (ConfigurationManager.getBooleanProperty("handle.plugin.checknameauthority",true))
         {
-	        // First, construct a string representating the naming authority Handle
+	        // First, construct a string representing the naming authority Handle
 	        // we'd expect.
-	        String expected = "0.NA/"
-	                + ConfigurationManager.getProperty("handle.prefix");
+	        String expected = "0.NA/" + HandleManager.getPrefix();
 	
 	        // Which authority does the request pertain to?
 	        String received = Util.decodeString(theHandle);
@@ -402,12 +370,12 @@ public class HandlePlugin implements HandleStorage
         {
             context = new Context();
 
-            List handles = HandleManager.getHandlesForPrefix(context, naHandle);
-            List results = new LinkedList();
+            List<String> handles = HandleManager.getHandlesForPrefix(context, naHandle);
+            List<byte[]> results = new LinkedList<byte[]>();
 
-            for (Iterator iterator = handles.iterator(); iterator.hasNext();)
+            for (Iterator<String> iterator = handles.iterator(); iterator.hasNext();)
             {
-                String handle = (String) iterator.next();
+                String handle = iterator.next();
 
                 // Transforms to byte array
                 results.add(Util.encodeString(handle));
@@ -422,6 +390,7 @@ public class HandlePlugin implements HandleStorage
                 log.debug("Exception in getHandlesForNA", sqle);
             }
 
+            // Stack loss as exception does not support cause
             throw new HandleException(HandleException.INTERNAL_ERROR);
         }
         finally

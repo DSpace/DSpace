@@ -1,41 +1,9 @@
-/*
- * JSPSampleStep.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.webui.submit.step;
 
@@ -45,8 +13,6 @@ import java.sql.SQLException;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import org.apache.log4j.Logger;
 
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.webui.submit.JSPStep;
@@ -100,13 +66,10 @@ import org.dspace.submit.step.SampleStep;
  * @see org.dspace.submit.step.SampleStep
  * 
  * @author Tim Donohue
- * @version $Revision: 3705 $
+ * @version $Revision: 5845 $
  */
 public class JSPSampleStep extends JSPStep
 {
-    /** log4j logger */
-    private static Logger log = Logger.getLogger(JSPSampleStep.class);
-    
     /** JSP which displays the step to the user * */
     private static final String DISPLAY_JSP = "/submit/sample-step.jsp";
 
@@ -252,14 +215,14 @@ public class JSPSampleStep extends JSPStep
 
         // This function retrieves the path of the JSP which just submitted its
         // form to this class (e.g. "/submit/sample-step.jsp", in this case)
-        String lastJSPDisplayed = JSPStepManager.getLastJSPDisplayed(request);
+        // String lastJSPDisplayed = JSPStepManager.getLastJSPDisplayed(request);
 
         // This function retrieves the number of the current "page"
         // within this Step. This is useful if your step actually
         // has more than one "page" within the Progress Bar. It can
         // help you determine which Page the user just came from,
         // as well as determine which JSP to load in doPreProcessing()
-        int currentPageNum = SampleStep.getCurrentPage(request);
+        // int currentPageNum = SampleStep.getCurrentPage(request);
 
         // This function returns the NAME of the button the user
         // just pressed in order to submit the form.

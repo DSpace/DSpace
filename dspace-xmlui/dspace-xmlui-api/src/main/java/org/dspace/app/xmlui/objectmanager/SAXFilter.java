@@ -1,43 +1,10 @@
-/*
- * SAXFilter.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.xmlui.objectmanager;
 
 import org.xml.sax.Attributes;
@@ -49,17 +16,17 @@ import org.xml.sax.helpers.NamespaceSupport;
 
 
 /** 
- * This is a swiss army like SAX Filter, it's purpose is to filter out 
- * undesierable SAX events from the stream. The primary application of 
+ * This is a Swiss army like SAX Filter, its purpose is to filter out 
+ * undesirable SAX events from the stream. The primary application of 
  * this is for inserting SAX fragment into an existing SAX pipeline, 
- * under this senario you would not want new startDocument or 
+ * under this scenario you would not want new startDocument or 
  * endDocument events interfering with the existing pipeline thus 
  * this class can filter those out.
  * 
- * The swiss army part comes in because it's configurable. Instead of 
+ * The Swiss army part comes in because it's configurable. Instead of 
  * defining a static set of events that are filled out by default all
  * events are filled out and must be turned on to allow each type
- * individualy.
+ * Individually.
  * 
  * Primarily you can filter events based upon their type, i.e. start/end 
  * elements or start/end documents. However there is one special control,
@@ -93,24 +60,24 @@ public class SAXFilter implements ContentHandler, LexicalHandler
 	/** 
 	 * The current XML level, each time start element is encountered this 
 	 * is increased, and each time an end element is encountered it is 
-	 * decressed. 
+	 * decreased. 
 	 */
 	private int currentElementLevel = 0;
 	
 	
 	/**
-	 * If no uri is provided then substitute this default prefix and URI:
+	 * If no URI is provided then substitute this default prefix and URI:
 	 */
 	private String defaultURI;
 	
-	/** The sax handlers and namespace support */
+	/** The SAX handlers and namespace support */
 	private ContentHandler contentHandler;
 	private LexicalHandler lexicalHandler;
 	private NamespaceSupport namespaces;
 
 	/**
 	 * Construct a new SAXFilter such that the allowed events will be routed
-	 * to the corresponding content and lexcial handlers.
+	 * to the corresponding content and lexical handlers.
 	 * 
 	 * @param contentHandler The SAX content handler.
 	 * @param lexicalHandler The SAX lexical handler.
@@ -160,8 +127,8 @@ public class SAXFilter implements ContentHandler, LexicalHandler
 	 * they are below the given XML level. I.e. each nested 
 	 * element is a new level.
 	 * 
-	 * @param belowElementLevel 
-	 * 				the minumum level required.
+	 * @param minimumElementLevel 
+	 * 				the minimum level required.
 	 * @return
 	 */
 	public SAXFilter allowElements(int minimumElementLevel)
@@ -233,39 +200,51 @@ public class SAXFilter implements ContentHandler, LexicalHandler
 	public void startDocument() throws SAXException
 	{
 		if (allowDocuments)
-			contentHandler.startDocument();
+        {
+            contentHandler.startDocument();
+        }
 	}
 
 	public void endDocument() throws SAXException
 	{	
 		if (allowDocuments)
-			contentHandler.endDocument();
+        {
+            contentHandler.endDocument();
+        }
 	}
 	
 	public void setDocumentLocator(Locator locator)
 	{
 		if (allowDocumentLocators)
-			contentHandler.setDocumentLocator(locator);
+        {
+            contentHandler.setDocumentLocator(locator);
+        }
 	}
 	
 	public void processingInstruction(String target, String data)
 	throws SAXException
 	{
 		if (allowProcessingInstructions)
-			contentHandler.processingInstruction(target, data);
+        {
+            contentHandler.processingInstruction(target, data);
+        }
 	}
 	
 	public void startPrefixMapping(String prefix, String uri)
 	throws SAXException
 	{
 		if (allowPrefixMappings)
-			contentHandler.startPrefixMapping(prefix, uri);
+        {
+            contentHandler.startPrefixMapping(prefix, uri);
+        }
 	}
 	
 	public void endPrefixMapping(String prefix) throws SAXException
 	{
 		if (allowPrefixMappings)
-			contentHandler.endPrefixMapping(prefix);
+        {
+            contentHandler.endPrefixMapping(prefix);
+        }
 	}
 	
 	public void startElement(String uri, String localName, String qName, Attributes atts) throws SAXException
@@ -331,20 +310,26 @@ public class SAXFilter implements ContentHandler, LexicalHandler
 	throws SAXException
 	{
 		if (allowIgnorableWhitespace)
-			contentHandler.ignorableWhitespace(ch, start, length);
+        {
+            contentHandler.ignorableWhitespace(ch, start, length);
+        }
 	}
 
 	public void skippedEntity(String name) throws SAXException
 	{
 		if (allowSkippedEntities)
-			contentHandler.skippedEntity(name);
+        {
+            contentHandler.skippedEntity(name);
+        }
 	}
 
 	public void characters(char[] ch, int start, int length)
 	throws SAXException
 	{
 		if (allowCharacters)
-			contentHandler.characters(ch, start, length);
+        {
+            contentHandler.characters(ch, start, length);
+        }
 	}
 	
 	/**
@@ -355,48 +340,62 @@ public class SAXFilter implements ContentHandler, LexicalHandler
 	throws SAXException
 	{
 		if (allowDTDs)
-			lexicalHandler.startDTD(name, publicId, systemId);
+        {
+            lexicalHandler.startDTD(name, publicId, systemId);
+        }
 	}
 
 	public void endDTD() throws SAXException
 	{
 		if (allowDTDs)
-			lexicalHandler.endDTD();
+        {
+            lexicalHandler.endDTD();
+        }
 	}
 
 	public void startEntity(String name)
 	throws SAXException
 	{
 		if (allowEntities)
-			lexicalHandler.startEntity(name);
+        {
+            lexicalHandler.startEntity(name);
+        }
 	}
 
 	public void endEntity(String name)
 	throws SAXException
 	{
 		if (allowEntities)
-			lexicalHandler.endEntity(name);
+        {
+            lexicalHandler.endEntity(name);
+        }
 	}
 
 	public void startCDATA()
 	throws SAXException
 	{
 		if (allowCDATA)
-			lexicalHandler.startCDATA();
+        {
+            lexicalHandler.startCDATA();
+        }
 	}
 
 	public void endCDATA()
 	throws SAXException
 	{
 		if (allowCDATA)
-			lexicalHandler.endCDATA();
+        {
+            lexicalHandler.endCDATA();
+        }
 	}
 
 	public void comment(char[] ch, int start, int length)
 	throws SAXException
 	{
 		if (allowComments)
-			lexicalHandler.comment(ch, start, length);
+        {
+            lexicalHandler.comment(ch, start, length);
+        }
 	}
 }
 

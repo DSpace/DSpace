@@ -1,41 +1,9 @@
-/*
- * BrandedPreviewJPEGFilter.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.mediafilter;
 
@@ -45,12 +13,6 @@ import java.awt.Font;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-
-import org.dspace.content.Bitstream;
-import org.dspace.content.BitstreamFormat;
-import org.dspace.content.Bundle;
-import org.dspace.content.Item;
-import org.dspace.core.Context;
 
 import javax.imageio.ImageIO;
 
@@ -130,19 +92,19 @@ public class BrandedPreviewJPEGFilter extends MediaFilter
         if (xsize > xmax)
         {
             // calculate scaling factor so that xsize * scale = new size (max)
-            float scale_factor = xmax / xsize;
+            float scaleFactor = xmax / xsize;
 
             // if verbose flag is set, print out extracted text
             // to STDOUT
             if (MediaFilterManager.isVerbose)
             {
-                System.out.println("x scale factor: " + scale_factor);
+                System.out.println("x scale factor: " + scaleFactor);
             }
 
             // now reduce x size
             // and y size
-            xsize = xsize * scale_factor;
-            ysize = ysize * scale_factor;
+            xsize = xsize * scaleFactor;
+            ysize = ysize * scaleFactor;
 
             // if verbose flag is set, print out extracted text
             // to STDOUT
@@ -155,12 +117,12 @@ public class BrandedPreviewJPEGFilter extends MediaFilter
         // scale by y if needed
         if (ysize > ymax)
         {
-            float scale_factor = ymax / ysize;
+            float scaleFactor = ymax / ysize;
 
             // now reduce x size
             // and y size
-            xsize = xsize * scale_factor;
-            ysize = ysize * scale_factor;
+            xsize = xsize * scaleFactor;
+            ysize = ysize * scaleFactor;
         }
 
         // if verbose flag is set, print details to STDOUT

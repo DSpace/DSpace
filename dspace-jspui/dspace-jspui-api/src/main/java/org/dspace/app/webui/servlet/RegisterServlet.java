@@ -1,41 +1,9 @@
-/*
- * RegisterServlet.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.webui.servlet;
 
@@ -128,7 +96,6 @@ public class RegisterServlet extends DSpaceServlet
          * will go to the "enter personal info" or "enter new password" page as
          * appropriate.
          */
-        boolean updated = false;
 
         // Get the token
         String token = request.getParameter("token");
@@ -139,7 +106,10 @@ public class RegisterServlet extends DSpaceServlet
             if (registering)
             {
                 // Registering a new user
-                if (ldap_enabled) JSPManager.showJSP(request, response, "/register/new-ldap-user.jsp");
+                if (ldap_enabled)
+                {
+                    JSPManager.showJSP(request, response, "/register/new-ldap-user.jsp");
+                }
                 JSPManager.showJSP(request, response, "/register/new-user.jsp");
             }
             else
@@ -172,7 +142,7 @@ public class RegisterServlet extends DSpaceServlet
                 // Indicate if user can set password
                 boolean setPassword =
                     AuthenticationManager.allowSetPassword(context, request, email);
-                request.setAttribute("set.password", new Boolean(setPassword));
+                request.setAttribute("set.password", Boolean.valueOf(setPassword));
 
                 // Forward to "personal info page"
                 JSPManager.showJSP(request, response,
@@ -263,7 +233,10 @@ public class RegisterServlet extends DSpaceServlet
         String password = request.getParameter("password");
         EPerson eperson = EPerson.findByEmail(context, email);
         EPerson eperson2 = null;
-        if (netid!=null) eperson2 = EPerson.findByNetid(context, netid.toLowerCase());
+        if (netid!=null)
+        {
+            eperson2 = EPerson.findByNetid(context, netid.toLowerCase());
+        }
 
         try
         {
@@ -306,7 +279,7 @@ public class RegisterServlet extends DSpaceServlet
                                     log.info(LogManager.getHeader(context,
                                         "invalid_email",
                                         "email=" + email));
-                                    request.setAttribute("retry", new Boolean(true));
+                                    request.setAttribute("retry", Boolean.TRUE);
                                     JSPManager.showJSP(request, response, "/register/new-user.jsp");
                                     return;
                             	}
@@ -378,7 +351,7 @@ public class RegisterServlet extends DSpaceServlet
                     log.info(LogManager.getHeader(context, "unknown_email",
                             "email=" + email));
 
-                    request.setAttribute("retry", new Boolean(true));
+                    request.setAttribute("retry", Boolean.TRUE);
 
                     JSPManager.showJSP(request, response,
                             "/register/forgot-password.jsp");
@@ -423,24 +396,28 @@ public class RegisterServlet extends DSpaceServlet
             log.info(LogManager.getHeader(context, "bad_email", "email="
                     + email));
 
-            request.setAttribute("retry", new Boolean(true));
+            request.setAttribute("retry", Boolean.TRUE);
 
             if (registering)
             {
-                if (ldap_enabled) JSPManager.showJSP(request, response, "/register/new-ldap-user.jsp");
-                else JSPManager.showJSP(request, response, "/register/new-user.jsp");
+                if (ldap_enabled)
+                {
+                    JSPManager.showJSP(request, response, "/register/new-ldap-user.jsp");
+                }
+                else
+                {
+                    JSPManager.showJSP(request, response, "/register/new-user.jsp");
+                }
             }
             else
             {
-                JSPManager.showJSP(request, response,
-                        "/register/forgot-password.jsp");
+                JSPManager.showJSP(request, response, "/register/forgot-password.jsp");
             }
         }
         catch (MessagingException me)
         {
             // Some other mailing error
-            log.info(LogManager.getHeader(context, "error_emailing", "email="
-                    + email), me);
+            log.info(LogManager.getHeader(context, "error_emailing", "email=" + email), me);
 
             JSPManager.showInternalError(request, response);
         }
@@ -467,7 +444,10 @@ public class RegisterServlet extends DSpaceServlet
         // Get the email address
         String email = AccountManager.getEmail(context, token);
         String netid = request.getParameter("netid");
-        if ((netid!=null)&&(email==null)) email = request.getParameter("email");
+        if ((netid!=null)&&(email==null))
+        {
+            email = request.getParameter("email");
+        }
         
         // If the token isn't valid, show an error
         if (email == null && netid==null)
@@ -484,10 +464,19 @@ public class RegisterServlet extends DSpaceServlet
 
         // If the token is valid, we create an eperson record if need be
         EPerson eperson = null;
-        if (email!=null) eperson = EPerson.findByEmail(context, email);
+        if (email!=null)
+        {
+            eperson = EPerson.findByEmail(context, email);
+        }
         EPerson eperson2 = null;
-        if (netid!=null) eperson2 = EPerson.findByNetid(context, netid.toLowerCase());
-        if (eperson2 !=null) eperson = eperson2;
+        if (netid!=null)
+        {
+            eperson2 = EPerson.findByNetid(context, netid.toLowerCase());
+        }
+        if (eperson2 !=null)
+        {
+            eperson = eperson2;
+        }
         
         if (eperson == null)
         {
@@ -497,7 +486,10 @@ public class RegisterServlet extends DSpaceServlet
             context.setIgnoreAuthorization(true);
             eperson = EPerson.create(context);
             eperson.setEmail(email);
-            if (netid!=null) eperson.setNetid(netid.toLowerCase());
+            if (netid!=null)
+            {
+                eperson.setNetid(netid.toLowerCase());
+            }
             eperson.update();
             context.setIgnoreAuthorization(false);
         }
@@ -518,7 +510,7 @@ public class RegisterServlet extends DSpaceServlet
 
         // If the user set a password, make sure it's OK
         boolean passwordOK = true;
-        if (eperson.getRequireCertificate() == false && netid==null &&
+        if (!eperson.getRequireCertificate() && netid==null &&
             AuthenticationManager.allowSetPassword(context, request,
                 eperson.getEmail()))
         {
@@ -533,7 +525,10 @@ public class RegisterServlet extends DSpaceServlet
                     "email=" + eperson.getEmail()));
 
             // delete the token
-            if (token!=null) AccountManager.deleteToken(context, token);
+            if (token!=null)
+            {
+                AccountManager.deleteToken(context, token);
+            }
             
             // Update user record
             eperson.update();
@@ -551,13 +546,13 @@ public class RegisterServlet extends DSpaceServlet
             request.setAttribute("token", token);
             request.setAttribute("eperson", eperson);
             request.setAttribute("netid", netid);
-            request.setAttribute("missing.fields", new Boolean(!infoOK));
-            request.setAttribute("password.problem", new Boolean(!passwordOK));
+            request.setAttribute("missing.fields", Boolean.valueOf(!infoOK));
+            request.setAttribute("password.problem", Boolean.valueOf(!passwordOK));
 
             // Indicate if user can set password
             boolean setPassword = AuthenticationManager.allowSetPassword(
                     context, request, email);
-            request.setAttribute("set.password", new Boolean(setPassword));
+            request.setAttribute("set.password", Boolean.valueOf(setPassword));
 
             JSPManager.showJSP(request, response,
                     "/register/registration-form.jsp");
@@ -624,7 +619,7 @@ public class RegisterServlet extends DSpaceServlet
         }
         else
         {
-            request.setAttribute("password.problem", new Boolean(true));
+            request.setAttribute("password.problem", Boolean.TRUE);
             request.setAttribute("token", token);
             request.setAttribute("eperson", eperson);
 

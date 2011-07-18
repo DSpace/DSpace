@@ -46,6 +46,8 @@ public class CASAuthentication
     private String firstName;
     private String lastName;
 
+    public final static String CASUSER = "dspace.current.user.ldap";
+    
     /**
      * Predicate, can new user automatically create EPerson.
      * Checks configuration value.  You'll probably want this to
@@ -95,7 +97,7 @@ public class CASAuthentication
     public int[] getSpecialGroups(Context context, HttpServletRequest request)
     {
       try {
-        Ldap ldap = (Ldap)request.getSession().getAttribute("dspace.current.user.ldap");
+        Ldap ldap = (Ldap)request.getSession().getAttribute(CASUSER);
 
         if (ldap != null) {
           ldap.setContext(context);
@@ -141,7 +143,11 @@ public class CASAuthentication
               if (eperson != null) {
 
                 // Save the ldap object in the session
-                request.getSession().setAttribute("dspace.current.user.ldap", ldap);
+                request.getSession().setAttribute(CASUSER, ldap);
+                
+                log.debug(LogManager.getHeader(context, 
+                		"authenticate", 
+                		CASUSER + "=" + request.getSession().getAttribute(CASUSER)));	
 
                 // Logged in OK.
                 context.setCurrentUser(eperson);
@@ -189,7 +195,11 @@ public class CASAuthentication
                 }
 
                 // Save the ldap object in the session
-                request.getSession().setAttribute("dspace.current.user.ldap", ldap);
+                request.getSession().setAttribute(CASUSER, ldap);
+
+                log.debug(LogManager.getHeader(context, 
+                		"authenticate", 
+                		CASUSER + "=" + request.getSession().getAttribute(CASUSER)));	
 
                 // Locate the eperson in DSpace
                 EPerson eperson = null;

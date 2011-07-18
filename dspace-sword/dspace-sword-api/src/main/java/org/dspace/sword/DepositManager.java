@@ -1,43 +1,13 @@
-/* DepositManager.java
- * 
- * Copyright (c) 2007, Aberystwyth University
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *  - Redistributions of source code must retain the above
- *    copyright notice, this list of conditions and the
- *    following disclaimer.
- *
- *  - Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- *  - Neither the name of the Centre for Advanced Software and
- *    Intelligent Systems (CASIS) nor the names of its
- *    contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
- * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- */ 
-
+ * http://www.dspace.org/license/
+ */
 package org.dspace.sword;
 
+import java.io.*;
 import java.util.Date;
 
 import org.apache.log4j.Logger;
@@ -47,6 +17,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.core.Utils;
 
 import org.purl.sword.base.Deposit;
 import org.purl.sword.base.DepositResponse;
@@ -64,7 +35,7 @@ import org.purl.sword.base.SWORDErrorException;
 public class DepositManager
 {
 	/** Log4j logger */
-	public static Logger log = Logger.getLogger(DepositManager.class);
+	public static final Logger log = Logger.getLogger(DepositManager.class);
 
 	/** The SWORD service implementation */
 	private SWORDService swordService;
@@ -109,7 +80,7 @@ public class DepositManager
 	/**
 	 * Once this object is fully prepared, this method will execute
 	 * the deposit process.  The returned DepositRequest can be
-	 * used then to assembel the SWORD response.
+	 * used then to assemble the SWORD response.
 	 * 
 	 * @return	the response to the deposit request
 	 * @throws DSpaceSWORDException
@@ -170,7 +141,42 @@ public class DepositManager
 			throw new DSpaceSWORDException("Deposit target is not a collection or an item");
 		}
 
-		DepositResult result = dep.doDeposit(deposit);
+        DepositResult result = null;
+
+        try
+        {
+            result = dep.doDeposit(deposit);
+        }
+        catch(DSpaceSWORDException e)
+        {
+            if (swordService.getSwordConfig().isKeepPackageOnFailedIngest())
+            {
+                try
+                {
+                    storePackageAsFile(deposit);
+                }
+                catch(IOException e2)
+                {
+                    log.warn("Unable to store SWORD package as file: " + e);
+                }
+            }
+            throw e;
+        }
+        catch(SWORDErrorException e)
+        {
+            if (swordService.getSwordConfig().isKeepPackageOnFailedIngest())
+            {
+                try
+                {
+                    storePackageAsFile(deposit);
+                }
+                catch(IOException e2)
+                {
+                    log.warn("Unable to store SWORD package as file: " + e);
+                }
+            }
+            throw e;
+        }
 
 		// now construct the deposit response.  The response will be
 		// CREATED if the deposit is in the archive, or ACCEPTED if
@@ -224,4 +230,44 @@ public class DepositManager
 		
 		return response;
 	}
+
+    /**
+     *   Store original package on disk and companion file containing SWORD headers as found in the deposit object
+     *   Also write companion file with header info from the deposit object.
+     *
+     * @param deposit
+     */
+    private void storePackageAsFile(Deposit deposit) throws IOException
+    {
+        String path = swordService.getSwordConfig().getFailedPackageDir();
+
+        File dir = new File(path);
+        if (!dir.exists() || !dir.isDirectory())
+        {
+            throw new IOException("Directory does not exist for writing packages on ingest error.");
+        }
+
+        String filenameBase =  "sword-" + deposit.getUsername() + "-" + (new Date()).getTime();
+
+        File packageFile = new File(path, filenameBase);
+        File headersFile = new File(path, filenameBase + "-headers");
+
+        InputStream is = new BufferedInputStream(new FileInputStream(deposit.getFile()));
+        OutputStream fos = new BufferedOutputStream(new FileOutputStream(packageFile));
+        Utils.copy(is, fos);
+        fos.close();
+        is.close();
+
+        //write companion file with headers
+        PrintWriter pw = new PrintWriter(new BufferedWriter(new FileWriter(headersFile)));
+
+        pw.println("Content-Disposition=" + deposit.getContentDisposition());
+        pw.println("Content-Type=" + deposit.getContentType());
+        pw.println("Packaging=" + deposit.getPackaging());
+        pw.println("Location=" + deposit.getLocation());
+        pw.println("On Behalf of=" + deposit.getOnBehalfOf());
+        pw.println("Slug=" + deposit.getSlug());
+        pw.println("User name=" + deposit.getUsername());
+        pw.close();
+    }
 }

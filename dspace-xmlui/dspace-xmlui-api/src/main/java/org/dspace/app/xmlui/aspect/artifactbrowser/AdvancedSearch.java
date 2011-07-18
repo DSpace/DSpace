@@ -1,48 +1,15 @@
-/*
- * AdvancedSearch
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -134,7 +101,7 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
     private static final int FIELD_MAX_COUNT = 12;
     
     /** A cache of extracted search fields */
-    private ArrayList<SearchField> fields;
+    private java.util.List<SearchField> fields;
     
     /**
      * Add Page metadata.
@@ -162,7 +129,9 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
         Request request = ObjectModelHelper.getRequest(objectModel);
         String numSearchField = request.getParameter("num_search_field");
         if (numSearchField == null || numSearchField.length() == 0)
-        	numSearchField = "3";
+        {
+            numSearchField = "3";
+        }
     	
         // Build the DRI Body
         Division search = body.addDivision("advanced-search","primary");
@@ -203,7 +172,9 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
         	// Skip over all the fields we've displayed.
         	int i = field.getIndex();
         	if (i <= FIELD_DISPLAY_COUNT)
-        		continue;
+            {
+                continue;
+            }
         	
         	query.addHidden("conjunction"+i).setValue(field.getConjunction());
         	query.addHidden("field"+i).setValue(field.getField());
@@ -229,14 +200,18 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
     {
         // No conjunction for the first row.
         if (row == 1)
+        {
             return;
+        }
 
         Request request = ObjectModelHelper.getRequest(objectModel);
         String current = request.getParameter("conjunction" + row);
 
         // default to AND if nothing specified.
         if (current == null || current.length() == 0)
+        {
             current = "AND";
+        }
         
         Select select = cell.addSelect("conjunction" + row);
 
@@ -278,10 +253,9 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
         select.addOption((current == null), "ANY").addContent(
                 message("xmlui.ArtifactBrowser.AdvancedSearch.type_ANY"));
 
-        for (String key : searchTypes.keySet())
+        for (Map.Entry<String, Message> searchType : searchTypes.entrySet())
         {
-            select.addOption(key.equals(current), key).addContent(
-                    searchTypes.get(key));
+            select.addOption(searchType.getKey().equals(current), searchType.getKey()).addContent(searchType.getValue());
         }
     }
 
@@ -306,11 +280,13 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
     private void buildQueryField(int row, Cell cell) throws WingException
     {
         Request request = ObjectModelHelper.getRequest(objectModel);
-        String current = URLDecode(request.getParameter("query" + row));
+        String current = decodeFromURL(request.getParameter("query" + row));
 
         Text text = cell.addText("query" + row);
         if (current != null)
+        {
             text.setValue(current);
+        }
     }
 
     /**
@@ -326,15 +302,21 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
         
         String numSearchField = request.getParameter("num_search_field");
         if (numSearchField != null)
-        	parameters.put("num_search_field", numSearchField);
+        {
+            parameters.put("num_search_field", numSearchField);
+        }
 
         String resultsPerPage = request.getParameter("results_per_page");
         if (resultsPerPage != null)
-        	parameters.put("results_per_page", resultsPerPage);
+        {
+            parameters.put("results_per_page", resultsPerPage);
+        }
         
         String scope = request.getParameter("scope");
         if (scope != null)
-        	parameters.put("scope", scope);
+        {
+            parameters.put("scope", scope);
+        }
         
         for (SearchField searchField : getSearchFields(request))
         {
@@ -349,19 +331,29 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
         }
         
         if (parameters.get("page") == null)
-        	parameters.put("page", String.valueOf(getParameterPage()));
+        {
+            parameters.put("page", String.valueOf(getParameterPage()));
+        }
         
         if (parameters.get("rpp") == null)
-        	parameters.put("rpp", String.valueOf(getParameterRpp()));
+        {
+            parameters.put("rpp", String.valueOf(getParameterRpp()));
+        }
         
         if (parameters.get("sort_by") == null)
-        	parameters.put("sort_by", String.valueOf(getParameterSortBy()));
+        {
+            parameters.put("sort_by", String.valueOf(getParameterSortBy()));
+        }
         
         if (parameters.get("order") == null)
-        	parameters.put("order",getParameterOrder());
+        {
+            parameters.put("order", getParameterOrder());
+        }
         
         if (parameters.get("etal") == null)
-        	parameters.put("etal",String.valueOf(getParameterEtAl()));
+        {
+            parameters.put("etal", String.valueOf(getParameterEtAl()));
+        }
         
         return super.generateURL("advanced-search", parameters);
     }
@@ -384,53 +376,61 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
      * @param fields The search fields
      * @return A string
      */
-    private String buildQuery(ArrayList<SearchField> fields)
+    private String buildQuery(java.util.List<SearchField> fields)
     {
     	Perl5Util util = new Perl5Util();
     	
-    	String query = "";
+    	StringBuilder query = new StringBuilder();
+        query.append("(");
     	
     	// Loop through the fields building the search query as we go.
     	for (SearchField field : fields)
     	{	
     		// if the field is empty, then skip it and try a later one.
     		if (field.getQuery() == null)
-    			continue;
+            {
+                continue;
+            }
     		
     		// Add the conjunction for everything but the first field.
     		if (fields.indexOf(field) > 0)
-    			query += " " + field.getConjunction() + " ";
+            {
+                query.append(" ").append(field.getConjunction()).append(" ").toString();
+            }
             
     		// Two cases, one if a specific search field is specified or if 
     		// ANY is given then just a general search is performed.
             if ("ANY".equals(field.getField()))
             {
             	// No field specified, 
-            	query += "(" + field.getQuery() + ")";
+            	query.append("(").append(field.getQuery()).append(")").toString();
             }
             else
             {   
             	// Specific search field specified, add the field specific field.
             	
             	// Replace singe quote's with double quotes (only if they match)
-            	String subquery = util.substitute("s/\'(.*)\'/\"$1\"/g", field.getQuery());
+            	String subQuery = util.substitute("s/\'(.*)\'/\"$1\"/g", field.getQuery());
             	
             	// If the field is not quoted ...
-            	if (!util.match("/\".*\"/", subquery))
+            	if (!util.match("/\".*\"/", subQuery))
                 {
             		// ... then seperate each word and re-specify the search field.
-                    subquery = util.substitute("s/ / " + field.getField() + ":/g", subquery);
+                    subQuery = util.substitute("s/[ ]+/ " + field.getField() + ":/g", subQuery);
                 }
             	
-            	// Put the subquery into the general query
-            	query += "("+field.getField()+":"+subquery+")";
+            	// Put the subQuery into the general query
+            	query.append("(").append(field.getField()).append(":").append(subQuery).append(")").toString();
             }
     	}
-    	
-    	if (query.length() == 0)
+
+
+    	if (query.length() == 1)
+        {
     		return "";
-    	else
-    		return "("+query+")";
+        }
+
+    	return query.append(")").toString();
     }
 
    
@@ -444,10 +444,12 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
      * @return Array of search fields
      * @throws UIException 
      */
-    public ArrayList<SearchField> getSearchFields(Request request) throws UIException
+    public java.util.List<SearchField> getSearchFields(Request request) throws UIException
 	{
     	if (this.fields != null)
-    		return this.fields;
+        {
+            return this.fields;
+        }
     	
     	// Get how many fields to search
 	    int numSearchField;
@@ -465,14 +467,16 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
 		for (int i = 1; i <= numSearchField; i++)
 		{
 			String field = request.getParameter("field"+i);
-			String query = URLDecode(request.getParameter("query"+i));
+			String query = decodeFromURL(request.getParameter("query"+i));
 			String conjunction = request.getParameter("conjunction"+i);
 			
 			if (field != null)
 			{
 				field = field.trim();
 				if (field.length() == 0)
-					field = null;
+                {
+                    field = null;
+                }
 			}
 			
 			
@@ -480,23 +484,33 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
 			{
 				query = query.trim();
 				if (query.length() == 0)
-					query = null;
+                {
+                    query = null;
+                }
 			}
 			
 			if (conjunction != null)
 			{
 				conjunction = conjunction.trim();
 				if (conjunction.length() == 0)
-					conjunction = null;
+                {
+                    conjunction = null;
+                }
 			}
 			
 			if (field == null)
-				field = "ANY";
+            {
+                field = "ANY";
+            }
 			if (conjunction == null)
-				conjunction = "AND";
+            {
+                conjunction = "AND";
+            }
 			
 			if (query != null)
-				fields.add(new SearchField(i,field,query,conjunction));
+            {
+                fields.add(new SearchField(i, field, query, conjunction));
+            }
 		}
 		
 		this.fields = fields;

@@ -1,41 +1,10 @@
-/* CollectionLocation.java
- * 
- * Copyright (c) 2007, Aberystwyth University
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- *  - Redistributions of source code must retain the above
- *    copyright notice, this list of conditions and the
- *    following disclaimer.
- *
- *  - Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- *  - Neither the name of the Centre for Advanced Software and
- *    Intelligent Systems (CASIS) nor the names of its
- *    contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF
- * THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- */ 
-
+ * http://www.dspace.org/license/
+ */
 package org.dspace.sword;
 
 import java.net.MalformedURLException;
@@ -61,7 +30,7 @@ import org.dspace.handle.HandleManager;
 public class CollectionLocation
 {
 	/** Log4j logger */
-	public static Logger log = Logger.getLogger(CollectionLocation.class);
+	public static final Logger log = Logger.getLogger(CollectionLocation.class);
 	
 	/**
 	 * Obtain the deposit URL for the given collection.  These URLs
@@ -132,9 +101,9 @@ public class CollectionLocation
 	 * If the configuration sword.deposit.url is set, this will be returned,
 	 * but if not, it will construct the url as follows:
 	 * 
-	 * [dspace.url]/dspace-sword/deposit
+	 * [dspace.baseUrl]/sword/deposit
 	 * 
-	 * where dspace.url is also in the configuration file.
+	 * where dspace.baseUrl is also in the configuration file.
 	 * 
 	 * @return	the base URL for sword deposit
 	 * @throws DSpaceSWORDException
@@ -145,10 +114,10 @@ public class CollectionLocation
 		String depositUrl = ConfigurationManager.getProperty("sword.deposit.url");
 		if (depositUrl == null || "".equals(depositUrl))
 		{
-			String dspaceUrl = ConfigurationManager.getProperty("dspace.url");
+			String dspaceUrl = ConfigurationManager.getProperty("dspace.baseUrl");
 			if (dspaceUrl == null || "".equals(dspaceUrl))
 			{
-				throw new DSpaceSWORDException("Unable to construct deposit urls, due to missing/invalid config in sword.deposit.url and/or dspace.url");
+				throw new DSpaceSWORDException("Unable to construct deposit urls, due to missing/invalid config in sword.deposit.url and/or dspace.baseUrl");
 			}
 
             try
@@ -158,7 +127,7 @@ public class CollectionLocation
             }
             catch (MalformedURLException e)
             {
-                throw new DSpaceSWORDException("Unable to construct deposit urls, due to invalid dspace.url " + e.getMessage(),e);
+                throw new DSpaceSWORDException("Unable to construct deposit urls, due to invalid dspace.baseUrl " + e.getMessage(),e);
             }
 			
 			

@@ -1,41 +1,9 @@
-/*
- * WorkspaceItem.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.content;
 
@@ -44,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -60,7 +29,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * Class representing an item in the process of being submitted by a user
  * 
  * @author Robert Tansley
- * @version $Revision: 3705 $
+ * @version $Revision: 6137 $
  */
 public class WorkspaceItem implements InProgressSubmission
 {
@@ -271,7 +240,7 @@ public class WorkspaceItem implements InProgressSubmission
         i.update();
 
         // Create the workspace item row
-        TableRow row = DatabaseManager.create(c, "workspaceitem");
+        TableRow row = DatabaseManager.row("workspaceitem");
 
         row.setColumn("item_id", i.getID());
         row.setColumn("collection_id", coll.getID());
@@ -281,7 +250,7 @@ public class WorkspaceItem implements InProgressSubmission
                         + "item_id=" + i.getID() + "collection_id="
                         + coll.getID()));
 
-        DatabaseManager.update(c, row);
+        DatabaseManager.insert(c, row);
 
         WorkspaceItem wi = new WorkspaceItem(c, row);
 
@@ -303,7 +272,7 @@ public class WorkspaceItem implements InProgressSubmission
     public static WorkspaceItem[] findByEPerson(Context context, EPerson ep)
             throws SQLException
     {
-        List wsItems = new ArrayList();
+        List<WorkspaceItem> wsItems = new ArrayList<WorkspaceItem>();
 
         TableRowIterator tri = DatabaseManager.queryTable(context, "workspaceitem",
                 "SELECT workspaceitem.* FROM workspaceitem, item WHERE " +
@@ -334,13 +303,12 @@ public class WorkspaceItem implements InProgressSubmission
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
-        WorkspaceItem[] wsArray = new WorkspaceItem[wsItems.size()];
-        wsArray = (WorkspaceItem[]) wsItems.toArray(wsArray);
-
-        return wsArray;
+        return wsItems.toArray(new WorkspaceItem[wsItems.size()]);
     }
 
     /**
@@ -356,7 +324,7 @@ public class WorkspaceItem implements InProgressSubmission
     public static WorkspaceItem[] findByCollection(Context context, Collection c)
             throws SQLException
     {
-        List wsItems = new ArrayList();
+        List<WorkspaceItem> wsItems = new ArrayList<WorkspaceItem>();
 
         TableRowIterator tri = DatabaseManager.queryTable(context, "workspaceitem",
                 "SELECT workspaceitem.* FROM workspaceitem WHERE " +
@@ -386,14 +354,41 @@ public class WorkspaceItem implements InProgressSubmission
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
-        WorkspaceItem[] wsArray = new WorkspaceItem[wsItems.size()];
-        wsArray = (WorkspaceItem[]) wsItems.toArray(wsArray);
-
-        return wsArray;
+        return wsItems.toArray(new WorkspaceItem[wsItems.size()]);
     }
+
+    /**
+     * Check to see if a particular item is currently still in a user's Workspace.
+     * If so, its WorkspaceItem is returned.  If not, null is returned
+     *
+     * @param context
+     *            the context object
+     * @param i
+     *            the item
+     *
+     * @return workflow item corresponding to the item, or null
+     */
+    public static WorkspaceItem findByItem(Context context, Item i)
+            throws SQLException
+    {
+        // Look for the unique workspaceitem entry where 'item_id' references this item
+        TableRow row =  DatabaseManager.findByUnique(context, "workspaceitem", "item_id", i.getID());
+
+        if (row == null)
+        {
+            return null;
+        }
+        else
+        {
+            return new WorkspaceItem(context, row);
+        }
+    }
+
 
     /**
      * Get all workspace items in the whole system
@@ -405,7 +400,7 @@ public class WorkspaceItem implements InProgressSubmission
     public static WorkspaceItem[] findAll(Context context)
         throws SQLException
     {
-        List wsItems = new ArrayList();
+        List<WorkspaceItem> wsItems = new ArrayList<WorkspaceItem>();
         String query = "SELECT * FROM workspaceitem ORDER BY item_id";
         TableRowIterator tri = DatabaseManager.queryTable(context,
                                     "workspaceitem",
@@ -434,13 +429,12 @@ public class WorkspaceItem implements InProgressSubmission
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
         
-        WorkspaceItem[] wsArray = new WorkspaceItem[wsItems.size()];
-        wsArray = (WorkspaceItem[]) wsItems.toArray(wsArray);
-
-        return wsArray;
+        return wsItems.toArray(new WorkspaceItem[wsItems.size()]);
     }
     
     /**
@@ -515,6 +509,36 @@ public class WorkspaceItem implements InProgressSubmission
     }
 
     /**
+     * Decide if this WorkspaceItem is equal to another
+     *
+     * @param o The other workspace item to compare to
+     * @return If they are equal or not
+     */
+    public boolean equals(Object o) {
+        if (this == o)
+        {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass())
+        {
+            return false;
+        }
+
+        final WorkspaceItem that = (WorkspaceItem)o;
+        if (this.getID() != that.getID())
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public int hashCode()
+    {
+        return new HashCodeBuilder().append(getID()).toHashCode();
+    }
+
+    /**
      * Delete the workspace item. The entry in workspaceitem, the unarchived
      * item and its contents are all removed (multiple inclusion
      * notwithstanding.)
@@ -526,6 +550,7 @@ public class WorkspaceItem implements InProgressSubmission
          * Authorisation is a special case. The submitter won't have REMOVE
          * permission on the collection, so our policy is this: Only the
          * original submitter or an administrator can delete a workspace item.
+
          */
         if (!AuthorizeManager.isAdmin(ourContext)
                 && ((ourContext.getCurrentUser() == null) || (ourContext

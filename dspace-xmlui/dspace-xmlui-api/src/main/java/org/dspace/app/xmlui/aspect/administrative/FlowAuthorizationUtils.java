@@ -1,48 +1,16 @@
-/*
- * FlowAuthorizationUtils.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.app.xmlui.aspect.administrative;
 
 import java.sql.SQLException;
 import java.util.List;
 
+import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -151,7 +119,13 @@ public class FlowAuthorizationUtils {
 		boolean added = false;
 	
 		ResourcePolicy policy = ResourcePolicy.find(context, policyID);
-			
+		
+		// check authorization to edit an existent policy
+		if (policy != null)
+		{
+		    AuthorizeUtil.authorizeManagePolicy(context, policy);
+		}
+		
 		/* First and foremost, if no group or action was selected, throw an error back to the user */
 		if (actionID == -1) {
 			result.setContinue(false);
@@ -168,15 +142,41 @@ public class FlowAuthorizationUtils {
 		DSpaceObject policyParent = null;
 		if (policy == null) 
 		{
-			policy = ResourcePolicy.create(context);
-			
 			switch (objectType) {
-			case Constants.COMMUNITY: policyParent = Community.find(context, objectID); break;
-			case Constants.COLLECTION: policyParent = Collection.find(context, objectID); break;
-			case Constants.ITEM: policyParent = Item.find(context, objectID); break;
-			case Constants.BUNDLE: policyParent = Bundle.find(context, objectID); break;
-			case Constants.BITSTREAM: policyParent = Bitstream.find(context, objectID); break;
+			case Constants.COMMUNITY: 
+			    {
+			        policyParent = Community.find(context, objectID); 
+			        AuthorizeUtil.authorizeManageCommunityPolicy(context, (Community)policyParent);
+			        break;
+			    }
+			case Constants.COLLECTION:
+		        {
+			        policyParent = Collection.find(context, objectID); 
+			        AuthorizeUtil.authorizeManageCollectionPolicy(context, (Collection)policyParent);        
+			        break;
+		        }
+			case Constants.ITEM:
+		        {
+			        policyParent = Item.find(context, objectID); 
+			        AuthorizeUtil.authorizeManageItemPolicy(context, (Item) policyParent);
+			        break;
+		        }
+			case Constants.BUNDLE:
+		        {
+			        policyParent = Bundle.find(context, objectID); 
+			        AuthorizeUtil.authorizeManageItemPolicy(context, (Item) (policyParent.getParentObject()));
+			        break;
+		        }
+			case Constants.BITSTREAM: 
+		        {
+			        policyParent = Bitstream.find(context, objectID); 
+			        AuthorizeUtil
+                        .authorizeManageItemPolicy(context, (Item) (policyParent
+                                .getParentObject()));
+			        break;
+		        }
 			}
+			policy = ResourcePolicy.create(context);
 			policy.setResource(policyParent);
 			added = true;
 		}
@@ -214,8 +214,14 @@ public class FlowAuthorizationUtils {
 	    
 	    result.setContinue(true);
 	    result.setOutcome(true);
-	    if (added) result.setMessage(new Message("default","A new policy was created successfully"));
-	    else result.setMessage(new Message("default","The policy was edited successfully"));
+	    if (added)
+        {
+            result.setMessage(new Message("default", "A new policy was created successfully"));
+        }
+	    else
+        {
+            result.setMessage(new Message("default", "The policy was edited successfully"));
+        }
 	    
 	    result.setParameter("policyID", policy.getID());
 	    
@@ -231,13 +237,15 @@ public class FlowAuthorizationUtils {
 	 * @param policyIDs The unique ids of the policies being deleted.
 	 * @return A process result's object.   
 	 */
-	public static FlowResult processDeletePolicies(Context context, String[] policyIDs) throws NumberFormatException, SQLException
+	public static FlowResult processDeletePolicies(Context context, String[] policyIDs) throws NumberFormatException, SQLException, AuthorizeException
 	{
 		FlowResult result = new FlowResult();
 	
 		for (String id : policyIDs) 
 		{
 			ResourcePolicy policyDeleted = ResourcePolicy.find(context, Integer.valueOf(id));
+			// check authorization
+			AuthorizeUtil.authorizeManagePolicy(context, policyDeleted);
 			policyDeleted.delete();
 	    }
 	
@@ -262,6 +270,7 @@ public class FlowAuthorizationUtils {
 	public static FlowResult processAdvancedPolicyAdd(Context context, String[] groupIDs, int actionID,
 			int resourceID, String [] collectionIDs) throws NumberFormatException, SQLException, AuthorizeException
 	{
+	    AuthorizeUtil.requireAdminRole(context);
 		FlowResult result = new FlowResult();
 		
 		for (String groupID : groupIDs) 
@@ -300,6 +309,7 @@ public class FlowAuthorizationUtils {
 	public static FlowResult processAdvancedPolicyDelete(Context context, int resourceID, String [] collectionIDs) 
 			throws NumberFormatException, SQLException, AuthorizeException
 	{
+	    AuthorizeUtil.requireAdminRole(context);
 		FlowResult result = new FlowResult();
 		
 		for (String collectionID : collectionIDs) 

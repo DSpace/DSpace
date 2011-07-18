@@ -1,52 +1,13 @@
-/*
- * OrderFormat.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.sort;
 
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
 import org.dspace.core.PluginManager;
-import org.dspace.sort.OrderFormatDelegate;
-import org.dspace.sort.OrderFormatAuthor;
-import org.dspace.sort.OrderFormatTitle;
-import org.dspace.sort.OrderFormatText;
 
 /**
  * Class implementing static helpers for anywhere that interacts with the sort columns
@@ -71,24 +32,24 @@ import org.dspace.sort.OrderFormatText;
  * (ie. run 'index-all', or 'dsrun org.dspace.browse.InitializeBrowse')
  * 
  * @author Graham Triggs
- * @version $Revision: 3705 $
+ * @version $Revision: 5844 $
  */
 public class OrderFormat
 {
-	private final static Logger log = LogManager.getLogger(OrderFormat.class);
-
-	public final static String AUTHOR = "author";
-	public final static String TITLE  = "title";
-	public final static String TEXT   = "text";
-	public final static String DATE   = "date";
+	public static final String AUTHOR = "author";
+	public static final String TITLE  = "title";
+	public static final String TEXT   = "text";
+	public static final String DATE   = "date";
+    public static final String AUTHORITY = "authority";
 	
 	// Array of all available order delegates - avoids excessive calls to plugin manager
-	private final static String[] delegates = PluginManager.getAllPluginNames(OrderFormatDelegate.class);
+	private static final String[] delegates = PluginManager.getAllPluginNames(OrderFormatDelegate.class);
 
-    private final static OrderFormatDelegate authorDelegate = new OrderFormatAuthor();
-    private final static OrderFormatDelegate titleDelegate  = new OrderFormatTitle();
-    private final static OrderFormatDelegate textDelegate   = new OrderFormatText();
-    private final static OrderFormatDelegate dateDelegate   = new OrderFormatDate();
+    private static final OrderFormatDelegate authorDelegate = new OrderFormatAuthor();
+    private static final OrderFormatDelegate titleDelegate  = new OrderFormatTitle();
+    private static final OrderFormatDelegate textDelegate   = new OrderFormatText();
+    private static final OrderFormatDelegate dateDelegate   = new OrderFormatDate();
+    private static final OrderFormatDelegate authorityDelegate = new OrderFormatText();
     
     /**
      * Generate a sort string for the given DC metadata
@@ -99,13 +60,16 @@ public class OrderFormat
     	
         // If there is no value, return null
         if (value == null)
+        {
             return null;
+        }
 
     	// If a named index has been supplied
     	if (type != null && type.length() > 0)
     	{
     		// Use a delegate if one is configured
-        	if ((delegate = OrderFormat.getDelegate(type)) != null)
+            delegate = OrderFormat.getDelegate(type);
+        	if (delegate != null)
         	{
         		return delegate.makeSortString(value, language);
         	}
@@ -129,6 +93,11 @@ public class OrderFormat
             if (type.equalsIgnoreCase(OrderFormat.DATE) && dateDelegate != null)
             {
               return dateDelegate.makeSortString(value, language);
+            }
+
+            if (type.equalsIgnoreCase(OrderFormat.AUTHORITY) && authorityDelegate != null)
+            {
+              return authorityDelegate.makeSortString(value, language);
             }
     	}
 

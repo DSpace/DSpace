@@ -1,43 +1,12 @@
 <%--
-  - full.jsp
-  -
-  - Version: $Revision: 3705 $
-  -
-  - Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
-  -
-  - Copyright (c) 2006, Hewlett-Packard Company and Massachusetts
-  - Institute of Technology.  All rights reserved.
-  -
-  - Redistribution and use in source and binary forms, with or without
-  - modification, are permitted provided that the following conditions are
-  - met:
-  -
-  - - Redistributions of source code must retain the above copyright
-  - notice, this list of conditions and the following disclaimer.
-  -
-  - - Redistributions in binary form must reproduce the above copyright
-  - notice, this list of conditions and the following disclaimer in the
-  - documentation and/or other materials provided with the distribution.
-  -
-  - - Neither the name of the Hewlett-Packard Company nor the name of the
-  - Massachusetts Institute of Technology nor the names of their
-  - contributors may be used to endorse or promote products derived from
-  - this software without specific prior written permission.
-  -
-  - THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-  - ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-  - LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-  - A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-  - HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-  - INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-  - BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
-  - OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-  - ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
-  - TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
-  - USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
-  - DAMAGE.
-  --%>
 
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+--%>
 <%--
   - Display the results of browsing a full hit list
   --%>
@@ -55,8 +24,6 @@
 <%@ page import="org.dspace.browse.BrowseIndex" %>
 <%@ page import="org.dspace.core.ConfigurationManager" %>
 <%@ page import="java.net.URLEncoder" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="java.util.Iterator" %>
 <%@ page import="org.dspace.content.DCDate" %>
 <%@ page import="org.dspace.app.webui.util.UIUtil" %>
 
@@ -65,10 +32,12 @@
 
     String urlFragment = "browse";
     String layoutNavbar = "default";
+    boolean withdrawn = false;
 	if (request.getAttribute("browseWithdrawn") != null)
 	{
 	    layoutNavbar = "admin";
         urlFragment = "dspace-admin/withdrawn";
+        withdrawn = true;
     }
 
 	// First, get the browse info object
@@ -103,11 +72,6 @@
 	
 	type = bix.getName();
 	
-	if (bi.hasValue())
-	{
-		value = "\"" + bi.getValue() + "\"";
-	}
-	
 	// next and previous links are of the form:
 	// [handle/<prefix>/<suffix>/]browse?type=<type>&sort_by=<sort_by>&order=<order>[&value=<value>][&rpp=<rpp>][&[focus=<focus>|vfocus=<vfocus>]
 	
@@ -123,12 +87,25 @@
 	}
 	
 	String direction = (bi.isAscending() ? "ASC" : "DESC");
-	String valueString = "";
-	if (bi.hasValue())
+	
+	String argument = null;
+	if (bi.hasAuthority())
+    {
+        value = bi.getAuthority();
+        argument = "authority";
+    }
+	else if (bi.hasValue())
 	{
-		valueString = "&amp;value=" + URLEncoder.encode(bi.getValue());
+		value = bi.getValue();
+	    argument = "value";
 	}
 
+	String valueString = "";
+	if (value!=null)
+	{
+		valueString = "&amp;" + argument + "=" + URLEncoder.encode(value);
+	}
+	
     String sharedLink = linkBase + urlFragment + "?";
 
     if (bix.getName() != null)
@@ -180,6 +157,10 @@
 		typeKey = "browse.type.item." + bi.getSortOption().getName();
 	else
 		typeKey = "browse.type.item." + bix.getSortOption().getName();
+
+    // Admin user or not
+    Boolean admin_b = (Boolean)request.getAttribute("admin_button");
+    boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
 %>
 
 <%-- OK, so here we start to develop the various components we will use in the UI --%>
@@ -202,7 +183,11 @@
 			<input type="hidden" name="rpp" value="<%= rpp %>"/>
 			<input type="hidden" name="etal" value="<%= bi.getEtAl() %>" />
 <%
-		if (bi.hasValue())
+		if (bi.hasAuthority())
+		{
+		%><input type="hidden" name="authority" value="<%=bi.getAuthority() %>"/><%
+		}
+		else if (bi.hasValue())
 		{
 			%><input type="hidden" name="value" value="<%= bi.getValue() %>"/><%
 		}
@@ -312,7 +297,11 @@
 	<form method="get" action="<%= formaction %>">
 		<input type="hidden" name="type" value="<%= bix.getName() %>"/>
 <%
-		if (bi.hasValue())
+		if (bi.hasAuthority())
+		{
+		%><input type="hidden" name="authority" value="<%=bi.getAuthority() %>"/><%
+		}
+		else if (bi.hasValue())
 		{
 			%><input type="hidden" name="value" value="<%= bi.getValue() %>"/><%
 		}
@@ -429,6 +418,14 @@
 		</select>
 		
 		<input type="submit" name="submit_browse" value="<fmt:message key="jsp.general.update"/>"/>
+
+<%
+    if (admin_button && !withdrawn)
+    {
+        %><input type="submit" name="submit_export_metadata" value="<fmt:message key="jsp.general.metadataexport.button"/>" /><%
+    }
+%>
+
 	</form>
 	</div>
 
@@ -517,7 +514,6 @@
 	<%-- 
 	<!-- <%= bi.toString() %> -->
 	--%>
- 
 
 </dspace:layout>
 

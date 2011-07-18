@@ -1,41 +1,9 @@
-/*
- * Bundle.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.content;
 
@@ -48,9 +16,11 @@ import java.util.List;
 import java.util.ListIterator;
 
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeConfiguration;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.authorize.ResourcePolicy;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -68,7 +38,7 @@ import org.dspace.storage.rdbms.TableRowIterator;
  * removing bitstreams has instant effect in the database.
  * 
  * @author Robert Tansley
- * @version $Revision: 3705 $
+ * @version $Revision: 5844 $
  */
 public class Bundle extends DSpaceObject
 {
@@ -103,13 +73,32 @@ public class Bundle extends DSpaceObject
         ourContext = context;
         bundleRow = row;
         bitstreams = new ArrayList<Bitstream>();
+        String bitstreamOrderingField  = ConfigurationManager.getProperty("webui.bitstream.order.field");
+        String bitstreamOrderingDirection   = ConfigurationManager.getProperty("webui.bitstream.order.direction");
+
+        if (bitstreamOrderingField == null)
+        {
+            bitstreamOrderingField = "sequence_id";
+        }
+
+        if (bitstreamOrderingDirection == null)
+        {
+            bitstreamOrderingDirection = "ASC";
+        }
+        
+        StringBuilder query = new StringBuilder();
+        query.append("SELECT bitstream.* FROM bitstream, bundle2bitstream WHERE");
+        query.append(" bundle2bitstream.bitstream_id=bitstream.bitstream_id AND");
+        query.append(" bundle2bitstream.bundle_id= ?");
+        query.append(" ORDER BY bitstream.");
+        query.append(bitstreamOrderingField);
+        query.append(" ");
+        query.append(bitstreamOrderingDirection);
 
         // Get bitstreams
         TableRowIterator tri = DatabaseManager.queryTable(
                 ourContext, "bitstream",
-                "SELECT bitstream.* FROM bitstream, bundle2bitstream WHERE "
-                        + "bundle2bitstream.bitstream_id=bitstream.bitstream_id AND "
-                        + "bundle2bitstream.bundle_id= ? ",
+                query.toString(),
                 bundleRow.getIntColumn("bundle_id"));
 
         try
@@ -136,13 +125,16 @@ public class Bundle extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         // Cache ourselves
         context.cache(this, row.getIntColumn("bundle_id"));
 
-        modified = modifiedMetadata = false;
+        modified = false;
+        modifiedMetadata = false;
     }
 
     /**
@@ -364,7 +356,9 @@ public class Bundle extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
 
         Item[] itemArray = new Item[items.size()];
@@ -456,11 +450,10 @@ public class Bundle extends DSpaceObject
         AuthorizeManager.inheritPolicies(ourContext, this, b);
 
         // Add the mapping row to the database
-        TableRow mappingRow = DatabaseManager.create(ourContext,
-                "bundle2bitstream");
+        TableRow mappingRow = DatabaseManager.row("bundle2bitstream");
         mappingRow.setColumn("bundle_id", getID());
         mappingRow.setColumn("bitstream_id", b.getID());
-        DatabaseManager.update(ourContext, mappingRow);
+        DatabaseManager.insert(ourContext, mappingRow);
     }
 
     /**
@@ -495,18 +488,19 @@ public class Bundle extends DSpaceObject
             {
                 // We've found the bitstream to remove
                 li.remove();
-                
-                // In the event that the bitstream to remove is actually
-                // the primary bitstream, be sure to unset the primary
-                // bitstream.
-                if (b.getID() == getPrimaryBitstreamID()) {
-                	unsetPrimaryBitstreamID();
-                }
             }
         }
 
         ourContext.addEvent(new Event(Event.REMOVE, Constants.BUNDLE, getID(), Constants.BITSTREAM, b.getID(), String.valueOf(b.getSequenceID())));
-
+        
+        // In the event that the bitstream to remove is actually
+        // the primary bitstream, be sure to unset the primary
+        // bitstream.
+        if (b.getID() == getPrimaryBitstreamID()) 
+        {
+            unsetPrimaryBitstreamID();
+        }
+        
         // Delete the mapping row
         DatabaseManager.updateQuery(ourContext,
                 "DELETE FROM bundle2bitstream WHERE bundle_id= ? "+
@@ -530,7 +524,9 @@ public class Bundle extends DSpaceObject
         {
             // close the TableRowIterator to free up resources
             if (tri != null)
+            {
                 tri.close();
+            }
         }
     }
 
@@ -657,5 +653,98 @@ public class Bundle extends DSpaceObject
         // change bundle policies
         AuthorizeManager.removeAllPolicies(ourContext, this);
         AuthorizeManager.addPolicies(ourContext, newpolicies, this);
+    }
+
+    public List<ResourcePolicy> getBundlePolicies() throws SQLException
+    {
+        return AuthorizeManager.getPolicies(ourContext, this);
+    }
+
+    public List<ResourcePolicy> getBitstreamPolicies() throws SQLException
+    {
+        List<ResourcePolicy> list = new ArrayList<ResourcePolicy>();
+        if (bitstreams != null && bitstreams.size() > 0)
+        {
+            for (Bitstream bs : bitstreams)
+            {
+                list.addAll(AuthorizeManager.getPolicies(ourContext, bs));
+            }
+        }
+        return list;
+    }
+    
+    public DSpaceObject getAdminObject(int action) throws SQLException
+    {
+        DSpaceObject adminObject = null;
+        Item[] items = getItems();
+        Item item = null;
+        Collection collection = null;
+        Community community = null;
+        if (items != null && items.length > 0)
+        {
+            item = items[0];
+            collection = item.getOwningCollection();
+            if (collection != null)
+            {
+                Community[] communities = collection.getCommunities();
+                if (communities != null && communities.length > 0)
+                {
+                    community = communities[0];
+                }
+            }
+        }
+        switch (action)
+        {
+        case Constants.REMOVE:
+            if (AuthorizeConfiguration.canItemAdminPerformBitstreamDeletion())
+            {
+                adminObject = item;
+            }
+            else if (AuthorizeConfiguration.canCollectionAdminPerformBitstreamDeletion())
+            {
+                adminObject = collection;
+            }
+            else if (AuthorizeConfiguration
+                    .canCommunityAdminPerformBitstreamDeletion())
+            {
+                adminObject = community;
+            }
+            break;
+        case Constants.ADD:
+            if (AuthorizeConfiguration.canItemAdminPerformBitstreamCreation())
+            {
+                adminObject = item;
+            }
+            else if (AuthorizeConfiguration
+                    .canCollectionAdminPerformBitstreamCreation())
+            {
+                adminObject = collection;
+            }
+            else if (AuthorizeConfiguration
+                    .canCommunityAdminPerformBitstreamCreation())
+            {
+                adminObject = community;
+            }
+            break;
+
+        default:
+            adminObject = this;
+            break;
+        }
+        return adminObject;
+    }
+    
+    public DSpaceObject getParentObject() throws SQLException
+    {
+        Item[] items = getItems();
+       
+        if (items != null && (items.length > 0 && items[0] != null))
+        {
+            return items[0];
+        }
+        else
+        {
+            return null;
+        }
     }
 }

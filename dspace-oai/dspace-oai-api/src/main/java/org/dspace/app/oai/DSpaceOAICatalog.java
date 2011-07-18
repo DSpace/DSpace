@@ -1,41 +1,9 @@
-/*
- * DSpaceOAICatalog.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.oai;
 
@@ -52,16 +20,19 @@ import java.util.StringTokenizer;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.core.Utils;
 import org.dspace.handle.HandleManager;
 import org.dspace.search.Harvest;
 import org.dspace.search.HarvestedItemInfo;
+import org.dspace.eperson.Group;
 
 import ORG.oclc.oai.server.catalog.AbstractCatalog;
 import ORG.oclc.oai.server.verb.BadArgumentException;
@@ -81,7 +52,7 @@ import ORG.oclc.oai.server.verb.OAIInternalServerError;
  * something else will need to update this code too. Sorry about that.
  * 
  * @author Robert Tansley
- * @version $Revision: 3705 $
+ * @version $Revision: 5845 $
  */
 public class DSpaceOAICatalog extends AbstractCatalog
 {
@@ -89,11 +60,10 @@ public class DSpaceOAICatalog extends AbstractCatalog
     private static Logger log = Logger.getLogger(DSpaceOAICatalog.class);
 
     /** Prefix that all our OAI identifiers have */
-    public final static String OAI_ID_PREFIX = "oai:"
-            + ConfigurationManager.getProperty("dspace.hostname") + ":";
+    public static final String OAI_ID_PREFIX = "oai:" + ConfigurationManager.getProperty("dspace.hostname") + ":";
 
     /** Maximum number of records returned by one request */
-    private final int MAX_RECORDS = 100;
+    private final int MAX_RECORDS = ConfigurationManager.getIntProperty("oai.response.max-records", 100);
 
     public DSpaceOAICatalog(Properties properties)
     {
@@ -133,7 +103,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
             context = new Context();
 
             // Valid identifiers all have prefix "oai:hostname:"
-            if (identifier.startsWith(OAI_ID_PREFIX))
+            if (identifier != null && identifier.startsWith(OAI_ID_PREFIX))
             {
                 itemInfo = Harvest.getSingle(context, identifier
                         .substring(OAI_ID_PREFIX.length()), // Strip prefix to
@@ -146,6 +116,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
             // Log the error
             log.warn(LogManager.getHeader(context, "database_error", ""), se);
 
+            // Stack trace loss as OAI Exception does not support cause
             throw new OAIInternalServerError(se.toString());
         }
         finally
@@ -227,8 +198,8 @@ public class DSpaceOAICatalog extends AbstractCatalog
         Context context = null;
 
         // Lists to put results in
-        List headers = new LinkedList();
-        List identifiers = new LinkedList();
+        List<String> headers = new LinkedList<String>();
+        List<String> identifiers = new LinkedList<String>();
 
         try
         {
@@ -237,10 +208,14 @@ public class DSpaceOAICatalog extends AbstractCatalog
             // Get the relevant OAIItemInfo objects to make headers
             DSpaceObject scope = resolveSet(context, set);
             boolean includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.oai", true);
-            List itemInfos = Harvest.harvest(context, scope, from, until, 0, 0, // Everything
+            // Warning: In large repositories, setting harvest.includerestricted.oai to false may cause
+            // performance problems as all items will need to have their authorization permissions checked,
+            // but because we haven't implemented resumption tokens in ListIdentifiers, ALL items will
+            // need checking whenever a ListIdentifiers request is made.
+            List<HarvestedItemInfo> itemInfos = Harvest.harvest(context, scope, from, until, 0, 0, // Everything
                                                                                 // for
                                                                                 // now
-                    false, true, true, includeAll);
+                    !includeAll, true, true, includeAll);
 
             // No Item objects, but we need to know collections they're in and
             // withdrawn items
@@ -252,11 +227,11 @@ public class DSpaceOAICatalog extends AbstractCatalog
             }
 
             // Build up lists of headers and identifiers
-            Iterator i = itemInfos.iterator();
+            Iterator<HarvestedItemInfo> i = itemInfos.iterator();
 
             while (i.hasNext())
             {
-                HarvestedItemInfo itemInfo = (HarvestedItemInfo) i.next();
+                HarvestedItemInfo itemInfo = i.next();
 
                 String[] header = getRecordFactory().createHeader(itemInfo);
 
@@ -269,10 +244,12 @@ public class DSpaceOAICatalog extends AbstractCatalog
             // Log the error
             log.warn(LogManager.getHeader(context, "database_error", ""), se);
 
+            // Stack trace loss as OAI Exception does not support cause
             throw new OAIInternalServerError(se.toString());
         }
         catch (ParseException pe)
         {
+            // Stack trace loss as OAI Exception does not support cause
             throw new OAIInternalServerError(pe.toString());
         }
         finally
@@ -284,7 +261,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
         }
 
         // Put results in form needed to return
-        Map results = new HashMap();
+        Map<String, Iterator<String>> results = new HashMap<String, Iterator<String>>();
         results.put("headers", headers.iterator());
         results.put("identifiers", identifiers.iterator());
 
@@ -347,7 +324,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
         try
         {
             // Valid IDs start with oai:hostname:
-            if (identifier.startsWith(OAI_ID_PREFIX))
+            if (identifier != null && identifier.startsWith(OAI_ID_PREFIX))
             {
                 context = new Context();
 
@@ -365,10 +342,32 @@ public class DSpaceOAICatalog extends AbstractCatalog
                         "id_does_not_exist"));
                 throw new IdDoesNotExistException(identifier);
             }
+            
+            boolean includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.oai", true);
 
-            String schemaURL;
+            if (!includeAll)
+            {
+                Group[] authorizedGroups = AuthorizeManager.getAuthorizedGroups(context, itemInfo.item, Constants.READ);
+                boolean authorized = false;
+                for (int i = 0; i < authorizedGroups.length; i++)
+                {
+                    if ((authorizedGroups[i].getID() == 0) && (!authorized))
+                    {
+                        authorized = true;
+                    }
+                }
 
-            if ((schemaURL = getCrosswalks().getSchemaURL(metadataPrefix)) == null)
+                if (!authorized)
+                {
+                    log.info(LogManager.getHeader(null, "oai_error",
+                            "id_not_accessible"));
+                    throw new IdDoesNotExistException(identifier);
+                }
+            }
+
+            String schemaURL = getCrosswalks().getSchemaURL(metadataPrefix);
+
+            if (schemaURL == null)
             {
                 log.info(LogManager.getHeader(null, "oai_error",
                         "cannot_disseminate_format"));
@@ -383,6 +382,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
             // Log the error
             log.warn(LogManager.getHeader(context, "database_error", ""), se);
 
+            // Stack trace loss as OAI Exception does not support cause
             throw new OAIInternalServerError(se.toString());
         }
         finally
@@ -552,7 +552,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
         }
 
         // List to put results in
-        List records = new LinkedList();
+        List<String> records = new LinkedList<String>();
 
         try
         {
@@ -561,22 +561,17 @@ public class DSpaceOAICatalog extends AbstractCatalog
             // Get the relevant HarvestedItemInfo objects to make headers
             DSpaceObject scope = resolveSet(context, set);
             boolean includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.oai", true);
-            List itemInfos = Harvest.harvest(context, scope, from, until,
+            List<HarvestedItemInfo> itemInfos = Harvest.harvest(context, scope, from, until,
                     offset, MAX_RECORDS, // Limit amount returned from one
                                          // request
                     true, true, true, includeAll); // Need items, containers + withdrawals
 
             // Build list of XML records from item info objects
-            Iterator i = itemInfos.iterator();
-
-            while (i.hasNext())
+            for (HarvestedItemInfo itemInfo : itemInfos)
             {
-                HarvestedItemInfo itemInfo = (HarvestedItemInfo) i.next();
-
                 try
                 {
-                    String recordXML = getRecordFactory().create(itemInfo,
-                            schemaURL, metadataPrefix);
+                    String recordXML = getRecordFactory().create(itemInfo, schemaURL, metadataPrefix);
                     records.add(recordXML);
                 }
                 catch (CannotDisseminateFormatException cdfe)
@@ -600,8 +595,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
             // Put results in form needed to return
             results.put("records", records.iterator());
 
-            log.info(LogManager.getHeader(context, "oai_harvest", "results="
-                    + records.size()));
+            log.info(LogManager.getHeader(context, "oai_harvest", "results=" + records.size()));
 
             // If we have MAX_RECORDS records, we need to provide a resumption
             // token
@@ -627,10 +621,12 @@ public class DSpaceOAICatalog extends AbstractCatalog
             // Log the error
             log.warn(LogManager.getHeader(context, "database_error", ""), se);
 
+            // Stack trace loss as OAI Exception does not support cause
             throw new OAIInternalServerError(se.toString());
         }
         catch (ParseException pe)
         {
+            // Stack trace loss as OAI Exception does not support cause
         	throw new OAIInternalServerError(pe.toString());
         }
         finally
@@ -649,7 +645,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
      * 
      * @return a Map object containing "sets" Iterator object (contains
      *         <setSpec/>XML Strings) as well as an optional resumptionMap Map.
-     * @exception OAIBadRequestException
+     * @exception NoSetHierarchyException
      *                signals an http status code 400 problem
      * @exception OAIInternalServerError
      *                signals an http status code 500 problem
@@ -662,7 +658,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
         Context context = null;
 
         // List to put results in
-        List sets = new LinkedList();
+        List<String> sets = new LinkedList<String>();
 
         try
         {
@@ -722,6 +718,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
             // Log the error
             log.warn(LogManager.getHeader(context, "database_error", ""), se);
 
+            // Stack trace loss as OAI Exception does not support cause
             throw new OAIInternalServerError(se.toString());
         }
         finally
@@ -733,7 +730,7 @@ public class DSpaceOAICatalog extends AbstractCatalog
         }
 
         // Put results in form needed to return
-        Map results = new HashMap();
+        Map<String, Iterator<String>> results = new HashMap<String, Iterator<String>>();
         results.put("sets", sets.iterator());
 
         return results;
@@ -917,14 +914,16 @@ public class DSpaceOAICatalog extends AbstractCatalog
                 throw new BadResumptionTokenException();
             }
 
-            obj[4] = new Integer(st.nextToken());
+            obj[4] = Integer.valueOf(st.nextToken());
         }
         catch (NumberFormatException nfe)
         {
+            // Stack trace loss as OAI Exception does not support cause
             throw new BadResumptionTokenException();
         }
         catch (NoSuchElementException nsee)
         {
+            // Stack trace loss as OAI Exception does not support cause
             throw new BadResumptionTokenException();
         }
 

@@ -1,41 +1,9 @@
-/*
- * BrowseIndex.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.browse;
 
@@ -57,7 +25,7 @@ import org.dspace.sort.SortException;
  * 
  * @author Richard Jones
  */
-public class BrowseIndex
+public final class BrowseIndex
 {
 	/** the configuration number, as specified in the config */
     /** used for single metadata browse tables for generating the table name */
@@ -95,7 +63,7 @@ public class BrowseIndex
     private static BrowseIndex withdrawnIndex = new BrowseIndex("bi_withdrawn");
 
     /**
-     * Ensure noone else can create these
+     * Ensure no one else can create these
      */
     private BrowseIndex()
     {
@@ -162,13 +130,19 @@ public class BrowseIndex
                     datatype = matcher.group(4);
 
                     if (metadataAll != null)
+                    {
                         metadata = metadataAll.split(",");
+                    }
 
                     if (metadata == null || metadata.length == 0)
+                    {
                         valid = false;
+                    }
 
                     if (datatype == null || datatype.equals(""))
+                    {
                         valid = false;
+                    }
 
                     // If an optional ordering configuration is supplied,
                     // set the defaultOrder appropriately (asc or desc)
@@ -176,7 +150,9 @@ public class BrowseIndex
                     {
                         String order = matcher.group(5);
                         if (SortOption.DESCENDING.equalsIgnoreCase(order))
+                        {
                             this.defaultOrder = SortOption.DESCENDING;
+                        }
                     }
 
                     tableBaseName = getItemBrowseIndex().tableBaseName;
@@ -188,11 +164,15 @@ public class BrowseIndex
                     for (SortOption so : SortOption.getSortOptions())
                     {
                         if (so.getName().equals(sortName))
+                        {
                             sortOption = so;
+                        }
                     }
 
                     if (sortOption == null)
+                    {
                         valid = false;
+                    }
 
                     // If an optional ordering configuration is supplied,
                     // set the defaultOrder appropriately (asc or desc)
@@ -200,7 +180,9 @@ public class BrowseIndex
                     {
                         String order = matcher.group(4);
                         if (SortOption.DESCENDING.equalsIgnoreCase(order))
+                        {
                             this.defaultOrder = SortOption.DESCENDING;
+                        }
                     }
 
                     tableBaseName = getItemBrowseIndex().tableBaseName;
@@ -241,7 +223,9 @@ public class BrowseIndex
 	public String getDataType()
 	{
         if (sortOption != null)
+        {
             return sortOption.getType();
+        }
 
 		return datatype;
 	}
@@ -260,7 +244,9 @@ public class BrowseIndex
     public int getMetadataCount()
     {
         if (isMetadataIndex())
+        {
             return metadata.length;
+        }
 
         return 0;
     }
@@ -271,7 +257,9 @@ public class BrowseIndex
 	public String[] getMdBits(int idx)
 	{
 	    if (isMetadataIndex())
-	        return mdBits[idx];
+        {
+            return mdBits[idx];
+        }
 	    
 	    return null;
 	}
@@ -338,7 +326,7 @@ public class BrowseIndex
     }
     
 	/**
-	 * Get the name of the sequence that will be used in the given circumnstances
+	 * Get the name of the sequence that will be used in the given circumstances
 	 * 
 	 * @param isDistinct	is a distinct table
 	 * @param isMap			is a map table
@@ -347,7 +335,9 @@ public class BrowseIndex
     public String getSequenceName(boolean isDistinct, boolean isMap)
     {
         if (isDistinct || isMap)
+        {
             return BrowseIndex.getSequenceName(number, isDistinct, isMap);
+        }
         
         return BrowseIndex.getSequenceName(tableBaseName, isDistinct, isMap);
     }
@@ -395,7 +385,7 @@ public class BrowseIndex
      * 
      * @param number		the index configuration number
      * @param isCommunity	whether this is a community constrained index (view)
-     * @param isCollection	whether this is a collection constrainted index (view)
+     * @param isCollection	whether this is a collection constrained index (view)
      * @param isDistinct	whether this is a distinct table
      * @param isMap			whether this is a distinct map table
      * @return				the name of the table
@@ -447,7 +437,7 @@ public class BrowseIndex
      * Get the name of the table in the given circumstances
      * 
      * @param isCommunity	whether this is a community constrained index (view)
-     * @param isCollection	whether this is a collection constrainted index (view)
+     * @param isCollection	whether this is a collection constrained index (view)
      * @param isDistinct	whether this is a distinct table
      * @param isMap			whether this is a distinct map table
      * @return				the name of the table
@@ -456,7 +446,9 @@ public class BrowseIndex
     public String getTableName(boolean isCommunity, boolean isCollection, boolean isDistinct, boolean isMap)
     {
         if (isDistinct || isMap)
+        {
             return BrowseIndex.getTableName(number, isCommunity, isCollection, isDistinct, isMap);
+        }
         
         return BrowseIndex.getTableName(tableBaseName, isCommunity, isCollection, isDistinct, isMap);
     }
@@ -469,7 +461,7 @@ public class BrowseIndex
      * </code>
      * 
      * @param isCommunity	whether this is a community constrained index (view)
-     * @param isCollection	whether this is a collection constrainted index (view)
+     * @param isCollection	whether this is a collection constrained index (view)
      * @return				the name of the table
      * @deprecated 1.5
      */
@@ -541,7 +533,7 @@ public class BrowseIndex
     }
 
     /**
-     * Get the name of the colum that is used to store the default value column
+     * Get the name of the column that is used to store the default value column
      * 
      * @return	the name of the value column
      */
@@ -604,7 +596,17 @@ public class BrowseIndex
      */
     public boolean isMetadataIndex()
     {
-        return "metadata".equals(displayType);
+        return displayType  != null && displayType.startsWith("metadata");
+    }
+    
+    /**
+     * Is the browse index authority value?
+     *
+     * @return true if authority, false if not
+     */
+    public boolean isAuthorityIndex()
+    {
+        return "metadataAuthority".equals(displayType);
     }
     
     /**
@@ -632,9 +634,13 @@ public class BrowseIndex
         else
         {
             if (sortOption != null)
+            {
                 focusField = "sort_" + sortOption.getNumber();
+            }
             else
+            {
                 focusField = "sort_1";  // Use the first sort column
+            }
         }
         
         return focusField;
@@ -669,7 +675,7 @@ public class BrowseIndex
     {
         int idx = 1;
         String definition;
-        ArrayList browseIndices = new ArrayList();
+        ArrayList<BrowseIndex> browseIndices = new ArrayList<BrowseIndex>();
 
         while ( ((definition = ConfigurationManager.getProperty("webui.browse.index." + idx))) != null)
         {
@@ -679,7 +685,7 @@ public class BrowseIndex
         }
 
         BrowseIndex[] bis = new BrowseIndex[browseIndices.size()];
-        bis = (BrowseIndex[]) browseIndices.toArray((BrowseIndex[]) bis);
+        bis = browseIndices.toArray(bis);
 
         return bis;
     }
@@ -698,7 +704,9 @@ public class BrowseIndex
         for (BrowseIndex bix : BrowseIndex.getBrowseIndices())
         {
             if (bix.getName().equals(name))
+            {
                 return bix;
+            }
         }
          
         return null;
@@ -716,7 +724,9 @@ public class BrowseIndex
         for (BrowseIndex bix : BrowseIndex.getBrowseIndices())
         {
             if (bix.getSortOption() == so)
+            {
                 return bix;
+            }
         }
         
         return null;
@@ -771,17 +781,6 @@ public class BrowseIndex
     	}
     	
     	return field;
-    }
-    
-    /**
-     * Does the browse index represent one of the internal item indexes
-     * 
-     * @param bi
-     * @return
-     */
-    public static boolean isInternalIndex(BrowseIndex bi)
-    {
-        return (bi == itemIndex || bi == withdrawnIndex);
     }
 
     /**

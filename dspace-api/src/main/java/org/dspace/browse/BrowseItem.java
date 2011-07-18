@@ -1,37 +1,9 @@
-/*
- * BrowseItem.java
- * 
- * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.browse;
 
@@ -71,7 +43,7 @@ public class BrowseItem extends DSpaceObject
 	private Context context;
 	
 	/** a List of all the metadata */
-	private List metadata = new ArrayList();
+	private List<DCValue> metadata = new ArrayList<DCValue>();
 	
 	/** database id of the item */
 	private int id = -1;
@@ -84,9 +56,6 @@ public class BrowseItem extends DSpaceObject
 
     /** item handle */
 	private String handle = null;
-    
-	/** inner item, if we really absolutely have to instantiate it */
-	private Item item;
 
     /**
 	 * Construct a new browse item with the given context and the database id
@@ -130,12 +99,12 @@ public class BrowseItem extends DSpaceObject
 
             if (!metadata.isEmpty())
             {
-                List values = new ArrayList();
-                Iterator i = metadata.iterator();
+                List<DCValue> values = new ArrayList<DCValue>();
+                Iterator<DCValue> i = metadata.iterator();
 
                 while (i.hasNext())
                 {
-                    DCValue dcv = (DCValue) i.next();
+                    DCValue dcv = i.next();
 
                     if (match(schema, element, qualifier, lang, dcv))
                     {
@@ -177,7 +146,7 @@ public class BrowseItem extends DSpaceObject
     }
 	
 	/**
-	 * Get the type of object.  This object masquerates as an Item, so this
+	 * Get the type of object.  This object masquerades as an Item, so this
 	 * returns the value of Constants.ITEM
 	 * 
 	 *@return Constants.ITEM
@@ -229,7 +198,7 @@ public class BrowseItem extends DSpaceObject
      * method will return <code>true</code> if the given schema,
      * element, qualifier and language match the schema, element,
      * qualifier and language of the <code>DCValue</code> object passed
-     * in.  Any or all of the elemenent, qualifier and language passed
+     * in.  Any or all of the element, qualifier and language passed
      * in can be the <code>Item.ANY</code> wildcard.
      *
      * @param schema
@@ -338,7 +307,7 @@ public class BrowseItem extends DSpaceObject
     	throws SQLException
     {
     	// instantiate an item for this one.  Not nice.
-    	item = Item.find(context, id);
+        Item item = Item.find(context, id);
     	
     	if (item == null)
     	{
@@ -393,8 +362,7 @@ public class BrowseItem extends DSpaceObject
         	if ((thumbnailBitstream != null)
         			&& (AuthorizeManager.authorizeActionBoolean(context, thumbnailBitstream, Constants.READ)))
         	{
-        		Thumbnail thumbnail = new Thumbnail(thumbnailBitstream, originalBitstream);
-        		return thumbnail;
+                return new Thumbnail(thumbnailBitstream, originalBitstream);
         	}
         }
 

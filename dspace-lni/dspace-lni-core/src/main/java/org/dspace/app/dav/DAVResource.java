@@ -1,41 +1,9 @@
-/*
- * DAVResource.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2007, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.dav;
 
@@ -45,16 +13,17 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Vector;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
@@ -171,7 +140,7 @@ abstract class DAVResource
             "current-user-privilege-set", DAV.NS_DAV);
 
     /** The common props. */
-    protected static List commonProps = new Vector();
+    protected static List<Element> commonProps = new ArrayList<Element>();
     static
     {
         commonProps.add(displaynameProperty);
@@ -191,7 +160,7 @@ abstract class DAVResource
     protected DAVResource(Context context, HttpServletRequest request,
             HttpServletResponse response, String pathElt[])
     {
-        this.pathElt = pathElt;
+        this.pathElt = (String[]) ArrayUtils.clone(pathElt);
         this.request = request;
         this.response = response;
         this.context = context;
@@ -207,7 +176,7 @@ abstract class DAVResource
      * 
      * @throws SQLException the SQL exception
      */
-    abstract protected DAVResource[] children() throws SQLException;
+    protected abstract DAVResource[] children() throws SQLException;
 
     /**
      * Execute a PROPFIND method request on this Resource, and insert the
@@ -226,7 +195,7 @@ abstract class DAVResource
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws DAVStatusException the DAV status exception
      */
-    abstract protected Element propfindInternal(Element property)
+    protected abstract Element propfindInternal(Element property)
             throws SQLException, AuthorizeException, IOException,
             DAVStatusException;
 
@@ -236,7 +205,7 @@ abstract class DAVResource
      * @return list of all properties that resource wants known to a "propname"
      * request.
      */
-    abstract protected List getAllProperties();
+    protected abstract List<Element> getAllProperties();
 
     /**
      * Execute a PROPPATCH method request on this Resource, and insert the
@@ -252,7 +221,7 @@ abstract class DAVResource
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws DAVStatusException the DAV status exception
      */
-    abstract protected int proppatchInternal(int action, Element prop)
+    protected abstract int proppatchInternal(int action, Element prop)
             throws SQLException, AuthorizeException, IOException,
             DAVStatusException;
 
@@ -265,7 +234,7 @@ abstract class DAVResource
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws DAVStatusException the DAV status exception
      */
-    abstract protected void get() throws SQLException, AuthorizeException,
+    protected abstract void get() throws SQLException, AuthorizeException,
             IOException, DAVStatusException;
 
     /**
@@ -278,7 +247,7 @@ abstract class DAVResource
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws DAVStatusException the DAV status exception
      */
-    abstract protected void put() throws SQLException, AuthorizeException,
+    protected abstract void put() throws SQLException, AuthorizeException,
             IOException, DAVStatusException;
 
     /**
@@ -300,7 +269,7 @@ abstract class DAVResource
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws DAVStatusException the DAV status exception
      */
-    abstract protected int copyInternal(DAVResource destination, int depth,
+    protected abstract int copyInternal(DAVResource destination, int depth,
             boolean overwrite, boolean keepProperties)
             throws DAVStatusException, SQLException, AuthorizeException,
             IOException;
@@ -324,7 +293,7 @@ abstract class DAVResource
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws DAVStatusException the DAV status exception
      */
-    abstract protected int deleteInternal() throws SQLException,
+    protected abstract int deleteInternal() throws SQLException,
             AuthorizeException, IOException, DAVStatusException;
 
     /**
@@ -341,7 +310,7 @@ abstract class DAVResource
      * @throws IOException Signals that an I/O exception has occurred.
      * @throws DAVStatusException the DAV status exception
      */
-    abstract protected int mkcolInternal(String name) throws SQLException,
+    protected abstract int mkcolInternal(String name) throws SQLException,
             AuthorizeException, IOException, DAVStatusException;
 
     /*----------------- Interpreting Resource URIs -----------------------*/
@@ -359,7 +328,7 @@ abstract class DAVResource
      * @throws DAVStatusException the DAV status exception
      * @throws AuthorizeException the authorize exception
      */
-    protected DAVResource URIToResource(String uri) throws IOException,
+    protected DAVResource uriToResource(String uri) throws IOException,
             SQLException, DAVStatusException, AuthorizeException
     {
         String dest = uri;
@@ -396,29 +365,47 @@ abstract class DAVResource
             String pathElt[]) throws IOException, SQLException,
             DAVStatusException, AuthorizeException
     {
-        DAVResource result = null;
-
-        if ((result = DAVSite.matchResourceURI(context, request, response,
-                pathElt)) == null
-                && (result = DAVLookup.matchResourceURI(context, request,
-                        response, pathElt)) == null
-                && (result = DAVWorkspace.matchResourceURI(context, request,
-                        response, pathElt)) == null
-                && (result = DAVWorkflow.matchResourceURI(context, request,
-                        response, pathElt)) == null
-                && (result = DAVEPerson.matchResourceURI(context, request,
-                        response, pathElt)) == null
-                && (result = DAVItem.matchResourceURI(context, request,
-                        response, pathElt)) == null
-                && (result = DAVBitstream.matchResourceURI(context, request,
-                        response, pathElt)) == null
-                && (result = DAVDSpaceObject.matchResourceURI(context, request,
-                        response, pathElt)) == null)
-        {
-            throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,
-                    "Unrecognized DSpace resource URI");
+        DAVResource result = DAVSite.matchResourceURI(context, request, response, pathElt);
+        if (result != null) {
+            return result;
         }
-        return result;
+
+        result = DAVLookup.matchResourceURI(context, request, response, pathElt);
+        if (result != null) {
+            return result;
+        }
+
+        result = DAVWorkspace.matchResourceURI(context, request, response, pathElt);
+        if (result != null) {
+            return result;
+        }
+
+        result = DAVWorkflow.matchResourceURI(context, request, response, pathElt);
+        if (result != null) {
+            return result;
+        }
+
+        result = DAVEPerson.matchResourceURI(context, request, response, pathElt);
+        if (result != null) {
+            return result;
+        }
+
+        result = DAVItem.matchResourceURI(context, request, response, pathElt);
+        if (result != null) {
+            return result;
+        }
+
+        result = DAVBitstream.matchResourceURI(context, request, response, pathElt);
+        if (result != null) {
+            return result;
+        }
+
+        result = DAVDSpaceObject.matchResourceURI(context, request, response, pathElt);
+        if (result != null) {
+            return result;
+        }
+
+        throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST, "Unrecognized DSpace resource URI");
     }
 
     /*----------------- Generating Resource URIs -----------------------*/
@@ -457,7 +444,7 @@ abstract class DAVResource
         {
             if (i + 1 < this.pathElt.length)
             {
-                result.append(this.pathElt[i] + "/");
+                result.append(this.pathElt[i]).append("/");
             }
             else
             {
@@ -567,7 +554,7 @@ abstract class DAVResource
             {
                 throw new DAVStatusException(
                         HttpServletResponse.SC_BAD_REQUEST,
-                        "Bad Depth header: " + sdepth);
+                        "Bad Depth header: " + sdepth, nfe);
             }
         }
 
@@ -613,7 +600,7 @@ abstract class DAVResource
     {
         // When there is no document, type defaults to <allprop>.
         int pfType = DAV.PROPFIND_ALLPROP;
-        List pfProps = null;
+        List<Element> pfProps = null;
 
         try
         {
@@ -630,10 +617,10 @@ abstract class DAVResource
 
             // Propfind child is be ONE of: allprop | propname | prop
             // if "prop", also get list of type names.
-            List pfChild = propfind.getChildren();
+            List<Element> pfChild = propfind.getChildren();
             if (pfChild.size() > 0)
             {
-                Element child0 = (Element) pfChild.get(0);
+                Element child0 = pfChild.get(0);
                 String rawType = child0.getName();
                 if (rawType.equalsIgnoreCase("prop"))
                 {
@@ -671,14 +658,14 @@ abstract class DAVResource
                         .toString()));
                 throw new DAVStatusException(
                         HttpServletResponse.SC_BAD_REQUEST,
-                        "Could not parse request document: " + je.toString());
+                        "Could not parse request document: " + je.toString(), je);
             }
         }
         catch (JDOMException je)
         {
             log.error(LogManager.getHeader(this.context, "propfind", je.toString()));
             throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,
-                    "Could not parse request document: " + je.toString());
+                    "Could not parse request document: " + je.toString(), je);
         }
 
         // At this point, pfProps, pfType and URI define the whole request.
@@ -710,7 +697,7 @@ abstract class DAVResource
      * @throws AuthorizeException the authorize exception
      * @throws IOException Signals that an I/O exception has occurred.
      */
-    private int propfindCrawler(Element multistatus, int pfType, List pfProps,
+    private int propfindCrawler(Element multistatus, int pfType, List<Element> pfProps,
             int depth, int typeMask, int count) throws DAVStatusException,
             SQLException, AuthorizeException, IOException
     {
@@ -727,8 +714,8 @@ abstract class DAVResource
             String uri = hrefURL();
             log.debug("PROPFIND returning (count=" + String.valueOf(count)
                     + ") href=" + uri);
-            Vector notFound = new Vector();
-            Vector forbidden = new Vector();
+            List<Element> notFound = new ArrayList<Element>();
+            List<Element> forbidden = new ArrayList<Element>();
             Element responseElt = new Element("response", DAV.NS_DAV);
             multistatus.addContent(responseElt);
 
@@ -745,8 +732,8 @@ abstract class DAVResource
             }
             else
             {
-                List success = new LinkedList();
-                List props = (pfType == DAV.PROPFIND_ALLPROP) ? getAllProperties()
+                List<Element> success = new LinkedList<Element>();
+                List<Element> props = (pfType == DAV.PROPFIND_ALLPROP) ? getAllProperties()
                         : pfProps;
                 ListIterator pi = props.listIterator();
                 while (pi.hasNext())
@@ -883,7 +870,7 @@ abstract class DAVResource
                 throw new DAVStatusException(
                         HttpServletResponse.SC_BAD_REQUEST,
                         "Could not parse PROPERTYUPDATE request document: "
-                                + je.toString());
+                                + je.toString(), je);
             }
         }
         catch (JDOMException je)
@@ -893,7 +880,7 @@ abstract class DAVResource
                             .toString()));
             throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,
                     "Could not parse PROPERTYUPDATE request document: "
-                            + je.toString());
+                            + je.toString(), je);
         }
         if (reqdoc == null)
         {
@@ -920,8 +907,8 @@ abstract class DAVResource
 
         // result status and accumulation:
         boolean failing = false;
-        List failedDep = new LinkedList();
-        List success = new LinkedList();
+        List<Element> failedDep = new LinkedList<Element>();
+        List<Element> success = new LinkedList<Element>();
 
         // process the SET and REMOVE elements under PROPERTYUPDATE:
         ListIterator ci = pupdate.getChildren().listIterator();
@@ -1161,7 +1148,7 @@ abstract class DAVResource
         {
             String srcPath = (new URI(this.request.getRequestURI())).getPath();
             String destPath = (new URI(destination)).getPath();
-            int slash = srcPath.lastIndexOf("/");
+            int slash = srcPath.lastIndexOf('/');
             if (slash > -1)
             {
                 String lastElt = srcPath.substring(slash);
@@ -1178,7 +1165,7 @@ abstract class DAVResource
         {
             throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,
                     "Illegal URI syntax in value of \"Destination\" header: "
-                            + destination);
+                            + destination, e);
         }
 
         // Depth arg from header
@@ -1202,7 +1189,7 @@ abstract class DAVResource
             {
                 throw new DAVStatusException(
                         HttpServletResponse.SC_BAD_REQUEST,
-                        "Illegal value in Depth request header: " + sdepth);
+                        "Illegal value in Depth request header: " + sdepth, nfe);
             }
         }
 
@@ -1229,14 +1216,14 @@ abstract class DAVResource
             {
                 throw new DAVStatusException(
                         HttpServletResponse.SC_BAD_REQUEST,
-                        "Error parsing XML document in COPY request.");
+                        "Error parsing XML document in COPY request.", je);
             }
         }
         catch (JDOMException je)
         {
             throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,
                     "Error parsing XML document in COPY request: "
-                            + je.toString());
+                            + je.toString(), je);
         }
         if (reqdoc != null)
         {
@@ -1297,7 +1284,7 @@ abstract class DAVResource
             boolean keepProperties) throws IOException, SQLException,
             AuthorizeException, DAVStatusException
     {
-        DAVResource destResource = URIToResource(destination);
+        DAVResource destResource = uriToResource(destination);
         if (destResource == null)
         {
             throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,
@@ -1332,6 +1319,7 @@ abstract class DAVResource
             typeMask = TYPE_ALL;
         }
         else
+        {
             for (String element : types)
             {
                 String key = element.trim();
@@ -1362,6 +1350,7 @@ abstract class DAVResource
                             "Unrecognized type keyword: " + key);
                 }
             }
+        }
         return typeMask;
     }
 
@@ -1411,7 +1400,7 @@ abstract class DAVResource
      * 
      * @return the element
      */
-    private static Element makePropstat(List properties, int status,
+    private static Element makePropstat(List<Element> properties, int status,
             String message)
     {
         Element ps = makePropstatInternal(status, message);
@@ -1524,13 +1513,12 @@ abstract class DAVResource
      * 
      * @return the list
      */
-    private static List copyElementList(List el)
+    private static List<Element> copyElementList(List<Element> el)
     {
-        Vector result = new Vector(el.size());
-        ListIterator li = el.listIterator();
-        while (li.hasNext())
+        List<Element> result = new ArrayList<Element>(el.size());
+        for (Element e : el)
         {
-            result.add(((Element) li.next()).clone());
+            result.add((Element)e.clone());
         }
         return result;
     }
@@ -1700,14 +1688,14 @@ abstract class DAVResource
                 throw new DAVStatusException(
                         HttpServletResponse.SC_BAD_REQUEST,
                         "Could not parse DELETE request document: "
-                                + je.toString());
+                                + je.toString(), je);
             }
         }
         catch (JDOMException je)
         {
             log.error(LogManager.getHeader(this.context, "delete", je.toString()));
             throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,
-                    "Could not parse DELETE request document: " + je.toString());
+                    "Could not parse DELETE request document: " + je.toString(), je);
         }
         if (reqdoc == null)
         {
@@ -1793,14 +1781,14 @@ abstract class DAVResource
                 throw new DAVStatusException(
                         HttpServletResponse.SC_BAD_REQUEST,
                         "Could not parse MKCOL request document: "
-                                + je.toString());
+                                + je.toString(), je);
             }
         }
         catch (JDOMException je)
         {
             log.error(LogManager.getHeader(this.context, "mkcol", je.toString()));
             throw new DAVStatusException(HttpServletResponse.SC_BAD_REQUEST,
-                    "Could not parse MKCOL request document: " + je.toString());
+                    "Could not parse MKCOL request document: " + je.toString(), je);
         }
         if (reqdoc == null)
         {
@@ -1809,9 +1797,8 @@ abstract class DAVResource
         }
 
         Element pupdate = reqdoc.getRootElement();
-        String newNodeName = null;
-        if (!pupdate.getName().equals("mkcol")
-                || (newNodeName = pupdate.getValue()) == null)
+        String newNodeName = pupdate.getValue();
+        if (!"mkcol".equals(pupdate.getName()) || newNodeName == null)
         {
             log.warn(LogManager.getHeader(this.context, "mkcol",
                     "Got bad root element, XML=" + pupdate.toString()));

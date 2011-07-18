@@ -1,41 +1,9 @@
-/*
- * DSpaceObject.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.content;
 
@@ -68,18 +36,22 @@ public abstract class DSpaceObject
      * separates entries with a comma.
      * Subclass can just start calling addDetails, since it creates
      * the cache if it needs to.
-     * @param detail detail string to add.
+     * @param d detail string to add.
      */
     protected void addDetails(String d)
     {
         if (eventDetails == null)
+        {
             eventDetails = new StringBuffer(d);
+        }
         else
+        {
             eventDetails.append(", ").append(d);
+        }
     }
 
     /**
-     * @returns summary of event details, or null if there are none.
+     * @return summary of event details, or null if there are none.
      */
     protected String getDetails()
     {
@@ -115,7 +87,7 @@ public abstract class DSpaceObject
      * @return Name for the object, or <code>null</code> if it doesn't have
      *         one
      */
-    abstract public String getName();
+    public abstract String getName();
 
     /**
      * Generic find for when the precise type of a DSO is not known, just the
@@ -141,6 +113,52 @@ public abstract class DSpaceObject
             case Constants.EPERSON   : return EPerson.find(context, id);
             case Constants.SITE      : return Site.find(context, id);
         }
+        return null;
+    }
+
+    /**
+     * Return the dspace object where an ADMIN action right is sufficient to
+     * grant the initial authorize check.
+     * <p>
+     * Default behaviour is ADMIN right on the object grant right on all other
+     * action on the object itself. Subclass should override this method as
+     * need.
+     * 
+     * @param action
+     *            ID of action being attempted, from
+     *            <code>org.dspace.core.Constants</code>. The ADMIN action is
+     *            not a valid parameter for this method, an
+     *            IllegalArgumentException should be thrown
+     * @return the dspace object, if any, where an ADMIN action is sufficient to
+     *         grant the original action
+     * @throws SQLException
+     * @throws IllegalArgumentException
+     *             if the ADMIN action is supplied as parameter of the method
+     *             call
+     */
+    public DSpaceObject getAdminObject(int action) throws SQLException
+    {
+        if (action == Constants.ADMIN)
+        {
+            throw new IllegalArgumentException("Illegal call to the DSpaceObject.getAdminObject method");
+        }
+        return this;
+    }
+
+    /**
+     * Return the dspace object that "own" the current object in the hierarchy.
+     * Note that this method has a meaning slightly different from the
+     * getAdminObject because it is independent of the action but it is in a way
+     * related to it. It defines the "first" dspace object <b>OTHER</b> then the
+     * current one, where allowed ADMIN actions imply allowed ADMIN actions on
+     * the object self.
+     * 
+     * @return the dspace object that "own" the current object in
+     *         the hierarchy
+     * @throws SQLException
+     */
+    public DSpaceObject getParentObject() throws SQLException
+    {
         return null;
     }
 }

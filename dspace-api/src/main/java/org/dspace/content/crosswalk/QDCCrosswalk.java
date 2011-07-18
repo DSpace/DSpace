@@ -1,43 +1,10 @@
-/*
- * QDCCrosswalk.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2005, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 package org.dspace.content.crosswalk;
 
 import java.io.File;
@@ -48,10 +15,11 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCValue;
@@ -66,8 +34,6 @@ import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.Namespace;
 import org.jdom.input.SAXBuilder;
-import org.jdom.output.Format;
-import org.jdom.output.XMLOutputter;
 
 /**
  * Configurable QDC Crosswalk
@@ -121,7 +87,7 @@ import org.jdom.output.XMLOutputter;
  *  http://dublincore.org/schemas/xmls/qdc/2003/04/02/qualifieddc.xsd</pre>
  *
  * @author Larry Stone
- * @version $Revision: 3705 $
+ * @version $Revision: 5844 $
  */
 public class QDCCrosswalk extends SelfNamedPlugin
     implements DisseminationCrosswalk, IngestionCrosswalk
@@ -130,10 +96,10 @@ public class QDCCrosswalk extends SelfNamedPlugin
     private static Logger log = Logger.getLogger(QDCCrosswalk.class);
 
     // map of qdc to JDOM Element
-    private HashMap qdc2element = new HashMap();
+    private Map<String, Element> qdc2element = new HashMap<String, Element>();
 
     // map of JDOM Element to qdc DCValue
-    private HashMap element2qdc = new HashMap();
+    private Map<String, String> element2qdc = new HashMap<String, String>();
 
     // the XML namespaces from config file for this name.
     private Namespace namespaces[] = null;
@@ -153,11 +119,6 @@ public class QDCCrosswalk extends SelfNamedPlugin
     // XML schemaLocation fragment for this crosswalk, from config.
     private String schemaLocation = null;
 
-    private static final Namespace XLINK_NS =
-        Namespace.getNamespace("xlink", "http://www.w3.org/TR/xlink");
-
-    private static XMLOutputter outputUgly = new XMLOutputter();
-    private static XMLOutputter outputPretty = new XMLOutputter(Format.getPrettyFormat());
     private static SAXBuilder builder = new SAXBuilder();
 
     /**
@@ -167,21 +128,23 @@ public class QDCCrosswalk extends SelfNamedPlugin
     private static String aliases[] = null;
     static
     {
-        List aliasList = new ArrayList();
-        Enumeration pe = ConfigurationManager.propertyNames();
+        List<String> aliasList = new ArrayList<String>();
+        Enumeration<String> pe = (Enumeration<String>)ConfigurationManager.propertyNames();
         String propname = CONFIG_PREFIX + ".properties.";
         while (pe.hasMoreElements())
         {
-            String key = (String)pe.nextElement();
+            String key = pe.nextElement();
             if (key.startsWith(propname))
+            {
                 aliasList.add(key.substring(propname.length()));
+            }
         }
         aliases = (String[])aliasList.toArray(new String[aliasList.size()]);
     }
 
     public static String[] getPluginNames()
     {
-        return aliases;
+        return (String[]) ArrayUtils.clone(aliases);
     }
 
     // utility: return "fully qualified" name of XML element, for a
@@ -192,7 +155,9 @@ public class QDCCrosswalk extends SelfNamedPlugin
         String prefix = "";
         Namespace ns = element.getNamespace();
         if (ns != null)
+        {
             prefix = ns.getPrefix() + ":";
+        }
         
         String tagName;
         String nsQualifier = element.getAttributeValue("type", DisseminationCrosswalk.XSI_NS);
@@ -244,24 +209,30 @@ public class QDCCrosswalk extends SelfNamedPlugin
         throws CrosswalkException, IOException
     {
         if (inited)
+        {
             return;
+        }
         inited = true;
 
         myName = getPluginInstanceName();
         if (myName == null)
-            throw new CrosswalkInternalException("Cannot determine plugin name, "+
-                       "You must use PluginManager to instantiate QDCCrosswalk so the instance knows its name.");
+        {
+            throw new CrosswalkInternalException("Cannot determine plugin name, " +
+                    "You must use PluginManager to instantiate QDCCrosswalk so the instance knows its name.");
+        }
 
         // grovel DSpace configuration for namespaces
-        List nsList = new ArrayList();
-        Enumeration pe = ConfigurationManager.propertyNames();
+        List<Namespace> nsList = new ArrayList<Namespace>();
+        Enumeration<String> pe = (Enumeration<String>)ConfigurationManager.propertyNames();
         String propname = CONFIG_PREFIX + ".namespace."+ myName +".";
         while (pe.hasMoreElements())
         {
-            String key = (String)pe.nextElement();
+            String key = pe.nextElement();
             if (key.startsWith(propname))
+            {
                 nsList.add(Namespace.getNamespace(key.substring(propname.length()),
-                             ConfigurationManager.getProperty(key)));
+                        ConfigurationManager.getProperty(key)));
+            }
         }
         nsList.add(Namespace.XML_NAMESPACE);
         namespaces = (Namespace[])nsList.toArray(new Namespace[nsList.size()]);
@@ -273,8 +244,10 @@ public class QDCCrosswalk extends SelfNamedPlugin
         String cmPropName = CONFIG_PREFIX+".properties."+myName;
         String propsFilename = ConfigurationManager.getProperty(cmPropName);
         if (propsFilename == null)
-            throw new CrosswalkInternalException("Configuration error: "+
-                "No properties file configured for QDC crosswalk named \""+myName+"\"");
+        {
+            throw new CrosswalkInternalException("Configuration error: " +
+                    "No properties file configured for QDC crosswalk named \"" + myName + "\"");
+        }
 
         String parent = ConfigurationManager.getProperty("dspace.dir") +
             File.separator + "config" + File.separator;
@@ -289,7 +262,15 @@ public class QDCCrosswalk extends SelfNamedPlugin
         finally
         {
             if (pfs != null)
-                try { pfs.close(); } catch (IOException ioe) { }
+            {
+                try
+                {
+                    pfs.close();
+                }
+                catch (IOException ioe)
+                {
+                }
+            }
         }
 
         // grovel properties to initialize qdc->element and element->qdc maps.
@@ -306,10 +287,10 @@ public class QDCCrosswalk extends SelfNamedPlugin
         }
         prologb.append(">");
         String prolog = prologb.toString();
-        pe = qdcProps.propertyNames();
+        pe = (Enumeration<String>)qdcProps.propertyNames();
         while (pe.hasMoreElements())
         {
-            String qdc = (String)pe.nextElement();
+            String qdc = pe.nextElement();
             String val = qdcProps.getProperty(qdc);
             try
             {
@@ -321,7 +302,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
             }
             catch (org.jdom.JDOMException je)
             {
-                throw new CrosswalkInternalException("Failed parsing XML fragment in properties file: \""+prolog+val+postlog+"\": "+je.toString());
+                throw new CrosswalkInternalException("Failed parsing XML fragment in properties file: \""+prolog+val+postlog+"\": "+je.toString(), je);
             }
         }
     }
@@ -335,7 +316,7 @@ public class QDCCrosswalk extends SelfNamedPlugin
         catch (Exception e)
         {
         }
-        return namespaces;
+        return (Namespace[]) ArrayUtils.clone(namespaces);
     }
 
     public String getSchemaLocation()
@@ -353,24 +334,26 @@ public class QDCCrosswalk extends SelfNamedPlugin
     /**
      * Returns object's metadata in MODS format, as XML structure node.
      */
-    public List disseminateList(DSpaceObject dso)
+    public List<Element> disseminateList(DSpaceObject dso)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
         return disseminateListInternal(dso, true);
     }
 
-    private List disseminateListInternal(DSpaceObject dso, boolean addSchema)
+    private List<Element> disseminateListInternal(DSpaceObject dso, boolean addSchema)
         throws CrosswalkException,
                IOException, SQLException, AuthorizeException
     {
         if (dso.getType() != Constants.ITEM)
+        {
             throw new CrosswalkObjectNotSupported("QDCCrosswalk can only crosswalk an Item.");
+        }
         Item item = (Item)dso;
         init();
 
         DCValue[] dc = item.getMetadata(Item.ANY, Item.ANY, Item.ANY, Item.ANY);
-        List result = new ArrayList(dc.length);
+        List<Element> result = new ArrayList<Element>(dc.length);
         for (int i = 0; i < dc.length; i++)
         {
             // Compose qualified DC name - schema.element[.qualifier]
@@ -379,22 +362,28 @@ public class QDCCrosswalk extends SelfNamedPlugin
                          ((dc[i].qualifier == null) ? dc[i].element
                             : (dc[i].element + "." + dc[i].qualifier));
 
-            Element elt = (Element)qdc2element.get(qdc);
+            Element elt = qdc2element.get(qdc);
 
             // only complain about missing elements in the DC schema:
             if (elt == null)
             {
                 if (dc[i].schema.equals(MetadataSchema.DC_SCHEMA))
-                    log.warn("WARNING: "+myName+": No QDC mapping for \"" + qdc+"\"");
+                {
+                    log.warn("WARNING: " + myName + ": No QDC mapping for \"" + qdc + "\"");
+                }
             }
             else
             {
                 Element qe = (Element)elt.clone();
                 qe.setText(dc[i].value);
                 if (addSchema && schemaLocation != null)
+                {
                     qe.setAttribute("schemaLocation", schemaLocation, XSI_NS);
+                }
                 if (dc[i].language != null)
+                {
                     qe.setAttribute("lang", dc[i].language, Namespace.XML_NAMESPACE);
+                }
                 result.add(qe);
             }
         }
@@ -408,7 +397,9 @@ public class QDCCrosswalk extends SelfNamedPlugin
         init();
         Element root = new Element("qualifieddc", DCTERMS_NS);
         if (schemaLocation != null)
+        {
             root.setAttribute("schemaLocation", schemaLocation, XSI_NS);
+        }
         root.addContent(disseminateListInternal(dso, false));
         return root;
     }
@@ -428,49 +419,63 @@ public class QDCCrosswalk extends SelfNamedPlugin
         // own..  just give up in the face of this madness and accept
         // anything with the right name.
         if (!(root.getName().equals("qualifieddc")))
-            throw new MetadataValidationException("Wrong root element for Qualified DC: "+root.toString());
+        {
+            throw new MetadataValidationException("Wrong root element for Qualified DC: " + root.toString());
+        }
         ingest(context, dso, root.getChildren());
     }
 
-    public void ingest(Context context, DSpaceObject dso, List ml)
+    public void ingest(Context context, DSpaceObject dso, List<Element> ml)
         throws CrosswalkException, IOException, SQLException, AuthorizeException
     {
         init();
 
         // for now, forget about any targets but item.
         if (dso.getType() != Constants.ITEM)
+        {
             throw new CrosswalkInternalException("Wrong target object type, QDCCrosswalk can only crosswalk to an Item.");
+        }
 
         Item item = (Item)dso;
 
-        Iterator mi = ml.iterator();
-        while (mi.hasNext())
+        for (Element me : ml)
         {
-            Element me = (Element)mi.next();
             String key = makeQualifiedTagName(me);
 
             // if the root element gets passed here, recurse:
-            if (me.getName().equals("qualifieddc"))
+            if ("qualifieddc".equals(me.getName()))
+            {
                 ingest(context, dso, me.getChildren());
+            }
 
             else if (element2qdc.containsKey(key))
             {
-                String qdc[] = ((String)element2qdc.get(key)).split("\\.");
+                String qdc[] = (element2qdc.get(key)).split("\\.");
 
                 // get language - prefer xml:lang, accept lang.
                 String lang = me.getAttributeValue("lang", Namespace.XML_NAMESPACE);
                 if (lang == null)
+                {
                     lang = me.getAttributeValue("lang");
+                }
 
                 if (qdc.length == 3)
+                {
                     item.addMetadata(qdc[0], qdc[1], qdc[2], lang, me.getText());
+                }
                 else if (qdc.length == 2)
-                    item.addMetadata(qdc[0], qdc[1], null,   lang, me.getText());
+                {
+                    item.addMetadata(qdc[0], qdc[1], null, lang, me.getText());
+                }
                 else
-                    throw new CrosswalkInternalException("Unrecognized format in QDC element identifier for key=\""+key+"\", qdc=\""+(String)element2qdc.get(key)+"\"");
+                {
+                    throw new CrosswalkInternalException("Unrecognized format in QDC element identifier for key=\"" + key + "\", qdc=\"" + element2qdc.get(key) + "\"");
+                }
             }
             else
-                log.warn("WARNING: "+myName+": No mapping for Element=\"" + key+"\" to qdc.");
+            {
+                log.warn("WARNING: " + myName + ": No mapping for Element=\"" + key + "\" to qdc.");
+            }
         }
     }
 

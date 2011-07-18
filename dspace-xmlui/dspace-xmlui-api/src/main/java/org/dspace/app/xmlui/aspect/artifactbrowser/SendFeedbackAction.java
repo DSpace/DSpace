@@ -1,41 +1,9 @@
-/*
- * SendFeedbackAction.java
+/**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 19:02:24 +0200 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002, Hewlett-Packard Company and Massachusetts
- * Institute of Technology.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the Hewlett-Packard Company nor the name of the
- * Massachusetts Institute of Technology nor the names of their
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
 package org.dspace.app.xmlui.aspect.artifactbrowser;
 
@@ -82,25 +50,44 @@ public class SendFeedbackAction extends AbstractAction
         // Obtain information from request
         // The page where the user came from
         String fromPage = request.getHeader("Referer");
-
         // Prevent spammers and splogbots from poisoning the feedback page
         String host = ConfigurationManager.getProperty("dspace.hostname");
+        String allowedReferrersString = ConfigurationManager.getProperty("mail.allowed.referrers");
+
+        String[] allowedReferrersSplit = null;
+        boolean validReferral = false;
+
+        if((allowedReferrersString != null) && (allowedReferrersString.length() > 0))
+        {
+            allowedReferrersSplit = allowedReferrersString.trim().split("\\s*,\\s*");
+            for(int i = 0; i < allowedReferrersSplit.length; i++)
+            {
+                if(fromPage.indexOf(allowedReferrersSplit[i]) != -1)
+                {
+                    validReferral = true;
+                    break;
+                }
+            }
+        }
 
         String basicHost = "";
-        if (host.equals("localhost") || host.equals("127.0.0.1")
-        		|| host.equals(InetAddress.getLocalHost().getHostAddress()))
+        if ("localhost".equals(host) || "127.0.0.1".equals(host)
+                        || host.equals(InetAddress.getLocalHost().getHostAddress()))
+        {
             basicHost = host;
+        }
         else
         {
             // cut off all but the hostname, to cover cases where more than one URL
             // arrives at the installation; e.g. presence or absence of "www"
-            int lastDot = host.lastIndexOf(".");
-            basicHost = host.substring(host.substring(0, lastDot).lastIndexOf("."));
+            int lastDot = host.lastIndexOf('.');
+            basicHost = host.substring(host.substring(0, lastDot).lastIndexOf('.'));
         }
 
-        if (fromPage == null || fromPage.indexOf(basicHost) == -1)
+        if ((fromPage == null) || ((fromPage.indexOf(basicHost) == -1) && (!validReferral)))
         {
-            throw new AuthorizeException();
+            // N.B. must use old message catalog because Cocoon i18n is only available to transformed pages.
+            throw new AuthorizeException(I18nUtil.getMessage("feedback.error.forbidden"));
         }
 
         // User email from context
@@ -108,7 +95,9 @@ public class SendFeedbackAction extends AbstractAction
         EPerson loggedin = context.getCurrentUser();
         String eperson = null;
         if (loggedin != null)
+        {
             eperson = loggedin.getEmail();
+        }
 
         if (page == null || page.equals(""))
         {
@@ -125,9 +114,13 @@ public class SendFeedbackAction extends AbstractAction
             map.put("page",page);
 
             if (address == null || address.equals(""))
-                map.put("email",eperson);
+            {
+                map.put("email", eperson);
+            }
             else
-                map.put("email",address);
+            {
+                map.put("email", address);
+            }
 
             map.put("comments",comments);
 
