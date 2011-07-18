@@ -45,7 +45,7 @@ import org.dspace.search.DSIndexer;
 
 /**
  * MediaFilterManager is the class that invokes the media/format filters over the
- * repository's content. a few command line flags affect the operation of the
+ * repository's content. A few command line flags affect the operation of the
  * MFM: -v verbose outputs all extracted text to STDOUT; -f force forces all
  * bitstreams to be processed, even if they have been before; -n noindex does not
  * recreate index after processing bitstreams; -i [identifier] limits processing 
@@ -325,7 +325,7 @@ public class MediaFilterManager
             c = new Context();
 
             // have to be super-user to do the filtering
-            c.setIgnoreAuthorization(true);
+            c.turnOffAuthorisationSystem();
 
             // now apply the filters
             if (identifier == null)
@@ -490,8 +490,8 @@ public class MediaFilterManager
     }
 
     /**
-     * iterate through the item's bitstreams in the ORIGINAL bundle, applying
-     * filters if possible
+     * Iterate through the item's bitstreams in the ORIGINAL bundle, applying
+     * filters if possible.
      * 
      * @return true if any bitstreams processed, 
      *         false if none
@@ -515,10 +515,10 @@ public class MediaFilterManager
     }
 
     /**
-     * Attempt to filter a bitstream
+     * Attempt to filter a bitstream.
      * 
      * An exception will be thrown if the media filter class cannot be
-     * instantiated, exceptions from filtering will be logged to STDOUT and
+     * instantiated.  Exceptions from filtering will be logged to STDOUT and
      * swallowed.
      * 
      * @return true if bitstream processed, 
@@ -573,7 +573,7 @@ public class MediaFilterManager
                 	String checksum = myBitstream.getChecksum() + " ("+myBitstream.getChecksumAlgorithm()+")";
                 	int assetstore = myBitstream.getStoreNumber();
    
-                	// Printout helpfull information to find the errored bistream.
+                	// Printout helpful information to find the errored bitstream.
                 	System.out.println("ERROR filtering, skipping bitstream:\n");
                 	System.out.println("\tItem Handle: "+ handle);
                 	for (Bundle bundle : bundles)
@@ -666,7 +666,7 @@ public class MediaFilterManager
     }
     
     /**
-     * processBitstream is a utility class that calls the virtual methods
+     * A utility class that calls the virtual methods
      * from the current MediaFilter class.
      * It scans the bitstreams in an item, and decides if a bitstream has 
      * already been filtered, and if not or if overWrite is set, invokes the 
@@ -797,7 +797,7 @@ public class MediaFilterManager
     
     /**
      * Return the item that is currently being processed/filtered
-     * by the MediaFilterManager
+     * by the MediaFilterManager.
      * <p>
      * This allows FormatFilters to retrieve the Item object
      * in case they need access to item-level information for their format
@@ -811,7 +811,7 @@ public class MediaFilterManager
     }
     
     /**
-     * Check whether or not to skip processing the given identifier
+     * Check whether or not to skip processing the given identifier.
      * 
      * @param identifier
      *            identifier (handle) of a community, collection or item
