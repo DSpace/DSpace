@@ -19,7 +19,7 @@ import org.textmining.extraction.word.WordTextExtractorFactory;
 /*
  * 
  * to do: helpful error messages - can't find mediafilter.cfg - can't
- * instantiate filter - bitstream format doesn't exist
+ * instantiate filter - bitstream format doesn't exist.
  *  
  */
 public class WordFilter extends MediaFilter
@@ -89,9 +89,10 @@ public class WordFilter extends MediaFilter
         } 
         catch (IOException ioe)
         {
-             System.out.println("Invalid Word Format");
-             log.error("Error detected - Word File format not recognized: " + ioe.getMessage(), ioe); 
+            System.out.println("Invalid Word Format");
+            log.error("Error detected - Word File format not recognized: "
+                    + ioe.getMessage(), ioe);
+            throw ioe;
         }
-        return null;
     }
 }

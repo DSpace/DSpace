@@ -17,7 +17,6 @@ import org.apache.poi.POITextExtractor;
 
 import org.apache.log4j.Logger;
 
-
 /*
  * TODO: Allow user to configure extraction of only text or only notes
  * 
@@ -34,7 +33,7 @@ public class PowerPointFilter extends MediaFilter
 
     /**
      * @return String bundle name
-     *
+     * 
      */
     public String getBundleName()
     {
@@ -42,9 +41,9 @@ public class PowerPointFilter extends MediaFilter
     }
 
     /**
-     * @return String bitstreamformat
-     *
-     *  TODO: Check that this is correct
+     * @return String bitstream format
+     * 
+     *         TODO: Check that this is correct
      */
     public String getFormatString()
     {
@@ -62,39 +61,40 @@ public class PowerPointFilter extends MediaFilter
     /**
      * @param source
      *            source input stream
-     *
+     * 
      * @return InputStream the resulting input stream
      */
     public InputStream getDestinationStream(InputStream source)
             throws Exception
     {
-        
+
         try
         {
-	  
-            String extractedText = null;  
-	    POITextExtractor pptExtractor = 
-		new ExtractorFactory().createExtractor(source);
-	
+
+            String extractedText = null;
+            new ExtractorFactory();
+            POITextExtractor pptExtractor = ExtractorFactory
+                    .createExtractor(source);
+
             // PowerPoint XML files and legacy format PowerPoint files
             // require different classes and APIs for text extraction
 
-            // If this is a PowerPoint XML file, extract accordingly  
-	    if (pptExtractor instanceof XSLFPowerPointExtractor)
-	    {  
-                
+            // If this is a PowerPoint XML file, extract accordingly
+            if (pptExtractor instanceof XSLFPowerPointExtractor)
+            {
+
                 // The true method arguments indicate that text from
                 // the slides and the notes is desired
-		extractedText = 
-                       ((XSLFPowerPointExtractor)pptExtractor).getText(true, true);
-	    }    
-            
+                extractedText = ((XSLFPowerPointExtractor) pptExtractor)
+                        .getText(true, true);
+            }
+
             // Legacy PowerPoint files
             else if (pptExtractor instanceof PowerPointExtractor)
             {
 
-                extractedText = ((PowerPointExtractor)pptExtractor).getText() 
-                    + " " + ((PowerPointExtractor)pptExtractor).getNotes();
+                extractedText = ((PowerPointExtractor) pptExtractor).getText()
+                        + " " + ((PowerPointExtractor) pptExtractor).getNotes();
 
             }
             if (extractedText != null)
@@ -110,14 +110,15 @@ public class PowerPointFilter extends MediaFilter
                 byte[] textBytes = extractedText.getBytes();
                 ByteArrayInputStream bais = new ByteArrayInputStream(textBytes);
 
-                return bais; 
+                return bais;
             }
-	}
-	catch(Exception e)
-	{
-	    log.error("Error filtering bitstream: " + e.getMessage(), e);
-	}
-	
+        }
+        catch (Exception e)
+        {
+            log.error("Error filtering bitstream: " + e.getMessage(), e);
+            throw e;
+        }
+
         return null;
     }
 }
