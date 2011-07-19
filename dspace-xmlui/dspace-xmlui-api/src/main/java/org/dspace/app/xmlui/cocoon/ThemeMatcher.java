@@ -72,7 +72,7 @@ public class ThemeMatcher extends AbstractLogEnabled implements Matcher {
 					
 					// Allow: allow all letters and numbers plus periods (but not consecutive), 
 					// dashes, underscores, and forward slashes 
-					if (!themePathOverride.matches("^[a-zA-V0-9][a-zA-Z0-9/_\\-]*/?$")) {
+					if (!themePathOverride.matches("^[a-zA-Z0-9][a-zA-Z0-9/_\\-]*/?$")) {
 						
 						throw new IllegalArgumentException("The user specified theme path, \""+themePathOverride+"\", may be " +
 								"an exploit attempt. To use this feature please limit your theme paths to only letters " +
