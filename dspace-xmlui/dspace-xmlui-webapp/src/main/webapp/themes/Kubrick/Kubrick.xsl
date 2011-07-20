@@ -650,21 +650,6 @@
     <!-- Generate the thunbnail, if present, from the file section -->
     <xsl:template match="mets:fileGrp[@USE='THUMBNAIL']" mode="itemMetadataPopup-DIM">
         <div class="popup-artifact-preview">
-            <!-- manakin-voss version: <a href="{ancestor::mets:METS/@OBJID}"> -->
-            <a href="{ancestor::dri:object/@url}"> 
-                <img alt="Thumbnail">
-                    <xsl:attribute name="src">
-                        <xsl:value-of select="mets:file/mets:FLocat[@LOCTYPE='URL']/@xlink:href" />
-                    </xsl:attribute>
-                </img>
-            </a>
-        </div>
-    </xsl:template>
-    
-    
-    <!-- Generate the thunbnail, if present, from the file section -->
-    <xsl:template match="mets:fileGrp[@USE='THUMBNAIL']" mode="itemMetadataPopup-DIM">
-        <div class="popup-artifact-preview">
             <a href="{ancestor::mets:METS/@OBJID}">
                 <img alt="Thumbnail">
                     <xsl:attribute name="src">
