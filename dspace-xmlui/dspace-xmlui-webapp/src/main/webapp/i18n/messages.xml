@@ -1678,6 +1678,7 @@
 	<message key="xmlui.administrative.ControlPanel.runtime_used">Used memory</message>
 	<message key="xmlui.administrative.ControlPanel.runtime_free">Free memory</message>
 	<message key="xmlui.administrative.ControlPanel.dspace_head">DSpace Settings</message>
+        <message key="xmlui.administrative.ControlPanel.dspace_version">DSpace Version</message>
 	<message key="xmlui.administrative.ControlPanel.dspace_dir">DSpace Installation Directory</message>
 	<message key="xmlui.administrative.ControlPanel.dspace_url">DSpace Base URL</message>
 	<message key="xmlui.administrative.ControlPanel.dspace_hostname">DSpace Host Name</message>

@@ -21,6 +21,7 @@ import org.apache.avalon.framework.service.Serviceable;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.commons.lang.StringUtils;
+import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
@@ -80,6 +81,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
     private static final Message T_DSPACE_URL 			= message("xmlui.administrative.ControlPanel.dspace_url");
     private static final Message T_DSPACE_HOST_NAME 	= message("xmlui.administrative.ControlPanel.dspace_hostname");
     private static final Message T_DSPACE_NAME 			= message("xmlui.administrative.ControlPanel.dspace_name");
+    private static final Message T_DSPACE_VERSION 			= message("xmlui.administrative.ControlPanel.dspace_version");
     private static final Message T_DB_NAME 				= message("xmlui.administrative.ControlPanel.db_name");
     private static final Message T_DB_URL 				= message("xmlui.administrative.ControlPanel.db_url");
     private static final Message T_DB_DRIVER 			= message("xmlui.administrative.ControlPanel.db_driver");
@@ -342,6 +344,9 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
 		// LIST: DSpace
         List dspace = div.addList("dspace");
         dspace.setHead(T_DSPACE_HEAD);
+        
+        dspace.addLabel(T_DSPACE_VERSION);
+        dspace.addItem(Util.getSourceVersion());
         
         dspace.addLabel(T_DSPACE_DIR);
     	dspace.addItem(ConfigurationManager.getProperty("dspace.dir"));
