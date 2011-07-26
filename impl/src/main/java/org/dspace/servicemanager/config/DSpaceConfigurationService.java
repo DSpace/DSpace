@@ -384,10 +384,10 @@ public final class DSpaceConfigurationService implements ConfigurationService {
         }
         //Attempt to load up all the config files in the modules directory
         try{
-            File modulesDirectory = new File(homePath + File.separator + DSPACE_MODULES_CONFIG_PATH);
+            File modulesDirectory = new File(homePath + File.separator + DSPACE_MODULES_CONFIG_PATH + File.separator);
             if(modulesDirectory.exists()){
                 try{
-                    Resource[] resources = new PathMatchingResourcePatternResolver().getResources("file:" + modulesDirectory.getAbsolutePath() + File.separator + "*" + DOT_CONFIG);
+                    Resource[] resources = new PathMatchingResourcePatternResolver().getResources(modulesDirectory.toURI().toURL().toString() + "*" + DOT_CONFIG);
                     if(resources != null){
                         for(Resource resource : resources){
                             String prefix = resource.getFilename().substring(0, resource.getFilename().lastIndexOf("."));
