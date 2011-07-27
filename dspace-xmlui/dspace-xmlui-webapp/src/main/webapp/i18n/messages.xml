@@ -1677,6 +1677,14 @@
 	<message key="xmlui.administrative.ControlPanel.runtime_total">Allocated memory</message>
 	<message key="xmlui.administrative.ControlPanel.runtime_used">Used memory</message>
 	<message key="xmlui.administrative.ControlPanel.runtime_free">Free memory</message>
+        <message key="xmlui.administrative.ControlPanel.cocoon_head">Cocoon Info</message>
+        <message key="xmlui.administrative.ControlPanel.cocoon_version">Cocoon Version</message>
+        <message key="xmlui.administrative.ControlPanel.cocoon_cache_dir">Cocoon Cache Directory</message>
+        <message key="xmlui.administrative.ControlPanel.cocoon_work_dir">Cocoon Work Directory</message>
+        <message key="xmlui.administrative.ControlPanel.cocoon_main_cache_size">Main Cache Size ({0})</message>
+        <message key="xmlui.administrative.ControlPanel.cocoon_cache_clear">(Clear Cache Immediately)</message>
+        <message key="xmlui.administrative.ControlPanel.cocoon_persistent_cache_size">Persistent Cache Size ({0})</message>
+        <message key="xmlui.administrative.ControlPanel.cocoon_transient_cache_size">Transient Cache Size ({0})</message>
 	<message key="xmlui.administrative.ControlPanel.dspace_head">DSpace Settings</message>
         <message key="xmlui.administrative.ControlPanel.dspace_version">DSpace Version</message>
 	<message key="xmlui.administrative.ControlPanel.dspace_dir">DSpace Installation Directory</message>

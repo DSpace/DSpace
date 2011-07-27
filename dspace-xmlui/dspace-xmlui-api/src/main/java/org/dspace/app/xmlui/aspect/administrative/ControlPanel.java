@@ -14,13 +14,18 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 
+import org.apache.avalon.framework.activity.Disposable;
 import org.apache.avalon.framework.service.ServiceException;
 import org.apache.avalon.framework.service.ServiceManager;
 import org.apache.avalon.framework.service.Serviceable;
+import org.apache.cocoon.configuration.Settings;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
 import org.apache.commons.lang.StringUtils;
+import org.apache.excalibur.store.Store;
+import org.apache.excalibur.store.StoreJanitor;
 import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
@@ -50,7 +55,7 @@ import org.xml.sax.SAXException;
  * @author Jay Paz
  * @author Scott Phillips
  */
-public class ControlPanel extends AbstractDSpaceTransformer implements Serviceable{
+public class ControlPanel extends AbstractDSpaceTransformer implements Serviceable, Disposable {
 	
     /** Language Strings */
     private static final Message T_DSPACE_HOME                  = message("xmlui.general.dspace_home");
@@ -74,7 +79,15 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
     private static final Message T_RUNTIME_MAX 			= message("xmlui.administrative.ControlPanel.runtime_max"); 
     private static final Message T_RUNTIME_TOTAL 		= message("xmlui.administrative.ControlPanel.runtime_total"); 
     private static final Message T_RUNTIME_USED 		= message("xmlui.administrative.ControlPanel.runtime_used"); 
-    private static final Message T_RUNTIME_FREE 		= message("xmlui.administrative.ControlPanel.runtime_free"); 
+    private static final Message T_RUNTIME_FREE 		= message("xmlui.administrative.ControlPanel.runtime_free");
+    private static final Message T_COCOON_HEAD                  = message("xmlui.administrative.ControlPanel.cocoon_head");  
+    private static final Message T_COCOON_VERSION               = message("xmlui.administrative.ControlPanel.cocoon_version");
+    private static final Message T_COCOON_CACHE_DIR             = message("xmlui.administrative.ControlPanel.cocoon_cache_dir");
+    private static final Message T_COCOON_WORK_DIR              = message("xmlui.administrative.ControlPanel.cocoon_work_dir");
+    private static final Message T_COCOON_MAIN_CACHE_SIZE       = message("xmlui.administrative.ControlPanel.cocoon_main_cache_size");
+    private static final Message T_COCOON_PERSISTENT_CACHE_SIZE = message("xmlui.administrative.ControlPanel.cocoon_persistent_cache_size");
+    private static final Message T_COCOON_TRANS_CACHE_SIZE      = message("xmlui.administrative.ControlPanel.cocoon_transient_cache_size");
+    private static final Message T_COCOON_CACHE_CLEAR           = message("xmlui.administrative.ControlPanel.cocoon_cache_clear");
     private static final Message T_DSPACE_HEAD 			= message("xmlui.administrative.ControlPanel.dspace_head");
     private static final Message T_DSPACE_DIR 			= message("xmlui.administrative.ControlPanel.dspace_dir");
     private static final Message T_DSPACE_URL 			= message("xmlui.administrative.ControlPanel.dspace_url");
@@ -150,18 +163,56 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
     private ServiceManager serviceManager;
     
     /**
+     * The Cocoon Settings (used to display Cocoon info)
+     */
+    private Settings settings;
+    
+    /**
+     * The Cocoon StoreJanitor (used for cache statistics)
+     */
+    private StoreJanitor storeJanitor;
+    
+     /**
+     * The Cocoon Default Store (used for cache statistics)
+     */
+    private Store storeDefault;
+    
+    /**
+     * The Cocoon Persistent Store (used for cache statistics)
+     */
+    private Store storePersistent;
+    
+    /**
      * The five states that this page can be in.
      */
     private enum OPTIONS {java, dspace, alerts, activity, harvest};
     
     /**
-     * From the servicable api, give us a service manager.
+     * From the <code>org.apache.avalon.framework.service.Serviceable</code> API, 
+     * give us the current <code>ServiceManager</code> instance.
+     * <P>
+     * Much of this ServiceManager logic/code has been borrowed from the source
+     * code of the Cocoon <code>StatusGenerator</code> class:
+     * http://svn.apache.org/repos/asf/cocoon/tags/cocoon-2.2/cocoon-sitemap-components/cocoon-sitemap-components-1.0.0/src/main/java/org/apache/cocoon/generation/StatusGenerator.java
      */
+    @Override
     public void service(ServiceManager serviceManager) throws ServiceException 
     {
         this.serviceManager = serviceManager;
+        
+        this.settings = (Settings) this.serviceManager.lookup(Settings.ROLE);
+        
+        if(this.serviceManager.hasService(StoreJanitor.ROLE))
+            this.storeJanitor = (StoreJanitor) this.serviceManager.lookup(StoreJanitor.ROLE);
+        
+        if (this.serviceManager.hasService(Store.ROLE))
+            this.storeDefault = (Store) this.serviceManager.lookup(Store.ROLE);
+        
+        if(this.serviceManager.hasService(Store.PERSISTENT_STORE))
+            this.storePersistent = (Store) this.serviceManager.lookup(Store.PERSISTENT_STORE);
     }
 	
+    @Override
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
                     WingException, UIException, SQLException, IOException,
                     AuthorizeException 
@@ -172,6 +223,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         pageMeta.addTrailLink(contextPath + "/admin/panel", T_trail);
     }
 
+    @Override
     public void addBody(Body body) throws SAXException, WingException,
                     UIException, SQLException, IOException, AuthorizeException 
     {
@@ -334,7 +386,92 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         runtime.addLabel(T_RUNTIME_USED);
         runtime.addItem(String.valueOf(usedMemory) + " MiB");
         runtime.addLabel(T_RUNTIME_FREE);
-        runtime.addItem(String.valueOf(freeMemory) + " MiB");	
+        runtime.addItem(String.valueOf(freeMemory) + " MiB");
+        
+        //List: Cocoon Info & Cache
+        addCocoonInformation(div);
+    }
+        
+    /**
+     * Add specific Cocoon information, especially related to the Cocoon Cache.
+     * <P>
+     * For more information about Cocoon Caches/Stores, see:
+     * http://wiki.apache.org/cocoon/StoreComponents  
+     */
+    private void addCocoonInformation(Division div) throws WingException
+    {
+        // List: Cocoon Info & Caches
+        List cocoon = div.addList("cocoon");
+        cocoon.setHead(T_COCOON_HEAD);
+        
+        cocoon.addLabel(T_COCOON_VERSION);
+        cocoon.addItem(org.apache.cocoon.Constants.VERSION);
+        
+        //attempt to Display some basic info about Cocoon's Settings & Caches
+
+        //Get access to basic Cocoon Settings
+        if(this.settings!=null)
+        {
+            //Output Cocoon's Work Directory & Cache Directory
+            cocoon.addLabel(T_COCOON_WORK_DIR);
+            cocoon.addItem(this.settings.getWorkDirectory());
+            cocoon.addLabel(T_COCOON_CACHE_DIR);
+            cocoon.addItem(this.settings.getCacheDirectory());
+        }    
+
+        // Check if we have access to Cocoon's Default Cache
+        //Cocoon's Main (Default) Store is used to store objects that are serializable
+        if(this.storeDefault!=null)
+        {
+            //Store name is just the className (remove the package info though, just to save space)
+            String storeName = this.storeDefault.getClass().getName();
+            storeName = storeName.substring(storeName.lastIndexOf(".")+1); 
+
+            //display main store's cache info
+            cocoon.addLabel(T_COCOON_MAIN_CACHE_SIZE.parameterize(storeName + ", 0x" + Integer.toHexString(this.storeDefault.hashCode())));
+
+            //display cache size & link to clear Cocoon's main cache
+            Item defaultSize = cocoon.addItem();
+            defaultSize.addContent(String.valueOf(this.storeDefault.size()) + "  ");
+            defaultSize.addXref(contextPath + "/admin/panel?java=true&clearcache=true", T_COCOON_CACHE_CLEAR);
+        }
+
+        // Check if we have access to Cocoon's Persistent Cache
+        //Cocoon's Persistent Store may be used by the Default Cache/Store to delegate persistent storage
+        //(it's an optional store which may not exist)
+        if(this.storePersistent!=null)
+        {
+            //Store name is just the className (remove the package info though, just to save space)
+            String storeName = this.storeDefault.getClass().getName();
+            storeName = storeName.substring(storeName.lastIndexOf(".")+1);
+
+            //display persistent store's cache size info
+            cocoon.addLabel(T_COCOON_PERSISTENT_CACHE_SIZE.parameterize(storeName + ", 0x" + Integer.toHexString(this.storePersistent.hashCode())));
+            cocoon.addItem(String.valueOf(this.storePersistent.size()));
+        }
+
+        //Check if we have access to Cocoon's StoreJanitor
+        //The Store Janitor manages all of Cocoon's "transient caches/stores"
+        // These "transient" stores are used for non-serializable objects or objects whose
+        // storage doesn't make sense across a server restart. 
+        if(this.storeJanitor!=null)
+        {
+            // For each Cache Store in Cocoon's StoreJanitor
+            Iterator i = this.storeJanitor.iterator();
+            while(i.hasNext())
+            {
+                //get the Cache Store
+                Store store = (Store) i.next();
+
+                //Store name is just the className (remove the package info though, just to save space)
+                String storeName = store.getClass().getName();
+                storeName = storeName.substring(storeName.lastIndexOf(".")+1); 
+
+                //display its size information
+                cocoon.addLabel(T_COCOON_TRANS_CACHE_SIZE.parameterize(storeName + ", 0x" + Integer.toHexString(store.hashCode())));
+                cocoon.addItem(String.valueOf(store.size()));
+            }
+        }
     }
 	
     /**
@@ -672,6 +809,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
          * Compare these two activity events based upon the given sort parameter. In the case of a tie,
          * allways fallback to sorting based upon the timestamp.
          */
+        @Override
         public int compare(E a, E b) 
         {
             // Protect against null events while sorting
@@ -866,4 +1004,25 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         }
     }
 	
+    
+    /**
+     * Release all Cocoon resources.
+     * @see org.apache.avalon.framework.activity.Disposable#dispose()
+     */
+    @Override
+    public void dispose() 
+    {
+        if (this.serviceManager != null) 
+        {
+            this.serviceManager.release(this.storePersistent);
+            this.serviceManager.release(this.storeJanitor);
+            this.serviceManager.release(this.storeDefault);
+            this.serviceManager.release(this.settings);
+            this.storePersistent = null;
+            this.storeJanitor = null; 	
+            this.storeDefault = null;
+            this.settings = null;
+        }
+        super.dispose();
+    }
 }
