@@ -15,6 +15,7 @@ importClass(Packages.org.dspace.content.Collection);
 importClass(Packages.org.dspace.eperson.EPerson);
 importClass(Packages.org.dspace.eperson.AccountManager);
 importClass(Packages.org.dspace.eperson.Subscribe);
+importClass(Packages.org.dspace.authorize.AuthorizeException);
 
 importClass(Packages.org.dspace.app.xmlui.utils.AuthenticationUtil);
 importClass(Packages.org.dspace.app.xmlui.utils.ContextUtil);
@@ -48,10 +49,18 @@ function getEPerson()
 
 
 /**
- * Preform a new user registration. 
+ * Perform a new user registration. 
  */
 function doRegister() 
 { 
+    //Make sure that user registration is enabled
+    if (!(ConfigurationManager.getBooleanProperty("xmlui.user.registration", true)))
+    {
+        // We're configured to not allow user registration
+        // User should only have gotten here by manually typing /register in URL, so we'll throw an error.
+        throw new AuthorizeException("User registration is disabled");
+    }
+    
     var token = cocoon.request.get("token");
     
     if (token == null) 
