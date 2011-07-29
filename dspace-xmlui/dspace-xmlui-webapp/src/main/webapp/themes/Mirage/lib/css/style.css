@@ -835,6 +835,7 @@ form.search .field-help {
 #aspect_administrative_registries_FormatRegistryMain_table_bitstream-format-registry,
 #aspect_submission_Submissions_table_unfinished-submissions,
 #aspect_submission_Submissions_table_submissions-inprogress,
+#aspect_submission_Submissions_table_completed-submissions,
 table.detailtable {
     margin-top: 10px;
     margin-bottom: 10px;
@@ -846,6 +847,7 @@ table.detailtable {
 #aspect_administrative_registries_FormatRegistryMain_table_bitstream-format-registry tr,
 #aspect_submission_Submissions_table_unfinished-submissions tr,
 #aspect_submission_Submissions_table_submissions-inprogress tr,
+#aspect_submission_Submissions_table_completed-submissions tr,
 table.detailtable tr {
     line-height: 1.6em;
     border: 1px solid #ebebeb;
@@ -856,6 +858,7 @@ table.detailtable tr {
 #aspect_administrative_registries_FormatRegistryMain_table_bitstream-format-registry tr.even,
 #aspect_submission_Submissions_table_unfinished-submissions tr.even,
 #aspect_submission_Submissions_table_submissions-inprogress tr.even,
+#aspect_submission_Submissions_table_completed-submissions tr.even,
 table.detailtable tr.even {
     background-color: #fafafa;
 }
@@ -865,6 +868,7 @@ table.detailtable tr.even {
 #aspect_administrative_registries_FormatRegistryMain_table_bitstream-format-registry td,
 #aspect_submission_Submissions_table_unfinished-submissions td,
 #aspect_submission_Submissions_table_submissions-inprogress td,
+#aspect_submission_Submissions_table_completed-submissions td,
 table.detailtable td {
     padding: 5px 10px;
     text-align: justify;
@@ -876,7 +880,8 @@ table.detailtable td {
 #aspect_administrative_registries_MetadataRegistryMain_table_metadata-registry-main-table tr.ds-table-header-row,
 #aspect_administrative_registries_FormatRegistryMain_table_bitstream-format-registry tr.ds-table-header-row,
 #aspect_submission_Submissions_table_unfinished-submissions tr.ds-table-header-row,
-#aspect_submission_Submissions_table_submissions-inprogress tr.ds-table-header-row {
+#aspect_submission_Submissions_table_submissions-inprogress tr.ds-table-header-row,
+#aspect_submission_Submissions_table_completed-submissions tr.ds-table-header-row {
     border: none;
 }
 

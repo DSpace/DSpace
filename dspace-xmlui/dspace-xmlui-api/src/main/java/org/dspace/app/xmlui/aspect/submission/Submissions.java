@@ -9,6 +9,11 @@ package org.dspace.app.xmlui.aspect.submission;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import org.apache.cocoon.environment.ObjectModelHelper;
+import org.apache.cocoon.environment.Request;
 
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
@@ -26,6 +31,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.ItemIterator;
 import org.dspace.content.SupervisedItem;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Constants;
@@ -146,9 +152,25 @@ public class Submissions extends AbstractDSpaceTransformer
         message("xmlui.Submission.Submissions.status_7"); 
     protected static final Message T_status_unknown = 
         message("xmlui.Submission.Submissions.status_unknown"); 
-
+    
+    // Used in the completed submissions section
+    protected static final Message T_c_head =
+            message("xmlui.Submission.Submissions.completed.head");
+    protected static final Message T_c_info =
+            message("xmlui.Submission.Submissions.completed.info");
+    protected static final Message T_c_column1 =
+            message("xmlui.Submission.Submissions.completed.column1");
+    protected static final Message T_c_column2 =
+            message("xmlui.Submission.Submissions.completed.column2");
+    protected static final Message T_c_column3 =
+            message("xmlui.Submission.Submissions.completed.column3");
+    protected static final Message T_c_limit =
+            message("xmlui.Submission.Submissions.completed.limit");
+    protected static final Message T_c_displayall =
+            message("xmlui.Submission.Submissions.completed.displayall");
 	
-	public void addPageMeta(PageMeta pageMeta) throws SAXException,
+    @Override
+    public void addPageMeta(PageMeta pageMeta) throws SAXException,
 	WingException, UIException, SQLException, IOException,
 	AuthorizeException
 	{
@@ -158,17 +180,26 @@ public class Submissions extends AbstractDSpaceTransformer
 		pageMeta.addTrailLink(contextPath + "/submissions",T_trail);
 	}
 	
-  
+    @Override
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
-    	        
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        boolean displayAll = false;
+        //This param decides whether we display all of the user's previous
+        // submissions, or just a portion of them
+        if (request.getParameter("all") != null)
+        {
+            displayAll=true;
+        }
+        
         Division div = body.addInteractiveDivision("submissions", contextPath+"/submissions", Division.METHOD_POST,"primary");
         div.setHead(T_head);
         
         this.addWorkflowTasks(div);
         this.addUnfinishedSubmissions(div);
         this.addSubmissionsInWorkflow(div);
+        this.addPreviousSubmissions(div, displayAll);
     }
     
     
@@ -602,6 +633,113 @@ public class Submissions extends AbstractDSpaceTransformer
 		}
     }
     
-    
+    /** 
+     * Show the user's completed submissions.
+     * 
+     * If the user has no completed submissions, display nothing.
+     * If 'displayAll' is true, then display all user's archived submissions.
+     * Otherwise, default to only displaying 50 archived submissions.
+     * 
+     * @param division div to put archived submissions in
+     * @param displayAll whether to display all or just a limited number.
+     */
+    private void addPreviousSubmissions(Division division, boolean displayAll)
+            throws SQLException,WingException
+    {
+        // Turn the iterator into a list (to get size info, in order to put in a table)
+        List subList = new LinkedList();
+        ItemIterator subs = Item.findBySubmitter(context, context.getCurrentUser());
+
+        //NOTE: notice we are adding each item to this list in *reverse* order...
+        // this is a very basic attempt at making more recent submissions float 
+        // up to the top of the list (findBySubmitter() doesn't guarrantee
+        // chronological order, but tends to return older items near top of the list)
+        try
+        {
+            while (subs.hasNext())
+            {
+                subList.add(0, subs.next());
+            }
+        }
+        finally
+        {
+            if (subs != null)
+                subs.close();
+        }
+
+        // No tasks, so don't show the table.
+        if (!(subList.size() > 0))
+            return;
+        
+        Division completedSubmissions = division.addDivision("completed-submissions");
+        completedSubmissions.setHead(T_c_head);
+        completedSubmissions.addPara(T_c_info);
+    	
+        // Create table, headers
+        Table table = completedSubmissions.addTable("completed-submissions",subList.size() + 2,3);
+        Row header = table.addRow(Row.ROLE_HEADER);
+        header.addCellContent(T_c_column1); // ISSUE DATE
+        header.addCellContent(T_c_column2); // ITEM TITLE (LINKED)
+        header.addCellContent(T_c_column3); // COLLECTION NAME (LINKED)
+    	
+        //Limit to showing just 50 archived submissions, unless overridden
+        //(This is a saftey measure for Admins who may have submitted 
+        // thousands of items under their account via bulk ingest tools, etc.)
+        int limit = 50;
+        int count = 0;
+        
+        // Populate table
+        Iterator i = subList.iterator();
+        while(i.hasNext())
+        {
+            count++;
+            //exit loop if we've gone over our limit of submissions to display
+            if(count>limit && !displayAll)
+                break;
+           
+            Item published = (Item) i.next();
+            String collUrl = contextPath+"/handle/"+published.getOwningCollection().getHandle();
+            String itemUrl = contextPath+"/handle/"+published.getHandle();
+            DCValue[] titles = published.getMetadata("dc", "title", null, Item.ANY);
+            String collectionName = published.getOwningCollection().getMetadata("name");
+            DCValue[] ingestDate = published.getMetadata("dc", "date", "accessioned", Item.ANY);
+
+            Row row = table.addRow();
+
+            // Item accession date
+            if (ingestDate != null && ingestDate.length > 0 &&
+                ingestDate[0].value != null)
+            {
+                String displayDate = ingestDate[0].value.substring(0,10);
+                Cell cellDate = row.addCell();
+                cellDate.addContent(displayDate);
+            }
+            else //if no accession date add an empty cell (shouldn't happen, but just in case)
+                row.addCell().addContent("");
+
+            // The item description
+            if (titles != null && titles.length > 0 &&
+                titles[0].value != null)
+            {
+                String displayTitle = titles[0].value;
+                if (displayTitle.length() > 50)
+                    displayTitle = displayTitle.substring(0,50)+ " ...";
+                row.addCell().addXref(itemUrl,displayTitle);
+            }
+            else
+                row.addCell().addXref(itemUrl,T_untitled);
+
+            // Owning Collection
+            row.addCell().addXref(collUrl,collectionName);
+        }//end while
+        
+        //Display limit text & link to allow user to override this default limit
+        if(!displayAll && count>limit)
+        {
+            Para limitedList = completedSubmissions.addPara();
+            limitedList.addContent(T_c_limit);
+            limitedList.addXref(contextPath + "/submissions?all", T_c_displayall);
+        }    
+    }
     
 }

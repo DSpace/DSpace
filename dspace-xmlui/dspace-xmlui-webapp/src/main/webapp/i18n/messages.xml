@@ -572,6 +572,14 @@
 	<message key="xmlui.Submission.Submissions.status_6">Submission being edited</message>
 	<message key="xmlui.Submission.Submissions.status_7">Submission has been archived</message>
 	<message key="xmlui.Submission.Submissions.status_unknown">Unknown state</message>
+        <!-- Same transformer, completed submissions section -->
+        <message key="xmlui.Submission.Submissions.completed.head">Archived Submissions</message>
+        <message key="xmlui.Submission.Submissions.completed.info">These are your completed submissions which have been accepted into DSpace.</message>
+        <message key="xmlui.Submission.Submissions.completed.column1">Date accepted</message>
+        <message key="xmlui.Submission.Submissions.completed.column2">Title</message>
+        <message key="xmlui.Submission.Submissions.completed.column3">Collection</message>
+        <message key="xmlui.Submission.Submissions.completed.limit">We've only listed 50 of your archived submissions above. </message>
+        <message key="xmlui.Submission.Submissions.completed.displayall">Display all my archived submissions.</message>
 
 	<!-- submission progress bar messages -->
 	<message key="xmlui.Submission.submit.progressbar.initial-questions">Initial Questions</message>
