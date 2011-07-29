@@ -28,7 +28,7 @@ public class DSAnalyzer extends Analyzer
      * An array containing some common words that are not usually useful for
      * searching.
      */
-    private static final String[] STOP_WORDS =
+    protected static final String[] STOP_WORDS =
     {
 
     // new stopwords (per MargretB)
@@ -47,12 +47,13 @@ public class DSAnalyzer extends Analyzer
     /*
      * Stop table
      */
-    private static final Set stopSet = StopFilter.makeStopSet(STOP_WORDS);
+    protected static final Set stopSet = StopFilter.makeStopSet(STOP_WORDS);
 
     /*
      * Create a token stream for this analyzer.
      */
-    public final TokenStream tokenStream(String fieldName, final Reader reader)
+    @Override
+    public TokenStream tokenStream(String fieldName, final Reader reader)
     {
         TokenStream result = new DSTokenizer(reader);
 
@@ -64,6 +65,7 @@ public class DSAnalyzer extends Analyzer
         return result;
     }
 
+    @Override
     public int getPositionIncrementGap(String fieldName)
     {
         // If it is the default field, or bounded fields is turned off in the config, return the default value
