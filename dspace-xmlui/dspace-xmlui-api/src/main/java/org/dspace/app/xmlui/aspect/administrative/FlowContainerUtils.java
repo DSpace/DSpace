@@ -1125,7 +1125,8 @@ public class FlowContainerUtils
                     Collection collection = Collection.find(context, dsoID);
                     if (collection != null)
                     {
-                        curator.curate(collection);
+                        //Call curate(context,ID) to ensure a Task Performer (Eperson) is set in Curator
+                        curator.curate(context, collection.getHandle());
                        
                     }
                     return FlowCurationUtils.getRunFlowResult(task, curator, true);
@@ -1187,7 +1188,8 @@ public class FlowContainerUtils
                     Community community = Community.find(context, dsoID);
                     if (community != null)
                     {
-                        curator.curate(community);
+                        //Call curate(context,ID) to ensure a Task Performer (Eperson) is set in Curator
+                        curator.curate(context, community.getHandle());
                     }
                     return FlowCurationUtils.getRunFlowResult(task, curator, true);
                 }

@@ -7,11 +7,15 @@
  */
 package org.dspace.app.xmlui.aspect.administrative;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.cocoon.environment.Request;
+
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 import org.dspace.curate.Curator;
 
 /**
@@ -158,4 +162,76 @@ public class FlowCurationUtils
             // So, we'll just return the TaskID, as it's better than nothing
             return taskID;
     }
+    
+    
+    /**
+     * Utility method to process curation tasks
+     * submitted via the DSpace Admin UI Curate Form.
+     * 
+     * @param context current DSpace Context
+     * @param request current Cocoon request
+     * @return FlowResult representing the result of request
+     * @see org.dspace.app.xmlui.aspect.administrative.CurateForm
+     */
+    public static FlowResult processCurateObject(Context context, Request request)
+    {
+        //get input values from Form (see org.dspace.app.xmlui.aspect.administrative.CurateForm)
+        String task = request.getParameter("curate_task");
+        String objHandle = request.getParameter("identifier");
+        Curator curator = FlowCurationUtils.getCurator(task);
+
+        FlowResult result = null;
+        try
+        {
+            // Curate this object & return result
+            curator.curate(context, objHandle);
+            result = FlowCurationUtils.getRunFlowResult(task, curator, true);
+        }
+        catch (Exception e) 
+        {
+            curator.setResult(task, e.getMessage());
+            result = FlowCurationUtils.getRunFlowResult(task, curator, false);
+        }
+        //pass curation task name & identifier back in FlowResult (so it can be pre-populated on UI)
+        result.setParameter("curate_task", task);
+        result.setParameter("identifier", objHandle);
+        return result;
+    }
+    
+    /**
+     * Utility method to queue curation tasks
+     * submitted via the DSpace Admin UI Curate Form.
+     * 
+     * @param context current DSpace Context
+     * @param request current Cocoon request
+     * @return FlowResult representing the result of request
+     * @see org.dspace.app.xmlui.aspect.administrative.CurateForm
+     */
+    public static FlowResult processQueueObject(Context context, Request request)
+    {
+        //get input values from Form (see org.dspace.app.xmlui.aspect.administrative.CurateForm)
+        String task = request.getParameter("curate_task");
+        String objHandle = request.getParameter("identifier");
+        
+        Curator curator = FlowCurationUtils.getCurator(task);
+        
+        String taskQueueName = ConfigurationManager.getProperty("curate", "ui.queuename");
+        boolean status = false;
+       
+        if (objHandle != null)
+        {
+            try
+            {
+                //queue the task for later processing of this object
+                curator.queue(context, objHandle, taskQueueName);
+                status = true;
+            }
+            catch (IOException ioe)
+            {
+                // no-op (any error should be logged by the Curator itself)
+            }
+        }
+        return FlowCurationUtils.getQueueFlowResult(task, status, objHandle, taskQueueName);
+    }
+    
 }

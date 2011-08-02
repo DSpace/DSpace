@@ -695,7 +695,8 @@ public class FlowItemUtils
                     Item item = Item.find(context, itemID);
                     if (item != null)
                     {
-                        curator.curate(item);
+                        //Call curate(context,ID) to ensure a Task Performer (Eperson) is set in Curator
+                        curator.curate(context, item.getHandle());
                     }
                     return FlowCurationUtils.getRunFlowResult(task, curator, true);
                 }

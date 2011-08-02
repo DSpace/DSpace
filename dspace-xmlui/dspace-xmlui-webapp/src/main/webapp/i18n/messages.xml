@@ -821,6 +821,7 @@
 	<message key="xmlui.administrative.Navigation.administrative_control_panel">Control Panel</message>
     <message key="xmlui.administrative.Navigation.statistics">Statistics</message>
         <message key="xmlui.administrative.Navigation.administrative_import_metadata">Import Metadata</message>
+        <message key="xmlui.administrative.Navigation.administrative_curation">Curation Tasks</message>
 
     <!-- my account items -->
 	<message key="xmlui.administrative.Navigation.account_export">My Exports</message>
@@ -1754,6 +1755,12 @@
 	<message key="xmlui.administrative.NotAuthorized.para1c">.</message>
 	<message key="xmlui.administrative.NotAuthorized.para2">Login as another user</message>
         
+        <!-- System-wide Curation Tasks form (org.dspace.app.xmlui.aspect.administrative.CurateForm) -->
+        <message key="xmlui.administrative.CurateForm.title">System Curation Tasks</message>
+        <message key="xmlui.administrative.CurateForm.trail">Curation Tasks</message>
+        <message key="xmlui.administrative.CurateForm.object_label_name">Handle of DSpace Object</message>
+        <message key="xmlui.administrative.CurateForm.object_hint">Hint: Enter [your-handle-prefix]/0 to run a task across entire site (not all tasks may support this capability)</message>
+        <message key="xmlui.administrative.CurateForm.task_label_name">Task</message>
 
     <!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
