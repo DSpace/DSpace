@@ -1571,31 +1571,32 @@ function doEditItemMetadata(itemID, templateCollectionID)
 }
 
 
-  /** Curate
- *
- *
+/**
+ * Curate an Item
+ * Can only be performed by someone who is able to edit that Item.
  */
-        function doCurateItem(itemID, task) {
-            var result;
+function doCurateItem(itemID, task) 
+{
+    var result;
 
-            do {
-                           sendPageAndWait("admin/item/curateItem",{"itemID":itemID}, result);
-                           assertEditCommunity(itemID);
-                           result = null;
-                           if (!cocoon.request.get("submit_curate_task") && !cocoon.request.get("submit_queue_task"))
-                           {
-                                  return null;
-                           }
-                           else if (cocoon.request.get("submit_curate_task"))
-                           {
-                                   result = FlowItemUtils.processCurateItem(getDSContext(), itemID, cocoon.request);
-                           }
-                           else if (cocoon.request.get("submit_queue_task"))
-                           {
-                                   result = FlowItemUtils.processQueueItem(getDSContext(), itemID, cocoon.request);
-                           }
-            } while (true);
-        }
+    do {
+           sendPageAndWait("admin/item/curateItem",{"itemID":itemID}, result);
+           assertEditItem(itemID);
+           result = null;
+           if (!cocoon.request.get("submit_curate_task") && !cocoon.request.get("submit_queue_task"))
+           {
+                return null;
+           }
+           else if (cocoon.request.get("submit_curate_task"))
+           {
+                result = FlowItemUtils.processCurateItem(getDSContext(), itemID, cocoon.request);
+           }
+           else if (cocoon.request.get("submit_queue_task"))
+           {
+                result = FlowItemUtils.processQueueItem(getDSContext(), itemID, cocoon.request);
+           }
+    } while (true);
+}
 
 /**
  * Confirm the deletition of this item.
@@ -2503,12 +2504,8 @@ function doAssignCollectionRoles(collectionID)
 }
 
 /**
- * Curate Collection
- *
- */
-/** Curate
- *
- *
+ * Curate a Collection
+ * Can only be performed by someone who is able to edit that collection.
  */
 function doCurateCollection(collectionID, task) {
     var result;
@@ -2922,9 +2919,9 @@ function doAssignCommunityRoles(communityID)
     }while (true);
 }
 
-/** Curate
- *
- *
+/**
+ * Curate a Community
+ * Can only be performed by someone who is able to edit that Community.
  */
 function doCurateCommunity(communityID, task) {
     var result;
@@ -2975,6 +2972,7 @@ function doDeleteCommunityRole(communityID,role)
 
 /**
  * Curate a DSpace Object, from site-wide Administrator tools
+ * (Can only be performed by a DSpace Administrator)
  */
 function doCurate() 
 {
