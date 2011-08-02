@@ -27,6 +27,7 @@ importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowItemUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowMapperUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowAuthorizationUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowContainerUtils);
+importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowCurationUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowMetadataImportUtils);
 importClass(Packages.java.lang.System);
 
@@ -606,8 +607,19 @@ function startEditCommunity()
 	cocoon.exit();
 }
 
+/**
+ * Start (site-wide) curation of any object
+ */
+function startCurate()
+{
+        assertAdministrator();
 
+        doCurate();
 
+        cocoon.redirectTo(cocoon.request.getContextPath());
+        getDSContext().complete();
+        cocoon.exit();
+}
 
 
 
@@ -2959,4 +2971,47 @@ function doDeleteCommunityRole(communityID,role)
 		return result;
 	}
 	return null;
+}
+
+/**
+ * Curate a DSpace Object, from site-wide Administrator tools
+ */
+function doCurate() 
+{
+    var result;
+    
+    assertAdministrator();
+
+    var identifier;
+    var curateTask;
+    do 
+    {
+        sendPageAndWait("admin/curate/main",{"identifier":identifier,"curate_task":curateTask},result);
+       	   
+        if (cocoon.request.get("submit_curate_task"))
+        {
+            result = FlowCurationUtils.processCurateObject(getDSContext(), cocoon.request);
+        }
+        else if (cocoon.request.get("submit_queue_task"))
+        {
+            result = FlowCurationUtils.processQueueObject(getDSContext(), cocoon.request);
+        }
+        
+        //if 'identifier' parameter was set in result, pass it back to sendPageAndWait call (so it is prepopulated in Admin UI)
+        if (result != null && result.getParameter("identifier")) {
+            identifier = result.getParameter("identifier");
+        }
+        else {
+            identifier = null;
+        }
+        
+        //if 'curate_task' parameter was set in result, pass it back to sendPageAndWait call (so it is prepopulated in Admin UI)
+        if (result != null && result.getParameter("curate_task")) {
+            curateTask = result.getParameter("curate_task");
+        }
+        else {
+            curateTask = null;
+        }  
+    }
+    while (true);
 }
