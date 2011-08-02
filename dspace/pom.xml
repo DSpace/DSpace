@@ -30,6 +30,11 @@
         <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace</url>
     </scm>
 
+    <properties>
+        <default.dspace.dir>/dspace</default.dspace.dir>
+        <default.mail.server>smtp.example.com</default.mail.server>
+    </properties>
+
     <profiles>
 
         <!--
