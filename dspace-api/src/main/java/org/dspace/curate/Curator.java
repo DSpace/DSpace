@@ -20,9 +20,11 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.ItemIterator;
+import org.dspace.content.Site;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
+import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
 
 /**
@@ -53,6 +55,8 @@ public class Curator
 
     private static Logger log = Logger.getLogger(Curator.class);
     
+    private static final ThreadLocal<Integer> performer = new ThreadLocal<Integer>();
+    
     private Map<String, TaskRunner> trMap = new HashMap<String, TaskRunner>();
     private List<String> perfList = new ArrayList<String>();
     private TaskQueue taskQ = null;
@@ -75,7 +79,7 @@ public class Curator
      */
     public Curator addTask(String taskName)
     {
-        CurationTask task = (CurationTask)PluginManager.getNamedPlugin("curate", CurationTask.class, taskName);
+        CurationTask task = TaskResolver.resolveTask(taskName);
         if (task != null)
         {
             try
@@ -160,11 +164,17 @@ public class Curator
     {
         if (id == null)
         {
-           log.error("curate - null id");
-           return;            
+           throw new IOException("Cannot perform curation task(s) on a null object identifier!");            
         }
         try
         {
+            //Save the currently authenticated user's ID to the current Task thread
+            //(Allows individual tasks to retrieve current user info via currentPerformer() method)
+            if(c.getCurrentUser()!=null)
+            {    
+                performer.set(Integer.valueOf(c.getCurrentUser().getID()));
+            }
+           
             DSpaceObject dso = HandleManager.resolveToObject(c, id);
             if (dso != null)
             {
@@ -182,10 +192,20 @@ public class Curator
         {
             throw new IOException(sqlE.getMessage(), sqlE);
         }
+        finally
+        {
+            performer.remove();
+        }
     }
 
     /**
      * Performs all configured tasks upon DSpace object 
+     * (Community, Collection or Item).
+     * <P>
+     * Note: Site-wide tasks will default to running as
+     * an Anonymous User unless you call the Site-wide task
+     * via the 'curate(Context,String)' method with an 
+     * authenticated Context object.
      * 
      * @param dso the DSpace object
      * @throws IOException
@@ -214,6 +234,10 @@ public class Curator
             {
                 doCommunity(tr, (Community)dso);
             }  
+            else if (type == Constants.SITE)
+            {
+                doSite(tr, (Site) dso);    
+            }
         }
     }
     
@@ -307,6 +331,60 @@ public class Curator
     }
 
     /**
+     * Returns the Eperson ID of the Context currently in use in performing a task,
+     * if known, else <code>null</code>. 
+     * <P>
+     * In many circumstances, this value will be null: 
+     * when the curator is not in the perform method, when curation
+     * is invoked with a DSO (the context is 'hidden'). 
+     * <P>
+     * The primary intended use for this method is to ensure individual tasks,
+     * which may need to create a new Context, can also properly initialize that
+     * Context with an EPerson ID (to ensure proper access rights exist in that Context).
+     * <P>
+     * Current performer information is also used when executing Site-Wide tasks 
+     * (see Curator.doSite() method).
+     */
+    public static Integer currentPerformer()
+    {
+    	return performer.get();
+    }
+    
+    /**
+     * Returns a Context object which is "authenticated" as the current
+     * EPerson performer (see 'currentPerformer()' method). This is primarily a 
+     * utility method to allow tasks access to an authenticated Context when 
+     * necessary.
+     * <P>
+     * If the 'currentPerformer()' is null or not set, then this just returns
+     * a brand new Context object representing an Anonymous User.
+     * 
+     * @return authenticated Context object (or anonymous Context if currentPerformer() is null)
+     */
+    public static Context authenticatedContext()
+            throws SQLException
+    {
+    	//Create a new context
+        Context ctx = new Context();
+        
+        Integer epersonID = currentPerformer();
+            
+        //If a Curator 'performer' ID is set
+        if(epersonID!=null)
+        {    
+            //parse the performer's User ID & set as the currently authenticated user in Context
+            EPerson autenticatedUser = EPerson.find(ctx, epersonID.intValue());
+            ctx.setCurrentUser(autenticatedUser);
+        }
+        else
+        {
+            //otherwise, no-op. This is the equivalent of an ANONYMOUS USER Context
+        }
+        
+        return ctx;
+    }
+
+    /**
      * Returns whether a given DSO is a 'container' - collection or community
      * @param dso a DSpace object
      * @return true if a container, false otherwise
@@ -317,6 +395,63 @@ public class Curator
                 dso.getType() == Constants.COLLECTION);
     }
 
+    /**
+     * Run task for entire Site (including all Communities, Collections & Items)
+     * @param tr TaskRunner
+     * @param site DSpace Site object
+     * @return true if successful, false otherwise
+     * @throws IOException 
+     */
+    private boolean doSite(TaskRunner tr, Site site) throws IOException
+    {
+        Context ctx = null;
+        try
+        {
+            // Site-wide Tasks really should have an EPerson performer associated with them,
+            // otherwise they are run as an "anonymous" user with limited access rights.
+            if(Curator.currentPerformer()==null)
+            {
+                log.warn("You are running one or more Site-Wide curation tasks in ANONYMOUS USER mode," +
+                         " as there is no EPerson 'performer' associated with this task. To associate an EPerson 'performer' " +
+                         " you should ensure tasks are called via the Curator.curate(Context, ID) method.");
+            }
+            else
+            {
+                // Create a new Context for this Sitewide task, authenticated as the current task performer.
+                ctx = Curator.authenticatedContext();
+            }
+            
+            //Run task for the Site object itself
+            if (! tr.run(site))
+            {
+                return false;
+            }
+            
+            //Then, perform this task for all Top-Level Communities in the Site
+            // (this will recursively perform task for all objects in DSpace)
+            for (Community subcomm : Community.findAllTop(ctx))
+            {
+                if (! doCommunity(tr, subcomm))
+                {
+                    return false;
+                }
+            }
+            
+            //complete & close our created Context
+            ctx.complete();
+        }
+        catch (SQLException sqlE)
+        {
+            //abort Context & all changes
+            if(ctx!=null)
+                ctx.abort();
+            
+            throw new IOException(sqlE);
+        }
+
+        return true;
+    }
+    
     /**
      * Run task for Community along with all sub-communities and collections.
      * @param tr TaskRunner
@@ -410,7 +545,8 @@ public class Curator
                     throw new IOException("DSpaceObject is null");
                 }
                 statusCode = task.perform(dso);
-                log.info(logMessage(dso.getHandle()));
+                String id = (dso.getHandle() != null) ? dso.getHandle() : "workflow item: " + dso.getID();
+                log.info(logMessage(id));
 
                 return ! suspend(statusCode);
             }
