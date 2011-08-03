@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.dspace.kernel.config.SpringLoader;
 import org.dspace.servicemanager.DSpaceServiceManager;
 import org.dspace.servicemanager.ServiceManagerSystem;
 import org.dspace.servicemanager.config.DSpaceConfigurationService;
@@ -83,7 +84,6 @@ public final class SpringServiceManager implements ServiceManagerSystem {
     public static final String configPath = "spring/spring-dspace-applicationContext.xml";
     public static final String coreResourcePath = "classpath*:spring/spring-dspace-core-services.xml";
     public static final String addonResourcePath = "classpath*:spring/spring-dspace-addon-*-services.xml";
-    public static final String localResourcePath = "/config/spring/*.xml";
 
     @SuppressWarnings("unchecked")
     public <T> T getServiceByName(String name, Class<T> type) {
@@ -178,10 +178,22 @@ public final class SpringServiceManager implements ServiceManagerSystem {
         if(testMode){
             log.warn("TEST Spring Service Manager running in test mode, no dspace home spring files will be loaded");
         } else {
-            //Add the dspace home dir config so that local files can override classpath spring files
-            String dspaceHome = configurationService.getProperty("dspace.dir");
-            if(dspaceHome != null){
-                pathList.add("file:" + dspaceHome + localResourcePath);
+            //Retrieve all our spring file locations depending on the deployed module
+            String springLoaderClassName;
+            int index = 1;
+            while((springLoaderClassName = configurationService.getProperty("spring.springloader.modules." + index)) != null){
+                try {
+                    Class<SpringLoader> springLoaderClass = (Class<SpringLoader>) Class.forName(springLoaderClassName);
+                    String[] resourcePaths = springLoaderClass.getConstructor().newInstance().getResourcePaths(configurationService);
+                    if(resourcePaths != null){
+                        pathList.addAll(Arrays.asList(resourcePaths));
+                    }
+                } catch (ClassNotFoundException e) {
+                    //Ignore this exception, if we get one this just means that this module isn't loaded
+                } catch (Exception e) {
+                    log.error("Error while retrieving spring resource paths for module: " + springLoaderClassName, e);
+                }
+                index++;
             }
         }
         String[] allPaths = pathList.toArray(new String[pathList.size()]);
