@@ -59,7 +59,7 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
 	private static final Message T_no_bundles = message("xmlui.administrative.item.AddBitstreamForm.no_bundles");
 
 	
-	private static final String DEFAULT_BUNDLE_LIST = "ORIGINAL, METADATA, THUMBNAIL, LICENSE, CC_LICENSE";
+	private static final String DEFAULT_BUNDLE_LIST = "ORIGINAL, METADATA, THUMBNAIL, LICENSE, CC-LICENSE";
 		
 	public void addPageMeta(PageMeta pageMeta) throws WingException
 	{
