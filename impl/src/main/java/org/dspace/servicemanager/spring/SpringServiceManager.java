@@ -179,21 +179,21 @@ public final class SpringServiceManager implements ServiceManagerSystem {
             log.warn("TEST Spring Service Manager running in test mode, no dspace home spring files will be loaded");
         } else {
             //Retrieve all our spring file locations depending on the deployed module
-            String springLoaderClassName;
-            int index = 1;
-            while((springLoaderClassName = configurationService.getProperty("spring.springloader.modules." + index)) != null){
-                try {
-                    Class<SpringLoader> springLoaderClass = (Class<SpringLoader>) Class.forName(springLoaderClassName);
-                    String[] resourcePaths = springLoaderClass.getConstructor().newInstance().getResourcePaths(configurationService);
-                    if(resourcePaths != null){
-                        pathList.addAll(Arrays.asList(resourcePaths));
+            String[] springLoaderClassNames = configurationService.getPropertyAsType("spring.springloader.modules", new String[0]);
+            if(springLoaderClassNames != null){
+                for(String springLoaderClassName : springLoaderClassNames){
+                    try {
+                        Class<SpringLoader> springLoaderClass = (Class<SpringLoader>) Class.forName(springLoaderClassName.trim());
+                        String[] resourcePaths = springLoaderClass.getConstructor().newInstance().getResourcePaths(configurationService);
+                        if(resourcePaths != null){
+                            pathList.addAll(Arrays.asList(resourcePaths));
+                        }
+                    } catch (ClassNotFoundException e) {
+                        //Ignore this exception, if we get one this just means that this module isn't loaded
+                    } catch (Exception e) {
+                        log.error("Error while retrieving spring resource paths for module: " + springLoaderClassName, e);
                     }
-                } catch (ClassNotFoundException e) {
-                    //Ignore this exception, if we get one this just means that this module isn't loaded
-                } catch (Exception e) {
-                    log.error("Error while retrieving spring resource paths for module: " + springLoaderClassName, e);
                 }
-                index++;
             }
         }
         String[] allPaths = pathList.toArray(new String[pathList.size()]);
