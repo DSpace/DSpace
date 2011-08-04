@@ -272,6 +272,11 @@
             <artifactId>contiperf</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.rometools</groupId>
+            <artifactId>rome-modules</artifactId>
+            <version>1.0</version>
+        </dependency>
     </dependencies>
 
 </project>
