@@ -217,7 +217,7 @@ public class XmlWorkflowItem implements InProgressSubmission {
         TableRowIterator tri = DatabaseManager.queryTable(c, "xmlwf_workflowitem",
                 "SELECT * FROM xmlwf_workflowitem, xmlwf_claimtask, xmlwf_pooltask " +
                         "WHERE (xmlwf_workflowitem.workflowitem_id=xmlwf_claimtask.workflowitem_id AND xmlwf_claimtask="+step_id+") " +
-                        "OR (xmlwf_workflowitem.workflowitem_id=xmlwf_pooltask.workflowitem_idAND xmlwf_pooltask=Ê"+step_id+") LIMIT "+pagesize+" OFFSET "+ ((page-1)*pagesize));
+                        "OR (xmlwf_workflowitem.workflowitem_id=xmlwf_pooltask.workflowitem_id AND xmlwf_pooltask="+step_id+") LIMIT "+pagesize+" OFFSET "+ ((page-1)*pagesize));
 
         try
         {
