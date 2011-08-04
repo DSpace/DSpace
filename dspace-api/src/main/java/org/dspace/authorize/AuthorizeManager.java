@@ -802,6 +802,27 @@ public class AuthorizeManager
     }
 
     /**
+     * Removes all policies from an eperson for a particular object that belong to
+     * an EPerson. FIXME doesn't check authorization
+     *
+     * @param c
+     *            current context
+     * @param o
+     *            the object
+     * @param e
+     *            the eperson
+     * @throws java.sql.SQLException
+     *             if there's a database problem
+     */
+    public static void removeEPersonPolicies(Context c, DSpaceObject o, EPerson e)
+            throws SQLException
+    {
+        DatabaseManager.updateQuery(c, "DELETE FROM resourcepolicy WHERE "
+                + "resource_type_id= ? AND resource_id= ? AND eperson_id= ? ",
+                o.getType(), o.getID(), e.getID());
+    }
+
+    /**
      * Returns all groups authorized to perform an action on an object. Returns
      * empty array if no matches.
      * 

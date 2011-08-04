@@ -17,12 +17,14 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.log4j.Logger;
 
 import org.dspace.app.util.SubmissionInfo;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.workflow.WorkflowManager;
+import org.dspace.xmlworkflow.XmlWorkflowManager;
 
 /**
  * This is the class which defines what happens once a submission completes!
@@ -83,8 +85,16 @@ public class CompleteStep extends AbstractProcessingStep
         boolean success = false;
         try
         {
-        WorkflowManager.start(context, (WorkspaceItem) subInfo
-                .getSubmissionItem());
+            if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
+                try{
+                    XmlWorkflowManager.start(context, (WorkspaceItem) subInfo.getSubmissionItem());
+                }catch (Exception e){
+                    log.error(LogManager.getHeader(context, "Error while starting xml workflow", "Item id: " + subInfo.getSubmissionItem().getItem().getID()), e);
+                    throw new ServletException(e);
+                }
+            }else{
+                WorkflowManager.start(context, (WorkspaceItem) subInfo.getSubmissionItem());
+            }
             success = true;
         }
         catch (Exception e)

@@ -33,13 +33,14 @@ import org.dspace.content.InstallItem;
 import org.dspace.content.Item;
 import org.dspace.content.Site;
 import org.dspace.content.WorkspaceItem;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
 import org.dspace.handle.HandleManager;
 import org.dspace.license.CreativeCommons;
-import org.dspace.workflow.WorkflowItem;
 import org.dspace.workflow.WorkflowManager;
+import org.dspace.xmlworkflow.XmlWorkflowManager;
 
 /**
  * Container class for code that is useful to many packagers.
@@ -501,8 +502,7 @@ public class PackageUtils
      * @throws AuthorizeException
      */
     public static Item finishCreateItem(Context context, WorkspaceItem wsi, String handle, PackageParameters params)
-            throws IOException, SQLException, AuthorizeException
-    {
+            throws IOException, SQLException, AuthorizeException {
         // if we are restoring/replacing existing object using the package
         if (params.restoreModeEnabled())
         {
@@ -518,10 +518,16 @@ public class PackageUtils
         {
             // Start an item workflow
             // (NOTICE: The specified handle is ignored, as Workflows *always* end in a new handle being assigned)
-            WorkflowItem wfi = WorkflowManager.startWithoutNotify(context, wsi);
-
-            // return item with workflow started
-            return wfi.getItem();
+            if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow")) {
+                try {
+                    return XmlWorkflowManager.startWithoutNotify(context, wsi).getItem();
+                } catch (Exception e) {
+                    log.error(e.getMessage(), e);
+                    return null;
+                }
+            } else {
+                return WorkflowManager.startWithoutNotify(context, wsi).getItem();
+            }
         }
 
         // default: skip workflow, but otherwise normal submission (i.e. package treated like a SIP)

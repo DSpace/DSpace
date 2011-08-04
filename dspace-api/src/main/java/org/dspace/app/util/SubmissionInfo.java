@@ -22,6 +22,7 @@ import org.dspace.content.InProgressSubmission;
 
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.workflow.WorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * Information about an item being editing with the submission UI
@@ -144,7 +145,7 @@ public class SubmissionInfo
      */
     public boolean isInWorkflow()
     {
-        return ((this.submissionItem != null) && this.submissionItem instanceof WorkflowItem);
+        return ((this.submissionItem != null) && (this.submissionItem instanceof WorkflowItem || this.submissionItem instanceof XmlWorkflowItem));
     }
 
     /**

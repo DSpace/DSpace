@@ -39,6 +39,8 @@ import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
 import org.dspace.workflow.WorkflowItem;
+import org.dspace.xmlworkflow.storedcomponents.CollectionRole;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 
 /**
  * Class representing a collection.
@@ -1121,25 +1123,38 @@ public class Collection extends DSpaceObject
         // Remove all authorization policies
         AuthorizeManager.removeAllPolicies(ourContext, this);
 
-        // Remove any WorkflowItems
-        WorkflowItem[] wfarray = WorkflowItem
-                .findByCollection(ourContext, this);
+        if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
+            // Remove any xml_WorkflowItems
+            XmlWorkflowItem[] xmlWfarray = XmlWorkflowItem
+                    .findByCollection(ourContext, this);
 
-        for (int x = 0; x < wfarray.length; x++)
-        {
-            // remove the workflowitem first, then the item
-            Item myItem = wfarray[x].getItem();
-            wfarray[x].deleteWrapper();
-            myItem.delete();
+            for (XmlWorkflowItem aXmlWfarray : xmlWfarray) {
+                // remove the workflowitem first, then the item
+                Item myItem = aXmlWfarray.getItem();
+                aXmlWfarray.deleteWrapper();
+                myItem.delete();
+            }
+        }else{
+            // Remove any WorkflowItems
+            WorkflowItem[] wfarray = WorkflowItem
+                    .findByCollection(ourContext, this);
+
+            for (WorkflowItem aWfarray : wfarray) {
+                // remove the workflowitem first, then the item
+                Item myItem = aWfarray.getItem();
+                aWfarray.deleteWrapper();
+                myItem.delete();
+            }
         }
+
+
 
         // Remove any WorkspaceItems
         WorkspaceItem[] wsarray = WorkspaceItem.findByCollection(ourContext,
                 this);
 
-        for (int x = 0; x < wsarray.length; x++)
-        {
-            wsarray[x].deleteAll();
+        for (WorkspaceItem aWsarray : wsarray) {
+            aWsarray.deleteAll();
         }
 
         //  get rid of the content count cache if it exists
@@ -1157,7 +1172,14 @@ public class Collection extends DSpaceObject
 
         // Remove any Handle
         HandleManager.unbindHandle(ourContext, this);
-        
+
+        if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
+            // delete all CollectionRoles for this Collection
+            for (CollectionRole collectionRole : CollectionRole.findByCollection(ourContext, this.getID())) {
+                collectionRole.delete();
+            }
+        }
+
         // Delete collection row
         DatabaseManager.delete(ourContext, collectionRow);
 

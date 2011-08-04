@@ -18,6 +18,9 @@ importClass(Packages.org.dspace.harvest.HarvestedCollection);
 importClass(Packages.org.dspace.eperson.EPerson);
 importClass(Packages.org.dspace.eperson.Group);
 
+importClass(Packages.org.dspace.xmlworkflow.WorkflowFactory);
+importClass(Packages.java.util.Set);
+
 importClass(Packages.org.dspace.app.xmlui.utils.FlowscriptUtils);
 importClass(Packages.org.dspace.app.xmlui.utils.ContextUtil);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowEPersonUtils);
@@ -30,6 +33,7 @@ importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowContainerUti
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowCurationUtils);
 importClass(Packages.org.dspace.app.xmlui.aspect.administrative.FlowMetadataImportUtils);
 importClass(Packages.java.lang.System);
+importClass(Packages.org.dspace.core.ConfigurationManager);
 
 /**
  * Simple access method to access the current cocoon object model.
@@ -2398,11 +2402,62 @@ function doEditCollectionMetadata(collectionID)
  * Returns to the EditCollection page and selected tab if this is a simple navigation,
  * not a submit.
  */
+function setXMLWorkflowRoles(workflow, collectionID, result) {
+    var roles = workflow.getRoles().keySet().toArray();
+    for (var i = 0; i < roles.length; i++) {
+        if (cocoon.request.get("submit_delete_wf_role_" + roles[i])) {
+            assertAdminCollection(collectionID);
+            result = doDeleteCollectionRole(collectionID, roles[i]);
+        }
+        if (cocoon.request.get("submit_edit_wf_role_" + roles[i])) {
+            assertEditCollection(collectionID);
+            var groupID = FlowContainerUtils.getCollectionRole(getDSContext(), collectionID, roles[i]);
+            result = doEditGroup(groupID);
+        }
+        if (cocoon.request.get("submit_create_wf_role_" + roles[i])) {
+            assertEditCollection(collectionID);
+            var groupID = FlowContainerUtils.getCollectionRole(getDSContext(), collectionID, roles[i]);
+            result = doEditGroup(groupID);
+        }
+    }
+    return result;
+}
+function setOriginalWorkflowRoles(collectionID, result) {
+    // WORKFLOW STEPS 1-3
+    if (cocoon.request.get("submit_edit_wf_step1") || cocoon.request.get("submit_create_wf_step1")) {
+        assertEditCollection(collectionID);
+        var groupID = FlowContainerUtils.getCollectionRole(getDSContext(), collectionID, "WF_STEP1");
+        result = doEditGroup(groupID);
+    }
+    else if (cocoon.request.get("submit_delete_wf_step1")) {
+        result = doDeleteCollectionRole(collectionID, "WF_STEP1");
+    }
+
+    else if (cocoon.request.get("submit_edit_wf_step2") || cocoon.request.get("submit_create_wf_step2")) {
+        assertEditCollection(collectionID);
+        var groupID = FlowContainerUtils.getCollectionRole(getDSContext(), collectionID, "WF_STEP2");
+        result = doEditGroup(groupID);
+    }
+    else if (cocoon.request.get("submit_delete_wf_step2")) {
+        result = doDeleteCollectionRole(collectionID, "WF_STEP2");
+    }
+
+    else if (cocoon.request.get("submit_edit_wf_step3") || cocoon.request.get("submit_create_wf_step3")) {
+        assertEditCollection(collectionID);
+        var groupID = FlowContainerUtils.getCollectionRole(getDSContext(), collectionID, "WF_STEP3");
+        result = doEditGroup(groupID);
+    }
+    else if (cocoon.request.get("submit_delete_wf_step3")) {
+        result = doDeleteCollectionRole(collectionID, "WF_STEP3");
+    }
+    return result;
+}
 function doAssignCollectionRoles(collectionID)
 {
 	assertEditCollection(collectionID);
 
 	var result;
+	var workflow = null;
 
 	do {
 		sendPageAndWait("admin/collection/assignRoles",{"collectionID":collectionID},result);
@@ -2414,6 +2469,7 @@ function doAssignCollectionRoles(collectionID)
 			cocoon.request.get("submit_roles") || cocoon.request.get("submit_harvesting") ||
                         cocoon.request.get("submit_curate"))
 		{
+			// return to the editCollection function which will determine where to go next.
 			return null;
 		}
 
@@ -2433,40 +2489,6 @@ function doAssignCollectionRoles(collectionID)
 		}
 		else if (cocoon.request.get("submit_delete_admin")) {
 			result = doDeleteCollectionRole(collectionID, "ADMIN");
-		}
-
-		// WORKFLOW STEPS 1-3
-		else if (cocoon.request.get("submit_edit_wf_step1") || cocoon.request.get("submit_create_wf_step1"))
-		{
-			assertEditCollection(collectionID);
-			var groupID = FlowContainerUtils.getCollectionRole(getDSContext(),collectionID, "WF_STEP1");
-			result = doEditGroup(groupID);
-		}
-		else if (cocoon.request.get("submit_delete_wf_step1"))
-		{
-			result = doDeleteCollectionRole(collectionID, "WF_STEP1");
-		}
-
-		else if (cocoon.request.get("submit_edit_wf_step2") || cocoon.request.get("submit_create_wf_step2"))
-		{
-			assertEditCollection(collectionID);
-			var groupID = FlowContainerUtils.getCollectionRole(getDSContext(),collectionID, "WF_STEP2");
-			result = doEditGroup(groupID);
-		}
-		else if (cocoon.request.get("submit_delete_wf_step2"))
-		{
-			result = doDeleteCollectionRole(collectionID, "WF_STEP2");
-		}
-
-		else if (cocoon.request.get("submit_edit_wf_step3") || cocoon.request.get("submit_create_wf_step3"))
-		{
-			assertEditCollection(collectionID);
-			var groupID = FlowContainerUtils.getCollectionRole(getDSContext(),collectionID, "WF_STEP3");
-			result = doEditGroup(groupID);
-		}
-		else if (cocoon.request.get("submit_delete_wf_step3"))
-		{
-			result = doDeleteCollectionRole(collectionID, "WF_STEP3");
 		}
 
 		// SUBMIT
@@ -2498,7 +2520,17 @@ function doAssignCollectionRoles(collectionID)
 		else if (cocoon.request.get("submit_delete_default_read"))
 		{
 			result = doDeleteCollectionRole(collectionID, "DEFAULT_READ");
-		}
+		}else{
+            if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
+                if(workflow == null){
+                    var collection = Collection.find(getDSContext(),collectionID);
+                    workflow = WorkflowFactory.getWorkflow(collection);
+                }
+                result = setXMLWorkflowRoles(workflow, collectionID, result);
+            }else{
+                result = setOriginalWorkflowRoles(collectionID, result);
+		    }
+        }
 
 	}while(true);
 }
@@ -2897,6 +2929,7 @@ function doAssignCommunityRoles(communityID)
 
 		   if (cocoon.request.get("submit_return") || cocoon.request.get("submit_metadata") || cocoon.request.get("submit_roles") || cocoon.request.get("submit_curate") )
 		   {
+			   // return to the editCommunity function which will determine where to go next.
 			   return null;
 		   }
 		   else if (cocoon.request.get("submit_authorizations"))

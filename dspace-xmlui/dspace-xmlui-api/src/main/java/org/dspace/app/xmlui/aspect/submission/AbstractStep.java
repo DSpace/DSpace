@@ -171,9 +171,14 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
 			
 			//load in-progress submission
 			if (this.id != null)
-            {    
-                this.submissionInfo = FlowUtils.obtainSubmissionInfo(objectModel, this.id);
-				this.submission = submissionInfo.getSubmissionItem();
+            {
+                try {
+                    this.submissionInfo = FlowUtils.obtainSubmissionInfo(objectModel, this.id);
+                } catch (AuthorizeException e) {
+                    log.error(e.getMessage(), e);
+                    throw new ProcessingException(e);
+                }
+                this.submission = submissionInfo.getSubmissionItem();
             }
 			
 			// Check required error conditions

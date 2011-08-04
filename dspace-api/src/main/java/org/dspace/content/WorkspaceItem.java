@@ -16,6 +16,7 @@ import org.apache.commons.lang.builder.HashCodeBuilder;
 import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
@@ -154,73 +155,83 @@ public class WorkspaceItem implements InProgressSubmission
         // read permission
         AuthorizeManager.addPolicy(c, i, Constants.READ, e);
 
-        if (step1group != null)
-        {
-            AuthorizeManager.addPolicy(c, i, Constants.READ, step1group);
+
+        if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("originalworkflow")) {
+            if (step1group != null)
+            {
+                AuthorizeManager.addPolicy(c, i, Constants.READ, step1group);
+            }
+
+            if (step2group != null)
+            {
+                AuthorizeManager.addPolicy(c, i, Constants.READ, step2group);
+            }
+
+            if (step3group != null)
+            {
+                AuthorizeManager.addPolicy(c, i, Constants.READ, step3group);
+            }
         }
 
-        if (step2group != null)
-        {
-            AuthorizeManager.addPolicy(c, i, Constants.READ, step2group);
-        }
-
-        if (step3group != null)
-        {
-            AuthorizeManager.addPolicy(c, i, Constants.READ, step3group);
-        }
 
         // write permission
         AuthorizeManager.addPolicy(c, i, Constants.WRITE, e);
 
-        if (step1group != null)
-        {
-            AuthorizeManager.addPolicy(c, i, Constants.WRITE, step1group);
-        }
+        if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("originalworkflow")) {
+            if (step1group != null)
+            {
+                AuthorizeManager.addPolicy(c, i, Constants.WRITE, step1group);
+            }
 
-        if (step2group != null)
-        {
-            AuthorizeManager.addPolicy(c, i, Constants.WRITE, step2group);
-        }
+            if (step2group != null)
+            {
+                AuthorizeManager.addPolicy(c, i, Constants.WRITE, step2group);
+            }
 
-        if (step3group != null)
-        {
-            AuthorizeManager.addPolicy(c, i, Constants.WRITE, step3group);
+            if (step3group != null)
+            {
+                AuthorizeManager.addPolicy(c, i, Constants.WRITE, step3group);
+            }
         }
 
         // add permission
         AuthorizeManager.addPolicy(c, i, Constants.ADD, e);
 
-        if (step1group != null)
-        {
-            AuthorizeManager.addPolicy(c, i, Constants.ADD, step1group);
-        }
+        if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("originalworkflow")) {
+            if (step1group != null)
+            {
+                AuthorizeManager.addPolicy(c, i, Constants.ADD, step1group);
+            }
 
-        if (step2group != null)
-        {
-            AuthorizeManager.addPolicy(c, i, Constants.ADD, step2group);
-        }
+            if (step2group != null)
+            {
+                AuthorizeManager.addPolicy(c, i, Constants.ADD, step2group);
+            }
 
-        if (step3group != null)
-        {
-            AuthorizeManager.addPolicy(c, i, Constants.ADD, step3group);
+            if (step3group != null)
+            {
+                AuthorizeManager.addPolicy(c, i, Constants.ADD, step3group);
+            }
         }
 
         // remove contents permission
         AuthorizeManager.addPolicy(c, i, Constants.REMOVE, e);
 
-        if (step1group != null)
-        {
-            AuthorizeManager.addPolicy(c, i, Constants.REMOVE, step1group);
-        }
+        if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("originalworkflow")) {
+            if (step1group != null)
+            {
+                AuthorizeManager.addPolicy(c, i, Constants.REMOVE, step1group);
+            }
 
-        if (step2group != null)
-        {
-            AuthorizeManager.addPolicy(c, i, Constants.REMOVE, step2group);
-        }
+            if (step2group != null)
+            {
+                AuthorizeManager.addPolicy(c, i, Constants.REMOVE, step2group);
+            }
 
-        if (step3group != null)
-        {
-            AuthorizeManager.addPolicy(c, i, Constants.REMOVE, step3group);
+            if (step3group != null)
+            {
+                AuthorizeManager.addPolicy(c, i, Constants.REMOVE, step3group);
+            }
         }
 
         // Copy template if appropriate

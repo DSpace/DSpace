@@ -7,8 +7,11 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.collection;
 
+import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
 
+import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
 import org.dspace.app.xmlui.aspect.administrative.FlowContainerUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -26,7 +29,12 @@ import org.dspace.app.xmlui.wing.element.Table;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Collection;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.LogManager;
 import org.dspace.eperson.Group;
+import org.dspace.xmlworkflow.Role;
+import org.dspace.xmlworkflow.WorkflowConfigurationException;
+import org.dspace.xmlworkflow.WorkflowUtils;
 
 /**
  * Presents the user (most likely a global administrator) with the form to edit
@@ -85,6 +93,8 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 	private static final Message T_not_allowed = message("xmlui.administrative.collection.AssignCollectionRoles.not_allowed");
 
 	
+    private static Logger log = Logger.getLogger(AssignCollectionRoles.class);
+
 	public void addPageMeta(PageMeta pageMeta) throws WingException
     {
         pageMeta.addMetadata("title").addContent(T_title);
@@ -101,11 +111,17 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 		String baseURL = contextPath + "/admin/collection?administrative-continue=" + knot.getId();
 		
 		Group admins = thisCollection.getAdministrators();
-		Group wfStep1 = thisCollection.getWorkflowGroup(1);
-		Group wfStep2 = thisCollection.getWorkflowGroup(2);
-		Group wfStep3 = thisCollection.getWorkflowGroup(3);
 		Group submitters = thisCollection.getSubmitters();
 
+        HashMap<String, Role> roles = null;
+
+        try {
+            roles = WorkflowUtils.getCollectionRoles(thisCollection);
+        } catch (WorkflowConfigurationException e) {
+            log.error(LogManager.getHeader(context, "error while getting collection roles", "Collection id: " + thisCollection.getID()));
+        } catch (IOException e) {
+            log.error(LogManager.getHeader(context, "error while getting collection roles", "Collection id: " + thisCollection.getID()));
+        }
 		Group defaultRead = null;
 		int defaultReadID = FlowContainerUtils.getCollectionDefaultRead(context, collectionID);
 		if (defaultReadID >= 0)
@@ -180,13 +196,100 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
 	    tableRow.addCell();
 	    tableRow.addCell(1,2).addHighlight("fade offset").addContent(T_help_admins);
 	    
-	    
-	    /* 
-	     * Workflow steps 1-3 
+	    /*
+	     * The collection submitters
+	     */
+	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
+	    tableRow.addCell(Cell.ROLE_HEADER).addContent(T_label_submitters);
+	    try
+	    {
+	        AuthorizeUtil.authorizeManageSubmittersGroup(context, thisCollection);
+    	    if (submitters != null)
+    	    {
+    	    	tableRow.addCell().addXref(baseURL + "&submit_edit_submit", submitters.getName());
+                tableRow.addCell().addButton("submit_delete_submit").setValue(T_delete);
+    	    }
+    	    else
+    	    {
+    	    	tableRow.addCell().addContent(T_no_role);
+                tableRow.addCell().addButton("submit_create_submit").setValue(T_create);
+    	    }
+	    }
+	    catch (AuthorizeException authex)
+	    {
+	        tableRow.addCell().addContent(T_not_allowed);
+	    }
+	    // help and directions row
+	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
+	    tableRow.addCell();
+	    tableRow.addCell(1,2).addHighlight("fade offset").addContent(T_help_submitters);
+
+
+	    /*
+	     * The collection's default read authorizations
+	     */
+	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
+	    tableRow.addCell(Cell.ROLE_HEADER).addContent(T_label_default_read);
+	    if (defaultRead == null)
+	    {
+	    	// Custome reading permissions, we can't handle it, just provide a link to the
+	    	// authorizations manager.
+	    	tableRow.addCell(1,2).addContent(T_default_read_custom);
+	    }
+	    else if (defaultRead.getID() == 0) {
+	    	// Anonymous reading
+	    	tableRow.addCell().addContent(T_default_read_anonymous);
+	    	addAdministratorOnlyButton(tableRow.addCell(),"submit_create_default_read",T_restrict);
+	    }
+	    else
+	    {
+	    	// A specific group is dedicated to reading.
+	    	tableRow.addCell().addXref(baseURL + "&submit_edit_default_read", defaultRead.getName());
+		    addAdministratorOnlyButton(tableRow.addCell(),"submit_delete_default_read",T_delete);
+	    }
+
+        // help and directions row
+        tableRow = rolesTable.addRow(Row.ROLE_DATA);
+        tableRow.addCell();
+        tableRow.addCell(1,2).addHighlight("fade offset").addContent(T_help_default_read);
+
+
+         if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){
+             addXMLWorkflowRoles(thisCollection, baseURL, roles, rolesTable);
+         }else{
+             addOriginalWorkflowRoles(thisCollection, baseURL, rolesTable);
+         }
+
+	    try
+	    {
+	        AuthorizeUtil.authorizeManageCollectionPolicy(context, thisCollection);
+		    // add one last link to edit the raw authorizations
+		    Cell authCell =rolesTable.addRow().addCell(1,3);
+		    authCell.addXref(baseURL + "&submit_authorizations", T_edit_authorization);
+	    }
+	    catch (AuthorizeException authex) {
+            // nothing to add, the user is not authorized to edit collection's policies
+        }
+
+	    Para buttonList = main.addPara();
+	    buttonList.addButton("submit_return").setValue(T_submit_return);
+
+
+
+    	main.addHidden("administrative-continue").setValue(knot.getId());
+
+    }
+
+    private void addOriginalWorkflowRoles(Collection thisCollection, String baseURL, Table rolesTable) throws SQLException, WingException {
+        Row tableRow;/*
+	     * Workflow steps 1-3
 	     */
 	    // data row
 	    try
         {
+            Group wfStep1 = thisCollection.getWorkflowGroup(1);
+            Group wfStep2 = thisCollection.getWorkflowGroup(2);
+            Group wfStep3 = thisCollection.getWorkflowGroup(3);
             AuthorizeUtil.authorizeManageWorkflowsGroup(context, thisCollection);
     	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
     	    tableRow.addCell(Cell.ROLE_HEADER).addContent(T_label_wf_step1);
@@ -249,86 +352,40 @@ public class AssignCollectionRoles extends AbstractDSpaceTransformer
             tableRow.addCell(Cell.ROLE_HEADER).addContent(T_label_wf);
             tableRow.addCell().addContent(T_not_allowed);
         }
-	    	
-	    /*
-	     * The collection submitters 
-	     */
-	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
-	    tableRow.addCell(Cell.ROLE_HEADER).addContent(T_label_submitters);
-	    try
-	    {
-	        AuthorizeUtil.authorizeManageSubmittersGroup(context, thisCollection);
-    	    if (submitters != null) 
-    	    {
-    	    	tableRow.addCell().addXref(baseURL + "&submit_edit_submit", submitters.getName());
-                tableRow.addCell().addButton("submit_delete_submit").setValue(T_delete);
-    	    }
-    	    else 
-    	    {
-    	    	tableRow.addCell().addContent(T_no_role);
-                tableRow.addCell().addButton("submit_create_submit").setValue(T_create);
-    	    }
-	    }
-	    catch (AuthorizeException authex)
-	    {
-	        tableRow.addCell().addContent(T_not_allowed);
-	    }
-	    // help and directions row
-	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
-	    tableRow.addCell();
-	    tableRow.addCell(1,2).addHighlight("fade offset").addContent(T_help_submitters);
-	    
-	    
-	    /* 
-	     * The collection's default read authorizations 
-	     */
-	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
-	    tableRow.addCell(Cell.ROLE_HEADER).addContent(T_label_default_read);
-	    if (defaultRead == null) 
-	    {
-	    	// Custome reading permissions, we can't handle it, just provide a link to the 
-	    	// authorizations manager.
-	    	tableRow.addCell(1,2).addContent(T_default_read_custom);
-	    }
-	    else if (defaultRead.getID() == 0) {
-	    	// Anonymous reading
-	    	tableRow.addCell().addContent(T_default_read_anonymous);
-	    	addAdministratorOnlyButton(tableRow.addCell(),"submit_create_default_read",T_restrict);
-	    }
-	    else 
-	    {
-	    	// A specific group is dedicated to reading.
-	    	tableRow.addCell().addXref(baseURL + "&submit_edit_default_read", defaultRead.getName());
-		    addAdministratorOnlyButton(tableRow.addCell(),"submit_delete_default_read",T_delete);
-	    }
-	 
-	    // help and directions row
-	    tableRow = rolesTable.addRow(Row.ROLE_DATA);
-	    tableRow.addCell();
-	    tableRow.addCell(1,2).addHighlight("fade offset").addContent(T_help_default_read);
-	    
-	    try
-	    {
-	        AuthorizeUtil.authorizeManageCollectionPolicy(context, thisCollection);
-		    // add one last link to edit the raw authorizations
-		    Cell authCell =rolesTable.addRow().addCell(1,3);
-		    authCell.addXref(baseURL + "&submit_authorizations", T_edit_authorization);
-	    }
-	    catch (AuthorizeException authex) {
-            // nothing to add, the user is not authorized to edit collection's policies
-        }
-
-	    Para buttonList = main.addPara();
-	    buttonList.addButton("submit_return").setValue(T_submit_return);
-	    
-	    
-	    
-    	main.addHidden("administrative-continue").setValue(knot.getId());
-    	
     }
-	
 
-	private void addAdministratorOnlyButton(Cell cell, String buttonName, Message buttonLabel) throws WingException, SQLException
+    private void addXMLWorkflowRoles(Collection thisCollection, String baseURL, HashMap<String, Role> roles, Table rolesTable) throws WingException, SQLException {
+        Row tableRow;
+        if(roles != null){
+            //ROLES: show group name instead of role name
+            for(String roleId: roles.keySet()){
+                Role role = roles.get(roleId);
+
+                if (role.getScope() == Role.Scope.COLLECTION) {
+                    tableRow = rolesTable.addRow(Row.ROLE_DATA);
+                    tableRow.addCell(Cell.ROLE_HEADER).addContent(role.getName());
+                    Group roleGroup = WorkflowUtils.getRoleGroup(context, thisCollection.getID(), role);
+                    if (roleGroup != null) {
+                        tableRow.addCell().addXref(baseURL + "&submit_edit_wf_role_" + roleId, roleGroup.getName());
+                        addAdministratorOnlyButton(tableRow.addCell(), "submit_delete_wf_role_" + roleId, T_delete);
+                    } else {
+                        tableRow.addCell().addContent(T_no_role);
+                        addAdministratorOnlyButton(tableRow.addCell(), "submit_create_wf_role_" + roleId, T_create);
+                    }
+                    // help and directions row
+                    tableRow = rolesTable.addRow(Row.ROLE_DATA);
+                    tableRow.addCell();
+                    if (role.getDescription() != null){
+                        tableRow.addCell(1,2).addHighlight("fade offset").addContent(role.getDescription());
+                    }
+
+                }
+            }
+        }
+    }
+
+
+    private void addAdministratorOnlyButton(Cell cell, String buttonName, Message buttonLabel) throws WingException, SQLException
 	{
     	Button button = cell.addButton(buttonName);
     	button.setValue(buttonLabel);

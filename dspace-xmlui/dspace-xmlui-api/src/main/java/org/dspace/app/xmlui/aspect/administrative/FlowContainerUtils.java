@@ -39,6 +39,9 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.curate.Curator;
 import org.dspace.eperson.Group;
+import org.dspace.xmlworkflow.Role;
+import org.dspace.xmlworkflow.WorkflowConfigurationException;
+import org.dspace.xmlworkflow.WorkflowUtils;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.xml.sax.SAXException;
@@ -423,68 +426,83 @@ public class FlowContainerUtils
 	 * @param roleName ADMIN, WF_STEP1,	WF_STEP2, WF_STEP3,	SUBMIT, DEFAULT_READ.
 	 * @return The id of the group associated with that particular role, or -1 if the role was not found.
 	 */
-	public static int getCollectionRole(Context context, int collectionID, String roleName) throws SQLException, AuthorizeException, IOException
-	{
+	public static int getCollectionRole(Context context, int collectionID, String roleName) throws SQLException, AuthorizeException, IOException, TransformerException, SAXException, WorkflowConfigurationException, ParserConfigurationException {
 		Collection collection = Collection.find(context, collectionID);
 		
 		// Determine the group based upon wich role we are looking for.
-		Group role = null;
+		Group roleGroup = null;
 		if (ROLE_ADMIN.equals(roleName))
 		{
-			role = collection.getAdministrators();
-			if (role == null)
-            {
-                role = collection.createAdministrators();
+			roleGroup = collection.getAdministrators();
+			if (roleGroup == null){
+				roleGroup = collection.createAdministrators();
             }
 		} 
 		else if (ROLE_SUBMIT.equals(roleName))
 		{
-			role = collection.getSubmitters();
-			if (role == null)
-            {
-                role = collection.createSubmitters();
+			roleGroup = collection.getSubmitters();
+			if (roleGroup == null)
+				roleGroup = collection.createSubmitters();
+		}else{
+            if(ConfigurationManager.getProperty("workflow","workflow.framework").equals("xmlworkflow")){//Resolve our id to a role
+                roleGroup = getXMLWorkflowRole(context, collectionID, roleName, collection, roleGroup);
+             }else{
+                roleGroup = getOriginalWorkflowRole(roleName, collection, roleGroup);
             }
+
 		}
-		else if (ROLE_WF_STEP1.equals(roleName))
-		{	
-			role = collection.getWorkflowGroup(1);
-			if (role == null)
-            {
-                role = collection.createWorkflowGroup(1);
-            }
-			
-		}
-		else if (ROLE_WF_STEP2.equals(roleName))
-		{
-			role = collection.getWorkflowGroup(2);
-			if (role == null)
-            {
-                role = collection.createWorkflowGroup(2);
-            }
-		}
-		else if (ROLE_WF_STEP3.equals(roleName))
-		{
-			role = collection.getWorkflowGroup(3);
-			if (role == null)
-            {
-                role = collection.createWorkflowGroup(3);
-            }
-			
-		}
-		
+
 		// In case we needed to create a group, save our changes
 		collection.update();
 		context.commit();
-		
+
 		// If the role name was valid then role should be non null,
-		if (role != null)
-        {
-            return role.getID();
-        }
-		
+		if (roleGroup != null)
+			return roleGroup.getID();
+
 		return -1;
-	}
-	
+    }
+			
+    private static Group getOriginalWorkflowRole(String roleName, Collection collection, Group roleGroup) throws SQLException, AuthorizeException {
+        if (ROLE_WF_STEP1.equals(roleName))
+        {
+            roleGroup = collection.getWorkflowGroup(1);
+            if (roleGroup == null)
+                roleGroup = collection.createWorkflowGroup(1);
+
+		}
+		else if (ROLE_WF_STEP2.equals(roleName))
+		{
+            roleGroup = collection.getWorkflowGroup(2);
+            if (roleGroup == null)
+                roleGroup = collection.createWorkflowGroup(2);
+        }
+		else if (ROLE_WF_STEP3.equals(roleName))
+		{
+            roleGroup = collection.getWorkflowGroup(3);
+            if (roleGroup == null)
+                roleGroup = collection.createWorkflowGroup(3);
+
+		}
+        return roleGroup;
+    }
+		
+    private static Group getXMLWorkflowRole(Context context, int collectionID, String roleName, Collection collection, Group roleGroup) throws IOException, WorkflowConfigurationException, SQLException, AuthorizeException {
+        Role role = WorkflowUtils.getCollectionRoles(collection).get(roleName);
+        if(role.getScope() == Role.Scope.COLLECTION){
+            roleGroup = WorkflowUtils.getRoleGroup(context, collectionID, role);
+            if(roleGroup == null){
+                AuthorizeManager.authorizeAction(context, collection, Constants.WRITE);
+                roleGroup = Group.create(context);
+                roleGroup.setName("COLLECTION_" + collection.getID() + "_WORKFLOW_ROLE_" + roleName);
+                roleGroup.update();
+                AuthorizeManager.addPolicy(context, collection, Constants.ADD, roleGroup);
+                WorkflowUtils.createCollectionWorkflowRole(context, collectionID, roleName, roleGroup);
+	        }
+        }
+        return roleGroup;
+    }
+
 	
 	/**
 	 * Delete one of collection's roles
@@ -511,21 +529,24 @@ public class FlowContainerUtils
 		{
 			collection.removeSubmitters();
 		}
-		else if (ROLE_WF_STEP1.equals(roleName))
-		{	
-			collection.setWorkflowGroup(1, null);
+        else{
+            WorkflowUtils.deleteRoleGroup(context, collectionID, roleName);
 		}
-		else if (ROLE_WF_STEP2.equals(roleName))
-		{
-			collection.setWorkflowGroup(2, null);
-		}
-		else if (ROLE_WF_STEP3.equals(roleName))
-		{
-			collection.setWorkflowGroup(3, null);
-			
-		}
-		
-		// Second, remove all authorizations for this role by searching for all policies that this 
+//		else if (ROLE_WF_STEP1.equals(roleName))
+//		{
+//			collection.setWorkflowGroup(1, null);
+//		}
+//		else if (ROLE_WF_STEP2.equals(roleName))
+//		{
+//			collection.setWorkflowGroup(2, null);
+//		}
+//		else if (ROLE_WF_STEP3.equals(roleName))
+//		{
+//			collection.setWorkflowGroup(3, null);
+//
+//		}
+
+		// Second, remove all authorizations for this role by searching for all policies that this
 		// group has on the collection and remove them otherwise the delete will fail because 
 		// there are dependencies.
 		@SuppressWarnings("unchecked") // the cast is correct

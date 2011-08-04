@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.app.xmlui.aspect.submission.workflow;
+package org.dspace.app.xmlui.aspect.workflow;
 
 import java.io.IOException;
 import java.sql.SQLException;

@@ -47,6 +47,7 @@ import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import org.dspace.search.DSIndexer;
 import org.dspace.workflow.WorkflowManager;
+import org.dspace.xmlworkflow.XmlWorkflowManager;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -757,13 +758,20 @@ public class ItemImport
             if (!isTest)
             {
                 // Should we send a workflow alert email or not?
-                if (useWorkflowSendEmail)
-                {
-                    WorkflowManager.start(c, wi);
-                }
-                else
-                {
-                    WorkflowManager.startWithoutNotify(c, wi);
+                if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow")) {
+                    if (useWorkflowSendEmail) {
+                        XmlWorkflowManager.start(c, wi);
+                    } else {
+                        XmlWorkflowManager.startWithoutNotify(c, wi);
+                    }
+                } else {
+                    if (useWorkflowSendEmail) {
+                        WorkflowManager.start(c, wi);
+                    }
+                    else
+                    {
+                        WorkflowManager.startWithoutNotify(c, wi);
+                    }
                 }
 
                 // send ID to the mapfile

@@ -11,6 +11,7 @@ import org.apache.commons.cli.*;
 
 import org.apache.log4j.Logger;
 import org.dspace.content.*;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
 import org.dspace.authorize.AuthorizeException;
@@ -18,6 +19,7 @@ import org.dspace.core.LogManager;
 import org.dspace.handle.HandleManager;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.WorkflowManager;
+import org.dspace.xmlworkflow.XmlWorkflowManager;
 
 import java.util.ArrayList;
 import java.io.File;
@@ -231,13 +233,20 @@ public class MetadataImport
                         }
 
                         // Should the workflow be used?
-                        if ((useWorkflow) && (workflowNotify))
-                        {
-                            WorkflowManager.start(c, wsItem);
-                        }
-                        else if (useWorkflow)
-                        {
-                            WorkflowManager.startWithoutNotify(c, wsItem);
+                        if(useWorkflow){
+                            if (ConfigurationManager.getProperty("workflow", "workflow.framework").equals("xmlworkflow")) {
+                                if (workflowNotify) {
+                                    XmlWorkflowManager.start(c, wsItem);
+                                } else {
+                                    XmlWorkflowManager.startWithoutNotify(c, wsItem);
+                                }
+                            } else {
+                                if (workflowNotify) {
+                                    WorkflowManager.start(c, wsItem);
+                                } else {
+                                    WorkflowManager.startWithoutNotify(c, wsItem);
+                                }
+                            }
                         }
                         else
                         {

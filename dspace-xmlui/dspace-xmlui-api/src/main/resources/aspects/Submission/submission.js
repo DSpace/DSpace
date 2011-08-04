@@ -17,8 +17,11 @@ importClass(Packages.org.dspace.core.Constants);
 importClass(Packages.org.dspace.workflow.WorkflowItem);
 importClass(Packages.org.dspace.workflow.WorkflowManager);
 importClass(Packages.org.dspace.content.WorkspaceItem);
+importClass(Packages.org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem);
 importClass(Packages.org.dspace.authorize.AuthorizeManager);
+importClass(Packages.org.dspace.core.ConfigurationManager);
 importClass(Packages.org.dspace.license.CreativeCommons);
+importClass(Packages.org.dspace.xmlworkflow.WorkflowFactory);
 
 importClass(Packages.org.dspace.app.xmlui.utils.ContextUtil);
 importClass(Packages.org.dspace.app.xmlui.cocoon.HttpServletRequestCocoonWrapper);
@@ -464,7 +467,7 @@ function processPage(workspaceID, stepConfig, page)
 	// often this processing takes place as part of a new request 
 	// and the DSpace Context is changed on each request) 
 	var submissionInfo = getSubmissionInfo(workspaceID);
-
+    var handle = submissionInfo.getCollectionHandle();
 	var response_flag = null;
 
 	//---------------------------------------------
@@ -501,9 +504,15 @@ function processPage(workspaceID, stepConfig, page)
 	stepClass.setCurrentPage(getHttpRequest(), page);	
 		
 	//call the step's doProcessing() method
-	response_flag = stepClass.doProcessing(getDSContext(), getHttpRequest(), getHttpResponse(), submissionInfo);
-	
-	//if this is a non-interactive step, 
+    try {
+	    response_flag = stepClass.doProcessing(getDSContext(), getHttpRequest(), getHttpResponse(), submissionInfo);
+    } catch(exception) {
+        sendPage("handle/" + handle + "/xmlworkflow/workflowexception", {"error":exception.toString()});
+        cocoon.exit();
+
+    }
+
+	//if this is a non-interactive step,
 	//we cannot do much with errors/responses other than logging them!
     if((!stepHasUI(stepConfig)) && (response_flag!=AbstractProcessingStep.STATUS_COMPLETE))
     {
@@ -706,119 +715,28 @@ function showCompleteConfirmation(handle)
     cocoon.exit(); // We're done, Stop execution.
 }
 
-/**
- * This is the starting point for all workflow tasks. The id of the workflow
- * is expected to be passed in as a request parameter. The user will be able
- * to view the item and perform the necessary actions on the task such as: 
- * accept, reject, or edit the item's metadata. 
- */
-function doWorkflow() 
-{
-    var workflowID = cocoon.request.get("workflowID");
-    
-    if (workflowID == null)
-    {
-        throw "Unable to find workflow, no workflow id supplied.";
-    }
-    
+function doWorkflowEditMetadata() {
+    var contextPath = cocoon.request.getContextPath();
+    var workflowItemId = cocoon.request.get("workflowID");
     // Get the collection handle for this item.
-    var handle = WorkflowItem.find(getDSContext(), workflowID).getCollection().getHandle();
-    
-    // Specify that we are working with workflows.
-    //(specify "W" for workflow item, for FlowUtils.findSubmission())
-    workflowID = "W"+workflowID;
-    
-    do
-    {
-        sendPageAndWait("handle/"+handle+"/workflow/performTaskStep",{"id":workflowID,"step":"0"});
-        
-        if (cocoon.request.get("submit_leave"))
-        {
-            // Just exit workflow with out doing anything
-            var contextPath = cocoon.request.getContextPath();
-            cocoon.redirectTo(contextPath+"/submissions",true);
-            getDSContext().complete();
-            cocoon.exit();
-        }
-        else if (cocoon.request.get("submit_approve"))
-        {
-            // Approve this task and exit the workflow
-            var archived = FlowUtils.processApproveTask(getDSContext(),workflowID);
-            
-            var contextPath = cocoon.request.getContextPath();
-            cocoon.redirectTo(contextPath+"/submissions",true);
-            getDSContext().complete();
-            cocoon.exit();
-        }
-        else if (cocoon.request.get("submit_return"))
-        {
-            // Return this task to the pool and exit the workflow
-            FlowUtils.processUnclaimTask(getDSContext(),workflowID);
-            
-            var contextPath = cocoon.request.getContextPath();
-            cocoon.redirectTo(contextPath+"/submissions",true);
-            getDSContext().complete();
-            cocoon.exit();
-        }
-        else if (cocoon.request.get("submit_take_task"))
-        {
-            // Take the task and stay on this workflow
-            FlowUtils.processClaimTask(getDSContext(),workflowID);
-            
-        }
-        else if (cocoon.request.get("submit_reject"))
-        {
-            var rejected = workflowStepReject(handle,workflowID);
-            
-            if (rejected == true)
-            {
-                // the user really rejected the item
-                var contextPath = cocoon.request.getContextPath();
-                cocoon.redirectTo(contextPath+"/submissions",true);
-                getDSContext().complete();
-                cocoon.exit();
-            }
-        }
-        else if (cocoon.request.get("submit_edit"))
-        {
-        	//User is editing this submission:
-            //	Send user through the Submission Control
-            //	(NOTE: The SubmissionInfo object decides which
-            //       steps are able to be edited in a Workflow)
-            submissionControl(handle, workflowID, null);
-        }
-        
-    } while (1==1)
-    
+    var handle = cocoon.parameters["handle"];
 
-}
-
-/**
- * This step is used when the user wants to reject a workflow item, at this step they 
- * are asked to enter a reason for the rejection.
- */
-function workflowStepReject(handle,workflowID)
-{
-    var error_fields;
-    do {
-        
-        sendPageAndWait("handle/"+handle+"/workflow/rejectTaskStep",{"id":workflowID, "step":"0", "error_fields":error_fields});
-
-        if (cocoon.request.get("submit_reject"))
-        {
-            error_fields = FlowUtils.processRejectTask(getDSContext(),workflowID,cocoon.request);
-            
-            if (error_fields == null)
-            {
-                // Only exit if rejection succeeded, otherwise ask for a reason again.
-                return true;
-            }      
-        }
-        else if (cocoon.request.get("submit_cancel"))
-        {
-            // just go back to the view workflow screen.
-            return false;
-        }
-    } while (1 == 1)
-    
+    //    submissionControl(handle, "X"+workflowItemId, null);
+    if (workflowItemId.startsWith("X")) {
+        workflowItemId = workflowItemId.replace("X", "");
+        var coll = XmlWorkflowItem.find(getDSContext(), workflowItemId).getCollection();
+        var workflow = WorkflowFactory.getWorkflow(coll);
+        var step = workflow.getStep(cocoon.request.get("stepID"));
+        var action = step.getActionConfig(cocoon.request.get("actionID"));
+        submissionControl(handle, "X"+workflowItemId, null);
+        cocoon.redirectTo(contextPath+"/handle/"+handle+"/xmlworkflow?"+"workflowID="+workflowItemId+"&stepID="+step.getId()+"&actionID="+action.getId(), true);
+        getDSContext().complete();
+        cocoon.exit();
+    } else {
+        workflowItemId = workflowItemId.replace("W", "");
+        submissionControl(handle, "W"+workflowItemId, null);
+        cocoon.redirectTo(contextPath+"/handle/"+handle+"/workflow?workflowID="+workflowItemId, true);
+        getDSContext().complete();
+        cocoon.exit();
+    }
 }
