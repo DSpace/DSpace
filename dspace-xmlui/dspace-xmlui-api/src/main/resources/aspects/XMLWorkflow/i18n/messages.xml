@@ -118,19 +118,19 @@
     <message key="xmlui.XMLWorkflow.default.editstep.claimaction">Accept/Edit/Reject</message>
     <message key="xmlui.XMLWorkflow.default.editstep.editaction">Accept/Edit/Reject</message>
 
-    <message key="xmlui.XMLWorkflow.default.finaleditstep">Final Accept/Edit/Reject</message>
-    <message key="xmlui.XMLWorkflow.default.finaleditstep.claimaction">Final Accept/Edit/Reject</message>
-    <message key="xmlui.XMLWorkflow.default.finaleditstep.finaleditaction">Final Accept/Edit/Reject</message>
+    <message key="xmlui.XMLWorkflow.default.finaleditstep">Final Accept/Edit</message>
+    <message key="xmlui.XMLWorkflow.default.finaleditstep.claimaction">Final Accept/Edit</message>
+    <message key="xmlui.XMLWorkflow.default.finaleditstep.finaleditaction">Final Accept/Edit</message>
 
 
-    <message key="xmlui.XMLWorkflow.default.selectSingleReviewer.selectReviewerStep.claimaction">Assign reviewer step</message>
-    <message key="xmlui.XMLWorkflow.default.selectSingleReviewer.selectReviewerStep.selectrevieweraction">Assign reviewer</message>
+    <message key="xmlui.XMLWorkflow.selectSingleReviewer.selectReviewerStep.claimaction">Assign reviewer step</message>
+    <message key="xmlui.XMLWorkflow.selectSingleReviewer.selectReviewerStep.selectrevieweraction">Assign reviewer</message>
 
-    <message key="xmlui.XMLWorkflow.default.selectSingleReviewer.singleUserReviewStep">Single user review step</message>
-    <message key="xmlui.XMLWorkflow.default.selectSingleReviewer.singleUserReviewStep.singleuserreviewaction">Review submission</message>
+    <message key="xmlui.XMLWorkflow.selectSingleReviewer.singleUserReviewStep">Single user review step</message>
+    <message key="xmlui.XMLWorkflow.selectSingleReviewer.singleUserReviewStep.singleuserreviewaction">Review submission</message>
 
-    <message key="xmlui.XMLWorkflow.default.scoreReview.scoreReviewStep.claimaction">Score review</message>
-    <message key="xmlui.XMLWorkflow.default.scoreReview.scoreReviewStep.scorereviewaction">Score review</message>
-    <message key="xmlui.XMLWorkflow.default.scoreReview.scoreReviewStep">Score review</message>
+    <message key="xmlui.XMLWorkflow.scoreReview.scoreReviewStep.claimaction">Score review</message>
+    <message key="xmlui.XMLWorkflow.scoreReview.scoreReviewStep.scorereviewaction">Score review</message>
+    <message key="xmlui.XMLWorkflow.scoreReview.scoreReviewStep">Score review</message>
 
   </catalogue>

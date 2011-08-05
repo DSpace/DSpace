@@ -96,6 +96,22 @@ xmlwf_collectionrole.group_id AS group_id
 FROM workflowitem INNER JOIN xmlwf_collectionrole ON workflowitem.collection_id = xmlwf_collectionrole.collection_id
 WHERE workflowitem.owner IS NULL AND workflowitem.state = 5 AND xmlwf_collectionrole.role_id = 'finaleditor';
 
+-- Delete existing workflowitem policies
+DELETE FROM resourcepolicy
+WHERE resource_type_id = 2 AND resource_id IN
+  (SELECT item_id FROM workflowitem);
+
+DELETE FROM resourcepolicy
+WHERE resource_type_id = 1 AND resource_id IN
+  (SELECT item2bundle.bundle_id FROM
+    (workflowitem INNER JOIN item2bundle ON workflowitem.item_id = item2bundle.item_id));
+
+DELETE FROM resourcepolicy
+WHERE resource_type_id = 0 AND resource_id IN
+  (SELECT bundle2bitstream.bitstream_id FROM
+    ((workflowitem INNER JOIN item2bundle ON workflowitem.item_id = item2bundle.item_id)
+      INNER JOIN bundle2bitstream ON item2bundle.bundle_id = bundle2bitstream.bundle_id));
+
 
 -- Create policies for claimtasks
 --     public static final int BITSTREAM = 0;
@@ -228,11 +244,17 @@ FROM (((xmlwf_workflowitem INNER JOIN item ON xmlwf_workflowitem.item_id = item.
 INSERT INTO xmlwf_in_progress_user (in_progress_user_id, workflowitem_id, user_id, finished)
 SELECT
   getnextid('xmlwf_in_progress_user') AS in_progress_user_id,
-  xmlwf_workflowitem.item_id AS workflowitem_id,
+  xmlwf_workflowitem.workflowitem_id AS workflowitem_id,
   xmlwf_claimtask.owner_id AS user_id,
   BOOL(0) as finished
 FROM
   (xmlwf_claimtask INNER JOIN xmlwf_workflowitem ON xmlwf_workflowitem.workflowitem_id = xmlwf_claimtask.workflowitem_id);
+
+
+-- Delete the old tasks and workflowitems
+-- This is important because otherwise the item can not be deleted
+DELETE FROM tasklistitem;
+DELETE FROM workflowitem;
 
 -- Update the sequences
 SELECT setval('xmlwf_workflowitem_seq', max(workflowitem_id)) FROM xmlwf_workflowitem;

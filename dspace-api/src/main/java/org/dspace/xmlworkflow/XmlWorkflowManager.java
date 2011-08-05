@@ -175,11 +175,13 @@ public class XmlWorkflowManager {
     public static WorkflowActionConfig processOutcome(Context c, EPerson user, Workflow workflow, Step currentStep, WorkflowActionConfig currentActionConfig, ActionResult currentOutcome, XmlWorkflowItem wfi, boolean enteredNewStep) throws IOException, WorkflowConfigurationException, AuthorizeException, SQLException, WorkflowException {
         if(currentOutcome.getType() == ActionResult.TYPE.TYPE_PAGE || currentOutcome.getType() == ActionResult.TYPE.TYPE_ERROR){
             //Our outcome is a page or an error, so return our current action
+            c.restoreAuthSystemState();
             return currentActionConfig;
         }else
         if(currentOutcome.getType() == ActionResult.TYPE.TYPE_CANCEL || currentOutcome.getType() == ActionResult.TYPE.TYPE_SUBMISSION_PAGE){
             //We either pressed the cancel button or got an order to return to the submission page, so don't return an action
             //By not returning an action we ensure ourselfs that we go back to the submission page
+            c.restoreAuthSystemState();
             return null;
         }else
         if (currentOutcome.getType() == ActionResult.TYPE.TYPE_OUTCOME) {
@@ -196,19 +198,29 @@ public class XmlWorkflowManager {
                     return nextActionConfig;
                 } else if( nextActionConfig.requiresUI() && enteredNewStep){
                     //We have entered a new step and have encountered a UI, return null since the current user doesn't have anything to do with this
+                    c.restoreAuthSystemState();
                     return null;
                 } else {
                     ActionResult newOutcome = nextActionConfig.getProcessingAction().execute(c, wfi, currentStep, null);
                     return processOutcome(c, user, workflow, currentStep, nextActionConfig, newOutcome, wfi, enteredNewStep);
                 }
-            }else{
+            }else
+            if(enteredNewStep){
+                // If the user finished his/her step, we keep processing until there is a UI step action or no step at all
+                Step nextStep = workflow.getNextStep(c, wfi, currentStep, currentOutcome.getResult());
+                c.turnOffAuthorisationSystem();
+                return processNextStep(c, user, workflow, currentOutcome, wfi, nextStep);
+            } else {
+                //
+                ClaimedTask task = ClaimedTask.findByWorkflowIdAndEPerson(c, wfi.getID(), user.getID());
 
+                //Check if we have a task for this action (might not be the case with automatic steps)
                 //First add it to our list of finished users, since no more actions remain
                 WorkflowRequirementsManager.addFinishedUser(c, wfi, user);
                 c.turnOffAuthorisationSystem();
                 //Check if our requirements have been met
                 if((currentStep.isFinished(c, wfi) && currentOutcome.getResult() == ActionResult.OUTCOME_COMPLETE) || currentOutcome.getResult() != ActionResult.OUTCOME_COMPLETE){
-                    //Clear all the metadata that might be saved by this step
+                    //Delete all the table rows containing the users who performed this task
                     WorkflowRequirementsManager.clearInProgressUsers(c, wfi);
                     //Remove all the tasks
                     XmlWorkflowManager.deleteAllTasks(c, wfi);
@@ -216,32 +228,9 @@ public class XmlWorkflowManager {
 
                     Step nextStep = workflow.getNextStep(c, wfi, currentStep, currentOutcome.getResult());
 
-                    if(nextStep!=null){
-                        nextActionConfig = nextStep.getUserSelectionMethod();
-                        nextActionConfig.getProcessingAction().activate(c, wfi);
-        //                nextActionConfig.getProcessingAction().generateTasks();
-
-                        if (nextActionConfig.requiresUI()) {
-                            //Since a new step has been started, stop executing actions once one with a user interface is present.
-                            c.restoreAuthSystemState();
-                            return null;
-                        } else {
-                            ActionResult newOutcome = nextActionConfig.getProcessingAction().execute(c, wfi, nextStep, null);
-                            c.restoreAuthSystemState();
-                            return processOutcome(c, user, workflow, nextStep, nextActionConfig, newOutcome, wfi, true);
-                        }
-                    }else{
-                        if(currentOutcome.getResult() != ActionResult.OUTCOME_COMPLETE){
-                            c.restoreAuthSystemState();
-                            throw new WorkflowException("No alternate step was found for outcome: " + currentOutcome.getResult());
-                        }
-                        archive(c, wfi);
-                        c.restoreAuthSystemState();
-                        return null;
-                    }
+                    return processNextStep(c, user, workflow, currentOutcome, wfi, nextStep);
                 }else{
                     //We are done with our actions so go to the submissions page but remove action ClaimedAction first
-                    ClaimedTask task = ClaimedTask.findByWorkflowIdAndEPerson(c, wfi.getID(), user.getID());
                     deleteClaimedTask(c, wfi, task);
                     c.restoreAuthSystemState();
                     return null;
@@ -252,6 +241,33 @@ public class XmlWorkflowManager {
 
         log.error(LogManager.getHeader(c, "Invalid step outcome", "Workflow item id: " + wfi.getID()));
         throw new WorkflowException("Invalid step outcome");
+    }
+
+    private static WorkflowActionConfig processNextStep(Context c, EPerson user, Workflow workflow, ActionResult currentOutcome, XmlWorkflowItem wfi, Step nextStep) throws SQLException, IOException, AuthorizeException, WorkflowException, WorkflowConfigurationException {
+        WorkflowActionConfig nextActionConfig;
+        if(nextStep!=null){
+            nextActionConfig = nextStep.getUserSelectionMethod();
+            nextActionConfig.getProcessingAction().activate(c, wfi);
+//                nextActionConfig.getProcessingAction().generateTasks();
+
+            if (nextActionConfig.requiresUI()) {
+                //Since a new step has been started, stop executing actions once one with a user interface is present.
+                c.restoreAuthSystemState();
+                return null;
+            } else {
+                ActionResult newOutcome = nextActionConfig.getProcessingAction().execute(c, wfi, nextStep, null);
+                c.restoreAuthSystemState();
+                return processOutcome(c, user, workflow, nextStep, nextActionConfig, newOutcome, wfi, true);
+            }
+        }else{
+            if(currentOutcome.getResult() != ActionResult.OUTCOME_COMPLETE){
+                c.restoreAuthSystemState();
+                throw new WorkflowException("No alternate step was found for outcome: " + currentOutcome.getResult());
+            }
+            archive(c, wfi);
+            c.restoreAuthSystemState();
+            return null;
+        }
     }
 
 
@@ -593,6 +609,10 @@ public class XmlWorkflowManager {
 
         // Add to item as a DC field
         myitem.addMetadata(MetadataSchema.DC_SCHEMA, "description", "provenance", "en", provDescription);
+
+        //Clear any workflow schema related metadata
+        myitem.clearMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, Item.ANY, Item.ANY, Item.ANY);
+
         myitem.update();
 
         //Restore permissions for the submitter

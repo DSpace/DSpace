@@ -82,6 +82,9 @@ public class RestartWorkflow {
             if (line.hasOption('e')) // eperson
             {
                 eperson = line.getOptionValue('e');
+            }else{
+                System.out.println("The -e (eperson) option is mandatory !");
+                System.exit(1);
             }
 
             // find the EPerson, assign to context

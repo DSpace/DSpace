@@ -189,7 +189,7 @@ public class Submissions extends AbstractDSpaceTransformer
     		}
     	}
     	
-    	Division unfinished = division.addInteractiveDivision("unfinished-submisions", contextPath+"/submit", Division.METHOD_POST);
+    	Division unfinished = division.addDivision("unfinished-submisions");
     	unfinished.setHead(T_s_head2);
     	Para p = unfinished.addPara();
     	p.addContent(T_s_info2a);

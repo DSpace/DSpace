@@ -62,10 +62,10 @@ public class WorkflowRequirementsManager {
         ipu.update();
         int totalUsers = InProgressUser.getNumberOfInProgressUsers(c, wfi.getID()) + InProgressUser.getNumberOfFinishedUsers(c, wfi.getID());
 
-            if(totalUsers == step.getRequiredUsers()){
-                //If enough users have claimed/finished this step then remove the tasks
-                XmlWorkflowManager.deleteAllPooledTasks(c, wfi);
-            }
+        if(totalUsers == step.getRequiredUsers()){
+            //If enough users have claimed/finished this step then remove the tasks
+            XmlWorkflowManager.deleteAllPooledTasks(c, wfi);
+        }
         wfi.update();
     }
 

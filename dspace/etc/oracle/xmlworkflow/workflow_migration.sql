@@ -1,24 +1,27 @@
 -- Convert workflow groups:
 -- TODO: is 'to_number' ok? do not forget to change role_id values
 
-INSERT INTO xmlwf_collectionrole (role_id, group_id, collection_id)
+INSERT INTO xmlwf_collectionrole (collectionrole_id, role_id, group_id, collection_id)
 SELECT
+xmlwf_collectionrole_seq.nextval as collectionrole_id,
 'reviewer' AS role_id,
 eperson_group_id AS group_id,
 to_number(replace(replace(name, 'COLLECTION_', ''), '_WORKFLOW_STEP_1', '')) AS collection_id
 FROM epersongroup
 WHERE name LIKE 'COLLECTION_%_WORKFLOW_STEP_1';
 
-INSERT INTO xmlwf_collectionrole  (role_id, group_id, collection_id)
+INSERT INTO xmlwf_collectionrole  (collectionrole_id, role_id, group_id, collection_id)
 SELECT
+xmlwf_collectionrole_seq.nextval as collectionrole_id,
 'editor' AS role_id,
 eperson_group_id AS group_id,
 to_number(replace(replace(name, 'COLLECTION_', ''), '_WORKFLOW_STEP_2', '')) AS collection_id
 FROM epersongroup
 WHERE name LIKE 'COLLECTION_%_WORKFLOW_STEP_2';
 
-INSERT INTO xmlwf_collectionrole  (role_id, group_id, collection_id)
+INSERT INTO xmlwf_collectionrole  (collectionrole_id, role_id, group_id, collection_id)
 SELECT
+xmlwf_collectionrole_seq.nextval as collectionrole_id,
 'finaleditor' AS role_id,
 eperson_group_id AS group_id,
 to_number(replace(replace(name, 'COLLECTION_', ''), '_WORKFLOW_STEP_3', '')) AS collection_id
@@ -39,8 +42,9 @@ FROM workflowitem;
 
 
 -- Migrate claimed tasks
-INSERT INTO xmlwf_claimtask (workflowitem_id, workflow_id, step_id, action_id, owner_id)
+INSERT INTO xmlwf_claimtask (claimtask_id,workflowitem_id, workflow_id, step_id, action_id, owner_id)
 SELECT
+xmlwf_claimtask_seq.nextval AS claimtask_id,
 workflow_id AS workflowitem_id,
 'default' AS workflow_id,
 'reviewstep' AS step_id,
@@ -48,8 +52,9 @@ workflow_id AS workflowitem_id,
 owner AS owner_id
 FROM workflowitem WHERE owner IS NOT NULL AND state = 2;
 
-INSERT INTO xmlwf_claimtask (workflowitem_id, workflow_id, step_id, action_id, owner_id)
+INSERT INTO xmlwf_claimtask (claimtask_id,workflowitem_id, workflow_id, step_id, action_id, owner_id)
 SELECT
+xmlwf_claimtask_seq.nextval AS claimtask_id,
 workflow_id AS workflowitem_id,
 'default' AS workflow_id,
 'editstep' AS step_id,
@@ -57,8 +62,9 @@ workflow_id AS workflowitem_id,
 owner AS owner_id
 FROM workflowitem WHERE owner IS NOT NULL AND state = 4;
 
-INSERT INTO xmlwf_claimtask (workflowitem_id, workflow_id, step_id, action_id, owner_id)
+INSERT INTO xmlwf_claimtask (claimtask_id,workflowitem_id, workflow_id, step_id, action_id, owner_id)
 SELECT
+xmlwf_claimtask_seq.nextval AS claimtask_id,
 workflow_id AS workflowitem_id,
 'default' AS workflow_id,
 'finaleditstep' AS step_id,
@@ -68,8 +74,9 @@ FROM workflowitem WHERE owner IS NOT NULL AND state = 6;
 
 
 -- Migrate pooled tasks
-INSERT INTO xmlwf_pooltask (workflowitem_id, workflow_id, step_id, action_id, group_id)
+INSERT INTO xmlwf_pooltask (pooltask_id,workflowitem_id, workflow_id, step_id, action_id, group_id)
 SELECT
+xmlwf_pooltask_seq.nextval AS pooltask_id,
 workflowitem.workflow_id AS workflowitem_id,
 'default' AS workflow_id,
 'reviewstep' AS step_id,
@@ -78,8 +85,9 @@ xmlwf_collectionrole.group_id AS group_id
 FROM workflowitem INNER JOIN xmlwf_collectionrole ON workflowitem.collection_id = xmlwf_collectionrole.collection_id
 WHERE workflowitem.owner IS NULL AND workflowitem.state = 1 AND xmlwf_collectionrole.role_id = 'reviewer';
 
-INSERT INTO xmlwf_pooltask (workflowitem_id, workflow_id, step_id, action_id, group_id)
+INSERT INTO xmlwf_pooltask (pooltask_id,workflowitem_id, workflow_id, step_id, action_id, group_id)
 SELECT
+xmlwf_pooltask_seq.nextval AS pooltask_id,
 workflowitem.workflow_id AS workflowitem_id,
 'default' AS workflow_id,
 'editstep' AS step_id,
@@ -88,8 +96,9 @@ xmlwf_collectionrole.group_id AS group_id
 FROM workflowitem INNER JOIN xmlwf_collectionrole ON workflowitem.collection_id = xmlwf_collectionrole.collection_id
 WHERE workflowitem.owner IS NULL AND workflowitem.state = 3 AND xmlwf_collectionrole.role_id = 'editor';
 
-INSERT INTO xmlwf_pooltask (workflowitem_id, workflow_id, step_id, action_id, group_id)
+INSERT INTO xmlwf_pooltask (pooltask_id,workflowitem_id, workflow_id, step_id, action_id, group_id)
 SELECT
+xmlwf_pooltask_seq.nextval AS pooltask_id,
 workflowitem.workflow_id AS workflowitem_id,
 'default' AS workflow_id,
 'finaleditstep' AS step_id,
@@ -98,6 +107,21 @@ xmlwf_collectionrole.group_id AS group_id
 FROM workflowitem INNER JOIN xmlwf_collectionrole ON workflowitem.collection_id = xmlwf_collectionrole.collection_id
 WHERE workflowitem.owner IS NULL AND workflowitem.state = 5 AND xmlwf_collectionrole.role_id = 'finaleditor';
 
+-- Delete resource policies for workflowitems before creating new ones
+DELETE FROM resourcepolicy
+WHERE resource_type_id = 2 AND resource_id IN
+  (SELECT item_id FROM workflowitem);
+
+DELETE FROM resourcepolicy
+WHERE resource_type_id = 1 AND resource_id IN
+  (SELECT item2bundle.bundle_id FROM
+    (workflowitem INNER JOIN item2bundle ON workflowitem.item_id = item2bundle.item_id));
+
+DELETE FROM resourcepolicy
+WHERE resource_type_id = 0 AND resource_id IN
+  (SELECT bundle2bitstream.bitstream_id FROM
+    ((workflowitem INNER JOIN item2bundle ON workflowitem.item_id = item2bundle.item_id)
+      INNER JOIN bundle2bitstream ON item2bundle.bundle_id = bundle2bitstream.bundle_id);
 -- Create policies for claimtasks
 --     public static final int BITSTREAM = 0;
 --     public static final int BUNDLE = 1;

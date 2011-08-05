@@ -10,6 +10,7 @@ package org.dspace.xmlworkflow.storedcomponents;
 import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.content.InProgressSubmission;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.storage.rdbms.TableRow;
@@ -28,7 +29,7 @@ import java.io.IOException;
 
 /**
  * Class representing an item going through the workflow process in DSpace
- * 
+ *
  * @author Bram De Schouwer (bram.deschouwer at dot com)
  * @author Kevin Van de Velde (kevin at atmire dot com)
  * @author Ben Bosman (ben at atmire dot com)
@@ -179,46 +180,45 @@ public class XmlWorkflowItem implements InProgressSubmission {
         if(collectionId != -1){
             query.append("WHERE collection_id=").append(collectionId);
         }
-
-        query.append(" LIMIT ").append(pagesize).append(" OFFSET ").append((page - 1) * pagesize);
-        TableRowIterator tri = DatabaseManager.queryTable(c, "xmlwf_workflowitem",
-                query.toString());
-
-        try
-        {
-            // make a list of workflow items
-            while (tri.hasNext())
-            {
-                TableRow row = tri.next();
-                XmlWorkflowItem wi = new XmlWorkflowItem(c, row);
-                wfItems.add(wi);
+        int offset = (page - 1) * pagesize;
+        if ("oracle".equals(ConfigurationManager.getProperty("db.name"))) {
+            // First prepare the query to generate row numbers
+            if (pagesize > 0 || offset > 0) {
+                query.insert(0, "SELECT /*+ FIRST_ROWS(n) */ rec.*, ROWNUM rnum  FROM (");
+                query.append(") ");
+            }
+            // Restrict the number of rows returned based on the limit
+            if (pagesize > 0) {
+                query.append("rec WHERE rownum<=? ");
+                // If we also have an offset, then convert the limit into the maximum row number
+                if (offset > 0) {
+                    pagesize += offset;
+                }
+            }
+            // Return only the records after the specified offset (row number)
+            if (offset > 0) {
+                query.insert(0, "SELECT * FROM (");
+                query.append(") WHERE rnum>?");
+            }
+        } else {
+            if (pagesize > 0) {
+                query.append(" LIMIT ? ");
+            }
+            if (offset > 0) {
+                query.append(" OFFSET ? ");
             }
         }
-        finally
-        {
-            if (tri != null)
-                tri.close();
+        String queryString = query.toString();
+        Object[] paramArr = new Object[]{};
+        if (pagesize > 0 && offset > 0) {
+            paramArr = new Object[]{pagesize, offset};
+        } else if (pagesize > 0) {
+            paramArr = new Object[]{pagesize};
+        } else if (offset > 0) {
+            paramArr = new Object[]{offset};
         }
-
-        XmlWorkflowItem[] wfArray = new XmlWorkflowItem[wfItems.size()];
-        wfArray = (XmlWorkflowItem[]) wfItems.toArray(wfArray);
-
-        return wfArray;
-    }
-
-    /**
-     * return all workflowitems in one step
-     *
-     * @param c  active context
-     * @return WorkflowItem [] of all workflows in system
-     */
-    public static XmlWorkflowItem[] findAllInStep(Context c, int page, int pagesize, String step_id) throws SQLException, AuthorizeException, IOException, WorkflowConfigurationException {
-        List wfItems = new ArrayList();
-        TableRowIterator tri = DatabaseManager.queryTable(c, "xmlwf_workflowitem",
-                "SELECT * FROM xmlwf_workflowitem, xmlwf_claimtask, xmlwf_pooltask " +
-                        "WHERE (xmlwf_workflowitem.workflowitem_id=xmlwf_claimtask.workflowitem_id AND xmlwf_claimtask="+step_id+") " +
-                        "OR (xmlwf_workflowitem.workflowitem_id=xmlwf_pooltask.workflowitem_id AND xmlwf_pooltask="+step_id+") LIMIT "+pagesize+" OFFSET "+ ((page-1)*pagesize));
-
+        // Get all the epeople that match the query
+        TableRowIterator tri = DatabaseManager.query(c, queryString, paramArr);
         try
         {
             // make a list of workflow items
