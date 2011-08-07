@@ -69,26 +69,22 @@ public class SelectCollectionTransformer extends AbstractDSpaceTransformer {
     public void addBody(Body body) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {
         String handle = parameters.getParameter("handle", null);
 
-        Division main = body.addInteractiveDivision("servicedocument-target", contextPath + "/swordclient", Division.METHOD_POST, "");
+        Division main = body.addDivision("main");
         main.setHead(T_main_head.parameterize(handle));
 
         Request request = ObjectModelHelper.getRequest(objectModel);
         ServiceDocument serviceDoc = (ServiceDocument) request.getAttribute("serviceDoc");
 
         java.util.List<Collection> collections = ServiceDocumentHelper.getCollections(serviceDoc);
-
-        List collectionsList = main.addList("collectionsList", List.TYPE_SIMPLE);
-
         for (Collection collection : collections)
         {
-            // Now we need another list for the individual collection, each of which encompasses a form.
-            List collectionList = collectionsList.addList(collection + "List", List.TYPE_FORM);
+            Division collectionDiv = main.addInteractiveDivision("collection", contextPath + "/swordclient", Division.METHOD_POST, "");
 
-            // Add a header to each individual collection List.
-            collectionList.setHead(T_collection_head.parameterize(collection.getLocation()));
+            // Add a header for each individual collection.
+            collectionDiv.setHead(T_collection_head.parameterize(collection.getLocation()));
 
             // Now add another list of the remaining collection parameters.
-            List paramsList = collectionList.addList(collection + "Params", List.TYPE_BULLETED);
+            List paramsList = collectionDiv.addList(collection + "Params", List.TYPE_BULLETED);
 
             paramsList.addItem().addContent(T_collection_title.parameterize(collection.getTitle()));
             paramsList.addItem().addContent(T_collection_policy.parameterize(collection.getCollectionPolicy()));
@@ -105,25 +101,28 @@ public class SelectCollectionTransformer extends AbstractDSpaceTransformer {
             // Assuming there are available file types and package formats then add a deposit button.
             if ((fileTypes.length > 0 ) && (packageFormats.length > 0))
             {
-                collectionList.addItem().addHidden("location").setValue(collection.getLocation());
-                collectionList.addItem().addButton("deposit").setValue(T_collection_deposit_button);
+                collectionDiv.addPara().addButton("deposit").setValue(T_collection_deposit_button);
+                collectionDiv.addHidden("location").setValue(collection.getLocation());
+                collectionDiv.addHidden("swordclient-continue").setValue(knot.getId());
             }
 
             // If the collection contains a reference to  a 'sub service' then allow the user to select
             // the service doc for that sub service.
             if ((collection.getService() != null) && (collection.getService().length() > 0))
             {
-                collectionList.addItem().addContent(T_sub_service_target + collection.getService());
-                collectionList.addItem().addHidden("sub-service").setValue(collection.getService());
-                collectionList.addItem().addButton("sub-service").setValue(T_sub_service_target_button);
+                collectionDiv.addPara(T_sub_service_target + collection.getService());
+                collectionDiv.addPara().addButton("sub-service").setValue(T_sub_service_target_button);
+                collectionDiv.addHidden("sub-service").setValue(collection.getService());
+                collectionDiv.addHidden("swordclient-continue").setValue(knot.getId());
             }
 
         }
 
-        Para buttonList = main.addPara();
-        buttonList.addButton("submit_cancel").setValue(T_submit_cancel);
+        Division buttons = main.addInteractiveDivision("buttons", contextPath + "/swordclient", Division.METHOD_POST, "");
 
-        main.addHidden("swordclient-continue").setValue(knot.getId());
+        Para buttonList = buttons.addPara();
+        buttonList.addButton("submit_cancel").setValue(T_submit_cancel);
+        buttons.addHidden("swordclient-continue").setValue(knot.getId());
 
     }
 
