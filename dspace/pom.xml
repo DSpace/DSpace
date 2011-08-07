@@ -255,6 +255,19 @@
             </modules>
         </profile>
 
+        <!-- Builds DSpace Sword Client from local source if present -->
+        <profile>
+            <id>dspace-sword-client</id>
+            <activation>
+                <file>
+                    <exists>../dspace-sword-client/pom.xml</exists>
+                </file>
+            </activation>
+            <modules>
+                <module>../dspace-sword-client</module>
+            </modules>
+        </profile>
+
         <!--
            Builds each separate XMLUI module for the XMLUI war (for development/Eclipse)
         -->
