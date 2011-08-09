@@ -462,8 +462,8 @@ public class StatisticsImporter
         // Verbose option
         boolean verbose = line.hasOption('v');
 
-        // Find our solrserver
-        String sserver = ConfigurationManager.getProperty("solr.log.server");
+        // Find our solr server
+        String sserver = ConfigurationManager.getProperty("solr-statistics", "server");
         if (verbose)
         {
             System.out.println("Writing to solr server at: " + sserver);
@@ -471,7 +471,7 @@ public class StatisticsImporter
 		solr = new CommonsHttpSolrServer(sserver);
 
 		metadataStorageInfo = SolrLogger.getMetadataStorageInfo();
-        String dbfile = ConfigurationManager.getProperty("solr.dbfile");
+        String dbfile = ConfigurationManager.getProperty("solr-statistics", "dbfile");
 		geoipLookup = new LookupService(dbfile, LookupService.GEOIP_STANDARD);
 
         StatisticsImporter si = new StatisticsImporter(local);

@@ -190,16 +190,16 @@ public class StatisticsDataGenerator {
 
 		// We got all our parameters now get the rest
 		Context context = new Context();
-		// Find our solrserver
+		// Find our solr server
 		CommonsHttpSolrServer solr = new CommonsHttpSolrServer(
-				ConfigurationManager.getProperty("solr.log.server"));
+				ConfigurationManager.getProperty("solr-statistics", "server"));
 		solr.deleteByQuery("*:*");
 		solr.commit();
 
 		Map<String, String> metadataStorageInfo = SolrLogger.getMetadataStorageInfo();
 
 		String prevIp = null;
-		String dbfile = ConfigurationManager.getProperty("solr.dbfile");
+		String dbfile = ConfigurationManager.getProperty("solr-statistics", "dbfile");
 		LookupService cl = new LookupService(dbfile,
 				LookupService.GEOIP_STANDARD);
 		int countryErrors = 0;

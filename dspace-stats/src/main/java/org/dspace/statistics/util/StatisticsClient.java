@@ -105,7 +105,7 @@ public class StatisticsClient
             System.out.println("Downloading latest spider IP addresses:");
 
             // Get the list URLs to download from
-            String urls = ConfigurationManager.getProperty("solr.spiderips.urls");
+            String urls = ConfigurationManager.getProperty("solr-statistics", "spiderips.urls");
             if ((urls == null) || ("".equals(urls)))
             {
                 System.err.println(" - Missing setting from dspace.cfg: solr.spiderips.urls");

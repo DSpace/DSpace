@@ -46,8 +46,7 @@ import java.util.*;
  */
 public class SolrLogger
 {
-	
-	private static Logger log = Logger.getLogger(SolrLogger.class);
+    private static Logger log = Logger.getLogger(SolrLogger.class);
 	
     private static final CommonsHttpSolrServer solr;
 
@@ -63,17 +62,17 @@ public class SolrLogger
 
     static
     {
-    	log.info("solr.spidersfile:" + ConfigurationManager.getProperty("solr.spidersfile"));
-		log.info("solr.log.server:" + ConfigurationManager.getProperty("solr.log.server"));
-		log.info("solr.dbfile:" + ConfigurationManager.getProperty("solr.dbfile"));
+        log.info("solr-statistics.spidersfile:" + ConfigurationManager.getProperty("solr-statistics", "spidersfile"));
+        log.info("solr-statistics.server:" + ConfigurationManager.getProperty("solr-statistics", "server"));
+        log.info("solr-statistics.dbfile:" + ConfigurationManager.getProperty("solr-statistics", "dbfile"));
     	
         CommonsHttpSolrServer server = null;
         
-        if (ConfigurationManager.getProperty("solr.log.server") != null)
+        if (ConfigurationManager.getProperty("solr-statistics", "server") != null)
         {
             try
             {
-                server = new CommonsHttpSolrServer(ConfigurationManager.getProperty("solr.log.server"));
+                server = new CommonsHttpSolrServer(ConfigurationManager.getProperty("solr-statistics", "server"));
                 SolrQuery solrQuery = new SolrQuery()
                         .setQuery("type:2 AND id:1");
                 server.query(solrQuery);
@@ -88,7 +87,7 @@ public class SolrLogger
 
         LookupService service = null;
         // Get the db file for the location
-        String dbfile = ConfigurationManager.getProperty("solr.dbfile");
+        String dbfile = ConfigurationManager.getProperty("solr-statistics", "dbfile");
         if (dbfile != null)
         {
             try
@@ -121,13 +120,13 @@ public class SolrLogger
         metadataStorageInfo = new HashMap<String, String>();
         int count = 1;
         String metadataVal;
-        while ((metadataVal = ConfigurationManager.getProperty("solr.metadata.item." + count)) != null)
+        while ((metadataVal = ConfigurationManager.getProperty("solr-statistics","metadata.item." + count)) != null)
         {
             String storeVal = metadataVal.split(":")[0];
             String metadataField = metadataVal.split(":")[1];
 
             metadataStorageInfo.put(storeVal, metadataField);
-            log.info("solr.metadata.item." + count + "=" + metadataVal);
+            log.info("solr-statistics.metadata.item." + count + "=" + metadataVal);
             count++;
         }
     }
@@ -152,7 +151,7 @@ public class SolrLogger
         try
         {
             if(isSpiderBot &&
-                    !ConfigurationManager.getBooleanProperty("solr.statistics.logBots",true))
+                    !ConfigurationManager.getBooleanProperty("solr-statistics", "logBots",true))
             {
                 return;
             }
@@ -869,14 +868,14 @@ public class SolrLogger
         // not be influenced
 
         // Choose to filter by the Legacy spider IP list (may get too long to properly filter all IP's
-        if(ConfigurationManager.getBooleanProperty("solr.statistics.query.filter.spiderIp",false))
+        if(ConfigurationManager.getBooleanProperty("solr-statistics", "query.filter.spiderIp",false))
         {
             solrQuery.addFilterQuery(getIgnoreSpiderIPs());
         }
 
         // Choose to filter by isBot field, may be overriden in future
         // to allow views on stats based on bots.
-        if(ConfigurationManager.getBooleanProperty("solr.statistics.query.filter.isBot",true))
+        if(ConfigurationManager.getBooleanProperty("solr-statistics", "query.filter.isBot",true))
         {
             solrQuery.addFilterQuery("-isBot:true");
         }
