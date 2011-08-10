@@ -8,7 +8,7 @@
 package org.dspace.event;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.dspace.core.Context;
@@ -31,7 +31,7 @@ public abstract class Dispatcher
     /**
      * Map of consumers by their configured name.
      */
-    protected Map<String, ConsumerProfile> consumers = new HashMap<String, ConsumerProfile>();
+    protected Map<String, ConsumerProfile> consumers = new LinkedHashMap<String, ConsumerProfile>();
 
     protected Dispatcher(String name)
     {
