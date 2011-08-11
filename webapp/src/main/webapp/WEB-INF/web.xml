@@ -30,18 +30,28 @@
              "com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl"/>
    -->
 
-
+  <!-- People who want to hardcode their "Solr Home" directly into the
+       WAR File can set the JNDI property here...
+   -->
+  <!--
+    <env-entry>
+       <env-entry-name>solr/home</env-entry-name>
+       <env-entry-value>/put/your/solr/home/here</env-entry-value>
+       <env-entry-type>java.lang.String</env-entry-type>
+    </env-entry>
+   -->
+   
   <!-- Any path (name) registered in solrconfig.xml will be sent to that filter -->
   <filter>
       <filter-name>LocalHostRestrictionFilter</filter-name>
       <filter-class>org.dspace.solr.filters.LocalHostRestrictionFilter</filter-class>
-   </filter>
+  </filter>
 
 	<!--
 		Any path (name) registered in solrconfig.xml will be sent to that
 		filter
 	-->
-	<filter>
+  <filter>
     <filter-name>SolrRequestFilter</filter-name>
     <filter-class>org.apache.solr.servlet.SolrDispatchFilter</filter-class>
     <!-- If you are wiring Solr into a larger web application which controls
@@ -88,9 +98,8 @@
     <url-pattern>/*</url-pattern>
   </filter-mapping>
 
-
   <!-- Otherwise it will continue to the old servlets -->
-
+  
   <servlet>
     <servlet-name>SolrServer</servlet-name>
     <display-name>Solr</display-name>
