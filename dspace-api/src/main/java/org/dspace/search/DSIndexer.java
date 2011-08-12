@@ -39,12 +39,8 @@ import org.apache.lucene.document.Field;
 import org.apache.lucene.document.DateTools;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.index.TermDocs;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
-import org.apache.lucene.util.Version;
 import org.dspace.content.Bitstream;
 import org.dspace.content.Bundle;
 import org.dspace.content.Collection;
@@ -212,22 +208,21 @@ public class DSIndexer
         /*
          * Create the index directory if it doesn't already exist.
          */
-        try
-        {
-            if (!IndexReader.indexExists(FSDirectory.open(new File(indexDirectory))))
+        if (!IndexReader.indexExists(indexDirectory))
+    	{
+    		try
             {
-
-                if (!new File(indexDirectory).mkdirs())
+    			if (!new File(indexDirectory).mkdirs())
                 {
                     log.error("Unable to create index directory: " + indexDirectory);
                 }
-                openIndex(true).close();
+				openIndex(true).close();
+			}
+            catch (IOException e)
+            {
+                throw new IllegalStateException("Could not create search index: " + e.getMessage(),e);
             }
-        }
-        catch (IOException e)
-        {
-            throw new IllegalStateException("Could not create search index: " + e.getMessage(),e);
-        }
+    	}
     }
 
     public static void setBatchProcessingMode(boolean mode)
@@ -907,15 +902,8 @@ public class DSIndexer
     private static IndexWriter openIndex(boolean wipeExisting)
             throws IOException
     {
-        Directory dir = FSDirectory.open(new File(indexDirectory));
-        IndexWriterConfig iwc = new IndexWriterConfig(Version.LUCENE_33, getAnalyzer());
-        if(wipeExisting){
-            iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE);
-        }else{
-            iwc.setOpenMode(IndexWriterConfig.OpenMode.CREATE_OR_APPEND);
-        }
-
-        IndexWriter writer = new IndexWriter(dir, iwc);
+    	
+    	IndexWriter writer = new IndexWriter(indexDirectory, getAnalyzer(), wipeExisting);
 
         /* Set maximum number of terms to index if present in dspace.cfg */
         if (maxfieldlength == -1)
@@ -994,8 +982,8 @@ public class DSIndexer
 
         if (name != null)
         {
-        	doc.add(new Field("name", name, Field.Store.NO, Field.Index.ANALYZED));
-        	doc.add(new Field("default", name, Field.Store.NO, Field.Index.ANALYZED));
+        	doc.add(new Field("name", name, Field.Store.NO, Field.Index.TOKENIZED));
+        	doc.add(new Field("default", name, Field.Store.NO, Field.Index.TOKENIZED));
         }
 
         return doc;
@@ -1020,8 +1008,8 @@ public class DSIndexer
 
         if (name != null)
         {
-        	doc.add(new Field("name", name, Field.Store.NO, Field.Index.ANALYZED));
-        	doc.add(new Field("default", name, Field.Store.NO, Field.Index.ANALYZED));
+        	doc.add(new Field("name", name, Field.Store.NO, Field.Index.TOKENIZED));
+        	doc.add(new Field("default", name, Field.Store.NO, Field.Index.TOKENIZED));
         }
 
         return doc;
@@ -1074,12 +1062,12 @@ public class DSIndexer
                                 doc.add( new Field(indexConfigArr[i].indexName,
                                                    DateTools.dateToString(d, DateTools.Resolution.SECOND),
                                                    Field.Store.NO,
-                                                   Field.Index.NOT_ANALYZED));
+                                                   Field.Index.UN_TOKENIZED));
 
                                 doc.add( new Field(indexConfigArr[i].indexName  + ".year",
                                                     DateTools.dateToString(d, DateTools.Resolution.YEAR),
                                                     Field.Store.NO,
-                                                    Field.Index.NOT_ANALYZED));
+                                                    Field.Index.UN_TOKENIZED));
                             }
                         }
                         else if ("date".equalsIgnoreCase(indexConfigArr[i].type))
@@ -1090,12 +1078,12 @@ public class DSIndexer
                                 doc.add( new Field(indexConfigArr[i].indexName,
                                                    DateTools.dateToString(d, DateTools.Resolution.DAY),
                                                    Field.Store.NO,
-                                                   Field.Index.NOT_ANALYZED));
+                                                   Field.Index.UN_TOKENIZED));
 
                                 doc.add( new Field(indexConfigArr[i].indexName  + ".year",
                                                     DateTools.dateToString(d, DateTools.Resolution.YEAR),
                                                     Field.Store.NO,
-                                                    Field.Index.NOT_ANALYZED));
+                                                    Field.Index.UN_TOKENIZED));
                             }
                         }
                         else
@@ -1111,7 +1099,7 @@ public class DSIndexer
                                 doc.add( new Field(indexConfigArr[i].indexName+"_authority",
                                    mydc[j].authority,
                                    Field.Store.NO,
-                                   Field.Index.NOT_ANALYZED));
+                                   Field.Index.UN_TOKENIZED));
 
                                 boolean valueAlreadyIndexed = false;
                                 if (variants != null)
@@ -1122,7 +1110,7 @@ public class DSIndexer
                                         doc.add( new Field(indexConfigArr[i].indexName,
                                                            var,
                                                            Field.Store.NO,
-                                                           Field.Index.ANALYZED));
+                                                           Field.Index.TOKENIZED));
                                         if (var.equals(mydc[j].value))
                                         {
                                             valueAlreadyIndexed = true;
@@ -1133,7 +1121,7 @@ public class DSIndexer
                                              doc.add( new Field("default",
                                                        var,
                                                        Field.Store.NO,
-                                                       Field.Index.ANALYZED));
+                                                       Field.Index.TOKENIZED));
                                         }
                                     }
                                 }
@@ -1144,7 +1132,7 @@ public class DSIndexer
                                     doc.add( new Field(indexConfigArr[i].indexName,
                                                        mydc[j].value,
                                                        Field.Store.NO,
-                                                       Field.Index.ANALYZED));
+                                                       Field.Index.TOKENIZED));
                                 }
                             }
                             else
@@ -1153,11 +1141,11 @@ public class DSIndexer
 	                            doc.add( new Field(indexConfigArr[i].indexName,
 	                                               mydc[j].value,
 	                                               Field.Store.NO,
-	                                               Field.Index.ANALYZED));
+	                                               Field.Index.TOKENIZED));
                         	}
                         }
 
-                        doc.add( new Field("default", mydc[j].value, Field.Store.NO, Field.Index.ANALYZED));
+                        doc.add( new Field("default", mydc[j].value, Field.Store.NO, Field.Index.TOKENIZED));
                     }
                 }
             }
@@ -1176,7 +1164,7 @@ public class DSIndexer
                 if (dcv.length > 0)
                 {
                     String value = OrderFormat.makeSortString(dcv[0].value, dcv[0].language, so.getType());
-                    doc.add( new Field("sort_" + so.getName(), value, Field.Store.NO, Field.Index.NOT_ANALYZED) );
+                    doc.add( new Field("sort_" + so.getName(), value, Field.Store.NO, Field.Index.UN_TOKENIZED) );
                 }
             }
         }
@@ -1242,15 +1230,15 @@ public class DSIndexer
 
         // want to be able to check when last updated
         // (not tokenized, but it is indexed)
-        doc.add(new Field(LAST_INDEXED_FIELD, Long.toString(System.currentTimeMillis()), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field(DOCUMENT_STATUS_FIELD, "archived", Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field(LAST_INDEXED_FIELD, Long.toString(System.currentTimeMillis()), Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(DOCUMENT_STATUS_FIELD, "archived", Field.Store.YES, Field.Index.UN_TOKENIZED));
 
         // KEPT FOR BACKWARDS COMPATIBILITY
         // do location, type, handle first
         doc.add(new Field("type", Integer.toString(type), Field.Store.YES, Field.Index.NO));
 
         // New fields to weaken the dependence on handles, and allow for faster list display
-        doc.add(new Field("search.resourcetype", Integer.toString(type), Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field("search.resourcetype", Integer.toString(type), Field.Store.YES, Field.Index.UN_TOKENIZED));
         doc.add(new Field("search.resourceid",   Integer.toString(id),   Field.Store.YES, Field.Index.NO));
 
         // want to be able to search for handle, so use keyword
@@ -1258,20 +1246,20 @@ public class DSIndexer
         if (handle != null)
         {
             // ??? not sure what the "handletext" field is but it was there in writeItemIndex ???
-            doc.add(new Field("handletext", handle, Field.Store.YES, Field.Index.ANALYZED));
+            doc.add(new Field("handletext", handle, Field.Store.YES, Field.Index.TOKENIZED));
 
             // want to be able to search for handle, so use keyword
             // (not tokenized, but it is indexed)
-            doc.add(new Field("handle", handle, Field.Store.YES, Field.Index.NOT_ANALYZED));
+            doc.add(new Field("handle", handle, Field.Store.YES, Field.Index.UN_TOKENIZED));
 
             // add to full text index
-            doc.add(new Field("default", handle, Field.Store.NO, Field.Index.ANALYZED));
+            doc.add(new Field("default", handle, Field.Store.NO, Field.Index.TOKENIZED));
         }
 
         if(location != null)
         {
-            doc.add(new Field("location", location, Field.Store.NO, Field.Index.ANALYZED));
-    	    doc.add(new Field("default", location, Field.Store.NO, Field.Index.ANALYZED));
+            doc.add(new Field("location", location, Field.Store.NO, Field.Index.TOKENIZED));
+    	    doc.add(new Field("default", location, Field.Store.NO, Field.Index.TOKENIZED));
         }
 
         return doc;
@@ -1283,8 +1271,8 @@ public class DSIndexer
 
         // want to be able to check when last updated
         // (not tokenized, but it is indexed)
-        doc.add(new Field(LAST_INDEXED_FIELD,    Long.toString(System.currentTimeMillis()), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field(DOCUMENT_STATUS_FIELD, "deleted", Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field(LAST_INDEXED_FIELD,    Long.toString(System.currentTimeMillis()), Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(DOCUMENT_STATUS_FIELD, "deleted", Field.Store.YES, Field.Index.UN_TOKENIZED));
 
         // Do not add any other fields, as we don't want to be able to find it - just check the last indexed time
 
@@ -1297,8 +1285,8 @@ public class DSIndexer
 
         // want to be able to check when last updated
         // (not tokenized, but it is indexed)
-        doc.add(new Field(LAST_INDEXED_FIELD,    Long.toString(System.currentTimeMillis()), Field.Store.YES, Field.Index.NOT_ANALYZED));
-        doc.add(new Field(DOCUMENT_STATUS_FIELD, "withdrawn", Field.Store.YES, Field.Index.NOT_ANALYZED));
+        doc.add(new Field(LAST_INDEXED_FIELD,    Long.toString(System.currentTimeMillis()), Field.Store.YES, Field.Index.UN_TOKENIZED));
+        doc.add(new Field(DOCUMENT_STATUS_FIELD, "withdrawn", Field.Store.YES, Field.Index.UN_TOKENIZED));
 
         // Do not add any other fields, as we don't want to be able to find it - just check the last indexed time
 

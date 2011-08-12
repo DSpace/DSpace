@@ -13,7 +13,6 @@ import org.apache.lucene.analysis.LowerCaseFilter;
 import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardFilter;
-import org.apache.lucene.util.Version;
 
 /**
  * Custom Lucene Analyzer that combines the standard filter, lowercase filter
@@ -33,7 +32,7 @@ public class DSNonStemmingAnalyzer extends DSAnalyzer
 
         result = new StandardFilter(result);
         result = new LowerCaseFilter(result);
-        result = new StopFilter(Version.LUCENE_33, result, stopSet);
+        result = new StopFilter(result, stopSet);
 
         return result;
     }

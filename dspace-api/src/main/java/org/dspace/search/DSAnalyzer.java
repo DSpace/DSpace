@@ -16,7 +16,6 @@ import org.apache.lucene.analysis.PorterStemFilter;
 import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardFilter;
-import org.apache.lucene.util.Version;
 import org.dspace.core.ConfigurationManager;
 
 /**
@@ -48,7 +47,7 @@ public class DSAnalyzer extends Analyzer
     /*
      * Stop table
      */
-    protected static final Set stopSet = StopFilter.makeStopSet(Version.LUCENE_33,STOP_WORDS);
+    protected static final Set stopSet = StopFilter.makeStopSet(STOP_WORDS);
 
     /*
      * Create a token stream for this analyzer.
@@ -60,7 +59,7 @@ public class DSAnalyzer extends Analyzer
 
         result = new StandardFilter(result);
         result = new LowerCaseFilter(result);
-        result = new StopFilter(Version.LUCENE_33, result, stopSet);
+        result = new StopFilter(result, stopSet);
         result = new PorterStemFilter(result);
 
         return result;
