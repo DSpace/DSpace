@@ -136,8 +136,8 @@ public class DSpaceI18NTransformer extends I18nTransformer {
             		aspectLocation.setValue(aspectLocationPath);
             		catalogueConf.addChild(aspectLocation);
             		
-            		log.info("Adding i18n location path for '"+catalogueId+"' catalogue: "+baseLocationPath);
-            		log.info("Adding i18n location path for '"+catalogueId+"' catalogue: "+aspectLocationPath);
+            		log.debug("Adding i18n location path for '"+catalogueId+"' catalogue: "+baseLocationPath);
+            		log.debug("Adding i18n location path for '"+catalogueId+"' catalogue: "+aspectLocationPath);
             	} // for each aspect
 			} // if catalogue has the aspect parameter
         } // for each catalogue
