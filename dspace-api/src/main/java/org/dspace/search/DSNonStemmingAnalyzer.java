@@ -12,7 +12,9 @@ import java.io.Reader;
 import org.apache.lucene.analysis.LowerCaseFilter;
 import org.apache.lucene.analysis.StopFilter;
 import org.apache.lucene.analysis.TokenStream;
+import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.standard.StandardFilter;
+import org.apache.lucene.util.Version;
 
 /**
  * Custom Lucene Analyzer that combines the standard filter, lowercase filter
@@ -22,18 +24,26 @@ import org.apache.lucene.analysis.standard.StandardFilter;
 public class DSNonStemmingAnalyzer extends DSAnalyzer
 {
     /**
+     * Builds an analyzer
+     *
+     * @param matchVersion Lucene version to match
+     */
+    public DSNonStemmingAnalyzer(Version matchVersion) {
+        super(matchVersion);
+    }
+
+    /**
      * Create a token stream for this analyzer.
      * This is identical to DSAnalyzer, except it omits the stemming filter
      */
     @Override
-    public TokenStream tokenStream(String fieldName, final Reader reader)
-    {
-        TokenStream result = new DSTokenizer(reader);
+    protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+        final Tokenizer source = new DSTokenizer(matchVersion,  reader);
+        TokenStream result = new StandardFilter(matchVersion, source);
 
-        result = new StandardFilter(result);
-        result = new LowerCaseFilter(result);
-        result = new StopFilter(result, stopSet);
+        result = new LowerCaseFilter(matchVersion, result);
+        result = new StopFilter(matchVersion, result, stopSet);
 
-        return result;
+        return new TokenStreamComponents(source, result);
     }
 }

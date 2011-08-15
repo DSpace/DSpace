@@ -10,20 +10,23 @@ package org.dspace.search;
 import java.io.Reader;
 import java.util.Set;
 
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.LowerCaseFilter;
 import org.apache.lucene.analysis.PorterStemFilter;
 import org.apache.lucene.analysis.StopFilter;
+import org.apache.lucene.analysis.StopwordAnalyzerBase;
+import org.apache.lucene.analysis.Tokenizer;
 import org.apache.lucene.analysis.TokenStream;
 import org.apache.lucene.analysis.standard.StandardFilter;
+import org.apache.lucene.util.Version;
 import org.dspace.core.ConfigurationManager;
 
 /**
  * Custom Lucene Analyzer that combines the standard filter, lowercase filter,
  * stemming and stopword filters.
  */
-public class DSAnalyzer extends Analyzer
+public class DSAnalyzer extends StopwordAnalyzerBase
 {
+    protected final Version matchVersion;
     /*
      * An array containing some common words that are not usually useful for
      * searching.
@@ -47,22 +50,28 @@ public class DSAnalyzer extends Analyzer
     /*
      * Stop table
      */
-    protected static final Set stopSet = StopFilter.makeStopSet(STOP_WORDS);
+    protected final Set stopSet;
 
-    /*
-     * Create a token stream for this analyzer.
+    /**
+     * Builds an analyzer
+     * @param matchVersion Lucene version to match
      */
-    @Override
-    public TokenStream tokenStream(String fieldName, final Reader reader)
-    {
-        TokenStream result = new DSTokenizer(reader);
+    public DSAnalyzer(Version matchVersion) {
+        super(matchVersion, StopFilter.makeStopSet(matchVersion, STOP_WORDS));
+        this.stopSet = StopFilter.makeStopSet(matchVersion, STOP_WORDS);
+        this.matchVersion = matchVersion;
+    }
 
-        result = new StandardFilter(result);
-        result = new LowerCaseFilter(result);
-        result = new StopFilter(result, stopSet);
+    @Override
+    protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+        final Tokenizer source = new DSTokenizer(matchVersion, reader);
+        TokenStream result = new StandardFilter(matchVersion, source);
+
+        result = new LowerCaseFilter(matchVersion, result);
+        result = new StopFilter(matchVersion, result, stopSet);
         result = new PorterStemFilter(result);
 
-        return result;
+        return new TokenStreamComponents(source, result);
     }
 
     @Override
