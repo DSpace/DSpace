@@ -28,6 +28,7 @@ import org.springframework.beans.factory.annotation.Required;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
@@ -255,7 +256,7 @@ public final class SessionRequestServiceImpl implements SessionService, RequestS
      * Class to hold the current request. Uses Map keyed on current thread id.
      */
     private class RequestHolder {
-        Map<Long, Request> requestMap = new HashMap<Long, Request>();
+        Map<Long, Request> requestMap = new ConcurrentHashMap<Long, Request>();
 
         Request getCurrent() {
             return requestMap.get(Thread.currentThread().getId());
