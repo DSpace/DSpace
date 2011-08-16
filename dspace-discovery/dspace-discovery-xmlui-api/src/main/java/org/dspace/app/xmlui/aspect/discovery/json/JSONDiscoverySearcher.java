@@ -17,6 +17,7 @@ import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.reading.AbstractReader;
 import org.apache.log4j.Logger;
 import org.dspace.discovery.*;
+import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
@@ -67,14 +68,6 @@ public class JSONDiscoverySearcher extends AbstractReader implements Recyclable 
         if(request.getParameterValues("fq") != null)
             queryArgs.addFilterQueries(request.getParameterValues("fq"));
 
-        //Retrieve our facet fields
-        if(request.getParameterValues("facet.field") != null){
-            for (int i = 0; i < request.getParameterValues("facet.field").length; i++) {
-                String facetField = request.getParameterValues("facet.field")[i];
-                queryArgs.addFacetField(new FacetFieldConfig(facetField, false));
-            }
-        }
-
         //Retrieve our facet limit (if any)
         int facetLimit;
         if(request.getParameter("facet.limit") != null){
@@ -89,14 +82,24 @@ public class JSONDiscoverySearcher extends AbstractReader implements Recyclable 
         {
             facetLimit = -1;
         }
-        queryArgs.setFacetLimit(facetLimit);
 
-        //Retrieve our sorting value
-        String facetSort = request.getParameter("facet.sort");
-        if(facetSort == null || facetSort.equalsIgnoreCase("count"))
-            queryArgs.setFacetSort(DiscoverQuery.FACET_SORT.COUNT);
-        else
-            queryArgs.setFacetSort(DiscoverQuery.FACET_SORT.INDEX);
+        //Retrieve our facet fields
+        if(request.getParameterValues("facet.field") != null){
+            for (int i = 0; i < request.getParameterValues("facet.field").length; i++) {
+                //Retrieve our sorting value
+                DiscoveryConfigurationParameters.SORT facetSort;
+                if(request.getParameter("facet.sort") == null || request.getParameter("facet.sort").equalsIgnoreCase("count")){
+                    facetSort = DiscoveryConfigurationParameters.SORT.COUNT;
+                }
+                else
+                    facetSort = DiscoveryConfigurationParameters.SORT.VALUE;
+
+
+                String facetField = request.getParameterValues("facet.field")[i];
+                queryArgs.addFacetField(new DiscoverFacetField(facetField, DiscoveryConfigurationParameters.TYPE_AC, facetLimit, facetSort));
+            }
+        }
+
 
         //Retrieve our facet min count
         int facetMinCount;

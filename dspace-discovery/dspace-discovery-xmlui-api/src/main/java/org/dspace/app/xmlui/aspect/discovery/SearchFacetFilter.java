@@ -28,6 +28,9 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.discovery.*;
+import org.dspace.discovery.configuration.DiscoveryConfiguration;
+import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
+import org.dspace.discovery.configuration.SidebarFacetConfiguration;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
@@ -174,7 +177,9 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         queryArgs = new DiscoverQuery();
 
         //Make sure we add our default filters
-        queryArgs.addFilterQueries(SearchUtils.getDefaultFilters("search"));
+        DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(scope);
+        List<String> defaultFilterQueries = discoveryConfiguration.getDefaultFilterQueries();
+        queryArgs.addFilterQueries(defaultFilterQueries.toArray(new String[defaultFilterQueries.size()]));
 
 
         queryArgs.setQuery(((request.getParameter("query") != null && !"".equals(request.getParameter("query").trim())) ? request.getParameter("query") : null));
@@ -190,13 +195,6 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         //query.setFacetLimit(11);
         queryArgs.setFacetMinCount(1);
 
-        //sort
-        //TODO: why this kind of sorting ? Should the sort not be on how many times the value appears like we do in the filter by sidebar ?
-        queryArgs.setFacetSort(DiscoverQuery.FACET_SORT.INDEX);
-
-        String facetField = request.getParameter(SearchFilterParam.FACET_FIELD);
-
-
         int offset = RequestUtils.getIntParameter(request, SearchFilterParam.OFFSET);
         if (offset == -1)
         {
@@ -205,18 +203,19 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         queryArgs.setFacetOffset(offset);
 
             //We add +1 so we can use the extra one to make sure that we need to show the next page
-        queryArgs.setFacetLimit(DEFAULT_PAGE_SIZE + 1);
+//        queryArgs.setFacetLimit();
 
-        FacetFieldConfig facetFieldConfig;
+        String facetField = request.getParameter(SearchFilterParam.FACET_FIELD);
+        DiscoverFacetField discoverFacetField;
         if(request.getParameter(SearchFilterParam.STARTS_WITH) != null)
-            {
-            facetFieldConfig = new FacetFieldConfig(facetField, false, request.getParameter(SearchFilterParam.STARTS_WITH).toLowerCase());
+        {
+            discoverFacetField = new DiscoverFacetField(facetField, DiscoveryConfigurationParameters.TYPE_TEXT, DEFAULT_PAGE_SIZE + 1, DiscoveryConfigurationParameters.SORT.VALUE, request.getParameter(SearchFilterParam.STARTS_WITH).toLowerCase());
         }else{
-            facetFieldConfig = new FacetFieldConfig(facetField, false);
-            }
+            discoverFacetField = new DiscoverFacetField(facetField, DiscoveryConfigurationParameters.TYPE_TEXT, DEFAULT_PAGE_SIZE + 1, DiscoveryConfigurationParameters.SORT.VALUE);
+        }
 
 
-        queryArgs.addFacetField(facetFieldConfig);
+        queryArgs.addFacetField(discoverFacetField);
 
 
         try {
@@ -297,38 +296,16 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
                     //Only show the nextpageurl if we have at least one result following our current results
                     String nextPageUrl = null;
-                    if(facetField.endsWith(".year")){
-                        offSet = Util.getIntParameter(request, SearchFilterParam.OFFSET);
-                        offSet = offSet == -1 ? 0 : offSet;
-
-                        if ((offSet + DEFAULT_PAGE_SIZE) < values.size())
-                        {
-                            nextPageUrl = getNextPageURL(browseParams, request);
-                        }
-                    }else{
-                        if (values.size() == (DEFAULT_PAGE_SIZE + 1))
-                        {
-                            nextPageUrl = getNextPageURL(browseParams, request);
-                        }
+                    if (values.size() == (DEFAULT_PAGE_SIZE + 1))
+                    {
+                        nextPageUrl = getNextPageURL(browseParams, request);
                     }
 
 
-                    int shownItemsMax;
+
+                    int shownItemsMax = offSet + (DEFAULT_PAGE_SIZE < values.size() ? values.size() - 1 : values.size());
 
 
-                    if(facetField.endsWith(".year")){
-                        if((values.size() - offSet) < DEFAULT_PAGE_SIZE)
-                        {
-                            shownItemsMax = values.size();
-                        }
-                        else
-                        {
-                            shownItemsMax = DEFAULT_PAGE_SIZE;
-                        }
-                    }else{
-                        shownItemsMax = offSet + (DEFAULT_PAGE_SIZE < values.size() ? values.size() - 1 : values.size());
-
-                    }
 
                     // We put our total results to -1 so this doesn't get shown in the results (will be hidden by the xsl)
                     // The reason why we do this is because solr 1.4 can't retrieve the total number of facets found
@@ -343,39 +320,16 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
                         filterQueries = Arrays.asList(request.getParameterValues("fq"));
                     }
 
-                    if(facetField.endsWith(".year")){
-                        int start = (values.size() - 1) - offSet;
-                        int end = start - DEFAULT_PAGE_SIZE;
-                        if(end < 0)
-                        {
-                            end = 0;
-                        }
-                        else
-                        {
-                            end++;
-                        }
-                        for(int i = start; end <= i; i--)
-                        {
-                            DiscoverResult.FacetResult value = values.get(i);
 
-                            renderFacetField(browseParams, dso, facetField, singleTable, filterQueries, value);
-                        }
-                    }else{
-                        int end = values.size();
-                        if(DEFAULT_PAGE_SIZE < end)
-                        {
-                            end = DEFAULT_PAGE_SIZE;
-                        }
-
-
-                        for (int i = 0; i < end; i++) {
-                            DiscoverResult.FacetResult value = values.get(i);
-
-                            renderFacetField(browseParams, dso, facetField, singleTable, filterQueries, value);
-                        }
+                    int end = values.size();
+                    if(DEFAULT_PAGE_SIZE < end)
+                    {
+                        end = DEFAULT_PAGE_SIZE;
                     }
-
-
+                    for (int i = 0; i < end; i++) {
+                        DiscoverResult.FacetResult value = values.get(i);
+                        renderFacetField(browseParams, dso, facetField, singleTable, filterQueries, value);
+                    }
                 }else{
                     results.addPara(message("xmlui.discovery.SearchFacetFilter.no-results"));
                 }
@@ -555,7 +509,6 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
      * Returns all the filter queries for use by discovery
      *  This method returns more expanded filter queries then the getParameterFilterQueries
      * @return an array containing the filter queries
-     * TODO: almost identical to: SimpleSearch.getFilterQueries
      */
     protected String[] getDiscoveryFilterQueries() {
         try {

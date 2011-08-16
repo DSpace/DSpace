@@ -136,7 +136,7 @@ public class RelatedItems extends AbstractDSpaceTransformer
             return;
         }
         /*
-        this.queryArgs = prepareDefaultFilters(getView());
+        this.queryArgs = getQueryArgs(getView());
         this.queryArgs.setMaxResults(1);
         this.queryArgs.add("fl","author,handle");
         this.queryArgs.add("mlt","true");
@@ -146,7 +146,7 @@ public class RelatedItems extends AbstractDSpaceTransformer
         this.queryArgs.setQuery("handle:" + dso.getHandle());
         this.queryArgs.setRows(1);
         */
-        queryResults = SearchUtils.getSearchService().search(context, queryArgs);
+        //queryResults = SearchUtils.getSearchService().search(context, queryArgs);
 
     }
 

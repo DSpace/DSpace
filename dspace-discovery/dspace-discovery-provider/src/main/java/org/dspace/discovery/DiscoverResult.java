@@ -85,7 +85,6 @@ public class DiscoverResult {
     }
 
     public static final class FacetResult{
-//        TODO: rename storedValue to filterValue
         private String asFilterQuery;
         private String displayedValue;
         private long count;

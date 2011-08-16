@@ -17,6 +17,8 @@ import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
 import org.dspace.discovery.*;
+import org.dspace.discovery.configuration.DiscoveryConfiguration;
+import org.dspace.discovery.configuration.DiscoveryRecentSubmissionsConfiguration;
 
 import java.io.Serializable;
 import java.sql.SQLException;
@@ -103,9 +105,6 @@ public abstract class AbstractRecentSubmissionTransformer extends AbstractDSpace
     	return this.validity;
     }
 
-
-    protected abstract String getView();
-
     /**
      * Retrieves the recent submitted items of the given scope
      *
@@ -121,23 +120,30 @@ public abstract class AbstractRecentSubmissionTransformer extends AbstractDSpace
         try {
             DiscoverQuery queryArgs = new DiscoverQuery();
 
-            queryArgs.addFilterQueries(SearchUtils.getDefaultFilters(getView()));
+            //Add the default filter queries
+            DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(dso);
+            List<String> defaultFilterQueries = discoveryConfiguration.getDefaultFilterQueries();
+            queryArgs.addFilterQueries(defaultFilterQueries.toArray(new String[defaultFilterQueries.size()]));
             queryArgs.setDSpaceObjectFilter(Constants.ITEM);
 
-            queryArgs.setMaxResults(SearchUtils.getConfig().getInt("solr.recent-submissions.size", 5));
-
-            String sortField = SearchUtils.getConfig().getString("recent.submissions.sort-option");
-            if(sortField != null){
-                queryArgs.setSortField(
-                        sortField,
-                        DiscoverQuery.SORT_ORDER.desc
-                );
+            DiscoveryRecentSubmissionsConfiguration recentSubmissionConfiguration = discoveryConfiguration.getRecentSubmissionConfiguration();
+            if(recentSubmissionConfiguration != null){
+                queryArgs.setMaxResults(recentSubmissionConfiguration.getMax());
+                String sortField = SearchUtils.getSearchService().toSortFieldIndex(recentSubmissionConfiguration.getMetadataSortField(), recentSubmissionConfiguration.getType());
+                if(sortField != null){
+                    queryArgs.setSortField(
+                            sortField,
+                            DiscoverQuery.SORT_ORDER.desc
+                    );
+                }
+                SearchService service = SearchUtils.getSearchService();
+                queryResults = service.search(context, dso, queryArgs);
+            }else{
+                //No configuration, no results
+                queryResults = null;
             }
-
-            SearchService service = SearchUtils.getSearchService();
-            queryResults = service.search(context, dso, queryArgs);
         }catch (SearchServiceException se){
-            log.error("Caught SearchServiceException while retrieving recent submission for: " + getView(), se);
+            log.error("Caught SearchServiceException while retrieving recent submission for: " + (dso == null ? "home page" : dso.getHandle()), se);
         }
     }
 

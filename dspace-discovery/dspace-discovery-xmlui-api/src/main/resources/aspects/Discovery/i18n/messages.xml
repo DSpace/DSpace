@@ -35,7 +35,8 @@
     <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.subject_filter">Subject</message>
     <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.type_filter">Content Type</message>
     <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.date.issued">Date Issued</message>
-    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.date.issued.year">Date Issued</message>
+    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dateIssued">Date Issued</message>
+
 
     <!-- Site Leve Recently Added Content -->
     <message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Recently Added</message>
@@ -81,12 +82,10 @@
     <message key="xmlui.ArtifactBrowser.AbstractSearch.type_dateissued_dt_browse">Browsing by: Issue date</message>
 
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.all">Full text</message>
-    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dc.title">Title</message>
-    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dc.contributor.author">Author</message>
-    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dc.subject">Subject</message>
-    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dc.description">Description</message>
-    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dc.date.issued.year">Date Issued</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author">Author</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.title">Title</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject">Subject</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dateIssued">Date issued</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.selected">Selected filters</message>
 
     <message key="xmlui.Discovery.SimpleSearch.filter_help">Enter some text to add a filter to your results, the box has an auto complete function containing all the values that can be found in the fields selected in the dropdown box. Please be aware however that although the full text option also has an auto complete, this only shows values from all the fields which can be selected &amp; not for all the values in the repository in which the search will occur when this is selected.</message>
@@ -95,17 +94,20 @@
 
     <message key="xmlui.dri2xhtml.structural.pagination-info.nototal">Now showing items {0}-{1}</message>
 
-    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dc.contributor.author_filter">Author</message>
-    <message key="xmlui.Discovery.AbstractSearch.type_dc.contributor.author_filter">Filter by: Author</message>
-    <message key="xmlui.Discovery.AbstractSearch.type_dc.subject_filter">Filter by: Subject</message>
-    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dc.subject_filter">Subject</message>
-    <message key="xmlui.Discovery.AbstractSearch.type_dc.date.issued.year_filter">Filter by: Date issued</message>
+    <message key="xmlui.Discovery.AbstractSearch.type_author">Filter by: Author</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author">Author</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author_filter">Author</message>
+    <message key="xmlui.Discovery.AbstractSearch.type_subject">Filter by: Subject</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject">Subject</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject_filter">Subject</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dateIssued.year">Date Issued</message>
+
 
     <message key="xmlui.Discovery.AbstractSearch.startswith">Starts with</message>
     <message key="xmlui.Discovery.AbstractSearch.startswith.help">Or enter first few letters:</message>
     
     <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.title_sort">Title</message>
-    <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.date.issued_dt_sort">Issue Date</message>
+    <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.date.issued_dt">Issue Date</message>
 
     <message key="xmlui.discovery.SearchFacetFilter.no-results">No filter values found</message>
 

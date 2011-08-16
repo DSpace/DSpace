@@ -58,22 +58,21 @@ public class CommunityRecentSubmissions extends AbstractRecentSubmissionTransfor
             return;
         }
 
-        Division lastSubmittedDiv = home
-                .addDivision("community-recent-submission", "secondary recent-submission");
+        if (0 < queryResults.getDspaceObjects().size()) {
+            Division lastSubmittedDiv = home
+                    .addDivision("community-recent-submission", "secondary recent-submission");
 
-        lastSubmittedDiv.setHead(T_head_recent_submissions);
+            lastSubmittedDiv.setHead(T_head_recent_submissions);
 
-        ReferenceSet lastSubmitted = lastSubmittedDiv.addReferenceSet(
-                "community-last-submitted", ReferenceSet.TYPE_SUMMARY_LIST,
-                null, "recent-submissions");
+            ReferenceSet lastSubmitted = lastSubmittedDiv.addReferenceSet(
+                    "community-last-submitted", ReferenceSet.TYPE_SUMMARY_LIST,
+                    null, "recent-submissions");
 
-        for (DSpaceObject resultObject : queryResults.getDspaceObjects()) {
-            lastSubmitted.addReference(resultObject);
+            for (DSpaceObject resultObject : queryResults.getDspaceObjects()) {
+                if(resultObject != null){
+                    lastSubmitted.addReference(resultObject);
+                }
+            }
         }
-    }
-
-    public String getView()
-    {
-        return "community";
     }
 }

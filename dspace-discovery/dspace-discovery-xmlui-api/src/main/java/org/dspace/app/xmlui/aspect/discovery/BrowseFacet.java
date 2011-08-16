@@ -174,7 +174,7 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
         queryArgs = new DiscoverQuery();
 
         //Make sure we add our default filters
-        queryArgs.addFilterQueries(SearchUtils.getDefaultFilters("browse"));
+        //queryArgs.addFilterQueries(SearchUtils.getDefaultFilters("browse"));
 
 
         queryArgs.setQuery("search.resourcetype: " + Constants.ITEM + ((request.getParameter("query") != null && !"".equals(request.getParameter("query"))) ? " AND (" + request.getParameter("query") + ")" : ""));
@@ -209,11 +209,11 @@ public class BrowseFacet extends AbstractDSpaceTransformer implements CacheableP
         queryArgs.setFacetOffset(offset);
 
         //We add +1 so we can use the extra one to make sure that we need to show the next page
-        queryArgs.setFacetLimit(DEFAULT_PAGE_SIZE + 1);
+        //queryArgs.setFacetLimit(DEFAULT_PAGE_SIZE + 1);
 
 
 
-        queryArgs.addFacetField(new FacetFieldConfig(request.getParameter(FACET_FIELD), false));
+        //queryArgs.addFacetField(new DiscoverFacetField(request.getParameter(FACET_FIELD)));
 
         try {
             queryResults = searchService.search(context, scope, queryArgs);

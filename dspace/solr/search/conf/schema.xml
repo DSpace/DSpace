@@ -426,27 +426,12 @@
     <!--This field is used for auto complete features in the discovery search-->
     <fieldType name="dspaceAutoComplete" class="solr.TextField" sortMissingLast="true" omitNorms="true">
         <analyzer>
-            <!--Split everything up by space-->
-            <tokenizer class="solr.WhitespaceTokenizerFactory"/>
+            <tokenizer class="solr.KeywordTokenizerFactory"/>
 
             <!--Lower cases our values-->
             <filter class="solr.LowerCaseFilterFactory" />
             <!--Discards common words.-->
             <filter class="solr.StopFilterFactory" />
-            <!-- The TrimFilter removes any leading or trailing whitespace -->
-            <filter class="solr.TrimFilterFactory" />
-        </analyzer>
-    </fieldType>
-
-
-    <!--This field is used for auto complete features in the discovery search-->
-    <fieldType name="dspaceAutoCompleteFull" class="solr.TextField" sortMissingLast="true" omitNorms="true">
-        <analyzer>
-            <!--Split everything up by space-->
-            <tokenizer class="solr.KeywordTokenizerFactory"/>
-
-            <!--Lower cases our values-->
-            <filter class="solr.LowerCaseFilterFactory" />
             <!-- The TrimFilter removes any leading or trailing whitespace -->
             <filter class="solr.TrimFilterFactory" />
         </analyzer>
@@ -515,15 +500,14 @@
    <field name="SolrIndexer.lastIndexed" type="date" indexed="true" stored="true" default="NOW" multiValued="false" omitNorms="true" />
 
    <!-- Custom Mapping to assure ds.creator is placed into dc.contributor.author by defualt -->
-   <copyField source="dc.creator" dest="dc.contributor.author"/>
-   <copyField source="dc.creator" dest="dc.contributor.author_ac"/>
-   <copyField source="dc.creator" dest="dc.contributor.author_filter"/>
-   <copyField source="dc.creator" dest="dc.contributor.author_sort"/>
+   <!--<copyField source="dc.creator" dest="dc.contributor.author"/>-->
+   <!--<copyField source="dc.creator" dest="dc.contributor.author_ac"/>-->
+   <!--<copyField source="dc.creator" dest="dc.contributor.author_filter"/>-->
+   <!--<copyField source="dc.creator" dest="dc.contributor.author_sort"/>-->
 
 
      <!--Dynamic field used for search autocompletion-->
     <dynamicField name="*_ac" type="dspaceAutoComplete" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
-    <dynamicField name="*_ac.full" type="dspaceAutoCompleteFull" indexed="true" stored="true" omitNorms="true" multiValued="true"/>
 
      <!--Dynamic field used for sidebar filters-->
      <dynamicField name="*_filter" type="dspaceFilter" indexed="true" stored="true" multiValued="true" omitNorms="true" />

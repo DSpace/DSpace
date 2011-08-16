@@ -9,6 +9,7 @@ package org.dspace.discovery;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
+import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -51,4 +52,11 @@ public interface SearchService {
      * @throws SQLException ...
      */
     DiscoverFilterQuery toFilterQuery(Context context, String field, String value) throws SQLException;
+
+    /**
+     * Transforms the metadata field of the given sort configuration into the indexed field which we can then use in our solr queries
+     * @param metadataField the metadata field
+     * @return the indexed field
+     */
+    String toSortFieldIndex(String metadataField, String type);
 }

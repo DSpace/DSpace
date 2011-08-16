@@ -46,25 +46,24 @@ public class SiteRecentSubmissions extends AbstractRecentSubmissionTransformer {
             return;
         }
 
-        Division home = body.addDivision("site-home", "primary repository");
+        if (0 < queryResults.getDspaceObjects().size()) {
+            Division home = body.addDivision("site-home", "primary repository");
 
-        Division lastSubmittedDiv = home
-                .addDivision("site-recent-submission", "secondary recent-submission");
+            Division lastSubmittedDiv = home
+                    .addDivision("site-recent-submission", "secondary recent-submission");
 
-        lastSubmittedDiv.setHead(T_head_recent_submissions);
+            lastSubmittedDiv.setHead(T_head_recent_submissions);
 
-        ReferenceSet lastSubmitted = lastSubmittedDiv.addReferenceSet(
-                "site-last-submitted", ReferenceSet.TYPE_SUMMARY_LIST,
-                null, "recent-submissions");
+            ReferenceSet lastSubmitted = lastSubmittedDiv.addReferenceSet(
+                    "site-last-submitted", ReferenceSet.TYPE_SUMMARY_LIST,
+                    null, "recent-submissions");
 
-        for (DSpaceObject dso : queryResults.getDspaceObjects()) {
-            lastSubmitted.addReference(dso);
+            for (DSpaceObject dso : queryResults.getDspaceObjects()) {
+                if(dso != null){
+                    lastSubmitted.addReference(dso);
+                }
+            }
         }
 
-    }
-
-    public String getView()
-    {
-        return "site";
     }
 }

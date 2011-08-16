@@ -22,12 +22,13 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
-import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
 import org.dspace.discovery.*;
+import org.dspace.discovery.configuration.DiscoveryConfiguration;
+import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
+import org.dspace.discovery.configuration.SidebarFacetConfiguration;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
@@ -147,7 +148,8 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
 
 
     public void performSearch() throws SearchServiceException, UIException, SQLException {
-        queryArgs = prepareDefaultFilters(context, getView(), getAllFilterQueries());
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        queryArgs = getQueryArgs(context, dso, getAllFilterQueries());
         //If we are on a search page performing a search a query may be used
         Request request = ObjectModelHelper.getRequest(objectModel);
         String query = request.getParameter("query");
@@ -157,7 +159,6 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
 
         //We do not need to retrieve any dspace objects, only facets
         queryArgs.setMaxResults(0);
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         queryResults =  getSearchService().search(context, dso,  queryArgs);
     }
 
@@ -183,28 +184,34 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                     fqs.add(getSearchService().toFilterQuery(context, fq).getFilterQuery());
                 }
             }
-            FacetFieldConfig[] facets = SearchUtils.getFacetsForType(getView());
 
-            if (facets != null && 0 < facets.length) {
+            DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(dso);
+            java.util.List<SidebarFacetConfiguration> facets = discoveryConfiguration.getSidebarFacets();
+
+            if (facets != null && 0 < facets.size()) {
 
                 List browse = options.addList("discovery");
 
                 browse.setHead(T_FILTER_HEAD);
 
-                for (FacetFieldConfig field : facets) {
+                for (SidebarFacetConfiguration field : facets) {
                     //Retrieve our values
-                    java.util.List<DiscoverResult.FacetResult> facetValues = queryResults.getFacetResult(field.getField());
+                    java.util.List<DiscoverResult.FacetResult> facetValues = queryResults.getFacetResult(field.getIndexFieldName());
+                    //Check if we are dealing with a date, sometimes the facet values arrive as dates !
+                    if(facetValues.size() == 0 && field.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)){
+                        facetValues = queryResults.getFacetResult(field.getIndexFieldName() + ".year");
+                    }
 
-                    int shownFacets = this.queryArgs.getFacetLimit();
+                    int shownFacets = field.getFacetLimit()+1;
 
                     //This is needed to make sure that the date filters do not remain empty
-                    if (0 < facetValues.size()) {
+                    if (facetValues != null && 0 < facetValues.size()) {
 
                         Iterator<DiscoverResult.FacetResult> iter = facetValues.iterator();
 
-                        List filterValsList = browse.addList(field.getField());
+                        List filterValsList = browse.addList(field.getIndexFieldName());
 
-                        filterValsList.setHead(message("xmlui.ArtifactBrowser.AdvancedSearch.type_" + field.getField().replace("_lc", "")));
+                        filterValsList.setHead(message("xmlui.ArtifactBrowser.AdvancedSearch.type_" + field.getIndexFieldName()));
 
                         for (int i = 0; i < shownFacets; i++) {
 
@@ -237,9 +244,9 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                                 }
                             }
                             //Show a view more url should there be more values, unless we have a date
-                            if (i == shownFacets - 1 && !field.isDate()/*&& facetField.getGap() == null*/) {
+                            if (i == shownFacets - 1 && !field.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)/*&& facetField.getGap() == null*/) {
 
-                                addViewMoreUrl(filterValsList, dso, request, field.getField());
+                                addViewMoreUrl(filterValsList, dso, request, field.getIndexFieldName());
                             }
                         }
                     }
@@ -283,46 +290,37 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
         );
     }
 
-    public DiscoverQuery prepareDefaultFilters(Context context, String scope, String ...filterQueries) {
+    public DiscoverQuery getQueryArgs(Context context, DSpaceObject scope, String... filterQueries) {
         DiscoverQuery queryArgs = new DiscoverQuery();
 
-        FacetFieldConfig[] facets = SearchUtils.getFacetsForType(scope);
+        DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(scope);
+        java.util.List<SidebarFacetConfiguration> facets = discoveryConfiguration.getSidebarFacets();
 
-        log.info("facets for scope, " + scope + ": " + (facets != null ? facets.length : null));
+        log.info("facets for scope, " + scope + ": " + (facets != null ? facets.size() : null));
 
 
 
-        //Set the default limit to 10
-        int max = 10;
-        try{
-            max = SearchUtils.getConfig().getInteger("search.facet.max");
-        }catch (Exception e){
-            //Ignore, only occurs if property isn't set in the config, default will be used then
-        }
-        //Add one to our facet limit to make sure that if we have more then the shown facets that we show our show more url
-        max++;
 
         if (facets != null){
-            queryArgs.setFacetLimit(max);
             queryArgs.setFacetMinCount(1);
         }
 
         //Add the default filters
-        queryArgs.addFilterQueries(SearchUtils.getDefaultFilters(scope));
+        queryArgs.addFilterQueries(discoveryConfiguration.getDefaultFilterQueries().toArray(new String[discoveryConfiguration.getDefaultFilterQueries().size()]));
         queryArgs.addFilterQueries(filterQueries);
 
         /** enable faceting of search results */
         if (facets != null){
-            for (FacetFieldConfig facet : facets) {
-                if(facet.isDate()){
-                    String dateFacet = facet.getField();
+            for (SidebarFacetConfiguration facet : facets) {
+                if(facet.getType().equals(DiscoveryConfigurationParameters.TYPE_DATE)){
+                    String dateFacet = facet.getIndexFieldName() + ".year";
                     try{
                         //Get a range query so we can create facet queries ranging from out first to our last date
                         //Attempt to determine our oldest & newest year by checking for previously selected filters
                         int oldestYear = -1;
                         int newestYear = -1;
                         for (String filterQuery : filterQueries) {
-                            if(filterQuery.startsWith(facet.getField() + ":")){
+                            if(filterQuery.startsWith(dateFacet + ":")){
                                 //Check for a range
                                 Pattern pattern = Pattern.compile("\\[(.*? TO .*?)\\]");
                                 Matcher matcher = pattern.matcher(filterQuery);
@@ -359,7 +357,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                             DiscoverQuery yearRangeQuery = new DiscoverQuery();
                             yearRangeQuery.setMaxResults(1);
                             //Set our query to anything that has this value
-                            yearRangeQuery.addFieldPresentQueries(facet.getField());
+                            yearRangeQuery.addFieldPresentQueries(dateFacet);
                             //Set sorting so our last value will appear on top
                             yearRangeQuery.setSortField(dateFacet, DiscoverQuery.SORT_ORDER.asc);
                             yearRangeQuery.addFilterQueries(filterQueries);
@@ -406,11 +404,11 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                             //We need a list of our years
                             //We have a date range add faceting for our field
                             //The faceting will automatically be limited to the 10 years in our span due to our filterquery
-                            queryArgs.addFacetField(facet);
+                            queryArgs.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(), facet.getType(), 10, facet.getSortOrder()));
                         }else{
                             java.util.List<String> facetQueries = new ArrayList<String>();
                             //Create facet queries but limit then to 11 (11 == when we need to show a show more url)
-                            for(int year = topYear; year > oldestYear && (facetQueries.size() < max); year-=gap){
+                            for(int year = topYear; year > oldestYear && (facetQueries.size() < 11); year-=gap){
                                 //Add a filter to remove the last year only if we aren't the last year
                                 int bottomYear = year - gap;
                                 //Make sure we don't go below our last year found
@@ -440,33 +438,14 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                         log.error(LogManager.getHeader(context, "Error in discovery while setting up date facet range", "date facet: " + dateFacet), e);
                     }
                 }else{
-                    queryArgs.addFacetField(facet);
+                    int facetLimit = facet.getFacetLimit();
+                    //Add one to our facet limit to make sure that if we have more then the shown facets that we show our show more url
+                    facetLimit++;
+                    queryArgs.addFacetField(new DiscoverFacetField(facet.getIndexFieldName(), DiscoveryConfigurationParameters.TYPE_TEXT, facetLimit, facet.getSortOrder()));
                 }
             }
         }
         return queryArgs;
-    }
-
-    public String getView() throws SQLException {
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-        if(dso == null){
-            if("discover".equals(ObjectModelHelper.getRequest(objectModel).getSitemapURI())){
-                //We are on a search page
-                return "search";
-            }else{
-                return "site";
-            }
-        }else
-        if(dso instanceof Community){
-            return "community";
-        }else
-        if(dso instanceof org.dspace.content.Collection){
-            return "collection";
-        }else
-        if(dso instanceof Item){
-            return "item";
-        }
-        return null;
     }
 
     /**

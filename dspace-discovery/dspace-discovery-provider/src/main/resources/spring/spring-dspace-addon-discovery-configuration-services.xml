@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xsi:schemaLocation="http://www.springframework.org/schema/beans
+           http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+           http://www.springframework.org/schema/context
+           http://www.springframework.org/schema/context/spring-context-2.5.xsd"
+    default-autowire-candidates="*Service,*DAO,javax.sql.DataSource">
+
+    <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
+
+    <bean id="org.dspace.discovery.configuration.DiscoveryConfigurationService" class="org.dspace.discovery.configuration.DiscoveryConfigurationService">
+        <property name="map">
+            <map>
+                <!--The default entry, DO NOT REMOVE the system requires this-->
+               <entry key="default" value-ref="defaultConfiguration" />
+
+               <!--Use site to override the default configuration for the home page & default discovery page-->
+               <!--<entry key="site" value-ref="defaultConfiguration" />-->
+               <!--<entry key="123456789/7621" value-ref="defaultConfiguration"/>-->
+            </map>
+        </property>
+    </bean>
+
+    <bean id="defaultConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+        <property name="sidebarFacets">
+            <list>
+                <ref bean="sidebarFacetAuthor" />
+                <ref bean="sidebarFacetSubject" />
+                <ref bean="sidebarFacetDateIssued" />
+            </list>
+        </property>
+        <property name="searchFilters">
+            <list>
+                <ref bean="searchFilterTitle" />
+                <ref bean="searchFilterAuthor" />
+                <ref bean="searchFilterSubject" />
+                <ref bean="searchFilterIssued" />
+            </list>
+        </property>
+        <property name="searchSortFields">
+            <list>
+                <ref bean="sortTitle" />
+                <ref bean="sortDateIssued" />
+            </list>
+        </property>
+        <!--<property name="defaultFilterQueries">-->
+            <!--<list>-->
+                <!--Only find items-->
+                <!--<value>search.resourcetype:2</value>-->
+            <!--</list>-->
+        <!--</property>-->
+        <property name="recentSubmissionConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoveryRecentSubmissionsConfiguration">
+                <property name="metadataSortField" value="dc.date.accessioned" />
+                <property name="type" value="date"/>
+                <property name="max" value="5"/>
+            </bean>
+        </property>
+    </bean>
+
+
+
+    <!--Search filter configuration beans-->
+    <bean id="searchFilterTitle" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="title"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.title</value>
+            </list>
+        </property>
+        <property name="fullAutoComplete" value="false"/>
+    </bean>
+
+    <bean id="searchFilterAuthor" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="author"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.contributor.author</value>
+                <value>dc.creator</value>
+            </list>
+        </property>
+        <property name="fullAutoComplete" value="true"/>
+    </bean>
+
+    <bean id="searchFilterSubject" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="subject"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.subject.*</value>
+            </list>
+        </property>
+        <property name="fullAutoComplete" value="true"/>
+    </bean>
+
+    <bean id="searchFilterIssued" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
+        <property name="indexFieldName" value="dateIssued"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.date.issued</value>
+            </list>
+        </property>
+        <property name="type" value="date"/>
+        <property name="fullAutoComplete" value="false"/>
+    </bean>
+
+
+
+    <!--Sidebar facet configuration beans-->
+    <bean id="sidebarFacetAuthor" class="org.dspace.discovery.configuration.SidebarFacetConfiguration">
+        <property name="indexFieldName" value="author"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.contributor.author</value>
+                <value>dc.creator</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrder" value="COUNT"/>
+    </bean>
+
+    <bean id="sidebarFacetSubject" class="org.dspace.discovery.configuration.SidebarFacetConfiguration">
+        <property name="indexFieldName" value="subject"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.subject.*</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrder" value="COUNT"/>
+    </bean>
+
+    <bean id="sidebarFacetDateIssued" class="org.dspace.discovery.configuration.SidebarFacetConfiguration">
+        <property name="indexFieldName" value="dateIssued"/>
+        <property name="metadataFields">
+            <list>
+                <value>dc.date.issued</value>
+            </list>
+        </property>
+        <property name="type" value="date"/>
+        <property name="sortOrder" value="VALUE"/>
+    </bean>
+
+
+    <!--Sort properties-->
+    <bean id="sortTitle" class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+        <property name="metadataField" value="dc.title"/>
+        <!--<property name="defaultSort" value="true"/>-->
+    </bean>
+
+    <bean id="sortDateIssued" class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+        <property name="metadataField" value="dc.date.issued"/>
+        <property name="type" value="date"/>
+    </bean>
+</beans>

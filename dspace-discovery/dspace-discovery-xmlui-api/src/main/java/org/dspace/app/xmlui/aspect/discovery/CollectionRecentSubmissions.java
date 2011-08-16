@@ -57,25 +57,24 @@ public class CollectionRecentSubmissions extends AbstractRecentSubmissionTransfo
             return;
         }
 
-        // Build the collection viewer division.
-        Division home = body.addDivision("collection-home", "primary repository collection");
+        if(0 < queryResults.getDspaceObjects().size()){
+            // Build the collection viewer division.
+            Division home = body.addDivision("collection-home", "primary repository collection");
 
-        Division lastSubmittedDiv = home
-                .addDivision("collection-recent-submission", "secondary recent-submission");
+            Division lastSubmittedDiv = home
+                    .addDivision("collection-recent-submission", "secondary recent-submission");
 
-        lastSubmittedDiv.setHead(T_head_recent_submissions);
+            lastSubmittedDiv.setHead(T_head_recent_submissions);
 
-        ReferenceSet lastSubmitted = lastSubmittedDiv.addReferenceSet(
-                "collection-last-submitted", ReferenceSet.TYPE_SUMMARY_LIST,
-                null, "recent-submissions");
+            ReferenceSet lastSubmitted = lastSubmittedDiv.addReferenceSet(
+                    "collection-last-submitted", ReferenceSet.TYPE_SUMMARY_LIST,
+                    null, "recent-submissions");
 
-        for (DSpaceObject resultObj : queryResults.getDspaceObjects()) {
-            lastSubmitted.addReference(resultObj);
+            for (DSpaceObject resultObj : queryResults.getDspaceObjects()) {
+                if(resultObj != null){
+                    lastSubmitted.addReference(resultObj);
+                }
+            }
         }
-    }
-
-    public String getView()
-    {
-        return "collection";
     }
 }

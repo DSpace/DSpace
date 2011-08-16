@@ -26,8 +26,11 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.LogManager;
 import org.dspace.discovery.*;
+import org.dspace.discovery.configuration.DiscoveryConfiguration;
+import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 import org.dspace.handle.HandleManager;
 import org.dspace.sort.SortOption;
+import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -288,7 +291,9 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
                         // Set a heading showing that we will be listing containers that matched:
                         referenceSet.setHead(T_head2);
                     }
-                    referenceSet.addReference(resultDso);
+                    if(resultDso != null){
+                        referenceSet.addReference(resultDso);
+                    }
                 }
             }
 
@@ -397,7 +402,10 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
 
         this.queryArgs = new DiscoverQuery();
 
-        queryArgs.addFilterQueries(SearchUtils.getDefaultFilters(getView()));
+        //Add the configured default filter queries
+        DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(scope);
+        List<String> defaultFilterQueries = discoveryConfiguration.getDefaultFilterQueries();
+        queryArgs.addFilterQueries(defaultFilterQueries.toArray(new String[defaultFilterQueries.size()]));
 
         if (filterQueries.size() > 0) {
             queryArgs.addFilterQueries(filterQueries.toArray(new String[filterQueries.size()]));
@@ -407,26 +415,28 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         queryArgs.setMaxResults(getParameterRpp());
 
         String sortBy = ObjectModelHelper.getRequest(objectModel).getParameter("sort_by");
-
+        if(sortBy == null){
+            //Attempt to find the default one, if none found we use SCORE
+            sortBy = "score";
+            List<DiscoverySortConfiguration> searchSortFields = discoveryConfiguration.getSearchSortFields();
+            for (DiscoverySortConfiguration sortConfiguration : searchSortFields) {
+                if(sortConfiguration.isDefaultSort()){
+                    sortBy = SearchUtils.getSearchService().toSortFieldIndex(sortConfiguration.getMetadataField(), sortConfiguration.getType());
+                }
+            }
+        }
         String sortOrder = ObjectModelHelper.getRequest(objectModel).getParameter("order");
+        if(sortOrder == null){
+            sortOrder = new DSpace().getConfigurationService().getProperty("discovery.search.default.sort.order");
+        }
 
-
-        //webui.itemlist.sort-option.1 = title:dc.title:title
-        //webui.itemlist.sort-option.2 = dateissued:dc.date.issued:date
-        //webui.itemlist.sort-option.3 = dateaccessioned:dc.date.accessioned:date
-        //webui.itemlist.sort-option.4 = ispartof:dc.relation.ispartof:text
-
-        if (sortBy != null) {
-            if (sortOrder == null || sortOrder.equals("DESC"))
-            {
-                queryArgs.setSortField(sortBy, DiscoverQuery.SORT_ORDER.desc);
-            }
-            else
-            {
-                queryArgs.setSortField(sortBy, DiscoverQuery.SORT_ORDER.asc);
-            }
-        } else {
-            queryArgs.setSortField("score", DiscoverQuery.SORT_ORDER.asc);
+        if (sortOrder == null || sortOrder.equals("DESC"))
+        {
+            queryArgs.setSortField(sortBy, DiscoverQuery.SORT_ORDER.desc);
+        }
+        else
+        {
+            queryArgs.setSortField(sortBy, DiscoverQuery.SORT_ORDER.asc);
         }
 
 
@@ -455,7 +465,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
 
         if (page > 1)
         {
-            queryArgs.setStart((page - 1) * queryResults.getMaxResults());
+            queryArgs.setStart((page - 1) * queryArgs.getMaxResults());
         }
         else
         {
@@ -578,7 +588,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
 
     protected String getParameterSortBy() {
         String s = ObjectModelHelper.getRequest(objectModel).getParameter("sort_by");
-        return s != null ? s : "score";
+        return s != null ? s : null;
     }
 
     protected String getParameterGroup() {
@@ -587,8 +597,11 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
     }
 
     protected String getParameterOrder() {
-        String s = ObjectModelHelper.getRequest(objectModel).getParameter("order");
-        return s != null ? s : "DESC";
+        String sortOrder = ObjectModelHelper.getRequest(objectModel).getParameter("order");
+        if(sortOrder == null){
+            sortOrder = new DSpace().getConfigurationService().getProperty("discovery.search.default.sort.order");
+        }
+        return sortOrder;
     }
 
     protected int getParameterEtAl() {
@@ -644,7 +657,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
 
 
     protected void buildSearchControls(Division div)
-            throws WingException {
+            throws WingException, SQLException {
         Table controlsTable = div.addTable("search-controls", 1, 3);
         //Table controlsTable = div.addTable("search-controls", 1, 4);
         Row controlsRow = controlsTable.addRow(Row.ROLE_DATA);
@@ -683,9 +696,15 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         sortCell.addContent(T_sort_by);
         Select sortSelect = sortCell.addSelect("sort_by");
         sortSelect.addOption(false, "score", T_sort_by_relevance);
-        for (String sortField : SearchUtils.getSortFields()) {
-            sortField += "_sort";
-            sortSelect.addOption((sortField.equals(getParameterSortBy())), sortField,
+
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(dso);
+
+        for (DiscoverySortConfiguration sortConfiguration : discoveryConfiguration.getSearchSortFields()) {
+            String sortField = SearchUtils.getSearchService().toSortFieldIndex(sortConfiguration.getMetadataField(), sortConfiguration.getType());
+
+            String currentSort = getParameterSortBy();
+            sortSelect.addOption((sortField.equals(currentSort) || sortConfiguration.isDefaultSort()), sortField,
                     message("xmlui.ArtifactBrowser.AbstractSearch.sort_by." + sortField));
         }
 
@@ -785,6 +804,4 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
                 + (queryArgs == null ? "" : queryArgs.getQuery()) + "\",results=(" + countCommunities + ","
                 + countCollections + "," + countItems + ")"));
     }
-
-    public abstract String getView();
 }

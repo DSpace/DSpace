@@ -28,7 +28,7 @@ var defaultFacets = new Array();
         }
         */
         //As a default facet we use everything
-        defaultFacets[0] = 'all_ac';
+        defaultFacets[0] = 'all';
         
         var widget = Manager.addWidget(new AjaxSolr.AutocompleteWidget({
             id: 'text',

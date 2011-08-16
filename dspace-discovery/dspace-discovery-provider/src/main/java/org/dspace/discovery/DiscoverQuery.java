@@ -35,16 +35,11 @@ public class DiscoverQuery {
     private SORT_ORDER sortOrder;
 
     /** Attributes required for the faceting of values **/
-    private List<FacetFieldConfig> facetFields;
+    private List<DiscoverFacetField> facetFields;
     private List<String> facetQueries;
     private int facetLimit = -1;
     private int facetMinCount = -1;
     private int facetOffset = 0;
-    public enum FACET_SORT {
-        INDEX,
-        COUNT
-    }
-    private FACET_SORT facetSort;
 
     /** Used when you want to search for a specific field value **/
     private List<String> searchFields;
@@ -57,12 +52,11 @@ public class DiscoverQuery {
         this.filterQueries = new ArrayList<String>();
         this.fieldPresentQueries = new ArrayList<String>();
 
-        this.facetFields = new ArrayList<FacetFieldConfig>();
+        this.facetFields = new ArrayList<DiscoverFacetField>();
         this.facetQueries = new ArrayList<String>();
         this.searchFields = new ArrayList<String>();
         //Use a linked hashmap since sometimes insertion order might matter
         this.properties = new LinkedHashMap<String, List<String>>();
-        this.facetSort = FACET_SORT.COUNT;
     }
 
 
@@ -177,7 +171,7 @@ public class DiscoverQuery {
      * Adds a new facet field
      * @param facetField the new facet field to be added
      */
-    public void addFacetField(FacetFieldConfig facetField){
+    public void addFacetField(DiscoverFacetField facetField){
         facetFields.add(facetField);
     }
 
@@ -185,7 +179,7 @@ public class DiscoverQuery {
      * Gets the facets fields configured
      * @return the facet fields for this query
      */
-    public List<FacetFieldConfig> getFacetFields() {
+    public List<DiscoverFacetField> getFacetFields() {
         return facetFields;
     }
 
@@ -206,22 +200,6 @@ public class DiscoverQuery {
     }
 
     /**
-     * Returns the maximum number of facet values that can be returned for one facet field
-     * @return how many facet values will be returned
-     */
-    public int getFacetLimit() {
-        return facetLimit;
-    }
-
-    /**
-     * Sets maximum number of facet values that can be returned for one facet field
-     * @param facetLimit how many facet values will be returned
-     */
-    public void setFacetLimit(int facetLimit) {
-        this.facetLimit = facetLimit;
-    }
-
-    /**
      * Gets the facet field offset
      * @return the facet field offset
      */
@@ -235,22 +213,6 @@ public class DiscoverQuery {
      */
     public void setFacetOffset(int facetOffset) {
         this.facetOffset = facetOffset;
-    }
-
-    /**
-     * Get the sort order for the facets
-     * @return the sort order for the facets
-     */
-    public FACET_SORT getFacetSort() {
-        return facetSort;
-    }
-
-    /**
-     * Set the sort order for the facets
-     * @param facetSort the sort order for the facets
-     */
-    public void setFacetSort(FACET_SORT facetSort) {
-        this.facetSort = facetSort;
     }
 
     public void addSearchField(String field){

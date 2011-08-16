@@ -29,6 +29,8 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.discovery.DiscoverFilterQuery;
 import org.dspace.discovery.SearchService;
 import org.dspace.discovery.SearchUtils;
+import org.dspace.discovery.configuration.DiscoveryConfiguration;
+import org.dspace.discovery.configuration.DiscoverySearchFilter;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 import org.dspace.discovery.SearchServiceException;
@@ -102,10 +104,6 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         // Build the DRI Body
         Division search = body.addDivision("search", "primary");
         search.setHead(T_head);
-        //The search url must end with a /
-//        String searchUrl = SearchUtils.getConfig().getString("solr.search.server");
-//        if(searchUrl != null && !searchUrl.endsWith("/"))
-//            searchUrl += "/";
         String searchUrl = ConfigurationManager.getProperty("dspace.url") + "/JSON/discovery/search";
 
         search.addHidden("discovery-json-search-url").setValue(searchUrl);
@@ -171,9 +169,12 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
                 option.addContent(": " + fq.getDisplayedValue());
             }
         }
-        
 
-        java.util.List<String> filterFields = SearchUtils.getSearchFilters();
+
+        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(dso);
+
+        java.util.List<DiscoverySearchFilter> filterFields = discoveryConfiguration.getSearchFilters();
         if(0 < filterFields.size()){
             //We have at least one filter so add our filter box
             Item item = queryList.addItem("search-filter-list", "search-filter-list");
@@ -185,11 +186,11 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
 
             Select select = filterComp.addSelect("filtertype");
             //First of all add a default filter
-            select.addOption("all_ac", message("xmlui.ArtifactBrowser.SimpleSearch.filter.all"));
+            select.addOption("all", message("xmlui.ArtifactBrowser.SimpleSearch.filter.all"));
             //For each field found (at least one) add options
 
-            for (String field : filterFields) {
-                select.addOption(field, message("xmlui.ArtifactBrowser.SimpleSearch.filter." + field));
+            for (DiscoverySearchFilter field : filterFields) {
+                select.addOption(field.getIndexFieldName(), message("xmlui.ArtifactBrowser.SimpleSearch.filter." + field.getIndexFieldName()));
             }
 
             //Add a box so we can search for our value
@@ -316,7 +317,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
             parameters.put("group_by", String.valueOf(this.getParameterGroup()));
         }
 
-        if (parameters.get("sort_by") == null)
+        if (getParameterSortBy() != null)
         {
             parameters.put("sort_by", String.valueOf(getParameterSortBy()));
         }
@@ -332,11 +333,5 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         }
 
         return super.generateURL("discover", parameters);
-    }
-
-
-    public String getView()
-    {
-        return "search";
     }
 }
