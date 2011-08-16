@@ -359,7 +359,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                             //Set our query to anything that has this value
                             yearRangeQuery.addFieldPresentQueries(dateFacet);
                             //Set sorting so our last value will appear on top
-                            yearRangeQuery.setSortField(dateFacet, DiscoverQuery.SORT_ORDER.asc);
+                            yearRangeQuery.setSortField(dateFacet + "_sort", DiscoverQuery.SORT_ORDER.asc);
                             yearRangeQuery.addFilterQueries(filterQueries);
                             yearRangeQuery.addSearchField(dateFacet);
                             DiscoverResult lastYearResult = getSearchService().search(context, yearRangeQuery);
@@ -372,7 +372,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                                 }
                             }
                             //Now get the first year
-                            yearRangeQuery.setSortField(dateFacet, DiscoverQuery.SORT_ORDER.desc);
+                            yearRangeQuery.setSortField(dateFacet + "_sort", DiscoverQuery.SORT_ORDER.desc);
                             DiscoverResult firstYearResult = getSearchService().search(context, yearRangeQuery);
                             if( 0 < firstYearResult.getDspaceObjects().size()){
                                 java.util.List<DiscoverResult.SearchDocument> searchDocuments = firstYearResult.getSearchDocument(firstYearResult.getDspaceObjects().get(0));

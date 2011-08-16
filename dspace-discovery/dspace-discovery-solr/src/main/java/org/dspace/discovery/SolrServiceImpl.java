@@ -779,7 +779,13 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                             //For our sidebar filters that are dates we only add the year
                             Date date = toDate(value);
                             if(date != null){
-                                doc.addField(configuration.getIndexFieldName() + ".year", DateFormatUtils.formatUTC(date, "yyyy"));
+                                String indexField = configuration.getIndexFieldName() + ".year";
+                                doc.addField(indexField, DateFormatUtils.formatUTC(date, "yyyy"));
+                                //Also save a sort value of this year, this is required for determining the upper & lower bound year of our facet
+                                if(doc.getField(indexField + "_sort") == null){
+                                    //We can only add one year so take the first one
+                                    doc.addField(indexField + "_sort", DateFormatUtils.formatUTC(date, "yyyy"));
+                                }
                             } else {
                                 log.warn("Error while indexing sidebar date field, item: " + item.getHandle() + " metadata field: " + field + " date value: " + date);
                             }
