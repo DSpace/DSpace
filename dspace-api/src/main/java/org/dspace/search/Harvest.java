@@ -7,30 +7,26 @@
  */
 package org.dspace.search;
 
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.TimeZone;
-
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
+import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
 import org.dspace.storage.rdbms.TableRowIterator;
-import org.dspace.authorize.AuthorizeManager;
-import org.dspace.eperson.Group;
+
+import java.io.Serializable;
+import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Utility class for extracting information about items, possibly just within a
@@ -44,7 +40,7 @@ public class Harvest
 {
     /** log4j logger */
     private static Logger log = Logger.getLogger(Harvest.class);
-    
+
     /**
      * Obtain information about items that have been created, modified or
      * withdrawn within a given date range. You can also specify 'offset' and
@@ -54,7 +50,7 @@ public class Harvest
      * (and OAI-PMH).
      * <P>
      * FIXME: Assumes all in_archive items have public metadata
-     * 
+     *
      * @param context
      *            DSpace context
      * @param scope
@@ -85,8 +81,8 @@ public class Harvest
      * @param nonAnon
      *            If items without anonymous access should be included or not
      * @return List of <code>HarvestedItemInfo</code> objects
-     * @throws SQLException
-     * @throws ParseException If the date is not in a supported format
+     * @throws java.sql.SQLException
+     * @throws java.text.ParseException If the date is not in a supported format
      */
     public static List<HarvestedItemInfo> harvest(Context context, DSpaceObject scope,
             String startDate, String endDate, int offset, int limit,
@@ -99,14 +95,14 @@ public class Harvest
         // Handles as our 'existence criterion'.
         // FIXME: I think the "DISTINCT" is redundant
         String query = "SELECT DISTINCT handle.handle, handle.resource_id, item.withdrawn, item.last_modified FROM handle, item";
-        
-        
-        // We are building a complex query that may contain a variable 
-        // about of input data points. To accommodate this while still 
-        // providing type safety we build a list of parameters to be 
+
+
+        // We are building a complex query that may contain a variable
+        // about of input data points. To accommodate this while still
+        // providing type safety we build a list of parameters to be
         // plugged into the query at the database level.
         List<Serializable> parameters = new ArrayList<Serializable>();
-        
+
         if (scope != null)
         {
         	if (scope.getType() == Constants.COLLECTION)
@@ -117,7 +113,7 @@ public class Harvest
         	{
         		query += ", communities2item";
         	}
-        }       
+        }
 
         query += " WHERE handle.resource_type_id=" + Constants.ITEM + " AND handle.resource_id=item.item_id ";
 
@@ -135,8 +131,8 @@ public class Harvest
 						 " AND communities2item.item_id=handle.resource_id";
         		parameters.add(Integer.valueOf(scope.getID()));
         	}
-        }      
-                
+        }
+
         if (startDate != null)
         {
         	query = query + " AND item.last_modified >= ? ";
@@ -147,20 +143,20 @@ public class Harvest
         {
             /*
              * If the end date has seconds precision, e.g.:
-             * 
+             *
              * 2004-04-29T13:45:43Z
-             * 
+             *
              * we need to add 999 milliseconds to this. This is because SQL
              * TIMESTAMPs have millisecond precision, and so might have a value:
-             * 
+             *
              * 2004-04-29T13:45:43.952Z
-             * 
+             *
              * and so <= '2004-04-29T13:45:43Z' would not pick this up. Reading
              * things out of the database, TIMESTAMPs are rounded down, so the
              * above value would be read as '2004-04-29T13:45:43Z', and
              * therefore a caller would expect <= '2004-04-29T13:45:43Z' to
              * include that value.
-             * 
+             *
              * Got that? ;-)
              */
         	boolean selfGenerated = false;
@@ -173,7 +169,7 @@ public class Harvest
         	query += " AND item.last_modified <= ? ";
             parameters.add(toTimestamp(endDate, selfGenerated));
         }
-        
+
         if (!withdrawn)
         {
             // Exclude withdrawn items
@@ -194,96 +190,66 @@ public class Harvest
         query += " ORDER BY handle.resource_id";
 
         log.debug(LogManager.getHeader(context, "harvest SQL", query));
-        
-        // Execute
+
         Object[] parametersArray = parameters.toArray();
         TableRowIterator tri = DatabaseManager.query(context, query, parametersArray);
         List<HarvestedItemInfo> infoObjects = new LinkedList<HarvestedItemInfo>();
+
+        // Count of items read from the record set that match the selection criteria.
+        // Note : Until 'index > offset' the records are not added to the output set.
         int index = 0;
+
+        // Count of items added to the output set.
         int itemCounter = 0;
 
         try
         {
             // Process results of query into HarvestedItemInfo objects
-            while (tri.hasNext())
+            while ((tri.hasNext()) && ((limit == 0) || (itemCounter < limit)))
             {
                 TableRow row = tri.next();
 
-                /**
-                 * If we are looking for public-only items, we need to scan all objects
-                 * for permissions in order to properly calculate the offset
-                 */
-                if ((!nonAnon) && (index < offset))
+                HarvestedItemInfo itemInfo = new HarvestedItemInfo();
+                itemInfo.context = context;
+                itemInfo.handle = row.getStringColumn("handle");
+                itemInfo.itemID = row.getIntColumn("resource_id");
+                itemInfo.datestamp = row.getDateColumn("last_modified");
+                itemInfo.withdrawn = row.getBooleanColumn("withdrawn");
+
+                if (collections)
                 {
-                    boolean added = false;
-                    HarvestedItemInfo itemInfo = new HarvestedItemInfo();
-                    itemInfo.itemID = row.getIntColumn("resource_id");
-                    itemInfo.withdrawn = row.getBooleanColumn("withdrawn");
-                    if (withdrawn && itemInfo.withdrawn)
-                    {
-                        added = true;
-                    }
-                    itemInfo.item = Item.find(context, itemInfo.itemID);
-                    Group[] authorizedGroups = AuthorizeManager.getAuthorizedGroups(context, itemInfo.item, Constants.READ);
-                        for (int i = 0; i < authorizedGroups.length; i++)
-                        {
-                            if ((authorizedGroups[i].getID() == 0) && (!added))
-                            {
-                                added = true;
-                            }
-                        }
-                        if (!added)
-                        {
-                            offset++;
-                        }
+                    // Add collections data
+                    fillCollections(context, itemInfo);
                 }
 
-                /*
-                 * This conditional ensures that we only process items within any
-                 * constraints specified by 'offset' and 'limit' parameters.
-                 */
-                else if ((index >= offset) && ((limit == 0) || (itemCounter < limit)))
+                if (items)
                 {
-                    HarvestedItemInfo itemInfo = new HarvestedItemInfo();
+                    // Add the item reference
+                    itemInfo.item = Item.find(context, itemInfo.itemID);
+                }
 
-                    itemInfo.context = context;
-                    itemInfo.handle = row.getStringColumn("handle");
-                    itemInfo.itemID = row.getIntColumn("resource_id");
-                    itemInfo.datestamp = row.getDateColumn("last_modified");
-                    itemInfo.withdrawn = row.getBooleanColumn("withdrawn");
-
-                    if (collections)
-                    {
-                        fillCollections(context, itemInfo);
-                    }
-
-                    if (items)
-                    {
-                        // Get the item
-                        itemInfo.item = Item.find(context, itemInfo.itemID);
-                    }
-
-                    if ((nonAnon) || (itemInfo.item == null) || (withdrawn && itemInfo.withdrawn))
+                if ((nonAnon) || (itemInfo.item == null) || (withdrawn && itemInfo.withdrawn))
+                {
+                    index++;
+                    if (index > offset)
                     {
                         infoObjects.add(itemInfo);
                         itemCounter++;
-                    } else
+                    }
+                }
+                else
+                {
+                    // We only want items that allow for anonymous access.
+                    if (anonAccessAllowed(context, itemInfo))
                     {
-                        Group[] authorizedGroups = AuthorizeManager.getAuthorizedGroups(context, itemInfo.item, Constants.READ);
-                        boolean added = false;
-                        for (int i = 0; i < authorizedGroups.length; i++)
+                        index++;
+                        if (index > offset)
                         {
-                            if ((authorizedGroups[i].getID() == 0) && (!added))
-                            {
-                                infoObjects.add(itemInfo);
-                                added = true;
-                                itemCounter++;
-                            }
+                            infoObjects.add(itemInfo);
+                            itemCounter++;
                         }
                     }
                 }
-
-                index++;
             }
         }
         finally
@@ -301,7 +267,7 @@ public class Harvest
     /**
      * Get harvested item info for a single item. <code>item</code> field in
      * returned <code>HarvestedItemInfo</code> object is always filled out.
-     * 
+     *
      * @param context
      *            DSpace context
      * @param handle
@@ -310,10 +276,10 @@ public class Harvest
      *            if <code>true</code> the <code>collectionHandles</code>
      *            field of the <code>HarvestedItemInfo</code> object is filled
      *            out
-     * 
+     *
      * @return <code>HarvestedItemInfo</code> object for the single item, or
      *         <code>null</code>
-     * @throws SQLException
+     * @throws java.sql.SQLException
      */
     public static HarvestedItemInfo getSingle(Context context, String handle,
             boolean collections) throws SQLException
@@ -347,19 +313,19 @@ public class Harvest
 
     /**
      * Fill out the containers field of the HarvestedItemInfo object
-     * 
+     *
      * @param context
      *            DSpace context
      * @param itemInfo
      *            HarvestedItemInfo object to fill out
-     * @throws SQLException
+     * @throws java.sql.SQLException
      */
     private static void fillCollections(Context context,
             HarvestedItemInfo itemInfo) throws SQLException
     {
         // Get the collection Handles from DB
         TableRowIterator colRows = DatabaseManager.query(context,
-                        "SELECT handle.handle FROM handle, collection2item WHERE handle.resource_type_id= ? " + 
+                        "SELECT handle.handle FROM handle, collection2item WHERE handle.resource_type_id= ? " +
                         "AND collection2item.collection_id=handle.resource_id AND collection2item.item_id = ? ",
                         Constants.COLLECTION, itemInfo.itemID);
 
@@ -383,14 +349,14 @@ public class Harvest
         }
     }
 
-    
+
     /**
      * Convert a String to a java.sql.Timestamp object
-     * 
+     *
      * @param t The timestamp String
      * @param selfGenerated Is this a self generated timestamp (e.g. it has .999 on the end)
      * @return The converted Timestamp
-     * @throws ParseException 
+     * @throws java.text.ParseException
      */
     private static Timestamp toTimestamp(String t, boolean selfGenerated) throws ParseException
     {
@@ -417,5 +383,23 @@ public class Harvest
         // Parse the date
         df.setCalendar(Calendar.getInstance(TimeZone.getTimeZone("UTC")));
         return new Timestamp(df.parse(t).getTime());
-    }    
+    }
+
+    /**
+     * Does the item allow anonymous access ? ie. authorizedGroups must include id=0.
+     */
+    private static boolean anonAccessAllowed(Context context, HarvestedItemInfo itemInfo) throws SQLException
+    {
+        Group[] authorizedGroups = AuthorizeManager.getAuthorizedGroups(context, itemInfo.item, Constants.READ);
+
+        for (Group authorizedGroup : authorizedGroups)
+        {
+            if (authorizedGroup.getID() == 0)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
