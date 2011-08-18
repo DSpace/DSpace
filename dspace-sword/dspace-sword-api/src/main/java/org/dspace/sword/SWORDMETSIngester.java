@@ -76,12 +76,18 @@ public class SWORDMETSIngester implements SWORDIngester
 			
 			// Initialize parameters to packager
 			PackageParameters params = new PackageParameters();
-                        // Force package ingester to respect Collection workflows
-                        params.setWorkflowEnabled(true);
-                        
-                        // Should restore mode be enabled, i.e. keep existing handle?
-                        if (ConfigurationManager.getBooleanProperty("sword-server", "restore-mode.enable",false))
-                            params.setRestoreModeEnabled(true);
+
+            // Force package ingester to respect Collection workflows
+            params.setWorkflowEnabled(true);
+
+            // Should restore mode be enabled, i.e. keep existing handle?
+            if (ConfigurationManager.getBooleanProperty("sword-server", "restore-mode.enable",false))
+            {
+                params.setRestoreModeEnabled(true);
+            }
+
+            // Whether or not to use the collection template
+            params.setUseCollectionTemplate(ConfigurationManager.getBooleanProperty("mets.default.ingest.useCollectionTemplate", false));
 			
 			// ingest the item from the temp file
 			DSpaceObject ingestedObject = pi.ingest(context, collection, depositFile, params, licence);
