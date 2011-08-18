@@ -33,6 +33,7 @@
     <properties>
         <default.dspace.dir>/dspace</default.dspace.dir>
         <default.mail.server>smtp.example.com</default.mail.server>
+        <default.solr.server>http://localhost:8080/solr</default.solr.server>
     </properties>
 
     <profiles>
@@ -530,7 +531,7 @@
             <!--  overall project assembly -->
             <plugin>
                 <artifactId>maven-assembly-plugin</artifactId>
-                <version>2.2-beta-1</version>
+                <version>2.2.1</version>
                 <configuration>
                     <descriptors>
                         <descriptor>src/assemble/assembly.xml</descriptor>
