@@ -73,16 +73,14 @@
 	<moduleSets>
 		<moduleSet>
 			<includes>
-				<include>org.dspace.modules:*:war:*</include>
+                            <include>org.dspace.modules:*:war:*</include>
 			</includes>
-			
+
 			<binaries>
-				<includeDependencies>false</includeDependencies>
-				<outputDirectory>webapps/</outputDirectory>
-			   <outputFileNameMapping>${artifactId}/</outputFileNameMapping>
-            <unpack>true</unpack>
-         </binaries>
-         
+                            <includeDependencies>false</includeDependencies>
+                            <outputDirectory>webapps/${module.artifactId}</outputDirectory>
+                            <unpack>true</unpack>
+                        </binaries>
 		</moduleSet>
 	</moduleSets>
 
