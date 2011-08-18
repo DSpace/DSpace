@@ -71,21 +71,21 @@ public class ShibAuthentication implements AuthenticationMethod
             email = request.getHeader(emailHeader);
 
             // fail, try lower case
-            if (email == null)
+            if (email == null || "".equals(email))
             {
                 email = request.getHeader(emailHeader.toLowerCase());
             }
         }
 
         // try to pull the "REMOTE_USER" info instead of the header
-        if (email == null && isUsingTomcatUser)
+        if ( (email == null || "".equals(email)) && isUsingTomcatUser)
         {
             email = request.getRemoteUser();
             log.info("RemoteUser identified as: " + email);
         }
 
         // No email address, perhaps the eperson has been setup, better check it
-        if (email == null)
+        if (email == null || "".equals(email))
         {
             EPerson p = context.getCurrentUser();
             if (p != null)
@@ -94,7 +94,7 @@ public class ShibAuthentication implements AuthenticationMethod
             }
         }
 
-        if (email == null)
+        if (email == null || "".equals(email))
         {
             log
                     .error("No email is given, you're denied access by Shib, please release email address");
