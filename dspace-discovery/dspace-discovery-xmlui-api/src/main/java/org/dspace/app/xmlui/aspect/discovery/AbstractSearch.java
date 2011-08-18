@@ -58,8 +58,6 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
     /**
      * Language strings
      */
-    private static final Message T_result_query =
-            message("xmlui.ArtifactBrowser.AbstractSearch.result_query");
 
     private static final Message T_head1_community =
             message("xmlui.ArtifactBrowser.AbstractSearch.head1_community");
@@ -89,6 +87,10 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
     private static final Message T_order_desc = message("xmlui.ArtifactBrowser.AbstractSearch.order.desc");
 
     private static final Message T_rpp = message("xmlui.ArtifactBrowser.AbstractSearch.rpp");
+
+
+    private static final Message T_sort_head = message("xmlui.Discovery.SimpleSearch.sort_head");
+    private static final Message T_sort_button = message("xmlui.Discovery.SimpleSearch.sort_apply");
 
     /**
      * Cached query results
@@ -229,11 +231,6 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
             queryResults = null;
         }
 
-        if (queryResults != null) {
-            search.addPara("result-query", "result-query")
-                    .addContent(T_result_query.parameterize(getQuery(), queryResults.getTotalSearchResults()));
-        }
-
         Division results = search.addDivision("search-results", "primary");
 
         DSpaceObject searchScope = getScope();
@@ -260,7 +257,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
 
             //if (itemsTotal < lastItemIndex)
             //    lastItemIndex = itemsTotal;
-            int currentPage = (int) (this.queryResults.getStart() / this.queryResults.getMaxResults()) + 1;
+            int currentPage = this.queryResults.getStart() / this.queryResults.getMaxResults() + 1;
             int pagesTotal = (int) ((this.queryResults.getTotalSearchResults() - 1) / this.queryResults.getMaxResults()) + 1;
             Map<String, String> parameters = new HashMap<String, String>();
             parameters.put("page", "{pageNum}");
@@ -374,7 +371,8 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
      * Query DSpace for a list of all items / collections / or communities that
      * match the given search query.
      *
-     * @return The associated query results.
+     *
+     * @param scope the dspace object parent
      */
     public void performSearch(DSpaceObject scope) throws UIException, SearchServiceException {
 
@@ -604,6 +602,10 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         return sortOrder;
     }
 
+    protected String getParameterScope() {
+        return ObjectModelHelper.getRequest(objectModel).getParameter("scope");
+    }
+
     protected int getParameterEtAl() {
         try {
             return Integer.parseInt(ObjectModelHelper.getRequest(objectModel).getParameter("etal"));
@@ -658,14 +660,17 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
 
     protected void buildSearchControls(Division div)
             throws WingException, SQLException {
-        Table controlsTable = div.addTable("search-controls", 1, 3);
-        //Table controlsTable = div.addTable("search-controls", 1, 4);
-        Row controlsRow = controlsTable.addRow(Row.ROLE_DATA);
 
+        org.dspace.app.xmlui.wing.element.List controlsList = div.addList("search-controls", org.dspace.app.xmlui.wing.element.List.TYPE_FORM);
+
+
+        controlsList.setHead(T_sort_head);
+        //Table controlsTable = div.addTable("search-controls", 1, 4);
+
+        org.dspace.app.xmlui.wing.element.Item controlsItem = controlsList.addItem();
         // Create a control for the number of records to display
-        Cell rppCell = controlsRow.addCell();
-        rppCell.addContent(T_rpp);
-        Select rppSelect = rppCell.addSelect("rpp");
+        controlsItem.addContent(T_rpp);
+        Select rppSelect = controlsItem.addSelect("rpp");
         for (int i : RESULTS_PER_PAGE_PROGRESSION) {
             rppSelect.addOption((i == getParameterRpp()), i, Integer.toString(i));
         }
@@ -691,10 +696,9 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         }
         */
         
-        Cell sortCell = controlsRow.addCell();
         // Create a drop down of the different sort columns available
-        sortCell.addContent(T_sort_by);
-        Select sortSelect = sortCell.addSelect("sort_by");
+        controlsItem.addContent(T_sort_by);
+        Select sortSelect = controlsItem.addSelect("sort_by");
         sortSelect.addOption(false, "score", T_sort_by_relevance);
 
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
@@ -709,12 +713,12 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         }
 
         // Create a control to changing ascending / descending order
-        Cell orderCell = controlsRow.addCell();
-        orderCell.addContent(T_order);
-        Select orderSelect = orderCell.addSelect("order");
+        controlsItem.addContent(T_order);
+        Select orderSelect = controlsItem.addSelect("order");
         orderSelect.addOption(SortOption.ASCENDING.equals(getParameterOrder()), SortOption.ASCENDING, T_order_asc);
         orderSelect.addOption(SortOption.DESCENDING.equals(getParameterOrder()), SortOption.DESCENDING, T_order_desc);
 
+        controlsItem.addButton("submit_sort").setValue(T_sort_button);
 
         // Create a control for the number of authors per item to display
         // FIXME This is currently disabled, as the supporting functionality
@@ -741,7 +745,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
      *
      * @return The current scope.
      */
-    private DSpaceObject getScope() throws SQLException {
+    protected DSpaceObject getScope() throws SQLException {
         Request request = ObjectModelHelper.getRequest(objectModel);
         String scopeString = request.getParameter("scope");
 

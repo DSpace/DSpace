@@ -29,6 +29,7 @@ import org.dspace.discovery.*;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.configuration.SidebarFacetConfiguration;
+import org.dspace.handle.HandleManager;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
@@ -148,7 +149,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
 
 
     public void performSearch() throws SearchServiceException, UIException, SQLException {
-        DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+        DSpaceObject dso = getScope();
         queryArgs = getQueryArgs(context, dso, getAllFilterQueries());
         //If we are on a search page performing a search a query may be used
         Request request = ObjectModelHelper.getRequest(objectModel);
@@ -362,7 +363,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                             yearRangeQuery.setSortField(dateFacet + "_sort", DiscoverQuery.SORT_ORDER.asc);
                             yearRangeQuery.addFilterQueries(filterQueries);
                             yearRangeQuery.addSearchField(dateFacet);
-                            DiscoverResult lastYearResult = getSearchService().search(context, yearRangeQuery);
+                            DiscoverResult lastYearResult = getSearchService().search(context, scope, yearRangeQuery);
 
 
                             if(0 < lastYearResult.getDspaceObjects().size()){
@@ -373,7 +374,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                             }
                             //Now get the first year
                             yearRangeQuery.setSortField(dateFacet + "_sort", DiscoverQuery.SORT_ORDER.desc);
-                            DiscoverResult firstYearResult = getSearchService().search(context, yearRangeQuery);
+                            DiscoverResult firstYearResult = getSearchService().search(context, scope, yearRangeQuery);
                             if( 0 < firstYearResult.getDspaceObjects().size()){
                                 java.util.List<DiscoverResult.SearchDocument> searchDocuments = firstYearResult.getSearchDocument(firstYearResult.getDspaceObjects().get(0));
                                 if(0 < searchDocuments.size() && 0 < searchDocuments.get(0).getSearchFieldValues(dateFacet).size()){
@@ -467,7 +468,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
             String type = request.getParameter("filtertype");
             String value = request.getParameter("filter");
 
-            if(value != null && !value.equals("") && request.getParameter("submit_search-filter-controls_add") != null){
+            if(value != null && !value.equals("")){
                 allFilterQueries.add(getSearchService().toFilterQuery(context, (type.equals("*") ? "" : type), value).getFilterQuery());
             }
 
@@ -483,6 +484,33 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
         } catch (Exception e) {
             return null;
         }
+    }
+
+    /**
+     * Determine the current scope. This may be derived from the current url
+     * handle if present or the scope parameter is given. If no scope is
+     * specified then null is returned.
+     *
+     * @return The current scope.
+     */
+    private DSpaceObject getScope() throws SQLException {
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        String scopeString = request.getParameter("scope");
+
+        // Are we in a community or collection?
+        DSpaceObject dso;
+        if (scopeString == null || "".equals(scopeString))
+        {
+            // get the search scope from the url handle
+            dso = HandleUtil.obtainHandle(objectModel);
+        }
+        else
+        {
+            // Get the search scope from the location parameter
+            dso = HandleManager.resolveToObject(context, scopeString);
+        }
+
+        return dso;
     }
 
 

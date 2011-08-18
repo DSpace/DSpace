@@ -1213,3 +1213,17 @@ span.Z3988 {
 	display: none;
 }
 
+
+form.discover-search-box div.ds-form-content,
+form.discover-sort-box div.ds-form-content
+{
+    width: auto;
+}
+
+form.discover-search-box div.ds-form-content input.update-filters{
+    margin-left: 145px;
+}
+
+form.discover-sort-box select{
+    margin: 0 4px;
+}

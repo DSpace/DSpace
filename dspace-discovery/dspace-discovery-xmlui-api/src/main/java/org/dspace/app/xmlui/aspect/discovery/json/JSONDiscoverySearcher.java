@@ -16,13 +16,19 @@ import org.apache.cocoon.environment.Response;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.reading.AbstractReader;
 import org.apache.log4j.Logger;
+import org.dspace.app.xmlui.utils.ContextUtil;
+import org.dspace.app.xmlui.utils.HandleUtil;
+import org.dspace.content.DSpaceObject;
+import org.dspace.core.Context;
 import org.dspace.discovery.*;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
+import org.dspace.handle.HandleManager;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.Map;
 
 /**
@@ -35,9 +41,7 @@ import java.util.Map;
 public class JSONDiscoverySearcher extends AbstractReader implements Recyclable {
 
     private static Logger log = Logger.getLogger(JSONDiscoverySearcher.class);
-    /** These are all our parameters which can be used by this generator **/
-    private DiscoverQuery queryArgs;
-    private String jsonWrf;
+    private String JSONString;
 
 
     /** The Cocoon response */
@@ -58,8 +62,8 @@ public class JSONDiscoverySearcher extends AbstractReader implements Recyclable 
         //Retrieve all the given parameters
         Request request = ObjectModelHelper.getRequest(objectModel);
         this.response = ObjectModelHelper.getResponse(objectModel);
-        
-        queryArgs = new DiscoverQuery();
+
+        DiscoverQuery queryArgs = new DiscoverQuery();
 
         queryArgs.setQuery(request.getParameter("q"));
 
@@ -109,23 +113,24 @@ public class JSONDiscoverySearcher extends AbstractReader implements Recyclable 
             facetMinCount = 1;
         }
         queryArgs.setFacetMinCount(facetMinCount);
-        jsonWrf = request.getParameter("json.wrf");
-    }
+        String jsonWrf = request.getParameter("json.wrf");
 
-    public void generate() throws IOException, SAXException, ProcessingException {
-        String result = null;
         try {
-            result = getSearchService().searchJSON(queryArgs, jsonWrf);
-        } catch (SearchServiceException e) {
+            Context context = ContextUtil.obtainContext(objectModel);
+            JSONString = getSearchService().searchJSON(queryArgs, getScope(context, objectModel), jsonWrf);
+        } catch (Exception e) {
             log.error("Error while retrieving JSON string for Discovery auto complete", e);
         }
 
-        if(result != null){
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(result.getBytes("UTF-8"));
+    }
+
+    public void generate() throws IOException, SAXException, ProcessingException {
+        if(JSONString != null){
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(JSONString.getBytes("UTF-8"));
 
             byte[] buffer = new byte[8192];
 
-            response.setHeader("Content-Length", String.valueOf(result.length()));
+            response.setHeader("Content-Length", String.valueOf(JSONString.length()));
             int length;
             while ((length = inputStream.read(buffer)) > -1)
             {
@@ -133,5 +138,33 @@ public class JSONDiscoverySearcher extends AbstractReader implements Recyclable 
             }
             out.flush();
         }
+    }
+
+    /**
+     * Determine the current scope. This may be derived from the current url
+     * handle if present or the scope parameter is given. If no scope is
+     * specified then null is returned.
+     *
+     * @param context the dspace context
+     * @return The current scope.
+     */
+    private DSpaceObject getScope(Context context, Map objectModel) throws SQLException {
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        String scopeString = request.getParameter("scope");
+
+        // Are we in a community or collection?
+        DSpaceObject dso;
+        if (scopeString == null || "".equals(scopeString))
+        {
+            // get the search scope from the url handle
+            dso = HandleUtil.obtainHandle(objectModel);
+        }
+        else
+        {
+            // Get the search scope from the location parameter
+            dso = HandleManager.resolveToObject(context, scopeString);
+        }
+
+        return dso;
     }
 }

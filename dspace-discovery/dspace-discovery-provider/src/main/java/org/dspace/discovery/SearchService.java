@@ -29,6 +29,7 @@ public interface SearchService {
 
     String searchJSON(DiscoverQuery query, String jsonIdentifier) throws SearchServiceException;
 
+    String searchJSON(DiscoverQuery query, DSpaceObject dso, String jsonIdentifier) throws SearchServiceException;
 
 
     List<DSpaceObject> search(Context context, String query, String orderfield, boolean ascending, int offset, int max, String... filterquery);

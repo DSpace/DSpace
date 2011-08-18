@@ -81,15 +81,12 @@
     <message key="xmlui.ArtifactBrowser.AbstractSearch.type_department_browse">Browsing by: Department</message>
     <message key="xmlui.ArtifactBrowser.AbstractSearch.type_dateissued_dt_browse">Browsing by: Issue date</message>
 
-    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.all">Full text</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author">Author</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.title">Title</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject">Subject</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.dateIssued">Date issued</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.selected">Selected filters</message>
 
-    <message key="xmlui.Discovery.SimpleSearch.filter_help">Enter some text to add a filter to your results, the box has an auto complete function containing all the values that can be found in the fields selected in the dropdown box. Please be aware however that although the full text option also has an auto complete, this only shows values from all the fields which can be selected &amp; not for all the values in the repository in which the search will occur when this is selected.</message>
-    <message key="xmlui.Discovery.SimpleSearch.filter_head">Add filter</message>
 
 
     <message key="xmlui.dri2xhtml.structural.pagination-info.nototal">Now showing items {0}-{1}</message>
@@ -113,4 +110,15 @@
 
     <message key="xmlui.discovery.AbstractFiltersTransformer.filters.head">Discover</message>
     <message key="xmlui.discovery.AbstractFiltersTransformer.filters.view-more">... View More</message>
+
+
+    <message key="xmlui.discovery.SimpleSearch.search_label">Search</message>
+    <message key="xmlui.Discovery.SimpleSearch.filter_head">Filters</message>
+    <message key="xmlui.Discovery.SimpleSearch.filter_add">Add Filters</message>
+    <message key="xmlui.Discovery.SimpleSearch.filter_help">Use filters to refine the search results.</message>
+    <message key="xmlui.Discovery.SimpleSearch.filter_apply">Update filters</message>
+
+    <message key="xmlui.Discovery.SimpleSearch.sort_head">Sort options</message>
+    <message key="xmlui.Discovery.SimpleSearch.sort_apply">Apply</message>
+
 </catalogue>

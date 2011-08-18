@@ -27,10 +27,12 @@ import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
 import org.dspace.discovery.*;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.discovery.configuration.SidebarFacetConfiguration;
+import org.dspace.handle.HandleManager;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
@@ -122,7 +124,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
             try {
                 DSpaceValidity validity = new DSpaceValidity();
 
-                DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+                DSpaceObject dso = getScope();
 
                 if (dso != null) {
                     // Add the actual collection;
@@ -567,6 +569,9 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
             result.put(FACET_FIELD, request.getParameter(FACET_FIELD));
             if(request.getParameter(QUERY) != null)
                 result.put(QUERY, request.getParameter(QUERY));
+            if(request.getParameter("scope") != null){
+                result.put("scope", request.getParameter("scope"));
+            }
             return result;
         }
 
@@ -581,6 +586,33 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
 
             return paramMap;
         }
-
     }
+
+    /**
+     * Determine the current scope. This may be derived from the current url
+     * handle if present or the scope parameter is given. If no scope is
+     * specified then null is returned.
+     *
+     * @return The current scope.
+     */
+    private DSpaceObject getScope() throws SQLException {
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        String scopeString = request.getParameter("scope");
+
+        // Are we in a community or collection?
+        DSpaceObject dso;
+        if (scopeString == null || "".equals(scopeString))
+        {
+            // get the search scope from the url handle
+            dso = HandleUtil.obtainHandle(objectModel);
+        }
+        else
+        {
+            // Get the search scope from the location parameter
+            dso = HandleManager.resolveToObject(context, scopeString);
+        }
+
+        return dso;
+    }
+
 }

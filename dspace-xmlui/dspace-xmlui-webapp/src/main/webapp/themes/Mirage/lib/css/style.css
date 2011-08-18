@@ -1012,3 +1012,17 @@ div.spacer{
     margin-bottom: 10px;
     text-align: center;
 }
+
+form.discover-search-box{
+    margin-bottom: 10px;
+}
+
+li.search-filter-list,
+li.used-filters-list
+{
+    padding-top: 5px;
+}
+
+form.discover-sort-box select{
+    margin: 0 4px;
+}

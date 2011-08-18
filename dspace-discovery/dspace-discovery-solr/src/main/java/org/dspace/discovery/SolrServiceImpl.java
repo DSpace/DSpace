@@ -741,16 +741,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                         doc.addField(searchFilter.getIndexFieldName(), value);
                         //Add a dynamic fields for auto complete in search
                         if(searchFilter.isFullAutoComplete()){
-                            //Add the field to all for autocomplete so our autocomplete works for all fields
-                            doc.addField("all_ac", value);
-                            doc.addField("all", value);
                             doc.addField(searchFilter.getIndexFieldName() + "_ac", value);
                         }else{
                             String[] values = value.split(" ");
                             for (String val : values) {
-                                //Add the field to all for autocomplete so our autocomplete works for all fields
-                                doc.addField("all_ac", val);
-                                doc.addField("all", val);
                                 doc.addField(searchFilter.getIndexFieldName() + "_ac", val);
                             }
                         }
@@ -1050,7 +1044,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 discoveryQuery.addFilterQueries("handle:" + dso.getHandle());
             }
         }
-        return  search(context, discoveryQuery);
+        return search(context, discoveryQuery);
 
     }
 
@@ -1068,7 +1062,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
             for (int i = 0; i < discoveryQuery.getFilterQueries().size(); i++) {
                 String filterQuery = discoveryQuery.getFilterQueries().get(i);
-                solrQuery.addFilterQuery(prepareFilterQuery(filterQuery));
+                solrQuery.addFilterQuery(filterQuery);
             }
             if(discoveryQuery.getDSpaceObjectFilter() != -1){
                 solrQuery.addFilterQuery("search.resourcetype:" + discoveryQuery.getDSpaceObjectFilter());
@@ -1147,6 +1141,21 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             throw new org.dspace.discovery.SearchServiceException(e.getMessage(),e);
         }
     }
+
+    @Override
+    public String searchJSON(DiscoverQuery query, DSpaceObject dso, String jsonIdentifier) throws SearchServiceException {
+        if(dso != null){
+            if (dso instanceof Community) {
+                query.addFilterQueries("location:m" + dso.getID());
+            } else if (dso instanceof Collection) {
+                query.addFilterQueries("location:l" + dso.getID());
+            } else if (dso instanceof Item){
+                query.addFilterQueries("handle:" + dso.getHandle());
+            }
+        }
+        return searchJSON(query, jsonIdentifier);
+    }
+
 
     public String searchJSON(DiscoverQuery query, String jsonIdentifier) throws SearchServiceException {
         Map<String, String> params = new HashMap<String, String>();
@@ -1247,15 +1256,6 @@ public class SolrServiceImpl implements SearchService, IndexingService {
 
         return baseURL;
     }
-
-    private String prepareFilterQuery(String filterQuery) {
-        //Ensure that range queries or specified field queries do not get a wildcard at the end
-        if(!filterQuery.matches(".*\\:\\[.* TO .*\\](?![a-z 0-9]).*") && !filterQuery.matches(".*:\".*\"$") && !filterQuery.endsWith("*")){
-            filterQuery = filterQuery + " OR " + filterQuery + "*";
-        }
-        return filterQuery;
-    }
-
 
     private DiscoverResult retrieveResult(Context context, DiscoverQuery query, QueryResponse solrQueryResponse) throws SQLException {
         DiscoverResult result = new DiscoverResult();
@@ -1435,6 +1435,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         {
             filterQuery = filterQuery.substring(filterQuery.indexOf(":") + 1, filterQuery.length());
         }
+//        "(tea coffee)".replaceFirst("\\((.*?)\\)", "")
 
         value = transformDisplayedValue(context, field, value);
 
@@ -1451,7 +1452,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         result.setField(field);
         result.setDisplayedValue(transformDisplayedValue(context, field, value));
 //        TODO: solr escape of value ?
-        result.setFilterQuery((field == null || field.equals("") ? "" : field + ":") +  "\"" + value + "\"");
+        result.setFilterQuery((field == null || field.equals("") ? "" : field + ":") +  "(" + value + ")");
 
 
         return result;
@@ -1509,6 +1510,10 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 valueBuffer.append(fqParts[i]);
             }
             value = valueBuffer.toString();
+        }else if(value.matches("\\((.*?)\\)"))
+        {
+            //The brackets where added for better solr results, remove the first & last one
+            value = value.substring(1, value.length() -1);
         }
         return value;
     }
