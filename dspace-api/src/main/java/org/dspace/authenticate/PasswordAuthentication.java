@@ -33,7 +33,7 @@ import org.dspace.eperson.Group;
  * If you are implementing a new "explicit" authentication method,
  * use this class as a model.
  * <p>
- * You can use this (or another explict) method in the stack to
+ * You can use this (or another explicit) method in the stack to
  * implement HTTP Basic Authentication for servlets, by passing the
  * Basic Auth username and password to the <code>AuthenticationManager</code>.
  *
@@ -49,10 +49,10 @@ public class PasswordAuthentication
     /**
      * Look to see if this email address is allowed to register.
      * <p>
-     * The configuration key authentication.password.domain.valid is examined
-     * in dspace.cfg to see what doamins are valid.
+     * The configuration key domain.valid is examined
+     * in authentication-password.cfg to see what domains are valid.
      * <p>
-     * Example - aber.ac.uk domains : @aber.ac.uk
+     * Example - aber.ac.uk domain : @aber.ac.uk
      * Example - MIT domain and all .ac.uk domains: @mit.edu, .ac.uk
      */
     public boolean canSelfRegister(Context context,
@@ -60,8 +60,8 @@ public class PasswordAuthentication
                                    String email)
                                                  throws SQLException
     {
-        // Is there anything set in authentication.password.domain.valid?
-        String domains = ConfigurationManager.getProperty("authentication.password.domain.valid");
+        // Is there anything set in domain.valid?
+        String domains = ConfigurationManager.getProperty("authentication-password", "domain.valid");
         if ((domains == null) || (domains.trim().equals("")))
         {
             // No conditions set, so must be able to self register
@@ -119,8 +119,8 @@ public class PasswordAuthentication
     }
 
     /**
-     * Add authenticated users to the group defined in dspace.cfg by
-     * the password.login.specialgroup key.
+     * Add authenticated users to the group defined in authentication-password.cfg by
+     * the login.specialgroup key.
      */
     public int[] getSpecialGroups(Context context, HttpServletRequest request)
     {
@@ -130,7 +130,7 @@ public class PasswordAuthentication
 		{
 			if (!context.getCurrentUser().getMetadata("password").equals(""))
 			{
-				String groupName = ConfigurationManager.getProperty("password.login.specialgroup");
+				String groupName = ConfigurationManager.getProperty("authentication-password", "login.specialgroup");
 				if ((groupName != null) && (!groupName.trim().equals("")))
 				{
 				    Group specialGroup = Group.findByName(context, groupName);
@@ -139,7 +139,7 @@ public class PasswordAuthentication
 						// Oops - the group isn't there.
 						log.warn(LogManager.getHeader(context,
 								"password_specialgroup",
-								"Group defined in password.login.specialgroup does not exist"));
+								"Group defined in modules/authentication-password.cfg login.specialgroup does not exist"));
 						return new int[0];
 					} else
 					{
