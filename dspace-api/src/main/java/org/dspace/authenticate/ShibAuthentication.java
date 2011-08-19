@@ -56,10 +56,10 @@ public class ShibAuthentication implements AuthenticationMethod
             log.debug("header:" + name + "=" + request.getHeader(name));
         }
 
-        boolean isUsingTomcatUser = ConfigurationManager.getBooleanProperty("authentication.shib.email-use-tomcat-remote-user");
-        String emailHeader = ConfigurationManager.getProperty("authentication.shib.email-header");
-        String fnameHeader = ConfigurationManager.getProperty("authentication.shib.firstname-header");
-        String lnameHeader = ConfigurationManager.getProperty("authentication.shib.lastname-header");
+        boolean isUsingTomcatUser = ConfigurationManager.getBooleanProperty("authentication-shibboleth", "email-use-tomcat-remote-user");
+        String emailHeader = ConfigurationManager.getProperty("authentication-shibboleth", "email-header");
+        String fnameHeader = ConfigurationManager.getProperty("authentication-shibboleth", "firstname-header");
+        String lnameHeader = ConfigurationManager.getProperty("authentication-shibboleth", "lastname-header");
 
         String email = null;
         String fname = null;
@@ -144,7 +144,7 @@ public class ShibAuthentication implements AuthenticationMethod
         // auto create user if needed
         if (eperson == null
                 && ConfigurationManager
-                        .getBooleanProperty("authentication.shib.autoregister"))
+                        .getBooleanProperty("authentication-shibboleth", "autoregister"))
         {
             log.info(LogManager.getHeader(context, "autoregister", "email="
                     + email));
@@ -217,9 +217,9 @@ public class ShibAuthentication implements AuthenticationMethod
 
         java.util.Set groups = new java.util.HashSet();
         String roleHeader = ConfigurationManager
-                .getProperty("authentication.shib.role-header");
+                .getProperty("authentication-shibboleth", "role-header");
         boolean roleHeader_ignoreScope = ConfigurationManager
-                .getBooleanProperty("authentication.shib.role-header.ignore-scope");
+                .getBooleanProperty("authentication-shibboleth", "role-header.ignore-scope");
         if (roleHeader == null || roleHeader.trim().length() == 0)
         {
             roleHeader = "Shib-EP-UnscopedAffiliation";
@@ -234,7 +234,7 @@ public class ShibAuthentication implements AuthenticationMethod
 
         // default role when fully authN but not releasing any roles?
         String defaultRoles = ConfigurationManager
-                .getProperty("authentication.shib.default-roles");
+                .getProperty("authentication-shibboleth", "default-roles");
         if (affiliations == null && defaultRoles != null)
         {
             affiliations = defaultRoles;
@@ -261,11 +261,11 @@ public class ShibAuthentication implements AuthenticationMethod
 
                 // perform mapping here if necessary
                 String groupLabels = ConfigurationManager
-                        .getProperty("authentication.shib.role." + affiliation);
+                        .getProperty("authentication-shibboleth", "role." + affiliation);
                 if (groupLabels == null || groupLabels.trim().length() == 0)
                 {
                     groupLabels = ConfigurationManager
-                            .getProperty("authentication.shib.role."
+                            .getProperty("authentication-shibboleth", "role."
                                     + affiliation.toLowerCase());
                 }
 
