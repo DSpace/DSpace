@@ -51,27 +51,27 @@ import org.dspace.eperson.Group;
  * <b>Configuration:</b>
  * 
  * <pre>
- *   authentication.x509.keystore.path =
+ *   x509.keystore.path =
  * <em>
  * path to Java keystore file
  * </em>
- *   authentication.x509.keystore.password =
+ *   keystore.password =
  * <em>
  * password to access the keystore
  * </em>
- *   authentication.x509.ca.cert =
+ *   ca.cert =
  * <em>
  * path to certificate file for CA whose client certs to accept.
  * </em>
- *   authentication.x509.autoregister =
+ *   autoregister =
  * <em>
  * &quot;true&quot; if E-Person is created automatically for unknown new users.
  * </em>
- *   authentication.x509.groups = 
+ *   groups =
  * <em>
  * comma-delimited list of special groups to add user to if authenticated.
  * </em>
- *   authentication.x509.emaildomain = 
+ *   emaildomain =
  * <em>
  * email address domain (after the 'at' symbol) to match before allowing 
  * membership in special groups.
@@ -123,22 +123,16 @@ public class X509Authentication implements AuthenticationMethod
          * authentication when selected by the user rather than implicitly.
          */
         loginPageTitle = ConfigurationManager
-                .getProperty("authentication.x509.chooser.title.key");
+                .getProperty("authentication-x509", "chooser.title.key");
         loginPageURL = ConfigurationManager
-                .getProperty("authentication.x509.chooser.uri");
+                .getProperty("authentication-x509", "chooser.uri");
 
         String keystorePath = ConfigurationManager
-                .getProperty("authentication.x509.keystore.path");
+                .getProperty("authentication-x509", "keystore.path");
         String keystorePassword = ConfigurationManager
-                .getProperty("authentication.x509.keystore.password");
+                .getProperty("authentication-x509", "keystore.password");
         String caCertPath = ConfigurationManager
-                .getProperty("authentication.x509.ca.cert");
-
-        // backward-compatible kludge
-        if (caCertPath == null)
-        {
-            caCertPath = ConfigurationManager.getProperty("webui.cert.ca");
-        }
+                .getProperty("authentication-x509", "ca.cert");
 
         // First look for keystore full of trusted certs.
         if (keystorePath != null)
@@ -290,11 +284,11 @@ public class X509Authentication implements AuthenticationMethod
     /**
      * Verify CERTIFICATE against KEY. Return true if and only if CERTIFICATE is
      * valid and can be verified against KEY.
-     * 
+     *
+     * @param context
+     *            The current DSpace context
      * @param certificate -
      *            An X509 certificate object
-     * @param key -
-     *            PublicKey to check the certificate against.
      * @return - True if CERTIFICATE is valid and can be verified against KEY,
      *         false otherwise.
      */
@@ -383,7 +377,7 @@ public class X509Authentication implements AuthenticationMethod
             String username) throws SQLException
     {
         return ConfigurationManager
-                .getBooleanProperty("authentication.x509.autoregister");
+                .getBooleanProperty("authentication-x509", "autoregister");
     }
 
     /**
@@ -423,9 +417,9 @@ public class X509Authentication implements AuthenticationMethod
 
         String x509GroupConfig = null;
         x509GroupConfig = ConfigurationManager
-                .getProperty("authentication.x509.groups");
+                .getProperty("authentication-x509", "groups");
 
-        if (null != x509GroupConfig && !x509GroupConfig.equals(""))
+        if (null != x509GroupConfig && !"".equals(x509GroupConfig))
         {
             String[] groups = x509GroupConfig.split("\\s*,\\s*");
 
@@ -456,7 +450,7 @@ public class X509Authentication implements AuthenticationMethod
 
         HttpSession session = request.getSession(true);
 
-        if (null != emailDomain && !emailDomain.equals(""))
+        if (null != emailDomain && !"".equals(emailDomain))
         {
             if (email.substring(email.length() - emailDomain.length()).equals(
                     emailDomain))
