@@ -48,7 +48,7 @@ public class FlowMetadataImportUtils
     private static final Message T_no_changes = new Message("default", "xmlui.administrative.metadataimport.general.no_changes");
 
     // Other variables
-    private static final int limit = ConfigurationManager.getIntProperty("bulkedit.gui-item-limit", 20);
+    private static final int limit = ConfigurationManager.getIntProperty("bulkedit", "gui-item-limit", 20);
     private static Logger log = Logger.getLogger(FlowMetadataImportUtils.class);
 
     public static FlowResult processMetadataImport(Context context,Request request) throws SQLException, AuthorizeException, IOException, Exception

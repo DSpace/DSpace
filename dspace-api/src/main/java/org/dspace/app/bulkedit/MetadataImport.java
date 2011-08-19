@@ -150,7 +150,7 @@ public class MetadataImport
                         else if ("expunge".equals(action))
                         {
                             // Does the configuration allow deletes?
-                            if (!ConfigurationManager.getBooleanProperty("bulkedit.allowexpunge", false))
+                            if (!ConfigurationManager.getBooleanProperty("bulkedit", "allowexpunge", false))
                             {
                                 throw new MetadataImportException("'expunge' action denied by configuration");
                             }

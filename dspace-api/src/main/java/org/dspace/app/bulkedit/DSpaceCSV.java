@@ -237,7 +237,7 @@ public class DSpaceCSV implements Serializable
 
         // Set the metadata fields to ignore
         ignore = new HashMap<String, String>();
-        String toIgnore = ConfigurationManager.getProperty("bulkedit.ignore-on-export");
+        String toIgnore = ConfigurationManager.getProperty("bulkedit", "ignore-on-export");
         if ((toIgnore == null) || ("".equals(toIgnore.trim())))
         {
             // Set a default value
@@ -272,14 +272,14 @@ public class DSpaceCSV implements Serializable
     /**
      * Set the value separator for multiple values stored in one csv value.
      *
-     * Is set in dspace.cfg as bulkedit.valueseparator
+     * Is set in bulkedit.cfg as valueseparator
      *
      * If not set, defaults to double pipe '||'
      */
     private void setValueSeparator()
     {
         // Get the value separator
-        valueSeparator = ConfigurationManager.getProperty("bulkedit.valueseparator");
+        valueSeparator = ConfigurationManager.getProperty("bulkedit", "valueseparator");
         if ((valueSeparator != null) && (!"".equals(valueSeparator.trim())))
         {
             valueSeparator = valueSeparator.trim();
@@ -298,7 +298,7 @@ public class DSpaceCSV implements Serializable
     /**
      * Set the field separator use to separate fields in the csv.
      *
-     * Is set in dspace.cfg as bulkedit.fieldseparator
+     * Is set in bulkedit.cfg as fieldseparator
      *
      * If not set, defaults to comma ','.
      *
@@ -308,7 +308,7 @@ public class DSpaceCSV implements Serializable
     private void setFieldSeparator()
     {
         // Get the value separator
-        fieldSeparator = ConfigurationManager.getProperty("bulkedit.fieldseparator");
+        fieldSeparator = ConfigurationManager.getProperty("bulkedit", "fieldseparator");
         if ((fieldSeparator != null) && (!"".equals(fieldSeparator.trim())))
         {
             fieldSeparator = fieldSeparator.trim();
@@ -589,7 +589,7 @@ public class DSpaceCSV implements Serializable
      * Is it Ok to export this value? When exportAll is set to false, we don't export
      * some of the metadata elements.
      *
-     * The list can be configured via the key bulkedit.ignore-on-export in dspace.cfg
+     * The list can be configured via the key ignore-on-export in bulkedit.cfg
      *
      * @param md The DCValue to examine
      * @return Whether or not it is OK to export this element
