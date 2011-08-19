@@ -85,19 +85,19 @@ public class Bundle extends DSpaceObject
         {
             bitstreamOrderingDirection = "ASC";
         }
-        
+
         StringBuilder query = new StringBuilder();
-        query.append("SELECT bitstream.* FROM bitstream, bundle2bitstream WHERE");
+        query.append("SELECT bitstream.*,bundle2bitstream.bitstream_order FROM bitstream, bundle2bitstream WHERE");
         query.append(" bundle2bitstream.bitstream_id=bitstream.bitstream_id AND");
         query.append(" bundle2bitstream.bundle_id= ?");
-        query.append(" ORDER BY bitstream.");
+        query.append(" ORDER BY ");
         query.append(bitstreamOrderingField);
         query.append(" ");
         query.append(bitstreamOrderingDirection);
 
         // Get bitstreams
-        TableRowIterator tri = DatabaseManager.queryTable(
-                ourContext, "bitstream",
+        TableRowIterator tri = DatabaseManager.query(
+                ourContext,
                 query.toString(),
                 bundleRow.getIntColumn("bundle_id"));
 
@@ -105,7 +105,7 @@ public class Bundle extends DSpaceObject
         {
             while (tri.hasNext())
             {
-                TableRow r = (TableRow) tri.next();
+                TableRow r = tri.next();
 
                 // First check the cache
                 Bitstream fromCache = (Bitstream) context.fromCache(
@@ -453,7 +453,32 @@ public class Bundle extends DSpaceObject
         TableRow mappingRow = DatabaseManager.row("bundle2bitstream");
         mappingRow.setColumn("bundle_id", getID());
         mappingRow.setColumn("bitstream_id", b.getID());
+        mappingRow.setColumn("bitstream_order", b.getSequenceID());
         DatabaseManager.insert(ourContext, mappingRow);
+    }
+
+    /**
+     * Changes bitstream order according to the array
+     * @param bitstreamIds the identifiers in the order they are to be set
+     * @throws SQLException when an SQL error has occurred (querying DSpace)
+     * @throws AuthorizeException If the user can't make the changes
+     */
+    public void setOrder(int bitstreamIds[]) throws AuthorizeException, SQLException {
+        AuthorizeManager.authorizeAction(ourContext, this, Constants.WRITE);
+
+        for (int i = 0; i < bitstreamIds.length; i++) {
+            int bitstreamId = bitstreamIds[i];
+
+            TableRow row = DatabaseManager.querySingleTable(ourContext, "bundle2bitstream",
+                    "SELECT * FROM bundle2bitstream WHERE bitstream_id= ? ", bitstreamId);
+
+            if(row == null){
+                log.warn(LogManager.getHeader(ourContext, "Invalid bitstream id while changing bitstream order", "Bundle: " + getID() + ", bitstream id: " + bitstreamId));
+            }else{
+                row.setColumn("bitstream_order", i);
+                DatabaseManager.update(ourContext, row);
+            }
+        }
     }
 
     /**

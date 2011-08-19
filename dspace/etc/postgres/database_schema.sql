@@ -270,9 +270,10 @@ CREATE INDEX item2bundle_bundle_fk_idx ON Item2Bundle(bundle_id);
 -------------------------------------------------------
 CREATE TABLE Bundle2Bitstream
 (
-  id           INTEGER PRIMARY KEY,
-  bundle_id    INTEGER REFERENCES Bundle(bundle_id),
-  bitstream_id INTEGER REFERENCES Bitstream(bitstream_id)
+  id              INTEGER PRIMARY KEY,
+  bundle_id       INTEGER REFERENCES Bundle(bundle_id),
+  bitstream_id    INTEGER REFERENCES Bitstream(bitstream_id),
+  bitstream_order INTEGER
 );
 
 -- index by bundle_id
