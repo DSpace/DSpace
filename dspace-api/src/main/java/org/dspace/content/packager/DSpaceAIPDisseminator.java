@@ -585,4 +585,28 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
         return this.filterBundles;
     }
     
+    
+    /**
+     * Returns a user help string which should describe the
+     * additional valid command-line options that this packager
+     * implementation will accept when using the <code>-o</code> or
+     * <code>--option</code> flags with the Packager script.
+     *
+     * @return a string describing additional command-line options available
+     * with this packager
+     */
+    @Override
+    public String getParameterHelp()
+    {
+        String parentHelp = super.getParameterHelp();
+
+        //Return superclass help info, plus the extra parameter/option that this class supports
+        return parentHelp +
+                "\n\n" +
+                "* filterBundles=[bundleList]      " +
+                   "List of bundles specifying which Bundles should be included in an AIP. If this list starts with a '+' symbol," +
+                   " then it represents a list of bundles to *include* in the AIP.  By default, the list represents a list of bundles" +
+                   " to *exclude* from the AIP.";
+    }
+    
 }
