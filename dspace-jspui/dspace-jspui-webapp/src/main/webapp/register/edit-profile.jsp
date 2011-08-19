@@ -40,7 +40,7 @@
     attr = (Boolean) request.getAttribute("password.problem");
     boolean passwordProblem = (attr != null && attr.booleanValue());
 
-    boolean ldap_enabled = ConfigurationManager.getBooleanProperty("ldap.enable");
+    boolean ldap_enabled = ConfigurationManager.getBooleanProperty("authentication-ldap", "enable");
     boolean ldap_eperson = (ldap_enabled && (eperson.getNetid() != null) && (eperson.getNetid().equals("") == false));
 %>
 

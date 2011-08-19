@@ -71,7 +71,7 @@ public class RegisterServlet extends DSpaceServlet
     public void init()
     {
         registering = getInitParameter("register").equalsIgnoreCase("true");
-        ldap_enabled = ConfigurationManager.getBooleanProperty("ldap.enable");
+        ldap_enabled = ConfigurationManager.getBooleanProperty("authentication-ldap", "enable");
     }
 
     protected void doDSGet(Context context, HttpServletRequest request,

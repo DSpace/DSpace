@@ -65,7 +65,7 @@
     String language     = eperson.getMetadata("language");
     boolean emailExists = (request.getAttribute("email_exists") != null);
 
-    boolean ldap_enabled = ConfigurationManager.getBooleanProperty("ldap.enable");
+    boolean ldap_enabled = ConfigurationManager.getBooleanProperty("authentication-ldap", "enable");
 %>
 
 <dspace:layout titlekey="jsp.dspace-admin.eperson-edit.title"

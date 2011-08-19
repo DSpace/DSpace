@@ -53,7 +53,7 @@ public class LDAPAuthentication
     {
         // XXX might also want to check that username exists in LDAP.
 
-        return ConfigurationManager.getBooleanProperty("webui.ldap.autoregister");
+        return ConfigurationManager.getBooleanProperty("authentication-ldap", "autoregister");
     }
 
     /**
@@ -99,7 +99,7 @@ public class LDAPAuthentication
 		{
 			if (!context.getCurrentUser().getNetid().equals(""))
 			{
-				String groupName = ConfigurationManager.getProperty("ldap.login.specialgroup");
+				String groupName = ConfigurationManager.getProperty("authentication-ldap", "login.specialgroup");
 				if ((groupName != null) && (!groupName.trim().equals("")))
 				{
 				Group ldapGroup = Group.findByName(context, groupName);
@@ -108,7 +108,7 @@ public class LDAPAuthentication
 						// Oops - the group isn't there.
 						log.warn(LogManager.getHeader(context,
 								"ldap_specialgroup",
-								"Group defined in ldap.login.specialgroup does not exist"));
+								"Group defined in login.specialgroup does not exist"));
 						return new int[0];
 					} else
 					{
@@ -194,9 +194,9 @@ public class LDAPAuthentication
                 // If there is no email and the email  domain is set, add it to the netid
 				String email = ldap.ldapEmail;
                 if (((email == null) || ("".equals(email))) &&
-                    (!"".equals(ConfigurationManager.getProperty("ldap.netid_email_domain"))))
+                    (!"".equals(ConfigurationManager.getProperty("authentication-ldap", "netid_email_domain"))))
                 {
-                    email = netid + ConfigurationManager.getProperty("ldap.netid_email_domain");
+                    email = netid + ConfigurationManager.getProperty("authentication-ldap", "netid_email_domain");
                 }
 
                 if ((email != null) && (!"".equals(email)))
@@ -312,10 +312,10 @@ public class LDAPAuthentication
         {
             if (!password.equals(""))
             {
-                String ldap_provider_url = ConfigurationManager.getProperty("ldap.provider_url");
-                String ldap_id_field = ConfigurationManager.getProperty("ldap.id_field");
-                String ldap_search_context = ConfigurationManager.getProperty("ldap.search_context");
-                String ldap_object_context = ConfigurationManager.getProperty("ldap.object_context");
+                String ldap_provider_url = ConfigurationManager.getProperty("authentication-ldap", "provider_url");
+                String ldap_id_field = ConfigurationManager.getProperty("authentication-ldap", "id_field");
+                String ldap_search_context = ConfigurationManager.getProperty("authentication-ldap", "search_context");
+                String ldap_object_context = ConfigurationManager.getProperty("authentication-ldap", "object_context");
 
                 // Set up environment for creating initial context
                 Hashtable env = new Hashtable(11);
@@ -333,10 +333,10 @@ public class LDAPAuthentication
                     // Create initial context
                     ctx = new InitialDirContext(env);
 
-                    String ldap_email_field = ConfigurationManager.getProperty("ldap.email_field");
-                    String ldap_givenname_field = ConfigurationManager.getProperty("ldap.givenname_field");
-                    String ldap_surname_field = ConfigurationManager.getProperty("ldap.surname_field");
-                    String ldap_phone_field = ConfigurationManager.getProperty("ldap.phone_field");
+                    String ldap_email_field = ConfigurationManager.getProperty("authentication-ldap", "email_field");
+                    String ldap_givenname_field = ConfigurationManager.getProperty("authentication-ldap", "givenname_field");
+                    String ldap_surname_field = ConfigurationManager.getProperty("authentication-ldap", "surname_field");
+                    String ldap_phone_field = ConfigurationManager.getProperty("authentication-ldap", "phone_field");
 
                     Attributes matchAttrs = new BasicAttributes(true);
                     matchAttrs.put(new BasicAttribute(ldap_id_field, netid));
@@ -426,8 +426,6 @@ public class LDAPAuthentication
 
             return true;
         }
-
-
     }
 
     /*

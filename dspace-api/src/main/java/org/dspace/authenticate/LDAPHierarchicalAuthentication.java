@@ -49,8 +49,8 @@ public class LDAPHierarchicalAuthentication
                                    String username)
         throws SQLException
     {
-        // Looks to see if webui.ldap.autoregister is set or not
-        return ConfigurationManager.getBooleanProperty("webui.ldap.autoregister");
+        // Looks to see if autoregister is set or not
+        return ConfigurationManager.getBooleanProperty("authentication-ldap", "autoregister");
     }
 
     /**
@@ -86,7 +86,7 @@ public class LDAPHierarchicalAuthentication
 
     /*
      * Add authenticated users to the group defined in dspace.cfg by
-     * the ldap.login.specialgroup key.
+     * the login.specialgroup key.
      */
     public int[] getSpecialGroups(Context context, HttpServletRequest request)
     {
@@ -96,7 +96,7 @@ public class LDAPHierarchicalAuthentication
 		{
 			if (!context.getCurrentUser().getNetid().equals(""))
 			{
-				String groupName = ConfigurationManager.getProperty("ldap.login.specialgroup");
+				String groupName = ConfigurationManager.getProperty("authentication-ldap", "login.specialgroup");
 				if ((groupName != null) && (!groupName.trim().equals("")))
 				{
 					Group ldapGroup = Group.findByName(context, groupName);
@@ -105,7 +105,7 @@ public class LDAPHierarchicalAuthentication
 						// Oops - the group isn't there.
 						log.warn(LogManager.getHeader(context,
 								"ldap_specialgroup",
-								"Group defined in ldap.login.specialgroup does not exist"));
+								"Group defined in login.specialgroup does not exist"));
 						return new int[0];
 					} else
 					{
@@ -180,8 +180,8 @@ public class LDAPHierarchicalAuthentication
         SpeakerToLDAP ldap = new SpeakerToLDAP(log);
 
 		// Get the DN of the user
-		String adminUser = ConfigurationManager.getProperty("ldap.search.user");
-		String adminPassword = ConfigurationManager.getProperty("ldap.search.password");
+		String adminUser = ConfigurationManager.getProperty("authentication-ldap", "search.user");
+		String adminPassword = ConfigurationManager.getProperty("authentication-ldap", "search.password");
 		String dn = ldap.getDNOfUser(adminUser, adminPassword, context, netid);
 
 		// Check a DN was found
@@ -231,9 +231,9 @@ public class LDAPHierarchicalAuthentication
                 // If there is no email and the email  domain is set, add it to the netid
 				String email = ldap.ldapEmail;
                 if (((email == null) || ("".equals(email))) &&
-                    (!"".equals(ConfigurationManager.getProperty("ldap.netid_email_domain"))))
+                    (!"".equals(ConfigurationManager.getProperty("authentication-ldap", "netid_email_domain"))))
                 {
-                    email = netid + ConfigurationManager.getProperty("ldap.netid_email_domain");
+                    email = netid + ConfigurationManager.getProperty("authentication-ldap", "netid_email_domain");
                 }
 
                 if ((email != null) && (!"".equals(email)))
@@ -335,16 +335,15 @@ public class LDAPHierarchicalAuthentication
         protected String ldapPhone = null;
 
 		/** LDAP settings */
-		String ldap_provider_url = ConfigurationManager.getProperty("ldap.provider_url");
-		String ldap_id_field = ConfigurationManager.getProperty("ldap.id_field");
-		String ldap_search_context = ConfigurationManager.getProperty("ldap.search_context");
-		String ldap_object_context = ConfigurationManager.getProperty("ldap.object_context");
-		String ldap_search_scope = ConfigurationManager.getProperty("ldap.search_scope");
+		String ldap_provider_url = ConfigurationManager.getProperty("authentication-ldap", "provider_url");
+		String ldap_id_field = ConfigurationManager.getProperty("authentication-ldap", "id_field");
+		String ldap_search_context = ConfigurationManager.getProperty("authentication-ldap", "search_context");
+		String ldap_search_scope = ConfigurationManager.getProperty("authentication-ldap", "search_scope");
 
-		String ldap_email_field = ConfigurationManager.getProperty("ldap.email_field");
-		String ldap_givenname_field = ConfigurationManager.getProperty("ldap.givenname_field");
-		String ldap_surname_field = ConfigurationManager.getProperty("ldap.surname_field");
-		String ldap_phone_field = ConfigurationManager.getProperty("ldap.phone_field");
+		String ldap_email_field = ConfigurationManager.getProperty("authentication-ldap", "email_field");
+		String ldap_givenname_field = ConfigurationManager.getProperty("authentication-ldap", "givenname_field");
+		String ldap_surname_field = ConfigurationManager.getProperty("authentication-ldap", "surname_field");
+		String ldap_phone_field = ConfigurationManager.getProperty("authentication-ldap", "phone_field");
 
 		SpeakerToLDAP(Logger thelog)
         {
