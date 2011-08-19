@@ -39,6 +39,9 @@ public class MetadataImport
     /** The Context */
     Context c;
 
+    /** The DSpaceCSV object we're processing */
+    DSpaceCSV csv;
+
     /** The lines to import */
     List<DSpaceCSVLine> toImport;
 
@@ -53,11 +56,12 @@ public class MetadataImport
      * @param c The context
      * @param toImport An array of CSV lines to examine
      */
-    public MetadataImport(Context c, List<DSpaceCSVLine> toImport)
+    public MetadataImport(Context c, DSpaceCSV toImport)
     {
         // Store the import settings
         this.c = c;
-        this.toImport = toImport;
+        csv = toImport;
+        this.toImport = toImport.getCSVLines();
     }
 
     /**
@@ -89,6 +93,12 @@ public class MetadataImport
                 // Get the DSpace item to compare with
                 int id = line.getID();
 
+                // Is there an action column?
+                if (csv.hasActions() && (!"".equals(line.getAction())) && (id == -1))
+                {
+                    throw new MetadataImportException("'action' not allowed for new items!");
+                }
+
                 // Is this a new item?
                 if (id != -1)
                 {
@@ -98,6 +108,8 @@ public class MetadataImport
                     {
                         throw new MetadataImportException("Unknown item ID " + id);
                     }
+
+                    // Record changes
                     BulkEditChange whatHasChanged = new BulkEditChange(item);
 
                     // Has it moved collection?
@@ -124,6 +136,63 @@ public class MetadataImport
 
                             // Compare
                             compare(item, fromCSV, change, md, whatHasChanged);
+                        }
+                    }
+
+                    if (csv.hasActions())
+                    {
+                        // Perform the action
+                        String action = line.getAction();
+                        if ("".equals(action))
+                        {
+                            // Do nothing
+                        }
+                        else if ("expunge".equals(action))
+                        {
+                            // Does the configuration allow deletes?
+                            if (!ConfigurationManager.getBooleanProperty("bulkedit.allowexpunge", false))
+                            {
+                                throw new MetadataImportException("'expunge' action denied by configuration");
+                            }
+
+                            // Remove the item
+                            Collection[] owners = item.getCollections();
+                            for (Collection owner : owners)
+                            {
+                                if (change)
+                                {
+                                    owner.removeItem(item);
+                                }
+                            }
+                            whatHasChanged.setDeleted();
+                        }
+                        else if ("withdraw".equals(action))
+                        {
+                            // Withdraw the item
+                            if (!item.isWithdrawn())
+                            {
+                                if (change)
+                                {
+                                    item.withdraw();
+                                }
+                                whatHasChanged.setWithdrawn();
+                            }
+                        }
+                        else if ("reinstate".equals(action))
+                        {
+                            // Reinstate the item
+                            if (item.isWithdrawn())
+                            {
+                                if (change)
+                                {
+                                    item.reinstate();
+                                }
+                                whatHasChanged.setReinstated();
+                            }
+                        }
+                        else {
+                            // Unknown action!
+                            throw new MetadataImportException("Unknown action: " + action);
                         }
                     }
 
@@ -164,7 +233,7 @@ public class MetadataImport
                     {
                         throw new MetadataImportException("New items must have a 'collection' assigned in the form of a handle");
                     }
-                    
+
                     // Check collections are really collections
                     ArrayList<Collection> check = new ArrayList<Collection>();
                     Collection collection;
@@ -204,7 +273,7 @@ public class MetadataImport
                         Collection extra = (Collection)HandleManager.resolveToObject(c, handle);
                         if (first)
                         {
-                            whatHasChanged.setOwningCollection(extra);   
+                            whatHasChanged.setOwningCollection(extra);
                         }
                         else
                         {
@@ -227,7 +296,7 @@ public class MetadataImport
                         {
                             item.addMetadata(dcv.schema,
                                              dcv.element,
-                                             dcv.qualifier, 
+                                             dcv.qualifier,
                                              dcv.language,
                                              dcv.value);
                         }
@@ -253,7 +322,7 @@ public class MetadataImport
                             // Install the item
                             InstallItem.installItem(c, wsItem);
                         }
-                                              
+
                         // Add to extra collections
                         if (line.get("collection").size() > 0)
                         {
@@ -313,8 +382,8 @@ public class MetadataImport
         log.debug(LogManager.getHeader(c, "metadata_import",
                                        "item_id=" + item.getID() + ",fromCSV=" + all));
 
-        // Don't compare collections
-        if ("collection".equals(md))
+        // Don't compare collections  or actions
+        if (("collection".equals(md)) || ("action".equals(md)))
         {
             return;
         }
@@ -633,8 +702,8 @@ public class MetadataImport
     private void add(String[] fromCSV, String md, BulkEditChange changes)
                                             throws SQLException, AuthorizeException
     {
-        // Don't add owning collection
-        if ("collection".equals(md))
+        // Don't add owning collection or action
+        if (("collection".equals(md)) || ("action".equals(md)))
         {
             return;
         }
@@ -759,7 +828,8 @@ public class MetadataImport
             List<Collection> oldCollections = change.getOldMappedCollections();
             if ((adds.size() > 0) || (removes.size() > 0) ||
                 (newCollections.size() > 0) || (oldCollections.size() > 0) ||
-                (change.getNewOwningCollection() != null) || (change.getOldOwningCollection() != null))
+                (change.getNewOwningCollection() != null) || (change.getOldOwningCollection() != null) ||
+                (change.isDeleted()) || (change.isWithdrawn()) || (change.isReinstated()))
             {
                 // Show the item
                 Item i = change.getItem();
@@ -786,6 +856,41 @@ public class MetadataImport
                     System.out.println();
                 }
                 changeCounter++;
+            }
+
+            // Show actions
+            if (change.isDeleted())
+            {
+                if (changed)
+                {
+                    System.out.println(" - EXPUNGED!");
+                }
+                else
+                {
+                    System.out.println(" - EXPUNGE!");
+                }
+            }
+            if (change.isWithdrawn())
+            {
+                if (changed)
+                {
+                    System.out.println(" - WITHDRAWN!");
+                }
+                else
+                {
+                    System.out.println(" - WITHDRAW!");
+                }
+            }
+            if (change.isReinstated())
+            {
+                if (changed)
+                {
+                    System.out.println(" - REINSTATED!");
+                }
+                else
+                {
+                    System.out.println(" - REINSTATE!");
+                }
             }
 
             if (change.getNewOwningCollection() != null)
@@ -846,7 +951,7 @@ public class MetadataImport
                 String cName = c.getName();
                 if (!changed)
                 {
-                    System.out.print(" + Um-map from collection (" + cHandle + "): ");
+                    System.out.print(" + Un-map from collection (" + cHandle + "): ");
                 }
                 else
                 {
@@ -1040,7 +1145,7 @@ public class MetadataImport
         }
 
         // Perform the first import - just highlight differences
-        MetadataImport importer = new MetadataImport(c, csv.getCSVLines());
+        MetadataImport importer = new MetadataImport(c, csv);
         List<BulkEditChange> changes;
 
         if (!line.hasOption('s'))
@@ -1126,7 +1231,7 @@ public class MetadataImport
         catch (Exception e)
         {
             c.abort();
-            System.err.println("Error commiting changes to database: " + e.getMessage());
+            System.err.println("Error committing changes to database: " + e.getMessage());
             System.err.println("Aborting most recent changes.");
             System.exit(1);
         }

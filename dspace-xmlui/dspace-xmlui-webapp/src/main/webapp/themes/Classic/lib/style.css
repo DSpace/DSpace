@@ -515,6 +515,18 @@ tr.ds-table-row.metadata-addition td,tr.ds-table-row.metadata-deletion td {
 	border-top: 1px solid black;
 }
 
+tr.ds-table-row.item-delete {
+	background-color: #CC99FF;
+}
+
+tr.ds-table-row.item-withdraw {
+	background-color: #CC99FF;
+}
+
+tr.ds-table-row.item-reinstate {
+	background-color: #CC99FF;
+}
+
 
 /*******************************
 ***********  forms  ***********

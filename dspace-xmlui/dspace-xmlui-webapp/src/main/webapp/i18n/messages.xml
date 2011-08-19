@@ -1380,8 +1380,8 @@
         <message key="xmlui.administrative.metadataimport.general.new_item">New item</message>
         <message key="xmlui.administrative.metadataimport.flow.upload_successful">Upload successful</message>
         <message key="xmlui.administrative.metadataimport.flow.upload_failed">Upload failed</message>
-    <message key="xmlui.administrative.metadataimport.flow.upload_badschema">Unknown metadata schema in heading</message>
-    <message key="xmlui.administrative.metadataimport.flow.upload_badelement">Unknown metadata element in heading</message>
+        <message key="xmlui.administrative.metadataimport.flow.upload_badschema">Unknown metadata schema in heading</message>
+        <message key="xmlui.administrative.metadataimport.flow.upload_badelement">Unknown metadata element in heading</message>
         <message key="xmlui.administrative.metadataimport.flow.import_successful">Import successful</message>
         <message key="xmlui.administrative.metadataimport.flow.import_failed">Import failed</message>
         <message key="xmlui.administrative.metadataimport.flow.over_limit">Number of changes exceeds maximum allowed. Limit changes or alter bulkedit.gui-item-limit in dspace.cfg</message>
@@ -1398,6 +1398,9 @@
         <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.collection_oldowner">Removed from owning collection</message>
         <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.collection_mapped">Mapped to collection</message>
         <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.collection_unmapped">Unmapped from collection</message>
+        <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.item_deleted">Item Expunged</message>
+        <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.item_withdrawn">Item Withdrawn</message>
+        <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.item_reinstated">Item Reinstated</message>
 
         <!-- org.dspace.app.xmlui.administrative.metadataimport.MetadataImportUpload -->
         <message key="xmlui.administrative.metadataimport.MetadataImportUpload.item_add">Add: </message>
@@ -1409,6 +1412,9 @@
         <message key="xmlui.administrative.metadataimport.MetadataImportUpload.changes_pending">Changes pending for item</message>
         <message key="xmlui.administrative.metadataimport.MetadataImportUpload.submit_confirm">Apply changes</message>
         <message key="xmlui.administrative.metadataimport.MetadataImportUpload.hint">Pending changes are listed below for review</message>
+        <message key="xmlui.administrative.metadataimport.MetadataImportUpload.item_delete">Expunge Item</message>
+        <message key="xmlui.administrative.metadataimport.MetadataImportUpload.item_withdraw">Withdraw Item</message>
+        <message key="xmlui.administrative.metadataimport.MetadataImportUpload.item_reinstate">Reinstate Item</message>
 
 	<!-- general mapper messages -->
 	<message key="xmlui.administrative.mapper.general.mapper_trail">Item mapper</message>

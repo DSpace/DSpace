@@ -79,7 +79,8 @@
                 boolean first = false;
                 if ((adds.size() > 0) || (removes.size() > 0) ||
                     (newCollections.size() > 0) || (oldCollections.size() > 0) ||
-                    (change.getNewOwningCollection() != null) || (change.getOldOwningCollection() != null))
+                    (change.getNewOwningCollection() != null) || (change.getOldOwningCollection() != null) ||
+                    (change.isDeleted()) || (change.isWithdrawn()) || (change.isReinstated()))
                 {
                     // Show the item
                     if (!change.isNewItem())
@@ -93,6 +94,65 @@
                     }
                     changeCounter++;
                     first = true;
+                }
+
+                // Show actions
+                if (change.isDeleted())
+                {
+                    if (!first)
+                    {
+                        %><tr><td bgcolor="white"></td><%
+                    }
+                    else
+                    {
+                        first = false;
+                    }
+                    if (!changed)
+                    {
+                        %><td bgcolor="#9B30FF" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.delete"/></td><td bgcolor="#9B30FF" style="font-size:10pt"></td></tr><%
+                    }
+                    else
+                    {
+                        %><td bgcolor="#9B30FF" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.deleted"/></td><td bgcolor="#9B30FF" style="font-size:10pt"></td></tr><%
+                    }
+                }
+                if (change.isWithdrawn())
+                {
+                    if (!first)
+                    {
+                        %><tr><td bgcolor="white"></td><%
+                    }
+                    else
+                    {
+                        first = false;
+                    }
+                    if (!changed)
+                    {
+                        %><td bgcolor="#9B30FF" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.withdraw"/></td><td bgcolor="#9B30FF" style="font-size:10pt"></td></tr><%
+                    }
+                    else
+                    {
+                        %><td bgcolor="#9B30FF" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.withdrawn"/></td><td bgcolor="#9B30FF" style="font-size:10pt"></td></tr><%
+                    }
+                }
+                if (change.isReinstated())
+                {
+                    if (!first)
+                    {
+                        %><tr><td bgcolor="white"></td><%
+                    }
+                    else
+                    {
+                        first = false;
+                    }
+                    if (!changed)
+                    {
+                        %><td bgcolor="#9B30FF" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.reinstate"/></td><td bgcolor="#9B30FF" style="font-size:10pt"></td></tr><%
+                    }
+                    else
+                    {
+                        %><td bgcolor="#9B30FF" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.reinstated"/></td><td bgcolor="#9B30FF" style="font-size:10pt"></td></tr><%
+                    }
                 }
 
                 // Show new owner collection
@@ -113,11 +173,11 @@
                         }
                         if (!changed)
                         {
-                            %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.addtoownercollection"/></td><td bgcolor="4E9258" style="font-size:10pt">(<%= cHandle %>): <%= cName %></td></tr><%
+                            %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.addtoownercollection"/></td><td bgcolor="#4E9258" style="font-size:10pt">(<%= cHandle %>): <%= cName %></td></tr><%
                         }
                         else
                         {
-                            %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.addedtoownercollection"/></td><td bgcolor="4E9258" style="font-size:10pt">(<%= cHandle %>): <%= cName %></td></tr><%
+                            %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.addedtoownercollection"/></td><td bgcolor="#4E9258" style="font-size:10pt">(<%= cHandle %>): <%= cName %></td></tr><%
                         }
                     }
                 }
@@ -140,11 +200,11 @@
                         }
                         if (!changed)
                         {
-                            %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.removefromownercollection"/></td><td bgcolor="4E9258" style="font-size:10pt">(<%= cHandle %>): <%= cName %></td></tr><%
+                            %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.removefromownercollection"/></td><td bgcolor="#4E9258" style="font-size:10pt">(<%= cHandle %>): <%= cName %></td></tr><%
                         }
                         else
                         {
-                            %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.removedfromownercollection"/></td><td bgcolor="4E9258" style="font-size:10pt">(<%= cHandle %>): <%= cName %></td></tr><%
+                            %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.removedfromownercollection"/></td><td bgcolor="#4E9258" style="font-size:10pt">(<%= cHandle %>): <%= cName %></td></tr><%
                         }
                     }
                 }
@@ -164,11 +224,11 @@
                     }
                     if (!changed)
                     {
-                        %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.addtocollection"/></td><td bgcolor="4E9258" style="font-size:10pt">(<%= cHandle %>): <%= cName %></td></tr><%
+                        %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.addtocollection"/></td><td bgcolor="#4E9258" style="font-size:10pt">(<%= cHandle %>): <%= cName %></td></tr><%
                     }
                     else
                     {
-                        %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.addedtocollection"/></td><td bgcolor="4E9258" style="font-size:10pt">(<%= cHandle %>): <%= cName %></td></tr><%
+                        %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.addedtocollection"/></td><td bgcolor="#4E9258" style="font-size:10pt">(<%= cHandle %>): <%= cName %></td></tr><%
                     }
                 }
 
@@ -187,11 +247,11 @@
                     }
                     if (!changed)
                     {
-                        %><td bgcolor="#98AFC7" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.removefromcollection"/></td><td bgcolor="98AFC7" style="font-size:10pt">(<%= cHandle %>): <%= cName %></td></tr><%
+                        %><td bgcolor="#98AFC7" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.removefromcollection"/></td><td bgcolor="#98AFC7" style="font-size:10pt">(<%= cHandle %>): <%= cName %></td></tr><%
                     }
                     else
                     {
-                        %><td bgcolor="#98AFC7" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.removedfromcollection"/></td><td bgcolor="98AFC7" style="font-size:10pt">(<%= cHandle %>): <%= cName %></td></tr><%
+                        %><td bgcolor="#98AFC7" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.removedfromcollection"/></td><td bgcolor="#98AFC7" style="font-size:10pt">(<%= cHandle %>): <%= cName %></td></tr><%
                     }
                 }
 
@@ -217,11 +277,11 @@
                     }
                     if (!changed)
                     {
-                        %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.add"/> (<%= md %>)</td><td bgcolor="4E9258" style="font-size:10pt"><%= dcv.value %></td></tr><%
+                        %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.add"/> (<%= md %>)</td><td bgcolor="#4E9258" style="font-size:10pt"><%= dcv.value %></td></tr><%
                     }
                     else
                     {
-                        %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.added"/> (<%= md %>)</td><td bgcolor="4E9258" style="font-size:10pt"><%= dcv.value %></td></tr><%
+                        %><td bgcolor="#4E9258" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.added"/> (<%= md %>)</td><td bgcolor="#4E9258" style="font-size:10pt"><%= dcv.value %></td></tr><%
                     }
                 }
 
@@ -247,11 +307,11 @@
                     }
                     if (!changed)
                     {
-                        %><td bgcolor="#98AFC7" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.remove"/> (<%= md %>)</td><td bgcolor="98AFC7" style="font-size:10pt"><%= dcv.value %></td></tr><%
+                        %><td bgcolor="#98AFC7" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.remove"/> (<%= md %>)</td><td bgcolor="#98AFC7" style="font-size:10pt"><%= dcv.value %></td></tr><%
                     }
                     else
                     {
-                        %><td bgcolor="#98AFC7" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.removed"/> (<%= md %>)</td><td bgcolor="98AFC7" style="font-size:10pt"><%= dcv.value %></td></tr><%
+                        %><td bgcolor="#98AFC7" style="font-size:10pt"><fmt:message key="jsp.dspace-admin.metadataimport.removed"/> (<%= md %>)</td><td bgcolor="#98AFC7" style="font-size:10pt"><%= dcv.value %></td></tr><%
                     }
                 }
             }

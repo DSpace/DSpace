@@ -64,7 +64,7 @@ public class FlowMetadataImportUtils
             try {
 
                 // Run the import
-                MetadataImport mImport = new MetadataImport(context, csv.getCSVLines());
+                MetadataImport mImport = new MetadataImport(context, csv);
                 List<BulkEditChange> changes = mImport.runImport(true, false, false, false);
 
                 // Commit the changes
@@ -149,7 +149,7 @@ public class FlowMetadataImportUtils
                             log.error("Unable to delete CSV file");
                         }
 
-                        MetadataImport mImport = new MetadataImport(context, csv.getCSVLines());
+                        MetadataImport mImport = new MetadataImport(context, csv);
                         List<BulkEditChange> changes = mImport.runImport(false, false, false, false);
                         log.debug(LogManager.getHeader(context, "metadataimport", changes.size() + " items with changes identified"));
 
@@ -201,6 +201,7 @@ public class FlowMetadataImportUtils
                         result.setContinue(false);
                         result.setOutcome(false);
                         result.setMessage(T_upload_failed);
+                        result.setCharacters(e.getMessage());
                         log.debug(LogManager.getHeader(context, "metadataimport", "Error encountered while looking for changes - " + e.getMessage()));
                     }
             }

@@ -61,6 +61,9 @@ public class MetadataImportUpload extends AbstractDSpaceTransformer {
     private static final Message T_collection_oldowner = message("xmlui.administrative.metadataimport.MetadataImportUpload.collection_oldowner");
     private static final Message T_collection_mapped = message("xmlui.administrative.metadataimport.MetadataImportUpload.collection_mapped");
     private static final Message T_collection_unmapped = message("xmlui.administrative.metadataimport.MetadataImportUpload.collection_unmapped");
+    private static final Message T_item_delete = message("xmlui.administrative.metadataimport.MetadataImportUpload.item_delete");
+    private static final Message T_item_withdraw = message("xmlui.administrative.metadataimport.MetadataImportUpload.item_withdraw");
+    private static final Message T_item_reinstate = message("xmlui.administrative.metadataimport.MetadataImportUpload.item_reinstate");
 
 	public void addPageMeta(PageMeta pageMeta) throws WingException  
 	{
@@ -85,7 +88,6 @@ public class MetadataImportUpload extends AbstractDSpaceTransformer {
             num_changes = changes.size();
         }
 
-
 		// DIVISION: metadata-import
 		Division div = body.addInteractiveDivision("metadata-import",contextPath + "/admin/metadataimport", Division.METHOD_MULTIPART,"primary administrative");
 		div.setHead(T_head1);
@@ -108,7 +110,8 @@ public class MetadataImportUpload extends AbstractDSpaceTransformer {
 
                 if ((adds.size() > 0) || (removes.size() > 0) ||
                     (newCollections.size() > 0) || (oldCollections.size() > 0) ||
-                    (change.getNewOwningCollection() != null) || (change.getOldOwningCollection() != null))
+                    (change.getNewOwningCollection() != null) || (change.getOldOwningCollection() != null) ||
+                    (change.isDeleted()) || (change.isWithdrawn()) || (change.isReinstated()))
                 {
                     Row headerrow = mdchanges.addRow(Row.ROLE_HEADER);
                     // Show the item
@@ -125,6 +128,32 @@ public class MetadataImportUpload extends AbstractDSpaceTransformer {
                       headerrow.addCellContent(T_new_item);
                     }
                     headerrow.addCell();
+                }
+
+                // Show actions
+                if (change.isDeleted())
+                {
+                    Row mdrow = mdchanges.addRow("addition",Row.ROLE_DATA,"item-delete");
+
+                    Cell cell = mdrow.addCell();
+                    cell.addContent(T_item_delete);
+                    mdrow.addCellContent("");
+                }
+                if (change.isWithdrawn())
+                {
+                    Row mdrow = mdchanges.addRow("addition",Row.ROLE_DATA,"item-withdraw");
+
+                    Cell cell = mdrow.addCell();
+                    cell.addContent(T_item_withdraw);
+                    mdrow.addCellContent("");
+                }
+                if (change.isReinstated())
+                {
+                    Row mdrow = mdchanges.addRow("addition",Row.ROLE_DATA,"item-reinstate");
+
+                    Cell cell = mdrow.addCell();
+                    cell.addContent(T_item_reinstate);
+                    mdrow.addCellContent("");
                 }
 
                 // Show new owning collection

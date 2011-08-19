@@ -51,6 +51,15 @@ public class BulkEditChange
     /** Is this a new item */
     private boolean newItem;
 
+    /** Has this item been deleted? */
+    private boolean deleted;
+
+    /** Has this item been withdrawn? */
+    private boolean withdrawn;
+
+    /** Has this item been reinstated? */
+    private boolean reinstated;
+
     /** Have any changes actually been made? */
     private boolean empty;
 
@@ -324,6 +333,66 @@ public class BulkEditChange
     {
         // Return the new item status
         return newItem;
+    }
+
+    /**
+     * Does this change object represent a deleted item?
+     *
+     * @return Whether or not this is for a deleted item
+     */
+    public boolean isDeleted()
+    {
+        // Return the new item status
+        return deleted;
+    }
+
+    /**
+     * Set that this item has been deleted
+     */
+    public void setDeleted() {
+        // Store the setting
+        deleted = true;
+        empty = false;
+    }
+
+    /**
+     * Does this change object represent a withdrawn item?
+     *
+     * @return Whether or not this is for a withdrawn item
+     */
+    public boolean isWithdrawn()
+    {
+        // Return the new item status
+        return withdrawn;
+    }
+
+    /**
+     * Set that this item has been withdrawn
+     */
+    public void setWithdrawn() {
+        // Store the setting
+        withdrawn = true;
+        empty = false;
+    }
+
+    /**
+     * Does this change object represent a reinstated item?
+     *
+     * @return Whether or not this is for a reinstated item
+     */
+    public boolean isReinstated()
+    {
+        // Return the new item status
+        return reinstated;
+    }
+
+    /**
+     * Set that this item has been deleted
+     */
+    public void setReinstated() {
+        // Store the setting
+        reinstated = true;
+        empty = false;
     }
 
     /**

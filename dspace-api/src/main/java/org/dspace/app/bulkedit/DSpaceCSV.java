@@ -114,6 +114,12 @@ public class DSpaceCSV implements Serializable
                     // Store the heading
                     headings.add(element);
                 }
+                // Store the action
+                else if ("action".equals(element))
+                {
+                    // Store the heading
+                    headings.add(element);
+                }
                 else if (!"id".equals(element))
                 {
                     // Verify that the heading is valid in the metadata registry
@@ -246,6 +252,21 @@ public class DSpaceCSV implements Serializable
                 ignore.put(toIgnoreString.trim(), toIgnoreString.trim());
             }
         }
+    }
+
+    /**
+     * Decide if this CSV file has an 'action' (case-dependent!) header.
+     *
+     * @return Whether or not there is an 'action' header
+     */
+    public boolean hasActions() {
+        // Look for a heading called 'action'
+        for (String header : headings) {
+            if (header.equals("action")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -575,12 +596,6 @@ public class DSpaceCSV implements Serializable
      */
     private final boolean okToExport(DCValue md)
     {
-        // First check the metadata format, and K all non DC elements
-        if (!"dc".equals(md.schema))
-        {
-            return true;
-        }
-
         // Now compare with the list to ignore
         String key = md.schema + "." + md.element;
         if (md.qualifier != null)

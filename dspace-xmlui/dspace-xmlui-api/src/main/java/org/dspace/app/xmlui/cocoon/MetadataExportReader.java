@@ -117,13 +117,13 @@ public class MetadataExportReader extends AbstractReader implements Recyclable
             if(dso.getType() == Constants.ITEM)
             {
                itemmd.add(dso.getID());
-               exporter = new MetadataExport(context, new ItemIterator(context, itemmd),true);
+               exporter = new MetadataExport(context, new ItemIterator(context, itemmd), false);
             }
             else if(dso.getType() == Constants.COLLECTION)
             {
                Collection collection = (Collection)dso;
                ItemIterator toExport = collection.getAllItems();
-               exporter = new MetadataExport(context, toExport,true);
+               exporter = new MetadataExport(context, toExport, false);
             }
             else if(dso.getType() == Constants.COMMUNITY)
             {
