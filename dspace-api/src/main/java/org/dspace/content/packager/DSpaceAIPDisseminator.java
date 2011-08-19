@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Arrays;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
@@ -112,6 +113,11 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
 
     // dissemination parameters passed to the AIP Disseminator
     private PackageParameters disseminateParams = null;
+    
+    // List of Bundles to filter on, when building AIP
+    private List<String> filterBundles = new ArrayList<String>();
+    // Whether 'filterBundles' specifies an exclusion list (default) or inclusion list.
+    private boolean excludeBundles = true;
 
     @Override
     public void disseminate(Context context, DSpaceObject dso,
@@ -511,8 +517,8 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
      * By default, include all bundles in AIP as content.
      * <P>
      * However, if the user specified a comma separated list of bundle names
-     * via the "includeBundles" option, then check if this bundle is in that
-     * list.  If it is, return true.  If it is not, return false.
+     * via the "filterBundles" (or "includeBundles")  option, then check if this 
+     * bundle is in that list.  If it is, return true.  If it is not, return false.
      *
      * @param bundle Bundle to check for
      * @return true if bundle should be disseminated when disseminating Item AIPs
@@ -520,27 +526,63 @@ public class DSpaceAIPDisseminator extends AbstractMETSDisseminator
     @Override
     public boolean includeBundle(Bundle bundle)
     {
-        //Check the 'includeBundles' option to see if a list of bundles was provided (default = "all")
-        String bundleList = this.disseminateParams.getProperty("includeBundles", "all");
+        List<String> bundleList = getBundleList();
 
-        if(bundleList.equalsIgnoreCase("all"))
+        //Check if we are disseminating all bundles
+        if(bundleList.size()==1 && bundleList.get(0).equalsIgnoreCase("all") && !this.excludeBundles)
         {
             return true; //all bundles should be disseminated
         }
         else
         {
-            //Check if this bundle is in our list of bundles to include
-            String[] bundleNames = bundleList.split(",");
-            for(String bundleName : bundleNames)
-            {
-                if(bundle.getName().equals(bundleName))
-                {
-                    return true;
-                }
-            }
-
-            //if not in the 'includeBundles' list, then return false
-            return false;
+            //Check if bundle name is in our list of filtered bundles
+            boolean inList = filterBundles.contains(bundle.getName());
+            //Based on whether this is an inclusion or exclusion filter, 
+            //return whether this bundle should be included.
+            return this.excludeBundles ? !inList : inList;
         }
     }
+    
+    /**
+     * Get our list of bundles to include/exclude in this AIP, 
+     * based on the passed in parameters
+     * @return List of bundles to filter on
+     */
+    protected List<String> getBundleList()
+    {
+        // Check if we already have our list of bundles to filter on, if so, just return it.
+        if(this.filterBundles!=null && !this.filterBundles.isEmpty())
+            return this.filterBundles;
+        
+        // Check for 'filterBundles' option, as this allows for inclusion/exclusion of bundles.
+        String bundleList = this.disseminateParams.getProperty("filterBundles");
+        
+        if(bundleList==null || bundleList.isEmpty())
+        {
+            //For backwards compatibility with DSpace 1.7.x, check the 
+            //'includeBundles' option to see if a list of bundles was provided
+            bundleList = this.disseminateParams.getProperty("includeBundles", "+all");
+            //if we are taking the 'includeBundles' value, prepend "+" to specify that this is an inclusion
+            bundleList = bundleList.startsWith("+") ? bundleList : "+".concat(bundleList);
+        }
+        // At this point, 'bundleList' will be *non-null*. If neither option was passed in,
+        // then 'bundleList' defaults to "+all" (i.e. include all bundles).
+        
+        //If our filter list of bundles begins with a '+', then this list
+        // specifies all the bundles to *include*. Otherwise all 
+        // bundles *except* the listed ones are included
+        if(bundleList.startsWith("+"))
+        {
+            this.excludeBundles = false;
+            //remove the preceding '+' from our bundle list
+            bundleList = bundleList.substring(1);
+        }
+ 
+        //Split our list of bundles to filter on commas
+        this.filterBundles = Arrays.asList(bundleList.split(","));
+        
+ 
+        return this.filterBundles;
+    }
+    
 }
