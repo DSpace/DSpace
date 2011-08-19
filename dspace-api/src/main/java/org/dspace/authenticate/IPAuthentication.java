@@ -78,19 +78,18 @@ public class IPAuthentication implements AuthenticationMethod
         ipMatcherGroupIDs = new HashMap<IPMatcher, Integer>();
         ipMatcherGroupNames = new HashMap<IPMatcher, String>();
 
-        Enumeration e = ConfigurationManager.propertyNames();
+        Enumeration e = ConfigurationManager.propertyNames("authentication-ip");
 
         while (e.hasMoreElements())
         {
             String propName = (String) e.nextElement();
-            if (propName.startsWith("authentication.ip."))
+            if (propName.startsWith("ip."))
             {
                 String[] nameParts = propName.split("\\.");
 
                 if (nameParts.length == 3)
                 {
-                    addMatchers(nameParts[2], ConfigurationManager
-                            .getProperty(propName));
+                    addMatchers(nameParts[2], ConfigurationManager.getProperty("authentication-ip", propName));
                 }
                 else
                 {
