@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.curate;
+package org.dspace.ctask.general;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -18,6 +18,9 @@ import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.curate.AbstractCurationTask;
+import org.dspace.curate.Curator;
+import org.dspace.curate.Distributive;
 
 /**
  * ProfileFormats is a task that creates a distribution table of Bitstream 

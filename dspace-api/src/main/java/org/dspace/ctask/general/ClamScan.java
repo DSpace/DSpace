@@ -5,7 +5,7 @@
  *
  * http://www.dspace.org/license/
  */
-package org.dspace.curate;
+package org.dspace.ctask.general;
 // above package assignment temporary pending better aysnch release process
 // package org.dspace.ctask.integrity;
 
@@ -27,6 +27,9 @@ import org.dspace.content.Bundle;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.curate.AbstractCurationTask;
+import org.dspace.curate.Curator;
+import org.dspace.curate.Suspendable;
 
 /**  ClamScan.java
  *
@@ -38,7 +41,7 @@ import org.dspace.core.ConfigurationManager;
  * @author wbossons
  */
 
-@Suspendable(invoked=Curator.Invoked.INTERACTIVE)
+@Suspendable(invoked= Curator.Invoked.INTERACTIVE)
 public class ClamScan extends AbstractCurationTask
 {
     private static final int DEFAULT_CHUNK_SIZE = 4096;//2048
