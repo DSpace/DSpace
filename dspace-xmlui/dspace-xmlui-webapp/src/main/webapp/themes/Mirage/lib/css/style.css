@@ -243,6 +243,16 @@ div.ds-option-set ul.sublist {
     padding-bottom: 0;
 }
 
+div#ds-feed-option li
+{
+    padding-top: 4px;
+}
+
+div#ds-feed-option a
+{
+    padding: 0px 0px 2px 20px;
+}
+
 #ds-search-option {
     padding: 10px;
 }

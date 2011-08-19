@@ -943,20 +943,16 @@ div#ds-options li {
         background-color: inherit;
 }
 
-div#ds-feed-option img
-{
-    padding-right: 5px;
-    border: none;
+div#ds-feed-option li {
+        padding-top: 4px;
 }
 
-div#ds-feed-option li
-{
-    padding-top: 4px;
+div#ds-feed-option ul {
+        list-style-type:none;
 }
 
-div#ds-feed-option ul
-{
-    list-style-type:none;
+div#ds-feed-option a {
+        padding: 0px 0px 2px 20px;
 }
 
 input.ds-password-field {

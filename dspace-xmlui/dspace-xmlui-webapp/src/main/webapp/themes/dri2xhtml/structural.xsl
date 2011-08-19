@@ -3286,12 +3286,11 @@
                         <xsl:value-of select="."/>
                     </xsl:attribute>
 
-                    <img alt="Syndication Feed Icon" >
-                        <xsl:attribute name="src">
-                            <xsl:value-of select="$context-path"/>
-                            <xsl:text>/static/icons/feed.png</xsl:text>
-                        </xsl:attribute>
-                    </img>
+                    <xsl:attribute name="style">
+                        <xsl:text>background: url(</xsl:text>
+                        <xsl:value-of select="$context-path"/>
+                        <xsl:text>/static/icons/feed.png) no-repeat</xsl:text>
+                    </xsl:attribute>
 
                     <xsl:choose>
                         <xsl:when test="contains(., 'rss_1.0')">
