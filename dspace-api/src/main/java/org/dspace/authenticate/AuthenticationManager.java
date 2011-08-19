@@ -49,7 +49,7 @@ public class AuthenticationManager
 {
     /** List of authentication methods, highest precedence first. */
     private static AuthenticationMethod methodStack[] =
-        (AuthenticationMethod[])PluginManager.getPluginSequence(AuthenticationMethod.class);
+        (AuthenticationMethod[])PluginManager.getPluginSequence("authentication", AuthenticationMethod.class);
 
     /**
      * Test credentials for authenticity.
