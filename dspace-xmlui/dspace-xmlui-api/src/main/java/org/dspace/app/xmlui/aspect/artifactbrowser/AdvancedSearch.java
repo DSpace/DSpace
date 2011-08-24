@@ -235,27 +235,24 @@ public class AdvancedSearch extends AbstractSearch implements CacheableProcessin
         
         Select select = cell.addSelect("field" + row);
 
-        Map<String, Message> searchTypes = new HashMap<String, Message>();
+        // Special case ANY
+        select.addOption((current == null), "ANY").addContent(
+                message("xmlui.ArtifactBrowser.AdvancedSearch.type_ANY"));
         
+        ArrayList<String> usedSearchTypes = new ArrayList<String>();
         int i = 1;
         String sindex = ConfigurationManager.getProperty("search.index." + i);
         while(sindex != null)
         {
             String field = sindex.split(":")[0];               
-            searchTypes.put(field, message("xmlui.ArtifactBrowser.AdvancedSearch.type_" + field));
             
-            sindex = ConfigurationManager.getProperty("search.index." + ++i);
+            if(! usedSearchTypes.contains(field))
+            {
+                usedSearchTypes.add(field);
+                select.addOption(field.equals(current), field).addContent(message("xmlui.ArtifactBrowser.AdvancedSearch.type_" + field));
         }
             
-        
-        
-        // Special case ANY
-        select.addOption((current == null), "ANY").addContent(
-                message("xmlui.ArtifactBrowser.AdvancedSearch.type_ANY"));
-
-        for (Map.Entry<String, Message> searchType : searchTypes.entrySet())
-        {
-            select.addOption(searchType.getKey().equals(current), searchType.getKey()).addContent(searchType.getValue());
+            sindex = ConfigurationManager.getProperty("search.index." + ++i);
         }
     }
 
