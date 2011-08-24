@@ -15,6 +15,7 @@ import java.util.Enumeration;
 
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.servlet.multipart.Part;
+import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
@@ -56,7 +57,8 @@ public class FlowItemUtils
 	private static final Message T_bitstream_failed = new Message("default","Error while uploading file.");
 	private static final Message T_bitstream_updated = new Message("default","The bitstream has been updated.");
 	private static final Message T_bitstream_delete = new Message("default","The selected bitstreams have been deleted.");
-	
+	private static final Message T_bitstream_order = new Message("default","The bitstream order has been successfully altered.");
+
 	
 	/**
 	 * Resolve the given identifier to an item. The identifier may be either an
@@ -673,6 +675,58 @@ public class FlowItemUtils
 		
 		return result;
 	}
+
+    public static FlowResult processReorderBitstream(Context context, int itemID, Request request) throws SQLException, AuthorizeException {
+        String submitButton = Util.getSubmitButton(request, "submit_update_order");
+        FlowResult result = new FlowResult();
+        result.setContinue(false);
+
+        Item item = Item.find(context, itemID);
+
+        Bundle[] bundles = item.getBundles();
+        for (Bundle bundle : bundles) {
+            Bitstream[] bitstreams = bundle.getBitstreams();
+
+            int[] newBitstreamOrder = new int[bitstreams.length];
+            if (submitButton.equals("submit_update_order")) {
+                for (Bitstream bitstream : bitstreams) {
+                    //The order is determined by javascript
+                    //For each of our bitstream retrieve the order value
+                    int order = Util.getIntParameter(request, "order_" + bitstream.getID());
+                    //-1 the order since the order needed to start from one
+                    order--;
+                    //Place the bitstream identifier in the correct order
+                    newBitstreamOrder[order] = bitstream.getID();
+                }
+            }else{
+                //Javascript isn't operational retrieve the value from the hidden field
+                //Retrieve the button key
+                String inputKey = submitButton.replace("submit_order_", "") + "_value";
+                if(inputKey.startsWith(bundle.getID() + "_")){
+                    String[] vals = request.getParameter(inputKey).split(",");
+                    for (int i = 0; i < vals.length; i++) {
+                        String val = vals[i];
+                        newBitstreamOrder[i] = Integer.parseInt(val);
+                    }
+                }else{
+                    newBitstreamOrder = null;
+                }
+            }
+            if(newBitstreamOrder != null){
+                //Set the new order in our bundle !
+                bundle.setOrder(newBitstreamOrder);
+                bundle.update();
+            }
+        }
+
+        context.commit();
+
+        result.setContinue(true);
+        result.setOutcome(true);
+        result.setMessage(T_bitstream_order);
+
+        return result;
+    }
 
         /**
          * processCurateDSO

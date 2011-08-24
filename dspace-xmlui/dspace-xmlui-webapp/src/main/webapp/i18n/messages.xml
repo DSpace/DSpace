@@ -1308,13 +1308,19 @@
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.column3">Description</message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.column4">Format</message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.column5">View</message>
+	<message key="xmlui.administrative.item.EditItemBitstreamsForm.column6">Order</message>
+	<message key="xmlui.administrative.item.EditItemBitstreamsForm.column7"> </message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.bundle_label"><strong>Bundle: {0}</strong></message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.primary_label"> (primary) </message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.view_link">view</message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.submit_add">Upload a new bitstream</message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.submit_delete">Delete bitstreams</message>
+	<message key="xmlui.administrative.item.EditItemBitstreamsForm.submit_reorder">Update bitstream order</message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.no_upload">You need the ADD &amp; WRITE privilege on the item and bundles to be able to upload new bitstreams.</message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.no_remove">Only System Administrators can delete bitstreams / files.</message>
+	<message key="xmlui.administrative.item.EditItemBitstreamsForm.previous_order">Previous:</message>
+	<message key="xmlui.administrative.item.EditItemBitstreamsForm.order_up">Move up</message>
+	<message key="xmlui.administrative.item.EditItemBitstreamsForm.order_down">Move down</message>
 
 	<!-- org.dspace.app.xmlui.administrative.item.EditItemMetadataForm -->
 	<message key="xmlui.administrative.item.EditItemMetadataForm.title">Item Metadata</message>

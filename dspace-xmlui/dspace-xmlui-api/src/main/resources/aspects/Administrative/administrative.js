@@ -17,6 +17,7 @@ importClass(Packages.org.dspace.content.Community);
 importClass(Packages.org.dspace.harvest.HarvestedCollection);
 importClass(Packages.org.dspace.eperson.EPerson);
 importClass(Packages.org.dspace.eperson.Group);
+importClass(Packages.org.dspace.app.util.Util);
 
 importClass(Packages.org.dspace.xmlworkflow.WorkflowFactory);
 importClass(Packages.java.util.Set);
@@ -1511,6 +1512,7 @@ function doEditItemBitstreams(itemID)
 		assertEditItem(itemID);
 		result = null;
 
+        var submitButton = Util.getSubmitButton(cocoon.request, "submit_return");
 		if (cocoon.request.get("submit_return") || cocoon.request.get("submit_status") || cocoon.request.get("submit_bitstreams") || cocoon.request.get("submit_metadata") || cocoon.request.get("view_item") || cocoon.request.get("submit_curate"))
 		{
 			// go back to where ever we came from.
@@ -1537,6 +1539,9 @@ function doEditItemBitstreams(itemID)
 
 			result = doDeleteBitstreams(itemID,bitstreamIDs)
 		}
+        else if (submitButton.equals("submit_update_order") || submitButton.startsWith("submit_order_")){
+            result = FlowItemUtils.processReorderBitstream(getDSContext(), itemID, cocoon.request);
+        }
 	} while (true)
 }
 

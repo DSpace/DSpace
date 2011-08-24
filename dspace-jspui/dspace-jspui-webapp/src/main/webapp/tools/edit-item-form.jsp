@@ -47,6 +47,8 @@
 <%@ page import="org.dspace.content.authority.MetadataAuthorityManager" %>
 <%@ page import="org.dspace.content.authority.ChoiceAuthorityManager" %>
 <%@ page import="org.dspace.content.authority.Choices" %>
+<%@ page import="org.apache.commons.lang.StringUtils" %>
+<%@ page import="java.util.ArrayList" %>
 
 <%
     Item item = (Item) request.getAttribute("item");
@@ -83,6 +85,9 @@
     
     Boolean reinstate = (Boolean)request.getAttribute("reinstate_button");
     boolean bReinstate = (reinstate == null ? false : reinstate.booleanValue());
+
+    Boolean reOrderBitstreams = (Boolean)request.getAttribute("reorder_bitstreams_button");
+    boolean breOrderBitstreams = (reOrderBitstreams != null && reOrderBitstreams);
 
     // owning Collection ID for choice authority calls
     int collectionID = -1;
@@ -180,6 +185,10 @@
                parenttitlekey="jsp.administer"
                parentlink="/dspace-admin"
                nocache="true">
+
+    <script type="text/javascript" src="<%= request.getContextPath() %>/dspace-admin/js/jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="<%= request.getContextPath() %>/dspace-admin/js/bitstream-ordering.js"></script>
+
 
     <%-- <h1>Edit Item</h1> --%>
         <h1><fmt:message key="jsp.tools.edit-item-form.title"/></h1>
@@ -438,7 +447,7 @@
         format field.</p> --%>
                 <p><fmt:message key="jsp.tools.edit-item-form.note3"/></p>
 
-        <table class="miscTable" summary="Bitstream data table">
+        <table id="bitstream-edit-form-table" class="miscTable" summary="Bitstream data table">
             <tr>
           <%-- <th class="oddRowEvenCol"><strong>Primary<br>Bitstream</strong></th>
                 <th class="oddRowOddCol"><strong>Name</strong></th>
@@ -453,7 +462,8 @@
                 <th id="t14" class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem9"/></strong></th>
                 <th id="t15" class="oddRowEvenCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem10"/></strong></th>
                 <th id="t16" class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem11"/></strong></th>
-                <th id="t17" class="oddRowEvenCol">&nbsp;</th>
+                <th id="t17" class="oddRowOddCol"><strong><fmt:message key="jsp.tools.edit-item-form.elem12"/></strong></th>
+                <th id="t18" class="oddRowEvenCol">&nbsp;</th>
             </tr>
 <%
     Bundle[] bundles = item.getBundles();
@@ -464,12 +474,17 @@
         Bitstream[] bitstreams = bundles[i].getBitstreams();
         for (int j = 0; j < bitstreams.length; j++)
         {
+            ArrayList<Integer> bitstreamIdOrder = new ArrayList<Integer>();
+            for (Bitstream bitstream : bitstreams) {
+                bitstreamIdOrder.add(bitstream.getID());
+            }
+
             // Parameter names will include the bundle and bitstream ID
             // e.g. "bitstream_14_18_desc" is the description of bitstream 18 in bundle 14
             String key = bundles[i].getID() + "_" + bitstreams[j].getID();
             BitstreamFormat bf = bitstreams[j].getFormat();
 %>
-            <tr>
+            <tr id="<%="row_" + bundles[i].getName() + "_" + bitstreams[j].getID()%>">
                 <% if (bundles[i].getName().equals("ORIGINAL"))
                    { %>
                      <td headers="t11" class="<%= row %>RowEvenCol" align="center">
@@ -496,7 +511,54 @@
                 <td headers="t16" class="<%= row %>RowOddCol">
                     <input type="text" name="bitstream_user_format_description_<%= key %>" value="<%= (bitstreams[j].getUserFormatDescription() == null ? "" : Utils.addEntities(bitstreams[j].getUserFormatDescription())) %>"/>
                 </td>
+<%
+                   if (bundles[i].getName().equals("ORIGINAL") && breOrderBitstreams)
+                   {
+                       //This strings are only used in case the user has javascript disabled
+                       String upButtonValue = null;
+                       String downButtonValue = null;
+                       if(0 != j){
+                           ArrayList<Integer> temp = (ArrayList<Integer>) bitstreamIdOrder.clone();
+                           //We don't have the first button, so create a value where the current bitstreamId moves one up
+                           Integer tempInt = temp.get(j);
+                           temp.set(j, temp.get(j - 1));
+                           temp.set(j - 1, tempInt);
+                           upButtonValue = StringUtils.join(temp.toArray(new Integer[temp.size()]), ",");
+                       }
+                       if(j < (bitstreams.length -1)){
+                           //We don't have the first button, so create a value where the current bitstreamId moves one up
+                           ArrayList<Integer> temp = (ArrayList<Integer>) bitstreamIdOrder.clone();
+                           Integer tempInt = temp.get(j);
+                           temp.set(j, temp.get(j + 1));
+                           temp.set(j + 1, tempInt);
+                           downButtonValue = StringUtils.join(temp.toArray(new Integer[temp.size()]), ",");
+                       }
+
+
+
+%>
                 <td headers="t17" class="<%= row %>RowEvenCol">
+                    <input type="hidden" value="<%=j+1%>" name="order_<%=bitstreams[j].getID()%>">
+                    <input type="hidden" value="<%=upButtonValue%>" name="<%=bundles[i].getID()%>_<%=bitstreams[j].getID()%>_up_value">
+                    <input type="hidden" value="<%=downButtonValue%>" name="<%=bundles[i].getID()%>_<%=bitstreams[j].getID()%>_down_value">
+                    <div>
+                        <input name="submit_order_<%=key%>_up" type="submit" value="<fmt:message key="jsp.tools.edit-item-form.move-up"/> " <%=j==0 ? "disabled=\"disabled\"" : ""%>/>
+                    </div>
+                    <div>
+                        <input name="submit_order_<%=key%>_down" type="submit" value="<fmt:message key="jsp.tools.edit-item-form.move-down"/> " <%=j==(bitstreams.length-1) ? "disabled=\"disabled\"" : ""%>/>
+                    </div>
+                </td>
+
+<%
+                   }else{
+%>
+                <td>
+                    <%=j+1%>
+                </td>
+<%
+                   }
+%>
+                <td headers="t18" class="<%= row %>RowEvenCol">
                     <%-- <a target="_blank" href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>">View</a>&nbsp;<input type="submit" name="submit_delete_bitstream_<%= key %>" value="Remove"> --%>
                                         <a target="_blank" href="<%= request.getContextPath() %>/retrieve/<%= bitstreams[j].getID() %>"><fmt:message key="jsp.tools.general.view"/></a>&nbsp;
                                         <% if (bRemoveBits) { %>
@@ -523,6 +585,11 @@
                 %>
                                                 <input type="submit" name="submit_addbitstream" value="<fmt:message key="jsp.tools.edit-item-form.addbit.button"/>"/>
                 <%  }
+                    if(breOrderBitstreams){
+                %>
+                    <input class="hidden" type="submit" value="<fmt:message key="jsp.tools.edit-item-form.order-update"/>" name="submit_update_order" style="visibility: hidden;">
+                <%
+                    }
 
                         if (ConfigurationManager.getBooleanProperty("webui.submit.enable-cc") && bccLicense)
                         {

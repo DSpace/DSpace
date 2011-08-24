@@ -69,6 +69,10 @@ public class TableRow
         return table;
     }
 
+    public void setTable(String table) {
+        this.table = table;
+    }
+
     /**
      * Return true if this row contains a column with this name.
      * 

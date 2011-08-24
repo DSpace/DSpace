@@ -1036,3 +1036,38 @@ li.used-filters-list
 form.discover-sort-box select{
     margin: 0 4px;
 }
+
+.hidden {
+    display:none;
+    visibility:hidden;
+}
+
+.icon-button{
+    padding:4px;
+    cursor: pointer;
+    margin: 2px;
+    background-color: #6D859C;
+    border: 1px solid #1F3F5E;
+    text-indent: -1000px;
+    width: 30px;
+    height: 30px;
+    display:block;
+}
+
+.ds-button-field[disabled="disabled"],
+.ds-button-field[disabled=""],
+.ds-button-field.disabled {
+    opacity: 0.35
+}
+
+.icon-button.arrowUp{
+    background-image: url(../../images/arrow_up_ffffff_16x16.png);
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+.icon-button.arrowDown{
+    background-image: url(../../images/arrow_down_ffffff_16x16.png);
+    background-repeat: no-repeat;
+    background-position: center center;
+}

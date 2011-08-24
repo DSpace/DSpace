@@ -29,6 +29,7 @@ import org.apache.commons.fileupload.FileUploadBase.FileSizeLimitExceededExcepti
 
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
+import org.dspace.app.util.Util;
 import org.dspace.app.webui.servlet.DSpaceServlet;
 import org.dspace.app.webui.util.FileUploadRequest;
 import org.dspace.app.webui.util.JSPManager;
@@ -461,6 +462,18 @@ public class EditItemServlet extends DSpaceServlet
             request.setAttribute("cclicense_button", Boolean.FALSE);
         }
         
+        try
+        {
+            if( 0 < item.getBundles("ORIGINAL").length){
+                AuthorizeUtil.authorizeManageBundlePolicy(context, item.getBundles("ORIGINAL")[0]);
+                request.setAttribute("reorder_bitstreams_button", Boolean.TRUE);
+            }
+        }
+        catch (AuthorizeException authex)
+        {
+            request.setAttribute("reorder_bitstreams_button", Boolean.FALSE);
+        }
+
         if (!item.isWithdrawn())
         {
             try
@@ -741,6 +754,48 @@ public class EditItemServlet extends DSpaceServlet
             request.setAttribute("item", item);
             JSPManager
                     .showJSP(request, response, "/tools/upload-bitstream.jsp");
+        }else
+        if(button.equals("submit_update_order") || button.startsWith("submit_order_"))
+        {
+            Bundle[] bundles = item.getBundles("ORIGINAL");
+            for (Bundle bundle : bundles) {
+                Bitstream[] bitstreams = bundle.getBitstreams();
+                int[] newBitstreamOrder = new int[bitstreams.length];
+                if (button.equals("submit_update_order")) {
+                    for (Bitstream bitstream : bitstreams) {
+                        //The order is determined by javascript
+                        //For each of our bitstream retrieve the order value
+                        int order = Util.getIntParameter(request, "order_" + bitstream.getID());
+                        //-1 the order since the order needed to start from one
+                        order--;
+                        //Place the bitstream identifier in the correct order
+                        newBitstreamOrder[order] = bitstream.getID();
+                    }
+                }else{
+                    //Javascript isn't operational retrieve the value from the hidden field
+                    //Retrieve the button key
+                    String inputKey = button.replace("submit_order_", "") + "_value";
+                    if(inputKey.startsWith(bundle.getID() + "_")){
+                        String[] vals = request.getParameter(inputKey).split(",");
+                        for (int i = 0; i < vals.length; i++) {
+                            String val = vals[i];
+                            newBitstreamOrder[i] = Integer.parseInt(val);
+                        }
+                    }else{
+                        newBitstreamOrder = null;
+                    }
+
+                }
+
+                if(newBitstreamOrder != null){
+                    //Set the new order in our bundle !
+                    bundle.setOrder(newBitstreamOrder);
+                    bundle.update();
+                }
+            }
+
+            // Show edit page again
+            showEditForm(context, request, response, item);
         }
         else
         {

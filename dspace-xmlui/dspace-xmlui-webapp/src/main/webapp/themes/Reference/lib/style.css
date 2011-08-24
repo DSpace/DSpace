@@ -1251,3 +1251,40 @@ form.discover-search-box div.ds-form-content input.update-filters{
 form.discover-sort-box select{
     margin: 0 4px;
 }
+
+
+.hidden {
+    display:none;
+    visibility:hidden;
+}
+
+.icon-button{
+    padding:4px;
+    cursor: pointer;
+    margin: 2px;
+    background-color: #E6E6E6;
+    border: 1px solid #D3D3D3;
+    text-indent: -1000px;
+    width: 30px;
+    height: 30px;
+    display:block;
+}
+
+.icon-button.ds-button-field[disabled="disabled"],
+.icon-button.ds-button-field[disabled=""],
+.icon-button.ds-button-field.disabled {
+    opacity: 0.35
+}
+
+
+.icon-button.arrowUp{
+    background-image: url(../images/arrow_up_444444_16x16.png);
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+.icon-button.arrowDown{
+    background-image: url(../images/arrow_down_444444_16x16.png);
+    background-repeat: no-repeat;
+    background-position: center center;
+}

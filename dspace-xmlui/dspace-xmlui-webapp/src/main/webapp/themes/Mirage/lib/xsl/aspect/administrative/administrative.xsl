@@ -102,4 +102,30 @@
         </li>
     </xsl:template>
 
+    <!--Template for the bitstream reordering-->
+    <xsl:template match="dri:cell[starts-with(@id, 'aspect.administrative.item.EditItemBitstreamsForm.cell.bitstream_order_')]" priority="2">
+        <td>
+            <xsl:call-template name="standardAttributes"/>
+            <xsl:apply-templates select="*[not(@type='button')]" />
+            <!--A div that will indicate the old & the new order-->
+            <div>
+                <span>
+                    <!--Give this one an ID so that the javascript can change his value-->
+                    <xsl:attribute name="id">
+                        <xsl:value-of select="dri:field/@id"/>
+                        <xsl:text>_new</xsl:text>
+                    </xsl:attribute>
+                    <xsl:value-of select="dri:field/dri:value"/>
+                </span>
+                <xsl:text> (</xsl:text>
+                <i18n:text>xmlui.administrative.item.EditItemBitstreamsForm.previous_order</i18n:text>
+                <xsl:value-of select="dri:field/dri:value"/>
+                <xsl:text>)</xsl:text>
+            </div>
+        </td>
+        <td>
+            <xsl:apply-templates select="dri:field[@type='button']"/>
+        </td>
+    </xsl:template>
+
 </xsl:stylesheet>
