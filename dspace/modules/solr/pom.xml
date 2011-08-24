@@ -9,13 +9,13 @@
    </description>
 
    <!--
-      A Parent POM that Maven inherits DSpace Default
-      POM atrributes from.
+      Solr uses DSpace POM to avoide limitations forced
+      in dpeendencies found in dspace-parent pom.
    -->
    <parent>
       <groupId>org.dspace</groupId>
-      <artifactId>modules</artifactId>
-      <version>1.8.0-SNAPSHOT</version>
+      <artifactId>dspace-pom</artifactId>
+      <version>10</version>
    </parent>
    
    <!--

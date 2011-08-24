@@ -13,6 +13,7 @@
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
       <version>1.8.0-SNAPSHOT</version>
+      <relativePath>..</relativePath>
    </parent>
 
    <!-- 
