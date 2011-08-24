@@ -8,7 +8,7 @@
 
     <!--
        A Parent POM that Maven inherits DSpace Defaults
-       POM atrributes from.
+       POM attributes from.
     -->
     <parent>
         <groupId>org.dspace</groupId>
@@ -18,7 +18,7 @@
 
     <!--
        The Subversion repository location is used by Continuum to update against
-       when changes have occured, this spawns a new build cycle and releases snapshots
+       when changes have occurred, this spawns a new build cycle and releases snapshots
        into the snapshot repository below.
     -->
     <scm>
@@ -85,6 +85,7 @@
             </plugin>
         </plugins>
     </build>
+
     <dependencies>
         <dependency>
             <groupId>org.dspace</groupId>
