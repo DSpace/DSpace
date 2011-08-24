@@ -63,16 +63,16 @@
 
         //Check if we are the first row, if so hide the up arrow
         if(isBundleRow(row.prev())){
-            upArrow.attr('disabled', 'disabled');
+            upArrow.attr('disabled', 'disabled').addClass('disabled');
         }else{
-            upArrow.removeAttr('disabled');
+            upArrow.removeAttr('disabled').removeClass('disabled');
         }
 
         //Check if we are the last row, <if so hide the down arrow
         if(isBundleRow(row.next())){
-            downArrow.attr('disabled', 'disabled');
+            downArrow.attr('disabled', 'disabled').addClass('disabled');
         }else{
-            downArrow.removeAttr('disabled');
+            downArrow.removeAttr('disabled').removeClass('disabled');
         }
 
         //Set the displayed new order

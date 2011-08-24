@@ -825,6 +825,9 @@ form.discover-sort-box select{
     width: 30px;
     height: 30px;
     display:block;
+    /*Required for IE*/
+    font-size: 0;
+    line-height: 0;
 }
 
 .icon-button.ds-button-field[disabled="disabled"],
