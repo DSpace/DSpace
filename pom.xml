@@ -15,7 +15,7 @@
    <parent>
      <artifactId>dspace-pom</artifactId>
      <groupId>org.dspace</groupId>
-     <version>9</version>
+     <version>11-SNAPSHOT</version>
    </parent>
 
    <build>
