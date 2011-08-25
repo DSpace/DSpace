@@ -7,7 +7,7 @@
    <description>
       DSpace SWORD Deposit Service Provider Web Application
    </description>
-   <url>http://www.ukoln.ac.uk/repositories/digirep/index/SWORD</url>
+   <url>http://swordapp.org/</url>
 
    <!--
       A Parent POM that Maven inherits DSpace Default
