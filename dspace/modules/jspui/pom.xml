@@ -29,6 +29,7 @@
 			the configuration.
 		-->
 		<profile>
+            <id>dspace-config</id>
 			<activation>
 				<property>
 					<name>dspace.config</name>

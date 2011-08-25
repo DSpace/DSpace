@@ -60,6 +60,7 @@
          web.xml etc.
       -->
       <profile>
+         <id>dspace-config</id>
          <activation>
             <property>
                <name>dspace.config</name>
