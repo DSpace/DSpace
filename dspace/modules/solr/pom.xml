@@ -9,13 +9,14 @@
    </description>
 
    <!--
-      Solr uses DSpace POM to avoide limitations forced
-      in dpeendencies found in dspace-parent pom.
+      Solr uses DSpace POM to avoid limitations forced
+      in dependencies found in dspace-parent pom. Solr is
+      a standalone webapplication.
    -->
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-pom</artifactId>
-      <version>10</version>
+      <version>11-SNAPSHOT</version>
    </parent>
    
    <!--
