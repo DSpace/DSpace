@@ -1,0 +1,40 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>org.dspace</groupId>
+   <artifactId>dspace-swordv2</artifactId>
+   <packaging>pom</packaging>
+   <name>DSpace SWORD v2</name>
+   <description>DSpace SWORD v2 Deposit Service Provider Web Application</description>
+   <url>http://swordapp.org/</url>
+
+   <!--
+      A Parent POM that Maven inherits DSpace Default
+      POM atrributes from.
+   -->
+   <parent>
+      <groupId>org.dspace</groupId>
+      <artifactId>dspace-parent</artifactId>
+      <version>1.8.0-SNAPSHOT</version>
+      <relativePath>..</relativePath>
+   </parent>
+
+
+   <!--
+      The Subversion repository location is used by Continuum to update against
+      when changes have occurred, this spawns a new build cycle and releases snapshots
+      into the snapshot repository below.
+   -->
+   <scm>
+      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-swordv2</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-swordv2</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-swordv2</url>
+   </scm>
+
+
+   <modules>
+       <module>dspace-foresite-java</module>
+       <module>dspace-swordv2-api</module>
+       <module>dspace-swordv2-webapp</module>
+   </modules>
+
+</project>

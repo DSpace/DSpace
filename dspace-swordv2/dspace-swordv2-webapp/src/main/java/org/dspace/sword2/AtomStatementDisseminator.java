@@ -1,0 +1,56 @@
+package org.dspace.sword2;
+
+import org.dspace.content.DCValue;
+import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
+import org.swordapp.server.AtomStatement;
+import org.swordapp.server.Statement;
+import org.swordapp.server.SwordError;
+import org.swordapp.server.SwordServerException;
+
+public class AtomStatementDisseminator extends GenericStatementDisseminator implements SwordStatementDisseminator
+{
+	public Statement disseminate(Context context, Item item) throws DSpaceSwordException, SwordError, SwordServerException
+	{
+		SwordUrlManager urlManager = new SwordUrlManager(new SwordConfigurationDSpace(), context);
+		String feedUri = urlManager.getAtomStatementUri(item);
+
+		String authorField = ConfigurationManager.getProperty("sword2.author.field");
+		String titleField = ConfigurationManager.getProperty("sword2.title.field");
+		String updatedField = ConfigurationManager.getProperty("sword2.updated.field");
+
+		String author = this.stringMetadata(item, authorField);
+		String title = this.stringMetadata(item, titleField);
+		String updated = this.stringMetadata(item, updatedField);
+
+		Statement s = new AtomStatement(feedUri, author, title, updated);
+		this.populateStatement(context, item, s);
+		return s;
+	}
+
+	private String stringMetadata(Item item, String field)
+	{
+		if (field == null)
+		{
+			return null;
+		}
+
+		DCValue[] dcvs = item.getMetadata(field);
+		if (dcvs == null)
+		{
+			return null;
+		}
+
+		StringBuilder md = new StringBuilder();
+		for (DCValue dcv : dcvs)
+		{
+			if (md.length() > 0)
+			{
+				md.append(", ");
+			}
+			md.append(dcv.value);
+		}
+		return md.toString();
+	}
+}

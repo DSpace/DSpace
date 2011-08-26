@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!--
+
+    The contents of this file are subject to the license and copyright
+    detailed in the LICENSE and NOTICE files at the root of the source
+    tree and available online at
+
+    http://www.dspace.org/license/
+
+-->
+<!DOCTYPE web-app PUBLIC "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN" "http://java.sun.com/dtd/web-app_2_3.dtd">
+
+<web-app>
+
+    <display-name>SWORD 2.0 Server - Example web.xml</display-name>
+
+    <!-- Configuration Information -->
+
+    <context-param>
+        <param-name>service-document-impl</param-name>
+        <param-value>org.swordapp.server.ServiceDocumentManagerImpl</param-value>
+        <description>
+            The ServiceDocumentManager server implementation class name
+        </description>
+    </context-param>
+
+    <!-- this can be omitted if the server does not wish to support listing collection contents -->
+    <context-param>
+        <param-name>collection-list-impl</param-name>
+        <param-value>org.swordapp.server.CollectionListManagerImpl</param-value>
+        <description>
+            The CollectionListManager server implementation class name
+        </description>
+    </context-param>
+
+    <context-param>
+        <param-name>collection-deposit-impl</param-name>
+        <param-value>org.swordapp.server.CollectionDepositManagerImpl</param-value>
+        <description>
+            The CollectionDepositManager server implementation class name
+        </description>
+    </context-param>
+
+    <context-param>
+        <param-name>media-resource-impl</param-name>
+        <param-value>org.swordapp.server.MediaResourceManagerImpl</param-value>
+        <description>
+            The MediaResourceManager server implementation class name
+        </description>
+    </context-param>
+
+    <context-param>
+        <param-name>container-impl</param-name>
+        <param-value>org.swordapp.server.ContainerManagerImpl</param-value>
+        <description>
+            The ContainerManager server implementation class name
+        </description>
+    </context-param>
+
+    <context-param>
+        <param-name>statement-impl</param-name>
+        <param-value>org.swordapp.server.StatementManagerImpl</param-value>
+        <description>
+            The StatementManager server implementation class name
+        </description>
+    </context-param>
+
+    <!-- This option here is an actual implementation of the configuration class, which
+        contains some default values -->
+    <context-param>
+        <param-name>config-impl</param-name>
+        <param-value>org.swordapp.server.SwordConfigurationDefault</param-value>
+        <description>
+            The SwordConfiguration server implementation class name
+        </description>
+    </context-param>
+
+	<context-param>
+		<param-name>authentication-method</param-name>
+		<param-value>Basic</param-value>
+		<description>
+			The type of authentication used : [Basic|None]
+		</description>
+	</context-param>
+
+
+    <!-- Servlets -->
+    <servlet>
+        <servlet-name>servicedocument</servlet-name>
+        <servlet-class>org.swordapp.server.servlets.ServiceDocumentServletDefault</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>collection</servlet-name>
+        <servlet-class>org.swordapp.server.servlets.CollectionServletDefault</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>mediaresource</servlet-name>
+        <servlet-class>org.swordapp.server.servlets.MediaResourceServletDefault</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>container</servlet-name>
+        <servlet-class>org.swordapp.server.servlets.ContainerServletDefault</servlet-class>
+    </servlet>
+
+    <servlet>
+        <servlet-name>statement</servlet-name>
+        <servlet-class>org.swordapp.server.servlets.StatementServletDefault</servlet-class>
+    </servlet>
+
+    <!-- Servlet Mappings -->
+
+    <servlet-mapping>
+        <servlet-name>servicedocument</servlet-name>
+        <url-pattern>/servicedocument/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>collection</servlet-name>
+        <url-pattern>/collection/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>mediaresource</servlet-name>
+        <url-pattern>/edit-media/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>container</servlet-name>
+        <url-pattern>/edit/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>statement</servlet-name>
+        <url-pattern>/statement/*</url-pattern>
+    </servlet-mapping>
+
+</web-app>

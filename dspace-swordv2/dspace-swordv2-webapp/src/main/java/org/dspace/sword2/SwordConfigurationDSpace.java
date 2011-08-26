@@ -1,0 +1,602 @@
+package org.dspace.sword2;
+
+import org.apache.log4j.Logger;
+import org.dspace.content.BitstreamFormat;
+import org.dspace.content.Collection;
+import org.dspace.content.DSpaceObject;
+import org.dspace.content.Item;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
+import org.jaxen.function.FalseFunction;
+import org.swordapp.server.SwordConfiguration;
+import org.swordapp.server.SwordError;
+
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import java.util.Set;
+
+public class SwordConfigurationDSpace implements SwordConfiguration
+{
+	/** logger */
+ 	public static final Logger log = Logger.getLogger(SwordConfigurationDSpace.class);
+
+	/** whether we can be verbose */
+	private boolean verbose = true;
+
+	/** what our default max upload size is */
+	private int maxUploadSize = -1;
+
+	/** do we support mediation */
+	private boolean mediated = false;
+
+	/** should we keep the original package as bitstream */
+	private boolean keepOriginal = false;
+
+	/** item bundle in which sword deposits are stored */
+	private String swordBundle = "SWORD";
+
+ 	/** should we keep the original package as a file on ingest error */
+ 	private boolean keepPackageOnFailedIngest = false;
+
+ 	/** location of directory to store packages on ingest error */
+ 	private String failedPackageDir = null;
+
+	private boolean allowCommunityDeposit = false;
+
+    private boolean entryFirst = false;
+
+    /** Accepted formats */
+    private List<String> swordaccepts;
+
+	/**
+	 * Initialise the sword configuration.  It is at this stage that the
+	 * object will interrogate the DSpace Configuration for details
+	 */
+	public SwordConfigurationDSpace()
+	{
+		// set the max upload size
+		int mus = ConfigurationManager.getIntProperty("sword2.max-upload-size");
+		if (mus > 0)
+		{
+			this.maxUploadSize = mus;
+		}
+
+		// set the mediation value
+		this.mediated = ConfigurationManager.getBooleanProperty("sword2.on-behalf-of.enable");
+
+		// find out if we keep the original as bitstream
+		this.keepOriginal = ConfigurationManager.getBooleanProperty("sword2.keep-original-package");
+
+		// get the sword bundle
+		String bundle = ConfigurationManager.getProperty("sword2.bundle.name");
+		if (bundle != null && "".equals(bundle))
+		{
+			this.swordBundle = bundle;
+		}
+
+        // find out if we keep the package as a file in specified directory
+        this.keepPackageOnFailedIngest = ConfigurationManager.getBooleanProperty("sword2.keep-package-on-fail", false);
+
+        // get directory path and name
+        this.failedPackageDir = ConfigurationManager.getProperty("sword2.failed-package.dir");
+
+        // Get the accepted formats
+        String acceptsProperty = ConfigurationManager.getProperty("sword2.accepts");
+        swordaccepts = new ArrayList<String>();
+        if (acceptsProperty == null)
+        {
+            acceptsProperty = "application/zip";
+        }
+        for (String element : acceptsProperty.split(","))
+        {
+            swordaccepts.add(element.trim());
+        }
+
+		// find out if community deposit is allowed
+		this.allowCommunityDeposit = ConfigurationManager.getBooleanProperty("sword2.allow-community-deposit");
+
+        // find out if we keep the package as a file in specified directory
+        this.entryFirst = ConfigurationManager.getBooleanProperty("sword2.multipart.entry-first", false);
+
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////
+	// Utilities
+	///////////////////////////////////////////////////////////////////////////////////
+
+	public String getStringProperty(String propName, String defaultValue, String[] allowedValues)
+	{
+		String cfg = ConfigurationManager.getProperty(propName);
+		if (cfg == null || "".equals(cfg))
+		{
+			return defaultValue;
+		}
+		boolean allowed = false;
+		if (allowedValues != null)
+		{
+			for (String value : allowedValues)
+			{
+				if (cfg.equals(value))
+				{
+					allowed = true;
+				}
+			}
+		}
+		else
+		{
+			allowed = true;
+		}
+		if (allowed)
+		{
+			return cfg;
+		}
+		return defaultValue;
+	}
+
+	public String getStringProperty(String propName, String defaultValue)
+	{
+		return this.getStringProperty(propName, defaultValue, null);
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////
+	// Required by the SwordConfiguration interface
+	//////////////////////////////////////////////////////////////////////////////////
+
+
+
+	public boolean returnDepositReceipt()
+	{
+		return true;
+	}
+
+	public boolean returnStackTraceInError()
+	{
+		return true;
+	}
+
+	public boolean returnErrorBody()
+	{
+		return true;
+	}
+
+	public String generator()
+	{
+		return this.getStringProperty("sword2.generator.url", DSpaceUriRegistry.DSPACE_SWORD_NS);
+	}
+
+	public String generatorVersion()
+	{
+		return this.getStringProperty("sword2.generator.version", "2.0");
+	}
+
+	public String administratorEmail()
+	{
+		return this.getStringProperty("mail.admin", null);
+	}
+
+	public String getAuthType()
+	{
+		return this.getStringProperty("sword2.auth-type", "Basic", new String[] { "Basic", "None" } );
+	}
+
+	public boolean storeAndCheckBinary()
+	{
+		return true;
+	}
+
+	public String getTempDirectory()
+	{
+		return this.getStringProperty("sword2.upload.tempdir", null);
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////
+	// Required by DSpace-side implementation
+	///////////////////////////////////////////////////////////////////////////////////
+
+	public SwordUrlManager getUrlManager(Context context, SwordConfigurationDSpace config)
+	{
+		return new SwordUrlManager(config, context);
+	}
+
+	public List<String> getDisseminatePackaging()
+	{
+		List<String> dps = new ArrayList<String>();
+		Properties props = ConfigurationManager.getProperties();
+        Set keyset = props.keySet();
+        for (Object keyObj : keyset)
+        {
+			// start by getting anything that starts with sword.disseminate-packging.
+			String sw = "sword2.disseminate-packaging.";
+
+			if (!(keyObj instanceof String))
+            {
+                continue;
+            }
+            String key = (String) keyObj;
+
+            if (!key.startsWith(sw))
+            {
+                continue;
+            }
+
+			String value = props.getProperty((key));
+			dps.add(value);
+		}
+		return dps;
+	}
+
+    public boolean isEntryFirst()
+    {
+        return this.entryFirst;
+    }
+
+	public boolean allowCommunityDeposit()
+	{
+		return this.allowCommunityDeposit;
+	}
+
+	/**
+	 * Get the bundle name that sword will store its original deposit packages in, when
+	 * storing them inside an item
+	 * @return
+	 */
+	public String getSwordBundle()
+	{
+		return swordBundle;
+	}
+
+	/**
+	 * Set the bundle name that sword will store its original deposit packages in, when
+	 * storing them inside an item
+	 * @param swordBundle
+	 */
+	public void setSwordBundle(String swordBundle)
+	{
+		this.swordBundle = swordBundle;
+	}
+
+	/**
+	 * is this a verbose deposit
+	 * @return
+	 */
+	public boolean isVerbose()
+	{
+		return verbose;
+	}
+
+	/**
+	 * set whether this is a verbose deposit
+	 * @param verbose
+	 */
+	public void setVerbose(boolean verbose)
+	{
+		this.verbose = verbose;
+	}
+
+	/**
+	 * what is the max upload size (in bytes) for the sword interface
+	 * @return
+	 */
+	public int getMaxUploadSize()
+	{
+		return maxUploadSize;
+	}
+
+	/**
+	 * set the max uplaod size (in bytes) for the sword interface
+	 * @param maxUploadSize
+	 */
+	public void setMaxUploadSize(int maxUploadSize)
+	{
+		this.maxUploadSize = maxUploadSize;
+	}
+
+	/**
+	 * does the server support mediated deposit (aka on-behalf-of)
+	 * @return
+	 */
+	public boolean isMediated()
+	{
+		return mediated;
+	}
+
+	/**
+	 * set whether the server supports mediated deposit (aka on-behalf-of)
+	 * @param mediated
+	 */
+	public void setMediated(boolean mediated)
+	{
+		this.mediated = mediated;
+	}
+
+	/**
+	 * should the repository keep the original package
+	 * @return
+	 */
+	public boolean isKeepOriginal()
+	{
+		return keepOriginal;
+	}
+
+	/**
+	 * set whether the repository should keep copies of the original package
+	 * @param keepOriginal
+	 */
+	public void setKeepOriginal(boolean keepOriginal)
+	{
+		this.keepOriginal = keepOriginal;
+	}
+
+ 	/**
+ 	 * set whether the repository should write file of the original package if ingest fails
+ 	 * @param keepOriginalOnFail
+ 	 */
+ 	public void setKeepPackageOnFailedIngest(boolean keepOriginalOnFail)
+ 	{
+ 		keepPackageOnFailedIngest = keepOriginalOnFail;
+ 	}
+
+    /**
+ 	 * should the repository write file of the original package if ingest fails
+ 	 * @return keepPackageOnFailedIngest
+ 	 */
+ 	public boolean isKeepPackageOnFailedIngest()
+ 	{
+ 		return keepPackageOnFailedIngest;
+ 	}
+
+ 	/**
+ 	 * set the directory to write file of the original package
+ 	 * @param dir
+ 	 */
+ 	public void setFailedPackageDir(String dir)
+ 	{
+ 		failedPackageDir = dir;
+ 	}
+
+ 	/**
+ 	 * directory location of the files with original packages
+     * for failed ingests
+ 	 * @return failedPackageDir
+ 	 */
+ 	public String getFailedPackageDir()
+ 	{
+ 		return failedPackageDir;
+ 	}
+
+	/**
+	 * Get the list of mime types that the given dspace object will
+	 * accept as packages
+	 *
+	 * @param context
+	 * @param dso
+	 * @return
+	 * @throws DSpaceSwordException
+	 */
+	public List<String> getAccepts(Context context, DSpaceObject dso)
+			throws DSpaceSwordException
+	{
+		try
+		{
+			List<String> accepts = new ArrayList<String>();
+			if (dso instanceof Collection)
+			{
+				for (String format : swordaccepts)
+                {
+                    accepts.add(format);
+                }
+			}
+			else if (dso instanceof Item)
+			{
+				// items will take any of the bitstream formats registered, plus
+				// any swordaccepts mimetypes
+				BitstreamFormat[] bfs = BitstreamFormat.findNonInternal(context);
+				for (int i = 0; i < bfs.length; i++)
+				{
+					accepts.add(bfs[i].getMIMEType());
+				}
+				for (String format : swordaccepts)
+                {
+					if (!accepts.contains(format))
+					{
+                    	accepts.add(format);
+					}
+                }
+			}
+
+			return accepts;
+		}
+		catch (SQLException e)
+		{
+			throw new DSpaceSwordException(e);
+		}
+	}
+
+    /**
+	 * Get the list of mime types that a Collection will accept as packages
+	 *
+	 * @return the list of mime types
+	 * @throws DSpaceSwordException
+	 */
+	public List<String> getCollectionAccepts() throws DSpaceSwordException
+	{
+        List<String> accepts = new ArrayList<String>();
+        for (String format : swordaccepts)
+        {
+            accepts.add(format);
+        }
+        return accepts;
+	}
+
+	/**
+	 * Get a map of packaging URIs to Q values for the packaging types which
+	 * the given collection will accept.
+	 *
+	 * The URI should be a unique identifier for the packaging type,
+	 * such as:
+	 *
+	 * http://purl.org/net/sword-types/METSDSpaceSIP
+	 *
+	 * and the Q value is a floating point between 0 and 1 which defines
+	 * how much  the server "likes" this packaging type
+	 *
+	 * @param col
+	 * @return
+	 */
+	public List<String> getAcceptPackaging(Collection col)
+    {
+		// sword2.accept-packaging.METSDSpaceSIP = http://purl.org/net/sword-types/METSDSpaceSIP
+		// sword2.accept-packaging.[handle].METSDSpaceSIP = http://purl.org/net/sword-types/METSDSpaceSIP
+		String handle = col.getHandle();
+		List<String> aps = new ArrayList<String>();
+
+		// build the holding maps of identifiers
+        Properties props = ConfigurationManager.getProperties();
+        Set keyset = props.keySet();
+        for (Object keyObj : keyset)
+        {
+			// start by getting anything that starts with sword.accept-packging.collection.
+			String sw = "sword2.accept-packaging.collection.";
+
+            if (!(keyObj instanceof String))
+            {
+                continue;
+            }
+            String key = (String) keyObj;
+
+            if (!key.startsWith(sw))
+            {
+                continue;
+            }
+
+			// extract the configuration into the holding Maps
+
+			// the suffix will be [typeid] or [handle].[typeid]
+            String suffix = key.substring(sw.length());
+
+			// is there a handle which represents this collection?
+			boolean withHandle = false;
+			if (suffix.startsWith(handle))
+			{
+				withHandle = true;
+			}
+
+			// is there NO handle
+			boolean general = false;
+			if (suffix.indexOf(".") == -1)
+			{
+				// a handle would be separated from the identifier of the package type
+				general = true;
+			}
+
+			if (withHandle || general)
+			{
+				String value = props.getProperty((key));
+				aps.add(value);
+			}
+		}
+
+		return aps;
+    }
+
+	public List<String> getItemAcceptPackaging()
+	{
+		List<String> aps = new ArrayList<String>();
+
+		// build the holding maps of identifiers
+        Properties props = ConfigurationManager.getProperties();
+        Set keyset = props.keySet();
+        for (Object keyObj : keyset)
+        {
+			// start by getting anything that starts with sword.accept-packging.collection.
+			String sw = "sword2.accept-packaging.item.";
+
+            if (!(keyObj instanceof String))
+            {
+                continue;
+            }
+            String key = (String) keyObj;
+
+            if (!key.startsWith(sw))
+            {
+                continue;
+            }
+
+			// extract the configuration into the holding Maps
+			String value = props.getProperty((key));
+			aps.add(value);
+		}
+
+		return aps;
+	}
+
+	/**
+	 * is the given packaging/media type supported by the given dspace object
+	 *
+	 * @param packageFormat
+	 * @param dso
+	 * @return
+	 * @throws DSpaceSwordException
+	 * @throws SwordError
+	 */
+	public boolean isAcceptedPackaging(String packageFormat, DSpaceObject dso)
+			throws DSpaceSwordException, SwordError
+	{
+		if (packageFormat == null || "".equals(packageFormat))
+		{
+			return true;
+		}
+
+		if (dso instanceof Collection)
+		{
+			List<String> accepts = this.getAcceptPackaging((Collection) dso);
+			for (String accept : accepts)
+			{
+				if (accept.equals(packageFormat))
+				{
+					return true;
+				}
+			}
+		}
+		else if (dso instanceof Item)
+		{
+			List<String> accepts = this.getItemAcceptPackaging();
+			for (String accept : accepts)
+			{
+				if (accept.equals(packageFormat))
+				{
+					return true;
+				}
+			}
+		}
+		
+		return false;
+	}
+
+	/**
+	 * is the given content mimetype acceptable to the given dspace object
+	 * @param context
+	 * @param type
+	 * @param dso
+	 * @return
+	 * @throws DSpaceSwordException
+	 */
+	public boolean isAcceptableContentType(Context context, String type, DSpaceObject dso)
+			throws DSpaceSwordException
+	{
+		List<String> accepts = this.getAccepts(context, dso);
+		return accepts.contains(type);
+	}
+
+	public String getStateUri(String state)
+	{
+		return ConfigurationManager.getProperty("sword2.state." + state + ".uri");
+	}
+
+	public String getStateDescription(String state)
+	{
+		return ConfigurationManager.getProperty("sword2.state." + state + ".description");
+	}
+}
