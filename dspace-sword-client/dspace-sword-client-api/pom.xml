@@ -33,11 +33,11 @@
        and releases snapshots into the snapshot repository below.
     -->
     <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-discovery/dspace-sword-client-api</connection>
+        <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword-client/dspace-sword-client-api</connection>
         <developerConnection>
-            scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-discovery/dspace-sword-client-api
+            scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword-client/dspace-sword-client-api
         </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-discovery/dspace-sword-client-api</url>
+        <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword-client/dspace-sword-client-api</url>
     </scm>
     
 </project>

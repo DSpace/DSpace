@@ -84,12 +84,12 @@
     -->
     <scm>
         <connection>
-            scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-discovery/dspace-sword-client-xmlui-webapp
+            scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword-client/dspace-sword-client-xmlui-webapp
         </connection>
         <developerConnection>
-            scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-discovery/dspace-sword-client-xmlui-webapp
+            scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword-client/dspace-sword-client-xmlui-webapp
         </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-discovery/dspace-sword-client-xmlui-webapp</url>
+        <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword-client/dspace-sword-client-xmlui-webapp</url>
     </scm>
 
 </project>

@@ -36,11 +36,13 @@
             <scope>provided</scope>
         </dependency>
 
+        <!--
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-sword-client-api</artifactId>
             <version>1.8.0-SNAPSHOT</version>
         </dependency>
+        -->
 
     </dependencies>
 
@@ -50,12 +52,12 @@
        and releases snapshots into the snapshot repository below.
     -->
     <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-discovery/dspace-sword-client-xmlui-api
+        <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword-client/dspace-sword-client-xmlui-api
         </connection>
         <developerConnection>
-            scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-discovery/dspace-sword-client-xmlui-api
+            scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword-client/dspace-sword-client-xmlui-api
         </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-discovery/dspace-sword-client-xmlui-api</url>
+        <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword-client/dspace-sword-client-xmlui-api</url>
     </scm>
 
 </project>
