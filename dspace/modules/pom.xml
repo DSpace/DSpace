@@ -78,6 +78,15 @@
             </modules>
         </profile>
         <profile>
+            <id>dspace-swordv2</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>swordv2</module>
+            </modules>
+        </profile>
+        <profile>
             <id>dspace-solr</id>
             <activation>
                 <activeByDefault>true</activeByDefault>

@@ -36,13 +36,10 @@
             <scope>provided</scope>
         </dependency>
 
-        <!--
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-sword-client-api</artifactId>
-            <version>1.8.0-SNAPSHOT</version>
         </dependency>
-        -->
 
     </dependencies>
 

@@ -161,6 +161,19 @@
         </profile>
 
         <!--
+           Builds SWORDv2 WAR for DSpace
+        -->
+        <profile>
+            <id>dspace-swordv2</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>dspace-swordv2</module>
+            </modules>
+        </profile>
+
+        <!--
            Builds DSpace Sword Client from local source if present
         -->
         <profile>
@@ -218,6 +231,7 @@
             <module>dspace-lni</module>
             <module>dspace-oai</module>
             <module>dspace-sword</module>
+            <module>dspace-swordv2</module>
             <module>dspace-sword-client</module>
          </modules>
       </profile>
@@ -305,6 +319,36 @@
               <version>1.8.0-SNAPSHOT</version>
               <type>war</type>
           </dependency>
+
+          <dependency>
+              <groupId>org.dspace</groupId>
+              <artifactId>dspace-swordv2-api</artifactId>
+              <version>1.8.0-SNAPSHOT</version>
+          </dependency>
+          <dependency>
+              <groupId>org.dspace</groupId>
+              <artifactId>dspace-swordv2-webapp</artifactId>
+              <version>1.8.0-SNAPSHOT</version>
+              <type>war</type>
+          </dependency>
+
+           <dependency>
+              <groupId>org.dspace</groupId>
+              <artifactId>dspace-sword-client-api</artifactId>
+              <version>1.8.0-SNAPSHOT</version>
+          </dependency>
+          <dependency>
+              <groupId>org.dspace</groupId>
+              <artifactId>dspace-sword-client-xmlui-api</artifactId>
+              <version>1.8.0-SNAPSHOT</version>
+          </dependency>
+          <dependency>
+              <groupId>org.dspace</groupId>
+              <artifactId>dspace-sword-client-xmlui-webapp</artifactId>
+              <version>1.8.0-SNAPSHOT</version>
+              <type>war</type>
+          </dependency>
+
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui-api</artifactId>
