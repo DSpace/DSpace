@@ -17,6 +17,7 @@
         <groupId>org.dspace</groupId>
         <artifactId>dspace-parent</artifactId>
         <version>1.8.0-SNAPSHOT</version>
+        <relativePath>..</relativePath>
     </parent>
 
     <!--
@@ -51,6 +52,7 @@
            the configuration.
         -->
         <profile>
+            <id>dspace-config</id>
             <activation>
                 <property>
                     <name>dspace.config</name>
@@ -61,176 +63,6 @@
                     <filter>${dspace.config}</filter>
                 </filters>
             </build>
-        </profile>
-
-
-        <!--
-           These profiles activate the inclusion of various modules into
-           the DSpace Build process. They activate automatically if the
-           source module is in the local file system, correctly located
-           relative to this file.
-        -->
-
-        <!--
-           Builds central API for DSpace
-        -->
-        <profile>
-            <id>dspace-api</id>
-            <activation>
-                <file>
-                    <exists>../dspace-api/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-api</module>
-            </modules>
-        </profile>
-
-        <!--
-           Builds DSpace Solr Stats for DSpace
-        -->
-        <profile>
-            <id>dspace-stats</id>
-            <activation>
-                <file>
-                    <exists>../dspace-stats/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-stats</module>
-            </modules>
-        </profile>
-
-        <!--
-            Builds DSpace discovery for DSpace
-        -->
-        <profile>
-            <id>dspace-discovery</id>
-            <activation>
-                <file>
-                    <exists>../dspace-discovery/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-discovery</module>
-            </modules>
-        </profile>
-
-        <!--
-           Builds OAI Gateway WAR for DSpace
-        -->
-        <profile>
-            <id>dspace-oai</id>
-            <activation>
-                <file>
-                    <exists>../dspace-oai/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-oai</module>
-            </modules>
-        </profile>
-
-        <!--
-           Builds JSPUI WAR for DSpace
-        -->
-        <profile>
-
-            <id>dspace-jspui</id>
-            <activation>
-                <file>
-                    <exists>../dspace-jspui/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-jspui</module>
-            </modules>
-        </profile>
-
-
-        <!--
-           Builds SWORD WAR for DSpace
-        -->
-        <profile>
-            <id>dspace-sword</id>
-            <activation>
-                <file>
-                    <exists>../dspace-sword/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-sword</module>
-            </modules>
-        </profile>
-
-        <!-- Builds DSpace Sword Client from local source if present -->
-        <profile>
-            <id>dspace-sword-client</id>
-            <activation>
-                <file>
-                    <exists>../dspace-sword-client/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-sword-client</module>
-            </modules>
-        </profile>
-
-        <profile>
-            <id>dspace-xmlui-lang</id>
-            <activation>
-                <file>
-                    <exists>../dspace-xmlui-lang/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-xmlui-lang</module>
-            </modules>
-        </profile>
-
-        <!--
-           Builds XMLUI WAR for DSpace
-        -->
-        <profile>
-            <id>dspace-xmlui</id>
-            <activation>
-                <file>
-                    <exists>../dspace-xmlui/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-xmlui</module>
-            </modules>
-        </profile>
-
-        <!--
-           Builds LNI WAR for DSpace
-        -->
-        <profile>
-            <id>dspace-lni</id>
-            <activation>
-                <file>
-                    <exists>../dspace-lni/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-lni</module>
-            </modules>
-        </profile>
-
-        <!--
-           Builds Language Packs for DSpace
-        -->
-        <profile>
-            <id>dspace-api-lang</id>
-            <activation>
-                <file>
-                    <exists>../dspace-api-lang/pom.xml</exists>
-                </file>
-            </activation>
-            <modules>
-                <module>../dspace-api-lang</module>
-            </modules>
         </profile>
 
         <!--

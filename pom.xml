@@ -36,6 +36,7 @@
          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
+            <version>2.9</version>
             <!-- tests whose name starts by Abstract will be ignored -->
             <configuration>
 	        <excludes>
@@ -60,22 +61,143 @@
    <profiles>
 
       <!--
-         =========================================================
-         These are administrative profiles used by release manager
-         to complete release tasks.
-         =========================================================
+           These profiles activate the inclusion of various modules into
+           the DSpace Build process. They activate automatically if the
+           source module is in the local file system, correctly located
+           relative to this file.
+        -->
 
-         Use 'mvn release:prepare -Pall' for tagging the release.
-      -->
-      <profile>
-         <id>all</id>
-         <activation>
-            <activeByDefault>true</activeByDefault>
-         </activation>
-         <modules>
-            <module>dspace</module>
-         </modules>
-      </profile>
+       <!--
+           Builds central API for DSpace
+        -->
+        <profile>
+            <id>dspace</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>dspace</module>
+            </modules>
+        </profile>
+
+        <!--
+           Builds central API for DSpace
+        -->
+        <profile>
+            <id>dspace-api</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>dspace-api</module>
+            </modules>
+        </profile>
+
+        <!--
+           Builds DSpace Solr Stats for DSpace
+        -->
+        <profile>
+            <id>dspace-stats</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>dspace-stats</module>
+            </modules>
+        </profile>
+
+        <!--
+            Builds DSpace discovery for DSpace
+        -->
+        <profile>
+            <id>dspace-discovery</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>dspace-discovery</module>
+            </modules>
+        </profile>
+
+        <!--
+           Builds OAI Gateway WAR for DSpace
+        -->
+        <profile>
+            <id>dspace-oai</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>dspace-oai</module>
+            </modules>
+        </profile>
+
+        <!--
+           Builds JSPUI WAR for DSpace
+        -->
+        <profile>
+
+            <id>dspace-jspui</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>dspace-jspui</module>
+            </modules>
+        </profile>
+
+
+        <!--
+           Builds SWORD WAR for DSpace
+        -->
+        <profile>
+            <id>dspace-sword</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>dspace-sword</module>
+            </modules>
+        </profile>
+
+        <!--
+           Builds DSpace Sword Client from local source if present
+        -->
+        <profile>
+            <id>dspace-sword-client</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>dspace-sword-client</module>
+            </modules>
+        </profile>
+
+        <!--
+           Builds XMLUI WAR for DSpace
+        -->
+        <profile>
+            <id>dspace-xmlui</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>dspace-xmlui</module>
+            </modules>
+        </profile>
+
+        <!--
+           Builds LNI WAR for DSpace
+        -->
+        <profile>
+            <id>dspace-lni</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <modules>
+                <module>dspace-lni</module>
+            </modules>
+        </profile>
 
 
       <!--
@@ -123,7 +245,7 @@
                               <descriptorRef>src-release</descriptorRef>
                            </descriptorRefs>
                            <tarLongFileMode>gnu</tarLongFileMode>
-                           <finalName>dspace-${pom.version}</finalName>
+                           <finalName>dspace-${project.version}</finalName>
                         </configuration>
                         <phase>package</phase>
                         <goals>
@@ -886,108 +1008,5 @@
       <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk</developerConnection>
       <url>http://scm.dspace.org/svn/repo/dspace/trunk</url>
    </scm>
-
-   <reporting>
-      <excludeDefaults>true</excludeDefaults>
-      <plugins>
-         <plugin>
-            <artifactId>maven-javadoc-plugin</artifactId>
-            <configuration>
-               <links>
-                  <link>http://projects.dspace.org/dspace/apidocs</link>
-                  <link>
-                     http://projects.dspace.org/dspace-api/apidocs
-                  </link>
-                  <link>
-                     http://projects.dspace.org/dspace-jspui/apidocs
-                  </link>
-                  <link>
-                     http://projects.dspace.org/dspace-oai/apidocs
-                  </link>
-                  <link>http://java.sun.com/j2se/6/docs/api</link>
-                  <link>
-                     http://jakarta.apache.org/commons/collections/apidocs-COLLECTIONS_3_0/
-                  </link>
-                  <link>
-                     http://jakarta.apache.org/commons/dbcp/apidocs/
-                  </link>
-                  <link>
-                     http://jakarta.apache.org/commons/fileupload/apidocs/
-                  </link>
-                  <link>
-                     http://jakarta.apache.org/commons/httpclient/apidocs/
-                  </link>
-                  <link>
-                     http://jakarta.apache.org/commons/logging/api/
-                  </link>
-                  <link>
-                     http://jakarta.apache.org/commons/pool/apidocs/
-                  </link>
-                  <link>http://www.junit.org/junit/javadoc/</link>
-                  <link>http://logging.apache.org/log4j/docs/api/</link>
-                  <link>http://jakarta.apache.org/regexp/apidocs/</link>
-                  <link>http://jakarta.apache.org/velocity/api/</link>
-               </links>
-            </configuration>
-         </plugin>
-         <plugin>
-            <artifactId>maven-jxr-plugin</artifactId>
-            <configuration>
-               <aggregate>true</aggregate>
-            </configuration>
-         </plugin>
-         <plugin>
-            <artifactId>maven-site-plugin</artifactId>
-         </plugin>
-         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>jdepend-maven-plugin</artifactId>
-            <version>2.0-beta-1</version>
-         </plugin>
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-report-plugin</artifactId>
-            <version>2.5</version>
-         </plugin>
-         <plugin>
-            <groupId>com.google.testability-explorer</groupId>
-            <artifactId>maven-testability-plugin</artifactId>
-            <version>1.3.3</version>
-         </plugin>
-         <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-pmd-plugin</artifactId>
-            <version>2.4</version>
-            <configuration>
-                <targetJdk>${maven.compiler.target}</targetJdk>
-            </configuration>
-         </plugin>
-         <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>findbugs-maven-plugin</artifactId>
-            <version>2.3</version>
-            <configuration>
-                    <xmlOutput>true</xmlOutput>
-                    <effort>Max</effort>
-            </configuration>
-        </plugin>
-        <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>taglist-maven-plugin</artifactId>
-            <version>2.4</version>
-            <configuration>
-                <aggregate>true</aggregate>
-                <tags>
-                    <tag>TODO</tag>
-                    <tag>FIXME</tag>
-                    <tag>@todo</tag>
-                    <tag>XXX</tag>
-                </tags>
-            </configuration>
-        </plugin>
-
-
-      </plugins>
-   </reporting>
 
 </project>
