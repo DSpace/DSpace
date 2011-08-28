@@ -131,7 +131,7 @@ public class PluginManager
      * exception.  It is typically used at initialization time to set up
      * a permanent part of the system so any failure is fatal.
      *
-     * @param name of config module, or <code>null</code> for standard location
+     * @param module name of config module, or <code>null</code> for standard location
      * @param interfaceClass interface Class object
      * @return instance of plugin
      * @throws PluginConfigurationError
