@@ -135,7 +135,33 @@ public class SyndicationFeed
         return (String[]) ArrayUtils.clone(descriptionFields);
     }
 
-
+    /**
+     * Strip out control characters, which are invalid XML.
+     */
+    private String stripControl(String value){
+        // strip out control characters
+        StringBuffer sb = new StringBuffer(value);
+        stripControl(sb);
+    	return sb.toString();	
+    }
+    
+    /**
+     * Strip out control characters, which are invalid XML.
+     */
+    private void stripControl(StringBuffer sb){
+        // strip out control characters
+        for (int j=0; j < sb.length(); j++) {
+    	    if (Character.isISOControl(sb.charAt(j)) 
+    	        && sb.charAt(j) != '\t'
+    	    	&& sb.charAt(j) != '\r'
+    	    	&& sb.charAt(j) != '\n'
+    	       ) 
+    	    {
+                sb.setCharAt(j, '\ufffd');
+    		}
+    	}
+    }
+    
     /**
      * Fills in the feed and entry-level metadata from DSpace objects.
      */
@@ -215,7 +241,7 @@ public class SyndicationFeed
                 entry.setUri(entryURL);
              
                 String title = getOneDC(item, titleField);
-                entry.setTitle(title == null ? localize(labels, MSG_UNTITLED) : title);
+                entry.setTitle(title == null ? localize(labels, MSG_UNTITLED) : stripControl(title));
              
                 // "published" date -- should be dc.date.issued
                 String pubDate = getOneDC(item, dateField);
@@ -265,6 +291,7 @@ public class SyndicationFeed
                 {
                     SyndContent desc = new SyndContentImpl();
                     desc.setType("text/plain");
+                    stripControl(db);
                     desc.setValue(db.toString());
                     entry.setDescription(desc);
                 }
@@ -277,7 +304,7 @@ public class SyndicationFeed
                     for (DCValue author : authors)
                     {
                         SyndPerson sp = new SyndPersonImpl();
-                        sp.setName(author.value);
+                        sp.setName(stripControl(author.value));
                         creators.add(sp);
                     }
                     entry.setAuthors(creators);
@@ -296,7 +323,7 @@ public class SyndicationFeed
                             List<String> creators = new ArrayList<String>();
                             for (DCValue author : dcAuthors)
                             {
-                                creators.add(author.value);
+                                creators.add(stripControl(author.value));
                             }
                             dc.setCreators(creators);
                         }
@@ -323,6 +350,7 @@ public class SyndicationFeed
                                 }
                                 descs.append(d.value);
                             }
+                            stripControl(descs);
                             dc.setDescription(descs.toString());
                         }
                     }
