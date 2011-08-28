@@ -93,7 +93,7 @@ public class SwordUrlManager
             try
             {
                 URL url = new URL(dspaceUrl);
-                sUrl = new URL(url.getProtocol(), url.getHost(), url.getPort(), "/sword2").toString();
+                sUrl = new URL(url.getProtocol(), url.getHost(), url.getPort(), "/swordv2").toString();
             }
             catch (MalformedURLException e)
             {
