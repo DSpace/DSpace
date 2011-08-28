@@ -32,7 +32,7 @@ public class SwordDisseminatorFactory
                     {
 						format = format.replace(";", "_"); // clean up the string for the plugin manager
 						format = format.replace("=", "_"); // clean up the string for the plugin manager
-                        disseminator = (SwordContentDisseminator) PluginManager.getNamedPlugin(SwordContentDisseminator.class, format);
+                        disseminator = (SwordContentDisseminator) PluginManager.getNamedPlugin("swordv2-server", SwordContentDisseminator.class, format);
                         if (disseminator == null)
                         {
                             continue;
@@ -63,7 +63,7 @@ public class SwordDisseminatorFactory
                 {
 					acceptPackaging = acceptPackaging.replace(";", "_"); // clean up the string for the plugin manager
 					acceptPackaging = acceptPackaging.replace("=", "_"); // clean up the string for the plugin manager
-                    disseminator = (SwordContentDisseminator) PluginManager.getNamedPlugin(SwordContentDisseminator.class, acceptPackaging);
+                    disseminator = (SwordContentDisseminator) PluginManager.getNamedPlugin("swordv2-server", SwordContentDisseminator.class, acceptPackaging);
                     if (disseminator != null)
                     {
                         if (accept != null)
@@ -115,7 +115,7 @@ public class SwordDisseminatorFactory
 				{
 					format = format.replace(";", "_"); // clean up the string for the plugin manager
 					format = format.replace("=", "_"); // clean up the string for the plugin manager
-					disseminator = (SwordStatementDisseminator) PluginManager.getNamedPlugin(SwordStatementDisseminator.class, format);
+					disseminator = (SwordStatementDisseminator) PluginManager.getNamedPlugin("swordv2-server", SwordStatementDisseminator.class, format);
 					if (disseminator != null)
 					{
 						break;
@@ -135,7 +135,7 @@ public class SwordDisseminatorFactory
     public static SwordEntryDisseminator getEntryInstance()
             throws DSpaceSwordException, SwordError
     {
-        SwordEntryDisseminator disseminator = (SwordEntryDisseminator) PluginManager.getSinglePlugin(SwordEntryDisseminator.class);
+        SwordEntryDisseminator disseminator = (SwordEntryDisseminator) PluginManager.getSinglePlugin("swordv2-server", SwordEntryDisseminator.class);
         if (disseminator == null)
         {
             throw new SwordError(DSpaceUriRegistry.REPOSITORY_ERROR, "No disseminator configured for handling sword entry documents");

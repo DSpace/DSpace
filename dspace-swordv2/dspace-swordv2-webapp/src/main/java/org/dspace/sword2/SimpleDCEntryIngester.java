@@ -38,13 +38,13 @@ public class SimpleDCEntryIngester implements SwordEntryIngester
     {
         // we should load our DC map from configuration
         this.dcMap = new HashMap<String, String>();
-        Properties props = ConfigurationManager.getProperties();
+        Properties props = ConfigurationManager.getProperties("swordv2-server");
         for (Object key : props.keySet())
         {
             String keyString = (String) key;
-            if (keyString.startsWith("sword2.simpledc."))
+            if (keyString.startsWith("simpledc."))
             {
-                String k = keyString.substring("sword2.simpledc.".length());
+                String k = keyString.substring("simpledc.".length());
                 String v = (String) props.get(key);
                 this.dcMap.put(k, v);
             }
@@ -274,7 +274,7 @@ public class SimpleDCEntryIngester implements SwordEntryIngester
 	protected void setUpdatedDate(Item item, VerboseDescription verboseDescription)
 			throws DSpaceSwordException
 	{
-		String field = ConfigurationManager.getProperty("sword2.updated.field");
+		String field = ConfigurationManager.getProperty("swordv2-server", "updated.field");
 		if (field == null || "".equals(field))
 		{
 			throw new DSpaceSwordException("No configuration, or configuration is invalid for: sword.updated.field");
@@ -307,7 +307,7 @@ public class SimpleDCEntryIngester implements SwordEntryIngester
 			return;
 		}
 
-		String field = ConfigurationManager.getProperty("sword2.slug.field");
+		String field = ConfigurationManager.getProperty("swordv2-server", "slug.field");
 		if (field == null || "".equals(field))
 		{
 			throw new DSpaceSwordException("No configuration, or configuration is invalid for: sword.slug.field");

@@ -46,7 +46,7 @@ public class SwordIngesterFactory
         SwordContentIngester ingester = null;
 
         // first look to see if there's an intester for the content type
-        ingester = (SwordContentIngester) PluginManager.getNamedPlugin(SwordContentIngester.class, deposit.getMimeType());
+        ingester = (SwordContentIngester) PluginManager.getNamedPlugin("swordv2-server", SwordContentIngester.class, deposit.getMimeType());
         if (ingester != null)
         {
             return ingester;
@@ -54,7 +54,7 @@ public class SwordIngesterFactory
 
         // if no ingester, then 
         // look to see if there's an ingester for the package format
-        ingester = (SwordContentIngester) PluginManager.getNamedPlugin(SwordContentIngester.class, deposit.getPackaging());
+        ingester = (SwordContentIngester) PluginManager.getNamedPlugin("swordv2-server", SwordContentIngester.class, deposit.getPackaging());
         if (ingester == null)
         {
             throw new SwordError(UriRegistry.ERROR_CONTENT, "No ingester configured for this package type");
@@ -65,7 +65,7 @@ public class SwordIngesterFactory
     public static SwordEntryIngester getEntryInstance(Context context, Deposit deposit, DSpaceObject dso)
             throws DSpaceSwordException, SwordError
     {
-		SwordEntryIngester ingester = (SwordEntryIngester) PluginManager.getSinglePlugin(SwordEntryIngester.class);
+		SwordEntryIngester ingester = (SwordEntryIngester) PluginManager.getSinglePlugin("swordv2-server", SwordEntryIngester.class);
 		if (ingester == null)
 		{
 			throw new SwordError(UriRegistry.ERROR_CONTENT, "No ingester configured for handling sword entry documents");

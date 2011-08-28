@@ -15,7 +15,6 @@ import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.apache.log4j.Logger;
-import org.dspace.core.PluginManager;
 import org.swordapp.server.DepositReceipt;
 import org.swordapp.server.SwordError;
 import org.swordapp.server.SwordServerException;
@@ -289,7 +288,7 @@ public class ReceiptGenerator
 	 */
 	protected void addLastUpdatedDate(DepositResult result, DepositReceipt receipt)
 	{
-		String config = ConfigurationManager.getProperty("sword2.updated.field");
+		String config = ConfigurationManager.getProperty("swordv2-server", "updated.field");
 		DCValue[] dcv = result.getItem().getMetadata(config);
 		if (dcv != null && dcv.length == 1)
         {
@@ -309,7 +308,7 @@ public class ReceiptGenerator
 
 	protected void addLastUpdatedDate(Item item, DepositReceipt receipt)
 	{
-		String config = ConfigurationManager.getProperty("sword2.updated.field");
+		String config = ConfigurationManager.getProperty("swordv2-server", "updated.field");
 		DCValue[] dcv = item.getMetadata(config);
 		if (dcv != null && dcv.length == 1)
         {

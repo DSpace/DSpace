@@ -277,7 +277,7 @@ public class SwordAuthenticator
 		}
 
 		// first find out if we support on-behalf-of deposit
-		boolean mediated = ConfigurationManager.getBooleanProperty("sword.on-behalf-of.enable");
+		boolean mediated = ConfigurationManager.getBooleanProperty("swordv2-server", "on-behalf-of.enable");
 		if (!mediated && obo != null)
 		{
 			// user is trying to do a mediated deposit on a repository which does not support it

@@ -64,33 +64,33 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 	public SwordConfigurationDSpace()
 	{
 		// set the max upload size
-		int mus = ConfigurationManager.getIntProperty("sword2.max-upload-size");
+		int mus = ConfigurationManager.getIntProperty("swordv2-server", "max-upload-size");
 		if (mus > 0)
 		{
 			this.maxUploadSize = mus;
 		}
 
 		// set the mediation value
-		this.mediated = ConfigurationManager.getBooleanProperty("sword2.on-behalf-of.enable");
+		this.mediated = ConfigurationManager.getBooleanProperty("swordv2-server", "on-behalf-of.enable");
 
 		// find out if we keep the original as bitstream
-		this.keepOriginal = ConfigurationManager.getBooleanProperty("sword2.keep-original-package");
+		this.keepOriginal = ConfigurationManager.getBooleanProperty("swordv2-server", "keep-original-package");
 
 		// get the sword bundle
-		String bundle = ConfigurationManager.getProperty("sword2.bundle.name");
+		String bundle = ConfigurationManager.getProperty("swordv2-server", "bundle.name");
 		if (bundle != null && "".equals(bundle))
 		{
 			this.swordBundle = bundle;
 		}
 
         // find out if we keep the package as a file in specified directory
-        this.keepPackageOnFailedIngest = ConfigurationManager.getBooleanProperty("sword2.keep-package-on-fail", false);
+        this.keepPackageOnFailedIngest = ConfigurationManager.getBooleanProperty("swordv2-server", "keep-package-on-fail", false);
 
         // get directory path and name
-        this.failedPackageDir = ConfigurationManager.getProperty("sword2.failed-package.dir");
+        this.failedPackageDir = ConfigurationManager.getProperty("swordv2-server", "failed-package.dir");
 
         // Get the accepted formats
-        String acceptsProperty = ConfigurationManager.getProperty("sword2.accepts");
+        String acceptsProperty = ConfigurationManager.getProperty("swordv2-server", "accepts");
         swordaccepts = new ArrayList<String>();
         if (acceptsProperty == null)
         {
@@ -102,10 +102,10 @@ public class SwordConfigurationDSpace implements SwordConfiguration
         }
 
 		// find out if community deposit is allowed
-		this.allowCommunityDeposit = ConfigurationManager.getBooleanProperty("sword2.allow-community-deposit");
+		this.allowCommunityDeposit = ConfigurationManager.getBooleanProperty("swordv2-server", "allow-community-deposit");
 
         // find out if we keep the package as a file in specified directory
-        this.entryFirst = ConfigurationManager.getBooleanProperty("sword2.multipart.entry-first", false);
+        this.entryFirst = ConfigurationManager.getBooleanProperty("swordv2-server", "multipart.entry-first", false);
 
 	}
 
@@ -113,9 +113,17 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 	// Utilities
 	///////////////////////////////////////////////////////////////////////////////////
 
-	public String getStringProperty(String propName, String defaultValue, String[] allowedValues)
+	public String getStringProperty(String module, String propName, String defaultValue, String[] allowedValues)
 	{
-		String cfg = ConfigurationManager.getProperty(propName);
+        String cfg;
+        if (module == null)
+        {
+            cfg = ConfigurationManager.getProperty(propName);
+        }
+        else
+        {
+		    cfg = ConfigurationManager.getProperty(module, propName);
+        }
 		if (cfg == null || "".equals(cfg))
 		{
 			return defaultValue;
@@ -142,9 +150,9 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 		return defaultValue;
 	}
 
-	public String getStringProperty(String propName, String defaultValue)
+	public String getStringProperty(String module, String propName, String defaultValue)
 	{
-		return this.getStringProperty(propName, defaultValue, null);
+		return this.getStringProperty(module, propName, defaultValue, null);
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////
@@ -170,22 +178,22 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 
 	public String generator()
 	{
-		return this.getStringProperty("sword2.generator.url", DSpaceUriRegistry.DSPACE_SWORD_NS);
+        return this.getStringProperty("swordv2-server", "generator.url", DSpaceUriRegistry.DSPACE_SWORD_NS);
 	}
 
 	public String generatorVersion()
 	{
-		return this.getStringProperty("sword2.generator.version", "2.0");
+		return this.getStringProperty("swordv2-server", "generator.version", "2.0");
 	}
 
 	public String administratorEmail()
 	{
-		return this.getStringProperty("mail.admin", null);
+		return this.getStringProperty(null, "mail.admin", null);
 	}
 
 	public String getAuthType()
 	{
-		return this.getStringProperty("sword2.auth-type", "Basic", new String[] { "Basic", "None" } );
+		return this.getStringProperty("swordv2-server", "auth-type", "Basic", new String[] { "Basic", "None" } );
 	}
 
 	public boolean storeAndCheckBinary()
@@ -195,7 +203,7 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 
 	public String getTempDirectory()
 	{
-		return this.getStringProperty("sword2.upload.tempdir", null);
+		return this.getStringProperty("swordv2-server", "upload.tempdir", null);
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////
@@ -210,12 +218,12 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 	public List<String> getDisseminatePackaging()
 	{
 		List<String> dps = new ArrayList<String>();
-		Properties props = ConfigurationManager.getProperties();
+		Properties props = ConfigurationManager.getProperties("swordv2-server");
         Set keyset = props.keySet();
         for (Object keyObj : keyset)
         {
 			// start by getting anything that starts with sword.disseminate-packging.
-			String sw = "sword2.disseminate-packaging.";
+			String sw = "disseminate-packaging.";
 
 			if (!(keyObj instanceof String))
             {
@@ -454,18 +462,18 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 	 */
 	public List<String> getAcceptPackaging(Collection col)
     {
-		// sword2.accept-packaging.METSDSpaceSIP = http://purl.org/net/sword-types/METSDSpaceSIP
-		// sword2.accept-packaging.[handle].METSDSpaceSIP = http://purl.org/net/sword-types/METSDSpaceSIP
+		// accept-packaging.METSDSpaceSIP = http://purl.org/net/sword-types/METSDSpaceSIP
+		// accept-packaging.[handle].METSDSpaceSIP = http://purl.org/net/sword-types/METSDSpaceSIP
 		String handle = col.getHandle();
 		List<String> aps = new ArrayList<String>();
 
 		// build the holding maps of identifiers
-        Properties props = ConfigurationManager.getProperties();
+        Properties props = ConfigurationManager.getProperties("swordv2-server");
         Set keyset = props.keySet();
         for (Object keyObj : keyset)
         {
-			// start by getting anything that starts with sword.accept-packging.collection.
-			String sw = "sword2.accept-packaging.collection.";
+			// start by getting anything that starts with sword.accept-packaging.collection.
+			String sw = "accept-packaging.collection.";
 
             if (!(keyObj instanceof String))
             {
@@ -513,12 +521,12 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 		List<String> aps = new ArrayList<String>();
 
 		// build the holding maps of identifiers
-        Properties props = ConfigurationManager.getProperties();
+        Properties props = ConfigurationManager.getProperties("swordv2-server");
         Set keyset = props.keySet();
         for (Object keyObj : keyset)
         {
 			// start by getting anything that starts with sword.accept-packging.collection.
-			String sw = "sword2.accept-packaging.item.";
+			String sw = "accept-packaging.item.";
 
             if (!(keyObj instanceof String))
             {
@@ -599,11 +607,11 @@ public class SwordConfigurationDSpace implements SwordConfiguration
 
 	public String getStateUri(String state)
 	{
-		return ConfigurationManager.getProperty("sword2.state." + state + ".uri");
+		return ConfigurationManager.getProperty("swordv2-server", "state." + state + ".uri");
 	}
 
 	public String getStateDescription(String state)
 	{
-		return ConfigurationManager.getProperty("sword2.state." + state + ".description");
+		return ConfigurationManager.getProperty("swordv2-server", "state." + state + ".description");
 	}
 }

@@ -172,7 +172,7 @@ public class WorkflowTools
             WorkspaceItem wsi = this.getWorkspaceItem(context, item);
 
             // kick off the workflow
-            boolean notify = ConfigurationManager.getBooleanProperty("sword2.workflow.notify");
+            boolean notify = ConfigurationManager.getBooleanProperty("swordv2-server", "workflow.notify");
             if (notify)
             {
                 WorkflowManager.start(context, wsi);

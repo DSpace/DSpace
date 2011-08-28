@@ -77,7 +77,7 @@ public abstract class AbstractSwordContentIngester implements SwordContentIngest
 	protected void setUpdatedDate(Item item, VerboseDescription verboseDescription)
 			throws DSpaceSwordException
 	{
-		String field = ConfigurationManager.getProperty("sword2.updated.field");
+		String field = ConfigurationManager.getProperty("swordv2-manager", "updated.field");
 		if (field == null || "".equals(field))
 		{
 			throw new DSpaceSwordException("No configuration, or configuration is invalid for: sword.updated.field");
@@ -110,7 +110,7 @@ public abstract class AbstractSwordContentIngester implements SwordContentIngest
 			return;
 		}
 
-		String field = ConfigurationManager.getProperty("sword2.slug.field");
+		String field = ConfigurationManager.getProperty("swordv2-server", "slug.field");
 		if (field == null || "".equals(field))
 		{
 			throw new DSpaceSwordException("No configuration, or configuration is invalid for: sword.slug.field");

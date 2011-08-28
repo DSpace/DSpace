@@ -7,15 +7,19 @@
  */
 package org.dspace.sword2;
 
+import org.apache.log4j.Logger;
 import org.dspace.core.PluginManager;
 import org.swordapp.server.SwordError;
 
 public class WorkflowManagerFactory
 {
-	public static WorkflowManager getInstance()
+	/** logger */
+	private static Logger log = Logger.getLogger(WorkflowManagerFactory.class);
+
+    public static WorkflowManager getInstance()
             throws DSpaceSwordException, SwordError
     {
-        WorkflowManager manager = (WorkflowManager) PluginManager.getSinglePlugin(WorkflowManager.class);
+        WorkflowManager manager = (WorkflowManager) PluginManager.getSinglePlugin("swordv2-server", WorkflowManager.class);
         if (manager == null)
         {
             throw new SwordError(DSpaceUriRegistry.REPOSITORY_ERROR, "No workflow manager configured");

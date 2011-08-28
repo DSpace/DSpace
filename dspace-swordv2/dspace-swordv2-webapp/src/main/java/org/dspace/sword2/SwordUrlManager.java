@@ -80,7 +80,7 @@ public class SwordUrlManager
 	public String getSwordBaseUrl()
 			throws DSpaceSwordException
 	{
-		String sUrl = ConfigurationManager.getProperty("sword2.url");
+		String sUrl = ConfigurationManager.getProperty("swordv2-server", "url");
 		if (sUrl == null || "".equals(sUrl))
 		{
 			String dspaceUrl = ConfigurationManager.getProperty("dspace.baseUrl");
@@ -313,20 +313,20 @@ public class SwordUrlManager
 	public String getBaseServiceDocumentUrl()
 			throws DSpaceSwordException
 	{
-		String sdUrl = ConfigurationManager.getProperty("sword2.servicedocument.url");
+		String sdUrl = ConfigurationManager.getProperty("swordv2-server", "servicedocument.url");
 		if (sdUrl == null || "".equals(sdUrl))
 		{
 			String dspaceUrl = ConfigurationManager.getProperty("dspace.baseUrl");
 			if (dspaceUrl == null || "".equals(dspaceUrl))
 			{
 				throw new DSpaceSwordException("Unable to construct service document urls, due to missing/invalid " +
-						"config in sword2.servicedocument.url and/or dspace.baseUrl");
+						"config in swordv2-server.cfg servicedocument.url and/or dspace.baseUrl");
 			}
 
             try
             {
                 URL url = new URL(dspaceUrl);
-                sdUrl = new URL(url.getProtocol(), url.getHost(), url.getPort(), "/sword2/servicedocument").toString();
+                sdUrl = new URL(url.getProtocol(), url.getHost(), url.getPort(), "/swordv2/servicedocument").toString();
             }
             catch (MalformedURLException e)
             {
@@ -356,20 +356,20 @@ public class SwordUrlManager
 	public String getBaseCollectionUrl()
 		throws DSpaceSwordException
 	{
-		String depositUrl = ConfigurationManager.getProperty("sword2.collection.url");
+		String depositUrl = ConfigurationManager.getProperty("swordv2-server", "collection.url");
 		if (depositUrl == null || "".equals(depositUrl))
 		{
 			String dspaceUrl = ConfigurationManager.getProperty("dspace.baseUrl");
 			if (dspaceUrl == null || "".equals(dspaceUrl))
 			{
 				throw new DSpaceSwordException("Unable to construct deposit urls, due to missing/invalid config in " +
-						"sword2.deposit.url and/or dspace.baseUrl");
+						"swordv2-server.cfg deposit.url and/or dspace.baseUrl");
 			}
 
             try
             {
                 URL url = new URL(dspaceUrl);
-                depositUrl = new URL(url.getProtocol(), url.getHost(), url.getPort(), "/sword2/collection").toString();
+                depositUrl = new URL(url.getProtocol(), url.getHost(), url.getPort(), "/swordv2/collection").toString();
             }
             catch (MalformedURLException e)
             {

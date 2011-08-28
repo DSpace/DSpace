@@ -49,7 +49,7 @@ public abstract class GenericStatementDisseminator implements SwordStatementDiss
 		{
 			// an original deposit is everything in the SWORD bundle
 			List<OriginalDeposit> originalDeposits = new ArrayList<OriginalDeposit>();
-            String swordBundle = ConfigurationManager.getProperty("sword2.bundle.name");
+            String swordBundle = ConfigurationManager.getProperty("swordv2-server", "bundle.name");
             if (swordBundle == null)
             {
                 swordBundle = "SWORD";

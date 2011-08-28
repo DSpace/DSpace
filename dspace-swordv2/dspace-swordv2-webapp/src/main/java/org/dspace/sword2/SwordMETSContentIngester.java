@@ -59,14 +59,14 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
 			File depositFile = deposit.getFile();
 
 			// load the plugin manager for the required configuration
-			String cfg = ConfigurationManager.getProperty("sword2.mets-ingester.package-ingester");
+			String cfg = ConfigurationManager.getProperty("swordv2-server", "mets-ingester.package-ingester");
 			if (cfg == null || "".equals(cfg))
 			{
 				cfg = "METS";  // default to METS
 			}
 			verboseDescription.append("Using package manifest format: " + cfg);
 
-			PackageIngester pi = (PackageIngester) PluginManager.getNamedPlugin(PackageIngester.class, cfg);
+			PackageIngester pi = (PackageIngester)PluginManager.getNamedPlugin("swordv2-server", PackageIngester.class, cfg);
 			verboseDescription.append("Loaded package ingester: " + pi.getClass().getName());
 
 			// the licence is either in the zip or the mets manifest.  Either way
@@ -79,7 +79,7 @@ public class SwordMETSContentIngester extends AbstractSwordContentIngester
 			params.setWorkflowEnabled(true);
 
 			// Should restore mode be enabled, i.e. keep existing handle?
-			if (ConfigurationManager.getBooleanProperty("sword2.restore-mode.enable",false))
+			if (ConfigurationManager.getBooleanProperty("swordv2-server", "restore-mode.enable",false))
 				params.setRestoreModeEnabled(true);
 
 			// ingest the item from the temp file

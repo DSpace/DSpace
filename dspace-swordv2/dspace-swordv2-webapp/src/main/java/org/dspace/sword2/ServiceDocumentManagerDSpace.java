@@ -46,7 +46,7 @@ public class ServiceDocumentManagerDSpace implements ServiceDocumentManager
 
 			// ensure that this method is allowed
 			WorkflowManagerFactory.getInstance().retrieveServiceDoc(context);
-			
+
 			if (log.isDebugEnabled())
 			{
 				log.debug(LogManager.getHeader(context, "sword_do_service_document", ""));
@@ -113,7 +113,7 @@ public class ServiceDocumentManagerDSpace implements ServiceDocumentManager
 			workspace.setTitle(ws);
 
 			// next thing to do is determine whether the default is communities or collections
-			boolean swordCommunities = ConfigurationManager.getBooleanProperty("sword2.expose-communities");
+			boolean swordCommunities = ConfigurationManager.getBooleanProperty("swordv2-server", "expose-communities");
 
 			if (swordCommunities)
 			{
@@ -129,12 +129,12 @@ public class ServiceDocumentManagerDSpace implements ServiceDocumentManager
 				List<Collection> cols = swordAuth.getAllowedCollections(context);
 				for (Collection col : cols)
 				{
-					SwordCollection scol = colGen.buildCollection(context.getContext(), col, swordConfig);
+				    SwordCollection scol = colGen.buildCollection(context.getContext(), col, swordConfig);
 					workspace.addCollection(scol);
 				}
 			}
 
-			service.addWorkspace(workspace);
+        	service.addWorkspace(workspace);
 		}
 		else
 		{

@@ -23,7 +23,7 @@ public class VersionManager
 	public void emptyBundle(Item item, String name)
 			throws SQLException, AuthorizeException, IOException
 	{
-		boolean keep = ConfigurationManager.getBooleanProperty("sword2.versions.keep");
+		boolean keep = ConfigurationManager.getBooleanProperty("swordv2-server", "versions.keep");
 		Bundle[] bundles = item.getBundles(name);
 		for (Bundle b : bundles)
 		{
@@ -34,7 +34,7 @@ public class VersionManager
 	public void emptyBundle(Item item, Bundle source)
 			throws SQLException, AuthorizeException, IOException
 	{
-		boolean keep = ConfigurationManager.getBooleanProperty("sword2.versions.keep");
+		boolean keep = ConfigurationManager.getBooleanProperty("swordv2-server", "versions.keep");
 		this.emptyBundle(item, source, keep);
 	}
 
@@ -55,7 +55,7 @@ public class VersionManager
 	public void removeBitstream(Item item, Bitstream bitstream)
 			throws SQLException, AuthorizeException, IOException
 	{
-		boolean keep = ConfigurationManager.getBooleanProperty("sword2.versions.keep");
+		boolean keep = ConfigurationManager.getBooleanProperty("swordv2-server", "versions.keep");
 		this.removeBitstream(item, bitstream, keep);
 	}
 
@@ -81,7 +81,7 @@ public class VersionManager
 	public Bundle archiveBitstream(Item item, Bitstream bitstream)
 			throws SQLException, AuthorizeException, IOException
 	{
-		String swordBundle = ConfigurationManager.getProperty("sword2.bundle.name");
+		String swordBundle = ConfigurationManager.getProperty("swordv2-server", "bundle.name");
 		if (swordBundle == null)
 		{
 			swordBundle = "SWORD";

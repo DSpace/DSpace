@@ -256,7 +256,7 @@ public class DSpaceSwordAPI
                 boolean ignoreAuth = context.ignoreAuthorization();
                 context.setIgnoreAuthorization(true);
 
-                String bundleName = ConfigurationManager.getProperty("sword2.bundle.name");
+                String bundleName = ConfigurationManager.getProperty("swordv2-server", "bundle.name");
                 if (bundleName == null || "".equals(bundleName))
                 {
                     bundleName = "SWORD";

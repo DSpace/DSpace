@@ -78,7 +78,7 @@ public class CollectionListManagerDSpace extends DSpaceSwordAPI implements Colle
 		{
 			Entry entry = feed.addEntry();
 			entry.setId(urlManager.getEditIRI(item).toString());
-			String title = this.stringMetadata(item, ConfigurationManager.getProperty("sword2.title.field"));
+			String title = this.stringMetadata(item, ConfigurationManager.getProperty("swordv2-server", "title.field"));
 			title = title == null? "Untitled" : title;
 			entry.setTitle(title);
 			entry.addLink(urlManager.getContentUrl(item).toString(), "edit-media");

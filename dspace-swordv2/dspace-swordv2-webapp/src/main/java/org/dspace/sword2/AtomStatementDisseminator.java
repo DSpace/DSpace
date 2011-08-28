@@ -23,9 +23,9 @@ public class AtomStatementDisseminator extends GenericStatementDisseminator impl
 		SwordUrlManager urlManager = new SwordUrlManager(new SwordConfigurationDSpace(), context);
 		String feedUri = urlManager.getAtomStatementUri(item);
 
-		String authorField = ConfigurationManager.getProperty("sword2.author.field");
-		String titleField = ConfigurationManager.getProperty("sword2.title.field");
-		String updatedField = ConfigurationManager.getProperty("sword2.updated.field");
+		String authorField = ConfigurationManager.getProperty("swordv2-server", "author.field");
+		String titleField = ConfigurationManager.getProperty("swordv2-server", "title.field");
+		String updatedField = ConfigurationManager.getProperty("swordv2-server", "updated.field");
 
 		String author = this.stringMetadata(item, authorField);
 		String title = this.stringMetadata(item, titleField);
