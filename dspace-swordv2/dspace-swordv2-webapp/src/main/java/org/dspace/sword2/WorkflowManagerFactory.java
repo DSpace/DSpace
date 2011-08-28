@@ -7,16 +7,12 @@
  */
 package org.dspace.sword2;
 
-import org.apache.log4j.Logger;
 import org.dspace.core.PluginManager;
 import org.swordapp.server.SwordError;
 
 public class WorkflowManagerFactory
 {
-	/** logger */
-	private static Logger log = Logger.getLogger(WorkflowManagerFactory.class);
-
-    public static WorkflowManager getInstance()
+	public static WorkflowManager getInstance()
             throws DSpaceSwordException, SwordError
     {
         WorkflowManager manager = (WorkflowManager) PluginManager.getSinglePlugin("swordv2-server", WorkflowManager.class);
