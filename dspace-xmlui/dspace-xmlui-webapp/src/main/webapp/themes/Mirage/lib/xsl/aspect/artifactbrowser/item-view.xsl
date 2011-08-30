@@ -232,8 +232,15 @@
 	                	<div class="spacer">&#160;</div>
 	                </xsl:if>
 	                <xsl:for-each select="dim:field[@element='description' and @qualifier='abstract']">
-		                <xsl:copy-of select="./node()"/>
-		                <xsl:if test="count(following-sibling::dim:field[@element='description' and @qualifier='abstract']) != 0">
+                        <xsl:choose>
+                            <xsl:when test="node()">
+                                <xsl:copy-of select="node()"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:text>&#160;</xsl:text>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        <xsl:if test="count(following-sibling::dim:field[@element='description' and @qualifier='abstract']) != 0">
                             <div class="spacer">&#160;</div>
 	                    </xsl:if>
 	              	</xsl:for-each>
