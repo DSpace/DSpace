@@ -13,6 +13,7 @@
 	<fileSets>
 		<fileSet>
             <directory>dspace</directory>
+            <outputDirectory>.</outputDirectory>
 			<useDefaultExcludes>true</useDefaultExcludes>
 			<includes>
 				<include>**</include>
