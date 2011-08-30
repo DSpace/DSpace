@@ -240,6 +240,9 @@
             <xsl:with-param name="class">
                 <xsl:text>ds-</xsl:text><xsl:value-of select="@type"/>
                 <xsl:text>-field </xsl:text>
+                <xsl:if test="@disabled='yes'">
+                    <xsl:text>disabled </xsl:text>
+                </xsl:if>
                 <xsl:if test="dri:error">
                     <xsl:text>error </xsl:text>
                 </xsl:if>

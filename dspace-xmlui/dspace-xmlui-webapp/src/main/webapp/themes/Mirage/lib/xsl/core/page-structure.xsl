@@ -28,8 +28,9 @@
 	xmlns:xhtml="http://www.w3.org/1999/xhtml"
 	xmlns:mods="http://www.loc.gov/mods/v3"
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
+    xmlns:confman="org.dspace.core.ConfigurationManager"
 	xmlns="http://www.w3.org/1999/xhtml"
-	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
+	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc confman">
 
     <xsl:output indent="yes"/>
 
@@ -272,7 +273,7 @@
                     <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
                     <xsl:text>/themes/</xsl:text>
                     <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-                    <xsl:text>/lib/js/modernizr-1.5.min.js</xsl:text>
+                    <xsl:text>/lib/js/modernizr-1.7.min.js</xsl:text>
                 </xsl:attribute>&#160;</script>
 
             <!-- Add the title in -->
@@ -440,7 +441,7 @@
         <div id="ds-footer-wrapper">
             <div id="ds-footer">
                 <div id="ds-footer-left">
-                    <a href="http://www.dspace.org/" target="_blank">DSpace software</a> copyright&#160;&#169;&#160;2002-2010&#160; <a href="http://www.duraspace.org/" target="_blank">Duraspace</a>
+                    <a href="http://www.dspace.org/" target="_blank">DSpace software</a> copyright&#160;&#169;&#160;2002-2011&#160; <a href="http://www.duraspace.org/" target="_blank">Duraspace</a>
                 </div>
                 <div id="ds-footer-right">
                     <span class="theme-by">Theme by&#160;</span>
@@ -520,14 +521,27 @@
     -->
 
     <xsl:template name="addJavascript">
-        <script type="text/javascript">
-            <xsl:text disable-output-escaping="yes">var JsHost = (("https:" == document.location.protocol) ? "https://" : "http://");
-            document.write(unescape("%3Cscript src='" + JsHost + "ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js' type='text/javascript'%3E%3C/script%3E"));</xsl:text>
-        </script>
+        <xsl:variable name="jqueryVersion">
+            <xsl:text>1.6.2</xsl:text>
+        </xsl:variable>
+
+        <xsl:variable name="protocol">
+            <xsl:choose>
+                <xsl:when test="starts-with(confman:getProperty('dspace.baseUrl'), 'https://')">
+                    <xsl:text>https://</xsl:text>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:text>http://</xsl:text>
+                </xsl:otherwise>
+            </xsl:choose>
+        </xsl:variable>
+        <script type="text/javascript" src="{concat($protocol, 'ajax.googleapis.com/ajax/libs/jquery/', $jqueryVersion ,'/jquery.min.js')}">&#160;</script>
 
         <xsl:variable name="localJQuerySrc">
                 <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-                <xsl:text>/static/js/jquery-1.4.2.min.js</xsl:text>
+            <xsl:text>/static/js/jquery-</xsl:text>
+            <xsl:value-of select="$jqueryVersion"/>
+            <xsl:text>.min.js</xsl:text>
         </xsl:variable>
 
         <script type="text/javascript">

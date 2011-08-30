@@ -33,7 +33,7 @@
     xmlns:encoder="xalan://java.net.URLEncoder"
     xmlns:util="org.dspace.app.xmlui.utils.XSLUtils"
     xmlns:confman="org.dspace.core.ConfigurationManager"
-    exclude-result-prefixes="xalan encoder i18n dri mets dim  xlink xsl">
+    exclude-result-prefixes="xalan encoder i18n dri mets dim xlink xsl util confman">
 
     <xsl:output indent="yes"/>
 

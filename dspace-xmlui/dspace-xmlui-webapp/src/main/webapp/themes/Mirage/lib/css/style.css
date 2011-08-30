@@ -48,6 +48,7 @@ select.multiple {
 #ds-header-wrapper {
     background-color: #1F3F5E;
     color: white;
+    min-width: 950px;
 }
 
 #ds-header-logo-link {
@@ -92,13 +93,14 @@ select.multiple {
     padding: 0;
     border-top: 1px solid #9cacba;
     border-bottom: 1px solid #9cacba;
+    min-width: 950px;
 }
 
 #ds-trail {
     list-style: none;
-    line-height: 25px;
+    line-height: 138.5%;
     margin: 0;
-    padding: 0;
+    padding: 3px 0;
 }
 
 #ds-trail li {
@@ -310,6 +312,13 @@ td {
     cursor: pointer;
 }
 
+.ds-button-field[disabled="disabled"],
+.ds-button-field.disabled,
+li.button.disabled input {
+    opacity: 0.35;
+    cursor: auto;
+}
+
 #aspect_eperson_StartRegistration_list_registration-progress li {
     cursor: default;
 }
@@ -372,6 +381,17 @@ ul.ds-progress-list li.disabled input.ds-button-field
     border: 1px solid #D8E8EB;
     color: #444444;
     cursor: default;
+}
+
+.ie6 .disabled,
+.ie6 li.disabled input,
+.ie7 .ds-button-field.disabled,
+.ie7 li.button.disabled input,
+.ie8 .ds-button-field.disabled,
+.ie8 li.button.disabled input {
+    filter: progid:DXImageTransform.Microsoft.Alpha(opacity = 50);
+    zoom: 1;
+    cursor: auto;
 }
 
 
@@ -600,6 +620,21 @@ span.field-help {
     margin-top: 3px;
     margin-bottom: 30px;
     padding: 10px;
+}
+
+#aspect_submission_Submissions_div_submissions table,
+#aspect_submission_Submissions_div_submissions table tr,
+#aspect_submission_Submissions_div_submissions table td,
+#aspect_submission_Submissions_div_submissions table th {
+    background-color: #FFFFFF;
+    border: 1px solid #9CACBA;
+}
+
+#aspect_submission_Submissions_div_submissions table tr.ds-table-header-row, 
+#aspect_submission_Submissions_div_submissions table tr.ds-table-header-row th {
+    background-color: #B6C8D9;
+    border: 1px solid #9CACBA;
+    
 }
 
 .submission .ds-form-sublist li.ds-form-item {
@@ -902,6 +937,11 @@ table.detailtable td.label-cell {
     width: 100px;
 }
 
+div.item-summary-view-metadata h1,
+div.item-summary-view-metadata h2 {
+    line-height: normal;
+}
+
 div.item-summary-view-metadata {
     text-align: justify;
     line-height: 161.6%;
@@ -1055,12 +1095,6 @@ form.discover-sort-box select{
     /*Required for IE*/
     font-size: 0;
     line-height: 0;
-}
-
-.ds-button-field[disabled="disabled"],
-.ds-button-field[disabled=""],
-.ds-button-field.disabled {
-    opacity: 0.35
 }
 
 .icon-button.arrowUp{

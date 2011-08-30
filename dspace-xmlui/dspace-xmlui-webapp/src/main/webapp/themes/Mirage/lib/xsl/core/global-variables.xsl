@@ -28,7 +28,7 @@
 	xmlns:dc="http://purl.org/dc/elements/1.1/"
 	xmlns="http://www.w3.org/1999/xhtml"
     xmlns:confman="org.dspace.core.ConfigurationManager"
-	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
+	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc confman">
 
     <xsl:output indent="yes"/>
 
