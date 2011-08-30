@@ -254,10 +254,10 @@
                      <execution>
                         <inherited>false</inherited>
                         <configuration>
-                           <descriptorRefs>
-                              <descriptorRef>release</descriptorRef>
-                              <descriptorRef>src-release</descriptorRef>
-                           </descriptorRefs>
+                           <descriptors>
+                              <descriptor>src/assemble/release.xml</descriptor>
+                              <descriptor>src/assemble/src-release.xml</descriptor>
+                           </descriptors>
                            <tarLongFileMode>gnu</tarLongFileMode>
                            <finalName>dspace-${project.version}</finalName>
                         </configuration>
@@ -267,13 +267,6 @@
                         </goals>
                      </execution>
                   </executions>
-                  <dependencies>
-                     <dependency>
-                        <groupId>org.dspace.maven.plugins</groupId>
-                        <artifactId>dspace-assembly-plugin</artifactId>
-                        <version>1.1</version>
-                     </dependency>
-                  </dependencies>
                </plugin>
             </plugins>
          </build>
@@ -298,7 +291,7 @@
       versions of dependency jars are used for compilation
       and packaging into the distribution.  Rather than placing
       a version in your dependencies, look here first to see if
-      its already strongly defined in dspace-pom and dspace-api.
+      its already strongly defined in dspace-parent and dspace-api.
    -->
    <dependencyManagement>
       <dependencies>
@@ -306,102 +299,102 @@
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-api</artifactId>
-            <version>1.8.0-SNAPSHOT</version>
+            <version>${project.version}</version>
          </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-sword-api</artifactId>
-              <version>1.8.0-SNAPSHOT</version>
+              <version>${project.version}</version>
           </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-sword-webapp</artifactId>
-              <version>1.8.0-SNAPSHOT</version>
+              <version>${project.version}</version>
               <type>war</type>
           </dependency>
 
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-swordv2-api</artifactId>
-              <version>1.8.0-SNAPSHOT</version>
+              <version>${project.version}</version>
           </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-swordv2-webapp</artifactId>
-              <version>1.8.0-SNAPSHOT</version>
+              <version>${project.version}</version>
               <type>war</type>
           </dependency>
 
            <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-sword-client-api</artifactId>
-              <version>1.8.0-SNAPSHOT</version>
+              <version>${project.version}</version>
           </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-sword-client-xmlui-api</artifactId>
-              <version>1.8.0-SNAPSHOT</version>
+              <version>${project.version}</version>
           </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-sword-client-xmlui-webapp</artifactId>
-              <version>1.8.0-SNAPSHOT</version>
+              <version>${project.version}</version>
               <type>war</type>
           </dependency>
 
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui-api</artifactId>
-            <version>1.8.0-SNAPSHOT</version>
+            <version>${project.version}</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-jspui-webapp</artifactId>
-            <version>1.8.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai-api</artifactId>
-            <version>1.8.0-SNAPSHOT</version>
+            <version>${project.version}</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-oai-webapp</artifactId>
-            <version>1.8.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-core</artifactId>
-            <version>1.8.0-SNAPSHOT</version>
+            <version>${project.version}</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-client</artifactId>
-            <version>1.8.0-SNAPSHOT</version>
+            <version>${project.version}</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-lni-webapp</artifactId>
-            <version>1.8.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-api</artifactId>
-            <version>1.8.0-SNAPSHOT</version>
+            <version>${project.version}</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-webapp</artifactId>
-            <version>1.8.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <type>war</type>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-wing</artifactId>
-            <version>1.8.0-SNAPSHOT</version>
+            <version>${project.version}</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
@@ -421,7 +414,7 @@
          <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-stats</artifactId>
-            <version>1.8.0-SNAPSHOT</version>
+            <version>${project.version}</version>
          </dependency>
          <!-- DSpace Localization Packages -->
          <dependency>
@@ -438,12 +431,12 @@
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-discovery-provider</artifactId>
-              <version>1.8.0-SNAPSHOT</version>
+              <version>${project.version}</version>
           </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-discovery-solr</artifactId>
-              <version>1.8.0-SNAPSHOT</version>
+              <version>${project.version}</version>
           </dependency>
          <!-- DSpace third Party Dependencies -->
 
@@ -782,18 +775,18 @@
 
    <licenses>
       <license>
-         <name>DSpace Sourcecode License</name>
-         <url>LICENSE.txt</url>
-         <distribution>repo</distribution>
-         <comments>
+            <name>DuraSpace Sourcecode License</name>
+            <url>http://scm.dspace.org/svn/repo/licenses/LICENSE.txt</url>
+            <distribution>repo</distribution>
+        <comments>
             A BSD compatable OSS license for the DSpace codebase.
          </comments>
       </license>
-   </licenses>
+    </licenses>
 
    <issueManagement>
       <system>JIRA</system>
-      <url>http://jira.dspace.org/jira/browse/DS</url>
+      <url>https://jira.duraspace.org/browse/DS</url>
    </issueManagement>
 
    <mailingLists>
