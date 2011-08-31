@@ -65,6 +65,11 @@ public abstract class AbstractProcessingStep
     public static final String NEXT_BUTTON = "submit_next";
 
     /***************************************************************************
+     * Constant - Name of the "Select" list
+     **************************************************************************/
+    public static final String SELECT_CHANGE = "submit_change";
+	
+	/***************************************************************************
      * Constant - Name of the "Cancel/Save" button
      **************************************************************************/
     public static final String CANCEL_BUTTON = "submit_cancel";

@@ -373,7 +373,68 @@
         </div>
     </xsl:template>
     
-    
+    <xsl:template name="cc-license">
+        <xsl:param name="metadataURL"/>
+        <xsl:variable name="externalMetadataURL">
+            <xsl:text>cocoon:/</xsl:text>
+            <xsl:value-of select="$metadataURL"/>
+            <xsl:text>?sections=dmdSec,fileSec&amp;fileGrpTypes=THUMBNAIL</xsl:text>
+        </xsl:variable>
+
+        <xsl:variable name="ccLicenseName"
+                      select="document($externalMetadataURL)//dim:field[@element='rights']"
+                      />
+        <xsl:variable name="ccLicenseUri"
+                      select="document($externalMetadataURL)//dim:field[@element='rights'][@qualifier='uri']"
+                      />
+        <xsl:variable name="handleUri">
+                    <xsl:for-each select="document($externalMetadataURL)//dim:field[@element='identifier' and @qualifier='uri']">
+                        <a>
+                            <xsl:attribute name="href">
+                                <xsl:copy-of select="./node()"/>
+                            </xsl:attribute>
+                            <xsl:copy-of select="./node()"/>
+                        </a>
+                        <xsl:if test="count(following-sibling::dim:field[@element='identifier' and @qualifier='uri']) != 0">
+                            <xsl:text>, </xsl:text>
+                        </xsl:if>
+                </xsl:for-each>
+        </xsl:variable>
+
+     <xsl:if test="$ccLicenseName and $ccLicenseUri and contains($ccLicenseUri, 'creativecommons')">
+        <div about="{$handleUri}">
+            <xsl:attribute name="style">
+                <xsl:text>margin:0em 2em 0em 2em; padding-bottom:0em;</xsl:text>
+            </xsl:attribute>
+            <a rel="license"
+                href="{$ccLicenseUri}"
+                alt="{$ccLicenseName}"
+                title="{$ccLicenseName}"
+                >
+                <img>
+                     <xsl:attribute name="src">
+                        <xsl:value-of select="concat($theme-path,'/images/cc-ship.gif')"/>
+                     </xsl:attribute>
+                     <xsl:attribute name="alt">
+                         <xsl:value-of select="$ccLicenseName"/>
+                     </xsl:attribute>
+                     <xsl:attribute name="style">
+                         <xsl:text>float:left; margin:0em 1em 0em 0em; border:none;</xsl:text>
+                     </xsl:attribute>
+                </img>
+            </a>
+            <span>
+                <xsl:attribute name="style">
+                    <xsl:text>vertical-align:middle; text-indent:0 !important;</xsl:text>
+                </xsl:attribute>
+                <i18n:text>xmlui.dri2xhtml.METS-1.0.cc-license-text</i18n:text>
+                <xsl:value-of select="$ccLicenseName"/>
+            </span>
+        </div>
+        </xsl:if>
+    </xsl:template>
+
+
     <!-- Like the header, the footer contains various miscellanious text, links, and image placeholders -->
     <xsl:template name="buildFooter">
         <div id="ds-footer">
@@ -646,6 +707,17 @@
                         </xsl:otherwise>
                 </xsl:choose>
         </div>
+        <xsl:variable name="itemDivision">
+                        <xsl:value-of select="@n"/>
+                </xsl:variable>
+                <xsl:variable name="xrefTarget">
+                        <xsl:value-of select="./dri:p/dri:xref/@target"/>
+                </xsl:variable>
+                <xsl:if test="$itemDivision='item-view' and contains($xrefTarget, 'show=full')">
+                    <xsl:call-template name="cc-license">
+                        <xsl:with-param name="metadataURL" select="./dri:referenceSet/dri:reference/@url"/>
+                    </xsl:call-template>
+                </xsl:if>
         <xsl:apply-templates select="@pagination">
             <xsl:with-param name="position">bottom</xsl:with-param>
         </xsl:apply-templates>
@@ -1580,9 +1652,16 @@
         <xsl:if test="@target">
             <a>
                 <xsl:attribute name="href"><xsl:value-of select="@target"/></xsl:attribute>
+                <xsl:if test="@title">
+                	<xsl:attribute name="title"><xsl:value-of select="@title"/></xsl:attribute>
+                </xsl:if>
+                <xsl:if test="@rend">
+                	<xsl:attribute name="class"><xsl:value-of select="@rend"/></xsl:attribute>
+                </xsl:if>
                 <img>
                     <xsl:attribute name="src"><xsl:value-of select="@source"/></xsl:attribute>
                     <xsl:attribute name="alt"><xsl:apply-templates /></xsl:attribute>
+                <xsl:attribute name="border"><xsl:text>none</xsl:text></xsl:attribute>
                 </img>
             </a>
         </xsl:if>
@@ -1593,8 +1672,6 @@
             </img>
         </xsl:if>
     </xsl:template>
-    
-    
     
     
     
@@ -2593,7 +2670,15 @@
     <xsl:template match="@size">
         <xsl:attribute name="size"><xsl:value-of select="."/></xsl:attribute>
     </xsl:template>
-    
+
+     <!-- used by select element -->
+    <xsl:template match="@evtbehavior">
+        <xsl:param name="behavior" select="."/>
+        <xsl:if test="normalize-space($behavior)='submitOnChange'">
+            <xsl:attribute name="onchange">this.form.submit();</xsl:attribute>
+                </xsl:if>
+    </xsl:template>
+
     <xsl:template match="@maxlength">
         <xsl:attribute name="maxlength"><xsl:value-of select="."/></xsl:attribute>
     </xsl:template>
@@ -3286,13 +3371,13 @@
                         <xsl:value-of select="."/>
                     </xsl:attribute>
 
-                    <xsl:attribute name="style">
-                        <xsl:text>background: url(</xsl:text>
-                        <xsl:value-of select="$context-path"/>
-                        <xsl:text>/static/icons/feed.png) no-repeat</xsl:text>
-                    </xsl:attribute>
-
-                    <xsl:choose>
+                     <img alt="Syndication Feed Icon" >
+                        <xsl:attribute name="src">
+                            <xsl:value-of select="$context-path"/>
+                            <xsl:text>/static/icons/feed.png</xsl:text>
+                        </xsl:attribute>
+                    </img>
+                                       <xsl:choose>
                         <xsl:when test="contains(., 'rss_1.0')">
                             <xsl:text>RSS 1.0</xsl:text>
                         </xsl:when>

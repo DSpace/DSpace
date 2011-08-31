@@ -34,11 +34,23 @@ public class Figure extends TextContainer implements StructuralElement
     /** The name of the target attribute */
     public static final String A_TARGET = "target";
 
+
+    /** The name of the title attribute */
+    public static final String A_TITLE = "title";
+
+    /** The name of the class attribute */
+    public static final String A_RENDER = "rend";
+
+
     /** The figure's source */
     private String source;
 
     /** The figure's xref target */
     private String target;
+
+
+    /** The figure's xref title */
+    private String title;
 
     /** Special rendering hints */
     private String rend;
@@ -48,7 +60,7 @@ public class Figure extends TextContainer implements StructuralElement
      * 
      * @param context
      *            (Required) The context this element is contained in
-     * @param source
+     * @param Source
      *            (Required) The figure's image source.
      * @param target
      *            (May be null) The figure's external reference, if present then
@@ -66,6 +78,17 @@ public class Figure extends TextContainer implements StructuralElement
         this.source = source;
         this.target = target;
         this.rend = rend;
+    }
+
+    protected Figure(WingContext context, String source, String target,
+            String title, String rend) throws WingException
+    {
+        super(context);
+        require(source, "The 'source' parameter is required for all figures.");
+        this.source = source;
+        this.target = target;
+        this.title 	  = title;
+        this.rend 	  = rend;
     }
 
     /**
@@ -88,13 +111,11 @@ public class Figure extends TextContainer implements StructuralElement
         AttributeMap attributes = new AttributeMap();
         attributes.put(A_SOURCE, this.source);
         if (this.target != null)
-        {
             attributes.put(A_TARGET, this.target);
-        }
+        if (this.title != null)
+            attributes.put(A_TITLE, this.title);
         if (this.rend != null)
-        {
             attributes.put(A_RENDER, this.rend);
-        }
 
         startElement(contentHandler, namespaces, E_FIGURE, attributes);
         super.toSAX(contentHandler, lexicalHandler, namespaces);

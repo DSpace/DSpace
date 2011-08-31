@@ -588,7 +588,7 @@
 	<message key="xmlui.Submission.submit.progressbar.upload">Upload</message>
 	<message key="xmlui.Submission.submit.progressbar.verify">Review</message>
 	<message key="xmlui.Submission.submit.progressbar.creative-commons">Creative Commons</message>
-	<message key="xmlui.Submission.submit.progressbar.CClicense">License</message>
+	<message key="xmlui.Submission.submit.progressbar.CClicense">CC License</message>
     <message key="xmlui.Submission.submit.progressbar.license">License</message>
 	<message key="xmlui.Submission.submit.progressbar.complete">Complete</message>
 
@@ -697,12 +697,14 @@
 	<message key="xmlui.Submission.submit.ReviewStep.supported">supported</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.CCLicenseStep -->
-	<message key="xmlui.Submission.submit.CCLicenseStep.head">Creative Commons License</message>
-	<message key="xmlui.Submission.submit.CCLicenseStep.info1">If you wish, you may add a <a href="http://creativecommons.org/">Creative Commons</a> License to your item. <strong>Creative Commons licenses govern what people who read your work may then do with it.</strong> If you wish to select a Creative Commons license click the button below. You will be taken to the Creative Commons website, where you will be presented with several licensing options.  After selecting a license, you will be returned to this page.</message>
-	<message key="xmlui.Submission.submit.CCLicenseStep.submit_to_creative_commons">Proceed to Creative Commons website to select a license</message>
-	<message key="xmlui.Submission.submit.CCLicenseStep.license">License</message>
-	<message key="xmlui.Submission.submit.CCLicenseStep.submit_remove">Remove this Creative Commons License</message>
-	<message key="xmlui.Submission.submit.CCLicenseStep.no_license">no creative commons license selected</message>
+    <message key="xmlui.Submission.submit.CCLicenseStep.head">License Your Work</message>
+    <message key="xmlui.Submission.submit.CCLicenseStep.info1">If you wish, you may add a <a href="http://creativecommons.org/">Creative Commons</a> License to your item. <strong>Creative Commons licenses govern what people who read your work may then do with it.</strong></message>
+    <message key="xmlui.Submission.submit.CCLicenseStep.submit_choose_creative_commons">Choose a license</message>
+    <message key="xmlui.Submission.submit.CCLicenseStep.submit_to_creative_commons">Proceed to Creative Commons website to select a license</message>
+    <message key="xmlui.Submission.submit.CCLicenseStep.license">License Type</message>
+    <message key="xmlui.Submission.submit.CCLicenseStep.select_change">Select or modify your license ...</message>
+    <message key="xmlui.Submission.submit.CCLicenseStep.no_license">No Creative Commons License</message>
+    <message key="xmlui.Submission.submit.CCLicenseStep.save_changes">You must click Next to save your changes.</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.LicenseStep -->
 	<message key="xmlui.Submission.submit.LicenseStep.head">Distribution License</message>
@@ -1774,6 +1776,9 @@
         <message key="xmlui.administrative.CurateForm.object_label_name">Handle of DSpace Object</message>
         <message key="xmlui.administrative.CurateForm.object_hint">Hint: Enter [your-handle-prefix]/0 to run a task across entire site (not all tasks may support this capability)</message>
         <message key="xmlui.administrative.CurateForm.task_label_name">Task</message>
+    <!-- Used by Curate<DSO>Form classes also -->
+        <message key="xmlui.administrative.CurateForm.taskgroup_label_name">Choose from the following groups</message>
+
 
     <!--!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
@@ -1882,6 +1887,7 @@
 	<message key="xmlui.dri2xhtml.METS-1.0.size-gigabytes">Gb</message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.license-text">The following license files are associated with this item:</message>
+    <message key="xmlui.dri2xhtml.METS-1.0.cc-license-text">Except where otherwise noted, this item's license is described as </message>
 
 	<message key="xmlui.dri2xhtml.METS-1.0.collection-not-implemented">
 		The summaryView of a collection is not currently used or implemented. This can be fixed

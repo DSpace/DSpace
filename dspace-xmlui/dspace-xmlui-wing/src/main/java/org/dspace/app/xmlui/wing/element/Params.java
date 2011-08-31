@@ -37,6 +37,9 @@ public class Params extends AbstractWingElement implements StructuralElement
     /** The name of the size attribute */
     public static final String A_SIZE = "size";
 
+    /** The name of the behavior attribute */
+    public static final String A_EVTBEHAVIOR = "evtbehavior";
+
     /** The name of the max length attribute */
     public static final String A_MAX_LENGTH = "maxlength";
 
@@ -91,6 +94,10 @@ public class Params extends AbstractWingElement implements StructuralElement
 
     /** The field size */
     protected int size = -1;
+
+
+    /** The event behavior attribute such as onchange, onfocus, on... */
+    protected String evtBehavior = "";
 
     /** The maximum length of the field */
     protected int maxlength = -1;
@@ -164,6 +171,20 @@ public class Params extends AbstractWingElement implements StructuralElement
     public void setSize(int size)
     {
         this.size = size;
+    }
+
+    /**
+     * Set the event behavior (e.g. a javascript event)
+     *  of the field.
+     *
+     * This applies to select fields as of this writing.
+     *
+     * @param behavior
+     *            The action on onchange of the field.
+     */
+    public void setEvtBehavior(String behavior)
+    {
+        this.evtBehavior = behavior;
     }
 
     /**
@@ -374,12 +395,18 @@ public class Params extends AbstractWingElement implements StructuralElement
             attributes.put(A_SIZE, this.size);
         }
 
+
+        if (!this.evtBehavior.equals(""))
+        {
+        	attributes.put(A_EVTBEHAVIOR, this.evtBehavior);
+        }
+        
         if (this.maxlength > -1)
         {
             attributes.put(A_MAX_LENGTH, this.maxlength);
         }
 
-        if (this.multiple)
+        if (this.multiple == true)
         {
             attributes.put(A_MULTIPLE, this.multiple);
         }

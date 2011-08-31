@@ -403,7 +403,7 @@
         </xsl:choose>
 
         <!-- Generate the Creative Commons license information from the file section (DSpace deposit license hidden by default)-->
-        <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CC-LICENSE' or @USE='LICENSE']"/>
+        <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CC-LICENSE']"/>
 
     </xsl:template>
     
@@ -725,7 +725,7 @@
 
         
         <!-- Generate the Creative Commons license information from the file section (DSpace deposit license hidden by default) -->
-        <xsl:apply-templates select="mets:fileSec/mets:fileGrp[@USE='CC-LICENSE' or @USE='LICENSE']"/>
+        <xsl:apply-templates select="mets:fileSec/mets:fileGrp[@USE='CC-LICENSE']"/>
         
     </xsl:template>
     
@@ -744,6 +744,7 @@
     </xsl:template>
             
     <xsl:template match="dim:field" mode="itemDetailView-DIM">
+            <xsl:if test="not(@element='description' and @qualifier='provenance')">
             <tr>
                 <xsl:attribute name="class">
                     <xsl:text>ds-table-row </xsl:text>
@@ -769,6 +770,7 @@
             </td>
                 <td><xsl:value-of select="./@language"/></td>
             </tr>
+            </xsl:if>
     </xsl:template>
 
 	
@@ -802,7 +804,7 @@
         	</div>
         </xsl:if>
         
-        <xsl:if test="string-length(dim:field[@element='rights'][not(@qualifier)])&gt;0">
+        <xsl:if test="string-length(dim:field[@element='rights'][not(@qualifier)])&gt;0 or string-length(dim:field[@element='rights'][@qualifier='license'])&gt;0">
         	<div class="detail-view-rights-and-license">
 		        <xsl:if test="string-length(dim:field[@element='rights'][not(@qualifier)])&gt;0">
 		            <p class="copyright-text">

@@ -12,7 +12,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.SQLException;
@@ -28,6 +27,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Bitstream;
 import org.dspace.content.BitstreamFormat;
 import org.dspace.content.Bundle;
+import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
@@ -85,7 +85,7 @@ public class CreativeCommons
         }
         catch (TransformerConfigurationException e)
         {
-            throw new IllegalStateException(e.getMessage(),e);
+            throw new RuntimeException(e.getMessage(),e);
         }
        
         
@@ -111,6 +111,23 @@ public class CreativeCommons
             item.removeBundle(bundles[0]);
         }
         return item.createBundle(CC_BUNDLE_NAME);
+    }
+
+
+     /** setLicenseRDF
+     *
+     * CC Web Service method for setting the RDF bitstream
+     *
+     */
+    public static void setLicenseRDF(Context context, Item item, String licenseRdf)
+    	throws SQLException, IOException,
+            AuthorizeException
+    {
+        Bundle bundle = getCcBundle(item);
+        // set the format
+        BitstreamFormat bs_rdf_format = BitstreamFormat.findByShortDescription(context, "RDF XML");
+        // set the RDF bitstream
+        setBitstreamFromBytes(item, bundle, BSN_LICENSE_RDF, bs_rdf_format, licenseRdf.getBytes());
     }
 
 
@@ -148,23 +165,35 @@ public class CreativeCommons
                 license_rdf.getBytes());
     }
 
+    /**
+     * Used by DSpaceMetsIngester
+     *
+     * @param context
+     * @param item
+     * @param licenseStm
+     * @param mimeType
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException
+     *
+     * * // PATCHED 12/01 FROM JIRA re: mimetypes for CCLicense and License RDF wjb
+     */
+
     public static void setLicense(Context context, Item item,
                                   InputStream licenseStm, String mimeType)
             throws SQLException, IOException, AuthorizeException
     {
         Bundle bundle = getCcBundle(item);
 
-        // set the format
+     // set the format
         BitstreamFormat bs_format;
-        if ("text/xml".equalsIgnoreCase(mimeType))
+        if (mimeType.equalsIgnoreCase("text/xml"))
         {
-            bs_format = BitstreamFormat.findByShortDescription(context, "CC License");
-        }
-        else if ("text/rdf".equalsIgnoreCase(mimeType)) {
+        	bs_format = BitstreamFormat.findByShortDescription(context, "CC License");
+        } else if (mimeType.equalsIgnoreCase("text/rdf")) {
             bs_format = BitstreamFormat.findByShortDescription(context, "RDF XML");
-        }
-        else {
-            bs_format = BitstreamFormat.findByShortDescription(context, "License");
+        } else {
+        	bs_format = BitstreamFormat.findByShortDescription(context, "License");
         }
 
         Bitstream bs = bundle.createBitstream(licenseStm);
@@ -177,6 +206,7 @@ public class CreativeCommons
         bs.update();
     }
 
+    
     public static void removeLicense(Context context, Item item)
             throws SQLException, IOException, AuthorizeException
     {
@@ -188,6 +218,23 @@ public class CreativeCommons
             item.removeBundle(bundles[0]);
         }
     }
+
+
+     /**
+     *  FOR CC 1.5 API
+     *
+     * @param context
+     * @param item
+     * @throws SQLException
+     * @throws IOException
+     * @throws AuthorizeException
+     */
+    public static void removeLicenseMetadata(Item item, String schema, String element, String qualifier, String lang)
+    throws SQLException, IOException, AuthorizeException
+	{
+    	item.clearMetadata(schema, element, qualifier, lang);
+
+	}
 
     public static boolean hasLicense(Context context, Item item)
             throws SQLException, IOException
@@ -216,6 +263,34 @@ public class CreativeCommons
 
         return true;
     }
+
+
+    /* for CC web services api */
+    public static boolean hasLicense(Item item, String schema, String element, String qualifier, String lang)
+    throws SQLException, IOException
+			{
+			// try to find CC license bundle
+			DCValue[] dcvalues = item.getMetadata(schema, element, qualifier, lang);
+
+			if (dcvalues.length == 0)
+			{
+			    return false;
+			} else {
+				return true;
+			}
+	}
+
+
+    /* for CC web services api */
+    public static String getLicenseMetadata(Item item, String schema, String element, String qualifier, String lang) {
+    	DCValue[] dcvalues = item.getMetadata(schema, element, qualifier, lang);
+    	for (DCValue dcvalue : dcvalues) {
+    		return dcvalue.value;
+    	}
+    	return "";
+    }
+
+
 
     public static String getLicenseURL(Item item) throws SQLException,
             IOException, AuthorizeException
@@ -255,7 +330,29 @@ public class CreativeCommons
         return getBitstream(item, BSN_LICENSE_TEXT);
     }
 
-
+    public static String fetchLicenseRdf(String ccResult) {
+    	StringWriter result 			= new StringWriter();
+    	String licenseRdfString 		= new String("");
+        try {
+    		InputStream inputstream = new ByteArrayInputStream(ccResult.getBytes("UTF-8"));
+    		templates.newTransformer().transform(new StreamSource(inputstream), new StreamResult(result));
+    	} catch (TransformerException te) {
+    		throw new RuntimeException("Transformer exception " + te.getMessage(), te);
+    	} catch (IOException ioe) {
+    		throw new RuntimeException("IOexception " + ioe.getCause().toString(), ioe);
+    	} finally {
+    		return result.getBuffer().toString();
+    	}
+    }
+    
+    
+    /** 
+    *
+    *  The next two methods are old CC.
+    * Remains until prev. usages are eliminated.
+    * @Deprecated
+    *
+    */
     /**
      * Get a few license-specific properties. We expect these to be cached at
      * least per server run.
@@ -267,7 +364,7 @@ public class CreativeCommons
 
         return (urlBytes != null) ? new String(urlBytes) : "";
     }
-
+    
     public static String fetchLicenseRDF(String license_url)
     {
         StringWriter result = new StringWriter();
@@ -303,7 +400,6 @@ public class CreativeCommons
 
         bs.setName(bitstream_name);
         bs.setSource(CC_BS_SOURCE);
-
         bs.setFormat(format);
 
         // commit everything
@@ -408,11 +504,7 @@ public class CreativeCommons
 
             return bytes;
         }
-        catch (MalformedURLException e)
-        {
-            return null;
-        }
-        catch (IOException e)
+        catch (Exception exc)
         {
             return null;
         }

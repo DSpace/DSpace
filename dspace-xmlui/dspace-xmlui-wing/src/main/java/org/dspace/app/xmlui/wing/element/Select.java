@@ -77,6 +77,16 @@ public class Select extends Field
     }
 
     /**
+     * Set the event behavior attribute of the select item
+     *
+     * @param action
+     *             javascript to instantiate on @evtbehavior
+     */
+    public void setEvtBehavior(String behavior) {
+    	this.params.setEvtBehavior(behavior);
+    }
+    
+    /**
      * Enable the add operation for this field. When this is enabled the
      * front end will add a button to add more items to the field.
      * 

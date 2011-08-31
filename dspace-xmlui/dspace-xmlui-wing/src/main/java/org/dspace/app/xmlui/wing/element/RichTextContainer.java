@@ -213,7 +213,31 @@ public abstract class RichTextContainer extends TextContainer
         return figure;
     }
     
-    
+     /**
+     * Add a figure element to the character container.
+     *
+     * The figure element is used to embed a reference to an image or a graphic
+     * element. The content of a figure will be use as an alternative descriptor
+     * or a caption.
+     *
+     * @param source
+     *            (Required) The source for the image, using a URL or a
+     *            pre-defined XML entity.
+     * @param target
+     *            (May be null) The target reference for the image if the image
+     *            is to operate as a link.
+     * @title
+     * @param rend
+     *            (May be null) a rendering hint used to override the default
+     *            display of the element.
+     */
+    public Figure addFigure(String source, String target, String title, String rend)
+            throws WingException
+    {
+        Figure figure = new Figure(context, source, target, title, rend);
+        contents.add(figure);
+        return figure;
+    }
     
     
     
