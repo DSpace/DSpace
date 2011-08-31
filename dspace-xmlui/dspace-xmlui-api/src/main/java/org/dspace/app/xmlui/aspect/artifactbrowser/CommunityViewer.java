@@ -31,6 +31,8 @@ import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
+import org.dspace.browse.ItemCountException;
+import org.dspace.browse.ItemCounter;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -138,11 +140,31 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 	            for (Community subCommunity : subCommunities)
 	            {
 	                validity.add(subCommunity);
+	                
+	                // Include the item count in the validity, only if the value is cached.
+	                boolean useCache = ConfigurationManager.getBooleanProperty("webui.strengths.cache");
+	                if (useCache)
+	        		{
+	                    try {	
+	                    	int size = new ItemCounter(context).getCount(subCommunity);
+	                    	validity.add("size:"+size);
+	                    } catch(ItemCountException e) { /* ignore */ }
+	        		}
 	            }
 	            // Sub collections
 	            for (Collection collection : collections)
 	            {
 	                validity.add(collection);
+	                
+	                // Include the item count in the validity, only if the value is cached.
+	                boolean useCache = ConfigurationManager.getBooleanProperty("webui.strengths.cache");
+	                if (useCache)
+	        		{
+	                    try {
+	                    	int size = new ItemCounter(context).getCount(collection);
+	                    	validity.add("size:"+size);
+	                    } catch(ItemCountException e) { /* ignore */ }
+	        		}
 	            }
 
 	            this.validity = validity.complete();

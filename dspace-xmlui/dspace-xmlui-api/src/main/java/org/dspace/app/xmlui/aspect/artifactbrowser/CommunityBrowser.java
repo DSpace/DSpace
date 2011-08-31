@@ -33,6 +33,8 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Reference;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.browse.ItemCountException;
+import org.dspace.browse.ItemCounter;
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
@@ -135,6 +137,20 @@ public class CommunityBrowser extends AbstractDSpaceTransformer implements Cache
 	                TreeNode node = stack.pop();
 	                
 	                validity.add(node.getDSO());
+	                
+	                // If we are configured to use collection strengths (i.e. item counts) then include that number in the validity.
+	                boolean useCache = ConfigurationManager.getBooleanProperty("webui.strengths.cache");
+	                if (useCache)
+	        		{
+	                    try
+	                    {	//try to determine Collection size (i.e. # of items)
+	                    	
+	                    	int size = new ItemCounter(context).getCount(node.getDSO());
+	                    	validity.add("size:"+size);
+	                    }
+	                    catch(ItemCountException e) { /* ignore */ }
+	        		}
+	                
 	                
 	                for (TreeNode child : node.getChildren())
 	                {
