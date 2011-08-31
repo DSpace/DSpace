@@ -8,12 +8,14 @@
 package org.dspace.curate;
 
 import java.io.File;
+import java.io.BufferedReader;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.Writer;
+import java.util.Properties;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
@@ -25,8 +27,8 @@ import org.dspace.core.ConfigurationManager;
 import org.dspace.core.PluginManager;
 
 /**
- * TaskResolver takes a logical name of a curation task and delivers a 
- * suitable implementation object. Supported implementation types include:
+ * TaskResolver takes a logical name of a curation task and attempts to deliver 
+ * a suitable implementation object. Supported implementation types include:
  * (1) Classpath-local Java classes configured and loaded via PluginManager.
  * (2) Local script-based tasks, viz. coded in any scripting language whose
  * runtimes are accessible via the JSR-223 scripting API. This really amounts
@@ -35,19 +37,29 @@ import org.dspace.core.PluginManager;
  * installed in the DSpace instance for them to be used here.
  * Further work may involve remote URL-loadable code, etc. 
  * 
- * Scripted tasks are configured in dspace/config/modules/curate.cfg with the 
- * property "script.tasks" with value syntax:
- * <task-desc> = taskName,
- * <task-desc> = taskName
- * where task-desc is a descriptor of the form:
- * <engine>:<relfilePath>:<implClassName>
- * An example property value:
+ * Scripted tasks are managed in a directory configured with the
+ * dspace/config/modules/curate.cfg property "script.dir". A catalog of
+ * scripted tasks named 'task.catalog" is kept in this directory.
+ * Each task has a 'descriptor' property with value syntax:
+ * <engine>|<relFilePath>|<implClassCtor>
+ * An example property:
  * 
- * ruby:rubytask.rb:LinkChecker = linkchecker
+ * linkchecker = ruby|rubytask.rb|LinkChecker.new
  * 
- * This descriptor means that the 'ruby' script engine will be created,
- * a script file named 'rubytask.rb' in the directory <taskbase>/ruby/rubtask.rb will be loaded
- * and the resolver will expect that a class 'LinkChecker' will be defined in that script file.
+ * This descriptor means that a 'ruby' script engine will be created,
+ * a script file named 'rubytask.rb' in the directory <script.dir> will be
+ * loaded and the resolver will expect an evaluation of 'LinkChecker.new' will 
+ * provide a correct implementation object.
+ * 
+ * Script files may embed their descriptors to facilitate deployment.
+ * To accomplish this, a script must include the descriptor string with syntax:
+ * $td=<descriptor> somewhere on a comment line. for example:
+ * 
+ * # My descriptor $td=ruby|rubytask.rb|LinkChecker.new
+ * 
+ * For portability, the <relFilePath> component may be omitted in this context.
+ * Thus, $td=ruby||LinkChecker.new will be expanded to a descriptor
+ * with the name of the embedding file.
  * 
  * @author richardrodgers
  */
@@ -57,35 +69,117 @@ public class TaskResolver
 	// logging service
 	private static Logger log = Logger.getLogger(TaskResolver.class);
 	
-	// base directory of task scripts
-	private static String scriptDir = ConfigurationManager.getProperty("curate", "script.dir");
-	 
-	// map of task script descriptions, keyed by logical task name
-	private static Map<String, String> scriptMap = new HashMap<String, String>();
+	// base directory of task scripts & catalog name
+	private static final String CATALOG = "task.catalog";
+	private static final String scriptDir = ConfigurationManager.getProperty("curate", "script.dir");
 	
-	static
+	// catalog of script tasks
+	private Properties catalog;
+	
+	public TaskResolver()
 	{
-		// build map of task descriptors
-		loadDescriptors();
 	}
-	
-	private TaskResolver()
+		
+	/**
+	 * Installs a task script. Succeeds only if script:
+	 * (1) exists in the configured script directory and
+	 * (2) contains a recognizable descriptor in a comment line.
+	 * If script lacks a descriptor, it may still be installed
+	 * by manually invoking <code>addDescriptor</code>.
+	 * 
+	 * @param taskName
+	 * 		  logical name of task to associate with script
+	 * @param fileName
+	 * 		  name of file containing task script
+	 * @return true if script installed, false if installation failed
+	 */
+	public boolean installScript(String taskName, String fileName)
 	{
+		// Can we locate the file in the script directory?
+		File script = new File(scriptDir, fileName);
+		if (script.exists())
+		{
+			BufferedReader reader = null;
+			try
+			{
+				reader = new BufferedReader(new FileReader(script));
+				String line = null;
+				while((line = reader.readLine()) != null)
+				{
+					if (line.startsWith("#") && line.indexOf("$td=") > 0)
+					{
+						String desc = line.substring(line.indexOf("$td=") + 4);
+						// insert relFilePath if missing
+						String[] tokens = desc.split("\\|");
+						if (tokens[1].length() == 0)
+						{
+							desc = tokens[0] + "|" + fileName + "|" + tokens[2];
+						}
+						addDescriptor(taskName, desc);
+						return true;
+					}
+				}
+			}
+			catch(IOException ioE)
+			{
+				log.error("Error reading task script: " + fileName);
+			}
+			finally
+			{
+				if (reader != null)
+				{
+					try
+					{
+						reader.close();
+					}
+					catch(IOException ioE)
+					{
+						log.error("Error closing task script: " + fileName);
+					}
+				}
+			}			
+		}
+		else
+		{
+			log.error("Task script: " + fileName + "not found in: " + scriptDir);
+		}
+		return false;
 	}
 	
 	/**
-	 * Loads the map of script descriptors
+	 * Adds a task descriptor property and flushes catalog to disk.
+	 * 
+	 * @param taskName
+	 *        logical task name
+	 * @param descriptor
+	 *         descriptor for task
 	 */
-	public static void loadDescriptors()
+	public void addDescriptor(String taskName, String descriptor)
 	{
-		scriptMap.clear();
-		String propVal = ConfigurationManager.getProperty("curate", "script.tasks");
-		if (propVal != null)
+		loadCatalog();
+		catalog.put(taskName, descriptor);
+		Writer writer = null;
+		try
 		{
-			for (String desc : propVal.split(","))
+			writer = new FileWriter(new File(scriptDir, CATALOG));
+			catalog.store(writer, "do not edit");
+		}
+		catch(IOException ioE)
+		{
+			log.error("Error saving scripted task catalog: " + CATALOG);
+		}
+		finally
+		{
+			if (writer != null)
 			{
-				String[] parts = desc.split("=");
-				scriptMap.put(parts[1].trim(), parts[0].trim());
+				try
+				{
+					writer.close();
+				}
+				catch (IOException ioE)
+				{
+					log.error("Error closing scripted task catalog: " + CATALOG);
+				}
 			}
 		}
 	}
@@ -93,62 +187,93 @@ public class TaskResolver
 	/**
 	 * Returns a task implementation for a given task name,
 	 * or <code>null</code> if no implementation could be obtained.
+	 * 
+	 * @param taskName
+	 *        logical task name
+	 * @return task
+	 *        an object that implements the CurationTask interface
 	 */
-	public static CurationTask resolveTask(String taskName)
+	public ResolvedTask resolveTask(String taskName)
 	{
-		CurationTask task = (CurationTask)PluginManager.getNamedPlugin("curate", CurationTask.class, taskName);
-		if (task == null)
+		CurationTask ctask = (CurationTask)PluginManager.getNamedPlugin("curate", CurationTask.class, taskName);
+		if (ctask != null)
 		{
-			// maybe it is implemented by a script?
-			String scriptDesc = scriptMap.get(taskName);
-			if (scriptDesc != null)
+			return new ResolvedTask(taskName, ctask);
+		}
+		// maybe it is implemented by a script?
+		loadCatalog();
+		String scriptDesc = catalog.getProperty(taskName);
+		if (scriptDesc != null)
+		{
+			String[] tokens = scriptDesc.split("\\|");
+			// first descriptor token is name ('alias') of scripting engine
+			ScriptEngineManager mgr = new ScriptEngineManager();
+			ScriptEngine engine = mgr.getEngineByName(tokens[0]);
+			if (engine != null)
 			{
-				String[] descParts = scriptDesc.split(":");
-				// first descriptor token is name ('alias') of scripting engine,
-				// which is also the subdirectory where script file kept
-				ScriptEngineManager mgr = new ScriptEngineManager();
-			    ScriptEngine engine = mgr.getEngineByName(descParts[0]);
-			    if (engine != null)
+			    // see if we can locate the script file and load it
+			    // the second token is the relative path to the file
+			    File script = new File(scriptDir, tokens[1]);
+			    if (script.exists())
 			    {
-			    	// see if we can locate the script file and load it
-			    	// the second token is the relative path to the file
-			    	File script = new File(scriptDir, descParts[1]);
-			    	if (script.exists())
+			    	try
 			    	{
-			    		try
-			    		{
-			    			Reader reader = new FileReader(script);
-			    			engine.eval(reader);
-			    			reader.close();
-			    			// third token is name of class implementing
-			    			// CurationTask interface - add ".new" to ask for an instance
-			    			String implInst = descParts[2] + ".new";
-			    			task = (CurationTask)engine.eval(implInst);
-			    		}
-			    		catch (FileNotFoundException fnfE)
-			    		{
-			    			log.error("Script: '" + script.getName() + "' not found for task: " + taskName);
-			    		}
-			    		catch (IOException ioE)
-			    		{
-			    			log.error("Error loading script: '" + script.getName() + "'");
-			    		}
-			    		catch (ScriptException scE)
-			    		{
-			    			log.error("Error evaluating script: '" + script.getName() + "' msg: " + scE.getMessage());
-			    		}
+			    		Reader reader = new FileReader(script);
+			    		engine.eval(reader);
+			    		reader.close();
+			    		// third token is the constructor expression for the class
+			    		// implementing CurationTask interface
+			    		ScriptedTask stask = (ScriptedTask)engine.eval(tokens[2]);
+			    		return new ResolvedTask(taskName, stask);
 			    	}
-			    	else
+			    	catch (FileNotFoundException fnfE)
 			    	{
-			    		log.error("No script: '" + script.getName() + "' found for task: " + taskName);
+			    		log.error("Script: '" + script.getName() + "' not found for task: " + taskName);
 			    	}
-			    } 
+			    	catch (IOException ioE)
+			    	{
+			    		log.error("Error loading script: '" + script.getName() + "'");
+			    	}
+			    	catch (ScriptException scE)
+			    	{
+			    		log.error("Error evaluating script: '" + script.getName() + "' msg: " + scE.getMessage());
+			    	}
+			    }
 			    else
 			    {
-			    	log.error("Script engine: '" + descParts[0] + "' is not installed");
-			    } 	
+			    	log.error("No script: '" + script.getName() + "' found for task: " + taskName);
+			    }
+			} 
+			else
+			{
+			    log.error("Script engine: '" + tokens[0] + "' is not installed");
+			} 	
+		}
+		return null;
+	}
+	
+	/**
+	 * Loads catalog of descriptors for tasks if not already loaded
+	 */
+	private void loadCatalog()
+	{
+		if (catalog == null)
+		{
+			catalog = new Properties();
+			File catalogFile = new File(scriptDir, CATALOG);
+			if (catalogFile.exists())
+			{
+				try
+				{
+					Reader reader = new FileReader(catalogFile);
+					catalog.load(reader);
+					reader.close();
+				}
+				catch(IOException ioE)
+				{
+					log.error("Error loading scripted task catalog: " + CATALOG);
+				}
 			}
 		}
-		return task;
 	}
 }

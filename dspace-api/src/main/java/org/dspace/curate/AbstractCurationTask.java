@@ -9,12 +9,16 @@ package org.dspace.curate;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Properties;
+
+import org.apache.log4j.Logger;
 
 import org.dspace.content.Collection;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.handle.HandleManager;
@@ -31,6 +35,10 @@ public abstract class AbstractCurationTask implements CurationTask
     protected Curator curator = null;
     // curator-assigned taskId
     protected String taskId = null;
+    // optional task configuration properties
+    private Properties taskProps = null;
+    // logger
+    private static Logger log = Logger.getLogger(AbstractCurationTask.class);
 
     @Override
     public void init(Curator curator, String taskId) throws IOException
@@ -150,4 +158,125 @@ public abstract class AbstractCurationTask implements CurationTask
     {
         curator.setResult(taskId, result);
     }
+    
+    /**
+     * Returns task configuration property value for passed name, else
+     * <code>null</code> if no properties defined or no value for passed key.
+     * 
+     * @param name
+     *        the property name
+     * @return value
+     *        the property value, or null
+     * 
+     */
+    protected String taskProperty(String name)
+    {
+    	if (taskProps == null)
+    	{
+    		// load properties
+    		taskProps = new Properties();
+    		StringBuilder modName = new StringBuilder();
+    		for (String segment : taskId.split("\\."))
+    		{
+    			// load property segments if present
+    			modName.append(segment);
+    			Properties modProps = ConfigurationManager.getProperties(modName.toString());
+    			if (modProps != null)
+    			{
+    				taskProps.putAll(modProps);
+    			}
+    			modName.append(".");
+    		}
+        	// warn if *no* properties found
+        	if (taskProps.size() == 0)
+        	{
+        		log.warn("Warning: No configuration properties found for task: " + taskId);
+        	}
+    	}
+    	return taskProps.getProperty(name);
+    }
+    
+    /**
+     * Returns task configuration integer property value for passed name, else
+     * passed default value if no properties defined or no value for passed key.
+     * 
+     * @param name
+     *        the property name
+     * @param defaultValue value
+     *        the default value
+     * @return value
+     *        the property value, or default value
+     * 
+     */
+    protected int taskIntProperty(String name, int defaultValue)
+    {
+    	int intVal = defaultValue;
+    	String strVal = taskProperty(name);
+    	if (strVal != null)
+    	{
+    		try
+    		{
+    			intVal = Integer.parseInt(strVal.trim());
+    		}
+    		catch(NumberFormatException nfE)
+    		{
+    			log.warn("Warning: Number format error in module: " + taskId + " property: " + name);
+    		}
+    	}
+    	return intVal;
+    } 
+    
+    /**
+     * Returns task configuration long property value for passed name, else
+     * passed default value if no properties defined or no value for passed key.
+     * 
+     * @param name
+     *        the property name
+     * @param defaultValue value
+     *        the default value
+     * @return value
+     *        the property value, or default
+     * 
+     */
+    protected long taskLongProperty(String name, long defaultValue)
+    {
+    	long longVal = defaultValue;
+    	String strVal = taskProperty(name);
+    	if (strVal != null)
+    	{
+    		try
+    		{
+    			longVal = Long.parseLong(strVal.trim());
+    		}
+    		catch(NumberFormatException nfE)
+    		{
+    			log.warn("Warning: Number format error in module: " + taskId + " property: " + name);
+    		}
+    	}
+    	return longVal;
+    }  
+    
+    /**
+     * Returns task configuration boolean property value for passed name, else
+     * passed default value if no properties defined or no value for passed key.
+     * 
+     * @param name
+     *        the property name
+     * @param defaultValue value
+     *        the default value
+     * @return value
+     *        the property value, or default
+     * 
+     */
+    protected boolean taskBooleanProperty(String name, boolean defaultValue)
+    {
+    	String strVal = taskProperty(name);
+    	if (strVal != null)
+    	{
+    		strVal = strVal.trim();
+    	    return strVal.equalsIgnoreCase("true") ||
+    	           strVal.equalsIgnoreCase("yes");
+    	}
+    	return defaultValue;
+    }  
 }

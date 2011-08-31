@@ -52,16 +52,21 @@ public class Curator
     
     // invocation modes - used by Suspendable tasks
     public static enum Invoked { INTERACTIVE, BATCH, ANY };
+    // transaction scopes
+    public static enum TxScope { OBJECT, CURATION, OPEN };
 
     private static Logger log = Logger.getLogger(Curator.class);
     
-    private static final ThreadLocal<Integer> performer = new ThreadLocal<Integer>();
+    private static final ThreadLocal<Context> curationCtx = new ThreadLocal<Context>();
     
     private Map<String, TaskRunner> trMap = new HashMap<String, TaskRunner>();
     private List<String> perfList = new ArrayList<String>();
     private TaskQueue taskQ = null;
     private String reporter = null;
     private Invoked iMode = null;
+    private TaskResolver resolver = new TaskResolver();
+    private int cacheLimit = Integer.MAX_VALUE;
+    private TxScope txScope = TxScope.OPEN;
 
     /**
      * No-arg constructor
@@ -79,13 +84,13 @@ public class Curator
      */
     public Curator addTask(String taskName)
     {
-        CurationTask task = TaskResolver.resolveTask(taskName);
+    	ResolvedTask task = resolver.resolveTask(taskName);
         if (task != null)
         {
             try
             {
-                task.init(this, taskName);
-                trMap.put(taskName, new TaskRunner(task, taskName));
+                task.init(this);
+                trMap.put(taskName, new TaskRunner(task));
                 // performance order currently FIFO - to be revisited
                 perfList.add(taskName);
             }
@@ -111,8 +116,7 @@ public class Curator
      {
          return perfList.contains(taskName);
      }
-    
-    
+      
     /**
      * Removes a task from the set to be performed.
      * 
@@ -150,6 +154,33 @@ public class Curator
         this.reporter = reporter;
         return this;
     }
+    
+    /**
+     * Sets an upper limit for the number of objects in the context cache 
+     * used in a curation, if context accessible. Note that for many forms of
+     * invocation, the context is not accessible. If limit is reached,
+     * context cache will be emptied. The default is no limit.
+     */
+    public Curator setCacheLimit(int limit)
+    {
+    	cacheLimit = limit;
+    	return this;
+    }
+    
+    /**
+     * Defines the transactional scope of curator executions.
+     * The default is 'open' meaning that no commits are
+     * performed by the framework during curation. A scope of
+     * 'curation' means that a single commit will occur after the
+     * entire performance is complete, and a scope of 'object'
+     * will commit for each object (e.g. item) encountered in
+     * a given execution.
+     */
+    public Curator setTransactionScope(TxScope scope)
+    {
+    	txScope = scope;
+    	return this;
+    }
 
     /**
      * Performs all configured tasks upon object identified by id. If
@@ -168,12 +199,8 @@ public class Curator
         }
         try
         {
-            //Save the currently authenticated user's ID to the current Task thread
-            //(Allows individual tasks to retrieve current user info via currentPerformer() method)
-            if(c.getCurrentUser()!=null)
-            {    
-                performer.set(Integer.valueOf(c.getCurrentUser().getID()));
-            }
+            //Save the context on current execution thread
+            curationCtx.set(c);
            
             DSpaceObject dso = HandleManager.resolveToObject(c, id);
             if (dso != null)
@@ -187,6 +214,14 @@ public class Curator
                     trMap.get(taskName).run(c, id);
                 }
             }
+            // if curation scoped, commit transaction
+            if (txScope.equals(TxScope.CURATION)) {
+            	Context ctx = curationCtx.get();
+            	if (ctx != null)
+            	{
+            		ctx.commit();
+            	}
+            }
         }
         catch (SQLException sqlE)
         {
@@ -194,7 +229,7 @@ public class Curator
         }
         finally
         {
-            performer.remove();
+            curationCtx.remove();
         }
     }
 
@@ -221,8 +256,7 @@ public class Curator
         {
             TaskRunner tr = trMap.get(taskName);
             // do we need to iterate over the object ?
-            if (type == Constants.ITEM ||
-                tr.task.getClass().isAnnotationPresent(Distributive.class))
+            if (type == Constants.ITEM || tr.task.isDistributive())
             {
                 tr.run(dso);
             }
@@ -329,59 +363,21 @@ public class Curator
             tr.setResult(result);
         }
     }
-
-    /**
-     * Returns the Eperson ID of the Context currently in use in performing a task,
-     * if known, else <code>null</code>. 
-     * <P>
-     * In many circumstances, this value will be null: 
-     * when the curator is not in the perform method, when curation
-     * is invoked with a DSO (the context is 'hidden'). 
-     * <P>
-     * The primary intended use for this method is to ensure individual tasks,
-     * which may need to create a new Context, can also properly initialize that
-     * Context with an EPerson ID (to ensure proper access rights exist in that Context).
-     * <P>
-     * Current performer information is also used when executing Site-Wide tasks 
-     * (see Curator.doSite() method).
-     */
-    public static Integer currentPerformer()
-    {
-    	return performer.get();
-    }
     
     /**
-     * Returns a Context object which is "authenticated" as the current
-     * EPerson performer (see 'currentPerformer()' method). This is primarily a 
-     * utility method to allow tasks access to an authenticated Context when 
-     * necessary.
+     * Returns the context object used in the current curation performance.
+     * This is primarily a utility method to allow tasks access to the context when necessary.
      * <P>
-     * If the 'currentPerformer()' is null or not set, then this just returns
+     * If the context is null or not set, then this just returns
      * a brand new Context object representing an Anonymous User.
      * 
-     * @return authenticated Context object (or anonymous Context if currentPerformer() is null)
+     * @return curation Context object (or anonymous Context if curation is null)
      */
-    public static Context authenticatedContext()
-            throws SQLException
+    public static Context curationContext() throws SQLException
     {
-    	//Create a new context
-        Context ctx = new Context();
-        
-        Integer epersonID = currentPerformer();
-            
-        //If a Curator 'performer' ID is set
-        if(epersonID!=null)
-        {    
-            //parse the performer's User ID & set as the currently authenticated user in Context
-            EPerson autenticatedUser = EPerson.find(ctx, epersonID.intValue());
-            ctx.setCurrentUser(autenticatedUser);
-        }
-        else
-        {
-            //otherwise, no-op. This is the equivalent of an ANONYMOUS USER Context
-        }
-        
-        return ctx;
+    	// Return curation context or new context if undefined
+    	Context curCtx = curationCtx.get();
+        return (curCtx != null) ? curCtx : new Context();
     }
 
     /**
@@ -407,18 +403,14 @@ public class Curator
         Context ctx = null;
         try
         {
+        	ctx = curationContext();
             // Site-wide Tasks really should have an EPerson performer associated with them,
             // otherwise they are run as an "anonymous" user with limited access rights.
-            if(Curator.currentPerformer()==null)
+            if(ctx.getCurrentUser()==null)
             {
                 log.warn("You are running one or more Site-Wide curation tasks in ANONYMOUS USER mode," +
                          " as there is no EPerson 'performer' associated with this task. To associate an EPerson 'performer' " +
                          " you should ensure tasks are called via the Curator.curate(Context, ID) method.");
-            }
-            else
-            {
-                // Create a new Context for this Sitewide task, authenticated as the current task performer.
-                ctx = Curator.authenticatedContext();
             }
             
             //Run task for the Site object itself
@@ -519,21 +511,43 @@ public class Curator
         }
         return true;
     }
+    
+    /**
+     * Record a 'visit' to a DSpace object and enforce any policies set
+     * on this curator.
+     */
+    private void visit(DSpaceObject dso) throws IOException
+    {
+    	Context curCtx = curationCtx.get();
+    	if (curCtx != null)
+    	{
+    		try
+    		{
+    			if (txScope.equals(TxScope.OBJECT))
+    			{
+    				curCtx.commit();
+    			}
+    			if (curCtx.getCacheSize() % cacheLimit == 0)
+    			{
+    				curCtx.clearCache();
+    			}
+    		}
+    		catch (SQLException sqlE)
+    		{
+    			throw new IOException(sqlE.getMessage());
+    		}
+    	}
+    }
 
     private class TaskRunner
     {
-        CurationTask task = null;
-        String taskName = null;
+        ResolvedTask task = null;
         int statusCode = CURATE_UNSET;
         String result = null;
-        Invoked mode = null;
-        int[] codes = null;
 
-        public TaskRunner(CurationTask task, String name)
+        public TaskRunner(ResolvedTask task)
         {
             this.task = task;
-            taskName = name;
-            parseAnnotations(task.getClass());
         }
         
         public boolean run(DSpaceObject dso) throws IOException
@@ -547,13 +561,13 @@ public class Curator
                 statusCode = task.perform(dso);
                 String id = (dso.getHandle() != null) ? dso.getHandle() : "workflow item: " + dso.getID();
                 log.info(logMessage(id));
-
+                visit(dso);
                 return ! suspend(statusCode);
             }
             catch(IOException ioe)
             {
                 //log error & pass exception upwards
-                log.error("Error executing curation task '" + taskName + "'", ioe);
+                log.error("Error executing curation task '" + task.getName() + "'", ioe);
                 throw ioe;
             }
         }
@@ -568,13 +582,13 @@ public class Curator
                 }
                 statusCode = task.perform(c, id);
                 log.info(logMessage(id));
-
+                visit(null);
                 return ! suspend(statusCode);
             }
             catch(IOException ioe)
             {
                 //log error & pass exception upwards
-                log.error("Error executing curation task '" + taskName + "'", ioe);
+                log.error("Error executing curation task '" + task.getName() + "'", ioe);
                 throw ioe;
             }
         }
@@ -584,21 +598,12 @@ public class Curator
             this.result = result;
         }
         
-        private void parseAnnotations(Class tClass)
-        {
-            Suspendable suspendAnn = (Suspendable)tClass.getAnnotation(Suspendable.class);
-            if (suspendAnn != null)
-            {
-                mode = suspendAnn.invoked();
-                codes = suspendAnn.statusCodes();
-            }
-        }
-        
         private boolean suspend(int code)
         {
+        	Invoked mode = task.getMode();
             if (mode != null && (mode.equals(Invoked.ANY) || mode.equals(iMode)))
             {
-                for (int i : codes)
+                for (int i : task.getCodes())
                 {
                     if (code == i)
                     {
@@ -617,7 +622,7 @@ public class Curator
         private String logMessage(String id) 
         {
             StringBuilder mb = new StringBuilder();
-            mb.append("Curation task: ").append(taskName).
+            mb.append("Curation task: ").append(task.getName()).
                append(" performed on: ").append(id).
                append(" with status: ").append(statusCode);
             if (result != null)
