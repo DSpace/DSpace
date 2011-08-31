@@ -211,6 +211,14 @@
         <xsl:attribute name="size"><xsl:value-of select="."/></xsl:attribute>
     </xsl:template>
 
+    <!-- used by select element -->
+    <xsl:template match="@evtbehavior">
+        <xsl:param name="behavior" select="."/>
+        <xsl:if test="normalize-space($behavior)='submitOnChange'">
+            <xsl:attribute name="onchange">this.form.submit();</xsl:attribute>
+                </xsl:if>
+    </xsl:template>
+
     <xsl:template match="@maxlength">
         <xsl:attribute name="maxlength"><xsl:value-of select="."/></xsl:attribute>
     </xsl:template>

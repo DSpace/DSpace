@@ -1108,3 +1108,37 @@ form.discover-sort-box select{
     background-repeat: no-repeat;
     background-position: center center;
 }
+
+/* FOR CC License */
+span.floatleft {
+	border:none;
+	float:right;
+	display:inline;
+}
+
+/* FOR CC PAGE to GROUP ITEMS horizontally */
+ul.horizontal li span.bold a { color: black; }
+
+/* group items horizontally in a list */
+
+ul.horizontalVanilla
+{
+font-weight: bold;
+list-style-type: none;
+padding: 0px;
+padding-left: 0px;
+padding-bottom: 15px;
+border-left: 1px solid white;
+border-right: 1px solid white;
+margin: 10px -1px 5px -1px;
+width: inherit;
+}
+
+ul.horizontalVanilla li
+{
+float: left;
+height: 100%;
+background-color: rgb(255, 255, 255);
+margin: 2px 2px 0px 2px;
+/* border: 1px solid rgb(240, 240, 210); */
+}

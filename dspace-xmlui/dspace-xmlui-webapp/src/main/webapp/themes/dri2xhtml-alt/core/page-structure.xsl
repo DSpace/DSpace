@@ -339,6 +339,66 @@
         </div>
     </xsl:template>
 
+    <xsl:template name="cc-license">
+        <xsl:param name="metadataURL"/>
+        <xsl:variable name="externalMetadataURL">
+            <xsl:text>cocoon:/</xsl:text>
+            <xsl:value-of select="$metadataURL"/>
+            <xsl:text>?sections=dmdSec,fileSec&amp;fileGrpTypes=THUMBNAIL</xsl:text>
+        </xsl:variable>
+
+        <xsl:variable name="ccLicenseName"
+                      select="document($externalMetadataURL)//dim:field[@element='rights']"
+                      />
+        <xsl:variable name="ccLicenseUri"
+                      select="document($externalMetadataURL)//dim:field[@element='rights'][@qualifier='uri']"
+                      />
+        <xsl:variable name="handleUri">
+                    <xsl:for-each select="document($externalMetadataURL)//dim:field[@element='identifier' and @qualifier='uri']">
+                        <a>
+                            <xsl:attribute name="href">
+                                <xsl:copy-of select="./node()"/>
+                            </xsl:attribute>
+                            <xsl:copy-of select="./node()"/>
+                        </a>
+                        <xsl:if test="count(following-sibling::dim:field[@element='identifier' and @qualifier='uri']) != 0">
+                            <xsl:text>, </xsl:text>
+                        </xsl:if>
+                </xsl:for-each>
+        </xsl:variable>
+
+   <xsl:if test="$ccLicenseName and $ccLicenseUri and contains($ccLicenseUri, 'creativecommons')">
+        <div about="{$handleUri}">
+            <xsl:attribute name="style">
+                <xsl:text>margin:0em 2em 0em 2em; padding-bottom:0em;</xsl:text>
+            </xsl:attribute>
+            <a rel="license"
+                href="{$ccLicenseUri}"
+                alt="{$ccLicenseName}"
+                title="{$ccLicenseName}"
+                >
+                <img>
+                     <xsl:attribute name="src">
+                        <xsl:value-of select="concat($theme-path,'/images/cc-ship.gif')"/>
+                     </xsl:attribute>
+                     <xsl:attribute name="alt">
+                         <xsl:value-of select="$ccLicenseName"/>
+                     </xsl:attribute>
+                     <xsl:attribute name="style">
+                         <xsl:text>float:left; margin:0em 1em 0em 0em; border:none;</xsl:text>
+                     </xsl:attribute>
+                </img>
+            </a>
+            <span>
+                <xsl:attribute name="style">
+                    <xsl:text>vertical-align:middle; text-indent:0 !important;</xsl:text>
+                </xsl:attribute>
+                <i18n:text>xmlui.dri2xhtml.METS-1.0.cc-license-text</i18n:text>
+                <xsl:value-of select="$ccLicenseName"/>
+            </span>
+        </div>
+        </xsl:if>
+    </xsl:template>
 
     <!-- Like the header, the footer contains various miscellanious text, links, and image placeholders -->
     <xsl:template name="buildFooter">

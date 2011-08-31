@@ -62,6 +62,17 @@
                         </xsl:otherwise>
                 </xsl:choose>
         </div>
+        <xsl:variable name="itemDivision">
+                        <xsl:value-of select="@n"/>
+                </xsl:variable>
+                <xsl:variable name="xrefTarget">
+                        <xsl:value-of select="./dri:p/dri:xref/@target"/>
+                </xsl:variable>
+                <xsl:if test="$itemDivision='item-view' and contains($xrefTarget, 'show=full')">
+                    <xsl:call-template name="cc-license">
+                        <xsl:with-param name="metadataURL" select="./dri:referenceSet/dri:reference/@url"/>
+                    </xsl:call-template>
+                </xsl:if>
         <xsl:apply-templates select="@pagination">
             <xsl:with-param name="position">bottom</xsl:with-param>
         </xsl:apply-templates>
