@@ -139,7 +139,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
         // Add metadata for quick searches:
         pageMeta.addMetadata("search", "simpleURL").addContent(
-                contextPath + "/discover");
+                "/discover");
         pageMeta.addMetadata("search", "advancedURL").addContent(
                 contextPath + "/discover");
         pageMeta.addMetadata("search", "queryField").addContent("query");
