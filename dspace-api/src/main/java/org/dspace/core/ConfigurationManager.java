@@ -1135,7 +1135,7 @@ public class ConfigurationManager
                     }
                     else
                     {
-                        result.append((String)properties.getProperty(var));
+                        result.append(((String)properties.getProperty(var)).trim());
                     }
                 }
                 else
