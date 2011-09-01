@@ -1,7 +1,11 @@
 /**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
+ * http://www.dspace.org/license/
  */
-package org.dspace.license; //package org.wendy.cc;
+package org.dspace.license;
 
 import java.io.File;
 import java.io.FileNotFoundException;
