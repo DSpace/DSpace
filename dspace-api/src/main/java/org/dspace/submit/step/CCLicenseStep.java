@@ -1,14 +1,11 @@
-/*
- * CCLicenseStep.java
- * 
+/**
  * The contents of this file are subject to the license and copyright
  * detailed in the LICENSE and NOTICE files at the root of the source
  * tree and available online at
  *
- *     http://dspace.org/license/
+ * http://www.dspace.org/license/
  */
 package org.dspace.submit.step;
-
 
 import java.io.IOException;
 import java.sql.SQLException;
