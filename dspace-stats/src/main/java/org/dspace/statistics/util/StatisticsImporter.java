@@ -472,7 +472,19 @@ public class StatisticsImporter
 
 		metadataStorageInfo = SolrLogger.getMetadataStorageInfo();
         String dbfile = ConfigurationManager.getProperty("solr-statistics", "dbfile");
-		geoipLookup = new LookupService(dbfile, LookupService.GEOIP_STANDARD);
+        try
+        {
+            geoipLookup = new LookupService(dbfile, LookupService.GEOIP_STANDARD);
+        }
+        catch (FileNotFoundException fe)
+        {
+            log.error("The GeoLite Database file is missing (" + dbfile + ")! Solr Statistics cannot generate location based reports! Please see the DSpace installation instructions for instructions to install this file.", fe);
+        }
+        catch (IOException e)
+        {
+            log.error("Unable to load GeoLite Database file (" + dbfile + ")! You may need to reinstall it. See the DSpace installation instructions for more details.", e);
+        }
+		
 
         StatisticsImporter si = new StatisticsImporter(local);
         if (line.hasOption('m'))

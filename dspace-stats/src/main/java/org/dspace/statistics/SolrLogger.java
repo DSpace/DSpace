@@ -9,6 +9,7 @@ package org.dspace.statistics;
 
 import com.maxmind.geoip.Location;
 import com.maxmind.geoip.LookupService;
+import java.io.FileNotFoundException;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.apache.log4j.Logger;
 import org.apache.solr.client.solrj.SolrQuery;
@@ -46,7 +47,7 @@ import java.util.*;
  */
 public class SolrLogger
 {
-    private static Logger log = Logger.getLogger(SolrLogger.class);
+    private static final Logger log = Logger.getLogger(SolrLogger.class);
 	
     private static final CommonsHttpSolrServer solr;
 
@@ -95,14 +96,18 @@ public class SolrLogger
                 service = new LookupService(dbfile,
                         LookupService.GEOIP_STANDARD);
             }
+            catch (FileNotFoundException fe)
+            {
+                log.error("The GeoLite Database file is missing (" + dbfile + ")! Solr Statistics cannot generate location based reports! Please see the DSpace installation instructions for instructions to install this file.", fe);
+            }
             catch (IOException e)
             {
-                e.printStackTrace();
+                log.error("Unable to load GeoLite Database file (" + dbfile + ")! You may need to reinstall it. See the DSpace installation instructions for more details.", e);
             }
         }
         else
         {
-            // System.out.println("NO SOLR DB FILE !");
+            log.error("The required 'dbfile' configuration is missing in solr-statistics.cfg!");
         }
         locationService = service;
 

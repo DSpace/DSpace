@@ -75,6 +75,8 @@ Common usage:
         <format property="build.date" pattern="yyyyMMdd-HHmmss" />
     </tstamp>
 
+    <!-- Default location of GeoLiteCity.dat.gz to download. This may be overridden, if URL path changes. -->
+    <property name="geolite" value="http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz" />
 
     <!-- ============================================================= -->
     <!-- The DSpace class path for executing installation targets      -->
@@ -88,6 +90,13 @@ Common usage:
         </fileset>
     </path>
 
+    <!-- ============================================================= -->
+    <!-- Load various Ant libraries which define extra tasks.          -->
+    <!-- ============================================================= -->
+     <!--Load/initialize all Ant-Contrib libraries from DSpace 'class.path' above.
+         For more info, see: 
+        http://ant-contrib.sourceforge.net/tasks/index.html -->
+    <taskdef resource="net/sf/antcontrib/antlib.xml" classpathref="class.path"/>
 
     <!-- ============================================================= -->
     <!-- Print some useful help text                                  -->
@@ -927,10 +936,38 @@ Common usage:
 
 	<!-- installes GeoCity resolution database -->
     <target name="update_geolite">
-        <echo>Downloading: http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz</echo>
-        <get src="http://geolite.maxmind.com/download/geoip/database/GeoLiteCity.dat.gz" dest="${dspace.dir}/config/GeoLiteCity.dat.gz" verbose="true" />
-        <gunzip src="${dspace.dir}/config/GeoLiteCity.dat.gz" dest="${dspace.dir}/config/GeoLiteCity.dat" />
-        <delete file="${dspace.dir}/config/GeoLiteCity.dat.gz" />
+        <echo>Downloading: ${geolite}</echo>
+        <trycatch property="geolite.error">
+            <try>
+                <get src="${geolite}" dest="${dspace.dir}/config/GeoLiteCity.dat.gz" verbose="true"/>
+                <gunzip src="${dspace.dir}/config/GeoLiteCity.dat.gz" dest="${dspace.dir}/config/GeoLiteCity.dat" />
+                <delete file="${dspace.dir}/config/GeoLiteCity.dat.gz" />
+            </try>
+            <catch>
+                <echo>
+====================================================================
+WARNING : FAILED TO DOWNLOAD GEOLITE DATABASE FILE
+          (Used for DSpace Solr Usage Statistics)
+          
+Underlying Error: ${geolite.error}
+     
+In order to use DSpace Solr Usage Statistics, you will need to 
+manually re-run:
+
+ant update_geolite
+
+OR
+
+You may manually install this file by following these steps:
+(1) Download the file from ${geolite}
+(2) Unzip it to create a file named 'GeoLiteCity.dat'
+(3) Copy that file to '${dspace.dir}/config/GeoLiteCity.dat'
+        
+====================================================================
+                </echo>
+            </catch>
+        </trycatch>    
+        
     </target>
 
     <target name="check_geolite">
