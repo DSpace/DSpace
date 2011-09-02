@@ -7,10 +7,17 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.collection;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.sql.SQLException;
+import java.util.Map;
+import org.xml.sax.SAXException;
 
+import org.apache.avalon.framework.parameters.Parameters;
+import org.apache.cocoon.ProcessingException;
+import org.apache.cocoon.environment.SourceResolver;
+
+import org.dspace.app.xmlui.aspect.administrative.FlowCurationUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -48,6 +55,15 @@ public class CurateCollectionForm extends AbstractDSpaceTransformer {
         private static final Message T_trail = message("xmlui.administrative.collection.CurateCollectionForm.trail");
 
         private static final Message T_label_name = message("xmlui.administrative.collection.CurateCollectionForm.label_name");
+        private static final Message T_taskgroup_label_name = message("xmlui.administrative.CurateForm.taskgroup_label_name");
+        
+        
+        public void setup(SourceResolver resolver, Map objectModel, String src,
+		          Parameters parameters) throws ProcessingException, SAXException, IOException
+		{
+        	super.setup(resolver, objectModel, src, parameters);
+        	FlowCurationUtils.setupCurationTasks();
+		}
 
         /**
          * common package method for initializing form gui elements
@@ -89,11 +105,35 @@ public class CurateCollectionForm extends AbstractDSpaceTransformer {
             options.addItem().addHighlight("bold").addXref(baseURL+"&submit_curate",T_options_curate);
 
 	    List curationTaskList = main.addList("curationTaskList", "form");
-	    curationTaskList.addLabel(T_label_name);
-            Select select = curationTaskList.addItem().addSelect("curate_task");
-            select = getCurationOptions(select);
-            select.setSize(1);
-            select.setRequired();
+        String curateGroup = "";
+        try
+        {
+        	curateGroup = (parameters.getParameter("select_curate_group") != null) ? parameters.getParameter("select_curate_group") : FlowCurationUtils.UNGROUPED_TASKS;
+        }
+        catch (Exception pe)
+        {
+        	// noop
+        }
+        if (!FlowCurationUtils.groups.isEmpty())
+        {
+        	curationTaskList.addLabel(T_taskgroup_label_name); //needs to check for >=1 group configured
+            Select groupSelect = curationTaskList.addItem().addSelect("select_curate_group");
+            groupSelect = FlowCurationUtils.getGroupSelectOptions(groupSelect);
+            groupSelect.setSize(1);
+            groupSelect.setRequired();
+            groupSelect.setEvtBehavior("submitOnChange");
+            if (curateGroup.equals(""))
+            {
+            	curateGroup = (String) (FlowCurationUtils.groups.keySet().iterator().next());
+            }
+            groupSelect.setOptionSelected(curateGroup);
+        }
+        curationTaskList.addLabel(T_label_name);
+        Select taskSelect = curationTaskList.addItem().addSelect("curate_task");
+        taskSelect = FlowCurationUtils.getTaskSelectOptions(taskSelect, curateGroup);
+        taskSelect.setSize(1);
+        taskSelect.setRequired();
+	    
 
             // need submit_curate_task and submit_return
 	    Para buttonList = main.addPara();
@@ -103,18 +143,5 @@ public class CurateCollectionForm extends AbstractDSpaceTransformer {
             main.addHidden("administrative-continue").setValue(knot.getId());
 
     }
-
-        private Select getCurationOptions(Select select)
-                                            throws WingException, UnsupportedEncodingException {
-            String tasksString = ConfigurationManager.getProperty("curate", "ui.tasknames");
-            String[] tasks = tasksString.split(",");
-            for (String task : tasks)
-            {
-                String[] keyValuePair = task.split("=");
-                select.addOption(URLDecoder.decode(keyValuePair[0].trim(), "UTF-8"),
-                                 URLDecoder.decode(keyValuePair[1].trim(), "UTF-8"));
-            }
-            return select;
-        }
 
 }

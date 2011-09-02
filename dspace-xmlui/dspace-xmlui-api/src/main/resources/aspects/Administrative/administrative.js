@@ -1415,7 +1415,8 @@ function doEditItem(itemID)
 		{
 			doViewItem(itemID);
 		}
-	        else if (cocoon.request.get("submit_curate"))  {
+	        else if (cocoon.request.get("submit_curate"))
+                {
                         doCurateItem(itemID, cocoon.request.get("curate_task"));
                 }
                 else
@@ -1589,10 +1590,16 @@ function doCurateItem(itemID, task)
     var result;
 
     do {
-           sendPageAndWait("admin/item/curateItem",{"itemID":itemID}, result);
+           if (cocoon.request.get("select_curate_group"))
+	   {
+                var select_curate_group = cocoon.request.getParameter("select_curate_group");
+                sendPageAndWait("admin/item/curateItem",{"itemID":itemID,"select_curate_group":select_curate_group}, result);
+	   } else {
+                sendPageAndWait("admin/item/curateItem",{"itemID":itemID}, result);
+           }
            assertEditItem(itemID);
            result = null;
-           if (!cocoon.request.get("submit_curate_task") && !cocoon.request.get("submit_queue_task"))
+           if (!cocoon.request.get("submit_curate_task") && !cocoon.request.get("submit_queue_task") && !cocoon.request.get("select_curate_group"))
            {
                 return null;
            }
@@ -2548,7 +2555,13 @@ function doCurateCollection(collectionID, task) {
     var result;
 
     do {
-		   sendPageAndWait("admin/collection/curateCollection",{"collectionID":collectionID},result);
+                   if (cocoon.request.get("select_curate_group"))
+                   {
+                      var select_curate_group = cocoon.request.getParameter("select_curate_group");
+                      sendPageAndWait("admin/collection/curateCollection",{"collectionID":collectionID,"select_curate_group":select_curate_group}, result);
+                   } else {
+                      sendPageAndWait("admin/collection/curateCollection",{"collectionID":collectionID}, result);
+                   } 
 		   assertEditCollection(collectionID);
 		   result = null;
 		   if (cocoon.request.get("submit_return") || cocoon.request.get("submit_metadata") ||
@@ -2965,7 +2978,13 @@ function doCurateCommunity(communityID, task) {
     var result;
 
     do {
-		   sendPageAndWait("admin/community/curateCommunity",{"communityID":communityID},result);
+		   if (cocoon.request.get("select_curate_group"))
+                   {
+                      var select_curate_group = cocoon.request.getParameter("select_curate_group");
+                      sendPageAndWait("admin/community/curateCommunity",{"communityID":communityID,"select_curate_group":select_curate_group}, result);
+                   } else {
+                      sendPageAndWait("admin/community/curateCommunity",{"communityID":communityID}, result);
+           	   }
 		   assertEditCommunity(communityID);
 		   result = null;
 		   if (cocoon.request.get("submit_return") || cocoon.request.get("submit_metadata") || cocoon.request.get("submit_roles") || cocoon.request.get("submit_curate") )
@@ -3022,7 +3041,16 @@ function doCurate()
     var curateTask;
     do 
     {
-        sendPageAndWait("admin/curate/main",{"identifier":identifier,"curate_task":curateTask},result);
+        if (cocoon.request.get("select_curate_group"))
+        {
+            var select_curate_group = cocoon.request.getParameter("select_curate_group");
+            var identifier = cocoon.request.getParameter("identifier");
+            sendPageAndWait("admin/curate/main",{"identifier":identifier,"curate_task":curateTask, "select_curate_group":select_curate_group},result);
+        }
+        else
+        {
+             sendPageAndWait("admin/curate/main",{"identifier":identifier,"curate_task":curateTask},result);	   
+        } 
        	   
         if (cocoon.request.get("submit_curate_task"))
         {
@@ -3037,7 +3065,9 @@ function doCurate()
         if (result != null && result.getParameter("identifier")) {
             identifier = result.getParameter("identifier");
         }
-        else {
+        else if (!cocoon.request.get("select_curate_group")) {
+             identifier = null;
+         }
             identifier = null;
         }
         
@@ -3045,7 +3075,7 @@ function doCurate()
         if (result != null && result.getParameter("curate_task")) {
             curateTask = result.getParameter("curate_task");
         }
-        else {
+        else if (!cocoon.request.get("select_curate_group")) {
             curateTask = null;
         }  
     }

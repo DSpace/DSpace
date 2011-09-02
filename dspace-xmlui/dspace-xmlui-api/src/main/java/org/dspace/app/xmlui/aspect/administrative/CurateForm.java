@@ -7,11 +7,18 @@
  */
 package org.dspace.app.xmlui.aspect.administrative;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.sql.SQLException;
-import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
+import java.util.Map;
+import org.xml.sax.SAXException;
 
+import org.apache.avalon.framework.parameters.Parameters;
+import org.apache.cocoon.ProcessingException;
+import org.apache.cocoon.environment.SourceResolver;
+
+import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -38,8 +45,16 @@ public class CurateForm extends AbstractDSpaceTransformer
         private static final Message T_title = message("xmlui.administrative.CurateForm.title");
         private static final Message T_trail = message("xmlui.administrative.CurateForm.trail");
         private static final Message T_task_label_name = message("xmlui.administrative.CurateForm.task_label_name");
+        private static final Message T_taskgroup_label_name = message("xmlui.administrative.CurateForm.taskgroup_label_name");
         private static final Message T_object_label_name = message("xmlui.administrative.CurateForm.object_label_name");
         private static final Message T_object_hint = message("xmlui.administrative.CurateForm.object_hint");
+        
+        public void setup(SourceResolver resolver, Map objectModel, String src,
+		          Parameters parameters) throws ProcessingException, SAXException, IOException
+		{
+        	super.setup(resolver, objectModel, src, parameters);
+        	FlowCurationUtils.setupCurationTasks();
+		}
         
         /**
          * Initialize the page metadata & breadcrumb trail
@@ -89,15 +104,37 @@ public class CurateForm extends AbstractDSpaceTransformer
                 id.setRequired();
                 id.setHelp(T_object_hint);
                 
-                // Selectbox of Curation Task options (required)              
-                Select select = form.addItem().addSelect("curate_task");
-                select.setLabel(T_task_label_name);
-                select = getCurationOptions(select);
-                select.setSize(1);
-                select.setRequired();
+                // Selectbox of Curation Task options (required)
+                String curateGroup = "";
+                try
+                {
+                	curateGroup = (parameters.getParameter("select_curate_group") != null) ? parameters.getParameter("select_curate_group") : FlowCurationUtils.UNGROUPED_TASKS;
+                }
+                catch (Exception pe)
+                {
+                	// noop
+                }
+                if (!FlowCurationUtils.groups.isEmpty())
+                {
+                    Select groupSelect = form.addItem().addSelect("select_curate_group");
+                    groupSelect = FlowCurationUtils.getGroupSelectOptions(groupSelect);
+                    groupSelect.setLabel(T_taskgroup_label_name); // todo: i18n this
+                    groupSelect.setSize(1);
+                    groupSelect.setRequired();
+                    groupSelect.setEvtBehavior("submitOnChange");
+                    if (curateGroup.equals(""))
+                    {
+                    	curateGroup = (String) (FlowCurationUtils.groups.keySet().iterator().next());
+                    }
+                    groupSelect.setOptionSelected(curateGroup);
+                }
+                Select taskSelect = form.addItem().addSelect("curate_task");
+                taskSelect = FlowCurationUtils.getTaskSelectOptions(taskSelect, curateGroup);
+                taskSelect.setSize(1);
+                taskSelect.setRequired();
                 if(taskSelected!=null)
                 {    
-                    select.setOptionSelected(taskSelected);
+                    taskSelect.setOptionSelected(taskSelected);
                 }
                 
                 // Buttons: 'curate' and 'queue'
@@ -106,27 +143,4 @@ public class CurateForm extends AbstractDSpaceTransformer
                 buttonList.addButton("submit_queue_task").setValue(T_submit_queue);
                 div.addHidden("administrative-continue").setValue(knot.getId());
         }
-
-        /**
-         * Build a selectbox of all available Curation Task options
-         * 
-         * @param select the empty selectbox
-         * @return a selectbox full of options
-         * @throws WingException
-         * @throws UnsupportedEncodingException 
-         */
-        private Select getCurationOptions(Select select)
-            throws WingException, UnsupportedEncodingException 
-        {
-            String tasksString = ConfigurationManager.getProperty("curate", "ui.tasknames");
-            String[] tasks = tasksString.split(",");
-            for (String task : tasks)
-            {
-                String[] keyValuePair = task.split("=");
-                select.addOption(URLDecoder.decode(keyValuePair[0].trim(), "UTF-8"),
-                                 URLDecoder.decode(keyValuePair[1].trim(), "UTF-8"));
-            }
-            return select;
-        }
-
 }

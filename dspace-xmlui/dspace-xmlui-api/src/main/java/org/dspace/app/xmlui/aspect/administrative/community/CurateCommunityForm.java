@@ -7,10 +7,17 @@
  */
 package org.dspace.app.xmlui.aspect.administrative.community;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.sql.SQLException;
-import java.util.Arrays;
+import java.util.Map;
+import org.xml.sax.SAXException;
+
+import org.apache.avalon.framework.parameters.Parameters;
+import org.apache.cocoon.ProcessingException;
+import org.apache.cocoon.environment.SourceResolver;
+
+import org.dspace.app.xmlui.aspect.administrative.FlowCurationUtils;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
@@ -36,18 +43,26 @@ public class CurateCommunityForm extends AbstractDSpaceTransformer   {
 	private static final Message T_community_trail = message("xmlui.administrative.community.general.community_trail");
 	private static final Message T_options_metadata = message("xmlui.administrative.community.general.options_metadata");
 	private static final Message T_options_roles = message("xmlui.administrative.community.general.options_roles");
-        private static final Message T_options_curate = message("xmlui.administrative.community.general.options_curate");
-        private static final Message T_submit_perform = message("xmlui.general.perform");
-        private static final Message T_submit_queue = message("xmlui.general.queue");
-        private static final Message T_submit_return = message("xmlui.general.return");
+    private static final Message T_options_curate = message("xmlui.administrative.community.general.options_curate");
+    private static final Message T_submit_perform = message("xmlui.general.perform");
+    private static final Message T_submit_queue = message("xmlui.general.queue");
+    private static final Message T_submit_return = message("xmlui.general.return");
         // End common package language strings
 
         // Page/Form specific language strings
-        private static final Message T_main_head = message("xmlui.administrative.community.CurateCommunityForm.main_head");
-        private static final Message T_title = message("xmlui.administrative.community.CurateCommunityForm.title");
-        private static final Message T_trail = message("xmlui.administrative.community.CurateCommunityForm.trail");
+    private static final Message T_main_head = message("xmlui.administrative.community.CurateCommunityForm.main_head");
+    private static final Message T_title = message("xmlui.administrative.community.CurateCommunityForm.title");
+    private static final Message T_trail = message("xmlui.administrative.community.CurateCommunityForm.trail");
 
-        private static final Message T_label_name = message("xmlui.administrative.community.CurateCommunityForm.label_name");
+    private static final Message T_label_name = message("xmlui.administrative.community.CurateCommunityForm.label_name");
+    private static final Message T_taskgroup_label_name = message("xmlui.administrative.CurateForm.taskgroup_label_name");
+    
+    public void setup(SourceResolver resolver, Map objectModel, String src,
+    		          Parameters parameters) throws ProcessingException, SAXException, IOException
+    {
+    	super.setup(resolver, objectModel, src, parameters);
+    	FlowCurationUtils.setupCurationTasks();
+    }
 
         /**
          * common package method for initializing form gui elements
@@ -90,38 +105,45 @@ public class CurateCommunityForm extends AbstractDSpaceTransformer   {
             options.addItem().addHighlight("bold").addXref(baseURL+"&submit_curate",T_options_curate);
 
 	    List curationTaskList = main.addList("curationTaskList", "form");
-	    curationTaskList.addLabel(T_label_name);
-            Select select = curationTaskList.addItem().addSelect("curate_task");
-            select = getCurationOptions(select);
-            select.setSize(1);
-            select.setRequired();
-            
-            // need submit_curate_task and submit_return
+        String curateGroup = "";
+        try
+        {
+        	curateGroup = (parameters.getParameter("select_curate_group") != null) ? parameters.getParameter("select_curate_group") : FlowCurationUtils.UNGROUPED_TASKS;
+        }
+        catch (Exception pe)
+        {
+        	// noop
+        }
+        if (!FlowCurationUtils.groups.isEmpty())
+        {
+        	curationTaskList.addLabel(T_taskgroup_label_name); //needs to check for >=1 group configured
+            Select groupSelect = curationTaskList.addItem().addSelect("select_curate_group");
+            groupSelect = FlowCurationUtils.getGroupSelectOptions(groupSelect);
+            groupSelect.setSize(1);
+            groupSelect.setRequired();
+            groupSelect.setEvtBehavior("submitOnChange");
+            if (curateGroup.equals(""))
+            {
+            	curateGroup = (String) (FlowCurationUtils.groups.keySet().iterator().next());
+            }
+            groupSelect.setOptionSelected(curateGroup);
+        }
+        curationTaskList.addLabel(T_label_name);
+        Select taskSelect = curationTaskList.addItem().addSelect("curate_task");
+        taskSelect = FlowCurationUtils.getTaskSelectOptions(taskSelect, curateGroup);
+        taskSelect.setSize(1);
+        taskSelect.setRequired();
+        
+        // need submit_curate_task and submit_return
 	    Para buttonList = main.addPara();
-            buttonList.addButton("submit_curate_task").setValue(T_submit_perform);
-            buttonList.addButton("submit_queue_task").setValue(T_submit_queue);
+        buttonList.addButton("submit_curate_task").setValue(T_submit_perform);
+        buttonList.addButton("submit_queue_task").setValue(T_submit_queue);
 	    buttonList.addButton("submit_return").setValue(T_submit_return);
-            main.addHidden("administrative-continue").setValue(knot.getId());
+        main.addHidden("administrative-continue").setValue(knot.getId());
 
     }
 
-        private Select getCurationOptions(Select select)
-                                            throws WingException, UnsupportedEncodingException {
-            String tasksString = ConfigurationManager.getProperty("curate", "ui.tasknames");
-            String[] tasks = tasksString.split(",");
-            java.util.List<String> taskList = Arrays.asList(tasks);
-            for (String task : taskList)
-            {
-                String[] keyValuePair = task.split("=");
-                select.addOption(URLDecoder.decode(keyValuePair[0].trim(), "UTF-8"), URLDecoder.decode(keyValuePair[1].trim(), "UTF-8"));
-            }
-            return select;
-        }
-
         // Add a method here to build it into the dspace.cfg ... ui.curation_tasks = estimate = "Estate"
         // Mapping the task name to either the description or the mapping key
-
-        
-
 
 }

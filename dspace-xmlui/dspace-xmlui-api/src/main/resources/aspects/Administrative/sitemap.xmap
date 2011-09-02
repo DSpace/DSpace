@@ -577,12 +577,13 @@ to administer DSpace.
 		        			</map:transform>
 		        		</map:match>
 
-                                        <!-- Curation options -->
+                        <!-- Curation options -->
 		        		<map:match pattern="admin/item/curateItem">
-                                            <map:transform type="CurateItemForm">
-                                                <map:parameter name="itemID" value="{flow-attribute:itemID}"/>
-                                            </map:transform>
-                                        </map:match>
+                            <map:transform type="CurateItemForm">
+                                <map:parameter name="select_curate_group" value="{flow-attribute:select_curate_group}"/>
+                                <map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+                            </map:transform>
+                        </map:match>
 		        		
 		        		<!--
 		        			Upload a new bitstream
@@ -762,12 +763,13 @@ to administer DSpace.
 		        			</map:transform>
 		        		</map:match> 		
 
-                                        <!-- Curation options -->
+                        <!-- Curation options -->
 		        		<map:match pattern="admin/collection/curateCollection">
-                                            <map:transform type="CurateCollectionForm">
-                                                <map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
-                                            </map:transform>
-                                        </map:match>
+                            <map:transform type="CurateCollectionForm">
+                                <map:parameter name="select_curate_group" value="{flow-attribute:select_curate_group}"/>
+                                <map:parameter name="collectionID" value="{flow-attribute:collectionID}"/>
+                            </map:transform>
+                        </map:match>
 		        		
 		        		
 		        		
@@ -811,12 +813,13 @@ to administer DSpace.
 		        			</map:transform>
 		        		</map:match>
       		
-                                        <!-- Curation options -->
+                        <!-- Curation options -->
 		        		<map:match pattern="admin/community/curateCommunity">
-                                            <map:transform type="CurateCommunityForm">
-                                                <map:parameter name="communityID" value="{flow-attribute:communityID}"/>
-                                            </map:transform>
-                                        </map:match>
+                            <map:transform type="CurateCommunityForm">
+                                <map:parameter name="select_curate_group" value="{flow-attribute:select_curate_group}"/> 
+                                <map:parameter name="communityID" value="{flow-attribute:communityID}"/>
+                            </map:transform>
+                        </map:match>
 		        	<!-- Authorization pages -->
 		        		
 		        		
@@ -892,12 +895,13 @@ to administer DSpace.
 		        			</map:transform>
 		        		</map:match>
 
-                                        <!-- Site-Wide Curation page -->
+                        <!-- Site-Wide Curation page -->
 		        		<map:match pattern="admin/curate/main">
-                                            <map:transform type="CurateForm">
-                                                <map:parameter name="curate_task" value="{flow-attribute:curate_task}"/>
-                                                <map:parameter name="identifier" value="{flow-attribute:identifier}"/>
-                                            </map:transform>
+                            <map:transform type="CurateForm">
+                                <map:parameter name="select_curate_group" value="{flow-attribute:select_curate_group}"/>
+                                <map:parameter name="curate_task" value="{flow-attribute:curate_task}"/>
+                                <map:parameter name="identifier" value="{flow-attribute:identifier}"/>
+                            </map:transform>
 		        		</map:match>
 
 		        	</map:match> <!-- if flow -->

@@ -8,15 +8,22 @@
 package org.dspace.app.xmlui.aspect.administrative;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.cocoon.environment.Request;
 
-import org.dspace.app.xmlui.wing.Message;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.curate.Curator;
+
+import org.dspace.app.xmlui.wing.Message;
+import org.dspace.app.xmlui.wing.WingException;
+import org.dspace.app.xmlui.wing.element.Select;
 
 /**
  *
@@ -143,7 +150,7 @@ public class FlowCurationUtils
      * @param taskID the short name / identifier for the task
      * @return the User Friendly name for this task
      */
-    private static String getUITaskName(String taskID)
+    protected static String getUITaskName(String taskID)
     {       
             String tasksString = ConfigurationManager.getProperty("curate", "ui.tasknames");
             String[] tasks = tasksString.split(",");
@@ -232,6 +239,136 @@ public class FlowCurationUtils
             }
         }
         return FlowCurationUtils.getQueueFlowResult(task, status, objHandle, taskQueueName);
+    }
+    
+    /** Utility methods to support curation groups/tasks form fields
+     *
+     *
+     */
+    public static final String CURATE_TASK_NAMES  = "ui.tasknames";
+    public static final String CURATE_GROUP_NAMES = "ui.taskgroups";
+    public static final String CURATE_GROUP_PREFIX = "ui.taskgroup";
+    public static final String UNGROUPED_TASKS    = "ungrouped";
+    
+    public static Map<String, String> allTasks = new LinkedHashMap<String, String>();
+    public static Map<String, String[]> groupedTasks = new LinkedHashMap<String, String[]>();
+    public static Map<String, String> groups = new LinkedHashMap<String, String>();
+    
+    public static void setupCurationTasks()
+    {
+    	try
+    	{
+    		setAllTasks();
+    		setGroupedTasks();
+    		setGroups();
+    	}
+    	catch (Exception we)
+    	{
+    		// noop
+    	}
+    }
+    
+    public static void setAllTasks() throws WingException, UnsupportedEncodingException
+    {
+    	String csvList = ConfigurationManager.getProperty("curate", CURATE_TASK_NAMES);
+    	String[] properties = csvList.split(",");
+    	for (String property : properties)
+    	{
+             //System.out.println("set all tasks and property = " + property + "\n");
+    		String[] keyValuePair = property.split("=");
+            allTasks.put(URLDecoder.decode(keyValuePair[0].trim(), "UTF-8"),
+            		    URLDecoder.decode(keyValuePair[1].trim(), "UTF-8"));
+    	}
+    }
+    
+    public static void setGroups() throws WingException, UnsupportedEncodingException
+    {
+    	String csvList = ConfigurationManager.getProperty("curate", CURATE_GROUP_NAMES);
+        if (csvList != null)
+        {
+        	String[] properties = csvList.split(",");
+        	for (String property : properties)
+            {
+        		String[] keyValuePair = property.split("=");
+        		groups.put(URLDecoder.decode(keyValuePair[0].trim(), "UTF-8"),
+                          URLDecoder.decode(keyValuePair[1].trim(), "UTF-8"));
+        	}
+        }
+    }
+    
+    public static void setGroupedTasks() throws WingException, UnsupportedEncodingException
+    {
+    	if (groups.isEmpty())
+    	{
+    		setGroups();
+    	}
+    	if (!groups.isEmpty())
+    	{
+    		Iterator<String> iterator = groups.keySet().iterator();
+    		while (iterator.hasNext())
+    		{
+                String key = iterator.next();
+                String csvList = ConfigurationManager.getProperty("curate", CURATE_GROUP_PREFIX + "." + key);
+                String[] properties  = csvList.split(",");
+                groupedTasks.put(URLDecoder.decode(key, "UTF-8"), properties);
+            }
+        }
+    }
+
+    public static Select getGroupSelectOptions(Select select) throws WingException
+    {
+    	Iterator<String> iterator = groups.keySet().iterator();
+        while (iterator.hasNext())
+        {
+        	String key = iterator.next();
+            select.addOption(key, groups.get(key));
+        }
+        return select;
+    }
+    
+    public static Select getTaskSelectOptions(Select select, String curateGroup) throws WingException
+    {
+    	String key = new String();
+    	String[] values = null;
+        Iterator<String> iterator = null;
+        if (groupedTasks.isEmpty())
+        {
+        	iterator = allTasks.keySet().iterator();
+            while (iterator.hasNext())
+            {
+            	key = iterator.next();
+                select.addOption(key, allTasks.get(key));
+            }
+            return select;
+        }
+        else
+        {
+        	iterator = groupedTasks.keySet().iterator();
+        }
+        while (iterator.hasNext())
+        {
+        	key = iterator.next();
+            values = groupedTasks.get(key);
+            if (key.equals(curateGroup))
+            {
+            	for (String value : values)
+                {
+                    Iterator<String> innerIterator = allTasks.keySet().iterator();
+                    while (innerIterator.hasNext())
+                    {
+                    	String optionValue = innerIterator.next().trim();
+                    	String optionText  = new String("");
+                    	// out.print("Value: " + value + ": OptionValue: " + optionValue + ". Does value.trim().equals(optionValue)? " + value.equals(opti$
+                    	if (optionValue.equals(value.trim()))
+                    	{	
+                    		optionText  = (String) allTasks.get(optionValue);
+                            select.addOption(optionValue, optionText);
+                        }
+                    }
+                }
+    		}
+        }
+        return select;
     }
     
 }
