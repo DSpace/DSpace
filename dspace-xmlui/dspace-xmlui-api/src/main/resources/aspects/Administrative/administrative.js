@@ -3068,9 +3068,7 @@ function doCurate()
         else if (!cocoon.request.get("select_curate_group")) {
              identifier = null;
          }
-            identifier = null;
-        }
-        
+       
         //if 'curate_task' parameter was set in result, pass it back to sendPageAndWait call (so it is prepopulated in Admin UI)
         if (result != null && result.getParameter("curate_task")) {
             curateTask = result.getParameter("curate_task");
