@@ -32,7 +32,6 @@
 
 
    <modules>
-       <module>dspace-foresite-java</module>
        <module>dspace-swordv2-api</module>
        <module>dspace-swordv2-webapp</module>
    </modules>
