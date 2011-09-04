@@ -20,6 +20,7 @@ import org.dspace.content.Bundle;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Constants;
+import org.dspace.license.CreativeCommons;
 
 /**
  * Default plugin implementation of the embargo setting function.
@@ -82,7 +83,7 @@ public class DefaultEmbargoSetter implements EmbargoSetter
         {
             // Skip the LICENSE and METADATA bundles, they stay world-readable
             String bnn = bn.getName();
-            if (!(bnn.equals(Constants.LICENSE_BUNDLE_NAME) || bnn.equals(Constants.METADATA_BUNDLE_NAME)))
+            if (!(bnn.equals(Constants.LICENSE_BUNDLE_NAME) || bnn.equals(Constants.METADATA_BUNDLE_NAME) || bnn.equals(CreativeCommons.CC_BUNDLE_NAME)))
             {
                 AuthorizeManager.removePoliciesActionFilter(context, bn, Constants.READ);
                 for (Bitstream bs : bn.getBitstreams())
@@ -106,7 +107,7 @@ public class DefaultEmbargoSetter implements EmbargoSetter
         {
             // Skip the LICENSE and METADATA bundles, they stay world-readable
             String bnn = bn.getName();
-            if (!(bnn.equals(Constants.LICENSE_BUNDLE_NAME) || bnn.equals(Constants.METADATA_BUNDLE_NAME)))
+            if (!(bnn.equals(Constants.LICENSE_BUNDLE_NAME) || bnn.equals(Constants.METADATA_BUNDLE_NAME) || bnn.equals(CreativeCommons.CC_BUNDLE_NAME)))
             {
                 // don't report on "TEXT" or "THUMBNAIL" bundles; those
                 // can have READ long as the bitstreams in them do not.
