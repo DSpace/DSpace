@@ -268,7 +268,7 @@ public class GoogleMetadata
 
         DCValue v = resolveMetadataField(config);
 
-        if (null != v && !v.value.trim().equals(""))
+        if (null != v && (null != v.value) && !v.value.trim().equals(""))
         {
             metadataMappings.put(fieldName, v.value);
             return true;
