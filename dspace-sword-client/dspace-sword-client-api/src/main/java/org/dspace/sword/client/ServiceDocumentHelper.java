@@ -56,7 +56,7 @@ public class ServiceDocumentHelper {
 
     public static String[] getCommonFileTypes(ServiceDocument serviceDoc, String location)
     {
-        String FTsString = ConfigurationManager.getProperty("sword-client", "sword-client.file-types");
+        String FTsString = ConfigurationManager.getProperty("sword-client", "file-types");
         String[] clientFTsArray = FTsString.split(",");
         List<String> clientFTs = Arrays.asList(clientFTsArray);
 
@@ -77,7 +77,7 @@ public class ServiceDocumentHelper {
 
     public static String[] getCommonPackageFormats(ServiceDocument serviceDoc, String location)
     {
-        String PFsString = ConfigurationManager.getProperty("sword-client", "sword-client.package-formats");
+        String PFsString = ConfigurationManager.getProperty("sword-client", "package-formats");
         String[] clientPFsArray = PFsString.split(",");
         List<String> clientPFs = Arrays.asList(clientPFsArray);
 

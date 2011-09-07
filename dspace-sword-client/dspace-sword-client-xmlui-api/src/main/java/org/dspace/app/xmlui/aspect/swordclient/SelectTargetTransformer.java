@@ -95,7 +95,7 @@ public class SelectTargetTransformer extends AbstractDSpaceTransformer
         List targetDetails = main.addList("target_details",List.TYPE_FORM);
 
         Select source = targetDetails.addItem().addSelect("url");
-        String targetsString = ConfigurationManager.getProperty("sword-client", "sword-client.targets");
+        String targetsString = ConfigurationManager.getProperty("sword-client", "targets");
         String[] targets = targetsString.split(",");
         for (String target : targets)
         {
