@@ -75,6 +75,7 @@
         </map:matchers>
 
         <map:actions>
+            <map:action name="ClaimTasksAction" src="org.dspace.app.xmlui.aspect.xmlworkflow.ClaimTasksAction"/>
             <map:action name="UnclaimTasksAction" src="org.dspace.app.xmlui.aspect.xmlworkflow.UnclaimTasksAction"/>
             <map:action name="ReturnToSubmitterAction" src="org.dspace.app.xmlui.aspect.xmlworkflow.admin.ReturnToSubmitterAction"/>
             <map:action name="DeleteWorkflowItemsAction" src="org.dspace.app.xmlui.aspect.xmlworkflow.admin.DeleteWorkflowItemsAction"/>
@@ -133,6 +134,10 @@
                     reviewing those submissions.
                     -->
                     <map:match pattern="submissions">
+                        <map:match type="request" pattern="submit_take_tasks">
+                            <map:act type="ClaimTasksAction" />
+                        </map:match>
+
                         <map:match type="request" pattern="submit_return_tasks">
                             <map:act type="UnclaimTasksAction"/>
                         </map:match>
@@ -154,6 +159,12 @@
                     </map:match>
 
                     <map:match pattern="handle/*/*/xmlworkflow/workflowexception">
+                        <map:transform type="WorkflowExceptionTransformer">
+                            <map:parameter name="error" value="{flow-attribute:error}"/>
+                        </map:transform>
+                    </map:match>
+
+                    <map:match pattern="handle/*/*/workflow/workflowexception">
                         <map:transform type="WorkflowExceptionTransformer">
                             <map:parameter name="error" value="{flow-attribute:error}"/>
                         </map:transform>

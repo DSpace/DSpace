@@ -247,7 +247,7 @@ public class Submissions extends AbstractDSpaceTransformer
         table.setHead(T_w_head3);
 
         header = table.addRow(Row.ROLE_HEADER);
-//        header.addCellContent(T_w_column1);
+        header.addCellContent(T_w_column1);
         header.addCellContent(T_w_column2);
         header.addCellContent(T_w_column3);
         header.addCellContent(T_w_column4);
@@ -265,7 +265,6 @@ public class Submissions extends AbstractDSpaceTransformer
                 try {
                     item = XmlWorkflowItem.find(context, workflowItemID);
                     Workflow wf = WorkflowFactory.getWorkflow(item.getCollection());
-                    Step step = wf.getStep(step_id);
                     String url = contextPath+"/handle/"+item.getCollection().getHandle()+"/xmlworkflow?workflowID="+workflowItemID+"&stepID="+step_id+"&actionID="+action_id;
                     DCValue[] titles = item.getItem().getDC("title", null, Item.ANY);
                     String collectionName = item.getCollection().getMetadata("name");
@@ -278,9 +277,9 @@ public class Submissions extends AbstractDSpaceTransformer
 
                     Row row = table.addRow();
 
-//                    CheckBox remove = row.addCell().addCheckBox("workflowID");
-//                    remove.setLabel("selected");
-//                    remove.addOption(workflowItemID);
+                    CheckBox claimTask = row.addCell().addCheckBox("workflowID");
+                    claimTask.setLabel("selected");
+                    claimTask.addOption(workflowItemID);
 
                     // The task description
 //                    row.addCell().addXref(url,message("xmlui.Submission.Submissions.claimAction"));
@@ -313,8 +312,8 @@ public class Submissions extends AbstractDSpaceTransformer
                     log.error(LogManager.getHeader(context, "Error while adding pooled tasks on the submissions page", ""), e);
                 }
             }
-//        	Row row = table.addRow();
-// 	    	row.addCell(0,5).addButton("submit_take_tasks").setValue(T_w_submit_take);
+        	Row row = table.addRow();
+	    	row.addCell(0,5).addButton("submit_take_tasks").setValue(T_w_submit_take);
         }
         else
         {

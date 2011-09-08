@@ -441,7 +441,7 @@ function doNextPage(collectionHandle, workspaceID, stepConfig, stepAndPage, resp
     //-------------------------------------
     //perform step processing (this returns null if no errors, otherwise an error string)
     response_flag = processPage(workspaceID, stepConfig, page);
-     
+
     return response_flag;
 }
 
@@ -504,13 +504,7 @@ function processPage(workspaceID, stepConfig, page)
 	stepClass.setCurrentPage(getHttpRequest(), page);	
 		
 	//call the step's doProcessing() method
-    try {
-	    response_flag = stepClass.doProcessing(getDSContext(), getHttpRequest(), getHttpResponse(), submissionInfo);
-    } catch(exception) {
-        sendPage("handle/" + handle + "/xmlworkflow/workflowexception", {"error":exception.toString()});
-        cocoon.exit();
-
-    }
+    response_flag = stepClass.doProcessing(getDSContext(), getHttpRequest(), getHttpResponse(), submissionInfo);
 
 	//if this is a non-interactive step,
 	//we cannot do much with errors/responses other than logging them!
