@@ -46,6 +46,14 @@ Common usage:
     <!-- Build parameters that are likely to need tweaking             -->
     <!-- ============================================================= -->
 
+    <!-- Default overwrite to true. This may be overridden. -->
+    <condition property="overwrite" value="true">
+        <not>
+            <isset property="overwrite"/>
+        </not>
+    </condition>
+
+
     <!-- Default configuration to use.  This may be overridden. -->
     <property name="config" value="config/dspace.cfg" />
 
@@ -132,9 +140,9 @@ Common usage:
         <echo message="" />
         <echo message="-Dconfig=&lt;path/to/dspace.cfg&gt;  -- Where your dspace.cfg configuration" />
         <echo message="                                  is located" />
-    	<echo message="-Doverwrite=true               -- Will force update_configs to copy existing"/>
+    	<echo message="-Doverwrite=false              -- Will force update_configs to no longer copy existing"/>
     	<echo message="                                  config to .old files when they conflict with"/>
-    	<echo message="                                  the new config.  Otherwise, new conflicting"/>
+    	<echo message="                                  the new config.  Instead, new conflicting"/>
     	<echo message="                                  file with be suffixed with .new."/>
 
         <echo message="-Dwars=true                    -- Build .war files when updating web" />
@@ -178,7 +186,7 @@ Common usage:
     	<antcall target="init_geolite" />
     </target>
 
-    <target name="overwrite_configs" description="Overwrites a configuration directory." if="overwrite" depends="copy_configs_keep">
+    <target name="overwrite_configs" description="Overwrites a configuration directory." if="${overwrite}" depends="copy_configs_keep">
 
         <!--
         Copy files that are absent in target
@@ -250,7 +258,7 @@ Common usage:
 
     </target>
 
-    <target name="copy_configs_keep" unless="overwrite" depends="prepare_configs">
+    <target name="copy_configs_keep" unless="${overwrite}" depends="prepare_configs">
 
         <!--
         Copy files that are absent in target
@@ -342,7 +350,7 @@ Common usage:
 
     </target>
 
-    <target name="overwrite_solr_configs" description="Overwrites a configuration directory." if="overwrite" depends="copy_solr_configs_keep">
+    <target name="overwrite_solr_configs" description="Overwrites a configuration directory." if="${overwrite}" depends="copy_solr_configs_keep">
 
         <!--
         Copy files that are absent in target
@@ -424,7 +432,7 @@ Common usage:
 
     </target>
 
-    <target name="copy_solr_configs_keep" unless="overwrite" depends="prepare_solr_configs">
+    <target name="copy_solr_configs_keep" unless="${overwrite}" depends="prepare_solr_configs">
 
         <!--
         Copy files that are absent in target
