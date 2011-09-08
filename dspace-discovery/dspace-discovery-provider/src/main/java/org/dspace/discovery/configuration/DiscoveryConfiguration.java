@@ -29,7 +29,7 @@ public class DiscoveryConfiguration {
     /** The search filters which can be selected on the search page**/
     private List<DiscoverySearchFilter> searchFilters = new ArrayList<DiscoverySearchFilter>();
 
-    private List<DiscoverySortConfiguration> searchSortFields = new ArrayList<DiscoverySortConfiguration>();
+    private DiscoverySortConfiguration searchSortConfiguration;
 
     private String id;
 
@@ -80,12 +80,12 @@ public class DiscoveryConfiguration {
         this.searchFilters = searchFilters;
     }
 
-    public List<DiscoverySortConfiguration> getSearchSortFields() {
-        return searchSortFields;
+    public DiscoverySortConfiguration getSearchSortConfiguration() {
+        return searchSortConfiguration;
     }
 
     @Required
-    public void setSearchSortFields(List<DiscoverySortConfiguration> searchSortFields) {
-        this.searchSortFields = searchSortFields;
+    public void setSearchSortConfiguration(DiscoverySortConfiguration searchSortConfiguration) {
+        this.searchSortConfiguration = searchSortConfiguration;
     }
 }

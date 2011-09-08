@@ -28,9 +28,9 @@ import org.dspace.core.LogManager;
 import org.dspace.discovery.*;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
+import org.dspace.discovery.configuration.DiscoverySortFieldConfiguration;
 import org.dspace.handle.HandleManager;
 import org.dspace.sort.SortOption;
-import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -413,22 +413,24 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         queryArgs.setMaxResults(getParameterRpp());
 
         String sortBy = ObjectModelHelper.getRequest(objectModel).getParameter("sort_by");
+        DiscoverySortConfiguration searchSortConfiguration = discoveryConfiguration.getSearchSortConfiguration();
         if(sortBy == null){
             //Attempt to find the default one, if none found we use SCORE
             sortBy = "score";
-            List<DiscoverySortConfiguration> searchSortFields = discoveryConfiguration.getSearchSortFields();
-            for (DiscoverySortConfiguration sortConfiguration : searchSortFields) {
-                if(sortConfiguration.isDefaultSort()){
-                    sortBy = SearchUtils.getSearchService().toSortFieldIndex(sortConfiguration.getMetadataField(), sortConfiguration.getType());
+            if(searchSortConfiguration != null){
+                for (DiscoverySortFieldConfiguration sortFieldConfiguration : searchSortConfiguration.getSortFields()) {
+                    if(sortFieldConfiguration.equals(searchSortConfiguration.getDefaultSort())){
+                        sortBy = SearchUtils.getSearchService().toSortFieldIndex(sortFieldConfiguration.getMetadataField(), sortFieldConfiguration.getType());
+                    }
                 }
             }
         }
         String sortOrder = ObjectModelHelper.getRequest(objectModel).getParameter("order");
-        if(sortOrder == null){
-            sortOrder = new DSpace().getConfigurationService().getProperty("discovery.search.default.sort.order");
+        if(sortOrder == null && searchSortConfiguration != null){
+            sortOrder = searchSortConfiguration.getDefaultSortOrder().toString();
         }
 
-        if (sortOrder == null || sortOrder.equals("DESC"))
+        if (sortOrder == null || sortOrder.equalsIgnoreCase("DESC"))
         {
             queryArgs.setSortField(sortBy, DiscoverQuery.SORT_ORDER.desc);
         }
@@ -595,11 +597,7 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
     }
 
     protected String getParameterOrder() {
-        String sortOrder = ObjectModelHelper.getRequest(objectModel).getParameter("order");
-        if(sortOrder == null){
-            sortOrder = new DSpace().getConfigurationService().getProperty("discovery.search.default.sort.order");
-        }
-        return sortOrder;
+        return ObjectModelHelper.getRequest(objectModel).getParameter("order");
     }
 
     protected String getParameterScope() {
@@ -704,19 +702,27 @@ public abstract class AbstractSearch extends AbstractDSpaceTransformer implement
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
         DiscoveryConfiguration discoveryConfiguration = SearchUtils.getDiscoveryConfiguration(dso);
 
-        for (DiscoverySortConfiguration sortConfiguration : discoveryConfiguration.getSearchSortFields()) {
-            String sortField = SearchUtils.getSearchService().toSortFieldIndex(sortConfiguration.getMetadataField(), sortConfiguration.getType());
+        DiscoverySortConfiguration searchSortConfiguration = discoveryConfiguration.getSearchSortConfiguration();
+        if(searchSortConfiguration != null){
+            for (DiscoverySortFieldConfiguration sortFieldConfiguration : searchSortConfiguration.getSortFields()) {
+                String sortField = SearchUtils.getSearchService().toSortFieldIndex(sortFieldConfiguration.getMetadataField(), sortFieldConfiguration.getType());
 
-            String currentSort = getParameterSortBy();
-            sortSelect.addOption((sortField.equals(currentSort) || sortConfiguration.isDefaultSort()), sortField,
-                    message("xmlui.ArtifactBrowser.AbstractSearch.sort_by." + sortField));
+                String currentSort = getParameterSortBy();
+                sortSelect.addOption((sortField.equals(currentSort) || sortFieldConfiguration.equals(searchSortConfiguration.getDefaultSort())), sortField,
+                        message("xmlui.ArtifactBrowser.AbstractSearch.sort_by." + sortField));
+            }
         }
 
         // Create a control to changing ascending / descending order
         controlsItem.addContent(T_order);
         Select orderSelect = controlsItem.addSelect("order");
-        orderSelect.addOption(SortOption.ASCENDING.equals(getParameterOrder()), SortOption.ASCENDING, T_order_asc);
-        orderSelect.addOption(SortOption.DESCENDING.equals(getParameterOrder()), SortOption.DESCENDING, T_order_desc);
+
+        String parameterOrder = getParameterOrder();
+        if(parameterOrder == null && searchSortConfiguration != null) {
+            parameterOrder = searchSortConfiguration.getDefaultSortOrder().toString();
+        }
+        orderSelect.addOption(SortOption.ASCENDING.equalsIgnoreCase(parameterOrder), SortOption.ASCENDING, T_order_asc);
+        orderSelect.addOption(SortOption.DESCENDING.equalsIgnoreCase(parameterOrder), SortOption.DESCENDING, T_order_desc);
 
         controlsItem.addButton("submit_sort").setValue(T_sort_button);
 

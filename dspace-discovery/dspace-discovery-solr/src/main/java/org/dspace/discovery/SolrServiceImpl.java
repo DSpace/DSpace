@@ -642,7 +642,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
             //A map used to save each sidebarFacet config by the metadata fields
             Map<String, List<SidebarFacetConfiguration>> sidebarFacets = new HashMap<String, List<SidebarFacetConfiguration>>();
             Map<String, List<DiscoverySearchFilter>> searchFilters = new HashMap<String, List<DiscoverySearchFilter>>();
-            Map<String, DiscoverySortConfiguration> sortFields = new HashMap<String, DiscoverySortConfiguration>();
+            Map<String, DiscoverySortFieldConfiguration> sortFields = new HashMap<String, DiscoverySortFieldConfiguration>();
             Map<String, DiscoveryRecentSubmissionsConfiguration> recentSubmissionsConfigurationMap = new HashMap<String, DiscoveryRecentSubmissionsConfiguration>();
             for (DiscoveryConfiguration discoveryConfiguration : discoveryConfigurations) {
                 //Sidebar facet mapping configuration read in
@@ -679,9 +679,11 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                     }
                 }
 
-                List<DiscoverySortConfiguration> sortConfigurations = discoveryConfiguration.getSearchSortFields();
-                for (DiscoverySortConfiguration discoverySortConfiguration : sortConfigurations) {
-                    sortFields.put(discoverySortConfiguration.getMetadataField(), discoverySortConfiguration);
+                DiscoverySortConfiguration sortConfiguration = discoveryConfiguration.getSearchSortConfiguration();
+                if(sortConfiguration != null){
+                    for (DiscoverySortFieldConfiguration discoverySortConfiguration : sortConfiguration.getSortFields()) {
+                        sortFields.put(discoverySortConfiguration.getMetadataField(), discoverySortConfiguration);
+                    }
                 }
 
                 DiscoveryRecentSubmissionsConfiguration recentSubmissionConfiguration = discoveryConfiguration.getRecentSubmissionConfiguration();

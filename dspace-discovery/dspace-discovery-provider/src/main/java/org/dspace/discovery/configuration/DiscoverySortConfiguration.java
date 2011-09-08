@@ -15,39 +15,51 @@
 package org.dspace.discovery.configuration;
 
 
+import org.apache.commons.collections.iterators.ArrayListIterator;
+import org.dspace.discovery.DiscoverQuery;
 import org.springframework.beans.factory.annotation.Required;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Kevin Van de Velde (kevin at atmire dot com)
  */
 public class DiscoverySortConfiguration {
 
-    private String metadataField;
-    private String type = DiscoveryConfigurationParameters.TYPE_TEXT;
-    private boolean defaultSort = false;
-
-    public String getMetadataField() {
-        return metadataField;
+    /** Attributes used for sorting of results **/
+    public enum SORT_ORDER {
+        desc,
+        asc
     }
 
-    @Required
-    public void setMetadataField(String metadataField) {
-        this.metadataField = metadataField;
-    }
+    private DiscoverySortFieldConfiguration defaultSort = null;
 
-    public String getType() {
-        return type;
-    }
+    private List<DiscoverySortFieldConfiguration> sortFields = new ArrayList<DiscoverySortFieldConfiguration>();
 
-    public void setType(String type) {
-        this.type = type;
-    }
+    private SORT_ORDER defaultSortOrder = SORT_ORDER.desc;
 
-    public boolean isDefaultSort() {
+    public DiscoverySortFieldConfiguration getDefaultSort() {
         return defaultSort;
     }
 
-    public void setDefaultSort(boolean defaultSort) {
+    public void setDefaultSort(DiscoverySortFieldConfiguration defaultSort) {
         this.defaultSort = defaultSort;
+    }
+
+    public List<DiscoverySortFieldConfiguration> getSortFields() {
+        return sortFields;
+    }
+
+    public void setSortFields(List<DiscoverySortFieldConfiguration> sortFields) {
+        this.sortFields = sortFields;
+    }
+
+    public SORT_ORDER getDefaultSortOrder() {
+        return defaultSortOrder;
+    }
+
+    public void setDefaultSortOrder(SORT_ORDER defaultSortOrder) {
+        this.defaultSortOrder = defaultSortOrder;
     }
 }

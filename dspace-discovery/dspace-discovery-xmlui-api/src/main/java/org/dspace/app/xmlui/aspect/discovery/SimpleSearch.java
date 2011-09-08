@@ -343,12 +343,12 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
             parameters.put("group_by", String.valueOf(this.getParameterGroup()));
         }
 
-        if (getParameterSortBy() != null)
+        if (parameters.get("sort_by") == null && getParameterSortBy() != null)
         {
             parameters.put("sort_by", String.valueOf(getParameterSortBy()));
         }
 
-        if (parameters.get("order") == null)
+        if (parameters.get("order") == null && getParameterOrder() != null)
         {
             parameters.put("order", getParameterOrder());
         }
@@ -357,7 +357,7 @@ public class SimpleSearch extends AbstractSearch implements CacheableProcessingC
         {
             parameters.put("etal", String.valueOf(getParameterEtAl()));
         }
-        if(parameters.get("scope") == null)
+        if(parameters.get("scope") == null && getParameterScope() != null)
         {
             parameters.put("scope", getParameterScope());
         }
