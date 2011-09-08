@@ -266,8 +266,8 @@
             <xsl:variable name="page_title" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']" />
             <title>
                 <xsl:choose>
-                        <xsl:when test="not($page_title)">
-                                <xsl:text>  </xsl:text>
+                        <xsl:when test="not($page_title) or (string-length($page_title) &lt; 1)">
+                                <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
                         </xsl:when>
                         <xsl:otherwise>
                                 <xsl:copy-of select="$page_title/node()" />
@@ -303,9 +303,9 @@
             </a>
             <h1 class="pagetitle">
                 <xsl:choose>
-                        <!-- protectiotion against an empty page title -->
-                        <xsl:when test="not(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title'])">
-                                <xsl:text> </xsl:text>
+                        <!-- protection against an empty page title -->
+                        <xsl:when test="not(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']) or (string-length(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']) &lt; 1)">
+                                <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
                         </xsl:when>
                         <xsl:otherwise>
                                 <xsl:copy-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']/node()"/>
@@ -1554,7 +1554,15 @@
             <xsl:call-template name="standardAttributes">
                 <xsl:with-param name="class">ds-div-head</xsl:with-param>
             </xsl:call-template>
-            <xsl:apply-templates />
+
+            <xsl:choose>
+                <xsl:when test="string-length(./node()) &lt; 1">
+                    <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
+                </xsl:when>
+                <xsl:otherwise>
+                    <xsl:apply-templates />
+                </xsl:otherwise>
+            </xsl:choose>
         </xsl:element>
     </xsl:template>
     

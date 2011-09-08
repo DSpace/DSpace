@@ -117,7 +117,7 @@
                         </xsl:choose>
                     </xsl:attribute>
                     <xsl:choose>
-                        <xsl:when test="dim:field[@element='title']">
+                        <xsl:when test="dim:field[@element='title'] and (string-length(dim:field[@element='title']) &gt; 0)">
                             <xsl:value-of select="dim:field[@element='title'][1]/node()"/>
                         </xsl:when>
                         <xsl:otherwise>
