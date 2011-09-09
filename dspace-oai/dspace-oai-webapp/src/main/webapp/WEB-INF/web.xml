@@ -79,9 +79,18 @@
     </description>
   </context-param>
 
-  <!-- 
-   Listener to initialise DSpace configuration and clean up the application 
-  -->
+    <!-- new ConfigurationService initialization for dspace.dir -->
+    <context-param>
+        <description>
+            The location of the main DSpace configuration file
+        </description>
+        <param-name>dspace.dir</param-name>
+        <param-value>${dspace.dir}</param-value>
+    </context-param>
+
+    <!--
+     Listener to initialise DSpace configuration and clean up the application
+    -->
   <listener>
      <listener-class>
         org.dspace.app.util.DSpaceContextListener
