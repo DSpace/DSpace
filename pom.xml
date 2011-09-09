@@ -318,6 +318,14 @@
               <artifactId>dspace-swordv2-api</artifactId>
               <version>${project.version}</version>
           </dependency>
+
+          <dependency>
+              <groupId>org.dspace</groupId>
+              <artifactId>dspace-swordv2-webapp</artifactId>
+              <version>${project.version}</version>
+              <type>jar</type>
+              <classifier>classes</classifier>
+          </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-swordv2-webapp</artifactId>

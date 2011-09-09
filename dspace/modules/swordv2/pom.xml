@@ -113,25 +113,39 @@
    </profiles>
 
    <dependencies>
+
+       <!-- DSpace Implementation of SWORDv2 Provider -->
+       <dependency>
+         <groupId>org.dspace</groupId>
+         <artifactId>dspace-swordv2-webapp</artifactId>
+         <type>jar</type>
+         <classifier>classes</classifier>
+      </dependency>
+
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-swordv2-webapp</artifactId>
          <type>war</type>
       </dependency>
+
+      <!-- SWORD v2 API -->
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-swordv2-api</artifactId>
       </dependency>
+
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-discovery-provider</artifactId>
       </dependency>
+
       <dependency>
          <groupId>javax.servlet</groupId>
          <artifactId>servlet-api</artifactId>
          <version>2.3</version>
          <scope>provided</scope>
       </dependency>
+
    </dependencies>
 
 </project>
