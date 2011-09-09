@@ -1,27 +1,27 @@
 -- Convert workflow groups:
 -- TODO: is 'to_number' ok? do not forget to change role_id values
 
-INSERT INTO xmlwf_collectionrole (collectionrole_id, role_id, group_id, collection_id)
+INSERT INTO cwf_collectionrole (collectionrole_id, role_id, group_id, collection_id)
 SELECT
-xmlwf_collectionrole_seq.nextval as collectionrole_id,
+cwf_collectionrole_seq.nextval as collectionrole_id,
 'reviewer' AS role_id,
 eperson_group_id AS group_id,
 to_number(replace(replace(name, 'COLLECTION_', ''), '_WORKFLOW_STEP_1', '')) AS collection_id
 FROM epersongroup
 WHERE name LIKE 'COLLECTION_%_WORKFLOW_STEP_1';
 
-INSERT INTO xmlwf_collectionrole  (collectionrole_id, role_id, group_id, collection_id)
+INSERT INTO cwf_collectionrole  (collectionrole_id, role_id, group_id, collection_id)
 SELECT
-xmlwf_collectionrole_seq.nextval as collectionrole_id,
+cwf_collectionrole_seq.nextval as collectionrole_id,
 'editor' AS role_id,
 eperson_group_id AS group_id,
 to_number(replace(replace(name, 'COLLECTION_', ''), '_WORKFLOW_STEP_2', '')) AS collection_id
 FROM epersongroup
 WHERE name LIKE 'COLLECTION_%_WORKFLOW_STEP_2';
 
-INSERT INTO xmlwf_collectionrole  (collectionrole_id, role_id, group_id, collection_id)
+INSERT INTO cwf_collectionrole  (collectionrole_id, role_id, group_id, collection_id)
 SELECT
-xmlwf_collectionrole_seq.nextval as collectionrole_id,
+cwf_collectionrole_seq.nextval as collectionrole_id,
 'finaleditor' AS role_id,
 eperson_group_id AS group_id,
 to_number(replace(replace(name, 'COLLECTION_', ''), '_WORKFLOW_STEP_3', '')) AS collection_id
@@ -30,7 +30,7 @@ WHERE name LIKE 'COLLECTION_%_WORKFLOW_STEP_3';
 
 
 -- Migrate workflow items
-INSERT INTO xmlwf_workflowitem (workflowitem_id, item_id, collection_id, multiple_titles, published_before, multiple_files)
+INSERT INTO cwf_workflowitem (workflowitem_id, item_id, collection_id, multiple_titles, published_before, multiple_files)
 SELECT
 workflow_id AS workflowitem_id,
 item_id,
@@ -42,9 +42,9 @@ FROM workflowitem;
 
 
 -- Migrate claimed tasks
-INSERT INTO xmlwf_claimtask (claimtask_id,workflowitem_id, workflow_id, step_id, action_id, owner_id)
+INSERT INTO cwf_claimtask (claimtask_id,workflowitem_id, workflow_id, step_id, action_id, owner_id)
 SELECT
-xmlwf_claimtask_seq.nextval AS claimtask_id,
+cwf_claimtask_seq.nextval AS claimtask_id,
 workflow_id AS workflowitem_id,
 'default' AS workflow_id,
 'reviewstep' AS step_id,
@@ -52,9 +52,9 @@ workflow_id AS workflowitem_id,
 owner AS owner_id
 FROM workflowitem WHERE owner IS NOT NULL AND state = 2;
 
-INSERT INTO xmlwf_claimtask (claimtask_id,workflowitem_id, workflow_id, step_id, action_id, owner_id)
+INSERT INTO cwf_claimtask (claimtask_id,workflowitem_id, workflow_id, step_id, action_id, owner_id)
 SELECT
-xmlwf_claimtask_seq.nextval AS claimtask_id,
+cwf_claimtask_seq.nextval AS claimtask_id,
 workflow_id AS workflowitem_id,
 'default' AS workflow_id,
 'editstep' AS step_id,
@@ -62,9 +62,9 @@ workflow_id AS workflowitem_id,
 owner AS owner_id
 FROM workflowitem WHERE owner IS NOT NULL AND state = 4;
 
-INSERT INTO xmlwf_claimtask (claimtask_id,workflowitem_id, workflow_id, step_id, action_id, owner_id)
+INSERT INTO cwf_claimtask (claimtask_id,workflowitem_id, workflow_id, step_id, action_id, owner_id)
 SELECT
-xmlwf_claimtask_seq.nextval AS claimtask_id,
+cwf_claimtask_seq.nextval AS claimtask_id,
 workflow_id AS workflowitem_id,
 'default' AS workflow_id,
 'finaleditstep' AS step_id,
@@ -74,38 +74,38 @@ FROM workflowitem WHERE owner IS NOT NULL AND state = 6;
 
 
 -- Migrate pooled tasks
-INSERT INTO xmlwf_pooltask (pooltask_id,workflowitem_id, workflow_id, step_id, action_id, group_id)
+INSERT INTO cwf_pooltask (pooltask_id,workflowitem_id, workflow_id, step_id, action_id, group_id)
 SELECT
-xmlwf_pooltask_seq.nextval AS pooltask_id,
+cwf_pooltask_seq.nextval AS pooltask_id,
 workflowitem.workflow_id AS workflowitem_id,
 'default' AS workflow_id,
 'reviewstep' AS step_id,
 'claimaction' AS action_id,
-xmlwf_collectionrole.group_id AS group_id
-FROM workflowitem INNER JOIN xmlwf_collectionrole ON workflowitem.collection_id = xmlwf_collectionrole.collection_id
-WHERE workflowitem.owner IS NULL AND workflowitem.state = 1 AND xmlwf_collectionrole.role_id = 'reviewer';
+cwf_collectionrole.group_id AS group_id
+FROM workflowitem INNER JOIN cwf_collectionrole ON workflowitem.collection_id = cwf_collectionrole.collection_id
+WHERE workflowitem.owner IS NULL AND workflowitem.state = 1 AND cwf_collectionrole.role_id = 'reviewer';
 
-INSERT INTO xmlwf_pooltask (pooltask_id,workflowitem_id, workflow_id, step_id, action_id, group_id)
+INSERT INTO cwf_pooltask (pooltask_id,workflowitem_id, workflow_id, step_id, action_id, group_id)
 SELECT
-xmlwf_pooltask_seq.nextval AS pooltask_id,
+cwf_pooltask_seq.nextval AS pooltask_id,
 workflowitem.workflow_id AS workflowitem_id,
 'default' AS workflow_id,
 'editstep' AS step_id,
 'claimaction' AS action_id,
-xmlwf_collectionrole.group_id AS group_id
-FROM workflowitem INNER JOIN xmlwf_collectionrole ON workflowitem.collection_id = xmlwf_collectionrole.collection_id
-WHERE workflowitem.owner IS NULL AND workflowitem.state = 3 AND xmlwf_collectionrole.role_id = 'editor';
+cwf_collectionrole.group_id AS group_id
+FROM workflowitem INNER JOIN cwf_collectionrole ON workflowitem.collection_id = cwf_collectionrole.collection_id
+WHERE workflowitem.owner IS NULL AND workflowitem.state = 3 AND cwf_collectionrole.role_id = 'editor';
 
-INSERT INTO xmlwf_pooltask (pooltask_id,workflowitem_id, workflow_id, step_id, action_id, group_id)
+INSERT INTO cwf_pooltask (pooltask_id,workflowitem_id, workflow_id, step_id, action_id, group_id)
 SELECT
-xmlwf_pooltask_seq.nextval AS pooltask_id,
+cwf_pooltask_seq.nextval AS pooltask_id,
 workflowitem.workflow_id AS workflowitem_id,
 'default' AS workflow_id,
 'finaleditstep' AS step_id,
 'claimaction' AS action_id,
-xmlwf_collectionrole.group_id AS group_id
-FROM workflowitem INNER JOIN xmlwf_collectionrole ON workflowitem.collection_id = xmlwf_collectionrole.collection_id
-WHERE workflowitem.owner IS NULL AND workflowitem.state = 5 AND xmlwf_collectionrole.role_id = 'finaleditor';
+cwf_collectionrole.group_id AS group_id
+FROM workflowitem INNER JOIN cwf_collectionrole ON workflowitem.collection_id = cwf_collectionrole.collection_id
+WHERE workflowitem.owner IS NULL AND workflowitem.state = 5 AND cwf_collectionrole.role_id = 'finaleditor';
 
 -- Delete resource policies for workflowitems before creating new ones
 DELETE FROM resourcepolicy
@@ -150,10 +150,10 @@ INSERT INTO resourcepolicy (policy_id, resource_type_id, resource_id, action_id,
 SELECT
 resourcepolicy_seq.nextval AS policy_id,
 2 AS resource_type_id,
-xmlwf_workflowitem.item_id AS resource_id,
+cwf_workflowitem.item_id AS resource_id,
 temptable.action_id AS action_id,
-xmlwf_claimtask.owner_id AS eperson_id
-FROM (xmlwf_workflowitem INNER JOIN xmlwf_claimtask ON xmlwf_workflowitem.workflowitem_id = xmlwf_claimtask.workflowitem_id),
+cwf_claimtask.owner_id AS eperson_id
+FROM (cwf_workflowitem INNER JOIN cwf_claimtask ON cwf_workflowitem.workflowitem_id = cwf_claimtask.workflowitem_id),
 temptable;
 
 -- Bundles
@@ -163,11 +163,11 @@ resourcepolicy_seq.nextval AS policy_id,
 1 AS resource_type_id,
 item2bundle.bundle_id AS resource_id,
 temptable.action_id AS action_id,
-xmlwf_claimtask.owner_id AS eperson_id
+cwf_claimtask.owner_id AS eperson_id
 FROM
 (
-	(xmlwf_workflowitem INNER JOIN xmlwf_claimtask ON xmlwf_workflowitem.workflowitem_id = xmlwf_claimtask.workflowitem_id)
-	INNER JOIN item2bundle ON xmlwf_workflowitem.item_id = item2bundle.item_id
+	(cwf_workflowitem INNER JOIN cwf_claimtask ON cwf_workflowitem.workflowitem_id = cwf_claimtask.workflowitem_id)
+	INNER JOIN item2bundle ON cwf_workflowitem.item_id = item2bundle.item_id
 ), temptable;
 
 
@@ -178,11 +178,11 @@ resourcepolicy_seq.nextval AS policy_id,
 0 AS resource_type_id,
 bundle2bitstream.bitstream_id AS resource_id,
 temptable.action_id AS action_id,
-xmlwf_claimtask.owner_id AS eperson_id
+cwf_claimtask.owner_id AS eperson_id
 FROM
 (
-	((xmlwf_workflowitem INNER JOIN xmlwf_claimtask ON xmlwf_workflowitem.workflowitem_id = xmlwf_claimtask.workflowitem_id)
-	INNER JOIN item2bundle ON xmlwf_workflowitem.item_id = item2bundle.item_id)
+	((cwf_workflowitem INNER JOIN cwf_claimtask ON cwf_workflowitem.workflowitem_id = cwf_claimtask.workflowitem_id)
+	INNER JOIN item2bundle ON cwf_workflowitem.item_id = item2bundle.item_id)
 	INNER JOIN bundle2bitstream ON item2bundle.bundle_id = bundle2bitstream.bundle_id
 ), temptable;
 
@@ -193,10 +193,10 @@ INSERT INTO resourcepolicy (policy_id, resource_type_id, resource_id, action_id,
 SELECT
 resourcepolicy_seq.nextval AS policy_id,
 2 AS resource_type_id,
-xmlwf_workflowitem.item_id AS resource_id,
+cwf_workflowitem.item_id AS resource_id,
 temptable.action_id AS action_id,
-xmlwf_pooltask.group_id AS epersongroup_id
-FROM (xmlwf_workflowitem INNER JOIN xmlwf_pooltask ON xmlwf_workflowitem.workflowitem_id = xmlwf_pooltask.workflowitem_id),
+cwf_pooltask.group_id AS epersongroup_id
+FROM (cwf_workflowitem INNER JOIN cwf_pooltask ON cwf_workflowitem.workflowitem_id = cwf_pooltask.workflowitem_id),
 temptable;
 
 -- Bundles
@@ -206,11 +206,11 @@ resourcepolicy_seq.nextval AS policy_id,
 1 AS resource_type_id,
 item2bundle.bundle_id AS resource_id,
 temptable.action_id AS action_id,
-xmlwf_pooltask.group_id AS epersongroup_id
+cwf_pooltask.group_id AS epersongroup_id
 FROM
 (
-	(xmlwf_workflowitem INNER JOIN xmlwf_pooltask ON xmlwf_workflowitem.workflowitem_id = xmlwf_pooltask.workflowitem_id)
-	INNER JOIN item2bundle ON xmlwf_workflowitem.item_id = item2bundle.item_id
+	(cwf_workflowitem INNER JOIN cwf_pooltask ON cwf_workflowitem.workflowitem_id = cwf_pooltask.workflowitem_id)
+	INNER JOIN item2bundle ON cwf_workflowitem.item_id = item2bundle.item_id
 ), temptable;
 
 -- Bitstreams
@@ -220,11 +220,11 @@ resourcepolicy_seq.nextval AS policy_id,
 0 AS resource_type_id,
 bundle2bitstream.bitstream_id AS resource_id,
 temptable.action_id AS action_id,
-xmlwf_pooltask.group_id AS epersongroup_id
+cwf_pooltask.group_id AS epersongroup_id
 FROM
 (
-	((xmlwf_workflowitem INNER JOIN xmlwf_pooltask ON xmlwf_workflowitem.workflowitem_id = xmlwf_pooltask.workflowitem_id)
-	INNER JOIN item2bundle ON xmlwf_workflowitem.item_id = item2bundle.item_id)
+	((cwf_workflowitem INNER JOIN cwf_pooltask ON cwf_workflowitem.workflowitem_id = cwf_pooltask.workflowitem_id)
+	INNER JOIN item2bundle ON cwf_workflowitem.item_id = item2bundle.item_id)
 	INNER JOIN bundle2bitstream ON item2bundle.bundle_id = bundle2bitstream.bundle_id
 ), temptable;
 
@@ -237,10 +237,10 @@ INSERT INTO resourcepolicy (policy_id, resource_type_id, resource_id, action_id,
 SELECT
 resourcepolicy_seq.nextval AS policy_id,
 2 AS resource_type_id,
-xmlwf_workflowitem.item_id AS resource_id,
+cwf_workflowitem.item_id AS resource_id,
 0 AS action_id,
 item.submitter_id AS eperson_id
-FROM (xmlwf_workflowitem INNER JOIN item ON xmlwf_workflowitem.item_id = item.item_id);
+FROM (cwf_workflowitem INNER JOIN item ON cwf_workflowitem.item_id = item.item_id);
 
 INSERT INTO resourcepolicy (policy_id, resource_type_id, resource_id, action_id, eperson_id)
 SELECT
@@ -249,8 +249,8 @@ resourcepolicy_seq.nextval AS policy_id,
 item2bundle.bundle_id AS resource_id,
 0 AS action_id,
 item.submitter_id AS eperson_id
-FROM ((xmlwf_workflowitem INNER JOIN item ON xmlwf_workflowitem.item_id = item.item_id)
-      INNER JOIN item2bundle ON xmlwf_workflowitem.item_id = item2bundle.item_id
+FROM ((cwf_workflowitem INNER JOIN item ON cwf_workflowitem.item_id = item.item_id)
+      INNER JOIN item2bundle ON cwf_workflowitem.item_id = item2bundle.item_id
      );
 
 INSERT INTO resourcepolicy (policy_id, resource_type_id, resource_id, action_id, eperson_id)
@@ -260,96 +260,96 @@ resourcepolicy_seq.nextval AS policy_id,
 bundle2bitstream.bitstream_id AS resource_id,
 0 AS action_id,
 item.submitter_id AS eperson_id
-FROM (((xmlwf_workflowitem INNER JOIN item ON xmlwf_workflowitem.item_id = item.item_id)
-      INNER JOIN item2bundle ON xmlwf_workflowitem.item_id = item2bundle.item_id)
+FROM (((cwf_workflowitem INNER JOIN item ON cwf_workflowitem.item_id = item.item_id)
+      INNER JOIN item2bundle ON cwf_workflowitem.item_id = item2bundle.item_id)
       INNER JOIN bundle2bitstream ON item2bundle.bundle_id = bundle2bitstream.bundle_id
 );
 
 -- TODO: not tested yet
-INSERT INTO xmlwf_in_progress_user (in_progress_user_id, workflowitem_id, step_id, user_id, finished)
+INSERT INTO cwf_in_progress_user (in_progress_user_id, workflowitem_id, step_id, user_id, finished)
 SELECT
-  xmlwf_in_progress_user_seq.nextval AS in_progress_user_id,
-  xmlwf_workflowitem.item_id AS workflowitem_id,
-  xmlwf_claimtask.owner_id AS user_id
+  cwf_in_progress_user_seq.nextval AS in_progress_user_id,
+  cwf_workflowitem.item_id AS workflowitem_id,
+  cwf_claimtask.owner_id AS user_id
   0 as finished
 FROM
-  (xmlwf_claimtask INNER JOIN xmlwf_workflowitem ON xmlwf_workflowitem.workflowitem_id = xmlwf_claimtask.workflowitem_id);
+  (cwf_claimtask INNER JOIN cwf_workflowitem ON cwf_workflowitem.workflowitem_id = cwf_claimtask.workflowitem_id);
 
 -- TODO: improve this, important is NVL(curr, 1)!! without this function, empty tables (max = [null]) will only result in sequence deletion
 DECLARE
   curr  NUMBER := 0;
 BEGIN
-  SELECT max(workflowitem_id) INTO curr FROM xmlwf_workflowitem;
+  SELECT max(workflowitem_id) INTO curr FROM cwf_workflowitem;
 
   curr := curr + 1;
 
-  EXECUTE IMMEDIATE 'DROP SEQUENCE xmlwf_workflowitem_seq';
+  EXECUTE IMMEDIATE 'DROP SEQUENCE cwf_workflowitem_seq';
 
-  EXECUTE IMMEDIATE 'CREATE SEQUENCE xmlwf_workflowitem_seq START WITH ' || NVL(curr, 1);
+  EXECUTE IMMEDIATE 'CREATE SEQUENCE cwf_workflowitem_seq START WITH ' || NVL(curr, 1);
 END;
 /
 
 DECLARE
   curr  NUMBER := 0;
 BEGIN
-  SELECT max(collectionrole_id) INTO curr FROM xmlwf_collectionrole;
+  SELECT max(collectionrole_id) INTO curr FROM cwf_collectionrole;
 
   curr := curr + 1;
 
-  EXECUTE IMMEDIATE 'DROP SEQUENCE xmlwf_collectionrole_seq';
+  EXECUTE IMMEDIATE 'DROP SEQUENCE cwf_collectionrole_seq';
 
-  EXECUTE IMMEDIATE 'CREATE SEQUENCE xmlwf_collectionrole_seq START WITH ' || NVL(curr, 1);
+  EXECUTE IMMEDIATE 'CREATE SEQUENCE cwf_collectionrole_seq START WITH ' || NVL(curr, 1);
 END;
 /
 
 DECLARE
   curr  NUMBER := 0;
 BEGIN
-  SELECT max(workflowitemrole_id) INTO curr FROM xmlwf_workflowitemrole;
+  SELECT max(workflowitemrole_id) INTO curr FROM cwf_workflowitemrole;
 
   curr := curr + 1;
 
-  EXECUTE IMMEDIATE 'DROP SEQUENCE xmlwf_workflowitemrole_seq';
+  EXECUTE IMMEDIATE 'DROP SEQUENCE cwf_workflowitemrole_seq';
 
-  EXECUTE IMMEDIATE 'CREATE SEQUENCE xmlwf_workflowitemrole_seq START WITH ' || NVL(curr, 1);
+  EXECUTE IMMEDIATE 'CREATE SEQUENCE cwf_workflowitemrole_seq START WITH ' || NVL(curr, 1);
 END;
 /
 
 DECLARE
   curr  NUMBER := 0;
 BEGIN
-  SELECT max(pooltask_id) INTO curr FROM xmlwf_pooltask;
+  SELECT max(pooltask_id) INTO curr FROM cwf_pooltask;
 
   curr := curr + 1;
 
-  EXECUTE IMMEDIATE 'DROP SEQUENCE xmlwf_pooltask_seq';
+  EXECUTE IMMEDIATE 'DROP SEQUENCE cwf_pooltask_seq';
 
-  EXECUTE IMMEDIATE 'CREATE SEQUENCE xmlwf_pooltask_seq START WITH ' || NVL(curr, 1);
+  EXECUTE IMMEDIATE 'CREATE SEQUENCE cwf_pooltask_seq START WITH ' || NVL(curr, 1);
 END;
 /
 
 DECLARE
   curr  NUMBER := 0;
 BEGIN
-  SELECT max(claimtask_id) INTO curr FROM xmlwf_claimtask;
+  SELECT max(claimtask_id) INTO curr FROM cwf_claimtask;
 
   curr := curr + 1;
 
-  EXECUTE IMMEDIATE 'DROP SEQUENCE xmlwf_claimtask_seq';
+  EXECUTE IMMEDIATE 'DROP SEQUENCE cwf_claimtask_seq';
 
-  EXECUTE IMMEDIATE 'CREATE SEQUENCE xmlwf_claimtask_seq START WITH ' || NVL(curr, 1);
+  EXECUTE IMMEDIATE 'CREATE SEQUENCE cwf_claimtask_seq START WITH ' || NVL(curr, 1);
 END;
 /
 
 DECLARE
   curr  NUMBER := 0;
 BEGIN
-  SELECT max(in_progress_user_id) INTO curr FROM xmlwf_in_progress_user;
+  SELECT max(in_progress_user_id) INTO curr FROM cwf_in_progress_user;
 
   curr := curr + 1;
 
-  EXECUTE IMMEDIATE 'DROP SEQUENCE xmlwf_in_progress_user_seq';
+  EXECUTE IMMEDIATE 'DROP SEQUENCE cwf_in_progress_user_seq';
 
-  EXECUTE IMMEDIATE 'CREATE SEQUENCE xmlwf_in_progress_user_seq START WITH ' || NVL(curr, 1);
+  EXECUTE IMMEDIATE 'CREATE SEQUENCE cwf_in_progress_user_seq START WITH ' || NVL(curr, 1);
 END;
 /

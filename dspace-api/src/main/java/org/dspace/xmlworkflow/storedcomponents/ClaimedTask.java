@@ -47,7 +47,7 @@ public class ClaimedTask {
 
     public static ClaimedTask find(Context context, int id)
             throws SQLException {
-        TableRow row = DatabaseManager.find(context, "xmlwf_claimtask", id);
+        TableRow row = DatabaseManager.find(context, "cwf_claimtask", id);
 
         if (row == null)
         {
@@ -60,8 +60,8 @@ public class ClaimedTask {
     }
 
     public static List<ClaimedTask> findByWorkflowId(Context context, int workflowID) throws SQLException {
-        TableRowIterator tri = DatabaseManager.queryTable(context,"xmlwf_claimtask",
-                "SELECT * FROM xmlwf_claimtask WHERE workflowitem_id= "+workflowID);
+        TableRowIterator tri = DatabaseManager.queryTable(context,"cwf_claimtask",
+                "SELECT * FROM cwf_claimtask WHERE workflowitem_id= "+workflowID);
         List<ClaimedTask> list = new ArrayList<ClaimedTask>();
         while(tri.hasNext()) {
             TableRow row = tri.next();
@@ -71,8 +71,8 @@ public class ClaimedTask {
     }
 
     public static ClaimedTask findByWorkflowIdAndEPerson(Context context, int workflowID, int epersonID) throws SQLException {
-        TableRow row = DatabaseManager.querySingleTable(context,"xmlwf_claimtask",
-                "SELECT * FROM xmlwf_claimtask WHERE workflowitem_id= ? AND owner_id= ?", workflowID, epersonID);
+        TableRow row = DatabaseManager.querySingleTable(context,"cwf_claimtask",
+                "SELECT * FROM cwf_claimtask WHERE workflowitem_id= ? AND owner_id= ?", workflowID, epersonID);
         if(row == null)
             return null;
         else
@@ -80,8 +80,8 @@ public class ClaimedTask {
     }
 
     public static List<ClaimedTask> findByEperson(Context context, int epersonID) throws SQLException {
-        TableRowIterator tri = DatabaseManager.queryTable(context,"xmlwf_claimtask",
-                "SELECT * FROM xmlwf_claimtask WHERE owner_id= "+epersonID);
+        TableRowIterator tri = DatabaseManager.queryTable(context,"cwf_claimtask",
+                "SELECT * FROM cwf_claimtask WHERE owner_id= "+epersonID);
         List<ClaimedTask> list = new ArrayList<ClaimedTask>();
         while(tri.hasNext()) {
             TableRow row = tri.next();
@@ -91,8 +91,8 @@ public class ClaimedTask {
     }
 
     public static List<ClaimedTask> find(Context c, int wfiID, String stepID) throws SQLException {
-        TableRowIterator tri = DatabaseManager.queryTable(c,"xmlwf_claimtask",
-                "SELECT * FROM xmlwf_claimtask WHERE workflowitem_id="+wfiID+" AND step_id= ?", stepID);
+        TableRowIterator tri = DatabaseManager.queryTable(c,"cwf_claimtask",
+                "SELECT * FROM cwf_claimtask WHERE workflowitem_id="+wfiID+" AND step_id= ?", stepID);
         List<ClaimedTask> list = new ArrayList<ClaimedTask>();
 
         while(tri.hasNext()) {
@@ -104,14 +104,14 @@ public class ClaimedTask {
     }
 
     public static ClaimedTask find(Context c, int epersonID, int wfiID, String stepID, String actionID) throws SQLException {
-        TableRow row = DatabaseManager.querySingleTable(c,"xmlwf_claimtask",
-                "SELECT * FROM xmlwf_claimtask WHERE workflowitem_id="+wfiID+" AND owner_id= "+epersonID+" AND action_id= ? AND step_id= ?",actionID, stepID);
+        TableRow row = DatabaseManager.querySingleTable(c,"cwf_claimtask",
+                "SELECT * FROM cwf_claimtask WHERE workflowitem_id="+wfiID+" AND owner_id= "+epersonID+" AND action_id= ? AND step_id= ?",actionID, stepID);
 
         return new ClaimedTask(c, row);
     }
     public static List<ClaimedTask> find(Context c, int wfiID, String stepID, String actionID) throws SQLException {
-        TableRowIterator tri = DatabaseManager.queryTable(c,"xmlwf_claimtask",
-                "SELECT * FROM xmlwf_claimtask WHERE workflowitem_id="+wfiID+" AND step_id= ? AND action_id=?", stepID, actionID);
+        TableRowIterator tri = DatabaseManager.queryTable(c,"cwf_claimtask",
+                "SELECT * FROM cwf_claimtask WHERE workflowitem_id="+wfiID+" AND step_id= ? AND action_id=?", stepID, actionID);
         List<ClaimedTask> list = new ArrayList<ClaimedTask>();
         while(tri.hasNext()) {
             TableRow row = tri.next();
@@ -121,8 +121,8 @@ public class ClaimedTask {
     }
 
     public static List<ClaimedTask> find(Context c, XmlWorkflowItem workflowItem) throws SQLException {
-        TableRowIterator tri = DatabaseManager.queryTable(c,"xmlwf_claimtask",
-                "SELECT * FROM xmlwf_claimtask WHERE workflowitem_id="+workflowItem.getID());
+        TableRowIterator tri = DatabaseManager.queryTable(c,"cwf_claimtask",
+                "SELECT * FROM cwf_claimtask WHERE workflowitem_id="+workflowItem.getID());
         List<ClaimedTask> list = new ArrayList<ClaimedTask>();
         while(tri.hasNext()) {
             TableRow row = tri.next();
@@ -132,7 +132,7 @@ public class ClaimedTask {
     }
 
     public static List<ClaimedTask> findAllInStep(Context c, String stepID) throws SQLException {
-        TableRowIterator tri = DatabaseManager.queryTable(c,"xmlwf_claimtask", "SELECT * FROM xmlwf_claimtask WHERE step_id= ?", stepID);
+        TableRowIterator tri = DatabaseManager.queryTable(c,"cwf_claimtask", "SELECT * FROM cwf_claimtask WHERE step_id= ?", stepID);
 
         List<ClaimedTask> list = new ArrayList<ClaimedTask>();
         while(tri.hasNext()) {
@@ -144,7 +144,7 @@ public class ClaimedTask {
 
     public static ClaimedTask create(Context context) throws SQLException {
 
-        TableRow row = DatabaseManager.create(context, "xmlwf_claimtask");
+        TableRow row = DatabaseManager.create(context, "cwf_claimtask");
 
         return new ClaimedTask(context, row);
     }

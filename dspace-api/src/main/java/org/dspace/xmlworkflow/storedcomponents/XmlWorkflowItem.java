@@ -52,7 +52,7 @@ public class XmlWorkflowItem implements InProgressSubmission {
 
 
     public static XmlWorkflowItem create(Context context) throws AuthorizeException, IOException, SQLException {
-        TableRow row = DatabaseManager.create(context, "xmlwf_workflowitem");
+        TableRow row = DatabaseManager.create(context, "cwf_workflowitem");
 
         return new XmlWorkflowItem(context, row);
     }
@@ -98,7 +98,7 @@ public class XmlWorkflowItem implements InProgressSubmission {
             return fromCache;
         }
 
-        TableRow row = DatabaseManager.find(context, "xmlwf_workflowitem", id);
+        TableRow row = DatabaseManager.find(context, "cwf_workflowitem", id);
 //        TableRow row = DatabaseManager.querySingle(context, "SELECT * FROM workflowitem WHERE item_id= "+id);
 
         if (row == null)
@@ -131,8 +131,8 @@ public class XmlWorkflowItem implements InProgressSubmission {
      */
     public static XmlWorkflowItem[] findAll(Context c) throws SQLException, AuthorizeException, IOException, WorkflowConfigurationException {
         List wfItems = new ArrayList();
-        TableRowIterator tri = DatabaseManager.queryTable(c, "xmlwf_workflowitem",
-                "SELECT * FROM xmlwf_workflowitem");
+        TableRowIterator tri = DatabaseManager.queryTable(c, "cwf_workflowitem",
+                "SELECT * FROM cwf_workflowitem");
 
         try
         {
@@ -176,7 +176,7 @@ public class XmlWorkflowItem implements InProgressSubmission {
         List wfItems = new ArrayList();
         StringBuffer query = new StringBuffer();
 
-        query.append("SELECT * FROM xmlwf_workflowitem ");
+        query.append("SELECT * FROM cwf_workflowitem ");
         if(collectionId != -1){
             query.append("WHERE collection_id=").append(collectionId);
         }
@@ -260,7 +260,7 @@ public class XmlWorkflowItem implements InProgressSubmission {
          */
         public static int countAllInCollection(Context c, int collId) throws SQLException, AuthorizeException, IOException, WorkflowConfigurationException {
         StringBuffer query = new StringBuffer();
-        query.append("SELECT count(*) AS count FROM xmlwf_workflowitem ");
+        query.append("SELECT count(*) AS count FROM cwf_workflowitem ");
         if(collId != -1){
             query.append(" WHERE collection_id= ").append(collId);
         }
@@ -278,11 +278,11 @@ public class XmlWorkflowItem implements InProgressSubmission {
             throws SQLException, AuthorizeException, IOException, WorkflowConfigurationException {
             List wfItems = new ArrayList();
 
-            TableRowIterator tri = DatabaseManager.queryTable(context, "xmlwf_workflowitem",
-                    "SELECT xmlwf_workflowitem.* FROM xmlwf_workflowitem, item WHERE " +
-                    "xmlwf_workflowitem.item_id=item.item_id AND " +
+            TableRowIterator tri = DatabaseManager.queryTable(context, "cwf_workflowitem",
+                    "SELECT cwf_workflowitem.* FROM cwf_workflowitem, item WHERE " +
+                    "cwf_workflowitem.item_id=item.item_id AND " +
                     "item.submitter_id= ? " +
-                    "ORDER BY xmlwf_workflowitem.workflowitem_id",
+                    "ORDER BY cwf_workflowitem.workflowitem_id",
                     ep.getID());
 
             while (tri.hasNext())
@@ -323,9 +323,9 @@ public class XmlWorkflowItem implements InProgressSubmission {
             throws SQLException, AuthorizeException, IOException {
         List wsItems = new ArrayList();
 
-        TableRowIterator tri = DatabaseManager.queryTable(context, "xmlwf_workflowitem",
-                "SELECT xmlwf_workflowitem.* FROM xmlwf_workflowitem WHERE " +
-                "xmlwf_workflowitem.collection_id= ? ",
+        TableRowIterator tri = DatabaseManager.queryTable(context, "cwf_workflowitem",
+                "SELECT cwf_workflowitem.* FROM cwf_workflowitem WHERE " +
+                "cwf_workflowitem.collection_id= ? ",
                 c.getID());
 
         try

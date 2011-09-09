@@ -54,7 +54,7 @@ public class CollectionRole {
     public static CollectionRole find(Context context, int id)
             throws SQLException
     {
-        TableRow row = DatabaseManager.find(context, "xmlwf_collectionrole", id);
+        TableRow row = DatabaseManager.find(context, "cwf_collectionrole", id);
 
         if (row == null)
         {
@@ -67,8 +67,8 @@ public class CollectionRole {
     }
 
     public static CollectionRole find(Context context, int collection, String role) throws SQLException {
-         TableRowIterator tri = DatabaseManager.queryTable(context,"xmlwf_collectionrole",
-                "SELECT * FROM xmlwf_collectionrole WHERE collection_id="+collection+" AND role_id= ? ",
+         TableRowIterator tri = DatabaseManager.queryTable(context,"cwf_collectionrole",
+                "SELECT * FROM cwf_collectionrole WHERE collection_id="+collection+" AND role_id= ? ",
                 role);
 
         TableRow row = null;
@@ -91,8 +91,8 @@ public class CollectionRole {
     }
 
     public static CollectionRole[] findByCollection(Context context, int collection) throws SQLException {
-         TableRowIterator tri = DatabaseManager.queryTable(context,"xmlwf_collectionrole",
-                "SELECT * FROM xmlwf_collectionrole WHERE collection_id=?", collection);
+         TableRowIterator tri = DatabaseManager.queryTable(context,"cwf_collectionrole",
+                "SELECT * FROM cwf_collectionrole WHERE collection_id=?", collection);
 
         List<CollectionRole> collectionRoles = new ArrayList<CollectionRole>();
 
@@ -118,7 +118,7 @@ public class CollectionRole {
     public static CollectionRole create(Context context) throws SQLException,
             AuthorizeException {
 
-        TableRow row = DatabaseManager.create(context, "xmlwf_collectionrole");
+        TableRow row = DatabaseManager.create(context, "cwf_collectionrole");
 
         return new CollectionRole(context, row);
     }

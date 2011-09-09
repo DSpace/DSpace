@@ -254,7 +254,7 @@ public class WorkflowUtils extends Util{
     }
 
 //    public static List<String> getAllUsedStepIdentifiers(Context context) throws SQLException {
-//        TableRowIterator tri = DatabaseManager.queryTable(context, "xmlwf_claimtask", "SELECT DISTINCT step_id FROM xmlwf_pooltask UNION SELECT DISTINCT step_id FROM xmlwf_claimtask");
+//        TableRowIterator tri = DatabaseManager.queryTable(context, "cwf_claimtask", "SELECT DISTINCT step_id FROM cwf_pooltask UNION SELECT DISTINCT step_id FROM cwf_claimtask");
 //        List<String> result = new ArrayList<String>();
 //        while(tri.hasNext()){
 //            TableRow row = tri.next();

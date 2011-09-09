@@ -673,7 +673,7 @@ public class XmlWorkflowManager {
 
         // Now remove the workflow object manually from the database
         DatabaseManager.updateQuery(c,
-                "DELETE FROM xmlwf_workflowitem WHERE workflowitem_id=" + wfi.getID());
+                "DELETE FROM cwf_workflowitem WHERE workflowitem_id=" + wfi.getID());
 
         return wi;
     }

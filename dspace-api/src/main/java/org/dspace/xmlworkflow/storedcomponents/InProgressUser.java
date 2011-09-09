@@ -47,7 +47,7 @@ public class InProgressUser {
 
     public static InProgressUser find(Context context, int id)
             throws SQLException {
-        TableRow row = DatabaseManager.find(context, "xmlwf_in_progress_user", id);
+        TableRow row = DatabaseManager.find(context, "cwf_in_progress_user", id);
 
         if (row == null)
         {
@@ -60,8 +60,8 @@ public class InProgressUser {
     }
 
     public static InProgressUser findByWorkflowItemAndEPerson(Context context, int wfiID, int epersonID) throws SQLException {
-        TableRow row = DatabaseManager.querySingleTable(context,"xmlwf_in_progress_user",
-                "SELECT * FROM xmlwf_in_progress_user WHERE workflowitem_id= ? AND user_id= ?", wfiID, epersonID);
+        TableRow row = DatabaseManager.querySingleTable(context,"cwf_in_progress_user",
+                "SELECT * FROM cwf_in_progress_user WHERE workflowitem_id= ? AND user_id= ?", wfiID, epersonID);
         if(row == null)
             return null;
         else
@@ -69,8 +69,8 @@ public class InProgressUser {
     }
 
     public static List<InProgressUser> findByEperson(Context context, int epersonID) throws SQLException {
-        TableRowIterator tri = DatabaseManager.queryTable(context,"xmlwf_in_progress_user",
-                "SELECT * FROM xmlwf_in_progress_user WHERE user_id = "+epersonID);
+        TableRowIterator tri = DatabaseManager.queryTable(context,"cwf_in_progress_user",
+                "SELECT * FROM cwf_in_progress_user WHERE user_id = "+epersonID);
         List<InProgressUser> list = new ArrayList<InProgressUser>();
         while(tri.hasNext()) {
             TableRow row = tri.next();
@@ -80,8 +80,8 @@ public class InProgressUser {
     }
 
     public static List<InProgressUser> findByWorkflowItem(Context c, int wfiID) throws SQLException {
-        TableRowIterator tri = DatabaseManager.queryTable(c,"xmlwf_in_progress_user",
-                "SELECT * FROM xmlwf_in_progress_user WHERE workflowitem_id="+wfiID);
+        TableRowIterator tri = DatabaseManager.queryTable(c,"cwf_in_progress_user",
+                "SELECT * FROM cwf_in_progress_user WHERE workflowitem_id="+wfiID);
         List<InProgressUser> list = new ArrayList<InProgressUser>();
 
         while(tri.hasNext()) {
@@ -93,20 +93,20 @@ public class InProgressUser {
     }
 
     public static int getNumberOfInProgressUsers(Context c, int wfiID) throws SQLException {
-        TableRowIterator tri = DatabaseManager.queryTable(c,"xmlwf_in_progress_user",
-                "SELECT * FROM xmlwf_in_progress_user WHERE workflowitem_id="+wfiID+" AND finished= '0'");
+        TableRowIterator tri = DatabaseManager.queryTable(c,"cwf_in_progress_user",
+                "SELECT * FROM cwf_in_progress_user WHERE workflowitem_id="+wfiID+" AND finished= '0'");
         return tri.toList().size();
     }
 
     public static int getNumberOfFinishedUsers(Context c, int wfiID) throws SQLException {
-        TableRowIterator tri = DatabaseManager.queryTable(c,"xmlwf_in_progress_user",
-                "SELECT * FROM xmlwf_in_progress_user WHERE workflowitem_id="+wfiID+" AND finished= '1'");
+        TableRowIterator tri = DatabaseManager.queryTable(c,"cwf_in_progress_user",
+                "SELECT * FROM cwf_in_progress_user WHERE workflowitem_id="+wfiID+" AND finished= '1'");
         return tri.toList().size();
     }
 
     public static InProgressUser create(Context context) throws SQLException {
 
-        TableRow row = DatabaseManager.create(context, "xmlwf_in_progress_user");
+        TableRow row = DatabaseManager.create(context, "cwf_in_progress_user");
 
         return new InProgressUser(context, row);
     }

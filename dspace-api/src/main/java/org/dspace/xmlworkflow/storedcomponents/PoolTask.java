@@ -53,7 +53,7 @@ public class PoolTask {
 
     public static PoolTask find(Context context, int id)
             throws SQLException {
-        TableRow row = DatabaseManager.find(context, "xmlwf_pooltask", id);
+        TableRow row = DatabaseManager.find(context, "cwf_pooltask", id);
 
         if (row == null)
         {
@@ -66,8 +66,8 @@ public class PoolTask {
     }
 
     public static List<PoolTask> findByEperson(Context context, int eperson_id) throws SQLException, AuthorizeException, IOException {
-        TableRowIterator tri = DatabaseManager.queryTable(context,"xmlwf_pooltask",
-                "SELECT * FROM xmlwf_pooltask WHERE eperson_id= "+eperson_id);
+        TableRowIterator tri = DatabaseManager.queryTable(context,"cwf_pooltask",
+                "SELECT * FROM cwf_pooltask WHERE eperson_id= "+eperson_id);
         //Hashmap to map workflow item id's to pooltasks. This will allow to have a list of unique workflowitems for which
         //the user will see PoolTasks
         HashMap<Integer, PoolTask> tasks = new HashMap<Integer, PoolTask>();
@@ -80,8 +80,8 @@ public class PoolTask {
         tri.close();
         //Get all PoolTasks for groups of which this eperson is a member
         for(Group group: Group.allMemberGroups(context, EPerson.find(context, eperson_id))){
-            tri = DatabaseManager.queryTable(context,"xmlwf_pooltask",
-                    "SELECT * FROM xmlwf_pooltask WHERE group_id= "+group.getID());
+            tri = DatabaseManager.queryTable(context,"cwf_pooltask",
+                    "SELECT * FROM cwf_pooltask WHERE group_id= "+group.getID());
             while(tri.hasNext()){
                 TableRow row = tri.next();
                 PoolTask task = new PoolTask(context, row);
@@ -97,8 +97,8 @@ public class PoolTask {
     }
 
     public static List<PoolTask> find(Context context, XmlWorkflowItem workflowItem) throws SQLException {
-        TableRowIterator tri = DatabaseManager.queryTable(context,"xmlwf_pooltask",
-                "SELECT * FROM xmlwf_pooltask WHERE workflowitem_id= "+workflowItem.getID());
+        TableRowIterator tri = DatabaseManager.queryTable(context,"cwf_pooltask",
+                "SELECT * FROM cwf_pooltask WHERE workflowitem_id= "+workflowItem.getID());
         List<PoolTask> list = new ArrayList<PoolTask>();
         while(tri.hasNext()){
             TableRow row = tri.next();
@@ -109,8 +109,8 @@ public class PoolTask {
     }
 
     public static PoolTask findByWorkflowIdAndEPerson(Context context, int workflowID, int epersonID) throws SQLException, AuthorizeException, IOException {
-        TableRow row = DatabaseManager.querySingleTable(context,"xmlwf_pooltask",
-                "SELECT * FROM xmlwf_pooltask WHERE workflowitem_id= ? AND eperson_id = ?", workflowID, epersonID);
+        TableRow row = DatabaseManager.querySingleTable(context,"cwf_pooltask",
+                "SELECT * FROM cwf_pooltask WHERE workflowitem_id= ? AND eperson_id = ?", workflowID, epersonID);
         //If there is a pooltask for this eperson, return it
         if(row != null)
             return new PoolTask(context, row);
@@ -125,8 +125,8 @@ public class PoolTask {
                 //If the user does not have a claimedtask yet, see whether one of the groups of the user has pooltasks
                 //for this workflow item
                 for(Group group: Group.allMemberGroups(context, EPerson.find(context, epersonID))){
-                    row = DatabaseManager.querySingleTable(context,"xmlwf_pooltask",
-                        "SELECT * FROM xmlwf_pooltask WHERE workflowitem_id= ? AND group_id = ?", workflowID, group.getID());
+                    row = DatabaseManager.querySingleTable(context,"cwf_pooltask",
+                        "SELECT * FROM cwf_pooltask WHERE workflowitem_id= ? AND group_id = ?", workflowID, group.getID());
                     if(row != null){
                         return new PoolTask(context, row);
                     }
@@ -137,7 +137,7 @@ public class PoolTask {
     }
     public static PoolTask create(Context context) throws SQLException {
 
-        TableRow row = DatabaseManager.create(context, "xmlwf_pooltask");
+        TableRow row = DatabaseManager.create(context, "cwf_pooltask");
 
         return new PoolTask(context, row);
     }

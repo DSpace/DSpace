@@ -989,15 +989,15 @@ public class EPerson extends DSpaceObject
     private void getXMLWorkflowConstraints(List<String> tableList) throws SQLException {
          TableRowIterator tri;
         // check for eperson in claimtask table
-        tri = DatabaseManager.queryTable(myContext, "xmlwf_claimtask",
-                "SELECT * from xmlwf_claimtask where owner_id= ? ",
+        tri = DatabaseManager.queryTable(myContext, "cwf_claimtask",
+                "SELECT * from cwf_claimtask where owner_id= ? ",
                 getID());
 
         try
         {
             if (tri.hasNext())
             {
-                tableList.add("xmlwf_claimtask");
+                tableList.add("cwf_claimtask");
             }
         }
         finally
@@ -1010,15 +1010,15 @@ public class EPerson extends DSpaceObject
         }
 
         // check for eperson in pooltask table
-        tri = DatabaseManager.queryTable(myContext, "xmlwf_pooltask",
-                "SELECT * from xmlwf_pooltask where eperson_id= ? ",
+        tri = DatabaseManager.queryTable(myContext, "cwf_pooltask",
+                "SELECT * from cwf_pooltask where eperson_id= ? ",
                 getID());
 
         try
         {
             if (tri.hasNext())
             {
-                tableList.add("xmlwf_pooltask");
+                tableList.add("cwf_pooltask");
             }
         }
         finally
@@ -1031,15 +1031,15 @@ public class EPerson extends DSpaceObject
         }
 
         // check for eperson in workflowitemrole table
-        tri = DatabaseManager.queryTable(myContext, "xmlwf_workflowitemrole",
-                "SELECT * from xmlwf_workflowitemrole where eperson_id= ? ",
+        tri = DatabaseManager.queryTable(myContext, "cwf_workflowitemrole",
+                "SELECT * from cwf_workflowitemrole where eperson_id= ? ",
                 getID());
 
         try
         {
             if (tri.hasNext())
             {
-                tableList.add("xmlwf_workflowitemrole");
+                tableList.add("cwf_workflowitemrole");
             }
         }
         finally

@@ -52,7 +52,7 @@ public class WorkflowItemRole {
     public static WorkflowItemRole find(Context context, int id)
             throws SQLException
     {
-        TableRow row = DatabaseManager.find(context, "xmlwf_workflowitemrole", id);
+        TableRow row = DatabaseManager.find(context, "cwf_workflowitemrole", id);
 
         if (row == null)
         {
@@ -65,8 +65,8 @@ public class WorkflowItemRole {
     }
 
     public static WorkflowItemRole[] find(Context context, int workflowItemId, String role) throws SQLException {
-         TableRowIterator tri = DatabaseManager.queryTable(context,"xmlwf_workflowitemrole",
-                "SELECT * FROM xmlwf_workflowitemrole WHERE workflowitem_id= ? AND role_id= ? ",
+         TableRowIterator tri = DatabaseManager.queryTable(context,"cwf_workflowitemrole",
+                "SELECT * FROM cwf_workflowitemrole WHERE workflowitem_id= ? AND role_id= ? ",
                 workflowItemId, role);
 
         ArrayList<WorkflowItemRole> roles = new ArrayList<WorkflowItemRole>();
@@ -78,8 +78,8 @@ public class WorkflowItemRole {
     }
 
     public static WorkflowItemRole[] findAllForItem(Context context, int workflowItemId) throws SQLException {
-        TableRowIterator tri = DatabaseManager.queryTable(context,"xmlwf_workflowitemrole",
-               "SELECT * FROM xmlwf_workflowitemrole WHERE workflowitem_id= ? ",
+        TableRowIterator tri = DatabaseManager.queryTable(context,"cwf_workflowitemrole",
+               "SELECT * FROM cwf_workflowitemrole WHERE workflowitem_id= ? ",
                workflowItemId);
 
        ArrayList<WorkflowItemRole> roles = new ArrayList<WorkflowItemRole>();
@@ -93,7 +93,7 @@ public class WorkflowItemRole {
     public static WorkflowItemRole create(Context context) throws SQLException,
             AuthorizeException {
 
-        TableRow row = DatabaseManager.create(context, "xmlwf_workflowitemrole");
+        TableRow row = DatabaseManager.create(context, "cwf_workflowitemrole");
 
         return new WorkflowItemRole(context, row);
     }
