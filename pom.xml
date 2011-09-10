@@ -12,13 +12,29 @@
       <url>http://www.dspace.org</url>
    </organization>
 
-   <parent>
-     <artifactId>dspace-pom</artifactId>
-     <groupId>org.dspace</groupId>
-     <version>11</version>
-   </parent>
+    <parent>
+        <artifactId>dspace-pom</artifactId>
+        <groupId>org.dspace</groupId>
+        <version>11</version>
+    </parent>
 
-   <build>
+    <repositories>
+        <repository>
+            <id>sonatype-nexus-releases</id>
+            <name>Sonatype Nexus Releases</name>
+            <url>
+                https://oss.sonatype.org/content/repositories/releases
+            </url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <build>
       <plugins>
          <plugin>
             <artifactId>maven-release-plugin</artifactId>
@@ -312,27 +328,19 @@
               <version>${project.version}</version>
               <type>war</type>
           </dependency>
-
           <dependency>
               <groupId>org.dspace</groupId>
-              <artifactId>dspace-swordv2-api</artifactId>
-              <version>${project.version}</version>
-          </dependency>
-
-          <dependency>
-              <groupId>org.dspace</groupId>
-              <artifactId>dspace-swordv2-webapp</artifactId>
+              <artifactId>dspace-swordv2</artifactId>
               <version>${project.version}</version>
               <type>jar</type>
               <classifier>classes</classifier>
           </dependency>
           <dependency>
               <groupId>org.dspace</groupId>
-              <artifactId>dspace-swordv2-webapp</artifactId>
+              <artifactId>dspace-swordv2</artifactId>
               <version>${project.version}</version>
               <type>war</type>
           </dependency>
-
            <dependency>
               <groupId>org.dspace</groupId>
               <artifactId>dspace-sword-client-api</artifactId>
@@ -493,6 +501,12 @@
 
         <dependency>
             <artifactId>spring-web</artifactId>
+            <groupId>org.springframework</groupId>
+            <version>3.0.5.RELEASE</version>
+        </dependency>
+
+        <dependency>
+            <artifactId>spring-webmvc</artifactId>
             <groupId>org.springframework</groupId>
             <version>3.0.5.RELEASE</version>
         </dependency>
