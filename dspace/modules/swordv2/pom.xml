@@ -117,21 +117,15 @@
        <!-- DSpace Implementation of SWORDv2 Provider -->
        <dependency>
          <groupId>org.dspace</groupId>
-         <artifactId>dspace-swordv2-webapp</artifactId>
+         <artifactId>dspace-swordv2</artifactId>
          <type>jar</type>
          <classifier>classes</classifier>
       </dependency>
 
       <dependency>
          <groupId>org.dspace</groupId>
-         <artifactId>dspace-swordv2-webapp</artifactId>
+         <artifactId>dspace-swordv2</artifactId>
          <type>war</type>
-      </dependency>
-
-      <!-- SWORD v2 API -->
-      <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-swordv2-api</artifactId>
       </dependency>
 
       <dependency>
