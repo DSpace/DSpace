@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <packaging>war</packaging>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-sword-client-xmlui-webapp</artifactId>
-    <version>1.8.0-SNAPSHOT</version>
+    <version>1.8.0-rc1</version>
     <name>DSpace Sword Client :: Sword Client XMLUI Webapp</name>
 
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-sword-client</artifactId>
-        <version>1.8.0-SNAPSHOT</version>
+        <version>1.8.0-rc1</version>
       <relativePath>..</relativePath>
     </parent>
 
@@ -83,12 +82,12 @@
     -->
     <scm>
         <connection>
-            scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword-client/dspace-sword-client-xmlui-webapp
+            scm:svn:http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.8.0-rc1/dspace-sword-client/dspace-sword-client-xmlui-webapp
         </connection>
         <developerConnection>
-            scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword-client/dspace-sword-client-xmlui-webapp
+            scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.8.0-rc1/dspace-sword-client/dspace-sword-client-xmlui-webapp
         </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword-client/dspace-sword-client-xmlui-webapp</url>
+        <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.8.0-rc1/dspace-sword-client/dspace-sword-client-xmlui-webapp</url>
     </scm>
 
 </project>
