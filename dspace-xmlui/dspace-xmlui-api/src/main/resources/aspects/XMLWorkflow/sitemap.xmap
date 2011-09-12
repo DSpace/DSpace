@@ -152,9 +152,9 @@
                     -->
                     <map:match pattern="handle/*/*/xmlworkflow/getTask">
                         <map:transform type="WorkflowTransformer">
-                            <map:parameter name="workflow_item_id" value="{flow-attribute:workflow_item_id}"/>
-                            <map:parameter name="step_id" value="{flow-attribute:step_id}"/>
-                            <map:parameter name="action_id" value="{flow-attribute:action_id}"/>
+                            <map:parameter name="workflowID" value="{flow-attribute:workflowID}"/>
+                            <map:parameter name="stepID" value="{flow-attribute:stepID}"/>
+                            <map:parameter name="actionID" value="{flow-attribute:actionID}"/>
                         </map:transform>
                     </map:match>
 

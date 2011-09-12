@@ -73,7 +73,7 @@ public abstract class AbstractXMLUIAction extends AbstractDSpaceTransformer impl
     public void setup(SourceResolver resolver, Map objectModel, String src, Parameters parameters) throws ProcessingException, SAXException, IOException {
         super.setup(resolver, objectModel, src, parameters);
 
-        int id = parameters.getParameterAsInteger("workflow_item_id", -1);
+        int id = parameters.getParameterAsInteger("workflowID", -1);
         try {
             workflowItem = XmlWorkflowItem.find(context, id);
         } catch (SQLException e) {

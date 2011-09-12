@@ -54,9 +54,9 @@ public class WorkflowTransformer extends AbstractDSpaceTransformer {
         super.setup(resolver, objectModel, src, parameters);
         authorized = true;
         try {
-            String stepID = parameters.getParameter("step_id");
-            String actionID = parameters.getParameter("action_id");
-            int workflowID = parameters.getParameterAsInteger("workflow_item_id");
+            String stepID = parameters.getParameter("stepID");
+            String actionID = parameters.getParameter("actionID");
+            int workflowID = parameters.getParameterAsInteger("workflowID");
             XmlWorkflowItem wfi = XmlWorkflowItem.find(context, workflowID);
             Workflow wf = WorkflowFactory.getWorkflow(wfi.getCollection());
 

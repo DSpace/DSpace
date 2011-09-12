@@ -164,15 +164,15 @@ public class Submissions extends AbstractDSpaceTransformer
         	for (ClaimedTask owned : ownedItems)
         	{
                 int workflowItemID = owned.getWorkflowItemID();
-                String step_id = owned.getStepID();
-                String action_id = owned.getActionID();
+                String stepID = owned.getStepID();
+                String actionID = owned.getActionID();
                 XmlWorkflowItem item = null;
                 try {
                     item = XmlWorkflowItem.find(context, workflowItemID);
                     Workflow wf = WorkflowFactory.getWorkflow(item.getCollection());
-                    Step step = wf.getStep(step_id);
-                    WorkflowActionConfig action = step.getActionConfig(action_id);
-                    String url = contextPath+"/handle/"+item.getCollection().getHandle()+"/xmlworkflow?workflowID="+workflowItemID+"&stepID="+step_id+"&actionID="+action_id;
+                    Step step = wf.getStep(stepID);
+                    WorkflowActionConfig action = step.getActionConfig(actionID);
+                    String url = contextPath+"/handle/"+item.getCollection().getHandle()+"/xmlworkflow?workflowID="+workflowItemID+"&stepID="+stepID+"&actionID="+actionID;
                     DCValue[] titles = item.getItem().getDC("title", null, Item.ANY);
                     String collectionName = item.getCollection().getMetadata("name");
                     EPerson submitter = item.getSubmitter();
@@ -197,7 +197,7 @@ public class Submissions extends AbstractDSpaceTransformer
                     }
 
                     // The task description
-                    row.addCell().addXref(url,message("xmlui.XMLWorkflow." + wf.getID() + "." + step_id + "." + action_id));
+                    row.addCell().addXref(url,message("xmlui.XMLWorkflow." + wf.getID() + "." + stepID + "." + actionID));
 
                     // The item description
                     if (titles != null && titles.length > 0)
@@ -258,14 +258,14 @@ public class Submissions extends AbstractDSpaceTransformer
 
         	for (PoolTask pooled : pooledItems)
         	{
-                String step_id = pooled.getStepID();
+                String stepID = pooled.getStepID();
                 int workflowItemID = pooled.getWorkflowItemID();
-                String action_id = pooled.getActionID();
+                String actionID = pooled.getActionID();
                     XmlWorkflowItem item;
                 try {
                     item = XmlWorkflowItem.find(context, workflowItemID);
                     Workflow wf = WorkflowFactory.getWorkflow(item.getCollection());
-                    String url = contextPath+"/handle/"+item.getCollection().getHandle()+"/xmlworkflow?workflowID="+workflowItemID+"&stepID="+step_id+"&actionID="+action_id;
+                    String url = contextPath+"/handle/"+item.getCollection().getHandle()+"/xmlworkflow?workflowID="+workflowItemID+"&stepID="+stepID+"&actionID="+actionID;
                     DCValue[] titles = item.getItem().getDC("title", null, Item.ANY);
                     String collectionName = item.getCollection().getMetadata("name");
                     EPerson submitter = item.getSubmitter();
@@ -283,7 +283,7 @@ public class Submissions extends AbstractDSpaceTransformer
 
                     // The task description
 //                    row.addCell().addXref(url,message("xmlui.Submission.Submissions.claimAction"));
-                    row.addCell().addXref(url,message("xmlui.XMLWorkflow." + wf.getID() + "." + step_id + "." + action_id));
+                    row.addCell().addXref(url,message("xmlui.XMLWorkflow." + wf.getID() + "." + stepID + "." + actionID));
 
                     // The item description
                     if (titles != null && titles.length > 0)

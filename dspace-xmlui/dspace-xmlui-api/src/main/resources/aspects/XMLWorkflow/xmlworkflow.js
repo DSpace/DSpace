@@ -128,7 +128,7 @@ function doWorkflow()
 
 
     do{
-        sendPageAndWait("handle/"+handle+"/xmlworkflow/getTask",{"workflow_item_id":workflowItemId,"step_id":step.getId(),"action_id":action.getId()});
+        sendPageAndWait("handle/"+handle+"/xmlworkflow/getTask",{"workflowID":workflowItemId,"stepID":step.getId(),"actionID":action.getId()});
 
         if (cocoon.request.get("submit_edit"))
         {
