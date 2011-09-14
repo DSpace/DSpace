@@ -49,3 +49,5 @@
  <!ATTLIST input-type value-pairs-name CDATA  #IMPLIED>
 
  <!ELEMENT vocabulary (#PCDATA) >
+
+ <!ATTLIST vocabulary closed (true|false) "false"> 
