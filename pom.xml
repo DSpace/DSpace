@@ -18,6 +18,7 @@
         <version>11</version>
     </parent>
 
+    <!--
     <repositories>
         <repository>
             <id>sonatype-nexus-releases</id>
@@ -33,6 +34,7 @@
             </snapshots>
         </repository>
     </repositories>
+    -->
 
     <build>
       <plugins>
