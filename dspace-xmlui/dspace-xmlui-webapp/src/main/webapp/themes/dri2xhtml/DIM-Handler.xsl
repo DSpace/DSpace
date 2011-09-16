@@ -117,8 +117,8 @@
                         </xsl:choose>
                     </xsl:attribute>
                     <xsl:choose>
-                        <xsl:when test="dim:field[@element='title'] and (string-length(dim:field[@element='title']) &gt; 0)">
-                            <xsl:value-of select="dim:field[@element='title'][1]/node()"/>
+                        <xsl:when test="dim:field[@mdschema='dc' and @element='title'] and (string-length(dim:field[@element='title']) &gt; 0)">
+                            <xsl:value-of select="dim:field[@mdschema='dc' and @element='title'][1]/node()"/>
                         </xsl:when>
                         <xsl:otherwise>
                             <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
@@ -744,7 +744,7 @@
     </xsl:template>
             
     <xsl:template match="dim:field" mode="itemDetailView-DIM">
-            <xsl:if test="not(@element='description' and @qualifier='provenance')">
+        <xsl:if test="not(@element='description' and @qualifier='provenance')">
             <tr>
                 <xsl:attribute name="class">
                     <xsl:text>ds-table-row </xsl:text>
@@ -770,7 +770,7 @@
             </td>
                 <td><xsl:value-of select="./@language"/></td>
             </tr>
-            </xsl:if>
+        </xsl:if>
     </xsl:template>
 
 	
@@ -804,7 +804,7 @@
         	</div>
         </xsl:if>
         
-        <xsl:if test="string-length(dim:field[@element='rights'][not(@qualifier)])&gt;0 or string-length(dim:field[@element='rights'][@qualifier='license'])&gt;0">
+        <xsl:if test="string-length(dim:field[@element='rights'][not(@qualifier)])&gt;0">
         	<div class="detail-view-rights-and-license">
 		        <xsl:if test="string-length(dim:field[@element='rights'][not(@qualifier)])&gt;0">
 		            <p class="copyright-text">
