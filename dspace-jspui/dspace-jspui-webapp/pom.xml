@@ -62,6 +62,7 @@
                     <!--Exclude license check for JSPUI files which don't need it-->
                     <excludes>
                         <exclude>**/META-INF/**</exclude>
+                        <exclude>**/fmt.tld</exclude>
                         <exclude>**/robots.txt</exclude>
                         <exclude>**/readme*</exclude>
                         <exclude>**/scriptaculous/**</exclude>
