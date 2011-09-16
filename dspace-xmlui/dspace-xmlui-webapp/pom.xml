@@ -51,41 +51,22 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>com.google.code.maven-license-plugin</groupId>
+                <groupId>com.mycila.maven-license-plugin</groupId>
                 <artifactId>maven-license-plugin</artifactId>
-                <version>1.4.0</version>
                 <configuration>
-                    <header>http://scm.dspace.org/svn/repo/licenses/LICENSE_HEADER</header>
-                    <includes>
-                        <include>src/**</include>
-                    </includes>
+                    <!--Exclude license check for XMLUI files which don't need it-->
                     <excludes>
-                        <exclude>target/**</exclude>
-                        <exclude>m2-target/**</exclude>
-                        <exclude>**/*.properties</exclude>
-                        <exclude>**/.project</exclude>
-                        <exclude>**/.classpath</exclude>
-                        <exclude>**/*.iws</exclude>
-                        <exclude>**/*.ipr</exclude>
-                        <exclude>**/*.iml</exclude>
                         <exclude>**/META-INF/**</exclude>
-                        <exclude>src/main/webapp/static/js/scriptaculous/**</exclude>
+                        <exclude>**/robots.txt</exclude>
+                        <exclude>**/readme*</exclude>
+                        <exclude>**/*.LICENSE</exclude>
+                        <exclude>**/cocoon/**</exclude>
+                        <exclude>**/scriptaculous/**</exclude>
                         <exclude>**/jquery*</exclude>
                         <exclude>**/modernizr*</exclude>
                         <exclude>**/DD_belated*</exclude>
-                        <exclude>**/*.LICENSE</exclude>
-
                     </excludes>
-                    <properties />
-                    <encoding>UTF-8</encoding>
                 </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>check</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
@@ -149,10 +130,16 @@
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-api</artifactId>
         </dependency>
+        <!-- TEMPORARY - For Testing of 'dspace-replicate' only-->
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-replicate</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
 
     </dependencies>
     <properties>
-        <netbeans.hint.deploy.server>Tomcat60</netbeans.hint.deploy.server>
+        <netbeans.hint.deploy.server>Tomcat</netbeans.hint.deploy.server>
     </properties>
 </project>
 
