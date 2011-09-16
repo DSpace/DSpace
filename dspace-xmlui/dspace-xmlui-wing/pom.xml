@@ -102,11 +102,6 @@
         </dependency>
 
         <dependency>
-            <artifactId>spring-aop</artifactId>
-            <groupId>org.springframework</groupId>
-        </dependency>
-
-        <dependency>
             <artifactId>spring-context</artifactId>
             <groupId>org.springframework</groupId>
         </dependency>

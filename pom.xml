@@ -478,12 +478,6 @@
         </dependency>
 
         <dependency>
-            <artifactId>spring-aop</artifactId>
-            <groupId>org.springframework</groupId>
-            <version>3.0.5.RELEASE</version>
-        </dependency>
-
-        <dependency>
             <artifactId>spring-context</artifactId>
             <groupId>org.springframework</groupId>
             <version>3.0.5.RELEASE</version>
