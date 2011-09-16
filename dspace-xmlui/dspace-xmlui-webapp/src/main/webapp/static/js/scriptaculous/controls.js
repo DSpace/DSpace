@@ -1,10 +1,3 @@
-/*
- * The contents of this file are subject to the license and copyright
- * detailed in the LICENSE and NOTICE files at the root of the source
- * tree and available online at
- *
- * http://www.dspace.org/license/
- */
 // script.aculo.us controls.js v1.8.2, Tue Nov 18 18:30:58 +0100 2008
 
 // Copyright (c) 2005-2008 Thomas Fuchs (http://script.aculo.us, http://mir.aculo.us)
