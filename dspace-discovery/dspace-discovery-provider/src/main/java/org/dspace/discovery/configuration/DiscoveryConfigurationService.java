@@ -4,7 +4,8 @@
  * tree and available online at
  *
  * http://www.dspace.org/license/
- */package org.dspace.discovery.configuration;
+ */
+package org.dspace.discovery.configuration;
 
 import org.dspace.utils.DSpace;
 
