@@ -58,6 +58,12 @@
             </p>
         </xsl:if>
 
+        <xsl:if test="string-length(dim:field[@element='description' and @qualifier='abstract'])&gt;0">
+            <p class="intro-text">
+               <xsl:copy-of select="dim:field[@element='description' and @qualifier='abstract']/node()"/>
+            </p>
+        </xsl:if>
+
         <xsl:if test="string-length(dim:field[@element='description'][@qualifier='tableofcontents'])&gt;0">
         	<div class="detail-view-news">
         		<h3><i18n:text>xmlui.dri2xhtml.METS-1.0.news</i18n:text></h3>
