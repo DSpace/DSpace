@@ -130,12 +130,6 @@
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-api</artifactId>
         </dependency>
-        <!-- TEMPORARY - For Testing of 'dspace-replicate' only-->
-        <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-replicate</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
 
     </dependencies>
     <properties>
