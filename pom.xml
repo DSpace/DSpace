@@ -272,12 +272,12 @@
                      <execution>
                         <inherited>false</inherited>
                         <configuration>
-                           <descriptors>
-                              <descriptor>src/assemble/release.xml</descriptor>
-                              <descriptor>src/assemble/src-release.xml</descriptor>
-                           </descriptors>
+                           <descriptorRefs>
+                              <descriptorRef>release</descriptorRef>
+                              <descriptorRef>src-release</descriptorRef>
+                           </descriptorRefs>
                            <tarLongFileMode>gnu</tarLongFileMode>
-                           <finalName>dspace-${project.version}</finalName>
+                           <finalName>dspace-${pom.version}</finalName>
                         </configuration>
                         <phase>package</phase>
                         <goals>
@@ -285,6 +285,13 @@
                         </goals>
                      </execution>
                   </executions>
+                  <dependencies>
+                     <dependency>
+                        <groupId>org.dspace.maven.plugins</groupId>
+                        <artifactId>dspace-assembly-plugin</artifactId>
+                        <version>1.2-SNAPSHOT</version>
+                     </dependency>
+                  </dependencies>
                </plugin>
             </plugins>
          </build>
