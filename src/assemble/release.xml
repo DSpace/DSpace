@@ -21,11 +21,9 @@
 	<baseDirectory>${finalName}-release</baseDirectory>
 	<fileSets>
 		<fileSet>
-            <directory>dspace</directory>
-            <outputDirectory>.</outputDirectory>
 			<useDefaultExcludes>true</useDefaultExcludes>
 			<includes>
-				<include>**</include>
+				<include>dspace</include>
 			</includes>
 			<excludes>
 				<exclude>**/target/**</exclude>
