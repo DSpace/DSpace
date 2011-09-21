@@ -171,13 +171,13 @@ public class HarvestedCollection
      */
     public static List<Integer> findReady(Context c) throws SQLException 
     {
-    	int harvestInterval = ConfigurationManager.getIntProperty("harvester.harvestFrequency");
+    	int harvestInterval = ConfigurationManager.getIntProperty("oai", "harvester.harvestFrequency");
     	if (harvestInterval == 0)
         {
             harvestInterval = 720;
         }
     	
-    	int expirationInterval = ConfigurationManager.getIntProperty("harvester.threadTimeout");
+    	int expirationInterval = ConfigurationManager.getIntProperty("oai", "harvester.threadTimeout");
     	if (expirationInterval == 0)
         {
             expirationInterval = 24;

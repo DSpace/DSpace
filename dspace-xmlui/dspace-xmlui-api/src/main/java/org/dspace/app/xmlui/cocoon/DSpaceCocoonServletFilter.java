@@ -198,7 +198,7 @@ public class DSpaceCocoonServletFilter implements Filter
     				"DSpace configuration directory. \n\n",e);
     	}
    
-		if (ConfigurationManager.getBooleanProperty("harvester.autoStart")) 
+		if (ConfigurationManager.getBooleanProperty("oai", "harvester.autoStart"))
     	{
     		try {
     			OAIHarvester.startNewScheduler();

@@ -151,7 +151,7 @@ public class OAIHarvester {
         metadataNS = OAIHarvester.getDMDNamespace(metadataKey);
                 
         if (metadataNS == null) {
-        	log.error("No matching metadata namespace found for \"" + metadataKey + "\", see dspace.cfg option \"harvester.oai.metadataformats.{MetadataKey} = {MetadataNS},{Display Name}\"");
+        	log.error("No matching metadata namespace found for \"" + metadataKey + "\", see oai.cfg option \"harvester.oai.metadataformats.{MetadataKey} = {MetadataNS},{Display Name}\"");
         	throw new HarvestingException("Metadata declaration not found");
         } 
 	}
@@ -166,14 +166,14 @@ public class OAIHarvester {
 		String ORESeialKey = null;
 		String oreString = "harvester.oai.oreSerializationFormat.";
         
-        Enumeration pe = ConfigurationManager.propertyNames();
+        Enumeration pe = ConfigurationManager.propertyNames("oai");
         
         while (pe.hasMoreElements())
         {
             String key = (String)pe.nextElement();
             if (key.startsWith(oreString)) {
             	ORESeialKey = key.substring(oreString.length());
-            	ORESerializationString = ConfigurationManager.getProperty(key);
+            	ORESerializationString = ConfigurationManager.getProperty("oai", key);
 
                 return Namespace.getNamespace(ORESeialKey, ORESerializationString);
             }
@@ -193,14 +193,14 @@ public class OAIHarvester {
 		String metadataString = null;
         String metaString = "harvester.oai.metadataformats.";
         
-        Enumeration pe = ConfigurationManager.propertyNames();
+        Enumeration pe = ConfigurationManager.propertyNames("oai");
         
         while (pe.hasMoreElements())
         {
             String key = (String)pe.nextElement();
             
             if (key.startsWith(metaString) && key.substring(metaString.length()).equals((metadataKey))) {
-            	metadataString = ConfigurationManager.getProperty(key);
+            	metadataString = ConfigurationManager.getProperty("oai", key);
             	String namespacePiece;
             	if (metadataString.indexOf(',') != -1)
                 {
@@ -293,7 +293,7 @@ public class OAIHarvester {
 			ourContext.commit();
 			
 			// expiration timer starts
-			int expirationInterval = ConfigurationManager.getIntProperty("harvester.threadTimeout");
+			int expirationInterval = ConfigurationManager.getIntProperty("oai", "harvester.threadTimeout");
 	    	if (expirationInterval == 0)
             {
                 expirationInterval = 24;
@@ -604,13 +604,13 @@ public class OAIHarvester {
      */
     private String extractHandle(Item item) 
     {
-    	String acceptedHandleServersString = ConfigurationManager.getProperty("harvester.acceptedHandleServer");
+    	String acceptedHandleServersString = ConfigurationManager.getProperty("oai", "harvester.acceptedHandleServer");
     	if (acceptedHandleServersString == null)
         {
             acceptedHandleServersString = "hdl.handle.net";
         }
     	
-    	String rejectedHandlePrefixString = ConfigurationManager.getProperty("harvester.rejectedHandlePrefix");
+    	String rejectedHandlePrefixString = ConfigurationManager.getProperty("oai", "harvester.rejectedHandlePrefix");
     	if (rejectedHandlePrefixString == null)
         {
             rejectedHandlePrefixString = "123456789";
@@ -659,13 +659,13 @@ public class OAIHarvester {
     private void scrubMetadata(Item item) throws SQLException, HarvestingException, AuthorizeException, IOException 
     {
     	// The two options, with three possibilities each: add, ignore, fail
-    	String schemaChoice = ConfigurationManager.getProperty("harvester.unknownSchema");
+    	String schemaChoice = ConfigurationManager.getProperty("oai", "harvester.unknownSchema");
     	if (schemaChoice == null)
         {
             schemaChoice = "fail";
         }
     	
-    	String fieldChoice = ConfigurationManager.getProperty("harvester.unknownField");
+    	String fieldChoice = ConfigurationManager.getProperty("oai", "harvester.unknownField");
     	if (fieldChoice == null)
         {
             fieldChoice = "fail";
@@ -741,7 +741,7 @@ public class OAIHarvester {
    	 * @return a string in the format 'yyyy-mm-ddThh:mm:ssZ' and converted to UTC timezone
    	 */
     private String processDate(Date date) {
-    	Integer timePad = ConfigurationManager.getIntProperty("harvester.timePadding");
+    	Integer timePad = ConfigurationManager.getIntProperty("oai", "harvester.timePadding");
 		
     	if (timePad == 0) {
     		timePad = 120;
@@ -1144,17 +1144,17 @@ public class OAIHarvester {
 			
 			harvestThreads = new Stack<HarvestThread>();
 			
-			maxActiveThreads = ConfigurationManager.getIntProperty("harvester.maxThreads");
+			maxActiveThreads = ConfigurationManager.getIntProperty("oai", "harvester.maxThreads");
 			if (maxActiveThreads == 0)
             {
                 maxActiveThreads = 3;
             }
-			minHeartbeat = ConfigurationManager.getIntProperty("harvester.minHeartbeat") * 1000;
+			minHeartbeat = ConfigurationManager.getIntProperty("oai", "harvester.minHeartbeat") * 1000;
 			if (minHeartbeat == 0)
             {
                 minHeartbeat = 30000;
             }
-			maxHeartbeat = ConfigurationManager.getIntProperty("harvester.maxHeartbeat") * 1000;
+			maxHeartbeat = ConfigurationManager.getIntProperty("oai", "harvester.maxHeartbeat") * 1000;
 			if (maxHeartbeat == 0)
             {
                 maxHeartbeat = 3600000;
@@ -1260,7 +1260,7 @@ public class OAIHarvester {
 					int nextCollectionId = HarvestedCollection.findOldestHarvest(tempContext);
 					HarvestedCollection hc = HarvestedCollection.find(tempContext, nextCollectionId);
 
-					int harvestInterval = ConfigurationManager.getIntProperty("harvester.harvestFrequency");
+					int harvestInterval = ConfigurationManager.getIntProperty("oai", "harvester.harvestFrequency");
 					if (harvestInterval == 0)
                     {
                         harvestInterval = 720;
