@@ -971,14 +971,14 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         generatorSettings.setHead(T_harvest_head_generator_settings);
 
         generatorSettings.addLabel(T_harvest_label_oai_url);
-        String oaiUrl = ConfigurationManager.getProperty("dspace.oai.url");
+        String oaiUrl = ConfigurationManager.getProperty("oai", "dspace.oai.url");
         if (!StringUtils.isEmpty(oaiUrl))
         {
             generatorSettings.addItem(oaiUrl);
         }
 
         generatorSettings.addLabel(T_harvest_label_oai_source);
-        String oaiAuthoritativeSource = ConfigurationManager.getProperty("ore.authoritative.source");
+        String oaiAuthoritativeSource = ConfigurationManager.getProperty("oai", "ore.authoritative.source");
         if (!StringUtils.isEmpty(oaiAuthoritativeSource))
         {
             generatorSettings.addItem(oaiAuthoritativeSource);

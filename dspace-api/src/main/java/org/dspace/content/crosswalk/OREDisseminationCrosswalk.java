@@ -86,10 +86,10 @@ public class OREDisseminationCrosswalk
     	String oaiUrl = null;
         String dsUrl = ConfigurationManager.getProperty("dspace.url");
         
-        String remSource = ConfigurationManager.getProperty("ore.authoritative.source");
+        String remSource = ConfigurationManager.getProperty("oai", "ore.authoritative.source");
     	if (remSource == null || remSource.equalsIgnoreCase("oai"))
         {
-            oaiUrl = ConfigurationManager.getProperty("dspace.oai.url");
+            oaiUrl = ConfigurationManager.getProperty("oai", "dspace.oai.url");
         }
     	else if (remSource.equalsIgnoreCase("xmlui") || remSource.equalsIgnoreCase("manakin"))
         {
