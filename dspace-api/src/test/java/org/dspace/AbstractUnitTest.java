@@ -22,6 +22,8 @@ import org.dspace.administer.RegistryImportException;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.browse.BrowseException;
 import org.dspace.content.NonUniqueMetadataException;
+import org.dspace.servicemanager.DSpaceKernelImpl;
+import org.dspace.servicemanager.DSpaceKernelInit;
 import org.junit.*;
 import static org.junit.Assert.*;
 import mockit.*;
@@ -123,6 +125,32 @@ public class AbstractUnitTest
             //load the test configuration file
             URL configFile = AbstractUnitTest.class.getClassLoader().getResource(testProps.getProperty("test.config.file"));
             ConfigurationManager.loadConfig(configFile.getPath());
+
+//            // Initialise the service manager kernel
+            DSpaceKernelImpl kernelImpl = null;
+            try {
+                kernelImpl = DSpaceKernelInit.getKernel(null);
+                if (!kernelImpl.isRunning())
+                {
+                    kernelImpl.start(ConfigurationManager.getProperty("dspace.dir"));
+                }
+            } catch (Exception e)
+            {
+                // Failed to start so destroy it and log and throw an exception
+                try
+                {
+                    if(kernelImpl != null){
+                        kernelImpl.destroy();
+                    }
+                }
+                catch (Exception e1)
+                {
+                    // Nothing to do
+                }
+                String message = "Failure during filter init: " + e.getMessage();
+                throw new IllegalStateException(message, e);
+            }
+
 
             //load the default registries. This assumes the temporal filesystem is working
             //and the in-memory DB in place
