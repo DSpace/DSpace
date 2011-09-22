@@ -8,7 +8,6 @@
 package org.dspace.license; 
 
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -18,7 +17,6 @@ import java.net.URLEncoder;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -26,6 +24,7 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.StringTokenizer;
 import java.util.Vector;
+import org.apache.log4j.Logger;
 
 import org.jaxen.JaxenException;
 import org.jaxen.jdom.JDOMXPath;
@@ -46,7 +45,8 @@ import org.dspace.core.ConfigurationManager;
  */
 public class CCLookup {
 
-
+        /** log4j logger */
+        private static Logger log = Logger.getLogger(CCLookup.class);
 
 	private static String cc_root     = ConfigurationManager.getProperty("webui.submit.cc-rooturl");
 	private static String jurisdiction  = (ConfigurationManager.getProperty("webui.submit.cc-jurisdiction") != null) ? ConfigurationManager.getProperty("webui.submit.cc-jurisdiction") : "";
@@ -371,7 +371,6 @@ public class CCLookup {
 
 		// Determine the issue URL
 		String issueUrl = this.cc_root + "/license/" + licenseId + "/issue";
-		System.out.println("the default locale is " + lang);
 		// Assemble the "answers" document
 		String answer_doc = "<answers>\n<locale>" + lang + "</locale>\n" + "<license-" + licenseId + ">\n";
 		Iterator keys = answers.keySet().iterator();
@@ -391,7 +390,6 @@ public class CCLookup {
 		}
 		// answer_doc +=	"<jurisdiction></jurisidiction>\n";  FAILS with jurisdiction argument
 		answer_doc +=						"</license-" + licenseId + ">\n</answers>\n";
-		System.out.println("The answer _doc is " + answer_doc);
 		String post_data;
 
 		try {
@@ -417,11 +415,10 @@ public class CCLookup {
 			// parsing document from input stream
 			java.io.InputStream stream = connection.getInputStream();
 			this.license_doc = this.parser.build(stream);
-			System.out.println("The size of the license doc is " + license_doc.getContent().size());
 		} catch (JDOMException jde) {
-			System.out.print( jde.getMessage());
+                        log.warn(jde.getMessage());
 		} catch (Exception e) {
-			System.out.println("Error reading the file " + e.getCause());
+			log.warn(e.getCause());
 		}
 		return;
 	} // issue
@@ -467,9 +464,9 @@ public class CCLookup {
 			java.io.InputStream stream = connection.getInputStream();
 			license_doc = this.parser.build(stream);
 		} catch (JDOMException jde) {
-			System.out.print( jde.getMessage());
+			log.warn( jde.getMessage());
 		} catch (Exception e) {
-			System.out.println("Error reading the file " + e.getCause());
+			log.warn(e.getCause());
 		}
 		return;
 	} // issue
@@ -486,7 +483,7 @@ public class CCLookup {
 		    text =  ((Element)xp_LicenseName.selectSingleNode(this.license_doc)).getText();
 		}
 		catch (Exception e) {
-			System.out.println(e.getMessage());
+			log.warn(e.getMessage());
 			setSuccess(false);
 			text = "An error occurred getting the license - uri.";
 		}
@@ -508,7 +505,7 @@ public class CCLookup {
 			text =  ((Element)xp_LicenseName.selectSingleNode(this.license_doc)).getText();
 		}
 		catch (Exception e) {
-			System.out.println(e.getMessage());
+			log.warn(e.getMessage());
 			setSuccess(false);
 			text = "An error occurred on the license name.";
 		}
@@ -539,11 +536,10 @@ public class CCLookup {
 			xmloutputter.output(licenseRdfParent, outputstream);
 			outputstream.write("\n</result>\n".getBytes());
 		} catch (Exception e) {
-			System.out.println("An error occurred getting the rdf . . ." + e.getMessage() );
+			log.warn("An error occurred getting the rdf . . ." + e.getMessage() );
 			setSuccess(false);
 		} finally {
 			outputstream.close();
-			System.out.println(outputstream.toString());
 			return outputstream.toString();
 		}
 	}
@@ -559,7 +555,7 @@ public class CCLookup {
 			setErrorMessage(text);
 		}
 		catch (Exception e) {
-			System.out.println("There was an issue . . . " + text);
+			log.warn("There was an issue . . . " + text);
 			setSuccess(true);
 		}
 		return this.success;

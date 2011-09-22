@@ -73,6 +73,7 @@ public class CCLicenseStep extends AbstractSubmissionStep
         protected static final Message T_no_license    = message("xmlui.Submission.submit.CCLicenseStep.no_license");
         protected static final Message T_select_change = message("xmlui.Submission.submit.CCLicenseStep.select_change");
         protected static final Message T_save_changes  = message("xmlui.Submission.submit.CCLicenseStep.save_changes");
+        protected static final Message T_ccws_error_prefix  = message("xmlui.Submission.submit.CCLicenseStep.ccws_error_prefix");
 
 
 	/**
@@ -164,19 +165,24 @@ public class CCLicenseStep extends AbstractSubmissionStep
         	}    
 		Division statusDivision = div.addDivision("statusDivision");
 		List statusList = statusDivision.addList("statusList", List.TYPE_FORM);
-		if (CreativeCommons.hasLicense(item, "dc", "rights", "uri", Item.ANY))
+		if (CreativeCommons.hasLicense(item, "dc", "rights", "uri", Item.ANY) && !CreativeCommons.getRightsURI(item, "dc", "rights", "uri", Item.ANY).equals(""))
 		{
-			String url  = CreativeCommons.getLicenseMetadata(item,"dc", "rights", "uri", Item.ANY);
-			statusList.addItem().addXref(url,url);
+			String ccUrl  = CreativeCommons.getRightsURI(item, "dc", "rights", "uri", Item.ANY);
+			statusList.addItem().addXref(ccUrl,ccUrl);
         	}
 		else
 		{
-			if (session.getAttribute("isFieldRequired") != null && session.getAttribute("isFieldRequired").equals("TRUE") && session.getAttribute("ccError") != null) {
-				statusList.addItem().addHighlight("error").addContent("Submission failed due to " + (String)session.getAttribute("ccError"));
-				session.removeAttribute("ccError");
-				session.removeAttribute("isFieldRequired");
-			} else {
-				 statusList.addItem().addHighlight("italic").addContent(T_save_changes);
+			if (session.getAttribute("isFieldRequired") != null && 	
+			    session.getAttribute("isFieldRequired").equals("TRUE") && 
+			    session.getAttribute("ccError") != null) 
+			{
+			    statusList.addItem().addHighlight("error").addContent(T_ccws_error_prefix + " " + (String)session.getAttribute("ccError"));
+			    session.removeAttribute("ccError");
+			    session.removeAttribute("isFieldRequired");
+			} 
+			else if (session.getAttribute("inProgress") != null && ((String)session.getAttribute("inProgress")).equals("TRUE")) 
+			{
+				statusList.addItem().addHighlight("italic").addContent(T_save_changes);
 			}
 		}
         addControlButtons(statusList);

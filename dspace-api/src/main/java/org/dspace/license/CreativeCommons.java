@@ -15,6 +15,8 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.net.URLConnection;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Iterator;
 
 import javax.xml.transform.Templates;
 import javax.xml.transform.TransformerConfigurationException;
@@ -32,6 +34,8 @@ import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.Utils;
+import org.dspace.license.CCLookup;
+import org.dspace.license.CCLicense;
 
 public class CreativeCommons
 {
@@ -233,8 +237,62 @@ public class CreativeCommons
     throws SQLException, IOException, AuthorizeException
 	{
     	item.clearMetadata(schema, element, qualifier, lang);
-
 	}
+
+    /** setItemMetadata
+     *
+     *@description removes the old rights metadata without
+     *   potentially removing other rights  metadata
+     */
+    public static void setItemMetadata(Item item, String license, String schema, String element, String qualifier,
+            String lang) throws java.sql.SQLException, java.io.IOException, org.dspace.authorize.AuthorizeException
+     {
+             DCValue[] dcvalues  = item.getMetadata(schema, element, qualifier, lang);
+             ArrayList<String> arrayList = new ArrayList<String>();
+             for (DCValue  dcvalue : dcvalues)
+             {
+                 boolean isUri = (qualifier != null) ? true : false;
+                 if (addDCValue(dcvalue.value, isUri))
+                 {
+                        arrayList.add(dcvalue.value);
+                 }
+              }
+              String[] licenses = (String[])arrayList.toArray(new String[arrayList.size()]);
+	      removeLicenseMetadata(item, schema, element, qualifier, Item.ANY);
+              item.addMetadata(schema, element, qualifier, lang, licenses);
+     }
+
+     private static ArrayList<String> licenseNames = new ArrayList<String>();
+     /**
+      * @param metavalue - the hopeful dc value
+      * @param isUri - true if uri
+      * @param dcValue - the dc value
+      * @return - a boolean to determine whether to restore the item's rights' metadata
+      */
+      private static boolean addDCValue(String metavalue, boolean isUri)
+                throws java.io.IOException
+     {
+          if (isUri)
+          {
+               if (metavalue.indexOf("creativecommons") != -1)
+               {
+                   // first get the license type from the web service api to look at later for dc.rights.null
+                   CCLookup cclookup = new CCLookup();
+                   cclookup.issue(metavalue); // http://api.creativecommons.org/rest/1.5/details?license-uri=
+                   licenseNames.add(cclookup.getLicenseName());
+                   return false;
+               }
+           }
+           else
+           {
+                // if the metavalue is in the original list then return false
+                if (licenseNames.contains(metavalue)) {
+                    return false;
+                }
+          }
+          return true;
+      }
+
 
     public static boolean hasLicense(Context context, Item item)
             throws SQLException, IOException
@@ -290,6 +348,37 @@ public class CreativeCommons
     	return "";
     }
 
+    /* for CC web services api */
+    public static String getRightsURI(Item item, String schema, String element, String qualifier, String lang) {
+        DCValue[] dcvalues = item.getMetadata(schema, element, qualifier, lang);
+        for (DCValue dcvalue : dcvalues) {
+            if ((dcvalue.value).indexOf("creativecommons") != -1) 
+	    {
+		return dcvalue.value;
+            }
+        }
+        return "";
+    }
+
+    /* for CC web services api */
+    public static String getRightsName(Item item, String schema, String element, String qualifier, String lang) {
+	// check if this is a cc license dc.rights value
+	CCLookup cclookup = new CCLookup();
+        Iterator iterator = cclookup.getLicenses(ConfigurationManager.getProperty("default.locale")).iterator();
+        String ccLicenseName = new String("");
+        while (iterator.hasNext()) {
+            CCLicense cclicense = (CCLicense)iterator.next();
+            ccLicenseName = (cclicense.getLicenseName()).trim();
+            DCValue[] dcvalues = item.getMetadata(schema, element, qualifier, lang);
+            for (DCValue dcvalue : dcvalues) {
+                if ((dcvalue.value).indexOf(ccLicenseName) != -1)
+                {
+                    return dcvalue.value;
+                }
+            }
+        }
+        return "";
+    }
 
 
     public static String getLicenseURL(Item item) throws SQLException,
