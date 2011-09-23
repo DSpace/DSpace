@@ -73,7 +73,7 @@ public class CCLicenseStep extends AbstractSubmissionStep
         protected static final Message T_no_license    = message("xmlui.Submission.submit.CCLicenseStep.no_license");
         protected static final Message T_select_change = message("xmlui.Submission.submit.CCLicenseStep.select_change");
         protected static final Message T_save_changes  = message("xmlui.Submission.submit.CCLicenseStep.save_changes");
-        protected static final Message T_ccws_error_prefix  = message("xmlui.Submission.submit.CCLicenseStep.ccws_error_prefix");
+        protected static final Message T_ccws_error  = message("xmlui.Submission.submit.CCLicenseStep.ccws_error");
 
 
 	/**
@@ -176,7 +176,7 @@ public class CCLicenseStep extends AbstractSubmissionStep
 			    session.getAttribute("isFieldRequired").equals("TRUE") && 
 			    session.getAttribute("ccError") != null) 
 			{
-			    statusList.addItem().addHighlight("error").addContent(T_ccws_error_prefix + " " + (String)session.getAttribute("ccError"));
+			    statusList.addItem().addHighlight("error").addContent(T_ccws_error.parameterize((String)session.getAttribute("ccError")));
 			    session.removeAttribute("ccError");
 			    session.removeAttribute("isFieldRequired");
 			} 
