@@ -1304,7 +1304,7 @@ public class ItemImport
             String[] dirListing = new File(path).list();
             for (String fileName : dirListing)
             {
-                if (!"dublin_core.xml".equals(fileName) && !filename.equals("handle") && !filename.startsWith("metadata_"))
+                if (!"dublin_core.xml".equals(fileName) && !fileName.equals("handle") && !fileName.startsWith("metadata_"))
                 {
                     throw new FileNotFoundException("No contents file found");
                 }
