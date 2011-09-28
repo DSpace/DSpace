@@ -80,24 +80,25 @@ and searching the repository.
                         
                         
                         <!--
-                                        Display the DSpace homepage. This includes the news.xml file
-                                        along with a list of top level communities in DSpace.
-                                        -->
+                            Display the DSpace homepage. This includes the news.xml file
+                            along with a list of top level communities in DSpace.
+                            -->
                         <map:match pattern="">
+                            <map:transform type="Include" src="resource://aspects/ArtifactBrowser/dspace-home.xml" />
                             <!--
                                 DSpacePropertyFileReader will read the DSpace property file and
                                 place the selected properties' value in this scope
                             -->
-                                <map:act type="DSpacePropertyFileReader">
-                                        <map:parameter name="dspace.dir" value="dspace.dir" />
-                                        <map:transform type="Include" src="file://{dspace.dir}/config/news-xmlui.xml" />
-                                </map:act>
-                                
-                                <map:transform type="FrontPageSearch"/>
-                                <map:transform type="CommunityBrowser">
-                                        <map:parameter name="depth" value="1"/>
-                                </map:transform>
-                                <map:serialize type="xml"/>
+                            <map:act type="DSpacePropertyFileReader">
+                                <map:parameter name="dspace.dir" value="dspace.dir" />
+                                <map:transform type="Include" src="file://{dspace.dir}/config/news-xmlui.xml" />
+                            </map:act>
+
+                            <map:transform type="FrontPageSearch"/>
+                            <map:transform type="CommunityBrowser">
+                                <map:parameter name="depth" value="1"/>
+                            </map:transform>
+                            <map:serialize type="xml"/>
                         </map:match>
                         
                         

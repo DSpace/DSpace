@@ -77,6 +77,7 @@ and searching the repository.
                                         along with a list of top level communities in DSpace.
                                         -->
                         <map:match pattern="">
+                            <map:transform type="Include" src="resource://aspects/ViewArtifacts/dspace-home.xml" />
                             <!--
                                 DSpacePropertyFileReader will read the DSpace property file and
                                 place the selected properties' value in this scope
