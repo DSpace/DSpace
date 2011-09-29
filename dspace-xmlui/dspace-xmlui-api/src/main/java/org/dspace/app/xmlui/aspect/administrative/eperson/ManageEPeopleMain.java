@@ -106,7 +106,7 @@ public class ManageEPeopleMain extends AbstractDSpaceTransformer
     {
         pageMeta.addMetadata("title").addContent(T_title);
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
-        pageMeta.addTrailLink(contextPath + "/admin/epeople",T_eperson_trail);
+        pageMeta.addTrailLink(null,T_eperson_trail);
     }
 		
 	

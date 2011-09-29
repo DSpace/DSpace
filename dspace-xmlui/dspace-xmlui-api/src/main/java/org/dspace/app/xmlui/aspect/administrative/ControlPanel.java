@@ -220,7 +220,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         pageMeta.addMetadata("title").addContent(T_title);
 
         pageMeta.addTrailLink(contextPath + "/", T_DSPACE_HOME);
-        pageMeta.addTrailLink(contextPath + "/admin/panel", T_trail);
+        pageMeta.addTrailLink(null, T_trail);
     }
 
     @Override

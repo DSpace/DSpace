@@ -78,7 +78,7 @@ public class MetadataRegistryMain extends AbstractDSpaceTransformer
     {
         pageMeta.addMetadata("title").addContent(T_title);
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
-        pageMeta.addTrailLink(contextPath + "/admin/metadata-registry",T_metadata_registry_trail);
+        pageMeta.addTrailLink(null,T_metadata_registry_trail);
     }
 		
 	

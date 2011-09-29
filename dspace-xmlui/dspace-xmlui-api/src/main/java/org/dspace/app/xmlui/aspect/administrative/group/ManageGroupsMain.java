@@ -112,7 +112,7 @@ public class ManageGroupsMain extends AbstractDSpaceTransformer
     {
         pageMeta.addMetadata("title").addContent(T_title);
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
-        pageMeta.addTrailLink(contextPath + "/admin/groups",T_group_trail);
+        pageMeta.addTrailLink(null,T_group_trail);
     }
 		
 	public void addBody(Body body) throws WingException, SQLException 

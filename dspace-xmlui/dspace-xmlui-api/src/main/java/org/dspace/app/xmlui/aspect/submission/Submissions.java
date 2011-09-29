@@ -115,7 +115,7 @@ public class Submissions extends AbstractDSpaceTransformer
 		pageMeta.addMetadata("title").addContent(T_title);
 
 		pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
-		pageMeta.addTrailLink(contextPath + "/submissions",T_trail);
+		pageMeta.addTrailLink(null,T_trail);
 	}
 	
     @Override
