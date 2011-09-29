@@ -35,7 +35,7 @@ import org.dspace.handle.HandleManager;
 public class HandleUtil
 {
 
-    /** The URL prefix of all handle */
+    /** The URL prefix of all handles */
     protected static final String HANDLE_PREFIX = "handle/";
 
     protected static final String DSPACE_OBJECT = "dspace.object";
@@ -138,9 +138,14 @@ public class HandleUtil
 
     /**
      * Build a list of trail metadata starting with the owning collection and
-     * ending with the root level parent. If the Object is an item the item is
-     * not included but all it's parents are. However if the item is a community
-     * or collection then it is included along with all parents.
+     * ending with the root level parent. If the Object is an item, a bundle,
+     * or a bitstream, then the object is not included, but its collection and
+     * community parents are. However if the item is a community or collection
+     * then it is included along with all parents.
+     * 
+     * <p>
+     * If the terminal object in the trail is the passed object, do not link to
+     * it, because that is (presumably) the page at which the user has arrived.
      * 
      * @param dso
      * @param pageMeta
@@ -150,42 +155,44 @@ public class HandleUtil
     {
         // Add the trail back to the repository root.
         Stack<DSpaceObject> stack = new Stack<DSpaceObject>();
+        DSpaceObject aDso = dso;
 
-        if (dso instanceof Bitstream)
+        if (aDso instanceof Bitstream)
         {
-        	Bitstream bitstream = (Bitstream) dso;
+        	Bitstream bitstream = (Bitstream) aDso;
         	Bundle[] bundles = bitstream.getBundles();
-        	
-        	dso = bundles[0];
-        }
-        
-        if (dso instanceof Bundle)
-        {
-        	Bundle bundle = (Bundle) dso;
-        	Item[] items = bundle.getItems();
-        	
-        	dso = items[0];
-        }
-        
-        if (dso instanceof Item)
-        {
-            Item item = (Item) dso;
-            Collection collection = item.getOwningCollection();
-            dso = collection;
+
+        	aDso = bundles[0];
         }
 
-        if (dso instanceof Collection)
+        if (aDso instanceof Bundle)
         {
-            Collection collection = (Collection) dso;
+        	Bundle bundle = (Bundle) aDso;
+        	Item[] items = bundle.getItems();
+
+        	aDso = items[0];
+        }
+
+        if (aDso instanceof Item)
+        {
+            Item item = (Item) aDso;
+            Collection collection = item.getOwningCollection();
+
+            aDso = collection;
+        }
+
+        if (aDso instanceof Collection)
+        {
+            Collection collection = (Collection) aDso;
             stack.push(collection);
             Community[] communities = collection.getCommunities();
 
-            dso = communities[0];
+            aDso = communities[0];
         }
 
-        if (dso instanceof Community)
+        if (aDso instanceof Community)
         {
-            Community community = (Community) dso;
+            Community community = (Community) aDso;
             stack.push(community);
 
             for (Community parent : community.getAllParents())
@@ -197,18 +204,24 @@ public class HandleUtil
         while (!stack.empty())
         {
             DSpaceObject pop = stack.pop();
-            
+
+            String target;
+            if (pop == dso)
+                target = null; // Do not link "back" to the terminal object
+            else
+                target = contextPath + "/handle/" + pop.getHandle();
+
             if (pop instanceof Collection)
             {
             	Collection collection = (Collection) pop;
             	String name = collection.getMetadata("name");
             	if (name == null || name.length() == 0)
                 {
-                    pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), new Message("default", "xmlui.general.untitled"));
+                    pageMeta.addTrailLink(target, new Message("default", "xmlui.general.untitled"));
                 }
             	else
                 {
-                    pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), name);
+                    pageMeta.addTrailLink(target, name);
                 }
             }
             else if (pop instanceof Community)
@@ -217,11 +230,11 @@ public class HandleUtil
             	String name = community.getMetadata("name");
             	if (name == null || name.length() == 0)
                 {
-                    pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), new Message("default", "xmlui.general.untitled"));
+                    pageMeta.addTrailLink(target, new Message("default", "xmlui.general.untitled"));
                 }
             	else
                 {
-                    pageMeta.addTrailLink(contextPath + "/handle/" + pop.getHandle(), name);
+                    pageMeta.addTrailLink(target, name);
                 }
             }
 
