@@ -56,7 +56,7 @@ import org.xml.sax.SAXException;
  * @author Scott Phillips
  */
 public class ControlPanel extends AbstractDSpaceTransformer implements Serviceable, Disposable {
-	
+
     /** Language Strings */
     private static final Message T_DSPACE_HOME                  = message("xmlui.general.dspace_home");
     private static final Message T_title 			= message("xmlui.administrative.ControlPanel.title");
@@ -155,38 +155,38 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
     private static final Message T_harvest_label_oai_source 		= message("xmlui.administrative.ControlPanel.harvest_label_oai_source");
     private static final Message T_harvest_head_harvester_settings 	= message("xmlui.administrative.ControlPanel.harvest_head_harvester_settings");
 
-	
+
     /** 
      * The service manager allows us to access the continuation's 
-     * manager, it is obtained from the servicable API
+     * manager.  It is obtained from the Serviceable API
      */
     private ServiceManager serviceManager;
-    
+
     /**
      * The Cocoon Settings (used to display Cocoon info)
      */
     private Settings settings;
-    
+
     /**
      * The Cocoon StoreJanitor (used for cache statistics)
      */
     private StoreJanitor storeJanitor;
-    
+
      /**
      * The Cocoon Default Store (used for cache statistics)
      */
     private Store storeDefault;
-    
+
     /**
      * The Cocoon Persistent Store (used for cache statistics)
      */
     private Store storePersistent;
-    
+
     /**
      * The five states that this page can be in.
      */
     private enum OPTIONS {java, dspace, alerts, activity, harvest};
-    
+
     /**
      * From the <code>org.apache.avalon.framework.service.Serviceable</code> API, 
      * give us the current <code>ServiceManager</code> instance.
@@ -211,7 +211,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         if(this.serviceManager.hasService(Store.PERSISTENT_STORE))
             this.storePersistent = (Store) this.serviceManager.lookup(Store.PERSISTENT_STORE);
     }
-	
+
     @Override
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
                     WingException, UIException, SQLException, IOException,
@@ -341,7 +341,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         }
 
     }
-	
+
     /**
      * Add specific java information including JRE, OS, and runtime memory statistics.
      */
@@ -391,7 +391,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         //List: Cocoon Info & Cache
         addCocoonInformation(div);
     }
-        
+
     /**
      * Add specific Cocoon information, especially related to the Cocoon Cache.
      * <P>
@@ -406,7 +406,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         
         cocoon.addLabel(T_COCOON_VERSION);
         cocoon.addItem(org.apache.cocoon.Constants.VERSION);
-        
+
         //attempt to Display some basic info about Cocoon's Settings & Caches
 
         //Get access to basic Cocoon Settings

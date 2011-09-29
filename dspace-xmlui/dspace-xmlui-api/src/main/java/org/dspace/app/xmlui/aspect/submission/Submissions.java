@@ -56,7 +56,7 @@ public class Submissions extends AbstractDSpaceTransformer
         message("xmlui.Submission.Submissions.untitled");
     protected static final Message T_email = 
         message("xmlui.Submission.Submissions.email");
-    
+
     // used by the unfinished submissions section
     protected static final Message T_s_head1 = 
         message("xmlui.Submission.Submissions.submit_head1"); 
@@ -106,18 +106,18 @@ public class Submissions extends AbstractDSpaceTransformer
             message("xmlui.Submission.Submissions.completed.limit");
     protected static final Message T_c_displayall =
             message("xmlui.Submission.Submissions.completed.displayall");
-	
+
     @Override
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
 	WingException, UIException, SQLException, IOException,
 	AuthorizeException
 	{
-		pageMeta.addMetadata("title").addContent(T_title);
+            pageMeta.addMetadata("title").addContent(T_title);
 
-		pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
-		pageMeta.addTrailLink(null,T_trail);
+            pageMeta.addTrailLink(contextPath + "/",T_dspace_home);
+            pageMeta.addTrailLink(null,T_trail);
 	}
-	
+
     @Override
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
@@ -130,72 +130,69 @@ public class Submissions extends AbstractDSpaceTransformer
         {
             displayAll=true;
         }
-        
+
         Division div = body.addInteractiveDivision("submissions", contextPath+"/submissions", Division.METHOD_POST,"primary");
         div.setHead(T_head);
-        
+
 //        this.addWorkflowTasksDiv(div);
         this.addUnfinishedSubmissions(div);
 //        this.addSubmissionsInWorkflowDiv(div);
         this.addPreviousSubmissions(div, displayAll);
     }
-    
-    
+
     /**
      * If the user has any workflow tasks, either assigned to them or in an 
      * available pool of tasks, then build two tables listing each of these queues.
      * 
-     * If the user dosn't have any workflows then don't do anything.
+     * If the user doesn't have any workflows then don't do anything.
      * 
      * @param division The division to add the two queues too.
      */
     private void addWorkflowTasksDiv(Division division) throws SQLException, WingException, AuthorizeException, IOException {
     	division.addDivision("workflow-tasks");
         }
-    	
-    	
 
     /**
-     * There are two options, the user has some unfinished submissions 
+     * There are two options:  the user has some unfinished submissions 
      * or the user does not.
      * 
      * If the user does not, then we just display a simple paragraph 
      * explaining that the user may submit new items to dspace.
      * 
-     * If the user does have unfinisshed submissions then a table is 
+     * If the user does have unfinished submissions then a table is 
      * presented listing all the unfinished submissions that this user has.
      * 
      */
     private void addUnfinishedSubmissions(Division division) throws SQLException, WingException
     {
-    	
+
         // User's WorkflowItems
     	WorkspaceItem[] unfinishedItems = WorkspaceItem.findByEPerson(context,context.getCurrentUser());
     	SupervisedItem[] supervisedItems = SupervisedItem.findbyEPerson(context, context.getCurrentUser());
 
     	if (unfinishedItems.length <= 0 && supervisedItems.length <= 0)
     	{
-    		Collection[] collections = Collection.findAuthorized(context, null, Constants.ADD);
-    		
-    		if (collections.length > 0)
-    		{
-    			Division start = division.addDivision("start-submision");
-	        	start.setHead(T_s_head1);
-	        	Para p = start.addPara();
-	        	p.addContent(T_s_info1a);
-	        	p.addXref(contextPath+"/submit",T_s_info1b);
-	        	p.addContent(T_s_info1c);
-	        	return;
-    		}
+            Collection[] collections = Collection.findAuthorized(context, null, Constants.ADD);
+
+            if (collections.length > 0)
+            {
+                Division start = division.addDivision("start-submision");
+                start.setHead(T_s_head1);
+                Para p = start.addPara();
+                p.addContent(T_s_info1a);
+                p.addXref(contextPath+"/submit",T_s_info1b);
+                p.addContent(T_s_info1c);
+                return;
+            }
     	}
-    	
+
     	Division unfinished = division.addDivision("unfinished-submisions");
     	unfinished.setHead(T_s_head2);
     	Para p = unfinished.addPara();
     	p.addContent(T_s_info2a);
     	p.addHighlight("bold").addXref(contextPath+"/submit",T_s_info2b);
     	p.addContent(T_s_info2c);
-    	
+
     	// Calculate the number of rows.
     	// Each list pluss the top header and bottom row for the button.
     	int rows = unfinishedItems.length + supervisedItems.length + 2;
@@ -207,104 +204,101 @@ public class Submissions extends AbstractDSpaceTransformer
         {
             rows++; // Supervising heading row
         }
-    	
-    	
+
     	Table table = unfinished.addTable("unfinished-submissions",rows,5);
         Row header = table.addRow(Row.ROLE_HEADER);
         header.addCellContent(T_s_column1);
         header.addCellContent(T_s_column2);
         header.addCellContent(T_s_column3);
         header.addCellContent(T_s_column4);
-        
+
         if (supervisedItems.length > 0 && unfinishedItems.length > 0)
         {
             header = table.addRow();
             header.addCell(null,Cell.ROLE_HEADER,0,5,null).addContent(T_s_head3);
         }
-        
+
         if (unfinishedItems.length > 0)
         {
-	        for (WorkspaceItem workspaceItem : unfinishedItems) 
-	        {
-	        	DCValue[] titles = workspaceItem.getItem().getDC("title", null, Item.ANY);
-	        	EPerson submitterEPerson = workspaceItem.getItem().getSubmitter();
-	        	
-	        	int workspaceItemID = workspaceItem.getID();
-	        	String url = contextPath+"/submit?workspaceID="+workspaceItemID;
-	        	String submitterName = submitterEPerson.getFullName();
-	        	String submitterEmail = submitterEPerson.getEmail();
-	        	String collectionName = workspaceItem.getCollection().getMetadata("name");
-	
-	        	Row row = table.addRow(Row.ROLE_DATA);
-	        	CheckBox remove = row.addCell().addCheckBox("workspaceID");
-	        	remove.setLabel("remove");
-	        	remove.addOption(workspaceItemID);
-	        	
-	        	if (titles.length > 0)
-	        	{
-	        		String displayTitle = titles[0].value;
-        			if (displayTitle.length() > 50)
+            for (WorkspaceItem workspaceItem : unfinishedItems) 
+            {
+                DCValue[] titles = workspaceItem.getItem().getDC("title", null, Item.ANY);
+                EPerson submitterEPerson = workspaceItem.getItem().getSubmitter();
+
+                int workspaceItemID = workspaceItem.getID();
+                String url = contextPath+"/submit?workspaceID="+workspaceItemID;
+                String submitterName = submitterEPerson.getFullName();
+                String submitterEmail = submitterEPerson.getEmail();
+                String collectionName = workspaceItem.getCollection().getMetadata("name");
+
+                Row row = table.addRow(Row.ROLE_DATA);
+                CheckBox remove = row.addCell().addCheckBox("workspaceID");
+                remove.setLabel("remove");
+                remove.addOption(workspaceItemID);
+
+                if (titles.length > 0)
+                {
+                    String displayTitle = titles[0].value;
+                    if (displayTitle.length() > 50)
                         displayTitle = displayTitle.substring(0, 50) + " ...";
-	        		row.addCell().addXref(url,displayTitle);
+                    row.addCell().addXref(url,displayTitle);
                 }
-	        	else
-	        		row.addCell().addXref(url,T_untitled);
-	        	row.addCell().addXref(url,collectionName);
-	        	Cell cell = row.addCell();
-	        	cell.addContent(T_email);
-	        	cell.addXref("mailto:"+submitterEmail,submitterName);
-	        }
+                else
+                    row.addCell().addXref(url,T_untitled);
+                row.addCell().addXref(url,collectionName);
+                Cell cell = row.addCell();
+                cell.addContent(T_email);
+                cell.addXref("mailto:"+submitterEmail,submitterName);
+            }
         } 
         else
         {
-        	header = table.addRow();
-        	header.addCell(0,5).addHighlight("italic").addContent(T_s_info3);
+            header = table.addRow();
+            header.addCell(0,5).addHighlight("italic").addContent(T_s_info3);
         }
-        
+
         if (supervisedItems.length > 0)
         {
             header = table.addRow();
             header.addCell(null,Cell.ROLE_HEADER,0,5,null).addContent(T_s_head4);
         }
-        
+
         for (WorkspaceItem workspaceItem : supervisedItems) 
         {
-        	
-        	DCValue[] titles = workspaceItem.getItem().getDC("title", null, Item.ANY);
-        	EPerson submitterEPerson = workspaceItem.getItem().getSubmitter();
-        	
-        	int workspaceItemID = workspaceItem.getID();
-        	String url = contextPath+"/submit?workspaceID="+workspaceItemID;
-        	String submitterName = submitterEPerson.getFullName();
-        	String submitterEmail = submitterEPerson.getEmail();
-        	String collectionName = workspaceItem.getCollection().getMetadata("name");
-        	
-        	
-        	Row row = table.addRow(Row.ROLE_DATA);
-        	CheckBox selected = row.addCell().addCheckBox("workspaceID");
-        	selected.setLabel("select");
-        	selected.addOption(workspaceItemID);
-        	
-        	if (titles.length > 0)
-        	{
-        		String displayTitle = titles[0].value;
-    			if (displayTitle.length() > 50)
+
+            DCValue[] titles = workspaceItem.getItem().getDC("title", null, Item.ANY);
+            EPerson submitterEPerson = workspaceItem.getItem().getSubmitter();
+
+            int workspaceItemID = workspaceItem.getID();
+            String url = contextPath+"/submit?workspaceID="+workspaceItemID;
+            String submitterName = submitterEPerson.getFullName();
+            String submitterEmail = submitterEPerson.getEmail();
+            String collectionName = workspaceItem.getCollection().getMetadata("name");
+
+            Row row = table.addRow(Row.ROLE_DATA);
+            CheckBox selected = row.addCell().addCheckBox("workspaceID");
+            selected.setLabel("select");
+            selected.addOption(workspaceItemID);
+
+            if (titles.length > 0)
+            {
+                String displayTitle = titles[0].value;
+                if (displayTitle.length() > 50)
                 {
                     displayTitle = displayTitle.substring(0, 50) + " ...";
                 }
-        		row.addCell().addXref(url,displayTitle);
-        	}
-        	else
+                row.addCell().addXref(url,displayTitle);
+            }
+            else
             {
                 row.addCell().addXref(url, T_untitled);
             }
-        	row.addCell().addXref(url,collectionName);
-        	Cell cell = row.addCell();
-        	cell.addContent(T_email);
-        	cell.addXref("mailto:"+submitterEmail,submitterName);
+            row.addCell().addXref(url,collectionName);
+            Cell cell = row.addCell();
+            cell.addContent(T_email);
+            cell.addXref("mailto:"+submitterEmail,submitterName);
         }
-        
-        
+
         header = table.addRow();
         Cell lastCell = header.addCell(0,5);
         if (unfinishedItems.length > 0 || supervisedItems.length > 0)
@@ -312,19 +306,18 @@ public class Submissions extends AbstractDSpaceTransformer
             lastCell.addButton("submit_submissions_remove").setValue(T_s_submit_remove);
         }
     }
-    
-    
+
     /**
      * This section lists all the submissions that this user has submitted which are currently under review.
      * 
      * If the user has none, this nothing is displayed.
      */
-     private void addSubmissionsInWorkflowDiv(Division division) throws SQLException, WingException, AuthorizeException, IOException {
+    private void addSubmissionsInWorkflowDiv(Division division)
+            throws SQLException, WingException, AuthorizeException, IOException
+    {
         division.addDivision("submissions-inprogress");
-        }
-    	
+    }
 
-    	
     /**
      * Show the user's completed submissions.
      * 
@@ -362,24 +355,24 @@ public class Submissions extends AbstractDSpaceTransformer
         // No tasks, so don't show the table.
         if (!(subList.size() > 0))
             return;
-        
+
         Division completedSubmissions = division.addDivision("completed-submissions");
         completedSubmissions.setHead(T_c_head);
         completedSubmissions.addPara(T_c_info);
-    	
+
         // Create table, headers
         Table table = completedSubmissions.addTable("completed-submissions",subList.size() + 2,3);
         Row header = table.addRow(Row.ROLE_HEADER);
         header.addCellContent(T_c_column1); // ISSUE DATE
         header.addCellContent(T_c_column2); // ITEM TITLE (LINKED)
         header.addCellContent(T_c_column3); // COLLECTION NAME (LINKED)
-    	
+
         //Limit to showing just 50 archived submissions, unless overridden
         //(This is a saftey measure for Admins who may have submitted 
         // thousands of items under their account via bulk ingest tools, etc.)
         int limit = 50;
         int count = 0;
-        
+
         // Populate table
         Iterator i = subList.iterator();
         while(i.hasNext())
@@ -388,7 +381,7 @@ public class Submissions extends AbstractDSpaceTransformer
             //exit loop if we've gone over our limit of submissions to display
             if(count>limit && !displayAll)
                 break;
-           
+
             Item published = (Item) i.next();
             String collUrl = contextPath+"/handle/"+published.getOwningCollection().getHandle();
             String itemUrl = contextPath+"/handle/"+published.getHandle();
@@ -424,7 +417,7 @@ public class Submissions extends AbstractDSpaceTransformer
             // Owning Collection
             row.addCell().addXref(collUrl,collectionName);
         }//end while
-        
+
         //Display limit text & link to allow user to override this default limit
         if(!displayAll && count>limit)
         {
@@ -433,5 +426,5 @@ public class Submissions extends AbstractDSpaceTransformer
             limitedList.addXref(contextPath + "/submissions?all", T_c_displayall);
         }    
     }
-    
+
 }

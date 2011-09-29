@@ -35,110 +35,107 @@ import org.dspace.eperson.EPerson;
  */
 public class ManageEPeopleMain extends AbstractDSpaceTransformer   
 {	
-	
-	/** Language Strings */
-	private static final Message T_title = 
+
+    /** Language Strings */
+    private static final Message T_title = 
 		message("xmlui.administrative.eperson.ManageEPeopleMain.title");
 	
-	private static final Message T_eperson_trail =
+    private static final Message T_eperson_trail =
 		message("xmlui.administrative.eperson.general.epeople_trail");
 	
-	private static final Message T_main_head =
+    private static final Message T_main_head =
 		message("xmlui.administrative.eperson.ManageEPeopleMain.main_head");
 	
-	private static final Message T_actions_head =
+    private static final Message T_actions_head =
 		message("xmlui.administrative.eperson.ManageEPeopleMain.actions_head");
 	
-	private static final Message T_actions_create =
+    private static final Message T_actions_create =
 		message("xmlui.administrative.eperson.ManageEPeopleMain.actions_create");
 	
-	private static final Message T_actions_create_link =
+    private static final Message T_actions_create_link =
 		message("xmlui.administrative.eperson.ManageEPeopleMain.actions_create_link");
 	
-	private static final Message T_actions_browse =
+    private static final Message T_actions_browse =
 		message("xmlui.administrative.eperson.ManageEPeopleMain.actions_browse");
 	
-	private static final Message T_actions_browse_link =
+    private static final Message T_actions_browse_link =
 		message("xmlui.administrative.eperson.ManageEPeopleMain.actions_browse_link");
 	
-	private static final Message T_actions_search =
+    private static final Message T_actions_search =
 		message("xmlui.administrative.eperson.ManageEPeopleMain.actions_search");
 	
-	private static final Message T_search_help =
+    private static final Message T_search_help =
 		message("xmlui.administrative.eperson.ManageEPeopleMain.search_help");
 	
-	private static final Message T_dspace_home =
+    private static final Message T_dspace_home =
 		message("xmlui.general.dspace_home");
 	
-	private static final Message T_go =
+    private static final Message T_go =
 		message("xmlui.general.go");
 
-	private static final Message T_search_head =
+    private static final Message T_search_head =
 		message("xmlui.administrative.eperson.ManageEPeopleMain.search_head");
 
-	private static final Message T_search_column1 =
+    private static final Message T_search_column1 =
 		message("xmlui.administrative.eperson.ManageEPeopleMain.search_column1");
 	
-	private static final Message T_search_column2 =
+    private static final Message T_search_column2 =
 		message("xmlui.administrative.eperson.ManageEPeopleMain.search_column2");
 
-	private static final Message T_search_column3 =
+    private static final Message T_search_column3 =
 		message("xmlui.administrative.eperson.ManageEPeopleMain.search_column3");
 
-	private static final Message T_search_column4 =
+    private static final Message T_search_column4 =
 		message("xmlui.administrative.eperson.ManageEPeopleMain.search_column4");
 
-	private static final Message T_submit_delete =
+    private static final Message T_submit_delete =
 		message("xmlui.administrative.eperson.ManageEPeopleMain.submit_delete");
 
-	private static final Message T_no_results =
+    private static final Message T_no_results =
 		message("xmlui.administrative.eperson.ManageEPeopleMain.no_results");
-	
-	
-	
-	/**
-	 * The total number of entries to show on a page
-	 */
-	private static final int PAGE_SIZE = 15;
-	
-	
-	public void addPageMeta(PageMeta pageMeta) throws WingException
+
+    /**
+     * The total number of entries to show on a page
+     */
+    private static final int PAGE_SIZE = 15;
+
+
+    public void addPageMeta(PageMeta pageMeta) throws WingException
     {
         pageMeta.addMetadata("title").addContent(T_title);
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
         pageMeta.addTrailLink(null,T_eperson_trail);
     }
-		
-	
-	public void addBody(Body body) throws WingException, SQLException 
-	{
-		/* Get and setup our parameters */
+
+
+    public void addBody(Body body) throws WingException, SQLException 
+    {
+        /* Get and setup our parameters */
         int page          = parameters.getParameterAsInteger("page",0);
         int highlightID   = parameters.getParameterAsInteger("highlightID",-1);
         String query      = decodeFromURL(parameters.getParameter("query",null));
         String baseURL    = contextPath+"/admin/epeople?administrative-continue="+knot.getId();
         int resultCount   = EPerson.searchResultCount(context, query);	
         EPerson[] epeople = EPerson.search(context, query, page*PAGE_SIZE, PAGE_SIZE);
-        
-        
+
+
         // DIVISION: eperson-main
-		Division main = body.addInteractiveDivision("epeople-main",contextPath+"/admin/epeople",Division.METHOD_POST,"primary administrative eperson");
-		main.setHead(T_main_head);
-		
-		
-		
-		
-		// DIVISION: eperson-actions
+        Division main = body.addInteractiveDivision("epeople-main", contextPath
+                + "/admin/epeople", Division.METHOD_POST,
+                "primary administrative eperson");
+        main.setHead(T_main_head);
+
+        // DIVISION: eperson-actions
         Division actions = main.addDivision("epeople-actions");
         actions.setHead(T_actions_head);
-        
+
         List actionsList = actions.addList("actions");
         actionsList.addLabel(T_actions_create);
         actionsList.addItemXref(baseURL+"&submit_add", T_actions_create_link);
         actionsList.addLabel(T_actions_browse);
         actionsList.addItemXref(baseURL+"&query&submit_search", 
         		T_actions_browse_link);
-	    
+
         actionsList.addLabel(T_actions_search);
         org.dspace.app.xmlui.wing.element.Item actionItem = actionsList.addItem();
         Text queryField = actionItem.addText("query");
@@ -148,22 +145,20 @@ public class ManageEPeopleMain extends AbstractDSpaceTransformer
         }
         queryField.setHelp(T_search_help);
         actionItem.addButton("submit_search").setValue(T_go);
-       
-        
-        
+
         // DIVISION: eperson-search
         Division search = main.addDivision("eperson-search");
 		search.setHead(T_search_head);
-        
+
         // If there are more than 10 results the paginate the division.
         if (resultCount > PAGE_SIZE) 
-		{
-        	// If there are enough results then paginate the results
-        	int firstIndex = page*PAGE_SIZE+1; 
-        	int lastIndex = page*PAGE_SIZE + epeople.length;
-       
-        	String nextURL = null, prevURL = null;
-        	if (page < (resultCount / PAGE_SIZE))
+        {
+            // If there are enough results then paginate the results
+            int firstIndex = page*PAGE_SIZE+1; 
+            int lastIndex = page*PAGE_SIZE + epeople.length;
+
+            String nextURL = null, prevURL = null;
+            if (page < (resultCount / PAGE_SIZE))
             {
                 nextURL = baseURL + "&page=" + (page + 1);
             }
@@ -171,12 +166,10 @@ public class ManageEPeopleMain extends AbstractDSpaceTransformer
             {
                 prevURL = baseURL + "&page=" + (page - 1);
             }
-        	
-			search.setSimplePagination(resultCount,firstIndex,lastIndex,prevURL, nextURL);
-		}
-        
-		
-        	
+
+            search.setSimplePagination(resultCount,firstIndex,lastIndex,prevURL, nextURL);
+        }
+
         Table table = search.addTable("eperson-search-table", epeople.length + 1, 1);
         Row header = table.addRow(Row.ROLE_HEADER);
         header.addCell().addContent(T_search_column1);
@@ -187,49 +180,47 @@ public class ManageEPeopleMain extends AbstractDSpaceTransformer
         CheckBox selectEPerson; 
         for (EPerson person : epeople)
         {
-        	String epersonID = String.valueOf(person.getID());
-        	String fullName = person.getFullName();
-        	String email = person.getEmail();
-        	String url = baseURL+"&submit_edit&epersonID="+epersonID;
-        	java.util.List<String> deleteConstraints = person.getDeleteConstraints();
-        	
-        	
-        	Row row;
-        	if (person.getID() == highlightID)
+            String epersonID = String.valueOf(person.getID());
+            String fullName = person.getFullName();
+            String email = person.getEmail();
+            String url = baseURL+"&submit_edit&epersonID="+epersonID;
+            java.util.List<String> deleteConstraints = person.getDeleteConstraints();
+
+            Row row;
+            if (person.getID() == highlightID)
             {
                 // This is a highlighted eperson
                 row = table.addRow(null, null, "highlight");
             }
-        	else
+            else
             {
                 row = table.addRow();
             }
-        	
-        	selectEPerson = row.addCell().addCheckBox("select_eperson");
-        	selectEPerson.setLabel(epersonID);
-        	selectEPerson.addOption(epersonID);
-        	if (deleteConstraints != null && deleteConstraints.size() > 0)
+
+            selectEPerson = row.addCell().addCheckBox("select_eperson");
+            selectEPerson.setLabel(epersonID);
+            selectEPerson.addOption(epersonID);
+            if (deleteConstraints != null && deleteConstraints.size() > 0)
             {
                 selectEPerson.setDisabled();
             }
-        	
-        	
-        	row.addCellContent(epersonID);
+
+            row.addCellContent(epersonID);
             row.addCell().addXref(url, fullName);
             row.addCell().addXref(url, email);
         }
-        
+
         if (epeople.length <= 0) 
-		{
-        	Cell cell = table.addRow().addCell(1, 4);
-        	cell.addHighlight("italic").addContent(T_no_results);
+        {
+            Cell cell = table.addRow().addCell(1, 4);
+            cell.addHighlight("italic").addContent(T_no_results);
         }
         else 
         {
-        	search.addPara().addButton("submit_delete").setValue(T_submit_delete);
+            search.addPara().addButton("submit_delete").setValue(T_submit_delete);
         }
-		
-		main.addHidden("administrative-continue").setValue(knot.getId());
-        
+
+        main.addHidden("administrative-continue").setValue(knot.getId());
+
    }
 }
