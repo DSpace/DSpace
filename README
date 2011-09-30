@@ -1,12 +1,8 @@
 Installation instructions are included in this release package under
 
- - dspace/docs/html/index.html
-or
- - dspace/docs/pdf/DSpace-Manual.pdf
+ - dspace/docs/DSpace-Manual.pdf
 
-DSpace version information can be found in this release package under
- - dspace/docs/html/History.html
-or viewed online at
+DSpace version information can be viewed online at
  - https://wiki.duraspace.org/display/DSDOC/History
 
 Documentation for the most recent stable release(s) may be downloaded
