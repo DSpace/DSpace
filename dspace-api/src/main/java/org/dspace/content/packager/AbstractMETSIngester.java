@@ -502,6 +502,11 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             // have subclass manage license since it may be extra package file.
             addLicense(context, item, license, collection, params);
 
+            // Subclass hook for final checks and rearrangements
+            // (this allows subclasses to do some final validation / changes as
+            // necessary)
+            finishObject(context, dso, params);
+            
             // Finally, if item is still in the workspace, then we actually need
             // to install it into the archive & assign its handle.
             if(wsi!=null)
@@ -522,10 +527,20 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
                 //Add template item if one is referenced from manifest (only for Collections)
                 addTemplateItem(context, dso, manifest, pkgFile, params, callback);
             }
+            
+            // Subclass hook for final checks and rearrangements
+            // (this allows subclasses to do some final validation / changes as
+            // necessary)
+            finishObject(context, dso, params);
         }// end if Community/Collection
         else if (type == Constants.SITE)
         {
-            // Do nothing -- Crosswalks will handle anything necessary to ingest at Site-level
+            // Do nothing by default -- Crosswalks will handle anything necessary to ingest at Site-level
+            
+            // Subclass hook for final checks and rearrangements
+            // (this allows subclasses to do some final validation / changes as
+            // necessary)
+            finishObject(context, dso, params);
         }
         else
         {
@@ -536,11 +551,6 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
 
         // -- Step 6 --
         // Finish things up!
-
-        // Subclass hook for final checks and rearrangements
-        // (this allows subclasses to do some final validation / changes as
-        // necessary)
-        finishObject(context, dso, params);
 
         // Update the object to make sure all changes are committed
         PackageUtils.updateDSpaceObject(dso);
