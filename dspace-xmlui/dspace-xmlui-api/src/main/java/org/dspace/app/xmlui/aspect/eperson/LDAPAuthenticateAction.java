@@ -22,6 +22,7 @@ import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.sitemap.PatternException;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 
@@ -81,6 +82,12 @@ public class LDAPAuthenticateAction extends AbstractAction {
 					redirectURL += AuthenticationUtil
 							.resumeInterruptedRequest(objectModel);
 				}
+                                else
+                                {
+                                        // Otherwise direct the user to the specified 'loginredirect' page (or homepage by default)
+                                        String loginRedirect = ConfigurationManager.getProperty("xmlui.user.loginredirect");
+                                        redirectURL += (loginRedirect != null) ? loginRedirect.trim() : "/";	
+                                }
 
 				// Authentication successfull send a redirect.
 				final HttpServletResponse httpResponse = (HttpServletResponse) objectModel

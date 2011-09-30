@@ -83,9 +83,9 @@ public class ShibbolethAction extends AbstractAction
             	}
             	else
             	{
-            		// Otherwise direct the user to the login page
+            		// Otherwise direct the user to the specified 'loginredirect' page (or homepage by default)
             		String loginRedirect = ConfigurationManager.getProperty("xmlui.user.loginredirect");
-            		redirectURL += (loginRedirect != null) ? loginRedirect.trim() : "";	
+            		redirectURL += (loginRedirect != null) ? loginRedirect.trim() : "/";	
             	}
             	
                 // Authentication successfull send a redirect.

@@ -224,26 +224,50 @@ public class DSpaceCocoonServletFilter implements Filter
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain arg2) throws IOException, ServletException { 
     
-		HttpServletRequest realRequest = (HttpServletRequest)request;
-		HttpServletResponse realResponse = (HttpServletResponse) response;
+            HttpServletRequest realRequest = (HttpServletRequest)request;
+            HttpServletResponse realResponse = (HttpServletResponse) response;
 
-		try {
+            try {
 	    	// Check if there is a request to be resumed.
 	        realRequest = AuthenticationUtil.resumeRequest(realRequest);
 	
 	        // Send the real request or the resumed request off to
-	        // cocoon....
+	        // cocoon....right after we check our URL...
 	
+                //Get the Request URI, this will include the Context Path
+                String requestUri = realRequest.getRequestURI();
+                //Get the Context Path of the XMLUI web application
+                String contextPath = realRequest.getContextPath();
+                //Remove the Context Path from the Request URI -- this is the URI within our webapp
+                String uri = requestUri.replace(contextPath, "");
+                
+                //If the URI within XMLUI is an empty string, this means user 
+                //accessed XMLUI homepage *without* a trailing slash
+                if(uri==null || uri.length()==0)
+                {
+                    //Redirect the user to XMLUI homepage with a trailing slash
+                    //(This is necessary to ensure our Session Cookie, which ends 
+                    // in a trailing slash, isn't lost by some browsers, e.g. IE)
+                    String locationWithTrailingSlash = realRequest.getRequestURI() + "/";
+                    
+                    //Reset any existing response headers -- instead we are going to redirect user to correct path
+                    realResponse.reset();
+                    
+                    //Redirect user to homepage with trailing slash
+                    realResponse.sendRedirect(locationWithTrailingSlash);
+                }    
 	        // if force ssl is on and the user has authenticated and the request is not secure redirect to https
-	        if ((ConfigurationManager.getBooleanProperty("xmlui.force.ssl")) && (realRequest.getSession().getAttribute("dspace.current.user.id")!=null) && (!realRequest.isSecure())) {
+                else if ((ConfigurationManager.getBooleanProperty("xmlui.force.ssl")) && (realRequest.getSession().getAttribute("dspace.current.user.id")!=null) && (!realRequest.isSecure())) {
 	                StringBuffer location = new StringBuffer("https://");
 	                location.append(ConfigurationManager.getProperty("dspace.hostname")).append(realRequest.getContextPath()).append(realRequest.getServletPath()).append(
 	                        realRequest.getQueryString() == null ? ""
 	                                : ("?" + realRequest.getQueryString()));
 	                realResponse.sendRedirect(location.toString());
 	        }
-	
-	        arg2.doFilter(realRequest, realResponse);
+                else
+                {   // invoke the next filter
+                    arg2.doFilter(realRequest, realResponse);
+                }
 
         } catch (RuntimeException e) {
             ContextUtil.abortContext(realRequest);
