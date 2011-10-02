@@ -10,6 +10,10 @@ or viewed online at
  - http://www.dspace.org/latest-release/
  - http://wiki.duraspace.org/display/DSDOC/
 
+In addition, a listing of all known contributors to DSpace software can be
+found online at:
+https://wiki.duraspace.org/display/DSPACE/DSpaceContributors
+
 Installation instructions for other versions may be different, so you
 are encouraged to obtain the appropriate version of the Documentation
 (from the links above or from SVN).
