@@ -19,9 +19,14 @@
 
     <context:annotation-config /> <!-- allows us to use spring annotations in beans -->
 
+    <!--Bean that is used for mapping communities/collections to certain discovery configurations.-->
     <bean id="org.dspace.discovery.configuration.DiscoveryConfigurationService" class="org.dspace.discovery.configuration.DiscoveryConfigurationService">
         <property name="map">
             <map>
+                <!--The map containing all the settings,
+                    the key is used to refer to the page (the "site" or a community/collection handle)
+                    the value-ref is a reference to an identifier of the DiscoveryConfiguration format
+                    -->
                 <!--The default entry, DO NOT REMOVE the system requires this-->
                <entry key="default" value-ref="defaultConfiguration" />
 
@@ -32,7 +37,9 @@
         </property>
     </bean>
 
+    <!--The default configuration settings for discovery-->
     <bean id="defaultConfiguration" class="org.dspace.discovery.configuration.DiscoveryConfiguration" scope="prototype">
+        <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
             <list>
                 <ref bean="sidebarFacetAuthor" />
@@ -40,6 +47,7 @@
                 <ref bean="sidebarFacetDateIssued" />
             </list>
         </property>
+        <!--The search filters which can be used on the discovery search page-->
         <property name="searchFilters">
             <list>
                 <ref bean="searchFilterTitle" />
@@ -48,18 +56,28 @@
                 <ref bean="searchFilterIssued" />
             </list>
         </property>
-        <property name="searchSortFields">
-            <list>
-                <ref bean="sortTitle" />
-                <ref bean="sortDateIssued" />
-            </list>
+        <!--The sort filters for the discovery search-->
+        <property name="searchSortConfiguration">
+            <bean class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+                <!--<property name="defaultSort" ref="sortDateIssued"/>-->
+                <!--DefaultSortOrder can either be desc or asc (desc is default)-->
+                <property name="defaultSortOrder" value="desc"/>
+                <property name="sortFields">
+                    <list>
+                        <ref bean="sortTitle" />
+                        <ref bean="sortDateIssued" />
+                    </list>
+                </property>
+            </bean>
         </property>
+        <!--Any default filter queries, these filter queries will be used for all queries done by discovery for this configuration-->
         <!--<property name="defaultFilterQueries">-->
             <!--<list>-->
                 <!--Only find items-->
                 <!--<value>search.resourcetype:2</value>-->
             <!--</list>-->
         <!--</property>-->
+        <!--The configuration for the recent submissions-->
         <property name="recentSubmissionConfiguration">
             <bean class="org.dspace.discovery.configuration.DiscoveryRecentSubmissionsConfiguration">
                 <property name="metadataSortField" value="dc.date.accessioned" />
@@ -153,12 +171,11 @@
 
 
     <!--Sort properties-->
-    <bean id="sortTitle" class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+    <bean id="sortTitle" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
         <property name="metadataField" value="dc.title"/>
-        <!--<property name="defaultSort" value="true"/>-->
     </bean>
 
-    <bean id="sortDateIssued" class="org.dspace.discovery.configuration.DiscoverySortConfiguration">
+    <bean id="sortDateIssued" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
         <property name="metadataField" value="dc.date.issued"/>
         <property name="type" value="date"/>
     </bean>
