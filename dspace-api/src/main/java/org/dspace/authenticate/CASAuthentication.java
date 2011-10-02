@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
@@ -101,7 +102,17 @@ public class CASAuthentication
 
         if (ldap != null) {
           ldap.setContext(context);
-          return ldap.getGroupsInt();
+          int ldap_groups[] = ldap.getGroupsInt();
+          
+          Group CASGroup = Group.findByName(context, "CAS Authenticated");
+          if (CASGroup == null) {
+            throw new Exception("Unable to find 'CAS Authenticated' group");
+          }         
+
+          int groups[] = Arrays.copyOf(ldap_groups, ldap_groups.length+1);
+          groups[groups.length-1] = CASGroup.getID();
+          
+          return groups;
         }
       }
       catch (Exception e) {
