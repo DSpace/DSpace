@@ -99,6 +99,9 @@ function DSpaceSetupAutocomplete(formID, args) {
                 if(authInput.length > 0) {
                     authInput = authInput[0];
                 }
+                else {
+                     authInput = null;
+                }
                 var authorities = ac.data('authorities');
                 var authValue = authorities['label: ' + ui.item.label + ', value: ' + ui.item.value];
                     if (authInput != null) {
