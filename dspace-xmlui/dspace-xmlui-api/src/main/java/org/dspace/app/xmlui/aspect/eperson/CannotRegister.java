@@ -27,10 +27,10 @@ public class CannotRegister extends AbstractDSpaceTransformer
         message("xmlui.EPerson.CannotRegister.title");
     
     private static final Message T_dspace_home =
-        message("xmlui.general.dspace-home");
+        message("xmlui.general.dspace_home");
     
     private static final Message T_trail_new_registration =
-        message("xmlui.EPerson.trail-new-registration");
+        message("xmlui.EPerson.trail_new_registration");
     
     private static final Message T_head =
         message("xmlui.EPerson.CannotRegister.head");
