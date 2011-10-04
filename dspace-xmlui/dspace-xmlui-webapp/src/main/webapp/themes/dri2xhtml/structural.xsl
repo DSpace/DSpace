@@ -714,7 +714,7 @@
                 <xsl:variable name="xrefTarget">
                         <xsl:value-of select="./dri:p/dri:xref/@target"/>
                 </xsl:variable>
-                <xsl:if test="$itemDivision='item-view' and contains($xrefTarget, 'show=full')">
+                <xsl:if test="$itemDivision='item-view'">
                     <xsl:call-template name="cc-license">
                         <xsl:with-param name="metadataURL" select="./dri:referenceSet/dri:reference/@url"/>
                     </xsl:call-template>
