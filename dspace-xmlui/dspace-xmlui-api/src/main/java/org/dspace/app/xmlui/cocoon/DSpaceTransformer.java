@@ -10,6 +10,7 @@ package org.dspace.app.xmlui.cocoon;
 import java.io.IOException;
 import java.sql.SQLException;
 
+import org.apache.cocoon.ProcessingException;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.WingTransformer;
@@ -35,7 +36,7 @@ public interface DSpaceTransformer extends WingTransformer
 
     /** What to add at the end of the body */
     public void addBody(Body body) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException;
+            UIException, SQLException, IOException, AuthorizeException, ProcessingException;
 
     /** What to add to the options list */
     public void addOptions(Options options) throws SAXException, WingException,

@@ -11,12 +11,10 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
 
-import javax.servlet.http.HttpServletResponse;
-
+import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
-import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
@@ -29,6 +27,7 @@ import org.dspace.app.xmlui.wing.element.Body;
 import org.dspace.app.xmlui.wing.element.Division;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 
@@ -37,6 +36,7 @@ import org.xml.sax.SAXException;
  * it is then displays some page not found text.
  * 
  * @author Scott Phillips
+ * @author Kim Shepherd
  */
 public class PageNotFoundTransformer extends AbstractDSpaceTransformer implements CacheableProcessingComponent
 {
@@ -87,6 +87,7 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
     /**
      * Receive notification of the beginning of a document.
      */
+    @Override
     public void startDocument() throws SAXException
     {
         // Reset our parameters before starting a new document.
@@ -99,6 +100,7 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
      * Process the SAX event.
      * @see org.xml.sax.ContentHandler#startElement
      */
+    @Override
     public void startElement(String namespaceURI, String localName,
             String qName, Attributes attributes) throws SAXException
     {          
@@ -126,6 +128,7 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
      * Process the SAX event.
      * @see org.xml.sax.ContentHandler#endElement
      */
+    @Override
     public void endElement(String namespaceURI, String localName, String qName)
             throws SAXException
     {
@@ -148,8 +151,9 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
   
     
     /** What to add at the end of the body */
+    @Override
     public void addBody(Body body) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException
+            UIException, SQLException, IOException, AuthorizeException, ResourceNotFoundException
     {
         if (this.bodyEmpty)
         {
@@ -158,16 +162,17 @@ public class PageNotFoundTransformer extends AbstractDSpaceTransformer implement
             notFound.setHead(T_head);
             
             notFound.addPara(T_para1); 
-            
+
             notFound.addPara().addXref(contextPath + "/",T_go_home);
 
-	    HttpServletResponse response = (HttpServletResponse)objectModel
-		.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-	    response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            throw new ResourceNotFoundException("Page cannot be found");
+
+
         }
     }
 
     /** What page metadata to add to the document */
+    @Override
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
             WingException, UIException, SQLException, IOException,
             AuthorizeException

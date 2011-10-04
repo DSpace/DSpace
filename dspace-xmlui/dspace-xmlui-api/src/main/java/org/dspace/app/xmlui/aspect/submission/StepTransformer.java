@@ -13,6 +13,7 @@ import java.util.Map;
 
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
+import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.environment.SourceResolver;
 
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -138,7 +139,7 @@ public class StepTransformer extends AbstractDSpaceTransformer
 
 	/** What to add at the end of the body */
     public void addBody(Body body) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException
+            UIException, SQLException, IOException, AuthorizeException, ProcessingException
     {
         //call addBody for this step
     	step.addBody(body);
