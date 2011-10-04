@@ -49,6 +49,12 @@
     <xsl:template match="dim:dim" mode="itemSummaryList-DIM">
         <xsl:variable name="itemWithdrawn" select="@withdrawn" />
         <div class="artifact-description">
+            <span class="Z3988">
+                <xsl:attribute name="title">
+                    <xsl:call-template name="renderCOinS"/>
+                </xsl:attribute>
+                &#xFEFF; <!-- non-breaking space to force separating the end tag -->
+            </span>
             <div class="artifact-title">
                 <xsl:element name="a">
                     <xsl:attribute name="href">
@@ -61,19 +67,14 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </xsl:attribute>
-                    <span class="Z3988">
-                        <xsl:attribute name="title">
-                            <xsl:call-template name="renderCOinS"/>
-                        </xsl:attribute>
-                        <xsl:choose>
-                            <xsl:when test="dim:field[@element='title']">
-                                <xsl:value-of select="dim:field[@element='title'][1]/node()"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </span>
+                    <xsl:choose>
+                        <xsl:when test="dim:field[@element='title']">
+                            <xsl:value-of select="dim:field[@element='title'][1]/node()"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:element>
             </div>
             <div class="artifact-info">

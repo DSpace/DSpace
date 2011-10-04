@@ -127,30 +127,31 @@
 
           <!-- Title row -->
           <xsl:when test="$clause = 1">
+              <span class="Z3988">
+                  <xsl:attribute name="title">
+                      <xsl:call-template name="renderCOinS"/>
+                  </xsl:attribute>
+                  &#xFEFF; <!-- non-breaking space to force separating the end tag -->
+              </span>
             <tr class="ds-table-row {$phase}">
                 <td><span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-title</i18n:text>: </span></td>
                 <td>
-                    <span class="Z3988">
-                        <xsl:attribute name="title">
-                            <xsl:call-template name="renderCOinS"/>
-                        </xsl:attribute>
-                        <xsl:choose>
-                            <xsl:when test="count(dim:field[@mdschema='dc' and @element='title'][not(@qualifier)]) &gt; 1">
-                                <xsl:for-each select="dim:field[@mdschema='dc' and @element='title'][not(@qualifier)]">
-                            	   <xsl:value-of select="./node()"/>
-                            	   <xsl:if test="count(following-sibling::dim:field[@mdschema='dc' and @element='title'][not(@qualifier)]) != 0">
-	                                    <xsl:text>; </xsl:text><br/>
-	                                </xsl:if>
-                                </xsl:for-each>
-                            </xsl:when>
-                            <xsl:when test="count(dim:field[@mdschema='dc' and @element='title'][not(@qualifier)]) = 1">
-                                <xsl:value-of select="dim:field[@mdschema='dc' and @element='title'][not(@qualifier)][1]/node()"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </span>
+                    <xsl:choose>
+                        <xsl:when test="count(dim:field[@mdschema='dc' and @element='title'][not(@qualifier)]) &gt; 1">
+                            <xsl:for-each select="dim:field[@mdschema='dc' and @element='title'][not(@qualifier)]">
+                                <xsl:value-of select="./node()"/>
+                                <xsl:if test="count(following-sibling::dim:field[@mdschema='dc' and @element='title'][not(@qualifier)]) != 0">
+                                    <xsl:text>; </xsl:text><br/>
+                                </xsl:if>
+                            </xsl:for-each>
+                        </xsl:when>
+                        <xsl:when test="count(dim:field[@mdschema='dc' and @element='title'][not(@qualifier)]) = 1">
+                            <xsl:value-of select="dim:field[@mdschema='dc' and @element='title'][not(@qualifier)][1]/node()"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </td>
             </tr>
             <xsl:call-template name="itemSummaryView-DIM-fields">

@@ -77,25 +77,26 @@
         <xsl:param name="href"/>
         <xsl:variable name="metadataWidth" select="675 - $thumbnail.maxwidth - 30"/>
         <div class="item-metadata" style="width: {$metadataWidth}px;">
+            <span class="Z3988">
+            <xsl:attribute name="title">
+                 <xsl:call-template name="renderCOinS"/>
+            </xsl:attribute>
+            &#xFEFF; <!-- non-breaking space to force separating the end tag -->
+            </span>
             <span class="bold"><i18n:text>xmlui.dri2xhtml.pioneer.title</i18n:text><xsl:text>:</xsl:text></span>
             <span class="content" style="width: {$metadataWidth - 110}px;">
                 <xsl:element name="a">
                     <xsl:attribute name="href">
                         <xsl:value-of select="$href"/>
                     </xsl:attribute>
-                    <span class="Z3988">
-                        <xsl:attribute name="title">
-                            <xsl:call-template name="renderCOinS"/>
-                        </xsl:attribute>
-                        <xsl:choose>
-                            <xsl:when test="dim:field[@element='title']">
-                                <xsl:value-of select="dim:field[@element='title'][1]/node()"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </span>
+                    <xsl:choose>
+                        <xsl:when test="dim:field[@element='title']">
+                            <xsl:value-of select="dim:field[@element='title'][1]/node()"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:element>
             </span>
             <span class="bold"><i18n:text>xmlui.dri2xhtml.pioneer.author</i18n:text><xsl:text>:</xsl:text></span>
@@ -152,23 +153,24 @@
         <xsl:param name="href"/>
         <div class="artifact-description">
             <div class="artifact-title">
+                <span class="Z3988">
+                    <xsl:attribute name="title">
+                        <xsl:call-template name="renderCOinS"/>
+                    </xsl:attribute>
+                    &#xFEFF; <!-- non-breaking space to force separating the end tag -->
+                </span>
                 <xsl:element name="a">
                     <xsl:attribute name="href">
                         <xsl:value-of select="$href"/>
                     </xsl:attribute>
-                    <span class="Z3988">
-                        <xsl:attribute name="title">
-                            <xsl:call-template name="renderCOinS"/>
-                        </xsl:attribute>
-                        <xsl:choose>
-                            <xsl:when test="dim:field[@element='title']">
-                                <xsl:value-of select="dim:field[@element='title'][1]/node()"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </span>
+                    <xsl:choose>
+                        <xsl:when test="dim:field[@element='title']">
+                            <xsl:value-of select="dim:field[@element='title'][1]/node()"/>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
+                        </xsl:otherwise>
+                    </xsl:choose>
                 </xsl:element>
             </div>
             <div class="artifact-info">
