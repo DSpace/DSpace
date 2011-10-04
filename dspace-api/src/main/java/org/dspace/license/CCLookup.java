@@ -14,16 +14,14 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.StringTokenizer;
-import java.util.Vector;
+
 import org.apache.log4j.Logger;
 
 import org.jaxen.JaxenException;
@@ -48,18 +46,30 @@ public class CCLookup {
         /** log4j logger */
         private static Logger log = Logger.getLogger(CCLookup.class);
 
-	private static String cc_root     = ConfigurationManager.getProperty("webui.submit.cc-rooturl");
-	private static String jurisdiction  = (ConfigurationManager.getProperty("webui.submit.cc-jurisdiction") != null) ? ConfigurationManager.getProperty("webui.submit.cc-jurisdiction") : "";
+	private static String cc_root = ConfigurationManager.getProperty("cc.api.rooturl");
+	private static String jurisdiction; 
+	private static List<String> lcFilter = new ArrayList<String>();
+	
 	private Document license_doc        = null;
 	private String rdfString            = null;
 	private String errorMessage         = null;
 	private boolean success             = false;
 
-
-
 	private SAXBuilder parser           = new SAXBuilder();
-	private List<CCLicense> licenses    = new Vector();
-	private static List<CCLicenseField> licenseFields = new Vector();
+	private List<CCLicense> licenses    = new ArrayList<CCLicense>();
+	private List<CCLicenseField> licenseFields = new ArrayList<CCLicenseField>();
+	
+	static {
+		String jurisProp = ConfigurationManager.getProperty("cc.license.jurisdiction");
+		jurisdiction = (jurisProp != null) ? jurisProp : "";
+		
+		String filterList = ConfigurationManager.getProperty("cc.license.classfilter");
+		if (filterList != null) {
+			for (String name: filterList.split(",")) {
+				lcFilter.add(name.trim());
+			}
+		}
+	}
 
 	/**
 	 * Constructs a new instance with the default web services root.
@@ -101,159 +111,39 @@ public class CCLookup {
 	 *
 	 */
 	public Collection<CCLicense> getLicenses(String language) {
-		boolean isCurrent = isCurrent();
-		if (isCurrent) {
-			return licenses;
-		} else {
-			JDOMXPath xp_Licenses;
-			JDOMXPath xp_LicenseID;
 
-			Document classDoc;
-			URL classUrl;
-			List results = null;
-
-			// create XPath expressions
-			try {
-				xp_Licenses = new JDOMXPath("//licenses/license");
-				xp_LicenseID = new JDOMXPath("@id");
-			} catch (JaxenException jaxen_e) {
-				return null;
-			}
-
-			// retrieve and parse the license class document
-			try {
-				classUrl = new URL(this.cc_root + "/classes");
-			} catch (Exception e) {
-				// do nothing... but we should
-				return null;
-			}
-
-			// parse the licenses document
-			try {
-				classDoc = this.parser.build(classUrl);
-			} catch (JDOMException jdom_e) {
-				return null;
-			} catch (IOException io_e) {
-				return null;
-			}
-
+		// create XPath expressions
+		try {
+			JDOMXPath xp_Licenses = new JDOMXPath("//licenses/license");
+			JDOMXPath xp_LicenseID = new JDOMXPath("@id");
+			URL classUrl = new URL(this.cc_root + "/classes");
+			Document classDoc = this.parser.build(classUrl);
 			// extract the identifiers and labels using XPath
-			try {
-				results = xp_Licenses.selectNodes(classDoc);
-			} catch (JaxenException jaxen_e) {
-				return null;
-			}
-
-			// reset the licenses container
+			List<Element> results = xp_Licenses.selectNodes(classDoc);
+			// populate licenses container
 			this.licenses.clear();
-			for (int i=0; i < results.size(); i++) {
-				Element license = (Element)results.get(i);
-				try {
-					CCLicense lc = new CCLicense(((Attribute)xp_LicenseID.selectSingleNode(license)).getValue(), license.getText(), i);
-					this.licenses.add(lc);
-				} catch (JaxenException jaxen_e) {
-					return null;
+			for (int i = 0; i < results.size(); i++) {
+				Element license = results.get(i);
+				// add if not filtered
+				String liD = ((Attribute)xp_LicenseID.selectSingleNode(license)).getValue();
+				if (! lcFilter.contains(liD)) {
+					this.licenses.add(new CCLicense(liD, license.getText(), i));
 				}
 			}
-			sort();
-		}
+		} catch (JaxenException jaxen_e) {
+			return null;
+		} catch (JDOMException jdom_e) {
+			return null;
+		} catch (IOException io_e) {
+			return null;
+		} catch (Exception e) {
+			// do nothing... but we should
+			return null;
+		}			
+
 		return licenses;
 	}
 
-	/** contains
-	 *
-	 * is the token in the licenses vector
-	 *
-	 * @param token
-	 * @return boolean
-	 */
-	protected boolean contains(String token) {
-		Iterator iterator = licenses.iterator();
-		for (CCLicense cclicense : licenses) {
-			if (cclicense.getLicenseId().equals(token)) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/** sort
-	 *
-	 *  sort the licenses according to the configuration file
-	 *
-	 *
-	 */
-	protected void sort() {
-		StringTokenizer stringtokenizer = getLicenseTokens();
-		String nexttoken    = null;
-		int i               = 0;
-		ListIterator<CCLicense> iterator = null;
-		CCLicense license   = null;
-		boolean isMember    = false;
-		while (stringtokenizer.hasMoreTokens()) {
-			nexttoken   = stringtokenizer.nextToken().trim();
-			iterator    = licenses.listIterator();
-			if (contains(nexttoken)) {
-				while (iterator.hasNext()) {
-						license = iterator.next();
-						if (nexttoken.equals(license.getLicenseId().trim())) {
-							license.setOrder(i);
-							break;
-						}
-				  }
-				} else {  // This is an instance specific selection . . .
-				  // String optiontext 			= nexttoken.replace("_", " ");
-				String optiontext = nexttoken; // this will be a key such as xmlui.Submission.submit.CCLicenseStep.submit_choose_creative_commons
-				  CCLicense newlicense 	= new CCLicense(nexttoken, nexttoken, i);
-				  iterator.add(newlicense);
-			  }
-			i++;
-		}
-		Comparator comparator = new Comparator() {
-			public int compare( Object a, Object b )
-	       {
-				CCLicense c1 = (CCLicense)a;
-				CCLicense c2 = (CCLicense)b;
-
-				return(Integer.valueOf(c1.getOrder()).compareTo(Integer.valueOf(c2.getOrder())));
-	       }
-		};
-			Collections.sort(licenses, comparator);
-    }
-
-	/** getLicenseTokens
-	 *
-	 *
-	 * @return StringTokenizer representing the configured allowed license types (classes)
-	 */
-    protected StringTokenizer getLicenseTokens() {
-    	String currentLicenses = ConfigurationManager.getProperty("webui.submit.cc.licenseclasses");
-		StringTokenizer stringtokenizer = new StringTokenizer(currentLicenses, ",");
-		return stringtokenizer;
-    }
-
-    /** isCurrent
-     *
-     * check to see if the configured license types(classes) have changed
-     *
-     * @return a boolean
-     */
-    private boolean isCurrent() {
-		StringTokenizer stringtokenizer = getLicenseTokens();
-		int i = 0;
-		boolean isCurrent = false;
-		while (licenses.size() > 0 && stringtokenizer.hasMoreTokens()) {
-			String license = stringtokenizer.nextToken();
-			if (license.equals(this.licenses.get(i).getLicenseName())) {
-				i++;
-				continue;
-			} else {
-				isCurrent = false;
-				break;
-			}
-		}
-		return isCurrent;
-	}
 
 	/**
 	 * Queries the web service for a set of licenseFields for a particular license class.

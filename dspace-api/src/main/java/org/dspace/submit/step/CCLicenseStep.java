@@ -67,8 +67,6 @@ public class CCLicenseStep extends AbstractProcessingStep
 
     /** log4j logger */
     private static Logger log = Logger.getLogger(CCLicenseStep.class);
-
-    private CCLookup cclookup = null;
     
     /**
      * Do any processing of the information input by the user, and/or perform
@@ -99,54 +97,121 @@ public class CCLicenseStep extends AbstractProcessingStep
             AuthorizeException,java.io.IOException
     {
 	    HttpSession session = request.getSession();		
-            session.setAttribute("inProgress", "TRUE");
-            // check what submit button was pressed in User Interface
-            String buttonPressed = Util.getSubmitButton(request, NEXT_BUTTON);
+        session.setAttribute("inProgress", "TRUE");
+        // check what submit button was pressed in User Interface
+        String buttonPressed = Util.getSubmitButton(request, NEXT_BUTTON);
+        if (buttonPressed.equals("submit_grant"))
+        {
+            return processCC(context, request, response, subInfo);
+        }
 	    String choiceButton = Util.getSubmitButton(request, SELECT_CHANGE);
-            Enumeration e = request.getParameterNames();
-            String isFieldRequired = "FALSE";
-            while (e.hasMoreElements())
+        Enumeration e = request.getParameterNames();
+        String isFieldRequired = "FALSE";
+        while (e.hasMoreElements())
+        {
+            String parameterName = (String) e.nextElement();
+            if (parameterName.equals("button_required"))
             {
-                String parameterName = (String) e.nextElement();
-                if (parameterName.equals("button_required")) {
-                	isFieldRequired = "TRUE";
-                	break;
-                }
+            	isFieldRequired = "TRUE";
+                break;
             }
-            session.setAttribute("isFieldRequired", isFieldRequired);
-            if (choiceButton.equals(SELECT_CHANGE)) {
+        }
+        session.setAttribute("isFieldRequired", isFieldRequired);
+        if (choiceButton.equals(SELECT_CHANGE))
+        {
 	        Item item = subInfo.getSubmissionItem().getItem();
-		if (CreativeCommons.hasLicense(item, "dc", "rights", "uri", Item.ANY) 
-				&& !CreativeCommons.getRightsURI(item, "dc", "rights", "uri", Item.ANY).equals(""))
-		{
-        	    CreativeCommons.setItemMetadata(item, CreativeCommons.getRightsURI(item, "dc", "rights", "uri", Item.ANY), "dc", "rights", "uri", ConfigurationManager.getProperty("default.locale"));
-                    item.addMetadata("dc", "rights", "uri", Item.ANY, CreativeCommons.getRightsURI(item, "dc", "rights", "uri", Item.ANY));
-		    if (ConfigurationManager.getBooleanProperty("webui.submit.include.cc-name") == true) 
-		    {
-                       CreativeCommons.setItemMetadata(item, CreativeCommons.getRightsName(item, "dc", "rights", null, Item.ANY), "dc", "rights", null, ConfigurationManager.getProperty("default.locale"));
-                       item.addMetadata("dc", "rights", null, Item.ANY, CreativeCommons.getRightsName(item, "dc", "rights", null, Item.ANY));
-		    }
-                    removeRequiredAttributes(session);
-                    item.update();
-                    context.commit();
+	        CreativeCommons.MdField uriField = CreativeCommons.getCCField("uri");
+	        CreativeCommons.MdField nameField = CreativeCommons.getCCField("name");
+	        String licenseUri = uriField.ccItemValue(item);
+	        if (licenseUri != null)
+	        //if (CreativeCommons.hasLicense(item, "dc", "rights", "uri", Item.ANY) 
+			//	&& !CreativeCommons.getRightsURI(item, "dc", "rights", "uri", Item.ANY).equals(""))
+	        {
+        	    //CreativeCommons.setItemMetadata(item, licenseURI, "dc", "rights", "uri", ConfigurationManager.getProperty("default.locale"));
+	        	uriField.removeItemValue(item, licenseUri);
+                if (ConfigurationManager.getBooleanProperty("cc.submit.setname"))
+                {
+                	String licenseName = nameField.keyedItemValue(item, licenseUri);
+                	nameField.removeItemValue(item, licenseName);
+                	//CreativeCommons.setItemMetadata(item, CreativeCommons.getRightsName(item, "dc", "rights", null, Item.ANY), "dc", "rights", null, ConfigurationManager.getProperty("default.locale"));
                 }
-		return STATUS_COMPLETE;
-            } else if (buttonPressed.startsWith(PROGRESS_BAR_PREFIX)
-                    || buttonPressed.equals(PREVIOUS_BUTTON))
-            {
+                if (ConfigurationManager.getBooleanProperty("cc.submit.addBitstream"))
+                {
+                	CreativeCommons.removeLicense(context, item);
+                }
                 removeRequiredAttributes(session);
+                item.update();
+                context.commit();
             }
-            if (buttonPressed.equals(NEXT_BUTTON) || buttonPressed.equals(CANCEL_BUTTON)) {
-                return processCC(context, request, response, subInfo);
-            } else {  
-                removeRequiredAttributes(session);
-		session.removeAttribute("inProgress");
-		return STATUS_COMPLETE;
-            }
+	        return STATUS_COMPLETE;
+        }
+        else if (buttonPressed.startsWith(PROGRESS_BAR_PREFIX) || buttonPressed.equals(PREVIOUS_BUTTON))
+        {
+            removeRequiredAttributes(session);
+        }
+        if (buttonPressed.equals(NEXT_BUTTON) || buttonPressed.equals(CANCEL_BUTTON) )
+        {
+            return processCCWS(context, request, response, subInfo);
+        }
+        else
+        {  
+            removeRequiredAttributes(session);
+            session.removeAttribute("inProgress");
+            return STATUS_COMPLETE;
+        }
     }
 
     /**
      * Process the input from the CC license page
+     *
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param response
+     *            current servlet response object
+     * @param subInfo
+     *            submission info object
+     *
+     * @return Status or error flag which will be processed by
+     *         doPostProcessing() below! (if STATUS_COMPLETE or 0 is returned,
+     *         no errors occurred!)
+     */
+    protected int processCC(Context context, HttpServletRequest request,
+            HttpServletResponse response, SubmissionInfo subInfo)
+            throws ServletException, IOException, SQLException,
+            AuthorizeException
+    {
+        String buttonPressed = Util.getSubmitButton(request, NEXT_BUTTON);
+
+        // RLR hack - need to distinguish between progress bar real submission
+        // (if cc_license_url exists, then users has accepted the CC License)
+        String ccLicenseUrl = request.getParameter("cc_license_url");
+
+        if (buttonPressed.equals("submit_no_cc"))
+        {
+            // Skipping the CC license - remove any existing license selection
+            CreativeCommons.removeLicense(context, subInfo.getSubmissionItem()
+                    .getItem());
+        }
+        else if ((ccLicenseUrl != null) && (ccLicenseUrl.length() > 0))
+        {
+            Item item = subInfo.getSubmissionItem().getItem();
+
+            // save the CC license
+            CreativeCommons.setLicense(context, item, ccLicenseUrl);
+        }
+
+        // commit changes
+        context.commit();
+
+        // completed without errors
+        return STATUS_COMPLETE;
+    }
+
+
+    /**
+     * Process the input from the CC license page using CC Web service
      * 
      * @param context
      *            current DSpace context
@@ -156,20 +221,22 @@ public class CCLicenseStep extends AbstractProcessingStep
      *            current servlet response object
      * @param subInfo
      *            submission info object
+     *
      * 
      * @return Status or error flag which will be processed by
      *         doPostProcessing() below! (if STATUS_COMPLETE or 0 is returned,
      *         no errors occurred!)
      */
-    protected int processCC(Context context, HttpServletRequest request,
+    protected int processCCWS(Context context, HttpServletRequest request,
             HttpServletResponse response, SubmissionInfo subInfo)
             throws ServletException, IOException, SQLException,
             AuthorizeException {
+       
         String ccLicenseUrl = request.getParameter("cc_license_url");
         HttpSession session = request.getSession();
-    	Map<String, String> map = new HashMap();
+    	Map<String, String> map = new HashMap<String, String>();
     	String licenseclass = (request.getParameter("licenseclass_chooser") != null) ? request.getParameter("licenseclass_chooser") : "";
-    	String jurisdiction = (ConfigurationManager.getProperty("webui.submit.cc-jurisdiction") != null) ? ConfigurationManager.getProperty("webui.submit.cc-jurisdiction") : "";
+    	String jurisdiction = (ConfigurationManager.getProperty("cc.license.jurisdiction") != null) ? ConfigurationManager.getProperty("cc.license.jurisdiction") : "";
     	if (licenseclass.equals("standard")) {
     		map.put("commercial", request.getParameter("commercial_chooser"));
     		map.put("derivatives", request.getParameter("derivatives_chooser"));
@@ -177,112 +244,70 @@ public class CCLicenseStep extends AbstractProcessingStep
     		map.put("sampling", request.getParameter("sampling_chooser"));
     	}
     	map.put("jurisdiction", jurisdiction);
-    	cclookup = new CCLookup();
-    	cclookup.issue(licenseclass, map, ConfigurationManager.getProperty("default.locale"));
-	Item item = subInfo.getSubmissionItem().getItem();
-	if (licenseclass.equals("xmlui.Submission.submit.CCLicenseStep.no_license")) 
-        {
-	    // only remove any previous licenses
-	    if (CreativeCommons.hasLicense(item, "dc", "rights", "uri", Item.ANY))
-	    {
-		CreativeCommons.removeLicenseMetadata(item, "dc", "rights", "uri", Item.ANY);
-		item.update();
-		context.commit();
-		removeRequiredAttributes(session);
-	    }
-	    return STATUS_COMPLETE;
-	 } else if (licenseclass.equals("xmlui.Submission.submit.CCLicenseStep.select_change"))
-	 {
-	    removeRequiredAttributes(session);
-	    
-	    return STATUS_COMPLETE;
-	 }
-	 else if (cclookup.isSuccess()) 
-	 {
-	     CreativeCommons.setItemMetadata(item, cclookup.getLicenseUrl(), "dc", "rights", "uri", ConfigurationManager.getProperty("default.locale"));
-	     item.addMetadata("dc", "rights", "uri", Item.ANY, cclookup.getLicenseUrl());
-             if (ConfigurationManager.getBooleanProperty("webui.submit.include.cc-name") == true) {
-		CreativeCommons.setItemMetadata(item, cclookup.getLicenseName(), "dc", "rights", null, ConfigurationManager.getProperty("default.locale"));
-                item.addMetadata("dc", "rights", null, Item.ANY, cclookup.getLicenseName());
-	     }
-	     item.update();
-	     context.commit();
-	     removeRequiredAttributes(session);
-             session.removeAttribute("inProgress");
-	  } 
-	  else 
-	  {
-              request.getSession().setAttribute("ccError", cclookup.getErrorMessage());
-	      if (CreativeCommons.hasLicense(item, "dc", "rights", "uri", Item.ANY))
-	      {
-	          CreativeCommons.removeLicenseMetadata(item, "dc", "rights", "uri", Item.ANY);
-	      }
-    	      return STATUS_LICENSE_REJECTED;
-    	  }
-	  return STATUS_COMPLETE;
-     }
+    	CCLookup ccLookup = new CCLookup();
+    	CreativeCommons.MdField uriField = CreativeCommons.getCCField("uri");
+    	CreativeCommons.MdField nameField = CreativeCommons.getCCField("name");
+    	ccLookup.issue(licenseclass, map, ConfigurationManager.getProperty("default.locale"));
+    	Item item = subInfo.getSubmissionItem().getItem();
+    	if (licenseclass.equals("xmlui.Submission.submit.CCLicenseStep.no_license")) 
+    	{
+    		// only remove any previous licenses
+    		String licenseUri = uriField.ccItemValue(item);
+    		if (licenseUri != null) {
+    			uriField.removeItemValue(item, licenseUri);
+    			if (ConfigurationManager.getBooleanProperty("cc.submit.setname"))
+                {
+                	String licenseName = nameField.keyedItemValue(item, licenseUri);
+                	nameField.removeItemValue(item, licenseName);
+                }
+                if (ConfigurationManager.getBooleanProperty("cc.submit.addBitstream"))
+                {
+                	CreativeCommons.removeLicense(context, item);
+                }
+    			item.update();
+    			context.commit();
+    			removeRequiredAttributes(session);
+    		}
+    		return STATUS_COMPLETE;
+    	}
+    	else if (licenseclass.equals("xmlui.Submission.submit.CCLicenseStep.select_change"))
+    	{
+    		removeRequiredAttributes(session);    
+    		return STATUS_COMPLETE;
+    	}
+    	else if (ccLookup.isSuccess()) 
+    	{
+    		uriField.addItemValue(item, ccLookup.getLicenseUrl());
+    		if (ConfigurationManager.getBooleanProperty("cc.submit.addbitstream")) {
+    			CreativeCommons.setLicenseRDF(context, item, ccLookup.getRdf());
+    		}	
+    		if (ConfigurationManager.getBooleanProperty("cc.submit.setname")) {
+    			nameField.addItemValue(item, ccLookup.getLicenseName());
+    		}
+    		item.update();
+    		context.commit();
+    		removeRequiredAttributes(session);
+    		session.removeAttribute("inProgress");
+    	} 
+    	else 
+    	{
+    		request.getSession().setAttribute("ccError", ccLookup.getErrorMessage());
+    		String licenseUri = uriField.ccItemValue(item);
+    		if (licenseUri != null)
+    		{
+    			uriField.removeItemValue(item, licenseUri);
+    		}
+    		return STATUS_LICENSE_REJECTED;
+    	}
+    	return STATUS_COMPLETE;
+    }
 	
 	private void removeRequiredAttributes(HttpSession session) {
 		session.removeAttribute("ccError");
 		session.removeAttribute("isFieldRequired");
 	}
      
-     /** 
-     * @param metaname -- license uri or license name
-     * @param schema -- ex. dc
-     * @param element -- ex. rights
-     * @param qualifier -- ex. uri or null
-     * @param lang -- ex. en_US or Item.ANY or ConfigurationManager.getProperty("default.locale")
-     */
-     private void setItemMetadata(Item item, String license, String schema, String element, String qualifier,
-            String lang) throws java.sql.SQLException, java.io.IOException, org.dspace.authorize.AuthorizeException
-     {
-             DCValue[] dcvalues  = item.getMetadata(schema, element, qualifier, lang);
-             ArrayList<String> arrayList = new ArrayList<String>();
-             for (DCValue  dcvalue : dcvalues)
-             {
-		 boolean isUri = (qualifier != null) ? true : false;
-                 if (addDCValue(dcvalue.value, isUri)) 
-		 {
-			arrayList.add(dcvalue.value);
-	         }
-              }
-              String[] licenses = (String[])arrayList.toArray(new String[arrayList.size()]);
-	      CreativeCommons.removeLicenseMetadata(item, schema, element, qualifier, Item.ANY);
-              item.addMetadata(schema, element, qualifier, lang, licenses);
-     }
-
-     ArrayList<String> licenseNames = new ArrayList<String>();
-     /**
-      * @param metavalue - the hopeful dc value
-      * @param isUri - true if uri
-      * @param dcValue - the dc value
-      * @return - a boolean to determine whether to the item's rights' metadata
-      */
-      private boolean addDCValue(String metavalue, boolean isUri) 
-		throws java.io.IOException 
-     {
-	  if (isUri)
-	  {
-	       if (metavalue.indexOf("creativecommons") != -1)
-               {
-	           // first get the license type from the web service api to look at later for dc.rights.null
-	           CCLookup cclookup = new CCLookup();
-	           cclookup.issue(metavalue); // http://api.creativecommons.org/rest/1.5/details?license-uri=
-	           licenseNames.add(cclookup.getLicenseName());
-	           return false;
-               } 
-	   }
-	   else
-	   {
-		// if the metavalue is in the original list then return false
-	        if (licenseNames.contains(metavalue)) {
-		    return false;
-                }
-	  }
-	  return true;
-      }
-
+     
      /**
      * Retrieves the number of pages that this "step" extends over. This method
      * is used to build the progress bar.
@@ -310,5 +335,5 @@ public class CCLicenseStep extends AbstractProcessingStep
     {
 		return 1;
     }
-
+   
 }
