@@ -311,6 +311,7 @@
             <xsl:attribute name="title">
                  <xsl:call-template name="renderCOinS"/>
             </xsl:attribute>
+            &#xFEFF; <!-- non-breaking space to force separating the end tag -->
         </span>
 		<table class="ds-includeSet-table detailtable">
 		    <xsl:apply-templates mode="itemDetailView-DIM"/>
