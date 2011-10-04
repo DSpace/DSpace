@@ -118,27 +118,25 @@ public class CCLicenseStep extends AbstractSubmissionStep
 	    Select selectList = list.addItem().addSelect("licenseclass_chooser");
 	    selectList.setLabel(T_license);
 	    selectList.setEvtBehavior("submitOnChange");
-	    Iterator iterator = cclookup.getLicenses(ConfigurationManager.getProperty("default.locale")).iterator();
+	    Iterator<CCLicense> iterator = cclookup.getLicenses(ConfigurationManager.getProperty("default.locale")).iterator();
+	    // build select List - first choice always 'choose a license', last always 'No license'
+	    selectList.addOption(T_select_change.getKey(), T_select_change);
 	    while (iterator.hasNext()) {
-	        CCLicense cclicense = (CCLicense)iterator.next();
-                if (cclicense.getLicenseId().contains("xmlui.Submission.submit.CCLicenseStep.")) 
-	        {
-		    selectList.addOption(cclicense.getLicenseId(), message(cclicense.getLicenseName()));
-		} else {
-		    selectList.addOption(cclicense.getLicenseId(), cclicense.getLicenseName());
-		}
-		if (selectedLicense != null && selectedLicense.equals(cclicense.getLicenseId()))
+	        CCLicense cclicense = iterator.next();
+	        selectList.addOption(cclicense.getLicenseId(), cclicense.getLicenseName());
+            if (selectedLicense != null && selectedLicense.equals(cclicense.getLicenseId()))
         	{
-		    selectList.setOptionSelected(cclicense.getLicenseId());
-		}
+            	selectList.setOptionSelected(cclicense.getLicenseId());
+        	}
 	    }
+	    selectList.addOption(T_no_license.getKey(), T_no_license);
 	    if (selectedLicense  !=  null) {
-		// output the license fields chooser for the license class type
-		if (cclookup.getLicenseFields(selectedLicense) == null ) {
-		    // do nothing
-		} 
-		else 
-		{
+	    	// output the license fields chooser for the license class type
+	    	if (cclookup.getLicenseFields(selectedLicense) == null ) {
+	    		// do nothing
+	    	} 
+	    	else 
+	    	{
 		    Iterator outerIterator = cclookup.getLicenseFields(selectedLicense).iterator();
 		    while (outerIterator.hasNext()) 
 		    {
@@ -165,11 +163,11 @@ public class CCLicenseStep extends AbstractSubmissionStep
         	}    
 		Division statusDivision = div.addDivision("statusDivision");
 		List statusList = statusDivision.addList("statusList", List.TYPE_FORM);
-		if (CreativeCommons.hasLicense(item, "dc", "rights", "uri", Item.ANY) && !CreativeCommons.getRightsURI(item, "dc", "rights", "uri", Item.ANY).equals(""))
+		String licenseUri = CreativeCommons.getCCField("uri").ccItemValue(item);
+		if (licenseUri != null)
 		{
-			String ccUrl  = CreativeCommons.getRightsURI(item, "dc", "rights", "uri", Item.ANY);
-			statusList.addItem().addXref(ccUrl,ccUrl);
-        	}
+			statusList.addItem().addXref(licenseUri, licenseUri);
+        }
 		else
 		{
 			if (session.getAttribute("isFieldRequired") != null && 	
