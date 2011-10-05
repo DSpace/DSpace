@@ -2900,7 +2900,7 @@
 		to input all the metadata.</message>
 	<message key="xmlui.submit.publication.journal.select.option.none">None</message>
 	<message key="xmlui.submit.publication.journal.select.option.journal">Select a journal</message>
-	<message key="xmlui.submit.publication.journal.select.help">If you chose a journal that is fully
+	<message key="xmlui.submit.publication.journal.select.help">*If you chose a journal that is fully
 		integrated with Dryad (indicated by an asterisk), you may enter a manuscript number to import
 		the article description automatically:</message>
 	<message key="xmlui.submit.publication.journal.select.label">Journal</message>
