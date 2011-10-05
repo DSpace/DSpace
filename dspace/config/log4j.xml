@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd" >
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+	<!-- Standard DSpace file logger -->
+	<appender name="FILE" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${log.dir}/dspace.log"/>
+		<param name="Append" value="true"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd"/>
+		<param name="Threshold" value="INFO"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %-5p %c @ %m%n"/>
+		</layout>
+	</appender>
+
+	<appender name="SUBMIT_FILE" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${log.dir}/journal-submit.log"/>
+		<param name="Append" value="true"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd"/>
+		<param name="Threshold" value="DEBUG"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %-5p %c @ %m%n"/>
+		</layout>
+	</appender>
+
+	<appender name="MINTER_FILE" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${log.dir}/dspace-minter.log"/>
+		<param name="Append" value="true"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd"/>
+		<param name="Threshold" value="DEBUG"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %-5p %c @ %m%n"/>
+		</layout>
+	</appender>
+	
+	<appender name="BAGIT_FILE" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${log.dir}/bagit-export.log"/>
+		<param name="Append" value="true"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd"/>
+		<param name="Threshold" value="DEBUG"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %-5p %c @ %m%n"/>
+		</layout>
+	</appender>
+
+	<appender name="DATAONE_MN_FILE" class="org.apache.log4j.DailyRollingFileAppender">
+		<param name="File" value="${log.dir}/dataone-mn.log"/>
+		<param name="DatePattern" value="'.'yyyy-MM-dd"/>
+		<param name="Append" value="true"/>
+		<param name="Threshold" value="DEBUG"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d %-5p %c @ %m%n"/>
+		</layout>
+	</appender>
+
+
+	<!-- Mail adapter, recommended for production systems as it
+	     sends out email when errors level messages occur -->
+	<appender name="EMAIL" class="org.apache.log4j.net.SMTPAppender">
+		<param name="BufferSize" value="512"/>
+		<param name="SMTPHost" value="${mail.server}"/>
+		<param name="From" value="${mail.from.address}"/>
+		<param name="To" value="${mail.admin}"/>
+		<param name="Subject" value="[DSpace] Application message"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[%d{ISO8601}]%n%n%%F:-5L%n%n-5p%n%n%c%n%n%m%n%n"/>
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="ERROR"/>
+			<param name="LevelMax" value="FATAL"/>
+		</filter>
+	</appender>
+
+	<!-- Console adapters, useful for development but should not be
+	     used in production.  Standard IDE logging integration with
+	     logging source file and line numbers printed on every statement -->
+	<appender name="STDOUT" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.out"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{ISO8601} [%F:%L] %-5p &lt;%m&gt; %n"/>
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="WARN"/>
+			<param name="LevelMax" value="FATAL"/>
+		</filter>
+	</appender>
+
+	<appender name="STDERR" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.err"/>
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{ISO8601} [%F:%L] %-5p &lt;%m&gt; %n"/>
+		</layout>
+		<filter class="org.apache.log4j.varia.LevelRangeFilter">
+			<param name="LevelMin" value="WARN"/>
+			<param name="LevelMax" value="FATAL"/>
+		</filter>
+	</appender>
+
+	<!--
+      Block passwords from being exposed in Axis logs. (DEBUG exposes passwords in Basic Auth)
+    -->
+	<logger name="log4j.logger.org.apache.axis.handlers.http.HTTPAuthHandler">
+		<level value="info"/>
+	</logger>
+
+	<!-- # block services logging except on exceptions -->
+	<logger name="org.dspace.kernel">
+		<level value="ERROR"/>
+	</logger>
+	<logger name="org.dspace.services">
+		<level value="ERROR"/>
+	</logger>
+	<logger name="org.dspace.servicemanager">
+		<level value="ERROR"/>
+	</logger>
+	<logger name="org.dspace.providers">
+		<level value="ERROR"/>
+	</logger>
+	<logger name="org.dspace.utils">
+		<level value="ERROR"/>
+	</logger>
+	<!-- prevents page not loaded warnings from our page loading mechanism-->
+	<logger name="org.apache.cocoon.components.xslt">
+		<level value="ERROR"/>
+	</logger>
+
+	<logger name="org.dspace.doi">
+		<level value="DEBUG"/>
+		<appender-ref ref="MINTER_FILE"/>
+	</logger>
+	
+	<logger name="org.datadryad.submission">
+		<level value="DEBUG"/>
+		<appender-ref ref="SUBMIT_FILE"/>
+	</logger>
+
+	<logger name="org.dspace.content.packager">
+		<level value="DEBUG"/>
+		<appender-ref ref="BAGIT_FILE"/>
+	</logger>
+
+	<logger name="org.dspace.dataonemn">
+		<level value="DEBUG"/>
+		<appender-ref ref="DATAONE_MN_FILE"/>
+	</logger>
+
+
+	<!-- Add appenders you want live here -->
+	<root>
+		<level value="WARN"/>
+		<appender-ref ref="FILE"/>
+	</root>
+
+</log4j:configuration>

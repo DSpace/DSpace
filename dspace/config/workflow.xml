@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wf-config>
+    <workflow-map>
+        <name-map collection="default" workflow="default"/>
+    </workflow-map>
+
+    <workflow start="requiresReviewStep" id="default">
+        <roles>
+            <role id="curator" name="Curator" />
+            <!--TODO: rename the group if needed-->
+            <role id="editors" name="Editors" />
+        </roles>
+
+        <step id="requiresReviewStep" nextStep="reviewStep" userSelectionMethod="noUserSelectionAction">
+            <alternativeOutcome>
+                <step status="1">dryadAcceptEditReject</step>
+            </alternativeOutcome>
+            <action id="requiresReviewAction"/>
+        </step>
+
+        <step id="reviewStep" nextStep="dryadAcceptEditReject" userSelectionMethod="assignOriginalSubmitterAction">
+            <alternativeOutcome>
+                <step status="1">pendingdelete</step>
+            </alternativeOutcome>
+            <action id="reviewAction"/>
+        </step>
+
+        <step id="dryadAcceptEditReject" userSelectionMethod="claimAction" role="editors">
+            <action id="dryadAcceptEditRejectAction"/>
+            <action id="pendingPublicationAction"/>
+            <alternativeOutcome>
+                <step status="1">pendingPublicationStep</step>
+            </alternativeOutcome>
+        </step>
+
+        <step id="pendingPublicationStep" userSelectionMethod="claimAction" role="curator">
+            <action id="dryadAcceptEditRejectAction"/>
+        </step>
+
+
+        <step id="pendingdelete" userSelectionMethod="noUserSelectionAction">
+            <action id="pendingdelete"/>
+        </step>
+
+    </workflow>
+</wf-config>

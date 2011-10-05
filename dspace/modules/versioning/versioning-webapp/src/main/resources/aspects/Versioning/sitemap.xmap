@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+
+    <map:components>
+
+        <map:transformers>
+            <map:transformer name="VersionHistoryForm" src="org.dspace.app.xmlui.aspect.versioning.VersionHistoryForm"/>
+            <map:transformer name="VersionItemForm" src="org.dspace.app.xmlui.aspect.versioning.VersionItemForm"/>
+            <map:transformer name="DeleteVersionsConfirm"
+                             src="org.dspace.app.xmlui.aspect.versioning.DeleteVersionsConfirm"/>
+            <map:transformer name="RestoreVersionForm" src="org.dspace.app.xmlui.aspect.versioning.RestoreVersionForm"/>
+            <map:transformer name="VersionNavigation"
+                             src="org.dspace.app.xmlui.aspect.versioning.VersioningNavigation"/>
+            <map:transformer name="VersionUpdateForm" src="org.dspace.app.xmlui.aspect.versioning.VersionUpdateForm"/>
+        </map:transformers>
+
+
+        <!--map:matchers default="wildcard">
+            <map:matcher name="requestParameterWild"
+                         src="org.apache.cocoon.matching.WildcardRequestParameterMatcher"/>
+        </map:matchers-->
+
+    </map:components>
+
+
+    <map:flow language="javascript">
+        <map:script src="versioning.js"/>
+    </map:flow>
+
+    <map:pipelines>
+
+        <map:pipeline>
+
+            <map:match pattern="item/version">
+                <map:match type="request" pattern="versioning-continue">
+                    <map:call continuation="{1}"/>
+                </map:match>
+
+                <map:match type="request" pattern="itemID">
+                    <map:call function="startCreateNewVersionItem"/>
+                </map:match>
+            </map:match>
+
+            <map:match pattern="item/versionhistory">
+                <map:match type="request" pattern="versioning-continue">
+                    <map:call continuation="{1}"/>
+                </map:match>
+
+                <map:match type="request" pattern="itemID">
+                    <map:call function="startVersionHistoryItem"/>
+                </map:match>
+            </map:match>
+
+
+            <map:generate/>
+
+
+            <map:transform type="VersionNavigation"/>
+
+
+
+            <map:match pattern="item/version/create">
+                <map:transform type="VersionItemForm">
+                    <map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+                    <map:parameter name="summary" value="{flow-attribute:summary}"/>
+                </map:transform>
+            </map:match>
+
+
+            <map:match pattern="item/versionhistory/show">
+                <map:transform type="VersionHistoryForm">
+                    <map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+                </map:transform>
+            </map:match>
+
+            <map:match pattern="item/versionhistory/delete">
+                <map:transform type="DeleteVersionsConfirm">
+                    <map:parameter name="versionIDs" value="{flow-attribute:versionIDs}"/>
+                </map:transform>
+            </map:match>
+
+            <map:match pattern="item/versionhistory/restore">
+                <map:transform type="RestoreVersionForm">
+                    <map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+                    <map:parameter name="versionID" value="{flow-attribute:versionID}"/>
+                </map:transform>
+            </map:match>
+
+            <map:match pattern="item/versionhistory/update">
+                <map:transform type="VersionUpdateForm">
+                    <map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+                    <map:parameter name="versionID" value="{flow-attribute:versionID}"/>
+                </map:transform>
+            </map:match>
+
+            <map:match pattern="handle/*/*">
+                <map:transform type="VersionHistoryForm"/>                                    
+            </map:match>
+
+
+            <map:serialize type="xml"/>
+        </map:pipeline>
+
+
+    </map:pipelines>
+
+</map:sitemap>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- MAVEN PROFILE TEMPLATE 
+ 
+     THIS FILE IS ONLY AN EXAMPLE. THE ACTUAL FILE IS STORED IN THE 
+     MAVEN DIRECTORY (which is not under subversion).
+-->
+
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">
+
+	<profiles>
+		<!-- You can have multiple profiles in a single settings.xml file (if you have more than one
+			Dryad instance/profile on a machine) but you can also have just one like this example -->
+		<profile>
+			<!-- may be: env-staging, env-prod, env-demo, etc. -->
+			<id>env-dev</id>
+			<properties>
+				<!-- Where is this Dryad instance? British Library? NCSU? -->
+				<default.dryad.home>North Carolina State University</default.dryad.home>
+				<!-- Where the Dryad runtime/deployed directory is on the machine -->
+				<default.dspace.dir>/opt/dryad</default.dspace.dir>
+				<!-- The hostname... set to what displays in browser: dev.datadryad.org,  etc. -->
+				<default.dspace.hostname>localhost</default.dspace.hostname>
+				<!-- Port at which Dryad/Tomcat responds -->
+				<default.dspace.port>9999</default.dspace.port>
+				<!-- Location and name of the Dryad PostgreSQL database -->
+				<default.db.url>jdbc:postgresql://karya.nescent.org:5432/[PUT_DB_HERE]</default.db.url>
+				<!-- PostgreSQL/Dryad username and password -->
+				<default.db.username>[PUT_DB_USERNAME_HERE]</default.db.username>
+				<default.db.password>[PUT_DB_PASSWORD_HERE]</default.db.password>
+				<!-- DOI registration (EZID currently) username and password -->
+				<default.doi.username>[PUT_DOI_REG_USERNAME_HERE]</default.doi.username>
+				<default.doi.password>[PUT_DOI_REG_PASSWORD_HERE]</default.doi.password>
+				<!-- Dryad's DOI prefix -->
+				<default.doi.prefix>10.5061</default.doi.prefix>
+				<!-- Location of Dryad's DOI webapp/API -->
+				<default.doi.service>http://localhost:9999/doi</default.doi.service>
+				<!-- Whether DOIs/Handles should be rewritten to resolve locally (instead of going to dx.doi.org, etc., to be resolved) -->
+				<default.dryad.localize>true</default.dryad.localize>
+				<!-- Whether we really register DOIs or just pretend to -->
+				<default.doi.datacite.connected>false</default.doi.datacite.connected>
+				<!-- Mail server can be setup to use GMail or the local mailserver -->
+				<default.mail.server>smtp.gmail.com</default.mail.server>
+				<!-- localhost mail would just be:
+					<default.mail.server>localhost</default.mail.server>
+				-->
+				<!-- If needed, mail server username and password -->
+				<default.mail.server.username>[PUT_MAIL_SERVER_USER_HERE]</default.mail.server.username>
+				<default.mail.server.password>[PUT_MAIL_SERVER_PASSWORD_HERE]</default.mail.server.password>
+				<!-- Email values for where emails from Dryad go -->
+				<default.mail.admin>admin@datadryad.org</default.mail.admin>
+				<default.mail.help>help@datadryad.org</default.mail.help>
+				<!-- Extra properties required if you're using Gmail as mail server (remove line breaks) -->
+				<default.mail.extraproperties>mail.smtp.socketFactory.port=465, mail.smtp.socketFactory.class=javax.net.ssl.SSLSocketFactory, mail.smtp.socketFactory.fallback=false</default.mail.extraproperties>
+				<!-- If you're not using Gmail:
+					<default.mail.extraproperties>mail.smtp.localhost=machine.domain.edu</default.mail.extraproperties>
+				-->
+				<!-- Who does the harvester run as? -->
+				<default.harvester.eperson>rscherle@nescent.org</default.harvester.eperson>
+				<!-- Location of Solr cores; ports should match dspace.port -->
+				<!-- Dryad uses different ports to indicate: dev, demo, etc. -->
+				<default.solr.search.server>http://localhost:9999/solr/search/</default.solr.search.server>
+				<default.solr.stats.server>http://localhost:9999/solr/statistics/</default.solr.stats.server>
+				<default.solr.dryad.server>http://localhost:9999/solr/dryad/</default.solr.dryad.server>
+				<!-- Location for the LoC BagIt software; we call from the cmdline -->
+				<default.bagit.executable>/home/dryad/bagit-3.6/bin/bag</default.bagit.executable>
+				<!-- Whether we should send bagit to test/dev server or production -->
+				<default.bagit.testing.mode>true</default.bagit.testing.mode>
+				<!-- Location for the journal-submit config file -->
+				<default.submit.journal.config>/opt/dryad/config/DryadJournalSubmission.properties</default.submit.journal.config>
+			</properties>
+		</profile>
+	</profiles>
+</settings>

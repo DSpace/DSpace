@@ -1,0 +1,28 @@
+# Data file review email message
+# Sent when a datapackage is submitted, but the associated journal 
+# article is listed as "in review"
+#
+# {0}  Title of submission
+# {1}  Doi of the data package
+# {2}  Title of the data package
+# {3}  Url of the data package
+# {4}  Url of the data file
+# {5}  Url for the review
+Subject: Dryad: Data package received for peer review {1}
+
+Dryad has received the following data package:
+Title:        {0}
+Submitted by: {3}
+Data file(s):
+{2}
+
+Dryad has assigned the following provisional DOI to the submission. This DOI may be included in the article manuscript. Although this DOI is not yet fully registered with the DOI system, it will be registered when the manuscript is accepted for publication.
+
+{1}
+
+Journal editors and anonymous peer reviewers may view the submission for review purposes using the following url:
+{4}
+
+Many thanks!
+
+The Dryad Team

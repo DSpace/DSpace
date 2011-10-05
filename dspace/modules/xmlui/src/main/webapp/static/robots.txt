@@ -1,0 +1,65 @@
+
+User-agent: *
+Request-rate: 1/5
+Sitemap: http://www.datadryad.org/sitemap
+
+# We use HTML sitemaps so are more liberal with Disallow(s):
+
+# Normal search/browse
+Disallow: /discover
+Disallow: /search-filter
+Disallow: /browse
+Disallow: /simple-search
+Disallow: /advanced-search
+Disallow: /search
+Disallow: /browse-date
+Disallow: /community-list
+
+# Collection-specific search/browse for Main
+Disallow: /handle/10255/1/search
+Disallow: /handle/10255/1/browse
+Disallow: /handle/10255/1/discover
+
+# Collection-specific search/browse for Data Files
+Disallow: /handle/10255/2/search
+Disallow: /handle/10255/2/browse
+Disallow: /handle/10255/2/discover
+
+# Collection-specific search/browse for Data Packages
+Disallow: /handle/10255/3/search
+Disallow: /handle/10255/3/browse
+Disallow: /handle/10255/3/discover
+
+# Collection-specific search/browse for BIRDD
+Disallow: /handle/10255/dryad.148/search
+Disallow: /handle/10255/dryad.148/browse
+Disallow: /handle/10255/dryad.148/discover
+
+# Collection-specific search/browse for TreeBASE
+Disallow: /handle/10255/dryad.2171/search
+Disallow: /handle/10255/dryad.2171/browse
+Disallow: /handle/10255/dryad.2171/discover
+
+# Collection-specific search/browse for LTER
+Disallow: /handle/10255/dryad.2027/search
+Disallow: /handle/10255/dryad.2027/browse
+Disallow: /handle/10255/dryad.2027/discover
+
+# Various DSpace pages that shouldn't be indexed
+Disallow: /contact
+Disallow: /feedback
+Disallow: /forgot
+Disallow: /login
+Disallow: /register
+
+# DataONE Member Node implementation
+Disallow: /mn
+
+# We also don't need them downloading our citations
+Disallow: /doi/citation
+
+# Don't allow indexing of the old /repo context at all, since
+# everything there just redirects to the main site. We don't want
+# it to appear in an index.
+Disallow: /repo
+

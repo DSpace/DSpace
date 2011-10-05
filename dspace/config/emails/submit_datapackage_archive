@@ -1,0 +1,44 @@
+# Data package Archived email message
+# This message is sent to a submitter when the Dryad curator
+# has approved the submission, and the data package is moved into
+# the main Dryad archive.
+# 
+# {0}  Title of data package
+# {1}  The doi identifier of the data package
+# {2}  The title(s) of the data file(s)
+# {3}  The doi's of the data files
+# {4}  The submitters full name
+# {5}  The manuscript identifier (or "none available" if the metadata doesn't contain one)
+#
+Subject: Dryad submission approved {1}
+
+Dear {4},
+
+Thank you for your recent submission to the Dryad repository. Your data package has been approved and assigned a unique identifier, called a DOI.
+
+Title: {0}
+Data identifier: {1}
+Journal manuscript number: {5}
+
+If your article has not yet been published, we recommend you add text specifying the location of the data, for example:
+
+Data deposited in the Dryad repository: {1}
+
+To view your Dryad entry, you may visit the repository at http://datadryad.org
+
+Check out the information for depositors at http://www.datadryad.org/depositing
+- How do I refer to my Dryad data in my article?
+- How can I see how often my data package is viewed and downloaded?
+- How can I add my data package to a Data section on my CV?
+- If my data files are embargoed, when will they be released?
+- and more!
+
+The UK-based Digital Curation Centre is looking for your help to respond to their 10 minute questionnaire on what matters to you when choosing where to deposit your data. You can find the questionnaire here:
+  https://www.survey.ed.ac.uk/depositers
+Results will contribute to an assessment framework for Dryad, and the questionnaire includes entry to a drawing for an $80/£50 Amazon gift card. DCC are carrying this out as part of the Dryad UK project, which also involves the British Library and Oxford University's Image Bioinformatics Lab.
+
+
+Thanks again for taking this important step to preserve and share your research data. We welcome your feedback! Contact us at help@datadryad.org.
+
+The Dryad Team
+datadryad.org 

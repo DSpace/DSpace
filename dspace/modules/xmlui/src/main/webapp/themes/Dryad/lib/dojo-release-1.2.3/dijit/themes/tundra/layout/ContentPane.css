@@ -1,0 +1,19 @@
+
+.tundra .dijitContentPane {
+    padding: 0px;
+}
+.tundra .dijitTabContainerTop-dijitContentPane,
+.tundra .dijitTabContainerLeft-dijitContentPane,
+.tundra .dijitTabContainerBottom-dijitContentPane,
+.tundra .dijitTabContainerRight-dijitContentPane,
+.tundra .dijitAccordionContainer-dijitContentPane {
+    border: none;
+    background-color: #fff;
+    padding: 5px;
+}
+.tundra .dijitSplitContainer-dijitContentPane,
+.tundra .dijitBorderContainer-dijitContentPane {
+    border: 1px #ccc solid;
+    background-color: #fff;
+    padding: 5px;
+}

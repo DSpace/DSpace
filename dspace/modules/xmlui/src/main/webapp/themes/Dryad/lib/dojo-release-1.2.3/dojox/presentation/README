@@ -1,0 +1,72 @@
+-------------------------------------------------------------------------------
+dojox.presentation
+-------------------------------------------------------------------------------
+Version 0.9
+Release date: 10/31/2007
+-------------------------------------------------------------------------------
+Project state:
+experimental
+-------------------------------------------------------------------------------
+Credits
+	pete higgins (dante)
+-------------------------------------------------------------------------------
+
+Project description
+
+This is the presentation base class. It provides a mechanism for various
+display-oriented tasks. It includes a powerpoint-esque engine [prototype].
+The SlideShow aspect of this project has been deprecated and lives now
+in dojox.image project.
+
+-------------------------------------------------------------------------------
+
+Dependencies:
+
+dojox.presentation requires both Dojo Base, Dojo FX Core, and Dijit system(s).
+
+-------------------------------------------------------------------------------
+
+Documentation
+
+See the Dojo API tool (http://dojotoolkit.org/api)
+
+-------------------------------------------------------------------------------
+
+Installation instructions
+
+This package is self-contained, but needs Dijit sytem. 
+
+Grab the following from the Dojo SVN Repository:
+
+svn co http://svn.dojotoolkit.org/dojo/dojox/trunk/presentation*
+svn co http://svn.dojotoolkit.org/dojo/dijit/*
+
+into your:
+/dojo root folder [checkout/release root]
+
+and require in dependancies via dojo.require('dojox.presentation');
+
+see /dojox/presentation/tests/test_presentation.html for example usage, but 
+basically the structure is this:
+
+presentation />
+	Slide />
+	Slide />
+		Text Outside of Part is Static
+		Part />
+		Part />
+		Action forPart/>
+		Action forPart/>
+	Slide href="remote.html" />
+	Slide />
+		Part />
+		Action forPart/>
+/presentation>
+
+NOTE: project marked experimental, and API has a planned deprecation. To 
+participate in the formation of the new presentation class, visit 
+the dojotoolkit forums at:
+
+http://dojotoolkit.org/forums
+
+

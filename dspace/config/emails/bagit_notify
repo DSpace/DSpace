@@ -1,0 +1,21 @@
+# Email sent to user when s/he selects to also upload data to a remote repo
+#
+# Parameters: {0} the remote repository to which s/he has uploaded data
+#             {1} the URL the user needs to log into to complete the upload
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: Your Dryad Submission to {0}
+
+Thank you for your recent deposit to the Dryad repository. During your
+submission, you chose to also automatically upload your data to {0}.
+
+This upload has been completed.  To finish the {0} submission you
+will need to log in to {0} and complete the process.  You can do
+this by visiting:
+
+{1}
+
+Thanks.
+
+Dryad

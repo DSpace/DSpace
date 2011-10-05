@@ -1,0 +1,15 @@
+# Email sent when there is a problem with the journal submission process
+#
+# Parameters: {0} the exception message that was caught at point of error
+#             {1} the location of the journal-submit logs (for more details)
+#             
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+# This email goes to the DSpace ${mail.admin} email account
+#
+Subject: Journal-Submit Problem
+Journal submit failed to complete, due to the following reason:
+ {0}
+
+ Check the logs at '{1}' for more details

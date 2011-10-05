@@ -1,0 +1,66 @@
+
+.soria .dijitMenu {
+	border: 1px solid #cbcbcb;
+	margin: 0px;
+	padding: 0px;
+	background-color: #fff;
+}
+.soria .dijitMenuItem {
+	background-color: #fff;
+	font-family: sans-serif;
+	margin: 0px;
+	color: #243C5F;
+}
+.soria .dijitMenuPreviousButton, .soria .dijitMenuNextButton {
+	font-style: italic;
+}
+.soria .dijitMenuItem TD {
+	padding:1px;
+}
+.soria .dijitMenuItemHover {
+	background-color: #d9e6f9; 
+	color: #243C5F;
+}
+.soria .dijitMenuItemIcon {
+	width: 15px;
+	height: 15px;
+	
+}
+.soria .dijitMenuExpand {
+	
+	width:15px;
+	height:15px;
+	background-image: url('images/spriteRoundedIconsSmall.png');
+	background-repeat: no-repeat;
+	background-position: -30px top;
+	display:block;
+}
+.dj_ie6 .soria .dijitMenuExpand {
+	background-image: url('images/spriteRoundedIconsSmall.gif');
+}
+.soria .dijitMenuSeparator {
+	background-color: #fff;
+	height: 1px;
+}
+.soria .dijitMenuSeparatorTop {
+	border-bottom: 1px solid #fff; 
+}
+.soria .dijitMenuSeparatorBottom {
+	border-top: 1px solid #8ba0bd;
+}
+.soria .dijitCheckedMenuItemIconChar {
+	display: none;
+}
+.soria .dijitCheckedMenuItemIcon {
+	background-image: url('images/spriteCheckbox.gif');
+	background-position: -16px;
+}
+.soria .dijitCheckedMenuItemIconChecked {
+	background-position: 0px;
+}
+.soria .dijitMenuItemHover .dijitCheckedMenuItemIcon {
+	background-position: -80px;
+}
+.soria .dijitMenuItemHover .dijitCheckedMenuItemIconChecked {
+	background-position: -64px;
+}

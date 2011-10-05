@@ -1,0 +1,92 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.dspace.modules</groupId>
+	<artifactId>versioning-api</artifactId>
+	<packaging>jar</packaging>
+	<name>DSpace Versioning :: API</name>
+	<description>DSpace Versioning API</description>
+
+	<parent>
+		<groupId>org.dspace.modules</groupId>
+		<artifactId>versioning</artifactId>
+		<version>1.7.2</version>
+	</parent>
+
+	<profiles>
+		<!--
+         when activated a dspace.config configuration
+         file location passed on the commandline
+         (-Ddspace.config=...) can be passed through
+         to be used as a filter source by projects for
+         tasks such as updating the ${dspace.dir} in
+         web.xml etc.
+      -->
+		<profile>
+			<activation>
+				<property>
+					<name>dspace.config</name>
+				</property>
+			</activation>
+			<build>
+				<filters>
+					<filter>${dspace.config}</filter>
+				</filters>
+			</build>
+		</profile>
+	</profiles>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-api</artifactId>
+		</dependency>
+
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-xmlui-api</artifactId>
+            <exclusions>
+                <exclusion>
+                    <artifactId>ehcache</artifactId>
+                    <groupId>net.sf.ehcache</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>            
+            <scope>provided</scope>
+        </dependency>
+       
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-services-api</artifactId>           
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-services-utils</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-services-impl</artifactId>            
+        </dependency>
+
+        <!--dependency>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>8.1-407.jdbc3</version>
+		</dependency>
+
+        <dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.5</version>
+		</dependency-->
+	</dependencies>
+
+</project>

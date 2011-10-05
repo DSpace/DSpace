@@ -1,0 +1,571 @@
+<?xml version="1.0"?><rdf:RDF 
+	xmlns:dryadt="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadTypes.rdf#" 
+	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+	xmlns:dbpedia="http://dbpedia.org/ontology/"
+	xmlns:datacite="http://purl.org/spar/datacite/"
+	xmlns:prism="http://prismstarndard.org/namespace/basic/2.0/"
+	xmlns:owl="http://www.w3.org/2002/07/owl#"
+	xmlns:dc="http://purl.org/dc/elements/1.1/"
+	xmlns:dcterms="http://purl.org/dc/terms/"
+	xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
+	xmlns:foaf="http://xmlns.com/foaf/0.1/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" > 
+
+<rdf:Description rdf:about="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.82">
+	<dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Data from  Hunting to extinction  biology and regional economy influence extinction risk and the impact of hunting in artiodactyls</dc:title>
+	<dc:creator rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/samplefoaf#SamanthaAPrice"/>
+	<dc:creator rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/samplefoaf#JohnLGittleman"/>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">phylogenetic comparative methods</dc:subject>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Bushmeat"/>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Extinction"/>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Hunting"/>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Economic_development"/>
+	<dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Half of all artiodactyls (even-toed hoofed mammals) are threatened with extinction, around double the mammalian average. Here, using a complete species-level phylogeny, we construct a multivariate model to assess for the first time which intrinsic (biological) and extrinsic (anthropogenic and environmental) factors influence variation in extinction risk in artiodactyls. Globally artiodactyls at greatest risk live in economically less developed areas, have older weaning ages and smaller geographical ranges. Our findings suggest that identifying predictors of threat is complicated by interactions between both biological and anthropogenic factors, resulting in differential responses to threatening processes. Artiodactyl species that experience unregulated hunting live in significantly less economically developed areas than those that are not hunted; however, hunted species are more susceptible to extinction if they have slower reproductive rates (older weaning ages). In contrast, risk in non-hunted artiodactyls is unrelated to reproductive rate and more closely associated with the economic development of the region in which they live.</dc:description>
+	<dc:publisher rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Royal Society Publishing</dc:publisher>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2008-02-27T17 42 57Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2008-02-27T17 42 57Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2007-08-07</dc:date>
+	<rdf:type rdf:resource="http://purl.org/dc/dcmitype/Text"/>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">doi 10.5061/dryad.82</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Price SA, Gittleman JL (2007) Hunting to extinction  biology and regional economy influence extinction risk and the impact of hunting in artiodactyls. Proceedings of the Royal Society B 274  1845-1851.</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">http //hdl.handle.net/10255/dryad.82</dc:identifier>
+	<dc:language rdf:datatype="http://www.w3.org/2001/XMLSchema#string">en</dc:language>
+	<dc:relation rdf:resource="Proceedings of the Royal Society"/>
+	<dc:relation rdf:resource="274"/>
+	<dc:relation rdf:resource="doi:10.5061/dryad.82/1"/>
+	<dc:relation rdf:resource="doi:10.1098/rspb.2007.0505"/>
+	<dc:relation rdf:resource="http://purl.org/phylo/treebase/phylows/study/TB2:S1271?format=html"/>
+	<dbpedia:species rdf:resource="http://dbpedia.org/resource/Artiodactyla"/>
+	<rdfs:seeAlso rdf:resource="http://purl.org/phylo/treebase/phylows/study/TB2:S1271?format=rdf"/>
+	<datacite:hasPrimaryIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10.5061/dryad.82</datacite:hasPrimaryIdentifier>
+	<datacite:hasAlternateIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10255/dryad.82</datacite:hasAlternateIdentifier>
+	<dc:hasPart rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.83"/>
+	<rdf:type rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadTypes.rdf#DCType"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.83">
+	<dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Price and Gittleman Data Set</dc:title>
+	<dc:creator rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/samplefoaf.rdf#SamanthaAPrice"/>
+	<dc:creator rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/samplefoaf.rdf#JohnLGittleman"/>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">phylogenetic comparative methods</dc:subject>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Bushmeat"/>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Extinction"/>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Hunting"/>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Economic_development"/>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2008-02-27T17 48 02Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2008-02-27T17 48 02Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2007-05-17</dc:date>
+	<rdf:type rdf:resource="http://purl.org/dc/dcmitype/Dataset"/>
+	<dcterms:publisher rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/samplefoaf.rdf#Dryad"/>	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">doi 10.5061/dryad.82/1</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">http //hdl.handle.net/10255/dryad.83</dc:identifier>
+	<dc:language rdf:datatype="http://www.w3.org/2001/XMLSchema#string">en</dc:language>
+	<dc:isPartOf rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.82"/>
+	<dc:rights rdf:resource="http://dbpedia.org/page/Creative_Commons"/>
+	<dbpedia:species rdf:resource="http://dbpedia.org/resource/Artiodactyla"/>
+	<datacite:hasPrimaryIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10.5061/dryad.82/1</datacite:hasPrimaryIdentifier>
+	<datacite:hasAlternateIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10255/dryad.83</datacite:hasAlternateIdentifier>
+	<datacite:hasPrimaryIdentifier rdf:resource="http://datadryad.org/handle/10255/dryad.83"/>
+	<rdf:type rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadTypes.rdf#DCType"/>
+	<dryadt:datafile rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#PriceGittleman_2007_append.xls"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#PriceGittleman_2007_append.xls">
+	<dryadt:filename  rdf:datatype="http://www.w3.org/2001/XMLSchema#string">PriceGittleman_2007_appendix.xls</dryadt:filename>
+	<dryadt:filesize  rdf:datatype="http://www.w3.org/2001/XMLSchema#string">94.72Kb</dryadt:filesize>
+	<dc:format  rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Microsoft Excel</dc:format>
+	<dbpedia:species rdf:resource="http://dbpedia.org/resource/Addax_nasomaculatus" />	<dbpedia:species rdf:resource="http://dbpedia.org/resource/Axis_axis" />	<dbpedia:species rdf:resource="http://dbpedia.org/resource/Capra_hircus" />	<dbpedia:species rdf:resource="http://dbpedia.org/resource/Kobus_leche" />	<dbpedia:species rdf:resource="http://dbpedia.org/resource/Ovis aries" />	<dbpedia:species rdf:resource="http://dbpedia.org/resource/Pacari_tajacu" />	<dbpedia:species rdf:resource="http://dbpedia.org/resource/Tayassu_pecari" />	<dbpedia:species rdf:resource="http://dbpedia.org/resource/Vicugna_vicugna" />	<dc:isPartOf rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.83"/>
+	<rdf:type rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadTypes.rdf#DatafileType"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.234">
+	<dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Data from  Towards a worldwide wood economics spectrum</dc:title>
+	<dc:creator>Zanne, Amy E.</dc:creator>
+	<dc:creator>Lopez-Gonzalez, G.</dc:creator>
+	<dc:creator>Coomes, David A.</dc:creator>
+	<dc:creator>Ilic, J.</dc:creator>
+	<dc:creator>Jansen, Steven</dc:creator>
+	<dc:creator>Lewis, Simon L.</dc:creator>
+	<dc:creator>Miller, R. B.</dc:creator>
+	<dc:creator>Swenson, Nathan G.</dc:creator>
+	<dc:creator>Wiemann, M. C.</dc:creator>
+	<dc:creator>Chave, Jerome</dc:creator>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Evolution"/>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Functional_ecology"/>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">plant economics</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">trade-offs</dc:subject>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Wood"/>
+	<dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Wood performs several essential functions in plants, including mechanically supporting aboveground tissue, storing water and other resources, and transporting sap. Woody tissues are likely to face physiological, structural and defensive trade-offs. How a plant optimizes among these competing functions can have major ecological implications, which have been under-appreciated by ecologists compared to the focus they have given to leaf function. To draw together our current understanding of wood function, we identify and collate data on the major wood functional traits, including the largest wood density database to date (8412 taxa), mechanical strength measures and anatomical features, as well as clade-specific features such as secondary chemistry. We then show how wood traits are related to one another, highlighting functional trade-offs, and to ecological and demographic plant features (growth form, growth rate, latitude, ecological setting). We suggest that, similar to the manifold that tree species leaf traits cluster around the 'leaf economics spectrum', a similar 'wood economics spectrum' may be defined. We then discuss the biogeography, evolution and biogeochemistry of the spectrum, and conclude by pointing out the major gaps in our current knowledge of wood functional traits.</dc:description>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2009-02-04T23 35 24Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2009-02-04T23 35 24Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2009</dc:date>
+	<rdf:type rdf:resource="http://purl.org/dc/dcmitype/Text"/>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">doi 10.5061/dryad.234</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Chave J, Coomes D, Jansen S, Lewis SL, Swenson NG, Zanne AE (2009) Towards a worldwide wood economics spectrum. Ecology Letters 12  351-366.</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">http //hdl.handle.net/10255/dryad.234</dc:identifier>
+	<dc:relation rdf:resource="Ecology Letters"/>
+	<dc:relation rdf:resource="12  351–366"/>
+	<dc:relation rdf:resource="doi:10.5061/dryad.234/1"/>
+	<dc:relation rdf:resource="doi:10.1111/j.1461-0248.2009.01285.x"/>
+	<datacite:hasPrimaryIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10.5061/dryad.234</datacite:hasPrimaryIdentifier>
+	<datacite:hasAlternateIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10255/dryad.234</datacite:hasAlternateIdentifier>
+	<dc:hasPart rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.235"/>
+	<rdf:type rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadTypes.rdf#DCType"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.235">
+	<dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Global Wood Density Database</dc:title>
+	<dc:creator>Miller, R. B.</dc:creator>
+	<dc:creator>Coomes, David A.</dc:creator>
+	<dc:creator>Jansen, Steven</dc:creator>
+	<dc:creator>Ilic, J.</dc:creator>
+	<dc:creator>Swenson, Nathan G.</dc:creator>
+	<dc:creator>Zanne, Amy E.</dc:creator>
+	<dc:creator>Chave, Jerome</dc:creator>
+	<dc:creator>Lewis, Simon L.</dc:creator>
+	<dc:creator>Wiemann, M. C.</dc:creator>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Evolution"/>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Functional_ecology"/>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">plant economics</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">trade-offs</dc:subject>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Wood"/>
+	<dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Please direct all correspondence to G. Lopez-Gonzalez  G.Lopez-Gonzalez leeds.ac.uk </dc:description>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2009-02-04T23 35 32Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2009-02-04T23 35 32Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2009-02-04T23 35 32Z</dc:date>
+	<rdf:type rdf:resource="http://purl.org/dc/dcmitype/Dataset"/>
+	<dcterms:publisher rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/samplefoaf.rdf#Dryad"/>	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">doi 10.5061/dryad.234/1</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">http //hdl.handle.net/10255/dryad.235</dc:identifier>
+	<dc:isPartOf rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.234"/>
+	<dc:rights rdf:resource="http://dbpedia.org/page/Creative_Commons"/>
+	<datacite:hasPrimaryIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10.5061/dryad.234/1</datacite:hasPrimaryIdentifier>
+	<datacite:hasAlternateIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10255/dryad.235</datacite:hasAlternateIdentifier>
+	<rdf:type rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadTypes.rdf#DCType"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.1252">
+	<dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Data from  Lineage diversification in a widespread species  roles for niche divergence and conservatism in the Common Kingsnake, Lampropeltis getula</dc:title>
+	<dc:creator>Pyron, Robert Alexander</dc:creator>
+	<dc:creator>Burbrink, Frank T</dc:creator>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Evolution"/>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Phylogeography"/>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Reptile"/>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Speciation"/>
+	<dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Niche conservatism and niche divergence are both important ecological mechanisms associated with promoting allopatric speciation across geographic barriers. However, the potential for variable responses in widely distributed organisms has not been fully investigated. For allopatric sister lineages, three patterns for the interaction of ecological niche preference and geographic barriers are possible  i) niche conservatism at a physical barrier, ii) niche divergence at a physical barrier, and iii) niche divergence in the absence of a physical barrier. We test for the presence of these patterns in a transcontinentally distributed snake species, the Common Kingsnake (Lampropeltis getula), to determine the relative frequency of niche conservatism or divergence in a single species complex inhabiting multiple distinct niches. We infer the phylogeographic structure of the kingsnake using a rangewide dataset sampled for the mitochondrial gene cyt-b. We use coalescent simulation methods to test for the presence of structured lineage formation versus fragmentation of a widespread ancestor. Finally, we use statistical techniques for creating and evaluating ecological niche models to test for conservatism of ecological niche preferences. Significant geographic structure is present in the kingsnake, for which coalescent tests indicate structured population division. Surprisingly, we find evidence for all three patterns of conservatism and divergence. This suggests that ecological niche preferences may be labile on recent phylogenetic time scales, and that lineage formation in widespread species results from an interaction between inertial tendencies of niche conservatism and natural selection on populations in ecologically divergent habitats.</dc:description>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2010-02-25T19 56 44Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2010-02-25T19 56 44Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2009-07-31</dc:date>
+	<rdf:type rdf:resource="http://purl.org/dc/dcmitype/Text"/>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">doi 10.5061/dryad.1252</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Pryon RA, Burbrink FT (2009) Lineage diversification in a widespread species  roles for niche divergence and conservatism in the Common Kingsnake, Lampropeltis getula. Molecular Ecology 18  3443-3457.</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">http //hdl.handle.net/10255/dryad.1252</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">MolEcol-13381079MEC-09-0227.R1-1267127519955</dc:identifier>
+	<dc:relation rdf:resource="Molecular Ecology"/>
+	<dc:relation rdf:resource="0962-1083"/>
+	<dc:relation rdf:resource="doi:10.5061/dryad.1252/1"/>
+	<dc:relation rdf:resource="doi:10.5061/dryad.1252/2"/>
+	<dc:relation rdf:resource="doi:10.1111/j.1365-294X.2009.04292.x"/>
+	<dbpedia:species rdf:resource="http://dbpedia.org/resource/Lampropeltis_getula"/>
+	<datacite:hasPrimaryIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10.5061/dryad.1252</datacite:hasPrimaryIdentifier>
+	<datacite:hasAlternateIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10255/dryad.1252</datacite:hasAlternateIdentifier>
+	<dc:hasPart rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.1253"/>
+	<dc:hasPart rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.1254"/>
+	<rdf:type rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadTypes.rdf#DCType"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.1253">
+	<dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Information for kingsnake specimens</dc:title>
+	<dc:creator>Pyron, Robert Alexander</dc:creator>
+	<dc:creator>Burbrink, Frank T</dc:creator>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Evolution"/>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Phylogeography"/>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Reptile"/>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Speciation"/>
+	<dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Clade designations, museum voucher numbers, GenBank accession numbers, general localities, and latitude/longitude data for kingsnake specimens in the molecular dataset</dc:description>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2010-02-25T19 56 39Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2010-02-25T19 56 39Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2010-02-25T19 56 39Z</dc:date>
+	<rdf:type rdf:resource="http://purl.org/dc/dcmitype/Dataset"/>
+	<dcterms:publisher rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/samplefoaf.rdf#Dryad"/>	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">doi 10.5061/dryad.1252/1</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">http //hdl.handle.net/10255/dryad.1253</dc:identifier>
+	<dc:isPartOf rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.1252"/>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">North America</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Holocene</dc:coverage>
+	<dc:rights rdf:resource="http://dbpedia.org/page/Creative_Commons"/>
+	<dbpedia:species rdf:resource="http://dbpedia.org/resource/Lampropeltis_getula"/>
+	<datacite:hasPrimaryIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10.5061/dryad.1252/1</datacite:hasPrimaryIdentifier>
+	<datacite:hasAlternateIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10255/dryad.1253</datacite:hasAlternateIdentifier>
+	<rdf:type rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadTypes.rdf#DCType"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.1254">
+	<dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Presence localities for kingsnakes</dc:title>
+	<dc:creator>Pyron, Robert Alexander</dc:creator>
+	<dc:creator>Burbrink, Frank T</dc:creator>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Evolution"/>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Phylogeography"/>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Reptile"/>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Speciation"/>
+	<dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Larger presence locality dataset, containing specimens from the molecular analysis as well as older museum records. Used to generate niche models for the separate lineages.</dc:description>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2010-02-25T19 56 41Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2010-02-25T19 56 41Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2010-02-25T19 56 41Z</dc:date>
+	<rdf:type rdf:resource="http://purl.org/dc/dcmitype/Dataset"/>
+	<dcterms:publisher rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/samplefoaf.rdf#Dryad"/>	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">doi 10.5061/dryad.1252/2</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">http //hdl.handle.net/10255/dryad.1254</dc:identifier>
+	<dc:isPartOf rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.1252"/>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">North America</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Holocene</dc:coverage>
+	<dc:rights rdf:resource="http://dbpedia.org/page/Creative_Commons"/>
+	<dbpedia:species rdf:resource="http://dbpedia.org/resource/Lampropeltis_getula"/>
+	<datacite:hasPrimaryIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10.5061/dryad.1252/2</datacite:hasPrimaryIdentifier>
+	<datacite:hasAlternateIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10255/dryad.1254</datacite:hasAlternateIdentifier>
+	<datacite:hasPrimaryIdentifier rdf:resource="http://datadryad.org/handle/10255/dryad.1254"/>
+	<rdf:type rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadTypes.rdf#DCType"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.2016">
+	<dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Data from  Are blue eggs a sexually selected signal of female collared flycatchers? A cross-fostering experiment</dc:title>
+	<dc:creator>Krist, Miloš</dc:creator>
+	<dc:creator>Grim, Tomáš</dc:creator>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">egg colour</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">differential allocation</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">female signalling</dc:subject>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Immunity"/>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Parental_investment"/>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">cross-fostering</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">nest defence</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">feeding frequency</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">laying order</dc:subject>
+	<dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Impressive variation in egg colouration among birds has puzzled evolutionary biologists for a long time. The most frequently studied selective forces moulding egg colouration – predation and brood parasitism – have either received little empirical support or may play a role in only a minority of species. A novel hypothesis has suggested that egg colour may be significantly influenced by sexual selection. Females may deposit a blue-green pigment biliverdin into eggshells instead of using it for themselves as a powerful antioxidant. By this handicap females may signal their quality to males which are then hypothesized to increase their paternal effort. We experimentally tested the hypothesis in the collared flycatcher (Ficedula albicollis), a species laying blue-green eggs. We cross-fostered clutches between nests to disentangle effects of female/territory quality and egg colour on paternal effort and nestling quality. The results supported two assumptions of sexual signalling through egg colour hypothesis  blue pigment seems to be a limited resource for females and female quality is positively correlated with intensity of blue-green colour. However, we did not find support for the main prediction of the hypothesis as male parental effort parameters (feeding frequencies to nestlings and intensity of nest defence) were unrelated to egg colour. We discuss possible reasons for the discrepancy between our results and previous correlative analyses that supported the hypothesis that blue egg colour may be a postmating sexually selected signal in females.</dc:description>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2010-09-29T21 13 21Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2010-09-29T21 13 21Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2007-01-10</dc:date>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">doi 10.5061/dryad.2016</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Krist M, Grim T (2007) Are blue eggs a sexually selected signal of female collared flycatchers? A cross-fostering experiment. Behavioral Ecology and Sociobiology 61  863-876.</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">http //hdl.handle.net/10255/dryad.2016</dc:identifier>
+	<dc:relation rdf:resource="http://datadryad.org/handle/10255/dryad.2017"/>
+	<dc:relation rdf:resource="http://datadryad.org/handle/10255/dryad.2018"/>
+	<dc:relation rdf:resource="doi:10.1007/s00265-006-0315-9"/>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Central Europe</dc:coverage>
+	<dbpedia:species rdf:resource="http://dbpedia.org/resource/Ficedula_albicollis"/>
+	<datacite:hasPrimaryIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10.5061/dryad.2016</datacite:hasPrimaryIdentifier>
+	<datacite:hasAlternateIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10255/dryad.2016</datacite:hasAlternateIdentifier>
+	<dc:hasPart rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.2017"/>
+	<dc:hasPart rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.2018"/>
+	<rdf:type rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadTypes.rdf#DCType"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.2017">
+	<dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">dataset</dc:title>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">egg colour</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">differential allocation</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">female signalling</dc:subject>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Immunity"/>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Parental_investment"/>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">cross-fostering</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">nest defence</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">feeding frequency</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">laying order</dc:subject>
+	<dc:contributor rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Krist, Miloš</dc:contributor>
+	<dc:contributor rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Grim, Tomáš</dc:contributor>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2010-09-29T21 13 21Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2010-09-29T21 13 21Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2010-09-29</dc:date>
+	<dc:type rdf:datatype="http://www.w3.org/2001/XMLSchema#string">none</dc:type>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">doi 10.5061/dryad.2016/1</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">http //hdl.handle.net/10255/dryad.2017</dc:identifier>
+	<dc:relation rdf:resource="http://datadryad.org/handle/10255/dryad.2016"/>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Central Europe</dc:coverage>
+	<dbpedia:species rdf:resource="http://dbpedia.org/resource/Ficedula_albicollis"/>
+	<datacite:hasPrimaryIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10.5061/dryad.2016/1</datacite:hasPrimaryIdentifier>
+	<datacite:hasAlternateIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10255/dryad.2017</datacite:hasAlternateIdentifier>
+	<rdf:type rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadTypes.rdf#DCType"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.2018">
+	<dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">individual_eggs</dc:title>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">egg colour</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">differential allocation</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">female signalling</dc:subject>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Immunity"/>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Parental_investment"/>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">cross-fostering</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">nest defence</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">feeding frequency</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">laying order</dc:subject>
+	<dc:contributor rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Krist, Miloš</dc:contributor>
+	<dc:contributor rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Grim, Tomáš</dc:contributor>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2010-09-29T21 13 21Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2010-09-29T21 13 21Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2010-09-29</dc:date>
+	<dc:type rdf:datatype="http://www.w3.org/2001/XMLSchema#string">none</dc:type>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">doi 10.5061/dryad.2016/2</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">http //hdl.handle.net/10255/dryad.2018</dc:identifier>
+	<dc:relation rdf:resource="http://datadryad.org/handle/10255/dryad.2016"/>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Central Europe</dc:coverage>
+	<dbpedia:species rdf:resource="http://dbpedia.org/resource/Ficedula_albicollis"/>
+	<datacite:hasPrimaryIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10.5061/dryad.2016/2</datacite:hasPrimaryIdentifier>
+	<datacite:hasAlternateIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10255/dryad.2018</datacite:hasAlternateIdentifier>
+	<rdf:type rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadTypes.rdf#DCType"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.8437">
+	<dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Data from  Deep mitochondrial divergence in Baja California populations of an aquilopelagic elasmobranch  the golden cownose ray</dc:title>
+	<dc:creator>Sandoval-Castillo, Jonathan</dc:creator>
+	<dc:creator>Rocha-Olivares, Axayácatl</dc:creator>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">aquilopelagic marine ray</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genetic structure</dc:subject>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Phylogeography"/>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">cryptic species</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">mtDNA</dc:subject>
+	<dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Assessing the realized effect of dispersal in the genetic makeup of a species has significant evolutionary, ecological, and economical consequences. Here, we investigate the genetic diversity and population differentiation in the aquilopelagic golden cownose ray Rhinoptera steindachneri from the Gulf of California (GC) and the Pacific coast of Baja California (PCBC) using the mitochondrial NADH2 gene. Low levels of genetic diversity were found with only 4 polymerase chain reaction-restriction fragment length polymorphism haplotypes among 76 specimens. Pacific coast organisms were fixed for a unique haplotype not shared with rays from the gulf; 92% of GC rays possessed a single NADH2 haplotype not found in the Pacific. This produced significant differentiation between the GC and the PCBC (ΦCT = 0.972, P   0.001). A pronounced phylogeographic pattern was found in which GC haplotypes were reciprocally monophyletic relative to a very divergent Pacific lineage (d = 10%). Our results indicate that despite high dispersal potential, GC and PCBC golden cownose ray populations are characterized by highly divergent mitochondrial lineages. Although more evidence is needed to corroborate the genetic isolation and systematic status of PCBC and GC golden cownose rays, our results suggest a possible cryptic species in the region.</dc:description>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2011-01-26T19 11 14Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2011-01-26T19 11 14Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2011-03-16</dc:date>
+	<rdf:type rdf:resource="http://purl.org/dc/dcmitype/Text"/>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">doi 10.5061/dryad.8437</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Sandoval-Castillo J, Rocha-Olivares A (2011) Deep mitochondrial divergence in Baja California populations of an aquilopelagic elasmobranch  the golden cownose ray. Journal of Heredity 102(3)  269-274.</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">http //hdl.handle.net/10255/dryad.8437</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">jhered-JOH-2010-145.R2-1295968987649</dc:identifier>
+	<dc:relation rdf:resource="http://datadryad.org/handle/10255/dryad.8438"/>
+	<dc:relation rdf:resource="http://datadryad.org/handle/10255/dryad.8439"/>
+	<dc:relation rdf:resource="http://datadryad.org/handle/10255/dryad.8440"/>
+	<dc:relation rdf:resource="http://datadryad.org/handle/10255/dryad.8441"/>
+	<dc:relation rdf:resource="doi:10.1093/jhered/esr004"/>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Gulf of California</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Baja California</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Pacific Ocean</dc:coverage>
+	<dbpedia:species rdf:resource="http://dbpedia.org/resource/Rhinoptera_steindachneri"/>
+	<datacite:hasPrimaryIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10.5061/dryad.8437</datacite:hasPrimaryIdentifier>
+	<datacite:hasAlternateIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10255/dryad.8437</datacite:hasAlternateIdentifier>
+	<dc:hasPart rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.8438"/>
+	<dc:hasPart rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.8439"/>
+	<dc:hasPart rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.8440"/>
+	<dc:hasPart rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.8441"/>
+	<rdf:type rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadTypes.rdf#DCType"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.8438">
+	<dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genbank HQ540559</dc:title>
+	<dc:creator>Sandoval-Castillo, Jonathan</dc:creator>
+	<dc:creator>Rocha-Olivares, Axayácatl</dc:creator>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">aquilopelagic marine ray</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genetic structure</dc:subject>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Phylogeography"/>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">cryptic species</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">mtDNA</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">elasmobranch</dc:subject>
+	<dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">DNA sequence of mitochondrial NADH2 gene from golden cownose ray</dc:description>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2011-01-26T19 11 14Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2011-03-18T06 30 07Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2011-01-26</dc:date>
+	<rdf:type rdf:resource="http://purl.org/dc/dcmitype/Dataset"/>
+	<dcterms:publisher rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/samplefoaf.rdf#Dryad"/>	<dc:type rdf:datatype="http://www.w3.org/2001/XMLSchema#string">untilArticleAppears</dc:type>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">doi 10.5061/dryad.8437/1</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">http //hdl.handle.net/10255/dryad.8438</dc:identifier>
+	<dc:relation rdf:resource="http://datadryad.org/handle/10255/dryad.8437"/>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Gulf of California</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Baja California</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Pacific Ocean</dc:coverage>
+	<dc:rights rdf:resource="http://dbpedia.org/page/Creative_Commons"/>
+	<dbpedia:species rdf:resource="http://dbpedia.org/resource/Rhinoptera_steindachneri"/>
+	<datacite:hasPrimaryIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10.5061/dryad.8437/1</datacite:hasPrimaryIdentifier>
+	<datacite:hasAlternateIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10255/dryad.8438</datacite:hasAlternateIdentifier>
+	<rdfs:seeAlso rdf:resource="http://bio2rdf.org/rdf/genbank/HQ540559"/>
+	<rdf:type rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadTypes.rdf#DCType"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.8439">
+	<dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genbank HQ540560</dc:title>
+	<dc:creator>Sandoval-Castillo, Jonathan</dc:creator>
+	<dc:creator>Rocha-Olivares, Axayácatl</dc:creator>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">aquilopelagic marine ray</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genetic structure</dc:subject>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Phylogeography"/>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">cryptic species</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">mtDNA</dc:subject>
+	<dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">DNA sequence of mitochodnial NADH2 gene from golden cownose ray</dc:description>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2011-01-26T19 11 14Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2011-03-18T06 30 07Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2011-01-26</dc:date>
+	<rdf:type rdf:resource="http://purl.org/dc/dcmitype/Dataset"/>
+	<dcterms:publisher rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/samplefoaf.rdf#Dryad"/>	<dc:type rdf:datatype="http://www.w3.org/2001/XMLSchema#string">untilArticleAppears</dc:type>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">doi 10.5061/dryad.8437/2</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">http //hdl.handle.net/10255/dryad.8439</dc:identifier>
+	<dc:relation rdf:resource="http://datadryad.org/handle/10255/dryad.8437"/>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Gulf of California</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Baja California</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Pacific Ocean</dc:coverage>
+	<dc:rights rdf:resource="http://dbpedia.org/page/Creative_Commons"/>
+	<dbpedia:species rdf:resource="http://dbpedia.org/resource/Rhinoptera_steindachneri"/>
+	<datacite:hasPrimaryIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10.5061/dryad.8437/2</datacite:hasPrimaryIdentifier>
+	<datacite:hasAlternateIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10255/dryad.8439</datacite:hasAlternateIdentifier>
+	<rdfs:seeAlso rdf:resource="http://bio2rdf.org/rdf/genbank/HQ540559"/>
+	<rdf:type rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadTypes.rdf#DCType"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.8440">
+	<dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genbank HQ540561</dc:title>
+	<dc:creator>Sandoval-Castillo, Jonathan</dc:creator>
+	<dc:creator>Rocha-Olivares, Axayácatl</dc:creator>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">aquilopelagic marine ray</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genetic structure</dc:subject>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Phylogeography"/>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">cryptic species</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">mtDNA</dc:subject>
+	<dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">DNA sequence of mitochondrial NADH2 gene from golden cownose ray</dc:description>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2011-01-26T19 11 14Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2011-03-18T06 30 07Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2011-01-26</dc:date>
+	<rdf:type rdf:resource="http://purl.org/dc/dcmitype/Dataset"/>
+	<dcterms:publisher rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/samplefoaf.rdf#Dryad"/>	<dc:type rdf:datatype="http://www.w3.org/2001/XMLSchema#string">untilArticleAppears</dc:type>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">doi 10.5061/dryad.8437/3</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">http //hdl.handle.net/10255/dryad.8440</dc:identifier>
+	<dc:relation rdf:resource="http://datadryad.org/handle/10255/dryad.8437"/>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Gulf of California</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Baja California</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Pacific Ocean</dc:coverage>
+	<dc:rights rdf:resource="http://dbpedia.org/page/Creative_Commons"/>
+	<dbpedia:species rdf:resource="http://dbpedia.org/resource/Rhinoptera_steindachneri"/>
+	<datacite:hasPrimaryIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10.5061/dryad.8437/3</datacite:hasPrimaryIdentifier>
+	<datacite:hasAlternateIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10255/dryad.8440</datacite:hasAlternateIdentifier>
+	<rdfs:seeAlso rdf:resource="http://bio2rdf.org/rdf/genbank/HQ540559"/>
+	<rdf:type rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadTypes.rdf#DCType"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.8441">
+	<dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genbank HQ540562</dc:title>
+	<dc:creator>Sandoval-Castillo, Jonathan</dc:creator>
+	<dc:creator>Rocha-Olivares, Axayácatl</dc:creator>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">aquilopelagic marine ray</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Genetic structure</dc:subject>
+	<dc:subject rdf:resource="http://dbpedia.org/resource/Phylogeography"/>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">cryptic species</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">mtDNA</dc:subject>
+	<dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">DNA sequence of mitochondrial NADH2 gene from golden cownose ray</dc:description>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2011-01-26T19 11 14Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2011-03-18T06 30 07Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2011-01-26</dc:date>
+	<rdf:type rdf:resource="http://purl.org/dc/dcmitype/Dataset"/>
+	<dcterms:publisher rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/samplefoaf.rdf#Dryad"/>	<dc:type rdf:datatype="http://www.w3.org/2001/XMLSchema#string">untilArticleAppears</dc:type>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">doi 10.5061/dryad.8437/4</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">http //hdl.handle.net/10255/dryad.8441</dc:identifier>
+	<dc:relation rdf:resource="http://datadryad.org/handle/10255/dryad.8437"/>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Gulf of California</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Baja California</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Pacific Ocean</dc:coverage>
+	<dc:rights rdf:resource="http://dbpedia.org/page/Creative_Commons"/>
+	<dbpedia:species rdf:resource="http://dbpedia.org/resource/Rhinoptera_steindachneri"/>
+	<datacite:hasPrimaryIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10.5061/dryad.8437/4</datacite:hasPrimaryIdentifier>
+	<datacite:hasAlternateIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10255/dryad.8441</datacite:hasAlternateIdentifier>
+	<rdfs:seeAlso rdf:resource="http://bio2rdf.org/rdf/genbank/HQ540559"/>
+	<rdf:type rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadTypes.rdf#DCType"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.1295">
+	<dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Data from  Comparison of quantitative and molecular genetic variation of native vs. invasive populations of purple loosestrife (Lythrum salicaria L., Lythraceae)</dc:title>
+	<dc:creator>Chun, Young Jin</dc:creator>
+	<dc:creator>Nason, John</dc:creator>
+	<dc:creator>Moloney, Kirk</dc:creator>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">AFLP</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">FST and QST</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">genetic variation</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Invasive Species</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Lythrum salicaria</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">quantitative trait</dc:subject>
+	<dc:description rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Study of adaptive evolutionary changes in populations of invasive species can be advanced through the joint application of quantitative and population genetic methods. Using purple loosestrife as a model system, we investigated the relative roles of natural selection, genetic drift, and gene flow in the invasive process by contrasting phenotypic and neutral genetic differentiation among native European and invasive North American populations (QST - FST analysis). Our results indicate that invasive and native populations harbor comparable levels of AFLP variation, a pattern consistent with multiple independent introductions from a diverse European gene pool. However, it was observed that the genetic variation reduced during subsequent invasion, perhaps by founder effects and genetic drift. Comparison of genetically-based quantitative trait differentiation (QST) to its expectation under neutrality (FST) revealed no evidence of disruptive selection (QST   FST) or stabilizing selection (QST   FST). One exception was found for only one trait (the number of stems) showing significant sign of stabilizing selection across all populations. It suggests that the difficulties in distinguishing the effects of non-adaptive population processes and natural selection. Multiple introductions of purple loosestrife may have created a genetic mixture from diverse source populations and increased population genetic diversity, but its link to the adaptive differentiation of invasive North American populations needs further research.</dc:description>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2010-03-07T17 23 13Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2010-03-07T17 23 13Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2009-06-22</dc:date>
+	<rdf:type rdf:resource="http://purl.org/dc/dcmitype/Text"/>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">doi 10.5061/dryad.1295</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Chun YJ, Nason JD, Moloney KA (2009) Comparison of quantitative and molecular genetic variation of native vs. invasive populations of purple loosestrife (Lythrum salicaria L., Lythraceae). Molecular Ecology 18  3020-3035.</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">http //hdl.handle.net/10255/dryad.1295</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">MolEcol-14650290MEC-09-0008.R1-1267982008829</dc:identifier>
+	<dc:relation rdf:resource="Molecular Ecology"/>
+	<dc:relation rdf:resource="0962-1083"/>
+	<dc:relation rdf:resource="doi:10.5061/dryad.1295/1"/>
+	<dc:relation rdf:resource="doi:10.5061/dryad.1295/2"/>
+	<dc:relation rdf:resource="doi:10.1111/j.1365-294X.2009.04254.x"/>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Boone Folks-Iowa-North America (42°17´N-93°56´W)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Little South Storm Lake-Iowa-North America (42°38´N-95°14´W)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Manly-Iowa-North America (43°16´N-93°07´W)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Kellogg Biological Station-Michigan-North America (42°21´N-85°21´W)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Lake Lansing-Michigan-North America (42°46´N-84°23´W)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Rifle Range near Pittsford-Michigan-North America (41°51´N-84°30´W)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Beaver Run-New Jersey-North America (41°09´N-74°36´W)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Hainville County Store-New Jersey-North America (41°15´N-74°48´W)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Walkill River-New Jersey-North America (41°03´N-74°37´W)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Golm-Potsdam-Europe (52°25´N-12°57´E)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Grube-Potsdam-Europe (52°27´N-12°57´E)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Potsdam-Potsdam-Europe (52°29´N-12°57´E)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Altmatt-Switzerland-Europe (47°20´N-07°52´E)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">North Sihl Lake-Switzerland-Europe (47°36´N-08°13´E)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Steinbode-Switzerland-Europe (47°09´N-08°43´E)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Hagelloch Tobel-Tübingen-Europe (48°32´N-09°01´E)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Reusten "Hinterer See"-Tübingen-Europe (48°33´N-08°55´E)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Unterjesingen "Wiesbrunn"-Tübingen-Europe (48°31´N-08°58´E)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Holocene</dc:coverage>
+	<dbpedia:species rdf:resource="http://dbpedia.org/resource/Lythrum_salicaria"/>
+	<datacite:hasPrimaryIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10.5061/dryad.1295/1</datacite:hasPrimaryIdentifier>
+	<datacite:hasAlternateIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10255/dryad.1295</datacite:hasAlternateIdentifier>
+	<dc:hasPart rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.1296"/>
+	<dc:hasPart rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.1300"/>
+	<geo:lat_long>48.5167,8.9667</geo:lat_long>
+	<rdf:type rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadTypes.rdf#DCType"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.1296">
+	<dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">AFLP data of Lythrum salicaria</dc:title>
+	<dc:creator>Chun, Young Jin</dc:creator>
+	<dc:creator>Nason, John</dc:creator>
+	<dc:creator>Moloney, Kirk</dc:creator>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">AFLP</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">FST and QST</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">genetic variation</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Invasive Species</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Lythrum salicaria</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">quantitative trait</dc:subject>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2010-03-07T17 23 08Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2010-03-07T17 23 08Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2010-03-07T17 23 08Z</dc:date>
+	<rdf:type rdf:resource="http://purl.org/dc/dcmitype/Dataset"/>
+	<dcterms:publisher rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/samplefoaf.rdf#Dryad"/>	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">doi 10.5061/dryad.1295/1</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">http //hdl.handle.net/10255/dryad.1296</dc:identifier>
+	<dc:isPartOf rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.1295"/>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Boone Folks-Iowa-North America (42°17´N-93°56´W)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Little South Storm Lake-Iowa-North America (42°38´N-95°14´W)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Manly-Iowa-North America (43°16´N-93°07´W)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Kellogg Biological Station-Michigan-North America (42°21´N-85°21´W)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Lake Lansing-Michigan-North America (42°46´N-84°23´W)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Rifle Range near Pittsford-Michigan-North America (41°51´N-84°30´W)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Beaver Run-New Jersey-North America (41°09´N-74°36´W)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Hainville County Store-New Jersey-North America (41°15´N-74°48´W)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Walkill River-New Jersey-North America (41°03´N-74°37´W)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Golm-Potsdam-Europe (52°25´N-12°57´E)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Grube-Potsdam-Europe (52°27´N-12°57´E)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Potsdam-Potsdam-Europe (52°29´N-12°57´E)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Altmatt-Switzerland-Europe (47°20´N-07°52´E)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">North Sihl Lake-Switzerland-Europe (47°36´N-08°13´E)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Steinbode-Switzerland-Europe (47°09´N-08°43´E)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Hagelloch Tobel-Tübingen-Europe (48°32´N-09°01´E)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Reusten "Hinterer See"-Tübingen-Europe (48°33´N-08°55´E)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Unterjesingen "Wiesbrunn"-Tübingen-Europe (48°31´N-08°58´E)</dc:coverage>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Holocene</dc:coverage>
+	<dc:rights rdf:resource="http://dbpedia.org/page/Creative_Commons"/>
+	<dbpedia:species rdf:resource="http://dbpedia.org/resource/Lythrum_salicaria"/>
+	<datacite:hasPrimaryIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10.5061/dryad.1295/1</datacite:hasPrimaryIdentifier>
+	<datacite:hasAlternateIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10255/dryad.1296</datacite:hasAlternateIdentifier>
+	<geo:lat_long>48.5167,8.9667</geo:lat_long>
+	<rdf:type rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadTypes.rdf#DCType"/>
+</rdf:Description>
+<rdf:Description rdf:about="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.1300">
+	<dc:title rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Quantitative trait data of Lythrum salicaria</dc:title>
+	<dc:creator>Chun, Young Jin</dc:creator>
+	<dc:creator>Nason, John</dc:creator>
+	<dc:creator>Moloney, Kirk</dc:creator>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">AFLP</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">FST and QST</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">genetic variation</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Invasive Species</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Lythrum salicaria</dc:subject>
+	<dc:subject rdf:datatype="http://www.w3.org/2001/XMLSchema#string">quantitative trait</dc:subject>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2010-03-07T17 27 23Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2010-03-07T17 27 23Z</dc:date>
+	<dc:date rdf:datatype="http://www.w3.org/2001/XMLSchema#string">2010-03-07T17 27 23Z</dc:date>
+	<rdf:type rdf:resource="http://purl.org/dc/dcmitype/Dataset"/>
+	<dcterms:publisher rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/samplefoaf.rdf#Dryad"/>	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">doi 10.5061/dryad.1295/2</dc:identifier>
+	<dc:identifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">http //hdl.handle.net/10255/dryad.1300</dc:identifier>
+	<dc:isPartOf rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadData.rdf#dryad.1295"/>
+	<dc:coverage rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Holocene</dc:coverage>
+	<dc:rights rdf:resource="http://dbpedia.org/page/Creative_Commons"/>
+	<dbpedia:species rdf:resource="http://dbpedia.org/resource/Lythrum_salicaria"/>
+	<datacite:hasPrimaryIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10.5061/dryad.1295/2</datacite:hasPrimaryIdentifier>
+	<datacite:hasAlternateIdentifier rdf:datatype="http://www.w3.org/2001/XMLSchema#string">10255/dryad.1300</datacite:hasAlternateIdentifier>
+	<rdf:type rdf:resource="http://rio.cs.utep.edu/ciserver/ciprojects/sdata/DryadTypes.rdf#DCType"/>
+</rdf:Description>
+</rdf:RDF>

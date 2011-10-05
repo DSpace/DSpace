@@ -1,0 +1,39 @@
+
+.tundra .dijitAccordionContainer {
+	border-color: #ccc;	
+}
+.tundra .dijitTabContainer-dijitAccordionContainer {
+    border: none;
+}
+.tundra .dijitAccordionContainer-dijitAccordionContainer {
+    border: none;
+    background-color: #fff;
+}
+.tundra .dijitSplitContainer-dijitAccordionContainer,
+.tundra .dijitBorderContainer-dijitAccordionContainer {
+    border: 1px #ccc solid;
+    background-color: #fff;
+}
+.tundra .dijitAccordionPane {
+	background-color: #e7e7e7;
+}
+.tundra .dijitAccordionTitle {
+	background:#fafafa url("../images/titleBar.png") repeat-x bottom left;
+	border-top: 1px solid #bfbfbf;
+	padding: 4px 4px 4px 8px;
+	cursor:pointer;
+}
+.tundra .dijitAccordionTitle-hover  {
+	background: #f8fafd url("../images/accordionItemHover.gif") bottom repeat-x;
+}
+.tundra .dijitAccordionTitle-selected  {
+	background: #f9f9f9 url("../images/accordionItemActive.gif") bottom repeat-x;
+	font-weight: bold;
+	border-top: 1px solid #aaaaaa;
+	border-bottom: 1px solid #bfbfbf;
+	padding: 4px 4px 4px 8px;
+	cursor: default;
+}
+.tundra .dijitAccordionBody {
+	background: #fff;
+}

@@ -1,0 +1,35 @@
+<!-- DSpace Custom Item Submission Process definition language -->
+<!--                                                           -->
+<!-- This DTD defines the format for the DSpace                -->
+<!-- 'config/item-submission.xml' configuration file           -->
+
+ <!-- Root element is 'item-submission' -->
+ <!ELEMENT item-submission (submission-map, step-definitions, submission-definitions) >
+
+ <!-- 'submission-map' must contain one or more 'name-map' nodes -->
+ <!ELEMENT submission-map (name-map+) >
+ 
+ <!ELEMENT name-map EMPTY >
+ <!ATTLIST name-map 
+           collection-handle CDATA #REQUIRED
+           submission-name NMTOKEN #REQUIRED>
+
+ <!-- 'step-definitions' must contain at least one 'step' node -->
+ <!-- (The "select collection" step *must* be here)            -->
+ <!ELEMENT step-definitions (step+) >
+ 
+ <!ELEMENT step (heading?, processing-class, jspui-binding?, xmlui-binding?, workflow-editable?) >
+ <!ATTLIST step id NMTOKEN #IMPLIED>
+ 
+ <!ELEMENT heading (#PCDATA) >
+ <!ELEMENT processing-class (#PCDATA)>
+ <!ELEMENT jspui-binding (#PCDATA)>
+ <!ELEMENT xmlui-binding (#PCDATA)>
+ <!ELEMENT workflow-editable (#PCDATA)>
+ 
+ <!-- 'submission-definitions' must contain at least one       -->
+ <!-- 'submission-process' node                                -->
+ <!ELEMENT submission-definitions (submission-process+)>
+ 
+ <!ELEMENT submission-process (step+)>
+ <!ATTLIST submission-process name NMTOKEN #REQUIRED>

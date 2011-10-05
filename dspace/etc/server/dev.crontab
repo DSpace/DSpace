@@ -1,0 +1,2 @@
+# Running this from NCSU set off Duke's firewall blocks
+15 1 * * * /home/dryad/rsync-backup.sh

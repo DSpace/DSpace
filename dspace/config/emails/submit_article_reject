@@ -1,0 +1,22 @@
+# Rejection email message
+# This message is sent to the submitter when Dryad receives
+# notification that their article has been rejected by the journal.
+#
+# {0}  Title of submission
+# {1}  Name(s) of the data file(s)
+# {2}  Name of the rejector (may be blank due to automated script action)
+# {3}  Reason for the rejection
+# {4}  Link to 'My DSpace' page
+#
+Subject: Dryad: Data package returned
+
+You submitted a data package to Dryad titled: {0}
+with the following data files:
+{1}
+
+The journal has notified Dryad that the associated article has not been accepted for publication. Therefore, the Dryad data package has been returned to your personal workspace, and will not be reviewed by the Dryad curators. This data package will be available in your workspace for a period of one year.
+
+Your submission has not been deleted.  You can access it from your
+"My Submissions" page at http://datadryad.org/submissions
+
+The Dryad Team

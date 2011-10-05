@@ -1,0 +1,62 @@
+-------------------------------------------------------------------------------
+dojox.form Collection
+-------------------------------------------------------------------------------
+Version 1.0
+Release date: 02/26/2008
+-------------------------------------------------------------------------------
+Project state:
+experimental
+-------------------------------------------------------------------------------
+Credits
+	Nathan Toone (nathan)
+	Peter Higgins	(dante)
+    Wolfram Kriesing (http://wolfram.kriesing.de/blog/): Rating
+    Mike Wilcox
+-------------------------------------------------------------------------------
+Project description
+
+	This is a collection of additional widgets that can be used in forms.
+-------------------------------------------------------------------------------
+Dependencies:
+
+	Depends on dojo core and dijit
+-------------------------------------------------------------------------------
+Documentation
+
+-------------------------------------------------------------------------------
+Installation instructions
+
+	Install into /dojox/form
+-------------------------------------------------------------------------------
+Additional Notes (Brief widget list):
+
+	* CheckedMultiSelect - an extension to dijit.form.MultiSelect which
+						uses check boxes instead of ctrl-click
+
+ 	* DropDownSelect - an extension to dijit.form.DropDownButton which is
+ 						meant to mirror the html <select> drop down
+
+	* DropDownStack/RadioStack - a widget that can toggle parts of a form as
+						"on" or "off" - to allow for different options based on 
+						the value selected.
+
+	* FileInput - experimental dijit-like input type="file"
+
+	* FileInputAuto/Blind - extension to FileInput for 
+						added flair/automation
+                        
+    * FileInputOverlay - Convert (almost) any button into a file input
+						
+	* FilePickerTextBox - a validating text box that can browser server-side
+						files using a dojox.data.FileStore
+	
+    * MultiComboBox - an experimental ComboBox that allows
+						multiple entries bases on a separator character.
+
+	* PasswordValidator - a widget which simplifies the common "old/new/verify" 
+						mechanism of specifying passwords
+
+	* Rating - a star-based rating widget
+ 	
+    * TimeSpinner - a number spinner that revolves through
+						time constrainsts

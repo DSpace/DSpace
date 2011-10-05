@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<profilesXml xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/profiles-1.0.0.xsd">
+    <!--  
+    
+        To use these profiles, you will need to copy this file to "profiles.xml" and customize
+        it appropriately.
+        
+        The following profiles show how to customize the build process for either
+        postgres or oracle to include extra details such as db.url, db.username and db.password
+        which will be populated in the resulting dspace.cfg that is filtered into
+        this projects target directory.
+
+        Note: for oracle you may more than likely find you need to retrieve the jar from
+        the Oracle website and install it locally into your repository.
+        
+    -->
+    <profiles>
+        <profile>
+            <id>postgres</id>
+            <activation>
+                <property>
+                    <name>!db.name</name>
+                </property>
+            </activation>
+            <properties>
+                <default.db.name>postgres</default.db.name>
+                <default.db.driver>org.postgresql.Driver</default.db.driver>
+                <default.db.url>jdbc:postgresql://localhost:5432/dspace</default.db.url>
+                <default.db.username>postgres_user</default.db.username>
+                <default.db.password>postgres_passwd</default.db.password>
+            </properties>
+        </profile>
+        <profile>
+            <id>oracle</id>
+            <activation>
+                <property>
+                    <name>db.name</name>
+                    <value>oracle</value>
+                </property>
+            </activation>
+            <properties>
+                <default.db.name>oracle</default.db.name>
+                <default.db.driver>oracle.jdbc.OracleDriver</default.db.driver>
+                <default.db.url>jdbc:oracle:thin:@//localhost:1521/xe</default.db.url>
+                <default.db.username>oracle_user</default.db.username>
+                <default.db.password>oracle_passwd</default.db.password>
+            </properties>
+        </profile>
+    </profiles>
+</profilesXml>

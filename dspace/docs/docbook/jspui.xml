@@ -1,0 +1,68 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<chapter remap="h1">
+    <title><anchor id="docbook-jspui.html"/>DSpace System Documentation: JPSUI Configuration and Customization</title>
+    <para>The DSpace digital repository supports two user interfaces: one based on JavaServer Pages (JSP) technologies and one based upon the Apache Cocoon framework. This chapter describes those parameters which are specific to the JPSUI interface.</para>
+    <section remap="h2">
+        <title><anchor id="docbook-jspui.html-configuration"/>Configuration</title>
+        <para>The user will need to refer to the extensive WebUI/JSPUI configurations that are contained in <link linkend="docbook-configure.html-jspui-settings">5.2.36 JSP Web Interface Settings</link>.</para>
+    </section>
+    <section remap="h2">
+        <title><anchor id="docbook-jspui.html-customizing" xreflabel="Customizing the JSP pages"/>Customizing the JSP pages</title>
+        <para>The JSPUI interface is implemented using Java Servlets which handle the business logic, and JavaServer Pages (JSPs) which produce the HTML pages sent to an end-user. Since the JSPs are much closer to HTML than Java code, altering the look and feel of DSpace is relatively easy.</para>
+        <para>To make it even easier, DSpace allows you to &apos;override&apos; the JSPs included in the source distribution with modified versions, that are stored in a separate place, so when it comes to updating your site with a new DSpace release, your modified versions will not be overwritten. It should be possible to dramatically change the look of DSpace to suit your organization by just changing the CSS style file and the site &apos;skin&apos; or &apos;layout&apos; JSPs in <literal>jsp/layout</literal>; if possible, it is recommended you limit local customizations to these files to make future upgrades easier.</para>
+        <para>You can also easily edit the text that appears on each JSP page by editing the <literal>Messages.properties</literal> file. However, note that unless you change the entry in all of the different language message files, users of other languages will still see the default text for their language. See <link linkend="docbook-application.html-i18n">Internationalization in Application Layer</link>.</para>
+        <para>Note that the data (attributes) passed from an underlying Servlet to the JSP may change between versions, so you may have to modify your customized JSP to deal with the new data.</para>
+        <para>Thus, if possible, it is recommended you limit your changes to the &apos;layout&apos; JSPs and the stylesheet.</para>
+        <para>The JSPs are available in one of two places:</para>
+        <itemizedlist>
+            <listitem>
+                <para><literal>[dspace-source]/dspace-jspui/dspace-jspui-webapp/src/main/webapp/</literal> - Only exists if you downloaded the full Source Release of DSpace</para>
+            </listitem>
+            <listitem>
+                <para><literal>[dspace-source]/dspace/target/dspace-[version].dir/webapps/dspace-jspui-webapp/</literal> - The location where they are copied after first building DSpace.</para>
+            </listitem>
+        </itemizedlist>
+        <para>If you wish to modify a particular JSP, place your edited version in the <emphasis role="bold"><literal>[dspace-source]/dspace/modules/jspui/src/main/webapp/</literal></emphasis> directory (<emphasis>this is the replacement for the pre-1.5 <literal>/jsp/local</literal> directory</emphasis>), with the same path as the original. If they exist, these will be used in preference to the default JSPs. For example:</para>
+        <informaltable>
+            <tgroup cols="2">
+                <colspec colname="c1" colwidth="50*"/>
+                <colspec colname="c2" colwidth="50*"/>
+                <tbody>
+                    <row>
+                        <entry align="center"><emphasis role="bold">DSpace default</emphasis></entry>
+                        <entry align="center"><emphasis role="bold">Locally-modified version</emphasis>
+                        </entry>
+                    </row>
+                    <row>
+                        <entry><literal>[jsp.dir]/community-list.jsp</literal></entry>
+                        <entry><literal>[jsp.custom-dir]/dspace/modules/jspui/src/main/webapp/community-list.jsp</literal></entry>
+                    </row>
+                    <row>
+                        <entry><literal>[jsp.dir]/mydspace/main.jsp</literal></entry>
+                        <entry><literal>[jsp.custom-dir]/dspace/modules/jspui/src/main/webapp/mydspace/main.jsp</literal></entry>
+                    </row>
+                </tbody>
+            </tgroup>
+        </informaltable>
+        <para>Heavy use is made of a style sheet, <literal>styles.css.jsp</literal>. If you make edits, copy the local version to <literal>[jsp.custom-dir]/dspace/modules/jspui/src/main/webapp/styles.css.jsp</literal>, and it will be used automatically in preference to the default, as described above.</para>
+        <para>Fonts and colors can be easily changed using the stylesheet. The stylesheet is a JSP so that the user&apos;s browser version can be detected and the stylesheet tweaked accordingly.</para>
+        <para>The &apos;layout&apos; of each page, that is, the top and bottom banners and the navigation bar, are determined by the JSPs <literal>/layout/header-*.jsp</literal> and <literal>/layout/footer-*.jsp</literal>. You can provide modified versions of these (in <literal>[jsp.custom-dir]/dspace/modules/jspui/src/main/webapp/layout</literal>), or define more styles and apply them to pages by using the &quot;style&quot; attribute of the <literal>dspace:layout</literal> tag.</para>
+        <orderedlist>
+            <listitem>
+                <para>Rebuild the DSpace installation package by running the following command from your <literal>[dspace-source]/dspace/</literal> directory:</para>
+                <screen>mvn package</screen>
+            </listitem>
+            <listitem>
+                <para>Update all DSpace webapps to <literal>[dspace]/webapps</literal> by running the following command from your <literal>[dspace-source]/dspace/target/dspace-[version]-build.dir</literal> directory:</para>
+                <screen>ant -Dconfig=<emphasis>[dspace]</emphasis>/config/dspace.cfg update </screen>
+            </listitem>
+            <listitem>
+                <para>Deploy the the new webapps: <screen>cp -R /[dspace]/webapps/* /[tomcat]/webapps</screen></para>
+            </listitem>
+            <listitem>
+                <para>Restart Tomcat</para>
+            </listitem>
+        </orderedlist>
+        <para>When you restart the web server you should see your customized JSPs.</para>
+    </section>
+</chapter>

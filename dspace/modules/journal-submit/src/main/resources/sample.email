@@ -1,0 +1,108 @@
+From ksclarke@gmail.com  Fri Aug 20 11:31:46 2010
+Return-Path: <ksclarke@gmail.com>
+X-Original-To: journal-submit-dev@nescent.org
+Delivered-To: journal-submit-dev@nescent.org
+Received: from mail-gw0-f47.google.com (mail-gw0-f47.google.com [74.125.83.47])
+	by mail.nescent.org (Postfix) with ESMTP id 65F281ADB017
+	for <journal-submit-dev@nescent.org>; Fri, 20 Aug 2010 11:31:45 -0400 (EDT)
+Received: by gwb15 with SMTP id 15so1474727gwb.20
+        for <journal-submit-dev@nescent.org>; Fri, 20 Aug 2010 08:31:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=gamma;
+        h=domainkey-signature:mime-version:received:sender:received:date
+         :x-google-sender-auth:message-id:subject:from:to:content-type
+         :content-transfer-encoding;
+        bh=cggrOm+qHbW2QRsVwZTke+6i5JQ4P5hBpKaKinBRSu8=;
+        b=BLcqK1bZed/Q3SSGGN69y94NINW0+7YUYOHJk9+0k2zq7Beh/Z663a1i6TmdfH1ucE
+         uDIhEGBsSRczkGRKU3/Hmz2ZX1lXRI6lp0tuExSY0/Cy/7KRex8+bLYsN4hOEUlb5meK
+         Om9+O5RSSf0CSP08mo3CUz0vRR9PM0zQx/wSQ=
+DomainKey-Signature: a=rsa-sha1; c=nofws;
+        d=gmail.com; s=gamma;
+        h=mime-version:sender:date:x-google-sender-auth:message-id:subject
+         :from:to:content-type:content-transfer-encoding;
+        b=fWfNJ8wYfzlbwV2JoRJfC2DihOvro26QCpiActj9R9BauWScYPfDrpHuONO2910diy
+         DKS3+OwsHavKnYr2ntHSREG6dVoOcLdvxRoAvdZn3CFZ3zcd9VvZRphz/xDTXxb6zEk+
+         0VigiH/b+1XGYleMi/6nsUOMtPgbbEBUjVxEM=
+MIME-Version: 1.0
+Received: by 10.90.80.4 with SMTP id d4mr1201707agb.12.1282318304715; Fri, 20
+ Aug 2010 08:31:44 -0700 (PDT)
+Sender: ksclarke@gmail.com
+Received: by 10.91.212.7 with HTTP; Fri, 20 Aug 2010 08:31:44 -0700 (PDT)
+Date: Fri, 20 Aug 2010 11:31:44 -0400
+X-Google-Sender-Auth: dx8bQDXI3jA4uzUKBfms_bSFbSQ
+Message-ID: <AANLkTikd7dpv7idPnHr5HeUEfx0pvU_=zGho-FqMLrHq@mail.gmail.com>
+Subject: Testing thanks
+From: "Kevin S. Clarke" <ksclarke@nescent.org>
+To: journal-submit-dev@nescent.org
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+
+Many thanks for agreeing to participate in the DRYAD project. To
+upload your data, please click the link below- it will take you
+directly to your entry in the DRYAD repository.
+http://datadryad.org/submit?journalID=3Devolution&manu=3D00-0001.R9
+
+To give the system time to create your individual entry, please allow
+10 minutes between receipt of this email and using the link above. If
+you cannot use the link provided to access your data after 24 hours,
+please contact the DRYAD administrator at help@datadryad.org.
+
+Below is the data that was sent to DRYAD regarding your submission.
+
+Once you have uploaded your data please include the DRYAD identifier
+in a document and send it to the editorial office to be included in
+your manuscript ASAP.  Please let me know if you have any questions
+about this process.
+
+Sincerely,
+
+Ms. Jennifer Mahar
+Managing Editor
+
+Journal Name: Evolution
+Print ISSN: 0014-3820
+Online ISSN: 1558-5646
+Journal Admin Email: ksclarke@gmail.com
+Journal Editor:
+Journal Editor Email:
+Journal Embargo Period: 0
+
+MS Reference Number: 00-0001.R9
+MS Dryad ID: 00-0001.R9
+MS Title: Conservation genetics of Neotropical pollinators revisited:
+microsatellite analysis suggests that diploid males are rare in orchid
+bees
+MS Authors: Souza, Rog=C3=A9rio; Del Lama, Marco; Cervini, Marcelo;
+Mortari, Norma; Eltz, Thomas; Zimm=C3=A9rmann, Yvonne; Bach, Carola; Brosi,
+Berry; Suni, Sevan; Quezada, Javier; Paxton, Robert
+
+Contact Author: Kevin Clarke
+Contact Author Email: ksclarke@gmail.com
+
+Contact Author Address 1: MBC 97 Lisburn Road
+Contact Author Address 2:
+Contact Author Address 3:
+Contact Author City: Ithaca
+Contact Author State:
+Contact Author Country: United Kingdom
+Contact Author ZIP/Postal Code: BT9 7BL
+
+Keywords: complementary sex determination, Hymenoptera, Euglossini, csd
+
+Abstract: Allozyme analyses have suggested that Neotropical orchid bee
+(Euglossini) pollinators are vulnerable because of putative high
+frequencies of diploid males, a result of loss of sex allele diversity
+in small hymenopteran populations with single locus complementary sex
+determination. Our analysis of 1010 males from 27 species of
+euglossine bees sampled across the Neotropics at 2-11 polymorphic
+microsatellite loci revealed only 5 diploid males at an overall
+frequency of 0.005 (95% CIs 0.002-0.010); errors through genetic
+non-detection of diploid males were likely small. In contrast to
+allozyme-based studies, we detected very weak or insignificant
+population genetic structure, even for a pair of populations >500 km
+apart, possibly accounting for low diploid male frequencies. Technical
+flaws in previous allozyme-based analyses have probably led to
+considerable overestimation of diploid male production in orchid bees.
+Other factors may have a more immediate impact on population
+persistence than the genetic load imposed by diploid males on these
+important Neotropical pollinators.

@@ -1,0 +1,32 @@
+# Send out subscription e-mails at 01:00 every day
+0 1 * * * /opt/dryad/bin/dspace sub-daily
+
+# Offsite backup script is run on karya because of firewall issues
+# we've had trying to run it from this (the NCSU) machine
+
+# Output system status to files
+5,10,15,20,25,30,35,40,45,50,55,0 * * * * /users/dryad/memdump.sh
+
+# Generate sitemaps for Dryad at 01:30 every day
+30 1 * * * /opt/dryad/bin/dspace generate-sitemaps
+
+# Run the media filter at 02:00 every day
+0 2 * * * /opt/dryad/bin/dspace filter-media
+
+# Run the embargo bit updater at 02:30 every day
+30 2 * * * /opt/dryad/bin/dspace embargo-lifter
+
+# Run the checksum checker at 03:00
+0 3 * * * /opt/dryad/bin/dspace checker -lp
+
+# Run the indexer that updates the Dryad MN index
+30 3 * * * /opt/coolstack/bin/curl -s http://localhost/doi/batch -o /tmp/doi.batch.cron
+
+# Mail the results to the sysadmin at 04:00
+0 4 * * * /opt/dryad/bin/dspace checker-emailer -u -m -c
+
+# Run stat analyses
+0 5 * * * /opt/dryad/bin/dspace stat-general
+0 5 * * * /opt/dryad/bin/dspace stat-monthly
+0 6 * * * /opt/dryad/bin/dspace stat-report-general
+0 6 * * * /opt/dryad/bin/dspace stat-report-monthly

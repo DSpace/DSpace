@@ -1,0 +1,25 @@
+Installation instructions are included in this release package under
+
+- http://code.google.com/p/dryad/wiki/DryadHowto
+
+Documentation for the most recent stable release may be viewed online at
+dspace.org:
+
+ - http://www.dspace.org/quick-start-guide
+
+Installation instructions for other version may be different, so you
+are encouraged to obtain the corresponding documentation package from
+SourceForge, or to download the latest documentation snapshot from SVN
+
+To obtain files from the SVN repository and build, please see:
+
+ - http://code.google.com/p/dryad/source/checkout
+
+Please refer any further problems to the Dryad users mailing list. 
+
+ - https://lists.nescent.org/mailman/listinfo/dryad-users
+
+For more details about DSpace, including a list of service providers,
+places to seek help, news articles and lists of other users, please see:
+
+ - http://www.dspace.org/

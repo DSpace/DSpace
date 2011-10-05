@@ -1,0 +1,2153 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<chapter remap="h1">
+	<title><anchor id="docbook-history.html"/>DSpace System Documentation: Version History</title>
+	<section remap="h2">
+		<title><anchor id="docbook-history.html-version1_61" xreflabel="Changes in DSpace 1.6.0"/>Changes in DSpace 1.6.1</title>
+		<section remap="h3">
+			<title>Bug Fixes</title>
+			<itemizedlist>
+				<listitem>
+					<para>DS-295 - CC License being assigned incorrect Mime Type during submission</para>
+				</listitem>
+				<listitem>
+					<para>DS-239 - java.net.MalformedURLException: unknow protocol: resource</para>
+				</listitem>
+				<listitem>
+					<para>DS-242 - Special groups shown for logged in user rather than for user being examined</para>
+				</listitem>
+				<listitem>
+					<para>DS-430 - Embargo</para>
+				</listitem>
+				<listitem>
+					<para>DS-469 - <literal>DCDate.displayDate(false,*)</literal> displays only year</para>
+				</listitem>
+				<listitem>
+					<para>DS-471 - Accessing site-level 'mets.xml' in XMLUI doesn't work properly for handle prefixes with periods (e.g. 2010.1)</para>
+				</listitem>
+				<listitem>
+					<para>DS-493 - Url in browser is incorrect after login</para>
+				</listitem>
+				<listitem>
+					<para>DS-497 - Date month and day get default values when user returns to describe form</para>
+				</listitem>
+				<listitem>
+					<para>DS-500 - Ukrainian for DSpace 1.6.0</para>
+				</listitem>
+				<listitem>
+					<para>DS-501 - Kubrick Theme - NaN in Item Browse</para>
+				</listitem>
+				<listitem>
+					<para>DS-506 - embargo-lifter command missing from <literal>launcher.xml</literal></para>
+				</listitem>
+				<listitem>
+					<para>DS-507 - Log Converter difference between docs (log-converter) and launcher (stats-log-converter)</para>
+				</listitem>
+				<listitem>
+					<para>DS-508 - Attachment spelled as attachement in DailyReportEmailer</para>
+				</listitem>
+				<listitem>
+					<para>DS-509 - Retrieving country names in SOLR can return ArrayIndexOutOfBounds when country code is unchecked</para>
+				</listitem>
+				<listitem>
+					<para>DS-513 - Connection leak in SWORD authentication process</para>
+				</listitem>
+				<listitem>
+					<para>DS-518 - Duplicate listing of dependencies in dspace-sword/pom.xml</para>
+				</listitem>
+				<listitem>
+					<para>DS-523 - Reordering of 1.5 -> 1.6 upgrade steps in DSpace manual</para>
+				</listitem>
+				<listitem>
+					<para>DS-526 - ItemUpdate - script and manual updates</para>
+				</listitem>
+				<listitem>
+					<para>DS-527 - Withdrawn items not shown as deleted in OAI</para>
+				</listitem>
+				<listitem>
+					<para>DS-534 - Documentation for &apos;schema&apos; attribute in metadata xml files</para>
+				</listitem>
+				<listitem>
+					<para>DS-537 - Malformed Japanese option values in the authority lookup window</para>
+				</listitem>
+				<listitem>
+					<para>DS-538 - restricted items are being returned in OAI GetRecord method while using harvest.includerestricted.oai</para>
+				</listitem>
+				<listitem>
+					<para>DS-539 - Misspelled attribute in MODS/METS output</para>
+				</listitem>
+				<listitem>
+					<para>DS-542 - verbose output for stats-log-importer displays spurious city/country from previous committed entry</para>
+				</listitem>
+				<listitem>
+					<para>DS-543 - Harvest not internationalized</para>
+				</listitem>
+				<listitem>
+					<para>DS-544 - Removal of mapped items can lead to NPE</para>
+				</listitem>
+				<listitem>
+					<para>DS-547 - Value for Recent Submissions is not workin in the XMLUI</para>
+				</listitem>
+				<listitem>
+					<para>DS-548 - Removing repeatable values in DescribeStep does not properly test for authority control</para>
+				</listitem>
+				<listitem>
+					<para>DS-551 - Export directories <literal>dspace.cfg</literal> and <literal>build.xml</literal> out of sync</para>
+				</listitem>
+				<listitem>
+					<para>DS-556 - Add Xalan to SOLR <literal>pom.xml</literal> as dependency</para>
+				</listitem>
+				<listitem>
+					<para>DS-557 - LC Authority Names - Lookup Feature - names without dates</para>
+				</listitem>
+				<listitem>
+					<para>DS-558 - Error in update sequence script 1.5 to 1.6 Oracle</para>
+				</listitem>
+				<listitem>
+					<para>DS-565 - Fixed for Empty description column in Itemview Page - General-Handler.xsl</para>
+				</listitem>
+				<listitem>
+					<para>DS-566 - Fixed for side bar menu dropping when there is license text in collection - DIM-Handler.xsl</para>
+				</listitem>
+				<listitem>
+					<para>DS-571 - Upgrade DSpace Services to next release</para>
+				</listitem>
+				<listitem>
+					<para>DS-572 - Batch metadata editor fails to notice change of item&apos;s owning collection</para>
+				</listitem>
+				<listitem>
+					<para>DS-573 - NPE resuming submission for item with an empty bundle original</para>
+				</listitem>
+				<listitem>
+					<para>DS-574 - DSpaceMETSIngester creates empty original bundle</para>
+				</listitem>
+				<listitem>
+					<para>DS-577 - Use modified Cocoon Servlet Service Impl in place of existing to support proper Cocoon Block addition</para>
+				</listitem>
+				<listitem>
+					<para>DS-579 - Required fields in submissions display wrong error message</para>
+				</listitem>
+				<listitem>
+					<para>DS-580 - DIDL format include HTML element if the item has no files</para>
+				</listitem>
+				<listitem>
+					<para>DS-581 - DIDL doesn't respect the hidden fields and the oai_dc metadata section is different than the simple oai_dc implementation</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+	</section>
+	<section remap="h2">
+		<title><anchor id="docbook-history.html-version1_6" xreflabel="Changes in DSpace 1.6.0"/>Changes in DSpace 1.6.0</title>
+		<section remap="h3">
+			<title>New Features</title>
+			<itemizedlist>
+				<listitem>
+					<para>DS-161 - Bulk Metadata Editing (Batch Metadata Editing)</para>
+				</listitem>
+				<listitem>
+					<para>DS-194 - Give METS ingester configuration option to make use of collection templates</para>
+				</listitem>
+				<listitem>
+					<para>DS-195 - Allow the primary bitstream to be set in the item importer / exporter</para>
+				</listitem>
+				<listitem>
+					<para>DS-204 - New -zip option for item exporter and importer</para>
+				</listitem>
+				<listitem>
+					<para>DS-205 - Creative Commons - option to set legal jurisdiction</para>
+				</listitem>
+				<listitem>
+					<para>DS-228 - Community Admin XMLUI: Delegated Admins Patch</para>
+				</listitem>
+				<listitem>
+					<para>DS-236 - Authority Control, and plug-in choice control for Metadata Fields</para>
+				</listitem>
+				<listitem>
+					<para>DS-288 - Hide metadata from full item view</para>
+				</listitem>
+				<listitem>
+					<para>DS-289 - OAI-PMH + OAI-ORE harvesting support</para>
+				</listitem>
+				<listitem>
+					<para>DS-317 - Embargo feature</para>
+				</listitem>
+				<listitem>
+					<para>DS-321 - DSpace command launcher</para>
+				</listitem>
+				<listitem>
+					<para>DS-323 - ItemUpdate - new feature to batch update metadata and bitstreams</para>
+				</listitem>
+				<listitem>
+					<para>DS-324 - Add support for OpenSearch syndicated search conventions</para>
+				</listitem>
+				<listitem>
+					<para>DS-330 - Create new session on login / invalidate sessions on logout</para>
+				</listitem>
+				<listitem>
+					<para>DS-359 - Add alternate file appender for log4j</para>
+				</listitem>
+				<listitem>
+					<para>DS-377 - Add META tags identifying DSpace source version to Web UIs</para>
+				</listitem>
+				<listitem>
+					<para>DS-388 - Item importer - new option to enable workflow notification emails</para>
+				</listitem>
+				<listitem>
+					<para>DS-430 - Embargo</para>
+				</listitem>
+				<listitem>
+					<para>DS-447 - Email test script</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+		<section remap="h3">
+			<title>General Improvments</title>
+			<itemizedlist>
+				<listitem>
+					<para>DS-52 - Factor out common webapp installation - ID: 2042160</para>
+				</listitem>
+				<listitem>
+					<para>DS-196 - METS exposed via OAI-PMH includes descritpion.provenance information</para>
+				</listitem>
+				<listitem>
+					<para>DS-201- handle.jar 6.2 needs adding to DSpace Maven repository</para>
+				</listitem>
+				<listitem>
+					<para>DS-213 - IPAuthentication extended to allow negative matching</para>
+				</listitem>
+				<listitem>
+					<para>DS-219 - Internal Server error - include login details of user</para>
+				</listitem>
+				<listitem>
+					<para>DS-221 - XMLUI &apos;current activity&apos; recognises Google Chrome as Safari</para>
+				</listitem>
+				<listitem>
+					<para>DS-234 - Configurable passing of Javamail parameter settings</para>
+				</listitem>
+				<listitem>
+					<para>DS-238 - Move item function in xmlui</para>
+				</listitem>
+				<listitem>
+					<para>DS-241 - DSpace Assembly Improvement</para>
+				</listitem>
+				<listitem>
+					<para>DS-243 - UsageEvent adjustments to support Statistics and Reporting Addons</para>
+				</listitem>
+				<listitem>
+					<para>DS-252 - Interpolate variables in the Subject: line of email templates as well</para>
+				</listitem>
+				<listitem>
+					<para>DS-261 - Community Admin JSPUI: porting of the DS-228 patch</para>
+				</listitem>
+				<listitem>
+					<para>DS-270 - Make delegate admin permissions configurable</para>
+				</listitem>
+				<listitem>
+					<para>DS-271 - Make the OAI DC crosswalk configurable</para>
+				</listitem>
+				<listitem>
+					<para>DS-291 - README update for top level of dspace 1.6.0 package directory</para>
+				</listitem>
+				<listitem>
+					<para>DS-297 - Refactor SQL source and Ant script to avoid copying Oracle versions over PostgreSQL</para>
+				</listitem>
+				<listitem>
+					<para>DS-299 - Allow long values to be specified for the max upload request (for uploading files greater than 2Gb)</para>
+				</listitem>
+				<listitem>
+					<para>DS-306 - Option to disable mailserver</para>
+				</listitem>
+				<listitem>
+					<para>DS-307 - Offer access in AbstractSearch to QueryResults for subclasses</para>
+				</listitem>
+				<listitem>
+					<para>DS-315 - Enhance readability of embedded metadata in html head</para>
+				</listitem>
+				<listitem>
+					<para>DS-316 - Make SWORD app:accepts configurable</para>
+				</listitem>
+				<listitem>
+					<para>DS-319 - Replace <literal>/dspace/bin/dsrun org.dspace.browse.ItemCounter</literal> with <literal>/dspace/bin/itemcounter</literal></para>
+				</listitem>
+				<listitem>
+					<para>DS-333 - Adjust SWORD ingest crosswalk to store bibliographic citation</para>
+				</listitem>
+				<listitem>
+					<para>DS-339 - Cleanup Dependenceis and POM files prior to release Upgrade Servlet API to 2.4 across all projects</para>
+				</listitem>
+				<listitem>
+					<para>DS-347 - Add --quiet option to MediaFilterManager to disable debug/monitoring output</para>
+				</listitem>
+				<listitem>
+					<para>DS-356 - Antispam for suggest item feature</para>
+				</listitem>
+				<listitem>
+					<para>DS-361 - Merge + Improvie Generation of Syndication Feeds</para>
+				</listitem>
+				<listitem>
+					<para>DS-372 - New verbose option for [dspace]/bin/dspace cleanup script</para>
+				</listitem>
+				<listitem>
+					<para>DS-382 - Add &apos;<literal>dc.creator</literal>&apos; to Author browse index by default</para>
+				</listitem>
+				<listitem>
+					<para>DS-386 - Allow user to specify which &lt;dmdSec&gt; is used by the METS Ingester when importing METS from Packager script</para>
+				</listitem>
+				<listitem>
+					<para>DS-389 - Misleading label: &quot;Submit to This Collection&quot; is corrected</para>
+				</listitem>
+				<listitem>
+					<para>DS-405 - New 1.6 Statistics settings in dspace.cfg need documentation</para>
+				</listitem>
+				<listitem>
+					<para>DS-407 - Install or Upgrade on existing server throws error for &apos;mvn package&apos;</para>
+				</listitem>
+				<listitem>
+					<para>DS-410 - Updates to upgrade instructions necessary</para>
+				</listitem>
+				<listitem>
+					<para>DS-412 - XPDF MediaFilter: generate UTF-8 text, and improve error reporting</para>
+				</listitem>
+				<listitem>
+					<para>DS-425 - JSP UI cosmetics: horizontal scroll bar</para>
+				</listitem>
+				<listitem>
+					<para>DS-445 - New bitstream.findAll() method</para>
+				</listitem>
+				<listitem>
+					<para>DS-446 - New ant step -test_database</para>
+				</listitem>
+				<listitem>
+					<para>DS-460 - Change logging from RollingFileAppender to DailyFileAppender</para>
+				</listitem>
+				<listitem>
+					<para>DS-461 - Add information about setting web proxies to maven to install docs</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+		<section remap="h3">
+			<title>Bug fixes</title>
+			<itemizedlist>
+				<listitem>
+					<para>DS-44 - Monthly statistics skip first and last of month - ID: 2541435</para>
+				</listitem>
+				<listitem>
+					<para>DS-114 - Links not working due to trailing white space in dspace.url</para>
+				</listitem>
+				<listitem>
+					<para>DS-118 - File preview link during submission leeds to page not found</para>
+				</listitem>
+				<listitem>
+					<para>DS-121 - XMLUI Feedback form breaks with multiple hostnames</para>
+				</listitem>
+				<listitem>
+					<para>DS-128 - Anchor in submission doesn't work</para>
+				</listitem>
+				<listitem>
+					<para>DS-156 - File description not available in XMLUI</para>
+				</listitem>
+				<listitem>
+					<para>DS-184 - NPE from Edit Collection, Item Template, Edit Authorizations</para>
+				</listitem>
+				<listitem>
+					<para>DS-191 - metadataschemaregistry_seq is not initialized correctly under Oracle</para>
+				</listitem>
+				<listitem>
+					<para>DS-193 - OAI RDF crosswalk fails when DC value is null</para>
+				</listitem>
+				<listitem>
+					<para>DS-197 - Deleting a primary bitstream does not clear the primary_bitstream_id on the bundle table</para>
+				</listitem>
+				<listitem>
+					<para>DS-198 - File descriptions can not be removed/cleared in XMLUI</para>
+				</listitem>
+				<listitem>
+					<para>DS-199 - SWORD module doesn't accept X-No-Op header (dry run)</para>
+				</listitem>
+				<listitem>
+					<para>DS-200 - SWORD module requires the X-Packaging header</para>
+				</listitem>
+				<listitem>
+					<para>DS-206 - Input form visibility restriction doesn't work properly</para>
+				</listitem>
+				<listitem>
+					<para>DS-209 - Context.java turnOffAuthorisationSystem() can throw a NPE</para>
+				</listitem>
+				<listitem>
+					<para>DS-212 - NPE thrown during Harvest of non-items when visibility restriction is enabled</para>
+				</listitem>
+				<listitem>
+					<para>DS-216 - Migrating items that use additional metadata schemas causes an NPE</para>
+				</listitem>
+				<listitem>
+					<para>DS-217 - Hardcoded String in the license bitstream</para>
+				</listitem>
+				<listitem>
+					<para>DS-218 - Cannot add/remove email subscriptions from Profile page in XMLUI</para>
+				</listitem>
+				<listitem>
+					<para>DS-222 - Email alerts due to internal errors are not sent, if context is missing</para>
+				</listitem>
+				<listitem>
+					<para>DS-223 - Submission process show previous button in JSPUI also if the step is the first &quot;visible&quot; step</para>
+				</listitem>
+				<listitem>
+					<para>DS-225 - <literal>dc.description.provenance</literal> - public display</para>
+				</listitem>
+				<listitem>
+					<para>DS-226 - confirmation page of edit profile has an invalid link</para>
+				</listitem>
+				<listitem>
+					<para>DS-227 - Values with double apos doesn't work in dropdown and list input type</para>
+				</listitem>
+				<listitem>
+					<para>DS-229 - <literal>dc.description.provenance</literal> shown in default xmlui 'full item view'</para>
+				</listitem>
+				<listitem>
+					<para>DS-231 - Missig file for index-init</para>
+				</listitem>
+				<listitem>
+					<para>DS-232 - DCPersonName parses name incorrectly (fix included)</para>
+				</listitem>
+				<listitem>
+					<para>DS-240 - Item validityKey not complete</para>
+				</listitem>
+				<listitem>
+					<para>DS-242 - Special groups shown for logged in user rather than for user being examined</para>
+				</listitem>
+				<listitem>
+					<para>DS-246 - Fix configurable browse parameter encoding (XMLUI)</para>
+				</listitem>
+				<listitem>
+					<para>DS-248 - Missing admin column in community table in database-schema.sql - community admin patch</para>
+				</listitem>
+				<listitem>
+					<para>DS-249 - sub-daily utility script does not pass arguments to Java (fix included)</para>
+				</listitem>
+				<listitem>
+					<para>DS-250 - Invalid identifers are not escaped</para>
+				</listitem>
+				<listitem>
+					<para>DS-253 - NullPointerException in HttpServletResponseBufferingWrapper</para>
+				</listitem>
+				<listitem>
+					<para>DS-254 - Bitstream (and item-export) download service does not correctly sense authenticated user</para>
+				</listitem>
+				<listitem>
+					<para>DS-255 - CompleteStep in submission LOSES SUBMISSION if an exception is thrown</para>
+				</listitem>
+				<listitem>
+					<para>DS-256 - Item Export ignores metadata language qualifier</para>
+				</listitem>
+				<listitem>
+					<para>DS-258 - Item View Thumbnails not displaying in XMLUI</para>
+				</listitem>
+				<listitem>
+					<para>DS-260 - Template item some times has owningCollection filled and some times not</para>
+				</listitem>
+				<listitem>
+					<para>DS-262 - Bug in DS-118, new patch included</para>
+				</listitem>
+				<listitem>
+					<para>DS-264 - XMLUI misses logging UsageEvent on requests fulfilled from the cache</para>
+				</listitem>
+				<listitem>
+					<para>DS-265 - IndexBrowse dies fatally when confronting badly-formatted date</para>
+				</listitem>
+				<listitem>
+					<para>DS-269 - Oracle JDBC connection string wrong in dspace.cfg - ID: 2722093</para>
+				</listitem>
+				<listitem>
+					<para>DS-274 - Typo in XSL breaks rendering of dri:xref with class</para>
+				</listitem>
+				<listitem>
+					<para>DS-275 - License files not listed on Item Summary page; XSL bug with patch</para>
+				</listitem>
+				<listitem>
+					<para>DS-276 - Patch to fix spelling error in Exception page</para>
+				</listitem>
+				<listitem>
+					<para>DS-280 - build.xml fails for ant versions below 1.7 (patch included)</para>
+				</listitem>
+				<listitem>
+					<para>DS-281 - Invalid Link to &quot;Go to DSpace Home&quot; on Page Not Found</para>
+				</listitem>
+				<listitem>
+					<para>DS-282 - &quot;Starts with&quot; navigation block should not display when browsing by specific value</para>
+				</listitem>
+				<listitem>
+					<para>DS-284 - Some rows if presented in the item summary will be wrongly considered odd or even.</para>
+				</listitem>
+				<listitem>
+					<para>DS-285 - Item and Bitstream pages do not provide Last-Modified HTTP header, nor recognize If-Modified-Since</para>
+				</listitem>
+				<listitem>
+					<para>DS-290 - <literal>[dspace]/exports</literal> is not created during fresh install</para>
+				</listitem>
+				<listitem>
+					<para>DS-295 - CC License being assigned incorrect Mime Type during submission.</para>
+				</listitem>
+				<listitem>
+					<para>DS-303 - Export migrate option incorrectly removes non-handle identifier.uris</para>
+				</listitem>
+				<listitem>
+					<para>DS-309 - Shiboleth default roles are applied also to anonymous user and user logged-in with other methods</para>
+				</listitem>
+				<listitem>
+					<para>DS-310 - UTF-8 encoding in community and collection text</para>
+				</listitem>
+				<listitem>
+					<para>DS-318 - JSPUI: Left over text in edit item about format</para>
+				</listitem>
+				<listitem>
+					<para>DS-320 - java.util.NoSuchElementException: Timeout waiting for idle object</para>
+				</listitem>
+				<listitem>
+					<para>DS-327 - SWORD temp upload directory missing trailing slash</para>
+				</listitem>
+				<listitem>
+					<para>DS-328 - SWORD service documents do not include atom:generator element</para>
+				</listitem>
+				<listitem>
+					<para>DS-337 - A bug related with adding new -EPersons</para>
+				</listitem>
+				<listitem>
+					<para>DS-338 - Bitstream download allows caching of content that requires authorization to read</para>
+				</listitem>
+				<listitem>
+					<para>DS-340 DSpace services log to the command line</para>
+				</listitem>
+				<listitem>
+					<para>DS-344 - Apostrophe in email address prevents EPerson from being selected</para>
+				</listitem>
+				<listitem>
+					<para>DS-349 - Edit Item in admin UI does not allow setting Bitstream to an Internal BitstreamFormat</para>
+				</listitem>
+				<listitem>
+					<para>DS-353 - Missing commits in XMLUI server-side javascript code.</para>
+				</listitem>
+				<listitem>
+					<para>DS-354 - Make-handle-server configuration fails. New command created using dspace launcher.</para>
+				</listitem>
+				<listitem>
+					<para>DS-365 New DSpace OAI-PMH Harvester doesn't support OAI gateways that do not use &apos;sets&apos;</para>
+				</listitem>
+				<listitem>
+					<para>DS-370 - E Mail Sent On Item Export Error Message</para>
+				</listitem>
+				<listitem>
+					<para>DS-373 - &quot;Letter&quot; links have broken URLs in 2nd-stage Browse</para>
+				</listitem>
+				<listitem>
+					<para>DS-378 - XMLUI Submission Interface messes up in IE7 after an empty &lt;hint&gt; in input_forms.xml</para>
+				</listitem>
+				<listitem>
+					<para>DS-379 - open-search in jspui won't return description.xml</para>
+				</listitem>
+				<listitem>
+					<para>DS-381 - community and collection homepage</para>
+				</listitem>
+				<listitem>
+					<para>DS-385 - Packager script is unable to import the same METS + DIM package that was exported</para>
+				</listitem>
+				<listitem>
+					<para>DS-392 - Error messages in the submission do not disappear if e.g. one of the two errors are solved</para>
+				</listitem>
+				<listitem>
+					<para>DS-393 - The issue date in the submission lowers each time the describe page is being displayed</para>
+				</listitem>
+				<listitem>
+					<para>DS-395 - DSpace Objects (communities, collections, items, bitstreams) only accessible to logged in users</para>
+				</listitem>
+				<listitem>
+					<para>DS-398 - Submission license displayed on collection and item homepage</para>
+				</listitem>
+				<listitem>
+					<para>DS-399 - Special characters in collection license lead to parse error</para>
+				</listitem>
+				<listitem>
+					<para>DS-400 - Webui item browse (date, title or similar) reduces displayed issue date by one day</para>
+				</listitem>
+				<listitem>
+					<para>DS-406 - View Statistics button does not work in item page</para>
+				</listitem>
+				<listitem>
+					<para>DS-409 - JSPUI Statistics Display ignores &quot;statistics.item.authorization.admin&quot;</para>
+				</listitem>
+				<listitem>
+					<para>DS-414 - solr statistics file downloads listed in statistics display of communites and collections</para>
+				</listitem>
+				<listitem>
+					<para>DS-415 - Create groups via admin UI authorization denied</para>
+				</listitem>
+				<listitem>
+					<para>DS-416 - Solr Statistics not starting on Windows Fresh install</para>
+				</listitem>
+				<listitem>
+					<para>DS-417 - 1-day (or passed) embargo dates give error upon submission</para>
+				</listitem>
+				<listitem>
+					<para>DS-418 - i18n broken in jspui</para>
+				</listitem>
+				<listitem>
+					<para>DS-419 - Setting embargo.field.terms to an unqualified field throws uncaught exception on item submission</para>
+				</listitem>
+				<listitem>
+					<para>DS-421 - Setting solr.metadata.item.X property to an unqualified field generates exception in <literal>SolrLogger.post</literal> on item view and prevents Solr from logging the event</para>
+				</listitem>
+				<listitem>
+					<para>DS-422 - Directory &quot;etc&quot; missing from Ant target &quot;init_installation&quot;.</para>
+				</listitem>
+				<listitem>
+					<para>DS-423 - Ant target &quot;clean_database&quot; doesn't drop all tables.</para>
+				</listitem>
+				<listitem>
+					<para>DS-424 - Export metadata button displayed in JSPUI Administration List of withdrawn items</para>
+				</listitem>
+				<listitem>
+					<para>DS-427 - Item license per default displayed in item display of the xmlui</para>
+				</listitem>
+				<listitem>
+					<para>DS-428 - Wrong link for bitstreams during submission unassigned</para>
+				</listitem>
+				<listitem>
+					<para>DS-432 - No mention of config/news-xmlui.xml in manual</para>
+				</listitem>
+				<listitem>
+					<para>DS-436 - SWORD Authenticator doesn&quot;t support the special groups infrastructure</para>
+				</listitem>
+				<listitem>
+					<para>DS-437 - Oracle DB Schema has artifacts from past releases</para>
+				</listitem>
+				<listitem>
+					<para>DS-438 - JSPUI stats - filename incorrect on second and subsequent files</para>
+				</listitem>
+				<listitem>
+					<para>DS-459 - OAI PMH is not delivering continuation tokens</para>
+				</listitem>
+				<listitem>
+					<para>DS-468 - CLONE - Foreign characters broken in group names</para>
+				</listitem>
+				<listitem>
+					<para>DS-472 - &quot;fresh_install&quot; broken on a completely clean system</para>
+				</listitem>
+				<listitem>
+					<para>DS-474 - handle.canonical.prefix undocumented</para>
+				</listitem>
+				<listitem>
+					<para>DS-475 - create a new group</para>
+				</listitem>
+				<listitem>
+					<para>DS-477 - LDAPHierarchicalAuthentication fails when the LDAP returns mixed case email address</para>
+				</listitem>
+				<listitem>
+					<para>DS-480 - Exception is thrown when removing the last file after the item is rejected during review.</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+	</section>
+	<section remap="h2">
+		<title><anchor id="docbook-history.html-version1_5_2" xreflabel="Changes in DSpace 1.5.2"/>Changes in DSpace 1.5.2</title>
+		<section remap="h3">
+			<title>General Improvements</title>
+			<itemizedlist>
+				<listitem>
+					<para>The History System has been removed since DSpace 1.5. The <literal>[dspace]/history</literal> directory and it's contents can be completely removed if you so choose as it is non functional. </para>
+				</listitem>
+			</itemizedlist>
+		</section>
+		<section remap="h3">
+			<title>Bug fixes and smaller patches</title>
+			<itemizedlist>
+				<listitem>
+					<para>TBD</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+	</section>
+	<section remap="h2">
+		<title><anchor id="docbook-history.html-version1_5_1" xreflabel="Changes in DSpace 1.5.1"/>Changes in DSpace 1.5.1</title>
+		<section remap="h3">
+			<title>General Improvements</title>
+			<itemizedlist>
+				<listitem>
+					<para>TBD</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+		<section remap="h3">
+			<title>Bug fixes and smaller patches</title>
+			<itemizedlist>
+				<listitem>
+					<para>TBD</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+	</section>
+	<section remap="h2">
+		<title><anchor id="docbook-history.html-version1_5" xreflabel="Changes in DSpace 1.5"/>Changes in DSpace 1.5</title>
+		<section remap="h3">
+			<title>General Improvements</title>
+			<itemizedlist>
+				<listitem>
+					<para>Highly configurable and theme-able new user interface (Manakin).</para>
+				</listitem>
+				<listitem>
+					<para>Apache Maven-based modular build system.</para>
+				</listitem>
+				<listitem>
+					<para>LNI (Lightweight Network Interface) service. Allows programmatic ingest of content via WebDAV or SOAP.</para>
+				</listitem>
+				<listitem>
+					<para>SWORD (Simple Web-service Offering Repository Deposit): repository-standard ingest service using Atom Publishing Protocol.</para>
+				</listitem>
+				<listitem>
+					<para>Highly configurable item web submission system. All submission steps are configurable not just metadata pages.</para>
+				</listitem>
+				<listitem>
+					<para>Browse functionality allowing customisation of the available indexes via dspace.cfg and pluggable normalisation of the sort strings. Integration with both JSP-UI and XML-UI included.</para>
+				</listitem>
+				<listitem>
+					<para>Extensible content event notification service.</para>
+				</listitem>
+				<listitem>
+					<para>Generation of Google and HTML sitemaps</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+		<section remap="h3">
+			<title>Bug fixes and smaller patches</title>
+			<itemizedlist>
+				<listitem>
+					<para>New options for ItemImporter to support bitstream permissions and descriptions.</para>
+				</listitem>
+				<listitem>
+					<para>1824710 Fix - Change in Creative Commons RDF.</para>
+				</listitem>
+				<listitem>
+					<para>1794700 Fix - Stat-monthly and stat-report-monthly</para>
+				</listitem>
+				<listitem>
+					<para>1566820 Patch - Authentication code moved to new org.dspace.authenticate package, add IP AUth</para>
+				</listitem>
+				<listitem>
+					<para>1670093 Patch - More stable metadata and schema registry import Option to generate community and collection &quot;strength&quot; as a batch job</para>
+				</listitem>
+				<listitem>
+					<para>1659868 Patch - Improved database level debugging</para>
+				</listitem>
+				<listitem>
+					<para>1620700 Patch - Add Community and Sub-Community to OAI Sets</para>
+				</listitem>
+				<listitem>
+					<para>1679972 Fix - OAIDCCrosswalk NPE and invalid character fix, also invalid output prevented</para>
+				</listitem>
+				<listitem>
+					<para>1549290 Fix - Suggest Features uses hard coded strings</para>
+				</listitem>
+				<listitem>
+					<para>1727034 Fix - Method MetadataField.unique() is incorrect for null values</para>
+				</listitem>
+				<listitem>
+					<para>1614546 Fix - Get rid of unused mets_bitstream_id column</para>
+				</listitem>
+				<listitem>
+					<para>1450491 Patch - i18n configurable multilingualism support</para>
+				</listitem>
+				<listitem>
+					<para>1764069 Patch - Replace &quot;String&quot; with &quot;Integer&quot; in PreparedStatement where needed</para>
+				</listitem>
+				<listitem>
+					<para>1743188 Patch - for Request #1145499 - Move Items</para>
+				</listitem>
+				<listitem>
+					<para>179196 Patch - Oracle SQL in Bitstream Checker</para>
+				</listitem>
+				<listitem>
+					<para>1751638 Patch - Set http disposition header to force download of large bitstreams</para>
+				</listitem>
+				<listitem>
+					<para>1799575 Patch - New EPersonConsumer event consumer</para>
+				</listitem>
+				<listitem>
+					<para>1566572 Patch - Item metadata in XHTML head elements</para>
+				</listitem>
+				<listitem>
+					<para>1589429 Patch - &quot;Self-Named&quot; Media Filters (i.e. MediaFilter Plugins) (updated version of this patch)</para>
+				</listitem>
+				<listitem>
+					<para>1888652 Patch - Statistics Rewritten In Java</para>
+				</listitem>
+				<listitem>
+					<para>1444364 Request - Metadata registry exporter</para>
+				</listitem>
+				<listitem>
+					<para>1221957 Request - Admin browser for withdrawn items</para>
+				</listitem>
+				<listitem>
+					<para>1740454 Fix - Concurrency</para>
+				</listitem>
+				<listitem>
+					<para>1552760 Fix - Submit interface looks bad in Safari</para>
+				</listitem>
+				<listitem>
+					<para>1642563 Patch - bin/update-handle-prefix rewritten in Java</para>
+				</listitem>
+				<listitem>
+					<para>1724330 Fix - Removes &quot;null&quot; being displayed in community-home.jsp</para>
+				</listitem>
+				<listitem>
+					<para>1763535 Patch - Alert DSpace administrator of new user registration</para>
+				</listitem>
+				<listitem>
+					<para>1759438 Patch - Multilingualism Language Switch - DSpace Header</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+	</section>
+	<section remap="h2">
+		<title><anchor id="docbook-history.html-version1_4_1" xreflabel="Changes in DSpace 1.4.1"/>Changes in DSpace 1.4.1</title>
+		<section remap="h3">
+			<title>General Improvements</title>
+			<itemizedlist>
+				<listitem>
+					<para>Error pages now return appropriate HTTP status codes (e.g. 404 not found)</para>
+				</listitem>
+				<listitem>
+					<para>Bad filenames in /bitstream/ URLs now result in 404 error -- prevents infinite URL spaces confusing crawlers and bad &quot;persistent&quot; bitstream IDs circulating</para>
+				</listitem>
+				<listitem>
+					<para>Prevent infinite URL spaces in HTMLServlet</para>
+				</listitem>
+				<listitem>
+					<para>InstallItem no longer sets dc.format.extent, dc.format.mimetype; no longer sets default value for dc.language.iso if one is not present</para>
+				</listitem>
+				<listitem>
+					<para>Empty values in drop-down submit fields are not added as empty metadata values</para>
+				</listitem>
+				<listitem>
+					<para>API methods for searching epeople and groups</para>
+				</listitem>
+				<listitem>
+					<para>Support stats from both 1.3 and 1.4</para>
+				</listitem>
+				<listitem>
+					<para>[dspace]/bin/update-handle-prefix now runs index-all</para>
+				</listitem>
+				<listitem>
+					<para>Remove cases of System.out from code executed in webapp</para>
+				</listitem>
+				<listitem>
+					<para>Change &quot;View Licence&quot; to &quot;View License&quot; in Messages.properties</para>
+				</listitem>
+				<listitem>
+					<para>dspace.cfg comments changed to indicate what default.language actually means</para>
+				</listitem>
+				<listitem>
+					<para>HandleServlet and BitstreamServlet support If-Modified-Since requests</para>
+				</listitem>
+				<listitem>
+					<para>Improved sanity-checking of XSL-based ingest crosswalks</para>
+				</listitem>
+				<listitem>
+					<para>Remove thumbnail filename from alt-text</para>
+				</listitem>
+				<listitem>
+					<para>Include item title in HTML title element</para>
+				</listitem>
+				<listitem>
+					<para>Improvements to help prevent spammers and sploggers</para>
+				</listitem>
+				<listitem>
+					<para>Make cleanup() commit outstanding work every 100 iterations</para>
+				</listitem>
+				<listitem>
+					<para>Better handling where email send failed due to wrong address for new user</para>
+				</listitem>
+				<listitem>
+					<para>Include robots.txt to limit bots navigating author, date and browse by subject pages</para>
+				</listitem>
+				<listitem>
+					<para>Add css styles for print media</para>
+				</listitem>
+				<listitem>
+					<para>RSS made more configurable and provide system-wide RSS feed, also moves text to Messages.properties</para>
+				</listitem>
+				<listitem>
+					<para>Jar file updates (includes required code changes for DSIndexer and DSQuery and new jars fontbox.jar and serializer.jar)</para>
+				</listitem>
+				<listitem>
+					<para>Various documentation additions and cleanups</para>
+				</listitem>
+				<listitem>
+					<para>XHTML compliance improvements</para>
+				</listitem>
+				<listitem>
+					<para>Move w3c valid xhtml boiler image into local repository</para>
+				</listitem>
+				<listitem>
+					<para>Remove uncessary Log4j Configuration in CheckerCommand</para>
+				</listitem>
+				<listitem>
+					<para>Include Windows CLASSPATH in dsrun.bat</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+		<section remap="h3">
+			<title>Bug fixes</title>
+			<itemizedlist>
+				<listitem>
+					<para>1604037 - UIUtil.encodeBitstream() now correctly encodes URLs (no longer incorrectly substitutes &apos;+&apos; for spaces in non-query segment</para>
+				</listitem>
+				<listitem>
+					<para>1592984 - Date comparisons strip time in org.dspace.harvest.Harvest</para>
+				</listitem>
+				<listitem>
+					<para>1589902 - Duplicate [field] checking error [on input-forms.xml]</para>
+				</listitem>
+				<listitem>
+					<para>1596952 - Collection Wizard create Template missing schema</para>
+				</listitem>
+				<listitem>
+					<para>1596978 - View unfinished submissions - collection empty</para>
+				</listitem>
+				<listitem>
+					<para>1588625 - Incorrect text on item mapper screen</para>
+				</listitem>
+				<listitem>
+					<para>1597805 - DIDL Crosswalk: wrong resource management</para>
+				</listitem>
+				<listitem>
+					<para>1605635 - NPE in Utils.java</para>
+				</listitem>
+				<listitem>
+					<para>1597504 - Search result page shows shortened query string</para>
+				</listitem>
+				<listitem>
+					<para>1532389 - Item Templates do not work for non-dc fields</para>
+				</listitem>
+				<listitem>
+					<para>1066771 - Metadata edit form dropping DC qualifier</para>
+				</listitem>
+				<listitem>
+					<para>1548738 - Multiple Metadata Schema, schema not shown on edit item page</para>
+				</listitem>
+				<listitem>
+					<para>1589895 - Not possible to add unqualified Metadata Field</para>
+				</listitem>
+				<listitem>
+					<para>1543853 - Statistics do not work in 1.4</para>
+				</listitem>
+				<listitem>
+					<para>1541381 - Browse-by-date and browse-by-title not working</para>
+				</listitem>
+				<listitem>
+					<para>1556947 - NullPointerException when no user selected to del/edit</para>
+				</listitem>
+				<listitem>
+					<para>1554064 - Fix exception handling for ClassCastException in BitstreamServlet</para>
+				</listitem>
+				<listitem>
+					<para>1548865 - Browse errors on withdrawn item</para>
+				</listitem>
+				<listitem>
+					<para>1554056 - Community/collection handle URL with / redirects to homepage</para>
+				</listitem>
+				<listitem>
+					<para>1571490 - UTF-8 encoded characters in licence</para>
+				</listitem>
+				<listitem>
+					<para>1571519 - UTF-8 in statistics</para>
+				</listitem>
+				<listitem>
+					<para>1544807 - Browse-by-Subject/Author paging mechanism broken</para>
+				</listitem>
+				<listitem>
+					<para>1543966 - &quot;Special&quot; groups inside groups bug</para>
+				</listitem>
+				<listitem>
+					<para>1480496 - Cannot turn off &quot;ignore authorization&quot; flag!</para>
+				</listitem>
+				<listitem>
+					<para>1515148 - Community policies not deleting correctly</para>
+				</listitem>
+				<listitem>
+					<para>1556829 - Docs mention old SiteAuthenticator class</para>
+				</listitem>
+				<listitem>
+					<para>1606435 - Workflow text out of context</para>
+				</listitem>
+				<listitem>
+					<para>Fix for bitstream authorization timeout</para>
+				</listitem>
+				<listitem>
+					<para>Fix to make sure cleanup() doesn&apos;t fail with NullPointerException</para>
+				</listitem>
+				<listitem>
+					<para>Fix for removeBitstream() failing to update primary bitstream</para>
+				</listitem>
+				<listitem>
+					<para>Fix for Advanced Search ignoring conjunctions for arbitrary number of queries</para>
+				</listitem>
+				<listitem>
+					<para>Fix minor bug in Harvest.java for Oracle users</para>
+				</listitem>
+				<listitem>
+					<para>Fix missing title for news editor page</para>
+				</listitem>
+				<listitem>
+					<para>Small Messages.properties modification (change of DSpace copyright text)</para>
+				</listitem>
+				<listitem>
+					<para>fix PDFBox tmp file issue</para>
+				</listitem>
+				<listitem>
+					<para>Fix HttpServletRequest encoding issues</para>
+				</listitem>
+				<listitem>
+					<para>Fix bug in TableRow toString() method where NPE is thrown if tablename not set</para>
+				</listitem>
+				<listitem>
+					<para>Update DIDL license and change coding style to DSpace standard</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+	</section>
+	<section remap="h2">
+		<title><anchor id="docbook-history.html-version1_4" xreflabel="Changes in DSpace 1.4"/>Changes in DSpace 1.4</title>
+		<section remap="h3">
+			<title>General Improvements</title>
+			<itemizedlist>
+				<listitem>
+					<para>Content verification through periodic checksum checking</para>
+				</listitem>
+				<listitem>
+					<para>Support for branded preview image</para>
+				</listitem>
+				<listitem>
+					<para>Add/replace Creative Commons in &apos;edit item&apos; tool</para>
+				</listitem>
+				<listitem>
+					<para>Customisable item listing columns and browse indices</para>
+				</listitem>
+				<listitem>
+					<para>Script for updating handle prefixes (e.g. for moving from development to production)</para>
+				</listitem>
+				<listitem>
+					<para>Configurable boolean search operator</para>
+				</listitem>
+				<listitem>
+					<para>Controlled vocabulary patch to provide search on classification terms, and addition of terms during submission.</para>
+				</listitem>
+				<listitem>
+					<para>Add &apos;visibility&apos; element to input-forms.xml</para>
+				</listitem>
+				<listitem>
+					<para>Browse by subject feature</para>
+				</listitem>
+				<listitem>
+					<para>Log4J enhancement to use XML configuration</para>
+				</listitem>
+				<listitem>
+					<para>QueryArgs class can support any number of fields in advanced search.</para>
+				</listitem>
+				<listitem>
+					<para>Community names no longer have to be unique</para>
+				</listitem>
+				<listitem>
+					<para>Enhanced Windows support</para>
+				</listitem>
+				<listitem>
+					<para>Support for multiple (flat) metadata schemas</para>
+				</listitem>
+				<listitem>
+					<para>Suggest an item page</para>
+				</listitem>
+				<listitem>
+					<para>RSS Feeds</para>
+				</listitem>
+				<listitem>
+					<para>Performance enhancements</para>
+				</listitem>
+				<listitem>
+					<para>Stackable authentication methods</para>
+				</listitem>
+				<listitem>
+					<para>Plug-in manager</para>
+				</listitem>
+				<listitem>
+					<para>Pluggable SIP/DIP support and metadata crosswalks</para>
+				</listitem>
+				<listitem>
+					<para>Nested groups of e-people</para>
+				</listitem>
+				<listitem>
+					<para>Expose METS and MPEG-21 DIDL DIPs via OAI-PMH</para>
+				</listitem>
+				<listitem>
+					<para>Configurable Lucene search analyzer (e.g. for Chinese metadata)</para>
+				</listitem>
+				<listitem>
+					<para>Support for SMTP servers requiring authentication</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+		<section remap="h3">
+			<title>Bug fixes</title>
+			<itemizedlist>
+				<listitem>
+					<para>1358197 - Edit Item, empty DC fields not removable</para>
+				</listitem>
+				<listitem>
+					<para>1363633 - Submission step 1 fails when there are no collections</para>
+				</listitem>
+				<listitem>
+					<para>1255264 - Resource policy eperson value was set to wrong column</para>
+				</listitem>
+				<listitem>
+					<para>1380494 - Error deleting an item with multiple metadata schema support</para>
+				</listitem>
+				<listitem>
+					<para>1443649 - Cannot configure unqualified elements for advanced search index</para>
+				</listitem>
+				<listitem>
+					<para>1333687 - Browse-(title|date) fails on withdrawn item</para>
+				</listitem>
+				<listitem>
+					<para>1066713 - Two (sub)communities cannot have one name</para>
+				</listitem>
+				<listitem>
+					<para>1284055 - Two Communities of same name throws error</para>
+				</listitem>
+				<listitem>
+					<para>1035366 - Bitstream size column should be bigint</para>
+				</listitem>
+				<listitem>
+					<para>1352257 - Selecting a Group for GroupToGroup while Creating Collection</para>
+				</listitem>
+				<listitem>
+					<para>1352226 - Navigation and Sorting in Group List (Select Groups) fails</para>
+				</listitem>
+				<listitem>
+					<para>1348276 - Null in collection name causes OAI ListSets to fail</para>
+				</listitem>
+				<listitem>
+					<para>1160898 - dspace_migrate removes Date.Issued from prev published items</para>
+				</listitem>
+				<listitem>
+					<para>1261191 - Malformed METS metadata exported</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+	</section>
+	<section remap="h2">
+		<title><anchor id="docbook-history.html-version1_3_2" xreflabel="Changes in DSpace 1.3.2"/>Changes in DSpace 1.3.2</title>
+		<section remap="h3">
+			<title>General Improvements</title>
+			<itemizedlist>
+				<listitem>
+					<para>DSpace UI XHTML/WAI compliant</para>
+				</listitem>
+				<listitem>
+					<para>Configure metadata fields shown on simple item display</para>
+				</listitem>
+				<listitem>
+					<para>Supervisor/workspace help documentation</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+		<section remap="h3">
+			<title>Bug fixes</title>
+			<itemizedlist>
+				<listitem>
+					<para>Oracle compatibility fixes</para>
+				</listitem>
+				<listitem>
+					<para>Item exporter now correctly exports metadata in UTF-8</para>
+				</listitem>
+				<listitem>
+					<para>fixed to handle &apos;null&apos; values passed in</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+	</section>
+	<section remap="h2">
+		<title><anchor id="docbook-history.html-version1_3_1" xreflabel="Changes in DSpace 1.3.1"/>Changes in DSpace 1.3.1</title>
+		<section remap="h3">
+			<title>Bug fixes</title>
+			<itemizedlist>
+				<listitem>
+					<para>1252153 - Error on fresh install</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+	</section>
+	<section remap="h2">
+		<title><anchor id="docbook-history.html-version1_3" xreflabel="Changes in DSpace 1.3"/>Changes in DSpace 1.3</title>
+		<section remap="h3">
+			<title>General Improvements</title>
+			<itemizedlist>
+				<listitem>
+					<para>Initial i18n Support for JSPs - Note: the implementation of this feature required changes to almost all JSP pages</para>
+				</listitem>
+				<listitem>
+					<para>LDAP authentication support</para>
+				</listitem>
+				<listitem>
+					<para>Log file analysis and report generation</para>
+				</listitem>
+				<listitem>
+					<para>Configurable item licence viewing</para>
+				</listitem>
+				<listitem>
+					<para>Supervision order/collaborative workspace administrative tools</para>
+				</listitem>
+				<listitem>
+					<para>Basic workspace for submissions in progress, with support for supervision</para>
+				</listitem>
+				<listitem>
+					<para>SRB storage system option</para>
+				</listitem>
+				<listitem>
+					<para>Updated handle server system</para>
+				</listitem>
+				<listitem>
+					<para>Database optimisations</para>
+				</listitem>
+				<listitem>
+					<para>Latest versions of Xerces, Xalan and OAICAT jars</para>
+				</listitem>
+				<listitem>
+					<para>Various documentation additions and cleanups</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+		<section remap="h3">
+			<title>Bug fixes</title>
+			<itemizedlist>
+				<listitem>
+					<para>1161459 - ItemExporter fails with Too many open files</para>
+				</listitem>
+				<listitem>
+					<para>1167373 - Email date field not populated</para>
+				</listitem>
+				<listitem>
+					<para>1193948 - New item submit problem</para>
+				</listitem>
+				<listitem>
+					<para>1188132 - NullPointerException when Adding EPerson</para>
+				</listitem>
+				<listitem>
+					<para>1188016 - Cannot Edit an Eperson</para>
+				</listitem>
+				<listitem>
+					<para>1219701 - Unable to open unfinished submission</para>
+				</listitem>
+				<listitem>
+					<para>1206836 - community strengths not reflecting sub-community</para>
+				</listitem>
+				<listitem>
+					<para>1238262 - Submit UI nav/progress buttons no longer show progress</para>
+				</listitem>
+				<listitem>
+					<para>1238276 - Double quote problem in some fields in submit UI</para>
+				</listitem>
+				<listitem>
+					<para>1238277 - format support level not shown in &quot;uploaded file&quot; page</para>
+				</listitem>
+				<listitem>
+					<para>1242548 - Uploading non-existing files</para>
+				</listitem>
+				<listitem>
+					<para>1244743 - Bad lookup key for special case of DC Title in ItemTag.java</para>
+				</listitem>
+				<listitem>
+					<para>1245223 - Subscription Emailer fails</para>
+				</listitem>
+				<listitem>
+					<para>1247508 - Error when browsing item with no content/bitstream collections</para>
+				</listitem>
+				<listitem>
+					<para>Set the content type in the HTTP header</para>
+				</listitem>
+				<listitem>
+					<para>Fix issue where EPerson edit would not work due to form indexing (partial fix)</para>
+				</listitem>
+				<listitem>
+					<para>POST handling in HTMLServlet</para>
+				</listitem>
+				<listitem>
+					<para>Missing ContentType directives added to some JSPs</para>
+				</listitem>
+				<listitem>
+					<para>Name dependency on Collection Admin and Submitter groups fixed</para>
+				</listitem>
+				<listitem>
+					<para>Fixed OAI-PMH XML encoding</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+	</section>
+	<section remap="h2">
+		<title><anchor id="docbook-history.html-version1_2_2" xreflabel="Changes in DSpace 1.2.2"/>Changes in DSpace 1.2.2</title>
+		<section remap="h3">
+			<title>General Improvements</title>
+			<itemizedlist>
+				<listitem>
+					<para>Customisable submission forms added</para>
+				</listitem>
+				<listitem>
+					<para>Configurable number of index terms in Lucene for full-text indexing</para>
+				</listitem>
+				<listitem>
+					<para>Improved scalability in media filter</para>
+				</listitem>
+				<listitem>
+					<para>Submit button on collection pages only appears if user has authorisation</para>
+				</listitem>
+				<listitem>
+					<para>PostgreSQL 8.0 compatibility</para>
+				</listitem>
+				<listitem>
+					<para>Search scope retention to improve browsing</para>
+				</listitem>
+				<listitem>
+					<para>Community and collection strengths displayed</para>
+				</listitem>
+				<listitem>
+					<para>Upgraded OAICat software</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+		<section remap="h3">
+			<title>Bug fixes</title>
+			<itemizedlist>
+				<listitem>
+					<para>Fix for Oracle too many cursors problem.</para>
+				</listitem>
+				<listitem>
+					<para>Fix for UTF-8 encoded searches in advanced search.</para>
+				</listitem>
+				<listitem>
+					<para>Fix for handling &quot;\&quot; in bitstream names.</para>
+				</listitem>
+				<listitem>
+					<para>Fix to prevent delete of &quot;unknown&quot; bitstream format</para>
+				</listitem>
+				<listitem>
+					<para>Fix for ItemImport creating new handles for replaced items</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+		<section remap="h3">
+			<title><anchor id="docbook-history.html-jsp-changes-1_2_1-1_2_2" xreflabel="Changes in JSPs"/>Changes in JSPs</title>
+			<itemizedlist>
+				<listitem>
+					<para>
+						<literal>collection-home.jsp</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>community-home.jsp</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>community-list.jsp</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>home.jsp</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>dspace-admin/list-formats.jsp</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>dspace-admin/wizard-questions.jsp</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>search/results.jsp</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>submit/cancel.jsp</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>submit/change-file-description.jsp</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>submit/choose-file.jsp</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>submit/complete.jsp</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>submit/creative-commons.jsp</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>submit/edit-metadata.jsp</literal>
+						<emphasis>new</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>submit/get-file-format.jsp</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>submit/initial-questions.jsp</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>submit/progressbar.jsp</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>submit/review.jsp</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>submit/select-collection.jsp</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>submit/show-license.jsp</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>submit/show-uploaded-file.jsp</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>submit/upload-error.jsp</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>submit/upload-file-list.jsp</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+	</section>
+	<section remap="h2">
+		<title><anchor id="docbook-history.html-version1_2_1" xreflabel="Changes in DSpace 1.2.1"/>Changes in DSpace 1.2.1</title>
+		<section remap="h3">
+			<title>General Improvements</title>
+			<itemizedlist>
+				<listitem>
+					<para>Oracle support added</para>
+				</listitem>
+				<listitem>
+					<para>Thumbnails in item view can now be switched off/on</para>
+				</listitem>
+				<listitem>
+					<para>Browse and search thumbnail options</para>
+				</listitem>
+				<listitem>
+					<para>Improved item importer </para>
+					<itemizedlist>
+						<listitem>
+							<para>can now import to multiple collections</para>
+						</listitem>
+						<listitem>
+							<para>added --test flag to simulate an import, without actually making any changes</para>
+						</listitem>
+						<listitem>
+							<para>added --resume flag to try to resume the import in case the import is aborted</para>
+						</listitem>
+					</itemizedlist>
+				</listitem>
+				<listitem>
+					<para>Configurable fields for the search index</para>
+				</listitem>
+				<listitem>
+					<para>Script for transferring items between DSpace instances</para>
+				</listitem>
+				<listitem>
+					<para>Sun library JARs (JavaMail, Java Activation Framework and Servlet) now included in DSpace source code bundle</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+		<section remap="h3">
+			<title>Bug fixes</title>
+			<itemizedlist>
+				<listitem>
+					<para>A logo to existing collection can now be added. Fixes SF bug #1065933</para>
+				</listitem>
+				<listitem>
+					<para>The community logo can now be edited. Fixes SF bug #1035692</para>
+				</listitem>
+				<listitem>
+					<para>MediaFilterManager doesn&apos;t &apos;touch&apos; every item every time. Fixes SF bug #1015296</para>
+				</listitem>
+				<listitem>
+					<para>Supported formats help page, set the format support level to &quot;known&quot; as default</para>
+				</listitem>
+				<listitem>
+					<para>Fixed various database connection pool leaks</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+		<section remap="h3">
+			<title><anchor id="docbook-history.html-jsp-changes-1_2-1_2_1" xreflabel="Changed JSPs"/>Changed JSPs</title>
+			<itemizedlist>
+				<listitem>
+					<para>
+						<literal>collection-home</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>community-home</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>display-item</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>dspace-admin/confirm-delete-collection</literal>
+						<emphasis>moved to tools/ and changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>dspace-admin/confirm-delete-community</literal>
+						<emphasis>moved to tools/ and changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>dspace-admin/edit-collection</literal>
+						<emphasis>moved to tools/ and changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>dspace-admin/edit-community</literal>
+						<emphasis>moved to tools/ and changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>dspace-admin/index</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>dspace-admin/upload-logo</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>dspace-admin/wizard-basicinfo</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>dspace-admin/wizard-default-item</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>dspace-admin/wizard-permissions</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>dspace-admin/wizard-questions</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>help/formats.html</literal>
+						<emphasis>removed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>help/formats</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>index</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+				<listitem>
+					<para>
+						<literal>layout/navbar-admin</literal>
+						<emphasis>changed</emphasis>
+					</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+	</section>
+	<section remap="h2">
+		<title><anchor id="docbook-history.html-version1_2" xreflabel="Changes in DSpace 1.2"/>Changes in DSpace 1.2</title>
+		<section remap="h3">
+			<title>General Improvments</title>
+			<itemizedlist>
+				<listitem>
+					<para>Communities can now contain sub-communities</para>
+				</listitem>
+				<listitem>
+					<para>Items may be included in more than one collection</para>
+				</listitem>
+				<listitem>
+					<para>Full text extraction and searching for MS Word, PDF, HTML, text documents</para>
+				</listitem>
+				<listitem>
+					<para>Thumbnails displayed in item view for items that contain images</para>
+				</listitem>
+				<listitem>
+					<para>Configurable MediaFilter tool creates both extracted text and thumbnails</para>
+				</listitem>
+				<listitem>
+					<para>Bitstream IDs are now persistent - generated from item&apos;s handle and a sequence number</para>
+				</listitem>
+				<listitem>
+					<para>Creative Commons licenses can optionally be added to items during web submission process</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+		<section remap="h3">
+			<title>Administration</title>
+			<itemizedlist>
+				<listitem>
+					<para>If you are logged in as administrator, you see admin buttons on item, collection, and community pages</para>
+				</listitem>
+				<listitem>
+					<para>New collection administration wizard</para>
+				</listitem>
+				<listitem>
+					<para>Can now administer collection&apos;s submitters from collection admin tool</para>
+				</listitem>
+				<listitem>
+					<para>Delegated administration - new &apos;collection editor&apos; role - edits item metadata, manages submitters list, edits collection metadata, links to items from other collections, and can withdraw items</para>
+				</listitem>
+				<listitem>
+					<para>Admin UI moved from /admin to /dspace-admin to avoid conflict with Tomcat /admin JSPs</para>
+				</listitem>
+				<listitem>
+					<para>New EPerson selector popup makes Group editing much easier</para>
+				</listitem>
+				<listitem>
+					<para>&apos;News&apos; section is now editable using admin UI (no more mucking with JSPs)</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+		<section remap="h3">
+			<title>Import/Export/OAI</title>
+			<itemizedlist>
+				<listitem>
+					<para>New tool that exports DSpace content in AIPs that use METS XML for metadata (incomplete)</para>
+				</listitem>
+				<listitem>
+					<para>OAI - sets are now collections, identified by Handles (&apos;safe&apos; with /, : converted to _)</para>
+				</listitem>
+				<listitem>
+					<para>OAI - contributor.author now mapped to oai_dc:creator</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+		<section remap="h3">
+			<title>Miscellaneous</title>
+			<itemizedlist>
+				<listitem>
+					<para>Build process streamlined with use of WAR files, symbolic links no longer used, friendlier to later versions of Tomcat</para>
+				</listitem>
+				<listitem>
+					<para>MIT-specific aspects of UI removed to avoid confusion</para>
+				</listitem>
+				<listitem>
+					<para>Item metadata now rendered to avoid interpreting as HTML (displays as entered)</para>
+				</listitem>
+				<listitem>
+					<para>Forms now have no-cache directive to avoid trouble with browser &apos;back&apos; button</para>
+				</listitem>
+				<listitem>
+					<para>Bundles now have &apos;names&apos; for more structure in item&apos;s content</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+		<section remap="h3">
+			<title><anchor id="docbook-history.html-jsp-file-changes" xreflabel="JSP file changes between 1.1 and
+1.2"/>JSP file changes between 1.1 and 1.2</title>
+			<para>This list generated with <literal>cvs -Q rdiff -s -r dspace-1_1 dspace</literal> and a sprinkling of perl.</para>
+			<itemizedlist>
+				<listitem>
+					<para>Changed: dspace/jsp/collection-home.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/community-home.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/community-list.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/display-item.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/index.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/home.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/styles.css.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin and changed: dspace/jsp/admin/authorize-advanced.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin and changed: dspace/jsp/admin/authorize-collection-edit.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin and changed: dspace/jsp/admin/authorize-community-edit.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin and changed: dspace/jsp/admin/authorize-item-edit.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin and changed: dspace/jsp/admin/authorize-main.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin and changed: dspace/jsp/admin/authorize-policy-edit.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin: dspace/jsp/admin/collection-select.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin: dspace/jsp/admin/community-select.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin: dspace/jsp/admin/confirm-delete-collection.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin: dspace/jsp/admin/confirm-delete-community.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin: dspace/jsp/admin/confirm-delete-dctype.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin: dspace/jsp/admin/confirm-delete-eperson.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin: dspace/jsp/admin/confirm-delete-format.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace/jsp/tools: dspace/jsp/admin/confirm-delete-item.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace/jsp/tools: dspace/jsp/admin/confirm-withdraw-item.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin and changed: dspace/jsp/admin/edit-collection.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin and changed: dspace/jsp/admin/edit-community.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace/jsp/tools and changed: dspace/jsp/admin/edit-item-form.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin and changed: dspace/jsp/admin/eperson-browse.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin: dspace/jsp/admin/eperson-confirm-delete.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin and changed: dspace/jsp/admin/eperson-edit.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin and changed: dspace/jsp/admin/eperson-main.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace/jsp/tools and changed: dspace/jsp/admin/get-item-id.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace/jsp/tools and changed: dspace/jsp/admin/group-edit.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin and changed: dspace/jsp/admin/group-eperson-select.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace/jsp/tools and changed: dspace/jsp/admin/group-list.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin: dspace/jsp/admin/index.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin and changed: dspace/jsp/admin/item-select.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin and changed: dspace/jsp/admin/list-communities.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin and changed: dspace/jsp/admin/list-dc-types.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Removed: dspace/jsp/admin/list-epeople.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin and changed: dspace/jsp/admin/list-formats.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace/jsp/tools: dspace/jsp/admin/upload-bitstream.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin and changed: dspace/jsp/admin/upload-logo.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin: dspace/jsp/admin/workflow-abort-confirm.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Moved to dspace-admin and changed: dspace/jsp/admin/workflow-list.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/browse/authors.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/browse/items-by-author.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/browse/items-by-date.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/browse/no-results.jsp</para>
+				</listitem>
+				<listitem>
+					<para>New: dspace-admin/eperson-deletion-error.jsp</para>
+				</listitem>
+				<listitem>
+					<para>New: dspace/jsp/dspace-admin/news-edit.jsp</para>
+				</listitem>
+				<listitem>
+					<para>New: dspace/jsp/dspace-admin/news-main.jsp</para>
+				</listitem>
+				<listitem>
+					<para>New: dspace/jsp/dspace-admin/wizard-basicinfo.jsp</para>
+				</listitem>
+				<listitem>
+					<para>New: dspace/jsp/dspace-admin/wizard-default-item.jsp</para>
+				</listitem>
+				<listitem>
+					<para>New: dspace/jsp/dspace-admin/wizard-permissions.jsp</para>
+				</listitem>
+				<listitem>
+					<para>New: dspace/jsp/dspace-admin/wizard-questions.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/components/contact-info.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/error/internal.jsp</para>
+				</listitem>
+				<listitem>
+					<para>New: dspace/jsp/help/formats.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/layout/footer-default.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/layout/header-default.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/layout/navbar-admin.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/layout/navbar-default.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/login/password.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/mydspace/main.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/mydspace/perform-task.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/mydspace/preview-task.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/mydspace/reject-reason.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/mydspace/remove-item.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/register/edit-profile.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/register/inactive-account.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/register/new-password.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/register/registration-form.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/search/advanced.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/search/results.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/submit/cancel.jsp</para>
+				</listitem>
+				<listitem>
+					<para>New: dspace/jsp/submit/cc-license.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/submit/choose-file.jsp</para>
+				</listitem>
+				<listitem>
+					<para>New: dspace/jsp/submit/creative-commons.css</para>
+				</listitem>
+				<listitem>
+					<para>New: dspace/jsp/submit/creative-commons.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/submit/edit-metadata-1.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/submit/edit-metadata-2.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/submit/get-file-format.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/submit/initial-questions.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/submit/progressbar.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/submit/review.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/submit/select-collection.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/submit/show-license.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/submit/show-uploaded-file.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/submit/upload-error.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/submit/upload-file-list.jsp</para>
+				</listitem>
+				<listitem>
+					<para>Changed: dspace/jsp/submit/verify-prune.jsp</para>
+				</listitem>
+				<listitem>
+					<para>New: dspace/jsp/tools/edit-item-form.jsp</para>
+				</listitem>
+				<listitem>
+					<para>New: dspace/jsp/tools/eperson-list.jsp</para>
+				</listitem>
+				<listitem>
+					<para>New: dspace/jsp/tools/itemmap-browse.jsp</para>
+				</listitem>
+				<listitem>
+					<para>New: dspace/jsp/tools/itemmap-info.jsp</para>
+				</listitem>
+				<listitem>
+					<para>New: dspace/jsp/tools/itemmap-main.jsp</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+	</section>
+	<section remap="h2">
+		<title><anchor id="docbook-history.html-version1_1_1" xreflabel="Changes in DSpace 1.1.1"/>Changes in DSpace 1.1.1</title>
+		<section remap="h3">
+			<title>Bug fixes</title>
+			<itemizedlist>
+				<listitem>
+					<para>non-administrators can now submit again</para>
+				</listitem>
+				<listitem>
+					<para>installations now preserve file creation dates, eliminating confusion with upgrades</para>
+				</listitem>
+				<listitem>
+					<para>authorization editing pages no longer create null entries in database, and no longer handles them poorly (no longer gives blank page instead of displaying policies.)</para>
+				</listitem>
+				<listitem>
+					<para>registration page Invalid token error page now displayed when an invalid token is received (as opposed to internal server error.) Fixes SF bug #739999</para>
+				</listitem>
+				<listitem>
+					<para>eperson admin &apos;recent submission&apos; links fixed for DSpaces deployed somewhere other than at / (e.g. /dspace).</para>
+				</listitem>
+				<listitem>
+					<para>help pages Link to help pages now includes servlet context (e.g. &apos;/dspace&apos;). Fixes SF bug #738399.</para>
+				</listitem>
+			</itemizedlist>
+		</section>
+		<section remap="h3">
+			<title>Improvements</title>
+			<itemizedlist>
+				<listitem>
+					<para><literal>bin/dspace-info.pl</literal> now checks jsp and asset store files for zero-length files</para>
+				</listitem>
+				<listitem>
+					<para><literal>make-release-package</literal> now works with SourceForge CVS</para>
+				</listitem>
+				<listitem>
+					<para>eperson editor now doesn&apos;t display the spurious text &apos;null&apos;</para>
+				</listitem>
+				<listitem>
+					<para>item exporter now uses Jakarta&apos;s cli command line arg parser (much cleaner)</para>
+				</listitem>
+				<listitem>
+					<para>item importer improvements: </para>
+					<itemizedlist>
+						<listitem>
+							<para>now uses Jakarta&apos;s cli command line arg parser (much cleaner)</para>
+						</listitem>
+						<listitem>
+							<para>imported items can now be routed through a workflow</para>
+						</listitem>
+						<listitem>
+							<para>more validation and error messages before import</para>
+						</listitem>
+						<listitem>
+							<para>can now use email addresses and handles instead of just database IDs</para>
+						</listitem>
+						<listitem>
+							<para>can import an item to a collection with the workflow suppressed</para>
+						</listitem>
+					</itemizedlist>
+				</listitem>
+			</itemizedlist>
+		</section>
+	</section>
+	<section remap="h2">
+		<title><anchor id="docbook-history.html-version1_1" xreflabel="Changes in DSpace 1.1"/>Changes in DSpace 1.1</title>
+		<itemizedlist>
+			<listitem>
+				<para>Fixed various OAI-related bugs; DSpace&apos;s OAI support should now be correct. Note that harvesting is now based on the new Item &apos;last modified&apos; date (as opposed to the Dublin Core <literal>date.available</literal> date.)</para>
+			</listitem>
+			<listitem>
+				<para>Fixed Handle support--DSpace now responds to naming authority requests correctly.</para>
+			</listitem>
+			<listitem>
+				<para>Multiple bitstream stores can now be specified; this allows DSpace storage to span several disks, and so there is no longer a hard limit on storage.</para>
+			</listitem>
+			<listitem>
+				<para>Search improvements: </para>
+				<itemizedlist>
+					<listitem>
+						<para>New fielded searching UI</para>
+					</listitem>
+					<listitem>
+						<para>Search results are now paged</para>
+					</listitem>
+					<listitem>
+						<para>Abstracts are indexed</para>
+					</listitem>
+					<listitem>
+						<para>Better use of Lucene API; should stop the number of open file handles getting large</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para>Submission UI improvements: </para>
+				<itemizedlist>
+					<listitem>
+						<para>now insists on a title being specified</para>
+					</listitem>
+					<listitem>
+						<para>fixed navigation on file upload page</para>
+					</listitem>
+					<listitem>
+						<para>citation &amp; identifier fields for previously published submissions now fixed</para>
+					</listitem>
+				</itemizedlist>
+			</listitem>
+			<listitem>
+				<para>Many Unicode fixes to the database and Web user interface</para>
+			</listitem>
+			<listitem>
+				<para>Collections can now be deleted</para>
+			</listitem>
+			<listitem>
+				<para>Bitstream descriptions (if available) displayed on item display page</para>
+			</listitem>
+			<listitem>
+				<para>Modified a couple of servlets to handle invalid parameters better (i.e. to report a suitable error message instead of an internal server error)</para>
+			</listitem>
+			<listitem>
+				<para>Item templates now work</para>
+			</listitem>
+			<listitem>
+				<para>Fixed registration token expiration problem (they no longer expire.)</para>
+			</listitem>
+		</itemizedlist>
+	</section>
+</chapter>

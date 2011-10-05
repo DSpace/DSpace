@@ -1,0 +1,7 @@
+#!/bin/sh
+
+BINDIR=`dirname $0`
+
+# Call the new way to update indexes (old and new)
+$BINDIR/dspace index-update
+$BINDIR/dspace update-discovery-index

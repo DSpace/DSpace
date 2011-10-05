@@ -1,0 +1,128 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.dspace</groupId>
+    <artifactId>modules</artifactId>
+    <packaging>pom</packaging>
+    <name>DSpace Addon Modules</name>
+    <url>http://www.dspace.org</url>
+    <description>DSpace Addon Modules</description>
+
+    <parent>
+        <groupId>org.dspace</groupId>
+        <artifactId>dspace-parent</artifactId>
+        <version>1.7.2</version>
+    </parent>
+
+    <repositories>
+        <repository>
+            <id>maven.dspace.org-snapshot</id>
+            <name>DSpace Maven Snapshot Repository</name>
+            <url>http://maven.dspace.org/snapshot</url>
+            <releases>
+                <enabled>false</enabled>
+                <checksumPolicy>fail</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <scm>
+        <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2</connection>
+        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2/dspace/modules
+        </developerConnection>
+        <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.7.2/dspace/modules</url>
+    </scm>
+
+    <modules>
+        <module>identifier-services</module>
+        <module>api</module>
+        <!--<module>discovery</module>-->
+        <module>xmlui</module>
+        <module>bagit</module>
+        <module>oai</module>
+        <module>solr</module>
+        <module>api-stats</module>
+        <module>doi</module>
+        <module>dataone-mn</module>
+        <module>journal-submit</module>
+        <module>versioning</module>
+        <!--module>solr-load-tester</module-->
+	</modules>
+
+
+    <dependencyManagement>
+           <dependencies>
+
+               <dependency>
+                   <groupId>org.dspace</groupId>
+                   <artifactId>dspace-services-api</artifactId>
+                   <version>2.0.3</version>
+               </dependency>
+                <dependency>
+                   <groupId>org.dspace</groupId>
+                   <artifactId>dspace-services-impl</artifactId>
+                   <version>2.0.3</version>
+               </dependency>
+                           <dependency>
+                   <groupId>org.dspace</groupId>
+                   <artifactId>dspace-services-utils</artifactId>
+                   <version>2.0.3</version>
+               </dependency>
+
+
+
+
+               <dependency>
+                   <groupId>org.dspace.modules</groupId>
+                   <artifactId>api</artifactId>
+                   <version>${pom.version}</version>
+               </dependency>
+
+               <dependency>
+                   <groupId>org.dspace.modules</groupId>
+                   <artifactId>identifier-services</artifactId>
+                   <version>${pom.version}</version>
+               </dependency>
+
+               <dependency>
+                   <groupId>org.dspace.modules</groupId>
+                   <artifactId>versioning-api</artifactId>
+                   <version>${pom.version}</version>
+               </dependency>
+
+               <dependency>
+                   <groupId>org.dspace.modules</groupId>
+                   <artifactId>doi-service</artifactId>
+                   <version>${pom.version}</version>
+               </dependency>
+
+               <dependency>
+                   <groupId>org.dspace.modules</groupId>
+                   <artifactId>versioning-webapp</artifactId>
+                   <type>jar</type>
+                   <classifier>classes</classifier>
+                   <version>${pom.version}</version>
+               </dependency>
+
+               <dependency>
+                   <groupId>org.dspace.modules</groupId>
+                   <artifactId>versioning-webapp</artifactId>
+                   <version>${pom.version}</version>
+                   <type>war</type>
+               </dependency>
+
+               <dependency>
+                   <groupId>org.dspace.modules</groupId>
+                   <artifactId>versioning-api</artifactId>
+                   <version>${pom.version}</version>
+               </dependency>
+
+           </dependencies>
+       </dependencyManagement>
+
+	
+</project>

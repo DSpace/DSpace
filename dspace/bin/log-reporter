@@ -1,0 +1,397 @@
+#!/usr/bin/env perl
+
+###########################################################################
+#
+# log-reporter
+#
+# Version: $Revision$
+#
+# Date: $Date$
+#
+# Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are
+# met:
+#
+# - Redistributions of source code must retain the above copyright
+# notice, this list of conditions and the following disclaimer.
+#
+# - Redistributions in binary form must reproduce the above copyright
+# notice, this list of conditions and the following disclaimer in the
+# documentation and/or other materials provided with the distribution.
+#
+# - Neither the name of the DSpace Foundation nor the names of its
+# contributors may be used to endorse or promote products derived from
+# this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+# ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+# A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+# HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
+# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
+# OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+# ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
+# TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+# USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+# DAMAGE.
+#
+###########################################################################
+
+# Does a useful, if simple, summary of the DSpace log for a given
+# time period.  Uses ParseDate to allow flexible specification of 
+# date ranges.
+#
+# Sample uses:
+# 
+#   reporter.pl --startdate "2 weeks ago sunday" \
+#               --enddate "last saturday"
+#
+#   ...generates a summary suitable for email (w/subject: line)
+#   for all of the last calendar week.
+#
+#
+#   reporter.pl --date yesterday --nosubject
+#
+#   ...generates a summary without email header for log records
+#   from previous day only
+
+
+use Getopt::Long;
+use Date::Manip qw(ParseDate UnixDate);
+use File::Basename;
+use strict;
+
+my $date;
+my $startdate;
+my $enddate;
+my $logfile;
+my $no_subject;
+my $help;
+
+
+# Process command line arguments
+GetOptions("date=s"      => \$date,
+           "startdate=s" => \$startdate,
+           "enddate=s"   => \$enddate,
+           "nosubject"   => \$no_subject,
+           "help"        => \$help);
+        
+if (defined $help)
+{
+        usage();
+        exit(1);
+}
+                
+
+# Set both start/end to date if specified
+if (defined $date)
+{
+        $startdate = $date;
+        $enddate = $date;
+}
+
+# Make the dates comparable
+if (defined $startdate) 
+{
+        $startdate = ParseDate($startdate);
+        if (!$startdate)
+        {
+                usage();
+                exit(1);
+        }
+
+        my ($year, $month, $day) = UnixDate($startdate, "%Y", "%m", "%d" );
+        $startdate = "$year-$month-$day";
+}
+
+if (defined $enddate)
+{
+        $enddate = ParseDate($enddate);
+        if (!$enddate)
+        {
+                usage();
+                exit(1);
+        }
+        my ($year, $month, $day) = UnixDate($enddate, "%Y", "%m", "%d" );
+        $enddate = "$year-$month-$day";
+}
+
+
+# Get DSpace bin directory
+my $bindir = dirname $0;
+
+# Get the DSpace log directory
+my $logdir = `$bindir/dsrun org.dspace.core.ConfigurationManager -property log.dir`;
+chomp $logdir;
+
+
+my $line_count = 0;
+
+# Okay, get on with it
+my $warnings = 0;
+my @logins;
+my @submissions;
+my @installations;
+my %item_views;
+my @searches;
+my %all_events;
+
+foreach $logfile (<$logdir/dspace.log*>)
+{
+        open (IN, $logfile);
+
+        while (<IN>)
+        {
+                $line_count++;
+
+                # Read in log data
+
+                # Sample log line:
+                # 2002-09-12 15:20:39,549 INFO  org.dspace.content.Item @ rtansley@mit.edu:session_id=4C1D7E8E5C132788A87BD76C683C5CA2:update_item:item_id=2
+
+                #                                                            Java class     session ID     parameters
+                #                                                                +             +              +
+                #                   date            time                level    +     user    +    action    +
+                #           --------------------- +++++++++++++++++++++ -----   +++   ------- ++++  ------- ++++
+                if ($_ !~ /^(\d\d\d\d-\d\d\-\d\d) \d\d:\d\d:\d\d,\d\d\d (\w+)\s+\S+ @ ([^:]+):[^:]+:([^:]+):(.*)/)
+                {
+                        # FIXME: throw away bad input lines for now
+                        next;
+                }
+
+                my $logdate = ParseDate($1);
+                my $level = $2;
+                my $user = $3;
+                my $action = $4;
+                my $params = $5;
+
+                my ($year, $month, $day) = UnixDate($logdate, "%Y", "%m", "%d");
+                $logdate = "$year-$month-$day";
+
+                # skip if the log record is too old
+                if (defined $startdate)
+                {
+                        if ($logdate lt $startdate)
+                        {
+                                next;
+                        }
+                }
+
+                # skip if the log record is too new
+                if (defined $enddate)
+                {
+                        if ($logdate gt $enddate)
+                        {
+                                next;
+                        }
+                }
+
+
+                # consider adding current record into the summary
+
+                # record warnings
+                if ($level eq "WARN")
+                {
+                        $warnings++;
+                }
+
+                # record logins
+                if ($action eq "login")
+                {
+                        push (@logins, $user);
+                }
+
+                # record submissions
+                if ($action eq "start_workflow")
+                {
+                        $params =~ /.*item_id=(\d+).*/;
+
+                        push (@submissions, "$1 ($user)");
+                }
+
+	        # Record item installations
+                if ($action eq "install_item")
+                {
+        	        $params =~ s/workflow_id=\d+, //;
+                        push (@installations, "$params ($user)");
+	        }
+
+                # record search terms and hit count
+                if( $action eq "search" )
+                {
+                        $params =~ s/query=//;
+                        push (@searches, $params);
+                }
+
+                # record item views
+                if( $action eq "view_item" )
+                {
+                        $params =~ s/handle=//;
+                        $params =~ s/,item_id=.*$//;
+                        $item_views{$params}++;
+                }        
+
+
+
+                # record all events
+                $all_events{$action}++;
+
+        }
+
+        close (IN);
+}
+
+
+# write the actual summary
+my $summary;
+
+# grab the hostname, which isn't in $ENV under bash on hpds*
+my $hostname = qx(hostname);
+chomp $hostname;
+
+if (!defined $hostname)
+{
+        $hostname = "";
+}
+
+# add a subject line for mail messages unless told not to
+if (defined $no_subject)
+{
+        # give a friendly header
+        $summary = "$hostname usage summary for ";
+}
+else
+{
+        $summary = "Subject: $hostname usage, ";
+}
+
+# add an appropriate date range to the header
+if (defined $date)
+{
+        $summary .= "$date\n";
+}
+else
+{
+        if (defined $startdate)
+        {
+                $summary .= "$startdate ";
+        }
+        
+        if (defined $enddate)
+        {
+                $summary .= "to $enddate";
+        }
+        
+        # appropriate whitespace
+        if (defined $no_subject)
+        {
+                $summary .= "\n\n -=-=-\n\n";
+        }
+        else
+        {
+                $summary .= "\n\n";
+        }
+}
+
+
+# summarize logins        
+if (@logins > 0)
+{
+	my %user_login;
+        my $login;
+        my $user;
+        
+        $summary .= "Users logging in\t(logins):\n\n";
+        foreach $login (sort @logins)
+        {
+                $user_login{$login}++;
+        }
+        foreach $user (sort keys %user_login)
+        {
+                $summary .= "$user\t($user_login{$user})\n";
+        }
+        $summary .= "\n\n";
+}
+
+# summarize new submissions
+if (@submissions > 0)
+{
+	my $submission;
+
+        $summary .= "Submissions (" . @submissions . " total):\n\n";
+        foreach $submission (sort @submissions)
+        {
+                $summary .= "$submission\n";
+        }
+        $summary .= "\n\n";
+}
+
+# summarize installations
+if (@installations > 0)
+{
+	my $installation;
+
+        $summary .= "Items accepted and installed (" . @installations . " total):\n\n";
+        foreach $installation (sort @installations)
+        {
+                $summary .= "$installation\n";
+        }
+        $summary .= "\n\n";
+}
+
+
+# summarize searches
+if (@searches > 0)
+{
+	my $search;
+
+        $summary .= "Searches:\n\n";
+        foreach $search (sort @searches)
+        {
+                $summary .= "$search\n";
+        }
+        $summary .= "\n\n";
+}
+
+
+# summarize items viewed
+my $item_viewed;
+
+$summary .= "Items viewed\t(views):\n\n";
+foreach $item_viewed (sort keys %item_views)
+{
+        $summary .= "$item_viewed\t(" . $item_views{$item_viewed}  . ")\n";
+}
+$summary .= "\n\n";
+
+
+# summarize warnings
+$summary .= "Warnings: " . $warnings . "\n\n";
+
+
+# summarize all events
+my $event;
+
+$summary .= "All events\t(total):\n\n";
+foreach $event (sort keys %all_events)
+{
+        $summary .= "$event\t(" . $all_events{$event} . ")\n";
+}
+
+
+print $summary;
+
+exit(0);
+
+
+# standard usage message
+sub usage
+{
+        print "Usage: reporter.pl [--date DATE] " .
+                "[--startdate STARTDATE] [--enddate ENDDATE]\n";
+            
+
+}
