@@ -3,57 +3,41 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ar.edu.unlp.sedici</groupId>
 	<artifactId>dspace-sedici</artifactId>
-	<packaging>war</packaging>
-	<version>1.8.1-rc1-SNAPSHOT</version>
-	<name>dspace-sedici Webapp</name>
+	<packaging>pom</packaging>
+	<name>dspace-sedici Parent</name>
 	<url>http://maven.apache.org</url>
-	<dependencies>
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
-			<version>3.8.1</version>
-			<scope>test</scope>
-		</dependency>
+	
+	<parent>
+		<groupId>org.dspace</groupId>
+		<artifactId>dspace-parent</artifactId>
+		<version>1.8.0-rc1</version>
+		<!-- <relativePath>..</relativePath> -->
+	</parent>
+	<modules>
+		<module>dspace-sedici-xmlui</module>
+		<module>dspace-sedici-installer</module>
+	</modules>
 
-		<dependency>
-			<groupId>org.dspace.modules</groupId>
-			<artifactId>xmlui</artifactId>
-			<version>1.8.0-rc1</version>
-			<type>war</type>
-		</dependency>
+	<properties>
+		<dspace.dir>/home/ariel/development/dspace/dspace-1.8.x</dspace.dir>
+	</properties>
+
+	<dependencies>
+
 
 	</dependencies>
+
 	<build>
-
-		<!-- <filters> -->
-		<!-- <filter>sedici.default.properties</filter> -->
-		<!-- </filters> -->
-		<resources>
-			<resource>
-				<directory>src/main/resources</directory>
-				<filtering>true</filtering>
-				<includes>
-					<include>**</include>
-				</includes>
-			</resource>
-		</resources>
-
 		<plugins>
-			<plugin>
-				<groupId>org.mortbay.jetty</groupId>
-				<artifactId>maven-jetty-plugin</artifactId>
-				<version>6.1.26</version>
-			</plugin>
-
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>tomcat-maven-plugin</artifactId>
-				<version>1.1</version>
-				<!-- <configuration> -->
-				<!-- <warFile>path/to/my/warFile.war</warFile> -->
-				<!-- </configuration> -->
-			</plugin>
-
+<!-- 			<plugin> -->
+<!-- 				<artifactId>maven-war-plugin</artifactId> -->
+<!-- 				<version>2.1.1</version> -->
+<!-- 				<configuration> -->
+<!-- 					<filters> -->
+<!-- 					<filter>${basedir}/config.prop</filter> -->
+<!-- 					</filters> -->
+<!-- 				</configuration> -->
+<!-- 			</plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-resources-plugin</artifactId>
@@ -62,64 +46,9 @@
 					<encoding>UTF-8</encoding>
 				</configuration>
 			</plugin>
-
-			<plugin>
-
-				<artifactId>maven-war-plugin</artifactId>
-				<version>2.1.1</version>
-
-				<configuration>
-					<archiveClasses>false</archiveClasses>
-					<filters>
-						<filter>config.prop</filter>
-					</filters>
-					<filtering>true</filtering>
-					<filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
-					<webXml>${project.build.directory}/${project.build.finalName}/webxml/WEB-INF/web.xml</webXml>
-
-					<webResources>
-						<resource>
-							<filtering>true</filtering>
-							<directory>${basedir}/src/main/webapp</directory>
-							<includes>
-								<include>**/*.xml</include>
-							</includes>
-						</resource>
-					</webResources>
-
-					<overlays>
-						<!-- Se extrae web.xml para filtrar por separado -->
-						<overlay>
-							<groupId>org.dspace.modules</groupId>
-							<artifactId>xmlui</artifactId>
-			
-							<includes>
-								<include>WEB-INF/web.xml</include>
-							</includes>
-							<targetPath>webxml/</targetPath>
-						</overlay>
-						<overlay>
-							<groupId>org.dspace.modules</groupId>
-							<artifactId>xmlui</artifactId>
-							
-							<excludes>
-								<exclude>WEB-INF/web.xml</exclude>
-							</excludes>
-						</overlay>
-						<overlay>
-							<!-- empty groupId/artifactId represents the current build -->
-						</overlay>
-					</overlays>
-				</configuration>
-
-			</plugin>
-
 		</plugins>
-
-		<finalName>dspace-sedici</finalName>
 	</build>
 
-	<!-- <properties> -->
-	<!-- <dspace.dir>/home/ariel/development/dspace/config/dspace.cfg</dspace.dir> -->
-	<!-- </properties> -->
+
+
 </project>
