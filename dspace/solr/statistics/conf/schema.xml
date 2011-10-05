@@ -294,6 +294,7 @@
    <field name="dns" type="string" indexed="true" stored="true" required="false"/>
    <field name="userAgent" type="string" indexed="true" stored="true" required="false"/>
    <field name="isBot" type="boolean" indexed="true" stored="true" required="false"/>
+   <field name="bundleName" type="string" indexed="true" stored="true" required="false" multiValued="true" />
 
  </fields>
 

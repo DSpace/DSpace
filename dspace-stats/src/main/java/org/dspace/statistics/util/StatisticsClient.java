@@ -59,6 +59,8 @@ public class StatisticsClient
         options.addOption("f", "delete-spiders-by-flag", false, "Delete Spiders in Solr By isBot Flag");
         options.addOption("i", "delete-spiders-by-ip", false, "Delete Spiders in Solr By IP Address");
         options.addOption("o", "optimize", false, "Run maintenance on the SOLR index");
+        options.addOption("b", "reindex-bitstreams", false, "Reindex the bitstreams to ensure we have the bundle name");
+        options.addOption("r", "remove-deleted-bitstreams", false, "While indexing the bundle names remove the statistics about deleted bitstreams");
         options.addOption("h", "help", false, "help");
 
 		CommandLine line = parser.parse(options, args);
@@ -88,6 +90,10 @@ public class StatisticsClient
         else if(line.hasOption('o'))
         {
             SolrLogger.optimizeSOLR();
+        }
+        else if(line.hasOption('b'))
+        {
+            SolrLogger.reindexBitstreamHits(line.hasOption('r'));
         }
         else
         {
