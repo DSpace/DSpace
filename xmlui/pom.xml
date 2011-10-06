@@ -11,9 +11,9 @@
 	<packaging>war</packaging>
 	<name>Dspace@SeDiCI XMLUI</name>
 	<description>desc</description>
-	
+
 	<dependencies>
-	
+
 		<dependency>
 			<groupId>org.dspace.modules</groupId>
 			<artifactId>xmlui</artifactId>
@@ -21,7 +21,7 @@
 			<type>war</type>
 		</dependency>
 	</dependencies>
-	
+
 	<build>
 
 		<!-- <filters> -->
@@ -42,6 +42,9 @@
 				<groupId>org.mortbay.jetty</groupId>
 				<artifactId>maven-jetty-plugin</artifactId>
 				<version>6.1.26</version>
+<!-- 				<configuration> -->
+<!-- 					<contextPath>/dspace</contextPath> -->
+<!-- 				</configuration> -->
 			</plugin>
 
 			<plugin>
@@ -59,9 +62,9 @@
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
 					<archiveClasses>false</archiveClasses>
-<!-- 					<filters> -->
-<!-- 						<filter>config.prop</filter> -->
-<!-- 					</filters> -->
+					<!-- <filters> -->
+					<!-- <filter>config.prop</filter> -->
+					<!-- </filters> -->
 					<filtering>true</filtering>
 					<filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
 					<webXml>${project.build.directory}/${project.build.finalName}/webxml/WEB-INF/web.xml</webXml>
@@ -105,5 +108,4 @@
 
 		</plugins>
 	</build>
-	<groupId>ar.edu.unlp.sedici</groupId>
 </project>
