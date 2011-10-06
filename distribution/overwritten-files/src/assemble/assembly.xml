@@ -3,7 +3,7 @@
 	online at http://www.dspace.org/license/ -->
 <assembly xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/assembly-1.1.0-SNAPSHOT.xsd">
-	<id>build</id>
+	<id>bin</id>
 	<formats>
 		<format>dir</format>
 	</formats>
@@ -43,7 +43,7 @@
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>config/modules/**</include>
-				<include>config/dspace.cfg</include>
+<!-- 				<include>config/dspace.cfg</include> -->
 			</includes>
 			<filtered>true</filtered>
 		</fileSet>
@@ -58,36 +58,28 @@
 		</fileSet>
 	</fileSets>
 
-<!-- 	<files> -->
-<!-- 		<file> -->
-<!-- 			<source>dspace-tag-files/config/dspace.cfg</source> -->
-<!-- 			<outputDirectory>config</outputDirectory> -->
-<!-- 			<filtered>true</filtered> -->
-<!-- 		</file> -->
-<!-- 	</files> -->
-
 	<dependencySets>
 		<dependencySet>
 			<excludes>
 				<exclude>*:war:*</exclude>
 			</excludes>
 			<outputDirectory>lib</outputDirectory>
+			<useProjectArtifact>false</useProjectArtifact>
 		</dependencySet>
 	</dependencySets>
 
 	<moduleSets>
+
 		<moduleSet>
-		 <useAllReactorProjects>true</useAllReactorProjects>
-      
-			<includes>
-				<!-- <include>org.dspace.modules:*:war:*</include> -->
-				<include>ar.edu.unlp.sedici:dspace-sedici-xmlui</include>
-			</includes>
+			<useAllReactorProjects>true</useAllReactorProjects>
+<!-- 			<includes> -->
+<!-- 				<include>ar.edu.unlp.sedici:xmlui</include> -->
+<!-- 			</includes> -->
 
 			<binaries>
 				<includeDependencies>false</includeDependencies>
 				<outputDirectory>webapps/${module.artifactId}</outputDirectory>
-				<unpack>false</unpack>
+				<unpack>true</unpack>
 			</binaries>
 		</moduleSet>
 	</moduleSets>

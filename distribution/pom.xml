@@ -21,16 +21,13 @@
 				<!-- <version>2.2-beta-3-SNAPSHOT</version> -->
 
 				<configuration>
-					<archiver>
-						<duplicateBehaviour>fail</duplicateBehaviour>
-					</archiver>
 					<descriptors>
 						<descriptor>overwritten-files/src/assemble/assembly.xml</descriptor>
 					</descriptors>
 				</configuration>
 				<executions>
 					<execution>
-						<id>build</id> <!-- this is used for inheritance merges -->
+						<id>bin</id> <!-- this is used for inheritance merges -->
 						<phase>package</phase> <!-- bind to the packaging phase -->
 						<goals>
 							<goal>single</goal>
@@ -39,52 +36,17 @@
 				</executions>
 			</plugin>
 		</plugins>
+		<finalName>dspace-sedici-distribution</finalName>
 	</build>
 
 	<dependencies>
 		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>dspace-api</artifactId>
+			<groupId>ar.edu.unlp.sedici</groupId>
+			<artifactId>xmlui</artifactId>
+			<version>${project.version}</version>
+			<type>war</type>
 		</dependency>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>dspace-api-lang</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>dspace-services-impl</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>dspace-services-utils</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>dspace-stats</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>dspace-discovery-provider</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.dspace</groupId>
-			<artifactId>dspace-discovery-solr</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>servlet-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>ant-contrib</groupId>
-			<artifactId>ant-contrib</artifactId>
-			<version>1.0b3</version>
-			<exclusions>
-				<exclusion>
-					<groupId>ant</groupId>
-					<artifactId>ant</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+		
 	</dependencies>
 
 </project>
