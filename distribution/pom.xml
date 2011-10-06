@@ -2,7 +2,7 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>dspace-sedici-installer</artifactId>
+	<artifactId>distribution</artifactId>
 	<packaging>pom</packaging>
 	<name>DSpace@SeDiCI Assembly and Configuration</name>
 	<parent>
@@ -11,27 +11,29 @@
 		<version>1.8.0-rc1</version>
 		<relativePath>..</relativePath>
 	</parent>
-	
-	
-	<modules>
-		<module>../dspace-sedici-xmlui</module>
-<!-- 		<module>../dspace-sedici-installer</module> -->
-	</modules>
+
+
 
 	<build>
 		<plugins>
 			<plugin>
 				<artifactId>maven-assembly-plugin</artifactId>
+				<!-- <version>2.2-beta-3-SNAPSHOT</version> -->
+
 				<configuration>
+					<archiver>
+						<duplicateBehaviour>fail</duplicateBehaviour>
+					</archiver>
 					<descriptors>
 						<descriptor>overwritten-files/src/assemble/assembly.xml</descriptor>
 					</descriptors>
 				</configuration>
 				<executions>
 					<execution>
-						<phase>package</phase>
+						<id>build</id> <!-- this is used for inheritance merges -->
+						<phase>package</phase> <!-- bind to the packaging phase -->
 						<goals>
-							<goal>directory-single</goal>
+							<goal>single</goal>
 						</goals>
 					</execution>
 				</executions>

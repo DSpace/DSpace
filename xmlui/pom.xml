@@ -7,7 +7,7 @@
 		<version>1.8.0-rc1</version>
 		<relativePath>..</relativePath>
 	</parent>
-	<artifactId>dspace-sedici-xmlui</artifactId>
+	<artifactId>xmlui</artifactId>
 	<packaging>war</packaging>
 	<name>Dspace@SeDiCI XMLUI</name>
 	<description>desc</description>
@@ -105,4 +105,5 @@
 
 		</plugins>
 	</build>
+	<groupId>ar.edu.unlp.sedici</groupId>
 </project>

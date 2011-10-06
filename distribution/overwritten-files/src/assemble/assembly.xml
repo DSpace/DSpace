@@ -39,9 +39,11 @@
 			</excludes>
 		</fileSet>
 		<fileSet>
+			<directory>dspace-tag-files</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
-				<include>dspace-tag-files/config/modules/**</include>
+				<include>config/modules/**</include>
+				<include>config/dspace.cfg</include>
 			</includes>
 			<filtered>true</filtered>
 		</fileSet>
@@ -49,7 +51,8 @@
 			<directory>overwritten-files</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
-				<include>config/**</include>
+				<include>config/modules/**</include>
+				<include>config/dspace.cfg</include>
 			</includes>
 			<filtered>true</filtered>
 		</fileSet>
@@ -74,15 +77,17 @@
 
 	<moduleSets>
 		<moduleSet>
+		 <useAllReactorProjects>true</useAllReactorProjects>
+      
 			<includes>
-<!-- 				<include>org.dspace.modules:*:war:*</include> -->
-				<include>ar.edu.unlp.sedici:*:war:*</include>
+				<!-- <include>org.dspace.modules:*:war:*</include> -->
+				<include>ar.edu.unlp.sedici:dspace-sedici-xmlui</include>
 			</includes>
 
 			<binaries>
 				<includeDependencies>false</includeDependencies>
 				<outputDirectory>webapps/${module.artifactId}</outputDirectory>
-				<unpack>true</unpack>
+				<unpack>false</unpack>
 			</binaries>
 		</moduleSet>
 	</moduleSets>
