@@ -66,22 +66,32 @@
 			<outputDirectory>lib</outputDirectory>
 			<useProjectArtifact>false</useProjectArtifact>
 		</dependencySet>
+		<dependencySet>
+			<includes>
+				<include>*:war:*</include>
+			</includes>
+			<outputDirectory>webapps</outputDirectory>
+			<useProjectArtifact>false</useProjectArtifact>
+			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+		</dependencySet>
 	</dependencySets>
 
-	<moduleSets>
+<!-- 	<moduleSets> -->
 
-		<moduleSet>
-			<useAllReactorProjects>true</useAllReactorProjects>
+<!-- 		<moduleSet> -->
+<!-- 			<useAllReactorProjects>true</useAllReactorProjects> -->
+			
 <!-- 			<includes> -->
 <!-- 				<include>ar.edu.unlp.sedici:xmlui</include> -->
+<!-- 				<include>org.dspace.modules:*</include> -->
 <!-- 			</includes> -->
 
-			<binaries>
-				<includeDependencies>false</includeDependencies>
-				<outputDirectory>webapps/${module.artifactId}</outputDirectory>
-				<unpack>true</unpack>
-			</binaries>
-		</moduleSet>
-	</moduleSets>
+<!-- 			<binaries> -->
+<!-- 				<includeDependencies>false</includeDependencies> -->
+<!-- 				<outputDirectory>webapps/${module.artifactId}</outputDirectory> -->
+<!-- 				<unpack>true</unpack> -->
+<!-- 			</binaries> -->
+<!-- 		</moduleSet> -->
+<!-- 	</moduleSets> -->
 
 </assembly>
