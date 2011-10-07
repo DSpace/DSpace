@@ -77,12 +77,6 @@
         <xsl:param name="href"/>
         <xsl:variable name="metadataWidth" select="675 - $thumbnail.maxwidth - 30"/>
         <div class="item-metadata" style="width: {$metadataWidth}px;">
-            <span class="Z3988">
-            <xsl:attribute name="title">
-                 <xsl:call-template name="renderCOinS"/>
-            </xsl:attribute>
-            &#xFEFF; <!-- non-breaking space to force separating the end tag -->
-            </span>
             <span class="bold"><i18n:text>xmlui.dri2xhtml.pioneer.title</i18n:text><xsl:text>:</xsl:text></span>
             <span class="content" style="width: {$metadataWidth - 110}px;">
                 <xsl:element name="a">
@@ -98,6 +92,12 @@
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:element>
+            </span>
+            <span class="Z3988">
+                <xsl:attribute name="title">
+                    <xsl:call-template name="renderCOinS"/>
+                </xsl:attribute>
+                &#xFEFF; <!-- non-breaking space to force separating the end tag -->
             </span>
             <span class="bold"><i18n:text>xmlui.dri2xhtml.pioneer.author</i18n:text><xsl:text>:</xsl:text></span>
             <span class="content" style="width: {$metadataWidth - 110}px;">
@@ -153,12 +153,6 @@
         <xsl:param name="href"/>
         <div class="artifact-description">
             <div class="artifact-title">
-                <span class="Z3988">
-                    <xsl:attribute name="title">
-                        <xsl:call-template name="renderCOinS"/>
-                    </xsl:attribute>
-                    &#xFEFF; <!-- non-breaking space to force separating the end tag -->
-                </span>
                 <xsl:element name="a">
                     <xsl:attribute name="href">
                         <xsl:value-of select="$href"/>
@@ -172,6 +166,12 @@
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:element>
+                <span class="Z3988">
+                    <xsl:attribute name="title">
+                        <xsl:call-template name="renderCOinS"/>
+                    </xsl:attribute>
+                    &#xFEFF; <!-- non-breaking space to force separating the end tag -->
+                </span>
             </div>
             <div class="artifact-info">
                 <span class="author">

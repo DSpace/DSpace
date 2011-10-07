@@ -49,12 +49,6 @@
     <xsl:template match="dim:dim" mode="itemSummaryList-DIM">
         <xsl:variable name="itemWithdrawn" select="@withdrawn" />
         <div class="artifact-description">
-            <span class="Z3988">
-                <xsl:attribute name="title">
-                    <xsl:call-template name="renderCOinS"/>
-                </xsl:attribute>
-                &#xFEFF; <!-- non-breaking space to force separating the end tag -->
-            </span>
             <div class="artifact-title">
                 <xsl:element name="a">
                     <xsl:attribute name="href">
@@ -77,6 +71,12 @@
                     </xsl:choose>
                 </xsl:element>
             </div>
+            <span class="Z3988">
+                <xsl:attribute name="title">
+                    <xsl:call-template name="renderCOinS"/>
+                </xsl:attribute>
+                &#xFEFF; <!-- non-breaking space to force separating the end tag -->
+            </span>
             <div class="artifact-info">
                 <span class="author">
                     <xsl:choose>

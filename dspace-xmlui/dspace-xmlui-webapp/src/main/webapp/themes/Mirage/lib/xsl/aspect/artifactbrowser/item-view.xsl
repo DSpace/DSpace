@@ -307,15 +307,15 @@
 
 
     <xsl:template match="dim:dim" mode="itemDetailView-DIM">
+        <table class="ds-includeSet-table detailtable">
+		    <xsl:apply-templates mode="itemDetailView-DIM"/>
+		</table>
         <span class="Z3988">
             <xsl:attribute name="title">
                  <xsl:call-template name="renderCOinS"/>
             </xsl:attribute>
             &#xFEFF; <!-- non-breaking space to force separating the end tag -->
         </span>
-		<table class="ds-includeSet-table detailtable">
-		    <xsl:apply-templates mode="itemDetailView-DIM"/>
-		</table>
     </xsl:template>
 
     <xsl:template match="dim:field" mode="itemDetailView-DIM">

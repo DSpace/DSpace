@@ -82,6 +82,12 @@
          <xsl:call-template name="itemSummaryView-DIM-fields">
          </xsl:call-template>
         </table>
+        <span class="Z3988">
+            <xsl:attribute name="title">
+                <xsl:call-template name="renderCOinS"/>
+            </xsl:attribute>
+            &#xFEFF; <!-- non-breaking space to force separating the end tag -->
+        </span>
     </xsl:template>
 
     <!-- render each field on a row, alternating phase between odd and even -->
@@ -127,12 +133,7 @@
 
           <!-- Title row -->
           <xsl:when test="$clause = 1">
-              <span class="Z3988">
-                  <xsl:attribute name="title">
-                      <xsl:call-template name="renderCOinS"/>
-                  </xsl:attribute>
-                  &#xFEFF; <!-- non-breaking space to force separating the end tag -->
-              </span>
+
             <tr class="ds-table-row {$phase}">
                 <td><span class="bold"><i18n:text>xmlui.dri2xhtml.METS-1.0.item-title</i18n:text>: </span></td>
                 <td>
@@ -359,14 +360,14 @@
 
     <!-- The block of templates used to render the complete DIM contents of a DRI object -->
     <xsl:template match="dim:dim" mode="itemDetailView-DIM">
+   		<table class="ds-includeSet-table">
+		    <xsl:apply-templates mode="itemDetailView-DIM"/>
+		</table>
         <span class="Z3988">
             <xsl:attribute name="title">
                  <xsl:call-template name="renderCOinS"/>
             </xsl:attribute>
         </span>
-		<table class="ds-includeSet-table">
-		    <xsl:apply-templates mode="itemDetailView-DIM"/>
-		</table>
     </xsl:template>
 
     <xsl:template match="dim:field" mode="itemDetailView-DIM">
