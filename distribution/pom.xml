@@ -13,7 +13,6 @@
 	</parent>
 
 
-
 	<build>
 		<plugins>
 			<plugin>
@@ -45,6 +44,13 @@
 			<artifactId>xmlui</artifactId>
 			<version>${project.version}</version>
 			<type>war</type>
+		</dependency>
+		
+		<dependency>
+			<groupId>ar.edu.unlp.sedici</groupId>
+			<artifactId>plugins</artifactId>
+			<version>${project.version}</version>
+			<type>jar</type>
 		</dependency>
 		
 	</dependencies>
