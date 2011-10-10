@@ -87,9 +87,9 @@ public class IPAuthentication implements AuthenticationMethod
             {
                 String[] nameParts = propName.split("\\.");
 
-                if (nameParts.length == 3)
+                if (nameParts.length == 2)
                 {
-                    addMatchers(nameParts[2], ConfigurationManager.getProperty("authentication-ip", propName));
+                    addMatchers(nameParts[1], ConfigurationManager.getProperty("authentication-ip", propName));
                 }
                 else
                 {
