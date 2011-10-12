@@ -12,6 +12,17 @@
 		<relativePath>..</relativePath>
 	</parent>
 
+	<properties>
+		<default.db.name>postgres</default.db.name>
+		<default.db.driver>org.postgresql.Driver</default.db.driver>
+		<default.db.url>jdbc:postgresql://localhost:5432/dspace</default.db.url>
+		<default.db.username>dspace_user</default.db.username>
+		<default.db.password>dspace_password</default.db.password>
+		<default.dspace.dir>/dspace</default.dspace.dir>
+		<default.mail.server>smtp.example.com</default.mail.server>
+		<default.solr.server>http://localhost:8080/solr</default.solr.server>
+	</properties>
+
 
 	<build>
 		<plugins>
@@ -45,14 +56,23 @@
 			<version>${project.version}</version>
 			<type>war</type>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>ar.edu.unlp.sedici</groupId>
 			<artifactId>plugins</artifactId>
 			<version>${project.version}</version>
 			<type>jar</type>
 		</dependency>
-		
+
+         <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
+
+		<dependency>
+			<groupId>postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+		</dependency>
 	</dependencies>
 
 </project>

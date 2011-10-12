@@ -19,6 +19,5 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.m2e.core.maven2Nature</nature>
-		<nature>com.sysdeo.eclipse.tomcat.tomcatnature</nature>
 	</natures>
 </projectDescription>

@@ -51,10 +51,21 @@
 			<directory>overwritten-files</directory>
 			<outputDirectory>.</outputDirectory>
 			<includes>
-				<include>config/modules/**</include>
+				<include>config/**</include>
 				<include>config/dspace.cfg</include>
 			</includes>
+			<excludes>
+				<exclude>config/GeoLiteCity.dat</exclude>
+			</excludes>
 			<filtered>true</filtered>
+		</fileSet>
+		<fileSet>
+			<directory>overwritten-files</directory>
+			<outputDirectory>.</outputDirectory>
+			<includes>
+				<include>config/GeoLiteCity.dat</include>
+			</includes>
+			<filtered>false</filtered>
 		</fileSet>
 	</fileSets>
 
@@ -70,9 +81,10 @@
 			<includes>
 				<include>*:war:*</include>
 			</includes>
-			<outputDirectory>webapps</outputDirectory>
+			<outputDirectory>webapps/${artifact.artifactId}</outputDirectory>
 			<useProjectArtifact>false</useProjectArtifact>
-			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping>
+<!-- 			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping> -->
+			<unpack>true</unpack>
 		</dependencySet>
 	</dependencySets>
 
