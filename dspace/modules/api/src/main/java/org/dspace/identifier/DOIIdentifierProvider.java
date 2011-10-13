@@ -63,7 +63,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
     
     private String myDoiPrefix;
 
-    private int mySuffixVarLength = 8;
+    private int mySuffixVarLength;
 
     private final SecureRandom myRandom = new SecureRandom();
     
@@ -80,6 +80,12 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
         myDataFileColl = configurationService.getProperty("stats.datafiles.coll");
         myDoiPrefix = configurationService.getProperty("doi.prefix");
         myLocalPartPrefix = configurationService.getProperty("doi.localpart.suffix");
+
+        try{
+            mySuffixVarLength = Integer.parseInt(configurationService.getProperty("doi.suffix.length"));
+        }catch (NumberFormatException nfe){
+            mySuffixVarLength=5;
+        }
 
         identifierMetadata.schema = MetadataSchema.DC_SCHEMA;
         identifierMetadata.element = "identifier";

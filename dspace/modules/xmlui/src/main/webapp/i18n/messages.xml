@@ -3199,4 +3199,14 @@
 
      <message key="xmlui.administrative.item.general.option_curate">Curate</message>
         <message key="xmlui.administrative.item.general.option_queue">Queue</message>
+
+
+    <message key="xmlui.Submission.submit.OverviewStep.headgenbank">Genbank</message>
+	<message key="xmlui.Submission.submit.OverviewStep.genbankhelp"></message>
+
+
+
+
+
+
 </catalogue>
