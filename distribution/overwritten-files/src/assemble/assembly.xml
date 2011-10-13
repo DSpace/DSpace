@@ -10,6 +10,28 @@
 	<includeBaseDirectory>false</includeBaseDirectory>
 
 	<fileSets>
+		<!-- Copio los archivos de conf redefinidos permaneceran -->
+		<fileSet>
+			<directory>overwritten-files</directory>
+			<outputDirectory>.</outputDirectory>
+			<includes>
+				<include>config/**</include>
+				<include>config/dspace.cfg</include>
+			</includes>
+			<excludes>
+				<exclude>config/GeoLiteCity.dat</exclude>
+			</excludes>
+			<filtered>true</filtered>
+		</fileSet>
+		<fileSet>
+			<directory>overwritten-files</directory>
+			<outputDirectory>.</outputDirectory>
+			<includes>
+				<include>config/GeoLiteCity.dat</include>
+			</includes>
+			<filtered>false</filtered>
+		</fileSet>
+
 		<fileSet>
 			<directory>dspace-tag-files/src/main/config</directory>
 			<outputDirectory>.</outputDirectory>
@@ -43,30 +65,11 @@
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>config/modules/**</include>
-<!-- 				<include>config/dspace.cfg</include> -->
+				<!-- <include>config/dspace.cfg</include> -->
 			</includes>
 			<filtered>true</filtered>
 		</fileSet>
-		<fileSet>
-			<directory>overwritten-files</directory>
-			<outputDirectory>.</outputDirectory>
-			<includes>
-				<include>config/**</include>
-				<include>config/dspace.cfg</include>
-			</includes>
-			<excludes>
-				<exclude>config/GeoLiteCity.dat</exclude>
-			</excludes>
-			<filtered>true</filtered>
-		</fileSet>
-		<fileSet>
-			<directory>overwritten-files</directory>
-			<outputDirectory>.</outputDirectory>
-			<includes>
-				<include>config/GeoLiteCity.dat</include>
-			</includes>
-			<filtered>false</filtered>
-		</fileSet>
+
 	</fileSets>
 
 	<dependencySets>
@@ -83,27 +86,27 @@
 			</includes>
 			<outputDirectory>webapps/${artifact.artifactId}</outputDirectory>
 			<useProjectArtifact>false</useProjectArtifact>
-<!-- 			<outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping> -->
+			<!-- <outputFileNameMapping>${artifact.artifactId}.${artifact.extension}</outputFileNameMapping> -->
 			<unpack>true</unpack>
 		</dependencySet>
 	</dependencySets>
 
-<!-- 	<moduleSets> -->
+	<!-- <moduleSets> -->
 
-<!-- 		<moduleSet> -->
-<!-- 			<useAllReactorProjects>true</useAllReactorProjects> -->
-			
-<!-- 			<includes> -->
-<!-- 				<include>ar.edu.unlp.sedici:xmlui</include> -->
-<!-- 				<include>org.dspace.modules:*</include> -->
-<!-- 			</includes> -->
+	<!-- <moduleSet> -->
+	<!-- <useAllReactorProjects>true</useAllReactorProjects> -->
 
-<!-- 			<binaries> -->
-<!-- 				<includeDependencies>false</includeDependencies> -->
-<!-- 				<outputDirectory>webapps/${module.artifactId}</outputDirectory> -->
-<!-- 				<unpack>true</unpack> -->
-<!-- 			</binaries> -->
-<!-- 		</moduleSet> -->
-<!-- 	</moduleSets> -->
+	<!-- <includes> -->
+	<!-- <include>ar.edu.unlp.sedici:xmlui</include> -->
+	<!-- <include>org.dspace.modules:*</include> -->
+	<!-- </includes> -->
+
+	<!-- <binaries> -->
+	<!-- <includeDependencies>false</includeDependencies> -->
+	<!-- <outputDirectory>webapps/${module.artifactId}</outputDirectory> -->
+	<!-- <unpack>true</unpack> -->
+	<!-- </binaries> -->
+	<!-- </moduleSet> -->
+	<!-- </moduleSets> -->
 
 </assembly>
