@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Provider PUBLIC "-//NLM//DTD LinkOut 1.0//EN" "http://www.ncbi.nlm.nih.gov/entrez/linkout/doc/LinkOut.dtd">
+<Provider>
+    <ProviderId>7893</ProviderId>
+    <Name>Dryad</Name>
+    <NameAbbr>dryaddb</NameAbbr>
+    <SubjectType>supplemental materials</SubjectType>
+    <Url>http://datadryad.org/</Url>
+    <IconUrl>http://datadryad.org/themes/Dryad/images/favicon.ico</IconUrl>
+    <Brief>Dryad is an international repository of data underlying peer-reviewed articles in the basic and applied biosciences.</Brief>
+</Provider>
