@@ -1,6 +1,8 @@
 package org.datadryad.submission;
 
 import javax.mail.Address;
+import javax.mail.Multipart;
+import javax.mail.Part;
 import javax.mail.Session;
 import javax.mail.internet.MimeMessage;
 
@@ -114,14 +116,30 @@ public class DryadEmailSubmission extends HttpServlet {
 						+ " " + contentID + " " + encoding);
 			}
 
-			if (contentType.equals("text/plain") || contentType instanceof String) {
+			Part part = null;
+			
+			if ("text/plain".equals(contentType)){
+			    part = (Part)mime;   //
+			}
+			else if (contentType != null && contentType.startsWith("multipart/alternative")){
+			    Multipart mp = (Multipart)mime.getContent();
+			    for (int i=0, count = mp.getCount();i<count;i++){
+			        Part p = mp.getBodyPart(i);
+			        String partContentType = p.getContentType();
+			        if ("text/plain".equals(partContentType)){
+			            part = p;
+			            break;
+			        }
+			    }
+			}
+			if (part != null) {
 				String message;
 				
 				if (encoding != null) {
-					message = (String) mime.getContent();
+					message = (String) part.getContent();
 				}
 				else {
-					InputStream in = mime.getInputStream();
+					InputStream in = part.getInputStream();
 					InputStreamReader isr = new InputStreamReader(in, "UTF-8");
 					BufferedReader br = new BufferedReader(isr);
 					StringBuilder builder = new StringBuilder();
