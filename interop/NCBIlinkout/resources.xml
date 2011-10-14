@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE LinkSet PUBLIC "-//NLM//DTD LinkOut 1.0//EN" "http://www.ncbi.nlm.nih.gov/entrez/linkout/doc/LinkOut.dtd">
+<LinkSet>
+    <Link>
+        <LinkId>dryad.487</LinkId>
+        <ProviderId>7893</ProviderId>
+        <IconUrl>http://www.nescent.org/wg/dryad/images/7/7f/DryadLogo-Button.png</IconUrl>
+        <ObjectSelector>
+            <Database>Pubmed</Database>
+            <ObjectList>
+                <Query>10.1111/j.1469-7580.2009.01108.x [doi]</Query>
+                <Query>10.1111/j.1558-5646.2007.00022.x [doi]</Query>
+                <Query>10.1098/rspb.2007.0505 [doi]</Query>
+            </ObjectList>
+        </ObjectSelector>
+        <ObjectUrl>
+            <Base>http://datadryad.org/discover?</Base>
+            <Rule>query=&lo.doi;</Rule>
+            <UrlName>Data in Dryad</UrlName>
+            <SubjectType>supplemental materials</SubjectType>
+        </ObjectUrl>
+    </Link>
+</LinkSet>
