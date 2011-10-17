@@ -246,19 +246,11 @@ and searching the repository.
                                         </map:match>
 
                                         <map:match type="HandleAuthorizedMatcher" pattern="!READ">
-                                                <map:select type="AuthenticatedSelector">
-                                                        <map:when test="eperson">
-                                                                <map:transform type="RestrictedItem"/>
-                                                                <map:serialize/>
-                                                        </map:when>
-                                                        <map:otherwise>
-                                                                <map:act type="StartAuthentication">
-                                                                        <map:parameter name="header" value="xmlui.ArtifactBrowser.RestrictedItem.auth_header"/>
-                                                                        <map:parameter name="message" value="xmlui.ArtifactBrowser.RestrictedItem.auth_message"/>
-                                                                </map:act>
-                                                                <map:serialize/>
-                                                        </map:otherwise>
-                                                </map:select>
+                                                <map:transform type="RestrictedItem">
+                                                    <map:parameter name="header" value="xmlui.ArtifactBrowser.RestrictedItem.auth_header"/>
+                                                    <map:parameter name="message" value="xmlui.ArtifactBrowser.RestrictedItem.auth_message"/>
+                                                </map:transform>
+                                                <map:serialize type="xml"/>
                                         </map:match>
                                 </map:match>
                                 

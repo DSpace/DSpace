@@ -16,9 +16,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import javax.servlet.http.HttpServletResponse;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
+import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -71,6 +73,8 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_head_parent_collections =
         message("xmlui.ArtifactBrowser.ItemViewer.head_parent_collections");
 
+    private static final Message T_withdrawn = message("xmlui.ArtifactBrowser.ItemViewer.withdrawn");
+    
 	/** Cached validity object */
 	private SourceValidity validity = null;
 
@@ -255,6 +259,18 @@ public class ItemViewer extends AbstractDSpaceTransformer implements CacheablePr
         else
         {
             division.setHead(item.getHandle());
+        }
+
+        // Add Withdrawn Message if it is
+        if(item.isWithdrawn()){
+            Division div = division.addDivision("notice", "notice");
+            Para p = div.addPara();
+            p.addContent(T_withdrawn);
+            //Set proper response. Return "404 Not Found"
+            HttpServletResponse response = (HttpServletResponse)objectModel
+                    .get(HttpEnvironment.HTTP_RESPONSE_OBJECT);   
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            return;
         }
 
         Para showfullPara = division.addPara(null, "item-view-toggle item-view-toggle-top");
