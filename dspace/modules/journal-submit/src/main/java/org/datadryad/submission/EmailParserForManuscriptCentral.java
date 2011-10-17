@@ -157,7 +157,14 @@ public class EmailParserForManuscriptCentral extends EmailParser {
                 fieldName = matchedField.substring(0, colonPosition);
 
                 // get the value of this field excluding ":"
-                String fieldValue = line.substring(colonPosition+1).trim();
+                // and removing any nbsp
+                String fieldValue;
+                if (line.length() > colonPosition+2 && line.codePointAt(colonPosition+2) == 160){  
+                    fieldValue = line.substring(colonPosition+3).trim();
+                }
+                else
+                    fieldValue = line.substring(colonPosition+1).trim();
+                
                 
                 // processing block applicable only for the first line of
                 // a new e-mail message

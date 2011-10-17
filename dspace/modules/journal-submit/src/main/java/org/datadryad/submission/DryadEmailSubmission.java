@@ -126,7 +126,7 @@ public class DryadEmailSubmission extends HttpServlet {
 			    for (int i=0, count = mp.getCount();i<count;i++){
 			        Part p = mp.getBodyPart(i);
 			        String partContentType = p.getContentType();
-			        if ("text/plain".equals(partContentType)){
+			        if (partContentType.startsWith("text/plain")){
 			            part = p;
 			            break;
 			        }
@@ -225,8 +225,8 @@ public class DryadEmailSubmission extends HttpServlet {
 				toBrowser.close();
 			}
 			else {
-				throw new SubmissionException("Unexpected email type: "
-						+ mime.getContent().getClass().getName());
+				throw new SubmissionException("Unexpected email type: " 
+						+ mime.getContent().getClass().getName() + " reported content-type was " + contentType);
 			}
 		}
 		catch (Exception details) {
@@ -411,6 +411,9 @@ public class DryadEmailSubmission extends HttpServlet {
 
 				if (m.find()) {
 					journalName = StringUtils.stripToEmpty(m.group(2));
+					if (journalName.codePointAt(0) == 160){          //Journal of Heredity has started inserting NBSP in several fields, including journal title
+					    journalName = journalName.substring(1);
+					}
 				}
 
 				lines.add(line);
