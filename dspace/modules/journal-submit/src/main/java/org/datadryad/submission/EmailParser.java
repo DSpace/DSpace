@@ -94,6 +94,7 @@ public abstract class EmailParser {
 	 */
 	public static String[] processAuthorList(String authors){
 	    final boolean hasSemicolons = authors.contains(";");
+	    final boolean hasCommas = authors.contains(",");
         String[] authorArray = null;
         if (hasSemicolons){
             authorArray = authors.split(";");
@@ -101,16 +102,22 @@ public abstract class EmailParser {
                 authorArray[i] = getStrippedText(StringUtils.stripToEmpty(authorArray[i]));
             }
         }
-        else {
+        else if (hasCommas){
             authorArray = authors.split(",");
             for (int i = 0; i< authorArray.length-1; i++){
-                authorArray[i] = flipName(getStrippedText(StringUtils.stripToEmpty(authorArray[i])));
+                authorArray[i] = StringUtils.stripToEmpty(flipName(getStrippedText(StringUtils.stripToEmpty(authorArray[i]))));
             }
             int lastAuthor = authorArray.length-1;
-            if (lastAuthor > 0 && authorArray[lastAuthor].startsWith("and "))
-                authorArray[lastAuthor] =flipName(getStrippedText(StringUtils.stripToEmpty(authorArray[lastAuthor].substring(4))));
+            if (lastAuthor > 0 && StringUtils.stripToEmpty(authorArray[lastAuthor]).startsWith("and "))
+                authorArray[lastAuthor] = StringUtils.stripToEmpty(flipName(getStrippedText(StringUtils.stripToEmpty(authorArray[lastAuthor]).substring(4))));
             else
                 authorArray[lastAuthor] = StringUtils.stripToEmpty(flipName(getStrippedText(authorArray[lastAuthor])));       
+        }
+        else {  //either a single author (first last) or two authors (first last and first last)
+            authorArray = authors.split(" and ");
+            for (int i = 0; i< authorArray.length-1; i++){
+                authorArray[i] = StringUtils.stripToEmpty(flipName(getStrippedText(StringUtils.stripToEmpty(authorArray[i]))));
+            }
         }
         return authorArray;
 	}

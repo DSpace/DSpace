@@ -35,6 +35,7 @@ public class EmailParserForEcoApp extends EmailParser {
 		ELEMENT_MAP.put("journal name", "Journal");
 		ELEMENT_MAP.put("journal admin email", "JournalEditorEmail");
 		ELEMENT_MAP.put("journal editor", "JournalEditor");
+		ELEMENT_MAP.put("journal senior editor", "JournalEditor");  //for Paleobiology, senior editor is only editor provided in sample.
 		ELEMENT_MAP.put("journal embargo period", "JournalEmbargoPeriod");
 		ELEMENT_MAP.put("ms authors", "Authors");
 		ELEMENT_MAP.put("abstract", "Abstract");
@@ -124,83 +125,83 @@ public class EmailParserForEcoApp extends EmailParser {
 	}
 
 	private String makeElement(String aName, String aValue) {
-		String name = ELEMENT_MAP.get(aName.toLowerCase());
+	    String name = ELEMENT_MAP.get(aName.toLowerCase());
 
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Making " + aName + " element; value: " + aValue);
-		}
-		
-		if (name == null) {
-			StringBuilder xml = new StringBuilder();
-			name = NESTED_ELEMENT_MAP.get(aName.toLowerCase());
+	    if (LOGGER.isDebugEnabled()) {
+	        LOGGER.debug("Making " + aName + " element; value: " + aValue);
+	    }
 
-			if (name.equalsIgnoreCase("CorrespondingAuthor")) {
-				String[] parts = aValue.split("\\r|\\n|\\t");
-				String location;
+	    if (name == null) {
+	        StringBuilder xml = new StringBuilder();
+	        name = NESTED_ELEMENT_MAP.get(aName.toLowerCase());
 
-				if (parts.length == 5) {
-					xml.append(new CorrespondingAuthor(parts[0].trim()).toXML());
-					xml.append(new AddressLine1(parts[1].trim()).toXML());
-					xml.append(new AddressLine2(parts[2].trim()).toXML());
-					xml.append(new AddressLine3(parts[3].trim()).toXML());
+	        if (name.equalsIgnoreCase("CorrespondingAuthor")) {
+	            String[] parts = aValue.split("\\r|\\n|\\t");
+	            String location;
 
-					location = parts[4];
-					parts = location.split(", | ");
+	            if (parts.length == 5) {
+	                xml.append(new CorrespondingAuthor(parts[0].trim()).toXML());
+	                xml.append(new AddressLine1(parts[1].trim()).toXML());
+	                xml.append(new AddressLine2(parts[2].trim()).toXML());
+	                xml.append(new AddressLine3(parts[3].trim()).toXML());
 
-					if (parts.length == 3) {
-						xml.append(new City(parts[0].trim()).toXML());
-						xml.append(new State(parts[1].trim()).toXML());
-						xml.append(new Zip(parts[2].trim()).toXML());
-					}
-					else
-						if (LOGGER.isWarnEnabled()) {
-							LOGGER.warn("Unexpected number of address location parts: "
-									+ parts.length + "(" + location + ")");
-						}
-				}
-				else
-					if (LOGGER.isWarnEnabled()) {
-						LOGGER.warn("Unexpected number of address parts: "
-								+ parts.length + "(" + aValue + ")");
-					}
+	                location = parts[4];
+	                parts = location.split(", | ");
 
-				return xml.toString();
-			}
-			else if (name.equalsIgnoreCase("Manuscript")) {
-				myManuscriptID = aValue.trim();
-				return ""; // we don't build xml element yet
-			}
-			else if (name.equalsIgnoreCase("ArticleTitle")) {
-				return new SubmissionMetadata(myManuscriptID, aValue.trim()).toXML();
-			}
-			else {
-				return "<" + name + ">" + aValue + "</" + name + ">";
-			}
-		}
+	                if (parts.length == 3) {
+	                    xml.append(new City(parts[0].trim()).toXML());
+	                    xml.append(new State(parts[1].trim()).toXML());
+	                    xml.append(new Zip(parts[2].trim()).toXML());
+	                }
+	                else
+	                    if (LOGGER.isWarnEnabled()) {
+	                        LOGGER.warn("Unexpected number of address location parts: "
+	                                + parts.length + "(" + location + ")");
+	                    }
+	            }
+	            else
+	                if (LOGGER.isWarnEnabled()) {
+	                    LOGGER.warn("Unexpected number of address parts: "
+	                            + parts.length + "(" + aValue + ")");
+	                }
 
-		try {
-			if (name.equalsIgnoreCase("Authors")) {
-				return new Authors(aValue.split(", and |, ")).toXML();
-			}
-			else if (name.equalsIgnoreCase("Journal Embargo Period")) {
-				if (aValue.trim().equalsIgnoreCase("1 year")) {
-					return new JournalEmbargoPeriod("oneyear").toXML();
-				}
-				else {
-					return new JournalEmbargoPeriod(aValue).toXML();
-				}
-			}
-			else {
-				String path = getClass().getPackage().getName();
-				Class<?> clazz = Class.forName(path + ".xml." + name);
-				Constructor<?> constructor = clazz.getConstructor(String.class);
-				return ((Element) constructor.newInstance(aValue)).toXML();
-			}
-		}
-		catch (Exception details) {
-			LOGGER.error(details.getMessage(), details);
-			throw new RuntimeException(details);
-		}
+	            return xml.toString();
+	        }
+	        else if (name.equalsIgnoreCase("Manuscript")) {
+	            myManuscriptID = aValue.trim();
+	            return ""; // we don't build xml element yet
+	        }
+	        else if (name.equalsIgnoreCase("ArticleTitle")) {
+	            return new SubmissionMetadata(myManuscriptID, aValue.trim()).toXML();
+	        }
+	        else {
+	            return "<" + name + ">" + aValue + "</" + name + ">";
+	        }
+	    }
+
+	    try {
+	        if (name.equalsIgnoreCase("Authors")) {
+	            return new Authors(EmailParser.processAuthorList(aValue)).toXML();
+	        }
+	        else if (name.equalsIgnoreCase("Journal Embargo Period")) {
+	            if (aValue.trim().equalsIgnoreCase("1 year")) {
+	                return new JournalEmbargoPeriod("oneyear").toXML();
+	            }
+	            else {
+	                return new JournalEmbargoPeriod(aValue).toXML();
+	            }
+	        }
+	        else {
+	            String path = getClass().getPackage().getName();
+	            Class<?> clazz = Class.forName(path + ".xml." + name);
+	            Constructor<?> constructor = clazz.getConstructor(String.class);
+	            return ((Element) constructor.newInstance(aValue)).toXML();
+	        }
+	    }
+	    catch (Exception details) {
+	        LOGGER.error(details.getMessage(), details);
+	        throw new RuntimeException(details);
+	    }
 	}
 
 	private static final String EOL = System.getProperty("line.separator");
