@@ -36,7 +36,7 @@ and searching the repository.
 
 
             <map:transformer name="CollectionSearch" src="org.dspace.app.xmlui.aspect.discovery.CollectionSearch"/>
-            <map:transformer name="CollectionRecentSubmissions" src="org.dspace.app.xmlui.aspect.discovery.CollectionRecentSubmissions"/>
+            <map:transformer name="CollectionRecentAlSubmissions" src="org.dspace.app.xmlui.aspect.discovery.CollectionRecentSubmissions"/>
 
 
             <map:transformer name="RelatedItems" src="org.dspace.app.xmlui.aspect.discovery.RelatedItems"/>

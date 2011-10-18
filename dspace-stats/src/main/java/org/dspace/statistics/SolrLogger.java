@@ -1008,97 +1008,107 @@ public class SolrLogger
             query.setRows(0);
             long totalRecords = solr.query(query).getResults().getNumFound();
 
-            Map<String, String> params = new HashMap<String, String>();
-            params.put(CommonParams.Q, "*:*");
-            params.put(CommonParams.FQ, "-bundleName:[* TO *] AND type:" + Constants.BITSTREAM);
-            params.put(CommonParams.WT, "csv");
-            params.put(CommonParams.ROWS, String.valueOf(totalRecords));
-
-            String solrRequestUrl = solr.getBaseURL() + "/select";
-            solrRequestUrl = generateURL(solrRequestUrl, params);
-
-            GetMethod get = new GetMethod(solrRequestUrl);
-            new HttpClient().executeMethod(get);
-
-            String csvOutput = get.getResponseBodyAsString();
-            String[][] csvParsed = CSVParser.parse(csvOutput);
-            String[] header = csvParsed[0];
-            //Attempt to find the bitstream id index !
-            int idIndex = 0;
-            for (int i = 0; i < header.length; i++) {
-                if(header[i].equals("id")){
-                    idIndex = i;
-                }
-            }
-
             File tempDirectory = new File(ConfigurationManager.getProperty("dspace.dir") + File.separator + "temp" + File.separator);
             tempDirectory.mkdirs();
-            File tempCsv = new File(tempDirectory.getPath() + File.separatorChar + "temp.csv");
-            FileOutputStream outputStream = new FileOutputStream(tempCsv);
-            CSVPrinter csvp = new CSVPrinter(outputStream);
-            csvp.setAlwaysQuote(false);
+            List<File> tempCsvFiles = new ArrayList<File>();
+            for(int i = 0; i < totalRecords; i+=10000){
+                Map<String, String> params = new HashMap<String, String>();
+                params.put(CommonParams.Q, "*:*");
+                params.put(CommonParams.FQ, "-bundleName:[* TO *] AND type:" + Constants.BITSTREAM);
+                params.put(CommonParams.WT, "csv");
+                params.put(CommonParams.ROWS, String.valueOf(10000));
+                params.put(CommonParams.START, String.valueOf(i));
 
-            //Write the header !
-            csvp.write(header);
-            csvp.write("bundleName");
-            csvp.writeln();
-            Map<Integer, String> bitBundleCache = new HashMap<Integer, String>();
-            //Loop over each line (skip the headers though)!
-            for (int i = 1; i < csvParsed.length; i++){
-                String[] csvLine = csvParsed[i];
-                //Write the default line !
-                int bitstreamId = Integer.parseInt(csvLine[idIndex]);
-                //Attempt to retrieve our bundle name from the cache !
-                String bundleName = bitBundleCache.get(bitstreamId);
-                if(bundleName == null){
-                    //Nothing found retrieve the bitstream
-                    Bitstream bitstream = Bitstream.find(context, bitstreamId);
-                    //Attempt to retrieve our bitstream !
-                    if (bitstream != null){
-                        Bundle[] bundles = bitstream.getBundles();
-                        if(bundles != null && 0 < bundles.length){
-                            Bundle bundle = bundles[0];
-                            bundleName = bundle.getName();
-                            context.removeCached(bundle, bundle.getID());
-                        }else{
-                            //No bundle found, we are either a collection or a community logo, check for it !
-                            DSpaceObject parentObject = bitstream.getParentObject();
-                            if(parentObject instanceof Collection){
-                                bundleName = "LOGO-COLLECTION";
-                            }else
-                            if(parentObject instanceof Community){
-                                bundleName = "LOGO-COMMUNITY";
-                            }
-                            if(parentObject != null){
-                                context.removeCached(parentObject, parentObject.getID());
-                            }
+                String solrRequestUrl = solr.getBaseURL() + "/select";
+                solrRequestUrl = generateURL(solrRequestUrl, params);
 
-                        }
-                        //Cache the bundle name
-                        bitBundleCache.put(bitstream.getID(), bundleName);
-                        //Remove the bitstream from cache
-                        context.removeCached(bitstream, bitstreamId);
-                    }
-                    //Check if we don't have a bundlename
-                    //If we don't have one & we do not need to delete the deleted bitstreams ensure that a BITSTREAM_DELETED bundle name is given !
-                    if(bundleName == null && !removeDeletedBitstreams){
-                        bundleName = "BITSTREAM_DELETED";
+                GetMethod get = new GetMethod(solrRequestUrl);
+                new HttpClient().executeMethod(get);
+
+                InputStream  csvOutput = get.getResponseBodyAsStream();
+                Reader csvReader = new InputStreamReader(csvOutput);
+                String[][] csvParsed = CSVParser.parse(csvReader);
+                String[] header = csvParsed[0];
+                //Attempt to find the bitstream id index !
+                int idIndex = 0;
+                for (int j = 0; j < header.length; j++) {
+                    if(header[j].equals("id")){
+                        idIndex = j;
                     }
                 }
-                csvp.write(csvLine);
-                csvp.write(bundleName);
+
+                File tempCsv = new File(tempDirectory.getPath() + File.separatorChar + "temp." + i + ".csv");
+                tempCsvFiles.add(tempCsv);
+                FileOutputStream outputStream = new FileOutputStream(tempCsv);
+                CSVPrinter csvp = new CSVPrinter(outputStream);
+                csvp.setAlwaysQuote(false);
+
+                //Write the header !
+                csvp.write(header);
+                csvp.write("bundleName");
                 csvp.writeln();
+                Map<Integer, String> bitBundleCache = new HashMap<Integer, String>();
+                //Loop over each line (skip the headers though)!
+                for (int j = 1; j < csvParsed.length; j++){
+                    String[] csvLine = csvParsed[j];
+                    //Write the default line !
+                    int bitstreamId = Integer.parseInt(csvLine[idIndex]);
+                    //Attempt to retrieve our bundle name from the cache !
+                    String bundleName = bitBundleCache.get(bitstreamId);
+                    if(bundleName == null){
+                        //Nothing found retrieve the bitstream
+                        Bitstream bitstream = Bitstream.find(context, bitstreamId);
+                        //Attempt to retrieve our bitstream !
+                        if (bitstream != null){
+                            Bundle[] bundles = bitstream.getBundles();
+                            if(bundles != null && 0 < bundles.length){
+                                Bundle bundle = bundles[0];
+                                bundleName = bundle.getName();
+                                context.removeCached(bundle, bundle.getID());
+                            }else{
+                                //No bundle found, we are either a collection or a community logo, check for it !
+                                DSpaceObject parentObject = bitstream.getParentObject();
+                                if(parentObject instanceof Collection){
+                                    bundleName = "LOGO-COLLECTION";
+                                }else
+                                if(parentObject instanceof Community){
+                                    bundleName = "LOGO-COMMUNITY";
+                                }
+                                if(parentObject != null){
+                                    context.removeCached(parentObject, parentObject.getID());
+                                }
+
+                            }
+                            //Cache the bundle name
+                            bitBundleCache.put(bitstream.getID(), bundleName);
+                            //Remove the bitstream from cache
+                            context.removeCached(bitstream, bitstreamId);
+                        }
+                        //Check if we don't have a bundlename
+                        //If we don't have one & we do not need to delete the deleted bitstreams ensure that a BITSTREAM_DELETED bundle name is given !
+                        if(bundleName == null && !removeDeletedBitstreams){
+                            bundleName = "BITSTREAM_DELETED";
+                        }
+                    }
+                    csvp.write(csvLine);
+                    csvp.write(bundleName);
+                    csvp.writeln();
+                }
+
+                //Loop over our parsed csv
+                csvp.flush();
+                csvp.close();
             }
 
-            //Loop over our parsed csv
-            csvp.flush();
-            csvp.close();
-            ContentStreamUpdateRequest contentStreamUpdateRequest = new ContentStreamUpdateRequest("/update/csv");
-            contentStreamUpdateRequest.setParam("stream.contentType", "text/plain;charset=utf-8");
-            contentStreamUpdateRequest.setAction(AbstractUpdateRequest.ACTION.COMMIT, true, true);
-            contentStreamUpdateRequest.addFile(tempCsv);
+            //Add all the separate csv files
+            for (File tempCsv : tempCsvFiles) {
+                ContentStreamUpdateRequest contentStreamUpdateRequest = new ContentStreamUpdateRequest("/update/csv");
+                contentStreamUpdateRequest.setParam("stream.contentType", "text/plain;charset=utf-8");
+                contentStreamUpdateRequest.setAction(AbstractUpdateRequest.ACTION.COMMIT, true, true);
+                contentStreamUpdateRequest.addFile(tempCsv);
 
-            solr.request(contentStreamUpdateRequest);
+                solr.request(contentStreamUpdateRequest);
+            }
 
             //Now that all our new bitstream stats are in place, delete all the old ones !
             solr.deleteByQuery("-bundleName:[* TO *] AND type:" + Constants.BITSTREAM);
