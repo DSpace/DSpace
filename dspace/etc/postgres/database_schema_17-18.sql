@@ -1,4 +1,4 @@
-﻿--
+--
 -- database_schema_17-18.sql
 --
 -- Version: $Revision$
