@@ -15,6 +15,7 @@ import org.datadryad.submission.xml.AddressLine2;
 import org.datadryad.submission.xml.AddressLine3;
 import org.datadryad.submission.xml.Authors;
 import org.datadryad.submission.xml.City;
+import org.datadryad.submission.xml.Classification;
 import org.datadryad.submission.xml.CorrespondingAuthor;
 import org.datadryad.submission.xml.JournalEmbargoPeriod;
 import org.datadryad.submission.xml.State;
@@ -39,6 +40,7 @@ public class EmailParserForEcoApp extends EmailParser {
 		ELEMENT_MAP.put("journal embargo period", "JournalEmbargoPeriod");
 		ELEMENT_MAP.put("ms authors", "Authors");
 		ELEMENT_MAP.put("abstract", "Abstract");
+		ELEMENT_MAP.put("article status", "ArticleStatus");
 	}
 
 	private static final Map<String, String> NESTED_ELEMENT_MAP;
@@ -47,6 +49,7 @@ public class EmailParserForEcoApp extends EmailParser {
 		NESTED_ELEMENT_MAP.put("contact author", "CorrespondingAuthor");
 		NESTED_ELEMENT_MAP.put("ms reference number", "Manuscript");
 		NESTED_ELEMENT_MAP.put("ms title", "ArticleTitle");
+        NESTED_ELEMENT_MAP.put("keywords", "Classification");
 	}
 
 	private static final Set<String> SKIPPED;
@@ -173,6 +176,13 @@ public class EmailParserForEcoApp extends EmailParser {
 	        }
 	        else if (name.equalsIgnoreCase("ArticleTitle")) {
 	            return new SubmissionMetadata(myManuscriptID, aValue.trim()).toXML();
+	        }
+	        else if (name.equalsIgnoreCase("Classification")){
+	            String[] keywords = EmailParser.processKeywordList(aValue);
+	            xml = new StringBuilder();
+	            xml.append(new Classification(keywords).toXML());
+	            return xml.toString();
+
 	        }
 	        else {
 	            return "<" + name + ">" + aValue + "</" + name + ">";
