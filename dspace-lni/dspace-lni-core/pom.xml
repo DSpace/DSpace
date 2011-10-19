@@ -10,14 +10,14 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-lni</artifactId>
-      <version>1.8.0-rc2</version>
+      <version>1.8.0-rc3-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
 
    <scm>
-      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-parent-1.8.0-rc2</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-parent-1.8.0-rc2/dspace-lni/dspace-lni-core</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-parent-1.8.0-rc2/dspace-lni/dspace-lni-core</url>
+      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-lni/dspace-lni-core</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-lni/dspace-lni-core</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-lni/dspace-lni-core</url>
    </scm>
 
    <dependencies>
