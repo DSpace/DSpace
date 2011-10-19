@@ -26,8 +26,7 @@ import org.dspace.utils.DSpace;
 
 public class CDLDataCiteService {
 
-    private static final Logger LOGGER = Logger
-            .getLogger(CDLDataCiteService.class);
+    private static final Logger log = Logger.getLogger(CDLDataCiteService.class);
 
     private static final String BASEURL = "https://n2t.net/ezid";
 
@@ -72,19 +71,21 @@ public class CDLDataCiteService {
 
         HashMap<String, String> map = new HashMap<String, String>();
         map.put("_target", aURL);
-        if (metadata != null)
-            map.putAll(metadata);
+        if (log.isDebugEnabled()) {
+            log.debug("Adding _target to metadata for update: " + aURL);
+        }
 
+        if (metadata != null) {
+	    log.debug("Adding other metadata");
+            map.putAll(metadata);
+	}
+	
         httpMethod.setRequestEntity(new StringRequestEntity(encodeAnvl(map), "text/plain", "UTF-8"));
 
         httpMethod.setRequestHeader("Content-Type", "text/plain");
         httpMethod.setRequestHeader("Accept", "text/plain");
 
         this.getClient().executeMethod(httpMethod);
-
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Adding _target to metadata for update: " + aURL);
-        }
 
         return httpMethod.getStatusLine().toString();
     }
@@ -144,9 +145,10 @@ public class CDLDataCiteService {
             }
 
             Map<String, String> metadata = null;
-            if (dso != null && dso instanceof Item)
+            if (dso != null && dso instanceof Item){
                 metadata = createMetadataList((Item) dso);
-
+	    }
+	    
             service = new CDLDataCiteService(username, password);
 
             if (action.equals("register")) {
@@ -165,7 +167,8 @@ public class CDLDataCiteService {
     public static Map<String, String> createMetadataList(Item item) {
         Map<String, String> metadata = new HashMap<String, String>();
 
-
+	log.debug("generating DataCite metadata for " + item.getMetadata("dc.title")[0]);
+	
         // dc: creator, title, publisher
         addMetadata(metadata, item, "dc.contributor.author", "dc.creator");
         addMetadata(metadata, item, "dc.title", "dc.title");
@@ -215,6 +218,7 @@ public class CDLDataCiteService {
         addMetadata(metadata, item, "dc.rights.uri", "dc.rights");
         addMetadata(metadata, item, "dc.description", "dc.description");
 
+	log.debug("DataCite metadata contains " + metadata.size() + " fields");
 
         return metadata;
 
