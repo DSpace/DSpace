@@ -114,13 +114,13 @@
 
    <dependencies>
 
-       <!-- DSpace Implementation of SWORDv2 Provider -->
        <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-swordv2</artifactId>
-         <type>jar</type>
-         <classifier>classes</classifier>
-      </dependency>
+           <groupId>org.swordapp</groupId>
+           <artifactId>server</artifactId>
+           <version>2.0</version>
+           <type>jar</type>
+           <classifier>classes</classifier>
+       </dependency>
 
       <dependency>
          <groupId>org.dspace</groupId>
