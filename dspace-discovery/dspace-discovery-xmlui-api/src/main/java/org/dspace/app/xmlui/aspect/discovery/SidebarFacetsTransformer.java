@@ -191,9 +191,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
 
             if (facets != null && 0 < facets.size()) {
 
-                List browse = options.addList("discovery");
-
-                browse.setHead(T_FILTER_HEAD);
+                List browse = null;
 
                 for (SidebarFacetConfiguration field : facets) {
                     //Retrieve our values
@@ -207,6 +205,13 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
 
                     //This is needed to make sure that the date filters do not remain empty
                     if (facetValues != null && 0 < facetValues.size()) {
+
+                        if(browse == null){
+                            //Since we have a value it is save to add the sidebar (doing it this way will ensure that we do not end up with an empty sidebar)
+                            browse = options.addList("discovery");
+
+                            browse.setHead(T_FILTER_HEAD);
+                        }
 
                         Iterator<DiscoverResult.FacetResult> iter = facetValues.iterator();
 
