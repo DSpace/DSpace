@@ -118,10 +118,12 @@ public class DryadEmailSubmission extends HttpServlet {
 
 			Part part = null;
 			
-			if ("text/plain".equals(contentType)){
+			if (contentType != null && contentType.startsWith("text/plain")){
 			    part = (Part)mime;   //
 			}
-			else if (contentType != null && contentType.startsWith("multipart/alternative")){
+			else if (contentType != null && 
+			        contentType.startsWith("multipart/alternative") ||
+			        contentType.startsWith("multipart/mixed")){    //could just use multipart as prefix, but what does this cover?
 			    Multipart mp = (Multipart)mime.getContent();
 			    for (int i=0, count = mp.getCount();i<count;i++){
 			        Part p = mp.getBodyPart(i);
