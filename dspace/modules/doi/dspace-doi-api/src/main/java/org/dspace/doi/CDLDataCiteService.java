@@ -135,7 +135,9 @@ public class CDLDataCiteService {
             IdentifierService identifierService = new DSpace().getSingletonService(IdentifierService.class);
             DSpaceObject dso = null;
             try {
+		log.debug("obtaining dspace object");
                 dso = identifierService.resolve(context, doiID);
+		log.debug("dspace object is " + dso);
             } catch (IdentifierNotFoundException e) {
                 e.printStackTrace(System.out);
                 System.exit(1);
@@ -144,6 +146,7 @@ public class CDLDataCiteService {
                 System.exit(1);
             }
 
+	    log.debug("checking for existance of item metadata");
             Map<String, String> metadata = null;
             if (dso != null && dso instanceof Item){
                 metadata = createMetadataList((Item) dso);
