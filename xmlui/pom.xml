@@ -21,6 +21,21 @@
 			<version>1.8.0-rc1</version>
 			<type>war</type>
 		</dependency>
+		
+	   <!-- Wing framework -->
+       <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-xmlui-wing</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-xmlui-api</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+        </dependency>
 
 		<dependency>
 			<groupId>ar.edu.unlp.sedici</groupId>

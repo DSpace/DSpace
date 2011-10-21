@@ -41,7 +41,7 @@
     -
     - Authors: Scott Phillips
     - Version: $Revision: 6533 $
-    - Date:    $Date: 2011-08-07 08:19:38 -0300 (Sun, 07 Aug 2011) $
+    - Date:    $Date: 2011-08-07 08:19:38 -0300 (dom, 07 ago 2011) $
 -->
 
 <xmlui>
@@ -66,20 +66,24 @@
         -->
         <aspect name="Displaying Artifacts" path="resource://aspects/ViewArtifacts/" />
         <aspect name="Browsing Artifacts" path="resource://aspects/BrowseArtifacts/" />
-        <!-- <aspect name="Searching Artifacts" path="resource://aspects/SearchArtifacts/" /> -->
+        <!--<aspect name="Searching Artifacts" path="resource://aspects/SearchArtifacts/" /> -->
         <aspect name="Administration" path="resource://aspects/Administrative/" />
         <aspect name="E-Person" path="resource://aspects/EPerson/" />
         <aspect name="Submission and Workflow" path="resource://aspects/Submission/" />
 	    <aspect name="Statistics" path="resource://aspects/Statistics/" />
 	    <aspect name="Original Workflow" path="resource://aspects/Workflow/" />
+	    <aspect name="News" path="resource://aspects/News/"/>
+	    <aspect name="Redirect" path="resource://aspects/Redirect/"/>
+	    <aspect name="Static Pages" path="resource://aspects/StaticPages/"/>
+	    <aspect name="Discovery" path="resource://aspects/Discovery/" />
 	    <!--<aspect name="XMLWorkflow" path="resource://aspects/XMLWorkflow/" />-->
         <!--
             To enable Discovery, uncomment this Aspect that will enable it
             within your existing XMLUI
             Also make sure to comment the SearchArtifacts aspect
             as leaving it on together with discovery will cause UI overlap issues
+            <aspect name="Discovery" path="resource://aspects/Discovery/" />
         -->
-        <aspect name="Discovery" path="resource://aspects/Discovery/" />
         <!--<aspect name="SwordClient" path="resource://aspects/SwordClient/" />-->
 
         <!--
@@ -121,7 +125,7 @@
         <!-- <theme name="Test Theme 2" regex="community-list" path="theme2/"/> -->
 
         <!-- Default theme -->
-        <theme name="Default Reference Theme" regex=".*" path="Reference/" />
+        <theme name="Default Reference Theme" regex=".*" path="Sedici_septiembre/" />
 
         <!-- Mirage theme, @mire contribution of new theme to support easier development and branding -->
         <!-- <theme name="Atmire Mirage Theme" regex=".*" path="Mirage/" /> -->
