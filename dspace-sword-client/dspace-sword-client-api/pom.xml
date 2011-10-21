@@ -5,13 +5,13 @@
     <packaging>jar</packaging>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-sword-client-api</artifactId>
-    <version>1.8.0-rc3</version>
+    <version>1.8.0-rc4-SNAPSHOT</version>
     <name>DSpace Sword Client :: Sword Client API</name>
 
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-sword-client</artifactId>
-        <version>1.8.0-rc3</version>
+        <version>1.8.0-rc4-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
     
@@ -33,11 +33,11 @@
        and releases snapshots into the snapshot repository below.
     -->
     <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.8.0-rc3/dspace-sword-client/dspace-sword-client-api</connection>
+        <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword-client/dspace-sword-client-api</connection>
         <developerConnection>
-            scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.8.0-rc3/dspace-sword-client/dspace-sword-client-api
+            scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword-client/dspace-sword-client-api
         </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.8.0-rc3/dspace-sword-client/dspace-sword-client-api</url>
+        <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword-client/dspace-sword-client-api</url>
     </scm>
     
 </project>

@@ -3,7 +3,7 @@
    <groupId>org.dspace</groupId>
    <artifactId>dspace-parent</artifactId>
    <packaging>pom</packaging>
-   <version>1.8.0-rc3</version>
+   <version>1.8.0-rc4-SNAPSHOT</version>
    <name>DSpace Parent Project</name>
    <url>http://projects.dspace.org</url>
 
@@ -1066,9 +1066,9 @@
       snapshots into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.8.0-rc3</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/tags/dspace-1.8.0-rc3</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/dspace/tags/dspace-1.8.0-rc3</url>
+      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/trunk</url>
    </scm>
 
 </project>
