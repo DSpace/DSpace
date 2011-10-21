@@ -79,6 +79,9 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
 
     // return from editing file information
     public static final int STATUS_EDIT_COMPLETE = 25;
+    
+    // error - missing required bitstreams
+    public static final int STATUS_MISSING_BITSTREAMS = 30;
 
     // descriptions for required bitstreams
     public static final List<String> requiredBitstreams = 
@@ -309,6 +312,18 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
         if (!item.hasUploadedFiles())
         {
             return STATUS_NO_FILES_ERROR;
+        }
+
+        // commit all changes to database
+        context.commit();
+
+        // ---------------------------------------------------
+        // Step #7: Determine if all required bitstreams are
+        // uploaded
+        // ---------------------------------------------------
+        if (getNeededBitstreams(context, request, subInfo).size() > 0)
+        {
+            return STATUS_MISSING_BITSTREAMS;
         }
 
         // commit all changes to database

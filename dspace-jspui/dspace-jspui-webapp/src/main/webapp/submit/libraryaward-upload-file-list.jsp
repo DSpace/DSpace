@@ -14,6 +14,7 @@
   -   just.uploaded     - Boolean indicating if a file has just been uploaded
   -                       so a nice thank you can be displayed.
   -   show.checksums    - Boolean indicating whether to show checksums
+  -   missing.bitstreams - Boolean indicating there are missing required bitstreams
   -
   - FIXME: Assumes each bitstream in a separate bundle.
   -        Shouldn't be a problem for early adopters.
@@ -44,6 +45,7 @@
 
     boolean justUploaded = ((Boolean) request.getAttribute("just.uploaded")).booleanValue();
     boolean showChecksums = ((Boolean) request.getAttribute("show.checksums")).booleanValue();
+    boolean missingBitstreams = ((Boolean) request.getAttribute("missing.bitstreams")).booleanValue();
     
     request.setAttribute("LanguageSwitch", "hide");
 %>
@@ -55,9 +57,14 @@
         <jsp:include page="/submit/progressbar.jsp"/>
 
 <%--        <h1>Submit: <%= (justUploaded ? "File Uploaded Successfully" : "Uploaded Files") %></h1> --%>
-    
+
+<% if (missingBitstreams) { %>
+    <h1>Submit: Missing Files</h1>
+    <p>You must upload all required files before moving to the next step in the submission process.</p>
 <%
-    if (justUploaded)
+    }
+
+    else if (justUploaded)
     {
 %>
 		<h1><fmt:message key="jsp.submit.upload-file-list.heading1"/></h1>
@@ -71,6 +78,7 @@
 <%
     }
 %>
+    
         <div><fmt:message key="jsp.submit.upload-file-list.info2"/>&nbsp;&nbsp;&nbsp;<dspace:popup page="<%= LocaleSupport.getLocalizedMessage(pageContext, \"help.index\") + \"#uploadedfile\"%>"><fmt:message key="jsp.morehelp"/></dspace:popup></div>
         
         <table class="miscTable" align="center" summary="Table dispalying your submitted files">

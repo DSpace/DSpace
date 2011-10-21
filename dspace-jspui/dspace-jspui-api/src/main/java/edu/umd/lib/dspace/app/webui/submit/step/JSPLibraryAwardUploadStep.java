@@ -24,7 +24,8 @@ import org.dspace.content.FormatIdentifier;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.LogManager;
-import org.dspace.submit.step.UploadStep;
+
+import edu.umd.lib.dspace.submit.step.LibraryAwardUploadStep;
 
 /**
  * Upload step for DSpace JSP-UI. Handles the pages that revolve around uploading files
@@ -52,7 +53,7 @@ import org.dspace.submit.step.UploadStep;
  *
  * @see org.dspace.app.webui.servlet.SubmissionController
  * @see org.dspace.app.webui.submit.JSPStep
- * @see org.dspace.submit.step.UploadStep
+ * @see org.dspace.submit.step.LibraryAwardUploadStep
  *
  * @author Tim Donohue
  * @version $Revision: 5845 $
@@ -164,12 +165,12 @@ public class JSPLibraryAwardUploadStep extends JSPStep
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
-        String buttonPressed = UIUtil.getSubmitButton(request, UploadStep.NEXT_BUTTON);
+        String buttonPressed = UIUtil.getSubmitButton(request, LibraryAwardUploadStep.NEXT_BUTTON);
 
         // Do we need to skip the upload entirely?
         boolean fileRequired = ConfigurationManager.getBooleanProperty("webui.submit.upload.required", true);
-        if (buttonPressed.equalsIgnoreCase(UploadStep.SUBMIT_SKIP_BUTTON) ||
-            (buttonPressed.equalsIgnoreCase(UploadStep.SUBMIT_UPLOAD_BUTTON) && !fileRequired))
+        if (buttonPressed.equalsIgnoreCase(LibraryAwardUploadStep.SUBMIT_SKIP_BUTTON) ||
+            (buttonPressed.equalsIgnoreCase(LibraryAwardUploadStep.SUBMIT_UPLOAD_BUTTON) && !fileRequired))
         {
             Bundle[] bundles = subInfo.getSubmissionItem().getItem()
                     .getBundles("ORIGINAL");
@@ -206,16 +207,16 @@ public class JSPLibraryAwardUploadStep extends JSPStep
         // Check for Errors!
         // ------------------------------
         // if an error or message was passed back, determine what to do!
-        if (status != UploadStep.STATUS_COMPLETE)
+        if (status != LibraryAwardUploadStep.STATUS_COMPLETE)
         {
-            if (status == UploadStep.STATUS_INTEGRITY_ERROR)
+            if (status == LibraryAwardUploadStep.STATUS_INTEGRITY_ERROR)
             {
                 // Some type of integrity error occurred
                 log.warn(LogManager.getHeader(context, "integrity_error",
                         UIUtil.getRequestLogInfo(request)));
                 JSPManager.showIntegrityError(request, response);
             }
-            else if (status == UploadStep.STATUS_UPLOAD_ERROR || status == UploadStep.STATUS_NO_FILES_ERROR)
+            else if (status == LibraryAwardUploadStep.STATUS_UPLOAD_ERROR || status == LibraryAwardUploadStep.STATUS_NO_FILES_ERROR)
             {
                 // There was a problem uploading the file!
 
@@ -246,7 +247,7 @@ public class JSPLibraryAwardUploadStep extends JSPStep
                     JSPStepManager.showJSP(request, response, subInfo, UPLOAD_ERROR_JSP);
                 }
             }
-            else if (status == UploadStep.STATUS_UNKNOWN_FORMAT)
+            else if (status == LibraryAwardUploadStep.STATUS_UNKNOWN_FORMAT)
             {
                 // user uploaded a file where the format is unknown to DSpace
 
@@ -255,9 +256,15 @@ public class JSPLibraryAwardUploadStep extends JSPStep
             }
         }
         
+        if (status == LibraryAwardUploadStep.STATUS_MISSING_BITSTREAMS && buttonPressed.equals(LibraryAwardUploadStep.NEXT_BUTTON)) {
+        	
+        	showUploadFileList(context, request, response, subInfo, false, false, true);
+        	
+        }
+
         // As long as there are no errors, clicking Next
         // should immediately send them to the next step
-        if (status == UploadStep.STATUS_COMPLETE && buttonPressed.equals(UploadStep.NEXT_BUTTON))
+        if (status == LibraryAwardUploadStep.STATUS_COMPLETE && buttonPressed.equals(LibraryAwardUploadStep.NEXT_BUTTON))
         {
             // just return, so user will continue on to next step!
             return;
@@ -266,7 +273,7 @@ public class JSPLibraryAwardUploadStep extends JSPStep
         // ------------------------------
         // Check for specific buttons
         // ------------------------------
-        if (buttonPressed.equals(UploadStep.SUBMIT_MORE_BUTTON))
+        if (buttonPressed.equals(LibraryAwardUploadStep.SUBMIT_MORE_BUTTON))
         {
             // Upload another file (i.e. show the Choose File jsp again)
             showChooseFile(context, request, response, subInfo);
@@ -453,9 +460,36 @@ public class JSPLibraryAwardUploadStep extends JSPStep
             SubmissionInfo subInfo, boolean justUploaded, boolean showChecksums)
             throws SQLException, ServletException, IOException
     {
+    	showUploadFileList(context, request, response, subInfo, justUploaded, showChecksums, false);
+    }
+
+    /**
+     * Show the page which lists all the currently uploaded files
+     *
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            the request object
+     * @param response
+     *            the response object
+     * @param subInfo
+     *            the SubmissionInfo object
+     * @param justUploaded
+     *            pass in true if the user just successfully uploaded a file
+     * @param showChecksums
+     *            pass in true if checksums should be displayed
+     * @param missingBitstreams
+     *            pass in true if required bitstreams are missing
+     */
+    private void showUploadFileList(Context context,
+            HttpServletRequest request, HttpServletResponse response,
+            SubmissionInfo subInfo, boolean justUploaded, boolean showChecksums, boolean missingBitstreams)
+            throws SQLException, ServletException, IOException
+    {
         // Set required attributes
         request.setAttribute("just.uploaded", Boolean.valueOf(justUploaded));
         request.setAttribute("show.checksums", Boolean.valueOf(showChecksums));
+        request.setAttribute("missing.bitstreams", Boolean.valueOf(missingBitstreams));
 
         // Always go to advanced view in workflow mode
         if (subInfo.isInWorkflow()
