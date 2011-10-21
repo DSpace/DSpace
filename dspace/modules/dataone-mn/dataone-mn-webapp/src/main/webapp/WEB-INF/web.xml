@@ -13,6 +13,12 @@
 		<param-name>dspace.dir</param-name>
 		<param-value>${dspace.dir}</param-value>
 	</context-param>
+
+
+    <listener>
+        <listener-class>org.dspace.servicemanager.servlet.DSpaceKernelServletContextListener</listener-class>
+    </listener>
+
 	
 	<servlet>
 		<servlet-name>DataOneMN</servlet-name>
