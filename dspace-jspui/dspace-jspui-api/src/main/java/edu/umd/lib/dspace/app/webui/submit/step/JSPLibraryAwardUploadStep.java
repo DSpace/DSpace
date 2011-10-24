@@ -7,6 +7,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
@@ -172,8 +173,9 @@ public class JSPLibraryAwardUploadStep extends JSPStep
         if (buttonPressed.equalsIgnoreCase(LibraryAwardUploadStep.SUBMIT_SKIP_BUTTON) ||
             (buttonPressed.equalsIgnoreCase(LibraryAwardUploadStep.SUBMIT_UPLOAD_BUTTON) && !fileRequired))
         {
-            Bundle[] bundles = subInfo.getSubmissionItem().getItem()
-                    .getBundles("ORIGINAL");
+            Bundle[] bundles = (Bundle[]) ArrayUtils.addAll(
+            		subInfo.getSubmissionItem().getItem().getBundles("ORIGINAL"),
+            		subInfo.getSubmissionItem().getItem().getBundles("PRESERVATION"));
 
             boolean fileAlreadyUploaded = false;
             
@@ -383,8 +385,9 @@ public class JSPLibraryAwardUploadStep extends JSPStep
             boolean justUploaded) throws SQLException, ServletException,
             IOException
     {
-        Bundle[] bundles = subInfo.getSubmissionItem().getItem().getBundles(
-                "ORIGINAL");
+        Bundle[] bundles = (Bundle[]) ArrayUtils.addAll(
+        		subInfo.getSubmissionItem().getItem().getBundles("ORIGINAL"),
+        		subInfo.getSubmissionItem().getItem().getBundles("PRESERVATION"));
         
         boolean fileAlreadyUploaded = false;
         

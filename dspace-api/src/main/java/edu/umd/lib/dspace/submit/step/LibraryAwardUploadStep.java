@@ -490,13 +490,18 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
                     // Create the bitstream
                     Item item = subInfo.getSubmissionItem().getItem();
         
+                    String bundleName = "ORIGINAL";
+                    if (fileDescription != null && fileDescription.equals("Letter of Support")) {
+                    	bundleName = "PRESERVATION";
+                    }
+                    
                     // do we already have a bundle?
-                    Bundle[] bundles = item.getBundles("ORIGINAL");
+                    Bundle[] bundles = item.getBundles(bundleName);
         
                     if (bundles.length < 1)
                     {
                         // set bundle's name to ORIGINAL
-                        b = item.createSingleBitstream(fileInputStream, "ORIGINAL");
+                        b = item.createSingleBitstream(fileInputStream, bundleName);
                     }
                     else
                     {
