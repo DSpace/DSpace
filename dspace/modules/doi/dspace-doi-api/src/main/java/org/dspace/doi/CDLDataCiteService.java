@@ -155,10 +155,15 @@ public class CDLDataCiteService {
      * @param args
      */
     public static void main(String[] args) throws IOException {
-        String usage = "Usage: class username password doi target register|update|lookup";
+        String usage = "Usage: class [username] [password] doi [target] [register|update]";
         CDLDataCiteService service;
 
-        if (args.length == 5) {
+        if(args.length == 1){
+            service = new CDLDataCiteService(null, null);
+            String doiID = args[0];
+            System.out.println(service.lookup(doiID));
+        }
+        else if (args.length == 5){
             String username = args[0];
             String password = args[1];
             String doiID = args[2];
@@ -191,11 +196,11 @@ public class CDLDataCiteService {
                 System.exit(1);
             }
 
-	    log.debug("checking for existance of item metadata");
+	        log.debug("checking for existance of item metadata");
             Map<String, String> metadata = null;
             if (dso != null && dso instanceof Item){
                 metadata = createMetadataList((Item) dso);
-	    }
+	        }
 	    
             service = new CDLDataCiteService(username, password);
 
@@ -203,10 +208,10 @@ public class CDLDataCiteService {
                 System.out.println(service.registerDOI(doiID, target, metadata));
             } else if (action.equals("update")) {
                 System.out.println(service.updateURL(doiID, target, metadata));
-            } else if (action.equals("lookup")) {
-                System.out.println(service.lookup(doiID));
+            } else{
+                 System.out.println(usage);
             }
-        } else {
+        }else{
             System.out.println(usage);
         }
     }
