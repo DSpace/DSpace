@@ -1,5 +1,8 @@
 # Dryad added IPs of spiders/bots
 
+# NESCent's Nagios server (checks to ensure Dryad is running)
+152.3.104.75
+
 # Elena's RoadRunner IP
 174.109.198.35
 
