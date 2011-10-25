@@ -114,18 +114,19 @@
 
    <dependencies>
 
-       <!-- DSpace Implementation of SWORDv2 Provider -->
-       <dependency>
-           <groupId>org.dspace</groupId>
-           <artifactId>dspace-swordv2</artifactId>
-           <type>jar</type>
-           <classifier>classes</classifier>
-       </dependency>
-
+      <!-- DSpace Custom SWORDv2 Web application -->
       <dependency>
-         <groupId>org.dspace</groupId>
-         <artifactId>dspace-swordv2</artifactId>
-         <type>war</type>
+        <groupId>org.dspace</groupId>
+        <artifactId>dspace-swordv2</artifactId>
+        <type>war</type>
+      </dependency>
+
+      <!-- DSpace Implementation of SWORDv2 Provider -->
+      <dependency>
+        <groupId>org.dspace</groupId>
+        <artifactId>dspace-swordv2</artifactId>
+        <type>jar</type>
+        <classifier>classes</classifier>
       </dependency>
 
       <dependency>
