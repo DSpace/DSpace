@@ -35,7 +35,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
                 <configuration>
-                    <archiveClasses>true</archiveClasses>
                     <attachClasses>true</attachClasses>
                     <!-- In version 2.1-alpha-1, this was incorrectly named warSourceExcludes -->
                     <packagingExcludes>WEB-INF/lib/*.jar</packagingExcludes>
