@@ -9,6 +9,7 @@ import java.util.*;
 import javax.net.ssl.HttpsURLConnection;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthPolicy;
@@ -32,6 +33,23 @@ public class CDLDataCiteService {
 
     private String myUsername;
     private String myPassword;
+
+    public static final String DC_CREATOR = "dc.creator";
+    public static final String DC_TITLE = "dc.title";
+    public static final String DC_PUBLISHER = "dc.publisher";
+    public static final String DC_DATE_AVAILABLE = "dc.date.available";
+    public static final String DC_DATE= "dc.date";
+    public static final String DC_SUBJECT= "dc.subject";
+    public static final String DC_RELATION_ISREFERENCEBY= "dc.relation.isreferencedby";
+    public static final String DC_RIGHTS= "dc.rights";
+    public static final String DC_DESCRIPTION= "dc.description";
+
+
+    public static final String DATACITE_CREATOR = "datacite.creator";
+    public static final String DATACITE_TITLE = "datacite.title";
+    public static final String DATACITE_PUBLISHER = "datacite.publisher";
+    public static final String DATACITE_PUBBLICATIONYEAR = "datacite.publicationyear";
+
 
     public CDLDataCiteService(final String aUsername, final String aPassword) {
         myUsername = aUsername;
@@ -62,7 +80,27 @@ public class CDLDataCiteService {
      */
     public String updateURL(String aDOI, String aURL, Map<String, String> metadata) throws IOException {
         PostMethod post = new PostMethod(BASEURL + "/id/doi%3A" + aDOI);
-        return executeHttpMethod(aURL, metadata, post);
+
+        if(aURL!=null)
+            return executeHttpMethod(aURL, metadata, post);
+
+        return executeHttpMethod(null, metadata, post);
+
+    }
+
+    public String lookup(String aDOI) throws IOException {
+
+        GetMethod get = new GetMethod(BASEURL + "/id/doi%3A" + aDOI);
+        HttpMethodParams params = new HttpMethodParams();
+
+        get.setRequestHeader("Content-Type", "text/plain");
+        get.setRequestHeader("Accept", "text/plain");
+
+        this.getClient(true).executeMethod(get);
+
+
+        String response = get.getResponseBodyAsString();
+        return response;
     }
 
 
@@ -70,7 +108,10 @@ public class CDLDataCiteService {
         HttpMethodParams params = new HttpMethodParams();
 
         HashMap<String, String> map = new HashMap<String, String>();
-        map.put("_target", aURL);
+
+        if(aURL!=null)
+            map.put("_target", aURL);
+
         if (log.isDebugEnabled()) {
             log.debug("Adding _target to metadata for update: " + aURL);
         }
@@ -85,8 +126,7 @@ public class CDLDataCiteService {
         httpMethod.setRequestHeader("Content-Type", "text/plain");
         httpMethod.setRequestHeader("Accept", "text/plain");
 
-        this.getClient().executeMethod(httpMethod);
-
+        this.getClient(false).executeMethod(httpMethod);
         return httpMethod.getStatusLine().toString();
     }
 
@@ -99,12 +139,12 @@ public class CDLDataCiteService {
 
     HttpClient client = new HttpClient();
 
-    private HttpClient getClient() throws IOException {
+    private HttpClient getClient(boolean lookup) throws IOException {
         List authPrefs = new ArrayList(2);
         authPrefs.add(AuthPolicy.DIGEST);
         authPrefs.add(AuthPolicy.BASIC);
         client.getParams().setParameter(AuthPolicy.AUTH_SCHEME_PRIORITY, authPrefs);
-        client.getState().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(myUsername, myPassword));
+        if(!lookup) client.getState().setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(myUsername, myPassword));
         return client;
     }
 
@@ -115,7 +155,7 @@ public class CDLDataCiteService {
      * @param args
      */
     public static void main(String[] args) throws IOException {
-        String usage = "Usage: class username password doi target register|update";
+        String usage = "Usage: class username password doi target register|update|lookup";
         CDLDataCiteService service;
 
         if (args.length == 5) {
@@ -135,9 +175,14 @@ public class CDLDataCiteService {
             IdentifierService identifierService = new DSpace().getSingletonService(IdentifierService.class);
             DSpaceObject dso = null;
             try {
-		log.debug("obtaining dspace object");
+                // FOR local TEST!
+                //dso = identifierService.resolve(context, "doi:10.5061/dryad.7mm0p");
+
+    	    	log.debug("obtaining dspace object");
                 dso = identifierService.resolve(context, doiID);
-		log.debug("dspace object is " + dso);
+
+	    	    log.debug("dspace object is " + dso);
+
             } catch (IdentifierNotFoundException e) {
                 e.printStackTrace(System.out);
                 System.exit(1);
@@ -158,8 +203,8 @@ public class CDLDataCiteService {
                 System.out.println(service.registerDOI(doiID, target, metadata));
             } else if (action.equals("update")) {
                 System.out.println(service.updateURL(doiID, target, metadata));
-            } else {
-                System.out.println(usage);
+            } else if (action.equals("lookup")) {
+                System.out.println(service.lookup(doiID));
             }
         } else {
             System.out.println(usage);
@@ -173,14 +218,14 @@ public class CDLDataCiteService {
 	log.debug("generating DataCite metadata for " + item.getMetadata("dc.title")[0]);
 	
         // dc: creator, title, publisher
-        addMetadata(metadata, item, "dc.contributor.author", "dc.creator");
-        addMetadata(metadata, item, "dc.title", "dc.title");
-        addMetadata(metadata, item, "dc.publisher", "dc.publisher");
+        addMetadata(metadata, item, "dc.contributor.author", DC_CREATOR);
+        addMetadata(metadata, item, "dc.title", DC_TITLE);
+        addMetadata(metadata, item, "dc.publisher", DC_PUBLISHER);
 
         // datacite: creator, title, publisher
-        addMetadata(metadata, item, "dc.contributor.author", "datacite.creator");
-        addMetadata(metadata, item, "dc.title", "datacite.title");
-        addMetadata(metadata, item, "dc.publisher", "datacite.publisher");
+        addMetadata(metadata, item, "dc.contributor.author", DATACITE_CREATOR);
+        addMetadata(metadata, item, "dc.title", DATACITE_TITLE);
+        addMetadata(metadata, item, "dc.publisher", DATACITE_PUBLISHER);
 
 
         // dc.date && datacite.publicationyear
@@ -193,9 +238,9 @@ public class CDLDataCiteService {
             if (values != null && values.length > 0) publicationDate = values[0].value;
         }
         if (publicationDate != null){
-            metadata.put("dc.date.available", publicationDate.substring(0, 4));
-            metadata.put("dc.date", publicationDate);
-            metadata.put("datacite.publicationyear", publicationDate.substring(0, 4));
+            metadata.put(DC_DATE_AVAILABLE, publicationDate.substring(0, 4));
+            metadata.put(DC_DATE, publicationDate);
+            metadata.put(DATACITE_PUBBLICATIONYEAR, publicationDate.substring(0, 4));
         }
 
 
@@ -214,12 +259,12 @@ public class CDLDataCiteService {
         values = item.getMetadata("dc:coverage.temporal");
         if (values != null && values.length > 0) suject += values[0].value;
 
-        if (suject != null) metadata.put("dc.subject", suject);
+        if (suject != null) metadata.put(DC_SUBJECT, suject);
 
 
-        addMetadata(metadata, item, "dc.relation.isreferencedby", "dc.relation.isreferencedby");
-        addMetadata(metadata, item, "dc.rights.uri", "dc.rights");
-        addMetadata(metadata, item, "dc.description", "dc.description");
+        addMetadata(metadata, item, "dc.relation.isreferencedby",DC_RELATION_ISREFERENCEBY);
+        addMetadata(metadata, item, "dc.rights.uri", DC_RIGHTS);
+        addMetadata(metadata, item, "dc.description", DC_DESCRIPTION);
 
 	log.debug("DataCite metadata contains " + metadata.size() + " fields");
 
@@ -227,10 +272,10 @@ public class CDLDataCiteService {
 
     }
 
-    private static void addMetadata(Map<String, String> metadataList, Item item, String itemMetadata, String hmMetadata) {
+    private static void addMetadata(Map<String, String> metadataList, Item item, String itemMetadata, String dataCiteMetadataKey) {
         DCValue[] values = item.getMetadata(itemMetadata);
         if (values != null && values.length > 0) {
-            metadataList.put(hmMetadata, values[0].value);
+            metadataList.put(dataCiteMetadataKey, values[0].value);
         }
     }
 
