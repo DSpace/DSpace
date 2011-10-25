@@ -5,6 +5,7 @@ import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.StreamIngestionCrosswalk;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.doi.CDLDataCiteService;
 import org.dspace.identifier.DOIIdentifierProvider;
 
@@ -29,6 +30,11 @@ public class DataCiteChecker extends AbstractCurationTask{
 
     @Override
     public int perform(DSpaceObject dso) throws IOException {
+
+        if(!ConfigurationManager.getBooleanProperty("doi.datacite.connected", false)){
+            this.setResult("Functionality not supported in test environment.");
+            return Curator.CURATE_FAIL;
+        }
 
         if(!(dso instanceof Item)) return Curator.CURATE_NOTASK;
 

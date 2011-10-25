@@ -29,6 +29,12 @@ public class DataCiteSynchronizer extends AbstractCurationTask{
     @Override
     public int perform(DSpaceObject dso) throws IOException {
 
+        if(!ConfigurationManager.getBooleanProperty("doi.datacite.connected", false)){
+            this.setResult("Functionality not supported in test environment.");
+            return Curator.CURATE_FAIL;
+        }
+
+
         if(!(dso instanceof Item)) return Curator.CURATE_NOTASK;
 
         Item item = (Item)dso;
