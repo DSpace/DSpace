@@ -11,8 +11,6 @@
 	<packaging>war</packaging>
 	<name>Dspace@SeDiCI XMLUI</name>
 	<description>desc</description>
-
-
 	<dependencies>
 
 		<dependency>
@@ -93,15 +91,18 @@
 					<filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
 					<webXml>${project.build.directory}/${project.build.finalName}/webxml/WEB-INF/web.xml</webXml>
 
-					<webResources>
-						<resource>
-							<filtering>true</filtering>
-							<directory>${basedir}/src/main/webapp</directory>
-							<includes>
-								<include>**/*.xml</include>
-							</includes>
-						</resource>
-					</webResources>
+<!-- 					<webResources> -->
+<!-- 						<resource> -->
+<!-- 							<filtering>true</filtering> -->
+<!-- 							<directory>${basedir}/src/main/webapp</directory> -->
+<!-- 							<includes> -->
+<!-- 								<include>**/*.xml</include> -->
+<!-- 							</includes> -->
+<!-- 							<excludes>	 -->
+<!-- 								<exclude>**/messages*.xml</exclude> -->
+<!-- 							</excludes> -->
+<!-- 						</resource> -->
+<!-- 					</webResources> -->
 
 					<overlays>
 						<!-- Se extrae web.xml para filtrar por separado -->
@@ -117,7 +118,6 @@
 						<overlay>
 							<groupId>org.dspace.modules</groupId>
 							<artifactId>xmlui</artifactId>
-
 							<excludes>
 								<exclude>WEB-INF/web.xml</exclude>
 							</excludes>
