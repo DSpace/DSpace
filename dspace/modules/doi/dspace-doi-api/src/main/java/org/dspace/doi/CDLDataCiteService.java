@@ -20,6 +20,7 @@ import org.apache.log4j.Logger;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.content.ItemIterator;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
 import org.dspace.identifier.IdentifierService;
@@ -105,7 +106,6 @@ public class CDLDataCiteService {
 
 
     private String executeHttpMethod(String aURL, Map<String, String> metadata, EntityEnclosingMethod httpMethod) throws IOException {
-        HttpMethodParams params = new HttpMethodParams();
 
         HashMap<String, String> map = new HashMap<String, String>();
 
@@ -117,9 +117,9 @@ public class CDLDataCiteService {
         }
 
         if (metadata != null) {
-	    log.debug("Adding other metadata");
+	        log.debug("Adding other metadata");
             map.putAll(metadata);
-	}
+	    }
 	
         httpMethod.setRequestEntity(new StringRequestEntity(encodeAnvl(map), "text/plain", "UTF-8"));
 
@@ -128,6 +128,28 @@ public class CDLDataCiteService {
 
         this.getClient(false).executeMethod(httpMethod);
         return httpMethod.getStatusLine().toString();
+    }
+
+
+    public void synchAll()  throws IOException{
+        System.out.println("Starting....");
+
+        try {
+            org.dspace.core.Context context = new org.dspace.core.Context();
+            context.turnOffAuthorisationSystem();
+            ItemIterator items = Item.findAll(context);
+
+            while(items.hasNext()){
+                Item item  = items.next();
+                if (item.isArchived()){
+                    System.out.println("Item: " + getDoiValue(item) + " result: " + this.updateURL(getDoiValue(item), null, createMetadataList(item)));
+                }
+            }
+
+        } catch (SQLException e) {
+            System.exit(1);
+        }
+        System.out.println("Synchronization executed with success.");
     }
 
 
@@ -155,14 +177,24 @@ public class CDLDataCiteService {
      * @param args
      */
     public static void main(String[] args) throws IOException {
-        String usage = "Usage: class [username] [password] doi [target] [register|update]";
+        String usage = "Usage\nto register or update a specific Item --> class username password doi target register|update  \nto lookup a specific item --> class doi \nto synchronize all the items against dataCite --> class username password synchall";
         CDLDataCiteService service;
 
+
+        // args[0]=DOI
         if(args.length == 1){
             service = new CDLDataCiteService(null, null);
             String doiID = args[0];
             System.out.println(service.lookup(doiID));
         }
+        // args= USERNAME PASSWORD synchall
+        else if(args.length==3 && args[2].equals("synchall")){
+            String username = args[0];
+            String password = args[1];
+            service = new CDLDataCiteService(username, password);
+            service.synchAll();
+        }
+        //args= USERNAME PASSWORD DOI URL ACTION
         else if (args.length == 5){
             String username = args[0];
             String password = args[1];
@@ -315,5 +347,14 @@ public class CDLDataCiteService {
             metadata.put(unescape(kv[0]).trim(), unescape(kv[1]).trim());
         }
         return metadata;
+    }
+
+    private static String getDoiValue(Item item) {
+        DCValue[] doiVals = item.getMetadata("dc", "identifier", null, Item.ANY);
+        if (doiVals != null && 0 < doiVals.length) {
+            return doiVals[0].value;
+        }
+        return null;
+
     }
 }
