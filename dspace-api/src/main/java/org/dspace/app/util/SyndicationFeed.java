@@ -9,10 +9,8 @@ package org.dspace.app.util;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -28,7 +26,6 @@ import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.handle.HandleManager;
@@ -106,8 +103,8 @@ public class SyndicationFeed
     private static String authorField =
         getDefaultedConfiguration("webui.feed.item.author", defaultAuthorField);
 
-    // metadata field for Item external media source url
-    private static String sourceField = getDefaultedConfiguration("webui.feed.item.sourceuri", defaultExternalMedia);
+    // metadata field for Podcast external media source url
+    private static String externalSourceField = getDefaultedConfiguration("webui.feed.podcast.sourceuri", defaultExternalMedia);
 
     // metadata field for Item dc:creator field in entry's DCModule (no default)
     private static String dcCreatorField = ConfigurationManager.getProperty("webui.feed.item.dc.creator");
@@ -118,6 +115,8 @@ public class SyndicationFeed
     // metadata field for Item dc:author field in entry's DCModule (no default)
     private static String dcDescriptionField = ConfigurationManager.getProperty("webui.feed.item.dc.description");
 
+    // List of available mimetypes that we'll add to podcast feed. Multiple values separated by commas
+    private static String podcastableMIMETypes = getDefaultedConfiguration("webui.feed.podcast.mimetypes", "audio/x-mpeg");
 
     // -------- Instance variables:
 
@@ -369,7 +368,7 @@ public class SyndicationFeed
                             Bitstream[] bits = bunds[0].getBitstreams();
                             for (int i = 0; (i < bits.length); i++) {
                                 String mime = bits[i].getFormat().getMIMEType();
-                                if(mime.contains("audio/x-mpeg")) {
+                                if(podcastableMIMETypes.contains(mime)) {
                                     SyndEnclosure enc = new SyndEnclosureImpl();
                                     enc.setType(bits[i].getFormat().getMIMEType());
                                     enc.setLength(bits[i].getSize());
@@ -382,13 +381,13 @@ public class SyndicationFeed
                         }
                         //Also try to add an external value from dc.identifier.other
                         // We are assuming that if this is set, then it is a media file
-                        DCValue[] externalMedia = item.getMetadata(sourceField);
+                        DCValue[] externalMedia = item.getMetadata(externalSourceField);
                         if(externalMedia.length > 0)
                         {
                             for(int i = 0; i< externalMedia.length; i++)
                             {
                                 SyndEnclosure enc = new SyndEnclosureImpl();
-                                enc.setType("audio/x-mpeg");
+                                enc.setType("audio/x-mpeg");        //We can't determine MIME of external file, so just picking one.
                                 enc.setLength(1);
                                 enc.setUrl(externalMedia[i].value);
                                 enclosures.add(enc);
