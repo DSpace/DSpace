@@ -38,10 +38,14 @@ public class EditItemEmbargoForm extends AbstractDSpaceTransformer {
     private static final Message T_option_embargo = message("xmlui.administrative.item.general.option_embargo");
     private static final Message T_option_metadata = message("xmlui.administrative.item.general.option_metadata");
     private static final Message T_option_view = message("xmlui.administrative.item.general.option_view");
-
-
     private static final Message T_title = message("xmlui.administrative.item.EditItemEmbargoForm.title");
     private static final Message T_trail = message("xmlui.administrative.item.EditItemEmbargoForm.trail");
+
+
+    private static final Message T_embargo_custom = message("xmlui.administrative.item.EditItemEmbargoForm.embargo_custom");
+    private static final Message T_embargo_curator_note  = message("xmlui.administrative.item.EditItemEmbargoForm.embargo_curator_note");
+    private static final Message T_embargo_until = message("xmlui.administrative.item.EditItemEmbargoForm.embargo_until");
+    private static final Message T_submit_lift_embargo = message("xmlui.administrative.item.EditItemEmbargoForm.lift_embargo");
 
 
     public void addPageMeta(PageMeta pageMeta) throws WingException
@@ -61,51 +65,65 @@ public class EditItemEmbargoForm extends AbstractDSpaceTransformer {
 
         Request request = ObjectModelHelper.getRequest(objectModel);
 
-
-        // DIVISION: main
         Division main = body.addInteractiveDivision("edit-item-status", contextPath+"/admin/item", Division.METHOD_POST,"primary administrative item");
         main.setHead(T_option_head);
 
-        DCDate embargoDate = EmbargoManager.getEmbargoDate(context, item);
-        String dateString = null;
-        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
-        if(embargoDate != null)
-            dateString = " (embargoed until: " + format.format(embargoDate.toDate()) + ")";
+        String dateString = getDateEmbargoString(item);
 
-        // LIST: options
+        addOptionsList(baseURL, main);
+
+        Division embargoDiv = createForm(main, dateString);
+
+        addButtons(embargoDiv);
+
+        main.addHidden("administrative-continue").setValue(knot.getId());
+    }
+
+    private void addOptionsList(String baseURL, Division main) throws WingException {
         List options = main.addList("options",List.TYPE_SIMPLE,"horizontal");
         options.addItem().addXref(baseURL+"&submit_status",T_option_status);
         options.addItem().addXref(baseURL+"&submit_bitstreams",T_option_bitstreams);
         options.addItem().addHighlight("bold").addXref(baseURL + "&submit_embargo", T_option_embargo);
         options.addItem().addXref(baseURL+"&submit_metadata",T_option_metadata);
         options.addItem().addXref(baseURL + "&view_item", T_option_view);
+    }
 
-        //Add a radio button to enable/disable embargo
+    private Division createForm(Division main, String dateString) throws WingException {
         Division embargoDiv = main.addDivision("edit_embargo_div");
-        Para para = embargoDiv.addPara();
-        //This will become a radio in the xsl
-        CheckBox embargoRadio = para.addCheckBox("embargo");
-        embargoRadio.addOption(embargoDate == null, "disabled", "Disabled");
-        embargoRadio.addOption(embargoDate != null, "enabled", "1 year embargo" + (dateString != null ? dateString : ""));
 
-        //Add the textboxes for the embargo
-//        Composite dateBox = para.addComposite("date");
-//        Text dayTxt = dateBox.addText("date_day", "Day:");
-//        Text monthTxt = dateBox.addText("date_month", "Month:");
-//        Text yearTxt = dateBox.addText("date_year", "Year:");
+        embargoDiv.addPara().addContent(T_embargo_custom);
 
-        //In case we have an embargodate show it
-//        if(embargoDate != null){
-//            dayTxt.setValue(String.valueOf(embargoDate.getDay()));
-//            monthTxt.setValue(String.valueOf(embargoDate.getMonth()));
-//            yearTxt.setValue(String.valueOf(embargoDate.getYear()));
-//        }
+        Para p = addTextBox(embargoDiv, T_embargo_until, "embargoed_until", dateString, false);
+        p.addButton("submit_update").setValue(T_submit_update);
 
+        embargoDiv.addPara().addContent(T_embargo_curator_note);
+        return embargoDiv;
+    }
+
+    private void addButtons(Division embargoDiv) throws WingException {
         Para buttonPara = embargoDiv.addPara("buttons", "");
 
-        buttonPara.addButton("submit_update").setValue(T_submit_update);
+        buttonPara.addButton("submit_lift_emabrgo").setValue(T_submit_lift_embargo);
         buttonPara.addButton("submit_return").setValue(T_submit_return);
+    }
 
-        main.addHidden("administrative-continue").setValue(knot.getId());
+
+    private String getDateEmbargoString(Item item) throws SQLException, AuthorizeException, IOException {
+        DCDate embargoDate = EmbargoManager.getEmbargoDate(context, item);
+        String dateString = null;
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+        if(embargoDate != null)
+            dateString = format.format(embargoDate.toDate());
+        return dateString;
+    }
+
+
+    private Para addTextBox(Division div, Message label, String name, String value, boolean disabled) throws WingException {
+        Para p = div.addPara();
+        p.addContent(label);
+        Text t1 = p.addText(name);
+        t1.setValue(value);
+        t1.setDisabled(disabled);
+        return p;
     }
 }

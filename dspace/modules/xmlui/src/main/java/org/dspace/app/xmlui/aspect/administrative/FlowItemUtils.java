@@ -10,8 +10,11 @@ package org.dspace.app.xmlui.aspect.administrative;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Enumeration;
 
 import org.apache.cocoon.environment.Request;
@@ -761,65 +764,60 @@ public class FlowItemUtils
 
         Item item = Item.find(context, itemID);
 
-        //Clear it anyways if we got a new it will be set later on
-        if("enabled".equals(request.getParameter("embargo"))){
-            try{
-//                int day = Integer.parseInt(request.getParameter("date_day"));
-//                int month = Integer.parseInt(request.getParameter("date_month"));
-//                int year = Integer.parseInt(request.getParameter("date_year"));
+        Date embargoDate = null;
+        String date = request.getParameter("embargoed_until");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        dateFormat.setLenient(false);
+        try {
+            embargoDate = dateFormat.parse(date);
+        } catch (ParseException e) {
+            result.setContinue(true);
+            result.setOutcome(false);
+            result.setMessage(new Message("error", "Date not Valid."));
+            return result;
+        }
 
-                //Check if we have a valid date
-//                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-//                dateFormat.setLenient(false);
-//                String dateStr = year + "-" + fleshOut(month) + "-" + fleshOut(day);
-//                Date embargoDateDate = dateFormat.parse(dateStr);
+        //We don't want a day before today
+        Calendar today = Calendar.getInstance();
+        if(embargoDate.before(today.getTime())){
+            result.setContinue(true);
+            result.setOutcome(false);
+            result.setMessage(new Message("error", "Date not Valid."));
+            return result;
+        }
 
-                //We don't want a day before today
-//                Calendar today = Calendar.getInstance();
-//                if(embargoDateDate.before(today.getTime()))
-//                    throw new IllegalArgumentException();
-
-                //First check if we already have an embargo
-                DCDate currentEmbargoDate = EmbargoManager.getEmbargoDate(context, item);
-                if(currentEmbargoDate == null){
-                    //We don't have an embargo at the moment so create a new one, a year in the future
-                    Calendar embargoDate = Calendar.getInstance();
-                    //Add one year
-                    embargoDate.add(Calendar.YEAR, 1);
-                    //Store it
-                    //Create and store our embargodate
-                    DCDate embargoDcDate = new DCDate(embargoDate.getTime());
-                    EmbargoManager.setEmbargo(context, item, embargoDcDate);
-                }
-
-
-            }catch(Exception e){
-                result.setContinue(true);
-                result.setOutcome(false);
-                result.setMessage(T_embargo_not_set);
-                return result;
-            }
-        }else
-            EmbargoManager.liftEmbargo(context, item);
-
-//        BitstreamUtil.setBitstreamEmbargos(context, item, true);
+        DCDate embargoDcDate = new DCDate(embargoDate);
+        EmbargoManager.setEmbargo(context, item, embargoDcDate);
 
         item.update();
         context.commit();
 
+        result.setMessage(new Message("default", "Embargo configured."));
         result.setContinue(true);
         result.setOutcome(true);
-        if("enabled".equals(request.getParameter("embargo"))){
-            result.setMessage(T_embargo_set);
-        } else {
-            result.setMessage(T_embargo_removed);
-        }
-
         return result;
 
     }
-    
-    
+
+    public static FlowResult processLiftEmbargo(Context context, int itemID, Request request) throws SQLException, AuthorizeException, IOException {
+        FlowResult result = new FlowResult();
+        result.setContinue(false);
+
+        Item item = Item.find(context, itemID);
+
+        EmbargoManager.liftEmbargo(context, item);
+
+        item.update();
+        context.commit();
+
+        result.setMessage(new Message("default", "Embargo lifted."));
+        result.setContinue(true);
+        result.setOutcome(true);
+        return result;
+
+    }
+
+
     /**
      * Flesh out a number to two digits
      *

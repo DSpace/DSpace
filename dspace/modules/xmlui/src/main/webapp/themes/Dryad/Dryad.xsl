@@ -608,99 +608,15 @@ test="$meta[@element='request'][@qualifier='URI'][not(contains(., 'discover')) a
 	</xsl:template>
 
 	<!--Render the edit embargo page-->
-	<xsl:template
-		match="dri:div[@id = 'aspect.administrative.item.EditItemEmbargoForm.div.edit_embargo_div']">
-		<xsl:for-each select="dri:p">
-			<xsl:choose>
-				<xsl:when test="@id = 'aspect.administrative.item.EditItemEmbargoForm.p.buttons'">
-					<p>
-						<xsl:apply-templates/>
-					</p>
-				</xsl:when>
-				<xsl:otherwise>
-					<fieldset class="ds-form-list">
-						<legend>
-							<i18n:text>xmlui.administrative.item.EditItemEmbargoForm.legend</i18n:text>
-						</legend>
-						<p>
-							<i18n:text>xmlui.administrative.item.EditItemEmbargoForm.help</i18n:text>
-						</p>
-						<table>
-							<xsl:attribute name="style">border:0;width:100%;</xsl:attribute>
-							<xsl:for-each select="dri:field">
-								<xsl:choose>
-									<xsl:when test="@type = 'checkbox'">
-										<xsl:for-each select="dri:option">
-											<tr>
-												<td>
-													<input type="radio">
-														<xsl:attribute name="id">
-															<xsl:value-of select="@returnValue"/>
-														</xsl:attribute>
-														<xsl:attribute name="name">
-															<xsl:value-of select="../@n"/>
-														</xsl:attribute>
-														<xsl:attribute name="value">
-															<xsl:value-of select="@returnValue"/>
-														</xsl:attribute>
-														<xsl:if test="../dri:value/@option = @returnValue">
-															<xsl:attribute name="checked">checked</xsl:attribute>
-														</xsl:if>
-													</input>
-													<label>
-														<xsl:attribute name="style">cursor:pointer;</xsl:attribute>
-														<xsl:attribute name="for">
-															<xsl:value-of select="@returnValue"/>
-														</xsl:attribute>
-														<xsl:value-of select="text()"/>
-													</label>
-												</td>
-											</tr>
-										</xsl:for-each>
-									</xsl:when>
-									<xsl:otherwise>
-										<!--We got the textboxes-->
-										<table>
-											<!--<xsl:attribute name="id">show_date</xsl:attribute>-->
-											<xsl:attribute name="style">border:0;width:1%;</xsl:attribute>
-											<tr>
-												<xsl:for-each select="dri:field">
-													<td>
-														<xsl:value-of select="@rend"/>
-													</td>
-													<td>
-														<input type="text">
-															<xsl:attribute name="name">
-																<xsl:value-of select="@n"/>
-															</xsl:attribute>
+    <xsl:template match="dri:div[@id = 'aspect.administrative.item.EditItemEmbargoForm.div.edit_embargo_div']">
+        <fieldset class="ds-form-list">
+            <legend>
+                <i18n:text>xmlui.administrative.item.EditItemEmbargoForm.legend</i18n:text>
+            </legend>
 
-															<xsl:choose>
-																<xsl:when test="@n = 'date_year' ">
-																	<xsl:attribute name="size">6</xsl:attribute>
-																	<xsl:attribute name="maxlength">4</xsl:attribute>
-																</xsl:when>
-																<xsl:otherwise>
-																	<xsl:attribute name="size">2</xsl:attribute>
-																	<xsl:attribute name="maxlength">2</xsl:attribute>
-																</xsl:otherwise>
-															</xsl:choose>
-															<xsl:attribute name="value">
-																<xsl:value-of select="dri:value/text()"/>
-															</xsl:attribute>
-														</input>
-													</td>
-												</xsl:for-each>
-											</tr>
-										</table>
-									</xsl:otherwise>
-								</xsl:choose>
-							</xsl:for-each>
-						</table>
-					</fieldset>
-				</xsl:otherwise>
-			</xsl:choose>
-		</xsl:for-each>
-	</xsl:template>
+            <xsl:apply-templates/>
+        </fieldset>
+    </xsl:template>
 
 	<xsl:template match="dri:xref[../../@id='aspect.submission.Navigation.list.submitNow'][@rend='submitnowbutton']">
 		<a class="button-link">
