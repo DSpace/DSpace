@@ -195,6 +195,21 @@ function doSubmissionOverview()
 
 }
 
+function doDepositConfirmed()
+{
+    do {
+        //Send user to the overviewpage & await further steps.
+        sendPageAndWait("submit/depositConfirmedStep",{"id":cocoon.request.get("itemID")});
+
+        var redirUrl = FlowUtils.processDepositConfirmedStep(getDSContext(), cocoon.request, cocoon.response, workItemID);
+        if(redirUrl != null){
+            cocoon.redirectTo(redirUrl,true);
+            cocoon.exit();
+        }
+    }while (true);
+
+}
+
 function doEditMetadata()
 {
     var wfItemID = cocoon.request.get("wfItemID");

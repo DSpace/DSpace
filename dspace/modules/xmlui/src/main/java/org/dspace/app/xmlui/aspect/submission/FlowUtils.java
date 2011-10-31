@@ -110,7 +110,8 @@ public class FlowUtils {
 	 */
 	public static InProgressSubmission findSubmission(Context context, String inProgressSubmissionID) throws SQLException, AuthorizeException, IOException, WorkflowConfigurationException {
 		char type = inProgressSubmissionID.charAt(0);
-		int id = Integer.valueOf(inProgressSubmissionID.substring(1));
+        String temp = inProgressSubmissionID.substring(1);
+		int id = Integer.valueOf(temp);
 
 		if (type == 'S')
 		{
@@ -175,8 +176,15 @@ public class FlowUtils {
         //try loading subInfo from HTTP request
         SubmissionInfo subInfo = (SubmissionInfo) request.getAttribute(DSPACE_SUBMISSION_INFO);
 
-        //get the submission represented by the WorkspaceID
-        InProgressSubmission submission = findSubmission(context, workspaceID);
+        InProgressSubmission submission=null;
+        if(request.getRequestURI().contains("deposit-confirmed")){
+            // find WorkflowItem
+            submission = WorkflowItem.findByItemId(context, Integer.valueOf(workspaceID));
+        }
+        else{
+            //get the submission represented by the WorkspaceID
+            submission = findSubmission(context, workspaceID);
+        }
 
         //if no submission info, or wrong submission info, reload it!
         if ((subInfo == null && submission!=null) ||
@@ -715,7 +723,11 @@ public class FlowUtils {
                 //We have a workspace item
                 finishSubmission(request, context, publication);
                 //We have finished, redir us to the submissions page
-                return request.getContextPath() + "/submissions";
+                //return request.getContextPath() + "/submissions";
+
+                // adding a new step: deposit-confirmed
+                return request.getContextPath() + "/deposit-confirmed?itemID=" + publication.getID();
+
             } else {
                 //We have a workflow item & have finished editing, redir to the overview page
                 ClaimedTask task = ClaimedTask.findByWorkflowIdAndEPerson(context, workItem.getID(), context.getCurrentUser().getID());
@@ -779,6 +791,16 @@ public class FlowUtils {
         //Return null, since no redir is required
         return null;
     }
+
+
+
+    public static String processDepositConfirmedStep(Context context, Request request, HttpServletResponse response, String workItemID)
+            throws SQLException, AuthorizeException, IOException, ServletException, TransformerException, WorkflowException, SAXException, WorkflowConfigurationException, MessagingException, ParserConfigurationException {
+        return request.getContextPath() + "/submissions";
+    }
+
+
+
 
     private static void finishSubmission(Request request, Context context, Item publication) throws SQLException, AuthorizeException, IOException, TransformerException, WorkflowException, SAXException, WorkflowConfigurationException, MessagingException, ParserConfigurationException {
         //We have completed everything time to start our dataset

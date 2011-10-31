@@ -1137,3 +1137,9 @@ div#embargo_notice_new {
 	font-weight: bold;
 	color: #8b0000;
 }
+
+
+
+div#aspect_submission_submit_DepositConfirmedStep_div_deposit-confirmed {
+	border: 2px solid gray;
+}

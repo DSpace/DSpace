@@ -38,7 +38,7 @@ public class PluggableVersioningService implements VersioningService{
             }
             else{
                 vh=versionHistoryDAO.create(c);
-                version = createVersion(c, vh, item, summary);
+                version = createVersion(c, vh, item, "");
             }
 
             ItemVersionProvider provider = getProvider();
@@ -48,7 +48,7 @@ public class PluggableVersioningService implements VersioningService{
 
 
             // create current version
-            createVersion(c, vh, itemNew, "current version");
+            createVersion(c, vh, itemNew, summary);
 
 
 

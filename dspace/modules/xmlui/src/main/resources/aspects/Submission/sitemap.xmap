@@ -70,6 +70,10 @@
                              src="org.dspace.app.xmlui.aspect.submission.workflow.PerformTaskStep"/>
 
             <map:transformer name="OverviewStep" src="org.dspace.app.xmlui.aspect.submission.submit.OverviewStep"/>
+
+            <map:transformer name="depositConfirmedStep" src="org.dspace.app.xmlui.aspect.submission.submit.DepositConfirmedStep"/>
+
+
             <map:transformer name="DryadReviewTransformer"
                              src="org.dspace.app.xmlui.aspect.submission.DryadReviewTransformer"/>
             <map:transformer name="WorkflowTransformer"
@@ -135,6 +139,10 @@
 
                     <map:match pattern="submit-overview">
                         <map:call function="doSubmissionOverview"/>
+                    </map:match>
+
+                    <map:match pattern="deposit-confirmed">
+                        <map:call function="doDepositConfirmed"/>
                     </map:match>
 
                     <map:match pattern="submit-edit-metadata">
@@ -341,6 +349,18 @@
                                 <map:parameter name="id" value="{flow-attribute:id}"/>
                             </map:transform>
                         </map:match>
+
+
+                        <!--
+                        This step is used to show a feedback to the user, to confirm the
+                        deposit.
+                        -->
+                        <map:match pattern="submit/depositConfirmedStep">
+                            <map:transform type="depositConfirmedStep">
+                                <map:parameter name="id" value="{flow-attribute:id}"/>
+                            </map:transform>
+                        </map:match>
+
 
                         <!--
                         This step is used throughout the submission processes for when

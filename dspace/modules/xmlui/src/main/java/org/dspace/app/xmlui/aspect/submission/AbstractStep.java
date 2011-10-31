@@ -16,6 +16,8 @@ import java.util.Set;
 
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ProcessingException;
+import org.apache.cocoon.environment.ObjectModelHelper;
+import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.SubmissionInfo;
@@ -183,31 +185,36 @@ public abstract class AbstractStep extends AbstractDSpaceTransformer
                 this.submission = submissionInfo.getSubmissionItem();
 
             }
-			
-			// Check required error conditions
-			if (this.requireSubmission && this.submission == null)
-            {
-                throw new ProcessingException("Unable to find submission for id: " + this.id);
-            }
-			
-			if (this.requireWorkflow && !(submission instanceof WorkflowItem))
-            {
-                throw new ProcessingException("The submission is not a workflow, " + this.id);
-            }
-			
-			if (this.requireWorkspace && !(submission instanceof WorkspaceItem))
-            {
-                throw new ProcessingException("The submission is not a workspace, " + this.id);
-            }
-			
-			if (this.requireStep && stepAndPage.getStep() < 0)
-            {
-                throw new ProcessingException("Step is a required parameter.");
-            }
-			
-			if (this.requireHandle && handle == null)
-            {
-                throw new ProcessingException("Handle is a required parameter.");
+
+            // check only if deposit-confirmer step (it is just a confermation form)
+            Request request = ObjectModelHelper.getRequest(objectModel);
+            if(!request.getRequestURI().contains("deposit-confirmed")){
+
+                // Check required error conditions
+                if (this.requireSubmission && this.submission == null)
+                {
+                    throw new ProcessingException("Unable to find submission for id: " + this.id);
+                }
+
+                if (this.requireWorkflow && !(submission instanceof WorkflowItem))
+                {
+                    throw new ProcessingException("The submission is not a workflow, " + this.id);
+                }
+
+                if (this.requireWorkspace && !(submission instanceof WorkspaceItem))
+                {
+                    throw new ProcessingException("The submission is not a workspace, " + this.id);
+                }
+
+                if (this.requireStep && stepAndPage.getStep() < 0)
+                {
+                    throw new ProcessingException("Step is a required parameter.");
+                }
+
+                if (this.requireHandle && handle == null)
+                {
+                    throw new ProcessingException("Handle is a required parameter.");
+                }
             }
 			
 		} 
