@@ -2358,10 +2358,10 @@
 	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.harvest_status_queued"
 		>Collection is in queue for harvest</message>
 	<message
-		key="xmlui.administrative.collection.EditCollectionHarvestingForm.harvest_status_oai_error">OAI error occured during last harvest</message>
+		key="xmlui.administrative.collection.EditCollectionHarvestingForm.harvest_status_oai_error">OAI error occurred during last harvest</message>
 	<message
 		key="xmlui.administrative.collection.EditCollectionHarvestingForm.harvest_status_unknown_error"
-		>Unexpected error occured during last harvest</message>
+		>Unexpected error occurred during last harvest</message>
 	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.option_md_only">Harvest metadata only.</message>
 	<message key="xmlui.administrative.collection.EditCollectionHarvestingForm.option_md_and_ref"
 		>Harvest metadata and references to bitstreams.</message>
