@@ -2,14 +2,11 @@ package org.dspace.doi;
 
 import java.io.IOException;
 import java.lang.String;
-import java.net.URL;
 import java.sql.SQLException;
 import java.util.*;
 
-import javax.net.ssl.HttpsURLConnection;
+import javax.mail.MessagingException;
 
-import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthPolicy;
@@ -21,6 +18,9 @@ import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
+import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Email;
+import org.dspace.core.I18nUtil;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
 import org.dspace.identifier.IdentifierService;
@@ -79,7 +79,7 @@ public class CDLDataCiteService {
      * @throws IOException If there was trouble connection and communicating to
      *                     the remote service
      */
-    public String updateURL(String aDOI, String aURL, Map<String, String> metadata) throws IOException {
+    public String update(String aDOI, String aURL, Map<String, String> metadata) throws IOException {
         PostMethod post = new PostMethod(BASEURL + "/id/doi%3A" + aDOI);
 
         if(aURL!=null)
@@ -142,7 +142,7 @@ public class CDLDataCiteService {
             while(items.hasNext()){
                 Item item  = items.next();
                 if (item.isArchived()){
-                    System.out.println("Item: " + getDoiValue(item) + " result: " + this.updateURL(getDoiValue(item), null, createMetadataList(item)));
+                    System.out.println("Item: " + getDoiValue(item) + " result: " + this.update(getDoiValue(item), null, createMetadataList(item)));
                 }
             }
 
@@ -239,7 +239,7 @@ public class CDLDataCiteService {
             if (action.equals("register")) {
                 System.out.println(service.registerDOI(doiID, target, metadata));
             } else if (action.equals("update")) {
-                System.out.println(service.updateURL(doiID, target, metadata));
+                System.out.println(service.update(doiID, target, metadata));
             } else{
                  System.out.println(usage);
             }
@@ -357,4 +357,27 @@ public class CDLDataCiteService {
         return null;
 
     }
+
+    public void emailException(String error, String item, String operation) throws IOException {
+		String admin = ConfigurationManager.getProperty("mail.admin");
+		Locale locale = I18nUtil.getDefaultLocale();
+		String emailFile = I18nUtil.getEmailFilename(locale, "datacite_error");
+		Email email = ConfigurationManager.getEmail(emailFile);
+
+		// Write our stack trace to a string for output
+		email.addRecipient(admin);
+
+		// Add details to display in the email message
+        email.addArgument(operation);
+        //email.addArgument(aThrowable);
+		email.addArgument(error);
+        email.addArgument(item);
+
+		try {
+			email.send();
+		}
+		catch (MessagingException emailExceptionDetails) {
+			throw new IOException(emailExceptionDetails);
+		}
+	}
 }

@@ -8,18 +8,12 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
-import org.bouncycastle.ocsp.OCSPReqGenerator;
-import org.dspace.content.DSpaceObject;
-import org.dspace.core.Constants;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;
-
-import javax.sound.sampled.Port;
 
 @SuppressWarnings("deprecation")
 public class Minter implements org.springframework.beans.factory.InitializingBean {
@@ -59,7 +53,7 @@ public class Minter implements org.springframework.beans.factory.InitializingBea
 			if (http.getResponseCode() == 303) {
 				if (!http.getHeaderField("Location").equals(target)) {
 					if (myDataCiteConnectionIsLive) {
-						String response = myDoiService.updateURL(doi, target, metadata);
+						String response = myDoiService.update(doi, target, metadata);
 
 						LOG.debug("Response from DataCite: " + response);
 					}
@@ -74,6 +68,13 @@ public class Minter implements org.springframework.beans.factory.InitializingBea
 			else {
 				if (myDataCiteConnectionIsLive) {
 					String response = myDoiService.registerDOI(doi, target, metadata);
+
+                     if(response.contains("bad request") || response.contains("BAD REQUEST") || response.contains("UNAUTHORIZED")){
+                        myDoiService.emailException(response, doi, "registration");
+                     }
+                     else if(!response.contains("OK")){
+                        myDoiService.emailException("Verified generic error.", doi, "registration");
+                     }
 
 					LOG.debug("From DataCite: " + response);
 				}

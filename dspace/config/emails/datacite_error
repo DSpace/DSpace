@@ -1,0 +1,15 @@
+# Email sent to DSpace admin when a datacite update fails to complete
+#
+# Parameters: {0} registration/update
+#             {1} the exception
+#             {2} the item in question
+
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: Dryad - Problem with the datacite EZID
+A Datacite EZID {0} was not successfully completed, due to the following reason:
+
+{1}
+
+The item in question is: {2}

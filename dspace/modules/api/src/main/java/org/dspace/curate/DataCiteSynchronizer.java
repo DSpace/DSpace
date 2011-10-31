@@ -47,7 +47,7 @@ public class DataCiteSynchronizer extends AbstractCurationTask{
         String doi = DOIIdentifierProvider.getDoiValue(item);
 
         Map<String, String> metadatalist = dataCiteService.createMetadataList(item);
-        String response = dataCiteService.updateURL(doi, null, metadatalist);
+        String response = dataCiteService.update(doi, null, metadatalist);
 
         if(response.contains("bad request") || response.contains("BAD REQUEST")){
             this.setResult(response);

@@ -26,7 +26,7 @@ public class DataCiteService {
 	private static final String ENDPOINT = "https://doi.tib.uni-hannover.de:8443/cocoon/regserv/datacite/webserviceinterface/";
 	private static final QName ECHO = new QName("RegServ", "echo");
 	private static final QName REG_DOI = new QName("RegServ", "registerDataDOI");
-	private static final QName UPDATE_DOI = new QName("RegServ", "updateURL");
+	private static final QName UPDATE_DOI = new QName("RegServ", "update");
 
 	private String myUsername;
 	private String myPassword;
