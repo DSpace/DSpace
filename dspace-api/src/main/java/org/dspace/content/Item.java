@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
+import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
 import org.dspace.app.util.AuthorizeUtil;
@@ -2314,7 +2315,10 @@ public class Item extends DSpaceObject
      */
     public boolean hasUploadedFiles() throws SQLException
     {
-        Bundle[] bundles = getBundles("ORIGINAL");
+        Bundle[] bundles = (Bundle[]) ArrayUtils.addAll(
+        		getBundles("ORIGINAL"),
+        		getBundles("PRESERVATION"));
+
         if (bundles.length == 0)
         {
             // if no ORIGINAL bundle,

@@ -453,6 +453,8 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
         BitstreamFormat bf = null;
         Bitstream b = null;
  
+        log.debug(LogManager.getHeader(context, "processUploadFile", "begin"));
+        
         //NOTE: File should already be uploaded. 
         //Manakin does this automatically via Cocoon.
         //For JSP-UI, the SubmissionController.uploadFiles() does the actual upload
@@ -487,6 +489,7 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
                 // with the upload
                 if (filePath == null || fileInputStream == null)
                 {
+                    log.info(LogManager.getHeader(context, "processUploadFile", "upload error: 0"));
                     return STATUS_UPLOAD_ERROR;
                 }
                 
@@ -570,6 +573,7 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
                 {
                     // In any event, if we don't have the submission info, the request
                     // was malformed
+                	 log.error(LogManager.getHeader(context, "processUploadFile", "integrity error"));
                     return STATUS_INTEGRITY_ERROR;
                 }
         
@@ -593,6 +597,7 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
                 else
                 {
                     // if we get here there was a problem uploading the file!
+                	 log.error(LogManager.getHeader(context, "processUploadFile", "upload error: 1"));
                     return STATUS_UPLOAD_ERROR;
                 }
             }//end if attribute ends with "-path"
