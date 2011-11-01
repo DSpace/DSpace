@@ -43,6 +43,7 @@
  	
  	// List of bitsreams (descriptions) still needed
  	List<String> needed = LibraryAwardUploadStep.getNeededBitstreams(context, request, subInfo);
+ 	String neededList = LibraryAwardUploadStep.listNeededBitstreams();
 %>
 
 
@@ -61,8 +62,8 @@
 		<h1>Submit: Upload Files</h1>
     
 		<div class="submitFormHelp">
-          You must submit one each of these files, one at a time: Essay, Research Paper, Bibliography, and Letter of Support.  
-          They must be all be submitted in PDF format.
+          You must submit the following files, one at a time: <%= neededList %>. 
+          All files must be submitted in PDF format. Please name files using the following format: lastname_essay.pdf, etc.
         </div>
     
         <table border="0" align="center">

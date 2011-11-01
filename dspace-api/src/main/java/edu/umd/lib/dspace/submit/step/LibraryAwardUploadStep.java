@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.servlet.ServletException;
@@ -85,8 +86,12 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
 
     // descriptions for required bitstreams
     public static final List<String> requiredBitstreams = 
-    		Arrays.asList("Essay","Research Paper","Bibliography","Letter of Support");
+    		Arrays.asList("Application Form","Essay","Research Paper","Bibliography","Letter of Support");
 
+    public static final List<String>hiddenBitstreams =
+    		Arrays.asList("Application Form","Bibliography","Letter of Support");
+    
+    
     /** log4j logger */
     private static Logger log = Logger.getLogger(LibraryAwardUploadStep.class);
 
@@ -491,7 +496,7 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
                     Item item = subInfo.getSubmissionItem().getItem();
         
                     String bundleName = "ORIGINAL";
-                    if (fileDescription != null && fileDescription.equals("Letter of Support")) {
+                    if (fileDescription != null && hiddenBitstreams.contains(fileDescription)) {
                     	bundleName = "PRESERVATION";
                     }
                     
@@ -742,4 +747,26 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
 
     	return needed;
     }
+    
+    /**
+     * Get display version of list of required bitstreams.
+     */
+    public static String listNeededBitstreams() {
+    	StringBuilder result = new StringBuilder();
+    	
+    	for (int i=0; i < requiredBitstreams.size(); i++) {
+    		String next = requiredBitstreams.get(i);
+    		
+    		if (i == requiredBitstreams.size()-1) {
+    			result.append(", and ");
+    		} else if (i > 0) {
+    			result.append(", ");
+    		}
+    		
+    		result.append(next);
+    	}
+    	
+    	return result.toString();
+    }
+     
 }

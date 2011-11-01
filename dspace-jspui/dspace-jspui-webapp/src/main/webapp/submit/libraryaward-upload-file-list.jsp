@@ -22,6 +22,8 @@
 
 <%@ page contentType="text/html;charset=UTF-8" %>
 
+<%@page import="java.util.List"%>
+
 <%@ page import="javax.servlet.jsp.jstl.fmt.LocaleSupport" %>
 
 <%@ page import="org.dspace.core.Context" %>
@@ -32,6 +34,8 @@
 <%@ page import="org.dspace.content.Bitstream" %>
 <%@ page import="org.dspace.content.BitstreamFormat" %>
 <%@ page import="org.dspace.content.Bundle" %>
+
+<%@ page import="edu.umd.lib.dspace.submit.step.LibraryAwardUploadStep" %>
 
 <%@ taglib uri="http://www.dspace.org/dspace-tags.tld" prefix="dspace" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -48,6 +52,10 @@
     boolean missingBitstreams = ((Boolean) request.getAttribute("missing.bitstreams")).booleanValue();
     
     request.setAttribute("LanguageSwitch", "hide");
+    
+ 	// List of bitsreams (descriptions) still needed
+ 	List<String> needed = LibraryAwardUploadStep.getNeededBitstreams(context, request, subInfo);
+ 	String neededList = LibraryAwardUploadStep.listNeededBitstreams();
 %>
 
 <dspace:layout locbar="off" navbar="off" titlekey="jsp.submit.upload-file-list.title">
@@ -60,7 +68,6 @@
 
 <% if (missingBitstreams) { %>
     <h1>Submit: Missing Files</h1>
-    <p>You must upload all required files before moving to the next step in the submission process.</p>
 <%
     }
 
@@ -207,9 +214,15 @@
         <%-- Hidden fields needed for SubmissionController servlet to know which step is next--%>
         <%= SubmissionController.getSubmissionParameters(context, request) %>
 
+        <% if (missingBitstreams) { %>
+          <p class="submitFormWarn">You must upload all required files before moving to the next step in the submission process.</p>
+        <% } %>
+
 <%-- HACK: Center used to align table; CSS and align="center" ignored by some browsers --%>
         <center>
-            <p><input type="submit" name="submit_more" value="<fmt:message key="jsp.submit.upload-file-list.button4"/>" /></p>
+            <% if (needed.size() > 0) { %>
+              <p><input type="submit" name="submit_more" value="<fmt:message key="jsp.submit.upload-file-list.button4"/>" /></p>
+            <% } %>
             <table border="0" width="80%">
                 <tr>
                     <td width="100%">&nbsp;</td>

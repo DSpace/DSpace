@@ -75,6 +75,7 @@ public class LibraryAwardCompleteStep extends AbstractProcessingStep
     	Item item = subInfo.getSubmissionItem().getItem();
     	
     	// add dc.date.issued
+    	item.clearMetadata("dc", "date", "issued", null);
     	item.addMetadata("dc", "date", "issued", null, df.format(new Date()));
 
     	item.update();

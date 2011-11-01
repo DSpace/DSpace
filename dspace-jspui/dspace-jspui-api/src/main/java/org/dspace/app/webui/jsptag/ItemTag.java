@@ -10,6 +10,7 @@ package org.dspace.app.webui.jsptag;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -194,6 +195,9 @@ public class ItemTag extends TagSupport
 
     /** Whether to show preview thumbs on the item page */
     private boolean showThumbs;
+    
+    /** Display bitstreams in all bundles? */
+    private boolean allBundles = false;
 
     /** Default DC fields to display, in absence of configuration */
     private static String defaultFields = "dc.title, dc.title.alternative, dc.contributor.*, dc.subject, dc.date.issued(date), dc.publisher, dc.identifier.citation, dc.relation.ispartofseries, dc.description.abstract, dc.description, dc.identifier.govdoc, dc.identifier.uri(link), dc.identifier.isbn, dc.identifier.issn, dc.identifier.ismn, dc.identifier";
@@ -365,6 +369,18 @@ public class ItemTag extends TagSupport
         style = "default";
         item = null;
         collections = null;
+        allBundles = false;
+    }
+    
+    public String getAllbundles() {
+    	String result = "" + allBundles;
+    	log.debug("getAllbundles: " + result);
+    	return result;
+    }
+    
+    public void setAllbundles(String allbundlesIn) {
+    	allBundles = (allbundlesIn != null && allbundlesIn.equals("true"));
+    	log.debug("setAllbundles: " + allbundlesIn + " ->  " + allBundles);
     }
 
     /**
@@ -757,8 +773,17 @@ public class ItemTag extends TagSupport
 
         try
         {
-        	Bundle[] bundles = item.getBundles("ORIGINAL");
-
+        	List<Bundle> bundlesList = new ArrayList<Bundle>();
+        	for (Bundle bundle : item.getBundles()) {
+        		log.debug("looking at " + bundle.getName() + " " + bundle.getClass().getName());
+        		if (allBundles || bundle.getName().equals("ORIGINAL")) {
+        			log.debug("adding " + bundle.getName());
+        			bundlesList.add(bundle);
+        		}
+        	}
+        	
+        	Bundle[] bundles = (Bundle[]) bundlesList.toArray(new Bundle[bundlesList.size()]);
+        	
         	boolean filesExist = false;
             
             for (Bundle bnd : bundles)
@@ -784,7 +809,16 @@ public class ItemTag extends TagSupport
         		String handle = item.getHandle();
         		Bitstream primaryBitstream = null;
 
-        		Bundle[] bunds = item.getBundles("ORIGINAL");
+        		List<Bundle> bundsList = new ArrayList<Bundle>();
+            	for (Bundle bundle : item.getBundles()) {
+            		if (! bundle.getName().equals("THUMBNAIL")) {
+            			if (allBundles || bundle.getName().equals("ORIGINAL")) {
+            				bundsList.add(bundle);
+            			}
+            		}
+            	}
+            	
+            	Bundle[] bunds = (Bundle[]) bundsList.toArray(new Bundle[bundsList.size()]);
         		Bundle[] thumbs = item.getBundles("THUMBNAIL");
 
         		// check if primary bitstream is html
@@ -804,7 +838,9 @@ public class ItemTag extends TagSupport
         		}
 
         		out
-                    .println("<table cellpadding=\"6\"><tr><th id=\"t1\" class=\"standard\">"
+                    .println("<table cellpadding=\"6\"><tr>"
+        	                + (allBundles ? "<th id=\"t0\" class=\"standard\">Bundle</th>" : "")	
+                    		+ "<th id=\"t1\" class=\"standard\">"
                             + LocaleSupport.getLocalizedMessage(pageContext,
                                     "org.dspace.app.webui.jsptag.ItemTag.file")
                             + "</th>");
@@ -911,8 +947,13 @@ public class ItemTag extends TagSupport
                                             .getName(),
                                             Constants.DEFAULT_ENCODING) + "\">";
 
-            					out
-                                    .print("<tr><td headers=\"t1\" class=\"standard\">");
+            					out.print("<tr>");
+            					if (allBundles) {
+                					out.print("<td headers=\"t0\" class=\"standard\">");
+                					out.print(bitstreams[k].getBundles()[0].getName());
+                					out.print("</td>");
+            					}
+            					out.print("<td headers=\"t1\" class=\"standard\">");
                                 out.print(bsLink);
             					out.print(bitstreams[k].getName());
                                 out.print("</a>");
