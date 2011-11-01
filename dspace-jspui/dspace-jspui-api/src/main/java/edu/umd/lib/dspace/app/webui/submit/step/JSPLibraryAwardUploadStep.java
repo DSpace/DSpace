@@ -166,8 +166,11 @@ public class JSPLibraryAwardUploadStep extends JSPStep
             throws ServletException, IOException, SQLException,
             AuthorizeException
     {
-        String buttonPressed = UIUtil.getSubmitButton(request, LibraryAwardUploadStep.NEXT_BUTTON);
+    	String buttonPressed = UIUtil.getSubmitButton(request, LibraryAwardUploadStep.NEXT_BUTTON);
 
+    	log.debug(LogManager.getHeader(context, "doPostProcessing", "buttonPressed="+buttonPressed));
+        log.debug(LogManager.getHeader(context, "doPostProcessing", "status="+status));
+        
         // Do we need to skip the upload entirely?
         boolean fileRequired = ConfigurationManager.getBooleanProperty("webui.submit.upload.required", true);
         if (buttonPressed.equalsIgnoreCase(LibraryAwardUploadStep.SUBMIT_SKIP_BUTTON) ||
@@ -261,6 +264,12 @@ public class JSPLibraryAwardUploadStep extends JSPStep
         if (status == LibraryAwardUploadStep.STATUS_MISSING_BITSTREAMS && buttonPressed.equals(LibraryAwardUploadStep.NEXT_BUTTON)) {
         	
         	showUploadFileList(context, request, response, subInfo, false, false, true);
+        	
+        }
+
+        if (status == LibraryAwardUploadStep.STATUS_NOT_PDF && buttonPressed.equals(LibraryAwardUploadStep.NEXT_BUTTON)) {
+        	
+        	showUploadFileList(context, request, response, subInfo, false, false, false, true);
         	
         }
 
@@ -489,11 +498,41 @@ public class JSPLibraryAwardUploadStep extends JSPStep
             SubmissionInfo subInfo, boolean justUploaded, boolean showChecksums, boolean missingBitstreams)
             throws SQLException, ServletException, IOException
     {
+            	showUploadFileList(context, request, response, subInfo, justUploaded, showChecksums, missingBitstreams, false);
+    }
+
+    /**
+     * Show the page which lists all the currently uploaded files
+     *
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            the request object
+     * @param response
+     *            the response object
+     * @param subInfo
+     *            the SubmissionInfo object
+     * @param justUploaded
+     *            pass in true if the user just successfully uploaded a file
+     * @param showChecksums
+     *            pass in true if checksums should be displayed
+     * @param missingBitstreams
+     *            pass in true if required bitstreams are missing
+     * @param notPdf
+     *            pass in true if not all bitstreams are pdf           
+     */
+    private void showUploadFileList(Context context,
+            HttpServletRequest request, HttpServletResponse response,
+            SubmissionInfo subInfo, boolean justUploaded, boolean showChecksums, boolean missingBitstreams,
+            boolean notPdf)
+            throws SQLException, ServletException, IOException
+    {
         // Set required attributes
         request.setAttribute("just.uploaded", Boolean.valueOf(justUploaded));
         request.setAttribute("show.checksums", Boolean.valueOf(showChecksums));
         request.setAttribute("missing.bitstreams", Boolean.valueOf(missingBitstreams));
-
+        request.setAttribute("not.pdf", Boolean.valueOf(notPdf));
+        
         // Always go to advanced view in workflow mode
         if (subInfo.isInWorkflow()
                 || subInfo.getSubmissionItem().hasMultipleFiles())

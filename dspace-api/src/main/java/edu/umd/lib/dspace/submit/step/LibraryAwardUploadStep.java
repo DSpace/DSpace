@@ -84,6 +84,9 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
     // error - missing required bitstreams
     public static final int STATUS_MISSING_BITSTREAMS = 30;
 
+    // error - not pdf
+    public static final int STATUS_NOT_PDF = 35;
+
     // descriptions for required bitstreams
     public static final List<String> requiredBitstreams = 
     		Arrays.asList("Application Form","Essay","Research Paper","Bibliography","Letter of Support");
@@ -329,6 +332,14 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
         if (getNeededBitstreams(context, request, subInfo).size() > 0)
         {
             return STATUS_MISSING_BITSTREAMS;
+        }
+
+        // ---------------------------------------------------
+        // Step #8: Determine if all bitstreams are pdf
+        // ---------------------------------------------------
+        if (! isAllPdf(context, request, subInfo))
+        {
+            return STATUS_NOT_PDF;
         }
 
         // commit all changes to database
@@ -774,4 +785,35 @@ public class LibraryAwardUploadStep extends AbstractProcessingStep
     	return result.toString();
     }
      
+    /**
+     * Determine if all uploaded bitstreams are pdf.
+     * 
+     * @param context
+     *            current DSpace context
+     * @param request
+     *            current servlet request object
+     * @param subInfo
+     *            submission info object
+     * 
+     * @return boolean
+     */
+    public static boolean isAllPdf(Context context,
+            HttpServletRequest request, SubmissionInfo subInfo) throws ServletException, IOException,
+            SQLException, AuthorizeException
+    {
+    	log.debug(LogManager.getHeader(context, "isAllPdf", "begin"));
+    	
+    	// iterate over already upload bitstreams
+    	for (Bitstream b : subInfo.getSubmissionItem().getItem().getNonInternalBitstreams()) {
+    		BitstreamFormat bf = b.getFormat();
+    		
+    		if (! bf.getMIMEType().equals("application/pdf")) {
+    			return false;
+    		}
+    	}
+    	
+    	return true;
+    }
+    
+
 }

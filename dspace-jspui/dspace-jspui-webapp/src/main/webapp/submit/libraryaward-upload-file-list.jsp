@@ -50,6 +50,7 @@
     boolean justUploaded = ((Boolean) request.getAttribute("just.uploaded")).booleanValue();
     boolean showChecksums = ((Boolean) request.getAttribute("show.checksums")).booleanValue();
     boolean missingBitstreams = ((Boolean) request.getAttribute("missing.bitstreams")).booleanValue();
+    boolean notPdf = ((Boolean) request.getAttribute("not.pdf")).booleanValue();
     
     request.setAttribute("LanguageSwitch", "hide");
     
@@ -71,6 +72,12 @@
 <%
     }
 
+   else if (notPdf)
+   {
+%>
+     <h1>Submit: Wrong File Format</h1>
+<%	   
+   }
     else if (justUploaded)
     {
 %>
@@ -216,6 +223,8 @@
 
         <% if (missingBitstreams) { %>
           <p class="submitFormWarn">You must upload all required files before moving to the next step in the submission process.</p>
+        <% } else if (notPdf) { %>
+          <p class="submitFormWarn">All files must be in PDF format.  Please remove any non-PDF files and re-upload as PDF.</p>
         <% } %>
 
 <%-- HACK: Center used to align table; CSS and align="center" ignored by some browsers --%>
