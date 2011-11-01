@@ -108,6 +108,7 @@ public class ViewWorkspaceItemServlet
         request.setAttribute("item", item);
         request.setAttribute("collections", collections);
         request.setAttribute("workspace_id", Integer.valueOf(wsItem.getID()));
+        request.setAttribute("allbundles", "true");
         
         JSPManager.showJSP(request, response, "/display-item.jsp");
     }

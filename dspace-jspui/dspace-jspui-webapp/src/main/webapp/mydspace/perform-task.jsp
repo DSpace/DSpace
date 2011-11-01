@@ -72,7 +72,7 @@
     }
 %>
     
-    <dspace:item item="<%= item %>" allbundles="true"/>
+    <dspace:item item="<%= item %>" allbundles="true" bundlename="true"/>
 
     <p>&nbsp;</p>
 

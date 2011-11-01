@@ -70,7 +70,7 @@
     }
 %>
     
-    <dspace:item item="<%= item %>" allbundles="true"/>
+    <dspace:item item="<%= item %>" allbundles="true" bundlename="true"/>
 
     <form action="<%= request.getContextPath() %>/mydspace" method="post">
         <input type="hidden" name="workflow_id" value="<%= workflowItem.getID() %>"/>

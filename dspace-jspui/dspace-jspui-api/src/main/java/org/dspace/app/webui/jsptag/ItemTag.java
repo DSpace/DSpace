@@ -198,6 +198,9 @@ public class ItemTag extends TagSupport
     
     /** Display bitstreams in all bundles? */
     private boolean allBundles = false;
+    
+    /** Display the name of the bitstream bundle? */
+    private boolean bundleName = false;
 
     /** Default DC fields to display, in absence of configuration */
     private static String defaultFields = "dc.title, dc.title.alternative, dc.contributor.*, dc.subject, dc.date.issued(date), dc.publisher, dc.identifier.citation, dc.relation.ispartofseries, dc.description.abstract, dc.description, dc.identifier.govdoc, dc.identifier.uri(link), dc.identifier.isbn, dc.identifier.issn, dc.identifier.ismn, dc.identifier";
@@ -381,6 +384,17 @@ public class ItemTag extends TagSupport
     public void setAllbundles(String allbundlesIn) {
     	allBundles = (allbundlesIn != null && allbundlesIn.equals("true"));
     	log.debug("setAllbundles: " + allbundlesIn + " ->  " + allBundles);
+    }
+
+    public String getBundlename() {
+    	String result = "" + bundleName;
+    	log.debug("getBundlename: " + result);
+    	return result;
+    }
+    
+    public void setBundlename(String bundlenameIn) {
+    	bundleName = (bundlenameIn != null && bundlenameIn.equals("true"));
+    	log.debug("setBundlename: " + bundlenameIn + " -> " + allBundles);
     }
 
     /**
@@ -839,7 +853,7 @@ public class ItemTag extends TagSupport
 
         		out
                     .println("<table cellpadding=\"6\"><tr>"
-        	                + (allBundles ? "<th id=\"t0\" class=\"standard\">Bundle</th>" : "")	
+        	                + (bundleName ? "<th id=\"t0\" class=\"standard\">Bundle</th>" : "")	
                     		+ "<th id=\"t1\" class=\"standard\">"
                             + LocaleSupport.getLocalizedMessage(pageContext,
                                     "org.dspace.app.webui.jsptag.ItemTag.file")
@@ -948,7 +962,7 @@ public class ItemTag extends TagSupport
                                             Constants.DEFAULT_ENCODING) + "\">";
 
             					out.print("<tr>");
-            					if (allBundles) {
+            					if (bundleName) {
                 					out.print("<td headers=\"t0\" class=\"standard\">");
                 					out.print(bitstreams[k].getBundles()[0].getName());
                 					out.print("</td>");

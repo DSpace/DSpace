@@ -194,6 +194,8 @@
       collections the item is in, worked out beforehand to avoid the chance
       of an error occurring during display.  If collections is null, the
       collections the item is in aren't listed.
+      allbundles - if true, show bitstreams from all bundles
+      bundlename - if true, display bundle name with bitstream info
     </info>
     <attribute>
       <name>item</name>
@@ -212,6 +214,11 @@
     </attribute>
     <attribute>
       <name>allbundles</name>
+      <required>false</required>
+      <rtexprvalue>true</rtexprvalue>
+    </attribute>
+    <attribute>
+      <name>bundlename</name>
       <required>false</required>
       <rtexprvalue>true</rtexprvalue>
     </attribute>

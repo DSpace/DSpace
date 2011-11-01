@@ -47,6 +47,10 @@
     Collection[] collections = (Collection[]) request.getAttribute("collections");
     Boolean admin_b = (Boolean)request.getAttribute("admin_button");
     boolean admin_button = (admin_b == null ? false : admin_b.booleanValue());
+    String allbundles = (String)request.getAttribute("allbundles");
+    if (allbundles == null) {
+    	allbundles = "false";
+    }
 
     // get the workspace id if one has been passed
     Integer workspace_id = (Integer) request.getAttribute("workspace_id");
@@ -131,7 +135,7 @@
     String displayStyle = (displayAll ? "full" : "");
 %>
     <dspace:item-preview item="<%= item %>" />
-    <dspace:item item="<%= item %>" collections="<%= collections %>" style="<%= displayStyle %>" />
+    <dspace:item item="<%= item %>" collections="<%= collections %>" style="<%= displayStyle %>" allbundles="<%= allbundles %>" />
 
 <%
     String locationLink = request.getContextPath() + "/handle/" + handle;
