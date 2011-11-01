@@ -724,7 +724,16 @@ public class WorkflowManager
             EPerson ep = i.getSubmitter();
             // Get the Locale
             Locale supportedLocale = I18nUtil.getEPersonLocale(ep);
-            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, "submit_archive"));
+            
+            // Get the email
+            String emailName = "submit_archive";
+            
+            Collection la = (Collection) HandleManager.resolveToObject(c, "1903/11324");
+            if (la != null && i.isOwningCollection(la)) {
+            	emailName = "libraryaward_submit_archive";
+            }
+            
+            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale, emailName));
             
             // Get the item handle to email to user
             String handle = HandleManager.findHandle(c, i);
@@ -1028,7 +1037,14 @@ public class WorkflowManager
             // Get rejector's name
             String rejector = getEPersonName(e);
             Locale supportedLocale = I18nUtil.getEPersonLocale(e);
-            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale,"submit_reject"));
+            
+            String emailName = "submit_reject";
+            
+            if (coll.getHandle().equals("1903/11324")) {
+            	emailName = "libraryaward_submit_reject";
+            }
+
+            Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(supportedLocale,emailName));
 
             email.addRecipient(getSubmitterEPerson(wi).getEmail());
             email.addArgument(title);
