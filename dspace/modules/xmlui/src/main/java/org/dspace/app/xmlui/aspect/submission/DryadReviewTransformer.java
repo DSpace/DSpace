@@ -47,18 +47,12 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
 
     private static final Logger log = Logger.getLogger(DryadReviewTransformer.class);
 
-    protected static final Message T_showfull =
-            message("xmlui.Submission.general.showfull");
-    protected static final Message T_showsimple =
-            message("xmlui.Submission.general.showsimple");
-    protected static final Message T_workflow_head =
-            message("xmlui.Submission.general.workflow.head");
-    protected static final Message T_workflow_trail =
-            message("xmlui.Submission.general.workflow.trail");
-    protected static final Message T_dspace_home =
-            message("xmlui.general.dspace_home");
-    protected static final Message T_workflow_title =
-            message("xmlui.Submission.general.workflow.title");
+    protected static final Message T_showfull = message("xmlui.Submission.general.showfull");
+    protected static final Message T_showsimple = message("xmlui.Submission.general.showsimple");
+    protected static final Message T_workflow_head = message("xmlui.Submission.general.workflow.head");
+    protected static final Message T_workflow_trail = message("xmlui.Submission.general.workflow.trail");
+    protected static final Message T_dspace_home = message("xmlui.general.dspace_home");
+    protected static final Message T_workflow_title = message("xmlui.Submission.general.workflow.title");
     private static final Message T_head_has_part = message("xmlui.ArtifactBrowser.ItemViewer.head_hasPart");
 
 
@@ -94,7 +88,13 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
         super.addPageMeta(pageMeta);
 
         if (wfItem != null) {
-            pageMeta.addMetadata("title").addContent(T_workflow_title);
+
+            String title = "";
+            DCValue[] vals = wfItem.getItem().getMetadata("dc.title");
+            if (vals != null && vals[0] != null)
+                title = vals[0].value;
+
+            pageMeta.addMetadata("title").addContent("Reviewing " + title);
             Collection collection = wfItem.getCollection();
 
             pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
@@ -131,6 +131,7 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
 
         DCValue[] vals = wfItem.getItem().getMetadata("dc.title");
         ReferenceSet referenceSet = null;
+
         if (showfull == null) {
             referenceSet = div.addReferenceSet("narf", ReferenceSet.TYPE_SUMMARY_VIEW);
             if (vals != null && vals[0] != null)
@@ -167,7 +168,8 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
         div.addHidden("wfID").setValue(String.valueOf(wfItem.getID()));
     }
 
-    private WorkflowItem getWFItem(Request request) throws IOException {
+    private WorkflowItem
+    getWFItem(Request request) throws IOException {
         int wfItemId;
         try {
             if (request.getParameter("wfID") != null) {

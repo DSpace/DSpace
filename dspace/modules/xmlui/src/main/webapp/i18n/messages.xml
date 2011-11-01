@@ -731,7 +731,7 @@
 	<message key="xmlui.Submission.general.submission.save">Save &amp; Exit</message>
 	<message key="xmlui.Submission.general.submission.next">Next &gt;</message>
 	<message key="xmlui.Submission.general.submission.complete">Save file and continue</message>
-	<message key="xmlui.Submission.general.workflow.title">Item submission</message>
+	<message key="xmlui.Submission.general.workflow.title">Reviewing </message>
 	<message key="xmlui.Submission.general.workflow.trail">Item submission</message>
 	<message key="xmlui.Submission.general.workflow.head">Item submission</message>
 	<message key="xmlui.Submission.general.showfull">Show full item record</message>
