@@ -31,6 +31,8 @@
   <!--messages from V1.5 Translated by Francisco Javier Herrero Vicente (fherrero@uji.es) at Universitat Jaume I de Castellon (http://www.uji.es/)-->    
     <!--minor modifications to v1.5 and messages from V1.6 and V1.7 translated by Alvaro López (alopez@arvo.es) at Arvo Consultores (http://www.arvo.es/)   -->
 
+<message key="xmlui.ArtifactBrowser.Navigation.links_browse">Paginas estáticas</message>
+
 	<!-- General keys -->
 	<message key="xmlui.general.dspace_home">Sedici</message>
 <message key="xmlui.general.search">Búsquedas</message>
