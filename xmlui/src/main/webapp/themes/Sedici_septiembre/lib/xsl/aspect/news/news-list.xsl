@@ -80,6 +80,6 @@
              </xsl:attribute>
              <xsl:value-of select="dri:item[@n='titulo']"/>
           </a>
-          <p><xsl:value-of select="dri:item[@n='descripcion']"/></p>
+          <p><xsl:value-of select="dri:item[@n='descripcion']" disable-output-escaping="yes"/></p>
     </xsl:template>
 </xsl:stylesheet>

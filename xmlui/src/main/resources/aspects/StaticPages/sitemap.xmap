@@ -46,10 +46,19 @@ collections / items / and bitstreams.
 
 -->
 <map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+    <map:components>
 
+        <map:transformers>
+            <map:transformer name="Navigation" src="ar.edu.unlp.sedici.aspect.staticPages.Navigation"/>
+        </map:transformers>
+
+    </map:components>
+    
     <map:pipelines>
         <map:pipeline>
             <map:generate/>
+            
+            <map:transform type="Navigation"/>            
             
             <map:match pattern="pages/**">
 			        <map:act type="DSpacePropertyFileReader">
