@@ -112,14 +112,21 @@ public abstract class EmailParser {
         }
         else if (hasCommas){
             authorArray = authors.split(",");
-            for (int i = 0; i< authorArray.length-1; i++){
-                authorArray[i] = StringUtils.stripToEmpty(flipName(getStrippedText(StringUtils.stripToEmpty(authorArray[i]))));
+            // distinguish single author from author list
+            if (authorArray.length > 2 || StringUtils.stripToEmpty(authorArray[0]).contains(" ")){
+                for (int i = 0; i< authorArray.length-1; i++){
+                    authorArray[i] = StringUtils.stripToEmpty(flipName(getStrippedText(StringUtils.stripToEmpty(authorArray[i]))));
+                }
+                int lastAuthor = authorArray.length-1;
+                if (lastAuthor > 0 && StringUtils.stripToEmpty(authorArray[lastAuthor]).startsWith("and "))
+                    authorArray[lastAuthor] = StringUtils.stripToEmpty(flipName(getStrippedText(StringUtils.stripToEmpty(authorArray[lastAuthor]).substring(4))));
+                else
+                    authorArray[lastAuthor] = StringUtils.stripToEmpty(flipName(getStrippedText(authorArray[lastAuthor])));  
             }
-            int lastAuthor = authorArray.length-1;
-            if (lastAuthor > 0 && StringUtils.stripToEmpty(authorArray[lastAuthor]).startsWith("and "))
-                authorArray[lastAuthor] = StringUtils.stripToEmpty(flipName(getStrippedText(StringUtils.stripToEmpty(authorArray[lastAuthor]).substring(4))));
-            else
-                authorArray[lastAuthor] = StringUtils.stripToEmpty(flipName(getStrippedText(authorArray[lastAuthor])));       
+            else{
+                authorArray = new String[1];
+                authorArray[0] = authors;
+            }
         }
         else if (hasLineBreaks){
             authorArray = authors.split("\n");
