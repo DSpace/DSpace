@@ -4,13 +4,13 @@
     <packaging>war</packaging>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-sword-client-xmlui-webapp</artifactId>
-    <version>3.0-SNAPSHOT</version>
+    <version>1.8.1-SNAPSHOT</version>
     <name>DSpace Sword Client :: Sword Client XMLUI Webapp</name>
 
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-sword-client</artifactId>
-        <version>3.0-SNAPSHOT</version>
+        <version>1.8.1-SNAPSHOT</version>
       <relativePath>..</relativePath>
     </parent>
 
@@ -82,12 +82,12 @@
     -->
     <scm>
         <connection>
-            scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword-client/dspace-sword-client-xmlui-webapp
+            scm:svn:http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-sword-client/dspace-sword-client-xmlui-webapp
         </connection>
         <developerConnection>
-            scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword-client/dspace-sword-client-xmlui-webapp
+            scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-sword-client/dspace-sword-client-xmlui-webapp
         </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword-client/dspace-sword-client-xmlui-webapp</url>
+        <url>http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-sword-client/dspace-sword-client-xmlui-webapp</url>
     </scm>
 
 </project>

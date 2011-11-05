@@ -12,14 +12,14 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>3.0-SNAPSHOT</version>
+      <version>1.8.1-SNAPSHOT</version>
         <relativePath>..</relativePath>
    </parent>
 
    <scm>
-      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/lni</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/lni</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/lni</url>
+      <connection>scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace/modules/lni</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace/modules/lni</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace/modules/lni</url>
    </scm>
 
    <build>
