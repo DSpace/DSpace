@@ -46,9 +46,9 @@ public class DepositConfirmedStep extends AbstractSubmissionStep{
 
         Division actionsDiv = main.addDivision("deposit-confirmed");
 
-        Division dataPacakgeDiv = actionsDiv.addDivision("puboverviewdivision", "odd subdiv");
+        Division dataPackageDiv = actionsDiv.addDivision("puboverviewdivision", "odd subdiv");
 
-        dataPacakgeDiv.addPara().addContent("Thank you for your submission! Your submission has been assigned a provisional DOI. This DOI can be placed in your article, though it will not be fully registered with the DOI system until your submission has been approved by the Dryad curation staff.");
+        dataPackageDiv.addPara().addContent("Thank you for your submission! Your submission has been assigned a provisional DOI. This DOI can be placed in your article, though it will not be fully registered with the DOI system until your submission has been approved by the Dryad curation staff.");
 
 	dataPackageDiv.addPara("data-label", "bold").addContent(item.getName());
 	dataPackageDiv.addPara("data-label", "bold").addContent("Provisional DOI: " + doi);

@@ -461,6 +461,10 @@ public class DataOneMN extends HttpServlet implements Constants {
 		return intValue;
 	}
 
+    /**
+       Parses a user-entered date. The date may appear in one of many common formats. If the date
+       format is not recognized, null is returned.
+    **/
 	private Date parseDate(HttpServletRequest aReq, String aParam)
 			throws ParseException {
 		String date = aReq.getParameter(aParam);
