@@ -47,22 +47,11 @@ public class DepositConfirmedStep extends AbstractSubmissionStep{
         Division actionsDiv = main.addDivision("deposit-confirmed");
 
         Division dataPacakgeDiv = actionsDiv.addDivision("puboverviewdivision", "odd subdiv");
-        dataPacakgeDiv.addPara("data-label", "bold").addContent("Pubblication");
 
+        dataPacakgeDiv.addPara().addContent("Thank you for your submission! Your submission has been assigned a provisional DOI. This DOI can be placed in your article, though it will not be fully registered with the DOI system until your submission has been approved by the Dryad curation staff.");
 
-        addPara(dataPacakgeDiv, "Thank you for your recent submission to the Dryad repository titled: " + doi);
-        //addTextBox(dataPacakgeDiv, "Thank you for your recent submission to the Dryad repository titled: ", "doi", doi, true);
-
-
-        dataPacakgeDiv.addPara().addContent("Your submission has been assigned a provisional DOI. This DOI can be placed in your article, though it will not be fully registered with the DOI system until your submission has been approved by the Dryad curation staff.");
-
-
-        //addTextBox(dataPacakgeDiv, "Data package title: ", "title", item.getName(), true);
-        //addTextBox(dataPacakgeDiv, "Provisional DOI: ", "doi1", doi, true);
-
-        addPara(dataPacakgeDiv, "Data package title: " + item.getName());
-        addPara(dataPacakgeDiv, "Provisional DOI: " + doi);
-
+	dataFileDiv.addPara("data-label", "bold").addContent(item.getName());
+	dataFileDiv.addPara("data-label", "bold").addContent("Provisional DOI: " + doi);
 
         Division dataFileDiv = actionsDiv.addDivision("dataFile", "even subdiv");
         dataFileDiv.addPara("data-label", "bold").addContent("Data Files");
@@ -70,15 +59,10 @@ public class DepositConfirmedStep extends AbstractSubmissionStep{
 
         int i = 0;
         for (org.dspace.content.Item dataFile : dataFiles){
-            doi = getDoiValue(dataFile);
-            //addTextBox(dataFileDiv, "Data File: ", "title_" + i, item.getName(), true);
-            //addTextBox(dataFileDiv, "Provisional DOI: ", "doi_" + i, doi, true);
-
-            addPara(dataFileDiv, "Data File: " + item.getName());
-            addPara(dataFileDiv, "Provisional DOI: " + doi);
+            addPara(dataFileDiv, "Data File: " + dataFile.getName());
         }
 
-	}
+    }
 
 
     private void addTextBox(Division div, String label, String name, String value, boolean disabled) throws WingException {
