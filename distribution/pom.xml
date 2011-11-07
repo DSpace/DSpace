@@ -66,7 +66,10 @@
          <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
-            <scope>provided</scope>
+<!--
+El scope no es provided, porque se usa desde consola            
+ <scope>provided</scope> 
+-->
         </dependency>
 
 		<dependency>
