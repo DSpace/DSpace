@@ -16,7 +16,13 @@
         <ObjectUrl>
             <Base>http://datadryad.org/discover?</Base>
             <Rule>query=&lo.doi;</Rule>
-            <UrlName>Data in Dryad</UrlName>
+            <!-- For some reason UrlName is actually not allowed for us - it
+                 needs to be "record-specific", but I still don't understand
+                 how the examples given at NCBI ("Homo sapiens" for a resource
+                 that links out from all Homo sapiens sequences, for example)
+                 are more specific than this one here.
+              -->
+            <!-- <UrlName>Data package for publication</UrlName> -->
             <SubjectType>supplemental materials</SubjectType>
         </ObjectUrl>
     </Link>
