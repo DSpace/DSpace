@@ -1,0 +1,8 @@
+// Spring Roo 1.1.5.RELEASE [rev d3a68c3] log opened at 2011-11-04 11:13:47
+finder list --class ar.edu.unlp.sedici.sedici2003.model.Personas
+help finder
+help finder list
+finder add --finderName findPersonasesByNombreLike
+// Spring Roo 1.1.5.RELEASE [rev d3a68c3] log opened at 2011-11-04 11:21:06
+finder list --class ar.edu.unlp.sedici.sedici2003.model.Personas
+finder add --finderName findPersonasesByApellidoLike

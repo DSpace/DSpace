@@ -1,0 +1,299 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+
+    <?xml version="1.0"?>
+    <project
+    	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+    	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    	<modelVersion>4.0.0</modelVersion>
+    	<parent>
+    		<artifactId>sedici2003</artifactId>
+    		<groupId>ar.edu.unlp.sedici</groupId>
+    		<version>1.8.0-rc1</version>
+    	</parent>
+
+    	<artifactId>sedici2003-web</artifactId>
+
+    	<name>sedici2003-web</name>
+    	<url>http://maven.apache.org</url>
+    	<properties>
+    		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    	</properties>
+    	<dependencies>
+    		<!-- General dependencies for standard applications -->
+
+    		<dependency>
+    			<groupId>ar.edu.unlp.sedici</groupId>
+    			<artifactId>sedici2003-api</artifactId>
+    			<version>${project.version}</version>
+    			<type>jar</type>
+    		</dependency>
+
+    		<dependency>
+    			<groupId>org.springframework</groupId>
+    			<artifactId>spring-web</artifactId>
+    			<version>${spring.version}</version>
+    			<classifier />
+    			<exclusions>
+    				<exclusion>
+    					<groupId>commons-logging</groupId>
+    					<artifactId>commons-logging</artifactId>
+    				</exclusion>
+    			</exclusions>
+    		</dependency>
+    		<dependency>
+    			<groupId>org.springframework</groupId>
+    			<artifactId>spring-webmvc</artifactId>
+    			<version>${spring.version}</version>
+    			<classifier />
+    			<exclusions>
+    				<exclusion>
+    					<groupId>commons-logging</groupId>
+    					<artifactId>commons-logging</artifactId>
+    				</exclusion>
+    			</exclusions>
+    		</dependency>
+    		<dependency>
+    			<groupId>org.springframework.webflow</groupId>
+    			<artifactId>spring-js-resources</artifactId>
+    			<version>2.2.1.RELEASE</version>
+    			<classifier />
+    		</dependency>
+    		<dependency>
+    			<groupId>commons-digester</groupId>
+    			<artifactId>commons-digester</artifactId>
+    			<version>2.0</version>
+    			<classifier />
+    			<exclusions>
+    				<exclusion>
+    					<groupId>commons-logging</groupId>
+    					<artifactId>commons-logging</artifactId>
+    				</exclusion>
+    			</exclusions>
+    		</dependency>
+    		<dependency>
+    			<groupId>commons-fileupload</groupId>
+    			<artifactId>commons-fileupload</artifactId>
+    			<version>1.2.1</version>
+    			<classifier />
+    			<exclusions>
+    				<exclusion>
+    					<groupId>commons-logging</groupId>
+    					<artifactId>commons-logging</artifactId>
+    				</exclusion>
+    			</exclusions>
+    		</dependency>
+    		<dependency>
+    			<groupId>javax.servlet.jsp.jstl</groupId>
+    			<artifactId>jstl-api</artifactId>
+    			<version>1.2</version>
+    			<classifier />
+    		</dependency>
+    		<dependency>
+    			<groupId>org.glassfish.web</groupId>
+    			<artifactId>jstl-impl</artifactId>
+    			<version>1.2</version>
+    			<classifier />
+    		</dependency>
+    		<dependency>
+    			<groupId>javax.el</groupId>
+    			<artifactId>el-api</artifactId>
+    			<version>1.0</version>
+    			<scope>provided</scope>
+    			<classifier />
+    		</dependency>
+    		<dependency>
+    			<groupId>joda-time</groupId>
+    			<artifactId>joda-time</artifactId>
+    			<version>1.6</version>
+    		</dependency>
+    		<dependency>
+    			<groupId>javax.servlet.jsp</groupId>
+    			<artifactId>jsp-api</artifactId>
+    			<version>2.1</version>
+    			<scope>provided</scope>
+    			<classifier />
+    		</dependency>
+    		<dependency>
+    			<groupId>commons-codec</groupId>
+    			<artifactId>commons-codec</artifactId>
+    			<version>1.4</version>
+    			<classifier />
+    		</dependency>
+    		<dependency>
+    			<groupId>org.apache.tiles</groupId>
+    			<artifactId>tiles-core</artifactId>
+    			<version>2.2.1</version>
+    			<classifier />
+    			<exclusions>
+    				<exclusion>
+    					<groupId>commons-logging</groupId>
+    					<artifactId>commons-logging</artifactId>
+    				</exclusion>
+    			</exclusions>
+    		</dependency>
+    		<dependency>
+    			<groupId>org.apache.tiles</groupId>
+    			<artifactId>tiles-jsp</artifactId>
+    			<version>2.2.1</version>
+    		</dependency>
+    		<dependency>
+    			<groupId>org.springframework.security</groupId>
+    			<artifactId>spring-security-core</artifactId>
+    			<version>${spring-security.version}</version>
+    			<classifier />
+    			<exclusions>
+    				<exclusion>
+    					<groupId>commons-logging</groupId>
+    					<artifactId>commons-logging</artifactId>
+    				</exclusion>
+    			</exclusions>
+    		</dependency>
+    		<dependency>
+    			<groupId>org.springframework.security</groupId>
+    			<artifactId>spring-security-config</artifactId>
+    			<version>${spring-security.version}</version>
+    			<classifier />
+    			<exclusions>
+    				<exclusion>
+    					<groupId>commons-logging</groupId>
+    					<artifactId>commons-logging</artifactId>
+    				</exclusion>
+    			</exclusions>
+    		</dependency>
+    		<dependency>
+    			<groupId>org.springframework.security</groupId>
+    			<artifactId>spring-security-web</artifactId>
+    			<version>${spring-security.version}</version>
+    			<classifier />
+    		</dependency>
+    		<dependency>
+    			<groupId>org.springframework.security</groupId>
+    			<artifactId>spring-security-taglibs</artifactId>
+    			<version>${spring-security.version}</version>
+    			<classifier />
+    		</dependency>
+
+    	</dependencies>
+
+
+
+    	<build>
+    		<plugins>
+    			<plugin>
+    				<groupId>org.apache.maven.plugins</groupId>
+    				<artifactId>maven-war-plugin</artifactId>
+    				<version>2.1.1</version>
+    				<!-- <configuration> <webXml>target/web.xml</webXml> </configuration> -->
+    				<configuration>
+    					<webResources>
+    						<resource>
+    							<directory>src/main/resources</directory>
+    							<excludes>
+    								<exclude>DBRE XML</exclude>
+    							</excludes>
+    						</resource>
+    					</webResources>
+    				</configuration>
+    			</plugin>
+    			<plugin>
+    				<groupId>org.codehaus.mojo</groupId>
+    				<artifactId>tomcat-maven-plugin</artifactId>
+    				<version>1.1</version>
+    			</plugin>
+    			<plugin>
+    				<groupId>org.mortbay.jetty</groupId>
+    				<artifactId>jetty-maven-plugin</artifactId>
+    				<version>7.4.2.v20110526</version>
+    				<configuration>
+    					<webAppConfig>
+    						<contextPath>/${project.name}</contextPath>
+    					</webAppConfig>
+    				</configuration>
+    			</plugin>
+
+
+    			<plugin>
+    				<groupId>org.apache.maven.plugins</groupId>
+    				<artifactId>maven-deploy-plugin</artifactId>
+    				<version>2.6</version>
+    			</plugin>
+    		</plugins>
+    	</build>
+    </project>
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:context="http://www.springframework.org/schema/context" xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:p="http://www.springframework.org/schema/p" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd     http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+				
+	<!-- The controllers are autodetected POJOs labeled with the @Controller annotation. -->
+	<context:component-scan base-package="ar.edu.unlp.sedici.sedici2003" use-default-filters="false">
+		<context:include-filter expression="org.springframework.stereotype.Controller" type="annotation"/>
+	</context:component-scan>
+	
+	<!-- Turns on support for mapping requests to Spring MVC @Controller methods
+	     Also registers default Formatters and Validators for use across all @Controllers -->
+	<mvc:annotation-driven conversion-service="applicationConversionService"/>
+	
+	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources -->
+	<mvc:resources location="/, classpath:/META-INF/web-resources/" mapping="/resources/**"/>
+	
+	<!-- Allows for mapping the DispatcherServlet to "/" by forwarding static resource requests to the container's default Servlet -->
+	<mvc:default-servlet-handler/>
+	
+	<!-- register "global" interceptor beans to apply to all registered HandlerMappings -->
+	<mvc:interceptors>
+		<bean class="org.springframework.web.servlet.theme.ThemeChangeInterceptor"/>
+		<bean class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor" p:paramName="lang"/>
+	</mvc:interceptors>
+	
+	<!-- selects a static view for rendering without the need for an explicit controller -->
+	<mvc:view-controller path="/login"/>
+    <mvc:view-controller path="/" view-name="index"/>
+	<mvc:view-controller path="/uncaughtException"/>
+	<mvc:view-controller path="/resourceNotFound"/>
+	<mvc:view-controller path="/dataAccessFailure"/>
+
+	<!-- Resolves localized messages*.properties and application.properties files in the application to	allow for internationalization. 
+		The messages*.properties files translate Roo generated messages which are part of the admin interface, the application.properties
+		resource bundle localizes all application specific messages such as entity names and menu items. -->
+	<bean class="org.springframework.context.support.ReloadableResourceBundleMessageSource" id="messageSource" p:basenames="WEB-INF/i18n/messages,WEB-INF/i18n/application" p:fallbackToSystemLocale="false"/>
+	
+	<!-- store preferred language configuration in a cookie -->
+	<bean class="org.springframework.web.servlet.i18n.CookieLocaleResolver" id="localeResolver" p:cookieName="locale"/>	
+	
+	<!-- resolves localized <theme_name>.properties files in the classpath to allow for theme support -->
+	<bean class="org.springframework.ui.context.support.ResourceBundleThemeSource" id="themeSource"/>
+	
+	<!-- store preferred theme configuration in a cookie -->
+	<bean class="org.springframework.web.servlet.theme.CookieThemeResolver" id="themeResolver" p:cookieName="theme" p:defaultThemeName="standard"/>
+
+	<!-- This bean resolves specific types of exceptions to corresponding logical - view names for error views. 
+	     The default behaviour of DispatcherServlet - is to propagate all exceptions to the servlet container: 
+	     this will happen - here with all other types of exceptions. -->
+	<bean class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver" p:defaultErrorView="uncaughtException">
+		<property name="exceptionMappings">
+			<props>
+				<prop key=".DataAccessException">dataAccessFailure</prop>
+				<prop key=".NoSuchRequestHandlingMethodException">resourceNotFound</prop>
+				<prop key=".TypeMismatchException">resourceNotFound</prop>
+				<prop key=".MissingServletRequestParameterException">resourceNotFound</prop>
+			</props>
+		</property>
+	</bean>
+	
+	<!-- allows for integration of file upload functionality -->
+	<bean class="org.springframework.web.multipart.commons.CommonsMultipartResolver" id="multipartResolver"/>
+<bean class="org.springframework.web.servlet.view.UrlBasedViewResolver" id="tilesViewResolver">
+    <property name="viewClass" value="org.springframework.web.servlet.view.tiles2.TilesView"/>
+  </bean>
+    <bean class="org.springframework.web.servlet.view.tiles2.TilesConfigurer" id="tilesConfigurer">
+    <property name="definitions">
+      <list>
+        <value>/WEB-INF/layouts/layouts.xml</value>
+        <!-- Scan views directory for Tiles configurations -->
+        <value>/WEB-INF/views/**/views.xml</value>
+      </list>
+    </property>
+  </bean>
+<bean class="ar.edu.unlp.sedici.sedici2003.web.ApplicationConversionServiceFactoryBean" id="applicationConversionService"/>
+</beans>

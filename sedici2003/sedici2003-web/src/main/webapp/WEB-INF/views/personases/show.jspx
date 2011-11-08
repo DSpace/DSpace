@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+
+    <?xml version="1.0"?>
+    <project
+    	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+    	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    	<modelVersion>4.0.0</modelVersion>
+    	<parent>
+    		<artifactId>sedici2003</artifactId>
+    		<groupId>ar.edu.unlp.sedici</groupId>
+    		<version>1.8.0-rc1</version>
+    	</parent>
+
+    	<artifactId>sedici2003-web</artifactId>
+
+    	<name>sedici2003-web</name>
+    	<url>http://maven.apache.org</url>
+    	<properties>
+    		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    	</properties>
+    	<dependencies>
+    		<!-- General dependencies for standard applications -->
+
+    		<dependency>
+    			<groupId>ar.edu.unlp.sedici</groupId>
+    			<artifactId>sedici2003-api</artifactId>
+    			<version>${project.version}</version>
+    			<type>jar</type>
+    		</dependency>
+
+    		<dependency>
+    			<groupId>org.springframework</groupId>
+    			<artifactId>spring-web</artifactId>
+    			<version>${spring.version}</version>
+    			<classifier />
+    			<exclusions>
+    				<exclusion>
+    					<groupId>commons-logging</groupId>
+    					<artifactId>commons-logging</artifactId>
+    				</exclusion>
+    			</exclusions>
+    		</dependency>
+    		<dependency>
+    			<groupId>org.springframework</groupId>
+    			<artifactId>spring-webmvc</artifactId>
+    			<version>${spring.version}</version>
+    			<classifier />
+    			<exclusions>
+    				<exclusion>
+    					<groupId>commons-logging</groupId>
+    					<artifactId>commons-logging</artifactId>
+    				</exclusion>
+    			</exclusions>
+    		</dependency>
+    		<dependency>
+    			<groupId>org.springframework.webflow</groupId>
+    			<artifactId>spring-js-resources</artifactId>
+    			<version>2.2.1.RELEASE</version>
+    			<classifier />
+    		</dependency>
+    		<dependency>
+    			<groupId>commons-digester</groupId>
+    			<artifactId>commons-digester</artifactId>
+    			<version>2.0</version>
+    			<classifier />
+    			<exclusions>
+    				<exclusion>
+    					<groupId>commons-logging</groupId>
+    					<artifactId>commons-logging</artifactId>
+    				</exclusion>
+    			</exclusions>
+    		</dependency>
+    		<dependency>
+    			<groupId>commons-fileupload</groupId>
+    			<artifactId>commons-fileupload</artifactId>
+    			<version>1.2.1</version>
+    			<classifier />
+    			<exclusions>
+    				<exclusion>
+    					<groupId>commons-logging</groupId>
+    					<artifactId>commons-logging</artifactId>
+    				</exclusion>
+    			</exclusions>
+    		</dependency>
+    		<dependency>
+    			<groupId>javax.servlet.jsp.jstl</groupId>
+    			<artifactId>jstl-api</artifactId>
+    			<version>1.2</version>
+    			<classifier />
+    		</dependency>
+    		<dependency>
+    			<groupId>org.glassfish.web</groupId>
+    			<artifactId>jstl-impl</artifactId>
+    			<version>1.2</version>
+    			<classifier />
+    		</dependency>
+    		<dependency>
+    			<groupId>javax.el</groupId>
+    			<artifactId>el-api</artifactId>
+    			<version>1.0</version>
+    			<scope>provided</scope>
+    			<classifier />
+    		</dependency>
+    		<dependency>
+    			<groupId>joda-time</groupId>
+    			<artifactId>joda-time</artifactId>
+    			<version>1.6</version>
+    		</dependency>
+    		<dependency>
+    			<groupId>javax.servlet.jsp</groupId>
+    			<artifactId>jsp-api</artifactId>
+    			<version>2.1</version>
+    			<scope>provided</scope>
+    			<classifier />
+    		</dependency>
+    		<dependency>
+    			<groupId>commons-codec</groupId>
+    			<artifactId>commons-codec</artifactId>
+    			<version>1.4</version>
+    			<classifier />
+    		</dependency>
+    		<dependency>
+    			<groupId>org.apache.tiles</groupId>
+    			<artifactId>tiles-core</artifactId>
+    			<version>2.2.1</version>
+    			<classifier />
+    			<exclusions>
+    				<exclusion>
+    					<groupId>commons-logging</groupId>
+    					<artifactId>commons-logging</artifactId>
+    				</exclusion>
+    			</exclusions>
+    		</dependency>
+    		<dependency>
+    			<groupId>org.apache.tiles</groupId>
+    			<artifactId>tiles-jsp</artifactId>
+    			<version>2.2.1</version>
+    		</dependency>
+    		<dependency>
+    			<groupId>org.springframework.security</groupId>
+    			<artifactId>spring-security-core</artifactId>
+    			<version>${spring-security.version}</version>
+    			<classifier />
+    			<exclusions>
+    				<exclusion>
+    					<groupId>commons-logging</groupId>
+    					<artifactId>commons-logging</artifactId>
+    				</exclusion>
+    			</exclusions>
+    		</dependency>
+    		<dependency>
+    			<groupId>org.springframework.security</groupId>
+    			<artifactId>spring-security-config</artifactId>
+    			<version>${spring-security.version}</version>
+    			<classifier />
+    			<exclusions>
+    				<exclusion>
+    					<groupId>commons-logging</groupId>
+    					<artifactId>commons-logging</artifactId>
+    				</exclusion>
+    			</exclusions>
+    		</dependency>
+    		<dependency>
+    			<groupId>org.springframework.security</groupId>
+    			<artifactId>spring-security-web</artifactId>
+    			<version>${spring-security.version}</version>
+    			<classifier />
+    		</dependency>
+    		<dependency>
+    			<groupId>org.springframework.security</groupId>
+    			<artifactId>spring-security-taglibs</artifactId>
+    			<version>${spring-security.version}</version>
+    			<classifier />
+    		</dependency>
+
+    	</dependencies>
+
+
+
+    	<build>
+    		<plugins>
+    			<plugin>
+    				<groupId>org.apache.maven.plugins</groupId>
+    				<artifactId>maven-war-plugin</artifactId>
+    				<version>2.1.1</version>
+    				<!-- <configuration> <webXml>target/web.xml</webXml> </configuration> -->
+    				<configuration>
+    					<webResources>
+    						<resource>
+    							<directory>src/main/resources</directory>
+    							<excludes>
+    								<exclude>DBRE XML</exclude>
+    							</excludes>
+    						</resource>
+    					</webResources>
+    				</configuration>
+    			</plugin>
+    			<plugin>
+    				<groupId>org.codehaus.mojo</groupId>
+    				<artifactId>tomcat-maven-plugin</artifactId>
+    				<version>1.1</version>
+    			</plugin>
+    			<plugin>
+    				<groupId>org.mortbay.jetty</groupId>
+    				<artifactId>jetty-maven-plugin</artifactId>
+    				<version>7.4.2.v20110526</version>
+    				<configuration>
+    					<webAppConfig>
+    						<contextPath>/${project.name}</contextPath>
+    					</webAppConfig>
+    				</configuration>
+    			</plugin>
+
+
+    			<plugin>
+    				<groupId>org.apache.maven.plugins</groupId>
+    				<artifactId>maven-deploy-plugin</artifactId>
+    				<version>2.6</version>
+    			</plugin>
+    		</plugins>
+    	</build>
+    </project>
+
+-->
+<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <page:show id="ps_ar_edu_unlp_sedici_sedici2003_model_Personas" object="${personas}" path="/personases" z="cBhJIl0f+IG1iri45RmTvBV3aXY=">
+        <field:display field="apellido" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_apellido" object="${personas}" z="AExLJ6LmoNxCzUE3VT4At8B0oQE="/>
+        <field:display field="cantVisitas" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_cantVisitas" object="${personas}" z="k5nn2evMG/Z6Y4zlznrAcJbf9nY="/>
+        <field:display field="cargo" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_cargo" object="${personas}" z="sB7asquXkXcvHJ9Yv4i6tz4hq5k="/>
+        <field:display field="categoria" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_categoria" object="${personas}" z="XMpCRkR53E0k4CYHTiUFkg0g3L8="/>
+        <field:display field="dni" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_dni" object="${personas}" z="P1QQrUTVyr+ow5XqthOw75Y71qA="/>
+        <field:display field="email" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_email" object="${personas}" z="ZecZuKrVoWw6yVMNQGGSKRe4jjA="/>
+        <field:display field="email1" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_email1" object="${personas}" z="o/crw/F+rw/CgVnK/x+dvPPyluY="/>
+        <field:display field="email2" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_email2" object="${personas}" z="v+7CKP2U1bBFny3H8lnH6raHEnM="/>
+        <field:display date="true" dateTimePattern="${personas_fechainscripcion_date_format}" field="fechaInscripcion" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_fechaInscripcion" object="${personas}" z="wFwXAwAuqsVJMu3siPRXBE3xozA="/>
+        <field:display field="horarioDeContacto" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_horarioDeContacto" object="${personas}" z="vvf6VhWH/guFeZ0sp8MzAkYZ3VA="/>
+        <field:display field="idDependencia" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_idDependencia" object="${personas}" z="IW85ZU1UBlJwW8oviyCZ5BY2h0U="/>
+        <field:display field="idGrado" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_idGrado" object="${personas}" z="t4v0WdJTPGhl0AeDBFF+9p0cQvY="/>
+        <field:display field="idIdioma" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_idIdioma" object="${personas}" z="2npF5enz2nEUgE1Brofk4948cq4="/>
+        <field:display field="idInstitucion" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_idInstitucion" object="${personas}" z="5N0ZTxuqgqO6AJyYt6qKlXJAi/8="/>
+        <field:display field="idPais" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_idPais" object="${personas}" z="g1wMzCFt9o1b2LjgBmYMhEbnZ8M="/>
+        <field:display field="idUnidad" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_idUnidad" object="${personas}" z="101oZx66vJuc3C51pxfFcCsQWXo="/>
+        <field:display field="login" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_login" object="${personas}" z="+amYQwdqgz6y5YVFDx+mY37pOe0="/>
+        <field:display field="lugarDeTrabajo" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_lugarDeTrabajo" object="${personas}" z="AXMwJFsr5mrCgj1D4Nf0go1mbuo="/>
+        <field:display field="mailvisible" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_mailvisible" object="${personas}" z="ARjhPuAay0A2g7y341T7OvXTdaI="/>
+        <field:display field="mailvisible1" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_mailvisible1" object="${personas}" z="BP+bO4lsl1TO3GF/axS9wqaHBA0="/>
+        <field:display field="mailvisible2" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_mailvisible2" object="${personas}" z="a9FRR3Pf2EVlDAIGTnlfcIeIfSY="/>
+        <field:display field="nombre" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_nombre" object="${personas}" z="WTo0bUVXkgpzv2BjdzTTSDbfr6M="/>
+        <field:display field="observaciones" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_observaciones" object="${personas}" z="qyii7cifbCErkLMnMHabvwp30ic="/>
+        <field:display field="otroDependencia" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_otroDependencia" object="${personas}" z="9NQGEW+JTJH2PP+RESCG7irT03g="/>
+        <field:display field="otroInstitucion" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_otroInstitucion" object="${personas}" z="KEe/dm/CcIo4pYLt+Kklw9cHROQ="/>
+        <field:display field="otroPais" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_otroPais" object="${personas}" z="DrWz/BiyHSaeYa89f6wnMX0RydA="/>
+        <field:display field="otroUnidad" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_otroUnidad" object="${personas}" z="xlLncr8B7yQpfk60asjLo+TBzWw="/>
+        <field:display field="password" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_password" object="${personas}" z="z8zNTmG1g1WDYVxGcv/FNrNFbdU="/>
+        <field:display field="perfil" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_perfil" object="${personas}" z="ROZGljl7EfISGDkCaTh1m0TilHQ="/>
+        <field:display field="recinf" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_recinf" object="${personas}" z="BbCXlDaIbMh/Umanm0p/SQxWZDY="/>
+        <field:display field="recinf1" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_recinf1" object="${personas}" z="kB8VqpnkfYR2RoWiPxOqB448x3E="/>
+        <field:display field="recinf2" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_recinf2" object="${personas}" z="JLZDnUAXqO5RfeHNZ9O4GUeqC3Y="/>
+        <field:display field="siteweb" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_siteweb" object="${personas}" z="rRLrKICpzrZ9vdHtsSZXLp8R9uI="/>
+        <field:display field="telefono" id="s_ar_edu_unlp_sedici_sedici2003_model_Personas_telefono" object="${personas}" z="r/ixuFSr07hLN8YfFTYygCF+oj8="/>
+    </page:show>
+</div>

@@ -1,0 +1,66 @@
+<aspectj>
+<aspects>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.InstitucionesController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.PersonasController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.UnidadesController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.AdministradoresController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.IpOaiController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.OrdenesMailController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.PartesController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.SequenceController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.DsiRelTesauroController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.JerarquiasRelacionesController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.PlantillaCorreoController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.TesaurosCategController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.PendientesController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.AbreviaturaPaisController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.DsiPeriodoController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.HistoricoBusquedasController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.IpLoginController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.IpController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.JerarquiasCategController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.MensajesController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.MetadatosController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.DsiNotificacionController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.ElementosTablaController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.CarpetasController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.ThemeController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.DsiRelTipoDocController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.CategoriaLinksController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.EstadoController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.IpWebserviceController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.TipoDeDocumentoController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.PaisesController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.IpDownloadsController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.ProductosController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.CarpetasDocumentosController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.TipoDeParteController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.DsiPersonasPerfilController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.DsiRelIdiomaDocController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.TipoRelacionTesauroController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.NoticiasController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.DsiRelPaisDocController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.TipoOperacionController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.DependenciasController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.TipoDocumentoController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.ContactoController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.LoggController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.MetadatosPartesController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.IpPaisesController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.DocumentosController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.TipoDeMetadatosController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.ApplicationConversionServiceFactoryBean_Roo_ConversionService"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.RelacionMetaTipodocController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.MailController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.MismensajesController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.JerarquiasTerminoController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.TesaurosRelacionesController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.TipoDeTablaController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.DublinCoreController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.DublinCoreLinkController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.LinkController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.DsiEmailLogController_Roo_Controller"/>
+<aspect name="ar.edu.unlp.sedici.sedici2003.web.TesaurosTerminoController_Roo_Controller"/>
+</aspects>
+</aspectj>
+

@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+
+    <?xml version="1.0"?>
+    <project
+    	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+    	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    	<modelVersion>4.0.0</modelVersion>
+    	<parent>
+    		<artifactId>sedici2003</artifactId>
+    		<groupId>ar.edu.unlp.sedici</groupId>
+    		<version>1.8.0-rc1</version>
+    	</parent>
+
+    	<artifactId>sedici2003-web</artifactId>
+
+    	<name>sedici2003-web</name>
+    	<url>http://maven.apache.org</url>
+    	<properties>
+    		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    	</properties>
+    	<dependencies>
+    		<!-- General dependencies for standard applications -->
+
+    		<dependency>
+    			<groupId>ar.edu.unlp.sedici</groupId>
+    			<artifactId>sedici2003-api</artifactId>
+    			<version>${project.version}</version>
+    			<type>jar</type>
+    		</dependency>
+
+    		<dependency>
+    			<groupId>org.springframework</groupId>
+    			<artifactId>spring-web</artifactId>
+    			<version>${spring.version}</version>
+    			<classifier />
+    			<exclusions>
+    				<exclusion>
+    					<groupId>commons-logging</groupId>
+    					<artifactId>commons-logging</artifactId>
+    				</exclusion>
+    			</exclusions>
+    		</dependency>
+    		<dependency>
+    			<groupId>org.springframework</groupId>
+    			<artifactId>spring-webmvc</artifactId>
+    			<version>${spring.version}</version>
+    			<classifier />
+    			<exclusions>
+    				<exclusion>
+    					<groupId>commons-logging</groupId>
+    					<artifactId>commons-logging</artifactId>
+    				</exclusion>
+    			</exclusions>
+    		</dependency>
+    		<dependency>
+    			<groupId>org.springframework.webflow</groupId>
+    			<artifactId>spring-js-resources</artifactId>
+    			<version>2.2.1.RELEASE</version>
+    			<classifier />
+    		</dependency>
+    		<dependency>
+    			<groupId>commons-digester</groupId>
+    			<artifactId>commons-digester</artifactId>
+    			<version>2.0</version>
+    			<classifier />
+    			<exclusions>
+    				<exclusion>
+    					<groupId>commons-logging</groupId>
+    					<artifactId>commons-logging</artifactId>
+    				</exclusion>
+    			</exclusions>
+    		</dependency>
+    		<dependency>
+    			<groupId>commons-fileupload</groupId>
+    			<artifactId>commons-fileupload</artifactId>
+    			<version>1.2.1</version>
+    			<classifier />
+    			<exclusions>
+    				<exclusion>
+    					<groupId>commons-logging</groupId>
+    					<artifactId>commons-logging</artifactId>
+    				</exclusion>
+    			</exclusions>
+    		</dependency>
+    		<dependency>
+    			<groupId>javax.servlet.jsp.jstl</groupId>
+    			<artifactId>jstl-api</artifactId>
+    			<version>1.2</version>
+    			<classifier />
+    		</dependency>
+    		<dependency>
+    			<groupId>org.glassfish.web</groupId>
+    			<artifactId>jstl-impl</artifactId>
+    			<version>1.2</version>
+    			<classifier />
+    		</dependency>
+    		<dependency>
+    			<groupId>javax.el</groupId>
+    			<artifactId>el-api</artifactId>
+    			<version>1.0</version>
+    			<scope>provided</scope>
+    			<classifier />
+    		</dependency>
+    		<dependency>
+    			<groupId>joda-time</groupId>
+    			<artifactId>joda-time</artifactId>
+    			<version>1.6</version>
+    		</dependency>
+    		<dependency>
+    			<groupId>javax.servlet.jsp</groupId>
+    			<artifactId>jsp-api</artifactId>
+    			<version>2.1</version>
+    			<scope>provided</scope>
+    			<classifier />
+    		</dependency>
+    		<dependency>
+    			<groupId>commons-codec</groupId>
+    			<artifactId>commons-codec</artifactId>
+    			<version>1.4</version>
+    			<classifier />
+    		</dependency>
+    		<dependency>
+    			<groupId>org.apache.tiles</groupId>
+    			<artifactId>tiles-core</artifactId>
+    			<version>2.2.1</version>
+    			<classifier />
+    			<exclusions>
+    				<exclusion>
+    					<groupId>commons-logging</groupId>
+    					<artifactId>commons-logging</artifactId>
+    				</exclusion>
+    			</exclusions>
+    		</dependency>
+    		<dependency>
+    			<groupId>org.apache.tiles</groupId>
+    			<artifactId>tiles-jsp</artifactId>
+    			<version>2.2.1</version>
+    		</dependency>
+    		<dependency>
+    			<groupId>org.springframework.security</groupId>
+    			<artifactId>spring-security-core</artifactId>
+    			<version>${spring-security.version}</version>
+    			<classifier />
+    			<exclusions>
+    				<exclusion>
+    					<groupId>commons-logging</groupId>
+    					<artifactId>commons-logging</artifactId>
+    				</exclusion>
+    			</exclusions>
+    		</dependency>
+    		<dependency>
+    			<groupId>org.springframework.security</groupId>
+    			<artifactId>spring-security-config</artifactId>
+    			<version>${spring-security.version}</version>
+    			<classifier />
+    			<exclusions>
+    				<exclusion>
+    					<groupId>commons-logging</groupId>
+    					<artifactId>commons-logging</artifactId>
+    				</exclusion>
+    			</exclusions>
+    		</dependency>
+    		<dependency>
+    			<groupId>org.springframework.security</groupId>
+    			<artifactId>spring-security-web</artifactId>
+    			<version>${spring-security.version}</version>
+    			<classifier />
+    		</dependency>
+    		<dependency>
+    			<groupId>org.springframework.security</groupId>
+    			<artifactId>spring-security-taglibs</artifactId>
+    			<version>${spring-security.version}</version>
+    			<classifier />
+    		</dependency>
+
+    	</dependencies>
+
+
+
+    	<build>
+    		<plugins>
+    			<plugin>
+    				<groupId>org.apache.maven.plugins</groupId>
+    				<artifactId>maven-war-plugin</artifactId>
+    				<version>2.1.1</version>
+    				<!-- <configuration> <webXml>target/web.xml</webXml> </configuration> -->
+    				<configuration>
+    					<webResources>
+    						<resource>
+    							<directory>src/main/resources</directory>
+    							<excludes>
+    								<exclude>DBRE XML</exclude>
+    							</excludes>
+    						</resource>
+    					</webResources>
+    				</configuration>
+    			</plugin>
+    			<plugin>
+    				<groupId>org.codehaus.mojo</groupId>
+    				<artifactId>tomcat-maven-plugin</artifactId>
+    				<version>1.1</version>
+    			</plugin>
+    			<plugin>
+    				<groupId>org.mortbay.jetty</groupId>
+    				<artifactId>jetty-maven-plugin</artifactId>
+    				<version>7.4.2.v20110526</version>
+    				<configuration>
+    					<webAppConfig>
+    						<contextPath>/${project.name}</contextPath>
+    					</webAppConfig>
+    				</configuration>
+    			</plugin>
+
+
+    			<plugin>
+    				<groupId>org.apache.maven.plugins</groupId>
+    				<artifactId>maven-deploy-plugin</artifactId>
+    				<version>2.6</version>
+    			</plugin>
+    		</plugins>
+    	</build>
+    </project>
+
+-->
+<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" id="menu" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <menu:menu id="_menu" z="nZaf43BjUg1iM0v70HJVEsXDopc=">
+        <menu:category id="c_categorialinks" z="CbM9Nb6dqyLMQ+iL4r35dv9lxkQ=">
+            <menu:item id="i_categorialinks_new" messageCode="global_menu_new" url="/categorialinkses?form" z="MCwqzIL7DR1tG+xTF9ATqGMYTmY="/>
+            <menu:item id="i_categorialinks_list" messageCode="global_menu_list" url="/categorialinkses?page=1&amp;size=${empty param.size ? 10 : param.size}" z="WxhGAuNzXCv5qUx4tdM672LnBj8="/>
+        </menu:category>
+        <menu:category id="c_tipodetabla" z="5vzlIAHj3lFkGdgvxUMVScate1A=">
+            <menu:item id="i_tipodetabla_new" messageCode="global_menu_new" url="/tipodetablas?form" z="gQe7AjYKYz/qSOKGctmuIB6Bp6E="/>
+            <menu:item id="i_tipodetabla_list" messageCode="global_menu_list" url="/tipodetablas?page=1&amp;size=${empty param.size ? 10 : param.size}" z="SV+iKq8WRxpnRtk+BTQdiPHnkZg="/>
+        </menu:category>
+        <menu:category id="c_carpetasdocumentos" z="SiF1b0iOKTRq8Rv5HvPJiNDmGrs=">
+            <menu:item id="i_carpetasdocumentos_new" messageCode="global_menu_new" url="/carpetasdocumentoses?form" z="PRGhUVhSjB4k6B0TaAxE+gNex/o="/>
+            <menu:item id="i_carpetasdocumentos_list" messageCode="global_menu_list" url="/carpetasdocumentoses?page=1&amp;size=${empty param.size ? 10 : param.size}" z="ix86bgjnyf9RU8KbdEOVdjRZsQs="/>
+        </menu:category>
+        <menu:category id="c_contacto" z="hBkvx/0fo1w7N+2eKKyRmHraKyA=">
+            <menu:item id="i_contacto_new" messageCode="global_menu_new" url="/contactoes?form" z="zdespq5tJ+FqS04xPOB/h4q/+mE="/>
+            <menu:item id="i_contacto_list" messageCode="global_menu_list" url="/contactoes?page=1&amp;size=${empty param.size ? 10 : param.size}" z="Dgb9u68WMSpRLucUcKYaYrSzP8w="/>
+        </menu:category>
+        <menu:category id="c_noticias" z="ebqcFXPV+B66YPTHsWQCN2Brg5w=">
+            <menu:item id="i_noticias_new" messageCode="global_menu_new" url="/noticiases?form" z="aBRyo/h+wcLGB/ZjuPy2AWMrHqE="/>
+            <menu:item id="i_noticias_list" messageCode="global_menu_list" url="/noticiases?page=1&amp;size=${empty param.size ? 10 : param.size}" z="cGTMjlo4941mEDknFKVJmfl+ziE="/>
+        </menu:category>
+        <menu:category id="c_dsireltipodoc" z="TQmIGJBhos0nX2gw0Lrh2APmad4=">
+            <menu:item id="i_dsireltipodoc_new" messageCode="global_menu_new" url="/dsireltipodocs?form" z="+c6r5wSv5aODCEV5YDZQSx5r/rQ="/>
+            <menu:item id="i_dsireltipodoc_list" messageCode="global_menu_list" url="/dsireltipodocs?page=1&amp;size=${empty param.size ? 10 : param.size}" z="NdkjNH7s1Dpm7XBsWeYSjXwL0HI="/>
+        </menu:category>
+        <menu:category id="c_tesauroscateg" z="zR1SY2V1xb64kxN9o35n/QsjWxg=">
+            <menu:item id="i_tesauroscateg_new" messageCode="global_menu_new" url="/tesauroscategs?form" z="sr/Mcfcm9IxTrAF/JkD5McPOFeA="/>
+            <menu:item id="i_tesauroscateg_list" messageCode="global_menu_list" url="/tesauroscategs?page=1&amp;size=${empty param.size ? 10 : param.size}" z="GsALEfD5Ux/ME5XjolrKYQBSOj8="/>
+        </menu:category>
+        <menu:category id="c_ipdownloads" z="OqWppT0XACXwXUQq8tcWOgzIZeI=">
+            <menu:item id="i_ipdownloads_new" messageCode="global_menu_new" url="/ipdownloadses?form" z="wsBZVTAr5k/kAet4fyjxd4vzAWc="/>
+            <menu:item id="i_ipdownloads_list" messageCode="global_menu_list" url="/ipdownloadses?page=1&amp;size=${empty param.size ? 10 : param.size}" z="Y610VryOcLOyBb0+6gx1Pa1ICng="/>
+        </menu:category>
+        <menu:category id="c_productos" z="pRxQeHc0hZws3QZH4bHYsEcaxv4=">
+            <menu:item id="i_productos_new" messageCode="global_menu_new" url="/productoses?form" z="PdDUK8d6T2sHc0QApLXP7WqCD9Q="/>
+            <menu:item id="i_productos_list" messageCode="global_menu_list" url="/productoses?page=1&amp;size=${empty param.size ? 10 : param.size}" z="jXfMRVXSe0rscovN59Vd0Spp8mA="/>
+        </menu:category>
+        <menu:category id="c_tesaurosrelaciones" z="JrM7JlVcCpEIv5Xi+SV0DlK2EDc=">
+            <menu:item id="i_tesaurosrelaciones_new" messageCode="global_menu_new" url="/tesaurosrelacioneses?form" z="/72B88ITlm/CKpP4bhHDuYWjrt4="/>
+            <menu:item id="i_tesaurosrelaciones_list" messageCode="global_menu_list" url="/tesaurosrelacioneses?page=1&amp;size=${empty param.size ? 10 : param.size}" z="rdVaDz3KIPxKC0Qhm8Hwd11MW50="/>
+        </menu:category>
+        <menu:category id="c_ippaises" z="Vat8LUyNZ5Bn9jXlt22qF11VJ4c=">
+            <menu:item id="i_ippaises_new" messageCode="global_menu_new" url="/ippaiseses?form" z="nnLRAYGMGUx2J+h028D/9lVmpU0="/>
+            <menu:item id="i_ippaises_list" messageCode="global_menu_list" url="/ippaiseses?page=1&amp;size=${empty param.size ? 10 : param.size}" z="J9+xBZXnZHR1LVBN/oft6LX1CR0="/>
+        </menu:category>
+        <menu:category id="c_logg" z="N0n6obDKeBZV1rAMVk2/zFUO9O4=">
+            <menu:item id="i_logg_new" messageCode="global_menu_new" url="/loggs?form" z="/2TOlTE7eUHxZYloxPZkfXadfYQ="/>
+            <menu:item id="i_logg_list" messageCode="global_menu_list" url="/loggs?page=1&amp;size=${empty param.size ? 10 : param.size}" z="2V/uihhb5eXaGc0jDfKTfxYjrXM="/>
+        </menu:category>
+        <menu:category id="c_tipodedocumento" z="ZTBu9dnugytRZjotBy3pJqLUl5w=">
+            <menu:item id="i_tipodedocumento_new" messageCode="global_menu_new" url="/tipodedocumentoes?form" z="3JkaruKiJQsxf4M1HlFW2xg87+Y="/>
+            <menu:item id="i_tipodedocumento_list" messageCode="global_menu_list" url="/tipodedocumentoes?page=1&amp;size=${empty param.size ? 10 : param.size}" z="sAwGd0JwoHIq3j4y39pbTDodY44="/>
+        </menu:category>
+        <menu:category id="c_iplogin" z="t6u718TWYeiad+8GW18Q7CY5LxU=">
+            <menu:item id="i_iplogin_new" messageCode="global_menu_new" url="/iplogins?form" z="r6cjz/odUGTD8byg8qq6ZxfJ6o4="/>
+            <menu:item id="i_iplogin_list" messageCode="global_menu_list" url="/iplogins?page=1&amp;size=${empty param.size ? 10 : param.size}" z="gfQjHIHR/bjU9X5CMsmDQIVWtCg="/>
+        </menu:category>
+        <menu:category id="c_jerarquiasrelaciones" z="usZbHmQmDCfBlrGCul+L8pb2KCU=">
+            <menu:item id="i_jerarquiasrelaciones_new" messageCode="global_menu_new" url="/jerarquiasrelacioneses?form" z="AzT7modF4s7raUOKlBOMfzvPNik="/>
+            <menu:item id="i_jerarquiasrelaciones_list" messageCode="global_menu_list" url="/jerarquiasrelacioneses?page=1&amp;size=${empty param.size ? 10 : param.size}" z="Gg5y1QINPjk7LKB7Fs2YUKFIF1k="/>
+        </menu:category>
+        <menu:category id="c_abreviaturapais" z="L0mgXSj4Y7IE3GeyHsCKvbbkPFQ=">
+            <menu:item id="i_abreviaturapais_new" messageCode="global_menu_new" url="/abreviaturapaises?form" z="s8hS6EF1/ZFo/Yse/qrcH1a1+D0="/>
+            <menu:item id="i_abreviaturapais_list" messageCode="global_menu_list" url="/abreviaturapaises?page=1&amp;size=${empty param.size ? 10 : param.size}" z="3gHQSScFTg+PuyAXe8YuhkOttJI="/>
+        </menu:category>
+        <menu:category id="c_personas" z="/tE3gx70hQ0ps858ZdAxdcFil48=">
+            <menu:item id="i_personas_new" messageCode="global_menu_new" url="/personases?form" z="6nPT0zYWFa2p6uh7O8uVQqUPvY8="/>
+            <menu:item id="i_personas_list" messageCode="global_menu_list" url="/personases?page=1&amp;size=${empty param.size ? 10 : param.size}" z="tHim99+VkhDB0DCWYkWAW2cwZ5Q="/>
+        </menu:category>
+        <menu:category id="c_tiporelaciontesauro" z="YzpoR6685rrSM8Us0evoiM4ECZk=">
+            <menu:item id="i_tiporelaciontesauro_new" messageCode="global_menu_new" url="/tiporelaciontesauroes?form" z="rowAHGqz9a86w6VpbQGZjqr9lOE="/>
+            <menu:item id="i_tiporelaciontesauro_list" messageCode="global_menu_list" url="/tiporelaciontesauroes?page=1&amp;size=${empty param.size ? 10 : param.size}" z="G89+5wqdMy+LRQzXT8vihev5eG0="/>
+        </menu:category>
+        <menu:category id="c_mail" z="M5SEdrpN85H3jZoGSSl4W+hMSmU=">
+            <menu:item id="i_mail_new" messageCode="global_menu_new" url="/mails?form" z="U9FPI2aFnfKGABIye+ZDmKckqXc="/>
+            <menu:item id="i_mail_list" messageCode="global_menu_list" url="/mails?page=1&amp;size=${empty param.size ? 10 : param.size}" z="RgxFBNvQ+FSPbbsXo6WkRRFTVU4="/>
+        </menu:category>
+        <menu:category id="c_ip" z="6lNHZRxxMGXWOl8mGMMBuF0fqo4=">
+            <menu:item id="i_ip_new" messageCode="global_menu_new" url="/ips?form" z="FUX9ngxvjBBK2YgpY/+aEyHrafU="/>
+            <menu:item id="i_ip_list" messageCode="global_menu_list" url="/ips?page=1&amp;size=${empty param.size ? 10 : param.size}" z="HMKDPx+/Z2rs/FLi0fSKIpFbt7E="/>
+        </menu:category>
+        <menu:category id="c_historicobusquedas" z="hqaIejhOv/pTZevD6x1s5Hmf+D0=">
+            <menu:item id="i_historicobusquedas_new" messageCode="global_menu_new" url="/historicobusquedases?form" z="FqFDb1jg6sO/zj9tX4hI/9NjybE="/>
+            <menu:item id="i_historicobusquedas_list" messageCode="global_menu_list" url="/historicobusquedases?page=1&amp;size=${empty param.size ? 10 : param.size}" z="LlAi1FzA020RMXOZ459p407p63k="/>
+        </menu:category>
+        <menu:category id="c_ordenesmail" z="DHO0FZ79+2JMi892Ae7GhqFsTXM=">
+            <menu:item id="i_ordenesmail_new" messageCode="global_menu_new" url="/ordenesmails?form" z="Zth4+8oIRe8m1X9hiJdlIXJ92WU="/>
+            <menu:item id="i_ordenesmail_list" messageCode="global_menu_list" url="/ordenesmails?page=1&amp;size=${empty param.size ? 10 : param.size}" z="3RXUi3amgaBUUksjhhAvBrn+h24="/>
+        </menu:category>
+        <menu:category id="c_tipodeparte" z="2V25VdTRj1icrjBS/RCEtxCXPR8=">
+            <menu:item id="i_tipodeparte_new" messageCode="global_menu_new" url="/tipodepartes?form" z="ilgHFzdg8ZQL40Zdeul2205f4XM="/>
+            <menu:item id="i_tipodeparte_list" messageCode="global_menu_list" url="/tipodepartes?page=1&amp;size=${empty param.size ? 10 : param.size}" z="oMZaJ5sfNAotZkZAvxb1ODEwaTc="/>
+        </menu:category>
+        <menu:category id="c_administradores" z="CAQq6jLrlbEPb6zqAN7sKh3T6uI=">
+            <menu:item id="i_administradores_new" messageCode="global_menu_new" url="/administradoreses?form" z="AmHlLTY86Yvqfdb1wigMGhwbQqM="/>
+            <menu:item id="i_administradores_list" messageCode="global_menu_list" url="/administradoreses?page=1&amp;size=${empty param.size ? 10 : param.size}" z="FRCJUK8zEMH18YaOJySlMGPy1PE="/>
+        </menu:category>
+        <menu:category id="c_sequence" z="AaWU/LetUWLmKrZDEfHZ1nTuZ78=">
+            <menu:item id="i_sequence_new" messageCode="global_menu_new" url="/sequences?form" z="6raCVyIuhlSdosMfRHl/ZwkcXwA="/>
+            <menu:item id="i_sequence_list" messageCode="global_menu_list" url="/sequences?page=1&amp;size=${empty param.size ? 10 : param.size}" z="szQrLeHK8S9JHuLhZIPcdXsI5Rs="/>
+        </menu:category>
+        <menu:category id="c_jerarquiastermino" z="qusoC8iu8HmB69gIjN7E2iuDLO8=">
+            <menu:item id="i_jerarquiastermino_new" messageCode="global_menu_new" url="/jerarquiasterminoes?form" z="ZAkh+J23P5tprVQdLJNRkywcHms="/>
+            <menu:item id="i_jerarquiastermino_list" messageCode="global_menu_list" url="/jerarquiasterminoes?page=1&amp;size=${empty param.size ? 10 : param.size}" z="5RAVnLnyT8SU9d14T4vWdqewOPk="/>
+        </menu:category>
+        <menu:category id="c_dependencias" z="XeV8MsF9mQrSOBybe3NZXVDxe28=">
+            <menu:item id="i_dependencias_new" messageCode="global_menu_new" url="/dependenciases?form" z="8GWfJDh/nhXLaIhr3W1CoE/VT4Q="/>
+            <menu:item id="i_dependencias_list" messageCode="global_menu_list" url="/dependenciases?page=1&amp;size=${empty param.size ? 10 : param.size}" z="DoRFom1LYeLIZz+VGfrBa8R6tv0="/>
+        </menu:category>
+        <menu:category id="c_dsiperiodo" z="ncYJK7Y2Tp2iFPlCZedI+9NqRsc=">
+            <menu:item id="i_dsiperiodo_new" messageCode="global_menu_new" url="/dsiperiodoes?form" z="tkQ+A9RCf2sm69GKUT2kSNYwn3w="/>
+            <menu:item id="i_dsiperiodo_list" messageCode="global_menu_list" url="/dsiperiodoes?page=1&amp;size=${empty param.size ? 10 : param.size}" z="ucHejpA1UWblODHOSHfBqvqcxyM="/>
+        </menu:category>
+        <menu:category id="c_jerarquiascateg" z="DNBSbHf304t4L1ksGT4KmSqbFLE=">
+            <menu:item id="i_jerarquiascateg_new" messageCode="global_menu_new" url="/jerarquiascategs?form" z="qpEh+KmSXdh7LmdITkik4vuFv+0="/>
+            <menu:item id="i_jerarquiascateg_list" messageCode="global_menu_list" url="/jerarquiascategs?page=1&amp;size=${empty param.size ? 10 : param.size}" z="CR7+jZPvT6byftjXs+SNU5o7mhk="/>
+        </menu:category>
+        <menu:category id="c_paises" z="LyNFj0QIgjgXF95005Da7DCL8b0=">
+            <menu:item id="i_paises_new" messageCode="global_menu_new" url="/paiseses?form" z="e5Z3o25eRBcnnKnXhD6Snl14iHw="/>
+            <menu:item id="i_paises_list" messageCode="global_menu_list" url="/paiseses?page=1&amp;size=${empty param.size ? 10 : param.size}" z="YS8wPmF+J0ugHyvzj1LZhdCe1NA="/>
+        </menu:category>
+        <menu:category id="c_plantillacorreo" z="Ktdc7gy6XWNQaAEog2AHZHGYoms=">
+            <menu:item id="i_plantillacorreo_new" messageCode="global_menu_new" url="/plantillacorreos?form" z="q/mtegsqGC7+7R2m+vgP79QiK0E="/>
+            <menu:item id="i_plantillacorreo_list" messageCode="global_menu_list" url="/plantillacorreos?page=1&amp;size=${empty param.size ? 10 : param.size}" z="bey+3h+4Ggq5mNJJ1W5X5f5NTbk="/>
+        </menu:category>
+        <menu:category id="c_dublincore" z="z1ooGXEUvna5aXtyY9EYHMZoxT4=">
+            <menu:item id="i_dublincore_new" messageCode="global_menu_new" url="/dublincores?form" z="GxJkY8QKirRIIyidxY/n4F6A5tQ="/>
+            <menu:item id="i_dublincore_list" messageCode="global_menu_list" url="/dublincores?page=1&amp;size=${empty param.size ? 10 : param.size}" z="lfX4/XBP3M2BZvnRuZxnrQz562w="/>
+        </menu:category>
+        <menu:category id="c_link" z="SPJgWbk3mCBigtdIiyM6NrKnDYo=">
+            <menu:item id="i_link_new" messageCode="global_menu_new" url="/links?form" z="n7jlbYMNhqR/1Kw9hMLy69e3jqo="/>
+            <menu:item id="i_link_list" messageCode="global_menu_list" url="/links?page=1&amp;size=${empty param.size ? 10 : param.size}" z="wY6kp12QvbbSwuPbsra/KIpzZU0="/>
+        </menu:category>
+        <menu:category id="c_tipooperacion" z="vL5xvDvKi01zChSzhfXAuyxfWRc=">
+            <menu:item id="i_tipooperacion_new" messageCode="global_menu_new" url="/tipooperacions?form" z="Bnw1On32YpkLlkpitn2O99JwyPI="/>
+            <menu:item id="i_tipooperacion_list" messageCode="global_menu_list" url="/tipooperacions?page=1&amp;size=${empty param.size ? 10 : param.size}" z="P4NRtIq/37y8vLV2kzMnCKz1uvY="/>
+        </menu:category>
+        <menu:category id="c_documentos" z="4zn+jHMHa5cm669Wl/HZk9SOQQA=">
+            <menu:item id="i_documentos_new" messageCode="global_menu_new" url="/documentoses?form" z="iO4ODAhhpgyIZScRKXOrTJZ0i1A="/>
+            <menu:item id="i_documentos_list" messageCode="global_menu_list" url="/documentoses?page=1&amp;size=${empty param.size ? 10 : param.size}" z="78bzUy3w52oHUUfIgIuw4iY8GsU="/>
+        </menu:category>
+        <menu:category id="c_ipoai" z="843FhmeXh1ucaZCcZp7BeE8WPEg=">
+            <menu:item id="i_ipoai_new" messageCode="global_menu_new" url="/ipoais?form" z="bY5WRn4roetYm8sPAuy2CCJsRlY="/>
+            <menu:item id="i_ipoai_list" messageCode="global_menu_list" url="/ipoais?page=1&amp;size=${empty param.size ? 10 : param.size}" z="o4z2EdHTxvM++ewdTx5AjrQ10dM="/>
+        </menu:category>
+        <menu:category id="c_metadatos" z="nTR1XD82U2HjB2ibDYPzkZLpE6g=">
+            <menu:item id="i_metadatos_new" messageCode="global_menu_new" url="/metadatoses?form" z="xjwcS0z6mlxzKTvf/wJMhIorcZo="/>
+            <menu:item id="i_metadatos_list" messageCode="global_menu_list" url="/metadatoses?page=1&amp;size=${empty param.size ? 10 : param.size}" z="P/mPCdmpkxj0g61aRDIJdmMrUIQ="/>
+        </menu:category>
+        <menu:category id="c_metadatospartes" z="dP3hw6tzwi6Lp0HLa3S0llM6ypA=">
+            <menu:item id="i_metadatospartes_new" messageCode="global_menu_new" url="/metadatosparteses?form" z="dBI6LwjI+4sLx/4jAD8uK3RIZl0="/>
+            <menu:item id="i_metadatospartes_list" messageCode="global_menu_list" url="/metadatosparteses?page=1&amp;size=${empty param.size ? 10 : param.size}" z="6EUKmK1KOQrTO2p86u2ZrEXzBcg="/>
+        </menu:category>
+        <menu:category id="c_tipodocumento" z="B/kNPkv8emZ0WxUq/7ZQZp9WYGc=">
+            <menu:item id="i_tipodocumento_new" messageCode="global_menu_new" url="/tipodocumentoes?form" z="qoV+9Fi91uK10C0sSwIa45Y+g1o="/>
+            <menu:item id="i_tipodocumento_list" messageCode="global_menu_list" url="/tipodocumentoes?page=1&amp;size=${empty param.size ? 10 : param.size}" z="0SHbEs4exH4GepFvxHdgEnDxucM="/>
+        </menu:category>
+        <menu:category id="c_dsirelpaisdoc" z="NRYkMZ+tpDKWkeWvlcP553kFVkY=">
+            <menu:item id="i_dsirelpaisdoc_new" messageCode="global_menu_new" url="/dsirelpaisdocs?form" z="TvSQutBLcOMj/mHJrtk0LByh7dg="/>
+            <menu:item id="i_dsirelpaisdoc_list" messageCode="global_menu_list" url="/dsirelpaisdocs?page=1&amp;size=${empty param.size ? 10 : param.size}" z="Y/WCkg3kFlTsprluynoyIsKY4kc="/>
+        </menu:category>
+        <menu:category id="c_instituciones" z="l0cbM9vXzGEmXd2CwX5g4JYkaDg=">
+            <menu:item id="i_instituciones_new" messageCode="global_menu_new" url="/institucioneses?form" z="dG+4A1bhwFNnC33379cAR/4BR0A="/>
+            <menu:item id="i_instituciones_list" messageCode="global_menu_list" url="/institucioneses?page=1&amp;size=${empty param.size ? 10 : param.size}" z="Z5bhHk8/yJrL1IVEMxPVCFmgWwo="/>
+        </menu:category>
+        <menu:category id="c_mensajes" z="4gLT9l57baNxqDnwYljaDXC5CY4=">
+            <menu:item id="i_mensajes_new" messageCode="global_menu_new" url="/mensajeses?form" z="bbo0ReA2DPZhMvTgzHl33bKfvYU="/>
+            <menu:item id="i_mensajes_list" messageCode="global_menu_list" url="/mensajeses?page=1&amp;size=${empty param.size ? 10 : param.size}" z="LoYmy6dKj8APZccdqjyBwIExJ3w="/>
+        </menu:category>
+        <menu:category id="c_tipodemetadatos" z="ot047fAXtOYnAVKAjHyGB6VKaEw=">
+            <menu:item id="i_tipodemetadatos_new" messageCode="global_menu_new" url="/tipodemetadatoses?form" z="593KNBtdFNAEKouX2pd9TKHuADM="/>
+            <menu:item id="i_tipodemetadatos_list" messageCode="global_menu_list" url="/tipodemetadatoses?page=1&amp;size=${empty param.size ? 10 : param.size}" z="kTX+92l5gPZuhTGDat0aplv6J70="/>
+        </menu:category>
+        <menu:category id="c_dsiemaillog" z="Fgmqjb+zIU/SekLz+C5qrcItI0w=">
+            <menu:item id="i_dsiemaillog_new" messageCode="global_menu_new" url="/dsiemaillogs?form" z="5xpCoUna824k+w3r/dzcnnpg9wk="/>
+            <menu:item id="i_dsiemaillog_list" messageCode="global_menu_list" url="/dsiemaillogs?page=1&amp;size=${empty param.size ? 10 : param.size}" z="HhJBz/CBYIXD9HATHaA49VC6fXI="/>
+        </menu:category>
+        <menu:category id="c_elementostabla" z="SesD+UB1ItkQDVkwp0SZ4zjJlQw=">
+            <menu:item id="i_elementostabla_new" messageCode="global_menu_new" url="/elementostablas?form" z="FbZ82TRuugMjAixXtNtrHJkl/7M="/>
+            <menu:item id="i_elementostabla_list" messageCode="global_menu_list" url="/elementostablas?page=1&amp;size=${empty param.size ? 10 : param.size}" z="QGpgNGzxBu1gt+fMjDiUYoVaNlE="/>
+        </menu:category>
+        <menu:category id="c_tesaurostermino" z="sQfDE/RMsZdtDq1vsj8W+4VzLQk=">
+            <menu:item id="i_tesaurostermino_new" messageCode="global_menu_new" url="/tesaurosterminoes?form" z="yp0IbuD0qokXqxXe2Q8dtadyrro="/>
+            <menu:item id="i_tesaurostermino_list" messageCode="global_menu_list" url="/tesaurosterminoes?page=1&amp;size=${empty param.size ? 10 : param.size}" z="ClEo/UTxY2fU3jnXC4fIPld1RiE="/>
+        </menu:category>
+        <menu:category id="c_mismensajes" z="3hYj0K4E+JGiVu1+ZfLpsvHP08c=">
+            <menu:item id="i_mismensajes_new" messageCode="global_menu_new" url="/mismensajeses?form" z="ugFuEzOf0KwJjvLBfVYcExx54rc="/>
+            <menu:item id="i_mismensajes_list" messageCode="global_menu_list" url="/mismensajeses?page=1&amp;size=${empty param.size ? 10 : param.size}" z="e8tRP+Sb4M9FapYwQCWSxyb4R+E="/>
+        </menu:category>
+        <menu:category id="c_dsireltesauro" z="ZwpywiLyl6qkgKzcIC893JMKpVI=">
+            <menu:item id="i_dsireltesauro_new" messageCode="global_menu_new" url="/dsireltesauroes?form" z="RiigwUosWs2U/jap0VO0lrBlNw4="/>
+            <menu:item id="i_dsireltesauro_list" messageCode="global_menu_list" url="/dsireltesauroes?page=1&amp;size=${empty param.size ? 10 : param.size}" z="lZ+7IJ/rF3ZiW5LW5QbJuaQQpfs="/>
+        </menu:category>
+        <menu:category id="c_dublincorelink" z="172CbRw16BMhFNumB5PQy6kayHc=">
+            <menu:item id="i_dublincorelink_new" messageCode="global_menu_new" url="/dublincorelinks?form" z="TEMURZ26XRN8WoGcasDt2PvEZuM="/>
+            <menu:item id="i_dublincorelink_list" messageCode="global_menu_list" url="/dublincorelinks?page=1&amp;size=${empty param.size ? 10 : param.size}" z="53aOCxswtZ908QPKxQ3UjIOzOVA="/>
+        </menu:category>
+        <menu:category id="c_dsinotificacion" z="qIv6OuYzwO53qd3q+QG3lv+xBrs=">
+            <menu:item id="i_dsinotificacion_new" messageCode="global_menu_new" url="/dsinotificacions?form" z="I4ankcA7Xbd0vxLp9EezleJ3lRs="/>
+            <menu:item id="i_dsinotificacion_list" messageCode="global_menu_list" url="/dsinotificacions?page=1&amp;size=${empty param.size ? 10 : param.size}" z="8//2vrCPJI+h7ZG3pTEaYTYl/D8="/>
+        </menu:category>
+        <menu:category id="c_estado" z="R0VnER9YYkIt+dO11st4rxP96qg=">
+            <menu:item id="i_estado_new" messageCode="global_menu_new" url="/estadoes?form" z="ycg0kAs5SJ41KTsAQHflCSNyXf0="/>
+            <menu:item id="i_estado_list" messageCode="global_menu_list" url="/estadoes?page=1&amp;size=${empty param.size ? 10 : param.size}" z="/PJMqPVs73Y+7l/7KDQDkMo0E5E="/>
+        </menu:category>
+        <menu:category id="c_relacionmetatipodoc" z="ixNb66gf3bjDCT6p2Df41Lt17mI=">
+            <menu:item id="i_relacionmetatipodoc_new" messageCode="global_menu_new" url="/relacionmetatipodocs?form" z="zE6KUzXLlVLgnC/Oca1vrFC2lZc="/>
+            <menu:item id="i_relacionmetatipodoc_list" messageCode="global_menu_list" url="/relacionmetatipodocs?page=1&amp;size=${empty param.size ? 10 : param.size}" z="J0zgdr9hotVF8FCKDOrtZ8eY7gA="/>
+        </menu:category>
+        <menu:category id="c_unidades" z="a1QkeSgtp+C84NzyWwTbDvxAekI=">
+            <menu:item id="i_unidades_new" messageCode="global_menu_new" url="/unidadeses?form" z="iWd852n40I+bzPpn1/luadRgQ6c="/>
+            <menu:item id="i_unidades_list" messageCode="global_menu_list" url="/unidadeses?page=1&amp;size=${empty param.size ? 10 : param.size}" z="dWv4AjcqJ1oguMSw88NLAy+QCEs="/>
+        </menu:category>
+        <menu:category id="c_carpetas" z="v9Q0k5RtiEtS1/3Z0okOvVCob/s=">
+            <menu:item id="i_carpetas_new" messageCode="global_menu_new" url="/carpetases?form" z="liCGD4HMRRG/yEyEF1BtP3EUyT4="/>
+            <menu:item id="i_carpetas_list" messageCode="global_menu_list" url="/carpetases?page=1&amp;size=${empty param.size ? 10 : param.size}" z="kay4amHVkTPkYBOvZ4QToXMYl5Q="/>
+        </menu:category>
+        <menu:category id="c_pendientes" z="QxkWSgPBrWoeMKTBwjD9cX9Qung=">
+            <menu:item id="i_pendientes_new" messageCode="global_menu_new" url="/pendienteses?form" z="+x6xqjr8TDaZkq3bs2Xc+WbFtFU="/>
+            <menu:item id="i_pendientes_list" messageCode="global_menu_list" url="/pendienteses?page=1&amp;size=${empty param.size ? 10 : param.size}" z="lZLoV5VhnbSWOtQkJBIV8Zxqs3E="/>
+        </menu:category>
+        <menu:category id="c_dsirelidiomadoc" z="rvELgr9cAtDXrjXu+svcFrVeZ7Q=">
+            <menu:item id="i_dsirelidiomadoc_new" messageCode="global_menu_new" url="/dsirelidiomadocs?form" z="LEjf5lz/9JlBuIQne/vMMO92vhI="/>
+            <menu:item id="i_dsirelidiomadoc_list" messageCode="global_menu_list" url="/dsirelidiomadocs?page=1&amp;size=${empty param.size ? 10 : param.size}" z="9wMYqDerWI+HHbqm2oYQKVSHXVI="/>
+        </menu:category>
+        <menu:category id="c_dsipersonasperfil" z="eVXAFBjsyOcKOHCgPV+GYKWcSnY=">
+            <menu:item id="i_dsipersonasperfil_new" messageCode="global_menu_new" url="/dsipersonasperfils?form" z="qxilhc3jAcxE5lTaG7VJxqbVM7E="/>
+            <menu:item id="i_dsipersonasperfil_list" messageCode="global_menu_list" url="/dsipersonasperfils?page=1&amp;size=${empty param.size ? 10 : param.size}" z="D3hQ/gACKTSuGkz/VBVIveEzcU4="/>
+        </menu:category>
+        <menu:category id="c_theme" z="W0+AbR9Fvxm5MuZPxop+zUTPGWY=">
+            <menu:item id="i_theme_new" messageCode="global_menu_new" url="/themes?form" z="DuNwYURs5ySUPX6+NsUyZfguD/w="/>
+            <menu:item id="i_theme_list" messageCode="global_menu_list" url="/themes?page=1&amp;size=${empty param.size ? 10 : param.size}" z="+aks7um/e3UTaRgtSfIK4ZTZBok="/>
+        </menu:category>
+        <menu:category id="c_partes" z="Ht2r7LrGVpXd1FE6S+PIg1OVVIE=">
+            <menu:item id="i_partes_new" messageCode="global_menu_new" url="/parteses?form" z="29IfMTI0kFU+WVswjR06vu4JyBs="/>
+            <menu:item id="i_partes_list" messageCode="global_menu_list" url="/parteses?page=1&amp;size=${empty param.size ? 10 : param.size}" z="Fhq+B+C/+0ztDfdakVAiNTquxLA="/>
+        </menu:category>
+        <menu:category id="c_ipwebservice" z="F+yScpiXsx2m9vO00V7+M4Qc6q8=">
+            <menu:item id="i_ipwebservice_new" messageCode="global_menu_new" url="/ipwebservices?form" z="DEroeaDZV+1WqJvnivz4zJYaiEU="/>
+            <menu:item id="i_ipwebservice_list" messageCode="global_menu_list" url="/ipwebservices?page=1&amp;size=${empty param.size ? 10 : param.size}" z="RUhWph1oaXlwY9BG3CAKeXk6eIU="/>
+        </menu:category>
+    </menu:menu>
+</div>
