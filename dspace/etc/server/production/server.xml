@@ -1,0 +1,53 @@
+<?xml version='1.0' encoding='utf-8'?>
+
+<!-- 
+   Dryad's server.xml for the production Tomcat system. This
+   configuration file tells Tomcat where to find the Dryad webapps.
+-->
+
+
+<Server port="8005" shutdown="SHUTDOWN">
+
+  <Listener className="org.apache.catalina.core.AprLifecycleListener" SSLEngine="on" />
+  <Listener className="org.apache.catalina.core.JasperListener" />
+  <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener" />
+  <Listener className="org.apache.catalina.mbeans.ServerLifecycleListener" />
+  <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
+
+  <GlobalNamingResources>
+    <Resource name="UserDatabase" auth="Container"
+              type="org.apache.catalina.UserDatabase"
+              description="User database that can be updated and saved"
+              factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
+              pathname="conf/tomcat-users.xml" />
+  </GlobalNamingResources>
+
+  <Service name="Catalina">
+  
+     <Connector port="8080" protocol="org.apache.coyote.http11.Http11AprProtocol"
+               connectionTimeout="20000"
+               redirectPort="8443" URIEncoding="UTF-8" />
+
+    <!-- Define an AJP 1.3 Connector on port 8009 -->
+    <Connector port="8009" protocol="AJP/1.3" redirectPort="8443" />
+
+    <Engine name="Catalina" defaultHost="dryad2.lib.ncsu.edu">
+
+      <Realm className="org.apache.catalina.realm.LockOutRealm">
+      <Realm className="org.apache.catalina.realm.UserDatabaseRealm"
+           resourceName="UserDatabase"/>
+      </Realm>
+
+      <Host name="dryad2.lib.ncsu.edu"  appBase="/opt/dryad/webapps" unpackWARs="true" autoDeploy="true" xmlValidation="false" xmlNamespaceAware="false">
+        <Context docBase="xmlui" path="" reloadable="true" cachingAllowed="false" allowLinking="true"/>
+        <Context docBase="solr" path="/solr" reloadable="true" cachingAllowed="false" allowLinking="true">
+            <Environment name="solr/home" type="java.lang.String" value="/opt/dryad/solr/" override="true" />
+        </Context>
+        <Context docBase="oai" path="/oai" reloadable="true" cachingAllowed="false" allowLinking="true"/>
+        <Context docBase="doi" path="/doi" reloadable="true" cachingAllowed="false" allowLinking="true"/>
+        <Context docBase="dataone-mn-webapp" path="/mn" reloadable="true" cachingAllowed="false" allowLinking="true"/>
+      </Host>
+
+    </Engine>
+  </Service>
+</Server>
