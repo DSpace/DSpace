@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <tomcatProjectProperties>
-    <rootDir>/target/xmlui-1.8.0-rc1</rootDir>
+    <rootDir>/target/xmlui-1.8.0</rootDir>
     <exportSource>false</exportSource>
     <reloadable>true</reloadable>
     <redirectLogger>true</redirectLogger>

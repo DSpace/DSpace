@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>dspace-sedici</artifactId>
 		<groupId>ar.edu.unlp.sedici</groupId>
-		<version>1.8.0-rc1</version>
+		<version>1.8.0</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>xmlui</artifactId>
@@ -16,7 +16,7 @@
 		<dependency>
 			<groupId>org.dspace.modules</groupId>
 			<artifactId>xmlui</artifactId>
-			<version>1.8.0-rc1</version>
+			<version>${project.version}</version>
 			<type>war</type>
 		</dependency>
 		
@@ -28,6 +28,16 @@
         <dependency>
             <groupId>org.dspace</groupId>
             <artifactId>dspace-xmlui-api</artifactId>
+            <exclusions>
+            	<exclusion>
+            		<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-log4j12</artifactId>
+            	</exclusion>
+            	<exclusion>
+            		<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+            	</exclusion>
+            </exclusions>
         </dependency>
         
         <dependency>
