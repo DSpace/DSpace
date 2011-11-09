@@ -171,7 +171,8 @@ public class CDLDataCiteService {
                     if(response.contains("invalid DOI identifier")){
                         try{
                             DOI doiObj = new DOI(doi, item);
-                            System.out.println("Register Item: " + doi + " result: " + this.registerDOI(doi, doiObj.toExternalForm(),  createMetadataList(item)));
+
+                            System.out.println("Register Item: " + doi + " result: " + this.registerDOI(doi, doiObj.getTargetURL().toString(),  createMetadataList(item)));
                         }catch (DOIFormatException de){
                             System.out.println("Can't build the following doi: " + doi);
                             de.printStackTrace(System.out);
