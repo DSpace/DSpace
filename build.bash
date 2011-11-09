@@ -33,7 +33,7 @@ do_update(){
 
 	echo -e "\n==========ACTUALIZANDO DSPACE@SEDICI"
 	cd $BASE_DIR/distribution/target/dspace-sedici-distribution-bin
-	ant -Ddspace.configuration=$DATA_DIR/config/dspace.cfg update
+	ant  -Ddspace.dir=$DATA_DIR -Ddspace.configuration=$DATA_DIR/config/dspace.cfg -Doverwrite=false update
 	
     print_sec "Felicitaciones! se actualizo correctamente Dspace@SeDiCI en \n\t $DATA_DIR"
 }
@@ -65,7 +65,7 @@ do_install()
 	#createdb -U $dspace_user -E UNICODE $dspace_dbname -h localhost
 
 	print_sec "INSTALANDO DSPACE@SEDICI"
-	cd $BASE_DIR/distribution/target/dspace-sedici-distribution-bin
+	cd $BASE_DIR/distribution/target/dspace-sedici-distribution-binorg.postgresql.util.PSQLException: FATAL: password authentication failed for user "dspace_user"
 	ant -Ddspace.dir=$DATA_DIR fresh_install -Dgeolite=$BASE_DIR/config/GeoLiteCity.dat.gz
 
 	$DATA_DIR/bin/dspace create-administrator
