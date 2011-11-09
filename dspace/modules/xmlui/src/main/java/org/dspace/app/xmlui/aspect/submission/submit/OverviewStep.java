@@ -204,17 +204,17 @@ public class OverviewStep extends AbstractStep {
         }
 
         // Add GenBank button
-        Division genBankDiv = actionsDiv.addDivision("genbankdivision", "odd subdiv");
-        if(submission instanceof WorkspaceItem){
-            genBankDiv.addPara("data-label", "bold").addContent(T_STEPS_HEAD_GENBANK);
-            genBankDiv.addPara().addContent(T_GENBANK_HELP);
-
-            String token = generateTokenAndAddToMetadata();
-
-            String url= ConfigurationManager.getProperty("genbank.url") + "/?tool=genbank&dryadID=" + publication.getMetadata("dc.identifier")[0].value +  "&ticket=" + token;
-            genBankDiv.addPara().addHidden("genbank_url").setValue(url);
-            genBankDiv.addPara().addButton("submit_genbank").setValue(T_GENBANK_BUTTON);
-        }
+//        Division genBankDiv = actionsDiv.addDivision("genbankdivision", "odd subdiv");
+//        if(submission instanceof WorkspaceItem){
+//            genBankDiv.addPara("data-label", "bold").addContent(T_STEPS_HEAD_GENBANK);
+//            genBankDiv.addPara().addContent(T_GENBANK_HELP);
+//
+//            String token = generateTokenAndAddToMetadata();
+//
+//            String url= ConfigurationManager.getProperty("genbank.url") + "/?tool=genbank&dryadID=" + publication.getMetadata("dc.identifier")[0].value +  "&ticket=" + token;
+//            genBankDiv.addPara().addHidden("genbank_url").setValue(url);
+//            genBankDiv.addPara().addButton("submit_genbank").setValue(T_GENBANK_BUTTON);
+//        }
 
         //Lastly add the finalize submission button
         {
