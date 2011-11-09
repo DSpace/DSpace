@@ -66,6 +66,8 @@ public class CDLDataCiteService {
      *                     the remote service
      */
     public String registerDOI(String aDOI, String aURL, Map<String, String> metadata) throws IOException {
+        changePrefixDOIForTestEnv(aDOI);
+
         PutMethod put = new PutMethod(BASEURL + "/id/doi%3A" + aDOI);
         return executeHttpMethod(aURL, metadata, put);
     }
@@ -80,6 +82,8 @@ public class CDLDataCiteService {
      *                     the remote service
      */
     public String update(String aDOI, String aURL, Map<String, String> metadata) throws IOException {
+        changePrefixDOIForTestEnv(aDOI);
+
         PostMethod post = new PostMethod(BASEURL + "/id/doi%3A" + aDOI);
 
         if(aURL!=null)
@@ -90,6 +94,11 @@ public class CDLDataCiteService {
     }
 
     public String lookup(String aDOI) throws IOException {
+        changePrefixDOIForTestEnv(aDOI);
+
+        if(aDOI.startsWith("doi")){
+            aDOI = aDOI.substring(4);
+        }
 
         GetMethod get = new GetMethod(BASEURL + "/id/doi%3A" + aDOI);
         HttpMethodParams params = new HttpMethodParams();
@@ -131,6 +140,19 @@ public class CDLDataCiteService {
     }
 
 
+
+    private String changePrefixDOIForTestEnv(String doi){
+
+        // if test env
+//        if(!ConfigurationManager.getBooleanProperty("doi.datacite.connected", false)){
+//            doi = doi.substring(doi.indexOf('/')+1);
+//            doi = "doi:10.5072/" + doi;
+//        }
+        return doi;
+    }
+
+
+
     public void synchAll()  throws IOException{
         System.out.println("Starting....");
 
@@ -141,8 +163,23 @@ public class CDLDataCiteService {
 
             while(items.hasNext()){
                 Item item  = items.next();
-                if (item.isArchived()){
-                    System.out.println("Item: " + getDoiValue(item) + " result: " + this.update(getDoiValue(item), null, createMetadataList(item)));
+                String doi = getDoiValue(item);
+
+                if(doi!=null){
+                    String response = lookup(doi);
+
+                    if(response.contains("invalid DOI identifier")){
+                        try{
+                            DOI doiObj = new DOI(doi, item);
+                            System.out.println("Register Item: " + doi + " result: " + this.registerDOI(doi, doiObj.toExternalForm(),  createMetadataList(item)));
+                        }catch (DOIFormatException de){
+                            System.out.println("Can't build the following doi: " + doi);
+                            de.printStackTrace(System.out);
+                        }
+                    }
+                    else{
+                        System.out.println("Update Item: " + doi + " result: " + this.update(doi, null, createMetadataList(item)));
+                    }
                 }
             }
 
