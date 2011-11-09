@@ -156,10 +156,17 @@
 				<map:match type="request" pattern="XML">
 					<map:serialize type="xml"/>
 				</map:match>
-
+				
 				<!-- Step 3: Transform to XHTML -->
-				<map:transform src="{global:theme-name}.xsl"/>
-			    <!-- <map:transform src="Mirage.xsl"/> -->
+                <map:select type="parameter">
+                   <map:parameter name="parameter-selector-test" value="{1}"/>
+	                <map:when test=""> 	
+						<map:transform src="Home.xsl"/>
+					</map:when>
+					<map:otherwise> 
+					    <map:transform src="{global:theme-name}.xsl"/>
+					</map:otherwise> 
+				</map:select>
 
 				<!-- Step 4: Localize the page -->
 				<map:act type="locale">
