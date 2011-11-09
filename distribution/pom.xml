@@ -57,21 +57,53 @@
 		</dependency>
 
 		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>modules</artifactId>
+			<version>${project.version}</version>
+			<type>war</type>
+		</dependency>
+		
+		<dependency>
 			<groupId>ar.edu.unlp.sedici</groupId>
 			<artifactId>plugins</artifactId>
 			<version>${project.version}</version>
 			<type>jar</type>
 		</dependency>
 
-         <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>servlet-api</artifactId>
-<!--
-El scope no es provided, porque se usa desde consola            
- <scope>provided</scope> 
--->
-        </dependency>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<!-- El scope no es provided, porque se usa desde consola <scope>provided</scope> -->
+		</dependency>
 
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-api</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-api-lang</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-services-impl</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-services-utils</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-stats</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-discovery-provider</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.dspace</groupId>
+			<artifactId>dspace-discovery-solr</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
