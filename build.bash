@@ -65,7 +65,7 @@ do_install()
 	#createdb -U $dspace_user -E UNICODE $dspace_dbname -h localhost
 
 	print_sec "INSTALANDO DSPACE@SEDICI"
-	cd $BASE_DIR/distribution/target/dspace-sedici-distribution-binorg.postgresql.util.PSQLException: FATAL: password authentication failed for user "dspace_user"
+	cd $BASE_DIR/distribution/target/dspace-sedici-distribution-bin
 	ant -Ddspace.dir=$DATA_DIR fresh_install -Dgeolite=$BASE_DIR/config/GeoLiteCity.dat.gz
 
 	$DATA_DIR/bin/dspace create-administrator
