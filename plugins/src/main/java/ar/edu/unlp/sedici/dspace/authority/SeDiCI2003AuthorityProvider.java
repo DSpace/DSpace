@@ -15,17 +15,24 @@
  */
 package ar.edu.unlp.sedici.dspace.authority;
 
-import java.util.Enumeration;
 import java.util.List;
 
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.Choices;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import com.sun.syndication.feed.atom.Entry;
+import ar.edu.unlp.sedici.sedici2003.service.SeDiCI2003Manager;
+
 
 public abstract class SeDiCI2003AuthorityProvider implements ChoiceAuthority {
 
+	private Logger log =LoggerFactory.getLogger(getClass()); 
+	
+	public SeDiCI2003AuthorityProvider() {
+		SeDiCI2003Manager.prepare();
+	}
 	
     /**
      * Get all values from the authority that match the profferred value.
@@ -60,9 +67,8 @@ public abstract class SeDiCI2003AuthorityProvider implements ChoiceAuthority {
             confidence = Choices.CF_UNCERTAIN;
         else
             confidence = Choices.CF_AMBIGUOUS;
-    	Choice[] c = null;
     	
-    	return new Choices(entities.toArray(c), start, entities.size(), confidence, (entities.size() <= limit));
+    	return new Choices(entities.toArray(new Choice[entities.size()]), start, entities.size(), confidence, (entities.size() <= limit));
 	}
 
     protected abstract List<Choice> findSeDiCI2003Entities(String text, int start, int limit, ChoiceFactory choiceFactory) ;

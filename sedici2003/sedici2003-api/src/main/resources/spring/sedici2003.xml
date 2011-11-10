@@ -7,7 +7,7 @@
         then be used within application context files in the form of
         ${propertyKey}.
     -->
-    <context:property-placeholder location="classpath*:META-INF/spring/sedici2003.properties"/>
+    <context:property-placeholder location="classpath*:sedici2003.properties"/>
     <!--
         Turn on AspectJ @Configurable support. As a result, any time you
         instantiate an object, Spring will attempt to perform dependency
