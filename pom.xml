@@ -14,7 +14,22 @@
 		<version>1.8.0</version>
 		<!-- <relativePath>..</relativePath> -->
 	</parent>
-	<profiles>
+
+
+	<repositories>
+		<repository>
+			<id>artifactory</id>
+			<url>http://maven.prebi.unlp.edu.ar/repo</url>
+			<releases>
+				<enabled>true</enabled>
+			</releases>
+			<snapshots>
+				<enabled>true</enabled>
+			</snapshots>
+		</repository>
+	</repositories>
+	
+		<profiles>
 		<profile>
 			<activation>
 				<property>
@@ -71,7 +86,7 @@
 			</exclusions>
 		</dependency>
 
-	
+
 		<dependency>
 			<groupId>ant-contrib</groupId>
 			<artifactId>ant-contrib</artifactId>
