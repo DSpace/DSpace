@@ -3189,7 +3189,7 @@
     <message key="xmlui.discovery.InternalItemTransformer.trail.non-archived">Non Archived Dryad Search</message>
     <message key="xmlui.discovery.InternalItemTransformer.trail.internal">Display internal item</message>
 
-    <message key="xmlui.discovery.InternalItemTransformer.workflow.finalize">Finalize submission</message>
+    <message key="xmlui.discovery.InternalItemTransformer.workflow.finalize">Edit submission</message>
     <message key="xmlui.discovery.InternalItemTransformer.workflow.continue">Continue submission</message>
     <message key="xmlui.discovery.InternalItemTransformer.workflow.none">None (Awaiting submission)</message>
     <message key="xmlui.discovery.InternalItemTransformer.workflow.task.claim">Claim task</message>
