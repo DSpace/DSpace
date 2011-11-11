@@ -31,12 +31,15 @@
 	
 		<profiles>
 		<profile>
+			<id>sedici.fulldistribution</id>
 			<activation>
 				<property>
-					<name>project.artifactId</name>
-					<value>distribution</value>
+					<name>!sedici.min_package</name>
 				</property>
 			</activation>
+			<modules>
+				<module>sedici2003</module>
+			</modules>
 			<build>
 				<plugins>
 					<plugin>
@@ -67,7 +70,7 @@
 		<module>xmlui</module>
 		<module>plugins</module>
 		<module>distribution</module>
-		<module>sedici2003</module>
+<!-- 		<module>sedici2003</module> Esta en el profile de distributio -->
 	</modules>
 
 	<dependencies>

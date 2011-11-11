@@ -9,6 +9,7 @@
     <parent>
         <artifactId>dspace-sedici</artifactId>
         <groupId>ar.edu.unlp.sedici</groupId>
+        <relativePath>../</relativePath>
         <version>1.8.0</version>
     </parent>
 

@@ -12,7 +12,7 @@
 	<packaging>pom</packaging>
 	<name>SeDiCI2003 Parent</name>
 	<modules>
-		<module>sedici2003-web</module>
+<!-- 		<module>sedici2003-web</module> -->
 		<module>sedici2003-api</module>
 	</modules>
 	<properties>

@@ -26,9 +26,20 @@ do_update(){
 		echo "El diretorio de instalacion no existe ($DATA_DIR). Seguro que queres hacer un update? " 
 		exit 0;
 	fi
-    print_sec "EMPAQUETADO DEL PROYECTO"
     
 	MVN_ARGS=" -Ddefault.dspace.dir=$DATA_DIR "
+		
+	
+	if [ $1  ]; then
+		if [ "$1" == "full"  ]; then
+			print_sec "EMPAQUETADO DEL PROYECTO FULLLLLLLLL!!!";
+	  	else
+		  echo "Elegí: update full o update, pero no $1";
+		fi
+	else
+		MVN_ARGS="$MVN_ARGS -Dsedici.min_package=true"
+	  	print_sec "EMPAQUETADO DEL PROYECTO parcial";
+	fi
 	mvn clean license:format install $MVN_ARGS
 
 	echo -e "\n==========ACTUALIZANDO DSPACE@SEDICI"
@@ -53,7 +64,7 @@ do_install()
 
 	print_sec "EMPAQUETADO DEL PROYECTO"
 	MVN_ARGS=" -Ddefault.dspace.dir=$DATA_DIR -Ddefault.db.username=$dspace_dbuser -Ddefault.db.password=$dspace_dbpassword -Ddefault.db.url=jdbc:postgresql://localhost:5432/$dspace_dbname"
-	mvn clean license:format install $MVN_ARGS
+	mvn clean license:format install $MVN_ARGS $EXTRA_ARGS
 
 	print_sec "CREACION DE LA BBDD"
 	echo -e "A continuacion ingrese '$dspace_dbpassword' 2 veces"
@@ -78,10 +89,15 @@ do_install()
 #=============================================================================
 
 if [ $1 -a $1 == "update" ]; then
-        do_update
+        do_update $2
+elif [ $1 -a $1 == "install" ]; then
+        do_install $2
 else
-        do_install
+	echo "Elegí: (update | install) full?"
+	exit 0;
 fi
+
+
 
 echo "Limpiando un poco. Se empaqueta de vuelta xmlui , para que quede xmlui/target filtrado..."
 cd $BASE_DIR/xmlui
