@@ -1,5 +1,6 @@
 package ar.edu.unlp.sedici.sedici2003.service;
 
+import org.apache.commons.dbcp.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
@@ -21,5 +22,12 @@ public class SeDiCI2003Manager {
 			log.info("Se levanta el application context  "+APPLICATION_CTX_PATH + ", el cual tiene " +applicationContext.getBeanDefinitionCount()+" beans definidos");
 		}
 		
+	}
+	
+	public static void main(String[] args) {
+		prepare();
+		org.apache.commons.dbcp.BasicDataSource ds =(BasicDataSource) applicationContext.getBean("dataSourceSeDiCI2003");
+		System.out.println(ds.getPassword());
+
 	}
 }
