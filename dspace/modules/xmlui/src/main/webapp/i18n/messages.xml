@@ -3159,7 +3159,7 @@
     <message key="xmlui.Discovery.AbstractSearch.type_Workflowstep_filter">Refine by: Workflow step</message>
     <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_DSpaceStatus_filter">Status</message>
 
-    <message key="xmlui.discovery.InternalItemTransformer.details">Item details</message>
+    <message key="xmlui.discovery.InternalItemTransformer.details">Internal item status</message>
     <message key="xmlui.discovery.InternalItemTransformer.details.submission-title">Submission title</message>
     <message key="xmlui.discovery.InternalItemTransformer.details.submitter-name">Submitter name</message>
     <message key="xmlui.discovery.InternalItemTransformer.details.status">Status</message>
