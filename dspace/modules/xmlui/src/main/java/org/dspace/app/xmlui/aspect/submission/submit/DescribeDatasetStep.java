@@ -39,6 +39,9 @@ public class DescribeDatasetStep extends AbstractSubmissionStep {
     private static final Message T_FORM_DATA_FILE_REPO_HELP = message("xmlui.submit.dataset.form.dataset.file-url.help");
     private static final Message T_FORM_REPO_NAME_HELP = message("xmlui.submit.dataset.form.dataset.repo-name.help");
 
+    private static final Message T_cancel = message("xmlui.general.cancel");
+
+
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
             WingException, SQLException, IOException,
             AuthorizeException {
@@ -207,7 +210,11 @@ public class DescribeDatasetStep extends AbstractSubmissionStep {
 //            actions.addButton(AbstractProcessingStep.PREVIOUS_BUTTON).setValue(T_previous);
 
         //always show "Save/Cancel"
-        actions.addButton(AbstractProcessingStep.CANCEL_BUTTON).setValue(T_save);
+        //actions.addButton(AbstractProcessingStep.CANCEL_BUTTON).setValue(T_save);
+
+        // customized cancel button for DRYAD: when a user click this button; it has to delete eventually the files added
+        // and go to overview step
+        actions.addButton(AbstractProcessingStep.CANCEL_BUTTON).setValue(T_cancel);
 
         //If last step, show "Complete Submission"
         if(isLastStep())

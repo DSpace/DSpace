@@ -77,9 +77,20 @@ public class DescribeDatasetStep extends AbstractProcessingStep {
         // check what submit button was pressed in User Interface
         String buttonPressed = Util.getSubmitButton(request, NEXT_BUTTON);
 
+
         // get the item and current page
         Item item = subInfo.getSubmissionItem().getItem();
         int currentPage = getCurrentPage(request);
+
+
+        // CANCEL: remove all bitstram and redirect to the Overview Step...
+        if(buttonPressed.equals("submit_cancel")){
+            removeAllBitstreams(context, item);
+            response.sendRedirect(request.getContextPath() + "/submit-overview?workspaceID=" + subInfo.getSubmissionItem().getID());
+            return STATUS_COMPLETE;
+        }
+
+
 
         Collection c = subInfo.getSubmissionItem().getCollection();
         DCInput[] inputs;
@@ -342,6 +353,15 @@ public class DescribeDatasetStep extends AbstractProcessingStep {
             {
                 item.removeBundle(owningBundle);
                 item.update();
+            }
+        }
+    }
+
+    private void removeAllBitstreams(Context context, Item item) throws SQLException, AuthorizeException, IOException {
+        Bundle[] bundles = item.getBundles();
+        for(Bundle b : bundles){
+            for(Bitstream bit : b.getBitstreams()){
+                removeBitstream(context, item, bit.getID());
             }
         }
     }
