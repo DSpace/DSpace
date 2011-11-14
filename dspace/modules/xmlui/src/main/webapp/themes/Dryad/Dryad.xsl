@@ -1390,4 +1390,38 @@ test="$meta[@element='request'][@qualifier='URI'][not(contains(., 'discover')) a
     </xsl:template>
 
 
+    <xsl:template
+            match="dri:body/dri:div[@id='aspect.submission.StepTransformer.div.submit-describe-dataset']/dri:list[@id='aspect.submission.StepTransformer.list.submit-describe-dataset']/dri:item/dri:field[@n='submit_cancel']">
+
+
+        <input id="aspect_submission_StepTransformer_field_submit_cancel" class="ds-button-field" name="submit_cancel"
+               type="submit" value="Cancel &amp; Delete">
+            <xsl:attribute name="onclick">
+		    <xsl:text>var x = confirm ("Data File and all its content will be deleted. Do you want to continue?");
+			      if(x) return true;
+		              return false;
+		    </xsl:text>
+            </xsl:attribute>
+        </input>
+
+    </xsl:template>
+
+
+    <xsl:template
+            match="dri:body/dri:div[@id='aspect.submission.StepTransformer.div.submit-describe-dataset']/dri:list[@n='submit-overview-file']/dri:item[@n='bitstream-item']/dri:hi/dri:field[@n='submit_remove_dataset']">
+
+
+        <input id="aspect_submission_StepTransformer_field_submit_remove_dataset" class="ds-button-field"
+               name="submit_remove_dataset" type="submit" value="Remove">
+            <xsl:attribute name="onclick">
+		<xsl:text>var x = confirm ("The selected file will be removed. Do you want to continue?");
+			  if(x) return true;
+			  return false;
+		</xsl:text>
+            </xsl:attribute>
+        </input>
+
+    </xsl:template>
+
+
 </xsl:stylesheet>

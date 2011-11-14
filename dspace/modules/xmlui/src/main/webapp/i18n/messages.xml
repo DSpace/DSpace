@@ -69,6 +69,11 @@
         <message key="xmlui.general.queue">Queue</message>
 
 
+
+
+
+
+
 	<!--
 		Page not found keys
 
@@ -3208,7 +3213,7 @@
     <message key="xmlui.Submission.submit.OverviewStep.headgenbank">Genbank</message>
 	<message key="xmlui.Submission.submit.OverviewStep.genbankhelp"></message>
 
-
+         <message key="xmlui.general.cancel_delete">Cancel &amp; Delete</message>
 
 
 

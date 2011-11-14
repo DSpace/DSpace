@@ -39,7 +39,7 @@ public class DescribeDatasetStep extends AbstractSubmissionStep {
     private static final Message T_FORM_DATA_FILE_REPO_HELP = message("xmlui.submit.dataset.form.dataset.file-url.help");
     private static final Message T_FORM_REPO_NAME_HELP = message("xmlui.submit.dataset.form.dataset.repo-name.help");
 
-    private static final Message T_cancel = message("xmlui.general.cancel");
+    private static final Message T_cancel = message("xmlui.general.cancel_delete");
 
 
     public void addPageMeta(PageMeta pageMeta) throws SAXException,

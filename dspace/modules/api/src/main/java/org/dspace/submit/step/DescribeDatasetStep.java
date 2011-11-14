@@ -12,6 +12,9 @@ import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
 import org.apache.log4j.Logger;
 import org.dspace.submit.utils.DryadJournalSubmissionUtils;
+import org.dspace.workflow.DryadWorkflowUtils;
+import org.dspace.workflow.WorkflowItem;
+import org.dspace.workflow.WorkflowManager;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -83,10 +86,12 @@ public class DescribeDatasetStep extends AbstractProcessingStep {
         int currentPage = getCurrentPage(request);
 
 
-        // CANCEL: remove all bitstram and redirect to the Overview Step...
+        // CANCEL: remove dataFile and redirect to the Overview Step...
         if(buttonPressed.equals("submit_cancel")){
-            removeAllBitstreams(context, item);
-            response.sendRedirect(request.getContextPath() + "/submit-overview?workspaceID=" + subInfo.getSubmissionItem().getID());
+            Item publication = DryadWorkflowUtils.getDataPackage(context, subInfo.getSubmissionItem().getItem());
+            WorkspaceItem wi = WorkspaceItem.findByItem(context, publication);
+            ((WorkspaceItem)subInfo.getSubmissionItem()).deleteAll();
+            response.sendRedirect(request.getContextPath() + "/submit-overview?workspaceID=" + wi.getID());
             return STATUS_COMPLETE;
         }
 
@@ -274,7 +279,7 @@ public class DescribeDatasetStep extends AbstractProcessingStep {
         // Process our dataset file
         int datasetFileSuccess;
         if(buttonPressed.equals("submit_remove_dataset")){
-            item.clearMetadata(MetadataSchema.DC_SCHEMA, "rights", "uri", Item.ANY);
+            item .clearMetadata(MetadataSchema.DC_SCHEMA, "rights", "uri", Item.ANY);
             //Remove the dataset file
             int bitId = -1;
             try{
