@@ -139,6 +139,7 @@ div#ds-header {
 	top: 0px;
 	height: 119px;
 	background-color: rgb(152, 187, 143);
+    position:relative;
 }
 div#ds-options {
 	padding: 0px 0px;
@@ -217,18 +218,26 @@ div#ds-user-box a:hover {
 	text-decoration: underline;
 }
 /* Trail */
-ul#ds-trail li.ds-trail-link {
+span.ds-trail-link {
 	top: 10px;
 	left: 50px;
 	list-style: none;
 	margin-left:0px;
+    color: #FFFFFF;
 }
-ul#ds-trail li.ds-trail-link a:hover {
+span.ds-trail-link a:hover {
 	text-decoration: underline;
 }
-ul#ds-trail li.ds-trail-link:after {
-	content: " > ";
+span.ds-trail-link:after {
+	/*content: " > ";*/
+    color: #FFFFFF;
 }
+
+span.ds-trail-shown{
+    position: absolute;
+    bottom: 0;
+}
+
 /*
   ******************************
   *******  Options list  *******

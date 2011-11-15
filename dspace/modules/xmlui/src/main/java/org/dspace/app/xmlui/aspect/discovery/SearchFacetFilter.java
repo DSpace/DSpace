@@ -496,8 +496,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
     }
 
     private void addBrowseJumpNavigation(Division div, SearchFilterParam browseParams, Request request)
-            throws WingException
-    {
+            throws WingException, SQLException {
         Division jump = div.addInteractiveDivision("filter-navigation", contextPath + "/" + getSearchFilterUrl(),
                 Division.METHOD_POST, "secondary navigation");
 
@@ -580,7 +579,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         }
     }
 
-    private String getNextPageURL(SearchFilterParam browseParams, Request request) {
+    private String getNextPageURL(SearchFilterParam browseParams, Request request) throws SQLException {
         int offSet = Util.getIntParameter(request, SearchFilterParam.OFFSET);
         if (offSet == -1)
         {
@@ -600,7 +599,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         return url;
     }
 
-    private String getPreviousPageURL(SearchFilterParam browseParams, Request request) {
+    private String getPreviousPageURL(SearchFilterParam browseParams, Request request) throws SQLException {
         //If our offset should be 0 then we shouldn't be able to view a previous page url
         if ("0".equals(queryArgs.get(FacetParams.FACET_OFFSET)) && Util.getIntParameter(request, "offset") == -1)
         {
@@ -636,7 +635,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
         super.recycle();
     }
 
-    public String addFilterQueriesToUrl(String url){
+    public String addFilterQueriesToUrl(String url) throws SQLException {
         String[] fqs = getParameterFilterQueries();
         if (fqs != null) {
             StringBuilder urlBuilder = new StringBuilder(url);
@@ -651,7 +650,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
     }
 
 
-    protected String[] getParameterFilterQueries() {
+    public String[] getParameterFilterQueries() throws SQLException{
         Request request = ObjectModelHelper.getRequest(objectModel);
         java.util.List<String> fqs = new ArrayList<String>();
         if(request.getParameterValues("fq") != null)

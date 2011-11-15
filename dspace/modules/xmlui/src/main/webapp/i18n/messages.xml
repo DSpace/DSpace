@@ -754,7 +754,7 @@
 
 	<!-- org.dspace.app.xmlui.Submission.submissions -->
 	<message key="xmlui.Submission.Submissions.title">Submissions &amp; Workflow</message>
-	<message key="xmlui.Submission.Submissions.trail">Submissions</message>
+	<message key="xmlui.Submission.Submissions.trail">Submissions overview</message>
 	<message key="xmlui.Submission.Submissions.head">Submissions &amp; workflow tasks</message>
 	<message key="xmlui.Submission.Submissions.untitled">
 		<i>Untitled</i>
@@ -3047,6 +3047,8 @@
 	<message key="xmlui.Submission.Submissions.default.reviewStep.reviewAction">Review stage</message>
 	<message key="xmlui.Submission.workflow.DryadReviewActionXMLUI.info1">Actions</message>
 	<message key="xmlui.Submission.submit.OverviewStep.help.add-datafile">Click the button to add a new data file, please be aware that if the data file isn't fully submitted when the dataset is approved/rejected that it will be deleted.</message>
+	<message key="xmlui.Submission.Submissions.step.head.dryadAcceptEditReject">Awaiting curator review</message>
+	<message key="xmlui.Submission.Submissions.step.head.Submission">Unfinished submissions</message>
 	<message
 		key="xmlui.Submission.Submissions.default.dryadAcceptEditReject.dryadAcceptEditRejectAction"
 		>Awaiting curator review</message>
@@ -3202,9 +3204,11 @@
     <message key="xmlui.discovery.InternalItemTransformer.workflow.task.wait">None (Awaiting task completion)</message>
     <message key="xmlui.discovery.InternalItemTransformer.workflow.task">Task</message>
     
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.Workflowstep">Workflow step</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.Workflowstep_filter">Workflow step</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.SubmitterName_filter">Submitter name</message>
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.DSpaceStatus_filter">Status</message>
+    <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.DSpaceStatus">Status</message>
 
      <message key="xmlui.administrative.item.general.option_curate">Curate</message>
         <message key="xmlui.administrative.item.general.option_queue">Queue</message>
@@ -3215,6 +3219,9 @@
 
          <message key="xmlui.general.cancel_delete">Cancel &amp; Delete</message>
 
+
+    <message key="xmlui.Discovery.DiscoverySubmissions.display-all">Display all</message>
+    <message key="xmlui.Discovery.Navigation.non-archived-discovery">Non archived discovery</message>
 
 
 

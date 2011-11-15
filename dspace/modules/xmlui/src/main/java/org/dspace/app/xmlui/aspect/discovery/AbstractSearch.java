@@ -78,21 +78,21 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
     private static final Message T_all_of_dspace =
             message("xmlui.ArtifactBrowser.AbstractSearch.all_of_dspace");
 
-    private static final Message T_sort_by_relevance =
+    protected static final Message T_sort_by_relevance =
             message("xmlui.ArtifactBrowser.AbstractSearch.sort_by.relevance");
 
-    private static final Message T_sort_by = message("xmlui.ArtifactBrowser.AbstractSearch.sort_by");
+    protected static final Message T_sort_by = message("xmlui.ArtifactBrowser.AbstractSearch.sort_by");
 
-    private static final Message T_order = message("xmlui.ArtifactBrowser.AbstractSearch.order");
-    private static final Message T_order_asc = message("xmlui.ArtifactBrowser.AbstractSearch.order.asc");
-    private static final Message T_order_desc = message("xmlui.ArtifactBrowser.AbstractSearch.order.desc");
+    protected static final Message T_order = message("xmlui.ArtifactBrowser.AbstractSearch.order");
+    protected static final Message T_order_asc = message("xmlui.ArtifactBrowser.AbstractSearch.order.asc");
+    protected static final Message T_order_desc = message("xmlui.ArtifactBrowser.AbstractSearch.order.desc");
 
-    private static final Message T_rpp = message("xmlui.ArtifactBrowser.AbstractSearch.rpp");
+    protected static final Message T_rpp = message("xmlui.ArtifactBrowser.AbstractSearch.rpp");
 
     /**
      * The options for results per page
      */
-    private static final int[] RESULTS_PER_PAGE_PROGRESSION = {5, 10, 20, 40, 60, 80, 100};
+    protected static final int[] RESULTS_PER_PAGE_PROGRESSION = {5, 10, 20, 40, 60, 80, 100};
 
     /**
      * Cached validity object

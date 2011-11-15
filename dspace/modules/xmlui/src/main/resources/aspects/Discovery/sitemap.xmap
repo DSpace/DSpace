@@ -52,10 +52,12 @@ and searching the repository.
 
             <map:transformer name="Navigation" src="org.dspace.app.xmlui.aspect.discovery.Navigation"/>
             <map:transformer name="SimpleSearch" src="org.dspace.app.xmlui.aspect.discovery.SimpleSearch"/>
-            <map:transformer name="NonArchivedSearch" src="org.dspace.app.xmlui.aspect.discovery.NonArchivedSearch"/>
+            <map:transformer name="DiscoverySubmissions" src="org.dspace.app.xmlui.aspect.discovery.DiscoverySubmissions"/>
+            <map:transformer name="NonArchivedDiscovery" src="org.dspace.app.xmlui.aspect.discovery.administrative.NonArchivedDiscovery"/>
             <map:transformer name="InternalItemTransformer" src="org.dspace.app.xmlui.aspect.discovery.InternalItemTransformer"/>
             <map:transformer name="BrowseFacet" src="org.dspace.app.xmlui.aspect.discovery.BrowseFacet"/>
             <map:transformer name="InternalSearchFacetFilter" src="org.dspace.app.xmlui.aspect.discovery.InternalSearchFacetFilter"/>
+            <map:transformer name="DiscoverySubmissionSearchFacetFilter" src="org.dspace.app.xmlui.aspect.discovery.DiscoverySubmissionSearchFacetFilter"/>
             <!--TODO: put this back !-->
             <map:transformer name="SiteStatsOverview" src="org.datadryad.dspace.statistics.SiteOverview"/>
             <map:transformer name="DryadBlogFeed" src="org.dspace.app.xmlui.aspect.dryadinfo.DryadBlogFeed"/>
@@ -206,7 +208,15 @@ and searching the repository.
                     </map:match>
 
                     <map:match pattern="submissions">
-                        <map:transform type="NonArchivedSearch"/>
+                        <map:transform type="DiscoverySubmissions"/>
+                        <map:transform type="IncludePageMeta">
+                            <map:parameter name="stylesheet.screen.discovery#1" value="../../static/css/discovery/style.css"/>
+                        </map:transform>
+                        <map:serialize type="xml"/>
+                    </map:match>
+
+                    <map:match pattern="non-archived-discovery">
+                        <map:transform type="NonArchivedDiscovery"/>
                         <map:transform type="IncludePageMeta">
                             <map:parameter name="stylesheet.screen.discovery#1" value="../../static/css/discovery/style.css"/>
                         </map:transform>
@@ -218,6 +228,12 @@ and searching the repository.
 
                         <map:serialize type="xml"/>
                     </map:match>
+
+                    <map:match pattern="discovery-submission-search-filter">
+                        <map:transform type="DiscoverySubmissionSearchFacetFilter"/>
+
+                        <map:serialize type="xml"/>
+                    </map:match>
                 </map:when>
                 <map:otherwise>
                     <map:match pattern="submissions">
@@ -226,7 +242,13 @@ and searching the repository.
                     <map:match pattern="internal-item">
                         <map:act type="StartAuthentication"/>
                     </map:match>
+                    <map:match pattern="non-archived-discovery">
+                        <map:act type="StartAuthentication"/>
+                    </map:match>
                     <map:match pattern="non-archived-search-filter">
+                        <map:act type="StartAuthentication"/>
+                    </map:match>
+                    <map:match pattern="discovery-submission-search-filter">
                         <map:act type="StartAuthentication"/>
                     </map:match>
                 </map:otherwise>

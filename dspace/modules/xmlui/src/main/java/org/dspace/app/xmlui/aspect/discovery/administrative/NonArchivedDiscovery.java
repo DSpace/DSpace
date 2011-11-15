@@ -1,12 +1,20 @@
-package org.dspace.app.xmlui.aspect.discovery;
+package org.dspace.app.xmlui.aspect.discovery.administrative;
 
 import org.apache.cocoon.environment.Request;
 import org.apache.log4j.Logger;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
+import org.dspace.app.xmlui.aspect.discovery.BrowseFacet;
+import org.dspace.app.xmlui.aspect.discovery.SimpleSearch;
+import org.dspace.app.xmlui.utils.ContextUtil;
+import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.*;
+import org.dspace.app.xmlui.wing.element.Division;
+import org.dspace.app.xmlui.wing.element.PageMeta;
+import org.dspace.app.xmlui.wing.element.ReferenceSet;
+import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.discovery.SearchServiceException;
@@ -14,16 +22,17 @@ import org.dspace.discovery.SearchUtils;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * User: kevin (kevin at atmire.com)
- * Date: 14-sep-2011
- * Time: 13:37:50
+ * Date: 15-nov-2011
+ * Time: 8:48:59
  */
-public class NonArchivedSearch extends SimpleSearch {
+public class NonArchivedDiscovery extends SimpleSearch {
 
-    private static final Logger log = Logger.getLogger(NonArchivedSearch.class);
+    private static final Logger log = Logger.getLogger(NonArchivedDiscovery.class);
 
     private static final Message T_no_results = message("xmlui.ArtifactBrowser.AbstractSearch.no_results");
     private static final Message T_VIEW_MORE = message("xmlui.discovery.AbstractFiltersTransformer.filters.view-more");
@@ -31,8 +40,12 @@ public class NonArchivedSearch extends SimpleSearch {
         message("xmlui.Submission.Submissions.title");
 
     @Override
-    public void addPageMeta(PageMeta pageMeta) throws WingException, SQLException {
+    public void addPageMeta(PageMeta pageMeta) throws WingException, SQLException, AuthorizeException {
         pageMeta.addMetadata("title").addContent(T_title);
+
+        if(!AuthorizeManager.isAdmin(ContextUtil.obtainContext(objectModel))){
+            throw new AuthorizeException();
+        }
     }
 
     @Override
@@ -109,8 +122,6 @@ public class NonArchivedSearch extends SimpleSearch {
             results.addPara(T_no_results);
         }
         //}// Empty query
-
-
     }
 
     public void addViewMoreUrl(org.dspace.app.xmlui.wing.element.List facet, DSpaceObject dso, Request request, String fieldName) throws WingException {
@@ -130,7 +141,7 @@ public class NonArchivedSearch extends SimpleSearch {
 
     @Override
     protected String getDiscoverUrl(){
-        return "submissions";
+        return "non-archived-discovery";
     }
 
     @Override

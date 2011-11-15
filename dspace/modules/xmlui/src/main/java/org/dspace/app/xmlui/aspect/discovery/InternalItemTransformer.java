@@ -17,6 +17,7 @@ import org.dspace.content.Collection;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
+import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.workflow.*;
 import org.xml.sax.SAXException;
@@ -96,11 +97,25 @@ public class InternalItemTransformer extends AbstractDSpaceTransformer {
         Request request = ObjectModelHelper.getRequest(objectModel);
         int itemId = Util.getIntParameter(request, "itemID");
         item = Item.find(context, itemId);
-        pageMeta.addMetadata("title").addContent(item.getName());
+
+        pageMeta.addMetadata("title").addContent(getTitle(item));
 
         pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
         pageMeta.addTrailLink(contextPath + "/submissions", T_non_archived_trail);
         pageMeta.addTrail().addContent(T_internal_trail);
+    }
+
+    private String getTitle(Item item) {
+        String title = item.getName();
+        if(title == null){
+            try {
+                title = I18nUtil.getMessage("org.dspace.workflow.WorkflowManager.untitled");
+            }
+            catch (MissingResourceException e) {
+                title = "Untitled";
+            }
+        }
+        return title;
     }
 
     @Override
@@ -118,7 +133,7 @@ public class InternalItemTransformer extends AbstractDSpaceTransformer {
         }
 
         Division division = body.addInteractiveDivision("item-view", contextPath + "/internal-item", Division.METHOD_POST, "primary");
-        division.setHead(item.getName());
+        division.setHead(getTitle(item));
 
 		Para showfullPara = division.addPara(null,
 				"item-view-toggle item-view-toggle-top");

@@ -255,7 +255,13 @@
 				</xsl:choose>
 			</a>
 
-			<span class="ds-trail">
+			<span >
+                <xsl:attribute name="class">
+                    <xsl:text>ds-trail</xsl:text>
+                    <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI'] = 'submissions'">
+                        <xsl:text>-shown</xsl:text>
+                    </xsl:if>
+                </xsl:attribute>
 				<xsl:choose>
 					<xsl:when test="count(/dri:document/dri:meta/dri:pageMeta/dri:trail) = 0">
 						<span class="ds-trail-link first-link">-</span>

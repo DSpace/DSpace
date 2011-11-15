@@ -75,7 +75,7 @@ public class SimpleSearch extends AbstractSearch implements
 	 * Add Page metadata.
 	 */
 	public void addPageMeta(PageMeta pageMeta) throws WingException,
-			SQLException {
+			SQLException, AuthorizeException {
 		pageMeta.addMetadata("title").addContent(T_title);
 		pageMeta.addTrailLink(contextPath + "/", T_dspace_home);
 

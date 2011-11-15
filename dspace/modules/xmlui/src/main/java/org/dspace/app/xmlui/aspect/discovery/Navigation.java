@@ -22,6 +22,7 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
@@ -59,6 +60,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
     private static final Message T_head_this_community =
         message("xmlui.ArtifactBrowser.Navigation.head_this_community");
+    private static final Message T_navigation_non_archived_discovery =
+            message("xmlui.Discovery.Navigation.non-archived-discovery");
 
     /**
      * Generate the unique caching key.
@@ -148,6 +151,12 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
         }
         */
+
+        if(AuthorizeManager.isAdmin(context)){
+            List admin = options.addList("administrative");
+
+            admin.addItem().addXref(contextPath + "/non-archived-discovery").addContent(T_navigation_non_archived_discovery);
+        }
     }
 
     /**
