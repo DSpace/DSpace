@@ -11,6 +11,7 @@ import junit.framework.TestCase;
 
 import org.hamcrest.CoreMatchers.*;
 import org.openqa.selenium.*;
+import org.openqa.selenium.htmlunit.HtmlUnitDriver;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.Select;
 
@@ -20,8 +21,8 @@ public class SearchingTest extends TestCase {
 
         @Before
 	public void setUp() throws Exception {
-		driver = new FirefoxDriver();
-		driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+	    driver = new HtmlUnitDriver();
+	    driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
 	}
 
 	@Test
