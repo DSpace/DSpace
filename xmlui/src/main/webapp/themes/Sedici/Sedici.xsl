@@ -34,20 +34,8 @@
 	xmlns="http://www.w3.org/1999/xhtml"
 	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
 
-    <xsl:import href="../dri2xhtml-alt/dri2xhtml.xsl"/>
-    <xsl:import href="lib/xsl/core/global-variables.xsl"/>
-    <xsl:import href="lib/xsl/core/page-structure.xsl"/>
-    <xsl:import href="lib/xsl/core/navigation.xsl"/>
-    <xsl:import href="lib/xsl/core/elements.xsl"/>
-    <xsl:import href="lib/xsl/core/forms.xsl"/>
-    <xsl:import href="lib/xsl/core/attribute-handlers.xsl"/>
-    <xsl:import href="lib/xsl/core/utils.xsl"/>
+    <xsl:import href="../Mirage/Mirage.xsl"/>
     <xsl:import href="lib/xsl/aspect/general/choice-authority-control.xsl"/>
-    <xsl:import href="lib/xsl/aspect/administrative/administrative.xsl"/>
-    <xsl:import href="lib/xsl/aspect/artifactbrowser/item-list.xsl"/>
-    <xsl:import href="lib/xsl/aspect/artifactbrowser/item-view.xsl"/>
-    <xsl:import href="lib/xsl/aspect/artifactbrowser/community-list.xsl"/>
-    <xsl:import href="lib/xsl/aspect/artifactbrowser/collection-list.xsl"/>
     <xsl:import href="lib/xsl/aspect/news/news-list.xsl"/>
     <xsl:output indent="yes"/>
     

@@ -189,10 +189,11 @@
         <xsl:with-param name="formID"        select="translate(ancestor::dri:div[@interactive='yes']/@id,'.','_')"/>
         <xsl:with-param name="metadataField" select="@n"/>
         <xsl:with-param name="inputName"     select="@n"/>
+        <xsl:with-param name="authorityControlled" select="dri:params/@authorityControlled"/>
         <xsl:with-param name="authorityName" select="concat(@n,'_authority')"/>
         <xsl:with-param name="containerID"   select="concat(translate(@id,'.','_'),'_container')"/>
         <xsl:with-param name="indicatorID"   select="concat(translate(@id,'.','_'),'_indicator')"/>
-        <xsl:with-param name="isClosed"      select="contains(dri:params/@choicesClosed,'true')"/>
+        <xsl:with-param name="isClosed"      select="dri:params/@choicesClosed"/>
         <xsl:with-param name="confidenceIndicatorID" select="$confidenceIndicatorID"/>
         <xsl:with-param name="confidenceName" select="$confidenceName"/>
         <xsl:with-param name="collectionID">
@@ -220,7 +221,8 @@
       <xsl:param name="indicatorID" select="'missing value'"/>
       <xsl:param name="confidenceIndicatorID" select="''"/>
       <xsl:param name="confidenceName" select="''"/>
-      <xsl:param name="isClosed" select="'false'"/>
+      <xsl:param name="isClosed" select="'No'"/>
+      <xsl:param name="authorityControlled" select="'No'"/>
       <script type="text/javascript">
         <xsl:text>runAfterJSImports.add(function() {</xsl:text>
             <xsl:text>$(document).ready(function() {</xsl:text>
@@ -230,11 +232,15 @@
                     <xsl:value-of select="$metadataField"/>
                     <xsl:text>', isClosed: '</xsl:text>
                     <xsl:value-of select="$isClosed"/>
+                    <xsl:text>', authorityControlled: '</xsl:text>
+                    <xsl:value-of select="$authorityControlled"/>
                     <xsl:text>', inputName: '</xsl:text>
                     <xsl:value-of select="$inputName"/>
                     <xsl:text>', authorityName: '</xsl:text>
                     <xsl:value-of select="$authorityName"/>
-                    <xsl:text>', containerID: '</xsl:text>
+                    <xsl:text>', authorityLabel: '</xsl:text>
+                    <xsl:value-of select="$authorityName"/>
+                    <xsl:text>_label', containerID: '</xsl:text>
                     <xsl:value-of select="$containerID"/>
                     <xsl:text>', indicatorID: '</xsl:text>
                     <xsl:value-of select="$indicatorID"/>
@@ -258,12 +264,42 @@
       <xsl:param name="id" select="''"/>
       <xsl:param name="position" select="''"/>
       <xsl:param name="authValue" select="''"/>
+      <xsl:param name="authLabel" select="''"/>
       <xsl:param name="confValue" select="''"/>
       <xsl:param name="confIndicatorID" select="''"/>
       <xsl:param name="unlockButton" select="''"/>
       <xsl:param name="unlockHelp" select="''"/>
       <xsl:variable name="authFieldID" select="concat(translate(@id,'.','_'),'_authority')"/>
+      <xsl:variable name="authLabelID" select="concat(translate(@id,'.','_'),'_authority_label')"/>
       <xsl:variable name="confFieldID" select="concat(translate(@id,'.','_'),'_confidence')"/>
+
+      <!-- the authority label -->
+
+      <xsl:if test="not(contains(dri:params/@choicesClosed, 'yes'))">
+      <input>
+        <xsl:attribute name="class">
+          <xsl:text>ds-authority-label</xsl:text>
+        </xsl:attribute>
+        <xsl:attribute name="type"><xsl:value-of select="$authorityInputType"/></xsl:attribute>
+        <xsl:attribute name="readonly"><xsl:text>readonly</xsl:text></xsl:attribute>
+        <xsl:attribute name="name">
+          <xsl:value-of select="concat($name,'_authority_label')"/>
+          <xsl:if test="$position">
+            <xsl:value-of select="concat('_', $position)"/>
+          </xsl:if>
+        </xsl:attribute>
+        <xsl:if test="$id">
+          <xsl:attribute name="id">
+            <xsl:value-of select="$authLabelID"/>
+          </xsl:attribute>
+        </xsl:if>
+        <xsl:attribute name="value">
+          <xsl:value-of select="$authValue"/>
+        </xsl:attribute>
+
+      </input>
+      </xsl:if>
+
       <!-- the authority key value -->
       <input>
         <xsl:attribute name="class">

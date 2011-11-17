@@ -47,10 +47,9 @@
 //     isClosed -- true if authority value is required, false = non-auth allowed
 // XXX Can't really enforce "isClosed=true" with autocomplete, user can type anything
 //
-// NOTE: Successful autocomplete always sets confidence to 'accepted' since
+// NOTE NICO: Successful autocomplete always sets confidence to 'accepted' since
 //  authority value (if any) *was* chosen interactively by a human.
 function DSpaceSetupAutocomplete(formID, args) {
-
     $(function() {
     if (args.authorityName == null)
         args.authorityName = dspace_makeFieldInput(args.inputName, '_authority');
@@ -59,7 +58,27 @@ function DSpaceSetupAutocomplete(formID, args) {
 
     var authorityID = null;
     if (form.elements[args.authorityName] != null)
-        authorityID = form.elements[args.authorityName].id;
+        authorityID = form.elements[args.authorityName].id;    
+    
+    var authorityLabelID = null;
+    if (form.elements[args.authorityLabel] != null)
+        authorityLabelID = form.elements[args.authorityLabel].id;
+
+    var isClosed;
+
+    if (args.isClosed=='yes'){
+    	isClosed=true; 
+    } else {
+    	isClosed=false;    
+    };
+    
+    var isAuthorityControlled;
+
+    if (args.authorityControlled=='yes'){
+    	isAuthorityControlled=true; 
+    } else {
+    	isAuthorityControlled=false;    
+    };
 
     // AJAX menu source, can add &query=TEXT
     var choiceURL = args.contextPath + "/choices/" + args.metadataField;
@@ -67,8 +86,14 @@ function DSpaceSetupAutocomplete(formID, args) {
         choiceURL += '?collection=' + collID;
 
         var ac = $('#' + inputID);
+        //esta variable identifica si la lista es cerrada por seleccion.
+        var seleccion;
+        
         ac.autocomplete({
+        	autoFocus: false,
             source: function(request, response) {
+            	//pongo la variable de seleccion en false
+            	seleccion=false;
                 var reqUrl = choiceURL;
                 if(request && request.term) {
                     reqUrl += "&query=" + request.term;
@@ -76,41 +101,69 @@ function DSpaceSetupAutocomplete(formID, args) {
                 $.get(reqUrl, function(xmldata) {
                     var options = [];
                     var authorities = [];
-                    $(xmldata).find('Choice').each(function() {
-                        // get value
-                        var value = $(this).attr('value') ? $(this).attr('value') : null;
-                        // get label, if empty set it to value
-                        var label = $(this).text() ? $(this).text() : value;
-                        // if value was empty but label was provided, set value to label
-                        if(!value) {
-                            value = label;
-                        }
-                        // if at this point either value or label == null, this means none of both were set and we shouldn't add it to the list of options
-                        if (label != null) {
-                            options.push({
-                                label: label,
-                                value: value
-                            });
-                            authorities['label: ' + label + ', value: ' + value] = $(this).attr('authority') ? $(this).attr('authority') : value;
-                        }
-                    });
+                    if($(xmldata).find('Choice').length>0){
+	                    $(xmldata).find('Choice').each(function() {
+	                        // get value
+	                        var value = $(this).attr('value') ? $(this).attr('value') : null;
+	                        // get label, if empty set it to value
+	                        var label = $(this).text() ? $(this).text() : value;
+	                        // if value was empty but label was provided, set value to label
+	                        if(!value) {
+	                            value = label;
+	                        }
+	                        // if at this point either value or label == null, this means none of both were set and we shouldn't add it to the list of options
+	                        if (label != null) {
+	                            options.push({
+	                                label: label,
+	                                value: value
+	                            });
+	                            authorities['label: ' + label + ', value: ' + value] = $(this).attr('authority') ? $(this).attr('authority') : value;
+	                        }
+	                    });
+                    } else {                    	
+                    	// No hay elementos que matcheen por lo que cambia la confianza y value del authority
+                    	// Debo corroborar si el campo tiene control de autoridad y si es cerrado debo modificar
+                    	verificarAuthority(isClosed, isAuthorityControlled, authorityID, args.confidenceIndicatorID, args.confidenceName)
+                    };
                     ac.data('authorities',authorities);
                     response(options);
                 });
                 },
+            close: function(event, ui) {            	
+            	//NOTE: en este evento verifico que si la lista se cierra sin haber seleccionado un dato modificar los input de authority y los iconos
+                if (!seleccion){
+                	verificarAuthority(isClosed, isAuthorityControlled, authorityID, args.confidenceIndicatorID, args.confidenceName);
+                	//alert('se cerro sin seleccionar');                	
+                };
+                
+            },
             select: function(event, ui) {
-                    // NOTE: lookup element late because it might not be in DOM
-                    // at the time we evaluate the function..
-//                var authInput = document.getElementById(authorityID);
-//                var authValue = li == null ? "" : li.getAttribute("authority");
-                var authInput = $('#' + authorityID);
+                // NOTE: lookup element late because it might not be in DOM
+                // at the time we evaluate the function..
+            	//var authInput = document.getElementById(authorityID);
+            	//var authValue = li == null ? "" : li.getAttribute("authority");
+                //modifico la variable que controla si la lista se cerró por seleccion en verdadero
+            	seleccion = true;
+            	var authInput = $('#' + authorityID);
+                
                 if(authInput.length > 0) {
                     authInput = authInput[0];
-                }
+                } 
                 var authorities = ac.data('authorities');
                 var authValue = authorities['label: ' + ui.item.label + ', value: ' + ui.item.value];
                     if (authInput != null) {
                         authInput.value = authValue;
+                        if (isClosed){
+                        	//alert('es Cerrado');
+                        } else {
+                        	if (isAuthorityControlled){
+	                            //Agrego el input del label en caso de que no sea closed el authority
+	                            var authLabel = document.getElementById(authorityLabelID);
+	                            authLabel.value = ui.item.label;
+	                        	//alert('es Abierto');
+                            }
+                        }
+                       
                         // update confidence input's value too if available.
                         if (args.confidenceName != null) {
                             var confInput = authInput.form.elements[args.confidenceName];
@@ -124,6 +177,43 @@ function DSpaceSetupAutocomplete(formID, args) {
                 }
 		});
 	});
+}
+
+//--------------------- Funcion que regula la autoridad y los choices cerrados
+function verificarAuthority(isClosed, isAuthorityControlled, authorityID, confidenceIndicatorID, confidenceName){
+	if (isClosed){
+ 	   //Es cerrado, por lo que debo mostrar el icono de error 
+ 	   if (isAuthorityControlled){                     		  
+     		//Como es cerrado y tiene control de autoridad debo borrar los valores del confidence y de authority
+     		var authInput = $('#' + authorityID);
+     		authInput.value = '';  
+     		// update confidence input's value too if available.
+              if (confidenceName != null) {
+                  var confInput = document.getElementById(confidenceName);
+                  if (confInput != null)
+                      confInput.value = 'blank';
+              };
+          };
+          //alert('fails');
+          DSpaceUpdateConfidence(document, confidenceIndicatorID,'failed');	                        	
+       } else {
+     	  //Si no es cerrado pero tiene autoridad, debo mostrar que el dato va a tener otro label distinto al de la autoridad
+     	  //excepto que no tenga configurada la autorida, por le que debo mostrar el label de error
+     	  if (isAuthorityControlled){
+     		  var authInput = document.getElementById(authorityID);		                    	 
+     		  if (authInput.value != ''){  
+     		     DSpaceUpdateConfidence(document, confidenceIndicatorID,'ambiguous');
+     		     //alert('ambiguos ..'+authInput.value);
+     		  } else {
+     			  DSpaceUpdateConfidence(document, confidenceIndicatorID,'failed');
+     			  //alert('fails');
+     		  }
+     	  } else {
+     		  //como no tiene autoridad y no es cerrado, esta bien que agregue uno nuevo
+     		  DSpaceUpdateConfidence(document, confidenceIndicatorID,'accepted');
+     		  //alert('aceptado');
+     	  };
+       }
 }
 
 // -------------------- support for Lookup Popup
@@ -442,7 +532,7 @@ function stringTrim(str) {
 
 // format utility - replace @1@, @2@ etc with args 1, 2, 3..
 // NOTE params MUST be monotonically increasing
-// NOTE we can't use "{1}" like the i18n catalog because it elides them!!
+// NOTE we can't use "{1}" like the i18n catalog becanewValueuse it elides them!!
 // ...UNLESS maybe it were to be fixed not to when no params...
 function dspace_formatMessage() {
     var template = dspace_formatMessage.arguments[0];
