@@ -30,8 +30,8 @@ public class DataFileDisplayTest extends TestCase {
 		assertEquals("Dryad data file: Morphospace Specimens", driver.getTitle());
 		assertTrue(isElementPresent(By.cssSelector("h1.ds-div-head")));
 		assertTrue("head contains Morphospace", sectionContains("h1.ds-div-head", "Morphospace"));
-		assertTrue("citation contains package info", sectionContains("div.citation-view", "(2007) Testing"));
-		assertTrue("citation contains file info", sectionContains("div.citation-view", "(2007) Testing"));
+		assertTrue("citation contains publication info", sectionContains("div.citation-view", "(2007) Testing"));
+		assertTrue("citation contains package info", sectionContains("div.citation-view", "(2007) Data from: Testing"));
 		assertTrue("bitstream present", isElementPresent(By.linkText("Evo_22_Table S1.doc")));
 		assertTrue("bitstream format present", sectionContains("div.primary","Microsoft Word"));
 	}
