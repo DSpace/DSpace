@@ -130,10 +130,6 @@ public class EmailParserForEcoApp extends EmailParser {
 	private String makeElement(String aName, String aValue) {
 	    String name = ELEMENT_MAP.get(aName.toLowerCase());
 
-	    if (LOGGER.isDebugEnabled()) {
-	        LOGGER.debug("Making " + aName + " element; value: " + aValue);
-	    }
-
 	    if (name == null) {
 	        StringBuilder xml = new StringBuilder();
 	        name = NESTED_ELEMENT_MAP.get(aName.toLowerCase());
