@@ -80,6 +80,9 @@
 
 	    <aspect name="Versioning Aspect" path="resource://aspects/Versioning/" />	    
 
+	<aspect name="AME" path="resource://aspects/AME/" />
+
+
 	    
 	    
         <!--
