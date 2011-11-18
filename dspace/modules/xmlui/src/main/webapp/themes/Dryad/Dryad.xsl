@@ -72,6 +72,62 @@
 		</div>
 	</xsl:template>
 		
+	<xsl:template match="*[@rend='ame-suggest-widget']">
+	    <xsl:param name="containerID" select="concat(translate(@id,'.','_'),'_container')"/>
+	    <xsl:param name="treeID" select="concat(translate(@id,'.','_'),'_tree')"/>
+	    <xsl:param name="itemID" select="//dri:field[@n='ame-item-id']/dri:value/text()"/>
+	    <xsl:param name="field" select="@n"/>
+	    <xsl:param name="buttonID" select="concat(translate(@id,'.','_'),'_add')"/>
+
+            <div class="ame-suggest-container">
+               <xsl:attribute name="id"><xsl:value-of select="$containerID"/></xsl:attribute>
+
+               <div class="ame-suggest-header">
+                   <font>Suggested Terms <a title="These terms have been automatically selected from a controlled vocabulary based on the article title, description, and any existing keywords.">?</a></font>
+               </div>
+               <div class="ame-suggest-control">
+                  <xsl:attribute name="id"><xsl:value-of select="$treeID"/></xsl:attribute>
+                  &#160;
+               </div>
+               <div class="ame-suggest-buttons">
+                  <input class="ame-suggest-add" type="button" value="Add Selected">
+                     <xsl:attribute name="id"><xsl:value-of select="$buttonID"/></xsl:attribute>
+                  </input>
+               </div>
+            </div>
+
+            <xsl:call-template name="ameSetup">
+		<xsl:with-param name="itemID" select="$itemID"/>
+		<xsl:with-param name="containerID" select="$containerID"/>
+		<xsl:with-param name="treeID" select="$treeID"/>
+		<xsl:with-param name="field" select="$field"/>
+		<xsl:with-param name="buttonID" select="$buttonID"/>
+            </xsl:call-template>
+            <div class="ame-suggest-end">&#160;</div>
+        </xsl:template>
+
+    <xsl:template name="ameSetup">
+      <xsl:param name="itemID" select="'mising value'" />
+      <xsl:param name="containerID" select="'missing value'"/>
+      <xsl:param name="treeID" select="'missing value'"/>
+      <xsl:param name="field" select="'missing value'"/>
+      <xsl:param name="buttonID" select="'missing value'"/>
+      <script type="text/javascript">
+        <xsl:text>var ame = AMESuggestSetup('</xsl:text>
+        <xsl:value-of select="$itemID"/>
+        <xsl:text>','</xsl:text>
+        <xsl:value-of select="$containerID"/>
+        <xsl:text>','</xsl:text>
+        <xsl:value-of select="$treeID"/>
+        <xsl:text>','</xsl:text>
+        <xsl:value-of select="$field"/>
+        <xsl:text>','</xsl:text>
+        <xsl:value-of select="$buttonID"/>
+        <xsl:text>');</xsl:text>
+      </script>
+    </xsl:template>
+
+
 	<xsl:template match="*[@rend='blog-box']">
 		<div id="dryad_blog">
 			<h3>

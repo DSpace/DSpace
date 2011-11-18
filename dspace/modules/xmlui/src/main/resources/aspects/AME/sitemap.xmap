@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+
+    <map:components>
+    
+        <map:transformers>
+            <map:transformer name="AMEForm" src="org.datadryad.app.xmlui.aspect.ame.AMEForm"/>
+            <map:transformer name="AMENavigation" src="org.datadryad.app.xmlui.aspect.ame.AMENavigation"/>
+            <map:transformer name="ChoiceLookup" src="org.dspace.app.xmlui.aspect.general.ChoiceLookupTransformer"/>
+        </map:transformers>
+
+        <map:serializers>
+            <map:serializer name="text" src="org.apache.cocoon.serialization.TextSerializer" 
+            	mime-type="text/plain" logger="sitemap.serializer.text" />
+        </map:serializers>
+
+    </map:components>
+
+
+    <map:flow language="javascript">
+        <map:script src="dryad-ame.js"/>
+    </map:flow>
+
+
+    <map:pipelines>
+    
+       <map:pipeline>
+			<!--
+				This is the general entry / resume point for automatic metadata extraction
+			-->
+			<map:match pattern="item/ame">
+				<map:match type="request" pattern="ame-continue">
+					<map:call continuation="{1}"/>
+				</map:match>
+				<map:match type="request" pattern="itemID">
+					<map:call function="startAME"/>
+				</map:match>
+
+			</map:match>
+
+	        <map:generate/>
+            <map:transform type="AMENavigation"/>   
+            
+
+			
+			<!-- Automatic metadata extraction -->
+            <map:match pattern="item/ame/edit">      
+                <map:transform type="AMEForm">
+                    <map:parameter name="itemID" value="{flow-attribute:itemID}"/>
+                </map:transform>
+            </map:match>
+
+            
+             <!-- Required for choice value lookup popup -->
+            <map:match pattern="item/ame/lookup">      
+              <map:transform type="ChoiceLookup">
+                <map:parameter name="field" value="{request-param:field}"/>
+                <map:parameter name="formID" value="{request-param:formID}"/>
+                <map:parameter name="value" value="{request-param:value}"/>
+                <map:parameter name="valueInput" value="{request-param:valueInput}"/>
+                <map:parameter name="authorityInput" value="{request-param:authorityInput}"/>
+                <map:parameter name="isName" value="{request-param:isName}"/>
+                <map:parameter name="isRepeating" value="{request-param:isRepeating}"/>
+                <map:parameter name="confIndicatorID" value="{request-param:confIndicatorID}"/>
+                <map:parameter name="start" value="{request-param:start}"/>
+                <map:parameter name="limit" value="{request-param:limit}"/>
+                <map:parameter name="collection" value="{request-param:collection}"/>
+              </map:transform>
+            </map:match>
+
+			<map:match pattern="item/ame/**">
+				<map:transform type="IncludePageMeta">
+					<map:parameter name="stylesheet.screen#1" value="lib/dynatree/ui.dynatree.css"/>
+					<map:parameter name="stylesheet.screen#2" value="lib/style.css"/>
+
+					
+			    	<!-- javascript libraries and utils for the choice and authority-control -->
+			   		<map:parameter name="javascript.static#1" value="static/js/scriptaculous/prototype.js"/>
+			      	<map:parameter name="javascript.static#2" value="static/js/scriptaculous/effects.js"/>
+			      	<map:parameter name="javascript.static#3" value="static/js/scriptaculous/builder.js"/>
+			      	<map:parameter name="javascript.static#4" value="static/js/scriptaculous/controls.js"/>
+			      	<map:parameter name="javascript.static#5" value="static/js/choice-support.js"/>
+			      	
+			      	<map:parameter name="javascript.static#6" value="static/js/jquery/jquery-1.5.1.js"/>
+			      	<map:parameter name="javascript.static#7" value="static/js/jquery/ui/jquery.ui.core.js"/>
+			      	<map:parameter name="javascript.static#8" value="static/js/jquery/ui/jquery.ui.widget.js"/>
+			      	<map:parameter name="javascript.static#9" value="static/js/jquery/ui/jquery.ui.button.js"/>
+			      	<map:parameter name="javascript.static#10" value="static/js/jquery/dynatree/jquery-ui.custom.js"/>
+			      	<map:parameter name="javascript.static#11" value="static/js/jquery/dynatree/jquery.cookie.js"/>
+			      	<map:parameter name="javascript.static#12" value="static/js/jquery/dynatree/jquery.dynatree.js"/>
+			      	<map:parameter name="javascript.static#13" value="static/js/ame.js"/>
+			      	
+			      	
+			    </map:transform>
+            		    
+			</map:match>
+		
+       
+			<map:serialize type="xml"/>	
+        </map:pipeline>
+        
+
+    </map:pipelines>
+</map:sitemap>

@@ -2805,22 +2805,14 @@
 	<message key="xmlui.dri2xhtml.mimetype.video/quicktime">QuickTime video</message>
 
 	<!-- explanatory messages for choice authority confidence values -->
-	<message key="xmlui.authority.confidence.description.cf_unset">Confidence was never recorded for
-		this value</message>
-	<message key="xmlui.authority.confidence.description.cf_novalue">No reasonable confidence value
-		was returned from the authority</message>
-	<message key="xmlui.authority.confidence.description.cf_rejected">The authority recommends this
-		submission be rejected</message>
-	<message key="xmlui.authority.confidence.description.cf_failed">The authority encountered an
-		internal failure</message>
-	<message key="xmlui.authority.confidence.description.cf_notfound">There are no matching answers in
-		the authority</message>
-	<message key="xmlui.authority.confidence.description.cf_ambiguous">There are multiple matching
-		authority values of equal validity</message>
-	<message key="xmlui.authority.confidence.description.cf_uncertain">Value is singular and valid but
-		has not been seen and accepted by a human so it is still uncertain</message>
-	<message key="xmlui.authority.confidence.description.cf_accepted">This authority value has been
-		confirmed as accurate by an interactive user</message>
+	<message key="xmlui.authority.confidence.description.cf_unset">Value has not been confirmed against the controlled vocabulary. Select "Lookup" to search for matching controlled terms.</message>
+	<message key="xmlui.authority.confidence.description.cf_uncertain">A single match was found in the controlled vocabulary, but it has not been accepted. Select "Lookup" to accept the value.</message>
+	<message key="xmlui.authority.confidence.description.cf_novalue">No reasonable confidence value was returned from the authority</message>
+	<message key="xmlui.authority.confidence.description.cf_rejected">The authority recommends this submission be rejected</message>
+	<message key="xmlui.authority.confidence.description.cf_failed">The authority encountered an internal failure</message>
+	<message key="xmlui.authority.confidence.description.cf_notfound">There are no matching answers in the authority</message>
+	<message key="xmlui.authority.confidence.description.cf_ambiguous">There are multiple possible matching values in the controlled vocabulary. Select "Lookup" to select the correct value.</message>
+	<message key="xmlui.authority.confidence.description.cf_accepted">This controlled term has been confirmed by the user.</message>
 	<!-- help message on "unlock" button in EditItemMetadata display -->
 	<message key="xmlui.authority.confidence.unlock.help">Unlock the authority key value for manual
 		editing, or toggle it locked again</message>
@@ -3224,5 +3216,27 @@
     <message key="xmlui.Discovery.Navigation.non-archived-discovery">Non archived discovery</message>
 
 
+    <!-- Messages for AME aspect --> 
+
+    <!-- org.datadryad.app.xmlui.aspect.ame.AMEForm -->
+    <message key="xmlui.aspect.ame.AMENavigation.context">Automatic metadata extraction</message>
+    <message key="xmlui.aspect.ame.AMEForm.title">Automatic Metadata Extraction</message>
+    <message key="xmlui.aspect.ame.AMEForm.trail">Automatic Metadata Extraction</message>
+    <message key="xmlui.aspect.ame.AMEForm.label_id">Item Internal ID</message>
+    <message key="xmlui.aspect.ame.AMEForm.label_title">Title</message>
+    <message key="xmlui.aspect.ame.AMEForm.label_abstract">Abstract</message>
+    <message key="xmlui.aspect.ame.AMEForm.label_keywords">Keywords</message>
+        <message key="xmlui.aspect.ame.AMEForm.instructions">Use this interface to add, remove, or enhance the subject and scientific name metadata for this record. Use the "Lookup" button to map free-text keywords to controlled terms. The "Suggested Terms" panel displays a list of terms automatically selected from a controlled vocabulary based on the resource title, abstract, and keywords.</message>
+    <message key="xmlui.aspect.ame.AMEForm.label_scientificNames">Scientific Names</message>
+
+        <!-- Choice Lookup - for Dryad dwc.ScientificName -->
+    <message key="xmlui.ChoiceLookupTransformer.field.dwc_ScientificName.title">Lookup Scientific Name</message>
+    <message key="xmlui.ChoiceLookupTransformer.field.dwc_ScientificName.instructions">Below is a list of possible matches from the configured <a href="http://en.wikipedia.org/wiki/Controlled_vocabulary">controlled vocabulary</a>. Select the desired scientific name and then select "Accept." The existing name will be replaced with the selected controlled name and will be linked to the associated controlled vocabulary. Select "Cancel" to keep the current entry.</message>
+        <message key="xmlui.ChoiceLookupTransformer.field.dwc_ScientificName.nonauthority">Use local value "@1@" (not in authority)</message>
+ 
+        <!-- Choice Lookup - for Dryad dc.subject -->
+    <message key="xmlui.ChoiceLookupTransformer.field.dc_subject.title">Lookup Subject</message>
+     <message key="xmlui.ChoiceLookupTransformer.field.dc_subject.instructions">Below is a list of possible matches from the configured <a href="http://en.wikipedia.org/wiki/Controlled_vocabulary">controlled vocabulary</a>. Select the desired term or phrase and then select "Accept." The existing phrase will be replaced with the selected controlled phrase and will be linked to the associated controlled vocabulary. Select "Cancel" to keep the current entry.</message>
+     <message key="xmlui.ChoiceLookupTransformer.field.dc_subject.nonauthority">Use local value "@1@" (not in authority)</message>
 
 </catalogue>

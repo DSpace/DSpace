@@ -1147,8 +1147,230 @@ div#embargo_notice_new {
 	color: #8b0000;
 }
 
-
-
 div#aspect_submission_submit_DepositConfirmedStep_div_deposit-confirmed {
 	border: 2px solid gray;
 }
+
+/** Additions for Authority Control elements **/
+/* for scriptaculous autocomplete */
+div.autocomplete {
+  position:absolute;
+  width:250px;
+  background-color:white;
+  border:1px solid #888;
+  margin:0;
+  padding:0;
+}
+div.autocomplete ul {
+  list-style-type:none;
+  margin:0;
+  padding:0;
+}
+div.autocomplete ul li.selected { background-color: #ffb;}
+div.autocomplete ul li {
+  list-style-type:none;
+  display:block;
+  margin:0;
+  padding:2px;
+/*  height:32px; */
+  cursor:pointer;
+}
+div.autocomplete ul li span.value { display:none; }
+
+/* this magic gets the 16x16 icon to show up.. setting height/width didn't
+   do it, but adding padding actually made it show up. */
+img.ds-authority-confidence
+{ width: 16px; height: 16px; margin: 0px 2px; padding: 0px; vertical-align: bottom;}
+
+img.ds-authority-confidence.cf-unset
+  { background: transparent url(../images/confidence/4-question.gif); }
+img.ds-authority-confidence.cf-novalue
+  /* { background: transparent } */
+  { background: transparent url(../images/confidence/3-circleslash.gif); }
+img.ds-authority-confidence.cf-rejected,
+img.ds-authority-confidence.cf-failed
+  { background: transparent url(../images/confidence/2-errortriangle.gif); }
+img.ds-authority-confidence.cf-notfound
+  { background: transparent url(../images/confidence/3-thumb2.gif); }
+img.ds-authority-confidence.cf-ambiguous
+  { background: transparent url(../images/confidence/4-question.gif); }
+img.ds-authority-confidence.cf-uncertain
+  { background: transparent url(../images/confidence/5-pinion.gif); }
+img.ds-authority-confidence.cf-accepted
+  { background: transparent url(../images/confidence/6-greencheck.gif); }
+
+/* hide authority-value inputs in forms */
+input.ds-authority-value { display:none; }
+/** XXX Change to this to get the authority value to show up for debugging:
+ input.ds-authority-value { display:inline; }
+**/
+
+/* ..except, show authority-value inputs in on the Item EditMetadata page */
+input.ds-authority-value.ds-authority-visible { display: inline; }
+
+/* for lock button */
+input.ds-authority-lock
+  { vertical-align: bottom; height: 24px; width:
+    24px; background-repeat: no-repeat; background-color: transparent; }
+input.ds-authority-lock.is-locked
+  { background-image: url(../images/lock24.png); }
+input.ds-authority-lock.is-unlocked
+  { background-image: url(../images/unlock24.png); }
+
+
+/* Example of authority display: this makes authors with an authority
+   value show up as red in the item summary view: */
+span.ds-dc_contributor_author-authority { color: #982521; }
+
+/* Automatic metadata extraction aspect styles */
+.ame-add-item div {
+    #margin-left: 32px;
+    margin-bottom: 0px;
+    padding: 2px;
+}
+.ame-item div {
+    margin-left: 0px;
+    margin-bottom: 0px;
+    padding: 2px;
+}
+
+.ame-actions
+{
+  display: block;
+  clear:both;
+}
+
+.ame-field-table
+{
+  display: block;
+  clear: both;
+}
+
+.ame-field-list
+{
+  font-weight: bold;
+  margin-left: 5px;
+  width: 400px;
+  float:left;
+}
+
+.ame-suggest-container
+{
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+   display: none;
+   float:right;
+   width: 45%;
+   margin-right: 50px;
+   white-space: nowrap;
+   margin-top: 20px;
+   border: 1px solid gray;
+}
+
+.ame-suggest-buttons
+{
+   padding: 2px;
+   float: left;
+   font-size: 9pt;
+   height: 25px;
+}
+
+.ame-suggest-header {
+  font-weight: bold;
+   height: 23px;
+   margin: 0px;
+   border-bottom: 1px solid gray;
+   width: 100%;
+}
+
+.ame-suggest-header font {
+   padding-left: 5px;
+   padding-top: 2px;
+}
+
+.ame-suggest-control 
+{
+   max-height: 100px;
+   overflow: auto;
+   border: none;
+   overflow-x: hidden;
+   border-bottom: 1px solid gray;
+}
+
+ul.dynatree-container
+{
+   font-size: 9pt;
+   white-space: nowrap;
+   padding-top: 3px;
+   margin-top: -3px;
+   background-color: #FFFFFF;
+   border:none;
+   overflow: auto;
+}
+
+.dynatree-path
+{
+   font-size: 8pt;
+   color: gray;
+   font-style: italic;
+   padding-left: 30px;
+   padding-top: 3px;
+}
+
+.ame-suggest-add
+{
+   margin: 3px;
+}
+.ame-suggest-end
+{
+   display: block;
+   clear:both;
+}
+
+.ame-item-field,
+.ame-add-item
+{
+   padding: 3px 3px 3px 70px;
+}
+
+.ame-tooltip {
+	display:none;
+	background-color:#ffa;
+	border:1px solid #cc9;
+	padding:3px;
+	font-size:12px;
+        max-width: 300px;
+	-moz-box-shadow: 2px 2px 11px #666;
+	-webkit-box-shadow: 2px 2px 11px #666;
+}
+
+
+.ame-instructions {
+   font-style: italic;
+}
+
+ul.dynatree-container a:hover
+{
+    text-decoration: underline; 
+    background: #FFFFFF; 
+    border-color: #FFFFFF; 
+}
+
+ul.dynatree-container a:focus,
+span.dynatree-focused a:link  /* @IE */
+{
+    border: none;
+    background-color: #FFFFF; 
+}
+
+span.dynatree-selected a
+{
+    font-style: italic;
+}
+
+span.dynatree-active a
+{
+    background-color: #FFFFFF; 
+    border: none;
+}
+
