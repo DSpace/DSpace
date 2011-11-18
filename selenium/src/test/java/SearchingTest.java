@@ -26,9 +26,7 @@ public class SearchingTest extends TestCase {
 	}
 
 	@Test
-	public void testSearchDog() {
-	    Assert.assertTrue("This is supposed to be true.", true);
-	    
+	public void testSearchDog() {	    
 		driver.get("http://datadryad.org");
 		driver.findElement(By.id("ds-header-logo")).click();
 		driver.findElement(By.name("query")).clear();
