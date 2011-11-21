@@ -30,13 +30,6 @@ public class HomePageTest extends TestCase {
 	driver.get(baseUrl + "/");
 	assertEquals("Dryad Home", driver.getTitle());
 	assertTrue("recently published list", isElementPresent(By.cssSelector("li.ds-artifact-item.even")));
-	assertTrue("head contains title", sectionContains("h1.ds-div-head", "Data from: Testing"));
-	assertTrue("citation contains publication info", sectionContains("div.citation-view", "(2007) Testing"));
-	assertTrue("citation contains package info", sectionContains("div.citation-view", "(2007) Data from: Testing"));
-	assertTrue("spatial coverage", sectionContains("div.primary","South America"));
-	assertTrue("data file description", sectionContains("div.primary","Relative Warps"));
-	assertTrue("data file size", sectionContains("div.primary","131.5Kb"));
-	assertTrue("file download link", isElementPresent(By.linkText("Sidlauskas 2007 Data.xls")));
     }
     
     @After
