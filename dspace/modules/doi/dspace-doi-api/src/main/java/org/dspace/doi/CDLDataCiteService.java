@@ -68,6 +68,10 @@ public class CDLDataCiteService {
     public String registerDOI(String aDOI, String aURL, Map<String, String> metadata) throws IOException {
         changePrefixDOIForTestEnv(aDOI);
 
+        if(aDOI.startsWith("doi")){
+            aDOI = aDOI.substring(4);
+        }
+
         PutMethod put = new PutMethod(BASEURL + "/id/doi%3A" + aDOI);
         return executeHttpMethod(aURL, metadata, put);
     }
@@ -83,6 +87,10 @@ public class CDLDataCiteService {
      */
     public String update(String aDOI, String aURL, Map<String, String> metadata) throws IOException {
         changePrefixDOIForTestEnv(aDOI);
+
+        if(aDOI.startsWith("doi")){
+            aDOI = aDOI.substring(4);
+        }
 
         PostMethod post = new PostMethod(BASEURL + "/id/doi%3A" + aDOI);
 
@@ -298,7 +306,7 @@ public class CDLDataCiteService {
     public static Map<String, String> createMetadataList(Item item) {
         Map<String, String> metadata = new HashMap<String, String>();
 
-	log.debug("generating DataCite metadata for " + item.getMetadata("dc.title")[0]);
+	    System.out.println("generating DataCite metadata for " + item.getMetadata("dc.title")[0]);
 	
         // dc: creator, title, publisher
         addMetadata(metadata, item, "dc.contributor.author", DC_CREATOR);
