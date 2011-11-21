@@ -129,6 +129,14 @@ public class CDLDataCiteService {
 	        log.debug("Adding other metadata");
             map.putAll(metadata);
 	    }
+
+        System.out.println("Adding the following Metadata:");
+        if(metadata!=null){
+            Set<String>keys = metadata.keySet();
+            for(String key : keys){
+                System.out.println(key + ": " + metadata.get(key));
+            }
+        }
 	
         httpMethod.setRequestEntity(new StringRequestEntity(encodeAnvl(map), "text/plain", "UTF-8"));
 
@@ -219,20 +227,20 @@ public class CDLDataCiteService {
         CDLDataCiteService service;
 
 
-        // args[0]=DOI
+        // LOOKUP: args[0]=DOI
         if(args.length == 1){
             service = new CDLDataCiteService(null, null);
             String doiID = args[0];
             System.out.println(service.lookup(doiID));
         }
-        // args= USERNAME PASSWORD synchall
+        // SYNCHALL: args= USERNAME PASSWORD synchall
         else if(args.length==3 && args[2].equals("synchall")){
             String username = args[0];
             String password = args[1];
             service = new CDLDataCiteService(username, password);
             service.synchAll();
         }
-        //args= USERNAME PASSWORD DOI URL ACTION
+        // REGISTER || UPDATE: args= USERNAME PASSWORD DOI URL ACTION
         else if (args.length == 5){
             String username = args[0];
             String password = args[1];
@@ -341,7 +349,7 @@ public class CDLDataCiteService {
         addMetadata(metadata, item, "dc.rights.uri", DC_RIGHTS);
         addMetadata(metadata, item, "dc.description", DC_DESCRIPTION);
 
-	log.debug("DataCite metadata contains " + metadata.size() + " fields");
+	   log.debug("DataCite metadata contains " + metadata.size() + " fields");
 
         return metadata;
 
