@@ -7,6 +7,7 @@ import java.util.*;
 
 import javax.mail.MessagingException;
 
+import com.sun.corba.se.impl.orbutil.concurrent.Sync;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthPolicy;
@@ -50,6 +51,14 @@ public class CDLDataCiteService {
     public static final String DATACITE_TITLE = "datacite.title";
     public static final String DATACITE_PUBLISHER = "datacite.publisher";
     public static final String DATACITE_PUBBLICATIONYEAR = "datacite.publicationyear";
+
+    public String publisher = null;
+
+
+    int registeredItems=0;
+    int synchItems=0;
+    int notProcessItems=0;
+    int itemsWithErrors=0;
 
 
     public CDLDataCiteService(final String aUsername, final String aPassword) {
@@ -138,13 +147,7 @@ public class CDLDataCiteService {
             map.putAll(metadata);
 	    }
 
-        System.out.println("Adding the following Metadata:");
-        if(metadata!=null){
-            Set<String>keys = metadata.keySet();
-            for(String key : keys){
-                System.out.println(key + ": " + metadata.get(key));
-            }
-        }
+        //logMetadata(metadata);
 	
         httpMethod.setRequestEntity(new StringRequestEntity(encodeAnvl(map), "text/plain", "UTF-8"));
 
@@ -155,6 +158,15 @@ public class CDLDataCiteService {
         return httpMethod.getStatusLine().toString();
     }
 
+    private void logMetadata(Map<String, String> metadata) {
+        log.debug("Adding the following Metadata:");
+        if(metadata!=null){
+            Set<String> keys = metadata.keySet();
+            for(String key : keys){
+                log.debug(key + ": " + metadata.get(key));
+            }
+        }
+    }
 
 
     private String changePrefixDOIForTestEnv(String doi){
@@ -169,8 +181,16 @@ public class CDLDataCiteService {
 
 
 
-    public void synchAll()  throws IOException{
+    public void synchAll(){
+
+        registeredItems=0;
+        synchItems=0;
+        notProcessItems=0;
+        itemsWithErrors=0;
+
         System.out.println("Starting....");
+        Item item  = null;
+        String doi = null;
 
         try {
             org.dspace.core.Context context = new org.dspace.core.Context();
@@ -178,32 +198,70 @@ public class CDLDataCiteService {
             ItemIterator items = Item.findAll(context);
 
             while(items.hasNext()){
-                Item item  = items.next();
-                String doi = getDoiValue(item);
+                item  = items.next();
+                doi = getDoiValue(item);
 
                 if(doi!=null){
                     String response = lookup(doi);
 
                     if(response.contains("invalid DOI identifier")){
-                        try{
-                            DOI doiObj = new DOI(doi, item);
-
-                            System.out.println("Register Item: " + doi + " result: " + this.registerDOI(doi, doiObj.getTargetURL().toString(),  createMetadataList(item)));
-                        }catch (DOIFormatException de){
-                            System.out.println("Can't build the following doi: " + doi);
-                            de.printStackTrace(System.out);
-                        }
+                        registerItem(item, doi);
+                        registeredItems++;
                     }
                     else{
-                        System.out.println("Update Item: " + doi + " result: " + this.update(doi, null, createMetadataList(item)));
+                        updateItem(item, doi);
+                        synchItems++;
                     }
+                }
+                else{
+
+                    // Impossible to process
+                    System.out.println("Item not processed because doi is absent: " + item.getID());
+                    notProcessItems++;
                 }
             }
 
         } catch (SQLException e) {
-            System.exit(1);
+            System.out.println("problem with Item: " + (item !=null ? item.getID() : null) + " - " + doi);
+            e.printStackTrace(System.out);
+            itemsWithErrors++;
+
+        } catch (IOException e) {
+            System.out.println("problem with Item: " + (item !=null ? item.getID() : null) + " - " + doi);
+            e.printStackTrace(System.out);
+            itemsWithErrors++;
+
         }
-        System.out.println("Synchronization executed with success.");
+
+        System.out.println("Synchronization executed.  registeredItems: " + registeredItems + " updateItems:" + synchItems + " notProcessedItems:" + notProcessItems + " itemsWithErrors:" + itemsWithErrors);
+    }
+
+
+
+    private void updateItem(Item item, String doi) throws IOException {
+        try{
+            System.out.println("Update Item: " + doi + " result: " + this.update(doi, null, createMetadataList(item)));
+
+        }catch (DOIFormatException de){
+            System.out.println("Can't synch the following Item: " + item.getID() + " - " + doi);
+            de.printStackTrace(System.out);
+            itemsWithErrors++;
+        }
+    }
+
+
+
+    private void registerItem(Item item, String doi) throws IOException {
+        try{
+            DOI doiObj = new DOI(doi, item);
+
+            System.out.println("Register Item: " + doi + " result: " + this.registerDOI(doi, doiObj.getTargetURL().toString(),  createMetadataList(item)));
+
+        }catch (DOIFormatException de){
+            System.out.println("Can't register the following Item: " + item.getID() + " - " + doi);
+            de.printStackTrace(System.out);
+            itemsWithErrors++;
+        }
     }
 
 
@@ -306,7 +364,7 @@ public class CDLDataCiteService {
     public static Map<String, String> createMetadataList(Item item) {
         Map<String, String> metadata = new HashMap<String, String>();
 
-	    System.out.println("generating DataCite metadata for " + item.getMetadata("dc.title")[0]);
+	    log.debug("generating DataCite metadata for " + item.getMetadata("dc.title")[0]);
 	
         // dc: creator, title, publisher
         addMetadata(metadata, item, "dc.contributor.author", DC_CREATOR);
@@ -316,7 +374,10 @@ public class CDLDataCiteService {
         // datacite: creator, title, publisher
         addMetadata(metadata, item, "dc.contributor.author", DATACITE_CREATOR);
         addMetadata(metadata, item, "dc.title", DATACITE_TITLE);
-        addMetadata(metadata, item, "dc.publisher", DATACITE_PUBLISHER);
+
+
+        //addMetadata(metadata, item, "dc.publisher", DATACITE_PUBLISHER);
+        metadata.put(DATACITE_PUBLISHER, "Dryad Digital Repository");
 
 
         // dc.date && datacite.publicationyear
@@ -363,8 +424,8 @@ public class CDLDataCiteService {
 
     }
 
-    private static void addMetadata(Map<String, String> metadataList, Item item, String itemMetadata, String dataCiteMetadataKey) {
-        DCValue[] values = item.getMetadata(itemMetadata);
+    private static void addMetadata(Map<String, String> metadataList, Item item, String itemMetadataInput, String dataCiteMetadataKey) {
+        DCValue[] values = item.getMetadata(itemMetadataInput);
         if (values != null && values.length > 0) {
             metadataList.put(dataCiteMetadataKey, values[0].value);
         }
