@@ -61,6 +61,7 @@ public class CDLDataCiteService {
     int itemsWithErrors=0;
 
 
+
     public CDLDataCiteService(final String aUsername, final String aPassword) {
         myUsername = aUsername;
         myPassword = aPassword;
@@ -188,17 +189,23 @@ public class CDLDataCiteService {
         notProcessItems=0;
         itemsWithErrors=0;
 
+        int itemCounter=0;
+
         System.out.println("Starting....");
         Item item  = null;
         String doi = null;
-
+        List<Item> itemsToProcess=new ArrayList<Item>();
         try {
-            org.dspace.core.Context context = new org.dspace.core.Context();
-            context.turnOffAuthorisationSystem();
-            ItemIterator items = Item.findAll(context);
+            itemsToProcess = getItems();
 
-            while(items.hasNext()){
-                item  = items.next();
+            System.out.println("Item to process: " + itemsToProcess.size());
+
+            for(Item item1 : itemsToProcess){
+
+                itemCounter++;
+                System.out.println("processing: " + itemCounter + " of " + itemsToProcess.size());
+
+                item=item1;
                 doi = getDoiValue(item);
 
                 if(doi!=null){
@@ -233,9 +240,26 @@ public class CDLDataCiteService {
 
         }
 
-        System.out.println("Synchronization executed.  registeredItems: " + registeredItems + " updateItems:" + synchItems + " notProcessedItems:" + notProcessItems + " itemsWithErrors:" + itemsWithErrors);
+        System.out.println("Synchronization executed. Prcocessed Items:" + itemsToProcess.size() + " registeredItems:" + registeredItems + " updateItems:" + synchItems + " notProcessedItems:" + notProcessItems + " itemsWithErrors:" + itemsWithErrors);
     }
 
+
+    private List<Item> getItems() throws SQLException {
+        org.dspace.core.Context context = new org.dspace.core.Context();
+        context.turnOffAuthorisationSystem();
+        ItemIterator items = Item.findAll(context);
+
+        // clean list item, process only dataPackages or DataFiles
+        List<Item> itemsToProcess = new ArrayList<Item>();
+        while (items.hasNext()) {
+            Item item = items.next();
+            String doi = getDoiValue(item);
+            if (doi != null && doi.startsWith("doi")) {
+                itemsToProcess.add(item);
+            }
+        }
+        return itemsToProcess;
+    }
 
 
     private void updateItem(Item item, String doi) throws IOException {
