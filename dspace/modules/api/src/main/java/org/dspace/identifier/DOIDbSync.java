@@ -19,7 +19,12 @@ import java.sql.SQLException;
  * User: fabio.bolognesi
  * Date: 8/15/11
  * Time: 2:53 PM
- * To change this template use File | Settings | File Templates.
+ *
+ * Process all the items in  stats.datapkgs.coll, stats.datafiles.coll and try to resolve/synchronize the DOI
+ *
+ * usage: ./dspace dsrun org.dspace.doi.DOIDbSync
+ *          -r: create a report (
+ *          -s create a report and synchronize
  */
 public class DOIDbSync {
 
