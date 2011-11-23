@@ -81,7 +81,7 @@ do_install()
 
 	$DATA_DIR/bin/dspace create-administrator
 	#sudo chown -R myUser.myGroup $DATA_DIR
-	chmod -R a+rw $DATA_DIR/log
+	chmod -R a+rw $DATA_DIR/log $DATA_DIR/assetstore $DATA_DIR/upload
 
     print_sec "Felicitaciones! se instalo correctamente Dspace@SeDiCI en \n\t $DATA_DIR \n\t con la BBDD $dspace_dbname"
 }
