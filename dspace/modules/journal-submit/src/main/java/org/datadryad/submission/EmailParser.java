@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Akio Sone
  * @author Kevin S. Clarke
+ * @author Peter E. Midford
  */
 public abstract class EmailParser {
 
