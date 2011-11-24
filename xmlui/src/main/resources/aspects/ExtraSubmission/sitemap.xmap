@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  
+  Este aspecto permite la inclusión de entradas en el DRI utilizadas para el proceso de submit 
+  
+-->
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+
+  <map:components>    
+    <map:selectors>
+      <map:selector name="AuthenticatedSelector" src="ar.edu.unlp.sedici.aspect.extraSubmission.AuthenticatedSelector"/>
+    </map:selectors>
+    
+    <map:matchers default="wildcard">
+      <map:matcher name="HandleTypeMatcher" src="org.dspace.app.xmlui.aspect.general.HandleTypeMatcher"/>
+      <map:matcher name="HandleAuthorizedMatcher" src="org.dspace.app.xmlui.aspect.general.HandleAuthorizedMatcher"/>
+      <map:matcher name="regexp" src="org.apache.cocoon.matching.RegexpURIMatcher"/>
+    </map:matchers>
+
+  </map:components>
+  
+  
+  <map:pipelines>
+    <map:pipeline>
+      <map:generate/>
+      <!-- Make sure the user is atleast logged in -->
+      <map:select type="AuthenticatedSelector">
+        <map:when test="administrator">
+          <map:match pattern="handle/*/*/submit/*.continue">
+            <map:transform type="IncludePageMeta">
+                <map:parameter name="administrator" value="true"/>
+            	<map:parameter name="javascript#1" value="lib/js/jquery-ui-1.8.15.custom.min.js"/>
+                <map:parameter name="javascript#2" value="lib/js/choice-support-administrator.js"/>
+            </map:transform>
+          </map:match>
+          
+          <map:serialize type="xml"/>
+          
+        </map:when>
+        
+        <map:when test="eperson">
+          
+          <map:match pattern="handle/*/*/submit/*.continue">
+            <map:transform type="IncludePageMeta">
+                <map:parameter name="administrator" value="false"/>
+                <map:parameter name="javascript#1" value="lib/js/jquery-ui-1.8.15.custom.min.js"/>
+            	<map:parameter name="javascript#2" value="lib/js/choice-support-eperson.js"/>
+            </map:transform>
+          </map:match>
+          
+          <map:serialize type="xml"/>
+        </map:when>
+        <map:otherwise>
+        	<map:serialize type="xml"/>
+        </map:otherwise>
+      </map:select> 
+  
+
+    </map:pipeline>
+  </map:pipelines>
+  
+  
+</map:sitemap>

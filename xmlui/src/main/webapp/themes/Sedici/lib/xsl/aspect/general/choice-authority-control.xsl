@@ -44,6 +44,9 @@
 
     <!-- choose 'hidden' for invisible auth, 'text' lets CSS control it. -->
     <xsl:variable name="authorityInputType" select="'text'"/>
+    
+    <!-- Variable para el manejo de la propiedad -->
+    <xsl:variable name="isAdministrator" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='administrator']"/>
 
     <!-- add button to invoke Choices lookup popup.. assume
       -  that the context is a dri:field, where dri:params/@choices is true.
@@ -273,33 +276,40 @@
       <xsl:variable name="authLabelID" select="concat(translate(@id,'.','_'),'_authority_label')"/>
       <xsl:variable name="confFieldID" select="concat(translate(@id,'.','_'),'_confidence')"/>
 
-      <!-- the authority label -->
-
-      <xsl:if test="not(contains(dri:params/@choicesClosed, 'yes'))">
-      <input>
-        <xsl:attribute name="class">
-          <xsl:text>ds-authority-label</xsl:text>
-        </xsl:attribute>
-        <xsl:attribute name="type"><xsl:value-of select="$authorityInputType"/></xsl:attribute>
-        <xsl:attribute name="readonly"><xsl:text>readonly</xsl:text></xsl:attribute>
-        <xsl:attribute name="name">
-          <xsl:value-of select="concat($name,'_authority_label')"/>
-          <xsl:if test="$position">
-            <xsl:value-of select="concat('_', $position)"/>
-          </xsl:if>
-        </xsl:attribute>
-        <xsl:if test="$id">
-          <xsl:attribute name="id">
-            <xsl:value-of select="$authLabelID"/>
-          </xsl:attribute>
-        </xsl:if>
-        <xsl:attribute name="value">
-          <xsl:value-of select="$authValue"/>
-        </xsl:attribute>
-
-      </input>
-      </xsl:if>
-
+      <!-- 
+      	The authority label 
+      	Agregado por Nico.
+      	Dependiendo si es administrador el usuario logueado y de si el authority es abierto se agrega un input onlyread
+      	que muestra el label correspondiente al authority key.
+      -->
+      <xsl:if test="$isAdministrator = 'true'">
+	      <xsl:if test="not(contains(dri:params/@choicesClosed, 'yes'))">
+	      <input>
+	        <xsl:attribute name="class">
+	          <xsl:text>ds-authority-label</xsl:text>
+	        </xsl:attribute>
+	        <xsl:attribute name="type"><xsl:value-of select="$authorityInputType"/></xsl:attribute>
+	        <xsl:attribute name="readonly"><xsl:text>readonly</xsl:text></xsl:attribute>
+	        <xsl:attribute name="name">
+	          <xsl:value-of select="concat($name,'_authority_label')"/>
+	          <xsl:if test="$position">
+	            <xsl:value-of select="concat('_', $position)"/>
+	          </xsl:if>
+	        </xsl:attribute>
+	        <xsl:if test="$id">
+	          <xsl:attribute name="id">
+	            <xsl:value-of select="$authLabelID"/>
+	          </xsl:attribute>
+	        </xsl:if>
+	        <xsl:attribute name="value">
+	          <xsl:value-of select="$authValue"/>
+	        </xsl:attribute>
+	
+	      </input>
+      	</xsl:if>
+	  </xsl:if>
+	  
+	  
       <!-- the authority key value -->
       <input>
         <xsl:attribute name="class">
