@@ -15,13 +15,13 @@ import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
-
 import org.apache.commons.lang.StringUtils;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import ar.edu.unlp.sedici.dspace.utils.*;
 
 /**
  * A command-line tool for creating an initial user for setting up a
@@ -241,7 +241,19 @@ public final class CreateUser
     	}
     	
     	// Create the user e-person
-        EPerson eperson = EPerson.findByEmail(context,email);
+        if (email==""){
+        	throw new IllegalStateException("Error, El usuario no tiene mail");
+        }else{
+        	if (!Utils.isEmail(email)){
+        		throw new IllegalStateException("Error, El email no es valido para el usuario: ");
+        	}
+        }
+        
+        if (last==""){
+        	throw new IllegalStateException("Error, El usuario no tiene el apellido Cargado");
+        }
+    	
+    	EPerson eperson = EPerson.findByEmail(context,email);
         
         // check if the email belongs to a registered user,
         // if not create a new user with this email
@@ -249,22 +261,30 @@ public final class CreateUser
         {
             eperson = EPerson.create(context);
             eperson.setEmail(email);
-            eperson.setCanLogIn(true);
+            eperson.setCanLogIn(false);
+            if (pw!=""){
+            	eperson.setCanLogIn(true);	
+            	eperson.setPassword(pw);
+            }
+            
             eperson.setRequireCertificate(false);
             eperson.setSelfRegistered(false);
+            eperson.setLastName(last);
+        	eperson.setFirstName(first);
+        	eperson.setLanguage(language);
+        	
+        	eperson.update();
+        	
+        	user_anonymous.addMember(eperson);
+        	user_anonymous.update();
+        	
+        	context.complete();
+        	
+        	System.out.println("La cuenta de usuario ha sido creada");
+        }else{
+        	throw new IllegalStateException("Error, El email ya se encuentra registrado");
         }
     	
-    	eperson.setLastName(last);
-    	eperson.setFirstName(first);
-    	eperson.setLanguage(language);
-    	eperson.setPassword(pw);
-    	eperson.update();
     	
-    	user_anonymous.addMember(eperson);
-    	user_anonymous.update();
-    	
-    	context.complete();
-    	
-    	System.out.println("User account created");
     }
 }

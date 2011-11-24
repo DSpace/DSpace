@@ -108,8 +108,7 @@ public final class ImportUsers
                 
                 DocumentBuilder db = factory.newDocumentBuilder();
                 Document doc = db.parse(uri);
-                System.out.println(doc);
-                 doNodes(doc);
+                doNodes(doc);
                // checkValues();
         }
         catch (FactoryConfigurationError fe)
@@ -118,7 +117,7 @@ public final class ImportUsers
         }
         catch (Exception e)
         {
-                throw new DCInputsReaderException("No puede importar los usuariosss: "+e);
+                throw new DCInputsReaderException("El archivo xml no esta bien formado: "+e);
         }
     }
    
@@ -249,7 +248,7 @@ public final class ImportUsers
                         lastname = getValue(nd);
                        
                 }
-                if (nd.getNodeName().equals("mail"))
+                if (nd.getNodeName().equals("email"))
                 {
                        email = getValue(nd);
                         
@@ -268,7 +267,8 @@ public final class ImportUsers
 			cu.createUser(email, firstname, lastname, "", password);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			//e1.printStackTrace();
+			System.out.println(e1);
 		}
     }
 
@@ -421,9 +421,9 @@ public final class ImportUsers
     	
     	CommandLine line = parser.parse(options, argv);
     	BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-    	//System.out.print("Ingrese el nombre del archivo de usuarios a importar: ");
-		//System.out.flush();
-    	iu.buildInputs(defsFile);
+    	System.out.print("Ingrese el nombre del archivo de usuarios a importar: ");
+		System.out.flush();
+    	iu.buildInputs(input.readLine());
     	
     	
     }
