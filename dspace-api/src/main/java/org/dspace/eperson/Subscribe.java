@@ -12,10 +12,12 @@ import java.sql.SQLException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
+import java.util.TimeZone;
 
 import javax.mail.MessagingException;
 
@@ -343,15 +345,23 @@ public class Subscribe
         ResourceBundle labels =  ResourceBundle.getBundle("Messages", supportedLocale);
         
         // Get the start and end dates for yesterday
-        Date thisTimeYesterday = new Date(System.currentTimeMillis()
-                - (24 * 60 * 60 * 1000));
 
-        DCDate dcDateYesterday = new DCDate(thisTimeYesterday);
+        // The date should reflect the timezone as well. Otherwise we stand to lose that information 
+        // in truncation and roll to an earlier date than intended.
+        Calendar cal = Calendar.getInstance(TimeZone.getDefault());
+        cal.setTime(new Date());
+        
+        // What we actually want to pass to Harvest is "Midnight of yesterday in my current timezone"
+        // Truncation will actually pass in "Midnight of yesterday in UTC", which will be,
+        // at least in CDT, "7pm, the day before yesterday, in my current timezone".
+        cal.add(Calendar.HOUR, -24);
+        Date thisTimeYesterday = cal.getTime();
+        
+        cal.set(Calendar.HOUR_OF_DAY, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        Date midnightYesterday = cal.getTime();
 
-        // this time yesterday in ISO 8601, stripping the time
-        String isoDateYesterday = dcDateYesterday.toString().substring(0, 10);
-
-        String startDate = isoDateYesterday;
 
         // FIXME: text of email should be more configurable from an
         // i18n viewpoint
@@ -366,7 +376,7 @@ public class Subscribe
                 boolean includeAll = ConfigurationManager.getBooleanProperty("harvest.includerestricted.subscription", true);
                 
                 // we harvest all the changed item from yesterday until now
-                List<HarvestedItemInfo> itemInfos = Harvest.harvest(context, c, startDate, null, 0, // Limit
+                List<HarvestedItemInfo> itemInfos = Harvest.harvest(context, c, new DCDate(midnightYesterday).toString(), null, 0, // Limit
                                                                                     // and
                                                                                     // offset
                                                                                     // zero,
