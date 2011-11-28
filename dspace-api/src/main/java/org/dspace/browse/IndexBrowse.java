@@ -564,6 +564,9 @@ public class IndexBrowse
                 {
                     String nValue = OrderFormat.makeSortString(value.value, value.language, so.getType());
                     sortMap.put(key, nValue);
+                } else {
+                	// Add an empty entry to clear out any old values in the sort columns.
+                	sortMap.put(key, null);
                 }
             }
             
