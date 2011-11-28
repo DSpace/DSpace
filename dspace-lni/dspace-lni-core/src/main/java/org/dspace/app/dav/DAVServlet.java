@@ -289,80 +289,92 @@ public class DAVServlet extends HttpServlet
     {
         Context context = new Context();
 
-        if (getAuthFromCookie(context, request))
-        {
-            putAuthCookie(context, request, response, false);
-            return context;
-        }
+        try {
+	        if (getAuthFromCookie(context, request))
+	        {
+	            putAuthCookie(context, request, response, false);
+		        Context returnContext = context;
+		        context = null;
+		        return returnContext;
+	        }
+	
+	        // get username/password from Basic auth header if avail:
+	        String cred = request.getHeader("Authorization");
+	        if (cred != null && username == null && password == null)
+	        {
+	            log.info(LogManager.getHeader(context, "got creds", "Authorize: "
+	                    + cred));
+	            StringTokenizer ct = new StringTokenizer(cred);
+	
+	            // format: Basic {username:password in base64}
+	            if (ct.nextToken().equalsIgnoreCase("Basic"))
+	            {
+	                String crud = ct.nextToken();
+	                String dcrud = new String(Base64.decodeBase64(crud.getBytes()));
+	                int colon = dcrud.indexOf(':');
+	                if (colon > 0)
+	                {
+	                    username = decodeFromURL(dcrud.substring(0, colon));
+	                    password = decodeFromURL(dcrud.substring(colon + 1));
+	                    log
+	                            .info(LogManager.getHeader(context, "auth",
+	                                    "Got username=\"" + username
+	                                            + "\" out of \"" + crud + "\"."));
+	                }
+	            }
+	        }
 
-        // get username/password from Basic auth header if avail:
-        String cred = request.getHeader("Authorization");
-        if (cred != null && username == null && password == null)
-        {
-            log.info(LogManager.getHeader(context, "got creds", "Authorize: "
-                    + cred));
-            StringTokenizer ct = new StringTokenizer(cred);
-
-            // format: Basic {username:password in base64}
-            if (ct.nextToken().equalsIgnoreCase("Basic"))
-            {
-                String crud = ct.nextToken();
-                String dcrud = new String(Base64.decodeBase64(crud.getBytes()));
-                int colon = dcrud.indexOf(':');
-                if (colon > 0)
-                {
-                    username = decodeFromURL(dcrud.substring(0, colon));
-                    password = decodeFromURL(dcrud.substring(colon + 1));
-                    log
-                            .info(LogManager.getHeader(context, "auth",
-                                    "Got username=\"" + username
-                                            + "\" out of \"" + crud + "\"."));
-                }
-            }
+            // Authenticate the user.
+	        if (AuthenticationManager.authenticate(context, username, password,
+	                null, request) == AuthenticationMethod.SUCCESS)
+	        {
+	            log.info(LogManager.getHeader(context, "auth",
+	                    "Authentication returned SUCCESS, eperson="
+	                            + context.getCurrentUser().getEmail()));
+	        }
+	        else
+	        {
+	            if (username == null)
+	            {
+	                log.info(LogManager.getHeader(context, "auth",
+	                        "No credentials, so sending WWW-Authenticate header."));
+	            }
+	            else
+	            {
+	                log.warn(LogManager.getHeader(context, "auth",
+	                        "Authentication FAILED, cred=" + cred));
+	            }
+	
+	            // ...EXCEPT if dav.access.anonymous is true in config:
+	            if (!allowAnonymousAccess)
+	            {
+	                if (response != null)
+	                {
+	                    response.setHeader("WWW-Authenticate",
+	                            "Basic realm=\"dspace\"");
+	                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
+	                }
+	                return null;
+	            }
+	        }
+	
+	        // Set any special groups - invoke the authentication mgr.
+	        int[] groupIDs = AuthenticationManager.getSpecialGroups(context,
+	                request);
+	        for (int element : groupIDs)
+	        {
+	            context.setSpecialGroup(element);
+	            log.debug("Adding Special Group id=" + String.valueOf(element));
+	        }
+	        putAuthCookie(context, request, response, true);
+	        
+	        Context returnContext = context;
+	        context = null;
+	        return returnContext;
+        } finally {
+        	if(context != null)
+        		context.abort();
         }
-        if (AuthenticationManager.authenticate(context, username, password,
-                null, request) == AuthenticationMethod.SUCCESS)
-        {
-            log.info(LogManager.getHeader(context, "auth",
-                    "Authentication returned SUCCESS, eperson="
-                            + context.getCurrentUser().getEmail()));
-        }
-        else
-        {
-            if (username == null)
-            {
-                log.info(LogManager.getHeader(context, "auth",
-                        "No credentials, so sending WWW-Authenticate header."));
-            }
-            else
-            {
-                log.warn(LogManager.getHeader(context, "auth",
-                        "Authentication FAILED, cred=" + cred));
-            }
-
-            // ...EXCEPT if dav.access.anonymous is true in config:
-            if (!allowAnonymousAccess)
-            {
-                if (response != null)
-                {
-                    response.setHeader("WWW-Authenticate",
-                            "Basic realm=\"dspace\"");
-                    response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
-                }
-                return null;
-            }
-        }
-
-        // Set any special groups - invoke the authentication mgr.
-        int[] groupIDs = AuthenticationManager.getSpecialGroups(context,
-                request);
-        for (int element : groupIDs)
-        {
-            context.setSpecialGroup(element);
-            log.debug("Adding Special Group id=" + String.valueOf(element));
-        }
-        putAuthCookie(context, request, response, true);
-        return context;
     }
 
     /**
