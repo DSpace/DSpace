@@ -219,6 +219,14 @@
 
                         <xsl:variable name="title"
                                       select="$meta[@element='title'][@qualifier='package']"/>
+                        <xsl:text>
+                            This is the complete metadata stored for 
+                        </xsl:text>
+                        <xsl:copy-of select="$title"/>
+                        <xsl:text>
+                            For a more viewer-friendly layout, please see 
+                        </xsl:text>
+                        <!-- <href><<URL for the normal item page>></href> -->
                         <xsl:if test="not(starts-with($title, 'Data from: '))">
                             <i18n:text>xmlui.DryadItemSummary.dataFrom</i18n:text>
                         </xsl:if>
