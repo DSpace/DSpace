@@ -17,8 +17,11 @@ function initdatasetsubmissionfile() {
             //Make sure the title gets set with the filename
             var fileName = jQuery(this).val().substr(0, jQuery(this).val().lastIndexOf('.'));
             fileName = fileName.substr(fileName.lastIndexOf('\\') + 1, fileName.length);
-            //Find our input & give it the value of our filename
-            jQuery('input#aspect_submission_StepTransformer_field_dc_title').val(fileName);
+
+
+            var title_t = jQuery('input#aspect_submission_StepTransformer_field_dc_title').val();
+	        if(title_t==null || title_t=='')
+		        jQuery('input#aspect_submission_StepTransformer_field_dc_title').val(fileName);
         }
         //Now find our form
         var form = jQuery(this).closest("form");

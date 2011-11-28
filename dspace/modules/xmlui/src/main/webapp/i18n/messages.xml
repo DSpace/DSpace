@@ -3203,13 +3203,15 @@
     <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.DSpaceStatus">Status</message>
 
      <message key="xmlui.administrative.item.general.option_curate">Curate</message>
-        <message key="xmlui.administrative.item.general.option_queue">Queue</message>
+    <message key="xmlui.administrative.item.general.option_queue">Queue</message>
 
 
     <message key="xmlui.Submission.submit.OverviewStep.headgenbank">Genbank</message>
 	<message key="xmlui.Submission.submit.OverviewStep.genbankhelp"></message>
+    <message key="xmlui.general.cancel_delete">Cancel &amp; Delete</message>
 
-         <message key="xmlui.general.cancel_delete">Cancel &amp; Delete</message>
+
+    <message key="xmlui.ArtifactBrowser.RestrictedItem.questions">If you have questions about the status of this item, please send them to the Dryad curation staff:</message>
 
 
     <message key="xmlui.Discovery.DiscoverySubmissions.display-all">Display all</message>

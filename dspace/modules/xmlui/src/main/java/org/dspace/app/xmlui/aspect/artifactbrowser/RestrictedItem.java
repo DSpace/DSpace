@@ -12,6 +12,7 @@ import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.*;
 import org.dspace.content.Item;
+import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.workflow.*;
 import org.dspace.workflow.actions.WorkflowActionConfig;
 import org.xml.sax.SAXException;
@@ -85,6 +86,10 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
     private static final Message T_submit =message("xmlui.ArtifactBrowser.RestrictedItem.submit");
     private static final Message T_head_item_new =message("xmlui.ArtifactBrowser.RestrictedItem.head_item_new");
 
+    private static final Message T_head_item_questions =message("xmlui.ArtifactBrowser.RestrictedItem.questions");
+
+
+
 
 
 
@@ -104,12 +109,9 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
     }
 
 
-    public void addBody(Body body) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException {
+    public void addBody(Body body) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {
         Request request = ObjectModelHelper.getRequest(objectModel);
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-
-
 
         if (dso == null) {
             Division unauthorized = body.addDivision("unauthorized-resource", "primary");
@@ -129,6 +131,7 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
             // The dso may be an item but it could still be an item's bitstream. So let's check for the parameter.
             if (request.getParameter("bitstreamId") != null) {
                 String identifier = "unknown";
+
                 try {
                     Bitstream bit = Bitstream.find(context, new Integer(request.getParameter("bitstreamId")));
                     if (bit != null) {
@@ -141,31 +144,35 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
                 Division unauthorized = body.addDivision("unauthorized-resource", "primary");
                 unauthorized.setHead(T_head_bitstream);
                 unauthorized.addPara(T_para_bitstream.parameterize(identifier));
-            } else {
-
-
-
-
+            }
+            else {
                 String identifier = "unknown";
                 String handle = dso.getHandle();
-                if (handle == null || "".equals(handle)) {
-                    identifier = "internal ID: " + dso.getID();
+
+                // display DOI || handle || ID
+                String   doi = DOIIdentifierProvider.getDoiValue((Item)dso);
+                if(doi!=null && !"".equals(doi)){
+                    identifier = ".Identifier: " + doi;
+                }
+                else if (handle == null || "".equals(handle)) {
+                    identifier = ".Internal ID: " + dso.getID();
                 } else {
-                    identifier = "hdl:" + handle;
+                    identifier = ".Hdl:" + handle;
                 }
 
                 Division unauthorized = body.addDivision(getStateDescription((Item) dso), "primary");
                 unauthorized.setHead(T_head_item_new);
                 unauthorized.addPara(T_para_item.parameterize(identifier));
 
-
                 Message status = getState((Item) dso);
                 unauthorized.addPara("item_status",status.getKey()).addContent(status);
-
 
                 Division feedback = unauthorized.addInteractiveDivision("feedback-form", contextPath+"/feedback",Division.METHOD_POST,"primary");
                 // create feedback form
                 org.dspace.app.xmlui.wing.element.List form = feedback.addList("form", org.dspace.app.xmlui.wing.element.List.TYPE_FORM);
+
+
+                form.addItem().addContent(T_head_item_questions);
 
                 Text email = form.addItem().addText("email");
                 email.setLabel(T_email);
