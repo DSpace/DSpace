@@ -146,7 +146,9 @@ public class LoginChooser extends AbstractDSpaceTransformer implements
 		String characters = (String) session
 				.getAttribute(AuthenticationUtil.REQUEST_INTERRUPTED_CHARACTERS);
 
-		if (header != null || message != null || characters != null) {
+		if ( (header != null && header.trim().length() > 0) || 
+			 (message != null && message.trim().length() > 0) ||
+			 (characters != null && characters.trim().length() > 0)) {
 			Division reason = body.addDivision("login-reason");
 
 			if (header != null)
