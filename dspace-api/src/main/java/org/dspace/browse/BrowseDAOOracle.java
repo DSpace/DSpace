@@ -836,6 +836,7 @@ public class BrowseDAOOracle implements BrowseDAO
             {
                 queryBuf.append(" DESC ");
             }
+            queryBuf.append(" NULLS LAST ");
         }
     }
 
