@@ -1551,6 +1551,23 @@
                          alt="The American Naturalist cover"/>
                 </a>
             </xsl:when>
+            <xsl:when test='$journal-name = "Biological Journal of the Linnean Society"'>
+                <a>
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="string('http://www.blackwellpublishing.com/BIJ')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/BJLS.png"
+                        alt="Biological Journal of the Linnean Society cover"/>
+                </a>
+            </xsl:when>
             <xsl:when test='$journal-name = "BioRisk"'>
                 <a>
                     <xsl:attribute name="href">
@@ -1753,7 +1770,7 @@
                         </xsl:choose>
                     </xsl:attribute>
                     <img id="journal-logo" src="/themes/Dryad/images/coverimages/MolEcolRes.png"
-                         alt="Molecular Ecology cover"/>
+                         alt="Molecular Ecology Resources cover"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Molecular Phylogenetics and Evolution"'>
