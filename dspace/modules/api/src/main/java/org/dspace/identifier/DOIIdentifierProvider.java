@@ -160,7 +160,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
                     DOI doi_ = new DOI(doi, previous);
 
 
-                    String collection = getCollection(context, item);
+                    String collection = getCollection(context, previous);
                     String myDataPkgColl = configurationService.getProperty("stats.datapkgs.coll");
                     DOI canonical=null;
 
