@@ -844,6 +844,7 @@ public class BrowseDAOPostgres implements BrowseDAO
             {
                 queryBuf.append(" DESC ");
             }
+            queryBuf.append(" NULLS LAST ");
         }
     }
 
