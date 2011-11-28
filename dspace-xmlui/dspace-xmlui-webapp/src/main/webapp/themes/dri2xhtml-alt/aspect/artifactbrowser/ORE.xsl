@@ -30,6 +30,8 @@
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:xalan="http://xml.apache.org/xalan"
     xmlns:encoder="xalan://java.net.URLEncoder"
+    xmlns:dcterms="http://purl.org/dc/terms/"
+    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
     exclude-result-prefixes="xalan encoder i18n dri mets dim  xlink xsl">
 
 
@@ -59,19 +61,37 @@
 
     <!-- Iterate over the links in the ORE resource maps and make them into bitstream references in the file section -->
     <xsl:template match="atom:link[@rel='http://www.openarchives.org/ore/terms/aggregates']">
-        <tr>
-            <xsl:attribute name="class">
-                <xsl:text>ds-table-row </xsl:text>
-                <xsl:if test="(position() mod 2 = 0)">even </xsl:if>
-                <xsl:if test="(position() mod 2 = 1)">odd </xsl:if>
-            </xsl:attribute>
-            <td>
-                <a>
-                    <xsl:attribute name="href">
-                        <xsl:value-of select="@href"/>
-                    </xsl:attribute>
-                    <xsl:attribute name="title">
+        <xsl:variable name="link_href" select="@href"/>
+        <xsl:if test="/atom:entry/oreatom:triples/rdf:Description[@rdf:about=$link_href][dcterms:description='ORIGINAL']
+                    or not(/atom:entry/oreatom:triples/rdf:Description[@rdf:about=$link_href])">
+            <tr>
+                <xsl:attribute name="class">
+                    <xsl:text>ds-table-row </xsl:text>
+                    <xsl:if test="(position() mod 2 = 0)">even </xsl:if>
+                    <xsl:if test="(position() mod 2 = 1)">odd </xsl:if>
+                </xsl:attribute>
+                <td>
+                    <a>
+                        <xsl:attribute name="href">
+                            <xsl:value-of select="@href"/>
+                        </xsl:attribute>
+                        <xsl:attribute name="title">
+                            <xsl:choose>
+                                <xsl:when test="@title">
+                                    <xsl:value-of select="@title"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="@href"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:attribute>
                         <xsl:choose>
+                            <xsl:when test="string-length(@title) > 50">
+                                <xsl:variable name="title_length" select="string-length(@title)"/>
+                                <xsl:value-of select="substring(@title,1,15)"/>
+                                <xsl:text> ... </xsl:text>
+                                <xsl:value-of select="substring(@title,$title_length - 25,$title_length)"/>
+                            </xsl:when>
                             <xsl:when test="@title">
                                 <xsl:value-of select="@title"/>
                             </xsl:when>
@@ -79,63 +99,49 @@
                                 <xsl:value-of select="@href"/>
                             </xsl:otherwise>
                         </xsl:choose>
-                    </xsl:attribute>
+                    </a>
+                </td>
+                <!-- File size always comes in bytes and thus needs conversion -->
+                <td>
                     <xsl:choose>
-                        <xsl:when test="string-length(@title) > 50">
-                            <xsl:variable name="title_length" select="string-length(@title)"/>
-                            <xsl:value-of select="substring(@title,1,15)"/>
-                            <xsl:text> ... </xsl:text>
-                            <xsl:value-of select="substring(@title,$title_length - 25,$title_length)"/>
+                        <xsl:when test="@length &lt; 1000">
+                            <xsl:value-of select="@length"/>
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.size-bytes</i18n:text>
                         </xsl:when>
-                        <xsl:when test="@title">
-                            <xsl:value-of select="@title"/>
+                        <xsl:when test="@length &lt; 1000000">
+                            <xsl:value-of select="substring(string(@length div 1000),1,5)"/>
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.size-kilobytes</i18n:text>
                         </xsl:when>
-                        <xsl:otherwise>
-                            <xsl:value-of select="@href"/>
-                        </xsl:otherwise>
+                        <xsl:when test="@length &lt; 1000000001">
+                            <xsl:value-of select="substring(string(@length div 1000000),1,5)"/>
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.size-megabytes</i18n:text>
+                        </xsl:when>
+                        <xsl:when test="@length &gt; 1000000000">
+                            <xsl:value-of select="substring(string(@length div 1000000000),1,5)"/>
+                            <i18n:text>xmlui.dri2xhtml.METS-1.0.size-gigabytes</i18n:text>
+                        </xsl:when>
+                        <!-- When one isn't available -->
+                        <xsl:otherwise><xsl:text>n/a</xsl:text></xsl:otherwise>
                     </xsl:choose>
-                </a>
-            </td>
-            <!-- File size always comes in bytes and thus needs conversion -->
-            <td>
-                <xsl:choose>
-                    <xsl:when test="@length &lt; 1000">
-                        <xsl:value-of select="@length"/>
-                        <i18n:text>xmlui.dri2xhtml.METS-1.0.size-bytes</i18n:text>
-                    </xsl:when>
-                    <xsl:when test="@length &lt; 1000000">
-                        <xsl:value-of select="substring(string(@length div 1000),1,5)"/>
-                        <i18n:text>xmlui.dri2xhtml.METS-1.0.size-kilobytes</i18n:text>
-                    </xsl:when>
-                    <xsl:when test="@length &lt; 1000000001">
-                        <xsl:value-of select="substring(string(@length div 1000000),1,5)"/>
-                        <i18n:text>xmlui.dri2xhtml.METS-1.0.size-megabytes</i18n:text>
-                    </xsl:when>
-                    <xsl:when test="@length &gt; 1000000000">
-                        <xsl:value-of select="substring(string(@length div 1000000000),1,5)"/>
-                        <i18n:text>xmlui.dri2xhtml.METS-1.0.size-gigabytes</i18n:text>
-                    </xsl:when>
-                    <!-- When one isn't available -->
-                    <xsl:otherwise><xsl:text>n/a</xsl:text></xsl:otherwise>
-                </xsl:choose>
-            </td>
-            <!-- Currently format carries forward the mime type. In the original DSpace, this
-                would get resolved to an application via the Bitstream Registry, but we are
-                constrained by the capabilities of METS and can't really pass that info through. -->
-            <td>
-                <xsl:value-of select="substring-before(@type,'/')"/>
-                <xsl:text>/</xsl:text>
-                <xsl:value-of select="substring-after(@type,'/')"/>
-            </td>
-            <td>
-                <a>
-                    <xsl:attribute name="href">
-                        <xsl:value-of select="@href"/>
-                    </xsl:attribute>
-                    <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-viewOpen</i18n:text>
-                </a>
-            </td>
-        </tr>
+                </td>
+                <!-- Currently format carries forward the mime type. In the original DSpace, this
+                    would get resolved to an application via the Bitstream Registry, but we are
+                    constrained by the capabilities of METS and can't really pass that info through. -->
+                <td>
+                    <xsl:value-of select="substring-before(@type,'/')"/>
+                    <xsl:text>/</xsl:text>
+                    <xsl:value-of select="substring-after(@type,'/')"/>
+                </td>
+                <td>
+                    <a>
+                        <xsl:attribute name="href">
+                            <xsl:value-of select="@href"/>
+                        </xsl:attribute>
+                        <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-viewOpen</i18n:text>
+                    </a>
+                </td>
+            </tr>
+        </xsl:if>
     </xsl:template>
 
 </xsl:stylesheet>
