@@ -89,7 +89,12 @@ abstract class DAVDSpaceObject extends DAVResource
         int hs;
         if (handleSeparator != '/')
         {
-            handle = handle.replaceFirst("/", String.valueOf(handleSeparator));
+        	if(handleSeparator != '$') {
+        		handle = handle.replaceFirst("/", String.valueOf(handleSeparator));
+        	} else {
+        		// handle $ specially
+        		handle = handle.replaceFirst("/", "\\$");
+        	}
         }
         return "dso_" + encodeHandle(handle);
     }
