@@ -2063,5 +2063,12 @@ este momento. Cuando se usa QDC para los elementos de DSpace se recomienda el us
 <message key="xmlui.ChoiceLookupTransformer.field.dc_contributor_author.title">Búsqueda de autores en la LC Name Authorithy</message>
 <message key="xmlui.ChoiceLookupTransformer.field.dc_contributor_author.nonauthority"> Valor local "@1@" (no se encuentra en la Autoridad)</message>
 
+<!-- XMLWorkflow -->
+<message key="xmlui.XMLWorkflow.default.CollectionLevelReview">Revisión Local</message>
+<message key="xmlui.XMLWorkflow.default.CollectionLevelReview.claimaction">Revisión Local</message>
+<message key="xmlui.XMLWorkflow.default.CollectionLevelReview.editaction">Revisión Local</message>
+<message key="xmlui.XMLWorkflow.default.SeDiCILevelReview">Revisión SeDiCI</message>
+<message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.claimaction">Revisión SeDiCI</message>
+<message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.editaction">Revisión SeDiCI</message>
 
 </catalogue>

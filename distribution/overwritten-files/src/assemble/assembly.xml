@@ -16,6 +16,7 @@
 			<outputDirectory>.</outputDirectory>
 			<includes>
 				<include>config/**</include>
+				<include>etc/**</include>
 				<include>config/dspace.cfg</include>
 			</includes>
 			<excludes>

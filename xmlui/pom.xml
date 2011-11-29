@@ -120,21 +120,24 @@
 						<overlay>
 							<groupId>org.dspace.modules</groupId>
 							<artifactId>xmlui</artifactId>
-
 							<includes>
 								<include>WEB-INF/web.xml</include>
 							</includes>
 							<targetPath>webxml/</targetPath>
 						</overlay>
+
+						<!-- Se copia los archivos del proyecto para que tengan prioridad sobre los archivos de dspace:xmlui -->
+						<overlay>
+<!-- 							empty groupId/artifactId represents the current build -->
+						</overlay>
+
+						<!-- Se copian los archivos de dspace:xmlui (sin el web.xml) -->
 						<overlay>
 							<groupId>org.dspace.modules</groupId>
 							<artifactId>xmlui</artifactId>
 							<excludes>
 								<exclude>WEB-INF/web.xml</exclude>
 							</excludes>
-						</overlay>
-						<overlay>
-							<!-- empty groupId/artifactId represents the current build -->
 						</overlay>
 					</overlays>
 				</configuration>

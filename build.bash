@@ -79,6 +79,12 @@ do_install()
 	cd $BASE_DIR/distribution/target/dspace-sedici-distribution-bin
 	ant -Ddspace.dir=$DATA_DIR fresh_install -Dgeolite=$BASE_DIR/config/GeoLiteCity.dat.gz
 
+	echo -e "Instalando XMLWorkflow"
+	WORKFLOW_SCRIPTS="$DATA_DIR/etc/postgres/xmlworkflow"
+	$DATA_DIR/bin/dspace dsrun org.dspace.storage.rdbms.InitializeDatabase $WORKFLOW_SCRIPTS/xml_workflow.sql
+	$DATA_DIR/bin/dspace dsrun org.dspace.storage.rdbms.InitializeDatabase $WORKFLOW_SCRIPTS/workflow_migration.sql
+	$DATA_DIR/bin/dspace dsrun org.dspace.storage.rdbms.InitializeDatabase $WORKFLOW_SCRIPTS/initialize.sql
+
 	$DATA_DIR/bin/dspace create-administrator
 	#sudo chown -R myUser.myGroup $DATA_DIR
 	chmod -R a+rw $DATA_DIR/log $DATA_DIR/assetstore $DATA_DIR/upload
