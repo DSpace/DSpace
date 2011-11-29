@@ -1056,7 +1056,6 @@
                         select=".//dim:field[@element='subject'][@mdschema='dc'][not(@qualifier)]">
                     <xsl:copy-of select="node()"/>
                     <xsl:text>, </xsl:text>
-                    <!--<br />  -->
                 </xsl:for-each>
             </xsl:variable>
             <xsl:if test="$keywords!=''">
@@ -1094,7 +1093,7 @@
             <xsl:variable name="sciNames">
                 <xsl:for-each select=".//dim:field[@element='ScientificName']">
                     <xsl:copy-of select="node()"/>
-                    <br/>
+                    <xsl:text>, </xsl:text>
                 </xsl:for-each>
             </xsl:variable>
             <xsl:if test="$sciNames!=''">
@@ -1116,7 +1115,7 @@
                 <xsl:for-each
                         select=".//dim:field[@element='coverage'][@qualifier='spatial']">
                     <xsl:copy-of select="node()"/>
-                    <br/>
+                    <xsl:text>, </xsl:text>
                 </xsl:for-each>
             </xsl:variable>
             <xsl:if test="$spatialCoverage!=''">
@@ -1138,7 +1137,7 @@
                 <xsl:for-each
                         select=".//dim:field[@element='coverage'][@qualifier='temporal']">
                     <xsl:copy-of select="node()"/>
-                    <br/>
+                    <xsl:text>, </xsl:text>
                 </xsl:for-each>
             </xsl:variable>
             <xsl:if test="$temporalCoverage!=''">
