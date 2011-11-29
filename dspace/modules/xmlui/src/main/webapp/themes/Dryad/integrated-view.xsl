@@ -195,7 +195,7 @@
             <xsl:for-each select="/mets:METS/mets:fileSec/mets:fileGrp[@USE='CONTENT']/mets:file">
                 <!-- TITLE -->
                 <div>
-                    <span style="filename">
+                    <span class="filename">
                         Download:
                         <a>
                             <xsl:attribute name="href">
