@@ -195,13 +195,15 @@
             <xsl:for-each select="/mets:METS/mets:fileSec/mets:fileGrp[@USE='CONTENT']/mets:file">
                 <!-- TITLE -->
                 <div>
-                    <span>Download:</span>
-                    <a>
-                        <xsl:attribute name="href">
-                            <xsl:value-of select="mets:FLocat/@xlink:href"/>
-                        </xsl:attribute>
-                        <xsl:value-of select="mets:FLocat/@xlink:title"/>
-                    </a>
+                    <span style="filename">
+                        Download:
+                        <a>
+                            <xsl:attribute name="href">
+                                <xsl:value-of select="mets:FLocat/@xlink:href"/>
+                            </xsl:attribute>
+                            <xsl:value-of select="mets:FLocat/@xlink:title"/>
+                        </a>
+                    </span>
                     <!-- SIZE -->
                     <span class="bitstream-filesize">(
                         <xsl:choose>
