@@ -21,7 +21,9 @@ import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+import org.dspace.handle.HandleManager;
 import org.dspace.sort.SortOption;
+import org.dspace.workflow.DryadWorkflowUtils;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -32,6 +34,8 @@ import java.util.List;
  * User: kevin (kevin at atmire.com)
  * Date: 14-sep-2011
  * Time: 13:37:50
+ *
+ * This class renders all items in the workflow/in progress/archived that belong to the submitter
  */
 public class DiscoverySubmissions extends SimpleSearch {
 
@@ -39,15 +43,18 @@ public class DiscoverySubmissions extends SimpleSearch {
         message("xmlui.general.dspace_home");
     protected static final Message T_trail =
         message("xmlui.Submission.Submissions.trail");
+    protected static final Message T_untitled =
+        message("xmlui.Submission.Submissions.untitled");
+
 
 
     private static final Logger log = Logger.getLogger(DiscoverySubmissions.class);
 
     private static final Message T_no_results = message("xmlui.ArtifactBrowser.AbstractSearch.no_results");
-    private static final Message T_VIEW_MORE = message("xmlui.discovery.AbstractFiltersTransformer.filters.view-more");
+    protected static final Message T_VIEW_MORE = message("xmlui.discovery.AbstractFiltersTransformer.filters.view-more");
     protected static final Message T_title =
         message("xmlui.Submission.Submissions.title");
-    private static final Message T_display_all = message("xmlui.Discovery.DiscoverySubmissions.display-all");
+    protected static final Message T_display_all = message("xmlui.Discovery.DiscoverySubmissions.display-all");
 
     @Override
     public void addPageMeta(PageMeta pageMeta) throws WingException, SQLException {
@@ -94,32 +101,48 @@ public class DiscoverySubmissions extends SimpleSearch {
                 queryResults.getResults().getNumFound() > 0) {
 
             //For each of our possible steps loop retrieve the max of 10 results
-            List<FacetField.Count> workflowSteps = queryResults.getFacetField("Workflowstep_filter").getValues();
             List<FacetField.Count> statusFilters  = queryResults.getFacetField("DSpaceStatus_filter").getValues();
-            if(workflowSteps != null){
-                for (FacetField.Count count : workflowSteps) {
-                    renderSubmissionBlock(results, count);
-                }
-            }
             if(statusFilters != null){
                 for (FacetField.Count count : statusFilters) {
-                    if(count.getName().equals("Submission")){
-                        renderSubmissionBlock(results, count);
+                    if(count.getName().equals("Withdrawn")){
+                        //Withdrawn items are not rendered here
+                        continue;
+                    }
+                    
+                    if(0 < count.getCount()){
+                        if(count.getName().equals("Workflow")){
+                            List<FacetField.Count> workflowSteps = queryResults.getFacetField("Workflowstep_filter").getValues();
+                            if(workflowSteps != null){
+                                for (FacetField.Count workflowStep : workflowSteps) {
+                                    if(0 < workflowStep.getCount()){
+                                        renderResultBlock(results, workflowStep);
+                                    }
+                                }
+                            }
+                        }else{
+                            renderResultBlock(results, count);
+                        }
                     }
                 }
             }
+
+
         } else {
-            results.addPara(T_no_results);
+            results.addPara(getNoResultsMessage());
         }
         //}// Empty query
 
     }
 
-    private void renderSubmissionBlock(Division results, FacetField.Count count) throws SearchServiceException, WingException, SQLException {
+    protected Message getNoResultsMessage() {
+        return T_no_results;
+    }
+
+    protected void renderResultBlock(Division results, FacetField.Count count) throws SearchServiceException, WingException, SQLException {
         //Perform a query for each of these workflow steps.
         SolrQuery solrQuery = getDefaultQueryArgs();
         if(count.getFacetField().getName().equals("DSpaceStatus_filter")){
-            solrQuery.addFilterQuery("DSpaceStatus:Submission");
+            solrQuery.addFilterQuery("DSpaceStatus:" + count.getName());
         }else{
             solrQuery.addFilterQuery("Workflowstep:" + count.getName());
         }
@@ -161,19 +184,43 @@ public class DiscoverySubmissions extends SimpleSearch {
         }
 
 
-        ReferenceSet referenceSet = workflowResultsDiv.addReferenceSet("search-results-repository",
-                ReferenceSet.TYPE_SUMMARY_LIST, null, "repository-search-results");
+        Table resultTable = workflowResultsDiv.addTable("results", solrResults.size(), 2);
 
         boolean showMoreUrl = false;
         if(solrResults.size() < solrResults.getNumFound()){
             showMoreUrl = true;
         }
 
+        Row headerRow = resultTable.addRow(Row.ROLE_HEADER);
+        headerRow.addCell().addContent(message("xmlui.Submission.result-table.head.title"));
+        headerRow.addCell().addContent(message("xmlui.Submission.result-table.head.datafiles"));
+
         for (SolrDocument doc : solrResults) {
             DSpaceObject resultDSO = SearchUtils.findDSpaceObject(context, doc);
 
             if (resultDSO instanceof Item) {
-                referenceSet.addReference(resultDSO);
+                Item item = (Item) resultDSO;
+                Row itemRow = resultTable.addRow();
+
+                String url;
+                if(item.isArchived()){
+                    //Add the item url
+                    itemRow.addCell().addXref(HandleManager.resolveToURL(context, item.getHandle()), item.getName());
+                }else{
+                    WorkspaceItem workspaceItem = WorkspaceItem.findByItem(context, item);
+                    if(workspaceItem != null){
+                        String title = item.getName();
+                        if(title == null){
+                            itemRow.addCell().addXref(contextPath + "/submit?workspaceID=" + workspaceItem.getID(), T_untitled);
+                        }else{
+                            itemRow.addCell().addXref(contextPath + "/submit?workspaceID=" + workspaceItem.getID(), title);
+                        }
+                    }else{
+                        itemRow.addCell().addContent(item.getName());
+                    }
+                }
+
+                itemRow.addCell().addContent(DryadWorkflowUtils.getDataFiles(context, item).length);
             }
         }
 
@@ -189,7 +236,7 @@ public class DiscoverySubmissions extends SimpleSearch {
                     maskBuilder.append("&fq=").append(fq);
                 }
                 if(count.getFacetField().getName().equals("DSpaceStatus_filter")){
-                    maskBuilder.append("&fq=DSpaceStatus:").append("Submission");
+                    maskBuilder.append("&fq=DSpaceStatus:").append(count.getName());
                 }else{
                     maskBuilder.append("&fq=Workflowstep:").append(count.getName());
                 }
@@ -263,7 +310,7 @@ public class DiscoverySubmissions extends SimpleSearch {
         facet.addItem().addXref(
                 contextPath +
                         (dso == null ? "" : "/handle/" + dso.getHandle()) +
-                        "/discovery-submission-search-filter?" + parameters + BrowseFacet.FACET_FIELD + "=" + fieldName,
+                        "/discovery-my-tasks-search-filter?" + parameters + BrowseFacet.FACET_FIELD + "=" + fieldName,
                 T_VIEW_MORE
 
         );
@@ -274,7 +321,7 @@ public class DiscoverySubmissions extends SimpleSearch {
      * If we are filtering different options become available
      * @return true if we are on a step filter page
      */
-    private boolean isStepFilterPage(){
+    protected boolean isStepFilterPage(){
         Request request = ObjectModelHelper.getRequest(objectModel);
         String[] filterQueries = request.getParameterValues("fq");
         if(filterQueries != null){
@@ -313,7 +360,7 @@ public class DiscoverySubmissions extends SimpleSearch {
         return null;
     }
 
-    private SolrQuery getDefaultQueryArgs() throws UIException {
+    protected SolrQuery getDefaultQueryArgs() throws UIException {
         String query = getQuery();
 
         int page = getParameterPage();
@@ -331,6 +378,8 @@ public class DiscoverySubmissions extends SimpleSearch {
         {
             filterQueries.addAll(Arrays.asList(fqs));
         }
+
+        filterQueries.add("SubmitterName_filter:\"" + eperson.getName() + "\"");
 
 
         try {

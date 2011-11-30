@@ -8,29 +8,27 @@ import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 
 /**
  * User: kevin (kevin at atmire.com)
- * Date: 14-nov-2011
- * Time: 15:02:10
+ * Date: 30-nov-2011
+ * Time: 14:54:57
  */
-public class DiscoverySubmissionSearchFacetFilter extends SearchFacetFilter{
+public class DiscoverySubmissionMyTaskFacetFilter extends SearchFacetFilter{
 
     public String getView(){
-        return "discoverySubmissions";
+        return "myTasks";
     }
 
     public String getSearchFilterUrl(){
-        return "discovery-submission-search-filter";
+        return "discovery-my-tasks-search-filter";
     }
 
     public String getDiscoverUrl(){
-        return "submissions";
+        return "my-tasks";
     }
 
     protected String[] getSolrFilterQueries() {
@@ -63,7 +61,7 @@ public class DiscoverySubmissionSearchFacetFilter extends SearchFacetFilter{
                     allFilterQueries.add(fq.endsWith("*") ? fq : fq + " OR " + fq + "*");
                 }
             }
-            allFilterQueries.add("SubmitterName_filter:\"" + eperson.getName() + "\"");
+            allFilterQueries.add("WorkflowEpersonId:" + eperson.getID());
 
 
             //Check if our current user is an admin, if so we need to show only workflow tasks assigned to him

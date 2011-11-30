@@ -81,6 +81,9 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     protected static final Message T_submissions =
         message("xmlui.Submission.Navigation.submissions");
 
+    protected static final Message T_my_tasks =
+        message("xmlui.Submission.Navigation.my_tasks");
+
     /** Cached validity object */
     private SourceValidity validity;
 
@@ -191,6 +194,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
 	    account.setHead(T_my_account);
             account.addItemXref(contextPath+"/submissions",T_submissions);
+            account.addItemXref(contextPath+"/my-tasks",T_my_tasks);
         }
 
 

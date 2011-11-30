@@ -35,7 +35,7 @@ public class InternalSearchFacetFilter extends SearchFacetFilter{
     }
 
     public String getDiscoverUrl(){
-        return "non-archived-discovery";
+        return "workflow-overview";
     }
     
 }

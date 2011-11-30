@@ -773,6 +773,15 @@ public class SolrServiceImpl implements SearchService, IndexingService {
                 doc.addField("WorkflowEpersonId", String.valueOf(claimedTask.getOwnerID()));
                 workflowStepId = claimedTask.getStepID();
             }
+            if(0 < pooltasks.size()){
+                doc.addField("WorkflowstepTask", workflowStepId + "_pool");
+                doc.addField("WorkflowstepTask_filter", workflowStepId + "_pool");
+            }else
+            if(0 < claimedtasks.size()){
+                doc.addField("WorkflowstepTask", workflowStepId + "_claimed");
+                doc.addField("WorkflowstepTask_filter", workflowStepId + "_claimed");
+            }
+            
             doc.addField("Workflowstep", workflowStepId);
             doc.addField("Workflowstep_filter", workflowStepId);
         }

@@ -750,12 +750,13 @@
 
 	<!-- org.dspace.app.xmlui.submission.Navigation -->
 	<message key="xmlui.Submission.Navigation.submissions">My Submissions</message>
+	<message key="xmlui.Submission.Navigation.my_tasks">My Tasks</message>
 
 
 	<!-- org.dspace.app.xmlui.Submission.submissions -->
-	<message key="xmlui.Submission.Submissions.title">Submissions &amp; Workflow</message>
-	<message key="xmlui.Submission.Submissions.trail">Submissions overview</message>
-	<message key="xmlui.Submission.Submissions.head">Submissions &amp; workflow tasks</message>
+	<message key="xmlui.Submission.Submissions.title">My Submissions</message>
+	<message key="xmlui.Submission.Submissions.trail">My Submissions</message>
+	<message key="xmlui.Submission.Submissions.head">My Submissions</message>
 	<message key="xmlui.Submission.Submissions.untitled">
 		<i>Untitled</i>
 	</message>
@@ -3041,6 +3042,10 @@
 	<message key="xmlui.Submission.submit.OverviewStep.help.add-datafile">Click the button to add a new data file, please be aware that if the data file isn't fully submitted when the dataset is approved/rejected that it will be deleted.</message>
 	<message key="xmlui.Submission.Submissions.step.head.dryadAcceptEditReject">Awaiting curator review</message>
 	<message key="xmlui.Submission.Submissions.step.head.Submission">Unfinished submissions</message>
+	<message key="xmlui.Submission.Submissions.step.head.Archived">Archived</message>
+	<message key="xmlui.Submission.Submissions.step.head.Withdrawn">Withdrawn</message>
+	<message key="xmlui.Submission.Submissions.step.head.reviewStep">In Journal Review</message>
+	<message key="xmlui.Submission.Submissions.step.head.pendingPublicationStep">In Journal Review</message>
 	<message
 		key="xmlui.Submission.Submissions.default.dryadAcceptEditReject.dryadAcceptEditRejectAction"
 		>Awaiting curator review</message>
@@ -3149,7 +3154,7 @@
 
 
     <message key="xmlui.discovery.Navigation.option">Non archived</message>
-    <message key="xmlui.discovery.NonArchivedSearch.head">Non archived item search</message>
+    <message key="xmlui.discovery.NonArchivedSearch.head">Workflow Overview</message>
 
 
     <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_SubmitterName_filter">Submitter name</message>
@@ -3215,7 +3220,7 @@
 
 
     <message key="xmlui.Discovery.DiscoverySubmissions.display-all">Display all</message>
-    <message key="xmlui.Discovery.Navigation.non-archived-discovery">Non archived discovery</message>
+    <message key="xmlui.Discovery.Navigation.workflow-overview">Workflow Overview</message>
 
 
     <!-- Messages for AME aspect --> 
@@ -3240,5 +3245,19 @@
     <message key="xmlui.ChoiceLookupTransformer.field.dc_subject.title">Lookup Subject</message>
      <message key="xmlui.ChoiceLookupTransformer.field.dc_subject.instructions">Below is a list of possible matches from the configured <a href="http://en.wikipedia.org/wiki/Controlled_vocabulary">controlled vocabulary</a>. Select the desired term or phrase and then select "Accept." The existing phrase will be replaced with the selected controlled phrase and will be linked to the associated controlled vocabulary. Select "Cancel" to keep the current entry.</message>
      <message key="xmlui.ChoiceLookupTransformer.field.dc_subject.nonauthority">Use local value "@1@" (not in authority)</message>
+
+    <message key="xmlui.Submission.MyTasks.title">My Tasks</message>
+    <message key="xmlui.Submission.MyTasks.trail">My Tasks</message>
+    <message key="xmlui.Submission.MyTasks.no-results">You currently have no tasks assigned to you.</message>
+
+    <message key="xmlui.Submission.result-table.head.title">Title</message>
+    <message key="xmlui.Submission.result-table.head.submitter">Submitter</message>
+    <message key="xmlui.Submission.result-table.head.datafiles">Number of data files</message>
+    <message key="xmlui.Submission.result-table.head.owner">Task owner</message>
+    
+    <message key="xmlui.Submission.Submissions.step.head.dryadAcceptEditReject_claimed">In Curation: Claimed</message>
+    <message key="xmlui.Submission.Submissions.step.head.dryadAcceptEditReject_pool">In Curation: Unclaimed</message>
+    <message key="xmlui.Submission.Submissions.step.head.reviewStep_claimed">In Journal Review: Claimed</message>
+    <message key="xmlui.Submission.Submissions.step.head.reviewStep_pool">In Journal Review: Unclaimed</message>
 
 </catalogue>

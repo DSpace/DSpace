@@ -914,7 +914,7 @@ function doWorkflow()
             }
             if(action == null){
                 var contextPath = cocoon.request.getContextPath();
-                cocoon.redirectTo(contextPath+"/submissions",true);
+                cocoon.redirectTo(contextPath+"/my-tasks",true);
                 getDSContext().complete();
                 cocoon.exit();
             }

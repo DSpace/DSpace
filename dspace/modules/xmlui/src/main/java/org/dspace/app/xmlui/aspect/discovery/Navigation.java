@@ -23,7 +23,6 @@ import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.app.xmlui.wing.element.PageMeta;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
-import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
@@ -32,7 +31,6 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.Collection;
 
 /**
  * Navigation that adds code needed for discovery search
@@ -60,8 +58,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
     private static final Message T_head_this_community =
         message("xmlui.ArtifactBrowser.Navigation.head_this_community");
-    private static final Message T_navigation_non_archived_discovery =
-            message("xmlui.Discovery.Navigation.non-archived-discovery");
+    private static final Message T_navigation_workflow_overview =
+            message("xmlui.Discovery.Navigation.workflow-overview");
 
     /**
      * Generate the unique caching key.
@@ -155,7 +153,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
         if(AuthorizeManager.isAdmin(context)){
             List admin = options.addList("administrative");
 
-            admin.addItem().addXref(contextPath + "/non-archived-discovery").addContent(T_navigation_non_archived_discovery);
+            admin.addItem().addXref(contextPath + "/workflow-overview").addContent(T_navigation_workflow_overview);
         }
     }
 
