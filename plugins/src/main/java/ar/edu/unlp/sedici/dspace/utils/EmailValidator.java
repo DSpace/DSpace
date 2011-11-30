@@ -35,6 +35,7 @@ import org.apache.oro.text.perl.Perl5Util;
  *
  * @version $Revision: 478560 $ $Date: 2006-11-23 13:09:27 +0000 (Thu, 23 Nov 2006) $
  * @since Validator 1.1
+ * @deprecated no se usa, queda solo como referencia por si hace falta. Se saco esta clase de /org/apache/commons/validator 1.3.1
  */
 public class EmailValidator {
 
