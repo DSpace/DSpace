@@ -475,8 +475,7 @@
                                         <td>
                                             <xsl:element name="a">
                                                 <xsl:attribute name="href">
-                                                    <xsl:value-of 
-                                                        select="concat('http://www.mendeley.com/import/?url=',$my_uri)"/>
+                                                    <xsl:value-of select="concat('http://dx.doi.org/', $pkgDOI)"/>
                                                 </xsl:attribute>
                                                 <img border="0px;" src="http://www.mendeley.com/graphics/mendeley.png"/>
                                             </xsl:element>
@@ -882,8 +881,7 @@
                                         <td>
                                             <xsl:element name="a">
                                                 <xsl:attribute name="href">
-                                                    <xsl:value-of 
-                                                        select="concat('http://www.mendeley.com/import/?url=',$my_uri)"/>
+                                                    <xsl:value-of select="concat('http://dx.doi.org/', $pkgDOI)"/>
                                                 </xsl:attribute>
                                                 <img border="0px;" src="http://www.mendeley.com/graphics/mendeley.png"/>
                                             </xsl:element>
@@ -1602,7 +1600,7 @@
                         alt="BioRisk cover"/>
                 </a>
             </xsl:when>
-            <xsl:when test='$journal-name = "BMJOpen"'>
+            <xsl:when test='$journal-name = "BMJ Open"'>
                 <a>
                     <xsl:attribute name="href">
                         <xsl:choose>
