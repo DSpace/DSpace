@@ -16,11 +16,13 @@ import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.PosixParser;
 import org.apache.commons.lang.StringUtils;
+import org.apache.log4j.Logger;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
+
 import ar.edu.unlp.sedici.dspace.utils.*;
 
 /**
@@ -48,7 +50,7 @@ public final class CreateUser
 {
 	/** DSpace Context object */
 	private Context context;
-	
+	static final Logger logger = Logger.getLogger(CreateUser.class);
     /**
      * For invoking via the command line.  If called with no command line arguments,
      * it will negotiate with the user for the user details
@@ -56,6 +58,8 @@ public final class CreateUser
      * @param argv
      *            command-line arguments
      */
+	
+	
     public static void main(String[] argv)
     	throws Exception
     {
@@ -77,7 +81,7 @@ public final class CreateUser
     	{
     		cu.createUser(line.getOptionValue("e"),
     				line.getOptionValue("f"), line.getOptionValue("l"),
-    				line.getOptionValue("c"), line.getOptionValue("p"));
+    				line.getOptionValue("c"), line.getOptionValue("p"),"");
     	}
     	else
     	{
@@ -94,6 +98,7 @@ public final class CreateUser
     	throws Exception
     {
     	context = new Context();
+    	
     }
     
     /**
@@ -210,7 +215,7 @@ public final class CreateUser
     	}
     	
     	// if we make it to here, we are ready to create an user
-    	createUser(email, firstName, lastName, language, password1);
+    	createUser(email, firstName, lastName, language, password1,"");
     }
     
     /**
@@ -225,7 +230,7 @@ public final class CreateUser
      * @throws Exception
      */
     public void createUser(String email, String first, String last,
-    		String language, String pw)
+    		String language, String pw, String sedici_eperson_id)
     	throws Exception
     {
     	// Of course we aren't an user yet so we need to
@@ -234,25 +239,35 @@ public final class CreateUser
     	
     	// Find user group
     	Group user_anonymous = Group.find(context, 0);
+    
     	
     	if (user_anonymous == null)
     	{
+    		context.abort();
     		throw new IllegalStateException("Error, no user_anonymous group (group 1) found");
     	}
-    	
     	// Create the user e-person
         if (email==""){
-        	throw new IllegalStateException("Error, El usuario no tiene mail");
+        	logger.error("El usuario no tiene mail");
+        	context.abort();
+        	throw new IllegalStateException("Error, Error: El usuario no tiene mail");
         }else{
         	if (!Utils.isEmail(email)){
-        		throw new IllegalStateException("Error, El email no es valido para el usuario: ");
+        		logger.error("El email no es valido para el usuario: "+sedici_eperson_id);
+        		context.abort();
+        		throw new IllegalStateException("Error, Error: El email no es valido para el usuario: "+sedici_eperson_id);
         	}
         }
         
         if (last==""){
-        	throw new IllegalStateException("Error, El usuario no tiene el apellido Cargado");
+        	logger.error("El usuario "+sedici_eperson_id+" no tiene el apellido Cargado");
+        	context.abort();
+        	throw new IllegalStateException("Error, Error: El usuario "+sedici_eperson_id+" no tiene el apellido Cargado");
         }
-    	
+        if (first==""){
+        	logger.info("Informacion: La cuenta de usuario no tiene nombre cargado");
+        	
+        }
     	EPerson eperson = EPerson.findByEmail(context,email);
         
         // check if the email belongs to a registered user,
@@ -262,9 +277,12 @@ public final class CreateUser
             eperson = EPerson.create(context);
             eperson.setEmail(email);
             eperson.setCanLogIn(false);
-            if (pw!=""){
+            if ((pw!="")&&(pw.length()>5)){
             	eperson.setCanLogIn(true);	
             	eperson.setPassword(pw);
+            }else{
+            	logger.info("Informacion: No tenia Password Cargado o la password tiene longitud menor a 6 caracteres");
+            	
             }
             
             eperson.setRequireCertificate(false);
@@ -273,16 +291,19 @@ public final class CreateUser
         	eperson.setFirstName(first);
         	eperson.setLanguage(language);
         	
+        	
         	eperson.update();
         	
         	user_anonymous.addMember(eperson);
         	user_anonymous.update();
         	
         	context.complete();
+        	logger.info("La cuenta de usuario ha sido creada con dspace_eperson_id ="+eperson.getID()+" y sedici_eperson_id ="+sedici_eperson_id);
+            
         	
-        	System.out.println("La cuenta de usuario ha sido creada");
         }else{
-        	throw new IllegalStateException("Error, El email ya se encuentra registrado");
+        	context.abort();
+        	throw new IllegalStateException("Error, El usuario "+sedici_eperson_id+" tiene un email que ya se encuentra registrado");
         }
     	
     	

@@ -234,6 +234,9 @@ public final class ImportUsers
         String lastname ="";
         String email="";
         String password="";
+        String sedici_eperson_id="";
+        
+        
         for (int i = 0; i < len; i++)
         {
                 Node nd = nl.item(i);
@@ -261,10 +264,17 @@ public final class ImportUsers
                        
                 }
                 
+                if (nd.getNodeName().equals("sedici_eperson_id"))
+                {
+                	sedici_eperson_id = getValue(nd);
+                        
+                       
+                }
         }
         try {
 			CreateUser cu=new CreateUser();
-			cu.createUser(email, firstname, lastname, "", password);
+			cu.createUser(email, firstname, lastname, "", password,sedici_eperson_id);
+			
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			//e1.printStackTrace();
