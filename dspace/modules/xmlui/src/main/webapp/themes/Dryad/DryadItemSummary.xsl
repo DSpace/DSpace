@@ -881,7 +881,7 @@
                                         <td>
                                             <xsl:element name="a">
                                                 <xsl:attribute name="href">
-                                                    <xsl:value-of select="concat('http://dx.doi.org/', $pkgDOI)"/>
+                                                    <xsl:value-of select="concat('http://dx.doi.org/', $my_doi)"/>
                                                 </xsl:attribute>
                                                 <img border="0px;" src="http://www.mendeley.com/graphics/mendeley.png"/>
                                             </xsl:element>
