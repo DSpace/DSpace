@@ -472,6 +472,15 @@
                                                 <xsl:text> </xsl:text>
                                             </xsl:element>
                                         </td>
+                                        <td>
+                                            <xsl:element name="a">
+                                                <xsl:attribute name="href">
+                                                    <xsl:value-of 
+                                                        select="concat('http://www.mendeley.com/import/?url=',$thispage)"/>
+                                                </xsl:attribute>
+                                                <img border="0px;" src="http://www.mendeley.com/graphics/mendeley.png"/>
+                                            </xsl:element>
+                                        </td>
                                     </tr>
                                 </table>
                             </div>
@@ -868,6 +877,15 @@
                                                 </xsl:attribute>
                                                 <xsl:attribute name="allowTransparency">true</xsl:attribute>
                                                 <xsl:text> </xsl:text>
+                                            </xsl:element>
+                                        </td>
+                                        <td>
+                                            <xsl:element name="a">
+                                                <xsl:attribute name="href">
+                                                    <xsl:value-of 
+                                                        select="concat('http://www.mendeley.com/import/?url=',$thispage)"/>
+                                                </xsl:attribute>
+                                                <img border="0px;" src="http://www.mendeley.com/graphics/mendeley.png"/>
                                             </xsl:element>
                                         </td>
                                     </tr>
