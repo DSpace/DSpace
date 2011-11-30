@@ -1,13 +1,13 @@
 # Data file review email message
 # Sent when a datapackage is submitted, but the associated journal 
-# article is listed as "in review"
+# article is listed as "in review". Submissions that go to the curation stage receive 
+# a similar message, submit_datapackage_confirm.
 #
 # {0}  Title of submission
 # {1}  Doi of the data package
 # {2}  Title of the data package
-# {3}  Url of the data package
-# {4}  Url of the data file
-# {5}  Url for the review
+# {3}  Submitter name/email
+# {4}  Url for the review
 Subject: Dryad: Data package received for peer review {1}
 
 Dryad has received the following data package:

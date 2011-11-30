@@ -1,13 +1,13 @@
-# Data package Archived email message
+# Data package confirmation email message
 # This message is a confirmation sent to a submitter to indicate that a data package has 
 # been received by Dryad. The message is sent when a submission is moved to the DSpace workflow
-# without going through the review stage.
+# without going through the review stage. Submissions that go to the review stage receive 
+# a similar message, submit_datapackage_review.
 #
 #
 # {0}  Title of data package
 # {1}  The doi identifier of the data package
 # {2}  The title(s) of the data file(s)
-# {3}  The doi's of the data files
 #
 Subject: Dryad submission received and assigned a provisional DOI
 
