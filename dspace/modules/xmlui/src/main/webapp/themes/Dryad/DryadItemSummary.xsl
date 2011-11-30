@@ -476,7 +476,7 @@
                                             <xsl:element name="a">
                                                 <xsl:attribute name="href">
                                                     <xsl:value-of 
-                                                        select="concat('http://www.mendeley.com/import/?url=',$thispage)"/>
+                                                        select="concat('http://www.mendeley.com/import/?url=',$my_uri)"/>
                                                 </xsl:attribute>
                                                 <img border="0px;" src="http://www.mendeley.com/graphics/mendeley.png"/>
                                             </xsl:element>
@@ -883,7 +883,7 @@
                                             <xsl:element name="a">
                                                 <xsl:attribute name="href">
                                                     <xsl:value-of 
-                                                        select="concat('http://www.mendeley.com/import/?url=',$thispage)"/>
+                                                        select="concat('http://www.mendeley.com/import/?url=',$my_uri)"/>
                                                 </xsl:attribute>
                                                 <img border="0px;" src="http://www.mendeley.com/graphics/mendeley.png"/>
                                             </xsl:element>
@@ -1600,6 +1600,23 @@
                     </xsl:attribute>
                     <img id="journal-logo" src="/themes/Dryad/images/coverimages/biorisk.png"
                         alt="BioRisk cover"/>
+                </a>
+            </xsl:when>
+            <xsl:when test='$journal-name = "BMJOpen"'>
+                <a>
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="string('http://bmjopen.bmj.com/')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/bmjOpen.png"
+                        alt="BMJ Open cover"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Comparative Cytogenetics"'>
