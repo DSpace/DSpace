@@ -39,16 +39,12 @@
  */
 package org.dspace.app.xmlui.aspect.versioning;
 
-import org.apache.avalon.framework.parameters.Parameters;
-import org.apache.cocoon.ProcessingException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Request;
-import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
-import org.dspace.app.itemexport.ItemExport;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.HandleUtil;
@@ -58,20 +54,20 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
-import org.dspace.core.Constants;
+import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.Group;
+import org.dspace.handle.HandleManager;
 import org.dspace.utils.DSpace;
-import org.dspace.versioning.PluggableVersioningService;
-import org.dspace.versioning.VersionHistory;
+
 import org.dspace.versioning.VersioningService;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
-import java.util.Map;
+import org.dspace.workflow.*;
+
 
 /**
  *
@@ -188,19 +184,16 @@ public class VersioningNavigation extends AbstractDSpaceTransformer implements C
     	if (dso instanceof Item)
     	{
     		Item item = (Item) dso;
-    		if (item.canEdit())
-    		{
-                context.setHead(T_context_head);
-                if(!isItemADataFile(item) ){
-                    if(isCurrentEpersonItemOwner(item) || canCurrentEPersonEditTheITem(item)){
-                    
-                        if(isLatest(item) && item.isArchived()){
-                            context.addItem().addXref(contextPath+"/item/version?itemID="+item.getID(), T_context_create_version);
-                        }
+            context.setHead(T_context_head);
+            if(!isItemADataFile(item) ){
+                if(isCurrentEpersonItemOwner(item) || canCurrentEPersonEditTheItem(item) || isCurrentEpersonACurator()){
 
-                        if(hasVersionHistory(item))
-                            context.addItem().addXref(contextPath+"/item/versionhistory?itemID="+item.getID(), T_context_show_version_history);
+                    if(isLatest(item) && item.isArchived()){
+                        context.addItem().addXref(contextPath+"/item/version?itemID="+item.getID(), T_context_create_version);
                     }
+
+                    if(hasVersionHistory(item))
+                        context.addItem().addXref(contextPath+"/item/versionhistory?itemID="+item.getID(), T_context_show_version_history);
                 }
             }
     	}
@@ -218,14 +211,34 @@ public class VersioningNavigation extends AbstractDSpaceTransformer implements C
 
 
     private boolean isCurrentEpersonItemOwner(Item item) throws SQLException {
-        if(item.getSubmitter().getID() ==eperson.getID())
+        if(item.getSubmitter().getID()==eperson.getID())
             return true;
         return false;
     }
 
-    private boolean canCurrentEPersonEditTheITem(Item item) throws SQLException {
+    private boolean canCurrentEPersonEditTheItem(Item item) throws SQLException {
         return item.canEdit();
     }
+
+    private boolean isCurrentEpersonACurator() throws SQLException {
+        Collection dataSetColl = (Collection) HandleManager.resolveToObject(context, ConfigurationManager.getProperty("submit.publications.collection"));
+        Workflow workflow = null;
+        try {
+            workflow = WorkflowFactory.getWorkflow(dataSetColl);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (WorkflowConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+        Role curatorRole = workflow.getRoles().get("curator");
+        Group curators = WorkflowUtils.getRoleGroup(context, dataSetColl.getID(), curatorRole);
+        if(curators != null && curators.isMember(context.getCurrentUser())){
+            return true;
+        }
+        return false;
+    }
+
+
 
 
     private boolean isItemADataFile(Item item){

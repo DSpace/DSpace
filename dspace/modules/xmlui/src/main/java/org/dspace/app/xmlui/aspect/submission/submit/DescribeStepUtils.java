@@ -411,13 +411,17 @@ public class DescribeStepUtils extends AbstractDSpaceTransformer {
 
         // show "Publish immediately" only if publicationBlackout=false or not defined in DryadJournalSubmission.properties.
         Map<String, String> values = journalProperties.get(journalFullName);
-        String isBlackedOut = values.get(PUBLICATION_BLACKOUT);
+        String isBlackedOut=null;
+        if(values!=null && values.size() > 0)
+            isBlackedOut = values.get(PUBLICATION_BLACKOUT);
+
         if(isBlackedOut==null || isBlackedOut.equals("false"))
             select.addOption("none", "Publish immediately");
 
         select.addOption("oneyear", "1 year embargo");
-	    select.addOption("custom", "Custom length embargo (approved by journal editor)");
+        select.addOption("custom", "Custom length embargo (approved by journal editor)");
         select.addOption("untilArticleAppears", "Embargo until article appears");
+
 
         // Setup the field's pre-selected values
         if (dcValues.length > 0) {

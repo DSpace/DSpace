@@ -81,7 +81,10 @@ public class DryadJournalSubmissionUtils {
 
         // show "Publish immediately" only if publicationBlackout=false or not defined in DryadJournalSubmission.properties.
         Map<String, String> values = journalProperties.get(journalFullName);
-        String isBlackedOut = values.get(PUBLICATION_BLACKOUT);
+
+        String isBlackedOut = null;
+        if(values!=null && values.size()>0)
+            isBlackedOut = values.get(PUBLICATION_BLACKOUT);
         if(isBlackedOut==null || isBlackedOut.equals("false"))
             return false;
         return true;
