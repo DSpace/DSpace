@@ -786,7 +786,7 @@
                                                     <xsl:value-of
                                                             select="concat($dfirstpart, $apos, 'http://dx.doi.org/', $my_doi, $apos, $dsecondpart)"/>
                                                 </xsl:attribute>
-                                                <img src="http://l.yimg.com/hr/img/delicious.small.gif"
+                                                <img src="http://www.delicious.com/static/img/delicious.small.gif"
                                                      height="18" width="18" alt="Delicious"
                                                      style="border: 1px solid #ccc;"/>
                                             </xsl:element>
