@@ -475,10 +475,9 @@
                                         <td>
                                             <xsl:element name="a">
                                                 <xsl:attribute name="href">
-                                                    <xsl:text>"http://www.mendeley.com/import/?url="</xsl:text>
-                                                    <xsl:call-template name="checkURL">
-                                                        <xsl:with-param name="doiIdentifier" select="$pkgDOI"/>
-                                                    </xsl:call-template>
+                                                    <xsl:value-of
+                                                        select="concat('http://www.mendeley.com/import/?url=http://datadryad.org/resource/',
+                                                                       $pkgDOI)" />
                                                 </xsl:attribute>
                                                 <img border="0px;" src="http://www.mendeley.com/graphics/mendeley.png"/>
                                             </xsl:element>
@@ -884,11 +883,10 @@
                                         <td>
                                             <xsl:element name="a">
                                                 <xsl:attribute name="href">
-                                                    <xsl:text>"http://www.mendeley.com/import/?url="</xsl:text>
-                                                    <xsl:call-template name="checkURL">
-                                                        <xsl:with-param name="doiIdentifier" select="$my_doi"/>
-                                                    </xsl:call-template>
-                                                </xsl:attribute>
+                                                        <xsl:value-of
+                                                            select="concat('http://www.mendeley.com/import/?url=http://datadryad.org/resource/',
+                                                            $pkgDOI)" />
+                                               </xsl:attribute>
                                                 <img border="0px;" src="http://www.mendeley.com/graphics/mendeley.png"/>
                                             </xsl:element>
                                         </td>
