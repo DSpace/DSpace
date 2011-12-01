@@ -475,6 +475,7 @@
                                         <td>
                                             <xsl:element name="a">
                                                 <xsl:attribute name="href">
+                                                    <xsl:text>"http://www.mendeley.com/import/?url="</xsl:text>
                                                     <xsl:call-template name="checkURL">
                                                         <xsl:with-param name="doiIdentifier" select="$pkgDOI"/>
                                                     </xsl:call-template>
@@ -883,6 +884,7 @@
                                         <td>
                                             <xsl:element name="a">
                                                 <xsl:attribute name="href">
+                                                    <xsl:text>"http://www.mendeley.com/import/?url="</xsl:text>
                                                     <xsl:call-template name="checkURL">
                                                         <xsl:with-param name="doiIdentifier" select="$my_doi"/>
                                                     </xsl:call-template>
@@ -1737,6 +1739,23 @@
                     </xsl:attribute>
                     <img id="journal-logo" src="/themes/Dryad/images/coverimages/EvolBiol.png"
                          alt="Journal of Evolutionary Biology cover"/>
+                </a>
+            </xsl:when>
+            <xsl:when test='$journal-name = "Journal of Fish and Wildlife Management"'>
+                <a>
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="string('http://www.fwspubs.org/loi/fwma')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/JFWM.png"
+                        alt="Journal of Fish and Wildlife Management cover"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Journal of Heredity"'>
