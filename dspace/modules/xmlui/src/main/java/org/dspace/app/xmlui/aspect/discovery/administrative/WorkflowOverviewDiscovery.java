@@ -100,9 +100,11 @@ public class WorkflowOverviewDiscovery extends SimpleSearch {
                     if(count.getName().equals("Workflow")){
                         //Retrieve the seperate workflow steps
                         List<FacetField.Count> workflowSteps = queryResults.getFacetField("WorkflowstepTask_filter").getValues();
-                        for (FacetField.Count workflowStep : workflowSteps) {
-                            if(0 < workflowStep.getCount()){
-                                renderResultBlock(results, workflowStep);
+                        if(workflowSteps!=null){
+                            for (FacetField.Count workflowStep : workflowSteps) {
+                                if(0 < workflowStep.getCount()){
+                                    renderResultBlock(results, workflowStep);
+                                }
                             }
                         }
                     }else{

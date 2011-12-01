@@ -181,8 +181,15 @@ public class VersioningNavigation extends AbstractDSpaceTransformer implements C
 
         // Context Administrative options  for Versioning
         DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
-    	if (dso instanceof Item)
-    	{
+
+
+        if(dso==null){
+            // case: internal-item http://localhost:8100/internal-item?itemID=3085
+            // retrieve the object from the DB
+            dso=getItemById();
+        }
+
+    	if (dso instanceof Item){
     		Item item = (Item) dso;
             context.setHead(T_context_head);
             if(!isItemADataFile(item) ){
@@ -199,6 +206,22 @@ public class VersioningNavigation extends AbstractDSpaceTransformer implements C
     	}
     }
 
+
+    private DSpaceObject getItemById() throws SQLException {
+        DSpaceObject dso = null;
+        Request request = ObjectModelHelper.getRequest(objectModel);
+        if (request.getRequestURI().contains("internal-item")){
+            String itemId = request.getParameter("itemID");
+            if (itemId != null){
+                try {
+                    dso = Item.find(this.context, Integer.parseInt(itemId));
+                } catch (NumberFormatException e) {
+                    return null;
+                }
+            }
+        }
+        return dso;
+    }
 
     /**
      * recycle
