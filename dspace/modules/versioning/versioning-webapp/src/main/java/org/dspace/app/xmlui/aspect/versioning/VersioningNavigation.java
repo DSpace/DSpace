@@ -211,9 +211,7 @@ public class VersioningNavigation extends AbstractDSpaceTransformer implements C
 
 
     private boolean isCurrentEpersonItemOwner(Item item) throws SQLException {
-        if(item.getSubmitter().getID()==eperson.getID())
-            return true;
-        return false;
+        return eperson != null && item.getSubmitter() != null && item.getSubmitter().getID() == eperson.getID();
     }
 
     private boolean canCurrentEPersonEditTheItem(Item item) throws SQLException {
