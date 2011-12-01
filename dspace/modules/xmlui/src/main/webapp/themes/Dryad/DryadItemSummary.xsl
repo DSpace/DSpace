@@ -460,7 +460,7 @@
                                                 <xsl:attribute name="src">
                                                     <xsl:value-of
                                                             select="concat('http://www.facebook.com/plugins/like.php?href=',
-														encoder:encode(concat('http://dx.doi.org/', $pkg_DOI)),
+														encoder:encode(concat('http://dx.doi.org/', $pkgDOI)),
 														'&amp;layout=button_count&amp;show_faces=false&amp;width=100&amp;action=like&amp;colorscheme=light&amp;height=21')"/>
                                                 </xsl:attribute>
                                                 <xsl:attribute name="scrolling">no</xsl:attribute>
@@ -885,7 +885,7 @@
                                                 <xsl:attribute name="href">
                                                         <xsl:value-of
                                                             select="concat('http://www.mendeley.com/import/?url=http://datadryad.org/resource/',
-                                                            $my_DOI)" />
+                                                            $my_doi)" />
                                                </xsl:attribute>
                                                 <img border="0px;" src="http://www.mendeley.com/graphics/mendeley.png"/>
                                             </xsl:element>
