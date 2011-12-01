@@ -59,7 +59,7 @@ public class DepositConfirmedStep extends AbstractSubmissionStep{
 
         int i = 0;
         for (org.dspace.content.Item dataFile : dataFiles){
-            addPara(dataFileDiv, "Data File: " + dataFile.getName());
+            addPara(dataFileDiv, " " + dataFile.getName());
         }
 
     }
