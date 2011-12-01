@@ -884,7 +884,7 @@
                                             <xsl:element name="a">
                                                 <xsl:attribute name="href">
                                                     <xsl:call-template name="checkURL">
-                                                        <xsl:with-param name="doiIdentifier" select="$my_doi"/>
+                                                        <xsl:with-param name="doiIdentifier" select="$my_uri"/>
                                                     </xsl:call-template>
                                                 </xsl:attribute>
                                                 <img border="0px;" src="http://www.mendeley.com/graphics/mendeley.png"/>
