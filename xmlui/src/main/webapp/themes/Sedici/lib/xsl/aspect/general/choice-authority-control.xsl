@@ -1,27 +1,7 @@
-<!--
+<!-- 
 
-    Copyright (C) 2011 SeDiCI <info@sedici.unlp.edu.ar>
-
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
-
-            http://www.apache.org/licenses/LICENSE-2.0
-
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-
--->
-<!--
-    Rendering of the authority control related pages.
-
-    Author: art.lowel at atmire.com
-    Author: lieven.droogmans at atmire.com
-    Author: ben at atmire.com
-    Author: Alexey Maslov
+Redefinido desde el tema mirage, del xsl con el mismo nombre.
+No redefino todos los templates, solo los que necesito redefinir. 
 
 -->
 
@@ -48,61 +28,6 @@
     <!-- Variable para el manejo de la propiedad -->
     <xsl:variable name="isAdministrator" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='administrator']"/>
 
-    <!-- add button to invoke Choices lookup popup.. assume
-      -  that the context is a dri:field, where dri:params/@choices is true.
-     -->
-    <xsl:template name="addLookupButton">
-      <xsl:param name="isName" select="'missing value'"/>
-      <!-- optional param if you want to send authority value to diff field -->
-      <xsl:param name="authorityInput" select="concat(@n,'_authority')"/>
-      <!-- optional param for confidence indicator ID -->
-      <xsl:param name="confIndicator" select="''"/>
-      <input type="button" name="{concat('lookup_',@n)}" class="ds-button-field ds-add-button" >
-        <xsl:attribute name="value">
-          <xsl:text>Lookup</xsl:text>
-          <xsl:if test="contains(dri:params/@operations,'add')">
-            <xsl:text> &amp; Add</xsl:text>
-          </xsl:if>
-        </xsl:attribute>
-        <xsl:attribute name="onClick">
-          <xsl:text>javascript:DSpaceChoiceLookup('</xsl:text>
-          <!-- URL -->
-          <xsl:value-of select="concat($context-path,'/admin/lookup')"/>
-          <xsl:text>', '</xsl:text>
-          <!-- field -->
-          <xsl:value-of select="dri:params/@choices"/>
-          <xsl:text>', '</xsl:text>
-          <!-- formID -->
-          <xsl:value-of select="translate(ancestor::dri:div[@interactive='yes']/@id,'.','_')"/>
-          <xsl:text>', '</xsl:text>
-          <!-- valueInput -->
-          <xsl:value-of select="@n"/>
-          <xsl:text>', '</xsl:text>
-          <!-- authorityInput, name of field to get authority -->
-          <xsl:value-of select="$authorityInput"/>
-          <xsl:text>', '</xsl:text>
-          <!-- Confidence Indicator's ID so lookup can frob it -->
-          <xsl:value-of select="$confIndicator"/>
-          <xsl:text>', </xsl:text>
-          <!-- Collection ID for context -->
-          <xsl:choose>
-            <xsl:when test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='choice'][@qualifier='collection']">
-              <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='choice'][@qualifier='collection']"/>
-            </xsl:when>
-            <xsl:otherwise>
-              <xsl:text>-1</xsl:text>
-            </xsl:otherwise>
-          </xsl:choose>
-          <xsl:text>, </xsl:text>
-          <!-- isName -->
-          <xsl:value-of select="$isName"/>
-          <xsl:text>, </xsl:text>
-          <!-- isRepating -->
-          <xsl:value-of select="boolean(contains(dri:params/@operations,'add'))"/>
-          <xsl:text>);</xsl:text>
-        </xsl:attribute>
-      </input>
-    </xsl:template>
 
     <!-- Fragment to display an authority confidence icon.
        -  Insert an invisible 1x1 image which gets "covered" by background
@@ -158,31 +83,6 @@
       </input>
     </xsl:template>
 
-
-    <!-- insert fields needed by Scriptaculous autocomplete -->
-    <xsl:template name="addAuthorityAutocompleteWidgets">
-      <!-- "spinner" indicator to signal "loading", managed by autocompleter -->
-      <!--  put it next to input field -->
-      <span style="display:none;">
-        <xsl:attribute name="id">
-         <xsl:value-of select="concat(translate(@id,'.','_'),'_indicator')"/>
-        </xsl:attribute>
-        <img alt="Loading...">
-          <xsl:attribute name="src">
-           <xsl:value-of select="concat($theme-path,'/images/authority_control/suggest-indicator.gif')"/>
-          </xsl:attribute>
-        </img>
-      </span>
-      <!-- This is the anchor for autocomplete popup, div id="..._container" -->
-      <!--  put it below input field, give ID to autocomplete below -->
-      <div class="autocomplete">
-        <xsl:attribute name="id">
-         <xsl:value-of select="concat(translate(@id,'.','_'),'_container')"/>
-        </xsl:attribute>
-        <xsl:text> </xsl:text>
-      </div>
-    </xsl:template>
-
     <!-- adds autocomplete fields and setup script to "normal" submit input -->
     <xsl:template name="addAuthorityAutocomplete">
       <xsl:param name="confidenceIndicatorID" select="''"/>
@@ -198,7 +98,7 @@
         <xsl:with-param name="indicatorID"   select="concat(translate(@id,'.','_'),'_indicator')"/>
         <xsl:with-param name="isClosed"      select="dri:params/@choicesClosed"/>
         <xsl:with-param name="confidenceIndicatorID" select="$confidenceIndicatorID"/>
-        <xsl:with-param name="confidenceName" select="$confidenceName"/>
+        <xsl:with-param name="confidenceName" select="concat(translate(@id,'.','_'),'_confidence')"/>
         <xsl:with-param name="collectionID">
           <xsl:choose>
             <xsl:when test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='choice'][@qualifier='collection']">
@@ -279,11 +179,13 @@
       <!-- 
       	The authority label 
       	Agregado por Nico.
-      	Dependiendo si es administrador el usuario logueado y de si el authority es abierto se agrega un input onlyread
+      	Dependiendo si es administrador el usuario logueado se agrega un input onlyread
       	que muestra el label correspondiente al authority key.
       -->
+
       <xsl:if test="$isAdministrator = 'true'">
-	      <xsl:if test="not(contains(dri:params/@choicesClosed, 'yes'))">
+       <xsl:choose>
+        <xsl:when test="$position = ''">
 	      <input>
 	        <xsl:attribute name="class">
 	          <xsl:text>ds-authority-label</xsl:text>
@@ -306,7 +208,12 @@
 	        </xsl:attribute>
 	
 	      </input>
-      	</xsl:if>
+		 </xsl:when>
+         <xsl:otherwise>
+              <!-- Aca va el valor real del authority -->
+         </xsl:otherwise>
+       </xsl:choose>
+		
 	  </xsl:if>
 	  
 	  
@@ -378,87 +285,5 @@
       </input>
     </xsl:template>
 
-    <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -  -->
-    <!-- Special Transformations for Choice Authority lookup popup page -->
-
-    <!-- indicator spinner -->
-    <xsl:template match="dri:item[@id='aspect.general.ChoiceLookupTransformer.item.select']/dri:figure">
-      <img id="lookup_indicator_id" alt="Loading..." style="display:none;">
-        <xsl:attribute name="src">
-         <xsl:value-of select="concat($theme-path,'/images/authority_control/lookup-indicator.gif')"/>
-        </xsl:attribute>
-      </img>
-    </xsl:template>
-
-    <!-- This inline JS must be added to the popup page for choice lookups -->
-    <xsl:template name="choiceLookupPopUpSetup">
-      <script type="text/javascript">
-        var form = document.getElementById('aspect_general_ChoiceLookupTransformer_div_lookup');
-        DSpaceChoicesSetup(form);
-      </script>
-    </xsl:template>
-
-    <!-- Special select widget for lookup popup -->
-    <xsl:template match="dri:field[@id='aspect.general.ChoiceLookupTransformer.field.chooser']">
-      <div>
-        <select onChange="javascript:DSpaceChoicesSelectOnChange();">
-          <xsl:call-template name="fieldAttributes"/>
-          <xsl:apply-templates/>
-          <xsl:comment>space filler because "unclosed" select annoys browsers</xsl:comment>
-        </select>
-        <img class="choices-lookup" id="lookup_indicator_id" alt="Loading..." style="display:none;">
-          <xsl:attribute name="src">
-           <xsl:value-of select="concat($theme-path,'/images/authority_control/lookup-indicator.gif')"/>
-          </xsl:attribute>
-        </img>
-      </div>
-    </xsl:template>
-
-    <!-- Generate buttons with onClick attribute, since it is the easiest
-       - way to set a single event handler in a browser-independent manner.
-      -->
-
-    <!-- choice popup "accept" button -->
-    <xsl:template match="dri:field[@id='aspect.general.ChoiceLookupTransformer.field.accept']">
-      <xsl:call-template name="choiceLookupButton">
-        <xsl:with-param name="onClick" select="'javascript:DSpaceChoicesAcceptOnClick();'"/>
-      </xsl:call-template>
-    </xsl:template>
-
-    <!-- choice popup "more" button -->
-    <xsl:template match="dri:field[@id='aspect.general.ChoiceLookupTransformer.field.more']">
-      <xsl:call-template name="choiceLookupButton">
-        <xsl:with-param name="onClick" select="'javascript:DSpaceChoicesMoreOnClick();'"/>
-      </xsl:call-template>
-    </xsl:template>
-
-    <!-- choice popup "cancel" button -->
-    <xsl:template match="dri:field[@id='aspect.general.ChoiceLookupTransformer.field.cancel']">
-      <xsl:call-template name="choiceLookupButton">
-        <xsl:with-param name="onClick" select="'javascript:DSpaceChoicesCancelOnClick();'"/>
-      </xsl:call-template>
-    </xsl:template>
-
-    <!-- button markup: special handling needed because these must not be <input type=submit> -->
-    <xsl:template name="choiceLookupButton">
-      <xsl:param name="onClick"/>
-      <input type="button" onClick="{$onClick}">
-        <xsl:call-template name="fieldAttributes"/>
-        <xsl:attribute name="value">
-            <xsl:choose>
-                <xsl:when test="./dri:value[@type='raw']">
-                    <xsl:value-of select="./dri:value[@type='raw']"/>
-                </xsl:when>
-                <xsl:otherwise>
-                    <xsl:value-of select="./dri:value[@type='default']"/>
-                </xsl:otherwise>
-            </xsl:choose>
-        </xsl:attribute>
-        <xsl:if test="dri:value/i18n:text">
-            <xsl:attribute name="i18n:attr">value</xsl:attribute>
-        </xsl:if>
-        <xsl:apply-templates />
-      </input>
-    </xsl:template>
 
 </xsl:stylesheet>

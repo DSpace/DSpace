@@ -35,6 +35,7 @@
 	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc">
 
     <xsl:import href="../Mirage/Mirage.xsl"/>
+    <xsl:import href="lib/xsl/core/forms.xsl"/>
     <xsl:import href="lib/xsl/core/page-structure.xsl"/>
     <xsl:import href="lib/xsl/core/navigation.xsl"/>
     <xsl:import href="lib/xsl/aspect/general/choice-authority-control.xsl"/>

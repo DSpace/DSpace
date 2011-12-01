@@ -69,6 +69,9 @@ img.ds-authority-confidence.cf-uncertain
   { background: transparent url(../../images/authority_control/confidence/5-pinion.gif); }
 img.ds-authority-confidence.cf-accepted
   { background: transparent url(../../images/authority_control/confidence/6-thumb2.gif); }
+img.ds-authority-confidence.cf-search
+  { background: transparent url(../../images/authority_control/suggest-indicator.gif); }
+
 
 /* hide authority-value inputs in forms */
 input.ds-authority-value { display:none; }
