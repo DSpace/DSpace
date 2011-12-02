@@ -24,7 +24,6 @@ import org.dspace.content.Site;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.PluginManager;
-import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
 
 /**
@@ -365,19 +364,27 @@ public class Curator
     }
     
     /**
-     * Returns the context object used in the current curation performance.
+     * Returns the context object used in the current curation thread.
      * This is primarily a utility method to allow tasks access to the context when necessary.
      * <P>
      * If the context is null or not set, then this just returns
      * a brand new Context object representing an Anonymous User.
      * 
-     * @return curation Context object (or anonymous Context if curation is null)
+     * @return curation thread's Context object (or a new, anonymous Context if no curation Context exists)
      */
     public static Context curationContext() throws SQLException
     {
-    	// Return curation context or new context if undefined
+    	// Return curation context or new context if undefined/invalid
     	Context curCtx = curationCtx.get();
-        return (curCtx != null) ? curCtx : new Context();
+        
+        if(curCtx==null || !curCtx.isValid())
+        {
+            //Create a new context (represents an Anonymous User)
+            curCtx = new Context();
+            //Save it to current execution thread
+            curationCtx.set(curCtx);
+        }    
+        return curCtx;
     }
 
     /**
@@ -403,10 +410,12 @@ public class Curator
         Context ctx = null;
         try
         {
-        	ctx = curationContext();
+            //get access to the curation thread's current context
+            ctx = curationContext();
+            
             // Site-wide Tasks really should have an EPerson performer associated with them,
             // otherwise they are run as an "anonymous" user with limited access rights.
-            if(ctx.getCurrentUser()==null)
+            if(ctx.getCurrentUser()==null && !ctx.ignoreAuthorization())
             {
                 log.warn("You are running one or more Site-Wide curation tasks in ANONYMOUS USER mode," +
                          " as there is no EPerson 'performer' associated with this task. To associate an EPerson 'performer' " +
@@ -428,16 +437,9 @@ public class Curator
                     return false;
                 }
             }
-            
-            //complete & close our created Context
-            ctx.complete();
         }
         catch (SQLException sqlE)
         {
-            //abort Context & all changes
-            if(ctx!=null)
-                ctx.abort();
-            
             throw new IOException(sqlE);
         }
 
@@ -534,7 +536,7 @@ public class Curator
     		}
     		catch (SQLException sqlE)
     		{
-    			throw new IOException(sqlE.getMessage());
+    			throw new IOException(sqlE.getMessage(), sqlE);
     		}
     	}
     }
