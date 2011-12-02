@@ -61,6 +61,10 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     private static final Message T_navigation_workflow_overview =
             message("xmlui.Discovery.Navigation.workflow-overview");
 
+
+    private static final Message T_administrative_head = 
+            message("xmlui.administrative.Navigation.administrative_head");
+
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
@@ -152,6 +156,7 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
         if(AuthorizeManager.isAdmin(context)){
             List admin = options.addList("administrative");
+            admin.setHead(T_administrative_head);
 
             admin.addItem().addXref(contextPath + "/workflow-overview").addContent(T_navigation_workflow_overview);
         }

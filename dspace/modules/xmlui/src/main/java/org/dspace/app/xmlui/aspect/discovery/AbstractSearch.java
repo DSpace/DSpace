@@ -146,7 +146,7 @@ public abstract class AbstractSearch extends AbstractFiltersTransformer {
      * @param search The search division to contain the search-results division.
      */
     protected void buildSearchResultsDivision(Division search)
-            throws IOException, SQLException, WingException, SearchServiceException {
+            throws IOException, SQLException, WingException, SearchServiceException, AuthorizeException {
 
         try {
             if (queryResults == null || queryResults.getResults() == null) {

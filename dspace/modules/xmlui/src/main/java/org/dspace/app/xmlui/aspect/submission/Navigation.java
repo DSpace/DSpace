@@ -42,7 +42,9 @@ package org.dspace.app.xmlui.aspect.submission;
 import java.io.IOException;
 import java.io.Serializable;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Locale;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
@@ -51,6 +53,7 @@ import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
+import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
@@ -60,10 +63,13 @@ import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.core.LogManager;
+import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
 import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.eperson.Group;
+import org.dspace.workflow.*;
 import org.xml.sax.SAXException;
 
 /**
@@ -86,6 +92,8 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
     /** Cached validity object */
     private SourceValidity validity;
+
+    private static final Logger log = Logger.getLogger(Navigation.class);
 
 	 /**
      * Generate the unique caching key.
@@ -194,7 +202,37 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
 	    account.setHead(T_my_account);
             account.addItemXref(contextPath+"/submissions",T_submissions);
-            account.addItemXref(contextPath+"/my-tasks",T_my_tasks);
+            if(coll != null){
+                boolean canHaveTasks = false;
+                try {
+                    HashMap<String,Role> roles = WorkflowUtils.getCollectionRoles(coll);
+                    for(String roleName : roles.keySet()){
+                        Role role = roles.get(roleName);
+                        Group group = WorkflowUtils.getRoleGroup(context, coll.getID(), role);
+                        if(group != null){
+                            if(group.isMember(context.getCurrentUser())){
+                                canHaveTasks = true;
+                            }else{
+                                //Also check the member groups
+                                Group[] groups = group.getMemberGroups();
+                                for (Group g : groups) {
+                                    if(g.isMember(context.getCurrentUser())){
+                                        canHaveTasks = true;
+                                    }
+                                }
+                            }
+                        }
+
+
+                    }
+                } catch (Exception e) {
+                    log.error(LogManager.getHeader(context, "Error while retrieving workflow roles", ""), e);
+                }
+
+                if(canHaveTasks){
+                    account.addItemXref(contextPath+"/my-tasks",T_my_tasks);
+                }
+            }
         }
 
 

@@ -25,6 +25,7 @@ import org.dspace.eperson.EPerson;
 import org.dspace.handle.HandleManager;
 import org.dspace.workflow.ClaimedTask;
 import org.dspace.workflow.DryadWorkflowUtils;
+import org.dspace.workflow.PoolTask;
 import org.dspace.workflow.WorkflowItem;
 
 import java.io.IOException;
@@ -58,7 +59,7 @@ public class WorkflowOverviewDiscovery extends SimpleSearch {
     }
 
     @Override
-    protected void buildSearchResultsDivision(Division search) throws IOException, SQLException, WingException, SearchServiceException {
+    protected void buildSearchResultsDivision(Division search) throws IOException, SQLException, WingException, SearchServiceException, AuthorizeException {
         try {
 
             DSpaceObject scope = getScope();
@@ -119,7 +120,7 @@ public class WorkflowOverviewDiscovery extends SimpleSearch {
         //}// Empty query
     }
 
-    private void renderResultBlock(Division results, FacetField.Count count) throws SearchServiceException, WingException, SQLException, IOException {
+    private void renderResultBlock(Division results, FacetField.Count count) throws SearchServiceException, WingException, SQLException, IOException, AuthorizeException {
         //Perform a query for each of these workflow steps.
         SolrQuery solrQuery = getDefaultQueryArgs();
         if(count.getFacetField().getName().equals("DSpaceStatus_filter")){
@@ -195,13 +196,37 @@ public class WorkflowOverviewDiscovery extends SimpleSearch {
                 Item item = (Item) resultDSO;
                 Row itemRow = resultTable.addRow();
 
-                if(item.isArchived()){
-                    //Add the item url
-                    itemRow.addCell().addXref(contextPath + "/admin/item?itemID=" + item.getID(), item.getName());
-
+                String url;
+                if(item.isArchived() || item.isWithdrawn()){
+                    url = contextPath + "/admin/item?itemID=" + item.getID();
                 }else{
-                    itemRow.addCell().addXref(contextPath + "/internal-item?itemID=" + item.getID() ,item.getName());
+                    //We most likely have a workflow item, find it
+                    WorkflowItem workflowItem = WorkflowItem.findByItemId(context, item.getID());
+                    //Attempt to find a task
+                    java.util.List<PoolTask> pooltasks = PoolTask.find(context,workflowItem);
+                    java.util.List<ClaimedTask> claimedtasks = ClaimedTask.find(context, workflowItem);
+
+
+                    String step_id = null;
+                    String action_id = null;
+                    if(0 < pooltasks.size()){
+                        step_id = pooltasks.get(0).getStepID();
+                        action_id = pooltasks.get(0).getActionID();
+                    }else
+                    if(0 < claimedtasks.size()){
+                        step_id = claimedtasks.get(0).getStepID();
+                        action_id = claimedtasks.get(0).getActionID();
+                    }
+                    if(step_id != null && action_id != null){
+                        url = contextPath+"/handle/"+workflowItem.getCollection().getHandle()+"/workflow?workflowID="+workflowItem.getID()+"&stepID="+step_id+"&actionID="+action_id;
+
+                    }else{
+                        url = contextPath + "/admin/item?itemID=" + item.getID();
+                    }
                 }
+                itemRow.addCell().addXref(url, item.getName());
+
+
                 EPerson submitter = item.getSubmitter();
                 if(submitter != null){
                     itemRow.addCell().addXref("mailto:" + submitter.getEmail(), submitter.getFullName());
