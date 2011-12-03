@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<dublin_core schema="dc">
+
+
+  <dcvalue element="contributor" qualifier="author" language="">Sidlauskas, Brian</dcvalue>
+  <dcvalue element="coverage" qualifier="spatial" language="">South America</dcvalue>
+  <dcvalue element="coverage" qualifier="spatial" language="">South America</dcvalue>
+  <dcvalue element="identifier" qualifier="none" language="*">doi:10.5061/dryad.20/2</dcvalue>
+  <dcvalue element="description" qualifier="none" language="">Results of a relative warps analysis done in tpsRelw using the data in http://hdl.handle.net/10255/dryad.57.  The data in the Excel spreadsheet were used to prepare the morphospace figures that appear in Sidlauskas 2007. The order of taxa in the spreadsheet should match the order of taxa in the TPS file.</dcvalue>
+  <dcvalue element="language" qualifier="iso" language="en_US">en_US</dcvalue>
+  <dcvalue element="relation" qualifier="ispartof" language="">http://hdl.handle.net/10255/dryad.20</dcvalue>
+  <dcvalue element="rights" qualifier="uri" language="">http://creativecommons.org/publicdomain/zero/1.0/</dcvalue>
+  <dcvalue element="subject" qualifier="none" language="">disparity</dcvalue>
+  <dcvalue element="subject" qualifier="none" language="">evolutionary rates</dcvalue>
+  <dcvalue element="subject" qualifier="none" language="">Brownian evolution</dcvalue>
+  <dcvalue element="subject" qualifier="none" language="">mode</dcvalue>
+  <dcvalue element="subject" qualifier="none" language="">freshwater fishes</dcvalue>
+  <dcvalue element="subject" qualifier="none" language="">tempo</dcvalue>
+  <dcvalue element="subject" qualifier="none" language="">adaptive radiation</dcvalue>
+  <dcvalue element="title" qualifier="none" language="en_US">Relative Warps</dcvalue>
+  <dcvalue element="type" qualifier="none" language="en_US">Dataset</dcvalue>
+  <dcvalue element="date" qualifier="issued">2007-12-20</dcvalue>
+</dublin_core>

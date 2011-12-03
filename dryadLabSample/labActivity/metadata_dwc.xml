@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<dublin_core schema="dwc">
+  <dcvalue element="ScientificName" qualifier="none" language="">Curimatoidea</dcvalue>
+  <dcvalue element="ScientificName" qualifier="none" language="">Anostomoidea</dcvalue>
+</dublin_core>

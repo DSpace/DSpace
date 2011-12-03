@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<dublin_core schema="dc">
+  <dcvalue element="contributor" qualifier="author" language="">????</dcvalue>
+  <dcvalue element="description" qualifier="none" language=""></dcvalue>
+  <dcvalue element="language" qualifier="iso" language="">en_US</dcvalue>
+  <dcvalue element="subject" qualifier="none" language=""></dcvalue>
+  <dcvalue element="title" qualifier="none" language=""></dcvalue>
+  <dcvalue element="type" qualifier="none" language=""></dcvalue>
+</dublin_core>
