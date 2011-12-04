@@ -1,23 +1,39 @@
 <?xml version="1.0" encoding="utf-8" standalone="no"?>
 <dublin_core schema="dc">
-
-
-  <dcvalue element="contributor" qualifier="author" language="">Sidlauskas, Brian</dcvalue>
-  <dcvalue element="coverage" qualifier="spatial" language="">South America</dcvalue>
-  <dcvalue element="coverage" qualifier="spatial" language="">South America</dcvalue>
-  <dcvalue element="identifier" qualifier="none" language="*">doi:10.5061/dryad.20/2</dcvalue>
-  <dcvalue element="description" qualifier="none" language="">Results of a relative warps analysis done in tpsRelw using the data in http://hdl.handle.net/10255/dryad.57.  The data in the Excel spreadsheet were used to prepare the morphospace figures that appear in Sidlauskas 2007. The order of taxa in the spreadsheet should match the order of taxa in the TPS file.</dcvalue>
-  <dcvalue element="language" qualifier="iso" language="en_US">en_US</dcvalue>
-  <dcvalue element="relation" qualifier="ispartof" language="">http://hdl.handle.net/10255/dryad.20</dcvalue>
-  <dcvalue element="rights" qualifier="uri" language="">http://creativecommons.org/publicdomain/zero/1.0/</dcvalue>
-  <dcvalue element="subject" qualifier="none" language="">disparity</dcvalue>
-  <dcvalue element="subject" qualifier="none" language="">evolutionary rates</dcvalue>
-  <dcvalue element="subject" qualifier="none" language="">Brownian evolution</dcvalue>
-  <dcvalue element="subject" qualifier="none" language="">mode</dcvalue>
-  <dcvalue element="subject" qualifier="none" language="">freshwater fishes</dcvalue>
-  <dcvalue element="subject" qualifier="none" language="">tempo</dcvalue>
+  <dcvalue element="description" qualifier="none" language="">Students use morphological data from seminal papers to explore adaptive radiation and speciation in the Galápagos finches (Geospinizae).</dcvalue>
+  <dcvalue element="contributor" qualifier="author" language="">Jenkins, Kristin (National Evolutionary Synthesis Center)</dcvalue>
+  <dcvalue element="contributor" qualifier="author" language="">Donovan, Sam (University of Pittsburg)</dcvalue>
+  <dcvalue element="contributor" qualifier="author" language="">BioQUEST BIRDD project</dcvalue>
+  <dcvalue element="rights" qualifier="uri" language="">http://creativecommons.org/licenses/by/2.0/</dcvalue>
+  <dcvalue element="educationalLevel" qualifier="none" language="">Upper-level undergraduate</dcvalue>
+  <dcvalue element="subject" qualifier="none" language="">evolution</dcvalue>
+  <dcvalue element="subject" qualifier="none" language="">morphology</dcvalue>
   <dcvalue element="subject" qualifier="none" language="">adaptive radiation</dcvalue>
-  <dcvalue element="title" qualifier="none" language="en_US">Relative Warps</dcvalue>
-  <dcvalue element="type" qualifier="none" language="en_US">Dataset</dcvalue>
-  <dcvalue element="date" qualifier="issued">2007-12-20</dcvalue>
+  <dcvalue element="subject" qualifier="none" language="">biogeography</dcvalue>
+  <dcvalue element="subject" qualifier="none" language="">competition</dcvalue>
+  <dcvalue element="subject" qualifier="none" language="">character displacement</dcvalue>
+  <dcvalue element="coverage" qualifier="spatial" language="">Galápagos Isla</dcvalue>
+<!-- NOTE: This field needs to be changed -->
+  <dcvalue element="description" qualifier="learningOutcome" language="en_US">This activity is designed to give students practice in developing a hypothesis, visualization and statistical analysis of large datasets, and interpretation of the results.  Students will apply their understanding of concepts in evolutionary biology, such as adaptive radiation and character displacement.  In addition, this activity is designed to give students experience in group work and presentation of their work.</dcvalue>
+<!-- NOTE: This field needs to be changed -->
+ <dcvalue element="extent" qualifier="none" language="en_US">120 minutes in class</dcvalue>
+<!-- NOTE: This field needs to be changed -->
+ <dcvalue element="description" qualifier="materialsRequired" language="en_US">One computer with internet access for each student group, with basic data management, graphing and statistical analysis software (e.g. Excel) on each.</dcvalue>
+  <dcvalue element="title" qualifier="none" language="en_US">Measuring Evolution: Morphology and Adaptive Radiation in Galápagos Finches</dcvalue>
+  <dcvalue element="type" qualifier="none" language="en_US">DryadLab Activity</dcvalue> 
+  <dcvalue element="date" qualifier="issued">2011-12-4</dcvalue>
+
+  <!-- supporting data packages -->
+  <dcvalue element="relation" qualifier="requires" language="en_US">doi:10.5061/dryad.154</dcvalue>
+  <dcvalue element="relation" qualifier="requires" language="en_US">doi:10.5061/dryad.152</dcvalue>
+  <dcvalue element="relation" qualifier="requires" language="en_US">doi:10.5061/dryad.150</dcvalue>
+  <dcvalue element="relation" qualifier="requires" language="en_US">doi:10.5061/dryad.156</dcvalue>
+
+  <!-- supporting articles. NOTE: these should be referenced by DOI, but not all will have one, and we need human-readable content here -->
+  <dcvalue element="relation" qualifier="references" language="en_US">Weiner, J. 1994. The Beak of the Finch. Vintage Books. New York.</dcvalue>
+  <dcvalue element="relation" qualifier="references" language="en_US">Sulloway, F.J. 1982. Darwin and His Finches: The Evolution of a Legend . J of the History of Biology Vol15(1):1-53. (http://www.sulloway.org/Finches.pdf)</dcvalue>
+  <dcvalue element="relation" qualifier="references" language="en_US">BioQuest BIRDD User’s Manual.</dcvalue>
+
 </dublin_core>
+
+
