@@ -163,7 +163,15 @@ public class Authenticate
         {
             loggedIn(context, request, context.getCurrentUser());
             log.info(LogManager.getHeader(context, "login", "type=implicit"));
-            return true;
+            if(context.getCurrentUser() != null){
+                //We have a new user
+                Authenticate.resumeInterruptedRequest(request, response);
+                return false;
+            }else{
+                //Couldn't log & authentication finished
+                return true;
+            }
+
         }
         else
         {
