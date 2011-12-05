@@ -1193,11 +1193,9 @@
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.actions_create">Create a new
 		E-Person</message>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.actions_create_link">Add a new E-Person.</message>
-	<message key="xmlui.administrative.eperson.ManageEPeopleMain.actions_browse">Browse
-		E-People</message>
+	<message key="xmlui.administrative.eperson.ManageEPeopleMain.actions_browse">Browse E-People</message>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.actions_browse_link">Browse all E-People.</message>
-	<message key="xmlui.administrative.eperson.ManageEPeopleMain.actions_search">Search for
-		E-People</message>
+	<message key="xmlui.administrative.eperson.ManageEPeopleMain.actions_search">Search for E-People</message>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.search_help">E-People are searched by
 		any partial match on email or name</message>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.search_para1">Below is the list of
@@ -1208,8 +1206,7 @@
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.search_column2">ID</message>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.search_column3">Name</message>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.search_column4">Email</message>
-	<message key="xmlui.administrative.eperson.ManageEPeopleMain.submit_delete">Delete
-		E-People</message>
+	<message key="xmlui.administrative.eperson.ManageEPeopleMain.submit_delete">Delete E-People</message>
 	<message key="xmlui.administrative.eperson.ManageEPeopleMain.no_results">Your search found no
 		results...</message>
 
@@ -1547,10 +1544,8 @@
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.column2">ID</message>
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.column3">Namespace</message>
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.column4">Name</message>
-	<message key="xmlui.administrative.registries.MetadataRegistryMain.submit_delete">Delete
-		schema</message>
-	<message key="xmlui.administrative.registries.MetadataRegistryMain.head2">Add a new
-		schema</message>
+	<message key="xmlui.administrative.registries.MetadataRegistryMain.submit_delete">Delete schema</message>
+	<message key="xmlui.administrative.registries.MetadataRegistryMain.head2">Add a new schema</message>
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.namespace">Namespace</message>
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.namespace_help">Namespace
 		should be an established URI location for the new schema.</message>
