@@ -796,8 +796,7 @@
 	<message key="xmlui.Submission.Submissions.submit_head3">Authoring:</message>
 	<message key="xmlui.Submission.Submissions.submit_info3">No submissions left unfinished.</message>
 	<message key="xmlui.Submission.Submissions.submit_head4">Supervising:</message>
-	<message key="xmlui.Submission.Submissions.submit_submit_remove">Remove selected
-		submissions</message>
+	<message key="xmlui.Submission.Submissions.submit_submit_remove">Remove selected submissions</message>
 	<!-- Same transformer, inprogress section -->
 	<message key="xmlui.Submission.Submissions.progress_head1">Submissions being reviewed</message>
 	<message key="xmlui.Submission.Submissions.progress_info1">These are your completed submissions
@@ -839,17 +838,13 @@
 		collection...</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.SaveOrRemoveStep -->
-	<message key="xmlui.Submission.submit.SaveOrRemoveStep.head">Save or cancel your
-		submission?</message>
+	<message key="xmlui.Submission.submit.SaveOrRemoveStep.head">Save or cancel your submission?</message>
 	<message key="xmlui.Submission.submit.SaveOrRemoveStep.info1">Do you want the submission removed,
 		or do you want to carry on working on it later? You may return to the submission process if you
 		clicked Exit by accident.</message>
-	<message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_back">Oops, continue
-		submission</message>
-	<message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_save">Save it, I'll work on it
-		later</message>
-	<message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_remove">Remove the
-		submission</message>
+	<message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_back">Oops, continue submission</message>
+	<message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_save">Save it, I'll work on it later</message>
+	<message key="xmlui.Submission.submit.SaveOrRemoveStep.submit_remove">Remove the submission</message>
 
 
 	<!-- org.dpspace.app.xmlui.Submission.submit.InitialQuestionsStep -->
@@ -859,17 +854,12 @@
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.separator">, </message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.open_set"> (</message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.close_set">)</message>
-	<message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles">Multiple
-		titles</message>
-	<message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles_help">The item has more
-		than one title, <i>e.g. a translated title</i></message>
-	<message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles_note">If the checkbox
-		above is unchecked then the following title(s) will be removed from the item: </message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles">Multiple titles</message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles_help">The item has more than one title, <i>e.g. a translated title</i></message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles_note">If the checkbox above is unchecked then the following title(s) will be removed from the item: </message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.published_before">Published</message>
-	<message key="xmlui.Submission.submit.InitialQuestionsStep.published_before_help">The item has
-		been published or publicly distributed before</message>
-	<message key="xmlui.Submission.submit.InitialQuestionsStep.published_before_note">If the checkbox
-		above is unchecked then the following will be removed from the item:</message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.published_before_help">The item has been published or publicly distributed before</message>
+	<message key="xmlui.Submission.submit.InitialQuestionsStep.published_before_note">If the checkbox above is unchecked then the following will be removed from the item:</message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.date_issued">Date Published</message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.citation">Citation</message>
 	<message key="xmlui.Submission.submit.InitialQuestionsStep.publisher">Publisher</message>
@@ -1262,16 +1252,13 @@
 	<message key="xmlui.administrative.eperson.EditEPersonForm.req_certs">Require
 		Certificate</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.can_log_in">Can Log In</message>
-	<message key="xmlui.administrative.eperson.EditEPersonForm.submit_reset_password">Reset
-		Password</message>
+	<message key="xmlui.administrative.eperson.EditEPersonForm.submit_reset_password">Reset Password</message>
 	<message key="xmlui.administrative.eperson.EditEPersonForm.special_help">You may also permanently
 		remove this E-Person from the system or reset his/her password. When resetting a password the
 		user will be sent an email containing a special link they can follow to choose a new
 		password.</message>
-	<message key="xmlui.administrative.eperson.EditEPersonForm.submit_delete">Delete
-		E-Person</message>
-	<message key="xmlui.administrative.eperson.EditEPersonForm.submit_login_as">Login as
-		E-Person</message>
+	<message key="xmlui.administrative.eperson.EditEPersonForm.submit_delete">Delete E-Person</message>
+	<message key="xmlui.administrative.eperson.EditEPersonForm.submit_login_as">Login as E-Person</message>
 
 	<message key="xmlui.administrative.eperson.EditEPersonForm.delete_constraint">This eperson is
 		unable to be deleted because of the following constraint(s):</message>
@@ -1404,28 +1391,21 @@
 		registry</message>
 
 	<!-- org.dspace.app.xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.java -->
-	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.title">Delete
-		Bitstream Formats</message>
-	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.trail">Delete
-		bitstream formats</message>
-	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.head">Confirm
-		Deletion</message>
+	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.title">Delete Bitstream Formats</message>
+	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.trail">Delete bitstream formats</message>
+	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.head">Confirm Deletion</message>
 	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.para1">Are you sure
 		the format should be deleted? Any existing bitstreams of this format will be reverted to the
 		unknown bitstream format.</message>
 	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.column1">ID</message>
-	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.column2">MIME
-		Type</message>
+	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.column2">MIME Type</message>
 	<message key="xmlui.administrative.registries.DeleteBitstreamFormatsConfirm.column3"
 		>Name</message>
 
 	<!-- org.dspace.app.xmlui.administrative.registries.DeleteMetadataFieldsConfirm.java -->
-	<message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.title">Delete
-		Fields</message>
-	<message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.trail">Delete
-		fields</message>
-	<message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.head">Confirm
-		Deletion</message>
+	<message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.title">Delete	Fields</message>
+	<message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.trail">Delete	fields</message>
+	<message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.head">Confirm	Deletion</message>
 	<message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.para1">Are you
 			<b>absolutely</b> sure you want to delete these fields? If any items contain metadata for
 		these fields, the field(s) cannot be deleted. You must ensure that no items use these
@@ -1435,16 +1415,12 @@
 		an error if any item contains metadata for these fields.</message>
 	<message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.column1">ID</message>
 	<message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.column2">Name</message>
-	<message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.column3">Scope
-		Note</message>
+	<message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.column3">Scope Note</message>
 
 	<!-- org.dspace.app.xmlui.administrative.registries.DeleteMetadataSchemaConfirm.java-->
-	<message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.title">Delete
-		Schema</message>
-	<message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.trail">Delete
-		schema</message>
-	<message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.head">Confirm
-		Deletion</message>
+	<message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.title">Delete Schema</message>
+	<message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.trail">Delete schema</message>
+	<message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.head">Confirm Deletion</message>
 	<message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.para1">Are you
 			<b>absolutely</b> sure you want to delete this schema? If any items contain metadata for
 		fields contained within this schema, the schema cannot be deleted. You must ensure that no items
@@ -1503,30 +1479,22 @@
 	<message key="xmlui.administrative.registries.EditMetadataSchema.para1">This is the metadata
 		schema for "{0}". You may add new or update existing metadata fields to this schema. Fields may
 		also be selected for deletion or be moved to another schema. </message>
-	<message key="xmlui.administrative.registries.EditMetadataSchema.head2">Schema metadata
-		fields</message>
+	<message key="xmlui.administrative.registries.EditMetadataSchema.head2">Schema metadata fields</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.column1"/>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.column2">ID</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.column3">Field</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.column4">Scope Note</message>
-	<message key="xmlui.administrative.registries.EditMetadataSchema.empty">No metadata
-		fields</message>
-	<message key="xmlui.administrative.registries.EditMetadataSchema.submit_delete">Delete
-		fields</message>
-	<message key="xmlui.administrative.registries.EditMetadataSchema.submit_move">Move fields to
-		another schema</message>
-	<message key="xmlui.administrative.registries.EditMetadataSchema.head3">Add new metadata
-		field</message>
+	<message key="xmlui.administrative.registries.EditMetadataSchema.empty">No metadata	fields</message>
+	<message key="xmlui.administrative.registries.EditMetadataSchema.submit_delete">Delete fields</message>
+	<message key="xmlui.administrative.registries.EditMetadataSchema.submit_move">Move fields to another schema</message>
+	<message key="xmlui.administrative.registries.EditMetadataSchema.head3">Add new metadata field</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.name">Field Name</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.note">Scope Note</message>
-	<message key="xmlui.administrative.registries.EditMetadataSchema.note_help">Additional notes about
-		this metadata field.</message>
-	<message key="xmlui.administrative.registries.EditMetadataSchema.submit_add">Add new metadata
-		field</message>
+	<message key="xmlui.administrative.registries.EditMetadataSchema.note_help">Additional notes about this metadata field.</message>
+	<message key="xmlui.administrative.registries.EditMetadataSchema.submit_add">Add new metadata field</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.head4">Update Field:
 		{0}</message>
-	<message key="xmlui.administrative.registries.EditMetadataSchema.submit_update">Update
-		field</message>
+	<message key="xmlui.administrative.registries.EditMetadataSchema.submit_update">Update field</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.error">Error</message>
 	<message key="xmlui.administrative.registries.EditMetadataSchema.error_duplicate_field">The field
 		name is already in use, all element and qualifiers must be unique.</message>
@@ -1563,8 +1531,7 @@
 	<message key="xmlui.administrative.registries.FormatRegistryMain.support_0">Unknown</message>
 	<message key="xmlui.administrative.registries.FormatRegistryMain.support_1">Known</message>
 	<message key="xmlui.administrative.registries.FormatRegistryMain.support_2">Support</message>
-	<message key="xmlui.administrative.registries.FormatRegistryMain.submit_delete">Delete
-		formats</message>
+	<message key="xmlui.administrative.registries.FormatRegistryMain.submit_delete">Delete formats</message>
 
 	<!-- org.dspace.app.xmlui.administrative.registries.MetadatRegistryMain.java -->
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.title">Metadata
@@ -1596,14 +1563,12 @@
 	<message key="xmlui.administrative.registries.MetadataRegistryMain.name_error">This field is
 		required and must be less than 32 characters and cannot contain any spaces, periods, or
 		underscores.</message>
-	<message key="xmlui.administrative.registries.MetadataRegistryMain.submit_add">Add new
-		schema</message>
+	<message key="xmlui.administrative.registries.MetadataRegistryMain.submit_add">Add new schema</message>
 
 	<!-- org.dspace.app.xmlui.administrative.registries.MoveMetadataField.java -->
 	<message key="xmlui.administrative.registries.MoveMetadataField.title">Move Fields</message>
 	<message key="xmlui.administrative.registries.MoveMetadataField.trail">Move fields</message>
-	<message key="xmlui.administrative.registries.MoveMetadataField.head1">Move metadata
-		fields</message>
+	<message key="xmlui.administrative.registries.MoveMetadataField.head1">Move metadata fields</message>
 	<message key="xmlui.administrative.registries.MoveMetadataField.para1">Select a target schema
 		where these fields will be moved. If the target schema already has fields with identical names
 		the fields will not be moved.</message>
@@ -1645,8 +1610,7 @@
 
 
 	<!-- org.dspace.app.xmlui.administrative.authorization.EditContainerPolicies -->
-	<message key="xmlui.administrative.authorization.EditContainerPolicies.title">Edit
-		Policies</message>
+	<message key="xmlui.administrative.authorization.EditContainerPolicies.title">Edit Policies</message>
 	<message key="xmlui.administrative.authorization.EditContainerPolicies.trail">Policies
 		List</message>
 	<message key="xmlui.administrative.authorization.EditContainerPolicies.main_head_collection"
@@ -1756,8 +1720,8 @@
 	<message
 		key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.actions_policyCollections"
 		>Collection</message>
-	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.submit_add">Add
-		policies</message>
+	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.submit_add"
+		>Add policies</message>
 	<message key="xmlui.administrative.authorization.AdvacedAuthorizationsForm.submit_remove_all"
 		>Clear policies</message>
 
@@ -2073,8 +2037,7 @@
 		maximum allowed. Limit changes or alter bulkedit.gui-item-limit in dspace.cfg</message>
 
 	<!-- org.dspace.app.xmlui.administrative.metadataimport.MetadataImportConfirm -->
-	<message key="xmlui.administrative.metadataimport.MetadataImportMain.submit_upload">Upload
-		CSV</message>
+	<message key="xmlui.administrative.metadataimport.MetadataImportMain.submit_upload">Upload CSV</message>
 
 	<!-- org.dspace.app.xmlui.administrative.metadataimport.MetadataImportConfirm -->
 	<message key="xmlui.administrative.metadataimport.MetadataImportConfirm.success">Successfully
