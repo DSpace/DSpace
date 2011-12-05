@@ -3218,4 +3218,23 @@
     <message key="xmlui.Submission.Submissions.step.head.reviewStep_claimed">In Journal Review: Claimed</message>
     <message key="xmlui.Submission.Submissions.step.head.reviewStep_pool">In Journal Review: Unclaimed</message>
 
+
+    <message key="xmlui_submit_publication_article_status_published">&#160; Published</message>
+    <message key="xmlui_submit_publication_article_status_accepted">&#160; Accepted</message>
+    <message key="xmlui_submit_publication_article_status_in_review">&#160; In review</message>
+    <message key="xmlui_submit_publication_article_status_not_yet_submitted">&#160; Not yet submitted</message>
+    <message key="xmlui.submit.publication.unknown_doi">&#160; This Article has been published in the Journal I will name, but I don't know or don't have a DOI or PubMedID for it.</message>
+    <message key="xmlui.submit.publication.article_status">Select Your Article Status</message>
+    <message key="xmlui.submit.publication.article_status_help">All data in Dryad must be associated with an article or other publication. Please select the status of your article.</message>
+    <message key="xmlui.submit.publication.journal.manu.acc.label">&#160; This manuscript has been accepted for publication in the above named journal.</message>
+    <message key="xmlui.submit.publication.journal.help_not_yet_submitted">If your journal is not listed, you can't submit data to Dryad at this stage.
+        For journals using Dryad to host data in review, you may submit data after receiving a manuscript number from the journal. For most journals,
+        you must wait until your manuscript has been accepted from publication before depositign data in Dryad.</message>
+
+     <message key="xmlui.submit.publication.journal.manu.help">example: 12345678MEC-11-1234.R1</message>
+     <message key="xmlui.submit.publication.enter_article_doi">Enter article DOI or PubMed ID</message>
+
+     <message key="xmlui.submit.select.pub.form.manu_error">Please, provide a manuscript number</message>
+
+
 </catalogue>

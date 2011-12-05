@@ -185,6 +185,7 @@ public class VersioningNavigation extends AbstractDSpaceTransformer implements C
 
         if(dso==null){
             // case: internal-item http://localhost:8100/internal-item?itemID=3085
+            // case: admin         http://localhost:8100/admin/item?itemID=3340
             // retrieve the object from the DB
             dso=getItemById();
         }
@@ -210,7 +211,7 @@ public class VersioningNavigation extends AbstractDSpaceTransformer implements C
     private DSpaceObject getItemById() throws SQLException {
         DSpaceObject dso = null;
         Request request = ObjectModelHelper.getRequest(objectModel);
-        if (request.getRequestURI().contains("internal-item")){
+        if (request.getQueryString()!=null && request.getQueryString().contains("itemID")){
             String itemId = request.getParameter("itemID");
             if (itemId != null){
                 try {

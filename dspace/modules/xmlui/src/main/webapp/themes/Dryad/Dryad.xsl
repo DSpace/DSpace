@@ -767,49 +767,7 @@ test="$meta[@element='request'][@qualifier='URI'][not(contains(., 'discover')) a
 	</xsl:template>
 
 
-	<xsl:template
-		match="dri:list/dri:item[@n='select_publication_new' or @n='select_publication_exist']">
-		<li>
-			<xsl:call-template name="standardAttributes">
-				<xsl:with-param name="class">
-					<xsl:text>ds-form-item </xsl:text>
-					<xsl:choose>
-						<xsl:when test="position() mod 2 = 0 and not(@rend = 'odd')">even</xsl:when>
-						<xsl:otherwise>odd</xsl:otherwise>
-					</xsl:choose>
-				</xsl:with-param>
-			</xsl:call-template>
-			<div class="ds-form-content">
-				<xsl:if test="dri:field[@type='radio']">
-					<xsl:apply-templates select="dri:field[@type='radio']"/>
-					<br/>
-				</xsl:if>
-				<table class="selectPubSubmitTable">
-					<xsl:for-each select="dri:field[@type='composite']/dri:field">
-						<xsl:variable name="currentId">
-							<xsl:value-of select="@id"/>
-						</xsl:variable>
-						<tr>
-							<td>
-								<label class="ds-form-label">
-									<xsl:attribute name="for">
-										<xsl:value-of select="translate($currentId,'.','_')"/>
-									</xsl:attribute>
-
-									<i18n:text><xsl:value-of select="dri:label"/></i18n:text>
-									<xsl:text>: </xsl:text>
-								</label>
-							</td>
-							<td>
-								<xsl:apply-templates select="../dri:field[@id=$currentId]"/>
-								<xsl:apply-templates select="../dri:field[@id=$currentId]/dri:error"/>
-							</td>
-						</tr>
-					</xsl:for-each>
-				</table>
-			</div>
-		</li>
-	</xsl:template>
+	
 
 	<xsl:template match="dri:field" mode="normalField">
 		<xsl:variable name="confidenceIndicatorID"
@@ -1484,6 +1442,118 @@ test="$meta[@element='request'][@qualifier='URI'][not(contains(., 'discover')) a
         </input>
 
     </xsl:template>
+
+
+
+
+
+    <!-- First submission form: added and rewrote some templates to manage the form using jquery,
+         to lead the user through the submission -->
+
+    <!-- First submission form: Article Status Radios -->
+    <xsl:template match="dri:body/dri:div/dri:list/dri:item[@n='article_status']/dri:field[@n='article_status']">
+
+        <div class="radios">
+
+            <xsl:for-each select="dri:option">
+                <input type="radio">
+                    <xsl:attribute name="id"><xsl:value-of select="."/></xsl:attribute>
+		            <xsl:attribute name="name"><xsl:value-of select="../@n"/></xsl:attribute>
+                    <xsl:attribute name="value"><xsl:value-of select="@returnValue"/></xsl:attribute>
+                    <xsl:if test="../dri:value[@type='option'][@option = current()/@returnValue]">
+                        <xsl:attribute name="checked">checked</xsl:attribute>
+                    </xsl:if>
+                </input>
+                <i18n:text><xsl:value-of select="."/></i18n:text>
+                <br/>
+
+            </xsl:for-each>
+        </div>
+    </xsl:template>
+    
+    <!-- First submission form: journalID Select + Manuscript Number Edit Box -->
+    <xsl:template match="dri:list/dri:item[@n='select_publication_new' or @n='select_publication_exist']">
+		<li>
+			<xsl:call-template name="standardAttributes">
+				<xsl:with-param name="class">
+					<xsl:text>ds-form-item </xsl:text>
+					<xsl:choose>
+						<xsl:when test="position() mod 2 = 0 and not(@rend = 'odd')">even</xsl:when>
+						<xsl:otherwise>odd</xsl:otherwise>
+					</xsl:choose>
+				</xsl:with-param>
+			</xsl:call-template>
+			<div class="ds-form-content">
+				<xsl:if test="dri:field[@type='radio']">
+					<xsl:apply-templates select="dri:field[@type='radio']"/>
+					<br/>
+				</xsl:if>
+                <xsl:for-each select="dri:field[@type='composite']/dri:field">
+                    <table class="selectPubSubmitTable">
+                    <xsl:variable name="currentId"><xsl:value-of select="@id"/></xsl:variable>
+                    <xsl:variable name="currentName"><xsl:value-of select="@n"/></xsl:variable>
+                    <tr>
+                        <xsl:attribute name="id"><xsl:value-of select="$currentName"/></xsl:attribute>
+                        <td>
+                            <label class="ds-form-label">
+                                <xsl:attribute name="for">
+                                    <xsl:value-of select="translate($currentId,'.','_')"/>
+                                </xsl:attribute>
+
+                                <i18n:text><xsl:value-of select="dri:label"/></i18n:text>
+                                <xsl:text>: </xsl:text>
+                            </label>
+                        </td>
+                        <td>
+                            <xsl:apply-templates select="../dri:field[@id=$currentId]"/>
+                            <xsl:apply-templates select="../dri:field[@id=$currentId]/dri:error"/>
+                        </td>
+                    </tr>
+                    </table>
+                </xsl:for-each>
+			</div>
+		</li>
+	</xsl:template>
+
+    <!-- First submission form: DOI Edit Box + Unknown DOI CheckBox -->
+        <xsl:template match="dri:list[@n='doi']">
+           <li id="aspect_submission_StepTransformer_list_doi">
+                <div class="ds-form-content">
+
+                        <xsl:for-each select="dri:item/dri:field">
+                            <xsl:variable name="currentId"><xsl:value-of select="@id"/></xsl:variable>
+                            <xsl:variable name="currentName"><xsl:value-of select="@n"/></xsl:variable>
+                <xsl:attribute name="id"><xsl:value-of select="$currentName"/></xsl:attribute>
+
+                <xsl:if test="$currentName!='unknown_doi'">
+                    <div>
+                    <label class="ds-form-label">
+                                            <xsl:attribute name="for"><xsl:value-of select="translate($currentId,'.','_')"/></xsl:attribute>
+                                            <i18n:text><xsl:value-of select="dri:label"/></i18n:text>
+                                            <xsl:text>: </xsl:text>
+                    </label>
+
+                    <xsl:apply-templates select="../dri:field[@id=$currentId]"/>
+                    <xsl:apply-templates select="../dri:field[@id=$currentId]/dri:error"/>
+                    </div>
+                </xsl:if>
+
+                <xsl:if test="$currentName='unknown_doi'">
+                    <div style='padding:10px;font-weight:bold;'>
+                    Or
+                    </div>
+                    <div>
+                    <xsl:apply-templates select="../dri:field[@id=$currentId]"/>
+                    <xsl:apply-templates select="../dri:field[@id=$currentId]/dri:error"/>
+                    </div>
+                </xsl:if>
+
+                        </xsl:for-each>
+
+                </div>
+            </li>
+        </xsl:template>
+
 
 
 </xsl:stylesheet>

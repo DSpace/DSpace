@@ -422,20 +422,8 @@ public class CDLDataCiteService {
 
         // others only dc.
         // dc.subject = dc:subject + dwc.ScientificName + dc:coverage.spatial + dc:coverage.temporal
-        String suject = null;
-        values = item.getMetadata("dc.subject");
-        if (values != null && values.length > 0) suject += values[0].value + " ";
-
-        values = item.getMetadata("dwc.ScientificName");
-        if (values != null && values.length > 0) suject += values[0].value + " ";
-
-        values = item.getMetadata("dc:coverage.spatial");
-        if (values != null && values.length > 0) suject += values[0].value + " ";
-
-        values = item.getMetadata("dc:coverage.temporal");
-        if (values != null && values.length > 0) suject += values[0].value;
-
-        if (suject != null) metadata.put(DC_SUBJECT, suject);
+        String subject = createSubject(item);
+        if (subject != null && !subject.equals("")) metadata.put(DC_SUBJECT, subject);
 
 
         addMetadata(metadata, item, "dc.relation.isreferencedby",DC_RELATION_ISREFERENCEBY);
@@ -446,6 +434,40 @@ public class CDLDataCiteService {
 
         return metadata;
 
+    }
+
+    private static String createSubject(Item item) {
+        DCValue[] values;
+        String subject = "";
+        values = item.getMetadata("dc.subject");
+        if (values != null && values.length > 0){
+            for(DCValue temp: values){
+                subject += temp.value + " ";
+            }
+
+        }
+
+        values = item.getMetadata("dwc.ScientificName");
+        if (values != null && values.length > 0){
+            for(DCValue temp: values){
+                subject += temp.value + " ";
+            }
+        }
+
+        values = item.getMetadata("dc:coverage.spatial");
+        if (values != null && values.length > 0){
+            for(DCValue temp: values){
+                subject += temp.value + " ";
+            }
+        }
+
+        values = item.getMetadata("dc:coverage.temporal");
+        if (values != null && values.length > 0){
+            for(DCValue temp: values){
+                subject += temp.value + " ";
+            }
+        }
+        return subject;
     }
 
     private static void addMetadata(Map<String, String> metadataList, Item item, String itemMetadataInput, String dataCiteMetadataKey) {

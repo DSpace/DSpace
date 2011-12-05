@@ -36,6 +36,11 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     public static final int ERROR_SELECT_JOURNAL = 3;
     public static final int ERROR_INVALID_JOURNAL = 4;
 
+    public static final int DISPLAY_MANUSCRIPT_NUMBER = 5;
+    public static final int DISPLAY_CONFIRM_MANUSCRIPT_ACCEPTANCE = 6;
+    public static final int ENTER_MANUSCRIPT_NUMBER = 7;
+
+
     private static Map<String, DCValue> journalToMetadata = new HashMap<String, DCValue>();
     public static List<String> integratedJournals = new ArrayList<String>();
     public static final List<String> journalNames = new ArrayList<String>();
@@ -46,6 +51,15 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     public static final Map<String, List<String>> journalNotifyOnArchive = new HashMap<String, List<String>>();
     private static Logger log = Logger.getLogger(SelectPublicationStep.class);
 
+
+    public final static int  ARTICLE_STATUS_PUBLISHED=0;
+    public final static int  ARTICLE_STATUS_ACCEPTED=1;
+    public final static int  ARTICLE_STATUS_IN_REVIEW=2;
+    public final static int  ARTICLE_STATUS_NOT_YET_SUBMITTED=3;
+
+
+    public final static int  UNKNOWN_DOI=5;
+    public final static int  MANU_ACC=6;
 
     static {
         journalVals.add("other");
@@ -112,12 +126,45 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     public int doProcessing(Context context, HttpServletRequest request, HttpServletResponse response, SubmissionInfo submissionInfo) throws ServletException, IOException, SQLException, AuthorizeException {
         Item item = submissionInfo.getSubmissionItem().getItem();
 
+
+        String journalID = request.getParameter("journalID");
+        String articleStatus = request.getParameter("article_status");
+        String manuscriptNumber = request.getParameter("manu");
+        String manuscriptNumberAcc = request.getParameter("manu-number-status-accepted");
+        String manuAcc = request.getParameter("manu_acc");
+
+
+        if(articleStatus!=null){
+            if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED){
+
+                // journalID=IntegratedJournals ==> DISPLAY_MANUSCRIPT_NUMBER
+                if(journalID!=null && integratedJournals.contains(journalID)){
+                    if(manuscriptNumberAcc==null)
+                        return  DISPLAY_MANUSCRIPT_NUMBER;
+                    else if(manuscriptNumberAcc.equals("")){
+                        return  ENTER_MANUSCRIPT_NUMBER;
+                    }
+                    else{
+                        manuscriptNumber = manuscriptNumberAcc;
+                    }
+                }
+                // journalID!=IntegratedJournals ==> DISPLAY_CONFIRM_MANUSCRIPT_ACCEPTANCE
+                else if(journalID!=null && !integratedJournals.contains(journalID) && (manuAcc==null || manuAcc.equals(""))){
+                    return DISPLAY_CONFIRM_MANUSCRIPT_ACCEPTANCE;
+                }
+                else{
+                    manuscriptNumber = manuscriptNumberAcc;
+                }
+            }
+            else if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_NOT_YET_SUBMITTED){
+                journalID = request.getParameter("journalIDStatusNotYetSubmitted");
+            }
+        }
+
         //First of all check if we have accepted our license
         if(request.getParameter("license_accept") == null || !Boolean.valueOf(request.getParameter("license_accept")))
             return STATUS_LICENSE_NOT_ACCEPTED;
 
-        String journalID = request.getParameter("journalID");
-        String manuscriptNumber = request.getParameter("manu");
 
         //We have selected to choose a journal, retrieve it
         if(!journalID.equals("other")){
@@ -158,6 +205,8 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                 }else{
                     //Add the error to our session so we know which one to display
                     request.getSession().setAttribute("submit_error", pBean.getMessage());
+                    if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED)
+                        return ENTER_MANUSCRIPT_NUMBER;
                     return ERROR_SELECT_JOURNAL;
                 }
             }
