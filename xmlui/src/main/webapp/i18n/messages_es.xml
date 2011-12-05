@@ -2071,4 +2071,8 @@ este momento. Cuando se usa QDC para los elementos de DSpace se recomienda el us
 <message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.claimaction">Revisión SeDiCI</message>
 <message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.editaction">Revisión SeDiCI</message>
 
+<!-- Choice authority -->
+<message key="sedici.choiceAuthorityControl.messageErrorConfidenceSingular">Verifique el valor</message>
+<message key="sedici.choiceAuthorityControl.messageErrorConfidencePlural">Hay errores en el formulario</message>
+
 </catalogue>

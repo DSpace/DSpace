@@ -7,6 +7,8 @@ var icono_search='search';
 var confianza_600='accepted';
 var confianza_300='notfound';
 var confianza_100='rejected';
+var errorConfianzaSingular='Verifique el valor';
+var errorConfianzaPlural='Hay errores en el formulario';
 
 
 //--------------------- Funcion que cambia la confianza del authority
@@ -61,7 +63,7 @@ function verificarConfidence(){
 		  }
     });
 	if (!retorno){
-		alert('Verifique los valores')
+		alert(errorConfianzaPlural);
 		primero.focus();
 	}
     return retorno;
@@ -78,7 +80,7 @@ function verificarConfidenceIndividual(inputID, confidenceName, confianza_valor)
 	var retorno=true;
 	if ($('#'+confidenceName).val()==confianza_valor){
 		retorno=false;
-		alert('Verifique el valor');
+		alert(errorConfianzaSingular);
 		$('#'+inputID).focus();
 	}
 

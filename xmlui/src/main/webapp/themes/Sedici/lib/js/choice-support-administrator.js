@@ -105,6 +105,10 @@ function DSpaceSetupAutocomplete(formID, args) {
     } else {
     	isAuthorityControlled=false;     
     };
+    
+    //cargo los valores de los errores
+    errorConfianzaSingular=args.messageErrorConfidenceSingular;
+    errorConfianzaPlural=args.messageErrorConfidencePlural;
 
     // AJAX menu source, can add &query=TEXT
     var choiceURL = args.contextPath + "/choices/" + args.metadataField;

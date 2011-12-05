@@ -151,6 +151,10 @@ No redefino todos los templates, solo los que necesito redefinir.
                     <xsl:value-of select="$confidenceIndicatorID"/>
                     <xsl:text>', confidenceName: '</xsl:text>
                     <xsl:value-of select="$confidenceName"/>
+                    <xsl:text>', messageErrorConfidenceSingular: '</xsl:text>
+                    <i18n:text>sedici.choiceAuthorityControl.messageErrorConfidenceSingular</i18n:text>
+                    <xsl:text>', messageErrorConfidencePlural: '</xsl:text>
+                    <i18n:text>sedici.choiceAuthorityControl.messageErrorConfidencePlural</i18n:text>
                     <xsl:text>', collection: </xsl:text>
                     <xsl:value-of select="$collectionID"/>
                     <xsl:text>, contextPath: '</xsl:text>
@@ -204,7 +208,7 @@ No redefino todos los templates, solo los que necesito redefinir.
 	          </xsl:attribute>
 	        </xsl:if>
 	        <xsl:attribute name="value">
-	          <xsl:value-of select="$authValue"/>
+	          <xsl:value-of select="substring-after($authValue, '#')"/>
 	        </xsl:attribute>
 	
 	      </input>
@@ -239,7 +243,7 @@ No redefino todos los templates, solo los que necesito redefinir.
           </xsl:attribute>
         </xsl:if>
         <xsl:attribute name="value">
-          <xsl:value-of select="$authValue"/>
+            <xsl:value-of select="substring-after($authValue, '#')"/>
         </xsl:attribute>
         <!-- this updates confidence after a manual change to authority value -->
         <xsl:attribute name="onChange">

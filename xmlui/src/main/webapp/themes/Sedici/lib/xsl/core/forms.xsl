@@ -43,7 +43,7 @@
             <div class="ds-previous-values">
                 <!-- Iterate over the dri:instance elements contained in this field. The instances contain
                     stored values as either "interpreted", "raw", or "default" values. -->
-                <xsl:call-template name="simpleFieldIterator">
+                <xsl:call-template name="especialSimpleFieldIterator">
                     <xsl:with-param name="position">1</xsl:with-param>
                 </xsl:call-template>
                 <!-- Conclude with a DELETE button if the delete operation is specified. This allows
@@ -61,5 +61,23 @@
         </xsl:if>
     </xsl:template>
 
+    <xsl:template name="especialSimpleFieldIterator">
+        <xsl:param name="position"/>
+        <xsl:if test="dri:instance[position()=$position]">
+            <input type="checkbox" value="{concat(@n,'_',$position)}" name="{concat(@n,'_selected')}"/>
+            <xsl:apply-templates select="dri:instance[position()=$position]" mode="interpreted"/>
+
+            <!-- look for authority value in instance. -->
+            <xsl:if test="dri:instance[position()=$position]/dri:value[@type='authority']">
+              <xsl:call-template name="authorityConfidenceIcon">
+                <xsl:with-param name="confidence" select="dri:instance[position()=$position]/dri:value[@type='authority']/@confidence"/>
+              </xsl:call-template>
+            </xsl:if>
+            <br/>
+            <xsl:call-template name="especialSimpleFieldIterator">
+                <xsl:with-param name="position"><xsl:value-of select="$position + 1"/></xsl:with-param>
+            </xsl:call-template>
+        </xsl:if>
+    </xsl:template>
 
 </xsl:stylesheet>
