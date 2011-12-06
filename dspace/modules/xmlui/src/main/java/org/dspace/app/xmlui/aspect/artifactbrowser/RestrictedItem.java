@@ -152,12 +152,12 @@ public class RestrictedItem extends AbstractDSpaceTransformer //implements Cache
                 // display DOI || handle || ID
                 String   doi = DOIIdentifierProvider.getDoiValue((Item)dso);
                 if(doi!=null && !"".equals(doi)){
-                    identifier = ".Identifier: " + doi;
+                    identifier = doi;
                 }
                 else if (handle == null || "".equals(handle)) {
-                    identifier = ".Internal ID: " + dso.getID();
+                    identifier = "Internal ID: " + dso.getID();
                 } else {
-                    identifier = ".Hdl:" + handle;
+                    identifier = handle;
                 }
 
                 Division unauthorized = body.addDivision(getStateDescription((Item) dso), "primary");

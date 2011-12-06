@@ -2860,9 +2860,7 @@
 		to input all the metadata.</message>
 	<message key="xmlui.submit.publication.journal.select.option.none">None</message>
 	<message key="xmlui.submit.publication.journal.select.option.journal">Select a journal</message>
-	<message key="xmlui.submit.publication.journal.select.help">*If you chose a journal that is fully
-		integrated with Dryad (indicated by an asterisk), you may enter a manuscript number to import
-		the article description automatically:</message>
+	<message key="xmlui.submit.publication.journal.select.help">* For journals fully integrated with Dryad, you will need to supply a manuscript number, and the article description will be imported automatically.</message>
 	<message key="xmlui.submit.publication.journal.select.label">Journal</message>
 	<message key="xmlui.submit.publication.journal.select.error">Please choose a valid journal</message>
 	<message key="xmlui.submit.publication.journal.manu.label">Manuscript Number</message>
@@ -3076,7 +3074,7 @@
     <message key="xmlui.ItemViewer.versionInWorkflow">A version of this item is in workflow waiting for curator review</message>
 
 	<message key="xmlui.dryad.page_title">Dryad data file: </message>
-    <message key="xmlui.utils.TombstoneTransformer.message">The requested Item is unavailable for more information contact an &#160;</message>
+    <message key="xmlui.utils.TombstoneTransformer.message">The requested Item is unavailable. For more information contact an &#160;</message>
     <message key="xmlui.utils.TombstoneTransformer.message_link">administrator</message>
     <message key="xmlui.utils.TombstoneTransformer.head1">Tombstone</message>
     <message key="xmlui.utils.IdentifierNotFoundTransformer.message">The requested identifier is unavailable for more information contact an &#160;</message>
