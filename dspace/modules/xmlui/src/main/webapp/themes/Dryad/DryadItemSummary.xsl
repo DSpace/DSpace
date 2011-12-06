@@ -1618,7 +1618,7 @@
                         </xsl:choose>
                     </xsl:attribute>
                     <img id="journal-logo" src="/themes/Dryad/images/coverimages/bmjOpen.png"
-                        alt="BMJ Open cover"/>
+                        alt="BMJ Open logo"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Comparative Cytogenetics"'>
@@ -1949,7 +1949,7 @@
                         </xsl:choose>
                     </xsl:attribute>
                     <img id="journal-logo" src="/themes/Dryad/images/coverimages/pbiology.png"
-                        alt="PLoS Biology cover"/>
+                        alt="PLoS Biology logo"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "PLoS Computational Biology"'>
@@ -1967,7 +1967,25 @@
                         </xsl:choose>
                     </xsl:attribute>
                     <img id="journal-logo" src="/themes/Dryad/images/coverimages/pcompbiol.png"
-                        alt="PLoS Computational Biology cover"/>
+                        alt="PLoS Computational Biology logo"/>
+                </a>
+            </xsl:when>
+            <xsl:when test='starts-with($journal-name,"PLoS Currents")'>
+                <a>
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of
+                                    select="string('http://www.plos.org/publications/currents/')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/pcurrents.png"
+                        alt="PLoS Currents logo"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "PLoS Genetics"'>
@@ -1985,7 +2003,7 @@
                         </xsl:choose>
                     </xsl:attribute>
                     <img id="journal-logo" src="/themes/Dryad/images/coverimages/pgenetics.png"
-                        alt="PLoS Genetics cover"/>
+                        alt="PLoS Genetics logo"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "PLoS Medicine"'>
@@ -2003,7 +2021,7 @@
                         </xsl:choose>
                     </xsl:attribute>
                     <img id="journal-logo" src="/themes/Dryad/images/coverimages/pmedicine.png"
-                        alt="PLoS Medicine cover"/>
+                        alt="PLoS Medicine logo"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "PLoS Neglected Tropical Diseases"'>
@@ -2021,7 +2039,7 @@
                         </xsl:choose>
                     </xsl:attribute>
                     <img id="journal-logo" src="/themes/Dryad/images/coverimages/pntd.png"
-                        alt="PLoS Neglected Tropical Diseases cover"/>
+                        alt="PLoS Neglected Tropical Diseases logo"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "PLoS ONE"'>
@@ -2039,7 +2057,7 @@
                         </xsl:choose>
                     </xsl:attribute>
                     <img id="journal-logo" src="/themes/Dryad/images/coverimages/pone.png"
-                        alt="PLoS ONE cover"/>
+                        alt="PLoS ONE logo"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "PLoS Pathogens"'>
@@ -2057,7 +2075,7 @@
                         </xsl:choose>
                     </xsl:attribute>
                     <img id="journal-logo" src="/themes/Dryad/images/coverimages/ppathogens.png"
-                        alt="PLoS Pathogens cover"/>
+                        alt="PLoS Pathogens logo"/>
                 </a>
             </xsl:when>
             <xsl:when test='$journal-name = "Systematic Biology"'>
