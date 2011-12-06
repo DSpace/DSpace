@@ -1656,7 +1656,7 @@
                          alt="Ecological Monographs cover"/>
                 </a>
             </xsl:when>
-            <xsl:when test='$journal-name = "Evolution"'>
+            <xsl:when test='$journal-name = "Evolution - suppress cover"'>
                 <a>
                     <xsl:attribute name="href">
                         <xsl:choose>
@@ -1672,7 +1672,7 @@
                     <img id="journal-logo" src="/themes/Dryad/images/coverimages/evolution.png" alt="Evolution cover"/>
                 </a>
             </xsl:when>
-            <xsl:when test='$journal-name = "Evolutionary Applications"'>
+            <xsl:when test='$journal-name = "Evolutionary Applications - suppress cover"'>
                 <a>
                     <xsl:attribute name="href">
                         <xsl:choose>
@@ -1722,7 +1722,7 @@
                     <img id="journal-logo" src="/themes/Dryad/images/coverimages/ijm.png" alt="International Journal of Myriapodology cover"/>
                 </a>
             </xsl:when>
-            <xsl:when test='$journal-name = "Journal of Evolutionary Biology"'>
+            <xsl:when test='$journal-name = "Journal of Evolutionary Biology - suppress cover"'>
                 <a>
                     <xsl:attribute name="href">
                         <xsl:choose>
@@ -1790,7 +1790,7 @@
                          alt="Molecular Biology and Evolution cover"/>
                 </a>
             </xsl:when>
-            <xsl:when test='$journal-name = "Molecular Ecology"'>
+            <xsl:when test='$journal-name = "Molecular Ecology - suppress cover"'>
                 <a>
                     <xsl:attribute name="href">
                         <xsl:choose>
@@ -1808,7 +1808,7 @@
                          alt="Molecular Ecology cover"/>
                 </a>
             </xsl:when>
-            <xsl:when test='$journal-name = "Molecular Ecology Resources"'>
+            <xsl:when test='$journal-name = "Molecular Ecology Resources - suppress cover"'>
                 <a>
                     <xsl:attribute name="href">
                         <xsl:choose>
