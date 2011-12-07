@@ -307,6 +307,15 @@ public class Item extends DSpaceObject
     }
 
     /**
+     * Method that updates the last modified date of the item
+     * The modified boolean will be set to true and the actual date update will occur on item.update().
+     */
+    void updateLastModified()
+    {
+        modified = true;
+    }
+
+    /**
      * Set the "is_archived" flag. This is public and only
      * <code>WorkflowItem.archive()</code> should set this.
      *

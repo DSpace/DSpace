@@ -491,6 +491,14 @@ public class Bundle extends DSpaceObject
 
             // Place the bitstream in the list of bitstreams in this bundle
             bitstreams.add(bitstreamMap.get(bitstreamId));
+        }
+
+        //The order of the bitstreams has changed, ensure that we update the last modified of our item
+        Item owningItem = (Item) getParentObject();
+        if(owningItem != null)
+        {
+            owningItem.updateLastModified();
+            owningItem.update();
 
         }
     }
@@ -531,7 +539,16 @@ public class Bundle extends DSpaceObject
         }
 
         ourContext.addEvent(new Event(Event.REMOVE, Constants.BUNDLE, getID(), Constants.BITSTREAM, b.getID(), String.valueOf(b.getSequenceID())));
-        
+
+        //Ensure that the last modified from the item is triggered !
+        Item owningItem = (Item) getParentObject();
+        if(owningItem != null)
+        {
+            owningItem.updateLastModified();
+            owningItem.update();
+
+        }
+
         // In the event that the bitstream to remove is actually
         // the primary bitstream, be sure to unset the primary
         // bitstream.
