@@ -80,6 +80,7 @@
 				</field>
 
 				<!-- Título (principal) -->
+				<!-- TODO Por ahora dejamos solo dc.title, porque DSpace no sabe que dc.title.main es el titulo -->
 				<field>
 					<dc-schema>dc</dc-schema>
 					<dc-element>title</dc-element>
