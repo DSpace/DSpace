@@ -1618,8 +1618,7 @@
 	<message key="xmlui.administrative.authorization.EditContainerPolicies.head_action"
 		>Action</message>
 	<message key="xmlui.administrative.authorization.EditContainerPolicies.head_group">Group</message>
-	<message key="xmlui.administrative.authorization.EditContainerPolicies.submit_delete">Delete
-		Selected</message>
+	<message key="xmlui.administrative.authorization.EditContainerPolicies.submit_delete">Delete Selected</message>
 	<message key="xmlui.administrative.authorization.EditContainerPolicies.group_edit">Edit</message>
 
 
@@ -1723,8 +1722,8 @@
 	<!-- org.dspace.app.xmlui.administrative.authorization.DeletePoliciesConfirm -->
 	<message key="xmlui.administrative.authorization.DeletePoliciesConfirm.title">Confirm Policy
 		Deletion</message>
-	<message key="xmlui.administrative.authorization.DeletePoliciesConfirm.trail">Confirm
-		Delete</message>
+	<message key="xmlui.administrative.authorization.DeletePoliciesConfirm.trail"
+		>Confirm Delete</message>
 	<message key="xmlui.administrative.authorization.DeletePoliciesConfirm.confirm_head">Confirm
 		Deletion</message>
 	<message key="xmlui.administrative.authorization.DeletePoliciesConfirm.confirm_para">The following
@@ -1895,8 +1894,8 @@
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.view_link">view</message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.submit_add">Upload a new
 		bitstream</message>
-	<message key="xmlui.administrative.item.EditItemBitstreamsForm.submit_delete">Delete
-		bitstreams</message>
+	<message key="xmlui.administrative.item.EditItemBitstreamsForm.submit_delete">
+		Delete bitstreams</message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.no_upload">You need the ADD &amp;
 		WRITE privilege on the item and bundles to be able to upload new bitstreams.</message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.no_remove">You need the REMOVE
@@ -1909,8 +1908,8 @@
 	<message key="xmlui.administrative.item.EditItemMetadataForm.name_label">Name</message>
 	<message key="xmlui.administrative.item.EditItemMetadataForm.value_label">Value</message>
 	<message key="xmlui.administrative.item.EditItemMetadataForm.lang_label">Language</message>
-	<message key="xmlui.administrative.item.EditItemMetadataForm.submit_add">Add new
-		metadata</message>
+	<message key="xmlui.administrative.item.EditItemMetadataForm.submit_add"
+		>Add new metadata</message>
 	<message key="xmlui.administrative.item.EditItemMetadataForm.para1">PLEASE NOTE: These changes are
 		not validated in any way. You are responsible for entering the data in the correct format. If
 		you are not sure what the format is, please do NOT make changes.</message>
@@ -1985,8 +1984,7 @@
 		>Reinstate...</message>
 	<message key="xmlui.administrative.item.EditItemStatusForm.submit_move">Move...</message>
 
-	<message key="xmlui.administrative.item.EditItemStatusForm.submit_delete">Permanently
-		delete</message>
+	<message key="xmlui.administrative.item.EditItemStatusForm.submit_delete">Permanently delete</message>
 	<message key="xmlui.administrative.item.EditItemStatusForm.na">n/a</message>
 	<message key="xmlui.administrative.item.EditItemStatusForm.sysadmins_only">(system administrators
 		only)</message>
@@ -2240,10 +2238,10 @@
 		>Edit...</message>
 	<message key="xmlui.administrative.collection.EditCollectionMetadataForm.submit_delete_logo"
 		>Remove logo</message>
-	<message key="xmlui.administrative.collection.EditCollectionMetadataForm.submit_delete">Delete
-		collection</message>
-	<message key="xmlui.administrative.collection.EditCollectionMetadataForm.submit_save">Save
-		updates</message>
+	<message key="xmlui.administrative.collection.EditCollectionMetadataForm.submit_delete"
+		>Delete collection</message>
+	<message key="xmlui.administrative.collection.EditCollectionMetadataForm.submit_save"
+		>Save updates</message>
 	<message key="xmlui.administrative.collection.EditCollectionMetadataForm.sysadmins_only">
 		<nobr>(system administrators only)</nobr>
 	</message>
