@@ -63,6 +63,19 @@
  *  var confianza_100='rejected';
  */
 
+//--------------------- Funcion que muestra el icono correcto de confianza al inicio
+
+function verificarConfianzaInicial(confidenceIndicatorID, confidenceName){
+	if ($('#'+confidenceName).val()==confianza_300){ 
+		DSpaceUpdateConfidence(document, confidenceIndicatorID, icono_new);
+	} else {
+		if ($('#'+confidenceName).val()==confianza_100){
+			DSpaceUpdateConfidence(document, confidenceIndicatorID, icono_rejected);
+			$('#' + inputID).attr('class', 'ds-text-field error submit-text');
+		}
+	}
+}
+
 function DSpaceSetupAutocomplete(formID, args) {
     $(function() {
     if (args.authorityName == null)
@@ -90,6 +103,7 @@ function DSpaceSetupAutocomplete(formID, args) {
 
     if (args.authorityControlled=='yes'){
     	isAuthorityControlled=true; 
+    	verificarConfianzaInicial(args.confidenceIndicatorID, args.confidenceName);
     } else {
     	isAuthorityControlled=false;    
     };

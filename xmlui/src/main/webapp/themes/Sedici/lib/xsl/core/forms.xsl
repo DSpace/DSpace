@@ -56,21 +56,30 @@
                     the form still submits the information in those instances, even though they are no
                     longer encoded as HTML fields. The DRI Reference should contain the exact attributes
                     the hidden fields should have in order for this to work properly. -->
-                <xsl:apply-templates select="dri:instance" mode="hiddenInterpreter"/>
-            </div>
+              </div>
         </xsl:if>
     </xsl:template>
-
+	
+	<!-- Este template recibirá en la propiedad authority formateado de la siguiente manera
+	     authorityKey#authorityLabel -->
     <xsl:template name="especialSimpleFieldIterator">
         <xsl:param name="position"/>
+        
         <xsl:if test="dri:instance[position()=$position]">
+            <xsl:variable name="authValue" select="substring-before(dri:instance[position()=$position]/dri:value[@type='authority'], '#')"/>
+            <xsl:variable name="authLabel" select="substring-after(dri:instance[position()=$position]/dri:value[@type='authority'], '#')"/>
             <input type="checkbox" value="{concat(@n,'_',$position)}" name="{concat(@n,'_selected')}"/>
-            <xsl:apply-templates select="dri:instance[position()=$position]" mode="interpreted"/>
+            <xsl:value-of select="dri:instance[position()=$position]/dri:value"></xsl:value-of>
 
-            <!-- look for authority value in instance. -->
-            <xsl:if test="dri:instance[position()=$position]/dri:value[@type='authority']">
-              <xsl:call-template name="authorityConfidenceIcon">
-                <xsl:with-param name="confidence" select="dri:instance[position()=$position]/dri:value[@type='authority']/@confidence"/>
+             <!-- look for authority value in instance. -->
+            <xsl:if test="dri:instance[position()=$position]/dri:value[@type='authority']">             	
+              <xsl:call-template name="multipleAuthorityInputFields">
+                <xsl:with-param name="name" select="@n"/>
+      			<xsl:with-param name="position" select="$position"/>
+     			<xsl:with-param name="value" select="dri:instance[position()=$position]/dri:value"/>
+      			<xsl:with-param name="authValue" select="$authValue"/>
+      			<xsl:with-param name="authLabel" select="$authLabel"/>
+      			<xsl:with-param name="confValue" select="dri:instance[position()=$position]/dri:value[@type='authority']/@confidence"/>
               </xsl:call-template>
             </xsl:if>
             <br/>
@@ -79,5 +88,91 @@
             </xsl:call-template>
         </xsl:if>
     </xsl:template>
+    
+    
+    
+    
+<!--   <input type="hidden" value="Aacn Clinical Issues" name="dc_title_alternative_1">
+<input class="ds-authority-value " type="text" onchange="javascript: return DSpaceAuthorityOnChange(this, '_confidence','');" value="1079-0713" name="dc_title_alternative_authority_1" readonly="readonly">
+<input class="ds-authority-confidence-input" type="hidden" value="failed" name="dc_title_alternative_confidence_1">
+-->   
+
+   <xsl:template name="multipleAuthorityInputFields">
+      <xsl:param name="name" select="''"/>
+      <xsl:param name="position" select="''"/>
+      <xsl:param name="value" select="''"/>
+      <xsl:param name="authValue" select="''"/>
+      <xsl:param name="authLabel" select="''"/>
+      <xsl:param name="confValue" select="''"/>
+      <xsl:variable name="confidence" select="translate($confValue,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')"/>
+
+	  <xsl:choose>
+
+	  	<xsl:when test="$confidence='accepted'">
+	  	  <xsl:choose>
+	  	  <xsl:when test="$authLabel = $value">
+			 <xsl:call-template name="authorityConfidenceIcon">
+                <xsl:with-param name="confidence">accepted</xsl:with-param>
+             </xsl:call-template>
+			</xsl:when>	
+			<xsl:otherwise>
+			 <xsl:text> (</xsl:text>
+			  <xsl:value-of select="$authLabel"/>
+			 <xsl:text> )</xsl:text>
+			 <xsl:call-template name="authorityConfidenceIcon">
+                <xsl:with-param name="confidence">failed</xsl:with-param>
+             </xsl:call-template>
+			</xsl:otherwise>
+				
+			</xsl:choose>	
+	  	</xsl:when>
+	  	
+	  	<xsl:when test="$confidence='notfound'">
+	  	   	 <xsl:call-template name="authorityConfidenceIcon">
+                <xsl:with-param name="confidence">ambiguous</xsl:with-param>
+             </xsl:call-template>
+	  	</xsl:when>
+	  
+	  </xsl:choose>
+
+      <!-- imprimo el value -->
+      <input type="hidden">
+        <xsl:attribute name="value">
+          <xsl:value-of select="$value"/>
+        </xsl:attribute>
+        <xsl:attribute name="name">
+          <xsl:value-of select="$name"/>
+		  <xsl:if test="$position">
+            <xsl:value-of select="concat('_', $position)"/>
+          </xsl:if>
+        </xsl:attribute>
+      </input>
+	  
+      <!-- the authority key value -->
+      <input type="hidden">
+        <xsl:attribute name="value">
+          <xsl:value-of select="$authValue"/>
+        </xsl:attribute>
+        <xsl:attribute name="name">
+          <xsl:value-of select="concat($name,'_authority')"/>
+          <xsl:if test="$position">
+            <xsl:value-of select="concat('_', $position)"/>
+          </xsl:if>
+        </xsl:attribute>
+      </input>
+ 
+      <input type="hidden">
+        <xsl:attribute name="name">
+          <xsl:value-of select="concat($name,'_confidence')"/>
+          <xsl:if test="$position">
+            <xsl:value-of select="concat('_', $position)"/>
+          </xsl:if>
+        </xsl:attribute>
+        <xsl:attribute name="value">
+          <xsl:value-of select="$confidence"/>
+        </xsl:attribute>
+      </input>
+    </xsl:template>
+
 
 </xsl:stylesheet>

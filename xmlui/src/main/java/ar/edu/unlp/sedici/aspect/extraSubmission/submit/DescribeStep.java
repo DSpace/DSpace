@@ -1211,8 +1211,8 @@ public class DescribeStep extends AbstractSubmissionStep
                 // Setup the field's values
                 if (dcInput.isRepeatable() || dcValues.length > 1)
                 {
-                        for (DCValue dcValue : dcValues)
-                        {
+                        for (DCValue dcValue : dcValues){
+                        	
 	                        	if (isAuth && (dcValue.authority != null)){
 	                            	authorityLabel=cmgr.getLabel(fieldKey, dcValue.authority, I18nUtil.getEPersonLocale(eperson).getLanguage());
 	                            } else {
@@ -1227,28 +1227,25 @@ public class DescribeStep extends AbstractSubmissionStep
                                 	
                                     if (dcValue.authority == null || dcValue.authority.equals(""))
                                     {
+                                    	
                                     	if (dcValue.confidence == 300){
-                                    		ti.setAuthorityValue("", "ambiguous");
+                                    		ti.setAuthorityValue("", "notfound");
                                     	} else {
                                     		ti.setAuthorityValue("", "blank");
                                     	}
+                                    } else { 
+                                    	ti.setAuthorityValue(dcValue.authority +"#"+ authorityLabel, Choices.getConfidenceText(dcValue.confidence));
                                     }
-                                    else
-                                    {    
-                                    	if (dcValue.value.equals(authorityLabel) && dcValue.confidence == 600){
-                                    		ti.setAuthorityValue(dcValue.authority+"#"+authorityLabel, Choices.getConfidenceText(dcValue.confidence));
-                                    	} else {
-                                    		ti.setAuthorityValue(dcValue.authority+"#"+authorityLabel, "failed");
-                                    	}
-                                        
-                                    }
+                                    //si le saco este sysout no anda, me manda siempre failed
+                                    //System.out.println(Choices.getConfidenceText(dcValue.confidence));
                         }
                 }
                 }
                 else if (dcValues.length == 1)
                 {
+                	//por aca entran los campos que no son multiples
 	                	if (isAuth && (dcValues[0].authority != null)){
-	                    	authorityLabel="#"+cmgr.getLabel(fieldKey, dcValues[0].authority, I18nUtil.getEPersonLocale(eperson).getLanguage());
+	                    	authorityLabel=cmgr.getLabel(fieldKey, dcValues[0].authority, I18nUtil.getEPersonLocale(eperson).getLanguage());
 	                    } else {
 	                    	authorityLabel="";
 	                    };
@@ -1260,19 +1257,15 @@ public class DescribeStep extends AbstractSubmissionStep
                             if (dcValues[0].authority == null || dcValues[0].authority.equals(""))
                             {
                             	if (dcValues[0].confidence == 300){
-                            		text.setAuthorityValue("", "ambiguous");
+                            		text.setAuthorityValue("", Choices.getConfidenceText(dcValues[0].confidence));
                             	} else {
                             		text.setAuthorityValue("", "blank");
                             	}
                             }
-                            else
-                            {                       
-                            	if (dcValues[0].value.equals(authorityLabel) && dcValues[0].confidence == 600){
-                            		text.setAuthorityValue(dcValues[0].authority+authorityLabel, Choices.getConfidenceText(dcValues[0].confidence));
-                            	} else {
-                            		text.setAuthorityValue(dcValues[0].authority+authorityLabel, "failed");
-                            	}
+                            else {  
+                            	text.setAuthorityValue(dcValues[0].authority+'#'+authorityLabel, Choices.getConfidenceText(dcValues[0].confidence));
                             }
+                            
                              
                 }
         }
@@ -1299,7 +1292,7 @@ public class DescribeStep extends AbstractSubmissionStep
          *
          *
          * However this method will not remove naughty or sexual innuendoes from the
-         * field's hints.
+         * field's hints.lcConfidence
          *
          *
          * @param dirtyHints HTML-ized hints

@@ -179,7 +179,7 @@ No redefino todos los templates, solo los que necesito redefinir.
       <xsl:variable name="authFieldID" select="concat(translate(@id,'.','_'),'_authority')"/>
       <xsl:variable name="authLabelID" select="concat(translate(@id,'.','_'),'_authority_label')"/>
       <xsl:variable name="confFieldID" select="concat(translate(@id,'.','_'),'_confidence')"/>
-
+      <xsl:variable name="lcConfidence" select="translate($confValue,'ABCDEFGHIJKLMNOPQRSTUVWXYZ','abcdefghijklmnopqrstuvwxyz')"/>
       <!-- 
       	The authority label 
       	Agregado por Nico.
@@ -284,7 +284,7 @@ No redefino todos los templates, solo los que necesito redefinir.
           </xsl:attribute>
         </xsl:if>
         <xsl:attribute name="value">
-          <xsl:value-of select="$confValue"/>
+          <xsl:value-of select="$lcConfidence"/>
         </xsl:attribute>
       </input>
     </xsl:template>

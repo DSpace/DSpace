@@ -157,4 +157,44 @@
         </form>
         </xsl:if>
     </xsl:template>
+    
+        
+<!-- The header (distinct from the HTML head element) contains the title, subtitle, login box and various
+     placeholders for header images -->
+
+    <xsl:template match="dri:trail">
+        <!--put an arrow between the parts of the trail-->
+        <xsl:if test="position()>1">        
+	        <xsl:if test="position()>2">
+	            <li class="ds-trail-arrow">
+	                <xsl:text>&#8594;</xsl:text>
+	            </li>
+	        </xsl:if>
+	        <li>
+	            <xsl:attribute name="class">
+	                <xsl:text>ds-trail-link </xsl:text>
+	                <xsl:if test="position()=2">
+	                    <xsl:text>first-link </xsl:text>
+	                </xsl:if>
+	                <xsl:if test="position()=last()">
+	                    <xsl:text>last-link</xsl:text>
+	                </xsl:if>
+	            </xsl:attribute>
+	            <!-- Determine whether we are dealing with a link or plain text trail link -->
+	            <xsl:choose>
+	                <xsl:when test="./@target">
+	                    <a>
+	                        <xsl:attribute name="href">
+	                            <xsl:value-of select="./@target"/>
+	                        </xsl:attribute>
+	                        <xsl:apply-templates />
+	                    </a>
+	                </xsl:when>
+	                <xsl:otherwise>
+	                    <xsl:apply-templates />
+	                </xsl:otherwise>
+	            </xsl:choose>
+	        </li>
+	     </xsl:if>
+    </xsl:template>
 </xsl:stylesheet>

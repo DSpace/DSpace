@@ -63,10 +63,29 @@
  *  var confianza_300='notfound';
  *  var confianza_100='rejected';
  */
-function DSpaceSetupAutocomplete(formID, args) {
-    $(function() {
 
-    	
+//--------------------- Funcion que muestra el icono correcto de confianza al inicio
+
+function verificarConfianzaInicial(inputID, authorityLabelID, confidenceIndicatorID, confidenceName){
+	if ($('#'+confidenceName).val()==confianza_600){ 
+		if ($('#'+inputID).val()!=$('#'+authorityLabelID).val()){
+			DSpaceUpdateConfidence(document, confidenceIndicatorID, icono_change);
+		}
+	} else {
+		if ($('#'+confidenceName).val()==confianza_300){ 
+			DSpaceUpdateConfidence(document, confidenceIndicatorID, icono_new);
+		} else {
+			if ($('#'+confidenceName).val()==confianza_100){
+				DSpaceUpdateConfidence(document, confidenceIndicatorID, icono_rejected);
+				$('#' + inputID).attr('class', 'ds-text-field error submit-text');
+			}
+		}
+	}
+}
+
+function DSpaceSetupAutocomplete(formID, args) {
+    $(function() {   
+
     if (args.authorityName == null)
         args.authorityName = dspace_makeFieldInput(args.inputName, '_authority');
         var form = $('#' + formID)[0];
@@ -101,6 +120,8 @@ function DSpaceSetupAutocomplete(formID, args) {
     			return verificarConfidenceIndividual(args.inputID, args.confidenceName, confianza_100);
     		})
     	}
+    	//si es authority controlled y el value del label es distinto al del value,  debo cambar la confianza ya que vendra como 200 y en realidad es 600
+    	verificarConfianzaInicial(inputID, authorityLabelID, args.confidenceIndicatorID, args.confidenceName);
     	
     } else {
     	isAuthorityControlled=false;     
