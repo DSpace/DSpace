@@ -896,8 +896,8 @@
 	<message key="xmlui.Submission.submit.UploadStep.description_help">Optionally, provide a brief
 		description of the file, for example "<i>Main article</i>", or "<i>Experiment data
 		readings</i>".</message>
-	<message key="xmlui.Submission.submit.UploadStep.submit_upload">Upload file &amp; add
-		another</message>
+	<message key="xmlui.Submission.submit.UploadStep.submit_upload"
+		>Upload file &amp; add another</message>
 	<message key="xmlui.Submission.submit.UploadStep.head2">Files Uploaded</message>
 	<message key="xmlui.Submission.submit.UploadStep.column0">Primary</message>
 	<message key="xmlui.Submission.submit.UploadStep.column1"> </message>
@@ -964,8 +964,8 @@
 	<message key="xmlui.Submission.submit.CCLicenseStep.submit_to_creative_commons">Proceed to
 		Creative Commons website to select a license</message>
 	<message key="xmlui.Submission.submit.CCLicenseStep.license">License</message>
-	<message key="xmlui.Submission.submit.CCLicenseStep.submit_remove">Remove this Creative Commons
-		License</message>
+	<message key="xmlui.Submission.submit.CCLicenseStep.submit_remove"
+		>Remove this Creative Commons License</message>
 	<message key="xmlui.Submission.submit.CCLicenseStep.no_license">no creative commons license
 		selected</message>
 
@@ -998,8 +998,8 @@
 		review process for this collection. You will receive e-mail notification as soon as your
 		submission has joined the collection, or if there is a problem with your submission. You may
 		also check on the status of your submission by visiting your submissions page.</message>
-	<message key="xmlui.Submission.submit.CompletedStep.go_submission">Go to the Submissions
-		page</message>
+	<message key="xmlui.Submission.submit.CompletedStep.go_submission"
+		>Go to the Submissions page</message>
 	<message key="xmlui.Submission.submit.CompletedStep.submit_again">Submit another item</message>
 
 	<!-- org.dspace.app.xmlui.Submission.workflow.PerformTaskStep -->
@@ -1285,8 +1285,7 @@
 		Deletion</message>
 	<message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.confirm_para">The following
 		E-People will be deleted: </message>
-	<message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.submit_confirm">Confirm
-		Deletion</message>
+	<message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.submit_confirm">Confirm Deletion</message>
 	<message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.head_id">ID</message>
 	<message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.head_name">Name</message>
 	<message key="xmlui.administrative.eperson.DeleteEPeopleConfirm.head_email">Email</message>
@@ -1892,10 +1891,9 @@
 	</message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.primary_label"> (primary) </message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.view_link">view</message>
-	<message key="xmlui.administrative.item.EditItemBitstreamsForm.submit_add">Upload a new
-		bitstream</message>
-	<message key="xmlui.administrative.item.EditItemBitstreamsForm.submit_delete">
-		Delete bitstreams</message>
+	<message key="xmlui.administrative.item.EditItemBitstreamsForm.submit_add">Upload a new bitstream</message>
+	<message key="xmlui.administrative.item.EditItemBitstreamsForm.submit_delete"
+		>Delete bitstreams</message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.no_upload">You need the ADD &amp;
 		WRITE privilege on the item and bundles to be able to upload new bitstreams.</message>
 	<message key="xmlui.administrative.item.EditItemBitstreamsForm.no_remove">You need the REMOVE
@@ -2092,8 +2090,8 @@
 	<message key="xmlui.administrative.mapper.BrowseItemForm.title">Browse Mapped Items</message>
 	<message key="xmlui.administrative.mapper.BrowseItemForm.trail">Browse mapped items</message>
 	<message key="xmlui.administrative.mapper.BrowseItemForm.head1">Browsing mapped items</message>
-	<message key="xmlui.administrative.mapper.BrowseItemForm.submit_unmap">Unmap selected
-		items</message>
+	<message key="xmlui.administrative.mapper.BrowseItemForm.submit_unmap"
+		>Unmap selected items</message>
 	<message key="xmlui.administrative.mapper.BrowseItemForm.column1"/>
 	<message key="xmlui.administrative.mapper.BrowseItemForm.column2">Collection</message>
 	<message key="xmlui.administrative.mapper.BrowseItemForm.column3">Author</message>
