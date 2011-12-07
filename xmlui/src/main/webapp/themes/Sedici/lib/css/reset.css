@@ -45,6 +45,14 @@ time, mark, audio, video {
   background:transparent;
 }
 
+body {
+background-image:url(../../images/test-body.png);
+background-position:bottom right;
+background-repeat:no-repeat;
+
+
+}
+
 article, aside, figure, footer, header,
 hgroup, nav, section { display:block; }
 
