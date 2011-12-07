@@ -1,4 +1,11 @@
 /**
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
+ *
+ * http://www.dspace.org/license/
+ */
+/**
  * Esta clase es un a redefinicion de org.dspace.app.xmlui.aspect.submission.submit
  * Se redefinio el metodo renderOneboxField para el manejo correcto de authorities
  * 
@@ -177,11 +184,26 @@ public class DescribeStep extends AbstractSubmissionStep
                 List form = div.addList("submit-describe",List.TYPE_FORM);
                 form.setHead(T_head);
 
+                // BEGIN SeDiCI: Tipo de documento seleccionado
+                String documentType = "";
+                if( (item.getMetadata("dc.type") != null) && (item.getMetadata("dc.type").length >0) )
+                {
+                    documentType = item.getMetadata("dc.type")[0].value;
+                }
+                // END SeDiCI
+                
                 // Iterate over all inputs and add it to the form.
                 for(DCInput dcInput : inputs)
                 {
                     String scope = submissionInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE;
                     boolean readonly = dcInput.isReadOnly(scope);
+                    
+                    // BEGIN SeDiCI: si el campo no esta permitido para el tipo de documento seleccionado, se esquiva
+                    if(!dcInput.isAllowedFor(documentType))
+                    {
+                    	continue;
+                    }
+                    // END SeDiCI
                     
                     // If the input is invisible in this scope, then skip it.
                         if (!dcInput.isVisible(scope) && !readonly)

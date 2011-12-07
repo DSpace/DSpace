@@ -79,8 +79,12 @@ do_install()
 	cd $BASE_DIR/distribution/target/dspace-sedici-distribution-bin
 	ant -Ddspace.dir=$DATA_DIR fresh_install -Dgeolite=$BASE_DIR/config/GeoLiteCity.dat.gz
 
+	echo -e "Personalizando los registros de la Base de Datos"
+	DB_SETUP_SCRIPTS="$DATA_DIR/etc/postgres"
+	$DATA_DIR/bin/dspace dsrun org.dspace.storage.rdbms.InitializeDatabase $DB_SETUP_SCRIPTS/sedici_db_setup.sql
+
 	echo -e "Instalando XMLWorkflow"
-	WORKFLOW_SCRIPTS="$DATA_DIR/etc/postgres/xmlworkflow"
+	WORKFLOW_SCRIPTS="$DB_SETUP_SCRIPTS/xmlworkflow"
 	$DATA_DIR/bin/dspace dsrun org.dspace.storage.rdbms.InitializeDatabase $WORKFLOW_SCRIPTS/xml_workflow.sql
 	$DATA_DIR/bin/dspace dsrun org.dspace.storage.rdbms.InitializeDatabase $WORKFLOW_SCRIPTS/workflow_migration.sql
 	$DATA_DIR/bin/dspace dsrun org.dspace.storage.rdbms.InitializeDatabase $WORKFLOW_SCRIPTS/initialize.sql
