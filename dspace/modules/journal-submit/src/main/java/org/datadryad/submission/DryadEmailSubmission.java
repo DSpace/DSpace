@@ -1,6 +1,7 @@
 package org.datadryad.submission;
 
 import javax.mail.Address;
+import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.Part;
 import javax.mail.Session;
@@ -58,435 +59,444 @@ import java.util.regex.Pattern;
 @SuppressWarnings("serial")
 public class DryadEmailSubmission extends HttpServlet {
 
-	private static Logger LOGGER = LoggerFactory
-			.getLogger(DryadEmailSubmission.class);
+    private static Logger LOGGER = LoggerFactory
+    .getLogger(DryadEmailSubmission.class);
 
-	private static String PROPERTIES_FILENAME = "DryadJournalSubmission.properties";
+    private static String PROPERTIES_FILENAME = "DryadJournalSubmission.properties";
 
-	private static String PROPERTIES_PROPERTY = "dryad.properties.filename";
+    private static String PROPERTIES_PROPERTY = "dryad.properties.filename";
 
-	private static String EMAIL_TEMPLATE = "journal_submit_error";
+    private static String EMAIL_TEMPLATE = "journal_submit_error";
 
-	// Not a concurrent map but we only access, don't write to except at init()
-	private static Map<String, PartnerJournal> myJournals;
+    // Not a concurrent map but we only access, don't write to except at init()
+    private static Map<String, PartnerJournal> myJournals;
 
-	/**
-	 * Handles the HTTP <code>GET</code> method by informing the caller that
-	 * <code>GET</code> is not supported, only <code>POST</code>.
-	 * 
-	 * @param aRequest A servlet request
-	 * @param aResponse A servlet response
-	 * @throws ServletException If a servlet-specific error occurs
-	 * @throws IOException If an I/O error occurs
-	 */
-	@Override
-	protected void doGet(HttpServletRequest aRequest,
-			HttpServletResponse aResponse) throws ServletException, IOException {
-		aResponse.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED,
-				"GET is not supported, you must POST to this service");
-	}
+    /**
+     * Handles the HTTP <code>GET</code> method by informing the caller that
+     * <code>GET</code> is not supported, only <code>POST</code>.
+     * 
+     * @param aRequest A servlet request
+     * @param aResponse A servlet response
+     * @throws ServletException If a servlet-specific error occurs
+     * @throws IOException If an I/O error occurs
+     */
+    @Override
+    protected void doGet(HttpServletRequest aRequest,
+            HttpServletResponse aResponse) throws ServletException, IOException {
+        aResponse.sendError(HttpServletResponse.SC_METHOD_NOT_ALLOWED,
+        "GET is not supported, you must POST to this service");
+    }
 
-	/**
-	 * Handles the HTTP <code>POST</code> method.
-	 * 
-	 * @param aRequest A servlet request
-	 * @param aResponse A servlet response
-	 * @throws ServletException If a servlet-specific error occurs
-	 * @throws IOException If an I/O error occurs
-	 */
-	@Override
-	protected void doPost(HttpServletRequest aRequest,
-			HttpServletResponse aResponse) throws ServletException, IOException {
-		PrintWriter toBrowser = getWriter(aResponse);
-		InputStream postBody = aRequest.getInputStream();
-		Session session = Session.getInstance(new Properties());
-		
-		if (LOGGER.isInfoEnabled()) {
-			LOGGER.info("Request encoding: " + aRequest.getCharacterEncoding());
-		}
-		
-		try {
-			MimeMessage mime = new MimeMessage(session, postBody);
-			String contentType = mime.getContentType();
-			String encoding = mime.getEncoding();
-			String contentID = mime.getContentID();
-			
-			if (LOGGER.isInfoEnabled()) {
-				LOGGER.info("MIME contentType/ID/encoding: " + contentType
-						+ " " + contentID + " " + encoding);
-			}
+    /**
+     * Handles the HTTP <code>POST</code> method.
+     * 
+     * @param aRequest A servlet request
+     * @param aResponse A servlet response
+     * @throws ServletException If a servlet-specific error occurs
+     * @throws IOException If an I/O error occurs
+     */
+    @Override
+    protected void doPost(HttpServletRequest aRequest,
+            HttpServletResponse aResponse) throws ServletException, IOException {
+        PrintWriter toBrowser = getWriter(aResponse);
+        InputStream postBody = aRequest.getInputStream();
+        Session session = Session.getInstance(new Properties());
 
-			Part part = null;
-			
-			if (contentType != null && contentType.startsWith("text/plain")){
-			    part = (Part)mime;   //
-			}
-			else if (contentType != null && 
-			        contentType.startsWith("multipart/alternative") ||
-			        contentType.startsWith("multipart/mixed")){    //could just use multipart as prefix, but what does this cover?
-			    Multipart mp = (Multipart)mime.getContent();
-			    for (int i=0, count = mp.getCount();i<count;i++){
-			        Part p = mp.getBodyPart(i);
-			        String partContentType = p.getContentType();
-			        if (partContentType.startsWith("text/plain")){
-			            part = p;
-			            break;
-			        }
-			    }
-			}
-			if (part != null) {
-				String message;
-				
-				if (encoding != null) {
-					message = (String) part.getContent();
-				}
-				else {
-					InputStream in = part.getInputStream();
-					InputStreamReader isr = new InputStreamReader(in, "UTF-8");
-					BufferedReader br = new BufferedReader(isr);
-					StringBuilder builder = new StringBuilder();
-					String line;
-					
-					while ((line = br.readLine()) != null) {
-						builder.append(line);
-						builder.append(System.getProperty("line.separator"));
-					}
-					
-					message = builder.toString();
-				}
-				
-				Address[] addresses = mime.getFrom();
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Request encoding: " + aRequest.getCharacterEncoding());
+        }
 
-				// Then we can hand off to implementer of EmailParser
-				ParsingResult result = processMessage(message);
-				
-				// Do this because this is what the parsers are expecting to
-				// build the corresponding author field from
-				for (Address address : addresses) {
-					message = "From: " + address.toString()
-							+ System.getProperty("line.separator") + message;
-					result.senderEmailAddress = address.toString();
-				}
+        try {
+            MimeMessage mime = new MimeMessage(session, postBody);
+            String contentType = mime.getContentType();
+            String encoding = mime.getEncoding();
+            String contentID = mime.getContentID();
 
-				if (result.getStatus() != null) {
-					throw new SubmissionException(result.getStatus());
-				}
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("MIME contentType/ID/encoding: " + contentType
+                        + " " + contentID + " " + encoding);
+            }
 
-				// isHas?
-				if (result.isHasFlawedId()) {
-					throw new SubmissionException("Result ID is flawed: "
-							+ result.submissionId);
-				}
+            Part part = getTextPart(mime);
+            if (part == null){
+                throw new SubmissionException("Unexpected email type: " 
+                        + mime.getContent().getClass().getName() + " reported content-type was " + contentType);
+            }
 
-				// We'll use JDOM b/c the libs are already included in DSpace
-				SAXBuilder saxBuilder = new SAXBuilder();
-				String xml = result.getSubmissionData().toString();
+            String message;
+            if (encoding != null) {
+                message = (String)part.getContent();
+            }
+            else {
+                InputStream in = part.getInputStream();
+                InputStreamReader isr = new InputStreamReader(in, "UTF-8");
+                BufferedReader br = new BufferedReader(isr);
+                StringBuilder builder = new StringBuilder();
+                String line;
 
-				// FIXME: Individual Email parsers don't supply a root element
-				// Our JDOM classes below will add version, encoding, etc.
-				xml = "<DryadEmailSubmission>"
-						+ System.getProperty("line.separator") + xml
-						+ "</DryadEmailSubmission>";
+                while ((line = br.readLine()) != null) {
+                    builder.append(line);
+                    builder.append(System.getProperty("line.separator"));
+                }
 
-				StringReader xmlReader = new StringReader(xml);
+                message = builder.toString();
+            }
 
-				try {
-					Format format = Format.getPrettyFormat();
-					XMLOutputter toFile = new XMLOutputter(format);
-					Document doc = saxBuilder.build(xmlReader);
-					String journalName = result.getJournalName();
+            Address[] addresses = mime.getFrom();
 
-					if (LOGGER.isDebugEnabled()) {
-						LOGGER.debug("Getting metadata dir for " + journalName);
-					}
+            // Then we can hand off to implementer of EmailParser
+            ParsingResult result = processMessage(message);
 
-					PartnerJournal journal = myJournals.get(journalName);
-					
-					if (journal == null ) {
-						throw new SubmissionRuntimeException("Journal (" + journalName + ") not properly registered");
-					}
-					
-					File dir = journal.getMetadataDir();
-					File file = new File(dir, result.getSubmissionId() + ".xml");
-					FileOutputStream out = new FileOutputStream(file);
-					OutputStreamWriter writer = new OutputStreamWriter(out, "UTF-8");
-					
-					// And we write the output to our submissions directory
-					toFile.output(doc, new BufferedWriter(writer));
-				}
-				catch (JDOMException details) {
-					if (LOGGER.isErrorEnabled()) {
-						LOGGER.debug(xml);
-					}
+            // Do this because this is what the parsers are expecting to
+            // build the corresponding author field from
+            for (Address address : addresses) {
+                message = "From: " + address.toString()
+                + System.getProperty("line.separator") + message;
+                result.senderEmailAddress = address.toString();
+            }
 
-					throw new SubmissionRuntimeException(details);
-				}
+            if (result.getStatus() != null) {
+                throw new SubmissionException(result.getStatus());
+            }
 
-				// Nice to return our result in case we are debugging output
-				toBrowser.println(xml);
-				toBrowser.close();
-			}
-			else {
-				throw new SubmissionException("Unexpected email type: " 
-						+ mime.getContent().getClass().getName() + " reported content-type was " + contentType);
-			}
-		}
-		catch (Exception details) {
-			sendEmailIfConfigured(details);
+            // isHas?
+            if (result.isHasFlawedId()) {
+                throw new SubmissionException("Result ID is flawed: "
+                        + result.submissionId);
+            }
 
-			if (details instanceof SubmissionException) {
-				throw (SubmissionException) details;
-			}
-			else {
-				throw new SubmissionException(details);
-			}
-		}
-	}
+            // We'll use JDOM b/c the libs are already included in DSpace
+            SAXBuilder saxBuilder = new SAXBuilder();
+            String xml = result.getSubmissionData().toString();
 
-	@Override
-	public void init(ServletConfig aConfig) throws ServletException {
-		super.init(aConfig);
+            // FIXME: Individual Email parsers don't supply a root element
+            // Our JDOM classes below will add version, encoding, etc.
+            xml = "<DryadEmailSubmission>"
+                + System.getProperty("line.separator") + xml
+                + "</DryadEmailSubmission>";
 
-		// First, get our properties from the configuration file
-		Properties props = new Properties();
-		String propFileName;
+            StringReader xmlReader = new StringReader(xml);
 
-		// If we're running in the Jetty/Maven plugin we set properties here
-		if ((propFileName = System.getProperty(PROPERTIES_PROPERTY)) != null) {
-			try {
-				props.load(new FileReader(new File(propFileName)));
-			}
-			catch (IOException details) {
-				throw new SubmissionException(details);
-			}
+            try {
+                Format format = Format.getPrettyFormat();
+                XMLOutputter toFile = new XMLOutputter(format);
+                Document doc = saxBuilder.build(xmlReader);
+                String journalName = result.getJournalName();
 
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Using {} properties from {}", new Object[] {
-						props.size(), propFileName });
-			}
-		}
-		// Otherwise, we're running in the standard DSpace Tomcat
-		else {
-		    // These lines support reading configuration from maven, which isn't fully set up for the journal-submission
-                    // server at this time  PEM 13 June 2011.
-		    //String journalPropFile = ConfigurationManager.getProperty("submit.journal.config");
-		    //File propFile = new File(journalPropFile);
-		    
-		    // Non-maven configuration
-		        ServletContext context = getServletContext();
-			String cfgDir = context.getInitParameter("dspace.dir") + "/config";
-			File propFile = new File(cfgDir, PROPERTIES_FILENAME);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("Getting metadata dir for " + journalName);
+                }
 
-			if (!propFile.exists()) {
-				throw new SubmissionException("Can't find properties file: "
-						+ propFile.getAbsolutePath());
-			}
+                PartnerJournal journal = myJournals.get(journalName);
 
-			try {
-				props.load(new FileReader(propFile));
-			}
-			catch (IOException details) {
-				throw new SubmissionException(details);
-			}
+                if (journal == null ) {
+                    throw new SubmissionRuntimeException("Journal (" + journalName + ") not properly registered");
+                }
 
-			//if (LOGGER.isDebugEnabled()) {
-			//	LOGGER.debug("Using properties from {}", journalPropFile);
-			//}
-			if (LOGGER.isDebugEnabled()) {
-			    LOGGER.debug("Using properties from {}",propFile);
-			}
-		}
+                File dir = journal.getMetadataDir();
+                File file = new File(dir, result.getSubmissionId() + ".xml");
+                FileOutputStream out = new FileOutputStream(file);
+                OutputStreamWriter writer = new OutputStreamWriter(out, "UTF-8");
 
-		// Next, turn those properties into something we can use
-		Map<String, PartnerJournal> journals = new HashMap<String, PartnerJournal>();
-		Enumeration<?> names = props.propertyNames();
+                // And we write the output to our submissions directory
+                toFile.output(doc, new BufferedWriter(writer));
+            }
+            catch (JDOMException details) {
+                if (LOGGER.isErrorEnabled()) {
+                    LOGGER.debug(xml);
+                }
 
-		while (names.hasMoreElements()) {
-			String propName = names.nextElement().toString();
-			StringTokenizer tokenizer = new StringTokenizer(propName, ".");
+                throw new SubmissionRuntimeException(details);
+            }
 
-			if (tokenizer.countTokens() < 3) continue;
+            // Nice to return our result in case we are debugging output
+            toBrowser.println(xml);
+            toBrowser.close();
+        }
+        catch (Exception details) {
+            sendEmailIfConfigured(details);
 
-			while (tokenizer.hasMoreTokens()) {
-				if (tokenizer.nextToken().equals("journal")) {
-					String code = tokenizer.nextToken();
-					String property = tokenizer.nextToken();
-					PartnerJournal journal;
+            if (details instanceof SubmissionException) {
+                throw (SubmissionException) details;
+            }
+            else {
+                throw new SubmissionException(details);
+            }
+        }
+    }
 
-					if (journals.containsKey(code)) {
-						journal = journals.get(code);
-					}
-					else {
-						journal = new PartnerJournal(code);
-						journals.put(code, journal);
-					}
+    /**
+     * This method was added because multipart content may contain other multipart content; this
+     * needs to dig down until some text is found
+     * @param part Either the full message or a part
+     * @return a part with text/plain content
+     * @throws MessagingException
+     * @throws IOException
+     */
+    private Part getTextPart(Part part) throws MessagingException, IOException{
+        String contentType = part.getContentType();
 
-					if (property.equals("parsingScheme")) {
-						journal.setParsingScheme(props.getProperty(propName));
-					}
-					else if (property.equals("metadataDir")) {
-						journal.setMetadataDir(props.getProperty(propName));
-					}
-					else if (property.equals("fullname")) {
-						journal.setFullName(props.getProperty(propName));
-					}
-					// else ignore
-				}
-				// else ignore
-			}
-		}
+        if (contentType != null && contentType.startsWith("text/plain")){
+            return part;   //
+        }
+        else if (contentType != null && 
+                contentType.startsWith("multipart/alternative") ||
+                contentType.startsWith("multipart/mixed")){    //could just use multipart as prefix, but what does this cover?
+            Multipart mp = (Multipart)part.getContent();
+            for (int i=0, count = mp.getCount();i<count;i++){
+                Part p = mp.getBodyPart(i);
+                Part pt = getTextPart(p);
+                if (pt != null)
+                    return pt;
+            }
+        }
+        return null;
+    }
 
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("Checking that all journals are correctly registered");
-		}
+    @Override
+    public void init(ServletConfig aConfig) throws ServletException {
+        super.init(aConfig);
 
-		// Returns validated map or throws an exception if there are problems
-		myJournals = validate(journals);
-	}
+        // First, get our properties from the configuration file
+        Properties props = new Properties();
+        String propFileName;
 
-	/**
-	 * If we're running within DSpace (and not the Maven/Jetty test instance),
-	 * we can send email through there using their template system.
-	 * 
-	 * @param aException An exception that was thrown in the process of
-	 *        receiving a journal submission
-	 * @throws SubmissionException
-	 * @throws IOException
-	 */
-	private void sendEmailIfConfigured(Exception aException)
-			throws SubmissionException {
-		try {
-			if (ConfigurationManager.isConfigured()) {
-				String exceptionMessage = aException.getMessage();
-				StringBuilder message = new StringBuilder(exceptionMessage);
-				String admin = ConfigurationManager.getProperty("mail.admin");
-				String logDir = ConfigurationManager.getProperty("log.dir");
-				Email email = ConfigurationManager.getEmail(EMAIL_TEMPLATE);
+        // If we're running in the Jetty/Maven plugin we set properties here
+        if ((propFileName = System.getProperty(PROPERTIES_PROPERTY)) != null) {
+            try {
+                props.load(new FileReader(new File(propFileName)));
+            }
+            catch (IOException details) {
+                throw new SubmissionException(details);
+            }
 
-				if (logDir == null || admin == null) {
-					throw new SubmissionException(
-							"DSpace mail is not properly configured");
-				}
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Using {} properties from {}", new Object[] {
+                        props.size(), propFileName });
+            }
+        }
+        // Otherwise, we're running in the standard DSpace Tomcat
+        else {
+            // These lines support reading configuration from maven, which isn't fully set up for the journal-submission
+            // server at this time  PEM 13 June 2011.
+            //String journalPropFile = ConfigurationManager.getProperty("submit.journal.config");
+            //File propFile = new File(journalPropFile);
 
-				for (StackTraceElement trace : aException.getStackTrace()) {
-					message.append(System.getProperty("line.separator"));
-					message.append("at ").append(trace.getClass()).append("(");
-					message.append(trace.getFileName()).append(":");
-					message.append(trace.getLineNumber()).append(")");
-				}
+            // Non-maven configuration
+            ServletContext context = getServletContext();
+            String cfgDir = context.getInitParameter("dspace.dir") + "/config";
+            File propFile = new File(cfgDir, PROPERTIES_FILENAME);
 
-				email.addRecipient(admin);
-				email.addArgument(message);
-				email.addArgument(logDir + "/journal-submit.log");
-				email.send();
-			}
-		}
-		catch (Exception details) {
-			if (details instanceof SubmissionException) {
-				throw (SubmissionException) details;
-			}
-			else {
-				throw new SubmissionException(details);
-			}
-		}
-	}
+            if (!propFile.exists()) {
+                throw new SubmissionException("Can't find properties file: "
+                        + propFile.getAbsolutePath());
+            }
 
-	private ParsingResult processMessage(String aMessage)
-			throws SubmissionException {
-		List<String> lines = new ArrayList<String>();
-		Scanner emailScanner = new Scanner(aMessage);
-		String journalName = null;
+            try {
+                props.load(new FileReader(propFile));
+            }
+            catch (IOException details) {
+                throw new SubmissionException(details);
+            }
 
-		while (emailScanner.hasNextLine()) {
-			String line = emailScanner.nextLine();
+            //if (LOGGER.isDebugEnabled()) {
+            //	LOGGER.debug("Using properties from {}", journalPropFile);
+            //}
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Using properties from {}",propFile);
+            }
+        }
 
-			if (LOGGER.isTraceEnabled()) {
-				LOGGER.trace("line=" + line);
-			}
+        // Next, turn those properties into something we can use
+        Map<String, PartnerJournal> journals = new HashMap<String, PartnerJournal>();
+        Enumeration<?> names = props.propertyNames();
 
-			if (StringUtils.stripToEmpty(line).equals("")) {
-				continue;
-			}
-			else {
-				Pattern p = Pattern.compile("^(JOURNAL|Journal Name):(.+)");
-				Matcher m = p.matcher(line);
+        while (names.hasMoreElements()) {
+            String propName = names.nextElement().toString();
+            StringTokenizer tokenizer = new StringTokenizer(propName, ".");
 
-				if (m.find()) {
-					journalName = StringUtils.stripToEmpty(m.group(2));
-					if (journalName.codePointAt(0) == 160){          //Journal of Heredity has started inserting NBSP in several fields, including journal title
-					    journalName = journalName.substring(1);
-					}
-				}
+            if (tokenizer.countTokens() < 3) continue;
 
-				lines.add(line);
-			}
-		}
+            while (tokenizer.hasMoreTokens()) {
+                if (tokenizer.nextToken().equals("journal")) {
+                    String code = tokenizer.nextToken();
+                    String property = tokenizer.nextToken();
+                    PartnerJournal journal;
 
-		if (journalName != null) {
-			PartnerJournal journal = myJournals.get(journalName);
-			if (journal != null){
-			    EmailParser parser = journal.getParser();
-			    ParsingResult result = parser.parseMessage(lines);
+                    if (journals.containsKey(code)) {
+                        journal = journals.get(code);
+                    }
+                    else {
+                        journal = new PartnerJournal(code);
+                        journals.put(code, journal);
+                    }
 
-			    // We use journal name to determine to which directory to write
-			    result.setJournalName(journalName);
+                    if (property.equals("parsingScheme")) {
+                        journal.setParsingScheme(props.getProperty(propName));
+                    }
+                    else if (property.equals("metadataDir")) {
+                        journal.setMetadataDir(props.getProperty(propName));
+                    }
+                    else if (property.equals("fullname")) {
+                        journal.setFullName(props.getProperty(propName));
+                    }
+                    // else ignore
+                }
+                // else ignore
+            }
+        }
 
-			    return result;
-			}
-			else {
-			    throw new SubmissionException("Journal " + journalName + " not found in configuration");
-			}
-		}
-		else {
-			throw new SubmissionException("Journal name not found in message");
-		}
-	}
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Checking that all journals are correctly registered");
+        }
 
-	private Map<String, PartnerJournal> validate(
-			Map<String, PartnerJournal> aJournalMap) {
-		Map<String, PartnerJournal> results = new HashMap<String, PartnerJournal>();
-		Iterator<PartnerJournal> iterator = aJournalMap.values().iterator();
+        // Returns validated map or throws an exception if there are problems
+        myJournals = validate(journals);
+    }
 
-		while (iterator.hasNext()) {
-			PartnerJournal journal = iterator.next();
+    /**
+     * If we're running within DSpace (and not the Maven/Jetty test instance),
+     * we can send email through there using their template system.
+     * 
+     * @param aException An exception that was thrown in the process of
+     *        receiving a journal submission
+     * @throws SubmissionException
+     * @throws IOException
+     */
+    private void sendEmailIfConfigured(Exception aException)
+    throws SubmissionException {
+        try {
+            if (ConfigurationManager.isConfigured()) {
+                String exceptionMessage = aException.getMessage();
+                StringBuilder message = new StringBuilder(exceptionMessage);
+                String admin = ConfigurationManager.getProperty("mail.admin");
+                String logDir = ConfigurationManager.getProperty("log.dir");
+                Email email = ConfigurationManager.getEmail(EMAIL_TEMPLATE);
 
-			if (!journal.isComplete()) {
-				throw new SubmissionRuntimeException(journal.getName()
-						+ "'s configuration isn't complete");
-			}
-			else {
-				// now store our metadata by the journal name instead of code
-				results.put(journal.getName(), journal);
-			}
+                if (logDir == null || admin == null) {
+                    throw new SubmissionException(
+                    "DSpace mail is not properly configured");
+                }
 
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("Registered journal: " + journal.toString());
-			}
-		}
+                for (StackTraceElement trace : aException.getStackTrace()) {
+                    message.append(System.getProperty("line.separator"));
+                    message.append("at ").append(trace.getClass()).append("(");
+                    message.append(trace.getFileName()).append(":");
+                    message.append(trace.getLineNumber()).append(")");
+                }
 
-		return results;
-	}
+                email.addRecipient(admin);
+                email.addArgument(message);
+                email.addArgument(logDir + "/journal-submit.log");
+                email.send();
+            }
+        }
+        catch (Exception details) {
+            if (details instanceof SubmissionException) {
+                throw (SubmissionException) details;
+            }
+            else {
+                throw new SubmissionException(details);
+            }
+        }
+    }
 
-	/**
-	 * Returns a short description of the servlet.
-	 * 
-	 * @return a String containing servlet description
-	 */
-	@Override
-	public String getServletInfo() {
-		return "Pre-processor for email from Dryad partner journals.";
-	}
+    private ParsingResult processMessage(String aMessage)
+    throws SubmissionException {
+        List<String> lines = new ArrayList<String>();
+        Scanner emailScanner = new Scanner(aMessage);
+        String journalName = null;
 
-	/**
-	 * Returns a PrintWriter with the correct character encoding set.
-	 * 
-	 * @param aResponse In which to set the character encoding
-	 * @return A <code>PrintWriter</code> to send text through
-	 * @throws IOException If there is trouble getting a writer
-	 */
-	private PrintWriter getWriter(HttpServletResponse aResponse)
-			throws IOException {
-		aResponse.setContentType("xml/application; charset=UTF-8");
-		return aResponse.getWriter();
-	}
+        while (emailScanner.hasNextLine()) {
+            String line = emailScanner.nextLine();
+
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace("line=" + line);
+            }
+
+            if (StringUtils.stripToEmpty(line).equals("")) {
+                continue;
+            }
+            else {
+                Pattern p = Pattern.compile("^(JOURNAL|Journal Name):(.+)");
+                Matcher m = p.matcher(line);
+
+                if (m.find()) {
+                    journalName = StringUtils.stripToEmpty(m.group(2));
+                    if (journalName.codePointAt(0) == 160){          //Journal of Heredity has started inserting NBSP in several fields, including journal title
+                        journalName = journalName.substring(1);
+                    }
+                }
+
+                lines.add(line);
+            }
+        }
+
+        if (journalName != null) {
+            PartnerJournal journal = myJournals.get(journalName);
+            if (journal != null){
+                EmailParser parser = journal.getParser();
+                ParsingResult result = parser.parseMessage(lines);
+
+                // We use journal name to determine to which directory to write
+                result.setJournalName(journalName);
+
+                return result;
+            }
+            else {
+                throw new SubmissionException("Journal " + journalName + " not found in configuration");
+            }
+        }
+        else {
+            throw new SubmissionException("Journal name not found in message");
+        }
+    }
+
+    private Map<String, PartnerJournal> validate(
+            Map<String, PartnerJournal> aJournalMap) {
+        Map<String, PartnerJournal> results = new HashMap<String, PartnerJournal>();
+        Iterator<PartnerJournal> iterator = aJournalMap.values().iterator();
+
+        while (iterator.hasNext()) {
+            PartnerJournal journal = iterator.next();
+
+            if (!journal.isComplete()) {
+                throw new SubmissionRuntimeException(journal.getName()
+                        + "'s configuration isn't complete");
+            }
+            else {
+                // now store our metadata by the journal name instead of code
+                results.put(journal.getName(), journal);
+            }
+
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Registered journal: " + journal.toString());
+            }
+        }
+
+        return results;
+    }
+
+    /**
+     * Returns a short description of the servlet.
+     * 
+     * @return a String containing servlet description
+     */
+    @Override
+    public String getServletInfo() {
+        return "Pre-processor for email from Dryad partner journals.";
+    }
+
+    /**
+     * Returns a PrintWriter with the correct character encoding set.
+     * 
+     * @param aResponse In which to set the character encoding
+     * @return A <code>PrintWriter</code> to send text through
+     * @throws IOException If there is trouble getting a writer
+     */
+    private PrintWriter getWriter(HttpServletResponse aResponse)
+    throws IOException {
+        aResponse.setContentType("xml/application; charset=UTF-8");
+        return aResponse.getWriter();
+    }
 }
