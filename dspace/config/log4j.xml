@@ -5,7 +5,7 @@
 
 	<!-- Standard DSpace file logger -->
 	<appender name="FILE" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="${log.dir}/dspace.log"/>
+		<param name="File" value="/opt/dryad/log/dspace.log"/>
 		<param name="Append" value="true"/>
 		<param name="DatePattern" value="'.'yyyy-MM-dd"/>
 		<param name="Threshold" value="INFO"/>
@@ -15,7 +15,7 @@
 	</appender>
 
 	<appender name="SUBMIT_FILE" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="${log.dir}/journal-submit.log"/>
+		<param name="File" value="/opt/dryad/log/journal-submit.log"/>
 		<param name="Append" value="true"/>
 		<param name="DatePattern" value="'.'yyyy-MM-dd"/>
 		<param name="Threshold" value="DEBUG"/>
@@ -25,7 +25,7 @@
 	</appender>
 
 	<appender name="MINTER_FILE" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="${log.dir}/dspace-minter.log"/>
+		<param name="File" value="/opt/dryad/log/dspace-minter.log"/>
 		<param name="Append" value="true"/>
 		<param name="DatePattern" value="'.'yyyy-MM-dd"/>
 		<param name="Threshold" value="DEBUG"/>
@@ -35,7 +35,7 @@
 	</appender>
 	
 	<appender name="BAGIT_FILE" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="${log.dir}/bagit-export.log"/>
+		<param name="File" value="/opt/dryad/log/bagit-export.log"/>
 		<param name="Append" value="true"/>
 		<param name="DatePattern" value="'.'yyyy-MM-dd"/>
 		<param name="Threshold" value="DEBUG"/>
@@ -45,7 +45,7 @@
 	</appender>
 
 	<appender name="DATAONE_MN_FILE" class="org.apache.log4j.DailyRollingFileAppender">
-		<param name="File" value="${log.dir}/dataone-mn.log"/>
+		<param name="File" value="/opt/dryad/log/dataone-mn.log"/>
 		<param name="DatePattern" value="'.'yyyy-MM-dd"/>
 		<param name="Append" value="true"/>
 		<param name="Threshold" value="DEBUG"/>
