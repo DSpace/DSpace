@@ -20,8 +20,7 @@ import org.dspace.core.Context;
 
 import org.joda.time.format.DateTimeFormat;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 /**
  * This class accepts an HTTP request and passes off to the appropriate location
@@ -35,8 +34,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 
 	private static final long serialVersionUID = -3545762362447908735L;
 
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(DataOneMN.class);
+    private static final Logger log = Logger.getLogger(DataOneMN.class);
 
 	private static final String CONTENT_TYPE = "application/xml; charset=UTF-8";
 
@@ -51,20 +49,17 @@ public class DataOneMN extends HttpServlet implements Constants {
 		String reqPath = aReq.getPathInfo();
 		Context ctxt = null;
 
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("pathinfo=" + reqPath);
-		}
+		log.debug("pathinfo=" + reqPath);
 
 		try {
 			ctxt = new Context();
 			ctxt.ignoreAuthorization();
 
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("DSpace context initialized");
-			}
+			log.debug("DSpace context initialized");
+			
 		}
 		catch (SQLException details) {
-			LOGGER.error("Unable to initialize DSpace", details);
+			log.error("Unable to initialize DSpace", details);
 			
 			try {
 				if (ctxt != null) {
@@ -72,7 +67,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 				}
 			}
 			catch (SQLException deets) {
-				LOGGER.warn(deets.getMessage(), deets);
+				log.warn(deets.getMessage(), deets);
 			}
 			
 			throw new ServletException(details);
@@ -86,40 +81,38 @@ public class DataOneMN extends HttpServlet implements Constants {
 			String format = parts[1];
 
 			try {
-				long length = objManager.getObjectSize(name, format);
-				aResp.setContentLength((int) length);
-
-				if (format.equals("xml") || format.equals("dap")) {
-					aResp.setContentType(CONTENT_TYPE);
+			    long length = objManager.getObjectSize(name, format);
+			    aResp.setContentLength((int) length);
+			    
+			    if (format.equals("xml") || format.equals("dap")) {
+				aResp.setContentType(CONTENT_TYPE);
+			    }
+			    else {
+				ServletContext context = getServletContext();
+				String mimeType = context.getMimeType("f." + format);
+				
+				if (mimeType == null || mimeType.equals("")) {
+				    mimeType = "application/octet-stream";
 				}
-				else {
-					ServletContext context = getServletContext();
-					String mimeType = context.getMimeType("f." + format);
-
-					if (mimeType == null || mimeType.equals("")) {
-						mimeType = "application/octet-stream";
-					}
-
-					if (LOGGER.isDebugEnabled()) {
-						LOGGER.debug("Checking mimeType of " + format);
-
-						LOGGER.debug("Setting data file MIME type to: "
-								+ mimeType + " (this is configurable)");
-					}
-
-					aResp.setContentType(mimeType);
-				}
+				
+				log.debug("Checking mimeType of " + format);
+				
+				log.debug("Setting data file MIME type to: "
+					  + mimeType + " (this is configurable)");
+			    
+				aResp.setContentType(mimeType);
+			    }
 			}
 			catch (SQLException details) {
-				LOGGER.error(details.getMessage(), details);
+				log.error(details.getMessage(), details);
 				throw new ServletException(details);
 			}
 			catch (StringIndexOutOfBoundsException details) {
-				LOGGER.error("Passed request did not find a match", details);
+				log.error("Passed request did not find a match", details);
 				aResp.sendError(HttpServletResponse.SC_NOT_FOUND);
 			}
 			catch (Exception details) {
-				LOGGER.error("UNEXPECTED EXCEPTION", details);
+				log.error("UNEXPECTED EXCEPTION", details);
 				aResp.sendError(HttpServletResponse.SC_NOT_FOUND);
 			}
 			finally {
@@ -127,7 +120,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 					ctxt.complete();
 				}
 				catch (SQLException sqlDetails) {
-					LOGGER.warn("Couldn't complete DSpace context");
+					log.warn("Couldn't complete DSpace context");
 				}
 			}
 		}
@@ -140,7 +133,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 				}
 			}
 			catch (SQLException details) {
-				LOGGER.warn(details.getMessage(), details);
+				log.warn(details.getMessage(), details);
 			}
 		}
 	}
@@ -174,20 +167,16 @@ public class DataOneMN extends HttpServlet implements Constants {
 		String reqPath = aReq.getPathInfo();
 		Context ctxt = null;
 		
-		if (LOGGER.isDebugEnabled()) {
-			LOGGER.debug("pathinfo=" + reqPath);
-		}
-
+		log.debug("pathinfo=" + reqPath);
+		
 		try {
 			ctxt = new Context();
 			ctxt.ignoreAuthorization();
 
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("DSpace context initialized");
-			}
+			log.debug("DSpace context initialized");
 		}
 		catch (SQLException details) {
-			LOGGER.error("Unable to initialize DSpace", details);
+			log.error("Unable to initialize DSpace", details);
 			
 			try {
 				if (ctxt != null) {
@@ -195,7 +184,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 				}
 			}
 			catch (SQLException deets) {
-				LOGGER.warn(deets.getMessage(), deets);
+				log.warn(deets.getMessage(), deets);
 			}
 			
 			throw new ServletException(details);
@@ -246,10 +235,8 @@ public class DataOneMN extends HttpServlet implements Constants {
 							mimeType = "application/octet-stream";
 						}
 
-						if (LOGGER.isDebugEnabled()) {
-							LOGGER.debug("Setting data file MIME type to: "
-									+ mimeType + " (this is configurable)");
-						}
+						log.debug("Setting data file MIME type to: "
+							  + mimeType + " (this is configurable)");
 
 						// We need to check types supported here and add to it
 						aResp.setContentType(mimeType);
@@ -276,27 +263,25 @@ public class DataOneMN extends HttpServlet implements Constants {
 							"Did you mean '/object' or '/object/doi:...'");
 				}
 
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("DSpace context completed");
-				}
+				log.debug("DSpace context completed");
 			}
 			catch (SQLException details) {
-				LOGGER.error(details.getMessage(), details);
+				log.error(details.getMessage(), details);
 				throw new ServletException(details);
 			}
 			catch (StringIndexOutOfBoundsException details) {
-				LOGGER.error("Passed request did not find a match", details);
+				log.error("Passed request did not find a match", details);
 				aResp.sendError(HttpServletResponse.SC_NOT_FOUND);
 			}
 			catch (Exception details) {
-				LOGGER.error("UNEXPECTED EXCEPTION", details);
+				log.error("UNEXPECTED EXCEPTION", details);
 			}
 			finally {
 				try {
 					ctxt.complete();
 				}
 				catch (SQLException sqlDetails) {
-					LOGGER.warn("Couldn't complete DSpace context");
+					log.warn("Couldn't complete DSpace context");
 				}
 			}
 		}
@@ -314,15 +299,15 @@ public class DataOneMN extends HttpServlet implements Constants {
 						+ " couldn't be found");
 			}
 			catch (SQLException details) {
-				LOGGER.error(details.getMessage(), details);
+				log.error(details.getMessage(), details);
 				throw new ServletException(details);
 			}
 			catch (SolrServerException details) {
-				LOGGER.error(details.getMessage(), details);
+				log.error(details.getMessage(), details);
 				throw new ServletException(details);
 			}
 			catch (StringIndexOutOfBoundsException details) {
-				LOGGER.error("Passed request did not find a match", details);
+				log.error("Passed request did not find a match", details);
 				aResp.sendError(HttpServletResponse.SC_NOT_FOUND);
 			}
 			finally {
@@ -330,7 +315,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 					ctxt.complete();
 				}
 				catch (SQLException sqlDetails) {
-					LOGGER.warn("Couldn't complete DSpace context");
+					log.warn("Couldn't complete DSpace context");
 				}
 			}
 		}
@@ -406,7 +391,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 			}
 		}
 		catch (SQLException details) {
-			LOGGER.warn(details.getMessage(), details);
+			log.warn(details.getMessage(), details);
 		}
 	}
 
@@ -423,9 +408,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 			if (aConfig.exists() && aConfig.canRead() && aConfig.isFile()) {
 				ConfigurationManager.loadConfig(aConfig.getAbsolutePath());
 
-				if (LOGGER.isDebugEnabled()) {
-					LOGGER.debug("DSpace config loaded from " + aConfig);
-				}
+					log.debug("DSpace config loaded from " + aConfig);
 			}
 			else if (!aConfig.exists()) {
 				throw new RuntimeException(aConfig.getAbsolutePath()
@@ -453,9 +436,7 @@ public class DataOneMN extends HttpServlet implements Constants {
 			}
 		}
 		catch (NumberFormatException details) {
-			if (LOGGER.isWarnEnabled()) {
-				LOGGER.warn(aParam + " parameter not an int: " + intString);
-			}
+		    log.warn(aParam + " parameter not an int: " + intString);
 		}
 
 		return intValue;
