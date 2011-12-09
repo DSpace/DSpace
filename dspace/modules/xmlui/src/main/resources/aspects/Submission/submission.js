@@ -476,7 +476,10 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
             	    stepBack = false;
             	   
             	state.stepAndPage = stepsInSubmission[state.progressIterator];
-            
+
+
+                cocoon.log.error("Error: Previous Step & Page=" + state.stepAndPage);
+
             	var prevStep = String(state.stepAndPage).split(".")[0];
             	var prevStepConfig = submissionInfo.getSubmissionConfig().getStep(prevStep);
             

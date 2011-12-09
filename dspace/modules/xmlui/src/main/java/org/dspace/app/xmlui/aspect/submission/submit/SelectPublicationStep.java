@@ -25,6 +25,13 @@ import java.util.ArrayList;
  * Date: 27-jan-2010
  * Time: 15:07:05
  * XMLUI interface for a step that allows to search and select a publication
+ *
+ *
+ * Modified by: Fabio
+ *
+ * Changed all the first submission page to control it with javascript to lead the user trough the process.
+ *
+ *
  */
 public class SelectPublicationStep extends AbstractSubmissionStep {
     private static final Message T_HEAD = message("xmlui.submit.select.pub.head");
@@ -44,8 +51,6 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     private static final Message T_MANU_HELP = message("xmlui.submit.publication.journal.manu.help");
 
     private static final Message T_PUB_MANU_ERROR = message("xmlui.submit.select.pub.form.manu_error");
-
-
 
     private static final Message T_MANU_ACC_LABEL = message("xmlui.submit.publication.journal.manu.acc.label");
 
@@ -113,7 +118,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
         addJournalSelect(selectedJournalId, newItem);
         addJournalSelectStatusNotYetSubmitted(selectedJournalId, newItem);
-
+        addJournalSelectStatusInReview(selectedJournalId, newItem);
 
         addManuscriptNumber(request, newItem);
 
@@ -296,6 +301,31 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_INVALID_JOURNAL)
             journalID.addError(T_SELECT_ERROR);
     }
+
+
+    private void addJournalSelectStatusInReview(String selectedJournalId, Item newItem) throws WingException {
+        Composite optionsList = newItem.addComposite("journalID_status_in_review");
+        Select journalID = optionsList.addSelect("journalIDStatusInReview");
+        java.util.List<String> journalVals = org.dspace.submit.step.SelectPublicationStep.journalVals;
+        java.util.List<String> journalNames = org.dspace.submit.step.SelectPublicationStep.journalNames;
+
+        for (int i = 0; i < journalVals.size(); i++){
+            String val =  journalVals.get(i);
+            String name =  journalNames.get(i);
+            if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(val))
+                name += "*";
+
+            // add only journal with   allowReviewWorkflow=true;
+            if(org.dspace.submit.step.SelectPublicationStep.allowReviewWorkflowJournals.contains(val))
+                journalID.addOption(val.equals(selectedJournalId), val, name);
+        }
+
+        journalID.setLabel(T_SELECT_LABEL);
+        journalID.setHelp(T_SELECT_HELP);
+        if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_INVALID_JOURNAL)
+            journalID.addError(T_SELECT_ERROR);
+    }
+
 
     public List addReviewSection(List list) throws SAXException, WingException, SQLException, IOException, AuthorizeException {
         return null;

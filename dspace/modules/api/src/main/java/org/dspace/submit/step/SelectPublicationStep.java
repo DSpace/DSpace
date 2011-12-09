@@ -43,6 +43,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
     private static Map<String, DCValue> journalToMetadata = new HashMap<String, DCValue>();
     public static List<String> integratedJournals = new ArrayList<String>();
+    public static List<String> allowReviewWorkflowJournals = new ArrayList<String>();
     public static final List<String> journalNames = new ArrayList<String>();
     public static final List<String> journalVals = new ArrayList<String>();
     public static final List<String> journalDirs = new ArrayList<String>();
@@ -82,11 +83,20 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                 List<String> onReviewMails = Arrays.asList(properties.getProperty("journal." + journalType + ".notifyOnReview", "").replace(" ", "").split(","));
                 List<String> onArchiveMails = Arrays.asList(properties.getProperty("journal." + journalType + ".notifyOnArchive", "").replace(" ", "").split(","));
 
+                String allowReviewWorkflow = properties.getProperty("journal." + journalType + ".allowReviewWorkflow");
+
+
+
                 journalVals.add(journalType);
                 journalNames.add(journalDisplay);
                 journalDirs.add(metadataDir);
                 if(integrated != null && Boolean.valueOf(integrated))
                     integratedJournals.add(journalType);
+
+                if(allowReviewWorkflow != null && Boolean.valueOf(allowReviewWorkflow))
+                    allowReviewWorkflowJournals.add(journalType);
+
+
                 journalEmbargo.add(Boolean.valueOf(embargo));
                 journalNotifyOnReview.put(journalType, onReviewMails);
                 journalNotifyOnArchive.put(journalType, onArchiveMails);

@@ -31,6 +31,7 @@ function initdatasetsubmissionfile() {
         form.attr('action', form.attr('action') + '?processonly=true');
         //Now we submit our form
         form.submit();
+        beginUpload();
     });
 
     jQuery("input[type='radio'][name='datafile_type']").change(function(){
@@ -152,50 +153,62 @@ function initFirstSubmissionForm() {
     // if I am in the first page
     if(jQuery("#aspect_submission_StepTransformer_div_submit-select-publication").length > 0){
 
-        // Status (onLoad of the page): status_accepted
+        // Status (onLoad of the page): STATUS_ACCEPTED
         if (jQuery("'#xmlui_submit_publication_article_status_accepted':checked").val()) {
+
             jQuery("#aspect_submission_StepTransformer_list_doi").hide();
-            jQuery("#journalID").show();
             jQuery("#manu").hide();
             jQuery("#journalIDStatusNotYetSubmitted").hide();
+            jQuery("#journalIDStatusInReview").hide();
+
+            jQuery("#journalID").show();
+
             enableNextButton();
         }
 
-        // Status (onLoad of the page): status_published
+        // Status (onLoad of the page): STATUS_PUBLISHED
         else if (jQuery("'#xmlui_submit_publication_article_status_published':checked").val()) {
-            jQuery("#aspect_submission_StepTransformer_list_doi").show();
             jQuery("#journalID").hide();
             jQuery("#manu").hide();
             jQuery("#journalIDStatusNotYetSubmitted").hide();
             jQuery("#manu").hide();
             jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").hide();
             jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").hide();
+            jQuery("#journalIDStatusInReview").hide();
+
+            jQuery("#aspect_submission_StepTransformer_list_doi").show();
             enableNextButton();
 
         }
 
-        // Status (onLoad of the page): status_in_review
+        // Status (onLoad of the page): STATUS_IN_REVIEW
         else if (jQuery("'#xmlui_submit_publication_article_status_in_review':checked").val()) {
             jQuery("#aspect_submission_StepTransformer_list_doi").hide();
-            jQuery("#journalID").show();
-            jQuery("#manu").show();
+            jQuery("#journalID").hide();
             jQuery("#journalIDStatusNotYetSubmitted").hide();
             jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").hide();
             jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").hide();
+
+            jQuery("#manu").show();
+            jQuery("#journalIDStatusInReview").show();
             enableNextButton();
         }
 
-        // Status (onLoad of the page): status_not_yet_submitted
+        // Status (onLoad of the page): STATUS_NOT_YET_DEPLOYED
         else if (jQuery("'#xmlui_submit_publication_article_status_not_yet_submitted':checked").val()) {
             jQuery("#aspect_submission_StepTransformer_list_doi").hide();
             jQuery("#journalID").hide();
-            jQuery("#journalIDStatusNotYetSubmitted").show();
             jQuery("#manu").hide();
             jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").hide();
             jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").hide();
+            jQuery("#journalIDStatusInReview").hide();
+
+            jQuery("#journalIDStatusNotYetSubmitted").show();
+
             enableNextButton();
         }
 
+        // Status (onLoad of the page): STATUS_NULL
         else{
            jQuery("#aspect_submission_StepTransformer_list_doi").hide();
            jQuery("#journalID").hide();
@@ -203,12 +216,13 @@ function initFirstSubmissionForm() {
            jQuery("#journalIDStatusNotYetSubmitted").hide();
            jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").hide();
            jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").hide();
+            jQuery("#journalIDStatusInReview").hide();
+
            enableNextButton();
         }
 
         // Click: status_published
         jQuery('#xmlui_submit_publication_article_status_published').click(function () {
-            jQuery("#aspect_submission_StepTransformer_list_doi").show();
             jQuery("#journalID").hide();
             jQuery("#manu").hide();
             jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").hide();
@@ -216,28 +230,36 @@ function initFirstSubmissionForm() {
             jQuery("#journalIDStatusNotYetSubmitted").hide();
             jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").hide();
             jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").hide();
+            jQuery("#journalIDStatusInReview").hide();
+
+            jQuery("#aspect_submission_StepTransformer_list_doi").show();
+
             enableNextButton();
         });
 
         // Click: status_in_review
         jQuery('#xmlui_submit_publication_article_status_in_review').click(function () {
             jQuery("#aspect_submission_StepTransformer_list_doi").hide();
-            jQuery("#journalID").show();
-            jQuery("#manu").show();
+            jQuery("#journalID").hide();
             jQuery("#aspect_submission_StepTransformer_item_new-manu-comp-acc").hide();
             jQuery("#aspect_submission_StepTransformer_item_new-manu-acc").hide();
             jQuery("#journalIDStatusNotYetSubmitted").hide();
             jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").hide();
             jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").hide();
+
+            jQuery("#manu").show();
+            jQuery("#journalIDStatusInReview").show();
             enableNextButton();
         });
 
         // Click: status_accepted
         jQuery('#xmlui_submit_publication_article_status_accepted').click(function () {
             jQuery("#aspect_submission_StepTransformer_list_doi").hide();
-            jQuery("#journalID").show();
             jQuery("#manu").hide();
             jQuery("#journalIDStatusNotYetSubmitted").hide();
+            jQuery("#journalIDStatusInReview").hide();
+
+            jQuery("#journalID").show();
             enableNextButton();
         });
 
@@ -247,9 +269,11 @@ function initFirstSubmissionForm() {
             jQuery("#journalID").hide();
             jQuery("#manu").hide();
             jQuery("#journalIDStatusNotYetSubmitted").hide();
-            jQuery("#journalIDStatusNotYetSubmitted").show();
             jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").hide();
             jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").hide();
+            jQuery("#journalIDStatusInReview").hide();
+
+            jQuery("#journalIDStatusNotYetSubmitted").show();
             enableNextButton();
         });
 
@@ -342,4 +366,47 @@ function enableNextButton() {
     }    
     jQuery("#aspect_submission_StepTransformer_field_submit_next").attr("disabled", "disabled");    
 }
+
+
+
+function beginUpload(form) {
+//alert("beginUpload()");
+
+    jQuery("#uploadprogressbar").fadeIn();
+
+//alert("$(#uploadprogressbar).fadeIn()");
+
+    var percentage = 10;
+    setInterval(function() {
+
+	//alert("setInterval()");
+
+	    //alert("form:" + url);
+
+	    var url = form.attr('action');
+
+	    //alert("url: " + url);
+
+	    url = "http://localhost:8100" + url;
+
+	    //alert("url: " + url);
+
+	    /*jQuery.getJSON(url, function(data) {
+		alert("here");
+		    alert("data:" + data);
+
+                    if (data == null)
+                            return;
+
+                    var percentage = Math.floor(100 * parseInt(data.bytes_uploaded) / parseInt(data.bytes_total));
+                    jQuery("#uploadprogressbar").progressBar(percentage);
+            });*/
+	    percentage = percentage + 10;
+    	    jQuery("#uploadprogressbar").progressBar(percentage);
+    }, 1);
+
+    return true;
+}
+
+
 

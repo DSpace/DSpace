@@ -958,14 +958,14 @@
                             </a>
                         </xsl:when>
                         <xsl:when test="$my_doi">
-                            <a>
-                                <xsl:attribute name="href">
-                                    <xsl:call-template name="checkURL">
-                                        <xsl:with-param name="doiIdentifier" select="$my_doi"/>
-                                    </xsl:call-template>
-                                </xsl:attribute>
+                            <!--<a>-->
+                                <!--<xsl:attribute name="href">-->
+                                    <!--<xsl:call-template name="checkURL">-->
+                                        <!--<xsl:with-param name="doiIdentifier" select="$my_doi"/>-->
+                                    <!--</xsl:call-template>-->
+                                <!--</xsl:attribute>-->
                                 <xsl:value-of select="$my_doi"/>
-                            </a>
+                            <!--</a>-->
                         </xsl:when>
                         <xsl:when test="$my_uri">
                             <a>
