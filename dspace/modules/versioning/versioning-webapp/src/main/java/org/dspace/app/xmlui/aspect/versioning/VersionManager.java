@@ -7,6 +7,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.PluggableVersioningService;
 import org.dspace.versioning.Version;
@@ -45,7 +46,9 @@ public class VersionManager {
 
             Item item = Item.find(context, itemID);
 
-            if (AuthorizeManager.isAdmin(context, item)) {
+
+
+            if (AuthorizeManager.isAdmin(context, item) || item.canEdit() || isCurrentEpersonItemSubmitter(context, item)) {
                 VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
                 Version version = versioningService.createNewVersion(context, itemID, summary);
 
@@ -61,6 +64,12 @@ public class VersionManager {
             throw new RuntimeException(ex);
         }
         return result;
+    }
+
+
+    private static boolean isCurrentEpersonItemSubmitter(Context context, Item item) throws SQLException {
+        EPerson eperson = context.getCurrentUser();
+        return eperson != null && item.getSubmitter() != null && item.getSubmitter().getID() == eperson.getID();
     }
 
 

@@ -169,6 +169,9 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             else if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_NOT_YET_SUBMITTED){
                 journalID = request.getParameter("journalIDStatusNotYetSubmitted");
             }
+            else if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_IN_REVIEW){
+                journalID = request.getParameter("journalIDStatusInReview");
+            }
         }
 
         //First of all check if we have accepted our license

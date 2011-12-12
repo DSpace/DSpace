@@ -290,9 +290,10 @@ function assertEditItem(itemID) {
  */
 function canEditItem(itemID)
 {
-	var item = Item.find(getDSContext(),itemID);
-	return item.canEdit();
+    // Navigation already deals with loading the right operation. return always true.
+    return true;
 }
+
 
 
 
