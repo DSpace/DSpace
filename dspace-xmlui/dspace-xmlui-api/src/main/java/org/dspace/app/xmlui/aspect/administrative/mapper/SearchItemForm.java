@@ -95,13 +95,22 @@ public class SearchItemForm extends AbstractDSpaceTransformer {
 		{
 			String itemID = String.valueOf(item.getID());
 			Collection owningCollection = item.getOwningCollection();
-			String owning = owningCollection.getMetadata("name");
-			String author = "unkown";
-			DCValue[] dcAuthors = item.getDC("contributor",Item.ANY,Item.ANY);
-			if (dcAuthors != null && dcAuthors.length >= 1)
+			String owning = "unknown";
+			if (owningCollection != null)
+				owning = owningCollection.getMetadata("name");
+			String author = "unknown";
+			DCValue[] dcCreators = item.getDC("creator",Item.ANY,Item.ANY);
+			if (dcCreators != null && dcCreators.length >= 1)
             {
-                author = dcAuthors[0].value;
-            }
+                author = dcCreators[0].value;
+            } else {
+            	// Do a fall back look for contributors
+				DCValue[] dcContributors = item.getDC("contributor",Item.ANY,Item.ANY);
+				if (dcContributors != null && dcContributors.length >= 1)
+	            {
+	                author = dcContributors[0].value;
+	            }
+			}
 			
 			String title = "untitled";
 			DCValue[] dcTitles = item.getDC("title",null,Item.ANY);
