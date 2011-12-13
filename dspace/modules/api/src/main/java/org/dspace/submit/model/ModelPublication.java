@@ -530,10 +530,12 @@ public class ModelPublication
 			    if(tag.equals("Article_Status")){
 				String ttext = text.trim().toLowerCase();
 
-				if(ttext.equals("in review") ||
+				if(ttext.equals("submitted") ||
+				   ttext.equals("in review") ||
+				   ttext.equals("under review")
 				   ttext.equals("revision in review") ||
-				   ttext.equals("submitted") ||
-				   ttext.equals("under review")) {
+				   ttext.equals("revision under review") ||
+				   ) {
 				    pbean.setSkipReviewStep(false);
 				} else if(ttext.equals("accepted") ||
 					  ttext.equals("rejected") ||
