@@ -49,12 +49,17 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     private static final Message T_SELECT_HELP = message("xmlui.submit.publication.journal.select.help");
     private static final Message T_MANU_LABEL = message("xmlui.submit.publication.journal.manu.label");
     private static final Message T_MANU_HELP = message("xmlui.submit.publication.journal.manu.help");
+    private static final Message T_SELECT_LABEL_NEW = message("xmlui.submit.publication.journal.select.label.new");
+    private static final Message T_MANU_LABEL_NEW = message("xmlui.submit.publication.journal.manu.label.new");
 
     private static final Message T_PUB_MANU_ERROR = message("xmlui.submit.select.pub.form.manu_error");
 
     private static final Message T_MANU_ACC_LABEL = message("xmlui.submit.publication.journal.manu.acc.label");
 
     private static final Message T_SELECT_HELP_NOT_YET_SUBMITTED = message("xmlui.submit.publication.journal.help_not_yet_submitted");
+    private static final Message T_SELECT_HELP_IN_REVIEW = message("xmlui.submit.publication.journal.help_in_review");
+
+
 
 
     private static final Message T_article_status = message("xmlui.submit.publication.article_status");
@@ -116,17 +121,14 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
         addRadioIfSubmitExisitng(content, submitExisting, pubIdError, pubColl, newItem);
 
-        addJournalSelect(selectedJournalId, newItem);
-        addJournalSelectStatusNotYetSubmitted(selectedJournalId, newItem);
+
+        addfieldsStatusAccepted(selectedJournalId, newItem, request);
+
+        //addJournalSelectStatusNotYetSubmitted(selectedJournalId, newItem);
+
         addJournalSelectStatusInReview(selectedJournalId, newItem);
 
         addManuscriptNumber(request, newItem);
-
-        // add only if: status=accepted and journalID=integratedJournal
-        addManuscriptNumberStatusAccepted(request, form);
-
-        // add only if: status=accepted and journalID=!integratedJournal
-        addManuscriptAcceptance(request, form);
 
 
         addPublicationNumberIfSubmitExisting(form, submitExisting, pubIdError, pubColl);
@@ -207,7 +209,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         accessRadios.addOption(org.dspace.submit.step.SelectPublicationStep.ARTICLE_STATUS_PUBLISHED, T_article_status_published);
         accessRadios.addOption(org.dspace.submit.step.SelectPublicationStep.ARTICLE_STATUS_ACCEPTED, T_article_status_accepted);
         accessRadios.addOption(org.dspace.submit.step.SelectPublicationStep.ARTICLE_STATUS_IN_REVIEW, T_article_status_in_review);
-        accessRadios.addOption(org.dspace.submit.step.SelectPublicationStep.ARTICLE_STATUS_NOT_YET_SUBMITTED, T_article_status_not_yet_submitted);
+        //accessRadios.addOption(org.dspace.submit.step.SelectPublicationStep.ARTICLE_STATUS_NOT_YET_SUBMITTED, T_article_status_not_yet_submitted);
         accessRadios.setOptionSelected(request.getParameter("article_status"));
     }
 
@@ -219,7 +221,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         Text manuText = optionsList.addText("manu");
         if(request.getParameter("manu") != null)
             manuText.setValue(request.getParameter("manu"));
-        manuText.setLabel(T_MANU_LABEL);
+        manuText.setLabel(T_MANU_LABEL_NEW);
 
         //Add an error message should our manuscript be invalid
         if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_SELECT_JOURNAL){
@@ -231,38 +233,9 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     }
 
 
-    private void addManuscriptNumberStatusAccepted(Request request, List form) throws WingException {
-        if(errorFlag==org.dspace.submit.step.SelectPublicationStep.DISPLAY_MANUSCRIPT_NUMBER || errorFlag==org.dspace.submit.step.SelectPublicationStep.ENTER_MANUSCRIPT_NUMBER){
-            Item item  = form.addItem("manu-number-status-accepted", "");
-            Text manuText = item.addText("manu-number-status-accepted");
-            if(request.getParameter("manu-number-status-accepted") != null)
-                manuText.setValue(request.getParameter("manu-number-status-accepted"));
-            manuText.setLabel(T_MANU_LABEL);
-            manuText.setHelp(T_MANU_HELP);
+    private void addfieldsStatusAccepted(String selectedJournalId, Item newItem, Request request) throws WingException {
 
-            //Add an error message should our manuscript be invalid
-            if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ENTER_MANUSCRIPT_NUMBER){
-                //Show the error coming from our bean !
-                manuText.addError(String.valueOf(request.getSession().getAttribute("submit_error")));
-                //We are done clear it
-                request.getSession().setAttribute("submit_error", null);
-            }
-
-//            if(errorFlag==org.dspace.submit.step.SelectPublicationStep.ENTER_MANUSCRIPT_NUMBER){
-//                manuText.addError(T_PUB_MANU_ERROR);
-//            }
-        }
-    }
-
-    private void addManuscriptAcceptance(Request request, List form) throws WingException {
-        if(errorFlag==org.dspace.submit.step.SelectPublicationStep.DISPLAY_CONFIRM_MANUSCRIPT_ACCEPTANCE){
-            Item item = form.addItem("manu_accepted-cb", "");
-            CheckBox checkBox = item.addCheckBox("manu_acc");
-            checkBox.addOption(String.valueOf(Boolean.TRUE), T_MANU_ACC_LABEL);
-        }
-    }
-
-    private void addJournalSelect(String selectedJournalId, Item newItem) throws WingException {
+        // JOURNAL ID
         Composite optionsList = newItem.addComposite("new-options-comp");
         Select journalID = optionsList.addSelect("journalID");
         java.util.List<String> journalVals = org.dspace.submit.step.SelectPublicationStep.journalVals;
@@ -276,10 +249,32 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
             journalID.addOption(val.equals(selectedJournalId), val, name);
         }
 
-        journalID.setLabel(T_SELECT_LABEL);
-        journalID.setHelp(T_SELECT_HELP);
+        journalID.setLabel(T_SELECT_LABEL_NEW);
+        //journalID.setHelp(T_SELECT_HELP);
         if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_INVALID_JOURNAL)
             journalID.addError(T_SELECT_ERROR);
+
+
+        // MANUSCRIPT NUMBER
+        Text manuText = newItem.addText("manu-number-status-accepted");
+        if(request.getParameter("manu-number-status-accepted") != null)
+            manuText.setValue(request.getParameter("manu-number-status-accepted"));
+        manuText.setLabel(T_MANU_LABEL_NEW);
+        manuText.setHelp(T_MANU_HELP);
+        //Add an error message should our manuscript be invalid
+        if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ENTER_MANUSCRIPT_NUMBER){
+            //Show the error coming from our bean !
+            manuText.addError(String.valueOf(request.getSession().getAttribute("submit_error")));
+            //We are done clear it
+            request.getSession().setAttribute("submit_error", null);
+        }
+
+
+        // CHECKBOX: CONFIRM MANUSCRIPT NUMBER ACCEPTANCE
+        CheckBox checkBox = newItem.addCheckBox("manu_accepted-cb");
+        checkBox.addOption(String.valueOf(Boolean.TRUE), T_MANU_ACC_LABEL);
+
+
     }
 
     private void addJournalSelectStatusNotYetSubmitted(String selectedJournalId, Item newItem) throws WingException {
@@ -321,7 +316,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         }
 
         journalID.setLabel(T_SELECT_LABEL);
-        journalID.setHelp(T_SELECT_HELP);
+        journalID.setHelp(T_SELECT_HELP_IN_REVIEW);
         if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_INVALID_JOURNAL)
             journalID.addError(T_SELECT_ERROR);
     }

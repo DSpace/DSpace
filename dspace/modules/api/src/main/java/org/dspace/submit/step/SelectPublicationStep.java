@@ -140,31 +140,13 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         String journalID = request.getParameter("journalID");
         String articleStatus = request.getParameter("article_status");
         String manuscriptNumber = request.getParameter("manu");
-        String manuscriptNumberAcc = request.getParameter("manu-number-status-accepted");
-        String manuAcc = request.getParameter("manu_acc");
 
 
         if(articleStatus!=null){
             if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED){
-
-                // journalID=IntegratedJournals ==> DISPLAY_MANUSCRIPT_NUMBER
-                if(journalID!=null && integratedJournals.contains(journalID)){
-                    if(manuscriptNumberAcc==null)
-                        return  DISPLAY_MANUSCRIPT_NUMBER;
-                    else if(manuscriptNumberAcc.equals("")){
-                        return  ENTER_MANUSCRIPT_NUMBER;
-                    }
-                    else{
-                        manuscriptNumber = manuscriptNumberAcc;
-                    }
-                }
-                // journalID!=IntegratedJournals ==> DISPLAY_CONFIRM_MANUSCRIPT_ACCEPTANCE
-                else if(journalID!=null && !integratedJournals.contains(journalID) && (manuAcc==null || manuAcc.equals(""))){
-                    return DISPLAY_CONFIRM_MANUSCRIPT_ACCEPTANCE;
-                }
-                else{
-                    manuscriptNumber = manuscriptNumberAcc;
-                }
+                String manuscriptNumberAcc = request.getParameter("manu-number-status-accepted");
+                String manuAcc = request.getParameter("manu_acc");
+                manuscriptNumber = manuscriptNumberAcc;
             }
             else if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_NOT_YET_SUBMITTED){
                 journalID = request.getParameter("journalIDStatusNotYetSubmitted");

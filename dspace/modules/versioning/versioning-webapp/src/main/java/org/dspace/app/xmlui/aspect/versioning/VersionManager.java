@@ -6,12 +6,15 @@ import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.Item;
+import org.dspace.content.WorkspaceItem;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
 import org.dspace.utils.DSpace;
 import org.dspace.versioning.PluggableVersioningService;
 import org.dspace.versioning.Version;
 import org.dspace.versioning.VersioningService;
+import org.dspace.workflow.Workflow;
+import org.dspace.workflow.WorkflowItem;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -51,13 +54,16 @@ public class VersionManager {
             if (AuthorizeManager.isAdmin(context, item) || item.canEdit() || isCurrentEpersonItemSubmitter(context, item)) {
                 VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
                 Version version = versioningService.createNewVersion(context, itemID, summary);
+                WorkspaceItem wsi = WorkspaceItem.findByItem(context, version.getItem());
 
                 context.commit();
 
+                result.setParameter("wsid", wsi.getID());
                 result.setOutcome(true);
                 result.setContinue(true);
                 result.setMessage(T_version_created);
                 result.setParameter("summary", summary);
+
             }
         } catch (Exception ex) {
             context.abort();

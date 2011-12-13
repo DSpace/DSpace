@@ -471,6 +471,9 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
             //Need to find the previous step which HAS a user interface.
             while(stepBack)
             {
+
+                cocoon.log.error("state.progressIterator=" + state.progressIterator);
+
             	state.progressIterator--;
             	if(state.progressIterator<0)
             	    stepBack = false;
@@ -478,18 +481,26 @@ function submissionControl(collectionHandle, workspaceID, initStepAndPage)
             	state.stepAndPage = stepsInSubmission[state.progressIterator];
 
 
-                cocoon.log.error("Error: Previous Step & Page=" + state.stepAndPage);
+                cocoon.log.error("Previous Step & Page=" + state.stepAndPage);
 
-            	var prevStep = String(state.stepAndPage).split(".")[0];
-            	var prevStepConfig = submissionInfo.getSubmissionConfig().getStep(prevStep);
-            
+
+                var prevStep = String(state.stepAndPage).split(".")[0];
+                var prevStepConfig = submissionInfo.getSubmissionConfig().getStep(prevStep);
+
+
+                cocoon.log.error("step has UI ? " + stepHasUI(prevStepConfig));
+                cocoon.log.error("is step accessible ? " + FlowUtils.isStepAccessible(getDSContext(), prevStepConfig.getProcessingClassName(), submissionInfo));
+
                 //Make sure that the step has a UI & that the step is accessible
-            	if(!stepHasUI(prevStepConfig) || !FlowUtils.isStepAccessible(getDSContext(), prevStepConfig.getProcessingClassName(), submissionInfo)){
-            		stepBack = true;
+                if(!stepHasUI(prevStepConfig) || !FlowUtils.isStepAccessible(getDSContext(), prevStepConfig.getProcessingClassName(), submissionInfo)){
+                    stepBack = true;
                 }
-            	else
-            		stepBack = false;
-     		}
+                else{
+                    stepBack = false;
+                }
+
+            }
+
             
             cocoon.log.debug("Previous Step & Page=" + state.stepAndPage);
         }

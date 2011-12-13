@@ -1476,7 +1476,7 @@ function doEditItemStatus(itemID)
 		assertEditItem(itemID);
 		result = null;
 
-		if (cocoon.request.get("submit_return")  || cocoon.request.get("submit_bitstreams") || cocoon.request.get("submit_metadata") || cocoon.request.get("view_item") || cocoon.request.get("submit_curate") )
+		if (cocoon.request.get("submit_return")  || cocoon.request.get("submit_bitstreams") || cocoon.request.get("submit_metadata") || cocoon.request.get("view_item") || cocoon.request.get("submit_curate") || cocoon.request.get("submit_embargo"))
 		{
 			// go back to where ever we came from.
 			return null;

@@ -37,6 +37,7 @@ public class PluggableVersioningService implements VersioningService{
                 version = updateVersion(c,item.getID(), summary);
             }
             else{
+                // first time: create 2 versions, .1(old version) and .2(new version)
                 vh=versionHistoryDAO.create(c);
                 version = createVersion(c, vh, item, "");
             }
@@ -46,11 +47,8 @@ public class PluggableVersioningService implements VersioningService{
             // Create new Item
             Item itemNew = provider.createNewItemAndAddItInWorkspace(c, item);
 
-
-            // create current version
-            createVersion(c, vh, itemNew, summary);
-
-
+            // create new version
+            version=createVersion(c, vh, itemNew, summary);
 
             // Complete any update of the Item and new Identifier generation that needs to happen
             provider.updateItemState(c, itemNew, item);

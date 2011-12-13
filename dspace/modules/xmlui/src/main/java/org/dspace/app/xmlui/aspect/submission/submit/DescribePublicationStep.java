@@ -90,7 +90,8 @@ public class DescribePublicationStep extends AbstractSubmissionStep {
 
         //only have "<-Previous" button if not first step
         if(!isFirstStep())
-            actions.addButton(AbstractProcessingStep.PREVIOUS_BUTTON).setValue(T_previous);
+            // dec-2011: removed previous button
+            //actions.addButton(AbstractProcessingStep.PREVIOUS_BUTTON).setValue(T_previous);
 
         //always show "Save/Cancel"
         actions.addButton(AbstractProcessingStep.CANCEL_BUTTON).setValue(T_save);

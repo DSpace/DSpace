@@ -1374,3 +1374,9 @@ span.dynatree-active a
     border: none;
 }
 
+.ds-form-label-select-publication {
+	display: block;
+	padding: 2px;
+	font-weight: bold;
+}
+

@@ -49,6 +49,7 @@ public class VersionItemForm extends AbstractDSpaceTransformer {
 	}
 
 	public void addBody(Body body) throws WingException, SQLException{
+
         // Get our parameters and state
         int itemID = parameters.getParameterAsInteger("itemID",-1);
         String summary=null;

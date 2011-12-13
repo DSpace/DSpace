@@ -3229,6 +3229,10 @@
      <message key="xmlui.submit.publication.enter_article_doi">Enter article DOI or PubMed ID</message>
 
      <message key="xmlui.submit.select.pub.form.manu_error">Please, provide a manuscript number</message>
+     <message key="xmlui.submit.publication.journal.select.label.new">Enter Your Journal Title</message>
+     <message key="xmlui.submit.publication.journal.manu.label.new">Enter Your Manuscript Number</message>
+
+    <message key="xmlui.submit.publication.journal.help_in_review">If your journal is not listed, you must wait until your manuscript number has been accepted before submitting dat to Dryad.</message>
 
 
 </catalogue>

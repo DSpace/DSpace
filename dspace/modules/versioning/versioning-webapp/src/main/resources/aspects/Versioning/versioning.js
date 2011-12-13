@@ -130,10 +130,12 @@ function startCreateNewVersionItem(){
 
 	var item = Item.find(getDSContext(),itemID);
 
-	cocoon.redirectTo(cocoon.request.getContextPath()+"/handle/"+item.getHandle(),true);
-	getDSContext().complete();
+    getDSContext().complete();
 	item = null;
-	cocoon.exit();
+
+//    var wsid = cocoon.request.get("wsid");
+//    cocoon.redirectTo(cocoon.request.getContextPath()+"/submit-overview?workspaceID=" + wsid,true);
+//	cocoon.exit();
 }
 
 /*
@@ -150,7 +152,12 @@ function doCreateNewVersion(itemID, result){
         else if (cocoon.request.get("submit_version")){
             var summary = cocoon.request.get("summary");
             assertEditItem(itemID);
-            result = VersionManager.processCreateNewVersion(getDSContext(),itemID, summary);                        
+            result = VersionManager.processCreateNewVersion(getDSContext(),itemID, summary);
+
+            var wsid = result.getParameter("wsid");
+            cocoon.redirectTo(cocoon.request.getContextPath()+"/submit-overview?workspaceID=" + wsid,true);
+	        cocoon.exit();
+
         }
         else if (cocoon.request.get("submit_update_version")){
             var summary = cocoon.request.get("summary");
