@@ -32,7 +32,7 @@
     </scm>
 
     <properties>
-        <default.dspace.dir>/dspace</default.dspace.dir>
+        <default.dspace.dir>/dspace-duraspace</default.dspace.dir>
         <default.mail.server>smtp.example.com</default.mail.server>
         <default.solr.server>http://localhost:8080/solr</default.solr.server>
     </properties>
