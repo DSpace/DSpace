@@ -24,6 +24,7 @@ collections / items / and bitstreams.
             <map:transformer name="CommunityRecentSubmissions" src="org.dspace.app.xmlui.aspect.artifactbrowser.CommunityRecentSubmissions"/>
             <map:transformer name="CollectionRecentSubmissions" src="org.dspace.app.xmlui.aspect.artifactbrowser.CollectionRecentSubmissions"/>
             <map:transformer name="ConfigurableBrowse" src="org.dspace.app.xmlui.aspect.artifactbrowser.ConfigurableBrowse"/>
+            <map:transformer name="StaticPage" src="org.dspace.app.xmlui.aspect.browseArtifacts.StaticPage"/>
         </map:transformers>
 
         <map:matchers default="wildcard">
@@ -55,6 +56,11 @@ collections / items / and bitstreams.
                             <map:parameter name="depth" value="999"/>
                     </map:transform>
                     <map:serialize type="xml"/>
+            </map:match>
+
+            <map:match pattern="page/*">
+                <map:transform type="StaticPage"/>
+                <map:serialize type="xml"/>
             </map:match>
 
             <!-- Browse (by anything) -->
@@ -90,7 +96,6 @@ collections / items / and bitstreams.
                 </map:match>
 
             </map:match>
-
 
             <!-- Not a URL we care about, so just pass it on. -->
             <map:serialize type="xml"/>
