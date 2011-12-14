@@ -736,12 +736,15 @@
 <message key="xmlui.Submission.submit.ReviewStep.supported">compatible</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.CCLicenseStep -->
-	<message key="xmlui.Submission.submit.CCLicenseStep.head">Licencia Creative Commons</message>
-<message key="xmlui.Submission.submit.CCLicenseStep.info1">Puede opcionalmente dotar de licencia a su ítem bajo una licencia &lt;a href="http://creativecommons.org/"&gt;Creative Commons&lt;/a&gt;. Si desea elegir una licencia Creative Commons pulse el botón inferior para ir a la página de Creative Commons. Una vez allí, se le presentarán varias opciones de licencia y tras elegir una, volverá a esta página.</message>
-<message key="xmlui.Submission.submit.CCLicenseStep.submit_to_creative_commons">Acceder a Creative Commons para elegir una licencia</message>
-<message key="xmlui.Submission.submit.CCLicenseStep.license">Licencia</message>
-<message key="xmlui.Submission.submit.CCLicenseStep.submit_remove">Borrar la licencia Creative Commons</message>
-<message key="xmlui.Submission.submit.CCLicenseStep.no_license">No elegir licencia Creative Commons</message>
+<message key="xmlui.Submission.submit.CCLicenseStep.ccws_error">Ha ocurrido un error: {0}</message>
+<message key="xmlui.Submission.submit.CCLicenseStep.head">Seleccione una Licencia para su trabajo</message>
+<message key="xmlui.Submission.submit.CCLicenseStep.info1">Si lo desea, puede seleccionar una licencia <a href="http://creativecommons.org/">Creative Commons</a> para su ítem. Esta licencia determina que acciones pueden realizar los usuarios respecto de su obra.</message>
+<message key="xmlui.Submission.submit.CCLicenseStep.submit_choose_creative_commons">Seleccione una licencia</message>
+<message key="xmlui.Submission.submit.CCLicenseStep.submit_to_creative_commons">Ir al sitio de Creative Commons para seleccionar una licencia</message>
+<message key="xmlui.Submission.submit.CCLicenseStep.license">Tipo de licencia</message>
+<message key="xmlui.Submission.submit.CCLicenseStep.select_change">Seleccione un tipo de licencia ...</message>
+<message key="xmlui.Submission.submit.CCLicenseStep.no_license">Sin licencia Creative Commons</message>
+<message key="xmlui.Submission.submit.CCLicenseStep.save_changes">Debe hacer click en siguiente para guardar los cambios</message>
 
 
 	<!-- org.dspace.app.xmlui.Submission.submit.LicenseStep -->

@@ -10,12 +10,11 @@ INSERT INTO metadatafieldregistry VALUES (getnextid('metadatafieldregistry'),1,'
 INSERT INTO metadatafieldregistry VALUES (getnextid('metadatafieldregistry'),1,'contributor','codirector','Co-Director de una Tesis');
 INSERT INTO metadatafieldregistry VALUES (getnextid('metadatafieldregistry'),1,'identifier','doi','Identificar DOI');
 INSERT INTO metadatafieldregistry VALUES (getnextid('metadatafieldregistry'),1,'identifier','purl','Identificador PURL');
+INSERT INTO metadatafieldregistry VALUES (getnextid('metadatafieldregistry'),1,'identifier','patent','Identificador de Patente');
 INSERT INTO metadatafieldregistry VALUES (getnextid('metadatafieldregistry'),1,'author','person','Autor de un documento (persona seleccionada desde la base de datos)');
 INSERT INTO metadatafieldregistry VALUES (getnextid('metadatafieldregistry'),1,'author','corporate','Autor Institucional (Institucion seleccionada desde la base de datos)');
-INSERT INTO metadatafieldregistry VALUES (getnextid('metadatafieldregistry'),1,'title','main','Título principal de la obra');
 INSERT INTO metadatafieldregistry VALUES (getnextid('metadatafieldregistry'),1,'title','subtitle','Subtítulo principal de la obra');
 INSERT INTO metadatafieldregistry VALUES (getnextid('metadatafieldregistry'),1,'description','fulltext','Indica si se posee el texto completo del recurso');
-INSERT INTO metadatafieldregistry VALUES (getnextid('metadatafieldregistry'),1,'rights','license','Licencia de uso seleccionada por el usuario');
 INSERT INTO metadatafieldregistry VALUES (getnextid('metadatafieldregistry'),1,'subject','keywords','Palabras claves, extraidas del texto');
 INSERT INTO metadatafieldregistry VALUES (getnextid('metadatafieldregistry'),1,'date','exposure','Fecha de exposicion de una Tesis o un Objeto de Conferencia');
 INSERT INTO metadatafieldregistry VALUES (getnextid('metadatafieldregistry'),1,'source','title','Nombre de un Evento (congreso, conferencia, etc)');

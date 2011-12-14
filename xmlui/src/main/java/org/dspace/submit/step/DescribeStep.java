@@ -9,8 +9,10 @@ package org.dspace.submit.step;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -18,10 +20,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.log4j.Logger;
-
+import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputsReader;
 import org.dspace.app.util.DCInputsReaderException;
-import org.dspace.app.util.DCInput;
 import org.dspace.app.util.SubmissionInfo;
 import org.dspace.app.util.Util;
 import org.dspace.authorize.AuthorizeException;
@@ -32,11 +33,12 @@ import org.dspace.content.DCSeriesNumber;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
-import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
+import org.dspace.eperson.Group;
 import org.dspace.submit.AbstractProcessingStep;
 
 /**
@@ -304,8 +306,9 @@ public class DescribeStep extends AbstractProcessingStep
         {
             for (int i = 0; i < inputs.length; i++)
             {
-                // BEGIN SeDiCI: si el campo no esta permitido para el tipo de documento seleccionado, se esquiva
-                if(!inputs[i].isAllowedFor(documentType))
+                // BEGIN SeDiCI: se omite el campo si no esta permitido en este scope (submit o workflow) o para el tipo de documento
+            	String scope = subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE;
+                if ( !( inputs[i].isVisible(scope) && inputs[i].isAllowedFor(documentType) ) )
                 {
                 	continue;
                 }
@@ -314,6 +317,19 @@ public class DescribeStep extends AbstractProcessingStep
                 DCValue[] values = item.getMetadata(inputs[i].getSchema(),
                         inputs[i].getElement(), inputs[i].getQualifier(), Item.ANY);
 
+                // BEGIN SeDiCI: chequeo de campo obligatorio según el grupo
+                if(inputs[i].isGroupBased()) 
+                {
+                	Group group = findGroup(context, inputs[i].getGroup());
+                	if( !(group.isMember(context, group.getID()) ^ inputs[i].hasToBeMemeber()) && values.length == 0 ) 
+                	{
+                		// agrega el campo faltante a la lista de errores 
+                        addErrorField(request, getFieldName(inputs[i]));
+                	}
+                    continue;
+                }
+                // END SeDiCI
+                
                 if (inputs[i].isRequired() && values.length == 0)
                 {
                     // since this field is missing add to list of error fields
@@ -344,6 +360,22 @@ public class DescribeStep extends AbstractProcessingStep
         return STATUS_COMPLETE;
     }
 
+    /**
+     * Mantiene una mini-cache de grupos previamente cargados, con la intención minimizar las consultas a la base de datos
+     * 
+     * @return instancia de Group correspondiente al parametro name
+     */
+    // BEGIN SeDiCI
+    private Map<String, Group> loadedGroups = new HashMap<String, Group>();
+    private Group findGroup(Context context, String groupName) throws SQLException {
+    	Group group = loadedGroups.get(groupName);
+    	if(group == null) {
+    		group = Group.findByName(context, groupName);
+    		loadedGroups.put(groupName, group);
+    	}
+    	return group;
+    }
+    // END SeDiCI
     
 
     /**

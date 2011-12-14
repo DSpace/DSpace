@@ -56,6 +56,7 @@
                     the form still submits the information in those instances, even though they are no
                     longer encoded as HTML fields. The DRI Reference should contain the exact attributes
                     the hidden fields should have in order for this to work properly. -->
+				<xsl:apply-templates select="dri:instance" mode="hiddenInterpreter"/>                    
               </div>
         </xsl:if>
     </xsl:template>

@@ -66,10 +66,15 @@ public class DCInput
     /** is the entry closed to vocabulary terms? */
     private boolean closedVocabulary = false;
 
-    /** BEGIN SeDiCI: Tipos para los que el field está permitido */
+    // BEGIN SeDiCI: Tipos para los que el field está permitido
     private List<String> typeBind = null;
-    // END SeDiCI
 
+    // Grupo para el cual este campo es obligatorio 
+    // si el flag hasToBeMember es true, entonces el campo es obligatorio solo si el usuario ES MIEMBRO del grupo especificado
+    // en caso contrario, el campo es obligatorio solo si el usuario NO ES MIEMBRO del grupo especificado
+    private String requiredOnGroup = null;
+    private boolean hasToBeMember = true;
+    // END SeDiCI
     
     /** 
      * The scope of the input sets, this restricts hidden metadata fields from 
@@ -125,7 +130,8 @@ public class DCInput
         closedVocabulary = "true".equalsIgnoreCase(closedVocabularyStr)
                             || "yes".equalsIgnoreCase(closedVocabularyStr);
         
-        // BEGIN SeDiCI: Si existe el elemento type-bind y tiene contenido, se parsea usando la coma (,) como separador 
+        // BEGIN SeDiCI
+        // Si existe el elemento type-bind y tiene contenido, se parsea usando la coma (,) como separador 
         typeBind = new ArrayList<String>();
         String typeBindDef = fieldMap.get("type-bind");
         if(typeBindDef != null && typeBindDef.trim().length() > 0) {
@@ -133,6 +139,17 @@ public class DCInput
         	for(String type : types) {
         		typeBind.add( type.trim() );
         	}
+        }
+        
+        // Determina si el campo es requerido por algún Rol
+        String requiredOnGroupDef = fieldMap.get("required-on-group");
+        if(requiredOnGroupDef != null && requiredOnGroupDef.trim().length() > 0) {
+        	//Determina si el usuario debe o no pertenecer al grupo (usa el signo de admiración como negación: !)
+        	if(requiredOnGroupDef.startsWith("!")) {
+        		this.hasToBeMember = false;
+        		requiredOnGroupDef = requiredOnGroupDef.substring(1);
+        	}
+        	requiredOnGroup = requiredOnGroupDef;
         }
         // END SeDiCI
     }
@@ -405,6 +422,30 @@ public class DCInput
 			return true;
 		
 		return typeBind.contains(typeName);
+	}
+	
+	/**
+	 * Retorna true si este campo tiene una restricción de obligatoriedad basada en un Grupo de usuario
+	 * @return
+	 */
+	public boolean isGroupBased() {
+		return (requiredOnGroup != null);
+	}
+	
+	/**
+	 * Si este campo tiene una restriccion de obligatoriedad basada en un Grupo, retorna el nombre del grupo. 
+	 * En caso contrario, retorna null.
+	 */
+	public String getGroup() {
+		return requiredOnGroup;
+	}
+	
+	/**
+	 * Indica si el usuario debe ser miembro o no del grupo sobre el cual se aplica la restriccion de obligatoriedad.
+	 * Notar que este valor no tiene sentido si isGroupBased() retorna false.
+	 */
+	public boolean hasToBeMemeber() {
+		return hasToBeMember;
 	}
 	//END SeDiCI
 }
