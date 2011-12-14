@@ -3,14 +3,14 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 
 <body>
 <div>
-<head>FAQ</head>
-<p>Preguntas frecuentes</p>
+<head>Staff</head>
+<p>Staff.</p>
 </div>
 </body>
 
 <meta>
 <pageMeta>
-<metadata element="title">Preguntas frecuentes</metadata>
+<metadata element="title">Staff</metadata>
 <trail target="/dspace">Repository Home</trail>
 </pageMeta>
 </meta>

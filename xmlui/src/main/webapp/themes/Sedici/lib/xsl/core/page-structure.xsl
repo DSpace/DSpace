@@ -13,6 +13,78 @@
 	exclude-result-prefixes="i18n dri mets xlink xsl dim xhtml mods dc confman">
 
     <xsl:output indent="yes"/>
+    
+        
+    <!-- Se redefine este template para insertar el menu superior -->
+    <xsl:template match="dri:document">
+        <html class="no-js">
+            <!-- First of all, build the HTML head element -->
+            <xsl:call-template name="buildHead"/>
+            <!-- Then proceed to the body -->
+
+            <!--paulirish.com/2008/conditional-stylesheets-vs-css-hacks-answer-neither/-->
+            <xsl:text disable-output-escaping="yes">&lt;!--[if lt IE 7 ]&gt; &lt;body class="ie6"&gt; &lt;![endif]--&gt;
+                &lt;!--[if IE 7 ]&gt;    &lt;body class="ie7"&gt; &lt;![endif]--&gt;
+                &lt;!--[if IE 8 ]&gt;    &lt;body class="ie8"&gt; &lt;![endif]--&gt;
+                &lt;!--[if IE 9 ]&gt;    &lt;body class="ie9"&gt; &lt;![endif]--&gt;
+                &lt;!--[if (gt IE 9)|!(IE)]&gt;&lt;!--&gt;&lt;body&gt;&lt;!--&lt;![endif]--&gt;</xsl:text>
+
+            <xsl:choose>
+              <xsl:when test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='framing'][@qualifier='popup']">
+                <xsl:apply-templates select="dri:body/*"/>
+              </xsl:when>
+                  <xsl:otherwise>
+                    <div id="ds-main">
+                        <!--The header div, complete with title, subtitle and other junk-->
+                        <xsl:call-template name="buildHeader"/>
+                        
+                        <xsl:call-template name="buildMenuSuperior"/>
+
+                        <!--The trail is built by applying a template over pageMeta's trail children. -->
+                        <xsl:call-template name="buildTrail"/>
+
+                        <!--javascript-disabled warning, will be invisible if javascript is enabled-->
+                        <div id="no-js-warning-wrapper" class="hidden">
+                            <div id="no-js-warning">
+                                <div class="notice failure">
+                                    <xsl:text>JavaScript is disabled for your browser. Some features of this site may not work without it.</xsl:text>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!--ds-content is a groups ds-body and the navigation together and used to put the clearfix on, center, etc.
+                            ds-content-wrapper is necessary for IE6 to allow it to center the page content-->
+                        <div id="ds-content-wrapper">
+                            <div id="ds-content" class="clearfix">
+                                <!--
+                               Goes over the document tag's children elements: body, options, meta. The body template
+                               generates the ds-body div that contains all the content. The options template generates
+                               the ds-options div that contains the navigation and action options available to the
+                               user. The meta element is ignored since its contents are not processed directly, but
+                               instead referenced from the different points in the document. -->
+                                <xsl:apply-templates/>
+                            </div>
+                        </div>
+
+
+                        <!--
+                            The footer div, dropping whatever extra information is needed on the page. It will
+                            most likely be something similar in structure to the currently given example. -->
+                        <xsl:call-template name="buildFooter"/>
+
+                    </div>
+
+                </xsl:otherwise>
+            </xsl:choose>
+                <!-- Javascript at the bottom for fast page loading -->
+              <xsl:call-template name="addJavascript"/>
+
+            <xsl:text disable-output-escaping="yes">&lt;/body&gt;</xsl:text>
+        </html>
+    </xsl:template>
+   
+    
   
     <xsl:template name="addJavascript">
         <xsl:variable name="jqueryVersion">
@@ -132,10 +204,12 @@
                     </p>
                 </div>
             </xsl:if>
-            
+ 
             <xsl:apply-templates select="dri:div[@id='aspect.discovery.SiteViewer.div.front-page-search']">
             <xsl:with-param name="muestra">true</xsl:with-param>
             </xsl:apply-templates>
+
+            
             
             <xsl:apply-templates/>  
 
@@ -197,4 +271,46 @@
 	        </li>
 	     </xsl:if>
     </xsl:template>
+
+ 
+   <xsl:template name="buildMenuSuperior">
+    <ul id="ds-menu-superior">              
+        <xsl:apply-templates select="/dri:document/dri:options/dri:list/dri:list[@id='aspect.browseArtifacts.Navigation.list.global']" mode="menuSuperior"/>
+                    
+        <li>
+        	<i18n:text>sedici.menuSuperior.staticPages.institucional</i18n:text>
+			<ul>
+				<li><a href="/dspace/pages/queEsSedici"><i18n:text>sedici.menuSuperior.staticPages.queEsSedici</i18n:text></a></li>
+				<li><a href="/dspace/pages/politica"><i18n:text>sedici.menuSuperior.staticPages.politica</i18n:text></a></li>
+			</ul>
+		</li>
+		<li><a href="/dspace/pages/links"><i18n:text>sedici.menuSuperior.staticPages.links</i18n:text></a></li>
+        <li><a href="/dspace/pages/staff"><i18n:text>sedici.menuSuperior.staticPages.staff</i18n:text></a></li>
+        <li><a href="/dspace/pages/comoLlegar"><i18n:text>sedici.menuSuperior.staticPages.comoLlegar</i18n:text></a></li>
+		<li>
+			<i18n:text>sedici.menuSuperior.staticPages.informacion</i18n:text>
+			<ul>
+			  <li><a href="/dspace/pages/comoAgregarTrabajos"><i18n:text>sedici.menuSuperior.staticPages.agregacion</i18n:text></a></li>
+			  <li><a href="/dspace/pages/FAQ"> <i18n:text>sedici.menuSuperior.staticPages.faq</i18n:text></a></li>
+			</ul>
+		
+		</li>
+		<li>
+			<a href="/dspace/pages/contacto"><i18n:text>sedici.menuSuperior.staticPages.contacto</i18n:text></a>
+		</li>
+            
+            
+     </ul>
+    </xsl:template>
+    
+    <!--give nested navigation list the class sublist-->
+    <xsl:template match="dri:options/dri:list/dri:list" priority="3" mode="menuSuperior">
+        <li>
+            <i18n:text><xsl:value-of select="dri:head"/></i18n:text>
+            <ul>
+                <xsl:apply-templates select="dri:item" mode="nested"/>
+            </ul>
+        </li>
+    </xsl:template>
+    
 </xsl:stylesheet>

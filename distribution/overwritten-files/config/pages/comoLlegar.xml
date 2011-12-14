@@ -3,14 +3,14 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 
 <body>
 <div>
-<head>Nueva pagina de prueba</head>
-<p>Nueva pagina de prueba</p>
+<head>Como llegar</head>
+<p>Como llegar.</p>
 </div>
 </body>
 
 <meta>
 <pageMeta>
-<metadata element="title">About Our Repository</metadata>
+<metadata element="title">Como llegar?</metadata>
 <trail target="/dspace">Repository Home</trail>
 </pageMeta>
 </meta>

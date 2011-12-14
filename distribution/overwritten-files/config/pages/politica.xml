@@ -3,14 +3,14 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 
 <body>
 <div>
-<head>FAQ</head>
-<p>Preguntas frecuentes</p>
+<head>Política del repositorio</head>
+<p>Política del repositorio.</p>
 </div>
 </body>
 
 <meta>
 <pageMeta>
-<metadata element="title">Preguntas frecuentes</metadata>
+<metadata element="title">Política del repositorio</metadata>
 <trail target="/dspace">Repository Home</trail>
 </pageMeta>
 </meta>

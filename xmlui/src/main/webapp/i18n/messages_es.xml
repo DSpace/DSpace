@@ -2075,4 +2075,20 @@ este momento. Cuando se usa QDC para los elementos de DSpace se recomienda el us
 <message key="sedici.choiceAuthorityControl.messageErrorConfidenceSingular">Verifique el valor</message>
 <message key="sedici.choiceAuthorityControl.messageErrorConfidencePlural">Hay errores en el formulario</message>
 
+
+<!-- Menu superior -->
+<message key="sedici.menuSuperior.staticPages.institucional">Institucional</message>
+<message key="sedici.menuSuperior.staticPages.queEsSedici">Que es SEDICI?</message>
+<message key="sedici.menuSuperior.staticPages.politica">Política del repositorio</message>
+
+<message key="sedici.menuSuperior.staticPages.links">Links</message>
+<message key="sedici.menuSuperior.staticPages.staff">Staff</message>
+<message key="sedici.menuSuperior.staticPages.comoLlegar">Como llegar</message>
+
+<message key="sedici.menuSuperior.staticPages.informacion">Información</message>
+<message key="sedici.menuSuperior.staticPages.agregacion">Como agrego trabajos?</message>
+<message key="sedici.menuSuperior.staticPages.faq">FAQ</message>
+
+<message key="sedici.menuSuperior.staticPages.contacto">Contacto</message>
+
 </catalogue>

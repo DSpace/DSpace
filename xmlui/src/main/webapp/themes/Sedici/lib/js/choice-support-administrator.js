@@ -170,8 +170,9 @@ function DSpaceSetupAutocomplete(formID, args) {
                     		$(xmldata).find('Choice').each(function() {
                     			if (entrada==$(this).text()){
                     				entrada_igual=true;
+                    				seleccion=true;
 			                        if (isAuthorityControlled) {
-			                        	cambiarAuthority(inputID, authorityID, $(this).attr('value'), args.confidenceIndicatorID, icono_accepted, args.confidenceName, confianza_600, authorityLabelID, $(this).text());
+			                        	cambiarAuthority(inputID, authorityID, $(this).attr('authority'), args.confidenceIndicatorID, icono_accepted, args.confidenceName, confianza_600, authorityLabelID, $(this).attr('value'));
     		                        } else {
 			                        	DSpaceUpdateConfidence(document, args.confidenceIndicatorID, icono_accepted);
 			                        }
