@@ -35,6 +35,12 @@
     <xsl:output indent="yes"/>
 
     <!--
+        Requested Page URI. Some functions may alter behavior of processing depending if URI matches a pattern.
+        Specifically, adding a static page will need to override the DRI, to directly add content.
+    -->
+    <xsl:variable name="request-uri" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI']"/>
+
+    <!--
         The starting point of any XSL processing is matching the root element. In DRI the root element is document,
         which contains a version attribute and three top level elements: body, options, meta (in that order).
 
@@ -280,6 +286,9 @@
             <xsl:variable name="page_title" select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']" />
             <title>
                 <xsl:choose>
+                        <xsl:when test="starts-with($request-uri, 'page/about')">
+                                <xsl:text>About This Repository</xsl:text>
+                        </xsl:when>
                         <xsl:when test="not($page_title)">
                                 <xsl:text>  </xsl:text>
                         </xsl:when>
@@ -389,6 +398,9 @@
         <div id="ds-trail-wrapper">
             <ul id="ds-trail">
                 <xsl:choose>
+                    <xsl:when test="starts-with($request-uri, 'page/about')">
+                         <xsl:text>About This Repository</xsl:text>
+                    </xsl:when>
                     <xsl:when test="count(/dri:document/dri:meta/dri:pageMeta/dri:trail) = 0">
                         <li class="ds-trail-link first-link">-</li>
                     </xsl:when>
@@ -561,7 +573,25 @@
                     </p>
                 </div>
             </xsl:if>
-            <xsl:apply-templates />
+
+            <!-- Check for the custom pages -->
+            <xsl:choose>
+                <xsl:when test="starts-with($request-uri, 'page/about')">
+                    <div>
+                        <h1>About This Repository</h1>
+                        <p>To add your own content to this page, edit webapps/xmlui/themes/Mirage/lib/xsl/core/page-structure.xsl and
+                            add your own content to the title, trail, and body. If you wish to add additional pages, you
+                            will need to create an additional xsl:when block and match the request-uri to whatever page
+                            you are adding. Currently, static pages created through altering XSL are only available
+                            under the URI prefix of page/.</p>
+                    </div>
+                </xsl:when>
+                <!-- Otherwise use default handling of body -->
+                <xsl:otherwise>
+                    <xsl:apply-templates />
+                </xsl:otherwise>
+            </xsl:choose>
+
         </div>
     </xsl:template>
 
