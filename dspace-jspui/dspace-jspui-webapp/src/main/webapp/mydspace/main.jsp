@@ -86,11 +86,6 @@
             </td>
         </tr>
             <td>
-                <p>University of Maryland faculty can deposit research works to DRUM.Find out more about <a href="help/about_submitting.jsp">depositing works</a> and <a href="help/submit_policy.jsp">submission policies</a>. Faculty can also request the creation of a new community.  Please review the <a href="help/new_community_policy.jsp"> policy on creating new communities</a>.</p>
-<!--
-                <p><strong>Please note</strong> While we are improving the My DRUM login, it will take 1-2 business days to set up deposit service for new users. The first time you log into My DRUM you will not be able to deposit works immediately. We will notify you via email when you have been given deposit privileges. Once your deposit privileges have been set up you can go to My DRUM and deposit works immediately with no further delays.</p>
--->
-
                 <p>For assistance or questions, please contact drum-help@umd.edu or call 
 4-1328.</p>
            </td>
