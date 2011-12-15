@@ -4,13 +4,13 @@
     <packaging>pom</packaging>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-sword-client</artifactId>
-    <version>1.8.1</version>
+    <version>1.8.2-SNAPSHOT</version>
     <name>DSpace Sword Client</name>
 
     <parent>
         <artifactId>dspace-parent</artifactId>
         <groupId>org.dspace</groupId>
-        <version>1.8.1</version>
+        <version>1.8.2-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
     
@@ -26,11 +26,11 @@
        and releases snapshots into the snapshot repository below.
     -->
     <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/tags/dspace-1.8.1</connection>
+        <connection>scm:svn:http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-sword-client</connection>
         <developerConnection>
-            scm:svn:https://scm.dspace.org/svn/repo/tags/dspace-1.8.1
+            scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-sword-client
         </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/tags/dspace-1.8.1</url>
+        <url>http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-sword-client</url>
     </scm>
 
     <issueManagement>

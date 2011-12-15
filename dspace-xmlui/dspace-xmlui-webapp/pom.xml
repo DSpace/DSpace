@@ -13,15 +13,15 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-xmlui</artifactId>
-        <version>1.8.1</version>
+        <version>1.8.2-SNAPSHOT</version>
       <relativePath>..</relativePath>
     </parent>
 
     <scm>
-        <connection>scm:svn:https://scm.dspace.org/svn/repo/tags/dspace-1.8.1</connection>
-        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/tags/dspace-1.8.1
+        <connection>scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-xmlui/dspace-xmlui-webapp</connection>
+        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-xmlui/dspace-xmlui-webapp
         </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/tags/dspace-1.8.1</url>
+        <url>http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-xmlui/dspace-xmlui-webapp</url>
     </scm>
 
     <build>
