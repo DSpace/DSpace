@@ -2080,18 +2080,34 @@ este momento. Cuando se usa QDC para los elementos de DSpace se recomienda el us
 
 
 <!-- Menu superior -->
-<message key="sedici.menuSuperior.staticPages.institucional">Institucional</message>
-<message key="sedici.menuSuperior.staticPages.queEsSedici">Que es SEDICI?</message>
-<message key="sedici.menuSuperior.staticPages.politica">Política del repositorio</message>
+<message key="sedici.menuSuperior.exploracion">Exploración</message>
+<message key="sedici.menuSuperior.exploracion.colecciones">Colecciones</message>
+<message key="sedici.menuSuperior.exploracion.fechaPublicacion">Por fecha de publicación</message>
+<message key="sedici.menuSuperior.exploracion.autor">Autores</message>
+<message key="sedici.menuSuperior.exploracion.titulo">Títulos</message>
+<message key="sedici.menuSuperior.exploracion.tema">Temas</message>
+<message key="sedici.menuSuperior.exploracion.filtrar">Filtrar</message>
 
-<message key="sedici.menuSuperior.staticPages.links">Links</message>
-<message key="sedici.menuSuperior.staticPages.staff">Staff</message>
-<message key="sedici.menuSuperior.staticPages.comoLlegar">Como llegar</message>
+<message key="sedici.menuSuperior.institucional">Institucional</message>
+<message key="sedici.menuSuperior.institucional.queEsSedici">Que es SEDICI?</message>
+<message key="sedici.menuSuperior.institucional.politica">Política del repositorio</message>
+<message key="sedici.menuSuperior.institucional.links">Links</message>
+<message key="sedici.menuSuperior.institucional.staff">Staff</message>
+<message key="sedici.menuSuperior.institucional.comoLlegar">Como llegar</message>
 
-<message key="sedici.menuSuperior.staticPages.informacion">Información</message>
-<message key="sedici.menuSuperior.staticPages.agregacion">Como agrego trabajos?</message>
-<message key="sedici.menuSuperior.staticPages.faq">FAQ</message>
+<message key="sedici.menuSuperior.informacion">Información</message>
+<message key="sedici.menuSuperior.informacion.agregacion">Como agrego trabajos?</message>
+<message key="sedici.menuSuperior.informacion.faq">FAQ</message>
 
-<message key="sedici.menuSuperior.staticPages.contacto">Contacto</message>
+<message key="sedici.menuSuperior.contacto">Contacto</message>
+
+<!-- Menu lateral -->
+<message key="sedici.menuLateral.cuenta.usuario">Usuario</message>
+<message key="sedici.menuLateral.cuenta.perfil">Perfil</message>
+<message key="sedici.menuLateral.cuenta.logout">Salir</message>
+<message key="sedici.menuLateral.cuenta.submissions">Envíos y depósitos</message>
+<message key="sedici.menuLateral.cuenta.export">Mis exportaciones</message>
+
+<message key="sedici.menuLateral.otros.head">Otros</message>
 
 </catalogue>

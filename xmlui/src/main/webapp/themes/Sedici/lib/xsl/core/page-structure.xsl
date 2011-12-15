@@ -38,7 +38,7 @@
                         <!--The header div, complete with title, subtitle and other junk-->
                         <xsl:call-template name="buildHeader"/>
                         
-                        <xsl:call-template name="buildMenuSuperior"/>
+                        <xsl:call-template name="menuSuperior"/>
 
                         <!--The trail is built by applying a template over pageMeta's trail children. -->
                         <xsl:call-template name="buildTrail"/>
@@ -195,7 +195,7 @@
         The template to handle the dri:body element. It simply creates the ds-body div and applies
         templates of the body's child elements (which consists entirely of dri:div tags).
     -->
-    <xsl:template match="dri:body">
+    <xsl:template match="dri:body">-
         <div id="ds-body">
             <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='alert'][@qualifier='message']">
                 <div id="ds-system-wide-alert">
@@ -211,7 +211,9 @@
 
             
             
-            <xsl:apply-templates/>  
+            <xsl:apply-templates/>
+            
+            <xsl:apply-templates select='/dri:document/dri:options/dri:list[@id="aspect.statistics.Navigation.list.statistics"]'/>  
 
 
         </div>
@@ -271,46 +273,6 @@
 	        </li>
 	     </xsl:if>
     </xsl:template>
-
- 
-   <xsl:template name="buildMenuSuperior">
-    <ul id="ds-menu-superior">              
-        <xsl:apply-templates select="/dri:document/dri:options/dri:list/dri:list[@id='aspect.browseArtifacts.Navigation.list.global']" mode="menuSuperior"/>
-                    
-        <li>
-        	<i18n:text>sedici.menuSuperior.staticPages.institucional</i18n:text>
-			<ul>
-				<li><a href="/dspace/pages/queEsSedici"><i18n:text>sedici.menuSuperior.staticPages.queEsSedici</i18n:text></a></li>
-				<li><a href="/dspace/pages/politica"><i18n:text>sedici.menuSuperior.staticPages.politica</i18n:text></a></li>
-			</ul>
-		</li>
-		<li><a href="/dspace/pages/links"><i18n:text>sedici.menuSuperior.staticPages.links</i18n:text></a></li>
-        <li><a href="/dspace/pages/staff"><i18n:text>sedici.menuSuperior.staticPages.staff</i18n:text></a></li>
-        <li><a href="/dspace/pages/comoLlegar"><i18n:text>sedici.menuSuperior.staticPages.comoLlegar</i18n:text></a></li>
-		<li>
-			<i18n:text>sedici.menuSuperior.staticPages.informacion</i18n:text>
-			<ul>
-			  <li><a href="/dspace/pages/comoAgregarTrabajos"><i18n:text>sedici.menuSuperior.staticPages.agregacion</i18n:text></a></li>
-			  <li><a href="/dspace/pages/FAQ"> <i18n:text>sedici.menuSuperior.staticPages.faq</i18n:text></a></li>
-			</ul>
-		
-		</li>
-		<li>
-			<a href="/dspace/pages/contacto"><i18n:text>sedici.menuSuperior.staticPages.contacto</i18n:text></a>
-		</li>
-            
-            
-     </ul>
-    </xsl:template>
     
-    <!--give nested navigation list the class sublist-->
-    <xsl:template match="dri:options/dri:list/dri:list" priority="3" mode="menuSuperior">
-        <li>
-            <i18n:text><xsl:value-of select="dri:head"/></i18n:text>
-            <ul>
-                <xsl:apply-templates select="dri:item" mode="nested"/>
-            </ul>
-        </li>
-    </xsl:template>
-    
+   
 </xsl:stylesheet>

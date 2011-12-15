@@ -39,9 +39,10 @@
     <xsl:import href="lib/xsl/aspect/artifactbrowser/item-view.xsl"/>
     <xsl:import href="lib/xsl/core/forms.xsl"/>
     <xsl:import href="lib/xsl/core/page-structure.xsl"/>
-    <xsl:import href="lib/xsl/core/navigation.xsl"/>
     <xsl:import href="lib/xsl/aspect/general/choice-authority-control.xsl"/>
     <xsl:import href="lib/xsl/aspect/news/news-list.xsl"/>
+    <xsl:import href="lib/xsl/core/menu-superior.xsl"/>
+    <xsl:import href="lib/xsl/core/menu-lateral.xsl"/>
     <xsl:output indent="yes"/>
     
 
