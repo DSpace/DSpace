@@ -313,7 +313,7 @@
 					<dc-element>identifier</dc-element>
 					<dc-qualifier>isbn</dc-qualifier>
 					<repeatable></repeatable>
-					<label>ISBN - Tesis</label>
+					<label>ISBN</label>
 					<input-type>onebox</input-type>
 					<hint>Si la tésis cuenta con un ISBN, éste debe ser ingresado aquí</hint>
 					<required></required>
@@ -326,7 +326,7 @@
 					<dc-element>identifier</dc-element>
 					<dc-qualifier>isbn</dc-qualifier>
 					<repeatable></repeatable>
-					<label>ISBN - Libro</label>
+					<label>ISBN</label>
 					<input-type>onebox</input-type>
 					<hint>El código ISBN correspondiente al libro</hint>
 					<required>Debe ingresar el ISBN del libro</required>
@@ -365,7 +365,7 @@
 					<dc-element>relation</dc-element>
 					<dc-qualifier>dossier</dc-qualifier>
 					<repeatable></repeatable>
-					<label>Dossier</label>
+					<label>Nombre del Dossier</label>
 					<input-type>onebox</input-type>
 					<hint>Nombre de la sección Dossier en la que el artículo se encuentra</hint>
 					<required></required>
@@ -511,6 +511,7 @@
 				</field>
 
 				<!-- Compilador de libro -->
+				<!-- TODO Hay que hacerlo controlado -->
 				<field>
 					<dc-schema>dc</dc-schema>
 					<dc-element>contributor</dc-element>
