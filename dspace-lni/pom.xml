@@ -12,7 +12,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
-      <version>1.8.1</version>
+      <version>1.8.1-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -22,9 +22,9 @@
       into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://scm.dspace.org/svn/repo/tags/dspace-1.8.1/dspace-lni</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/tags/dspace-1.8.1/dspace-lni</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/tags/dspace-1.8.1/dspace-lni</url>
+      <connection>scm:svn:http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-lni</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-lni</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-lni</url>
    </scm>
 
    <modules>
