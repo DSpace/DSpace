@@ -16,7 +16,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>dspace-parent</artifactId>
-      <version>1.8.1-SNAPSHOT</version>
+      <version>1.8.1</version>
       <relativePath>..</relativePath>
    </parent>
 
@@ -26,9 +26,9 @@
       into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-sword</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-sword</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-sword</url>
+      <connection>scm:svn:http://scm.dspace.org/svn/repo/tags/dspace-1.8.1/dspace-sword</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/tags/dspace-1.8.1/dspace-sword</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/tags/dspace-1.8.1/dspace-sword</url>
    </scm>
 
 
