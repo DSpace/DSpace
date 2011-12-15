@@ -1066,9 +1066,9 @@
       snapshots into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://scm.dspace.org/svn/repo/branches/dspace-1_8_x</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/branches/dspace-1_8_x</url>
+      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/branches/dspace-1_8_x</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/branches/dspace-1_8_x</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/dspace/branches/dspace-1_8_x</url>
    </scm>
 
 </project>
