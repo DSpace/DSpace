@@ -1243,3 +1243,48 @@ margin: 2px 2px 0px 2px;
 div.primary > ul > li > ul > li.community > div.artifact-description a {
 	color: green;
 }
+
+
+/*Menu*/
+
+#ds-menu-superior { 
+background-color:black;
+
+padding:10px;
+position:inline;
+}
+
+#ds-menu-superior ul { 
+list-style-type:none;
+position:relative;
+/*display:inline;*/
+}
+
+#ds-menu-superior li { 
+list-style-type:none;
+display:inline;
+color:white;
+}
+
+#ds-menu-superior li a{ 
+list-style-type:none;
+/*display:inline;*/
+color:#FFFFFF;
+}
+
+#ds-menu-superior ul li{ 
+list-style-type:none;
+/*display:none;*/
+}
+
+
+#ds-menu-superior li:hover{
+display:inline;
+}
+
+
+/* Busqueda */
+//*Sort*//
+#aspect_discovery_SimpleSearch_div_search-controls {
+background-color:white;
+}
