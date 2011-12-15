@@ -16,7 +16,7 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>1.8.1-SNAPSHOT</version>
+      <version>1.8.1</version>
         <relativePath>..</relativePath>
    </parent>
 
@@ -26,9 +26,9 @@
       into the snapshot repository below.
    -->
    <scm>
-      <connection>scm:svn:http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace/modules/oai</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace/modules/oai</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace/modules/oai</url>
+      <connection>scm:svn:http://scm.dspace.org/svn/repo/tags/dspace-1.8.1/dspace/modules/oai</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/tags/dspace-1.8.1/dspace/modules/oai</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/tags/dspace-1.8.1/dspace/modules/oai</url>
    </scm>
 
    <build>
