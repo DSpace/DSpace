@@ -83,6 +83,7 @@ public class CreateCommunityForm extends AbstractDSpaceTransformer
 	    metadataList.addLabel(T_label_name);
 	    Text name = metadataList.addItem().addText("name");
 	    name.setSize(40);
+        name.setAutofocus("autofocus");
 	    
 	    // short description
 	    metadataList.addLabel(T_label_short_description);

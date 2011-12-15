@@ -121,6 +121,7 @@ public class ResetPassword extends AbstractDSpaceTransformer
        
        Field password = form.addItem().addPassword("password");
        password.setRequired();
+       password.setAutofocus("autofocus");
        password.setLabel(T_new_password);
        if (errors.contains("password"))
        {

@@ -180,6 +180,7 @@ public class LDAPLogin extends AbstractDSpaceTransformer implements
 
 		Text email = list.addItem().addText("username");
 		email.setRequired();
+        email.setAutofocus("autofocus");
 		email.setLabel(T_userName);
 		if (previousUserName != null) {
 			email.setValue(previousUserName);

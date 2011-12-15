@@ -72,6 +72,7 @@ public class CreateCollectionForm extends AbstractDSpaceTransformer
 	    // collection name
 	    metadataList.addLabel(T_label_name);
 	    Text name = metadataList.addItem().addText("name");
+        name.setAutofocus("autofocus");
 	    name.setSize(40);
 	    
 	    // short description

@@ -96,6 +96,7 @@ public class CurateForm extends AbstractDSpaceTransformer
 		
                 // Object ID Textbox (required)
                 Text id = form.addItem().addText("identifier");
+                id.setAutofocus("autofocus");
                 id.setLabel(T_object_label_name);
                 if (objectID != null)
                 {

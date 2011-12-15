@@ -67,6 +67,7 @@ public class FindItemForm extends AbstractDSpaceTransformer {
 		List form = findItem.addList("find-item-form", List.TYPE_FORM);
 		
 		Text id = form.addItem().addText("identifier");
+        id.setAutofocus("autofocus");
 		id.setLabel(T_identifier_label);
 		if (identifier != null)
         {

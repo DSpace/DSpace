@@ -293,6 +293,7 @@ public class EditProfile extends AbstractDSpaceTransformer
        
        // First name
        Text firstName = identity.addItem().addText("first_name");
+       firstName.setAutofocus("autofocus");
        firstName.setRequired();
        firstName.setLabel(T_first_name);
        firstName.setValue(defaultFirstName);

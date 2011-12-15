@@ -148,6 +148,7 @@ public class AddEPersonForm extends AbstractDSpaceTransformer
         
         Text email = identity.addItem().addText("email_address");
         email.setRequired();
+        email.setAutofocus("autofocus");
         email.setLabel(T_email_address);
         email.setValue(emailValue);
         if (errors.contains("eperson_email_key")) {

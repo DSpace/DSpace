@@ -105,6 +105,7 @@ public class AuthorizationMain extends AbstractDSpaceTransformer
         actionsList.addLabel(T_actions_item_lookup);
         Item actionItem = actionsList.addItem();
         Text queryField = actionItem.addText("identifier");
+        queryField.setAutofocus("autofocus");
         if (query != null)
         {
             queryField.setValue(query);

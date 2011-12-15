@@ -279,6 +279,16 @@ public abstract class Field extends AbstractWingElement implements
     }
 
     /**
+     * Set the field's autofocus attribute, an HTML5 feature.
+     * Valid input values to enable autofocus are: autofocus, and empty string.
+     * @param value To enable autofocus: "autofocus" or ""
+     */
+    public void setAutofocus(String value)
+    {
+        this.params.setAutofocus(value);
+    }
+
+    /**
      * Declare that this field has a value to be chosen from a choice
      * provider (see ChoicesManager).  Value is a metadata field key
      * naming the field whose choices to use.

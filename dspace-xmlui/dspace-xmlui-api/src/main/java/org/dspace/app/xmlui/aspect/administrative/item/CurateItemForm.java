@@ -132,6 +132,7 @@ public class CurateItemForm extends AbstractDSpaceTransformer {
         }
         curationTaskList.addLabel(T_label_name);
         Select taskSelect = curationTaskList.addItem().addSelect("curate_task");
+        taskSelect.setAutofocus("autofocus");
         taskSelect = FlowCurationUtils.getTaskSelectOptions(taskSelect, curateGroup);
         taskSelect.setSize(1);
         taskSelect.setRequired();

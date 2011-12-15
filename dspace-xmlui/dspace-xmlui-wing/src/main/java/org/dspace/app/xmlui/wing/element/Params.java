@@ -57,6 +57,9 @@ public class Params extends AbstractWingElement implements StructuralElement
 
     /** True if an authority value is required */
     public static final String A_AUTHORITY_REQUIRED = "authorityRequired";
+    
+    /** The name of the HTML5 autofocus field */
+    public static final String A_AUTOFOCUS = "autofocus";
 
     /** The name of the field to use for a list of choices */
     public static final String A_CHOICES = "choices";
@@ -116,6 +119,9 @@ public class Params extends AbstractWingElement implements StructuralElement
 
     /** Value of the Authority_Required attribute */
     protected boolean authority_required = false;
+
+    /** Value of the HTML5 autofocus field */
+    protected String autofocus = null;
 
     /** Value of the Choices attribute */
     protected String choices = null;
@@ -292,6 +298,16 @@ public class Params extends AbstractWingElement implements StructuralElement
     }
 
     /**
+     * Set the field's autofocus attribute, an HTML5 feature.
+     * Valid input values to enable autofocus are: autofocus, and empty string.
+     * @param value
+     */
+    public void setAutofocus(String value)
+    {
+        this.autofocus = value;
+    }
+
+    /**
      *
      * @param fieldKey pre-determined metadata field key
      */
@@ -440,6 +456,11 @@ public class Params extends AbstractWingElement implements StructuralElement
         if (this.choicesClosed)
         {
             attributes.put(A_CHOICES_CLOSED, true);
+        }
+
+        if (this.autofocus != null)
+        {
+            attributes.put(A_AUTOFOCUS, this.autofocus);
         }
 
         startElement(contentHandler, namespaces, E_PARAMS, attributes);

@@ -544,6 +544,7 @@ public class ControlPanel extends AbstractDSpaceTransformer implements Serviceab
         form.addItem(T_alerts_warning);
 
         TextArea message = form.addItem().addTextArea("message");
+        message.setAutofocus("autofocus");
         message.setLabel(T_alerts_message_label);
         message.setSize(5, 45);
         if (SystemwideAlerts.getMessage() == null)

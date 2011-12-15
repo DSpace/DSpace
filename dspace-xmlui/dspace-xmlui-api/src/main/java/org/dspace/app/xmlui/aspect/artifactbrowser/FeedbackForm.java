@@ -110,6 +110,7 @@ public class FeedbackForm extends AbstractDSpaceTransformer implements Cacheable
         List form = feedback.addList("form",List.TYPE_FORM);
         
         Text email = form.addItem().addText("email");
+        email.setAutofocus("autofocus");
         email.setLabel(T_email);
         email.setHelp(T_email_help);
         email.setValue(parameters.getParameter("email",""));

@@ -237,6 +237,11 @@
         <xsl:attribute name="cols"><xsl:value-of select="."/></xsl:attribute>
     </xsl:template>
 
+    <!-- Add the HTML5 autofocus attribute to the input field -->
+    <xsl:template match="@autofocus">
+        <xsl:attribute name="autofocus"><xsl:value-of select="."/></xsl:attribute>
+    </xsl:template>
+
     <!-- The general "catch-all" template for attributes matched, but not handled above -->
     <xsl:template match="@*"></xsl:template>
 

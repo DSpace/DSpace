@@ -198,6 +198,7 @@ public class PasswordLogin extends AbstractDSpaceTransformer implements Cacheabl
         List list = login.addList("password-login",List.TYPE_FORM);
 
         Text email = list.addItem().addText("login_email");
+        email.setAutofocus("autofocus");
         email.setRequired();
         email.setLabel(T_email_address);
         if (previousEmail != null)

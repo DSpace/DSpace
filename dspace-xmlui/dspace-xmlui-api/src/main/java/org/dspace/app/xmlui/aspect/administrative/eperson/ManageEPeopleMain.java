@@ -139,6 +139,7 @@ public class ManageEPeopleMain extends AbstractDSpaceTransformer
         actionsList.addLabel(T_actions_search);
         org.dspace.app.xmlui.wing.element.Item actionItem = actionsList.addItem();
         Text queryField = actionItem.addText("query");
+        queryField.setAutofocus("autofocus");
         if (query != null)
         {
             queryField.setValue(query);

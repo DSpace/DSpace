@@ -91,6 +91,7 @@ public class SelectCollectionStep extends AbstractSubmissionStep
         List list = div.addList("select-collection", List.TYPE_FORM);
         list.setHead(T_head);       
         Select select = list.addItem().addSelect("handle");
+        select.setAutofocus("autofocus");
         select.setLabel(T_collection);
         select.setHelp(T_collection_help);
         

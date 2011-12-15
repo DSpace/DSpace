@@ -122,6 +122,7 @@ public class StartForgotPassword extends AbstractDSpaceTransformer
        
        Text email = form.addItem().addText("email");
        email.setRequired();
+       email.setAutofocus("autofocus");
        email.setLabel(T_email_address);
        email.setHelp(T_email_address_help);
        
