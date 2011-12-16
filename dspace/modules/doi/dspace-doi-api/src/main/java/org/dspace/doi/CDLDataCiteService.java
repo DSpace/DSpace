@@ -15,17 +15,23 @@ import org.apache.commons.httpclient.auth.AuthScope;
 import org.apache.commons.httpclient.methods.*;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.log4j.Logger;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
-import org.dspace.core.ConfigurationManager;
-import org.dspace.core.Email;
-import org.dspace.core.I18nUtil;
+import org.dspace.content.crosswalk.CrosswalkException;
+import org.dspace.content.crosswalk.DIMDisseminationCrosswalk;
+import org.dspace.content.crosswalk.DisseminationCrosswalk;
+import org.dspace.content.crosswalk.XSLTDisseminationCrosswalk;
+import org.dspace.core.*;
 import org.dspace.identifier.IdentifierNotFoundException;
 import org.dspace.identifier.IdentifierNotResolvableException;
 import org.dspace.identifier.IdentifierService;
 import org.dspace.utils.DSpace;
+import org.jdom.Element;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
 public class CDLDataCiteService {
 
@@ -46,6 +52,8 @@ public class CDLDataCiteService {
     public static final String DC_RIGHTS= "dc.rights";
     public static final String DC_DESCRIPTION= "dc.description";
 
+
+    public static final String DATACITE = "datacite";
 
     public static final String DATACITE_CREATOR = "datacite.creator";
     public static final String DATACITE_TITLE = "datacite.title";
@@ -76,14 +84,16 @@ public class CDLDataCiteService {
      *                     the remote service
      */
     public String registerDOI(String aDOI, String aURL, Map<String, String> metadata) throws IOException {
-        changePrefixDOIForTestEnv(aDOI);
 
-        if(aDOI.startsWith("doi")){
-            aDOI = aDOI.substring(4);
+        if(ConfigurationManager.getBooleanProperty("doi.datacite.connected", false)){
+            if(aDOI.startsWith("doi")){
+                aDOI = aDOI.substring(4);
+            }
+
+            PutMethod put = new PutMethod(BASEURL + "/id/doi%3A" + aDOI);
+            return executeHttpMethod(aURL, metadata, put);
         }
-
-        PutMethod put = new PutMethod(BASEURL + "/id/doi%3A" + aDOI);
-        return executeHttpMethod(aURL, metadata, put);
+        return "datacite.notConnected";
     }
 
 
@@ -96,39 +106,46 @@ public class CDLDataCiteService {
      *                     the remote service
      */
     public String update(String aDOI, String aURL, Map<String, String> metadata) throws IOException {
-        changePrefixDOIForTestEnv(aDOI);
 
-        if(aDOI.startsWith("doi")){
-            aDOI = aDOI.substring(4);
+        if(ConfigurationManager.getBooleanProperty("doi.datacite.connected", false)){
+            if(aDOI.startsWith("doi")){
+                aDOI = aDOI.substring(4);
+            }
+
+            PostMethod post = new PostMethod(BASEURL + "/id/doi%3A" + aDOI);
+
+            if(aURL!=null)
+                return executeHttpMethod(aURL, metadata, post);
+
+            return executeHttpMethod(null, metadata, post);
         }
-
-        PostMethod post = new PostMethod(BASEURL + "/id/doi%3A" + aDOI);
-
-        if(aURL!=null)
-            return executeHttpMethod(aURL, metadata, post);
-
-        return executeHttpMethod(null, metadata, post);
+        return "datacite.notConnected";
 
     }
 
+
+
+
     public String lookup(String aDOI) throws IOException {
-        changePrefixDOIForTestEnv(aDOI);
 
-        if(aDOI.startsWith("doi")){
-            aDOI = aDOI.substring(4);
+        if(ConfigurationManager.getBooleanProperty("doi.datacite.connected", false)){
+            if(aDOI.startsWith("doi")){
+                aDOI = aDOI.substring(4);
+            }
+
+            GetMethod get = new GetMethod(BASEURL + "/id/doi%3A" + aDOI);
+            HttpMethodParams params = new HttpMethodParams();
+
+            get.setRequestHeader("Content-Type", "text/plain");
+            get.setRequestHeader("Accept", "text/plain");
+
+            this.getClient(true).executeMethod(get);
+
+
+            String response = get.getResponseBodyAsString();
+            return response;
         }
-
-        GetMethod get = new GetMethod(BASEURL + "/id/doi%3A" + aDOI);
-        HttpMethodParams params = new HttpMethodParams();
-
-        get.setRequestHeader("Content-Type", "text/plain");
-        get.setRequestHeader("Accept", "text/plain");
-
-        this.getClient(true).executeMethod(get);
-
-
-        String response = get.getResponseBodyAsString();
-        return response;
+        return "datacite.notConnected";
     }
 
 
@@ -137,20 +154,20 @@ public class CDLDataCiteService {
         HashMap<String, String> map = new HashMap<String, String>();
 
         if(aURL!=null)
-            map.put("_target", aURL);
+            metadata.put("_target", aURL);
 
         if (log.isDebugEnabled()) {
             log.debug("Adding _target to metadata for update: " + aURL);
         }
 
-        if (metadata != null) {
-	        log.debug("Adding other metadata");
-            map.putAll(metadata);
-	    }
+//        if (metadata != null) {
+//	        log.debug("Adding other metadata");
+//            map.putAll(metadata);
+//	    }
 
-        //logMetadata(metadata);
+        logMetadata(metadata);
 	
-        httpMethod.setRequestEntity(new StringRequestEntity(encodeAnvl(map), "text/plain", "UTF-8"));
+        httpMethod.setRequestEntity(new StringRequestEntity(encodeAnvl(metadata), "text/plain", "UTF-8"));
 
         httpMethod.setRequestHeader("Content-Type", "text/plain");
         httpMethod.setRequestHeader("Accept", "text/plain");
@@ -160,23 +177,22 @@ public class CDLDataCiteService {
     }
 
     private void logMetadata(Map<String, String> metadata) {
-        log.debug("Adding the following Metadata:");
+        System.out.println("Adding the following Metadata:");
         if(metadata!=null){
             Set<String> keys = metadata.keySet();
             for(String key : keys){
-                log.debug(key + ": " + metadata.get(key));
+                System.out.println(key + ": " + metadata.get(key));
             }
         }
     }
 
 
     private String changePrefixDOIForTestEnv(String doi){
-
         // if test env
-//        if(!ConfigurationManager.getBooleanProperty("doi.datacite.connected", false)){
-//            doi = doi.substring(doi.indexOf('/')+1);
-//            doi = "doi:10.5072/" + doi;
-//        }
+        if(ConfigurationManager.getBooleanProperty("doi.datacite.connected", false)){
+            doi = doi.substring(doi.indexOf('/')+1);
+            doi = "doi:10.5072/" + doi;
+        }
         return doi;
     }
 
@@ -290,7 +306,7 @@ public class CDLDataCiteService {
 
 
     private String escape(String s) {
-        return s.replace("%", "%25").replace("\n", "%0A").
+        return s.replace("%", "%25").replace("", "%0A").
                 replace("\r", "%0D").replace(":", "%3A");
     }
 
@@ -313,7 +329,7 @@ public class CDLDataCiteService {
      * @param args
      */
     public static void main(String[] args) throws IOException {
-        String usage = "Usage\nto register or update a specific Item --> class username password doi target register|update  \nto lookup a specific item --> class doi \nto synchronize all the items against dataCite --> class username password synchall";
+        String usage = "Usageto register or update a specific Item --> class username password doi target register|update  to lookup a specific item --> class doi to synchronize all the items against dataCite --> class username password synchall";
         CDLDataCiteService service;
 
 
@@ -373,8 +389,15 @@ public class CDLDataCiteService {
             service = new CDLDataCiteService(username, password);
 
             if (action.equals("register")) {
+
+                if(target.equals("NULL")){
+                    System.out.println("URL must be present!");
+                    System.exit(0);
+                }
+
                 System.out.println(service.registerDOI(doiID, target, metadata));
             } else if (action.equals("update")) {
+                if(target.equals("NULL")) target=null;
                 System.out.println(service.update(doiID, target, metadata));
             } else{
                  System.out.println(usage);
@@ -389,7 +412,7 @@ public class CDLDataCiteService {
         Map<String, String> metadata = new HashMap<String, String>();
 
 	    log.debug("generating DataCite metadata for " + item.getMetadata("dc.title")[0]);
-	
+
         // dc: creator, title, publisher
         addMetadata(metadata, item, "dc.contributor.author", DC_CREATOR);
         addMetadata(metadata, item, "dc.title", DC_TITLE);
@@ -430,10 +453,99 @@ public class CDLDataCiteService {
         addMetadata(metadata, item, "dc.rights.uri", DC_RIGHTS);
         addMetadata(metadata, item, "dc.description", DC_DESCRIPTION);
 
-	   log.debug("DataCite metadata contains " + metadata.size() + " fields");
+	    log.debug("DataCite metadata contains " + metadata.size() + " fields");
 
+
+
+        //metadata= createMetadataListXML(item);
         return metadata;
 
+    }
+
+
+    public static Map<String, String> createMetadataListXML(Item item) {
+        Map<String, String> metadata = new HashMap<String, String>();
+        try {
+            DisseminationCrosswalk dc = (DisseminationCrosswalk) PluginManager.getNamedPlugin(DisseminationCrosswalk.class,"DIM2DATACITE");
+            Element element = dc.disseminateElement(item);
+            XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
+            String xmlout = outputter.outputString(element);
+            
+             xmlout="<resource  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" metadataVersionNumber=\"1\"" +
+                    "lastMetadataUpdate=\"2006-05-04\" xsi:noNamespaceSchemaLocation=\"datacite-metadata-v2.0.xsd\">" +
+                    "<identifier identifierType=\"DOI\">10.5061/DRYAD.2222</identifier>" +
+                    "<creators>" +
+                    "<creator>" +
+                    "<creatorName>Toru, Nozawa</creatorName>" +
+                    "</creator>" +
+                    "<creator>" +
+                    "<creatorName>Utor, Awazon</creatorName>" +
+                    "<nameIdentifier nameIdentifierScheme=\"ISNI\">1422 4586 3573 0476</nameIdentifier>" +
+                    "</creator>" +
+                    "</creators>" +
+                    "<titles>" +
+                    "<title>National Institute for Environmental Studies and Center for Climate System Research Japan</title>" +
+                    "<title titleType=\"Subtitle\">A survey</title>" +
+                    "</titles>" +
+                    "<publisher>World Data Center for Climate (WDCC)</publisher>" +
+                    "<publicationYear>2004</publicationYear>" +
+                    "<subjects>" +
+                    "<subject>Earth sciences and geology</subject>" +
+                    "</subjects>" +
+                    "<contributors>" +
+                    "<contributor contributorType=\"DataManager\">" +
+                    "<contributorName>PANGAEA</contributorName>" +
+                    "</contributor>" +
+                    "<contributor contributorType=\"ContactPerson\">" +
+                    "<contributorName>Doe, John</contributorName>" +
+                    "<nameIdentifier nameIdentifierScheme=\"ORCID\">xyz789</nameIdentifier>" +
+                    "</contributor>" +
+                    "</contributors>" +
+                    "<dates>" +
+                    "<date dateType=\"Valid\">2005-04-05</date>" +
+                    "<date dateType=\"Accepted\">2005-01-01</date>" +
+                    "</dates>" +
+                    "<language>en</language>" +
+                    "<resourceType resourceTypeGeneral=\"Image\">Animation</resourceType>" +
+                    "<alternateIdentifiers>" +
+                    "<alternateIdentifier alternateIdentifierType=\"ISBN\">937-0-1234-56789-X</alternateIdentifier>" +
+                    "</alternateIdentifiers>" +
+                    "<relatedIdentifiers>" +
+                    "<relatedIdentifier relationType=\"IsCitedBy\" relatedIdentifierType=\"DOI\">10.1234/testpub</relatedIdentifier>" +
+                    "<relatedIdentifier relationType=\"Cites\" relatedIdentifierType=\"URN\">http://testing.ts/testpub" +
+                    "</relatedIdentifier>" +
+                    "</relatedIdentifiers>" +
+                    "<sizes>" +
+                    "<size>285 kb</size>" +
+                    "<size>100 pages</size>" +
+                    "</sizes>" +
+                    "<formats>" +
+                    "<format>text/plain</format>" +
+                    "DataCite Metadata Scheme V 2 / January 2011 15" +
+                    "</formats>" +
+                    "<version>1.0</version>" +
+                    "<rights>Open Database License [ODbL]</rights>" +
+                    "<descriptions>" +
+                    "<description descriptionType=\"Other\">" +
+                    "The current xml-example for a DataCite record is the official example from the documentation." +
+                    "<br/>" +
+                    "Please look on datacite.org to find the newest versions of sample data and schemas." +
+                    "</description>" +
+                    "</descriptions>" +
+                    "</resource>";
+            
+            System.out.println(xmlout);
+            metadata.put(DATACITE, xmlout);
+        } catch (CrosswalkException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (SQLException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (AuthorizeException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        } catch (IOException e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+        return metadata;
     }
 
     private static String createSubject(Item item) {
@@ -454,14 +566,14 @@ public class CDLDataCiteService {
             }
         }
 
-        values = item.getMetadata("dc:coverage.spatial");
+        values = item.getMetadata("dc.coverage.spatial");
         if (values != null && values.length > 0){
             for(DCValue temp: values){
                 subject += temp.value + " ";
             }
         }
 
-        values = item.getMetadata("dc:coverage.temporal");
+        values = item.getMetadata("dc.coverage.temporal");
         if (values != null && values.length > 0){
             for(DCValue temp: values){
                 subject += temp.value + " ";
@@ -483,7 +595,7 @@ public class CDLDataCiteService {
         StringBuffer b = new StringBuffer();
         while (i.hasNext()) {
             Map.Entry<String, String> e = i.next();
-            b.append(escape(e.getKey()) + ": " + escape(e.getValue()) + "\n");
+            b.append(escape(e.getKey()) + ": " + escape(e.getValue()) + "");
         }
         return b.toString();
     }

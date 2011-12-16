@@ -2813,8 +2813,8 @@
 	<message key="xmlui.administrative.item.EditItemEmbargoForm.trail">Item Embargo</message>
 	<message key="xmlui.administrative.item.EditItemEmbargoForm.title">Item Embargo</message>
 	<message key="xmlui.administrative.item.EditItemEmbargoForm.legend">Edit item embargo</message>
-    <message key="xmlui.administrative.item.EditItemEmbargoForm.embargo_custom">Embargo Type: custom</message>
-    <message key="xmlui.administrative.item.EditItemEmbargoForm.embargo_curator_note">Curator Note: set embargo to THREE YEARS after article publication</message>
+    <message key="xmlui.administrative.item.EditItemEmbargoForm.embargo_custom">Embargo Type: {0}</message>
+    <message key="xmlui.administrative.item.EditItemEmbargoForm.embargo_curator_note">Curator Note: set embargo to {0} after article publication</message>
     <message key="xmlui.administrative.item.EditItemEmbargoForm.embargo_until">Embargoed Until Date: </message>
     <message key="xmlui.administrative.item.EditItemEmbargoForm.lift_embargo">Lift Embargo Now</message>
 	<message key="xmlui.administrative.item.EditItemEmbargoForm.help">PLEASE NOTE: That the metadata

@@ -57,6 +57,9 @@ public class EditItemEmbargoForm extends AbstractDSpaceTransformer {
 		pageMeta.addTrail().addContent(T_trail);
 	}
 
+
+
+
     public void addBody(Body body) throws SAXException, WingException, UIException, SQLException, IOException, AuthorizeException {
         // Get our parameters and state
         int itemID = parameters.getParameterAsInteger("itemID",-1);
@@ -72,7 +75,7 @@ public class EditItemEmbargoForm extends AbstractDSpaceTransformer {
 
         addOptionsList(baseURL, main);
 
-        Division embargoDiv = createForm(main, dateString);
+        Division embargoDiv = createForm(main, dateString, item);
 
         addButtons(embargoDiv);
 
@@ -88,15 +91,29 @@ public class EditItemEmbargoForm extends AbstractDSpaceTransformer {
         options.addItem().addXref(baseURL + "&view_item", T_option_view);
     }
 
-    private Division createForm(Division main, String dateString) throws WingException {
+    private Division createForm(Division main, String dateString, Item item) throws WingException {
         Division embargoDiv = main.addDivision("edit_embargo_div");
 
-        embargoDiv.addPara().addContent(T_embargo_custom);
+
+        // Embargo Type
+        DCValue[] values = item.getMetadata("dc.type.embargo");
+        String type ="";
+        if(values!=null && values.length > 0){
+            type = values[0].value;
+        }
+        embargoDiv.addPara().addContent(T_embargo_custom.parameterize(type));
 
         Para p = addTextBox(embargoDiv, T_embargo_until, "embargoed_until", dateString, false);
         p.addButton("submit_update").setValue(T_submit_update);
 
-        embargoDiv.addPara().addContent(T_embargo_curator_note);
+
+        // Curator Note
+        values = item.getMetadata("dryad.curatorNote");
+        String curatorNote ="";
+        if(values!=null && values.length > 0){
+            curatorNote = values[0].value;
+        }
+        embargoDiv.addPara().addContent(T_embargo_curator_note.parameterize(curatorNote));
         return embargoDiv;
     }
 
