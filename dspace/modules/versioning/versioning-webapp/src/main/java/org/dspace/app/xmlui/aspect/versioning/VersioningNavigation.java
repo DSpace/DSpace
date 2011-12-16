@@ -192,16 +192,19 @@ public class VersioningNavigation extends AbstractDSpaceTransformer implements C
 
     	if (dso instanceof Item){
     		Item item = (Item) dso;
-            context.setHead(T_context_head);
             if(!isItemADataFile(item) ){
                 if(isCurrentEpersonItemOwner(item) || canCurrentEPersonEditTheItem(item) || isCurrentEpersonACurator()){
-
+                    boolean headAdded=false;
                     if(isLatest(item) && item.isArchived()){
+                        context.setHead(T_context_head);
+                        headAdded=true;
                         context.addItem().addXref(contextPath+"/item/version?itemID="+item.getID(), T_context_create_version);
                     }
 
-                    if(hasVersionHistory(item))
+                    if(hasVersionHistory(item)){
+                        if(!headAdded) context.setHead(T_context_head);
                         context.addItem().addXref(contextPath+"/item/versionhistory?itemID="+item.getID(), T_context_show_version_history);
+                    }
                 }
             }
     	}
