@@ -1247,40 +1247,64 @@ div.primary > ul > li > ul > li.community > div.artifact-description a {
 
 /*Menu*/
 
-#ds-menu-superior { 
-background-color:black;
-
-padding:10px;
-position:inline;
+#topNav { 
+	display:block; 
+	position:relative; 
+	background-color:#000000; 
+	font: 13px Tahoma, Sans-serif; 
 }
-
-#ds-menu-superior ul { 
-list-style-type:none;
-position:relative;
-/*display:inline;*/
+#topNav ul { 
+	padding:0; 
+	margin:0; 
 }
-
-#ds-menu-superior li { 
-list-style-type:none;
-display:inline;
-color:white;
+#topNav li { 
+	position:relative; 
+	float:left; 
+	list-style-type:none; 
 }
-
-#ds-menu-superior li a{ 
-list-style-type:none;
-/*display:inline;*/
-color:#FFFFFF;
+#topNav ul:after { 
+	content:"."; 
+	display:block; 
+	height:0; 
+	clear:both; 
+	visibility:hidden; 
 }
-
-#ds-menu-superior ul li{ 
-list-style-type:none;
-/*display:none;*/
+#topNav li a { 
+	display:block; 
+	padding:7px 20px; 
+	color:#FFFFFF; 
+	text-decoration:none; 
 }
-
-
-#ds-menu-superior li:hover{
-display:inline;
+#topNav li a:focus { 
+	outline: none; 
+	text-decoration: underline; 
 }
+#topNav ul ul { 
+	display:none; 
+	width:210px; 
+	position:absolute; 
+	left:0; 
+	background:#000000;
+}
+#topNav ul ul li { 
+	float:none; 
+}
+#topNav ul ul a:hover { 
+	background-color:#555; 
+}
+#topNav > ul {
+	padding: 0px; 
+	background-color: #000000;
+}
+#topNav a:visited {
+	color: #FFFFFF; 
+}
+#topNav a:hover {
+	color: #FFFFFF; 
+}
+#topNav ul {
+	z-index: 999;
+} 
 
 
 /* Busqueda */

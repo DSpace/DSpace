@@ -189,6 +189,29 @@
                    })();
            </xsl:text></script>
         </xsl:if>
+        
+		<script type="text/javascript">
+			<xsl:text>
+			$(document).ready(function() {
+				//add indicators and hovers to submenu parents
+				$("#topNav li.main").each(function() {
+					if ($(this).children("ul").length) {
+		
+						//show subnav on hover
+						$(this).mouseenter(function() {
+							$(this).children("ul").show();
+						});
+		
+						//hide submenus on exit
+						$(this).mouseleave(function() {
+							$(this).children("ul").hide();
+						});
+					}
+				});
+			});
+			</xsl:text>
+		</script>
+        
     </xsl:template>
     
         <!--
