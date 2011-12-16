@@ -41,6 +41,7 @@
         <module>identifier-services</module>
         <module>api</module>
         <!--<module>discovery</module>-->
+        <module>atmire-workflow</module>
         <module>xmlui</module>
         <module>bagit</module>
         <module>oai</module>

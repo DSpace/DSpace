@@ -90,7 +90,7 @@
         <dependency>
            <groupId>com.atmire</groupId>
            <artifactId>atmire-workflow-xmlui-api</artifactId>
-           <version>1.6.2-SNAPSHOT</version>
+           <version>1.7.2</version>
            <exclusions>
                 <exclusion>
                     <artifactId>ehcache</artifactId>

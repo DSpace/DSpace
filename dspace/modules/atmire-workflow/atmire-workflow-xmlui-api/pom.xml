@@ -1,0 +1,68 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+   <modelVersion>4.0.0</modelVersion>
+   <groupId>com.atmire</groupId>
+    <artifactId>atmire-workflow-xmlui-api</artifactId>
+    <packaging>jar</packaging>
+    <name>Atmire configurable workflow xmlui api</name>
+    <url>atmire.com</url>
+
+    <parent>
+       <groupId>com.atmire</groupId>
+       <artifactId>atmire-workflow</artifactId>
+       <version>1.7.2</version>
+    </parent>
+
+    <repositories>
+       <repository>
+          <id>maven.dspace.org-snapshot</id>
+          <name>DSpace Maven Snapshot Repository</name>
+          <url>http://maven.dspace.org/snapshot</url>
+          <releases>
+             <enabled>false</enabled>
+             <checksumPolicy>fail</checksumPolicy>
+          </releases>
+          <snapshots>
+             <enabled>true</enabled>
+             <checksumPolicy>fail</checksumPolicy>
+          </snapshots>
+       </repository>
+       <repository>
+         <id>atmire.com-releases</id>
+         <name>atmire.com-releases</name>
+         <url>https://atmire.com/artifactory/atmire.com-releases</url>
+         <releases>
+            <enabled>true</enabled>
+            <checksumPolicy>fail</checksumPolicy>
+         </releases>
+         <snapshots>
+            <enabled>true</enabled>
+            <updatePolicy>never</updatePolicy>
+            <checksumPolicy>fail</checksumPolicy>
+         </snapshots>
+      </repository>
+    </repositories>
+
+
+    <!--TODO: add db profiles ?-->
+
+    <dependencies>
+        <dependency>
+            <groupId>com.atmire</groupId>
+            <artifactId>atmire-workflow-api</artifactId>
+            <version>1.7.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.dspace</groupId>
+            <artifactId>dspace-xmlui-api</artifactId>
+            <version>1.7.2</version>
+        </dependency>
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+
+</project>
+
