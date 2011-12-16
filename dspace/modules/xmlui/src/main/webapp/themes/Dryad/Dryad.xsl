@@ -1673,5 +1673,18 @@
     <xsl:template match="dri:options//dri:list[count(child::*)=0]" priority="5" mode="nested"></xsl:template>
     <xsl:template match="dri:options//dri:list[count(child::*)=0]" priority="5"></xsl:template>
 
+    <xsl:template match="dri:options/dri:list" priority="3">
+	<xsl:if test="dri:item">
+	    <xsl:apply-templates select="dri:head"/>
+	    <div>
+		<xsl:call-template name="standardAttributes">
+		    <xsl:with-param name="class">ds-option-set</xsl:with-param>
+		</xsl:call-template>
+		<ul class="ds-simple-list">
+		    <xsl:apply-templates select="dri:item" mode="nested"/>
+		</ul>
+	    </div>
+	</xsl:if>
+    </xsl:template>
 
 </xsl:stylesheet>
