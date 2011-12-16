@@ -792,7 +792,7 @@ border:1px solid #eeeeee;
 ul.ds-artifact-list li.odd {
 background-color:white;
 border-bottom:1px solid #e0e0e0;
-border-top:1px solid #FFFFFF;
+border-top:1px solid #E0E0E0;
 background-image:url(../../images/fondo_li1.gif);
 background-repeat:repeat-x;
 
@@ -800,7 +800,7 @@ background-repeat:repeat-x;
 
 ul.ds-artifact-list li.even {
 background-color:white;
-border-bottom:1px solid #e0e0e0;
+border-bottom:1px solid white;
 border-top:1px solid #FFFFFF;
 background-image:url(../../images/fondo_li2.gif);
 background-repeat:repeat-x;
