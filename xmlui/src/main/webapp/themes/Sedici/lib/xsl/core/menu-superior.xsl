@@ -17,6 +17,12 @@
    <xsl:template name="menuSuperior">
     <div id="topNav">
 	    <ul id="ds-menu-superior">
+			<li class="main">
+				<a href="{$context-path}/"><i18n:text>sedici.menuSuperior.home</i18n:text></a>
+			</li>
+			<li class="main">
+				<a href="{$context-path}/discover"><i18n:text>sedici.menuSuperior.buscar</i18n:text></a>
+			</li>
 	        <li class="main">
 	        	<a href="#"><i18n:text>sedici.menuSuperior.exploracion</i18n:text></a>
 				<ul>
@@ -25,7 +31,6 @@
 					<li><a href="{$context-path}/browse?type=author"><i18n:text>sedici.menuSuperior.exploracion.autor</i18n:text></a></li>
 	        		<li><a href="{$context-path}/browse?type=title"><i18n:text>sedici.menuSuperior.exploracion.titulo</i18n:text></a></li>
 	        		<li><a href="{$context-path}/browse?type=subject"><i18n:text>sedici.menuSuperior.exploracion.tema</i18n:text></a></li>
-	        		<li><a href="{$context-path}/discover"><i18n:text>sedici.menuSuperior.exploracion.filtrar</i18n:text></a></li>
 			    </ul>
 			</li>            
 	        <li class="main">

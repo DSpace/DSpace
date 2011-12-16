@@ -2099,6 +2099,8 @@ este momento. Cuando se usa QDC para los elementos de DSpace se recomienda el us
 <message key="sedici.menuSuperior.informacion.agregacion">Como agrego trabajos?</message>
 <message key="sedici.menuSuperior.informacion.faq">FAQ</message>
 
+<message key="sedici.menuSuperior.home">Inicio</message>
+<message key="sedici.menuSuperior.buscar">Buscar</message>
 <message key="sedici.menuSuperior.contacto">Contacto</message>
 
 <!-- Menu lateral -->
