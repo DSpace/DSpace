@@ -1,8 +1,12 @@
 package org.dspace.submit.step;
 
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.log4j.Logger;
 import org.dspace.content.*;
+import org.dspace.content.crosswalk.IngestionCrosswalk;
 import org.dspace.core.LogManager;
+import org.dspace.core.PluginManager;
 import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.core.Context;
 import org.dspace.core.ConfigurationManager;
@@ -12,13 +16,25 @@ import org.dspace.handle.HandleManager;
 import org.dspace.submit.bean.PublicationBean;
 import org.dspace.submit.model.ModelPublication;
 import org.dspace.workflow.WorkflowRequirementsManager;
+import org.jdom.Element;
+import org.jdom.input.DOMBuilder;
+import org.jdom.input.SAXBuilder;
+import org.omg.CORBA.PUBLIC_MEMBER;
+import org.w3c.dom.Document;
+import org.xml.sax.InputSource;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.stream.StreamSource;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -35,6 +51,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     public static final int STATUS_LICENSE_NOT_ACCEPTED = 2;
     public static final int ERROR_SELECT_JOURNAL = 3;
     public static final int ERROR_INVALID_JOURNAL = 4;
+    public static final int ERROR_PUBMED_DOI = 8;
 
     public static final int DISPLAY_MANUSCRIPT_NUMBER = 5;
     public static final int DISPLAY_CONFIRM_MANUSCRIPT_ACCEPTANCE = 6;
@@ -161,6 +178,134 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             return STATUS_LICENSE_NOT_ACCEPTED;
 
 
+
+        if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_PUBLISHED){
+            String identifier = request.getParameter("article_doi");
+            if(identifier!=null && !identifier.equals("")){
+
+                if(identifier.indexOf('/')!=-1){
+                    if(!processDOI(context, item, identifier))
+                        return ERROR_PUBMED_DOI;
+                }
+                else{
+                   if(!processPubMed(context, item, identifier))
+                        return ERROR_PUBMED_DOI;
+                }
+            }
+
+        }
+        // ARTICLE_STATUS_ACCEPTED ||  ARTICLE_STATUS_IN_REVIEW ||  ARTICLE_STATUS_NOT_YET_SUBMITTED
+        else{
+            if(!processJournal(journalID, manuscriptNumber, item, context, request)){
+
+                if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED) return ENTER_MANUSCRIPT_NUMBER;
+
+                return ERROR_SELECT_JOURNAL;
+            }
+        }
+
+        return STATUS_COMPLETE;
+    }
+
+
+    private boolean processDOI(Context context, Item item, String identifier){
+        if(identifier.startsWith("doi:"))
+            identifier = identifier.replaceFirst("doi:", "");
+        try{
+            Element jElement = retrieveXML("http://api.labs.crossref.org/" + identifier + ".xml");
+            if(jElement != null){
+
+                List<Element> children = jElement.getChildren();
+                if(children.size()==0){
+                    return false;
+                }
+
+                if(!isAValidDOI(jElement)) return false;
+
+                // Use the ingest process to parse the XML document, transformation is done
+                // using XSLT
+                IngestionCrosswalk xwalk = (IngestionCrosswalk) PluginManager.getNamedPlugin(IngestionCrosswalk.class, "DOI");
+
+                xwalk.ingest(context, item, jElement);
+                return true;
+            }
+        }catch (Exception ex){
+            ex.printStackTrace(System.out);
+            return false;
+        }
+        return false;
+
+    }
+
+
+    private boolean processPubMed(Context context, Item item, String identifier){
+        if(!isValidPubmedID(identifier)) return false;
+
+        try{
+            Element jElement = retrieveXML("http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&retmode=xml&id=" + identifier);
+            if(jElement != null){
+
+                List<Element> children = jElement.getChildren();
+                if(jElement.getName().equals("ERROR") || children.size()==0){
+                    return false;
+                }
+
+                // Use the ingest process to parse the XML document, transformation is done
+                // using XSLT
+                IngestionCrosswalk xwalk = (IngestionCrosswalk) PluginManager.getNamedPlugin(IngestionCrosswalk.class, "PUBMED");
+                xwalk.ingest(context, item, jElement);
+                return true;
+            }
+        }catch (Exception ex){
+            return false;
+        }
+        return false;
+    }
+
+    private Element retrieveXML(String urls) throws Exception{
+        SAXBuilder builder = new SAXBuilder();
+        org.jdom.Document doc = builder.build(urls);
+        return doc.getRootElement();
+    }
+
+
+
+    private boolean isValidPubmedID(String pmid){
+        try{
+            // A valid PMID will be parseable as an integer
+            return (Integer.parseInt(pmid, 10) > 0);
+        }
+        catch (NumberFormatException nfe){
+            return false;
+        }
+    }
+
+
+    private static boolean isAValidDOI(Element element) {
+        List<Element> children = element.getChildren();
+        for(Element e : children){
+            if(e.getName().equals("doi_record")){
+                List<Element> doiRecordsChildren = e.getChildren();
+                for(Element e1 : doiRecordsChildren){
+
+                    if(e1.getName().equals("crossref")){
+                        List<Element> crossRefChildren = e1.getChildren();
+                        for(Element e2 : crossRefChildren){
+                            if(e2.getName().equals("error")){
+                                return false;
+                            }
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+
+    private boolean processJournal(String journalID, String manuscriptNumber, Item item, Context context, HttpServletRequest request) throws AuthorizeException, SQLException {
+
         //We have selected to choose a journal, retrieve it
         if(!journalID.equals("other")){
             if(!integratedJournals.contains(journalID) || (integratedJournals.contains(journalID) && manuscriptNumber != null && manuscriptNumber.trim().equals(""))){
@@ -198,17 +343,16 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                     }
                     item.update();
                 }else{
-                    //Add the error to our session so we know which one to display
                     request.getSession().setAttribute("submit_error", pBean.getMessage());
-                    if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED)
-                        return ENTER_MANUSCRIPT_NUMBER;
-                    return ERROR_SELECT_JOURNAL;
+                    return false;
                 }
             }
         }
-
-        return STATUS_COMPLETE;
+        return true;
     }
+
+
+
 
     private void importJournalMetadata(Context context, Item item, PublicationBean pBean){
         addSingleMetadataValueFromJournal(context, item, "journalName", pBean.getJournalName());
@@ -286,4 +430,52 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         return stepAccessible;
 //        return item.getMetadata(MetadataSchema.DC_SCHEMA, "relation", "ispartof", Item.ANY).length == 0;
     }
+
+
+
+    ////////// TEST ///////////////////////////////////////////
+//    public static void main(String[] args) {
+//        Element jElement = null;
+//        try {
+//            //jElement = retrieveXMLMain("http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&retmode=xml&id=22167771");
+//            jElement = retrieveXMLMain("http://api.labs.crossref.org/10.2307/1935157.xml");
+//            if (jElement != null) {
+//
+//                List<Element> children = jElement.getChildren();
+//                printXML(jElement);
+//
+//                if(!checkDOIXML(jElement))
+//                    System.out.println("ERROR!");
+//                else
+//                    System.out.println("OK!");
+//
+//
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+//        }
+//
+//    }
+//
+//
+//
+//    static private Element retrieveXMLMain(String urls) throws Exception{
+//        SAXBuilder builder = new SAXBuilder();
+//        org.jdom.Document doc = builder.build(urls);
+//        return doc.getRootElement();
+//
+//    }
+//
+//    static private void printXML(Element root){
+//
+//        List<Element> children = root.getChildren();
+//         if(children.size() > 0){
+//            for(Element e : children){
+//                printXML(e);
+//            }
+//         }
+//         else{
+//             System.out.println(root.getName() + ":" + root.getValue());
+//         }
+//    }
 }

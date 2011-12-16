@@ -108,7 +108,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         addArticleStatusRadios(request, form);
 
         // case A (published selected): this fields will be displayed.
-        addDOIField(form);
+        addFieldsStatusPublished(request, form);
 
         //Get all the data required
         boolean pubIdError = this.errorFlag == org.dspace.submit.step.SelectPublicationStep.STATUS_INVALID_PUBLICATION_ID;
@@ -191,13 +191,23 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
             licensebox.addError(T_PUB_LICENSE_ERROR);
     }
 
-    private void addDOIField(List form) throws WingException {
+    private void addFieldsStatusPublished(Request request, List form) throws WingException {
         List doi = form.addList("doi");
         Text textArticleDOI = doi.addItem().addText("article_doi");
         textArticleDOI.setLabel(T_enter_article_doi);
+        if(request.getParameter("article_doi") != null)
+            textArticleDOI.setValue(request.getParameter("article_doi"));
+
+
         doi.addItem().addContent("OR");
         CheckBox cb = doi.addItem().addCheckBox("unknown_doi");
         cb.addOption(String.valueOf(Boolean.TRUE), T_unknown_doi);
+
+        if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_PUBMED_DOI){
+            textArticleDOI.addError("Invalid Identifier.");
+        }
+
+
     }
 
     private void addArticleStatusRadios(Request request, List form) throws WingException {
@@ -250,7 +260,6 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         }
 
         journalID.setLabel(T_SELECT_LABEL_NEW);
-        //journalID.setHelp(T_SELECT_HELP);
         if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_INVALID_JOURNAL)
             journalID.addError(T_SELECT_ERROR);
 
@@ -325,4 +334,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     public List addReviewSection(List list) throws SAXException, WingException, SQLException, IOException, AuthorizeException {
         return null;
     }
+
+
+
 }

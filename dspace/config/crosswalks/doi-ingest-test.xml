@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doi_records>
+  <doi_record owner="10.2307" timestamp="2007-08-06 17:39:47">
+    <crossref>
+      <journal>
+        <journal_metadata>
+          <full_title>Ecology</full_title>
+          <abbrev_title>Ecology</abbrev_title>
+          <issn media_type="print">00129658</issn>
+
+        </journal_metadata>
+        <journal_issue>
+          <publication_date media_type="print">
+            <month>05</month>
+            <year>1974</year>
+          </publication_date>
+          <journal_volume>
+            <volume>55</volume>
+
+          </journal_volume>
+          <issue>3</issue>
+        </journal_issue>
+        <journal_article publication_type="full_text">
+          <titles>
+            <title>Preadult Competition between Drosophila Pavani and Drosophila Melanogaster, Drosophila Simulans, and Drosophila Willistoni</title>
+          </titles>
+          <contributors>
+
+            <person_name sequence="first" contributor_role="author">
+              <given_name>Myriam</given_name>
+              <surname>Budnik</surname>
+            </person_name>
+            <person_name sequence="additional" contributor_role="author">
+              <given_name>Danko</given_name>
+              <surname>Brncic</surname>
+
+            </person_name>
+          </contributors>
+          <publication_date media_type="print">
+            <month>05</month>
+            <year>1974</year>
+          </publication_date>
+          <pages>
+            <first_page>657</first_page>
+
+          </pages>
+          <doi_data>
+            <doi>10.2307/1935157</doi>
+            <timestamp>20061118220624</timestamp>
+            <resource>http://www.jstor.org/stable/1935157?origin=crossref</resource>
+          </doi_data>
+        </journal_article>
+
+      </journal>
+    </crossref>
+  </doi_record>
+</doi_records>

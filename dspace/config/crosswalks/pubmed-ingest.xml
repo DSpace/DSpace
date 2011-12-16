@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<!DOCTYPE PubmedArticleSet PUBLIC "-//NLM//DTD PubMedArticle, 1st January 2011//EN" "http://www.ncbi.nlm.nih.gov/entrez/query/DTD/pubmed_110101.dtd">
+<PubmedArticleSet>
+<PubmedArticle>
+    <MedlineCitation Owner="NLM" Status="Publisher">
+        <PMID Version="1">22167771</PMID>
+        <DateCreated>
+            <Year>2011</Year>
+            <Month>12</Month>
+
+            <Day>14</Day>
+        </DateCreated>
+        <Article PubModel="Print-Electronic">
+            <Journal>
+                <ISSN IssnType="Electronic">1526-7598</ISSN>
+                <JournalIssue CitedMedium="Internet">
+                    <PubDate>
+                        <Year>2011</Year>
+
+                        <Month>Dec</Month>
+                        <Day>13</Day>
+                    </PubDate>
+                </JournalIssue>
+                <Title>Anesthesia and analgesia</Title>
+            </Journal>
+            <ArticleTitle>Determination of Minimum Alveolar Concentration for Isoflurane and Sevoflurane in a Rodent Model of Human Metabolic Syndrome.</ArticleTitle>
+
+            <Pagination>
+                <MedlinePgn/>
+            </Pagination>
+            <Abstract>
+                <AbstractText>Background:Morbid obesity affects the pharmacokinetics and pharmacodynamics of anesthetics, which may result in inappropriate dosing. We hypothesized that obesity significantly alters the minimum alveolar concentration (MAC) for isoflurane and sevoflurane. To test this hypothesis, we used a rodent model of human metabolic syndrome developed through artificial selection for inherent low aerobic capacity runners (LCR) and high aerobic capacity runners (HCR). The LCR rats are obese, display phenotypes homologous to those characteristic of human metabolic syndrome, and exhibit low running endurance. In contrast, HCR rats have high running endurance and are characterized by improved cardiovascular performance and overall health.Methods:Male and female LCR (n = 10) and HCR (n = 10) rats were endotracheally intubated and maintained on mechanical ventilation with either isoflurane or sevoflurane. A bracketing design was used to determine MAC; sensory stimulation was induced by tail clamping. An equilibration period of 30 minutes was provided before and between the consecutive tail clamps. Two-tailed parametric (unpaired t test) and nonparametric (Mann-Whitney test) statistics were used for the comparison of MAC between LCR and HCR rats. The data are reported as mean ± sd along with the 95% confidence interval. A P value of &lt;0.05 was considered statistically significant.Results:The MAC for isoflurane in LCR rats (1.52% ± 0.13%) was similar to previously reported isoflurane-MAC for normal rats (1.51% ± 0.12%). The HCR rats showed a significantly higher isoflurane-MAC (1.90% ± 0.19%) than did the LCR rats (1.52% ± 0.13%) (P = 0.0001). The MAC for sevoflurane was not significantly different between LCR and HCR rats and was similar to the previously published sevoflurane-MAC for normal rats (2.4% ± 0.30%). There was no influence of sex on the MAC of either isoflurane or sevoflurane.Conclusion:Obesity and associated comorbidities do not affect anesthetic requirements as measured by MAC in a rodent model of metabolic syndrome. By contrast, high aerobic capacity is associated with a higher MAC for isoflurane and may be a risk factor for subtherapeutic dosing.</AbstractText>
+            </Abstract>
+            <Affiliation>From the Department of Anesthesiology, University of Michigan Medical School, Ann Arbor, Michigan.</Affiliation>
+
+            <AuthorList>
+                <Author>
+                    <LastName>Pal</LastName>
+                    <ForeName>Dinesh</ForeName>
+                    <Initials>D</Initials>
+                </Author>
+                <Author>
+
+                    <LastName>Walton</LastName>
+                    <ForeName>Meredith E</ForeName>
+                    <Initials>ME</Initials>
+                </Author>
+                <Author>
+                    <LastName>Lipinski</LastName>
+                    <ForeName>William J</ForeName>
+
+                    <Initials>WJ</Initials>
+                </Author>
+                <Author>
+                    <LastName>Koch</LastName>
+                    <ForeName>Lauren G</ForeName>
+                    <Initials>LG</Initials>
+                </Author>
+
+                <Author>
+                    <LastName>Lydic</LastName>
+                    <ForeName>Ralph</ForeName>
+                    <Initials>R</Initials>
+                </Author>
+                <Author>
+                    <LastName>Britton</LastName>
+
+                    <ForeName>Steve L</ForeName>
+                    <Initials>SL</Initials>
+                </Author>
+                <Author>
+                    <LastName>Mashour</LastName>
+                    <ForeName>George A</ForeName>
+                    <Initials>GA</Initials>
+
+                </Author>
+            </AuthorList>
+            <Language>ENG</Language>
+            <PublicationTypeList>
+                <PublicationType>JOURNAL ARTICLE</PublicationType>
+            </PublicationTypeList>
+            <ArticleDate DateType="Electronic">
+                <Year>2011</Year>
+
+                <Month>12</Month>
+                <Day>13</Day>
+            </ArticleDate>
+        </Article>
+        <MedlineJournalInfo>
+            <MedlineTA>Anesth Analg</MedlineTA>
+            <NlmUniqueID>1310650</NlmUniqueID>
+
+            <ISSNLinking>0003-2999</ISSNLinking>
+        </MedlineJournalInfo>
+    </MedlineCitation>
+    <PubmedData>
+        <History>
+            <PubMedPubDate PubStatus="entrez">
+                <Year>2011</Year>
+                <Month>12</Month>
+
+                <Day>15</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="pubmed">
+                <Year>2011</Year>
+                <Month>12</Month>
+
+                <Day>15</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+            <PubMedPubDate PubStatus="medline">
+                <Year>2011</Year>
+                <Month>12</Month>
+
+                <Day>15</Day>
+                <Hour>6</Hour>
+                <Minute>0</Minute>
+            </PubMedPubDate>
+        </History>
+        <PublicationStatus>aheadofprint</PublicationStatus>
+        <ArticleIdList>
+
+            <ArticleId IdType="pii">ANE.0b013e31823ede22</ArticleId>
+            <ArticleId IdType="doi">10.1213/ANE.0b013e31823ede22</ArticleId>
+            <ArticleId IdType="pubmed">22167771</ArticleId>
+        </ArticleIdList>
+    </PubmedData>
+</PubmedArticle>
+
+
+</PubmedArticleSet>
