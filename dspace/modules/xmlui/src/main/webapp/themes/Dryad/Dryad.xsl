@@ -1515,7 +1515,7 @@
       <!-- First submission form: STATUS: PUBLISHED - journalID Select + Manuscript Number Edit Box -->
       <xsl:template match="dri:list[@n='doi']">
           <li id="aspect_submission_StepTransformer_list_doi">
-          <table style="border: 2px solid gray; float:right; display:inline-block; margin-top:-65px; margin-right:500px; padding:10px; width:50%;">
+          <table style="border: 2px solid gray; float:right; display:inline-block; margin-top:-65px; margin-right:300px; padding:10px; width:50%;">
               <tr>
 		<xsl:for-each select="dri:item/dri:field">
 		    <xsl:variable name="currentId"><xsl:value-of select="@id"/></xsl:variable>
