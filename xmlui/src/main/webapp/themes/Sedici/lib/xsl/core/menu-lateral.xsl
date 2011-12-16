@@ -51,7 +51,7 @@
 				 -->
 				
 				<!-- Genero la seccion de la cuenta del usuario -->
-				<xsl:if test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
+			<!-- <xsl:if test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
     				<div id="div-menu-lateral-cuenta">
     				   <div id='div-menu-lateral-cuenta-superior'>
     				      <div id='div-menu-lateral-cuenta-superior-izquierdo'>
@@ -73,8 +73,9 @@
     				   </div>
     				
     				</div>
-    			</xsl:if>
-    			
+    			</xsl:if>    			
+    			  -->	
+    			  
     			<!-- Genero la seccion del contexto-->	
                 <xsl:apply-templates select="dri:list[@id='aspect.viewArtifacts.Navigation.list.context']"/>
 

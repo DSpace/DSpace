@@ -84,7 +84,87 @@
         </html>
     </xsl:template>
    
+   <!-- The header (distinct from the HTML head element) contains the title, subtitle, login box and various
+        placeholders for header images -->
+    <xsl:template name="buildHeader">
+        <div id="ds-header-wrapper">
+            <div id="ds-header" class="clearfix">
+                <a id="ds-header-logo-link">
+                    <xsl:attribute name="href">
+                        <xsl:value-of
+                                select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                        <xsl:text>/</xsl:text>
+                    </xsl:attribute>
+                    <span id="ds-header-logo">&#160;</span>
+                    <span id="ds-header-logo-text">mirage</span>
+                </a>
+                <h1 class="pagetitle visuallyhidden">
+                    <xsl:choose>
+                        <!-- protectiotion against an empty page title -->
+                        <xsl:when test="not(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title'])">
+                            <xsl:text> </xsl:text>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:copy-of
+                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='title']/node()"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+
+                </h1>
+                <h2 class="static-pagetitle visuallyhidden">
+                    <i18n:text>xmlui.dri2xhtml.structural.head-subtitle</i18n:text>
+                </h2>
+
+
+                <xsl:choose>
+                    <xsl:when test="/dri:document/dri:meta/dri:userMeta/@authenticated = 'yes'">
+                    <!-- Genero la seccion de la cuenta del usuario -->
+                    <div id="ds-user-box">
+    				   <div id='div-menu-lateral-cuenta-superior'>
+    				      <div id='div-menu-lateral-cuenta-superior-izquierdo'>
+    				      	<h1><i18n:text>sedici.menuLateral.cuenta.usuario</i18n:text></h1>
+    				      	<h2><xsl:call-template name="buildUsuarioName"/></h2>
+    				      </div>
+    				      <div id='div-menu-lateral-cuenta-superior-derecho'>
+    				      	<a href="{$context-path}/logout"><i18n:text>sedici.menuLateral.cuenta.logout</i18n:text></a>
+    				      </div>
+    				   </div>
+    				   <div id='div-menu-lateral-cuenta-inferior'>
+    				       <ul>
+    				          <li><a href="{$context-path}/profile"><i18n:text>sedici.menuLateral.cuenta.perfil</i18n:text></a></li>
+    				          <li><a href="{$context-path}/submissions"><i18n:text>sedici.menuLateral.cuenta.submissions</i18n:text></a></li>
+    				          <xsl:if test="count(dri:list[@id='aspect.viewArtifacts.Navigation.list.account']/dri:item)>3">
+    				          	<li><a href="{$context-path}/admin/export"><i18n:text>sedici.menuLateral.cuenta.export</i18n:text></a></li>
+    				          </xsl:if>
+    				       </ul>
+    				   </div>
+    				
+    				</div>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <div id="ds-user-box">
+                            <p>
+                                <a>
+                                    <xsl:attribute name="href">
+                                        <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/
+                                        dri:metadata[@element='identifier' and @qualifier='loginURL']"/>
+                                    </xsl:attribute>
+                                    <i18n:text>xmlui.dri2xhtml.structural.login</i18n:text>
+                                </a>
+                            </p>
+                        </div>
+                    </xsl:otherwise>
+                </xsl:choose>
+
+            </div>
+        </div>
+    </xsl:template>
     
+    <xsl:template name="buildUsuarioName">
+        <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier' and @qualifier='firstName']"/>
+        <xsl:text> </xsl:text>
+        <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier' and @qualifier='lastName']"/>
+    </xsl:template>
   
     <xsl:template name="addJavascript">
         <xsl:variable name="jqueryVersion">

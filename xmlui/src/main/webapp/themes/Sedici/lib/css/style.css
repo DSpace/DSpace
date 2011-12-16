@@ -1244,7 +1244,6 @@ div.primary > ul > li > ul > li.community > div.artifact-description a {
 	color: green;
 }
 
-
 /*Menu*/
 
 #topNav { 
@@ -1312,3 +1311,8 @@ div.primary > ul > li > ul > li.community > div.artifact-description a {
 #aspect_discovery_SimpleSearch_div_search-controls {
 background-color:white;
 }
+
+#aspect_administrative_authorization_EditPolicyForm_field_group_id{
+	height: auto;
+}
+
