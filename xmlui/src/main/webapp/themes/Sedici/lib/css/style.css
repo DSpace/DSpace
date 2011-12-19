@@ -97,7 +97,7 @@ select.multiple {
 }
 
 #ds-user-box a{
-    color: white;
+    color: #08597c;
 	text-decoration:none;
 }
 
@@ -1273,7 +1273,10 @@ div.primary > ul > li > ul > li.community > div.artifact-description a {
 	padding:7px 20px; 
 	color:#FFFFFF; 
 	text-decoration:none; 
+	font-family:Arial, Helvetica, sans-serif;
+	font-size:14px;
 }
+
 #topNav li a:focus { 
 	outline: none; 
 	text-decoration: underline; 
@@ -1289,11 +1292,13 @@ div.primary > ul > li > ul > li.community > div.artifact-description a {
 	float:none; 
 }
 #topNav ul ul a:hover { 
-	background-color:#555; 
+	background-color:#64a7cd; 
 }
 #topNav > ul {
 	padding: 0px; 
 	background-color: #000000;
+	position:relative;
+	left:40px;
 }
 #topNav a:visited {
 	color: #FFFFFF; 
@@ -1305,7 +1310,7 @@ div.primary > ul > li > ul > li.community > div.artifact-description a {
 	z-index: 999;
 } 
 #topNav ul li:hover {
-	background-color:#555;
+	background-color:#64a7cd;
 }
 
 
@@ -1319,3 +1324,69 @@ background-color:white;
 	height: auto;
 }
 
+
+/*login*/
+#ds-user-box {
+width:200px;
+/*background-color: #b0d4ef;*/
+padding:10px;
+border:1px dashed white;
+color:#1b86b4;
+}
+
+
+
+#ds-user-box h1{
+font-size:12px;
+/*color:#1b86b4;*/
+color:white;
+}
+
+#ds-user-box h2{
+
+font-size:16px;
+color:white;
+}
+
+#div-menu-lateral-cuenta-superior-derecho {
+float:right;
+position:absolute;
+right:12px;
+}
+
+#div-menu-lateral-cuenta-superior-izquierdo {
+float:left;
+}
+
+#div-menu-lateral-cuenta-superior {
+font-size:12px;
+float:left;
+clear:both;
+display:block;
+border-bottom:1px dashed white;
+padding-bottom:8px;
+}
+
+#div-menu-lateral-cuenta-inferior {
+clear:both;
+padding:0px;
+margin:0px;
+/*background-color:#e6f4ff;*/
+padding:10px 3px 3px 3px;
+}
+
+#ds-user-box ul li{
+list-style-type:none;
+position:relative;
+left:-20px;
+}
+
+#ds-user-box ul li a:hover{
+text-decoration:underline;!important
+color:#000000;!important
+}
+
+#div-menu-lateral-cuenta-superior a:hover{
+    color: red;
+	text-decoration:none;
+}
