@@ -6,6 +6,7 @@ INSERT INTO metadataschemaregistry VALUES (4, 'http://path.to.etd.namespace', 't
   
   -- Nuevos metadatos  
   -- INSERT INTO metadatafieldregistry (metadata_field_id, metadata_schema_id, element, qualifier, scope_note);
+INSERT INTO metadatafieldregistry VALUES (getnextid('metadatafieldregistry'),1,'subtype',null,'Subtipo de un documento');
 INSERT INTO metadatafieldregistry VALUES (getnextid('metadatafieldregistry'),1,'contributor','director','Director de una Tesis');
 INSERT INTO metadatafieldregistry VALUES (getnextid('metadatafieldregistry'),1,'contributor','codirector','Co-Director de una Tesis');
 INSERT INTO metadatafieldregistry VALUES (getnextid('metadatafieldregistry'),1,'identifier','doi','Identificar DOI');

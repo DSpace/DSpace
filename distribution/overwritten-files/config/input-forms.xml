@@ -41,6 +41,8 @@
 
 			<page number="1">
 
+				<!-- /////////////////// SELECCION DE TIPO Y SUBTIPO /////////////////// -->
+				
 				<!-- Tipo de documento: determina la carga de otros metadatos -->
 				<field>
 					<dc-schema>dc</dc-schema>
@@ -52,6 +54,124 @@
 					<hint>Seleccione el Tipo de Documento que desea cargar</hint>
 					<required>Debe seleccionar un tipo de documento, ya que el proceso de carga dependerá de su elección</required>
 				</field>
+
+				<!-- 
+				Sub-tipo de documento: clasificación específica hecha por administradores.
+				Dado que no hay manera de hacer dos combos dependientes, se genera una combo para cada 
+				posible tipo de documento seleccionado en el campo anterior (dc.type).
+				Esto, además de ser una solución muy mala, tiene el problema de que las opciones que 
+				se ofrecen en el workflow son solo aquellas que corresponden al tipo principal seleccionado
+				en el proceso de submit. Si se desea cambiar el tipo principal del documento, primero debe
+				pasarse a la pagina siguiente (para que se actualice el valor del metadato dc.type) y luego
+				volver a esta pagina.
+				La ventaja de esta solución "mala" es que es muy rápida. :)
+				-->
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>subtype</dc-element>
+					<dc-qualifier></dc-qualifier>
+					<repeatable></repeatable>
+					<label>Especifique el tipo de Artículo</label>
+					<input-type value-pairs-name="common_subtypes_article">dropdown</input-type>
+					<hint>Seleccione el tipo de artículo que desea cargar</hint>
+					<required>Debe seleccionar un subtipo de documento</required>
+					<visibility>workflow</visibility>
+					<type-bind>article</type-bind>
+				</field>
+
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>subtype</dc-element>
+					<dc-qualifier></dc-qualifier>
+					<repeatable></repeatable>
+					<label>Especifique el tipo de Tesis</label>
+					<input-type value-pairs-name="common_subtypes_thesis">dropdown</input-type>
+					<hint>Seleccione el tipo de tesis que desea cargar</hint>
+					<required>Debe seleccionar un subtipo de documento</required>
+					<visibility>workflow</visibility>
+					<type-bind>thesis</type-bind>
+				</field>
+
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>subtype</dc-element>
+					<dc-qualifier></dc-qualifier>
+					<repeatable></repeatable>
+					<label>Especifique el tipo de Libro</label>
+					<input-type value-pairs-name="common_subtypes_book">dropdown</input-type>
+					<hint>Seleccione el tipo de libro que desea cargar</hint>
+					<required>Debe seleccionar un subtipo de documento</required>
+					<visibility>workflow</visibility>
+					<type-bind>book</type-bind>
+				</field>
+
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>subtype</dc-element>
+					<dc-qualifier></dc-qualifier>
+					<repeatable></repeatable>
+					<label>Especifique el tipo de Objeto de Conferencia</label>
+					<input-type value-pairs-name="common_subtypes_conferenceObject">dropdown</input-type>
+					<hint>Seleccione el tipo de objeto de conferencia que desea cargar</hint>
+					<required>Debe seleccionar un subtipo de documento</required>
+					<visibility>workflow</visibility>
+					<type-bind>conferenceObject</type-bind>
+				</field>
+
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>subtype</dc-element>
+					<dc-qualifier></dc-qualifier>
+					<repeatable></repeatable>
+					<label>Especifique el tipo de Documento Institucional</label>
+					<input-type value-pairs-name="common_subtypes_institutionalDocument">dropdown</input-type>
+					<hint>Seleccione el tipo de documento institucional que desea cargar</hint>
+					<required>Debe seleccionar un subtipo de documento</required>
+					<visibility>workflow</visibility>
+					<type-bind>institutionalDocument</type-bind>
+				</field>
+
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>subtype</dc-element>
+					<dc-qualifier></dc-qualifier>
+					<repeatable></repeatable>
+					<label>Especifique el tipo de Imagen Fija</label>
+					<input-type value-pairs-name="common_subtypes_fixedImage">dropdown</input-type>
+					<hint>Seleccione el tipo de imagen fija que desea cargar</hint>
+					<required>Debe seleccionar un subtipo de documento</required>
+					<visibility>workflow</visibility>
+					<type-bind>fixedImage</type-bind>
+				</field>
+
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>subtype</dc-element>
+					<dc-qualifier></dc-qualifier>
+					<repeatable></repeatable>
+					<label>Especifique el tipo de Imagen en Movimiento</label>
+					<input-type value-pairs-name="common_subtypes_movingImage">dropdown</input-type>
+					<hint>Seleccione el tipo de imagen en movimiento que desea cargar</hint>
+					<required>Debe seleccionar un subtipo de documento</required>
+					<visibility>workflow</visibility>
+					<type-bind>movingImage</type-bind>
+				</field>
+
+				<field>
+					<dc-schema>dc</dc-schema>
+					<dc-element>subtype</dc-element>
+					<dc-qualifier></dc-qualifier>
+					<repeatable></repeatable>
+					<label>Especifique el tipo de Audio</label>
+					<input-type value-pairs-name="common_subtypes_audio">dropdown</input-type>
+					<hint>Seleccione el tipo de audio que desea cargar</hint>
+					<required>Debe seleccionar un subtipo de documento</required>
+					<visibility>workflow</visibility>
+					<type-bind>audio</type-bind>
+				</field>
+
+				<!-- /////////////////// FIN DE LOS TYPES Y SUBTYPES /////////////////// -->
+				
 
 				<!-- Autor (persona) -->
 				<!-- TODO Hay que hacerlo controlado -->
@@ -304,7 +424,7 @@
 					<input-type>onebox</input-type>
 					<hint>ISSN de la revista en la que el artículo fué publicado</hint>
 					<required></required>
-					<type-bind>article,preprint,workingPaper,comunication,review,journalContribution,report,conferenceObject</type-bind>
+					<type-bind>article,conferenceObject</type-bind>
 				</field>
 
 				<!-- ISBN - TESIS (opcional) -->
@@ -317,7 +437,7 @@
 					<input-type>onebox</input-type>
 					<hint>Si la tésis cuenta con un ISBN, éste debe ser ingresado aquí</hint>
 					<required></required>
-					<type-bind>doctoralThesis,masterThesis,bachelorThesis,specializationThesis,conferenceObject</type-bind>
+					<type-bind>thesis,conferenceObject</type-bind>
 				</field>
 				
 				<!-- ISBN - LIBROS (obligatorio) -->
@@ -356,7 +476,7 @@
 					<hint>Título y volúmen de la revista en la que el artículo fué publicado</hint>
 					<required>Debe proveer la información de la revista en la que el artículo fue publicado</required>
 					<required-on-group>SeDiCIAdmin</required-on-group>
-					<type-bind>article,preprint,workingPaper,comunication,review,journalContribution,report</type-bind>
+					<type-bind>article</type-bind>
 				</field>
 				
 				<!-- Dossier -->
@@ -369,7 +489,7 @@
 					<input-type>onebox</input-type>
 					<hint>Nombre de la sección Dossier en la que el artículo se encuentra</hint>
 					<required></required>
-					<type-bind>article,preprint,workingPaper,comunication,review,journalContribution,report</type-bind>
+					<type-bind>article</type-bind>
 					<visibility>workflow</visibility>
 				</field>
 
@@ -383,7 +503,7 @@
 					<input-type value-pairs-name="common_evaluations">dropdown</input-type>
 					<hint>Tipo de evaluación a la que el recurso fue sometido</hint>
 					<required></required>
-					<type-bind>article,preprint,workingPaper,comunication,review,journalContribution,report,conferenceObject</type-bind>
+					<type-bind>article,conferenceObject</type-bind>
 				</field>
 
 				<!-- Fecha de exposición de tesis -->
@@ -396,7 +516,7 @@
 					<input-type>date</input-type>
 					<hint>Fecha en la que se expuso el trabajo para su aprobación</hint>
 					<required></required>
-					<type-bind>doctoralThesis,masterThesis,bachelorThesis,specializationThesis,conferenceObject</type-bind>
+					<type-bind>thesis,conferenceObject</type-bind>
 				</field>
 
 				<!-- Nombre del evento -->
@@ -438,7 +558,7 @@
 					<input-type>onebox</input-type>
 					<hint>Nombre del director de la Tésis</hint>
 					<required>Debe indicar el nombre del director de la tesis</required>
-					<type-bind>doctoralThesis,masterThesis,bachelorThesis,specializationThesis</type-bind>
+					<type-bind>thesis</type-bind>
 				</field>
 
 				<!-- CoDirecotor de tesis -->
@@ -451,7 +571,7 @@
 					<input-type>onebox</input-type>
 					<hint>Nombre de los co-directores de la Tésis</hint>
 					<required></required>
-					<type-bind>doctoralThesis,masterThesis,bachelorThesis,specializationThesis</type-bind>
+					<type-bind>thesis</type-bind>
 				</field>
 
 				<!-- Jurado de tesis -->
@@ -464,7 +584,7 @@
 					<input-type>onebox</input-type>
 					<hint>Nombre de los miembros del jurado que evaluaron el trabajo</hint>
 					<required></required>
-					<type-bind>doctoralThesis,masterThesis,bachelorThesis,specializationThesis</type-bind>
+					<type-bind>thesis</type-bind>
 				</field>
 
 				<!-- Lugar de desarrollo de la tesis -->
@@ -477,7 +597,7 @@
 					<input-type>onebox</input-type>
 					<hint>Institución en donde se desarrollo el trabajo de tesis</hint>
 					<required>Debe ingresar la institución en la cual se desarrolló a cabo la tesis</required>
-					<type-bind>doctoralThesis,masterThesis,bachelorThesis,specializationThesis</type-bind>
+					<type-bind>thesis</type-bind>
 				</field>
 
 				<!-- Grado alcanzado -->
@@ -491,7 +611,7 @@
 					<input-type>onebox</input-type>
 					<hint>Grado al que el tesista accede</hint>
 					<required>Debe seleccionar el Grado Alcanzado</required>
-					<type-bind>doctoralThesis,masterThesis,bachelorThesis,specializationThesis</type-bind>
+					<type-bind>thesis</type-bind>
 					<visibility>workflow</visibility>
 				</field>
 
@@ -506,7 +626,7 @@
 					<input-type>onebox</input-type>
 					<hint>Institución que respalda el trabajo de tesis y el grado obtenido por el mismo</hint>
 					<required></required>
-					<type-bind>doctoralThesis,masterThesis,bachelorThesis,specializationThesis</type-bind>
+					<type-bind>thesis</type-bind>
 					<visibility>workflow</visibility>
 				</field>
 
@@ -635,44 +755,8 @@
 				<stored-value>article</stored-value>
 			</pair>
 			<pair>
-				<displayed-value>Preprint</displayed-value>
-				<stored-value>preprint</stored-value>
-			</pair>
-			<pair>
-				<displayed-value>Working paper</displayed-value>
-				<stored-value>workingPaper</stored-value>
-			</pair>
-			<pair>
-				<displayed-value>Comunicación</displayed-value>
-				<stored-value>comunication</stored-value>
-			</pair>
-			<pair>
-				<displayed-value>Revisión</displayed-value>
-				<stored-value>review</stored-value>
-			</pair>
-			<pair>
-				<displayed-value>Contribución a revistas</displayed-value>
-				<stored-value>journalContribution</stored-value>
-			</pair>
-			<pair>
-				<displayed-value>Reporte</displayed-value>
-				<stored-value>report</stored-value>
-			</pair>
-			<pair>
-				<displayed-value>Tesis Doctoral</displayed-value>
-				<stored-value>doctoralThesis</stored-value>
-			</pair>
-			<pair>
-				<displayed-value>Tesis de Maestría</displayed-value>
-				<stored-value>masterThesis</stored-value>
-			</pair>
-			<pair>
-				<displayed-value>Tesis de Grado</displayed-value>
-				<stored-value>bachelorThesis</stored-value>
-			</pair>
-			<pair>
-				<displayed-value>Trabajo de especialización</displayed-value>
-				<stored-value>specializationThesis</stored-value>
+				<displayed-value>Tesis</displayed-value>
+				<stored-value>thesis</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Libro</displayed-value>
@@ -698,11 +782,100 @@
 				<displayed-value>Audio</displayed-value>
 				<stored-value>audio</stored-value>
 			</pair>
+		</value-pairs>
+		
+		<value-pairs value-pairs-name="common_subtypes_article" dc-term="type">
 			<pair>
-				<displayed-value>Otro</displayed-value>
-				<stored-value>other</stored-value>
+				<displayed-value>Preprint</displayed-value>
+				<stored-value>preprint</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Working paper</displayed-value>
+				<stored-value>workingPaper</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Comunicación</displayed-value>
+				<stored-value>comunication</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Revisión</displayed-value>
+				<stored-value>review</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Contribución a revistas</displayed-value>
+				<stored-value>journalContribution</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Reporte</displayed-value>
+				<stored-value>report</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Artículo</displayed-value>
+				<stored-value>article</stored-value>
 			</pair>
 		</value-pairs>
+		
+		<value-pairs value-pairs-name="common_subtypes_thesis" dc-term="type">
+			<pair>
+				<displayed-value>Tesis Doctoral</displayed-value>
+				<stored-value>doctoralThesis</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Tesis de Maestría</displayed-value>
+				<stored-value>masterThesis</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Tesis de Grado</displayed-value>
+				<stored-value>bachelorThesis</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Trabajo de especialización</displayed-value>
+				<stored-value>specializationThesis</stored-value>
+			</pair>
+		</value-pairs>
+		
+		<value-pairs value-pairs-name="common_subtypes_book" dc-term="type">
+			<pair>
+				<displayed-value>Libro</displayed-value>
+				<stored-value>book</stored-value>
+			</pair>
+		</value-pairs>
+
+		<value-pairs value-pairs-name="common_subtypes_conferenceObject" dc-term="type">
+			<pair>
+				<displayed-value>Objeto de Conferencia</displayed-value>
+				<stored-value>conferenceObject</stored-value>
+			</pair>
+		</value-pairs>
+
+		<value-pairs value-pairs-name="common_subtypes_institutionalDocument" dc-term="type">
+			<pair>
+				<displayed-value>Documento institucional</displayed-value>
+				<stored-value>institutionalDocument</stored-value>
+			</pair>
+		</value-pairs>
+
+		<value-pairs value-pairs-name="common_subtypes_fixedImage" dc-term="type">
+			<pair>
+				<displayed-value>Imagen fija</displayed-value>
+				<stored-value>fixedImage</stored-value>
+			</pair>
+		</value-pairs>
+
+		<value-pairs value-pairs-name="common_subtypes_movingImage" dc-term="type">
+			<pair>
+				<displayed-value>Imagen en movimiento</displayed-value>
+				<stored-value>movingImage</stored-value>
+			</pair>
+		</value-pairs>
+
+		<value-pairs value-pairs-name="common_subtypes_audio" dc-term="type">
+			<pair>
+				<displayed-value>Audio</displayed-value>
+				<stored-value>audio</stored-value>
+			</pair>
+		</value-pairs>
+
 
 		<!-- default language order: (from dspace 1.2.1) "en_US", "en", "es", "de", 
 			"fr", "it", "ja", "zh", "other", "" -->
