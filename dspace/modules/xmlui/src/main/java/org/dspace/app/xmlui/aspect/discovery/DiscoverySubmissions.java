@@ -13,17 +13,21 @@ import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.core.LogManager;
 import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
 import org.dspace.eperson.EPerson;
 import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import org.dspace.sort.SortOption;
+import org.dspace.workflow.ClaimedTask;
 import org.dspace.workflow.DryadWorkflowUtils;
+import org.dspace.workflow.WorkflowItem;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -202,7 +206,6 @@ public class DiscoverySubmissions extends SimpleSearch {
                 Item item = (Item) resultDSO;
                 Row itemRow = resultTable.addRow();
 
-                String url;
                 if(item.isArchived()){
                     //Add the item url
                     itemRow.addCell().addXref(HandleManager.resolveToURL(context, item.getHandle()), item.getName());
@@ -216,7 +219,28 @@ public class DiscoverySubmissions extends SimpleSearch {
                             itemRow.addCell().addXref(contextPath + "/submit?workspaceID=" + workspaceItem.getID(), title);
                         }
                     }else{
-                        itemRow.addCell().addContent(item.getName());
+
+                        try {
+                            WorkflowItem workflowItem = WorkflowItem.findByItemId(context, item.getID());
+                            ClaimedTask claimedTask = ClaimedTask.findByWorkflowIdAndEPerson(context, workflowItem.getID(), context.getCurrentUser().getID());
+                            if(claimedTask != null){
+                                //We have a task for this item, so allow him to perform this task !
+                                String url = contextPath+"/handle/"+ workflowItem.getCollection().getHandle()+"/workflow?" +
+                                        "workflowID="+workflowItem.getID()+"&" +
+                                        "stepID="+claimedTask.getStepID()+"&" +
+                                        "actionID="+claimedTask.getActionID();
+
+                                itemRow.addCell().addXref(url ,item.getName());
+                            }else{
+                                itemRow.addCell().addContent(item.getName());
+                            }
+                        } catch (AuthorizeException e) {
+                            log.error(LogManager.getHeader(context, "Error while retrieving the workflow item for item with id: " + item.getID(), ""), e);
+                            itemRow.addCell().addContent(item.getName());
+                        } catch (IOException e) {
+                            log.error(LogManager.getHeader(context, "Error while retrieving the workflow item for item with id: " + item.getID(), ""), e);
+                            itemRow.addCell().addContent(item.getName());
+                        }
                     }
                 }
 
