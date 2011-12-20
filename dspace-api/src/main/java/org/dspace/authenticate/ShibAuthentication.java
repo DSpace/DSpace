@@ -165,7 +165,7 @@ public class ShibAuthentication implements AuthenticationMethod
 		// sword. This allows this compatability without installing the password-based
 		// authentication method which has side effects such as allowing users to login
 		// with a username and password from the webui.
-		boolean swordCompatability = ConfigurationManager.getBooleanProperty("authentication.shib.sword.compatability", true);
+		boolean swordCompatability = ConfigurationManager.getBooleanProperty("authentication-shibboleth","sword.compatability", true);
 		if ( swordCompatability &&
 				username != null && username.length() > 0 &&
 				password != null && password.length() > 0 ) {
@@ -199,7 +199,7 @@ public class ShibAuthentication implements AuthenticationMethod
 		}
 
 		// Should we auto register new users.
-		boolean autoRegister = ConfigurationManager.getBooleanProperty("authentication.shib.autoregister", true);
+		boolean autoRegister = ConfigurationManager.getBooleanProperty("authentication-shibboleth","autoregister", true);
 
 		// Four steps to authenticate a user
 		try {
@@ -291,10 +291,10 @@ public class ShibAuthentication implements AuthenticationMethod
 			}
 
 			log.debug("Starting to determine special groups");
-			String defaultRoles = ConfigurationManager.getProperty("authentication.shib.default-roles");
-			String roleHeader = ConfigurationManager.getProperty("authentication.shib.role-header");
-			boolean ignoreScope = ConfigurationManager.getBooleanProperty("authentication.shib.role-header.ignore-scope", true);
-			boolean ignoreValue = ConfigurationManager.getBooleanProperty("authentication.shib.role-header.ignore-value", false);
+			String defaultRoles = ConfigurationManager.getProperty("authentication-shibboleth","default-roles");
+			String roleHeader = ConfigurationManager.getProperty("authentication-shibboleth","role-header");
+			boolean ignoreScope = ConfigurationManager.getBooleanProperty("authentication-shibboleth","role-header.ignore-scope", true);
+			boolean ignoreValue = ConfigurationManager.getBooleanProperty("authentication-shibboleth","role-header.ignore-value", false);
 
 			if (ignoreScope && ignoreValue) {
 				throw new IllegalStateException("Both config parameters for ignoring an roll attributes scope and value are turned on, this is not a permissable configuration. (Note: ignore-scope defaults to true) The configuration parameters are: 'authentication.shib.role-header.ignore-scope' and 'authentication.shib.role-header.ignore-value'");
@@ -330,9 +330,9 @@ public class ShibAuthentication implements AuthenticationMethod
 					} 
 
 					// Get the group names
-					String groupNames = ConfigurationManager.getProperty("authentication.shib.role." + affiliation);
+					String groupNames = ConfigurationManager.getProperty("authentication-shibboleth","role." + affiliation);
 					if (groupNames == null || groupNames.trim().length() == 0) {
-						groupNames = ConfigurationManager.getProperty("authentication.shib.role." + affiliation.toLowerCase());
+						groupNames = ConfigurationManager.getProperty("authentication-shibboleth","role." + affiliation.toLowerCase());
 					}
 
 					if (groupNames == null) {
@@ -473,11 +473,11 @@ public class ShibAuthentication implements AuthenticationMethod
 		// If this server is configured for lazy sessions then use this to
 		// login, otherwise default to the protected shibboleth url.
 
-		boolean lazySession = ConfigurationManager.getBooleanProperty("authentication.shib.lazysession", false);
+		boolean lazySession = ConfigurationManager.getBooleanProperty("authentication-shibboleth","lazysession", false);
 
 		if ( lazySession ) {
-			String shibURL = ConfigurationManager.getProperty("authentication.shib.lazysession.loginurl");
-			boolean forceHTTPS = ConfigurationManager.getBooleanProperty("authentication.shib.lazysession.secure",true);
+			String shibURL = ConfigurationManager.getProperty("authentication-shibboleth","lazysession.loginurl");
+			boolean forceHTTPS = ConfigurationManager.getBooleanProperty("authentication-shibboleth","lazysession.secure",true);
 
 			// Shibboleth authentication initiator 
 			if (shibURL == null || shibURL.length() == 0)
@@ -565,9 +565,9 @@ public class ShibAuthentication implements AuthenticationMethod
 	 */
 	private EPerson findEPerson(Context context, HttpServletRequest request) throws SQLException, AuthorizeException {
 
-		boolean isUsingTomcatUser = ConfigurationManager.getBooleanProperty("authentication.shib.email-use-tomcat-remote-user");
-		String netidHeader = ConfigurationManager.getProperty("authentication.shib.netid-header");
-		String emailHeader = ConfigurationManager.getProperty("authentication.shib.email-header");
+		boolean isUsingTomcatUser = ConfigurationManager.getBooleanProperty("authentication-shibboleth","email-use-tomcat-remote-user");
+		String netidHeader = ConfigurationManager.getProperty("authentication-shibboleth","netid-header");
+		String emailHeader = ConfigurationManager.getProperty("authentication-shibboleth","email-header");
 
 		EPerson eperson = null;
 		boolean foundNetID = false;
@@ -664,10 +664,10 @@ public class ShibAuthentication implements AuthenticationMethod
 	private EPerson registerNewEPerson(Context context, HttpServletRequest request) throws SQLException, AuthorizeException {
 
 		// Header names
-		String netidHeader = ConfigurationManager.getProperty("authentication.shib.netid-header");
-		String emailHeader = ConfigurationManager.getProperty("authentication.shib.email-header");
-		String fnameHeader = ConfigurationManager.getProperty("authentication.shib.firstname-header");
-		String lnameHeader = ConfigurationManager.getProperty("authentication.shib.lastname-header");
+		String netidHeader = ConfigurationManager.getProperty("authentication-shibboleth","netid-header");
+		String emailHeader = ConfigurationManager.getProperty("authentication-shibboleth","email-header");
+		String fnameHeader = ConfigurationManager.getProperty("authentication-shibboleth","firstname-header");
+		String lnameHeader = ConfigurationManager.getProperty("authentication-shibboleth","lastname-header");
 
 		// Header values
 		String netid = findSingleHeader(request,netidHeader);
@@ -751,10 +751,10 @@ public class ShibAuthentication implements AuthenticationMethod
 	private void updateEPerson(Context context, HttpServletRequest request, EPerson eperson) throws SQLException, AuthorizeException {
 
 		// Header names & values
-		String netidHeader = ConfigurationManager.getProperty("authentication.shib.netid-header");
-		String emailHeader = ConfigurationManager.getProperty("authentication.shib.email-header");
-		String fnameHeader = ConfigurationManager.getProperty("authentication.shib.firstname-header");
-		String lnameHeader = ConfigurationManager.getProperty("authentication.shib.lastname-header");
+		String netidHeader = ConfigurationManager.getProperty("authentication-shibboleth","netid-header");
+		String emailHeader = ConfigurationManager.getProperty("authentication-shibboleth","email-header");
+		String fnameHeader = ConfigurationManager.getProperty("authentication-shibboleth","firstname-header");
+		String lnameHeader = ConfigurationManager.getProperty("authentication-shibboleth","lastname-header");
 
 		String netid = findSingleHeader(request,netidHeader);
 		String email = findSingleHeader(request,emailHeader);
@@ -897,8 +897,8 @@ public class ShibAuthentication implements AuthenticationMethod
 
 		HashMap<String, String> map = new HashMap<String,String>();
 
-		String mappingString = ConfigurationManager.getProperty("authentication.shib.eperson.metadata");
-		boolean autoCreate = ConfigurationManager.getBooleanProperty("authentication.shib.eperson.metadata.autocreate", true);
+		String mappingString = ConfigurationManager.getProperty("authentication-shibboleth","eperson.metadata");
+		boolean autoCreate = ConfigurationManager.getBooleanProperty("authentication-shibboleth","eperson.metadata.autocreate", true);
 
 		// Bail out if not set, returning an empty map.
 		if (mappingString == null || mappingString.trim().length() == 0) {
