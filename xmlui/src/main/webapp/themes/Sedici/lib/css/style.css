@@ -23,11 +23,11 @@
 h1 {
     font-size: 182%;
     color: black;
-    text-align: justify;
+    text-align: left;
 }
 
 h2{
-    font-size: 123.1%;
+    font-size: 100%;
 }
 
 h3 {
@@ -89,20 +89,17 @@ select.multiple {
 	display:none;
 }
 
-#ds-user-box {
-    right: 0;
-    top: 10px;
-    position: absolute;
-    color: white;
-}
 
-#ds-user-box a{
+#ds-user-box a {
     color: #08597c;
 	text-decoration:none;
 }
 
+
+
 #ds-trail-wrapper {
-    background-color: #ebf8ff;
+/*    background-color: #ebf8ff;*/
+/*	background-color: #fff2e5;*/
     margin: 0;
     padding: 6px 0px 0px 0px;
 	color:black;
@@ -110,6 +107,9 @@ select.multiple {
 /*    border-bottom: 1px solid #9cacba;*/
     min-width: 950px;
 	height:25px;
+/*	background-image:url(../../images/trail.png);*/
+	background-position:100px -10px;
+	border-bottom:1px dashed #dedede;
 }
 
 #ds-trail-wrapper a{
@@ -134,11 +134,13 @@ font-weight:bold;
 #ds-trail a {
     color: #8a4d0c;
 /*	background-image:url(../../images/icono_navegacion.png);*/
-	background-repeat:no-repeat;
-	background-position: top left;
 	height:38px;
 /*	padding:5px 0px 0px 20px;*/
 	font-weight:normal;
+	background-image:url(../../images/trailie.png);
+	background-position:bottom center;
+	background-repeat:no-repeat;
+	
 }
 
 #no-js-warning,
@@ -341,9 +343,9 @@ td {
 
 .ds-button-field,
 #aspect_eperson_StartRegistration_list_registration-progress li {
-    background-color: #6d859c;
-    border: 1px solid #1F3F5E;
-    padding: 2px 5px;
+    background-color: #c2c2c2;
+    border: none;
+    padding: 5px;
     color: #FFFFFF;
     font-weight: bold;
     cursor: pointer;
@@ -408,14 +410,15 @@ ul.ds-progress-list li.button input.ds-button-field {
 
 ul.ds-progress-list li.current input.ds-button-field,
 #aspect_eperson_StartRegistration_list_registration-progress li.current {
-    background-color: #499c73;
-    border: 1px solid #1f5e3f;
+    background-color: #f48620;
+    border: none;
+	padding:10px;
 }
 
 ul.ds-progress-list li.disabled input.ds-button-field
 #aspect_eperson_StartRegistration_list_registration-progress li.disabled {
-    background-color: #F0F2F5;
-    border: 1px solid #D8E8EB;
+    background-color: #dedede;
+    border: none;
     color: #444444;
     cursor: default;
 }
@@ -450,11 +453,26 @@ ul.ds-progress-list li.arrow {
 textarea.ds-textarea-field,
 input.ds-text-field,
 input.ds-file-field,
-input.ds-button-field,
 input.ds-password-field {
     margin-bottom: 5px;
     margin-top: 5px;
     font-size: 93%;
+}
+
+input.ds-button-field {
+border:none;
+}
+
+#aspect_discovery_SiteViewer_field_submit {
+font-size:16px;
+background-image:url(../../images/lupita.png);
+height:24px;
+background-color:white;
+background-repeat:no-repeat;
+padding:0px 0px 0px 20px;
+color:#939598;
+font-weight:bold;
+margin-left:8px;
 }
 
 textarea.ds-textarea-field,
@@ -563,7 +581,7 @@ li.ds-form-item {
     margin-bottom: 35px;
     vertical-align: middle !important;
     position: relative;
-    clear: left;
+/*    clear: left;*/
 }
 
 li.ds-form-item.last {
@@ -572,7 +590,7 @@ li.ds-form-item.last {
 
 li.ds-form-item .ds-form-label{
     font-weight: bold;
-    font-size: 123.1%;
+    font-size: 90%;
 }
 
 li.ds-form-item label.ds-composite-component{
@@ -1045,8 +1063,8 @@ div.item-summary-view-metadata {
 }
 
 div.simple-item-view-authors {
-    font-size: 123.1%;
-    font-weight: bold;
+    font-size: 100%;
+    font-weight: normal;
     border-bottom:1px solid #D8E8EB;
     padding-bottom: 2px;
     margin-bottom: 20px;
@@ -1251,6 +1269,8 @@ div.primary > ul > li > ul > li.community > div.artifact-description a {
 	position:relative; 
 	background-color:#000000; 
 	font: 13px Tahoma, Sans-serif; 
+	background-image:url(../../images/fondo_topnav.png);
+	background-repeat:repeat-x;
 }
 #topNav ul { 
 	padding:0; 
@@ -1279,7 +1299,8 @@ div.primary > ul > li > ul > li.community > div.artifact-description a {
 
 #topNav li a:focus { 
 	outline: none; 
-	text-decoration: underline; 
+	text-decoration: none; 
+	
 }
 #topNav ul ul { 
 	display:none; 
@@ -1290,32 +1311,48 @@ div.primary > ul > li > ul > li.community > div.artifact-description a {
 }
 #topNav ul ul li { 
 	float:none; 
+
 }
+
+#topNav ul ul a { 
+	background-color:#434343; 
+
+}
+
 #topNav ul ul a:hover { 
 	background-color:#64a7cd; 
+	background-image:url(../../images/topnavhover.png);
+	background-repeat:repeat-x;
+
+	
 }
 #topNav > ul {
 	padding: 0px; 
 	background-color: #000000;
 	position:relative;
 	left:40px;
+	background-image:url(../../images/fondo_topnav.png);
+	background-repeat:repeat-x;
 }
 #topNav a:visited {
 	color: #FFFFFF; 
 }
 #topNav a:hover {
 	color: #FFFFFF; 
+
 }
 #topNav ul {
 	z-index: 999;
 } 
 #topNav ul li:hover {
-	background-color:#64a7cd;
+	background-color:#64a7cd;}
+/*	background-color:#346b8a;/*
+
 }
 
 
 /* Busqueda */
-//*Sort*//
+/*Sort*/
 #aspect_discovery_SimpleSearch_div_search-controls {
 background-color:white;
 }
@@ -1326,14 +1363,19 @@ background-color:white;
 
 
 /*login*/
+
+
 #ds-user-box {
 width:200px;
-/*background-color: #b0d4ef;*/
 padding:10px;
 border:1px dashed white;
 color:#1b86b4;
-}
+    right: 0;
+    top: 10px;
+    position: absolute;
+    
 
+}
 
 
 #ds-user-box h1{
@@ -1389,4 +1431,78 @@ color:#000000;!important
 #div-menu-lateral-cuenta-superior a:hover{
     color: red;
 	text-decoration:none;
+}
+
+
+.ds-static-div secondary browse {
+background-color:red;
+}
+
+.ds-trail-arrow  li {
+background-color:#00FF33;
+}
+
+#aspect_discovery_SiteViewer_field_query {
+background-image:url(../../images/busqueda.png);
+/*border-bottom:1 px solid #dedede;*/
+/*border-top:1px solid white;*/
+background-color:#e8e7e7;
+border:1px solid #e8e7e7;
+boderder-right:none;
+background-repeat:repeat-x;
+width: 300px;
+height:25px;
+font-size:13px;
+
+}
+
+
+#aspect_eperson_PasswordLogin_list_password-login {
+background-color:white;
+padding:25px 10px 10px 10px;
+/*border:1px dashed #dedede;*/
+margin-bottom:20px;
+background-image:url(../../images/fondoregistro.png);
+background-repeat:no-repeat;
+width:637px;
+height:130px;
+margin-top:10px;
+}
+
+#aspect_eperson_PasswordLogin_div_register {
+
+padding:10px;
+}
+
+#aspect_submission_Submissions_field_submit_submissions_remove {
+background-image:url(../../images/tachito.png);
+background-repeat:no-repeat;
+background-position: 0px 3px;
+padding-top:3px;
+padding-left:20px;
+background-color:white;
+color:#6c6c6c;
+height:20px;
+}
+
+/*LOGIN*/
+#aspect_eperson_PasswordLogin_field_login_email {
+background-color:#eaeaea;
+border-bottom:1px solid #dedede;
+border-right:1px solid #dedede;
+}
+
+#aspect_eperson_PasswordLogin_field_login_password {
+background-color:#eaeaea;
+border-bottom:1px solid #dedede;
+border-right:1px solid #dedede;
+}
+
+#aspect_eperson_PasswordLogin_field_submit {
+margin-top:10px;
+background-image:url(../../images/ok.png);
+padding-left:20px;
+background-repeat:no-repeat;
+color: #8cb063;
+background-color:white;
 }
