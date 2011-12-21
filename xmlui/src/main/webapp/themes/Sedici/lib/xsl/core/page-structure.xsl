@@ -298,7 +298,7 @@
         The template to handle the dri:body element. It simply creates the ds-body div and applies
         templates of the body's child elements (which consists entirely of dri:div tags).
     -->
-    <xsl:template match="dri:body">-
+    <xsl:template match="dri:body">
         <div id="ds-body">
             <xsl:if test="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='alert'][@qualifier='message']">
                 <div id="ds-system-wide-alert">

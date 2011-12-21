@@ -85,6 +85,7 @@
 	                <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
 	            </xsl:otherwise>
             </xsl:choose>
+            Nuico
         </a>
 		<!--Display collection strengths (item counts) if they exist-->
 		<xsl:if test="string-length($data/dim:field[@element='format'][@qualifier='extent'][1]) &gt; 0">

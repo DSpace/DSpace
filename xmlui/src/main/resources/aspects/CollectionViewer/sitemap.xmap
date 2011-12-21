@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
+        <map:components>              
+                
+                <map:transformers>
+                        <map:transformer name="CollectionViewer" src="ar.edu.unlp.sedici.aspect.collectionViewer.CollectionViewer"/>
+                        <map:transformer name="CommunityViewer" src="ar.edu.unlp.sedici.aspect.collectionViewer.CommunityViewer"/>
+                </map:transformers>
+
+
+                <map:matchers default="wildcard">
+                        <map:matcher name="HandleTypeMatcher" src="org.dspace.app.xmlui.aspect.general.HandleTypeMatcher"/>
+                        <map:matcher name="HandleAuthorizedMatcher" src="org.dspace.app.xmlui.aspect.general.HandleAuthorizedMatcher"/>
+                </map:matchers>
+                
+                <map:actions>
+                        <map:action name="UsageLoggerAction" src="org.dspace.app.xmlui.cocoon.UsageLoggerAction"/>
+                </map:actions>
+
+        </map:components>
+        <map:pipelines>
+                <map:pipeline>                        
+                        
+                        <map:generate/>                        
+
+                        <!-- Handle specific features -->
+                        <map:match pattern="handle/*/**">
+     
+                                <!-- Community, Collection, and Item Viewers -->
+                              
+                                        <map:match type="HandleAuthorizedMatcher" pattern="READ">
+                                                <map:match type="HandleTypeMatcher" pattern="community">
+                                                        <map:act type="UsageLoggerAction">
+                                                        <map:parameter name="type" value="community"/>
+                                                        <map:parameter name="eventType" value="view"/>
+                                                </map:act>
+                                                        <map:transform type="CommunityViewer"/>
+                                                        <map:serialize type="xml"/>
+                                                </map:match>
+ 
+                                                <map:match type="HandleTypeMatcher" pattern="collection">
+                                                        <map:act type="UsageLoggerAction">
+                                                        	<map:parameter name="type" value="collection"/>
+                                                        	<map:parameter name="eventType" value="view"/>
+                                                		</map:act>
+                                                        <map:transform type="CollectionViewer"/>
+                                                        <map:serialize type="xml"/>
+                                                </map:match>
+                                         </map:match>
+                                
+                                
+                        </map:match> <!-- End match handle/*/** -->                    
+                        
+                        <!-- Not a URL we care about, so just pass it on. -->
+                        <map:serialize type="xml"/>
+                        
+                </map:pipeline>
+        </map:pipelines>
+</map:sitemap>
