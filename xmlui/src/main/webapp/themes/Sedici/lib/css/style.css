@@ -1591,9 +1591,16 @@ float:left;
 
 .community-root-div {
 background-color:red;
+position:relative;
+width:200px;
+left:-50px;
 }
+
 .community-actual-div {
 height:50px;
-width:50px;
+width:100px;
+float:right;
+
+
 }
 
