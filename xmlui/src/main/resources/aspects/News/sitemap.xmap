@@ -45,7 +45,9 @@ collections / items / and bitstreams.
             -->
 
             <map:match pattern="">
-                <map:transform type="ShowNews"/>
+                <map:transform type="ShowNews">
+                     <map:parameter name="id" value="feed"/>            
+                </map:transform>
                 <map:serialize type="xml"/>
             </map:match>
 

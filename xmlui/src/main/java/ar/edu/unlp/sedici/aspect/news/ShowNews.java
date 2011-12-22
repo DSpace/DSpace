@@ -22,6 +22,7 @@ import java.net.URL;
 import java.sql.SQLException;
 import java.util.Iterator;
 
+import org.apache.avalon.framework.parameters.ParameterException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
@@ -88,7 +89,13 @@ public class ShowNews  extends AbstractDSpaceTransformer implements CacheablePro
     public void addBody(Body body) throws SAXException, WingException,
             UIException, SQLException, IOException, AuthorizeException
     {
-    	String url = ConfigurationManager.getProperty("sedici-dspace", "feed");
+    	String id;
+    	try {
+			id=parameters.getParameter("id");
+		} catch (ParameterException e) {
+			id="feed";
+		};
+    	String url = ConfigurationManager.getProperty("sedici-dspace", id);
     	//String url="http://feeds.feedburner.com/luauf";
         SyndFeed feed;
         try {
