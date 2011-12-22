@@ -343,10 +343,10 @@ td {
 
 .ds-button-field,
 #aspect_eperson_StartRegistration_list_registration-progress li {
-    background-color: #c2c2c2;
+    background-color: #52bae7;
     border: none;
     padding: 5px;
-    color: #FFFFFF;
+    color:white;
     font-weight: bold;
     cursor: pointer;
 }
@@ -463,7 +463,13 @@ input.ds-button-field {
 border:none;
 }
 
-#aspect_discovery_SiteViewer_field_submit {
+/* IR */ 
+#aspect_administrative_group_ManageGroupsMain_field_submit_search,
+#aspect_discovery_SiteViewer_field_submit, 
+#aspect_discovery_CommunitySearch_field_submit,
+#aspect_artifactbrowser_ConfigurableBrowse_field_submit,
+#aspect_discovery_SimpleSearch_field_submit
+ {
 font-size:16px;
 background-image:url(../../images/lupita.png);
 height:24px;
@@ -474,6 +480,11 @@ color:#939598;
 font-weight:bold;
 margin-left:8px;
 }
+
+#aspect_artifactbrowser_ConfigurableBrowse_field_submit:hover {
+color:#52BAE7;
+}
+ 
 
 textarea.ds-textarea-field,
 input.ds-text-field,
@@ -531,10 +542,12 @@ input.input.ds-password-field:focus {
 
 span.error {
     clear: both;
-    display: block;
+    display: inline;
     color: #c22121;
-    font-size: 0.9em;
-    margin-top: 3px;
+	position:absolute;
+	top:50px;
+	width:500px;
+	left:120px;
 }
 
 textarea.ds-textarea-field.error,
@@ -1323,6 +1336,7 @@ div.primary > ul > li > ul > li.community > div.artifact-description a {
 	background-color:#64a7cd; 
 	background-image:url(../../images/topnavhover.png);
 	background-repeat:repeat-x;
+	
 
 	
 }
@@ -1345,7 +1359,9 @@ div.primary > ul > li > ul > li.community > div.artifact-description a {
 	z-index: 999;
 } 
 #topNav ul li:hover {
-	background-color:#64a7cd;}
+	background-color:#64a7cd;
+
+	}
 /*	background-color:#346b8a;/*
 
 }
@@ -1442,7 +1458,10 @@ background-color:red;
 background-color:#00FF33;
 }
 
-#aspect_discovery_SiteViewer_field_query {
+/*CAJAS DE BUSDQUEDA PRINCIPALES*/
+#aspect_discovery_SiteViewer_field_query,
+#aspect_discovery_CommunitySearch_field_query
+ {
 background-image:url(../../images/busqueda.png);
 /*border-bottom:1 px solid #dedede;*/
 /*border-top:1px solid white;*/
@@ -1453,8 +1472,20 @@ background-repeat:repeat-x;
 width: 300px;
 height:25px;
 font-size:13px;
-
 }
+
+
+#aspect_artifactbrowser_ConfigurableBrowse_field_starts_with {
+background-image:url(../../images/busqueda.png);
+background-color:#e8e7e7;
+border:1px solid #e8e7e7;
+boderder-right:none;
+background-repeat:repeat-x;
+height:25px;
+font-size:13px;
+margin-left:5px;
+}
+
 
 
 #aspect_eperson_PasswordLogin_list_password-login {
@@ -1474,7 +1505,8 @@ margin-top:10px;
 padding:10px;
 }
 
-#aspect_submission_Submissions_field_submit_submissions_remove {
+#aspect_submission_Submissions_field_submit_submissions_remove
+ {
 background-image:url(../../images/tachito.png);
 background-repeat:no-repeat;
 background-position: 0px 3px;
@@ -1483,6 +1515,19 @@ padding-left:20px;
 background-color:white;
 color:#6c6c6c;
 height:20px;
+}
+
+input.ds-delete-button {
+display:block;
+background-image:url(../../images/tachito.png);
+background-repeat:no-repeat;
+background-position: 0px 3px;
+padding-top:3px;
+padding-left:20px;
+background-color:white;
+color:#6c6c6c;
+height:20px;
+float:right;
 }
 
 /*LOGIN*/
@@ -1500,9 +1545,55 @@ border-right:1px solid #dedede;
 
 #aspect_eperson_PasswordLogin_field_submit {
 margin-top:10px;
+background-image:url(../../images/ok_gris.png);
+padding-left:20px;
+background-repeat:no-repeat;
+color: #949494;
+background-color:white;
+}
+
+#aspect_eperson_PasswordLogin_field_submit:hover{
+margin-top:10px;
 background-image:url(../../images/ok.png);
 padding-left:20px;
 background-repeat:no-repeat;
 color: #8cb063;
 background-color:white;
 }
+
+
+li.ds-form-item even {
+background-color:red;
+}
+
+li.first-link {
+display:none;
+}
+
+#submit_subscriptions_add,
+.ds-add-button {
+font-size:16px;
+background-image:url(../../images/add.png);
+height:20px;
+background-color:white;
+background-repeat:no-repeat;
+padding:0px 0px 5px 17px;
+color:#939598;
+font-weight:bold;
+margin-left:8px;
+
+}
+
+.logo {
+width:100%;
+float:left;
+}
+
+.community-root-div {
+background-color:red;
+}
+.community-actual-div {
+height:50px;
+width:50px;
+}
+
