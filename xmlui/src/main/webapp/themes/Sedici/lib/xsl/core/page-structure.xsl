@@ -337,11 +337,29 @@
         </xsl:if>
     </xsl:template>
     
+         
+    <xsl:template name="buildTrail">
+        <div id="ds-trail-wrapper">
+            <ul id="ds-trail">
+                <!-- No muestro ni el home ni el base en caso de ser uno solo -->
+                <xsl:choose>
+                    <xsl:when test="count(/dri:document/dri:meta/dri:pageMeta/dri:trail) >2">
+                        <xsl:apply-templates select="/dri:document/dri:meta/dri:pageMeta/dri:trail"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        
+                    </xsl:otherwise>
+                </xsl:choose>
+            </ul>
+        </div>
+    </xsl:template>
         
 <!-- The header (distinct from the HTML head element) contains the title, subtitle, login box and various
      placeholders for header images -->
 
     <xsl:template match="dri:trail">
+        <!-- Este if controla que la ultima ocurrencia del trail no se muestre -->
+        <xsl:if test="count(/dri:document/dri:meta/dri:pageMeta/dri:trail) - 1 > (position()-1)">
         <!--put an arrow between the parts of the trail-->
         <xsl:if test="position()>1">        
 	        <xsl:if test="position()>2">
@@ -355,7 +373,7 @@
 	                <xsl:if test="position()=2">
 	                    <xsl:text>first-link </xsl:text>
 	                </xsl:if>
-	                <xsl:if test="position()=last()">
+	                <xsl:if test="position()=(last()-1)">
 	                    <xsl:text>last-link</xsl:text>
 	                </xsl:if>
 	            </xsl:attribute>
@@ -374,6 +392,7 @@
 	                </xsl:otherwise>
 	            </xsl:choose>
 	        </li>
+	     </xsl:if>
 	     </xsl:if>
     </xsl:template>
     

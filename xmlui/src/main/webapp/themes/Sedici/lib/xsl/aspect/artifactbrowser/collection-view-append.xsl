@@ -105,10 +105,12 @@
 
     
     <xsl:template match='mets:METS' mode='image-header'>
+    <xsl:if test="mets:fileSec/mets:fileGrp[@USE='LOGO']/mets:file/mets:FLocat[@LOCTYPE='URL']/@xlink:href">
             <img src="{mets:fileSec/mets:fileGrp[@USE='LOGO']/mets:file/mets:FLocat[@LOCTYPE='URL']/@xlink:href}" class="logo">
                 <xsl:attribute name="alt">xmlui.dri2xhtml.METS-1.0.collection-logo-alt</xsl:attribute>
                 <xsl:attribute name="attr" namespace="http://apache.org/cocoon/i18n/2.1">alt</xsl:attribute>
             </img>
+    </xsl:if>
     </xsl:template>
 
        
