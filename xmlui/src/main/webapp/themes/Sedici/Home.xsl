@@ -36,10 +36,10 @@
 
 
     <xsl:import href="Sedici.xsl"/>
+    <xsl:include href="slideshow/slideshow.xsl"/>
     
     <xsl:template match="dri:div[@id='aspect.artifactbrowser.CommunityBrowser.div.comunity-browser']">
-    <!-- Esto modifica el template para el comunity browser. No sirve si quiero alterar el orden de divs -->
-
+       <xsl:call-template name="slideshow"/>
     </xsl:template>
     <xsl:output indent="yes"/>
     

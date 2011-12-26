@@ -143,16 +143,38 @@
                 <map:transform type="IncludePageMeta">
                     <map:parameter name="stylesheet.handheld" value="lib/css/handheld.css"/>
                     <map:parameter name="stylesheet.print" value="lib/css/print.css"/>
-                </map:transform>               
+                </map:transform>   
+                
+                                
+                <map:match pattern='community-list'>
+	                <map:transform type="IncludePageMeta">
+	                    <map:parameter name="stylesheet.all" value="lib/css/media.css"/> 
+	                    <map:parameter name="javascript#1" value="lib/js/menu-desplegable.js"/>
+	                    <map:parameter name="javascript#2" value="lib/js/jquery-ui-1.8.15.custom.min.js"/>                  
+                        <map:parameter name="theme.path" value="{global:theme-path}"/>
+                        <map:parameter name="theme.name" value="{global:theme-name}"/>                    
+	                </map:transform>
+                </map:match> 
+                
+                <map:match pattern=''>
+	                <map:transform type="IncludePageMeta">
+	                    <map:parameter name="stylesheet" value="lib/css/slideshow-sedici.css"/>
+	                    <map:parameter name="stylesheet.all" value="lib/css/media.css"/> 
+	                    <map:parameter name="javascript#1" value="lib/js/slideshow-sedici.js"/>
+	                    <map:parameter name="javascript#2" value="lib/js/jquery-ui-1.8.15.custom.min.js"/>                
+                        <map:parameter name="theme.path" value="{global:theme-path}"/>
+                        <map:parameter name="theme.name" value="{global:theme-name}"/>                    
+	                </map:transform>
+                </map:match>                 
 
                 <map:transform type="IncludePageMeta">
                     <map:parameter name="stylesheet.all" value="lib/css/media.css"/>
-                    <map:parameter name="javascript#1" value="lib/js/menu-desplegable.js"/>
-                    <map:parameter name="javascript#2" value="lib/js/jquery-ui-1.8.15.custom.min.js"/>                    
+                    <map:parameter name="javascript" value="lib/js/jquery-ui-1.8.15.custom.min.js"/>                    
                     <map:parameter name="theme.path" value="{global:theme-path}"/>
                     <map:parameter name="theme.name" value="{global:theme-name}"/>
                 </map:transform>
 
+                
 
 				<!-- Debuging output -->
 				<map:match type="request" pattern="XML">
