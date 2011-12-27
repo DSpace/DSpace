@@ -87,14 +87,15 @@
                 </xsl:choose>
             </xsl:attribute>
             
-            <xsl:apply-templates select="document($externalMetadataURL)" mode="community-list-page"/>
-            
             <!-- Si es una comunidad muestro el boton para desplegar -->
             <xsl:if test="@type='DSpace Community'">
-	            <div id='div-{$id}' class='div-boton-menu-desplegable'>
-	        	   <a href="javascript:llamar_alerta('div-{$id}','boton-{$id}','ocultar', 'ver');" type="button" class='ocultador' id='boton-{$id}' value="ver">+</a>
-	            </div>            
+	           <div id='div-{$id}' class='div-boton-menu-desplegable'>
+        	   		<a href="javascript:llamar_alerta('div-{$id}','boton-{$id}','ocultar', 'ver');" type="button" class='ocultador' id='boton-{$id}' value="ver">+</a>
+        	   </div>
             </xsl:if>
+            
+            <xsl:apply-templates select="document($externalMetadataURL)" mode="community-list-page"/>
+            
             <xsl:apply-templates mode='community-list-page'/>
         </li>
     </xsl:template>
