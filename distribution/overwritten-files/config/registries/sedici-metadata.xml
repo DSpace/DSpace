@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dspace-dc-types>
+
+	<dspace-header>
+		<title>Metadatos - SeDiCI 2011</title>
+		<contributor.author>SeDiCI Team</contributor.author>
+	</dspace-header>
+
+	<!-- Schemas -->
+	<dc-schema>
+		<name>sedici</name>
+		<namespace>http://sedici.unlp.edu.ar/namespace/sedici</namespace>
+	</dc-schema>
+	<dc-schema>
+		<name>eprints</name>
+		<namespace>http://path.to.eprints.namespace</namespace>
+	</dc-schema>
+	<dc-schema>
+		<name>thesis</name>
+		<namespace>http://path.to.etd.namespace</namespace>
+	</dc-schema>
+	<dc-schema>
+		<name>mods</name>
+		<namespace>http://www.loc.gov/mods/v3</namespace>
+	</dc-schema>
+
+	<!-- Metadatos -->
+	<dc-type>
+		<schema>sedici</schema>
+		<element>identifier</element>
+		<qualifier>uri</qualifier>
+		<scope_note>URL de acceso al recurso en PDF</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>identifier</element>
+		<qualifier>doi</qualifier>
+		<scope_note>Identificador persistente DOI</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>identifier</element>
+		<qualifier>handle</qualifier>
+		<scope_note>Identificador persistente Handle (ajeno al handle de SeDiCI)</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>identifier</element>
+		<qualifier>other</qualifier>
+		<scope_note>Otros identificadores (ej.: patente)</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>identifier</element>
+		<qualifier>issn</qualifier>
+		<scope_note>Identificador ISSN</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>identifier</element>
+		<qualifier>isbn</qualifier>
+		<scope_note>Identificador ISBN</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>dc</schema>
+		<element>title</element>
+		<!-- sin calificar -->
+		<scope_note>Título principal de un documento</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>dc</schema>
+		<element>title</element>
+		<qualifier>alternative</qualifier>
+		<scope_note>Título alternativo de un documento (ej.: traducciones)</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>title</element>
+		<qualifier>subtitle</qualifier>
+		<scope_note>Subtítulo principal de un documento</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>creator</element>
+		<qualifier>person</qualifier>
+		<scope_note>Autor (persona) del documento</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>creator</element>
+		<qualifier>corporate</qualifier>
+		<scope_note>Autor (institución) del documento</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>dc</schema>
+		<element>date</element>
+		<qualifier>issued</qualifier>
+		<scope_note>Fecha de publicación del documento</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>dc</schema>
+		<element>date</element>
+		<qualifier>available</qualifier>
+		<scope_note>Fecha de disponibilización del recurso (normalmente es la fecha de fin de embargo)</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>dc</schema>
+		<element>date</element>
+		<qualifier>created</qualifier>
+		<scope_note>Fecha de creación del recurso. Creada automaticamente</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>embargo</element>
+		<qualifier>period</qualifier>
+		<scope_note>Período de embargo en días</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>embargo</element>
+		<qualifier>liftDate</qualifier>
+		<scope_note>Fecha de fin de embargo</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>mods</schema>
+		<element>location</element>
+		<!-- sin calificar -->
+		<scope_note>URL de acceso al catalogo de la biblioteca, o información de acceso al recurso fisico (ej.: Bibhuma). Si el recurso no es fulltext, es un campo obligatorio</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>dc</schema>
+		<element>description</element>
+		<qualifier>abstract</qualifier>
+		<scope_note>Resumen del documento</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>note</element>
+		<!-- sin calificar -->
+		<scope_note>Anotaciones del usuario o administrador, aclarando algún aspecto sobre el documento y su catalogación</scope_note>
+	</dc-type>	
+	<dc-type>
+		<schema>dc</schema>
+		<element>coverage</element>
+		<qualifier>spatial</qualifier>
+		<scope_note>Identificadores geográficos a los cuales se hace alusión en el contenido del documento</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>dc</schema>
+		<element>coverage</element>
+		<qualifier>temporal</qualifier>
+		<scope_note>Fechas y períodos de tiempo a los que se hace referencia en el contenido del documento</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>dc</schema>
+		<element>format</element>
+		<qualifier>extent</qualifier>
+		<scope_note>Descripción física del recurso (ej.: cantidad de páginas, dimensiones, duración, etc)</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>dc</schema>
+		<element>language</element>
+		<!-- sin calificar -->
+		<scope_note>Idioma del documento</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>subject</element>
+		<qualifier>materias</qualifier>
+		<scope_note>Materia asociada al documento, extraída del vocabulario de SeDiCI</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>subject</element>
+		<qualifier>lcsh</qualifier>
+		<scope_note>Materia asociada al documento, extraída del vocabulario del Library of Congress Subject Headings</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>subject</element>
+		<qualifier>decs</qualifier>
+		<scope_note>Descriptores extraídos del tesauro DECS</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>subject</element>
+		<qualifier>eurovoc</qualifier>
+		<scope_note>Descriptores extraídos del tesauro Eurovoc</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>subject</element>
+		<qualifier>descriptores</qualifier>
+		<scope_note>Descriptores extraídos de los tesauros SeDiCI y Unesco</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>subject</element>
+		<qualifier>other</qualifier>
+		<scope_note>Descriptores libres</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>subject</element>
+		<qualifier>keywords</qualifier>
+		<scope_note>Palabras clave extraídas del documento</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>fulltext</element>
+		<!-- sin calificar -->
+		<scope_note>Indica si se posee el registro a texto completo</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>mods</schema>
+		<element>originInfo</element>
+		<qualifier>place</qualifier>
+		<scope_note>Entidad de origen. Institución donde se creó el documento</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>dc</schema>
+		<element>type</element>
+		<!-- sin calificar -->
+		<scope_note>Tipo (general) del documento. A partir de este tipo se determinan los metadatos a cargar en los forumalios de envío de documentos</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>subtype</element>
+		<!-- sin calificar -->
+		<scope_note>Tipo (específico) del documento</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>rights</element>
+		<qualifier>license</qualifier>
+		<scope_note>Nombre de la licencia Creative Commons seleccionada en el proceso de carga del documento</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>rights</element>
+		<qualifier>uri</qualifier>
+		<scope_note>URL de acceso a la descripción de la licencia Creative Commons seleccionada en el proceso de carga del documento</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>dc</schema>
+		<element>description</element>
+		<qualifier>provenance</qualifier>
+		<scope_note>Registro de origen. Es oculto, se carga cuando se recolecta por OAI o se ingesta el documento por algun otro medio automatizado</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>contributor</element>
+		<qualifier>colaborator</qualifier>
+		<scope_note>Colaborador en la creación de un documento</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>contributor</element>
+		<qualifier>editor</qualifier>
+		<scope_note>Editor de un documento</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>contributor</element>
+		<qualifier>translator</qualifier>
+		<scope_note>Traductor de un documento</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>contributor</element>
+		<qualifier>compiler</qualifier>
+		<scope_note>Compilador de un documento</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>contributor</element>
+		<qualifier>director</qualifier>
+		<scope_note>Director de una tesis</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>contributor</element>
+		<qualifier>codirector</qualifier>
+		<scope_note>Codirector de una tesis</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>contributor</element>
+		<qualifier>juror</qualifier>
+		<scope_note>Miembro de jurado en la evaluación de una tesis</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>dc</schema>
+		<element>publisher</element>
+		<!-- sin calificar -->
+		<scope_note>Editorial que reliazó la publicación de un libro o tesis</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>dc</schema>
+		<element>relation</element>
+		<qualifier>isVersionOf</qualifier>
+		<scope_note>No utilizado por el momento. Handle o URL que apunta hacia otro recurso, del cual este documento es una versión</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>eprints</schema>
+		<element>AffiliatedInstitution</element>
+		<!-- sin calificar -->
+		<scope_note>Lugar de desarrollo de una tesis</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>thesis</schema>
+		<element>degree</element>
+		<qualifier>name</qualifier>
+		<scope_note>Grado alcanzado con la tesis</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>thesis</schema>
+		<element>degree</element>
+		<qualifier>grantor</qualifier>
+		<scope_note>Institución que respalda la tesis</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>date</element>
+		<qualifier>exposure</qualifier>
+		<scope_note>Fecha de presentación de una tesis u objeto de conferencia</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>dc</schema>
+		<element>relation</element>
+		<qualifier>isPartOf</qualifier>
+		<scope_note>Puede ser: (a) nombre del evento al que un objeto fue presentado; (b) título y número de la revista en la que un artículo fue presentado</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>eprints</schema>
+		<element>status</element>
+		<!-- sin calificar -->
+		<scope_note>Indica si el documento cuenta con revisión por pares o no</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>relation</element>
+		<qualifier>dossier</qualifier>
+		<scope_note>Nombre del dossier en el que un artículo fue publicado</scope_note>
+	</dc-type>
+</dspace-dc-types>
