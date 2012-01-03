@@ -329,7 +329,13 @@
 		<schema>dc</schema>
 		<element>relation</element>
 		<qualifier>isPartOf</qualifier>
-		<scope_note>Puede ser: (a) nombre del evento al que un objeto fue presentado; (b) título y número de la revista en la que un artículo fue presentado</scope_note>
+		<scope_note>Título y número de la revista en la que un artículo fue presentado</scope_note>
+	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>relation</element>
+		<qualifier>event</qualifier>
+		<scope_note>Nombre del evento al que un objeto fue presentado</scope_note>
 	</dc-type>
 	<dc-type>
 		<schema>eprints</schema>

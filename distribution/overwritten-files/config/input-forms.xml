@@ -47,8 +47,6 @@
 				<field>
 					<dc-schema>dc</dc-schema>
 					<dc-element>type</dc-element>
-					<dc-qualifier></dc-qualifier>
-					<repeatable></repeatable>
 					<label>Tipo de documento</label>
 					<input-type value-pairs-name="common_types">dropdown</input-type>
 					<hint>Seleccione el Tipo de Documento que desea cargar</hint>
@@ -67,101 +65,85 @@
 				La ventaja de esta solución "mala" es que es muy rápida. :)
 				-->
 				<field>
-					<dc-schema>dc</dc-schema>
+					<dc-schema>sedici</dc-schema>
 					<dc-element>subtype</dc-element>
-					<dc-qualifier></dc-qualifier>
-					<repeatable></repeatable>
 					<label>Especifique el tipo de Artículo</label>
-					<input-type value-pairs-name="common_subtypes_article">dropdown</input-type>
+					<input-type value-pairs-name="common_subtypes_articulo">dropdown</input-type>
 					<hint>Seleccione el tipo de artículo que desea cargar</hint>
 					<required>Debe seleccionar un subtipo de documento</required>
 					<visibility>workflow</visibility>
-					<type-bind>article</type-bind>
+					<type-bind>articulo</type-bind>
 				</field>
 
 				<field>
-					<dc-schema>dc</dc-schema>
+					<dc-schema>sedici</dc-schema>
 					<dc-element>subtype</dc-element>
-					<dc-qualifier></dc-qualifier>
-					<repeatable></repeatable>
 					<label>Especifique el tipo de Tesis</label>
-					<input-type value-pairs-name="common_subtypes_thesis">dropdown</input-type>
+					<input-type value-pairs-name="common_subtypes_tesis">dropdown</input-type>
 					<hint>Seleccione el tipo de tesis que desea cargar</hint>
 					<required>Debe seleccionar un subtipo de documento</required>
 					<visibility>workflow</visibility>
-					<type-bind>thesis</type-bind>
+					<type-bind>tesis</type-bind>
 				</field>
 
 				<field>
-					<dc-schema>dc</dc-schema>
+					<dc-schema>sedici</dc-schema>
 					<dc-element>subtype</dc-element>
-					<dc-qualifier></dc-qualifier>
-					<repeatable></repeatable>
 					<label>Especifique el tipo de Libro</label>
-					<input-type value-pairs-name="common_subtypes_book">dropdown</input-type>
+					<input-type value-pairs-name="common_subtypes_libro">dropdown</input-type>
 					<hint>Seleccione el tipo de libro que desea cargar</hint>
 					<required>Debe seleccionar un subtipo de documento</required>
 					<visibility>workflow</visibility>
-					<type-bind>book</type-bind>
+					<type-bind>libro</type-bind>
 				</field>
 
 				<field>
-					<dc-schema>dc</dc-schema>
+					<dc-schema>sedici</dc-schema>
 					<dc-element>subtype</dc-element>
-					<dc-qualifier></dc-qualifier>
-					<repeatable></repeatable>
 					<label>Especifique el tipo de Objeto de Conferencia</label>
-					<input-type value-pairs-name="common_subtypes_conferenceObject">dropdown</input-type>
+					<input-type value-pairs-name="common_subtypes_objeto_conferencia">dropdown</input-type>
 					<hint>Seleccione el tipo de objeto de conferencia que desea cargar</hint>
 					<required>Debe seleccionar un subtipo de documento</required>
 					<visibility>workflow</visibility>
-					<type-bind>conferenceObject</type-bind>
+					<type-bind>objeto_conferencia</type-bind>
 				</field>
 
 				<field>
-					<dc-schema>dc</dc-schema>
+					<dc-schema>sedici</dc-schema>
 					<dc-element>subtype</dc-element>
-					<dc-qualifier></dc-qualifier>
-					<repeatable></repeatable>
 					<label>Especifique el tipo de Documento Institucional</label>
-					<input-type value-pairs-name="common_subtypes_institutionalDocument">dropdown</input-type>
+					<input-type value-pairs-name="common_subtypes_documento_institucional">dropdown</input-type>
 					<hint>Seleccione el tipo de documento institucional que desea cargar</hint>
 					<required>Debe seleccionar un subtipo de documento</required>
 					<visibility>workflow</visibility>
-					<type-bind>institutionalDocument</type-bind>
+					<type-bind>documento_institucional</type-bind>
 				</field>
 
 				<field>
-					<dc-schema>dc</dc-schema>
+					<dc-schema>sedici</dc-schema>
 					<dc-element>subtype</dc-element>
-					<dc-qualifier></dc-qualifier>
-					<repeatable></repeatable>
 					<label>Especifique el tipo de Imagen Fija</label>
-					<input-type value-pairs-name="common_subtypes_fixedImage">dropdown</input-type>
+					<input-type value-pairs-name="common_subtypes_imagen_fija">dropdown</input-type>
 					<hint>Seleccione el tipo de imagen fija que desea cargar</hint>
 					<required>Debe seleccionar un subtipo de documento</required>
 					<visibility>workflow</visibility>
-					<type-bind>fixedImage</type-bind>
+					<type-bind>imagen_fija</type-bind>
 				</field>
 
 				<field>
-					<dc-schema>dc</dc-schema>
+					<dc-schema>sedici</dc-schema>
 					<dc-element>subtype</dc-element>
-					<dc-qualifier></dc-qualifier>
-					<repeatable></repeatable>
 					<label>Especifique el tipo de Imagen en Movimiento</label>
-					<input-type value-pairs-name="common_subtypes_movingImage">dropdown</input-type>
+					<input-type value-pairs-name="common_subtypes_imagen_movimiento">dropdown</input-type>
 					<hint>Seleccione el tipo de imagen en movimiento que desea cargar</hint>
 					<required>Debe seleccionar un subtipo de documento</required>
 					<visibility>workflow</visibility>
-					<type-bind>movingImage</type-bind>
+					<type-bind>imagen_movimiento</type-bind>
 				</field>
 
 				<field>
-					<dc-schema>dc</dc-schema>
+					<dc-schema>sedici</dc-schema>
 					<dc-element>subtype</dc-element>
-					<dc-qualifier></dc-qualifier>
-					<repeatable></repeatable>
 					<label>Especifique el tipo de Audio</label>
 					<input-type value-pairs-name="common_subtypes_audio">dropdown</input-type>
 					<hint>Seleccione el tipo de audio que desea cargar</hint>
@@ -176,8 +158,8 @@
 				<!-- Autor (persona) -->
 				<!-- TODO Hay que hacerlo controlado -->
 				<field>
-					<dc-schema>dc</dc-schema>
-					<dc-element>author</dc-element>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>creator</dc-element>
 					<dc-qualifier>person</dc-qualifier>
 					<repeatable>true</repeatable>
 					<label>Autor</label>
@@ -190,10 +172,9 @@
 				<!-- Autor Institucional (institucion) -->
 				<!-- TODO Hay que hacerlo controlado -->
 				<field>
-					<dc-schema>dc</dc-schema>
-					<dc-element>author</dc-element>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>creator</dc-element>
 					<dc-qualifier>corporate</dc-qualifier>
-					<repeatable></repeatable>
 					<label>Autor Institucional</label>
 					<input-type>onebox</input-type>
 					<hint>Cuando la autoría de la obra no se puede asignar a una persona en particular, el autor es la institución en donde la obra se genera</hint>
@@ -204,8 +185,6 @@
 				<field>
 					<dc-schema>dc</dc-schema>
 					<dc-element>title</dc-element>
-					<dc-qualifier></dc-qualifier>
-					<repeatable></repeatable>
 					<label>Título</label>
 					<input-type>onebox</input-type>
 					<hint>El título principal de la obra</hint>
@@ -214,14 +193,12 @@
 
 				<!-- Subtítulo (principal) -->
 				<field>
-					<dc-schema>dc</dc-schema>
+					<dc-schema>sedici</dc-schema>
 					<dc-element>title</dc-element>
 					<dc-qualifier>subtitle</dc-qualifier>
-					<repeatable></repeatable>
 					<label>Subtítulo</label>
 					<input-type>onebox</input-type>
 					<hint>Si el título de la obra se compone de título y subtítulo, éste último debe ingresarse en este campo</hint>
-					<required></required>
 				</field>
 
 				<!-- Título alternativo -->
@@ -233,16 +210,14 @@
 					<label>Título alternativo</label>
 					<input-type>onebox</input-type>
 					<hint>Otros títulos con los que se conoce la obra, traducciones del título, etc. Si el título alternativo incluye un subtítulo, éste debe indicarse usando "::" (ej: titulo alternativo :: subtitulo)</hint>
-					<required></required>
 					<visibility>workflow</visibility>
 				</field>
 
 				<!-- Idioma del recurso -->
+				<!-- TODO Hacerlo controlado -->
 				<field>
 					<dc-schema>dc</dc-schema>
 					<dc-element>language</dc-element>
-					<dc-qualifier>iso</dc-qualifier>
-					<repeatable>false</repeatable>
 					<label>Idioma</label>
 					<input-type value-pairs-name="common_iso_languages">dropdown</input-type>
 					<hint>Idioma principal de la obra</hint>
@@ -254,37 +229,19 @@
 					<dc-schema>dc</dc-schema>
 					<dc-element>date</dc-element>
 					<dc-qualifier>issued</dc-qualifier>
-					<repeatable></repeatable>
 					<label>Fecha de Publicación</label>
 					<input-type>date</input-type>
 					<hint>Fecha en la que la obra fue publicada en una revista, libro, etc. La fecha de entrega o defensa de una tésis se carga en el campo Fecha de Presentación</hint>
-					<required>Debe indicar la fecha de publicación</required>
-					<required-on-group>!SeDiCIAdmin</required-on-group>
-				</field>
-
-				<!-- Fecha de disponibilidad -->
-				<field>
-					<dc-schema>dc</dc-schema>
-					<dc-element>date</dc-element>
-					<dc-qualifier>available</dc-qualifier>
-					<repeatable></repeatable>
-					<label>Fecha de Disponibilidad</label>
-					<input-type>date</input-type>
-					<hint>Fecha a partir de la cual la obra estará disponible para descarga. Previo a esta fecha sólo los metadatos serán accesibles.</hint>
-					<required>Debe indicar la fecha de disponibilidad del documento</required>
-					<visibility>workflow</visibility>
 				</field>
 
 				<!-- Localización fisica -->
 				<field>
 					<dc-schema>mods</dc-schema>
 					<dc-element>location</dc-element>
-					<dc-qualifier></dc-qualifier>
 					<repeatable>true</repeatable>
 					<label>Localización Física</label>
 					<input-type>onebox</input-type>
 					<hint>URL de acceso al catalogo de la biblioteca o información de acceso al recurso fisico (ej.: Bibhuma). Es obligatorio cuando el recurso no es FULLTEXT</hint>
-					<required></required>
 					<visibility>workflow</visibility>
 				</field>
 
@@ -298,12 +255,10 @@
 					<label>Alcance Geográfico</label>
 					<input-type>onebox</input-type>
 					<hint>Zona geográfica a la que se hace referencia en la obra</hint>
-					<required></required>
 					<visibility>workflow</visibility>
 				</field>
 
 				<!-- Alcance Temporal -->
-				<!-- TODO Hay que hacerlo controlado -->
 				<field>
 					<dc-schema>dc</dc-schema>
 					<dc-element>coverage</dc-element>
@@ -312,7 +267,6 @@
 					<label>Alcance Temporal</label>
 					<input-type>onebox</input-type>
 					<hint>Período temporal al que se hace referencia en el texto</hint>
-					<required></required>
 					<visibility>workflow</visibility>
 				</field>
 
@@ -325,16 +279,13 @@
 					<label>Descripción Física</label>
 					<input-type>onebox</input-type>
 					<hint>Cantidad de páginas, duración, tamaño, etc</hint>
-					<required></required>
 					<visibility>workflow</visibility>
 				</field>
 
 				<!-- Fulltext -->
 				<field>
-					<dc-schema>dc</dc-schema>
-					<dc-element>description</dc-element>
-					<dc-qualifier>fulltext</dc-qualifier>
-					<repeatable></repeatable>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>fulltext</dc-element>
 					<label>Texto completo</label>
 					<input-type value-pairs-name="boolean_values">dropdown</input-type>
 					<hint>Indica si se cuenta con el texto completo de la obra</hint>
@@ -348,7 +299,6 @@
 					<dc-schema>mods</dc-schema>
 					<dc-element>originInfo</dc-element>
 					<dc-qualifier>place</dc-qualifier>
-					<repeatable></repeatable>
 					<label>Entidad de origen</label>
 					<input-type>onebox</input-type>
 					<hint>Institución donde el documento fue creado</hint>
@@ -356,16 +306,25 @@
 					<visibility>workflow</visibility>
 				</field>
 
+				<!-- Período de embargo -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>embargo</dc-element>
+					<dc-qualifier>period</dc-qualifier>
+					<label>Período de Embargo</label>
+					<input-type value-pairs-name="embargo_periods">dropdown</input-type>
+					<hint>Si usted desea que su obra sea embargada, debe indicarlo aquí seleccionando el período apropiado. Luego deberá concurrir al SeDiCI para completar y firmar el formulario de solicitud de embargo</hint>
+				</field>
+
 				<!-- Localización electrónica -->
 				<field>
-					<dc-schema>dc</dc-schema>
+					<dc-schema>sedici</dc-schema>
 					<dc-element>identifier</dc-element>
 					<dc-qualifier>uri</dc-qualifier>
 					<repeatable>true</repeatable>
 					<label>Localización electrónica</label>
 					<input-type>onebox</input-type>
 					<hint>URL de acceso al recurso</hint>
-					<required></required>
 					<visibility>workflow</visibility>
 				</field>
 
@@ -378,31 +337,27 @@
 					<dc-schema>dc</dc-schema>
 					<dc-element>description</dc-element>
 					<dc-qualifier>abstract</dc-qualifier>
-					<repeatable></repeatable>
+					<repeatable>true</repeatable>
 					<label>Resumen</label>
 					<input-type>textarea</input-type>
 					<hint>Resumen de la obra</hint>
-					<required>Debe cargar el resumen de la obra</required>
-					<required-on-group>!SeDiCIAdmin</required-on-group>
 				</field>
 
 				<!-- Keywords -->
 				<field>
-					<dc-schema>dc</dc-schema>
+					<dc-schema>sedici</dc-schema>
 					<dc-element>subject</dc-element>
 					<dc-qualifier>keywords</dc-qualifier>
 					<repeatable>true</repeatable>
 					<label>Palabras clave</label>
 					<input-type>onebox</input-type>
 					<hint>Palabras o terminos extraídos del documento</hint>
-					<required>Debe indicar las palabras claves</required>
-					<required-on-group>!SeDiCIAdmin</required-on-group>
 				</field>
 
 				<!-- Materia (de la lista de encabezamiento de LoC) -->
 				<!-- TODO Hay que hacerlo controlado -->
 				<field>
-					<dc-schema>dc</dc-schema>
+					<dc-schema>sedici</dc-schema>
 					<dc-element>subject</dc-element>
 					<dc-qualifier>lcsh</dc-qualifier>
 					<repeatable>true</repeatable>
@@ -414,82 +369,109 @@
 					<visibility>workflow</visibility>
 				</field>
 
+				<!-- Descriptores DECS -->
+				<!-- TODO Hay que hacerlo controlado -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subject</dc-element>
+					<dc-qualifier>decs</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Descriptores DECS</label>
+					<input-type>onebox</input-type>
+					<hint>Descriptores del recurso a partir del tesauro DECS</hint>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Descriptores Eurovoc -->
+				<!-- TODO Hay que hacerlo controlado -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subject</dc-element>
+					<dc-qualifier>eurovoc</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Descriptores Eurovoc</label>
+					<input-type>onebox</input-type>
+					<hint>Descriptores del recurso a partir del tesauro Eurovoc</hint>
+					<visibility>workflow</visibility>
+				</field>
+
+				<!-- Descriptores libres -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subject</dc-element>
+					<dc-qualifier>other</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Otros descriptores</label>
+					<input-type>onebox</input-type>
+					<hint>Descriptores del recurso. Texto libre</hint>
+					<visibility>workflow</visibility>
+				</field>
+
 				<!-- ISSN -->
 				<field>
-					<dc-schema>dc</dc-schema>
+					<dc-schema>sedici</dc-schema>
 					<dc-element>identifier</dc-element>
 					<dc-qualifier>issn</dc-qualifier>
-					<repeatable></repeatable>
 					<label>ISSN</label>
 					<input-type>onebox</input-type>
 					<hint>ISSN de la revista en la que el artículo fué publicado</hint>
-					<required></required>
-					<type-bind>article,conferenceObject</type-bind>
+					<type-bind>articulo,objeto_conferencia</type-bind>
 				</field>
 
 				<!-- ISBN - TESIS (opcional) -->
 				<field>
-					<dc-schema>dc</dc-schema>
+					<dc-schema>sedici</dc-schema>
 					<dc-element>identifier</dc-element>
 					<dc-qualifier>isbn</dc-qualifier>
-					<repeatable></repeatable>
 					<label>ISBN</label>
 					<input-type>onebox</input-type>
-					<hint>Si la tésis cuenta con un ISBN, éste debe ser ingresado aquí</hint>
-					<required></required>
-					<type-bind>thesis,conferenceObject</type-bind>
+					<hint>Si cuenta con un ISBN, éste debe ser ingresado aquí</hint>
+					<type-bind>tesis,objeto_conferencia</type-bind>
 				</field>
 				
 				<!-- ISBN - LIBROS (obligatorio) -->
 				<field>
-					<dc-schema>dc</dc-schema>
+					<dc-schema>sedici</dc-schema>
 					<dc-element>identifier</dc-element>
 					<dc-qualifier>isbn</dc-qualifier>
-					<repeatable></repeatable>
 					<label>ISBN</label>
 					<input-type>onebox</input-type>
 					<hint>El código ISBN correspondiente al libro</hint>
 					<required>Debe ingresar el ISBN del libro</required>
-					<type-bind>book</type-bind>
+					<type-bind>libro</type-bind>
 				</field>
 
 				<!-- Otros identificadores -->
 				<field>
-					<dc-schema>dc</dc-schema>
+					<dc-schema>sedici</dc-schema>
 					<dc-element>identifier</dc-element>
-					<dc-qualifier></dc-qualifier>
 					<repeatable>true</repeatable>
 					<label>Otros identificadores</label>
 					<input-type value-pairs-name="common_identifiers">qualdrop_value</input-type>
 					<hint>Otros códigos de identificación de la obra</hint>
-					<required></required>
 				</field>
 
 				<!-- Revista y volúmen de publicación -->
 				<field>
 					<dc-schema>dc</dc-schema>
 					<dc-element>relation</dc-element>
-					<dc-qualifier>ispartof</dc-qualifier>
-					<repeatable>false</repeatable>
+					<dc-qualifier>isPartOf</dc-qualifier>
 					<label>Revista</label>
 					<input-type>series</input-type>
 					<hint>Título y volúmen de la revista en la que el artículo fué publicado</hint>
 					<required>Debe proveer la información de la revista en la que el artículo fue publicado</required>
-					<required-on-group>SeDiCIAdmin</required-on-group>
-					<type-bind>article</type-bind>
+					<type-bind>articulo</type-bind>
 				</field>
 				
 				<!-- Dossier -->
 				<field>
-					<dc-schema>dc</dc-schema>
+					<dc-schema>sedici</dc-schema>
 					<dc-element>relation</dc-element>
 					<dc-qualifier>dossier</dc-qualifier>
-					<repeatable></repeatable>
 					<label>Nombre del Dossier</label>
 					<input-type>onebox</input-type>
 					<hint>Nombre de la sección Dossier en la que el artículo se encuentra</hint>
-					<required></required>
-					<type-bind>article</type-bind>
+					<type-bind>articulo</type-bind>
 					<visibility>workflow</visibility>
 				</field>
 
@@ -497,107 +479,83 @@
 				<field>
 					<dc-schema>eprints</dc-schema>
 					<dc-element>status</dc-element>
-					<dc-qualifier></dc-qualifier>
-					<repeatable>false</repeatable>
 					<label>Evaluación</label>
 					<input-type value-pairs-name="common_evaluations">dropdown</input-type>
 					<hint>Tipo de evaluación a la que el recurso fue sometido</hint>
-					<required></required>
-					<type-bind>article,conferenceObject</type-bind>
+					<type-bind>articulo,objeto_conferencia</type-bind>
 				</field>
 
 				<!-- Fecha de exposición de tesis -->
 				<field>
-					<dc-schema>dc</dc-schema>
+					<dc-schema>sedici</dc-schema>
 					<dc-element>date</dc-element>
 					<dc-qualifier>exposure</dc-qualifier>
-					<repeatable></repeatable>
-					<label>Fecha de exposición</label>
+					<label>Fecha de presentación</label>
 					<input-type>date</input-type>
 					<hint>Fecha en la que se expuso el trabajo para su aprobación</hint>
-					<required></required>
-					<type-bind>thesis,conferenceObject</type-bind>
+					<type-bind>tesis,objeto_conferencia</type-bind>
 				</field>
 
 				<!-- Nombre del evento -->
 				<field>
-					<dc-schema>dc</dc-schema>
-					<dc-element>source</dc-element>
-					<dc-qualifier>title</dc-qualifier>
-					<repeatable></repeatable>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>relation</dc-element>
+					<dc-qualifier>event</dc-qualifier>
 					<label>Nombre del evento</label>
 					<input-type>onebox</input-type>
 					<hint>Nombre del congreso o conferencia en el que este objeto fue presentado</hint>
-					<type-bind>conferenceObject</type-bind>
+					<type-bind>objeto_conferencia</type-bind>
 					<required>Debe ingresar el nombre del evento al que este objeto pertenece</required>
-					<required-on-group>SeDiCIAdmin</required-on-group>
-					<visibility>workflow</visibility>
-				</field>
-
-				<!-- Fecha del evento -->
-				<field>
-					<dc-schema>dc</dc-schema>
-					<dc-element>date</dc-element>
-					<dc-qualifier></dc-qualifier>
-					<repeatable></repeatable>
-					<label>Fecha del evento</label>
-					<input-type>date</input-type>
-					<hint>Fecha en la que se llevó a cabo el evento</hint>
-					<required>Debe ingresar la fecha en la que se realizó el evento al que este objeto pertenece</required>
-					<type-bind>conferenceObject</type-bind>
-					<visibility>workflow</visibility>
 				</field>
 
 				<!-- Director de tesis -->
+				<!-- TODO Hacerlo controlado -->
 				<field>
-					<dc-schema>dc</dc-schema>
+					<dc-schema>sedici</dc-schema>
 					<dc-element>contributor</dc-element>
 					<dc-qualifier>director</dc-qualifier>
-					<repeatable>false</repeatable>
 					<label>Director de la Tésis</label>
 					<input-type>onebox</input-type>
 					<hint>Nombre del director de la Tésis</hint>
 					<required>Debe indicar el nombre del director de la tesis</required>
-					<type-bind>thesis</type-bind>
+					<type-bind>tesis</type-bind>
 				</field>
 
 				<!-- CoDirecotor de tesis -->
+				<!-- TODO Hacerlo controlado -->
 				<field>
-					<dc-schema>dc</dc-schema>
+					<dc-schema>sedici</dc-schema>
 					<dc-element>contributor</dc-element>
 					<dc-qualifier>codirector</dc-qualifier>
 					<repeatable>true</repeatable>
 					<label>Co-Director de la Tésis</label>
 					<input-type>onebox</input-type>
 					<hint>Nombre de los co-directores de la Tésis</hint>
-					<required></required>
-					<type-bind>thesis</type-bind>
+					<type-bind>tesis</type-bind>
 				</field>
 
 				<!-- Jurado de tesis -->
 				<field>
-					<dc-schema>dc</dc-schema>
+					<dc-schema>sedici</dc-schema>
 					<dc-element>contributor</dc-element>
 					<dc-qualifier>juror</dc-qualifier>
 					<repeatable>true</repeatable>
-					<label>Jurado</label>
+					<label>Miembros del Jurado</label>
 					<input-type>onebox</input-type>
 					<hint>Nombre de los miembros del jurado que evaluaron el trabajo</hint>
-					<required></required>
-					<type-bind>thesis</type-bind>
+					<type-bind>tesis</type-bind>
 				</field>
 
 				<!-- Lugar de desarrollo de la tesis -->
+				<!-- TODO Hacerlo controlado -->
 				<field>
 					<dc-schema>eprints</dc-schema>
-					<dc-element>AffilliatedInstitution</dc-element>
-					<dc-qualifier></dc-qualifier>
-					<repeatable></repeatable>
+					<dc-element>AffiliatedInstitution</dc-element>
 					<label>Lugar de desarrollo</label>
 					<input-type>onebox</input-type>
 					<hint>Institución en donde se desarrollo el trabajo de tesis</hint>
 					<required>Debe ingresar la institución en la cual se desarrolló a cabo la tesis</required>
-					<type-bind>thesis</type-bind>
+					<type-bind>tesis</type-bind>
 				</field>
 
 				<!-- Grado alcanzado -->
@@ -606,13 +564,11 @@
 					<dc-schema>thesis</dc-schema>
 					<dc-element>degree</dc-element>
 					<dc-qualifier>name</dc-qualifier>
-					<repeatable></repeatable>
 					<label>Grado alcanzado</label>
 					<input-type>onebox</input-type>
 					<hint>Grado al que el tesista accede</hint>
 					<required>Debe seleccionar el Grado Alcanzado</required>
-					<type-bind>thesis</type-bind>
-					<visibility>workflow</visibility>
+					<type-bind>tesis</type-bind>
 				</field>
 
 				<!-- Institución garante -->
@@ -621,66 +577,66 @@
 					<dc-schema>thesis</dc-schema>
 					<dc-element>degree</dc-element>
 					<dc-qualifier>grantor</dc-qualifier>
-					<repeatable></repeatable>
 					<label>Institución garante</label>
 					<input-type>onebox</input-type>
 					<hint>Institución que respalda el trabajo de tesis y el grado obtenido por el mismo</hint>
-					<required></required>
-					<type-bind>thesis</type-bind>
-					<visibility>workflow</visibility>
+					<type-bind>tesis</type-bind>
 				</field>
 
 				<!-- Compilador de libro -->
 				<!-- TODO Hay que hacerlo controlado -->
 				<field>
-					<dc-schema>dc</dc-schema>
+					<dc-schema>sedici</dc-schema>
 					<dc-element>contributor</dc-element>
 					<dc-qualifier>compiler</dc-qualifier>
 					<repeatable>true</repeatable>
 					<label>Compilador</label>
 					<input-type>onebox</input-type>
 					<hint>Persona que realizó el trabajo de compilación (sólo si aplica)</hint>
-					<required></required>
-					<type-bind>book</type-bind>
+					<type-bind>libro</type-bind>
+				</field>
+				
+				<!-- Otros colaboradores (general) -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>contributor</dc-element>
+					<dc-qualifier>colaborator</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Colaboradores</label>
+					<input-type>onebox</input-type>
+					<hint>Otros colaboradores de la obra</hint>
 				</field>
 
-				<!-- Otros colaboradores -->
+				<!-- Otros colaboradores de un libro -->
 				<field>
-					<dc-schema>dc</dc-schema>
+					<dc-schema>sedici</dc-schema>
 					<dc-element>contributor</dc-element>
-					<dc-qualifier></dc-qualifier>
 					<repeatable>true</repeatable>
-					<label>Otros colaboradores</label>
-					<input-type value-pairs-name="common_book_contributors">qualdrop_value</input-type>
-					<hint>Traductores, editores y otros colaboradores</hint>
-					<required></required>
-					<type-bind>book</type-bind>
+					<label>Otros colaboradores del Libro</label>
+					<input-type value-pairs-name="common_libro_contributors">dropdown</input-type>
+					<hint>Otros colaboradores del libro</hint>
+					<type-bind>libro</type-bind>
+					<visibility>workflow</visibility>
 				</field>
 
 				<!-- Editorial -->
 				<field>
 					<dc-schema>dc</dc-schema>
 					<dc-element>publisher</dc-element>
-					<dc-qualifier></dc-qualifier>
-					<repeatable>false</repeatable>
 					<label>Editorial</label>
 					<input-type>onebox</input-type>
 					<hint>Editorial encargada de la publicación de la obra</hint>
-					<required></required>
-					<type-bind>book</type-bind>
+					<type-bind>tesis,libro</type-bind>
 					<visibility>workflow</visibility>
 				</field>
 				
 				<!-- Notas -->
 				<field>
-					<dc-schema>dc</dc-schema>
-					<dc-element>description</dc-element>
-					<dc-qualifier>note</dc-qualifier>
-					<repeatable></repeatable>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>note</dc-element>
 					<label>Notas</label>
 					<input-type>textarea</input-type>
 					<hint>Cualquier nota o comentario que quiera dejar registrado</hint>
-					<required></required>
 				</field>
 
 			</page>
@@ -717,24 +673,20 @@
 		
 		<value-pairs value-pairs-name="common_identifiers" dc-term="identifier">
 			<pair>
-				<displayed-value>Other</displayed-value>
+				<displayed-value>Otro</displayed-value>
 				<stored-value>other</stored-value>
-			</pair>
-			<pair>
-				<displayed-value>Patente</displayed-value>
-				<stored-value>patent</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>DOI</displayed-value>
 				<stored-value>doi</stored-value>
 			</pair>
 			<pair>
-				<displayed-value>PURL</displayed-value>
-				<stored-value>purl</stored-value>
+				<displayed-value>Handle</displayed-value>
+				<stored-value>handle</stored-value>
 			</pair>
 		</value-pairs>
 
-		<value-pairs value-pairs-name="common_book_contributors" dc-term="identifier">
+		<value-pairs value-pairs-name="common_libro_contributors" dc-term="identifier">
 			<pair>
 				<displayed-value>Editor</displayed-value>
 				<stored-value>editor</stored-value>
@@ -743,40 +695,36 @@
 				<displayed-value>Traductor</displayed-value>
 				<stored-value>translator</stored-value>
 			</pair>
-			<pair>
-				<displayed-value>Colaborador</displayed-value>
-				<stored-value>colaborator</stored-value>
-			</pair>
 		</value-pairs>
 
 		<value-pairs value-pairs-name="common_types" dc-term="type">
 			<pair>
 				<displayed-value>Articulo</displayed-value>
-				<stored-value>article</stored-value>
+				<stored-value>articulo</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Tesis</displayed-value>
-				<stored-value>thesis</stored-value>
+				<stored-value>tesis</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Libro</displayed-value>
-				<stored-value>book</stored-value>
+				<stored-value>libro</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Objeto de Conferencia</displayed-value>
-				<stored-value>conferenceObject</stored-value>
+				<stored-value>objeto_conferencia</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Documento institucional</displayed-value>
-				<stored-value>institutionalDocument</stored-value>
+				<stored-value>documento_institucional</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Imagen fija</displayed-value>
-				<stored-value>fixedImage</stored-value>
+				<stored-value>imagen_fija</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Imagen en movimiento</displayed-value>
-				<stored-value>movingImage</stored-value>
+				<stored-value>imagen_movimiento</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Audio</displayed-value>
@@ -784,88 +732,88 @@
 			</pair>
 		</value-pairs>
 		
-		<value-pairs value-pairs-name="common_subtypes_article" dc-term="type">
+		<value-pairs value-pairs-name="common_subtypes_articulo" dc-term="type">
 			<pair>
 				<displayed-value>Preprint</displayed-value>
 				<stored-value>preprint</stored-value>
 			</pair>
 			<pair>
-				<displayed-value>Working paper</displayed-value>
-				<stored-value>workingPaper</stored-value>
+				<displayed-value>Documento de trabajo</displayed-value>
+				<stored-value>documento_trabajo</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Comunicación</displayed-value>
-				<stored-value>comunication</stored-value>
+				<stored-value>comunicacion</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Revisión</displayed-value>
-				<stored-value>review</stored-value>
+				<stored-value>revision</stored-value>
 			</pair>
 			<pair>
-				<displayed-value>Contribución a revistas</displayed-value>
-				<stored-value>journalContribution</stored-value>
+				<displayed-value>Contribución a revista</displayed-value>
+				<stored-value>contribucion_revista</stored-value>
 			</pair>
 			<pair>
-				<displayed-value>Reporte</displayed-value>
-				<stored-value>report</stored-value>
+				<displayed-value>Informe técnico</displayed-value>
+				<stored-value>informe_tecnico</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Artículo</displayed-value>
-				<stored-value>article</stored-value>
+				<stored-value>articulo</stored-value>
 			</pair>
 		</value-pairs>
 		
-		<value-pairs value-pairs-name="common_subtypes_thesis" dc-term="type">
+		<value-pairs value-pairs-name="common_subtypes_tesis" dc-term="type">
 			<pair>
 				<displayed-value>Tesis Doctoral</displayed-value>
-				<stored-value>doctoralThesis</stored-value>
+				<stored-value>tesis_doctorado</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Tesis de Maestría</displayed-value>
-				<stored-value>masterThesis</stored-value>
+				<stored-value>tesis_maestria</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Tesis de Grado</displayed-value>
-				<stored-value>bachelorThesis</stored-value>
+				<stored-value>tesis_grado</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Trabajo de especialización</displayed-value>
-				<stored-value>specializationThesis</stored-value>
+				<stored-value>tesis_especializacion</stored-value>
 			</pair>
 		</value-pairs>
 		
-		<value-pairs value-pairs-name="common_subtypes_book" dc-term="type">
+		<value-pairs value-pairs-name="common_subtypes_libro" dc-term="type">
 			<pair>
 				<displayed-value>Libro</displayed-value>
-				<stored-value>book</stored-value>
+				<stored-value>libro</stored-value>
 			</pair>
 		</value-pairs>
 
-		<value-pairs value-pairs-name="common_subtypes_conferenceObject" dc-term="type">
+		<value-pairs value-pairs-name="common_subtypes_objeto_conferencia" dc-term="type">
 			<pair>
 				<displayed-value>Objeto de Conferencia</displayed-value>
-				<stored-value>conferenceObject</stored-value>
+				<stored-value>objeto_conferencia</stored-value>
 			</pair>
 		</value-pairs>
 
-		<value-pairs value-pairs-name="common_subtypes_institutionalDocument" dc-term="type">
+		<value-pairs value-pairs-name="common_subtypes_documento_institucional" dc-term="type">
 			<pair>
 				<displayed-value>Documento institucional</displayed-value>
-				<stored-value>institutionalDocument</stored-value>
+				<stored-value>documento_institucional</stored-value>
 			</pair>
 		</value-pairs>
 
-		<value-pairs value-pairs-name="common_subtypes_fixedImage" dc-term="type">
+		<value-pairs value-pairs-name="common_subtypes_imagen_fija" dc-term="type">
 			<pair>
 				<displayed-value>Imagen fija</displayed-value>
-				<stored-value>fixedImage</stored-value>
+				<stored-value>imagen_fija</stored-value>
 			</pair>
 		</value-pairs>
 
-		<value-pairs value-pairs-name="common_subtypes_movingImage" dc-term="type">
+		<value-pairs value-pairs-name="common_subtypes_imagen_movimiento" dc-term="type">
 			<pair>
 				<displayed-value>Imagen en movimiento</displayed-value>
-				<stored-value>movingImage</stored-value>
+				<stored-value>imagen_movimiento</stored-value>
 			</pair>
 		</value-pairs>
 
@@ -906,6 +854,38 @@
 			<pair>
 				<displayed-value>Sin revisión por pares</displayed-value>
 				<stored-value>non-peer-review</stored-value>
+			</pair>
+		</value-pairs>
+
+		<!-- Los valores se guardan en Dias -->
+		<value-pairs value-pairs-name="embargo_periods">
+			<pair>
+				<displayed-value>NO SE SOLICITA EMBARGO</displayed-value>
+				<stored-value>0</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>1 Mes</displayed-value>
+				<stored-value>30</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>3 Meses</displayed-value>
+				<stored-value>90</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>6 Meses</displayed-value>
+				<stored-value>180</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>1 Año</displayed-value>
+				<stored-value>365</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>1 Año y 6 Meses</displayed-value>
+				<stored-value>545</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>2 Años</displayed-value>
+				<stored-value>730</stored-value>
 			</pair>
 		</value-pairs>
 
