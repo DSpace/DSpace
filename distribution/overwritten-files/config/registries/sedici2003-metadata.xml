@@ -66,11 +66,6 @@
 	</dc-type>
 	<dc-type>
 		<schema>sedici2003</schema>
-		<scope_note>fecha_disponibilidad</scope_note>
-		<element>fecha-disponibilidad</element>
-	</dc-type>
-	<dc-type>
-		<schema>sedici2003</schema>
 		<scope_note>tipo_documento</scope_note>
 		<element>Tipo de Documento</element>
 	</dc-type>
@@ -403,11 +398,6 @@
 		<schema>sedici2003</schema>
 		<scope_note>71</scope_note>
 		<element>Técnica</element>
-	</dc-type>
-	<dc-type>
-		<schema>sedici2003</schema>
-		<scope_note>80</scope_note>
-		<element>Última revisión</element>
 	</dc-type>
 	<dc-type>
 		<schema>sedici2003</schema>

@@ -543,9 +543,9 @@
 <message key="xmlui.Submission.general.submission.title">Envío de ítems</message>
 <message key="xmlui.Submission.general.submission.trail">Envío de ítems</message>
 <message key="xmlui.Submission.general.submission.head">Envío de ítems</message>
-<message key="xmlui.Submission.general.submission.previous">&lt; Anterior</message>
+<message key="xmlui.Submission.general.submission.previous">Anterior</message>
 <message key="xmlui.Submission.general.submission.save">Guardar / Cancelar</message>
-<message key="xmlui.Submission.general.submission.next">Siguiente &gt;</message>
+<message key="xmlui.Submission.general.submission.next">Siguiente</message>
 <message key="xmlui.Submission.general.submission.complete">Completar el envío</message>
 <message key="xmlui.Submission.general.workflow.title">Envío de ítems</message>
 <message key="xmlui.Submission.general.workflow.trail">Envío de ítems</message>
@@ -1888,6 +1888,7 @@ Este no es un objeto Dspace conforme con el perfil METS1.0,  por tanto no puede 
 Puede reemplazar la plantilla que gestiona el caso general dri2xhtml para mejorar la función necesaria o crear una plantilla que se ajuste al perfil usado.
            </message>
 
+<message key="xmlui.dri2xhtml.METS-1.0.item-subtype">Tipo de documento</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-preview">Vista previa</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-title">Título</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-author">Autor</message>
@@ -1904,7 +1905,7 @@ Puede reemplazar la plantilla que gestiona el caso general dri2xhtml para mejora
 <message key="xmlui.dri2xhtml.METS-1.0.item-files-format">Formato</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-files-view">Ver</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-files-description">Descripción</message>
-<message key="xmlui.dri2xhtml.METS-1.0.item-files-viewOpen">Ver/&lt;wbr/&gt;Abrir</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-files-viewOpen">Abrir</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-no-files">No hay ficheros asociados a este ítem.</message>
 <message key="xmlui.dri2xhtml.METS-1.0.size-bytes">bytes</message>
 <message key="xmlui.dri2xhtml.METS-1.0.size-kilobytes">Kb</message>
