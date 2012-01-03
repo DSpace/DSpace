@@ -222,7 +222,12 @@ public class DiscoverySubmissions extends SimpleSearch {
 
                         try {
                             WorkflowItem workflowItem = WorkflowItem.findByItemId(context, item.getID());
-                            ClaimedTask claimedTask = ClaimedTask.findByWorkflowIdAndEPerson(context, workflowItem.getID(), context.getCurrentUser().getID());
+                            ClaimedTask claimedTask = null;
+                            if (workflowItem != null) {
+                                claimedTask = ClaimedTask.findByWorkflowIdAndEPerson(context, workflowItem.getID(), context.getCurrentUser().getID());
+                            } else {
+                                log.error("workflowItem is null for item " + item.getID());
+                            }
                             if(claimedTask != null){
                                 //We have a task for this item, so allow him to perform this task !
                                 String url = contextPath+"/handle/"+ workflowItem.getCollection().getHandle()+"/workflow?" +
