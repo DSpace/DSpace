@@ -81,6 +81,7 @@ do_install()
 
 	echo -e "Personalizando los metadatos"
 	$DATA_DIR/bin/dspace dsrun org.dspace.administer.MetadataImporter -f $DATA_DIR/config/registries/sedici-metadata.xml
+	$DATA_DIR/bin/dspace dsrun org.dspace.administer.MetadataImporter -f $DATA_DIR/config/registries/sedici2003-metadata.xml
 
 	echo -e "Instalando XMLWorkflow"
 	WORKFLOW_SCRIPTS="$DATA_DIR/etc/postgres/xmlworkflow"

@@ -347,7 +347,7 @@
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>subject</dc-element>
-					<dc-qualifier>keywords</dc-qualifier>
+					<dc-qualifier>keyword</dc-qualifier>
 					<repeatable>true</repeatable>
 					<label>Palabras clave</label>
 					<input-type>onebox</input-type>

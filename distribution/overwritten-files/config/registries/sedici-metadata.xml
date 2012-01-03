@@ -202,7 +202,7 @@
 	<dc-type>
 		<schema>sedici</schema>
 		<element>subject</element>
-		<qualifier>keywords</qualifier>
+		<qualifier>keyword</qualifier>
 		<scope_note>Palabras clave extraídas del documento</scope_note>
 	</dc-type>
 	<dc-type>

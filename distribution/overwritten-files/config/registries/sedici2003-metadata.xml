@@ -1,0 +1,427 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<dspace-dc-types>
+
+	<dspace-header>
+		<title>Metadatos - SeDiCI 2003: Metadatos originales de SeDICI 2003,
+			conservados a modo de backup</title>
+		<contributor.author>SeDiCI Team</contributor.author>
+	</dspace-header>
+
+	<!-- Schemas -->
+	<dc-schema>
+		<name>sedici2003</name>
+		<namespace>http://sedici.unlp.edu.ar/namespace/sedici2003</namespace>
+	</dc-schema>
+
+	<!-- Metadatos -->
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>id</scope_note>
+		<element>identifier</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>id_padre_doc</scope_note>
+		<element>padre</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>abstract</scope_note>
+		<element>abstract</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>pais</scope_note>
+		<element>pais</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>institucion</scope_note>
+		<element>institucion</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>dependencia</scope_note>
+		<element>dependencia</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>unidad</scope_note>
+		<element>unidad</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>fecha_disponibilidad</scope_note>
+		<element>fecha-disponibilidad</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>fecha_hora_modificacion</scope_note>
+		<element>fecha-hora-actualizacion</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>fecha_hora_creacion</scope_note>
+		<element>fecha-hora-creacion</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>fecha_disponibilidad</scope_note>
+		<element>fecha-disponibilidad</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>tipo_documento</scope_note>
+		<element>Tipo de Documento</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>estado</scope_note>
+		<element>estado</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>owner</scope_note>
+		<element>owner</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>download</scope_note>
+		<element>descargas</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>115</scope_note>
+		<element>Asesor</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>132</scope_note>
+		<element>Autoarchivo</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>1</scope_note>
+		<element>Autor</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>40</scope_note>
+		<element>Autor institucional</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>68</scope_note>
+		<element>Co-director de tesis</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>117</scope_note>
+		<element>Colaboradores</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>107</scope_note>
+		<element>Comité de redacción</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>89</scope_note>
+		<element>Comité de referato</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>76</scope_note>
+		<element>Comité editorial</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>114</scope_note>
+		<element>Comité organizador</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>108</scope_note>
+		<element>Compilador</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>97</scope_note>
+		<element>Consejo asesor</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>98</scope_note>
+		<element>Consejo editorial</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>101</scope_note>
+		<element>Coordinador</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>84</scope_note>
+		<element>Descripción del recurso</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>4</scope_note>
+		<element>Descriptores</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>72</scope_note>
+		<element>Dimensiones</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>75</scope_note>
+		<element>Director</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>43</scope_note>
+		<element>Director de tesis</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>92</scope_note>
+		<element>Dossier</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>74</scope_note>
+		<element>Editor</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>94</scope_note>
+		<element>Editor de la sección Libros</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>93</scope_note>
+		<element>Editor del Dossier</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>106</scope_note>
+		<element>Editorial</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>87</scope_note>
+		<element>Evento</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>113</scope_note>
+		<element>Fecha</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>100</scope_note>
+		<element>Fecha de presentación</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>96</scope_note>
+		<element>Fecha de publicación</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>73</scope_note>
+		<element>Frecuencia</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>118</scope_note>
+		<element>Fulltext</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>33</scope_note>
+		<element>Grado alcanzado</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>51</scope_note>
+		<element>Identificadores geográficos</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>41</scope_note>
+		<element>Idioma</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>133</scope_note>
+		<element>Institucion Otorgante</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>79</scope_note>
+		<element>ISBN</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>70</scope_note>
+		<element>ISSN</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>2</scope_note>
+		<element>Jurado</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>125</scope_note>
+		<element>Licencia</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>78</scope_note>
+		<element>Localización electrónica</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>116</scope_note>
+		<element>Localización física</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>86</scope_note>
+		<element>Lugar</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>3</scope_note>
+		<element>Lugar de desarrollo</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>77</scope_note>
+		<element>Materias</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>112</scope_note>
+		<element>Nombre del evento/Evento</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>50</scope_note>
+		<element>Notas</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>48</scope_note>
+		<element>Número de la serie</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>119</scope_note>
+		<element>Número de patente</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>120</scope_note>
+		<element>País</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>81</scope_note>
+		<element>Palabras Clave</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>134</scope_note>
+		<element>Revisado por pares</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>103</scope_note>
+		<element>Revista indizada en</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>91</scope_note>
+		<element>Secretaría de redacción</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>90</scope_note>
+		<element>Subdirector</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>32</scope_note>
+		<element>Subtítulo</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>71</scope_note>
+		<element>Técnica</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>102</scope_note>
+		<element>Tipo de Documento</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>31</scope_note>
+		<element>Título del documento</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>109</scope_note>
+		<element>Título en idioma original</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>110</scope_note>
+		<element>Traductor</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>80</scope_note>
+		<element>Última revisión</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>95</scope_note>
+		<element>Verificación de referatos</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>115</scope_note>
+		<element>Asesor</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>71</scope_note>
+		<element>Técnica</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>80</scope_note>
+		<element>Última revisión</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>101</scope_note>
+		<element>Coordinador</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>47</scope_note>
+		<element>Título de la serie</element>
+	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>67</scope_note>
+		<element>Subtitulo de la serie</element>
+	</dc-type>
+</dspace-dc-types>
