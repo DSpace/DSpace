@@ -84,7 +84,7 @@ public class CDLDataCiteServiceTest {
         Map<String, String> metadata = new HashMap<String, String>();
 
         String xmlout = "<resource  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" metadataVersionNumber=\"1\"" +
-                "lastMetadataUpdate=\"2006-05-04\" xsi:noNamespaceSchemaLocation=\"datacite-metadata-v2.0.xsd\">" +
+                " lastMetadataUpdate=\"2006-05-04\" xsi:noNamespaceSchemaLocation=\"datacite-metadata-v2.0.xsd\">" +
                 "<identifier identifierType=\"DOI\">10.5061/DRYAD.2222</identifier>" +
                 "<creators>" +
                 "<creator>" +
@@ -133,7 +133,6 @@ public class CDLDataCiteServiceTest {
                 "</sizes>" +
                 "<formats>" +
                 "<format>text/plain</format>" +
-                "DataCite Metadata Scheme V 2 / January 2011 15" +
                 "</formats>" +
                 "<version>1.0</version>" +
                 "<rights>Open Database License [ODbL]</rights>" +
