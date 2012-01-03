@@ -63,7 +63,7 @@ public class CDLDataCiteServiceTest {
     }
 
     private String escape(String s) {
-        return s.replace("%", "%25").replace("", "%0A").
+        return s.replace("%", "%25").replace("\n", "%0A").
                 replace("\r", "%0D").replace(":", "%3A");
     }
 
