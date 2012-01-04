@@ -67,9 +67,7 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                         try {  //want to continue if a problem comes up
                             itemEmbargoDate = EmbargoManager.getEmbargoDate(null, item);
                         } catch (Exception e) {
-                            if (LOGGER.isWarnEnabled()) {
-                                LOGGER.info("Exception " + e + " encountered while processing " + item);
-                            } 
+                            this.report("Exception " + e + " encountered while processing " + item);
                             return Curator.CURATE_SKIP;
                         }
                     }
@@ -77,6 +75,7 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                 }
                 
             } catch (SQLException e) {
+                this.setResult("Failed on SQL Error");
                 return Curator.CURATE_ERROR;
             }
         }
