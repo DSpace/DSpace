@@ -1515,7 +1515,7 @@
       <!-- First submission form: STATUS: PUBLISHED - journalID Select + Manuscript Number Edit Box -->
       <xsl:template match="dri:list[@n='doi']">
           <li id="aspect_submission_StepTransformer_list_doi">
-          <table style="border: 2px solid gray; float:right; display:inline-block; margin-top:-65px; margin-right:300px; padding:10px; width:50%;">
+          <table style="border: 2px solid gray; float:right; display:inline-block; margin-top:-65px; margin-right:300px; padding:10px; width:900px">
               <tr>
 		<xsl:for-each select="dri:item/dri:field">
 		    <xsl:variable name="currentId"><xsl:value-of select="@id"/></xsl:variable>
@@ -1563,7 +1563,7 @@
       <!-- First submission form: STATUS: ACCEPTED/IN REVIEW/NOT_YET_SUBMITTED -->
       <xsl:template match="dri:list/dri:item[@n='select_publication_new' or @n='select_publication_exist']">
           <li>
-          <table id="status_other_than_published" style="border: 2px solid gray; float:right; display:inline-block; margin-top:-65px; margin-right:300px; padding:10px; width:50%;">
+          <table id="status_other_than_published" style="border: 2px solid gray; float:right; display:inline-block; margin-top:-65px; margin-right:300px; padding:10px; width:900px;">
           <tr><td>
               <!--xsl:call-template name="standardAttributes">
               <xsl:with-param name="class">
