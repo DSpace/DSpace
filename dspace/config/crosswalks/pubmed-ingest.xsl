@@ -30,7 +30,7 @@
 
             <!-- Title -->
             <xsl:if test="MedlineCitation/Article/Journal/Title">
-                <dim:field mdschema="dc" element="title">
+                <dim:field mdschema="prism" element="publicationName">
                     Data from:<xsl:value-of select="MedlineCitation/Article/Journal/Title"/>
                 </dim:field>
             </xsl:if>
@@ -48,14 +48,22 @@
              <!-- ISReferencedBy -->
             <xsl:if test="MedlineCitation/PMID">
                 <dim:field mdschema="dc" element="relation" qualifier="isreferencedby">
-                    doi:<xsl:value-of select="MedlineCitation/PMID"/>
+                    PMID:<xsl:value-of select="MedlineCitation/PMID"/>
                 </dim:field>
             </xsl:if>
 
             <!-- Full Title -->
             <xsl:if test="MedlineCitation/Article/ArticleTitle">
-                <dim:field mdschema="prism" element="publicationName">
+                <dim:field mdschema="dc" element="title">
                     <xsl:value-of select="MedlineCitation/Article/ArticleTitle"/>
+                </dim:field>
+            </xsl:if>
+
+
+            <!-- Abstract -->
+            <xsl:if test="MedlineCitation/Article/Abstract/AbstractText">
+                <dim:field mdschema="dc" element="description">
+                    <xsl:value-of select="MedlineCitation/Article/Abstract/AbstractText"/>
                 </dim:field>
             </xsl:if>
 
