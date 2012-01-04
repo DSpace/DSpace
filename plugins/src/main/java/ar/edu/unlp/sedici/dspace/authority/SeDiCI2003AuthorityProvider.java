@@ -57,7 +57,12 @@ public abstract class SeDiCI2003AuthorityProvider implements ChoiceAuthority {
      * @return a Choices object (never null).
      */
     public Choices getMatches(String field, String text, int collection, int start, int limit, String locale) {
+    	
     	if (text == null) text = "";
+    	
+    	//FIXME Ver de donde viene el limit
+    	if(limit > 10) limit = 10;
+    	
     	List<Choice> entities = this.findSeDiCI2003Entities(text, start, limit, new ChoiceFactory(field));
 		
     	int confidence;
@@ -68,7 +73,7 @@ public abstract class SeDiCI2003AuthorityProvider implements ChoiceAuthority {
         else
             confidence = Choices.CF_AMBIGUOUS;
     	
-    	return new Choices(entities.toArray(new Choice[entities.size()]), start, entities.size(), confidence, (entities.size() <= limit));
+    	return new Choices(entities.toArray(new Choice[entities.size()]), start, entities.size(), confidence, (entities.size() < limit));
 	}
 
     protected abstract List<Choice> findSeDiCI2003Entities(String text, int start, int limit, ChoiceFactory choiceFactory) ;
@@ -109,14 +114,17 @@ public abstract class SeDiCI2003AuthorityProvider implements ChoiceAuthority {
 		return getSeDiCI2003EntityLabel(key);
 	}
 
-     static class ChoiceFactory{
-    	private String authority;
-    	protected ChoiceFactory(String authority){
-    		this.authority = authority;
+    static class ChoiceFactory{
+    	private String field;
+    	
+    	protected ChoiceFactory(String field){
+    		this.field = field;
     	}
-		public Choice createChoice(int id, String label){
-			return new Choice(this.authority, String.valueOf(id), label);
+    	
+		public Choice createChoice(int id, String value, String label){
+			return new Choice(String.valueOf(id), value, label);
 		}
+		
     }
 	
 }
