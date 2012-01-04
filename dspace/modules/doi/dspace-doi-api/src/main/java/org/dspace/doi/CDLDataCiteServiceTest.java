@@ -49,6 +49,7 @@ public class CDLDataCiteServiceTest {
         httpMethod.setRequestHeader("Accept", "text/plain");
 
         this.getClient(false).executeMethod(httpMethod);
+	System.out.println("HTTP output: " + httpMethod.getStatusText());
         return httpMethod.getStatusLine().toString();
     }
 
