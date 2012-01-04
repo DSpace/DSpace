@@ -171,6 +171,20 @@ public class DryadReviewAction extends ProcessingAction {
         //email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/submission-review?wfID=" + wf.getID() + "&token=" + key);
         email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/review?wfID=" + wf.getID() + "&token=" + key);
 
+	// add journal's manuscript number
+	String manuScriptIdentifier = "";
+	DCValue[] manuScripIdentifiers = wf.getItem().getMetadata(MetadataSchema.DC_SCHEMA, "identifier", "manuscriptNumber", Item.ANY);
+	if(0 < manuScripIdentifiers.length){
+	    manuScriptIdentifier = manuScripIdentifiers[0].value;
+	}
+	
+	if(manuScriptIdentifier.length() == 0) {
+	    manuScriptIdentifier = "none available";
+	}
+	
+	email.addArgument(manuScriptIdentifier);
+
+	
         try {
             email.send();
         } catch (MessagingException e) {

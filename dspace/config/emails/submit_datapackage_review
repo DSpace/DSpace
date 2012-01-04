@@ -8,10 +8,12 @@
 # {2}  Title of the data package
 # {3}  Submitter name/email
 # {4}  Url for the review
+# {5}  The manuscript identifier (or "none available" if the metadata doesn't contain one)
 Subject: Dryad: Data package received for peer review {1}
 
 Dryad has received the following data package:
 Title:        {0}
+Journal manuscript number: {5}
 Submitted by: {3}
 Data file(s):
 {2}
