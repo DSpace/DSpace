@@ -68,7 +68,7 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                             itemEmbargoDate = EmbargoManager.getEmbargoDate(null, item);
                         } catch (Exception e) {
                             this.report("Exception " + e + " encountered while processing " + item);
-                            return Curator.CURATE_ERROR;
+                            //return Curator.CURATE_ERROR;
                         }
                     }
 
@@ -76,7 +76,7 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                 
             } catch (SQLException e) {
                 this.report("Failed on SQL Error");
-                return Curator.CURATE_ERROR;
+                //return Curator.CURATE_ERROR;
             }
         }
 
