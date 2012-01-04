@@ -55,12 +55,7 @@ public class CDLDataCiteServiceTest {
 
     private void logMetadata(Map<String, String> metadata) {
         System.out.println("Adding the following Metadata:");
-        if(metadata!=null){
-            Set<String> keys = metadata.keySet();
-            for(String key : keys){
-                System.out.println(key + ": " + metadata.get(key));
-            }
-        }
+	System.out.println(encodeAnvl(metadata));
     }
 
     private String escape(String s) {
