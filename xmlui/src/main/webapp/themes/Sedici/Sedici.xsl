@@ -40,6 +40,8 @@
     <xsl:import href="lib/xsl/aspect/artifactbrowser/item-view.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/collection-view-append.xsl"/>
     <xsl:import href="lib/xsl/aspect/artifactbrowser/community-view-append.xsl"/>
+    <xsl:import href="lib/xsl/aspect/artifactbrowser/community-collection-search.xsl"/>
+    <xsl:import href="lib/xsl/aspect/artifactbrowser/authors_table.xsl"/>
     <xsl:import href="lib/xsl/core/forms.xsl"/>
     <xsl:import href="lib/xsl/core/page-structure.xsl"/>
     <xsl:import href="lib/xsl/aspect/general/choice-authority-control.xsl"/>
