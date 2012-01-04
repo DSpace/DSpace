@@ -202,30 +202,34 @@ public class WorkflowOverviewDiscovery extends SimpleSearch {
                 }else{
                     //We most likely have a workflow item, find it
                     WorkflowItem workflowItem = WorkflowItem.findByItemId(context, item.getID());
-                    //Attempt to find a task
-                    java.util.List<PoolTask> pooltasks = PoolTask.find(context,workflowItem);
-                    java.util.List<ClaimedTask> claimedtasks = ClaimedTask.find(context, workflowItem);
+                    if (workflowItem != null) {
+                        //Attempt to find a task
+                        List<PoolTask> pooltasks = PoolTask.find(context,workflowItem);
+                        List<ClaimedTask> claimedtasks = ClaimedTask.find(context, workflowItem);
 
 
-                    String step_id = null;
-                    String action_id = null;
-                    if(0 < pooltasks.size()){
-                        step_id = pooltasks.get(0).getStepID();
-                        action_id = pooltasks.get(0).getActionID();
-                    }else
-                    if(0 < claimedtasks.size()){
-                        step_id = claimedtasks.get(0).getStepID();
-                        action_id = claimedtasks.get(0).getActionID();
-                    }
-                    if(step_id != null && action_id != null){
-                        if(step_id.equals("reviewStep")){
-                            url = contextPath+"/internal-item?itemID=" + item.getID();
+                        String step_id = null;
+                        String action_id = null;
+                        if(0 < pooltasks.size()){
+                            step_id = pooltasks.get(0).getStepID();
+                            action_id = pooltasks.get(0).getActionID();
+                        }else
+                        if(0 < claimedtasks.size()){
+                            step_id = claimedtasks.get(0).getStepID();
+                            action_id = claimedtasks.get(0).getActionID();
+                        }
+                        if(step_id != null && action_id != null){
+                            if(step_id.equals("reviewStep")){
+                                url = contextPath+"/internal-item?itemID=" + item.getID();
+
+                            }else{
+                                url = contextPath+"/handle/"+workflowItem.getCollection().getHandle()+"/workflow?workflowID="+workflowItem.getID()+"&stepID="+step_id+"&actionID="+action_id;
+                            }
 
                         }else{
-                            url = contextPath+"/handle/"+workflowItem.getCollection().getHandle()+"/workflow?workflowID="+workflowItem.getID()+"&stepID="+step_id+"&actionID="+action_id;
+                            url = contextPath + "/admin/item?itemID=" + item.getID();
                         }
-
-                    }else{
+                    } else {
                         url = contextPath + "/admin/item?itemID=" + item.getID();
                     }
                 }
