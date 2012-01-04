@@ -80,7 +80,7 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
             }
         }
 
-        this.setResult("Total items = " + total + "; unpublished items = " + unpublishedCount);
+        this.report("Total items = " + total + "; unpublished items = " + unpublishedCount);
         return Curator.CURATE_SUCCESS;
     }
 
