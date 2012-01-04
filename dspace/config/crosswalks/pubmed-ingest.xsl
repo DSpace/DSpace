@@ -28,10 +28,10 @@
                 </xsl:if>
             </xsl:for-each>
 
-            <!-- Title -->
+            <!-- Journal Name -->
             <xsl:if test="MedlineCitation/Article/Journal/Title">
                 <dim:field mdschema="prism" element="publicationName">
-                    Data from:<xsl:value-of select="MedlineCitation/Article/Journal/Title"/>
+                    <xsl:value-of select="MedlineCitation/Article/Journal/Title"/>
                 </dim:field>
             </xsl:if>
 
@@ -55,7 +55,7 @@
             <!-- Full Title -->
             <xsl:if test="MedlineCitation/Article/ArticleTitle">
                 <dim:field mdschema="dc" element="title">
-                    <xsl:value-of select="MedlineCitation/Article/ArticleTitle"/>
+                    Data from: <xsl:value-of select="MedlineCitation/Article/ArticleTitle"/>
                 </dim:field>
             </xsl:if>
 
