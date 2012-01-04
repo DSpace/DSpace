@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
+import org.dspace.content.MetadataSchema;
 import org.dspace.core.*;
 import org.dspace.identifier.DOIIdentifierProvider;
 import org.dspace.eperson.EPerson;
