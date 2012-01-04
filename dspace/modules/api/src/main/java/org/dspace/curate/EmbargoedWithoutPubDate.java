@@ -32,7 +32,7 @@ import java.util.StringTokenizer;
  *
  */
 
-@Suspendable
+//@Suspendable
 public class EmbargoedWithoutPubDate extends AbstractCurationTask {
 
     private static Logger LOGGER = LoggerFactory.getLogger(EmbargoedWithoutPubDate.class);
