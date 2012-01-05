@@ -45,11 +45,11 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
     
     @Override
     public int perform(DSpaceObject dso) throws IOException {
-        int total = 0;
-        int unpublishedCount = 0;
         
         if (dso instanceof Collection){
             try {
+                int total = 0;
+                int unpublishedCount = 0;
                 ItemIterator iit = ((Collection)dso).getAllItems();
                 while (iit.hasNext()){
                     Item item = iit.next();
@@ -73,14 +73,12 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                     }
 
                 }
-                
+                this.report("Total items = " + total + "; unpublished items = " + unpublishedCount);                        
             } catch (SQLException e) {
                 this.report("Failed on SQL Error");
                 //return Curator.CURATE_ERROR;
             }
         }
-
-        this.report("Total items = " + total + "; unpublished items = " + unpublishedCount);
         return Curator.CURATE_SUCCESS;
     }
 
