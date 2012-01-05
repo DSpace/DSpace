@@ -91,7 +91,7 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                 itemEmbargoDate = EmbargoManager.getEmbargoDate(null, item);
                 if (itemEmbargoDate != null){
                     DatedEmbargo de = new DatedEmbargo(itemEmbargoDate.toDate(),item);
-                    Date d = itemEmbargoDate.toDate();
+                    embargoes.add(de);
                 }
             } catch (Exception e) {
                 this.report("Exception " + e + " encountered while processing " + item);
