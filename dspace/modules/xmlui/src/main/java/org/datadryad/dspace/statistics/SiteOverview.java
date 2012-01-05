@@ -49,8 +49,7 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
 
 	private static final String PUB_SEARCH = "/select/?q=*:*&facet=on&rows=0&facet.field=prism.publicationName_filter&fq=location:l2";
 
-	//private static final String PUB_COUNTER = "count(//lst[@name='prism.publicationName_filter']/int[.!='0'])";
-    private static final String PUB_COUNTER = "count(//lst[@name='prism.publicationName_filter']/int)";
+	private static final String PUB_COUNTER = "count(//lst[@name='prism.publicationName_filter']/int[.!='0'])";
 
 
 	private SourceValidity validity;
