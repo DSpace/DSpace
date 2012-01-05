@@ -25,7 +25,7 @@ import ar.edu.unlp.sedici.sedici2003.model.Personas;
 public class SeDiCI2003Authors extends SeDiCI2003AuthorityProvider{
 	
 	@Override
-	protected List<Choice> findSeDiCI2003Entities(String text, int start, int limit, ChoiceFactory choiceFactory) {
+	protected List<Choice> findSeDiCI2003Entities(String field, String text, int start, int limit, ChoiceFactory choiceFactory) {
 		
 		String[] parts = text.split(", ",1);
 		String apellido = parts[0];
@@ -33,12 +33,12 @@ public class SeDiCI2003Authors extends SeDiCI2003AuthorityProvider{
 		List<Personas> personas = Personas.findPersonasesByApellidoYNombre(apellido, nombre, start, limit);
 		List<Choice> choices= new ArrayList<Choice>(personas.size());
 		for (Personas p : personas) {
-			choices.add(choiceFactory.createChoice(p.getId(), p.getApellidoYNombre(), p.getApellidoYNombre()));
+			choices.add(choiceFactory.createChoice(String.valueOf(p.getId()), p.getApellidoYNombre(), p.getApellidoYNombre()));
 		}
 		return choices;
 	}
 
-	protected String getSeDiCI2003EntityLabel(String key) {
+	protected String getSeDiCI2003EntityLabel(String field, String key) {
 		Personas p = Personas.findPersonas(Integer.valueOf(key));
 		return p.getApellidoYNombre();
 	}

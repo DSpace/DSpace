@@ -27,6 +27,12 @@
  */
 package ar.edu.unlp.sedici.sedici2003.model;
 
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.Query;
+import javax.persistence.TypedQuery;
+
 import org.springframework.roo.addon.dbre.RooDbManaged;
 import org.springframework.roo.addon.entity.RooEntity;
 import org.springframework.roo.addon.javabean.RooJavaBean;
@@ -37,4 +43,42 @@ import org.springframework.roo.addon.tostring.RooToString;
 @RooEntity(versionField = "", table = "tesauros_termino")
 @RooDbManaged(automaticallyDelete = true)
 public class TesaurosTermino {
+	
+	public static List<TesaurosTermino> findAll(String text, String[] parents, boolean includeChilds, int start, int count) {
+
+		if (text == null || text.length() == 0) throw new IllegalArgumentException("The text argument is required");
+		if (parents == null || parents.length == 0) throw new IllegalArgumentException("The parents argument is required");
+		
+		if (start < 0) start = 0;
+		if (count <= 0) count = 10;
+		
+		// Armamos el filtro de descendencia
+		String parentFilter = "(";
+		if(includeChilds) {
+			for(String parentID : parents) {
+				parentFilter += " terminos.id LIKE '"+parentID+"%' OR";
+			}
+		} else {
+			for(String parentID : parents) {
+				parentFilter += " relaciones.id.idTermino1 = '"+parentID+"' OR";
+			}
+		}
+
+		//Sacamos el ultimo OR
+		parentFilter = parentFilter.substring(0, parentFilter.length()-2)+ ")";
+		
+		String sql = "SELECT terminos " +
+			"FROM TesaurosTermino AS terminos, TesaurosRelaciones AS relaciones " +
+			"WHERE terminos.id = relaciones.id.idTermino2 AND relaciones.id.tipoRelacion = 1 " +
+			"AND LOWER(terminos.nombreEs) LIKE LOWER(:filtro) AND " + parentFilter;
+
+		EntityManager em = TesaurosTermino.entityManager();
+		TypedQuery<TesaurosTermino> q = em.createQuery(sql, TesaurosTermino.class);
+		q.setParameter("filtro", "%"+text+"%");
+		q.setFirstResult(start);
+		q.setMaxResults(count);
+		
+		return q.getResultList();    
+	}
+
 }

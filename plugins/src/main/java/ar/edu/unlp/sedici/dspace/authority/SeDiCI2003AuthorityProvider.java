@@ -63,7 +63,7 @@ public abstract class SeDiCI2003AuthorityProvider implements ChoiceAuthority {
     	//FIXME Ver de donde viene el limit
     	if(limit > 10) limit = 10;
     	
-    	List<Choice> entities = this.findSeDiCI2003Entities(text, start, limit, new ChoiceFactory(field));
+    	List<Choice> entities = this.findSeDiCI2003Entities(field, text, start, limit, new ChoiceFactory(field));
 		
     	int confidence;
     	if (entities.size() == 0)
@@ -76,8 +76,8 @@ public abstract class SeDiCI2003AuthorityProvider implements ChoiceAuthority {
     	return new Choices(entities.toArray(new Choice[entities.size()]), start, entities.size(), confidence, (entities.size() < limit));
 	}
 
-    protected abstract List<Choice> findSeDiCI2003Entities(String text, int start, int limit, ChoiceFactory choiceFactory) ;
-    protected abstract String getSeDiCI2003EntityLabel(String key) ;
+    protected abstract List<Choice> findSeDiCI2003Entities(String field, String text, int start, int limit, ChoiceFactory choiceFactory) ;
+    protected abstract String getSeDiCI2003EntityLabel(String field, String key) ;
 	/**
      * Get the single "best" match (if any) of a value in the authority
      * to the given user value.  The "confidence" element of Choices is
@@ -111,7 +111,7 @@ public abstract class SeDiCI2003AuthorityProvider implements ChoiceAuthority {
      * @return descriptive label - should always return something, never null.
      */
     public String getLabel(String field, String key, String locale) {
-		return getSeDiCI2003EntityLabel(key);
+		return getSeDiCI2003EntityLabel(field, key);
 	}
 
     static class ChoiceFactory{
@@ -121,8 +121,8 @@ public abstract class SeDiCI2003AuthorityProvider implements ChoiceAuthority {
     		this.field = field;
     	}
     	
-		public Choice createChoice(int id, String value, String label){
-			return new Choice(String.valueOf(id), value, label);
+		public Choice createChoice(String id, String value, String label){
+			return new Choice(id, value, label);
 		}
 		
     }
