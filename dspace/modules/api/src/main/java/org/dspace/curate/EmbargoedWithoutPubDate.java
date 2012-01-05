@@ -55,6 +55,11 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
     }
     
     @Override
+    public int perform(DSpaceObject dso) throws IOException{
+        throw new RuntimeException("Didn't want to call this");
+    }
+    
+    @Override
     public int perform(Context ctx, String id) throws IOException {
         DSpaceObject dso = dereference(ctx,id);
         if (dso instanceof Collection){
