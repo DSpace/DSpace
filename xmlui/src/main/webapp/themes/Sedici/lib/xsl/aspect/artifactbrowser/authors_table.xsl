@@ -7,7 +7,14 @@
 
    <xsl:template match="dri:div[@id='aspect.artifactbrowser.ConfigurableBrowse.div.browse-by-author-results']">
      <xsl:variable name="cantItemsXCol">
-          20
+          <xsl:choose>
+          <xsl:when test="@itemsTotal>60">
+              <xsl:value-of select="ceiling(@itemsTotal div 3)"/>
+          </xsl:when>
+          <xsl:otherwise>
+                20
+          </xsl:otherwise>
+          </xsl:choose>
      </xsl:variable> 
      
      <xsl:apply-templates mode="tabla_autores">    
@@ -92,6 +99,7 @@
        
     </xsl:template>
     
+    <!-- Es el mismo que el di:row normal, solo que necesito por el MODE -->
     <xsl:template match="dri:row" mode="tabla_autores">
         <tr>
             <xsl:call-template name="standardAttributes">
