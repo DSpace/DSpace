@@ -66,7 +66,7 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                 Arrays.sort(s);
                 this.report("Collection: " + dso.getName() + "; Total items = " + total + "; unpublished items = " + unpublishedCount); 
                 for(DatedEmbargo d : s)
-                    this.report(s.toString());
+                    this.report(d.toString());
             }
             else if (total > 0)
                 this.report("Collection: " + dso.getName() + "; Total items = " + total + "; no unpublished items"); 
