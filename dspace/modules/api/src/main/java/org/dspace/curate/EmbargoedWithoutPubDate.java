@@ -32,9 +32,13 @@ import java.util.StringTokenizer;
  *
  */
 
-//@Suspendable
+@Suspendable
 public class EmbargoedWithoutPubDate extends AbstractCurationTask {
 
+    
+    private int total;
+    private int unpublishedCount;
+    
     private static Logger LOGGER = LoggerFactory.getLogger(EmbargoedWithoutPubDate.class);
     
 
@@ -47,39 +51,33 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
     public int perform(DSpaceObject dso) throws IOException {
         
         if (dso instanceof Collection){
-            try {
-                int total = 0;
-                int unpublishedCount = 0;
-                ItemIterator iit = ((Collection)dso).getAllItems();
-                while (iit.hasNext()){
-                    Item item = iit.next();
-                    total++;
-                    boolean unpublished = false;
-                    DCDate itemPubDate;
-                    DCValue values[] = item.getMetadata("dc", "date", "available", Item.ANY);
-                    if (values== null || values.length==0){ //no available date - save and report
-                        unpublished = true;
-                    }
-                    
-                    DCDate itemEmbargoDate = null;
-                    if (unpublished){
-                        unpublishedCount++;
-                        try {  //want to continue if a problem comes up
-                            itemEmbargoDate = EmbargoManager.getEmbargoDate(null, item);
-                        } catch (Exception e) {
-                            this.report("Exception " + e + " encountered while processing " + item);
-                            //return Curator.CURATE_ERROR;
-                        }
-                    }
-
-                }
-                this.report("Total items = " + total + "; unpublished items = " + unpublishedCount);                        
-            } catch (SQLException e) {
-                this.report("Failed on SQL Error");
-                //return Curator.CURATE_ERROR;
-            }
+            total = 0;
+            unpublishedCount = 0;
+            distribute(dso);
+            this.report("Collection: " + dso.getName() + "; Total items = " + total + "; unpublished items = " + unpublishedCount);                        
         }
         return Curator.CURATE_SUCCESS;
     }
 
+    @Override
+    protected void performItem(Item item){
+        total++;
+        boolean unpublished = false;
+        DCDate itemPubDate;
+        DCValue values[] = item.getMetadata("dc", "date", "available", Item.ANY);
+        if (values== null || values.length==0){ //no available date - save and report
+            unpublished = true;
+        }
+        
+        DCDate itemEmbargoDate = null;
+        if (unpublished){
+            unpublishedCount++;
+            try {  //want to continue if a problem comes up
+                itemEmbargoDate = EmbargoManager.getEmbargoDate(null, item);
+            } catch (Exception e) {
+                this.report("Exception " + e + " encountered while processing " + item);
+            }
+        }
+
+    }
 }
