@@ -34,6 +34,10 @@ h3 {
     font-size: 116%;
 }
 
+h3.ds-table-head {font-size:100%;
+margin-bottom:5px;
+}
+
 h4 {
     font-size: 108%;
 }
@@ -48,7 +52,7 @@ other browsers*/
 select {
     height: 25px;
 	border:1px solid #dedede;
-	padding:3px;
+	padding:0px;
 	margin-left:3px;
 }
 
@@ -151,7 +155,7 @@ font-weight:bold;
 #ds-header,
 #ds-footer,
 #ds-content {
-    width: 950px;
+    width: 970px;
     margin: auto;
     position: relative;
 }
@@ -239,9 +243,10 @@ font-weight:bold;
     float: right;
     width: 249px;
     padding-top:10px;
-/*background-image:url(../../images/columna.png);*/
+background-image:url(../../images/columna.png);
 background-position:top left;
 background-repeat:no-repeat;
+min-height:800px;
 }
 
 #ds-options {
@@ -253,7 +258,7 @@ h1.ds-option-set-head {
 /* background-color: #f0f2f5;*/
     padding: 8px 10px;
     border: 1px dashed #dedede;
-   border-bottom: 2px solid #dedede;
+   border-bottom: 1px dashed #dedede;
 /*border-bottom:none;*/
     font-size: 108%;
 	color:#2882a8;
@@ -264,9 +269,10 @@ h1.ds-option-set-head {
 }
 
 div.ds-option-set {
-    border: 1px dashed #dedede;
+    border: none;
     border-top: none;
 	padding:0px 0px 0px 5px;
+/*	min-height:800px;*/
 }
 
 div.ds-option-set ul {
@@ -352,12 +358,12 @@ td {
 
 .ds-button-field,
 #aspect_eperson_StartRegistration_list_registration-progress li {
-    background-color: #52bae7;
     border: none;
     padding: 5px;
-    color:white;
+    color:black;
     font-weight: bold;
     cursor: pointer;
+	background-color:transparent;
 }
 
 .ds-button-field[disabled="disabled"],
@@ -421,7 +427,8 @@ ul.ds-progress-list li.current input.ds-button-field,
 #aspect_eperson_StartRegistration_list_registration-progress li.current {
     background-color: #f48620;
     border: none;
-	padding:10px;
+	padding:5px;
+	color:white;
 }
 
 ul.ds-progress-list li.disabled input.ds-button-field
@@ -479,12 +486,15 @@ border:none;
 #aspect_discovery_CommunitySearch_field_submit,
 #aspect_artifactbrowser_ConfigurableBrowse_field_submit,
 #aspect_discovery_SimpleSearch_field_submit,
-#aspect_discovery_CollectionSearch_field_submit
+#aspect_discovery_CollectionSearch_field_submit,
+#aspect_administrative_eperson_ManageEPeopleMain_field_submit_search,
+#aspect_administrative_authorization_AuthorizationMain_field_submit_edit,
+#aspect_administrative_item_FindItemForm_field_submit_find
  {
 font-size:16px;
 background-image:url(../../images/lupita.png);
 height:24px;
-background-color:white;
+background-color:none;
 background-repeat:no-repeat;
 padding:0px 0px 0px 20px;
 color:#939598;
@@ -516,6 +526,7 @@ input.ds-password-field {
 .administrative .ds-form-list input.ds-text-field,
 textarea.ds-textarea-field {
     width: 500px;
+	border-color:#dedede;
 }
 
 table textarea.ds-textarea-field {
@@ -555,13 +566,17 @@ input.input.ds-password-field:focus {
 }
 
 span.error {
-    clear: both;
+/*    clear: both;
     display: inline;
     color: #c22121;
 	position:absolute;
 	top:50px;
 	width:500px;
-	left:120px;
+	left:120px;*/
+	float:left;
+	color: #c22121;
+	display:inline;
+	position:relative;
 }
 
 textarea.ds-textarea-field.error,
@@ -710,14 +725,14 @@ span.field-help {
     clear: both;
 }
 
-#aspect_submission_Submissions_div_submissions .ds-static-div,
+/*#aspect_submission_Submissions_div_submissions .ds-static-div,
 .submission .ds-form-sublist ol {
     background-color: #fafafa;
     border: 1px solid #ebebeb;
     margin-top: 3px;
     margin-bottom: 30px;
     padding: 10px;
-}
+}*/
 
 #aspect_submission_Submissions_div_submissions table,
 #aspect_submission_Submissions_div_submissions table tr,
@@ -725,6 +740,7 @@ span.field-help {
 #aspect_submission_Submissions_div_submissions table th {
     background-color: #FFFFFF;
     border: 1px solid #9CACBA;
+	margin-bottom:20px;
 }
 
 #aspect_submission_Submissions_div_submissions table tr.ds-table-header-row, 
@@ -794,7 +810,7 @@ border:none;
 background-image:url(../../images/sombra_abajo.png);
 height:20px;
 background-repeat:no-repeat;
-background-position:center -20px;
+background-position:center -35px;
 padding-bottom:5px;
 
 /*    padding: 7px;
@@ -821,6 +837,8 @@ padding-bottom:5px;
     color: #1F3F5E;
 }
 
+#aspect_submission_submit_SelectCollectionStep_field_submit,
+#aspect_submission_StepTransformer_field_submit_next,
 .next-page-link {
 background-image:url(../../images/paginasiguiente_off.png);
 background-repeat:no-repeat;
@@ -830,7 +848,8 @@ text-decoration:none;
 color:#949494;
 }
 
-.previous-page-link {
+.previous-page-link,
+#aspect_submission_StepTransformer_field_submit_prev {
 background-image:url(../../images/paginaprevia_off.png);
 background-repeat:no-repeat;
 background-position:left;
@@ -840,12 +859,16 @@ color:#949494;
 margin-right:10px;
 }
 
-.next-page-link:hover{
+
+#aspect_submission_submit_SelectCollectionStep_field_submit:hover,
+.next-page-link:hover,
+#aspect_submission_StepTransformer_field_submit_next:hover{
 background-image:url(../../images/paginasiguiente.png);
 color:#607890;
 }
 
-.previous-page-link:hover {
+.previous-page-link:hover,
+#aspect_submission_StepTransformer_field_submit_prev:hover{
 background-image:url(../../images/paginaprevia.png);
 color:#607890;
 }
@@ -874,13 +897,13 @@ color:#607890;
 
 .file-wrapper,
 .ds-artifact-item {
-    padding-top: 15px;
-    padding-bottom: 15px;
+    padding-top: 8px;
+    padding-bottom: 8px;
 	list-style-type:none;
 	}
 	
 li.ds-artifact-item:hover {
-background-color:red;
+background-color:none ;
 }
 
 ul.ds-artifact-item a{
@@ -909,14 +932,13 @@ background-repeat:repeat-x;
 
 
 .ds-artifact-item :hover{
-background-color:#fbfbfb;
 z-index:0;
 }
 
 ul.ds-artifact-list li.even {
 background-color:white;
 border-bottom:1px solid white;
-border-top:1px solid #FFFFFF;
+border-top:2px solid #FFFFFF;
 background-image:url(../../images/fondo_li2.gif);
 background-repeat:repeat-x;
 }
@@ -947,7 +969,7 @@ background-repeat:repeat-x;
 
 
 .community .artifact-description a{
-color: blue;
+/*color: blue;*/
 }
 
 .ds-artifact-item .community .Z3988 a{
@@ -956,7 +978,7 @@ color:#dedede;
 
 .collection .artifact-title a {
     font-weight: normal;
-	color:red;
+	
 }
 
 #aspect_artifactbrowser_CommunityBrowser_div_comunity-browser .short-description, #aspect_discovery_SiteRecentSubmissions_div_site-home .short-description {
@@ -973,17 +995,29 @@ color:#dedede;
     margin-bottom: 25px;
 }
 
-.artifact-title {
-    font-size: 110%;
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-dateissued-results .artifact-title,
+#aspect_discovery_SiteRecentSubmissions_div_site-recent-submission .artifact-title,
+#aspect_discovery_CommunityRecentSubmissions_div_community-recent-submission .artifact-title,
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-title-results .artifact-title
+{
+    font-size: 100%;
 	font-weight:bold;
 	text-decoration:none;
-	background-image:url(../../images/marquita.png);
+	background-image:url(../../images/marquitaprueba.png);
 	background-repeat:no-repeat;
-	background-position:left;
+	background-position:left -3px;
 	position:relative;
-	right:17px;
-	padding-left:20px;
+	right:25px;
+	min-height:20px;
+	padding: 17px 9px 5px 20px;
+	border-bottom:2px solid #eaeaea;
+		
 }
+
+#artifact-description-community.artifact-title {
+background-color:#0000CC;
+}
+
 
 .artifact-title a {
 	text-decoration:none;
@@ -1032,10 +1066,10 @@ td select.ds-select-field {
 }
 
 form.search {
-    background-color: #fafafa;
-    border: 1px solid #ebebeb;
+/*    background-color: #fafafa;*/
+/*    border: 1px solid #ebebeb;*/
     padding: 10px;
-    margin-bottom: 15px;
+/*    margin-bottom: 15px;*/
 }
 
 form.search label {
@@ -1051,6 +1085,17 @@ form.search p.ds-paragraph.button-list {
 p.ds-paragraph {
 margin-left:40px;
 luxas
+}
+
+.ds-paragraph a {
+padding:0px 3px 0px 3px;
+margin: 0px 2px 0px 2px;
+text-decoration:none;
+color:#f59321;
+}
+
+.ds-paragraph a:hover {
+color:#9e4a20;
 }
 
 form.search fieldset {
@@ -1093,7 +1138,8 @@ clear:both;
 }
 
 #aspect_discovery_CollectionSearch_p_search-query,
-#aspect_discovery_CommunitySearch_p_search-query{
+#aspect_discovery_CommunitySearch_p_search-query
+{
     margin-bottom:0;
 }
 
@@ -1268,6 +1314,11 @@ div.spacer{
 #aspect_artifactbrowser_CollectionViewer_div_collection-home h2 {
     margin-top: 30px;
 /*    border-bottom:1px solid #D8E8EB;*/
+background-image:url(../../images/libritos_chicos.png);
+background-repeat:no-repeat;
+padding-left:25px;
+border-bottom:1px solid #dedede;
+color:#9C4F0A;
 
     margin-bottom: 3px;
 }
@@ -1376,6 +1427,8 @@ div.primary > ul > li > ul > li.community > div.artifact-description a {
 	color: green;
 }
 
+
+div
 /*Menu*/
 
 #topNav { 
@@ -1621,7 +1674,8 @@ margin-top:10px;
 padding:10px;
 }
 
-#aspect_submission_Submissions_field_submit_submissions_remove
+#aspect_submission_Submissions_field_submit_submissions_remove,
+#aspect_administrative_eperson_ManageEPeopleMain_field_submit_delete
  {
 background-image:url(../../images/tachito.png);
 background-repeat:no-repeat;
@@ -1661,7 +1715,8 @@ border-right:1px solid #dedede;
 
 #aspect_eperson_PasswordLogin_field_submit,
 #aspect_discovery_SimpleSearch_field_submit_sort,
-#aspect_artifactbrowser_ConfigurableBrowse_field_update
+#aspect_artifactbrowser_ConfigurableBrowse_field_update,
+#aspect_administrative_community_CreateCommunityForm_field_submit_save
  {
 margin-top:10px;
 background-image:url(../../images/ok_gris.png);
@@ -1673,7 +1728,9 @@ background-color:white;
 
 #aspect_eperson_PasswordLogin_field_submit:hover,
 #aspect_discovery_SimpleSearch_field_submit_sort:hover,
-#aspect_artifactbrowser_ConfigurableBrowse_field_update:hover{
+#aspect_artifactbrowser_ConfigurableBrowse_field_update:hover,
+#aspect_administrative_community_CreateCommunityForm_field_submit_save:hover
+{
 margin-top:10px;
 background-image:url(../../images/ok.png);
 padding-left:20px;
@@ -1681,6 +1738,29 @@ background-repeat:no-repeat;
 color: #8cb063;
 background-color:white;
 }
+
+
+
+#aspect_administrative_community_CreateCommunityForm_field_submit_cancel
+ {
+margin-top:10px;
+background-image:url(../../images/cancel_gris.png);
+padding-left:20px;
+background-repeat:no-repeat;
+color: #949494;
+background-color:white;
+}
+
+#aspect_administrative_community_CreateCommunityForm_field_submit_cancel:hover
+{
+margin-top:10px;
+background-image:url(../../images/cancel.png);
+padding-left:20px;
+background-repeat:no-repeat;
+color: red;
+background-color:white;
+}
+
 
 
 li.ds-form-item even {
@@ -1720,28 +1800,62 @@ float:left;
 .community-root-div {
 background-color:red;
 position:relative;
-width:200px;
-left:-50px;
+width:120px;
+/*left:-50px;*/
 }
 
 /*journal*/
 .community-actual-div {
-height:50px;
-width:100px;
+width:120px;
 float:right;
+position:relative;
+bottom:20px;
+
 }
+
+div#ds-body div.community-actual-div:first-child {
+float:left;
+position:relative;
+top:5px;
+
+}
+
+
+.detail-view {
+padding:40px 0 0 0 ;
+background-image:url(../../images/sombra_abajo.png);
+background-position:top center;
+background-repeat:no-repeat;
+width:100%;
+position:relative;
+bottom:15px;
+clear:both;
+min-height:40px;
+}
+
+.detail-view ul{
+margin:5px 0px 10px 0px;
+
+}
+
 
 /*titulo*/
 .ds-div-head {
-border-top:1px solid grey;
+/*border-top:1px solid grey;*/
 padding-top:5px;
 
 }
 
 #collection-title h1.ds-div-head {
-color:red;
+color:#fdbe83;
 background-image:none;
 padding:0;
+display:inline;
+padding-bottom:5px;
+text-shadow:1px 1px 0 #9c4f0a; /*Color de la sombra - Eje X - Eje Y - Difuminado*/  
+/*text-shadow: -1px -1px #F48620,1px 1px #cecece;*/
+
+
 }
 
 h1.ds-div-head {
@@ -1749,30 +1863,77 @@ background-image:url(../../images/libritos.gif);
 border:none;
 background-repeat:no-repeat;
 background-position:left;
-padding:0px 0px 0px 45px;
+padding:18px 0px 20px 45px;
 height:35px;
 }
 
-#aspect_artifactbrowser_CommunityViewer_list_community-browse a{
+#aspect_artifactbrowser_CommunityViewer_list_community-browse a,
+#aspect_artifactbrowser_CollectionViewer_list_collection-browse a
+
+{
 display:inline;
 text-decoration:none;
+color:white;
+margin-right:6px;
+padding: 0px 4px 0px 4px;
 }
 
+#aspect_artifactbrowser_CommunityViewer_list_community-browse,
+#aspect_artifactbrowser_CollectionViewer_div_collection-search-browse 
+#aspect_artifactbrowser_CollectionViewer_list_collection-browse{
+background-color:none;
+height:50px;
+position:relative;
+background-image:url(../../images/fondo_bandita3.png);
+background-repeat:no-repeat;
+background-position:80px 0px;
+padding:3px 0px;
+position:relative;
+top:-5px;
+width:520px;
+/*left:100px;*/
+
+}
+
+#aspect_artifactbrowser_CommunityViewer_list_community-browse li,
+#aspect_artifactbrowser_CollectionViewer_div_collection-search-browse li,
+#aspect_artifactbrowser_CollectionViewer_list_collection-browse li
+{
+display:inline;
+margin-left:5px;
+}
+
+#aspect_artifactbrowser_CommunityViewer_list_community-browse a:hover,
+#aspect_artifactbrowser_CollectionViewer_list_collection-browse a:hover{
+display:inline;
+text-decoration:none;
+color:#0c3e4d;
+/*background-color:#0a8eb7;*/
+
+}
 #aspect_artifactbrowser_CommunityViewer_div_community-browse h2{
 color:red;
 }
 
 
 .artifact-description-community {
-color:green;
 width:300px;
 display:inline;
 
 
 }
 
+.artifact-description-community a {
+color:green;
+}
+
+.artifact-description-collection a{
+color:red;
+}
+
+
+
 .ocultador {
-background-color:red;
 color:white;
 text-align:center;
 text-decoration:none;
@@ -1783,7 +1944,7 @@ display:inline;
 position:relative;
 background-image:url(../../images/carpeta_cerrada.png);
 margin-top: 4px;
-margin-right 3px;
+margin-right: 5px;
 }
 
 .ocultador:hover{
@@ -1885,22 +2046,24 @@ color:black;
 #aspect_artifactbrowser_ConfigurableBrowse_table_browse-by-subject-results {
 margin:0 auto;
 }
-
+/*
 #aspect_artifactbrowser_CollectionViewer_div_collection-browse {
 display:inline;
 float:left;
 clear:both;
 }
+*/
 
 .ds-static-div secondary search-browse {
 display:inline;
 float:left;
 }
-
+/*
 ul#aspect_artifactbrowser_CollectionViewer_list_collection-browse {
 padding-bottom:10px;
 margin:0px;
 }
+
 
 ul#aspect_artifactbrowser_CollectionViewer_list_collection-browse li a{
 text-decoration:none;
@@ -1912,13 +2075,14 @@ display:inline;
 text-decoration:none;
 margin-right:10px;
 }
-
+*/
 .author {
 font-weight:bold;
 border-bottom:1px dashed #dedede;
 float:left;
 clear:right;
 }
+
 
 .artifact-title a:hover {
 color:#4e5a66;
@@ -1934,7 +2098,7 @@ bottom:20px;
 .artifact-info {
 font-size:90%;
 margin-top:3px;
-background-color:#f5f5f5;
+background
 margin-left:-3px;
 padding-left:10px;
 }
@@ -1949,3 +2113,114 @@ padding-left:10px;
 .publisher {
 margin-left:5px;
 }
+
+
+
+#aspect_discovery_CommunitySearch_div_community-search {
+/*position:relative;*/
+bottom:10px;
+}
+
+.intro-text {
+float:left;
+}
+
+
+#aspect_submission_StepTransformer_field_submit_jump_2_1:hover,
+#aspect_submission_StepTransformer_field_submit_jump_3_1:hover,
+#aspect_submission_StepTransformer_field_submit_jump_4_1:hover,
+#aspect_submission_StepTransformer_field_submit_jump_5_1:hover
+{
+background-color:#efefef;
+}
+/*
+#aspect_submission_StepTransformer_field_submit_jump_3_1, 
+#aspect_submission_StepTransformer_field_submit_jump_4_1,
+#aspect_submission_StepTransformer_field_submit_jump_5_1,
+#aspect_submission_StepTransformer_field_submit_jump_6_1,
+#aspect_submission_StepTransformer_field_submit_jump_7_1 {
+{
+color:green;
+}
+*/
+
+
+#aspect_submission_StepTransformer_field_submit_cancel {
+background-image:url(../../images/guardar.png);
+background-position:left;
+background-repeat:no-repeat;
+padding-left:23px;
+color:#939598;
+}
+
+#aspect_submission_StepTransformer_field_submit_cancel:hover {
+background-image:url(../../images/guardar_hover.png);
+background-position:left;
+background-repeat:no-repeat;
+padding-left:23px;
+color:#79a068;
+}
+
+
+#aspect_submission_StepTransformer_field_dc_description_abstract {
+border-color:#dedede;
+}
+
+#aspect_xmlworkflow_Submissions_div_workflow-tasks p.ds-paragraph,
+#aspect_submission_Submissions_div_completed-submissions p.ds-paragraph
+{
+margin:0px 0px 20px 0px;
+padding:0px;
+}
+
+
+
+#aspect_submission_Submissions_div_start-submision {
+width:600px;
+/*background-image:url(../../images/fondo_depositos.png);
+background-position:right center;
+background-repeat:no-repeat;
+background-color:white;
+*/
+height:150px;
+border:none;
+
+}
+
+
+#aspect_submission_Submissions_div_submissions {
+background-image:url(../../images/fondo_depositos.png);
+background-position:right top;
+background-repeat:no-repeat;
+height:150px;
+background-color:white;
+border:none;
+}
+
+#aspect_submission_Submissions_div_submissions p.ds-paragraph {
+width:450px;
+margin: 0px;
+}
+
+
+
+#aspect_xmlworkflow_Submissions_div_workflow-tasks,
+#aspect_submission_Submissions_div_completed-submissions {
+    background-color: #fafafa;
+    border: 1px solid #ebebeb;
+    margin-top: 3px;
+    margin-bottom: 30px;
+    padding: 10px;
+}
+
+#aspect_submission_Submissions_div_start-submision p.ds-paragraph {
+margin:0px 200px 0px 0px;
+line-height:2;
+
+}
+
+
+h2.ds-div-head {
+padding-top: 20px;
+}
+
