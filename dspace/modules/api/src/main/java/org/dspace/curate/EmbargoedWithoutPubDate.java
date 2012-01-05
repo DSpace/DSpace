@@ -56,7 +56,8 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
     
     @Override
     public int perform(DSpaceObject dso) throws IOException{
-        throw new RuntimeException("Didn't want to call this");
+        this.report("Object is " + dso + "; handle is " + dso.getHandle());
+        return Curator.CURATE_FAIL;
     }
     
     @Override
