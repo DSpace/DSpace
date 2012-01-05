@@ -12,6 +12,7 @@ import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
 import org.dspace.content.crosswalk.StreamIngestionCrosswalk;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Context;
 import org.dspace.doi.CDLDataCiteService;
 import org.dspace.embargo.EmbargoManager;
 import org.dspace.identifier.DOIIdentifierProvider;
@@ -54,8 +55,8 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
     }
     
     @Override
-    public int perform(DSpaceObject dso) throws IOException {
-        
+    public int perform(Context ctx, String id) throws IOException {
+        DSpaceObject dso = dereference(ctx,id);
         if (dso instanceof Collection){
             total = 0;
             unpublishedCount = 0;
@@ -76,28 +77,32 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
 
     @Override
     protected void performItem(Item item){
-        total++;
-        boolean unpublished = false;
-        DCDate itemPubDate;
-        DCValue values[] = item.getMetadata("dc", "date", "available", Item.ANY);
-        if (values== null || values.length==0){ //no available date - save and report
-            unpublished = true;
-        }
-        
-        DCDate itemEmbargoDate = null;
-        if (unpublished){
-            unpublishedCount++;
-            try {  //want to continue if a problem comes up
-                itemEmbargoDate = EmbargoManager.getEmbargoDate(null, item);
-                if (itemEmbargoDate != null){
-                    DatedEmbargo de = new DatedEmbargo(itemEmbargoDate.toDate(),item);
-                    embargoes.add(de);
-                }
-            } catch (Exception e) {
-                this.report("Exception " + e + " encountered while processing " + item);
+        String handle = item.getHandle();
+        DCValue partof[] = item.getMetadata("dc.relation.ispartof");
+        if (handle != null){   //ignore items in workflow
+            total++;
+            boolean unpublished = false;
+            DCDate itemPubDate;
+            DCValue values[] = item.getMetadata("dc", "date", "available", Item.ANY);
+            if (values== null || values.length==0){ //no available date - save and report
+                unpublished = true;
             }
-        }
+        
+            DCDate itemEmbargoDate = null;
+            if (unpublished){
+                unpublishedCount++;
+                try {  //want to continue if a problem comes up
+                    itemEmbargoDate = EmbargoManager.getEmbargoDate(null, item);
+                    if (itemEmbargoDate != null){
+                        DatedEmbargo de = new DatedEmbargo(itemEmbargoDate.toDate(),item);
+                        embargoes.add(de);
+                    }
+                } catch (Exception e) {
+                    this.report("Exception " + e + " encountered while processing " + item);
+                }
+            }
 
+        }
     }
     
     private static class DatedEmbargo implements Comparable<DatedEmbargo>{
