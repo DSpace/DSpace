@@ -62,6 +62,7 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
     @Override
     public int perform(Context ctx, String id) throws IOException {
         DSpaceObject dso = dereference(ctx,id);
+        this.report("Found an object: " + dso);
         if (dso instanceof Collection){
             total = 0;
             unpublishedCount = 0;
