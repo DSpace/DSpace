@@ -35,11 +35,29 @@
             </map:transform>
           </map:match>
           
+          <map:match pattern="submit/*.continue">
+            <map:transform type="IncludePageMeta">
+                <map:parameter name="administrator" value="true"/>
+            	<map:parameter name="javascript#1" value="lib/js/jquery-ui-1.8.15.custom.min.js"/>
+                <map:parameter name="javascript#2" value="lib/js/choice-support.js"/>
+                <map:parameter name="javascript#3" value="lib/js/choice-support-administrator.js"/>
+            </map:transform>
+          </map:match>
+          
           <map:serialize type="xml"/>
           
         </map:when>
         
         <map:when test="eperson">
+          
+          <map:match pattern="submit/*.continue">
+            <map:transform type="IncludePageMeta">
+                <map:parameter name="administrator" value="false"/>
+                <map:parameter name="javascript#1" value="lib/js/jquery-ui-1.8.15.custom.min.js"/>
+            	<map:parameter name="javascript#2" value="lib/js/choice-support.js"/>
+            	<map:parameter name="javascript#3" value="lib/js/choice-support-eperson.js"/>
+            </map:transform>
+          </map:match>
           
           <map:match pattern="handle/*/*/submit/*.continue">
             <map:transform type="IncludePageMeta">

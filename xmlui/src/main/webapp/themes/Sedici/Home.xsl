@@ -62,6 +62,10 @@
 	     <div id='home_feed'>
 	         <xsl:apply-templates select="dri:div[@id='ar.edu.unlp.sedici.aspect.news.ShowNews.div.feed']"/>
 	     </div>
+	     
+	     <div id='home_envios_recientes'>
+	         <xsl:apply-templates select="dri:div[@n='site-home']"/>
+	     </div>
 	  </div>
          
     </xsl:template>

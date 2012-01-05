@@ -54,7 +54,7 @@
 
          	<h1><xsl:value-of select='dri:head'/></h1>
          	 <xsl:for-each select="dri:list[@id='ar.edu.unlp.sedici.aspect.news.ShowNews.list.news']">
-      			<b><xsl:value-of select='dri:head'/></b>
+      			<b>Breve descripcion</b>
 			    <br/>
 			    <br/>
                 <xsl:call-template name="noticias"></xsl:call-template>
@@ -64,9 +64,13 @@
     
     <xsl:template name="noticias">
        <!-- recorro la lista de noticias -->
+       <ul class="ul_noticias">
        <xsl:for-each select='dri:list'>
-                 <xsl:call-template name="noticia_individual"></xsl:call-template> 
+                <li class='li_noticia_individual'>
+                   <xsl:call-template name="noticia_individual"/> 
+                 </li>
        </xsl:for-each>
+       </ul>
 
     </xsl:template>
     
@@ -80,6 +84,6 @@
              </xsl:attribute>
              <xsl:value-of select="dri:item[@n='titulo']"/>
           </a>
-          <p><xsl:value-of select="dri:item[@n='descripcion']" disable-output-escaping="yes"/></p>
+         <!-- <p><xsl:value-of select="dri:item[@n='descripcion']" disable-output-escaping="yes"/></p> --> 
     </xsl:template>
 </xsl:stylesheet>
