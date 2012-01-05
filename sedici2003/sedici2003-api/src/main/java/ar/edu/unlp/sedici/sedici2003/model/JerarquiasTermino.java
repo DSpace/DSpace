@@ -55,6 +55,7 @@ public class JerarquiasTermino {
 		String parentFilter = "(";
 		if(includeChilds) {
 			for(String parentID : parents) {
+				if(!parentID.endsWith("."))	parentID += ".";
 				parentFilter += " terminos.id LIKE '"+parentID+"%' OR";
 			}
 		} else {
