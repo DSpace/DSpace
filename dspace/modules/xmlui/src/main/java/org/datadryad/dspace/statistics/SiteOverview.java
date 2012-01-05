@@ -2,6 +2,7 @@ package org.datadryad.dspace.statistics;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.io.StringWriter;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -9,6 +10,12 @@ import java.util.Date;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerConfigurationException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
@@ -30,6 +37,7 @@ import org.dspace.content.Collection;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.handle.HandleManager;
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 public class SiteOverview extends AbstractDSpaceTransformer implements
@@ -41,7 +49,9 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
 
 	private static final String PUB_SEARCH = "/select/?q=*:*&facet=on&rows=0&facet.field=prism.publicationName_filter&fq=location:l2";
 
-	private static final String PUB_COUNTER = "count(//lst[@name='prism.publicationName_filter']/int[.!='0'])";
+	//private static final String PUB_COUNTER = "count(//lst[@name='prism.publicationName_filter']/int[.!='0'])";
+    private static final String PUB_COUNTER = "count(//lst[@name='prism.publicationName_filter']/int)";
+
 
 	private SourceValidity validity;
 
@@ -82,6 +92,10 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
 			case 202:
 				Document doc = db.parse(get.getResponseBodyAsStream());
 				doc.getDocumentElement().normalize();
+
+                xmlToString(doc);
+
+
 				XPathFactory xpf = XPathFactory.newInstance();
 				XPath xpath = xpf.newXPath();
 				String xpathResult = xpath.evaluate(PUB_COUNTER, doc);
@@ -124,4 +138,32 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
 
 		return validity;
 	}
+
+
+    /**
+     * Method used for debugging scope.
+     *
+    */
+
+    public static void xmlToString(Node node) {
+        try {
+            TransformerFactory transFactory = TransformerFactory.newInstance();
+            Transformer transformer = null;
+
+            transformer = transFactory.newTransformer();
+
+            StringWriter buffer = new StringWriter();
+            transformer.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            transformer.transform(new DOMSource(node), new StreamResult(buffer));
+            String str = buffer.toString();
+            LOGGER.error("SiteOverviewStatistic - journalXML: " + str);
+
+        } catch (Exception e) {
+            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+        }
+
+    }
+
+
+
 }
