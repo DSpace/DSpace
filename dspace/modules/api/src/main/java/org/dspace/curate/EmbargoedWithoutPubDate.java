@@ -66,7 +66,7 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                 Arrays.sort(s);
                 this.report("Collection: " + dso.getName() + "; Total items = " + total + "; unpublished items = " + unpublishedCount); 
                 for(DatedEmbargo d : s)
-                    this.report(s.toString() + "\n");
+                    this.report(s.toString());
             }
             else if (total > 0)
                 this.report("Collection: " + dso.getName() + "; Total items = " + total + "; no unpublished items"); 
@@ -117,7 +117,7 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
         
         @Override
         public String toString(){
-            return "";
+            return embargoedItem.getName() + " " + embargoDate.toString();
         }
     }
 }
