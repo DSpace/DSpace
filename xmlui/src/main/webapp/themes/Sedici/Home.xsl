@@ -38,9 +38,34 @@
     <xsl:import href="Sedici.xsl"/>
     <xsl:include href="slideshow/slideshow.xsl"/>
     
-    <xsl:template match="dri:div[@id='aspect.artifactbrowser.CommunityBrowser.div.comunity-browser']">
-       <xsl:call-template name="slideshow"/>
+    <xsl:template match="dri:body">
+    
+       <div id="ds-body">
+         <div id='home_slideshow'>
+            <xsl:call-template name="slideshow"/>
+         </div>
+         
+         <div id='home_search'>
+	         <xsl:apply-templates select="dri:div[@n='front-page-search']">
+	                     <xsl:with-param name="muestra">true</xsl:with-param>
+	         </xsl:apply-templates>
+	     </div>
+	     
+	     <div id='home_info'>
+	         <xsl:apply-templates select="dri:div[@n='news']"/>
+	     </div>
+	     
+	     <div id='home_main_communities'>
+	         Links estaticos
+	     </div>
+	     
+	     <div id='home_feed'>
+	         <xsl:apply-templates select="dri:div[@id='ar.edu.unlp.sedici.aspect.news.ShowNews.div.feed']"/>
+	     </div>
+	  </div>
+         
     </xsl:template>
+
     <xsl:output indent="yes"/>
     
 
