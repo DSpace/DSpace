@@ -20,7 +20,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
@@ -38,6 +42,8 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
     
     private int total;
     private int unpublishedCount;
+    private List<DatedEmbargo> embargoes;
+    private DatedEmbargo[] dummy = new DatedEmbargo[1];
     
     private static Logger LOGGER = LoggerFactory.getLogger(EmbargoedWithoutPubDate.class);
     
@@ -53,8 +59,17 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
         if (dso instanceof Collection){
             total = 0;
             unpublishedCount = 0;
+            embargoes = new ArrayList<DatedEmbargo>();
             distribute(dso);
-            this.report("Collection: " + dso.getName() + "; Total items = " + total + "; unpublished items = " + unpublishedCount);                        
+            if (!embargoes.isEmpty()){
+                DatedEmbargo[] s = embargoes.toArray(dummy);
+                Arrays.sort(s);
+                this.report("Collection: " + dso.getName() + "; Total items = " + total + "; unpublished items = " + unpublishedCount); 
+                for(DatedEmbargo d : s)
+                    this.report(s.toString() + "\n");
+            }
+            else if (total > 0)
+                this.report("Collection: " + dso.getName() + "; Total items = " + total + "; no unpublished items"); 
         }
         return Curator.CURATE_SUCCESS;
     }
@@ -74,10 +89,35 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
             unpublishedCount++;
             try {  //want to continue if a problem comes up
                 itemEmbargoDate = EmbargoManager.getEmbargoDate(null, item);
+                if (itemEmbargoDate != null){
+                    DatedEmbargo de = new DatedEmbargo(itemEmbargoDate.toDate(),item);
+                    Date d = itemEmbargoDate.toDate();
+                }
             } catch (Exception e) {
                 this.report("Exception " + e + " encountered while processing " + item);
             }
         }
 
+    }
+    
+    private static class DatedEmbargo implements Comparable<DatedEmbargo>{
+
+        private Date embargoDate;
+        private Item embargoedItem;
+        
+        public DatedEmbargo(Date date, Item item) {
+            embargoDate = date;
+            embargoedItem = item;
+        }
+
+        @Override
+        public int compareTo(DatedEmbargo o) {
+            return embargoDate.compareTo(o.embargoDate);
+        }
+        
+        @Override
+        public String toString(){
+            return "";
+        }
     }
 }
