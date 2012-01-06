@@ -70,6 +70,11 @@ select.multiple {
 /*	border-bottom: 10px solid #144961;*/
 }
 
+#ds-header-wrapper #ds-header {
+position:absolute;
+left:120px;
+}
+
 #ds-header-logo-link {
     text-decoration: none;
     cursor: pointer;
@@ -253,6 +258,16 @@ min-height:800px;
     padding: 0;
 }
 
+#ds-options #aspect_discovery_Navigation_list_discovery h2{
+font-weight:bold;
+margin-left:20px;
+}
+
+#ds-options #aspect_discovery_Navigation_list_discovery a{
+text-decoration:none;
+}
+
+
 h1.ds-option-set-head {
     margin-top: 20px;
 /* background-color: #f0f2f5;*/
@@ -277,9 +292,10 @@ div.ds-option-set {
 
 div.ds-option-set ul {
     list-style: none;
-    margin-left: 10px;
+    margin-left: 7px;
     padding-top: 5px;
     padding-bottom: 5px;
+
 }
 
 div.ds-option-set .ds-sublist-head {
@@ -291,6 +307,11 @@ div.ds-option-set ul.sublist {
     margin-left: 20px;
     padding-top: 0;
     padding-bottom: 0;
+	margin-bottom:10px;
+}
+
+div.ds-option-set ul.sublist li a:hover {
+background-color:#f7f7f7;
 }
 
 div#ds-feed-option li
@@ -502,8 +523,11 @@ font-weight:bold;
 margin-left:8px;
 }
 
-#aspect_artifactbrowser_ConfigurableBrowse_field_submit:hover {
+#aspect_artifactbrowser_ConfigurableBrowse_field_submit:hover,
+#aspect_discovery_SiteViewer_field_submit:hover
+ {
 color:#52BAE7;
+background-image:url(../../images/lupitahover.png);
 }
 
 
@@ -912,13 +936,22 @@ color:#dedede;
 
 
 ul.ds-artifact-list li {
-padding: 15px;
+padding: 0px 25px 15px 15px;
 border:1px solid #eeeeee;
-
+margin-bottom:5px;
+-webkit-border-bottom-right-radius: 10px;
+-webkit-border-bottom-left-radius: 10px;
+-moz-border-radius-bottomright: 10px;
+-moz-border-radius-bottomleft: 10px;
+border-bottom-right-radius: 10px;
+border-bottom-left-radius: 10px;
 }
+
+
 
 ul.ds-artifact-list {
 margin-top:10px;
+
 }
 
 ul.ds-artifact-list li.odd {
@@ -937,8 +970,8 @@ z-index:0;
 
 ul.ds-artifact-list li.even {
 background-color:white;
-border-bottom:1px solid white;
-border-top:2px solid #FFFFFF;
+border-bottom:1px solid #dedede;
+border-top:1px solid #dedede;
 background-image:url(../../images/fondo_li2.gif);
 background-repeat:repeat-x;
 }
@@ -995,6 +1028,10 @@ color:#dedede;
     margin-bottom: 25px;
 }
 
+#aspect_discovery_SiteRecentSubmissions_div_site-home .artifact-title a {
+
+}
+
 #aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-dateissued-results .artifact-title,
 #aspect_discovery_SiteRecentSubmissions_div_site-recent-submission .artifact-title,
 #aspect_discovery_CommunityRecentSubmissions_div_community-recent-submission .artifact-title,
@@ -1003,14 +1040,15 @@ color:#dedede;
     font-size: 100%;
 	font-weight:bold;
 	text-decoration:none;
-	background-image:url(../../images/marquitaprueba.png);
+	background-image:url(../../images/marquitaprueba8.png);
 	background-repeat:no-repeat;
-	background-position:left -3px;
+	background-position:bottom left;
 	position:relative;
 	right:25px;
 	min-height:20px;
-	padding: 17px 9px 5px 20px;
-	border-bottom:2px solid #eaeaea;
+	padding: 4px 9px 17px 20px;
+/*	border-top:1px solid #eaeaea;*/
+	width:655px;
 		
 }
 
@@ -1083,13 +1121,13 @@ form.search p.ds-paragraph.button-list {
 }
 
 p.ds-paragraph {
-margin-left:40px;
-luxas
+margin-left:0px;
+
 }
 
 .ds-paragraph a {
-padding:0px 3px 0px 3px;
-margin: 0px 2px 0px 2px;
+padding:0px 3px 0px 0px;
+margin: 0px 2px 0px 0px;
 text-decoration:none;
 color:#f59321;
 }
@@ -1157,6 +1195,7 @@ table.detailtable {
     margin-top: 10px;
     margin-bottom: 10px;
     border-collapse: collapse;
+
 }
 
 #aspect_administrative_registries_EditMetadataSchema_table_metadata-schema-edit-existing-fields tr,
@@ -1207,6 +1246,10 @@ table.detailtable td.label-cell {
     font-weight: bold;
     text-align: left;
     width: 100px;
+}
+
+h3.bold {
+color:black;
 }
 
 div.item-summary-view-metadata h1,
@@ -1424,7 +1467,7 @@ margin: 2px 2px 0px 2px;
 }
 
 div.primary > ul > li > ul > li.community > div.artifact-description a {
-	color: green;
+	color: #e27b2a;
 }
 
 
@@ -1546,7 +1589,9 @@ color:#1b86b4;
     top: 10px;
     position: absolute;
 	text-align:center;
-    
+    -webkit-border-radius: 5px;
+-moz-border-radius: 5px;
+border-radius: 5px;
 
 }
 
@@ -1655,7 +1700,14 @@ font-size:13px;
 margin-left:5px;
 }
 
-
+#aspect_eperson_PasswordLogin_list_password-login span.error {
+color:red;
+position:absolute;
+width:400px;
+left:0px;
+top:45px;
+font-size:11px;
+}
 
 #aspect_eperson_PasswordLogin_list_password-login {
 background-color:white;
@@ -1865,6 +1917,10 @@ background-repeat:no-repeat;
 background-position:left;
 padding:18px 0px 20px 45px;
 height:35px;
+display:inline;
+color:#E27B2A;
+font-size:20px;
+
 }
 
 #aspect_artifactbrowser_CommunityViewer_list_community-browse a,
@@ -1924,11 +1980,11 @@ display:inline;
 }
 
 .artifact-description-community a {
-color:green;
+color:#e27b2a;
 }
 
 .artifact-description-collection a{
-color:red;
+color:black;
 }
 
 
@@ -1980,7 +2036,6 @@ padding-bottom:50px;
 background-color:red;}
 
 #aspect_discovery_SimpleSearch_div_search-filters {
-background-color:#f7fcff ;
 border-color:#d9e6ed;
 }
 
@@ -2224,3 +2279,37 @@ h2.ds-div-head {
 padding-top: 20px;
 }
 
+#home_feed{
+line-height:1.7;
+}
+
+#home_feed h1 {
+font-size:14px;
+}
+
+#home_feed ul {
+list-style-type:circle;
+}
+
+#home_feed ul li a{
+padding:0px;
+text-decoration:none;
+
+
+}
+
+
+#home_search h1.ds-div-head,
+#home_info h1.ds-div-head {
+display:none;
+}
+
+#home_search p.ds-paragraph{
+padding-top:10px;
+margin:0px;
+}
+
+#home_info p.ds-paragraph{
+padding:0px;
+margin:0px;
+} 
