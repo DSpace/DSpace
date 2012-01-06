@@ -19,6 +19,7 @@ import org.dspace.identifier.DOIIdentifierProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -125,9 +126,28 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                     URL oaiAccessURL = new URL("http://www.datadryad.org/oai/request?verb=GetRecord&identifier=oai:datadryad.org:" + shortHandle + "&metadataPrefix=mets");
                     Document oaidoc = docb.parse(oaiAccessURL.openStream());
                     NodeList nl = oaidoc.getElementsByTagName("mods:relatedItem");
+                    String citation = "";
                     for(int i = 0;i<nl.getLength();i++){
                         Node nd = nl.item(i);
+                        Node typeNode = null;
+                        NamedNodeMap nm = nd.getAttributes();
+                        if (nm != null){
+                            typeNode = nm.getNamedItem("type");
+                        }
+                        if (typeNode != null && "host".equals(typeNode.getNodeName())){
+                            NodeList children = nd.getChildNodes();
+                            for(int j=0;j<children.getLength();j++){
+                                Node child = children.item(j);
+                                if ("mods:part".equals(child.getNodeName())){
+                                    Node textNode = child.getFirstChild();
+                                    citation = textNode.getTextContent();
+                                }
+                            }
+                            
+                        }
                     }
+                    if (citation != "")
+                        this.report("Found citation: " + citation);
                 }
                 catch(Exception e){
                     
