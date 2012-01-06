@@ -37,7 +37,7 @@ import org.w3c.dom.NodeList;
 @Suspendable
 public class EmbargoedWithoutPubDate extends AbstractCurationTask {
 
-    
+
     private int total;
     private int unpublishedCount;
     private List<DatedEmbargo> embargoes;
@@ -45,9 +45,9 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
     private Context thisContext = null;
     private DocumentBuilderFactory dbf = null;
     private DocumentBuilder docb = null;
-    
+
     private static Logger LOGGER = LoggerFactory.getLogger(EmbargoedWithoutPubDate.class);
-    
+
 
     @Override
     public void init(Curator curator, String taskID) throws IOException{
@@ -60,7 +60,7 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
             throw new IOException("unable to initiate xml processor", e);
         }
     }
-    
+
     @Override
     public int perform(DSpaceObject dso) throws IOException {
         if (dso instanceof Collection){
@@ -87,91 +87,91 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
         DCValue partof[] = item.getMetadata("dc.relation.ispartof");
         if (handle != null)  //ignore items in workflow
             if (partof != null && partof.length==1){  //and articles
-            total++;
-            //first find the article this data is associated with
-            DCValue partofArticle = partof[0];
-            String articleID = partofArticle.value;  //most likely a handle, but probably ought to be a doi, so try looking both ways
-            String shortHandle = "";
-            if(articleID.startsWith("http://hdl.handle.net/10255/")) {   //modified from the DataPackageStats tool
-                shortHandle = articleID.substring("http://hdl.handle.net/".length());
-            } else if (articleID.startsWith("http://datadryad.org/handle/")) {
-                shortHandle = articleID.substring("http://datadryad.org/handle/".length());
-            } else if (articleID.startsWith("doi:10.5061/")) {
-                try{
-                URL doiLookupURL = new URL("http://datadryad.org/doi?lookup=" + articleID);
-                shortHandle = (new BufferedReader(new InputStreamReader(doiLookupURL.openStream()))).readLine();
-                }
-                catch(Exception e){
-                    this.report("Exception encountered while looking handle for " + articleID + " found in " + item.getName() + " (" + item.getHandle() + ")");
-                }
-            } else {
-                this.report("Bad partof ID: " + articleID + " found in " + item.getName() + " (" + item.getHandle() + ")");
-            }
-            if (shortHandle != ""){
-                try{
-                    URL oaiAccessURL = new URL("http://www.datadryad.org/oai/request?verb=GetRecord&identifier=oai:datadryad.org:" + shortHandle + "&metadataPrefix=mets");
-                    Document oaidoc = docb.parse(oaiAccessURL.openStream());
-                    NodeList nl = oaidoc.getElementsByTagName("mods:relatedItem");
-//                    if (nl.getLength() != 0){
-//                        this.report("Found " + nl.getLength() + " mods:relatedItem entries for " + articleID);
-//                    }
-                    String citation = "";
-                    for(int i = 0;i<nl.getLength();i++){
-                        Node nd = nl.item(i);
-                        Node typeNode = null;
-                        NamedNodeMap nm = nd.getAttributes();
-                        if (nm != null){
-                            typeNode = nm.getNamedItem("type");
-                            this.report("Found a type attribute for a mods:relatedItem for " + articleID);
-                        }
-                        if (typeNode != null && "host".equals(typeNode.getNodeName())){
-                            NodeList children = nd.getChildNodes();
-                            for(int j=0;j<children.getLength();j++){
-                                Node child = children.item(j);
-                                if ("mods:part".equals(child.getNodeName())){
-                                    Node textNode = child.getFirstChild();
-                                    citation = textNode.getTextContent();
-                                }
-                            }
-                            
-                        }
+                total++;
+                //first find the article this data is associated with
+                DCValue partofArticle = partof[0];
+                String articleID = partofArticle.value;  //most likely a handle, but probably ought to be a doi, so try looking both ways
+                String shortHandle = "";
+                if(articleID.startsWith("http://hdl.handle.net/10255/")) {   //modified from the DataPackageStats tool
+                    shortHandle = articleID.substring("http://hdl.handle.net/".length());
+                } else if (articleID.startsWith("http://datadryad.org/handle/")) {
+                    shortHandle = articleID.substring("http://datadryad.org/handle/".length());
+                } else if (articleID.startsWith("doi:10.5061/")) {
+                    try{
+                        URL doiLookupURL = new URL("http://datadryad.org/doi?lookup=" + articleID);
+                        shortHandle = (new BufferedReader(new InputStreamReader(doiLookupURL.openStream()))).readLine();
                     }
-                    if (citation != "")
-                        this.report("Found citation: " + citation);
+                    catch(Exception e){
+                        this.report("Exception encountered while looking handle for " + articleID + " found in " + item.getName() + " (" + item.getHandle() + ")");
+                    }
+                } else {
+                    this.report("Bad partof ID: " + articleID + " found in " + item.getName() + " (" + item.getHandle() + ")");
                 }
-                catch(Exception e){
-                    
-                }
-            }
-//            boolean unpublished = false;
-//            DCDate itemPubDate;
-//            DCValue values[] = item.getMetadata("dc.identifier.citation");
-//            if (values== null || values.length==0){ //no citation - save and report
-//                unpublished = true;
-//            }
-//        
-//            DCDate itemEmbargoDate = null;
-//            if (unpublished){
-//                unpublishedCount++;
-//                try {  //want to continue if a problem comes up
-//                    itemEmbargoDate = EmbargoManager.getEmbargoDate(null, item);
-//                    if (itemEmbargoDate != null){
-//                        DatedEmbargo de = new DatedEmbargo(itemEmbargoDate.toDate(),item);
-//                        embargoes.add(de);
-//                    }
-//                } catch (Exception e) {
-//                    this.report("Exception " + e + " encountered while processing " + item);
-//                }
-//            }
+                if (shortHandle != ""){
+                    try{
+                        URL oaiAccessURL = new URL("http://www.datadryad.org/oai/request?verb=GetRecord&identifier=oai:datadryad.org:" + shortHandle + "&metadataPrefix=mets");
+                        Document oaidoc = docb.parse(oaiAccessURL.openStream());
+                        NodeList nl = oaidoc.getElementsByTagName("mods:relatedItem");
+                        //                    if (nl.getLength() != 0){
+                        //                        this.report("Found " + nl.getLength() + " mods:relatedItem entries for " + articleID);
+                        //                    }
+                        String citation = "";
+                        for(int i = 0;i<nl.getLength();i++){
+                            Node nd = nl.item(i);
+                            Node typeNode = null;
+                            NamedNodeMap nm = nd.getAttributes();
+                            if (nm != null){
+                                typeNode = nm.getNamedItem("type");
+                                this.report("Found a type attribute with name " + typeNode.getNodeName() +"for a mods:relatedItem for " + articleID);                               		
+                            }
+                            if (typeNode != null && "host".equals(typeNode.getNodeName())){
+                                NodeList children = nd.getChildNodes();
+                                for(int j=0;j<children.getLength();j++){
+                                    Node child = children.item(j);
+                                    if ("mods:part".equals(child.getNodeName())){
+                                        Node textNode = child.getFirstChild();
+                                        citation = textNode.getTextContent();
+                                    }
+                                }
 
-        }
+                            }
+                        }
+                        if (citation != "")
+                            this.report("Found citation: " + citation);
+                    }
+                    catch(Exception e){
+
+                    }
+                }
+                //            boolean unpublished = false;
+                //            DCDate itemPubDate;
+                //            DCValue values[] = item.getMetadata("dc.identifier.citation");
+                //            if (values== null || values.length==0){ //no citation - save and report
+                //                unpublished = true;
+                //            }
+                //        
+                //            DCDate itemEmbargoDate = null;
+                //            if (unpublished){
+                //                unpublishedCount++;
+                //                try {  //want to continue if a problem comes up
+                //                    itemEmbargoDate = EmbargoManager.getEmbargoDate(null, item);
+                //                    if (itemEmbargoDate != null){
+                //                        DatedEmbargo de = new DatedEmbargo(itemEmbargoDate.toDate(),item);
+                //                        embargoes.add(de);
+                //                    }
+                //                } catch (Exception e) {
+                //                    this.report("Exception " + e + " encountered while processing " + item);
+                //                }
+                //            }
+
+            }
     }
-    
+
     private static class DatedEmbargo implements Comparable<DatedEmbargo>{
 
         private Date embargoDate;
         private Item embargoedItem;
-        
+
         public DatedEmbargo(Date date, Item item) {
             embargoDate = date;
             embargoedItem = item;
@@ -181,7 +181,7 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
         public int compareTo(DatedEmbargo o) {
             return embargoDate.compareTo(o.embargoDate);
         }
-        
+
         @Override
         public String toString(){
             return embargoedItem.getName() + " " + embargoDate.toString();
