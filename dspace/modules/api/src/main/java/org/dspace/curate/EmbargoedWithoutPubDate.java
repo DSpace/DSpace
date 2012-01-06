@@ -15,10 +15,12 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.dspace.content.Collection;
+import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
+import org.dspace.embargo.EmbargoManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -112,9 +114,6 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                         URL oaiAccessURL = new URL("http://www.datadryad.org/oai/request?verb=GetRecord&identifier=oai:datadryad.org:" + shortHandle + "&metadataPrefix=mets");
                         Document oaidoc = docb.parse(oaiAccessURL.openStream());
                         NodeList nl = oaidoc.getElementsByTagName("mods:relatedItem");
-                        //                    if (nl.getLength() != 0){
-                        //                        this.report("Found " + nl.getLength() + " mods:relatedItem entries for " + articleID);
-                        //                    }
                         String citation = "";
                         for(int i = 0;i<nl.getLength();i++){
                             Node nd = nl.item(i);
@@ -122,9 +121,9 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                             NamedNodeMap nm = nd.getAttributes();
                             if (nm != null){
                                 typeNode = nm.getNamedItem("type");
-                                this.report("Found a type attribute with value " + typeNode.getNodeValue() +" for a mods:relatedItem for " + articleID);                                       
                             }
                             if (typeNode != null && "host".equals(typeNode.getNodeValue())){
+                                this.report("Found a type attribute with value " + typeNode.getNodeValue() +" for a mods:relatedItem for " + articleID);                                       
                                 NodeList children = nd.getChildNodes();
                                 for(int j=0;j<children.getLength();j++){
                                     Node child = children.item(j);
@@ -136,33 +135,26 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
 
                             }
                         }
-                        if (citation != "")
+                        boolean unpublished = false;
+                        if ("".equals(citation))
+                            unpublished = true;
+                        else
                             this.report("Found citation: " + citation);
-                    }
-                    catch(Exception e){
+                        DCDate itemEmbargoDate = null;
+                        if (unpublished){
+                            unpublishedCount++;
+                            itemEmbargoDate = EmbargoManager.getEmbargoDate(null, item);
+                            if (itemEmbargoDate != null){
+                                DatedEmbargo de = new DatedEmbargo(itemEmbargoDate.toDate(),item);
+                                embargoes.add(de);
+                            }
+                        }
 
                     }
+                    catch(Exception e){
+                        this.report("Exception " + e + " encountered while processing " + item);
+                    }
                 }
-                //            boolean unpublished = false;
-                //            DCDate itemPubDate;
-                //            DCValue values[] = item.getMetadata("dc.identifier.citation");
-                //            if (values== null || values.length==0){ //no citation - save and report
-                //                unpublished = true;
-                //            }
-                //        
-                //            DCDate itemEmbargoDate = null;
-                //            if (unpublished){
-                //                unpublishedCount++;
-                //                try {  //want to continue if a problem comes up
-                //                    itemEmbargoDate = EmbargoManager.getEmbargoDate(null, item);
-                //                    if (itemEmbargoDate != null){
-                //                        DatedEmbargo de = new DatedEmbargo(itemEmbargoDate.toDate(),item);
-                //                        embargoes.add(de);
-                //                    }
-                //                } catch (Exception e) {
-                //                    this.report("Exception " + e + " encountered while processing " + item);
-                //                }
-                //            }
 
             }
     }
