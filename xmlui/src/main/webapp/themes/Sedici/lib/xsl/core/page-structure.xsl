@@ -169,35 +169,36 @@
 	    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img_unlp.png
 	    			</xsl:attribute>
 				</img>
-				<strong>2003-2012 &#xA9; <a href="http://prebi.unlp.edu.ar/" target="_blank">PrEBi</a></strong>
-				<br/>
-				<a href="http://www.unlp.edu.ar" target="_blank">Universidad Nacional de La Plata.</a>
-				<br/>
-				Todos los derechos reservados conforme a la ley 11.723
+				<div class="datos_unlp">
+					<strong>2003-2012 &#xA9; <a href="http://prebi.unlp.edu.ar/" target="_blank">PrEBi</a></strong>
+					<br/>
+					<a href="http://www.unlp.edu.ar" target="_blank">Universidad Nacional de La Plata.</a>
+					<br/>
+					Todos los derechos reservados conforme a la ley 11.723
+				</div>
 			</div>
 			<div id="footercol2">
-				<div>
+				<div class="datos_sedici">
 					<strong>SeDiCI - Servicio de Difusión de la Creación Intelectual</strong>
 					<br/>
 			  		Calle 49 y 115 s/n 1er piso - Edificio ex-Liceo
 			  		<br/>
 			  		1900 La Plata, Buenos Aires - Tel 0221 423 6696/6677 (int 141) 
 			  		<div id="comollegar">
-			  			<img class="footsedici">
+			  			<img class="vermapa">
 			    			<xsl:attribute name="src">
 			    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img1.png
 			    			</xsl:attribute>
 			  			</img>
-			  			Cómo llegar
 			  		</div>
 			  	</div>
 			  	<div id="news-contacto-etc">
-			  		<img>
+			  		<img class="newsletter">
 		    			<xsl:attribute name="src">
 		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img2.png
 		    			</xsl:attribute>
 			  		</img>
-			  		<img>
+			  		<img class="contacto">
 		    			<xsl:attribute name="src">
 		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img3.png
 		    			</xsl:attribute>
