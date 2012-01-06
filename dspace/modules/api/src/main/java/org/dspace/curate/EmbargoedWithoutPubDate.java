@@ -99,7 +99,7 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
         String handle = item.getHandle();
         DCValue partof[] = item.getMetadata("dc.relation.ispartof");
         if (handle != null)  //ignore items in workflow
-            if (partof != null && partof.length!=1){  //and articles
+            if (partof != null && partof.length==1){  //and articles
             total++;
             //first find the article this data is associated with
             DCValue partofArticle = partof[0];
