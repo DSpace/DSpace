@@ -122,9 +122,9 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                             NamedNodeMap nm = nd.getAttributes();
                             if (nm != null){
                                 typeNode = nm.getNamedItem("type");
-                                this.report("Found a type attribute with name " + typeNode.getNodeName() +"for a mods:relatedItem for " + articleID);                               		
+                                this.report("Found a type attribute with value " + typeNode.getNodeValue() +" for a mods:relatedItem for " + articleID);                                       
                             }
-                            if (typeNode != null && "host".equals(typeNode.getNodeName())){
+                            if (typeNode != null && "host".equals(typeNode.getNodeValue())){
                                 NodeList children = nd.getChildNodes();
                                 for(int j=0;j<children.getLength();j++){
                                     Node child = children.item(j);
