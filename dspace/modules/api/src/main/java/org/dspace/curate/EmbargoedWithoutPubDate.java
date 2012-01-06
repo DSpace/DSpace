@@ -126,6 +126,9 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                     URL oaiAccessURL = new URL("http://www.datadryad.org/oai/request?verb=GetRecord&identifier=oai:datadryad.org:" + shortHandle + "&metadataPrefix=mets");
                     Document oaidoc = docb.parse(oaiAccessURL.openStream());
                     NodeList nl = oaidoc.getElementsByTagName("mods:relatedItem");
+                    if (nl.getLength() != 0){
+                        this.report("Found " + nl.getLength() + " mods:relatedItem entries for " + articleID);
+                    }
                     String citation = "";
                     for(int i = 0;i<nl.getLength();i++){
                         Node nd = nl.item(i);
