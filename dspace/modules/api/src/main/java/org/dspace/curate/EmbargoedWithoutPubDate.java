@@ -1,44 +1,30 @@
 package org.dspace.curate;
 
 
-import org.apache.commons.httpclient.methods.GetMethod;
-import org.apache.commons.httpclient.params.HttpMethodParams;
-import org.dspace.authorize.AuthorizeException;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.dspace.content.Collection;
-import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
-import org.dspace.content.ItemIterator;
-import org.dspace.content.crosswalk.StreamIngestionCrosswalk;
-import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.doi.CDLDataCiteService;
-import org.dspace.embargo.EmbargoManager;
-import org.dspace.identifier.DOIIdentifierProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.StringTokenizer;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Curation task to report embargoed items without publication date
@@ -126,9 +112,9 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                     URL oaiAccessURL = new URL("http://www.datadryad.org/oai/request?verb=GetRecord&identifier=oai:datadryad.org:" + shortHandle + "&metadataPrefix=mets");
                     Document oaidoc = docb.parse(oaiAccessURL.openStream());
                     NodeList nl = oaidoc.getElementsByTagName("mods:relatedItem");
-                    if (nl.getLength() != 0){
-                        this.report("Found " + nl.getLength() + " mods:relatedItem entries for " + articleID);
-                    }
+//                    if (nl.getLength() != 0){
+//                        this.report("Found " + nl.getLength() + " mods:relatedItem entries for " + articleID);
+//                    }
                     String citation = "";
                     for(int i = 0;i<nl.getLength();i++){
                         Node nd = nl.item(i);
@@ -136,6 +122,7 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                         NamedNodeMap nm = nd.getAttributes();
                         if (nm != null){
                             typeNode = nm.getNamedItem("type");
+                            this.report("Found a type attribute for a mods:relatedItem for " + articleID);
                         }
                         if (typeNode != null && "host".equals(typeNode.getNodeName())){
                             NodeList children = nd.getChildNodes();
