@@ -2,9 +2,14 @@
 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 
 <body>
-<div>
-<head>Contacto</head>
-<p>Contacto</p>
+<div id='pagina_estatica'>
+<![CDATA[
+
+<h1>Nico</h1>
+<h2>Nico3</h2>
+
+]]>
+
 </div>
 </body>
 
@@ -16,4 +21,3 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 </meta>
 
 </document>
-

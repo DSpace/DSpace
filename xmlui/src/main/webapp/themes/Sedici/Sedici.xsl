@@ -48,6 +48,7 @@
     <xsl:import href="lib/xsl/aspect/news/news-list.xsl"/>
     <xsl:import href="lib/xsl/core/menu-superior.xsl"/>
     <xsl:import href="lib/xsl/core/menu-lateral.xsl"/>
+    <xsl:import href="lib/xsl/core/paginas_estaticas.xsl"/>
     <xsl:output indent="yes"/>
     
 

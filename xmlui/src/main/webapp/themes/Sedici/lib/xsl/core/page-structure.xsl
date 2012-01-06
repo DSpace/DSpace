@@ -160,6 +160,19 @@
         </div>
     </xsl:template>
     
+    <!-- Creo el footer especifico para SeDiCI -->
+    <xsl:template name="buildFooter">
+		<div id="footer">
+		<div id="footercol1">
+		<img class="unlp" src=""/><strong>2003-2012 &#xA9; <a href="http://prebi.unlp.edu.ar/" target="_blank">PrEBi</a> </strong><br />
+		  <a href="http://www.unlp.edu.ar/" target="_blank">Universidad Nacional de La Plata. </a><br />
+		  Todos los derechos reservados conforme a la ley 11.723</div>
+		<div id="footercol2"><div><strong>SeDiCI - Servicio de Difusión de la Creación Intelectual</strong><br />
+		  Calle 49 y 115 s/n 1er piso - Edificio ex-Liceo<br />
+		  1900 La Plata, Buenos Aires - Tel 0221 423 6696/6677 (int 141) <div id="comollegar"><img class="footsedici" src="" />Cómo llegar </div></div> <div id="news-contacto-etc"><img src="" /><img src="" /> </div></div>
+		</div>
+    </xsl:template>
+    
     <xsl:template name="buildUsuarioName">
         <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier' and @qualifier='firstName']"/>
         <xsl:text> </xsl:text>

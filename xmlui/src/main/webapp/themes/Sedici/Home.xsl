@@ -46,13 +46,13 @@
          </div>
          
          <div id='home_search'>
-	         <xsl:apply-templates select="dri:div[@n='front-page-search']">
+	         <xsl:apply-templates select="dri:div[@n='front-page-search']/dri:p[2]">
 	                     <xsl:with-param name="muestra">true</xsl:with-param>
 	         </xsl:apply-templates>
 	     </div>
 	     
 	     <div id='home_info'>
-	         <xsl:apply-templates select="dri:div[@n='news']"/>
+	         <xsl:apply-templates select="dri:div[@n='news']/dri:p"/>
 	     </div>
 	     
 	     <div id='home_main_communities'>
@@ -64,10 +64,50 @@
 	     </div>
 	     
 	     <div id='home_envios_recientes'>
-	         <xsl:apply-templates select="dri:div[@n='site-home']"/>
+	         <h1><i18n:text><xsl:value-of select="dri:div[@n='site-home']/dri:div/dri:head"/></i18n:text></h1>
+	         <ul class="ul_envios_recientes">
+		       <xsl:for-each select="dri:div[@n='site-home']/dri:div/dri:referenceSet/dri:reference">
+		                <li class='li_envios_recientes'>
+		                   <xsl:apply-templates select='.' mode="home"/>
+		                 </li>
+		       </xsl:for-each>
+		     </ul>
+	         
 	     </div>
 	  </div>
          
+    </xsl:template>
+    
+   <xsl:template match='dri:reference' mode='home'>
+     <xsl:call-template name="envio_reciente">
+            <xsl:with-param name="url">
+               <xsl:value-of select="@url"/>
+            </xsl:with-param>
+     </xsl:call-template>
+   </xsl:template>
+     
+   <xsl:template name="envio_reciente">
+       <xsl:param name="url"/>
+        <xsl:variable name="externalMetadataURL">
+            <xsl:text>cocoon:/</xsl:text>
+            <xsl:value-of select="$url"/>
+            <!-- No options selected, render the full METS document -->
+        </xsl:variable>
+        <xsl:comment> External Metadata URL: <xsl:value-of select="$externalMetadataURL"/> </xsl:comment>
+        <xsl:apply-templates select="document($externalMetadataURL)" mode="home"/>
+
+
+   </xsl:template>
+
+
+    
+    <xsl:template match='mets:METS' mode='home'>
+       <a>
+          <xsl:attribute name="href">
+          	<xsl:value-of select="@OBJID"/>
+          </xsl:attribute>
+               <xsl:value-of select="mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim/dim:field[@element='title']"/>
+       </a> 
     </xsl:template>
 
     <xsl:output indent="yes"/>

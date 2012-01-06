@@ -54,10 +54,7 @@
 
          	<h1><xsl:value-of select='dri:head'/></h1>
          	 <xsl:for-each select="dri:list[@id='ar.edu.unlp.sedici.aspect.news.ShowNews.list.news']">
-      			<b>Breve descripcion</b>
-			    <br/>
-			    <br/>
-                <xsl:call-template name="noticias"></xsl:call-template>
+                <xsl:call-template name="noticias"/>
             </xsl:for-each>
 
     </xsl:template>
