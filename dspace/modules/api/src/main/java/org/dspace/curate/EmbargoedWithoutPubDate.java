@@ -109,7 +109,7 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                 } else {
                     this.report("Bad partof ID: " + articleID + " found in " + item.getName() + " (" + item.getHandle() + ")");
                 }
-                if (shortHandle != ""){
+                if (shortHandle != ""){  //now query to get oai/mets metadata, from which a related item of type host will contain the citation (if any)
                     try{
                         URL oaiAccessURL = new URL("http://www.datadryad.org/oai/request?verb=GetRecord&identifier=oai:datadryad.org:" + shortHandle + "&metadataPrefix=mets");
                         Document oaidoc = docb.parse(oaiAccessURL.openStream());
@@ -123,7 +123,7 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                                 typeNode = nm.getNamedItem("type");
                             }
                             if (typeNode != null && "host".equals(typeNode.getNodeValue())){
-                                this.report("Found a type attribute with value " + typeNode.getNodeValue() +" for a mods:relatedItem for " + articleID);                                       
+                                //this.report("Found a type attribute with value " + typeNode.getNodeValue() +" for a mods:relatedItem for " + articleID);                                       
                                 NodeList children = nd.getChildNodes();
                                 for(int j=0;j<children.getLength();j++){
                                     Node child = children.item(j);
@@ -138,8 +138,8 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                         boolean unpublished = false;
                         if ("".equals(citation))
                             unpublished = true;
-                        else
-                            this.report("Found citation: " + citation);
+                        //else
+                            //this.report("Found citation: " + citation);
                         DCDate itemEmbargoDate = null;
                         if (unpublished){
                             unpublishedCount++;
