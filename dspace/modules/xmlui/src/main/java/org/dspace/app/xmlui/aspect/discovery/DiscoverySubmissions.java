@@ -355,7 +355,7 @@ public class DiscoverySubmissions extends SimpleSearch {
         String[] filterQueries = request.getParameterValues("fq");
         if(filterQueries != null){
             for(String fq : filterQueries){
-                if(fq.startsWith("Workflowstep:") || fq.startsWith("DSpaceStatus:")){
+                if(fq.startsWith("Workflowstep:") || fq.startsWith("DSpaceStatus:") || fq.startsWith("WorkflowstepTask:")){
                     return true;
                 }
             }
