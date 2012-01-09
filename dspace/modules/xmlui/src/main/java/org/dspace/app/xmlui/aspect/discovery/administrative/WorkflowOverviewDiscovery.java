@@ -219,12 +219,12 @@ public class WorkflowOverviewDiscovery extends SimpleSearch {
                             action_id = claimedtasks.get(0).getActionID();
                         }
                         if(step_id != null && action_id != null){
-                            if(step_id.equals("reviewStep")){
-                                url = contextPath+"/internal-item?itemID=" + item.getID();
+//                            if(step_id.equals("reviewStep")){
+                            url = contextPath+"/internal-item?itemID=" + item.getID();
 
-                            }else{
-                                url = contextPath+"/handle/"+workflowItem.getCollection().getHandle()+"/workflow?workflowID="+workflowItem.getID()+"&stepID="+step_id+"&actionID="+action_id;
-                            }
+//                            }else{
+//                                url = contextPath+"/handle/"+workflowItem.getCollection().getHandle()+"/workflow?workflowID="+workflowItem.getID()+"&stepID="+step_id+"&actionID="+action_id;
+//                            }
 
                         }else{
                             url = contextPath + "/admin/item?itemID=" + item.getID();
