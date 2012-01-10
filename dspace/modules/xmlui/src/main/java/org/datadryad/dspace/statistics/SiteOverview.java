@@ -92,7 +92,7 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
 				Document doc = db.parse(get.getResponseBodyAsStream());
 				doc.getDocumentElement().normalize();
 
-                xmlToString(doc);
+                // xmlToString(doc);
 
 
 				XPathFactory xpf = XPathFactory.newInstance();
