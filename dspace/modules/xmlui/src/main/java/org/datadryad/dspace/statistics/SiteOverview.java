@@ -47,7 +47,7 @@ public class SiteOverview extends AbstractDSpaceTransformer implements
 
 	private static final Message STATS_TEXT = message("xmlui.Site.stats");
 
-	private static final String PUB_SEARCH = "/select/?q=*:*&facet=on&rows=0&facet.field=prism.publicationName_filter&fq=location:l2";
+	private static final String PUB_SEARCH = "/select/?q=*:*&facet=on&rows=0&facet.field=prism.publicationName_filter&fq=location:l2&facet.limit=-1";
 
 	private static final String PUB_COUNTER = "count(//lst[@name='prism.publicationName_filter']/int[.!='0'])";
 
