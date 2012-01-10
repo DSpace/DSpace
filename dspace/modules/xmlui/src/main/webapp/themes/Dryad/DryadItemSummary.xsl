@@ -513,9 +513,9 @@
                     <p class="ds-paragraph">
                         <i18n:text>xmlui.DryadItemSummary.whenUsing</i18n:text>
                     </p>
-                    <table>
+                  <!--  <table>
                         <tr>
-                            <td>
+                            <td>  -->
                                 <blockquote>
                                     <xsl:choose>
                                         <xsl:when test="$citation!=''">
@@ -581,11 +581,11 @@
                                         </xsl:otherwise>
                                     </xsl:choose>
                                 </blockquote>
-                            </td>
+                <!--            </td>
                             <td rowspace="2">
                             </td>
                         </tr>
-                    </table>
+                    </table>  -->
                     <xsl:if test="$datafiles">
                         <p class="ds-paragraph">
                             <i18n:text>xmlui.DryadItemSummary.pleaseCite</i18n:text>
