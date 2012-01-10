@@ -513,79 +513,77 @@
                     <p class="ds-paragraph">
                         <i18n:text>xmlui.DryadItemSummary.whenUsing</i18n:text>
                     </p>
-                  <!--  <table>
-                        <tr>
-                            <td>  -->
-                                <blockquote>
-                                    <xsl:choose>
-                                        <xsl:when test="$citation!=''">
-                                            <xsl:choose>
-                                                <xsl:when test="$article_id">
-                                                    <xsl:value-of select="$citation"/>
-                                                    <xsl:text> </xsl:text>
-                                                    <xsl:value-of select="$article_id"/>
-                                                </xsl:when>
-                                                <xsl:when
-                                                        test="$article_doi and not(contains($citation, $article_doi))">
-                                                    <xsl:copy-of select="$citation"/>
-                                                    <a>
-                                                        <xsl:attribute name="href">
-                                                            <xsl:value-of
-                                                                    select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
-                                                        </xsl:attribute>
-                                                        <xsl:value-of select="$article_doi"/>
-                                                    </a>
-                                                </xsl:when>
-                                                <xsl:when test="$article_doi">
-                                                    <xsl:copy-of select="substring-before($citation, $article_doi)"/>
-                                                    <a>
-                                                        <xsl:attribute name="href">
-                                                            <xsl:value-of
-                                                                    select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
-                                                        </xsl:attribute>
-                                                        <xsl:value-of select="$article_doi"/>
-                                                    </a>
-                                                </xsl:when>
-                                                <xsl:otherwise>
-                                                    <xsl:value-of select="$citation"/>
-                                                </xsl:otherwise>
-                                            </xsl:choose>
+                   <blockquote>
+                        <xsl:choose>
+                            <xsl:when test="$citation!=''">
+                                <xsl:choose>
+                                    <xsl:when test="$article_id">
+                                        <xsl:value-of select="$citation"/>
+                                        <xsl:text> </xsl:text>
+                                        <xsl:value-of select="$article_id"/>
                                         </xsl:when>
-                                        <xsl:otherwise>
-                                            <xsl:variable name="journal"
-                                                          select=".//dim:field[@element='publicationName']"/>
-                                            <xsl:choose>
-                                                <xsl:when test="$journal">
-                                                    <span style="font-style: italic;">
-                                                        <i18n:text>xmlui.DryadItemSummary.citationNotYet1</i18n:text>
-                                                        <xsl:value-of select="$journal"/>
-                                                        <xsl:text>. </xsl:text>
-                                                        <i18n:text>xmlui.DryadItemSummary.citationNotYet2</i18n:text>
-                                                        <xsl:if test="$article_doi">
-                                                            <a>
-                                                                <xsl:attribute name="href">
-                                                                    <xsl:value-of
-                                                                            select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
-                                                                </xsl:attribute>
-                                                                <xsl:value-of select="$article_doi"/>
-                                                            </a>
-                                                        </xsl:if>
-                                                    </span>
-                                                </xsl:when>
-                                                <xsl:otherwise>
-                                                    <span style="font-style: italic;">
-                                                        <i18n:text>xmlui.DryadItemSummary.citationNotYet</i18n:text>
-                                                    </span>
-                                                </xsl:otherwise>
-                                            </xsl:choose>
-                                        </xsl:otherwise>
-                                    </xsl:choose>
-                                </blockquote>
-                <!--            </td>
+                                    <xsl:when
+                                        test="$article_doi and not(contains($citation, $article_doi))">
+                                        <xsl:copy-of select="$citation"/>
+                                        <a>
+                                            <xsl:attribute name="href">
+                                                <xsl:value-of
+                                                    select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
+                                            </xsl:attribute>
+                                            <xsl:value-of select="$article_doi"/>
+                                        </a>
+                                    </xsl:when>
+                                    <xsl:when test="$article_doi">
+                                        <xsl:copy-of select="substring-before($citation, $article_doi)"/>
+                                        <a>
+                                            <xsl:attribute name="href">
+                                                <xsl:value-of
+                                                    select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
+                                            </xsl:attribute>
+                                            <xsl:value-of select="$article_doi"/>
+                                        </a>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <xsl:value-of select="$citation"/>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:variable name="journal"
+                                    select=".//dim:field[@element='publicationName']"/>
+                                <xsl:choose>
+                                    <xsl:when test="$journal">
+                                        <span style="font-style: italic;">
+                                            <i18n:text>xmlui.DryadItemSummary.citationNotYet1</i18n:text>
+                                            <xsl:value-of select="$journal"/>
+                                            <xsl:text>. </xsl:text>
+                                            <i18n:text>xmlui.DryadItemSummary.citationNotYet2</i18n:text>
+                                            <xsl:if test="$article_doi">
+                                                <a>
+                                                    <xsl:attribute name="href">
+                                                        <xsl:value-of
+                                                            select="concat('http://dx.doi.org/', substring-after($article_doi, 'doi:'))"/>
+                                                    </xsl:attribute>
+                                                    <xsl:value-of select="$article_doi"/>
+                                                </a>
+                                            </xsl:if>
+                                        </span>
+                                    </xsl:when>
+                                    <xsl:otherwise>
+                                        <span style="font-style: italic;">
+                                            <i18n:text>xmlui.DryadItemSummary.citationNotYet</i18n:text>
+                                        </span>
+                                    </xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </blockquote>
+                    <table>
+                        <tr>
                             <td rowspace="2">
                             </td>
                         </tr>
-                    </table>  -->
+                    </table> 
                     <xsl:if test="$datafiles">
                         <p class="ds-paragraph">
                             <i18n:text>xmlui.DryadItemSummary.pleaseCite</i18n:text>
