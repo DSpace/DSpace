@@ -72,6 +72,8 @@ public class ApproveRejectReviewItem {
 		getSearchService().search(c, "dc.identifier.manuscriptNumber: " + manuScriptNumber, 0, 2, false);
 	    if(0 < manuscriptItems.size()){
 		wfi = WorkflowItem.findByItemId(c, manuscriptItems.get(0).getID());
+	    } else {
+		System.out.println("Na items found with the matching manuscript number.");
 	    }
 	} else if(line.hasOption('i')) {
 	    // get a WorkflowItem using a workflow ID
