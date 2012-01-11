@@ -1334,7 +1334,7 @@
         </table>
 
         <!-- we only want this view from item view - not the administrative pages -->
-        <xsl:if test="$meta[@qualifier='URI' and contains(.., 'handle')]">
+        <xsl:if test="$meta[@qualifier='URI' and contains(.., 'handle') and not(contains(..,'workflow'))]">
             <div style="padding: 10px; margin-top: 5px; margin-bottom: 5px;">
                 <a href="?show=full">
                     <i18n:text>xmlui.DryadItemSummary.showFull</i18n:text>
