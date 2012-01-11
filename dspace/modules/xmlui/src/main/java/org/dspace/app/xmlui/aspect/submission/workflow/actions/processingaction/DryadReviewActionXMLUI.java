@@ -9,11 +9,19 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
+import org.dspace.content.DCValue;
+import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
+import org.dspace.identifier.DOIIdentifierProvider;
+import org.dspace.identifier.IdentifierNotFoundException;
+import org.dspace.identifier.IdentifierNotResolvableException;
+import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.*;
+import java.util.List;
 
 /**
  * User: kevin (kevin at atmire.com)
@@ -30,6 +38,7 @@ public class DryadReviewActionXMLUI extends AbstractXMLUIAction {
     protected static final Message T_info1= message("xmlui.Submission.workflow.DryadReviewActionXMLUI.info1");
 
     protected static final Message T_cancel_submit = message("xmlui.general.cancel");
+    private static final Message T_head_has_part = message("xmlui.ArtifactBrowser.ItemViewer.head_hasPart");
 
 
     @Override
@@ -53,6 +62,21 @@ public class DryadReviewActionXMLUI extends AbstractXMLUIAction {
         Table table = div.addTable("workflow-actions", 1, 1);
         table.setHead(T_info1);
 
+
+        // Add datafile list
+        ReferenceSet referenceSet = div.addReferenceSet("collection-viewer", ReferenceSet.TYPE_SUMMARY_VIEW);
+        org.dspace.app.xmlui.wing.element.Reference itemRef = referenceSet.addReference(item);
+        if (item.getMetadata("dc.relation.haspart").length > 0) {
+            ReferenceSet hasParts;
+            hasParts = itemRef.addReferenceSet("embeddedView", null, "hasPart");
+            hasParts.setHead(T_head_has_part);
+
+            for (Item obj : retrieveDataFiles(item)) {
+                hasParts.addReference(obj);
+            }
+        }
+
+
         // Approve task
         Row row = table.addRow();
         row.addCellContent(T_ADD_DATAFILE_help);
@@ -64,5 +88,27 @@ public class DryadReviewActionXMLUI extends AbstractXMLUIAction {
 
 
         div.addHidden("submission-continue").setValue(knot.getId());
+    }
+
+    private List<Item> retrieveDataFiles(Item item) throws SQLException {
+        java.util.List<Item> dataFiles = new ArrayList<Item>();
+        DOIIdentifierProvider dis = new DSpace().getSingletonService(DOIIdentifierProvider.class);
+
+        if (item.getMetadata("dc.relation.haspart").length > 0) {
+
+            for (DCValue value : item.getMetadata("dc.relation.haspart")) {
+
+                DSpaceObject obj = null;
+                try {
+                    obj = dis.resolve(context, value.value);
+                } catch (IdentifierNotFoundException e) {
+                    // just keep going
+                } catch (IdentifierNotResolvableException e) {
+                    // just keep going
+                }
+                if (obj != null) dataFiles.add((Item) obj);
+            }
+        }
+        return dataFiles;
     }
 }
