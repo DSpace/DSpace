@@ -979,27 +979,31 @@
                                   select="$meta[@element='dryad'][@qualifier='pageviews']"/>
                     <xsl:if test="$pageviews">
                         <span style="font-size: smaller; font-weight: bold;">
-                            <xsl:text>&#160;&#160;&#160;</xsl:text>
+                            <xsl:text>   </xsl:text>
                             <xsl:value-of select="$pageviews"/>
                             <xsl:choose>
                                 <xsl:when test="string($pageviews) = '1'">
                                     <i18n:text>xmlui.DryadItemSummary.view</i18n:text>
+                                    <xsl:text>&#160;</xsl:text>
                                 </xsl:when>
                                 <xsl:otherwise>
                                     <i18n:text>xmlui.DryadItemSummary.views</i18n:text>
+                                    <xsl:text>&#160;</xsl:text>
                                 </xsl:otherwise>
                             </xsl:choose>
                             <xsl:variable name="downloads"
                                           select="$meta[@element='dryad'][@qualifier='downloads']"/>
                             <xsl:if test="$downloads">
-                                <xsl:text>&#160;&#160;&#160;</xsl:text>
+                                <xsl:text>   </xsl:text>
                                 <xsl:value-of select="$downloads"/>
                                 <xsl:choose>
                                     <xsl:when test="string($downloads) = '1'">
                                         <i18n:text>xmlui.DryadItemSummary.download</i18n:text>
+                                        <xsl:text>&#160;</xsl:text>
                                     </xsl:when>
                                     <xsl:otherwise>
                                         <i18n:text>xmlui.DryadItemSummary.downloads</i18n:text>
+                                        <xsl:text>&#160;</xsl:text>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </xsl:if>
