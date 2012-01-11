@@ -43,6 +43,7 @@ body {
 	font-size: 10pt;
 	font-style: normal;
 	height: 100%;
+	min-width:800px;
 }
 /*
   ******************************
@@ -1381,6 +1382,6 @@ span.dynatree-active a
 }
 
 #aspect_submission_StepTransformer_list_submit-create-publication{
-	width:1350px;
+	width:920px;
 }
 
