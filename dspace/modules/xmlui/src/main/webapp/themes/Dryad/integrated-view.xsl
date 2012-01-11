@@ -59,26 +59,30 @@
             <xsl:variable name="pageviews" select=".//dim:field[@element='dryad'][@qualifier='pageviews']"/>
             <xsl:if test="$pageviews">
                 <span style="font-size: smaller; font-weight: bold;">
-                    <xsl:text>&#160;&#160;&#160;</xsl:text>
+                    <xsl:text>   </xsl:text>
                     <xsl:value-of select="$pageviews"/>
                     <xsl:choose>
                         <xsl:when test="string($pageviews) = '1'">
+                            <xsl:text>&#160;</xsl:text>
                             <i18n:text>xmlui.DryadItemSummary.view</i18n:text>
                         </xsl:when>
                         <xsl:otherwise>
+                            <xsl:text>&#160;</xsl:text>
                             <i18n:text>xmlui.DryadItemSummary.views</i18n:text>
                         </xsl:otherwise>
                     </xsl:choose>
                     <xsl:variable name="downloads"
                                   select=".//dim:field[@element='dryad'][@qualifier='downloads']"/>
                     <xsl:if test="$downloads">
-                        <xsl:text>&#160;&#160;&#160;</xsl:text>
+                        <xsl:text>   </xsl:text>
                         <xsl:value-of select="$downloads"/>
                         <xsl:choose>
                             <xsl:when test="string($downloads) = '1'">
+                                <xsl:text>&#160;</xsl:text>
                                 <i18n:text>xmlui.DryadItemSummary.download</i18n:text>
                             </xsl:when>
                             <xsl:otherwise>
+                                <xsl:text>&#160;</xsl:text>
                                 <i18n:text>xmlui.DryadItemSummary.downloads</i18n:text>
                             </xsl:otherwise>
                         </xsl:choose>
@@ -120,7 +124,7 @@
                         </xsl:choose>
                     </xsl:attribute>
 
-                    <xsl:text>View File Details</xsl:text>
+                    <xsl:text>View&#160;File&#160;Details</xsl:text>
                 </a>
             </xsl:if>
         </div>
