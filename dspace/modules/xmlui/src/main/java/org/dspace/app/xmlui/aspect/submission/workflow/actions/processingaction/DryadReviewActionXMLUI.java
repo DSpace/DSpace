@@ -67,9 +67,9 @@ public class DryadReviewActionXMLUI extends AbstractXMLUIAction {
 
         ReferenceSet referenceSet;
         if (showfull == null){
-            referenceSet = div.addReferenceSet("collection-viewer", ReferenceSet.TYPE_DETAIL_VIEW);
-        } else {
             referenceSet = div.addReferenceSet("collection-viewer", ReferenceSet.TYPE_SUMMARY_VIEW);
+        } else {
+            referenceSet = div.addReferenceSet("collection-viewer", ReferenceSet.TYPE_DETAIL_VIEW);
         }
         org.dspace.app.xmlui.wing.element.Reference itemRef = referenceSet.addReference(item);
         if (item.getMetadata("dc.relation.haspart").length > 0) {
