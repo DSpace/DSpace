@@ -983,12 +983,12 @@
                             <xsl:value-of select="$pageviews"/>
                             <xsl:choose>
                                 <xsl:when test="string($pageviews) = '1'">
-                                    <i18n:text>xmlui.DryadItemSummary.view</i18n:text>
                                     <xsl:text>&#160;</xsl:text>
+                                    <i18n:text>xmlui.DryadItemSummary.view</i18n:text>
                                 </xsl:when>
                                 <xsl:otherwise>
-                                    <i18n:text>xmlui.DryadItemSummary.views</i18n:text>
                                     <xsl:text>&#160;</xsl:text>
+                                    <i18n:text>xmlui.DryadItemSummary.views</i18n:text>
                                 </xsl:otherwise>
                             </xsl:choose>
                             <xsl:variable name="downloads"
@@ -998,12 +998,12 @@
                                 <xsl:value-of select="$downloads"/>
                                 <xsl:choose>
                                     <xsl:when test="string($downloads) = '1'">
-                                        <i18n:text>xmlui.DryadItemSummary.download</i18n:text>
                                         <xsl:text>&#160;</xsl:text>
+                                        <i18n:text>xmlui.DryadItemSummary.download</i18n:text>
                                     </xsl:when>
                                     <xsl:otherwise>
-                                        <i18n:text>xmlui.DryadItemSummary.downloads</i18n:text>
                                         <xsl:text>&#160;</xsl:text>
+                                        <i18n:text>xmlui.DryadItemSummary.downloads</i18n:text>
                                     </xsl:otherwise>
                                 </xsl:choose>
                             </xsl:if>
