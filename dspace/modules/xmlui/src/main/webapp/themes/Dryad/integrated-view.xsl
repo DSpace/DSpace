@@ -242,7 +242,6 @@
             <a href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank">
                 <img src="/themes/Dryad/images/cc-zero.png"/>
             </a>
-            <xsl:text>&#160;</xsl:text>
             <a href="http://opendefinition.org/">
                 <img src="/themes/Dryad/images/opendata.png"/>
             </a>
