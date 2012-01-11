@@ -791,6 +791,10 @@ p.copyright-text {
 		margin: 30px auto 0px auto;
 }
 
+/** Item Submission select a collection page */
+select#aspect_submission_submit_SelectCollectionStep_field_handle {
+    max-width: 350px;
+}
 
 
 form.discover-search-box div.ds-form-content,

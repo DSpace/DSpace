@@ -574,6 +574,10 @@ li.ds-form-item label.ds-composite-component.last{
     font-size: 93%;
 }
 
+select#aspect_submission_submit_SelectCollectionStep_field_handle {
+    max-width: 350px;
+}
+
 #aspect_submission_StepTransformer_field_dc_date_issued_year,
 #aspect_submission_StepTransformer_field_dc_date_issued_day {
     width: 50px;

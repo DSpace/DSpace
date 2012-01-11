@@ -99,10 +99,6 @@ public class SelectCollectionStep extends AbstractSubmissionStep
         for (Collection collection : collections) 
         {
         	String name = collection.getMetadata("name");
-   		   	if (name.length() > 50)
-                  {
-                      name = name.substring(0, 47) + "...";
-                  }
         	select.addOption(collection.getHandle(),name);
         }
         

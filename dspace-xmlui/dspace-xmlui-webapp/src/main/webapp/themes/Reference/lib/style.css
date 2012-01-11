@@ -1327,3 +1327,9 @@ background-color: rgb(255, 255, 255);
 margin: 2px 2px 0px 2px;
 /* border: 1px solid rgb(240, 240, 210); */
 }
+
+/* DS-1044 For select a collection select box to show full name of collection.  */
+select#aspect_submission_submit_SelectCollectionStep_field_handle
+{
+    max-width: 350px;
+}
