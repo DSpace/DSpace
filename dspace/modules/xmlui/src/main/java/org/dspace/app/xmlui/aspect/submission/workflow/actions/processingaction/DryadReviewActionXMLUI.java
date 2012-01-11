@@ -56,15 +56,21 @@ public class DryadReviewActionXMLUI extends AbstractXMLUIAction {
         //TODO: add to msgs.props
         div.setHead("Review submission");
 
-        addWorkflowItemInformation(div, item, request);
+        //addWorkflowItemInformation(div, item, request);
 
+         // Add datafile list
+        String showfull = request.getParameter("submit_full_item_info");
 
-        Table table = div.addTable("workflow-actions", 1, 1);
-        table.setHead(T_info1);
+        // if the user selected showsimple, remove showfull.
+        if (showfull != null && request.getParameter("submit_simple_item_info") != null)
+            showfull = null;
 
-
-        // Add datafile list
-        ReferenceSet referenceSet = div.addReferenceSet("collection-viewer", ReferenceSet.TYPE_SUMMARY_VIEW);
+        ReferenceSet referenceSet;
+        if (showfull == null){
+            referenceSet = div.addReferenceSet("collection-viewer", ReferenceSet.TYPE_DETAIL_VIEW);
+        } else {
+            referenceSet = div.addReferenceSet("collection-viewer", ReferenceSet.TYPE_SUMMARY_VIEW);
+        }
         org.dspace.app.xmlui.wing.element.Reference itemRef = referenceSet.addReference(item);
         if (item.getMetadata("dc.relation.haspart").length > 0) {
             ReferenceSet hasParts;
@@ -75,6 +81,11 @@ public class DryadReviewActionXMLUI extends AbstractXMLUIAction {
                 hasParts.addReference(obj);
             }
         }
+
+
+        Table table = div.addTable("workflow-actions", 1, 1);
+        table.setHead(T_info1);
+
 
 
         // Approve task
