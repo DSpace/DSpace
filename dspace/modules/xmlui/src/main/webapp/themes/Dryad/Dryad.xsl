@@ -1557,7 +1557,10 @@
           </li>
       </xsl:template>
 
-
+    <xsl:template match="textarea[@id='aspect_artifactbrowser_FeedbackForm_field_comments']">
+        <textarea id="aspect_artifactbrowser_FeedbackForm_field_comments" class="ds-textarea-field" name="comments" onfocus="javascript:tFocus(this);" cols="60" rows="5"> 
+        </textarea>
+    </xsl:template>
 
 
       <!-- First submission form: STATUS: ACCEPTED/IN REVIEW/NOT_YET_SUBMITTED -->
