@@ -239,12 +239,18 @@
         <div style="padding-left:1px; padding-top:2px;">
             <i18n:text>xmlui.dri2xhtml.METS-1.0.license-cc0</i18n:text>
             <xsl:text> &#160; </xsl:text>
-            <a href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank">
-                <img src="/themes/Dryad/images/cc-zero.png"/>
-            </a>
-            <a href="http://opendefinition.org/">
-                <img src="/themes/Dryad/images/opendata.png"/>
-            </a>
+            <table>
+                <tr>
+                    <td>
+                        <a href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank">
+                            <img src="/themes/Dryad/images/cc-zero.png"/>
+                        </a>
+                        <a href="http://opendefinition.org/">
+                            <img src="/themes/Dryad/images/opendata.png"/>
+                        </a>
+                    </td>
+                </tr>
+            </table>
         </div>
 
         <br/>
