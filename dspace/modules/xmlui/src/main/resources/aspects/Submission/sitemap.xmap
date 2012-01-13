@@ -101,6 +101,9 @@
             <map:action name="ClaimTasksAction" src="org.dspace.app.xmlui.aspect.submission.workflow.ClaimTasksAction"/>
             <map:action name="UnclaimTasksAction"
                         src="org.dspace.app.xmlui.aspect.submission.workflow.UnclaimTasksAction"/>
+
+            <map:action name="PublicationCompletedAction"
+                        src="org.dspace.app.xmlui.aspect.submission.submit.PublicationCompletedAction"/>
         </map:actions>
 
     </map:components>
@@ -130,6 +133,9 @@
 
                     <!-- Start a new submission, unscoped -->
                     <map:match pattern="submit">
+                        <!--If our publication has been completed, we need to sent to the overview page-->
+                        <map:act type="PublicationCompletedAction"/>
+
                         <map:call function="doSubmission"/>
                     </map:match>
 
