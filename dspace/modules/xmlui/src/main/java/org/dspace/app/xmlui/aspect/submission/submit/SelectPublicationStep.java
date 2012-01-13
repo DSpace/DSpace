@@ -136,8 +136,9 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
         addLicence(form);
 
-        //add standard control/paging buttons
-        addControlButtons(form);
+        //add "Next" button
+	Item actions = form.addItem();
+	actions.addButton(AbstractProcessingStep.NEXT_BUTTON).setValue(T_next);
     }
 
     private void addPublicationNumberIfSubmitExisting(List form, boolean submitExisting, boolean pubIdError, Collection pubColl) throws WingException, SQLException {
