@@ -828,7 +828,9 @@
                     -->
                     <xsl:choose>
                         <xsl:when test="not(./dri:params[@cols])">
-                            <xsl:call-template name="textAreaCols"/>
+                           <!-- <xsl:call-template name="textAreaCols"/>  -->  
+                           <!-- override to Dryad specific value - maybe this can be refined in if makes things ugly-->
+                           <xsl:attribute name="cols">60</xsl:attribute>
                         </xsl:when>
                     </xsl:choose>
                     <xsl:choose>
@@ -1556,12 +1558,6 @@
 	  </table>
           </li>
       </xsl:template>
-
-    <xsl:template match="textarea[@id='aspect_artifactbrowser_FeedbackForm_field_comments']">
-        <textarea id="aspect_artifactbrowser_FeedbackForm_field_comments" class="ds-textarea-field" name="comments" onfocus="javascript:tFocus(this);" cols="60" rows="5"> 
-        </textarea>
-    </xsl:template>
-
 
       <!-- First submission form: STATUS: ACCEPTED/IN REVIEW/NOT_YET_SUBMITTED -->
       <xsl:template match="dri:list/dri:item[@n='select_publication_new' or @n='select_publication_exist']">
