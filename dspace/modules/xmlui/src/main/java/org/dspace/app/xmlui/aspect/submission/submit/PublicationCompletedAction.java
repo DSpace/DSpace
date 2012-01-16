@@ -7,6 +7,7 @@ import org.apache.cocoon.environment.Redirector;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.environment.http.HttpEnvironment;
+import org.apache.log4j.Logger;
 import org.dspace.app.util.Util;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.content.InProgressSubmission;
@@ -24,18 +25,22 @@ import java.util.Map;
  */
 public class PublicationCompletedAction extends AbstractAction {
 
+    private static final Logger log = Logger.getLogger(PublicationCompletedAction.class);
 
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
             String source, Parameters parameters) throws Exception
     {
+        log.info("Entered publication completed action");
         Request request = ObjectModelHelper.getRequest(objectModel);
         int workspaceId = Util.getIntParameter(request, "workspaceID");
+        log.info("Publication completed action workspace ID: " + workspaceId);
         if(workspaceId == -1){
             return null;
         }
         Context context = ContextUtil.obtainContext(objectModel);
         WorkspaceItem publication = WorkspaceItem.find(context, workspaceId);
         if(publication == null){
+            log.info("ERROR: Publication completed action no Workspace item with id: " + workspaceId);
             return null;
         }
 
@@ -44,6 +49,8 @@ public class PublicationCompletedAction extends AbstractAction {
             final HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
             httpResponse.sendRedirect(request.getContextPath() + "/submit-overview?workspaceID=" + publication.getID());
             return new HashMap();
+        }else{
+            log.info("Publication not completed for: " + workspaceId);
         }
         return null;
     }
