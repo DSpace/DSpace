@@ -30,17 +30,17 @@ public class PublicationCompletedAction extends AbstractAction {
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
             String source, Parameters parameters) throws Exception
     {
-        log.info("Entered publication completed action");
+        System.out.println("Entered publication completed action");
         Request request = ObjectModelHelper.getRequest(objectModel);
         int workspaceId = Util.getIntParameter(request, "workspaceID");
-        log.info("Publication completed action workspace ID: " + workspaceId);
+        System.out.println("Publication completed action workspace ID: " + workspaceId);
         if(workspaceId == -1){
             return null;
         }
         Context context = ContextUtil.obtainContext(objectModel);
         WorkspaceItem publication = WorkspaceItem.find(context, workspaceId);
         if(publication == null){
-            log.info("ERROR: Publication completed action no Workspace item with id: " + workspaceId);
+            System.out.println("ERROR: Publication completed action no Workspace item with id: " + workspaceId);
             return null;
         }
 
@@ -50,7 +50,7 @@ public class PublicationCompletedAction extends AbstractAction {
             httpResponse.sendRedirect(request.getContextPath() + "/submit-overview?workspaceID=" + publication.getID());
             return new HashMap();
         }else{
-            log.info("Publication not completed for: " + workspaceId);
+            System.out.println("Publication not completed for: " + workspaceId);
         }
         return null;
     }
