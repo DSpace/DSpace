@@ -26,24 +26,21 @@ import java.util.Map;
 public class PublicationCompletedAction extends AbstractAction {
 
     private static final Logger log = Logger.getLogger(PublicationCompletedAction.class);
-    static {
-        System.out.println("Initializing PublicationCompletedAction class");
-    }
 
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
             String source, Parameters parameters) throws Exception
     {
-        System.out.println("Entered publication completed action");
+        log.debug("Entered publication completed action");
         Request request = ObjectModelHelper.getRequest(objectModel);
         int workspaceId = Util.getIntParameter(request, "workspaceID");
-        System.out.println("Publication completed action workspace ID: " + workspaceId);
+        log.debug("Publication completed action workspace ID: " + workspaceId);
         if(workspaceId == -1){
             return null;
         }
         Context context = ContextUtil.obtainContext(objectModel);
         WorkspaceItem publication = WorkspaceItem.find(context, workspaceId);
         if(publication == null){
-            System.out.println("ERROR: Publication completed action no Workspace item with id: " + workspaceId);
+            log.debug("ERROR: Publication completed action no Workspace item with id: " + workspaceId);
             return null;
         }
 
@@ -53,7 +50,7 @@ public class PublicationCompletedAction extends AbstractAction {
             httpResponse.sendRedirect(request.getContextPath() + "/submit-overview?workspaceID=" + publication.getID());
             return new HashMap();
         }else{
-            System.out.println("Publication not completed for: " + workspaceId);
+            log.debug("Publication not completed for: " + workspaceId);
         }
         return null;
     }
