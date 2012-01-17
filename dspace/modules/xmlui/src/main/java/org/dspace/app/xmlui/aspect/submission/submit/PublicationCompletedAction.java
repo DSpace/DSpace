@@ -26,6 +26,9 @@ import java.util.Map;
 public class PublicationCompletedAction extends AbstractAction {
 
     private static final Logger log = Logger.getLogger(PublicationCompletedAction.class);
+    static {
+        System.out.println("Initializing PublicationCompletedAction class");
+    }
 
     public Map act(Redirector redirector, SourceResolver resolver, Map objectModel,
             String source, Parameters parameters) throws Exception
