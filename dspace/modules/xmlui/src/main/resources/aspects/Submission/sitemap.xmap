@@ -167,6 +167,10 @@
 
                     <!-- Start a new submission to specific collection -->
                     <map:match pattern="handle/*/*/submit">
+
+                        <!--This should not be required, but due to a strange issue on the test server, this is required-->
+                        <map:act type="PublicationCompletedAction"/>
+
                         <map:call function="doSubmission">
                             <map:parameter name="handle" value="{1}/{2}"/>
                         </map:call>
