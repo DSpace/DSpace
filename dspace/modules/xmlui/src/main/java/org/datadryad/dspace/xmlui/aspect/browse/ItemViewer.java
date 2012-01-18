@@ -505,6 +505,10 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
             p.addContent(T_withdrawn);
             return;
         }
+
+
+        log.error("Item ADDING MESSAGE!!!!!!");
+
         // Add Versioning Message
         VersioningService versioningService = new DSpace().getSingletonService(VersioningService.class);
         VersionHistory history = versioningService.findVersionHistory(context, item.getID());
@@ -560,11 +564,15 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
         // add IN_WORKFLOW Message
         else {
             WorkflowItem wfi = WorkflowItem.findByItemId(context, item.getID());
+            log.error("Item ADDING MESSAGE WORKFLOW: " + wfi);
             if (wfi != null) {
                 //List<ClaimedTask> claimedTasks = ClaimedTask.findByWorkflowId(context, wfi.getID());
                 //if(claimedTasks.size() > 0){
                     //if (claimedTasks.get(0).getStepID().equals("dryadAcceptEditReject")  && claimedTasks.get(0).getActionID().equals("dryadAcceptEditRejectAction")) {
                 DCValue[] values = item.getMetadata("workflow.step.reviewerKey");
+
+                log.error("Item ADDING MESSAGE REVIEW KEY: " + values);
+                log.error("Item ADDING MESSAGE REVIEW KEY: " + values.length);
                 if(values!=null && values.length > 0){
                     addMessage(division, T_in_workflow, null, null);
                 }
