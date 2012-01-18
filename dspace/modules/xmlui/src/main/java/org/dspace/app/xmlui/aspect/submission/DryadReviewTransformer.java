@@ -11,10 +11,7 @@ import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.wing.WingException;
-import org.dspace.app.xmlui.wing.element.Body;
-import org.dspace.app.xmlui.wing.element.Division;
-import org.dspace.app.xmlui.wing.element.PageMeta;
-import org.dspace.app.xmlui.wing.element.ReferenceSet;
+import org.dspace.app.xmlui.wing.element.*;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DCValue;
@@ -54,6 +51,7 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
     protected static final Message T_dspace_home = message("xmlui.general.dspace_home");
     protected static final Message T_workflow_title = message("xmlui.Submission.general.workflow.title");
     private static final Message T_head_has_part = message("xmlui.ArtifactBrowser.ItemViewer.head_hasPart");
+    private static final Message T_in_workflow = message("xmlui.DryadItemSummary.in_workflow");
 
 
     private String doi;
@@ -121,6 +119,9 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
 
         Division div = body.addInteractiveDivision("main-div", contextPath + "/review", Division.METHOD_POST, "");
 
+        // Adding message for withdrawn or workflow item
+        addWarningMessage(wfItem.getItem(), div);
+
         //Add an overview of the item in question
         String showfull = request.getParameter("submit_full_item_info");
 
@@ -149,6 +150,8 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
 
             div.addHidden("submit_full_item_info").setValue("true");
         }
+
+
 
         // adding the dataFile
         org.dspace.app.xmlui.wing.element.Reference itemRef = referenceSet.addReference(wfItem.getItem());
@@ -233,6 +236,35 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
             }
         }
     }
+
+
+private void addWarningMessage(Item item, Division division) throws WingException, SQLException, AuthorizeException, IOException {
+
+        log.warn("InternalItemTransformer - addWarningMessage");
+
+        WorkflowItem wfi = WorkflowItem.findByItemId(context, item.getID());
+
+        log.warn("InternalItemTransformer - addWarningMessage() wfi: " + wfi);
+
+        if (wfi != null) {
+            DCValue[] values = item.getMetadata("workflow.step.reviewerKey");
+
+            log.warn("InternalItemTransformer - addWarningMessage() values: " + values);
+
+            if(values!=null && values.length > 0){
+                addMessage(division, T_in_workflow, null, null);
+            }
+        }
+    }
+
+    private void addMessage(Division main, Message message, String link, Message linkMessage) throws WingException {
+        Division div = main.addDivision("notice", "notice");
+        Para p = div.addPara();
+        p.addContent(message);
+        p.addXref(link, linkMessage);
+
+    }
+
 
     /**
      * recycle
