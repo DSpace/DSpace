@@ -238,7 +238,7 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
     }
 
 
-private void addWarningMessage(Item item, Division division) throws WingException, SQLException, AuthorizeException, IOException {
+    private void addWarningMessage(Item item, Division division) throws WingException, SQLException, AuthorizeException, IOException {
 
         log.warn("InternalItemTransformer - addWarningMessage");
 
