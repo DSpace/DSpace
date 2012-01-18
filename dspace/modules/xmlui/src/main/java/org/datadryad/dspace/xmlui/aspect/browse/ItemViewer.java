@@ -561,11 +561,12 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
         else {
             WorkflowItem wfi = WorkflowItem.findByItemId(context, item.getID());
             if (wfi != null) {
-                List<ClaimedTask> claimedTasks = ClaimedTask.findByWorkflowId(context, wfi.getID());
-                if(claimedTasks.size() > 0){
-                    if (claimedTasks.get(0).getStepID().equals("dryadAcceptEditReject")  && claimedTasks.get(0).getActionID().equals("dryadAcceptEditRejectAction")) {
-                        addMessage(division, T_in_workflow, null, null);
-                    }
+                //List<ClaimedTask> claimedTasks = ClaimedTask.findByWorkflowId(context, wfi.getID());
+                //if(claimedTasks.size() > 0){
+                    //if (claimedTasks.get(0).getStepID().equals("dryadAcceptEditReject")  && claimedTasks.get(0).getActionID().equals("dryadAcceptEditRejectAction")) {
+                DCValue[] values = item.getMetadata("workflow.step.reviewerKey");
+                if(values!=null && values.length > 0){
+                    addMessage(division, T_in_workflow, null, null);
                 }
             }
         }
