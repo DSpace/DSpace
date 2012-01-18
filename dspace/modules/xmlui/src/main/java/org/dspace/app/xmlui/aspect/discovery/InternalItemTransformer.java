@@ -19,6 +19,10 @@ import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.core.I18nUtil;
 import org.dspace.eperson.EPerson;
+import org.dspace.utils.DSpace;
+import org.dspace.versioning.Version;
+import org.dspace.versioning.VersionHistory;
+import org.dspace.versioning.VersioningService;
 import org.dspace.workflow.*;
 import org.xml.sax.SAXException;
 
@@ -90,7 +94,7 @@ public class InternalItemTransformer extends AbstractDSpaceTransformer {
     private static final Message T_workflow_task_perform = message("xmlui.discovery.InternalItemTransformer.workflow.task.perform");
     private static final Message T_workflow_task_waiting = message("xmlui.discovery.InternalItemTransformer.workflow.task.wait");
     private static final Message T_workflow_task = message("xmlui.discovery.InternalItemTransformer.workflow.task");
-
+    private static final Message T_in_workflow = message("xmlui.DryadItemSummary.in_workflow");
     @Override
     public void addPageMeta(PageMeta pageMeta) throws SAXException, WingException, SQLException, IOException, AuthorizeException {
         Item item;
@@ -134,6 +138,11 @@ public class InternalItemTransformer extends AbstractDSpaceTransformer {
 
         Division division = body.addInteractiveDivision("item-view", contextPath + "/internal-item", Division.METHOD_POST, "primary");
         division.setHead(getTitle(item));
+
+
+
+        // Adding message for withdrawn or workflow item
+        addWarningMessage(item, division);
 
 		Para showfullPara = division.addPara(null,
 				"item-view-toggle item-view-toggle-top");
@@ -408,6 +417,35 @@ public class InternalItemTransformer extends AbstractDSpaceTransformer {
             }
         }
     }
+
+
+    private void addWarningMessage(Item item, Division division) throws WingException, SQLException, AuthorizeException, IOException {
+
+        log.warn("InternalItemTransformer - addWarningMessage");
+
+        WorkflowItem wfi = WorkflowItem.findByItemId(context, item.getID());
+
+        log.warn("InternalItemTransformer - addWarningMessage() wfi: " + wfi);
+
+        if (wfi != null) {
+            DCValue[] values = item.getMetadata("workflow.step.reviewerKey");
+
+            log.warn("InternalItemTransformer - addWarningMessage() values: " + values);
+
+            if(values!=null && values.length > 0){
+                addMessage(division, T_in_workflow, null, null);
+            }
+        }
+    }
+
+    private void addMessage(Division main, Message message, String link, Message linkMessage) throws WingException {
+        Division div = main.addDivision("notice", "notice");
+        Para p = div.addPara();
+        p.addContent(message);
+        p.addXref(link, linkMessage);
+
+    }
+
 
 
     /**
