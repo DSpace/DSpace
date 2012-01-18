@@ -33,10 +33,7 @@ public class PluggableVersioningService implements VersioningService{
             Item item = Item.find(c, itemId);
             Version version = null;
             VersionHistory vh = versionHistoryDAO.find(c, item.getID(), versionDAO);;
-            if(vh!=null){
-                version = updateVersion(c,item.getID(), summary);
-            }
-            else{
+            if(vh==null){
                 // first time: create 2 versions, .1(old version) and .2(new version)
                 vh=versionHistoryDAO.create(c);
                 version = createVersion(c, vh, item, "");
