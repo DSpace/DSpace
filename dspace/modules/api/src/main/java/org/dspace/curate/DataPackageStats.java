@@ -37,10 +37,9 @@ import org.dspace.core.Constants;
 
 /**
  * DataPackageStats retrieves statistics based on an input data package.
- * WARNING: This file is a complete hack! Its primary purpose was to generate
- * statistics for the 2011 Dryad NSF grant proposal. It is stored in the
- * etc directory for reference only, since some of the calculations may be
- * useful for the curator reports that will be produced in the future.
+ * WARNING: This file is a complete hack! Its original purpose was to generate
+ * statistics for the 2011 Dryad NSF grant proposal. It is being modified
+ * to generate statistics for conference presentations.
  *
  * The task succeeds if it was able to locate all required stats, otherwise it fails.
  * Originally based on the RequiredMetadata task by Richard Rodgers.
