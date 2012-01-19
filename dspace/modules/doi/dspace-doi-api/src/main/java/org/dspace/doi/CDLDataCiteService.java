@@ -123,9 +123,6 @@ public class CDLDataCiteService {
 
     }
 
-
-
-
     public String lookup(String aDOI) throws IOException {
 
         if(ConfigurationManager.getBooleanProperty("doi.datacite.connected", false)){
@@ -160,10 +157,10 @@ public class CDLDataCiteService {
             log.debug("Adding _target to metadata for update: " + aURL);
         }
 
-//        if (metadata != null) {
-//	        log.debug("Adding other metadata");
-//            map.putAll(metadata);
-//	    }
+        if (metadata != null) {
+	        log.debug("Adding other metadata");
+            map.putAll(metadata);
+	    }
 
         logMetadata(metadata);
 	
@@ -456,97 +453,12 @@ public class CDLDataCiteService {
 	    log.debug("DataCite metadata contains " + metadata.size() + " fields");
 
 
-
-        //metadata= createMetadataListXML(item);
         return metadata;
 
     }
 
 
-    public static Map<String, String> createMetadataListXML(Item item) {
-        Map<String, String> metadata = new HashMap<String, String>();
-        try {
-            DisseminationCrosswalk dc = (DisseminationCrosswalk) PluginManager.getNamedPlugin(DisseminationCrosswalk.class,"DIM2DATACITE");
-            Element element = dc.disseminateElement(item);
-            XMLOutputter outputter = new XMLOutputter(Format.getPrettyFormat());
-            String xmlout = outputter.outputString(element);
-            
-             xmlout="<resource  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" metadataVersionNumber=\"1\"" +
-                    "lastMetadataUpdate=\"2006-05-04\" xsi:noNamespaceSchemaLocation=\"datacite-metadata-v2.0.xsd\">" +
-                    "<identifier identifierType=\"DOI\">10.5061/DRYAD.2222</identifier>" +
-                    "<creators>" +
-                    "<creator>" +
-                    "<creatorName>Toru, Nozawa</creatorName>" +
-                    "</creator>" +
-                    "<creator>" +
-                    "<creatorName>Utor, Awazon</creatorName>" +
-                    "<nameIdentifier nameIdentifierScheme=\"ISNI\">1422 4586 3573 0476</nameIdentifier>" +
-                    "</creator>" +
-                    "</creators>" +
-                    "<titles>" +
-                    "<title>National Institute for Environmental Studies and Center for Climate System Research Japan</title>" +
-                    "<title titleType=\"Subtitle\">A survey</title>" +
-                    "</titles>" +
-                    "<publisher>World Data Center for Climate (WDCC)</publisher>" +
-                    "<publicationYear>2004</publicationYear>" +
-                    "<subjects>" +
-                    "<subject>Earth sciences and geology</subject>" +
-                    "</subjects>" +
-                    "<contributors>" +
-                    "<contributor contributorType=\"DataManager\">" +
-                    "<contributorName>PANGAEA</contributorName>" +
-                    "</contributor>" +
-                    "<contributor contributorType=\"ContactPerson\">" +
-                    "<contributorName>Doe, John</contributorName>" +
-                    "<nameIdentifier nameIdentifierScheme=\"ORCID\">xyz789</nameIdentifier>" +
-                    "</contributor>" +
-                    "</contributors>" +
-                    "<dates>" +
-                    "<date dateType=\"Valid\">2005-04-05</date>" +
-                    "<date dateType=\"Accepted\">2005-01-01</date>" +
-                    "</dates>" +
-                    "<language>en</language>" +
-                    "<resourceType resourceTypeGeneral=\"Image\">Animation</resourceType>" +
-                    "<alternateIdentifiers>" +
-                    "<alternateIdentifier alternateIdentifierType=\"ISBN\">937-0-1234-56789-X</alternateIdentifier>" +
-                    "</alternateIdentifiers>" +
-                    "<relatedIdentifiers>" +
-                    "<relatedIdentifier relationType=\"IsCitedBy\" relatedIdentifierType=\"DOI\">10.1234/testpub</relatedIdentifier>" +
-                    "<relatedIdentifier relationType=\"Cites\" relatedIdentifierType=\"URN\">http://testing.ts/testpub" +
-                    "</relatedIdentifier>" +
-                    "</relatedIdentifiers>" +
-                    "<sizes>" +
-                    "<size>285 kb</size>" +
-                    "<size>100 pages</size>" +
-                    "</sizes>" +
-                    "<formats>" +
-                    "<format>text/plain</format>" +
-                    "DataCite Metadata Scheme V 2 / January 2011 15" +
-                    "</formats>" +
-                    "<version>1.0</version>" +
-                    "<rights>Open Database License [ODbL]</rights>" +
-                    "<descriptions>" +
-                    "<description descriptionType=\"Other\">" +
-                    "The current xml-example for a DataCite record is the official example from the documentation." +
-                    "<br/>" +
-                    "Please look on datacite.org to find the newest versions of sample data and schemas." +
-                    "</description>" +
-                    "</descriptions>" +
-                    "</resource>";
-            
-            System.out.println(xmlout);
-            metadata.put(DATACITE, xmlout);
-        } catch (CrosswalkException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (SQLException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (AuthorizeException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        } catch (IOException e) {
-            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-        }
-        return metadata;
-    }
+
 
     private static String createSubject(Item item) {
         DCValue[] values;
