@@ -345,6 +345,17 @@ public class DataPackageStats extends AbstractCurationTask {
 	report(handle + ", " + doi + ", \"" + journal + "\", " + numKeywords + ", " +
 	       numKeywordsJournal + ", " + numberOfFiles + ", " + packageSize + ", " +
 	       embargoType + ", " + numberOfDownloads + ", " + manuscriptNum + ", " + dateAccessioned);
+
+	// don't overwhelm the production server with requests
+	// TODO: remove this after the code above is rewritten to not use OAI or METS -- it will be much more
+	// efficient once it is accessing the database directly
+	try {
+	    Thread.sleep(500);
+	} catch(InterruptedException e) {
+	    // ignore it
+	}
+
+	
 	log.debug("DataPackageStats complete");
 	return Curator.CURATE_SUCCESS;
     }
