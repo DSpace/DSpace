@@ -162,6 +162,7 @@ public class DataPackageStats extends AbstractCurationTask {
 		log.debug("numKeywords = " + numKeywords);
 
 		// number of keywords in journal email
+		//TODO: fix this for the new style of manuscript numbers -- it fails on anything deposited in 2012 and later
 		DCValue[] manuvals = item.getMetadata("dc.identifier.manuscriptNumber");
 		manuscriptNum = null;
 		if(manuvals.length > 0) {
@@ -188,20 +189,26 @@ public class DataPackageStats extends AbstractCurationTask {
 			firstdash = 5;
 		    }
 		    if(!journalAbbrev.equals("new")) {
+			numKeywordsJournal = "0";
 			String journalDir="/opt/dryad/submission/journalMetadata/";
 			manuscriptNum = manuscriptNum.substring(firstdash + 1);
 			int lastdash = manuscriptNum.lastIndexOf("-");
-			manuscriptNum = manuscriptNum.substring(0, lastdash);		    
-			File journalFile = new File(journalDir + journalAbbrev + "/" + manuscriptNum + ".xml");
-			
-			//get keywords from the file and count them
-			if(journalFile.exists()) {
-			    Document journaldoc = docb.parse(new FileInputStream(journalFile));
-			    NodeList nl = journaldoc.getElementsByTagName("keyword");
-			    numKeywordsJournal = "" + nl.getLength();
+			if(lastdash >= 0) {
+			    manuscriptNum = manuscriptNum.substring(0, lastdash);		    
+			    File journalFile = new File(journalDir + journalAbbrev + "/" + manuscriptNum + ".xml");
+			    
+			    //get keywords from the file and count them
+			    if(journalFile.exists()) {
+				Document journaldoc = docb.parse(new FileInputStream(journalFile));
+				NodeList nl = journaldoc.getElementsByTagName("keyword");
+				numKeywordsJournal = "" + nl.getLength();
+			    } else {
+				report("Unable to find journal file " + journalFile);
+				log.error("Unable to find journal file " + journalFile);
+			    }
 			} else {
-			    report("Unable to find journal file " + journalFile);
-			    throw new Exception("Unable to find journal file " + journalFile);
+			    report("Unable to parse manuscript number " +  manuvals[0].value);
+			    log.error("Unable to parse manuscript number " +  manuvals[0].value);
 			}
 		    }
 		}
