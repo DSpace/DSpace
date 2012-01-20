@@ -134,7 +134,8 @@ public class DataPackageStats extends AbstractCurationTask {
 		vals = item.getMetadata("prism.publicationName");
 		if (vals.length == 0) {
 		    setResult("Object has no prism.publicationName available " + handle);
-		    return Curator.CURATE_FAIL;
+		    log.error("Object has no prism.publicationName available " + handle);
+		    return Curator.CURATE_SKIP;
 		} else {
 		    journal = vals[0].value;
 		}
@@ -260,7 +261,8 @@ public class DataPackageStats extends AbstractCurationTask {
 			Document oaidoc = docb.parse(oaiAccessURL.openStream());
 			NodeList nl = oaidoc.getElementsByTagName("mods:titleInfo");
 			if(nl.getLength() < 1) {
-			    throw new MetadataValidationException("item has no title");
+			    log.error("Object has no mods:titleInfo available " + handle);
+			    return Curator.CURATE_SKIP;
 			}
 			String nodeText = nl.item(0).getTextContent();
 
