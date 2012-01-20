@@ -9,8 +9,6 @@ package org.dspace.curate;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.net.URL;
 import java.io.InputStreamReader;
@@ -26,6 +24,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import org.dspace.handle.HandleManager;
 import org.dspace.app.util.DCInput;
 import org.dspace.app.util.DCInputSet;
 import org.dspace.app.util.DCInputsReader;
@@ -34,6 +33,7 @@ import org.dspace.content.DCValue;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.content.crosswalk.MetadataValidationException;
+import org.dspace.core.Context;
 import org.dspace.core.Constants;
 
 import org.apache.log4j.Logger;
@@ -58,7 +58,6 @@ public class DataPackageStats extends AbstractCurationTask {
 
     DocumentBuilderFactory dbf = null;
     DocumentBuilder docb = null;
-    HashMap<String, String> handleToID = null;
     
     @Override 
     public void init(Curator curator, String taskId) throws IOException {
@@ -71,22 +70,6 @@ public class DataPackageStats extends AbstractCurationTask {
 	} catch (ParserConfigurationException e) {
 	    throw new IOException("unable to initiate xml processor", e);
 	}
-
-	// init handle-to-id lookup
-	handleToID = new HashMap<String, String>();
-	BufferedReader rdr = new BufferedReader(
-		                 new InputStreamReader(
-			             new FileInputStream(new File("/temp/handleToID.csv"))));
-	String aLine = rdr.readLine();
-        while(aLine != null) {
-	    int comma = aLine.indexOf(",");
-	    String handle = aLine.substring(0, comma).trim();
-	    String itemID = aLine.substring(comma + 1).trim();
-	    handleToID.put(handle, itemID);
-            aLine = rdr.readLine();
-        }
-        rdr.close();
-
     }
     
     /**
@@ -239,6 +222,17 @@ public class DataPackageStats extends AbstractCurationTask {
 		    for(int i = 0; i < vals.length; i++) {
 			String fileID = vals[i].value;
 			log.debug(" ======= processing fileID = " + fileID);
+
+			/////////////////////////////////////////////////////////////////////////////////////////
+			// TODO: instead of the crude mess below (OAI calls, pulling the METS, querying SOLR),
+			// get the info directly from the fileItem object
+			/////////////////////////////////////////////////////////////////////////////////////////
+			
+			// TODO: THE fileID should always be a DOI now -- do we need the handle, or can we make use of the DOI directly?
+			// the DOI will work to get the database ID (for a package)
+
+			//TODO: Not sure if we need the section below, which ensures a handle, then gets an object... can we
+			// get the object directly from the DOI?
 			
 			// ensure fileID is a handle, so we can query OAI with it
 			String shortHandle = "";
@@ -255,12 +249,9 @@ public class DataPackageStats extends AbstractCurationTask {
 			}
 			log.debug("data file handle = " + shortHandle);
 			
-
-			/////////////////////////////////////////////////////////////////////////////////////////
-			// TODO: instead of the crude mess below (OAI calls, pulling the METS, querying SOLR),
-			// get the actual data file object through the DSpace API and obtain the information from it
-			/////////////////////////////////////////////////////////////////////////////////////////
-
+			// get the internal database ID for this item
+			Item fileItem = getDSpaceItem(shortHandle);
+			log.debug("file internalID = " + fileItem.getID());
 			
 			// total package size
 			// get the file metadata via OAI, since it reports on the file sizes, even for embargoed items
@@ -313,9 +304,7 @@ public class DataPackageStats extends AbstractCurationTask {
 			// number of downlaods for most downloaded file
 			// must translate between the shortHandle and the DSpace internal database ID
 			// (since the solr stats system is based on the DSpace database ID)
-			log.debug("####### DSPACE OBJECT HAS INTERNAL ID: " + dso.getID());
-			String itemID = handleToID.get(shortHandle);
-			URL downloadStatURL = new URL("http://datadryad.org/solr/statistics/select/?indent=on&q=owningItem:" + itemID);
+			URL downloadStatURL = new URL("http://datadryad.org/solr/statistics/select/?indent=on&q=owningItem:" + fileItem.getID());
 			log.debug("fetching " + downloadStatURL);
 			Document statsdoc = docb.parse(downloadStatURL.openStream());
 			nl = statsdoc.getElementsByTagName("result");
@@ -358,4 +347,17 @@ public class DataPackageStats extends AbstractCurationTask {
 	return aNode.getChildNodes().item(0).getNodeValue();
     }
 
+    private Item getDSpaceItem(String shortHandle) {
+	Item dspaceItem = null;
+	try {
+	    Context context = new Context();
+	    dspaceItem = (Item)HandleManager.resolveToObject(context, shortHandle);
+	    context.complete();
+        } catch (SQLException e) {
+	    log.fatal("Unable to get DSpace Item for " + shortHandle, e);
+        }
+
+	return dspaceItem;
+    }
+    
 }
