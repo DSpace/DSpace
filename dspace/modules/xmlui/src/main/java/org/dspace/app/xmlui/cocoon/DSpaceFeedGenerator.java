@@ -30,6 +30,11 @@ import org.apache.cocoon.xml.dom.DOMStreamer;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.log4j.Logger;
 
+import org.apache.solr.client.solrj.SolrQuery;
+import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.common.SolrDocument;
+import org.dspace.app.xmlui.aspect.discovery.AbstractFiltersTransformer;
+import org.dspace.app.xmlui.aspect.discovery.CollectionRecentSubmissions;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.FeedUtils;
@@ -40,6 +45,7 @@ import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowserScope;
 import org.dspace.content.*;
+import org.dspace.discovery.SearchUtils;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
 import org.dspace.core.ConfigurationManager;
@@ -52,6 +58,8 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import com.sun.syndication.io.FeedException;
+
+import javax.mail.MethodNotSupportedException;
 
 /**
  *
@@ -93,7 +101,7 @@ import com.sun.syndication.io.FeedException;
  *
  */
 
-public class DSpaceFeedGenerator extends AbstractGenerator
+public class DSpaceFeedGenerator extends AbstractFiltersTransformer
                 implements Configurable, CacheableProcessingComponent, Recyclable
 {
     private static final Logger log = Logger.getLogger(DSpaceFeedGenerator.class);
@@ -238,7 +246,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
         
             SyndicationFeed feed = new SyndicationFeed(SyndicationFeed.UITYPE_XMLUI);
             feed.populate(ObjectModelHelper.getRequest(objectModel),
-                          dso, getRecentlySubmittedItems(context,dso), FeedUtils.i18nLabels);
+                          dso, getRecentlySubmittedItemsUsingDiscovery(context,dso), FeedUtils.i18nLabels);
             feed.setType(this.format);
             Document dom = feed.outputW3CDom();
             FeedUtils.unmangleI18N(dom);
@@ -258,7 +266,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
                 throw new SAXException(sqle);
         }
     }
-    
+
     /**
      * @return recently submitted Items within the indicated scope
      */
@@ -445,4 +453,95 @@ public class DSpaceFeedGenerator extends AbstractGenerator
         }
 
     }
+
+
+    private Item[] getRecentlySubmittedItemsUsingDiscovery(Context context, DSpaceObject dso) throws SQLException {
+        performSearch(dso);
+        Item[] items = new Item[queryResults.getResults().size()];
+        int index = 0;
+        for (SolrDocument doc : queryResults.getResults()) {
+
+            items[index] = (Item) SearchUtils.findDSpaceObject(context, doc);
+            index++;
+
+        }
+
+        List<Item> result = new ArrayList<Item>();
+
+        // filter out Items that are not world-readable
+        if (!includeRestrictedItems) {
+
+            for (Item item : items) {
+                checkAccess:
+                {
+                    for (Group group : AuthorizeManager.getAuthorizedGroups(context, item, Constants.READ)) {
+                        if ((group.getID() == 0)) {
+
+                            // check also its datafiles before add it to the result list
+                            // if a datafile is under embargo don't add the dataPackage to the result list.
+                            if (!isADataFileEmbargoed(context, item)) {
+                                result.add(item);
+                                break checkAccess;
+                            }
+                        }
+                    }
+                }
+            }
+            this.recentSubmissionItems = result.toArray(new Item[result.size()]);
+        }
+
+
+        return items;
+    }
+
+
+    public void performSearch(DSpaceObject scope) throws SQLException{
+        if(queryResults != null)
+        {
+            return;
+        }// queryResults;
+
+        queryArgs = prepareDefaultFilters(getView(scope));
+
+        queryArgs.setQuery("search.resourcetype:" + Constants.ITEM);
+
+        queryArgs.setRows(ConfigurationManager.getIntProperty("webui.feed.items"));
+
+
+        String sortField = SearchUtils.getConfig().getString("recent.submissions.sort-option");
+        if(sortField != null){
+            queryArgs.setSortField(
+                    sortField,
+                    SolrQuery.ORDER.desc
+            );
+        }
+        /* Set the communities facet filters */
+        queryArgs.setFilterQueries("location:m" + scope.getID());
+
+        try {
+            Context context = ContextUtil.obtainContext(objectModel);
+            queryResults =  getSearchService().search(context, queryArgs);
+        } catch (RuntimeException e) {
+            log.error(e.getMessage(),e);
+        } catch (Exception e) {
+            log.error(e.getMessage(),e);
+        }
+    }
+
+    private String getView(DSpaceObject dso){
+        if (dso instanceof Collection){
+            return "collection";
+        }
+        else if (dso instanceof Community){
+            return "community";
+        }
+        return "site";
+    }
+
+    public String getView()
+    {
+        throw new NoSuchMethodError();
+    }
+
+
 }
