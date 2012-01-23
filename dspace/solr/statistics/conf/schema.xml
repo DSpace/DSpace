@@ -293,6 +293,8 @@
    <field name="userAgent" type="string" indexed="true" stored="true" required="false"/>
    <field name="isBot" type="boolean" indexed="true" stored="true" required="false"/>
 
+     <field name="referrer" type="string" indexed="true" stored="true" required="true" />
+
  </fields>
 
 

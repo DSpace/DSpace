@@ -189,7 +189,14 @@ public class SolrLogger
 	        }
 
             doc1.addField("ip", ip);
-                        
+
+
+
+            String referrer = request.getHeader("referer");
+            log.info("SolrLogger - referrer: " + request.getHeader("referer"));
+            if(referrer!=null)
+                doc1.addField("referrer", referrer);
+
             doc1.addField("id", dspaceObject.getID());
             doc1.addField("type", dspaceObject.getType());
             // Save the current time
