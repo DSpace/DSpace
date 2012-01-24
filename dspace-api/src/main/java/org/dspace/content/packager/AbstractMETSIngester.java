@@ -792,6 +792,11 @@ public abstract class AbstractMETSIngester extends AbstractPackageIngester
             Bitstream bitstream = bundle.createBitstream(fileStream);
             bitstream.setName(path);
 
+             // Set bitstream sequence id, if known
+            String seqID = mfile.getAttributeValue("SEQ");
+            if(seqID!=null && !seqID.isEmpty())
+                bitstream.setSequenceID(Integer.parseInt(seqID));
+            
             // crosswalk this bitstream's administrative metadata located in
             // METS manifest (or referenced externally)
             manifest.crosswalkBitstream(context, params, bitstream, mfileID,
