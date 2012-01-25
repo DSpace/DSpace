@@ -344,18 +344,34 @@ function enableNextButton() {
     // note: JOURNAL_ID is always present because the default value!!
 
     // license must be cheched
+
+
     if (jQuery('input[name|="license_accept"]:checked').val()) {
 
         // Status: status_accepted ==> must have JOURNAL_ID && (MANUSCRIPT_NUMBER || CB_This manuscript has been accepted)
         if (jQuery("'#xmlui_submit_publication_article_status_accepted':checked").val()) {
+            var journal = jQuery("#journalID :selected").text();
 
-            //var val = jQuery("#aspect_submission_StepTransformer_field_manu-number-status-accepted").val();
-            //if(val!=null && val != '' || jQuery('input[name|="manu_acc"]:checked').val() ){
-            //jQuery("#aspect_submission_StepTransformer_field_submit_next").removeAttr("disabled");
-            jQuery("#aspect_submission_StepTransformer_field_submit_next").removeAttr("disabled");
+            if (journal.indexOf('*') != -1) {
+
+                var val = jQuery("#aspect_submission_StepTransformer_field_manu-number-status-accepted").val();
+                if (val != null && val != '') {
+                    jQuery("#aspect_submission_StepTransformer_field_submit_next").removeAttr("disabled");
+                }
+                else {
+                    jQuery("#aspect_submission_StepTransformer_field_submit_next").attr("disabled", "disabled");
+                }
+            }
+            else {
+                if (jQuery('input[name|="manu_accepted-cb"]:checked').val()) {
+                    jQuery("#aspect_submission_StepTransformer_field_submit_next").removeAttr("disabled");
+                }
+                else {
+                    jQuery("#aspect_submission_StepTransformer_field_submit_next").attr("disabled", "disabled");
+                }
+            }
             return;
         }
-
 
         // Status: status_published ==> must have DOI || CB_unknown_doi
         else if (jQuery("'#xmlui_submit_publication_article_status_published':checked").val()) {
@@ -372,9 +388,11 @@ function enableNextButton() {
 
         // Status: status_in_review ==> must have JOURNAL_ID && MANUSCRIPT_NUMBER
         else if (jQuery("'#xmlui_submit_publication_article_status_in_review':checked").val()) {
-            jQuery("#aspect_submission_StepTransformer_field_submit_next").removeAttr("disabled");
+            var val = jQuery("#aspect_submission_StepTransformer_field_manu").val();
+            if (val != null && val != '') {
+                jQuery("#aspect_submission_StepTransformer_field_submit_next").removeAttr("disabled");
+            }
             return;
-            //}
         }
 
     // Status status_not_yet_submitted ==> must have JOURNAL_ID
@@ -386,7 +404,6 @@ function enableNextButton() {
     }
     jQuery("#aspect_submission_StepTransformer_field_submit_next").attr("disabled", "disabled");
 }
-
 
 function beginUpload(form) {
 //alert("beginUpload()");
