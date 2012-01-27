@@ -9,7 +9,7 @@
 # {3}  Submitter name/email
 # {4}  Url for the review
 # {5}  The manuscript identifier (or "none available" if the metadata doesn't contain one)
-Subject: Dryad: Data package received for peer review {1}
+Subject: Dryad: Data package received for review {1}
 
 Dryad has received the following data package:
 Title:        {0}
@@ -18,7 +18,7 @@ Submitted by: {3}
 Data file(s):
 {2}
 
-Dryad has assigned the following provisional DOI to the submission. This DOI may be included in the article manuscript. Although this DOI is not yet fully registered with the DOI system, it will be registered when the manuscript is accepted for publication.
+Dryad has assigned the following provisional DOI to the submission. This DOI may be included in the article manuscript. Although this DOI is not yet fully registered with the DOI system, it will be registered when the manuscript is ready for publication.
 
 {1}
 
