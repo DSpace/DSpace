@@ -11,6 +11,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
 import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -27,9 +28,9 @@ public interface SearchService {
 
     DiscoverResult search(Context context, DSpaceObject dso, DiscoverQuery query) throws SearchServiceException;
 
-    String searchJSON(DiscoverQuery query, String jsonIdentifier) throws SearchServiceException;
+    InputStream searchJSON(DiscoverQuery query, String jsonIdentifier) throws SearchServiceException;
 
-    String searchJSON(DiscoverQuery query, DSpaceObject dso, String jsonIdentifier) throws SearchServiceException;
+    InputStream searchJSON(DiscoverQuery query, DSpaceObject dso, String jsonIdentifier) throws SearchServiceException;
 
 
     List<DSpaceObject> search(Context context, String query, String orderfield, boolean ascending, int offset, int max, String... filterquery);

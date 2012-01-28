@@ -28,6 +28,7 @@ import org.xml.sax.SAXException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -41,7 +42,7 @@ import java.util.Map;
 public class JSONDiscoverySearcher extends AbstractReader implements Recyclable {
 
     private static Logger log = Logger.getLogger(JSONDiscoverySearcher.class);
-    private String JSONString;
+    private InputStream JSONStream;
 
 
     /** The Cocoon response */
@@ -117,7 +118,7 @@ public class JSONDiscoverySearcher extends AbstractReader implements Recyclable 
 
         try {
             Context context = ContextUtil.obtainContext(objectModel);
-            JSONString = getSearchService().searchJSON(queryArgs, getScope(context, objectModel), jsonWrf);
+            JSONStream = getSearchService().searchJSON(queryArgs, getScope(context, objectModel), jsonWrf);
         } catch (Exception e) {
             log.error("Error while retrieving JSON string for Discovery auto complete", e);
         }
@@ -125,14 +126,12 @@ public class JSONDiscoverySearcher extends AbstractReader implements Recyclable 
     }
 
     public void generate() throws IOException, SAXException, ProcessingException {
-        if(JSONString != null){
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(JSONString.getBytes("UTF-8"));
-
+        if(JSONStream != null){
             byte[] buffer = new byte[8192];
 
-            response.setHeader("Content-Length", String.valueOf(JSONString.length()));
+            response.setHeader("Content-Length", String.valueOf(JSONStream.available()));
             int length;
-            while ((length = inputStream.read(buffer)) > -1)
+            while ((length = JSONStream.read(buffer)) > -1)
             {
                 out.write(buffer, 0, length);
             }
