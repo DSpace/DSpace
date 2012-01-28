@@ -35,6 +35,7 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -243,8 +244,7 @@ public class SidebarFacetsTransformer extends AbstractDSpaceTransformer implemen
                                                     "/discover?" +
                                                     paramsQuery +
                                                     "fq=" +
-                                                //TODO: encode URLEncoder ?
-                                                    filterQuery,
+                                                    URLEncoder.encode(filterQuery, "UTF-8"),
                                             displayedValue + " (" + value.getCount() + ")"
                                     );
                                 }

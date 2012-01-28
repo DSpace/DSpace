@@ -54,7 +54,7 @@ AjaxSolr.AutocompleteWidget = AjaxSolr.AbstractFacetWidget.extend({
     }
     var fqs = $("input[name='fq']");
     for(var j = 0; j < fqs.length; j ++){
-        params.push('fq=' + $(fqs[j]).val());
+        params.push('fq=' + encodeURIComponent($(fqs[j]).val()));
     }
     //Attempt to add our scope !
     var scope = $("input[name='discovery-json-scope']").val();

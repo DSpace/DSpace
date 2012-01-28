@@ -40,6 +40,7 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.List;
@@ -414,7 +415,7 @@ public class SearchFacetFilter extends AbstractDSpaceTransformer implements Cach
             //Add already existing filter queries
             url = addFilterQueriesToUrl(url);
             //Last add the current filter query
-            url += "&fq=" + filterQuery;
+            url += "&fq=" + URLEncoder.encode(filterQuery, "UTF-8");
             cell.addXref(url, displayedValue + " (" + value.getCount() + ")"
             );
         }
