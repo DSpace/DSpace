@@ -11,6 +11,7 @@ import java.util.*;
 
 public class CDLDataCiteServiceTest {
 
+    private static Logger log = Logger.getLogger(CDLDataCiteServiceTest.class);
     private static final String BASEURL = "https://n2t.net/ezid";
 
     private String myUsername;
@@ -25,7 +26,8 @@ public class CDLDataCiteServiceTest {
 
         Map<String, String> metadata = createMetadataListXML();
         CDLDataCiteServiceTest service = new CDLDataCiteServiceTest(username, password);
-        System.out.println(service.update("10.5061/DRYAD.2222", metadata));
+        String updateOutput = service.update("10.5061/DRYAD.2222", metadata);
+	log.info(updateOutput);
     }
 
 
@@ -54,8 +56,8 @@ public class CDLDataCiteServiceTest {
     }
 
     private void logMetadata(Map<String, String> metadata) {
-        System.out.println("Adding the following Metadata:");
-	System.out.println(encodeAnvl(metadata));
+        log.info("Adding the following Metadata:");
+	log.info(encodeAnvl(metadata));
     }
 
     private String escape(String s) {
@@ -79,7 +81,23 @@ public class CDLDataCiteServiceTest {
     private static Map<String, String> createMetadataListXML() {
         Map<String, String> metadata = new HashMap<String, String>();
 
-        String xmlout = "<resource  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" metadataVersionNumber=\"1\"" +
+        String xmlout =  "<resource  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" metadataVersionNumber=\"1\"" +
+                " lastMetadataUpdate=\"2006-05-04\" xsi:noNamespaceSchemaLocation=\"datacite-metadata-v2.0.xsd\">" +
+                "<identifier identifierType=\"DOI\">10.5061/DRYAD.2222</identifier>" +
+                "<creators>" +
+                "<creator>" +
+                "<creatorName>Toru, Nozawa</creatorName>" +
+                "</creator>" +
+                "</creators>" +
+                "<titles>" +
+                "<title>National Institute for Environmental Studies and Center for Climate System Research Japan</title>" +
+                "</titles>" +
+                "<publisher>World Data Center for Climate (WDCC)</publisher>" +
+                "<publicationYear>2004</publicationYear>" +
+                "</resource>";
+
+	    /*
+	    "<resource  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" metadataVersionNumber=\"1\"" +
                 " lastMetadataUpdate=\"2006-05-04\" xsi:noNamespaceSchemaLocation=\"datacite-metadata-v2.0.xsd\">" +
                 "<identifier identifierType=\"DOI\">10.5061/DRYAD.2222</identifier>" +
                 "<creators>" +
@@ -140,8 +158,8 @@ public class CDLDataCiteServiceTest {
                 "</description>" +
                 "</descriptions>" +
                 "</resource>";
-
-        System.out.println(xmlout);
+*/
+        log.debug("test metadata is " + xmlout);
         metadata.put("datacite", xmlout);
 
         return metadata;
