@@ -299,7 +299,7 @@ div.ds-option-set ul {
 }
 
 div.ds-option-set .ds-sublist-head {
-    font-weight: normal;
+    font-weight: bold;
     font-size: 100%;
 }
 
@@ -1274,6 +1274,7 @@ div.simple-item-view-authors {
 
 div.simple-item-view-authors span{
     text-align: justify;
+	color:black;
 }
 
 #aspect_artifactbrowser_ItemViewer_div_item-view h2,
@@ -1550,8 +1551,8 @@ div
 }
 #topNav a:hover {
 	color: #FFFFFF; 
-
 }
+
 #topNav ul {
 	z-index: 999;
 } 
@@ -1592,20 +1593,21 @@ color:#1b86b4;
     -webkit-border-radius: 5px;
 -moz-border-radius: 5px;
 border-radius: 5px;
-
+background-image:url(../../images/fondo_login.png);
 }
 
 
 #ds-user-box h1{
 font-size:12px;
 /*color:#1b86b4;*/
-color:white;
+color:#207095;
+font-weight:normal;
+margin-bottom:3px;
 }
 
 #ds-user-box h2{
-
 font-size:16px;
-color:white;
+color:black;
 }
 
 #div-menu-lateral-cuenta-superior-derecho {
@@ -2313,3 +2315,64 @@ margin:0px;
 padding:0px;
 margin:0px;
 } 
+
+#footercol1 {
+float:left;
+width:350px;}
+
+#footercol2 {
+float: left;
+}
+
+#footer {
+font-family: "Trebuchet MS", sans-serif;
+font-size:11px;
+width:100%;
+border-top:1px solid #dedede;
+padding:10px;
+}
+
+.unlp {
+height:57px;
+widht:45px;
+float:left;
+}
+
+.datos_unlp {
+padding-left:10px;
+float:left;
+}
+
+.datos_unlp a {
+text-decoration:none;
+color:#e38338;
+}
+
+.datos_unlp a:hover {
+color:#1f7297;
+}
+
+
+#news-contacto-etc {
+float:right;
+}
+
+#comollegar {
+width:91px;
+/*border:1px solid black;*/
+float:right;
+right:10px;
+position:relative;
+top:-27px;
+}
+
+.datos_sedici {
+float:left;
+/*border:1px solid black;*/
+width:450px;
+}
+
+.newsletter,
+.contacto {
+margin:0px 4px 0px 4px;
+}
