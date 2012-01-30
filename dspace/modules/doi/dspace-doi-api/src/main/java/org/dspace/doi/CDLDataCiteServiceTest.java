@@ -27,7 +27,7 @@ public class CDLDataCiteServiceTest {
         Map<String, String> metadata = createMetadataListXML();
         CDLDataCiteServiceTest service = new CDLDataCiteServiceTest(username, password);
         String updateOutput = service.update("10.5061/DRYAD.2222", metadata);
-	log.info(updateOutput);
+	log.info("Output of the update command: " + updateOutput);
     }
 
 
@@ -51,18 +51,14 @@ public class CDLDataCiteServiceTest {
         httpMethod.setRequestHeader("Accept", "text/plain");
 
         this.getClient(false).executeMethod(httpMethod);
-	System.out.println("HTTP output: " + httpMethod.getStatusText());
+	log.info("HTTP status: " + httpMethod.getStatusLine());
+	log.debug("HTTP response text: " + httpMethod.getResponseBodyAsString(1000));
         return httpMethod.getStatusLine().toString();
     }
 
     private void logMetadata(Map<String, String> metadata) {
         log.info("Adding the following Metadata:");
 	log.info(encodeAnvl(metadata));
-    }
-
-    private String escape(String s) {
-        return s.replace("%", "%25").replace("\n", "%0A").
-                replace("\r", "%0D").replace(":", "%3A");
     }
 
 
@@ -81,8 +77,11 @@ public class CDLDataCiteServiceTest {
     private static Map<String, String> createMetadataListXML() {
         Map<String, String> metadata = new HashMap<String, String>();
 
-        String xmlout =  "<resource  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" metadataVersionNumber=\"1\"" +
-                " lastMetadataUpdate=\"2006-05-04\" xsi:noNamespaceSchemaLocation=\"datacite-metadata-v2.0.xsd\">" +
+        String xmlout =  "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+	    "<resource xmlns=\"http://datacite.org/schema/kernel-2.2\" " +
+	    "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
+	    "xsi:schemaLocation=\"http://datacite.org/schema/kernel-2.2 http://schema.datacite.org/meta/kernel-2.2/metadata.xsd\" " +
+	    "metadataVersionNumber=\"1\" lastMetadataUpdate=\"2006-05-04\">" +
                 "<identifier identifierType=\"DOI\">10.5061/DRYAD.2222</identifier>" +
                 "<creators>" +
                 "<creator>" +
@@ -173,6 +172,11 @@ public class CDLDataCiteServiceTest {
             b.append(escape(e.getKey()) + ": " + escape(e.getValue()) + "");
         }
         return b.toString();
+    }
+
+    private String escape(String s) {
+        return s.replace("%", "%25").replace("\n", "%0A").
+	    replace("\r", "%0D").replace(":", "%3A");
     }
 
 }
