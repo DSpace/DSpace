@@ -9,7 +9,7 @@
 
 	<!-- Este es el codigo que deberan tocar para modificar el slideshow -->
 	<ul class="slideshow">
-	    <li class="show">
+	    <li>
 	    	<a href="#">
 	    		<img title="SeDiCI" alt="Serivicio de Difusión de la Creación Intelectual de la Universidad Nacional de La Plata">
 	    			<xsl:attribute name="src">
@@ -18,7 +18,7 @@
 	    		</img>
 	    	</a>
 	    </li>
-	    <li class="show">
+	    <li>
 	    	<a href="#">
 	    		<img title="Nueva colección con libros de medicina" alt="Se ha agregado una nueva colección exclusiva para libros de medicina, con mas de 500 libros en formato digital, accesibles bajo las políticas de Acceso Abierto">
 	    			<xsl:attribute name="src">
@@ -27,7 +27,7 @@
 	    		</img>
 	    	</a>
 	    </li>
-	    <li class="show">
+	    <li>
 	    	<a href="#">
 	    		<img title="Reglamentación de Tesis de Posgrado" alt="La Universidad Nacional de La Plata publicó la resolución Nº 785/45 que obliga a los alumnos de posgrado a depositar sus tesis en SeDiCI como requisito para tramitar su título">
 	    			<xsl:attribute name="src">

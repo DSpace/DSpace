@@ -1,5 +1,5 @@
 $(document).ready(function() {
-   //Execute the slideShow, set 4 seconds for each images
+   //Execute the slideShow, set 6 seconds for each images
    slideShow(6000);
 });
 
@@ -19,7 +19,7 @@ function slideShow(speed) {
    $('#slideshow-caption p').html($('ul.slideshow li.show').find('img').attr('alt'));
 
    //Display the caption
-   $('#slideshow-caption').css({opacity: 0.7, bottom:0});
+   $('#slideshow-caption').css({opacity: 0.8, bottom:0});
 
    //Call the gallery function to run the slideshow
    var timer = setInterval('gallery()',speed);
