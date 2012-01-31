@@ -211,7 +211,7 @@
 <message key="xmlui.ArtifactBrowser.CollectionViewer.browse_authors">Autores</message>
 <message key="xmlui.ArtifactBrowser.CollectionViewer.browse_dates">Fechas</message>
 <message key="xmlui.ArtifactBrowser.CollectionViewer.advanced_search_link">Búsqueda avanzada</message>
-<message key="xmlui.ArtifactBrowser.CollectionViewer.head_recent_submissions">Últimos documentos agregados</message>
+<message key="xmlui.ArtifactBrowser.CollectionViewer.head_recent_submissions">Últimos documentos agregados en</message>
 
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.CommunityBrowser.java -->
@@ -231,7 +231,7 @@
 <message key="xmlui.ArtifactBrowser.CommunityViewer.advanced_search_link">Búsqueda avanzada</message>
 <message key="xmlui.ArtifactBrowser.CommunityViewer.head_sub_communities">Subcomunidades en esta comunidad</message>
 <message key="xmlui.ArtifactBrowser.CommunityViewer.head_sub_collections">Colecciones en esta comunidad</message>
-<message key="xmlui.ArtifactBrowser.CommunityViewer.head_recent_submissions">Últimos documentos agregados</message>
+<message key="xmlui.ArtifactBrowser.CommunityViewer.head_recent_submissions">Últimos documentos agregados en</message>
 
 
 
