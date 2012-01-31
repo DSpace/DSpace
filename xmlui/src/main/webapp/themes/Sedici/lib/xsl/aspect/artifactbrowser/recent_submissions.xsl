@@ -44,5 +44,23 @@
       	<i18n:text><xsl:value-of select="."/></i18n:text>&#160;<xsl:value-of select="/dri:document/dri:body/dri:div/dri:head"/>
       </h2>
     </xsl:template>
+    
+    <!-- 
+    Esto es para no mostrar las entradas del DRI del aspecto artifact browser que vienen con los archivos recientes en la vista de la comunidad.
+    Se debe mostrar en blanco ya que el discovery las muestra por su parte.
+    En caso de desactivar el discovery se debrá cambiar la muestra.
+    -->
+    <xsl:template match="dri:referenceSet[@id='aspect.artifactbrowser.CommunityRecentSubmissions.referenceSet.collection-last-submitted']">
+		
+    </xsl:template>
+    
+    <!-- 
+      Esto es para no mostrar las entradas del DRI del aspecto artifact browser que vienen con los archivos recientes en la vista de la collection.
+      Se debe mostrar en blanco ya que el discovery las muestra por su parte.
+      En caso de desactivar el discovery se debrá cambiar la muestra.
+    -->
+    <xsl:template match="dri:referenceSet[@id='aspect.artifactbrowser.CollectionRecentSubmissions.referenceSet.collection-last-submitted']">
+		
+    </xsl:template>
 
 </xsl:stylesheet>
