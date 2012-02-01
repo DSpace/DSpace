@@ -5,8 +5,16 @@
 
     <xsl:output indent="yes"/>
 
-   <xsl:template match="dri:div[@id='aspect.artifactbrowser.ConfigurableBrowse.div.browse-by-author-results']">
-     <xsl:variable name="cantItemsXCol">
+   <!-- Para aplicar el matcheo cuando muestra la tabla de autores-->
+   
+   <xsl:template match="dri:table[@id='aspect.artifactbrowser.ConfigurableBrowse.table.browse-by-author-results']">
+	 <!-- Recupero la cantidad de autores a mostrar en la pagina -->
+	 <xsl:variable name="itemsTotal">
+       <xsl:value-of select="/dri:document/dri:body/dri:div[@id='aspect.artifactbrowser.ConfigurableBrowse.div.browse-by-author']/dri:div[@id='aspect.artifactbrowser.ConfigurableBrowse.div.browse-by-author-results']/@itemsTotal"/>
+     </xsl:variable>
+     
+      <!-- Calculo la cantidad de autores por columna. -->
+	 <xsl:variable name="cantItemsXCol">
           <xsl:choose>
           <xsl:when test="@itemsTotal>60">
               <xsl:value-of select="ceiling(@itemsTotal div 3)"/>
@@ -16,17 +24,10 @@
           </xsl:otherwise>
           </xsl:choose>
      </xsl:variable> 
+
      
-     <xsl:apply-templates mode="tabla_autores">    
-        <xsl:with-param name="itemsTotal"><xsl:value-of select="@itemsTotal"/></xsl:with-param>
-        <xsl:with-param name="cantItemsXCol"><xsl:value-of select="$cantItemsXCol"/></xsl:with-param>
-     </xsl:apply-templates>
-     
-   </xsl:template>
-   
-   <xsl:template match="dri:table" mode='tabla_autores'>
-	 <xsl:param name="itemsTotal"/>
-     <xsl:param name="cantItemsXCol"/>
+	 <!--  <xsl:param name="itemsTotal"/>
+     <xsl:param name="cantItemsXCol"/>-->
      
      <!-- Si hay mas de un elemento debo mostrar por lo menos el primer contenedor de autores -->
      <xsl:if test="$itemsTotal>1">
