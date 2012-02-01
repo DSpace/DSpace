@@ -73,16 +73,22 @@ public class LinkControlledMetadata extends AbstractCurationTask {
         for (DCValue m : metadata) {
         	Matcher matcher = pattern.matcher(m.value);
         	if(matcher.matches()) {
-        		String id = matcher.group(1);
-        		String newValue = matcher.group(2);
+        		String old_value = m.value;
         		
-        		report("["+m.schema+"."+m.element+"."+m.qualifier+"] "+m.value+" ==> ("+id+") "+newValue);
-
-        		// Insertamos el metadato actualizado
-        		item.addMetadata(m.schema, m.element, m.qualifier, m.language, newValue, id, Choices.CF_ACCEPTED);
-        	} else {
-        		item.addMetadata(m.schema, m.element, m.qualifier, m.language, m.value, m.authority, m.confidence);
+        		m.authority = matcher.group(1);
+        		m.value = matcher.group(2);
+        		
+        		if("0".equals( m.authority )) {
+        			m.authority = null;
+        			m.confidence = Choices.CF_NOTFOUND;
+        		} else {
+        			m.confidence = Choices.CF_ACCEPTED;
+        		}
+        		report("["+m.schema+"."+m.element+"."+m.qualifier+"] "+old_value+" ==> ("+m.authority+") "+m.value);
         	}
+
+        	// Insertamos el metadato actualizado
+        	item.addMetadata(m.schema, m.element, m.qualifier, m.language, m.value, m.authority, m.confidence);
         }
 	}
 
