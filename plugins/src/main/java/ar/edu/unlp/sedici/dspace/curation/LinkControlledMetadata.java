@@ -24,7 +24,7 @@ import org.dspace.curate.Curator;
  */
 public class LinkControlledMetadata extends AbstractCurationTask {
 
-	private Pattern pattern = Pattern.compile("^(\\d*):::(.*)$");
+	private Pattern pattern = Pattern.compile("^(.*):::(.*)$");
 	
 	@Override
 	public int perform(DSpaceObject dso) throws IOException {
@@ -81,10 +81,9 @@ public class LinkControlledMetadata extends AbstractCurationTask {
         		// Insertamos el metadato actualizado
         		item.addMetadata(m.schema, m.element, m.qualifier, m.language, newValue, id, Choices.CF_ACCEPTED);
         	} else {
-        		item.addMetadata(m.schema, m.element, m.qualifier, m.language, m.language);
+        		item.addMetadata(m.schema, m.element, m.qualifier, m.language, m.value, m.authority, m.confidence);
         	}
         }
-
 	}
 
 }
