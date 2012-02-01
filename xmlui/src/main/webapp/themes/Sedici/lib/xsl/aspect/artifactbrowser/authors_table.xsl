@@ -9,28 +9,24 @@
    
    <xsl:template match="dri:table[@id='aspect.artifactbrowser.ConfigurableBrowse.table.browse-by-author-results']">
 	 <!-- Recupero la cantidad de autores a mostrar en la pagina -->
-	 <xsl:variable name="itemsTotal">
-       <xsl:value-of select="/dri:document/dri:body/dri:div[@id='aspect.artifactbrowser.ConfigurableBrowse.div.browse-by-author']/dri:div[@id='aspect.artifactbrowser.ConfigurableBrowse.div.browse-by-author-results']/@itemsTotal"/>
+     <xsl:variable name="itemsTotal">
+       <xsl:value-of select="@rows -1"/>
      </xsl:variable>
      
       <!-- Calculo la cantidad de autores por columna. -->
 	 <xsl:variable name="cantItemsXCol">
           <xsl:choose>
-          <xsl:when test="@itemsTotal>60">
-              <xsl:value-of select="ceiling(@itemsTotal div 3)"/>
+          <xsl:when test="$itemsTotal>60">
+              <xsl:value-of select="ceiling($itemsTotal div 3)"/>
           </xsl:when>
           <xsl:otherwise>
                 20
           </xsl:otherwise>
           </xsl:choose>
      </xsl:variable> 
-
-     
-	 <!--  <xsl:param name="itemsTotal"/>
-     <xsl:param name="cantItemsXCol"/>-->
      
      <!-- Si hay mas de un elemento debo mostrar por lo menos el primer contenedor de autores -->
-     <xsl:if test="$itemsTotal>1">
+     <xsl:if test="$itemsTotal>=1">
 	     <xsl:call-template name="div_contenedor_autores">
 	     	<xsl:with-param name="contador">0</xsl:with-param>
 	     	 <xsl:with-param name="cantItemsXCol"><xsl:value-of select="$cantItemsXCol"/></xsl:with-param>
