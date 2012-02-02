@@ -62,8 +62,7 @@
 		     <xsl:call-template name="header_autores">
 		     	<xsl:with-param name="header"><xsl:value-of select="dri:row[@role='header']"/></xsl:with-param>
 		     </xsl:call-template>
-		     
-	         <xsl:apply-templates select="dri:row[floor(position() div ($cantItemsXCol+2)) = $contador]"  mode="tabla_autores"/>
+	         <xsl:apply-templates select="dri:row[floor((position()-2) div ($cantItemsXCol)) = $contador]"  mode="tabla_autores"/>
 	
 		  </table>
 	     </div>
