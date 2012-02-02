@@ -236,7 +236,9 @@
         </div>
 
         <!-- cc-zero.png && opendata.png -->
-        <div style="padding-left:1px; padding-top:2px;">
+        <xsl:if
+            test=".//dim:field[@element='rights'][.='http://creativecommons.org/publicdomain/zero/1.0/']">
+            <div style="padding-left:1px; padding-top:2px;">
             <table>
                 <tr>
                     <td>
@@ -257,6 +259,7 @@
             </table>
             <xsl:text> &#160; </xsl:text>
         </div>
+        </xsl:if>
 
         <br/>
         <br/>
