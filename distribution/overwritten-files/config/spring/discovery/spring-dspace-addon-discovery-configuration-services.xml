@@ -42,11 +42,10 @@
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
             <list>
-                <ref bean="sidebarFacetApellido" />
-                <!-- <ref bean="sidebarFacetAuthor" />-->
+                <ref bean="sidebarFacetAuthor" />
                 <ref bean="sidebarFacetSubject" />
                 <ref bean="sidebarFacetDateIssued" />
-                <ref bean="sidebarFacetDireccion" />
+                <ref bean="sidebarFacetLanguage" />
             </list>
         </property>
         <!--The search filters which can be used on the discovery search page-->
@@ -56,7 +55,6 @@
                 <ref bean="searchFilterAuthor" />
                 <ref bean="searchFilterSubject" />
                 <ref bean="searchFilterIssued" />
-                <ref bean="searchFilterDireccion" />
             </list>
         </property>
         <!--The sort filters for the discovery search-->
@@ -107,8 +105,7 @@
         <property name="indexFieldName" value="author"/>
         <property name="metadataFields">
             <list>
-                <value>dc.contributor.author</value>
-                <value>dc.creator</value>
+                <value>sedici.creator.*</value>
             </list>
         </property>
         <property name="fullAutoComplete" value="true"/>
@@ -118,7 +115,7 @@
         <property name="indexFieldName" value="subject"/>
         <property name="metadataFields">
             <list>
-                <value>dc.subject.*</value>
+                <value>sedici.subject.materias</value>
             </list>
         </property>
         <property name="fullAutoComplete" value="true"/>
@@ -135,25 +132,12 @@
         <property name="fullAutoComplete" value="false"/>
     </bean>
     
-    <bean id="searchFilterDireccion" class="org.dspace.discovery.configuration.DiscoverySearchFilter">
-        <property name="indexFieldName" value="sedici.autor.direccion"/>
-        <property name="metadataFields">
-            <list>
-                <value>sedici.autor.direccion</value>
-            </list>
-        </property>
-        <property name="fullAutoComplete" value="false"/>
-    </bean>
-
-
-
     <!--Sidebar facet configuration beans-->
     <bean id="sidebarFacetAuthor" class="org.dspace.discovery.configuration.SidebarFacetConfiguration">
         <property name="indexFieldName" value="author"/>
         <property name="metadataFields">
             <list>
-                <value>dc.contributor.author</value>
-                <value>dc.creator</value>
+                <value>sedici.creator.*</value>
             </list>
         </property>
         <property name="facetLimit" value="10"/>
@@ -164,7 +148,7 @@
         <property name="indexFieldName" value="subject"/>
         <property name="metadataFields">
             <list>
-                <value>dc.subject.*</value>
+                <value>sedici.subject.materias</value>
             </list>
         </property>
         <property name="facetLimit" value="10"/>
@@ -182,32 +166,17 @@
         <property name="sortOrder" value="VALUE"/>
     </bean>
     
-    <bean id="sidebarFacetDireccion" class="org.dspace.discovery.configuration.SidebarFacetConfiguration">
-        <property name="indexFieldName" value="sedici.autor.direccion"/>
+    <bean id="sidebarFacetLanguage" class="org.dspace.discovery.configuration.SidebarFacetConfiguration">
+        <property name="indexFieldName" value="language"/>
         <property name="metadataFields">
             <list>
-                <value>sedici.autor.direccion</value>
+                <value>dc.language</value>
             </list>
         </property>
-        <property name="type" value="text"/>
         <property name="facetLimit" value="10"/>
         <property name="sortOrder" value="COUNT"/>
     </bean>
-
     
-    <bean id="sidebarFacetApellido" class="org.dspace.discovery.configuration.SidebarFacetConfiguration">
-        <property name="indexFieldName" value="sedici.autor.apellido"/>
-        <property name="metadataFields">
-            <list>
-                <value>sedici.autor.apellido</value>
-                <value>sedici.autor.nombre</value>
-            </list>
-        </property>
-        <property name="type" value="text"/>
-        <property name="facetLimit" value="10"/>
-        <property name="sortOrder" value="COUNT"/>
-    </bean>
-
     <!--Sort properties-->
     <bean id="sortTitle" class="org.dspace.discovery.configuration.DiscoverySortFieldConfiguration">
         <property name="metadataField" value="dc.title"/>
