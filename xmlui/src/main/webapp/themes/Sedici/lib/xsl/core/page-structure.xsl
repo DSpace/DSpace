@@ -264,25 +264,55 @@
             This is obviously not ideal, but adding those scripts in those sitemaps is far
             from ideal as well--> 
             <!-- En caso de que cargamos en el DRI un choice-support especial (el NO ESTATICO) en el DRI, el choice-support.js viejo debe obviarse. -->
-
-            
             <xsl:choose>
-                <xsl:when test="(text() = 'static/js/choice-support.js') and (/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][not(@qualifier)][text()='lib/js/choice-support.js'])">
-                            				
-                </xsl:when>
-                
-                <xsl:otherwise>
-	                <xsl:if test="not(starts-with(text(), 'static/js/scriptaculous'))">
-	                    <script type="text/javascript">
+                <xsl:when test="text() = 'static/js/choice-support.js'">
+                   <xsl:if test="not(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][not(@qualifier)][text()='lib/js/choice-support.js'])"> 
+	                   <script type="text/javascript">
 	                        <xsl:attribute name="src">
-	                            <xsl:value-of
-	                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-	                            <xsl:text>/</xsl:text>
-	                            <xsl:value-of select="."/>
-	                        </xsl:attribute>&#160;</script>
-	                </xsl:if>
-                </xsl:otherwise>
+	                            <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+	                            <xsl:text>/themes/</xsl:text>
+	                            <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+	                            <xsl:text>/lib/js/choice-support.js</xsl:text>
+	                        </xsl:attribute>&#160;
+	                   </script>
+                   </xsl:if>
+                </xsl:when>
+                <xsl:when test="not(starts-with(text(), 'static/js/scriptaculous'))">
+                    <script type="text/javascript">
+                        <xsl:attribute name="src">
+                            <xsl:value-of
+                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+                            <xsl:text>/</xsl:text>
+                            <xsl:value-of select="."/>
+                        </xsl:attribute>&#160;</script>
+                </xsl:when>
             </xsl:choose>
+            
+            
+<!--             <xsl:choose> -->
+<!--                 <xsl:when test="(text() = 'static/js/choice-support.js') and (/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='javascript'][not(@qualifier)][text()='lib/js/choice-support.js'])"> -->
+                            				
+<!--                 </xsl:when> -->
+                
+<!--                 <xsl:otherwise> -->
+<!--                 <script type="text/javascript"> -->
+<!-- 	                        <xsl:attribute name="src"> -->
+<!-- 	                            <xsl:value-of -->
+<!-- 	                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/> -->
+<!-- 	                            <xsl:text>/</xsl:text> -->
+<!-- 	                            <xsl:value-of select="."/> -->
+<!-- 	                        </xsl:attribute>&#160;</script> -->
+<!-- 	                <xsl:if test="not(starts-with(text(), 'static/js/scriptaculous'))"> -->
+<!-- 	                    <script type="text/javascript"> -->
+<!-- 	                        <xsl:attribute name="src"> -->
+<!-- 	                            <xsl:value-of -->
+<!-- 	                                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/> -->
+<!-- 	                            <xsl:text>/</xsl:text> -->
+<!-- 	                            <xsl:value-of select="."/> -->
+<!-- 	                        </xsl:attribute>&#160;</script> -->
+<!-- 	                </xsl:if> -->
+<!--                 </xsl:otherwise> -->
+<!--             </xsl:choose> -->
         </xsl:for-each>
 
         <!-- add setup JS code if this is a choices lookup page -->
