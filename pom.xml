@@ -73,6 +73,27 @@
                      Once the bug is fixed, we should put open-ended range in dspace-pom -->
                 <version>2.1.1</version>
          </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>2.2.1</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/assembly/testEnvironment.xml</descriptor>
+                            </descriptors>
+                            <filters>
+                                <filter>src/main/filters/testEnvironment.properties</filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+                <inherited>false</inherited>
+            </plugin>
       </plugins>
    </build>
 
