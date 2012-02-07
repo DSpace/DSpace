@@ -29,6 +29,7 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.content.Collection;
@@ -36,6 +37,7 @@ import org.dspace.content.Community;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.ConfigurationManager;
+import org.dspace.core.Constants;
 import org.xml.sax.SAXException;
 
 import java.io.IOException;
@@ -59,6 +61,9 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
     private static final Message T_head_links =
         message("xmlui.ArtifactBrowser.Navigation.links_browse");
+
+    private static final Message T_context_edit_item =
+            message("xmlui.administrative.Navigation.context_edit_item_workflow");
 
     /**
      * Generate the unique caching key.
@@ -113,11 +118,19 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
 
         options.addList("browse");
         options.addList("account");
-        options.addList("context");
+        List context = options.addList("context");
         options.addList("administrative");
         List links = options.addList("links");
 
-
+        // Agregamos el menu para editar un item desde el workflow
+		DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+		if (dso != null && dso.getType() == Constants.ITEM) {
+			Item item = (Item) dso;
+			if (item.canEdit()) {
+				context.addItem().addXref(contextPath+"/handle/"+item.getHandle()+"/edit_item_metadata", T_context_edit_item);
+			}
+		}
+        
         links.setHead(T_head_links);
         
         Map<String, String> urls=this.generarUrls();

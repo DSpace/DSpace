@@ -1363,7 +1363,7 @@ background-repeat:no-repeat;
 padding-left:25px;
 border-bottom:1px solid #dedede;
 color:#9C4F0A;
-
+	padding-top: 0px;
     margin-bottom: 3px;
 }
 
@@ -1885,6 +1885,7 @@ position:relative;
 bottom:15px;
 clear:both;
 min-height:40px;
+display: table;
 }
 
 .detail-view ul{

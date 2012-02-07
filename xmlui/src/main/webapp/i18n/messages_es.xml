@@ -839,7 +839,7 @@
 	<!-- org.dspace.app.xmlui.administrative.Navigation -->
 	<!-- contextual menu items -->
 	<message key="xmlui.administrative.Navigation.context_head">Contexto</message>
-<message key="xmlui.administrative.Navigation.context_edit_item">Editar este ítem</message>
+<message key="xmlui.administrative.Navigation.context_edit_item">Administrar Item</message>
 <message key="xmlui.administrative.Navigation.context_edit_collection">Editar colección</message>
 <message key="xmlui.administrative.Navigation.context_item_mapper">Relacionador de ítems</message>
 <message key="xmlui.administrative.Navigation.context_edit_community">Editar comunidad</message>
@@ -2118,5 +2118,7 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 
 <!-- Traducciones para Discover -->
 <message key="xmlui.discovery.AbstractFiltersTransformer.filters.head">Navegar</message>
+
+<message key="xmlui.administrative.Navigation.context_edit_item_workflow">Editar Item</message>
 
 </catalogue>

@@ -19,6 +19,9 @@
 
   </map:components>
   
+  <map:flow language="javascript">
+    <map:script src="sedicixmlworkflow.js"/>
+  </map:flow>
   
   <map:pipelines>
     <map:pipeline>
@@ -53,6 +56,12 @@
             </map:transform>
           </map:match>
           
+          <map:match pattern="handle/*/*/edit_item_metadata">
+            <map:call function="doEditItemMetadata">
+              <map:parameter name="handle" value="{1}/{2}"/>
+            </map:call>
+          </map:match>
+
           <map:serialize type="xml"/>
           
         </map:when>

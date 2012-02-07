@@ -354,6 +354,20 @@
 					<hint>Palabras o terminos extraídos del documento</hint>
 				</field>
 
+				<!-- Materia (categoria 5 del Tesauro) -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>subject</dc-element>
+					<dc-qualifier>materias</dc-qualifier>
+					<repeatable>true</repeatable>
+					<label>Materia SeDiCI</label>
+					<input-type>onebox</input-type>
+					<hint>Area temática del recurso extraída del tesauro de materias de SeDiCI</hint>
+					<required>Debe ingresar al menos una materia para el documento</required>
+					<vocabulary>srsc</vocabulary>
+					<visibility>workflow</visibility>
+				</field>
+
 				<!-- Materia (de la lista de encabezamiento de LoC) -->
 				<!-- TODO Hay que hacerlo controlado -->
 				<field>
@@ -361,10 +375,9 @@
 					<dc-element>subject</dc-element>
 					<dc-qualifier>lcsh</dc-qualifier>
 					<repeatable>true</repeatable>
-					<label>Materia</label>
+					<label>Materia LCSH</label>
 					<input-type>onebox</input-type>
-					<hint>Area temática del recurso</hint>
-					<required>Debe ingresar al menos una materia para el documento</required>
+					<hint>Area temática del recurso extraida del tesauro de la Library of Congress</hint>
 					<vocabulary>srsc</vocabulary>
 					<visibility>workflow</visibility>
 				</field>
@@ -423,6 +436,7 @@
 					<dc-schema>sedici</dc-schema>
 					<dc-element>identifier</dc-element>
 					<dc-qualifier>isbn</dc-qualifier>
+					<repeatable>true</repeatable>
 					<label>ISBN</label>
 					<input-type>onebox</input-type>
 					<hint>Si cuenta con un ISBN, éste debe ser ingresado aquí</hint>
@@ -434,6 +448,7 @@
 					<dc-schema>sedici</dc-schema>
 					<dc-element>identifier</dc-element>
 					<dc-qualifier>isbn</dc-qualifier>
+					<repeatable>true</repeatable>
 					<label>ISBN</label>
 					<input-type>onebox</input-type>
 					<hint>El código ISBN correspondiente al libro</hint>
