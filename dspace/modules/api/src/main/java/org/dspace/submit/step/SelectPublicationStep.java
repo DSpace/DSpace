@@ -196,7 +196,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         }
         // ARTICLE_STATUS_ACCEPTED ||  ARTICLE_STATUS_IN_REVIEW ||  ARTICLE_STATUS_NOT_YET_SUBMITTED
         else{
-            if(!processJournal(journalID, manuscriptNumber, item, context, request)){
+            if(!processJournal(journalID, manuscriptNumber, item, context, request, articleStatus)){
 
                 if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED) return ENTER_MANUSCRIPT_NUMBER;
 
@@ -304,7 +304,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     }
 
 
-    private boolean processJournal(String journalID, String manuscriptNumber, Item item, Context context, HttpServletRequest request) throws AuthorizeException, SQLException {
+    private boolean processJournal(String journalID, String manuscriptNumber, Item item, Context context, HttpServletRequest request, String articleStatus) throws AuthorizeException, SQLException {
 
         //We have selected to choose a journal, retrieve it
         if(!journalID.equals("other")){
@@ -329,6 +329,20 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                 //We have a valid journal
                 PublicationBean pBean = ModelPublication.getDataFromPublisherFile(manuscriptNumber, journalID, journalPath);
                 if (pBean.getMessage().equals((""))) {
+
+                    // check if the status is "in review" or "rejected"
+                    if(articleStatus!=null){
+                        if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED){
+                            if(pBean.getStatus()!=null && pBean.getStatus().equals(PublicationBean.STATUS_IN_REVIEW) || pBean.getStatus().equals(PublicationBean.STATUS_REJECTED)){
+                                request.getSession().setAttribute("submit_error", "Invalid manuscript number. (in review/rejected)");
+                                return false;
+                            }
+
+                        }
+                    }
+
+
+
                     importJournalMetadata(context, item, pBean);
                     List<String> reviewEmails = journalNotifyOnReview.get(journalID);
                     item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "review", "mailUsers", null, reviewEmails.toArray(new String[reviewEmails.size()]));

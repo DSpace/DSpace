@@ -530,6 +530,9 @@ public class ModelPublication
 			    if(tag.equals("Article_Status")){
 				String ttext = text.trim().toLowerCase();
 
+                pbean.setStatus(ttext);
+
+
 				if(ttext.equals("submitted") ||
 				   ttext.equals("in review")   ||
 				   ttext.equals("under review")  ||

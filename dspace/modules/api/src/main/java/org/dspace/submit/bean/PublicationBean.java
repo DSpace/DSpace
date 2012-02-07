@@ -43,6 +43,22 @@ public class PublicationBean extends DataBean
 	private String publicationDir = ""; //directory where this publication's files are stored, relative to the base directory
     private boolean skipReviewStep = true;
 
+    private String status=null;
+
+
+    public static String STATUS_SUBMITTED="submitted";
+    public static String STATUS_IN_REVIEW="in review";
+    public static String STATUS_UNDER_REVIEW="under review";
+    public static String STATUS_REVISION_IN_REVIEW="revision in review";
+    public static String STATUS_REVISION_UNDER_REVIEW="revision under review";
+    public static String STATUS_ACCEPTED="accepted";
+    public static String STATUS_REJECTED="rejected";
+    public static String STATUS_NEEDS_REVISION="needs revision";
+
+
+
+
+
 
 	public PublicationBean()
 	{
@@ -274,5 +290,13 @@ public class PublicationBean extends DataBean
 
     public void setSkipReviewStep(boolean skipReviewStep) {
         this.skipReviewStep = skipReviewStep;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
