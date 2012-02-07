@@ -334,7 +334,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                     if(articleStatus!=null){
                         if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED){
                             if(pBean.getStatus()!=null && pBean.getStatus().equals(PublicationBean.STATUS_IN_REVIEW) || pBean.getStatus().equals(PublicationBean.STATUS_REJECTED)){
-                                request.getSession().setAttribute("submit_error", "Invalid manuscript number. (in review/rejected)");
+                                request.getSession().setAttribute("submit_error", "Invalid manuscript number.");
                                 return false;
                             }
 
