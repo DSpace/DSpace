@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -14,6 +15,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Collection;
 import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
@@ -21,6 +23,7 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Context;
 import org.dspace.embargo.EmbargoManager;
+import org.dspace.handle.HandleManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -85,7 +88,8 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
 
     @Override
     protected void performItem(Item item){
-        String handle = item.getHandle();
+        final String handle = item.getHandle();
+        final StringBuilder result = new StringBuilder(200);
         DCValue partof[] = item.getMetadata("dc.relation.ispartof");
         if (handle != null)  //ignore items in workflow
             if (partof != null && partof.length==1){  //and articles
@@ -109,39 +113,14 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                 } else {
                     this.report("Bad partof ID: " + articleID + " found in " + item.getName() + " (" + item.getHandle() + ")");
                 }
-                if (shortHandle != ""){  //now query to get oai/mets metadata, from which a related item of type host will contain the citation (if any)
-                    try{
-                        URL oaiAccessURL = new URL("http://www.datadryad.org/oai/request?verb=GetRecord&identifier=oai:datadryad.org:" + shortHandle + "&metadataPrefix=mets");
-                        Document oaidoc = docb.parse(oaiAccessURL.openStream());
-                        NodeList nl = oaidoc.getElementsByTagName("mods:relatedItem");
-                        String citation = "";
-                        for(int i = 0;i<nl.getLength();i++){
-                            Node nd = nl.item(i);
-                            Node typeNode = null;
-                            NamedNodeMap nm = nd.getAttributes();
-                            if (nm != null){
-                                typeNode = nm.getNamedItem("type");
-                            }
-                            if (typeNode != null && "host".equals(typeNode.getNodeValue())){
-                                //this.report("Found a type attribute with value " + typeNode.getNodeValue() +" for a mods:relatedItem for " + articleID);                                       
-                                NodeList children = nd.getChildNodes();
-                                for(int j=0;j<children.getLength();j++){
-                                    Node child = children.item(j);
-                                    if ("mods:part".equals(child.getNodeName())){
-                                        Node textNode = child.getFirstChild();
-                                        citation = textNode.getTextContent();
-                                    }
-                                }
-
-                            }
-                        }
-                        boolean unpublished = false;
-                        if ("".equals(citation))
-                            unpublished = true;
-                        //else
-                            //this.report("Found citation: " + citation);
+                Item parentItem = null;
+                try{
+                    Context context = new Context();
+                    parentItem = (Item)HandleManager.resolveToObject(context, shortHandle);
+                    if (parentItem != null){
+                        DCValue[] citationValues = parentItem.getDC("identifier", "citation", null);
                         DCDate itemEmbargoDate = null;
-                        if (unpublished){
+                        if (citationValues == null || citationValues.length == 0){  //no citation; treat as unpublished
                             unpublishedCount++;
                             itemEmbargoDate = EmbargoManager.getEmbargoDate(null, item);
                             if (itemEmbargoDate != null){
@@ -149,14 +128,62 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                                 embargoes.add(de);
                             }
                         }
-
                     }
-                    catch(Exception e){
-                        this.report("Exception " + e + " encountered while processing " + item);
-                    }
+                } catch (SQLException e){
+                    LOGGER.error("Unable to get DSpace Item for " + shortHandle);
+                } catch (AuthorizeException e) {
+                    LOGGER.error("EmbargoManager unable to authorize access to embargo data for this item");
+                } catch (IOException e) {
+                    LOGGER.error("EmbargoManager generated an IOException when accessing embargo data for this item");
                 }
-
+                        
             }
+//                if (shortHandle != ""){  //now query to get oai/mets metadata, from which a related item of type host will contain the citation (if any)
+//                    try{
+//                        URL oaiAccessURL = new URL("http://www.datadryad.org/oai/request?verb=GetRecord&identifier=oai:datadryad.org:" + shortHandle + "&metadataPrefix=mets");
+//                        Document oaidoc = docb.parse(oaiAccessURL.openStream());
+//                        NodeList nl = oaidoc.getElementsByTagName("mods:relatedItem");
+//                        String citation = "";
+//                        for(int i = 0;i<nl.getLength();i++){
+//                            Node nd = nl.item(i);
+//                            Node typeNode = null;
+//                            NamedNodeMap nm = nd.getAttributes();
+//                            if (nm != null){
+//                                typeNode = nm.getNamedItem("type");
+//                            }
+//                            if (typeNode != null && "host".equals(typeNode.getNodeValue())){
+//                                //this.report("Found a type attribute with value " + typeNode.getNodeValue() +" for a mods:relatedItem for " + articleID);                                       
+//                                NodeList children = nd.getChildNodes();
+//                                for(int j=0;j<children.getLength();j++){
+//                                    Node child = children.item(j);
+//                                    if ("mods:part".equals(child.getNodeName())){
+//                                        Node textNode = child.getFirstChild();
+//                                        citation = textNode.getTextContent();
+//                                    }
+//                                }
+//
+//                            }
+//                        }
+//                        boolean unpublished = false;
+//                        if ("".equals(citation))
+//                            unpublished = true;
+//                        //else
+//                            //this.report("Found citation: " + citation);
+//                        DCDate itemEmbargoDate = null;
+//                        if (unpublished){
+//                            unpublishedCount++;
+//                            itemEmbargoDate = EmbargoManager.getEmbargoDate(null, item);
+//                            if (itemEmbargoDate != null){
+//                                DatedEmbargo de = new DatedEmbargo(itemEmbargoDate.toDate(),item);
+//                                embargoes.add(de);
+//                            }
+//                        }
+//
+//                    }
+//                    catch(Exception e){
+//                        this.report("Exception " + e + " encountered while processing " + item);
+//                    }
+//                }
     }
 
     private static class DatedEmbargo implements Comparable<DatedEmbargo>{
