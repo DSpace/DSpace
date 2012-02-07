@@ -123,6 +123,7 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                         if (citationValues == null || citationValues.length == 0){  //no citation; treat as unpublished
                             unpublishedCount++;
                             itemEmbargoDate = EmbargoManager.getEmbargoDate(null, item);
+                            this.report("Successfully processed shortHandle: " + shortHandle);
                             if (itemEmbargoDate != null){
                                 DatedEmbargo de = new DatedEmbargo(itemEmbargoDate.toDate(),item);
                                 embargoes.add(de);
