@@ -51,6 +51,7 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
     private DocumentBuilderFactory dbf = null;
     private DocumentBuilder docb = null;
 
+    private Context dspaceContext;
     private static Logger LOGGER = LoggerFactory.getLogger(EmbargoedWithoutPubDate.class);
 
 
@@ -61,9 +62,15 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
         try {
             dbf = DocumentBuilderFactory.newInstance();
             docb = dbf.newDocumentBuilder();
+            dspaceContext = new Context();
         } catch (ParserConfigurationException e) {
             throw new IOException("unable to initiate xml processor", e);
+        } catch (SQLException e1) {
+            LOGGER.error("Unable to create Dspace context");
+            LOGGER.error("Exception was " + e1);
+            return;
         }
+
     }
 
     @Override
@@ -90,14 +97,6 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
     protected void performItem(Item item){
         final String handle = item.getHandle();
         final StringBuilder result = new StringBuilder(200);
-        Context context;
-        try {
-            context = new Context();
-        } catch (SQLException e1) {
-            LOGGER.error("Unable to create Dspace context");
-            LOGGER.error("Exception was " + e1);
-            return;
-        }
         DCValue partof[] = item.getMetadata("dc.relation.ispartof");
         if (handle != null)  //ignore items in workflow
             if (partof != null && partof.length==1){  //and articles
@@ -105,7 +104,6 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                 //first find the article this data is associated with
                 DCValue partofArticle = partof[0];
                 String articleID = partofArticle.value;  //most likely a handle, but probably ought to be a doi, so try looking both ways
-                this.report("Raw parent id = " + articleID);
                 String shortHandle = "";
                 if(articleID.startsWith("http://hdl.handle.net/10255/")) {   //modified from the DataPackageStats tool
                     shortHandle = articleID.substring("http://hdl.handle.net/".length());
@@ -125,7 +123,7 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                 }
                 Item parentItem = null;
                 try{
-                    parentItem = (Item)HandleManager.resolveToObject(context, shortHandle);
+                    parentItem = (Item)HandleManager.resolveToObject(dspaceContext, shortHandle);
                     if (parentItem != null){
                         DCValue[] citationValues = parentItem.getDC("identifier", "citation", null);
                         DCDate itemEmbargoDate = null;
