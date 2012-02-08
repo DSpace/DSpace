@@ -97,6 +97,7 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                 //first find the article this data is associated with
                 DCValue partofArticle = partof[0];
                 String articleID = partofArticle.value;  //most likely a handle, but probably ought to be a doi, so try looking both ways
+                this.report("Raw parent id = " + articleID);
                 String shortHandle = "";
                 if(articleID.startsWith("http://hdl.handle.net/10255/")) {   //modified from the DataPackageStats tool
                     shortHandle = articleID.substring("http://hdl.handle.net/".length());
@@ -105,7 +106,8 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                 } else if (articleID.startsWith("doi:10.5061/")) {
                     try{
                         URL doiLookupURL = new URL("http://datadryad.org/doi?lookup=" + articleID);
-                        shortHandle = (new BufferedReader(new InputStreamReader(doiLookupURL.openStream()))).readLine();
+                        String doiLookup = (new BufferedReader(new InputStreamReader(doiLookupURL.openStream()))).readLine();
+                        shortHandle = doiLookup.substring("http://datadryad.org/handle/".length());
                     }
                     catch(Exception e){
                         this.report("Exception encountered while looking handle for " + articleID + " found in " + item.getName() + " (" + item.getHandle() + ")");
