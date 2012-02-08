@@ -134,6 +134,7 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                     }
                 } catch (SQLException e){
                     LOGGER.error("Unable to get DSpace Item for " + shortHandle);
+                    LOGGER.error("Exception was " + e);
                 } catch (AuthorizeException e) {
                     LOGGER.error("EmbargoManager unable to authorize access to embargo data for this item");
                 } catch (IOException e) {
