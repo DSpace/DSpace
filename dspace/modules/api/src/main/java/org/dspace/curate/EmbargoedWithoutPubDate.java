@@ -90,6 +90,14 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
     protected void performItem(Item item){
         final String handle = item.getHandle();
         final StringBuilder result = new StringBuilder(200);
+        Context context;
+        try {
+            context = new Context();
+        } catch (SQLException e1) {
+            LOGGER.error("Unable to create Dspace context");
+            LOGGER.error("Exception was " + e1);
+            return;
+        }
         DCValue partof[] = item.getMetadata("dc.relation.ispartof");
         if (handle != null)  //ignore items in workflow
             if (partof != null && partof.length==1){  //and articles
@@ -117,7 +125,6 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                 }
                 Item parentItem = null;
                 try{
-                    Context context = new Context();
                     parentItem = (Item)HandleManager.resolveToObject(context, shortHandle);
                     if (parentItem != null){
                         DCValue[] citationValues = parentItem.getDC("identifier", "citation", null);
