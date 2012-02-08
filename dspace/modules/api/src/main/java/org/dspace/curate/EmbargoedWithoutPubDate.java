@@ -58,13 +58,9 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
     @Override
     public void init(Curator curator, String taskID) throws IOException{
         super.init(curator, taskID);
-        // init xml processing
+        // init dspace context to allow access to database
         try {
-            dbf = DocumentBuilderFactory.newInstance();
-            docb = dbf.newDocumentBuilder();
             dspaceContext = new Context();
-        } catch (ParserConfigurationException e) {
-            throw new IOException("unable to initiate xml processor", e);
         } catch (SQLException e1) {
             LOGGER.error("Unable to create Dspace context");
             LOGGER.error("Exception was " + e1);
@@ -117,6 +113,7 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                     }
                     catch(Exception e){
                         this.report("Exception encountered while looking handle for " + articleID + " found in " + item.getName() + " (" + item.getHandle() + ")");
+                        LOGGER.error("Exception was " + e);
                     }
                 } else {
                     this.report("Bad partof ID: " + articleID + " found in " + item.getName() + " (" + item.getHandle() + ")");
@@ -130,7 +127,6 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                         if (citationValues == null || citationValues.length == 0){  //no citation; treat as unpublished
                             unpublishedCount++;
                             itemEmbargoDate = EmbargoManager.getEmbargoDate(null, item);
-                            this.report("Successfully processed shortHandle: " + shortHandle);
                             if (itemEmbargoDate != null){
                                 DatedEmbargo de = new DatedEmbargo(itemEmbargoDate.toDate(),item);
                                 embargoes.add(de);
@@ -147,52 +143,6 @@ public class EmbargoedWithoutPubDate extends AbstractCurationTask {
                 }
                         
             }
-//                if (shortHandle != ""){  //now query to get oai/mets metadata, from which a related item of type host will contain the citation (if any)
-//                    try{
-//                        URL oaiAccessURL = new URL("http://www.datadryad.org/oai/request?verb=GetRecord&identifier=oai:datadryad.org:" + shortHandle + "&metadataPrefix=mets");
-//                        Document oaidoc = docb.parse(oaiAccessURL.openStream());
-//                        NodeList nl = oaidoc.getElementsByTagName("mods:relatedItem");
-//                        String citation = "";
-//                        for(int i = 0;i<nl.getLength();i++){
-//                            Node nd = nl.item(i);
-//                            Node typeNode = null;
-//                            NamedNodeMap nm = nd.getAttributes();
-//                            if (nm != null){
-//                                typeNode = nm.getNamedItem("type");
-//                            }
-//                            if (typeNode != null && "host".equals(typeNode.getNodeValue())){
-//                                //this.report("Found a type attribute with value " + typeNode.getNodeValue() +" for a mods:relatedItem for " + articleID);                                       
-//                                NodeList children = nd.getChildNodes();
-//                                for(int j=0;j<children.getLength();j++){
-//                                    Node child = children.item(j);
-//                                    if ("mods:part".equals(child.getNodeName())){
-//                                        Node textNode = child.getFirstChild();
-//                                        citation = textNode.getTextContent();
-//                                    }
-//                                }
-//
-//                            }
-//                        }
-//                        boolean unpublished = false;
-//                        if ("".equals(citation))
-//                            unpublished = true;
-//                        //else
-//                            //this.report("Found citation: " + citation);
-//                        DCDate itemEmbargoDate = null;
-//                        if (unpublished){
-//                            unpublishedCount++;
-//                            itemEmbargoDate = EmbargoManager.getEmbargoDate(null, item);
-//                            if (itemEmbargoDate != null){
-//                                DatedEmbargo de = new DatedEmbargo(itemEmbargoDate.toDate(),item);
-//                                embargoes.add(de);
-//                            }
-//                        }
-//
-//                    }
-//                    catch(Exception e){
-//                        this.report("Exception " + e + " encountered while processing " + item);
-//                    }
-//                }
     }
 
     private static class DatedEmbargo implements Comparable<DatedEmbargo>{
