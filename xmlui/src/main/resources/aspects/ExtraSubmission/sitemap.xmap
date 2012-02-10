@@ -11,6 +11,10 @@
       <map:selector name="AuthenticatedSelector" src="ar.edu.unlp.sedici.aspect.extraSubmission.AuthenticatedSelector"/>
     </map:selectors>
     
+	<map:transformers>
+		<map:transformer name="Navigation" src="ar.edu.unlp.sedici.aspect.extraSubmission.Navigation"/>
+	</map:transformers>
+
     <map:matchers default="wildcard">
       <map:matcher name="HandleTypeMatcher" src="org.dspace.app.xmlui.aspect.general.HandleTypeMatcher"/>
       <map:matcher name="HandleAuthorizedMatcher" src="org.dspace.app.xmlui.aspect.general.HandleAuthorizedMatcher"/>
@@ -25,7 +29,11 @@
   
   <map:pipelines>
     <map:pipeline>
+    
       <map:generate/>
+      
+      <map:transform type="Navigation"/>
+      
       <!-- Make sure the user is atleast logged in -->
       <map:select type="AuthenticatedSelector">
         <map:when test="administrator">

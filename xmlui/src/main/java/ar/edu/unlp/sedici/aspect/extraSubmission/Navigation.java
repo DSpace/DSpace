@@ -13,7 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package ar.edu.unlp.sedici.aspect.staticPages;
+package ar.edu.unlp.sedici.aspect.extraSubmission;
+
+
+import java.io.IOException;
+import java.io.Serializable;
+import java.sql.SQLException;
 
 import org.apache.cocoon.caching.CacheableProcessingComponent;
 import org.apache.cocoon.environment.ObjectModelHelper;
@@ -30,30 +35,37 @@ import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.DSpaceObject;
-import org.dspace.core.ConfigurationManager;
+import org.dspace.content.Item;
+import org.dspace.core.Constants;
 import org.xml.sax.SAXException;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
- * Navigation that adds code needed for the browse features from dspace
- *
- * @author Kevin Van de Velde (kevin at atmire dot com)
- * @author Mark Diggory (markd at atmire dot com)
- * @author Ben Bosman (ben at atmire dot com)
+ * Aspect para agregar temas relacionados al submit y workflow
  */
-public class Navigation extends AbstractDSpaceTransformer implements CacheableProcessingComponent {
-
+public class Navigation  extends AbstractDSpaceTransformer implements CacheableProcessingComponent
+{
     /** Language Strings */
-    private static final Message T_head_all_of_dspace =
-        message("xmlui.ArtifactBrowser.Navigation.head_all_of_dspace");
+    
+    private static final Message T_context_edit_item =
+            message("xmlui.administrative.Navigation.context_edit_item_workflow");
 
-    private static final Message T_head_links =
-        message("xmlui.ArtifactBrowser.Navigation.links_browse");
+    public void addOptions(Options options) throws SAXException, WingException,
+    UIException, SQLException, IOException, AuthorizeException
+{
+    
+    	List context = options.addList("context");
+    	
+        // Agregamos el menu para editar un item desde el workflow
+		DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
+		if (dso != null && dso.getType() == Constants.ITEM) {
+			Item item = (Item) dso;
+			if (item.canEdit()) {
+				context.addItem().addXref(contextPath+"/handle/"+item.getHandle()+"/edit_item_metadata", T_context_edit_item);
+			}
+		}
+        
+    }
 
     /**
      * Generate the unique caching key.
@@ -87,57 +99,5 @@ public class Navigation extends AbstractDSpaceTransformer implements CacheablePr
     public SourceValidity getValidity() {
         return NOPValidity.SHARED_INSTANCE;
     }
-
-    /**
-     * Add the basic navigational options:
-     *
-     * browse - browse by Titles - browse by Authors - browse by Dates
-     *
-     * language FIXME: add languages
-     *
-     * context no context options are added.
-     *
-     * action no action options are added.
-     */
-    public void addOptions(Options options) throws SAXException, WingException,
-            UIException, SQLException, IOException, AuthorizeException
-    {
-        /* Create skeleton menu structure to ensure consistent order between aspects,
-         * even if they are never used
-         */
-
-        options.addList("browse");
-        options.addList("account");
-        options.addList("context");
-        options.addList("administrative");
-        List links = options.addList("links");
-
-
-        links.setHead(T_head_links);
-        
-        Map<String, String> urls=this.generarUrls();
-        for (String nombre : urls.keySet()) {
-        	links.addItemXref(contextPath + urls.get(nombre),nombre);
-		};
-
-
-    }
-    
-	private static Map<String, String> generarUrls() {
-		int inicial=1;
-		Map<String, String> retorno=new HashMap<String, String>();
-		String valor=ConfigurationManager.getProperty("sedici.pages", "map.url"+inicial);
-		String nombre=ConfigurationManager.getProperty("sedici.pages", "map.url"+inicial+".nombre");
-		while (valor!=null){
-			retorno.put(nombre, valor);
-			inicial+=1;
-			valor=ConfigurationManager.getProperty("sedici.pages", "map.url"+inicial);
-			nombre=ConfigurationManager.getProperty("sedici.pages", "map.url"+inicial+".nombre");
-			
-		}
-		return retorno;
-		
-	}
-
 }
 
