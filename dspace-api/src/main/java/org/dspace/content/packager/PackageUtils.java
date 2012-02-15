@@ -834,14 +834,16 @@ public class PackageUtils
 
             if(dso==null)
             {
-                // No such object.  Change the name to something harmless.
+                // No such object.  Change the name to something harmless, but predictable.
+                // NOTE: this name *must* be predictable. If we generate the same AIP
+                // twice in a row, we must end up with the same group name each time.
                 String newName;
                 if (orphanGroups.containsKey(groupName))
                     newName =  orphanGroups.get(groupName);
                 else
                 {
-                    newName= "GROUP_" + Utils.generateHexKey() + "_"
-                            + objType + "_" + groupType;
+                    newName= "ORPHANED_" + objType + "_GROUP_"
+                            + objID + "_" + groupType;
                     orphanGroups.put(groupName, newName);
                     // A given group should only be translated once, since the
                     // new name contains unique random elements which would be
