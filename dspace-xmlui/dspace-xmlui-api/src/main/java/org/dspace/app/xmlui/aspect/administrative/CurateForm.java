@@ -9,7 +9,6 @@ package org.dspace.app.xmlui.aspect.administrative;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.sql.SQLException;
 import java.util.Map;
 import org.xml.sax.SAXException;
@@ -30,7 +29,6 @@ import org.dspace.app.xmlui.wing.element.Para;
 import org.dspace.app.xmlui.wing.element.Select;
 import org.dspace.app.xmlui.wing.element.Text;
 import org.dspace.authorize.AuthorizeException;
-import org.dspace.core.ConfigurationManager;
 
 /**
  * Generates the Administrative Curate Form, from which any DSpace object can
@@ -118,7 +116,7 @@ public class CurateForm extends AbstractDSpaceTransformer
                 {
                     Select groupSelect = form.addItem().addSelect("select_curate_group");
                     groupSelect = FlowCurationUtils.getGroupSelectOptions(groupSelect);
-                    groupSelect.setLabel(T_taskgroup_label_name); // todo: i18n this
+                    groupSelect.setLabel(T_taskgroup_label_name); 
                     groupSelect.setSize(1);
                     groupSelect.setRequired();
                     groupSelect.setEvtBehavior("submitOnChange");
@@ -130,6 +128,7 @@ public class CurateForm extends AbstractDSpaceTransformer
                 }
                 Select taskSelect = form.addItem().addSelect("curate_task");
                 taskSelect = FlowCurationUtils.getTaskSelectOptions(taskSelect, curateGroup);
+                taskSelect.setLabel(T_task_label_name);
                 taskSelect.setSize(1);
                 taskSelect.setRequired();
                 if(taskSelected!=null)
