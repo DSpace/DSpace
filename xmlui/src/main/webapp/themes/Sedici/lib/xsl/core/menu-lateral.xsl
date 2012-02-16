@@ -83,15 +83,15 @@
                 <xsl:apply-templates select="dri:list[@id='aspect.viewArtifacts.Navigation.list.administrative']"/>
                 
                 <!-- Genero la seccion de otros -->
-                <xsl:if test="count(dri:list[@id='aspect.viewArtifacts.Navigation.list.account']/dri:item)>2">
-	                <h1 id="ds-options-otros" class="ds-option-set-head">
+               <xsl:if test="count(dri:list[@id='aspect.viewArtifacts.Navigation.list.account']/dri:item)>2">
+	                <!-- <h1 id="ds-options-otros" class="ds-option-set-head">
 	                    <i18n:text>sedici.menuLateral.otros.head</i18n:text>
 	                </h1>
 	                <div id="ds-otros-set" class="ds-option-set">
 	                    <ul>
 	                       <li></li> 
 	                    </ul>
-	                </div>
+	                </div>--> 
                 </xsl:if>
 
                 <!-- Genero la seccion del discovery -->

@@ -61,10 +61,14 @@ public abstract class SeDiCI2003AuthorityProvider implements ChoiceAuthority {
     	if (text == null) text = "";
     	
     	//FIXME Ver de donde viene el limit
-    	if(limit > 10) limit = 10;
-    	
-    	List<Choice> entities = this.findSeDiCI2003Entities(field, text, start, limit, new ChoiceFactory(field));
+    	//Hay que tener cuidado con el limite cuando es 0, ya que por otro lado se esta cargando con 20 si el limite es menos o igual a 0
+    	if((limit > 100) || (limit <= 0)) limit = 100;
+
+		int total=this.findSeDiCI2003EntitiesCount(field, text);
 		
+    	List<Choice> entities = this.findSeDiCI2003Entities(field, text, start, limit, new ChoiceFactory(field));
+
+    	
     	int confidence;
     	if (entities.size() == 0)
             confidence = Choices.CF_NOTFOUND;
@@ -73,10 +77,11 @@ public abstract class SeDiCI2003AuthorityProvider implements ChoiceAuthority {
         else
             confidence = Choices.CF_AMBIGUOUS;
     	
-    	return new Choices(entities.toArray(new Choice[entities.size()]), start, entities.size(), confidence, (entities.size() < limit));
+    	return new Choices(entities.toArray(new Choice[entities.size()]), start, entities.size(), confidence, (total > (start + limit)));
 	}
 
     protected abstract List<Choice> findSeDiCI2003Entities(String field, String text, int start, int limit, ChoiceFactory choiceFactory) ;
+    protected abstract int findSeDiCI2003EntitiesCount(String field, String text) ;
     protected abstract String getSeDiCI2003EntityLabel(String field, String key) ;
 	/**
      * Get the single "best" match (if any) of a value in the authority

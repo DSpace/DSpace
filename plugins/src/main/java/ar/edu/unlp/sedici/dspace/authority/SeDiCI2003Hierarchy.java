@@ -42,6 +42,10 @@ public abstract class SeDiCI2003Hierarchy extends SeDiCI2003AuthorityProvider {
 
 		return choices;
 	}
+	
+    protected int findSeDiCI2003EntitiesCount(String field, String text){
+    	return 0;
+    }
 
 	@Override
 	protected String getSeDiCI2003EntityLabel(String field, String key) {

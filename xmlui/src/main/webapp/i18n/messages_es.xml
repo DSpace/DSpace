@@ -2119,6 +2119,8 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <!-- Traducciones para Discover -->
 <message key="xmlui.discovery.AbstractFiltersTransformer.filters.head">Navegar</message>
 
+<message key="sedici.aspect.collectionViewer.addItem">Agregar Item</message>
+
 <message key="xmlui.administrative.Navigation.context_edit_item_workflow">Editar Item</message>
 
 </catalogue>

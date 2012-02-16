@@ -30,6 +30,7 @@ package ar.edu.unlp.sedici.sedici2003.model;
 import java.util.List;
 
 import javax.persistence.EntityManager;
+import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 
 import org.springframework.roo.addon.dbre.RooDbManaged;
@@ -46,31 +47,22 @@ public class Personas {
 	public String getApellidoYNombre(){
 		return this.getApellido() + ", " + this.getNombre();
 	}
+	
 	   public static List<Personas> findPersonasesByApellidoYNombre(String apellido,String nombre, int start,int count) {
-	        if (apellido == null || apellido.length() == 0) throw new IllegalArgumentException("The apellido argument is required");
-	        if (nombre == null) nombre = "";
+	       if (apellido == null || apellido.length() == 0) apellido = "";
+	       if (nombre == null) nombre = "";	   
 	        if (start < 0) start = 0;
 	        if (count <= 0) count = 20;
-	        
-	        String where = "LOWER(o.apellido) LIKE LOWER(:apellido)";
-	        apellido = apellido.replace('*', '%');
-	        if (apellido.charAt(0) != '%') 
-	        	apellido = "%" + apellido;
-	        if (apellido.charAt(apellido.length() - 1) != '%')
-	            apellido = apellido + "%";
-	        
-	        if (nombre.length() != 0){
-		        nombre = nombre.replace('*', '%');
-		        if (nombre.charAt(0) != '%') 
-		        	nombre = "%" + nombre;
-		        if (nombre.charAt(nombre.length() - 1) != '%')
-		        	nombre = nombre + "%";
-		        where += " AND LOWER(o.nombre) LIKE LOWER(:nombre)";
-	        }
-	        
+	      
+	       apellido=Personas.convertirParaQuery(apellido);
+	       nombre=Personas.convertirParaQuery(nombre);
+	       
+	       String where=Personas.generateCondition(apellido, nombre); 
+
 	        EntityManager em = Personas.entityManager();
-	        TypedQuery<Personas> q = em.createQuery("SELECT o FROM Personas AS o WHERE " + where , Personas.class);
-	        q.setParameter("apellido", apellido);
+	        TypedQuery<Personas> q = em.createQuery("SELECT o FROM Personas AS o " + where , Personas.class);
+	        if (apellido.length() != 0)
+	        	q.setParameter("apellido", apellido);
 	        if (nombre.length() != 0)
 	        	q.setParameter("nombre", nombre);
 	        q.setFirstResult(start);
@@ -78,6 +70,56 @@ public class Personas {
 	        return q.getResultList();
 	        
 	    }
+
+	   
+   public static int findPersonasesByApellidoYNombreCount(String apellido,String nombre) {
+       if (apellido == null || apellido.length() == 0) apellido = "";
+       if (nombre == null) nombre = "";
+      
+       apellido=Personas.convertirParaQuery(apellido);
+       nombre=Personas.convertirParaQuery(nombre);
+       
+       String where=Personas.generateCondition(apellido, nombre);
+       
+       /*if (apellido == null || apellido.length() == 0) apellido="";
+       if (nombre == null) nombre = "";
+	   String where=Personas.generateCondition(apellido, nombre);*/
+
+
+       EntityManager em = Personas.entityManager();
+       Query q = em.createQuery("SELECT count(o) FROM Personas AS o " + where );
+       if (apellido.length() != 0)
+       	q.setParameter("apellido", apellido);
+       if (nombre.length() != 0)
+       	q.setParameter("nombre", nombre);
+       return Integer.valueOf(q.getResultList().get(0).toString());   
+    }	   
+
+
+
+private static String convertirParaQuery(String valor) {
+	if (valor.length() != 0){
+		valor = valor.replace('*', '%');
+	    if (valor.charAt(0) != '%') 
+	    	valor = "%" + valor;
+	    if (valor.charAt(valor.length() - 1) != '%')
+	    	valor = valor + "%";
+	}
+	return valor;
+}
+
+//Genera la condicion de where para una consulta dependiendo de los parrámetros
+   //apellido y nombre vienen vacios en caso de no tener valores recibidos
+   private static String generateCondition(String apellido,String nombre){
+	   String where="";
+       if (apellido.length() != 0){
+    	   where = "where LOWER(o.apellido) LIKE LOWER(:apellido)";
+       }
+       if (nombre.length() != 0){
+	        where += " AND LOWER(o.nombre) LIKE LOWER(:nombre)";
+       }           
+       return where;
+   }
 	    
 
 }

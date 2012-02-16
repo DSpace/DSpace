@@ -10,6 +10,13 @@ var confianza_100='rejected';
 var errorConfianzaSingular='Verifique el valor';
 var errorConfianzaPlural='Hay errores en el formulario';
 
+//-------------------Variable para el limite en el lookup
+var limit_lookup=20;
+//-------------------Variable para el limite en el suggest
+var limit_suggest=30;
+//-------------------Variable para el paginado del lookup
+var previous_start=0;
+
 
 //--------------------- Funcion que cambia la confianza del authority
 
@@ -97,6 +104,7 @@ $(document).ready(function (){
 	$("#aspect_submission_StepTransformer_field_submit_prev").click(function() {
 			return verificarConfidence();
 			});	
+
 });
 
 //-------------------- support for Lookup Popup
@@ -108,8 +116,7 @@ function DSpaceChoiceLookup(url, field, formID, valueInput, authInput,
  // fill in URL
  url += '?field=' + field + '&formID=' + formID + '&valueInput=' + valueInput +
          '&authorityInput=' + authInput + '&collection=' + collectionID +
-         '&isName=' + isName + '&isRepeating=' + isRepeating + '&confIndicatorID=' + confIndicatorID;
-
+         '&isName=' + isName + '&isRepeating=' + isRepeating + '&confIndicatorID=' + confIndicatorID + '&limit='+limit_lookup;
  // primary input field - for positioning popup.
  var inputFieldName = isName ? dspace_makeFieldInput(valueInput, '_last') : valueInput;
  var inputField = $('input[name = ' + inputFieldName + ']');
@@ -162,6 +169,7 @@ function DSpaceChoicesLoad(form) {
      value = '';
  var start = $('*[name = paramStart]').val();
  var limit = $('*[name = paramLimit]').val();
+
  var formID = $('*[name = paramFormID]').val();
  var collID = $('*[name = paramCollection]').val();
  var isName = $('*[name = paramIsName]').val() == 'true';
@@ -174,7 +182,6 @@ function DSpaceChoicesLoad(form) {
  var pNAInput = $('*[name = paramNonAuthority]');
  if (pNAInput.length > 0)
      nonAuthority = pNAInput.val();
-
  // get value from form inputs in opener if not explicitly supplied
  if (value.length == 0) {
      var of = $(window.opener.document).find('#' + formID);
@@ -221,24 +228,47 @@ function DSpaceChoicesLoad(form) {
          if (err != null && err == 'true')
              window.alert(fail + " Server indicates error in response.");
          var opts = Choices.find('Choice');
-
+         
          // update range message and update 'more' button
+         //var oldStart = 1 * Choices.attr('start');
+         //actualizo el start viejo
          var oldStart = 1 * Choices.attr('start');
-         var nextStart = oldStart + opts.length;
-         var lastTotal = Choices.attr('total');
+         previous_start=oldStart-(1*limit_lookup);
+         if (previous_start<0) previous_start=0;
+         
+         var lastTotal = 1 * Choices.attr('total');
+         var nextStart = oldStart + lastTotal;
          var resultMore = Choices.attr('more');
-         $('*[name = more]').attr('disabled', !(resultMore != null && resultMore == 'true'));
+         if(!(resultMore != null && resultMore == 'true')){
+        	 $('*[name = more]').attr('disabled', 'disabled');
+         } else {
+        	 $('*[name = more]').attr('class','ds-button-field choices-lookup');
+             $('*[name = more]').attr('disabled',null); 
+         };
+         
+         if(oldStart==previous_start){
+        	 $('#aspect_general_ChoiceLookupTransformer_field_less').attr('disabled', 'disabled');
+         } else {
+        	 $('#aspect_general_ChoiceLookupTransformer_field_less').attr('class','ds-button-field choices-lookup');
+        	 $('#aspect_general_ChoiceLookupTransformer_field_less').attr('disabled',null); 
+         };
+         //Activo el botón de ver mas resultados y le cambio el estilo
+         /*$('*[name = more]').attr('class','ds-button-field choices-lookup');
+         $('*[name = more]').attr('disabled',null);*/
+
          $('*[name = paramStart]').val(nextStart);
 
          // clear select first
          var select = $('select[name = chooser]:first');
-         select.find('option:not(:last)').remove();
-         var lastOption = select.find('option:last');
+         select.find('option').remove();
+         /*select.find('option:not(:last)').remove();
+         var lastOption = select.find('option:last');*/
 
          var selectedByValue = -1; // select by value match
          var selectedByChoices = -1;  // Choice says its selected
          $.each(opts, function(index) {
 //             debugger;
+
              var current = $(this);
              if (current.attr('value') == value)
                  selectedByValue = index;
@@ -247,11 +277,15 @@ function DSpaceChoicesLoad(form) {
 
              var newOption = $('<option value="' + current.attr('value') + '">' + current.text() + '</option>');
              newOption.data('authority', current.attr('authority'));
-
-             if (lastOption.length > 0)
-                 lastOption.insertBefore(newOption);
-             else
+             select.append(newOption);
+             
+             /*if (lastOption.length > 0){
+                 //lastOption.insertBefore(newOption);
+            	 select.append(newOption);
+             }
+             else {                 
                  select.append(newOption);
+             }*/
          });
 
 
@@ -290,6 +324,7 @@ function DSpaceChoicesLoad(form) {
                          oldStart + 1, statLast, Math.max(lastTotal, statLast), value));
      }
  });
+
 }
 
 //handler for change event on choice selector - load new values
@@ -375,6 +410,12 @@ function DSpaceChoicesAcceptOnClick() {
 
 //handler for lookup popup's more button
 function DSpaceChoicesMoreOnClick() {
+ DSpaceChoicesLoad(this.form);
+}
+
+//handler for lookup popup's more button
+function DSpaceChoicesLessOnClick() {
+ $('*[name = paramStart]').val(previous_start);
  DSpaceChoicesLoad(this.form);
 }
 

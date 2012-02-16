@@ -37,6 +37,17 @@ public class SeDiCI2003Authors extends SeDiCI2003AuthorityProvider{
 		}
 		return choices;
 	}
+	
+	@Override
+	protected int findSeDiCI2003EntitiesCount(String field, String text) {
+		
+		String[] parts = text.split(", ",1);
+		String apellido = parts[0];
+		String nombre = (parts.length == 2)?parts[1]:"";
+		int total = Personas.findPersonasesByApellidoYNombreCount(apellido, nombre);
+
+		return total;
+	}
 
 	protected String getSeDiCI2003EntityLabel(String field, String key) {
 		Personas p = Personas.findPersonas(Integer.valueOf(key));

@@ -288,6 +288,12 @@ No redefino todos los templates, solo los que necesito redefinir.
         </xsl:attribute>
       </input>
     </xsl:template>
+    
+    <!-- Para el manejo del navegador de resultados del lookup -->
+    <xsl:template match="dri:field[@id='aspect.general.ChoiceLookupTransformer.field.more']">
+     <input id="aspect_general_ChoiceLookupTransformer_field_less" class="ds-button-field choices-lookup" type="button" value="Anterior" name="less" onclick="javascript:DSpaceChoicesLessOnClick();"/>
+     <input id="aspect_general_ChoiceLookupTransformer_field_more" class="ds-button-field choices-lookup" type="button" value="Siguiente" name="more" onclick="javascript:DSpaceChoicesMoreOnClick();"/>
+    </xsl:template>
 
 
 </xsl:stylesheet>

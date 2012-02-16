@@ -6,6 +6,7 @@
                 <map:transformers>
                         <map:transformer name="CollectionViewer" src="ar.edu.unlp.sedici.aspect.collectionViewer.CollectionViewer"/>
                         <map:transformer name="CommunityViewer" src="ar.edu.unlp.sedici.aspect.collectionViewer.CommunityViewer"/>
+                        <map:transformer name="Navigation" src="ar.edu.unlp.sedici.aspect.collectionViewer.Navigation"/>
                 </map:transformers>
 
 
@@ -22,7 +23,9 @@
         <map:pipelines>
                 <map:pipeline>                        
                         
-                        <map:generate/>                        
+                        <map:generate/>   
+                        
+                        <map:transform type="Navigation"/>                     
 
                         <!-- Handle specific features -->
                         <map:match pattern="handle/*/**">

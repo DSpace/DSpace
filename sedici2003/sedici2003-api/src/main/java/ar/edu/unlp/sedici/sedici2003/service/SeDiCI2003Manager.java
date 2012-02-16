@@ -6,6 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import ar.edu.unlp.sedici.sedici2003.model.Personas;
+
 public class SeDiCI2003Manager {
 
 	private static Logger log = LoggerFactory.getLogger(SeDiCI2003Manager.class);
@@ -25,9 +27,14 @@ public class SeDiCI2003Manager {
 	}
 	
 	public static void main(String[] args) {
-		prepare();
+		/*prepare();
 		org.apache.commons.dbcp.BasicDataSource ds =(BasicDataSource) applicationContext.getBean("dataSourceSeDiCI2003");
-		System.out.println(ds.getPassword());
+		System.out.println(ds.getPassword());*/
+		
+		/*System.out.println("Hola 3");
+		SeDiCI2003Manager.prepare();
+		System.out.println(Personas.findPersonasesByApellidoYNombre("", "", 0, 0).size() + "Nico");
+		System.out.println(Personas.findPersonasesByApellidoYNombreCount("", ""));*/
 
 	}
 }

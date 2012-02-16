@@ -129,7 +129,7 @@ function DSpaceSetupAutocomplete(formID, args) {
             	seleccion=false;
                 var reqUrl = choiceURL;
                 if(request && request.term) {
-                    reqUrl += "&query=" + request.term;
+                    reqUrl += "&query=" + request.term + "&limit="+limit_suggest;
                         }
                 
                 //antes de empezar a buscar pongo el icono de ambiguos en el authority icon
