@@ -186,8 +186,6 @@
             <link type="application/atom+xml" rel="alternate" href="/feed/atom_1.0/10255/3"/>
             <link rel="icon" type="image/ico" href="/themes/Dryad/images/favicon.ico"/>
 
-            <script type="text/javascript">jQuery.noConflict();</script>
-
             <script type="text/javascript" language="javascript" src="http://platform.twitter.com/widgets.js">
                 <xsl:text>&#160;</xsl:text>
             </script>
@@ -274,6 +272,9 @@
             <xsl:if test="$meta[@element='xhtml_head_item']">
                 <xsl:value-of select="$meta[@element='xhtml_head_item']" disable-output-escaping="yes"/>
             </xsl:if>
+
+            <script type="text/javascript">jQuery.noConflict();</script>
+
 
         </head>
     </xsl:template>
@@ -1672,5 +1673,54 @@
     <xsl:template match="dri:options//dri:list[count(child::*)=0]" priority="5" mode="nested"></xsl:template>
     <xsl:template match="dri:options//dri:list[count(child::*)=0]" priority="5"></xsl:template>
 
+
+    <!-- generate the script that sets up autocomplete feature on input field -->
+    <!-- ..it has lots of params -->
+    <xsl:template name="autocompleteSetup">
+        <xsl:param name="formID" select="'missing value'"/>
+        <xsl:param name="metadataField" select="'missing value'"/>
+        <xsl:param name="inputName" select="'missing value'"/>
+        <xsl:param name="authorityName" select="''"/>
+        <xsl:param name="containerID" select="'missing value'"/>
+        <xsl:param name="collectionID" select="'-1'"/>
+        <xsl:param name="indicatorID" select="'missing value'"/>
+        <xsl:param name="confidenceIndicatorID" select="''"/>
+        <xsl:param name="confidenceName" select="''"/>
+        <xsl:param name="isClosed" select="'false'"/>
+
+        <!-- CALLING THE FUNCTION WITHOUT OVERRIDING THE OnLoad() method -->
+        <script type="text/javascript">
+
+            <xsl:text>jQuery(document).ready(function() {</xsl:text>
+            <xsl:text>var gigo = DSpaceSetupAutocomplete('</xsl:text>
+            <xsl:value-of select="$formID"/>
+            <xsl:text>', { metadataField: '</xsl:text>
+            <xsl:value-of select="$metadataField"/>
+            <xsl:text>', isClosed: '</xsl:text>
+            <xsl:value-of select="$isClosed"/>
+            <xsl:text>', inputName: '</xsl:text>
+            <xsl:value-of select="$inputName"/>
+            <xsl:text>', authorityName: '</xsl:text>
+            <xsl:value-of select="$authorityName"/>
+            <xsl:text>', containerID: '</xsl:text>
+            <xsl:value-of select="$containerID"/>
+            <xsl:text>', indicatorID: '</xsl:text>
+            <xsl:value-of select="$indicatorID"/>
+            <xsl:text>', confidenceIndicatorID: '</xsl:text>
+            <xsl:value-of select="$confidenceIndicatorID"/>
+            <xsl:text>', confidenceName: '</xsl:text>
+            <xsl:value-of select="$confidenceName"/>
+            <xsl:text>', collection: </xsl:text>
+            <xsl:value-of select="$collectionID"/>
+            <xsl:text>, contextPath: '</xsl:text>
+            <xsl:value-of
+                    select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+            <xsl:text>'});</xsl:text>
+            <xsl:text>});</xsl:text>
+        </script>
+
+
+
+    </xsl:template>
 
 </xsl:stylesheet>

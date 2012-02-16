@@ -131,9 +131,10 @@
 							<map:parameter name="stylesheet.screen#1" value="lib/style.css"/>
 							<map:parameter name="stylesheet.screen#2" value="lib/style-ie6.css"/>
 
-                            <map:parameter name="javascript#1" value="lib/jquery-1.3.1.min.js"/>
+                            <map:parameter name="javascript#1" value="lib/jquery-1.4.2.min.js"/>
                             <map:parameter name="javascript#2" value="lib/utils.js"/>
                             <map:parameter name="javascript#3" value="lib/jquery.tooltip.js"/>
+                            <map:parameter name="javascript#4" value="lib/jquery-ui-1.8.5.custom.min.js"/>
 
 							<map:parameter name="theme.path" value="{global:theme-path}"/>
 							<map:parameter name="theme.name" value="{global:theme-name}"/>
@@ -143,9 +144,10 @@
 						<map:transform type="IncludePageMeta">
 							<map:parameter name="stylesheet.screen" value="lib/style.css"/>
 
-                            <map:parameter name="javascript#1" value="lib/jquery-1.3.1.min.js"/>
+                            <map:parameter name="javascript#1" value="lib/jquery-1.4.2.min.js"/>
                             <map:parameter name="javascript#2" value="lib/utils.js"/>
                             <map:parameter name="javascript#3" value="lib/jquery.tooltip.js"/>
+                            <map:parameter name="javascript#4" value="lib/jquery-ui-1.8.5.custom.min.js"/>
 
 							<map:parameter name="theme.path" value="{global:theme-path}"/>
 							<map:parameter name="theme.name" value="{global:theme-name}"/>

@@ -283,6 +283,13 @@
            <artifactId>spring-webmvc</artifactId>
            <version>3.0.5.RELEASE</version>
        </dependency>
+
+
+       <dependency>
+           <groupId>com.atmire</groupId>
+           <artifactId>atmire-authority</artifactId>
+       </dependency>
+
    </dependencies>
 
 </project>

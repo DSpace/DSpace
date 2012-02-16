@@ -154,7 +154,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         Item item = submissionInfo.getSubmissionItem().getItem();
 
 
-        String journalID = request.getParameter("journalID");
+        String journalID = request.getParameter("prism_publicationName");
         String articleStatus = request.getParameter("article_status");
         String manuscriptNumber = request.getParameter("manu");
 

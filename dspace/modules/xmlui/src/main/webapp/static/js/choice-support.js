@@ -1,47 +1,17 @@
 /*
- * choice-support.js
+ * The contents of this file are subject to the license and copyright
+ * detailed in the LICENSE and NOTICE files at the root of the source
+ * tree and available online at
  *
- * Version: $Revision: 3705 $
- *
- * Date: $Date: 2009-04-11 13:02:24 -0400 (Sat, 11 Apr 2009) $
- *
- * Copyright (c) 2002-2009, The DSpace Foundation.  All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are
- * met:
- *
- * - Redistributions of source code must retain the above copyright
- * notice, this list of conditions and the following disclaimer.
- *
- * - Redistributions in binary form must reproduce the above copyright
- * notice, this list of conditions and the following disclaimer in the
- * documentation and/or other materials provided with the distribution.
- *
- * - Neither the name of the DSpace Foundation nor the names of its
- * contributors may be used to endorse or promote products derived from
- * this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * ``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * HOLDERS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
- * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
- * BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
- * OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR
- * TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
- * USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
- * DAMAGE.
+ * http://www.dspace.org/license/
  */
-
 // Client-side scripting to support DSpace Choice Control
 
 // IMPORTANT NOTE:
-//  This code depends on a *MODIFIED* version of the
-//  script.aculo.us controls v1.8.2, fixed to avoid a bug that
-//  affects autocomplete in Firefox 3.  This code is included in DSpace.
+//  This version of choice-support.js has been rewritten to use jQuery
+// instead of prototype & scriptaculous. The goal was not to change the
+// way it works in any way, just to get the prototype dependency out.
+// @Author Art Lowel (art.lowel at atmire.com)
 
 // Entry points:
 //  1. DSpaceAutocomplete -- add autocomplete (suggest) to an input field
@@ -49,7 +19,7 @@
 //  2.  DSpaceChoiceLookup -- create popup window with authority choices
 //
 //  @Author: Larry Stone  <lcs@hulmail.harvard.edu>
-//  $Revision $
+//  jQueryRevision jQuery
 
 // -------------------- support for Autocomplete (Suggest)
 
@@ -71,64 +41,89 @@
 //
 // NOTE: Successful autocomplete always sets confidence to 'accepted' since
 //  authority value (if any) *was* chosen interactively by a human.
-function DSpaceSetupAutocomplete(formID, args)
-{
+
+
+function DSpaceSetupAutocomplete(formID, args) {
+
+    jQuery(function() {
+        
     if (args.authorityName == null)
-        args.authorityName = dspace_makeFieldInput(args.inputName,'_authority');
-    var form = document.getElementById(formID);
+        args.authorityName = dspace_makeFieldInput(args.inputName, '_authority');
+        var form = jQuery('#' + formID)[0];
     var inputID = form.elements[args.inputName].id;
+
     var authorityID = null;
     if (form.elements[args.authorityName] != null)
         authorityID = form.elements[args.authorityName].id;
 
     // AJAX menu source, can add &query=TEXT
-    var choiceURL = args.contextPath+"/choices/"+args.metadataField;
-
+    var choiceURL = args.contextPath + "/choices/" + args.metadataField;
     var collID = args.collection == null ? -1 : args.collection;
+        choiceURL += '?collection=' + collID;
 
-    // field in whcih to store authority value
-    var options =
-      {
-        // class name of spans that contain value in li elements
-        select: "value",
-        // make up query args for AJAX callback
-        parameters: 'collection='+collID+'&format=ul',
-        callback:
-          function(inField, querystring) {
-            return querystring+"&query="+inField.value;
-          },
-        // called after target field is updated
-        afterUpdateElement:
-          function(ignoreField, li)
-            {
-                // NOTE: lookup element late because it might not be in DOM
-                // at the time we evaluate the function..
-                var authInput = document.getElementById(authorityID);
-                var authValue = li == null ? "" : li.getAttribute("authority");
-                if (authInput != null)
-                {
-                    authInput.value = authValue;
-                    // update confidence input's value too if available.
-                    if (args.confidenceName != null)
-                    {
-                        var confInput = authInput.form.elements[args.confidenceName];
-                        if (confInput != null)
-                            confInput.value = 'accepted';
-                    }
+        var ac = jQuery('#' + inputID);
+
+        ac.autocomplete({
+            source: function(request, response) {
+                var reqUrl = choiceURL;
+
+                
+                if(request && request.term) {
+                    reqUrl += "&query=" + request.term;
                 }
-                // make indicator blank if no authority value
-                DSpaceUpdateConfidence(document, args.confidenceIndicatorID,
-                    authValue == null || authValue == '' ? 'blank' :'accepted');
-            }
-      };
 
-      if (args.indicatorID != null)
-          options.indicator = args.indicatorID;
-
-    // be sure to turn off autocomplete, it absorbs arrow-key events!
-    form.elements[args.inputName].setAttribute("autocomplete", "off");
-
-    new Ajax.Autocompleter(inputID, args.containerID, choiceURL, options);
+                        
+                jQuery.get(reqUrl, function(xmldata) {
+                    var options = [];
+                    var authorities = [];
+                    jQuery(xmldata).find('Choice').each(function() {
+                        // get value
+                        var value = jQuery(this).attr('value') ? jQuery(this).attr('value') : null;
+                        // get label, if empty set it to value
+                        var label = jQuery(this).text() ? jQuery(this).text() : value;
+                        // if value was empty but label was provided, set value to label
+                        if(!value) {
+                            value = label;
+                        }
+                        // if at this point either value or label == null, this means none of both were set and we shouldn't add it to the list of options
+                        if (label != null) {
+                            options.push({
+                                label: label,
+                                value: value
+                            });
+                            authorities['label: ' + label + ', value: ' + value] = jQuery(this).attr('authority') ? jQuery(this).attr('authority') : value;
+                        }
+                    });
+                    ac.data('authorities',authorities);
+                    response(options);
+                });
+                },
+            select: function(event, ui) {
+                    // NOTE: lookup element late because it might not be in DOM
+                    // at the time we evaluate the function..
+//                var authInput = document.getElementById(authorityID);
+//                var authValue = li == null ? "" : li.getAttribute("authority");
+                var authInput = jQuery('#' + authorityID);
+                if(authInput.length > 0) {
+                    authInput = authInput[0];
+                }
+                var authorities = ac.data('authorities');
+                var authValue = authorities['label: ' + ui.item.label + ', value: ' + ui.item.value];
+                    if (authInput != null) {
+                        authInput.value = authValue;
+                        // update confidence input's value too if available.
+                        if (args.confidenceName != null) {
+                            var confInput = authInput.form.elements[args.confidenceName];
+                            if (confInput != null)
+                                confInput.value = 'accepted';
+                        }
+                    }
+                    // make indicator blank if no authority value
+                    DSpaceUpdateConfidence(document, args.confidenceIndicatorID,
+                            authValue == null || authValue == '' ? 'blank' : 'accepted');
+                }
+		});
+	});
 }
 
 // -------------------- support for Lookup Popup
@@ -136,55 +131,50 @@ function DSpaceSetupAutocomplete(formID, args)
 // Create popup window with authority choices for value of an input field.
 // This is intended to be called by onClick of a "Lookup" or "Add"  button.
 function DSpaceChoiceLookup(url, field, formID, valueInput, authInput,
-    confIndicatorID, collectionID, isName, isRepeating)
-{
+                            confIndicatorID, collectionID, isName, isRepeating) {
     // fill in URL
-    url += '?field='+field+'&formID='+formID+'&valueInput='+valueInput+
-             '&authorityInput='+authInput+'&collection='+collectionID+
-             '&isName='+isName+'&isRepeating='+isRepeating+'&confIndicatorID='+confIndicatorID;
+    url += '?field=' + field + '&formID=' + formID + '&valueInput=' + valueInput +
+            '&authorityInput=' + authInput + '&collection=' + collectionID +
+            '&isName=' + isName + '&isRepeating=' + isRepeating + '&confIndicatorID=' + confIndicatorID;
 
     // primary input field - for positioning popup.
-    var inputFieldName = isName ? dspace_makeFieldInput(valueInput,'_last') : valueInput;
-    var inputField = document.getElementById(formID).elements[inputFieldName];
-    // scriptactulous magic to figure out true offset:
+    var inputFieldName = isName ? dspace_makeFieldInput(valueInput, '_last') : valueInput;
+    var inputField = jQuery('input[name = ' + inputFieldName + ']');
+    // sometimes a textarea is used, in which case the previous jQuery search delivered no results...
+    if(inputField.length == 0) {
+        // so search for a textarea
+        inputField = jQuery('textarea[name = ' + inputFieldName + ']');
+    }
     var cOffset = 0;
-    //if (inputField != null)
-    //    cOffset = $(inputField).cumulativeOffset();
+    if (inputField != null)
+        cOffset = inputField.offset();
     var width = 600;  // XXX guesses! these should be params, or configured..
     var height = 470;
-    var left; var top;
+    var left;
+    var top;
     if (window.screenX == null) {
-        left = window.screenLeft + cOffset.left - (width/2);
-        top = window.screenTop + cOffset.top - (height/2);
+        left = window.screenLeft + cOffset.left - (width / 2);
+        top = window.screenTop + cOffset.top - (height / 2);
     } else {
-        left = window.screenX + cOffset.left - (width/2);
-        top = window.screenY + cOffset.top - (height/2);
+        left = window.screenX + cOffset.left - (width / 2);
+        top = window.screenY + cOffset.top - (height / 2);
     }
     if (left < 0) left = 0;
     if (top < 0) top = 0;
     var pw = window.open(url, 'ignoreme',
-         'width='+width+',height='+height+',left='+left+',top='+top+
-         ',toolbar=no,menubar=no,location=no,status=no,resizable');
+            'width=' + width + ',height=' + height + ',left=' + left + ',top=' + top +
+                    ',toolbar=no,menubar=no,location=no,status=no,resizable');
     if (window.focus) pw.focus();
     return false;
 }
 
 // Run this as the Lookup page is loaded to initialize DOM objects, load choices
-function DSpaceChoicesSetup(form)
-{
+function DSpaceChoicesSetup(form) {
     // find the "LEGEND" in fieldset, which acts as page title,
-    // and save it as a bogus form element, e.g. elements['statline']
-    var fieldset = document.getElementById('aspect_general_ChoiceLookupTransformer_list_choicesList');
-    for (i = 0; i < fieldset.childNodes.length; ++i)
-    {
-      if (fieldset.childNodes[i].nodeName == 'LEGEND')
-      {
-          form.statline = fieldset.childNodes[i];
-          form.statline_template = fieldset.childNodes[i].innerHTML;
-          fieldset.childNodes[i].innerHTML = "Loading...";
-          break;
-      }
-    }
+    var legend = jQuery('#aspect_general_ChoiceLookupTransformer_list_choicesList :header:first');
+    //save the template as a jQuery data field
+    legend.data('template', legend.html());
+    legend.html("Loading...");
     DSpaceChoicesLoad(form);
 }
 
@@ -192,234 +182,218 @@ function DSpaceChoicesSetup(form)
 // populate the "select" with options from ajax request
 // stash some parameters as properties of the "select" so we can add to
 // the last start index to query for next set of results.
-function DSpaceChoicesLoad(form)
-{
-    var field = form.elements['paramField'].value;
-    var value = form.elements['paramValue'].value;
-    var start = form.elements['paramStart'].value;
-    var limit = form.elements['paramLimit'].value;
-    var formID = form.elements['paramFormID'].value;
-    var collID = form.elements['paramCollection'].value;
-    var isName = form.elements['paramIsName'].value == 'true';
-    var isRepeating = form.elements['paramIsRepeating'].value == 'true';
-    var isClosed = form.elements['paramIsClosed'].value == 'true';
-    var contextPath = form.elements['contextPath'].value;
-    var fail = form.elements['paramFail'].value;
-    var valueInput = form.elements['paramValueInput'].value;
+function DSpaceChoicesLoad(form) {
+    var field = jQuery('*[name = paramField]').val();
+    var value = jQuery('*[name = paramValue]').val();
+    if (!value)
+        value = '';
+    var start = jQuery('*[name = paramStart]').val();
+    var limit = jQuery('*[name = paramLimit]').val();
+    var formID = jQuery('*[name = paramFormID]').val();
+    var collID = jQuery('*[name = paramCollection]').val();
+    var isName = jQuery('*[name = paramIsName]').val() == 'true';
+    var isRepeating = jQuery('*[name = paramIsRepeating]').val() == 'true';
+    var isClosed = jQuery('*[name = paramIsClosed]').val() == 'true';
+    var contextPath = jQuery('*[name = contextPath]').val();
+    var fail = jQuery('*[name = paramFail]').val();
+    var valueInput = jQuery('*[name = paramValueInput]').val();
     var nonAuthority = "";
-    if (form.elements['paramNonAuthority'] != null)
-        nonAuthority = form.elements['paramNonAuthority'].value;
+    var pNAInput = jQuery('*[name = paramNonAuthority]');
+    if (pNAInput.length > 0)
+        nonAuthority = pNAInput.val();
 
     // get value from form inputs in opener if not explicitly supplied
-    if (value.length == 0)
-    {
-        var of = window.opener.document.getElementById(formID);
+    if (value.length == 0) {
+        var of = jQuery(window.opener.document).find('#' + formID);
         if (isName)
-            value = makePersonName(of.elements[dspace_makeFieldInput(valueInput,'_last')].value,
-                                   of.elements[dspace_makeFieldInput(valueInput,'_first')].value);
+            value = makePersonName(of.find('*[name = ' + dspace_makeFieldInput(valueInput, '_last') + ']').val(),
+                    of.find('*[name = ' + dspace_makeFieldInput(valueInput, '_first') + ']').val());
         else
-            value = of.elements[valueInput].value;
+            value = of.find('*[name = ' + valueInput + ']').val();
 
         // if this is a repeating input, clear the source value so that e.g.
         // clicking "Next" on a submit-describe page will not *add* the proposed
         // lookup text as a metadata value:
-        if (isRepeating)
-        {
-            if (isName)
-            {
-                of.elements[dspace_makeFieldInput(valueInput,'_last')].value = null;
-                of.elements[dspace_makeFieldInput(valueInput,'_first')].value = null;
+        if (isRepeating) {
+            if (isName) {
+                of.find('*[name = ' + dspace_makeFieldInput(valueInput, '_last') + ']').val('');
+                of.find('*[name = ' + dspace_makeFieldInput(valueInput, '_first') + ']').val('');
             }
             else
-                of.elements[valueInput].value = null;
+                of.find('*[name = ' + valueInput + ']').val(null);
         }
     }
 
     // start spinner
-    var indicator = document.getElementById('lookup_indicator_id');
-    if (indicator != null)
-        indicator.style.display = "inline";
+    var indicator = jQuery('#lookup_indicator_id');
+    indicator.show('fast');
 
-    new Ajax.Request(contextPath+"/choices/"+field,
-      {
-        method: "get",
-        parameters: {query: value, format: 'select', collection: collID,
+    jQuery(window).ajaxError(function(e, xhr, settings, exception) {
+        window.alert(fail + " Exception=" + e);
+        if (indicator != null) indicator.style.display = "none";
+    });
+
+    jQuery.ajax({
+        url: contextPath + "/choices/" + field,
+        type: "GET",
+        data: {query: value, collection: collID,
                      start: start, limit: limit},
-        // triggered by any exception, even in success
-        onException: function(req, e) {
-          window.alert(fail+" Exception="+e);
-          if (indicator != null) indicator.style.display = "none";
+        error: function() {
+            window.alert(fail + " HTTP error resonse");
+            if (indicator != null) indicator.style.display = "none";
         },
-        // when http load of choices fails
-        onFailure: function() {
-          window.alert(fail+" HTTP error resonse");
-          if (indicator != null) indicator.style.display = "none";
-        },
-        // format is <select><option authority="key" value="val">label</option>...
-        onSuccess: function(transport) {
-          var ul = transport.responseXML.documentElement;
-          var err = ul.getAttributeNode('error');
-          if (err != null && err.value == 'true')
-              window.alert(fail+" Server indicates error in response.");
-          var opts = ul.getElementsByTagName('option');
+        success: function(data) {
+            var Choices = jQuery(data).find('Choices');
+            var err = Choices.attr('error');
+            if (err != null && err == 'true')
+                window.alert(fail + " Server indicates error in response.");
+            var opts = Choices.find('Choice');
 
-          // update range message and update 'more' button
-          var oldStart = 1 * ul.getAttributeNode('start').value;
-          var nextStart = oldStart + opts.length;
-          var lastTotal = ul.getAttributeNode('total').value;
-          var resultMore = ul.getAttributeNode('more');
-          form.elements['more'].disabled = !(resultMore != null && resultMore.value == 'true');
-          form.elements['paramStart'].value = nextStart;
+            // update range message and update 'more' button
+            var oldStart = 1 * Choices.attr('start');
+            var nextStart = oldStart + opts.length;
+            var lastTotal = Choices.attr('total');
+            var resultMore = Choices.attr('more');
+            jQuery('*[name = more]').attr('disabled', !(resultMore != null && resultMore == 'true'));
+            jQuery('*[name = paramStart]').val(nextStart);
 
-          // clear select first
-          var select = form.elements['chooser'];
-          for (var i = select.length-1; i >= 0; --i)
-            select.remove(i);
+            // clear select first
+            var select = jQuery('select[name = chooser]:first');
+            select.find('option:not(:last)').remove();
+            var lastOption = select.find('option:last');
 
-          // load select and look for default selection
-          var selectedByValue = -1; // select by value match
-          var selectedByChoices = -1;  // Choice says its selected
-          for (var i = 0; i < opts.length; ++i)
-          {
-            var opt = opts.item(i);
-            var olabel = "";
-            for (var j = 0; j < opt.childNodes.length; ++j)
-            {
-               var node = opt.childNodes[j];
-               if (node.nodeName == "#text")
-                 olabel += node.data;
+            var selectedByValue = -1; // select by value match
+            var selectedByChoices = -1;  // Choice says its selected
+            jQuery.each(opts, function(index) {
+//                debugger;
+                var current = jQuery(this);
+                if (current.attr('value') == value)
+                    selectedByValue = index;
+                if(current.attr('selected') != undefined)
+                    selectedByChoices = index;
+
+                var newOption = jQuery('<option value="' + current.attr('value') + '">' + current.text() + '</option>');
+                newOption.data('authority', current.attr('authority'));
+
+                if (lastOption.length > 0)
+                    lastOption.insertBefore(newOption);
+                else
+                    select.append(newOption);
+            });
+
+
+            // add non-authority option if needed.
+            if (!isClosed) {
+                select.append(new Option(dspace_formatMessage(nonAuthority, value), value), null);
             }
-            var ovalue = opt.getAttributeNode('value').value;
-            var option = new Option(olabel, ovalue);
-            option.authority = opt.getAttributeNode('authority').value;
-            select.add(option, null);
-            if (value == ovalue)
-                selectedByValue = select.options.length - 1;
-            if (opt.getAttributeNode('selected') != null)
-                selectedByChoices = select.options.length - 1;
-          }
-          // add non-authority option if needed.
-          if (!isClosed)
-          {
-            select.add(new Option(dspace_formatMessage(nonAuthority, value), value), null);
-          }
-          var defaultSelected = -1;
-          if (selectedByChoices >= 0)
-            defaultSelected = selectedByChoices;
-          else if (selectedByValue >= 0)
-            defaultSelected = selectedByValue;
-          else if (select.options.length == 1)
-            defaultSelected = 0;
+            var defaultSelected = -1;
+            if (selectedByChoices >= 0)
+                defaultSelected = selectedByChoices;
+            else if (selectedByValue >= 0)
+                defaultSelected = selectedByValue;
+            else if (select[0].options.length == 1)
+                defaultSelected = 0;
 
-          // load default-selected value
-          if (defaultSelected >= 0)
-          {
-            select.options[defaultSelected].defaultSelected = true;
-            var so = select.options[defaultSelected];
-            if (isName)
-            {
-                form.elements['text1'].value = lastNameOf(so.value);
-                form.elements['text2'].value = firstNameOf(so.value);
+            // load default-selected value
+            if (defaultSelected >= 0) {
+                select[0].options[defaultSelected].defaultSelected = true;
+                var so = select[0].options[defaultSelected];
+                if (isName) {
+                    jQuery('*[name = text1]').val(lastNameOf(so.value));
+                    jQuery('*[name = text2]').val(firstNameOf(so.value));
+                }
+                else
+                    jQuery('*[name = text1]').val(so.value);
             }
-            else
-                form.elements['text1'].value = so.value;
-          }
 
-          // turn off spinner
-          if (indicator != null)
-              indicator.style.display = "none";
+            // turn off spinner
+            indicator.hide('fast');
 
-          // "results" status line
-          var statLast =  nextStart + (isClosed ? 2 : 1);
+            // "results" status line
+            var statLast = nextStart + (isClosed ? 2 : 1);
 
-          form.statline.innerHTML =
-            dspace_formatMessage(form.statline_template,
-              oldStart+1, statLast, Math.max(lastTotal,statLast), value);
+            var legend = jQuery('#aspect_general_ChoiceLookupTransformer_list_choicesList :header:first');
+            legend.html(dspace_formatMessage(legend.data('template'),
+                            oldStart + 1, statLast, Math.max(lastTotal, statLast), value));
         }
-      });
+    });
 }
 
 // handler for change event on choice selector - load new values
-function DSpaceChoicesSelectOnChange ()
-{
+function DSpaceChoicesSelectOnChange() {
     // "this" is the window,
-    var form = document.getElementById('aspect_general_ChoiceLookupTransformer_div_lookup');
-    var select = form.elements['chooser'];
-    var so = select.options[select.selectedIndex];
-    var isName = form.elements['paramIsName'].value == 'true';
 
-    if (isName)
-    {
-        form.elements['text1'].value = lastNameOf(so.value);
-        form.elements['text2'].value = firstNameOf(so.value);
+    var form = jQuery('#aspect_general_ChoiceLookupTransformer_div_lookup');
+    var select = form.find('*[name = chooser]');
+
+    var isName = form.find('*[name = paramIsName]').val() == 'true';
+
+    var selectedValue = select.val();
+
+    if (isName) {
+        form.find('*[name = text1]').val(lastNameOf(selectedValue));
+        form.find('*[name = text2]').val(firstNameOf(selectedValue));
     }
     else
-        form.elements['text1'].value = so.value;
+        form.find('*[name = text1]').val(selectedValue);
 }
 
 // handler for lookup popup's accept (or add) button
 //  stuff values back to calling page, force an add if necessary, and close.
-function DSpaceChoicesAcceptOnClick ()
-{
-    var select = this.form.elements['chooser'];
-    var isName = this.form.elements['paramIsName'].value == 'true';
-    var isRepeating = this.form.elements['paramIsRepeating'].value == 'true';
-    var valueInput = this.form.elements['paramValueInput'].value;
-    var authorityInput = this.form.elements['paramAuthorityInput'].value;
-    var formID = this.form.elements['paramFormID'].value;
-    var confIndicatorID = this.form.elements['paramConfIndicatorID'] == null?null:this.form.elements['paramConfIndicatorID'].value;
+function DSpaceChoicesAcceptOnClick() {
+    var select = jQuery('*[name = chooser]');
+    var isName = jQuery('*[name = paramIsName]').val() == 'true';
+    var isRepeating = jQuery('*[name = paramIsRepeating]').val() == 'true';
+    var valueInput = jQuery('*[name = paramValueInput]').val();
+    var authorityInput = jQuery('*[name = paramAuthorityInput]').val();
+    var formID = jQuery('*[name = paramFormID]').val();
+    var confIndicatorID = jQuery('*[name = paramConfIndicatorID]').length = 0 ? null : jQuery('*[name = paramConfIndicatorID]').val();
 
     // default the authority input if not supplied.
     if (authorityInput.length == 0)
-        authorityInput = dspace_makeFieldInput(valueInput,'_authority');
+        authorityInput = dspace_makeFieldInput(valueInput, '_authority');
 
     // always stuff text fields back into caller's value input(s)
-    if (valueInput.length > 0)
-    {
-        var of = window.opener.document.getElementById(formID);
-        if (isName)
-        {
-            of.elements[dspace_makeFieldInput(valueInput,'_last')].value = this.form.elements['text1'].value;
-            of.elements[dspace_makeFieldInput(valueInput,'_first')].value = this.form.elements['text2'].value;
+    if (valueInput.length > 0) {
+        var of = jQuery(window.opener.document).find('#' + formID);
+        if (isName) {
+            of.find('*[name = ' + dspace_makeFieldInput(valueInput, '_last') + ']').val(jQuery('*[name = text1]').val());
+            of.find('*[name = ' + dspace_makeFieldInput(valueInput, '_first') + ']').val(jQuery('*[name = text2]').val());
         }
         else
-            of.elements[valueInput].value = this.form.elements['text1'].value;
+            of.find('*[name = ' + valueInput + ']').val(jQuery('*[name = text1]').val());
 
-        if (authorityInput.length > 0 && of.elements[authorityInput] != null)
-        {
+        if (authorityInput.length > 0 && of.find('*[name = ' + authorityInput + ']').length > 0) {
             // conf input is auth input, substitute '_confidence' for '_authority'
             // if conf fieldname is  FIELD_confidence_NUMBER, then '_authority_' => '_confidence_'
             var confInput = "";
 
             var ci = authorityInput.lastIndexOf("_authority_");
             if (ci < 0)
-                confInput = authorityInput.substring(0, authorityInput.length-10)+'_confidence';
+                confInput = authorityInput.substring(0, authorityInput.length - 10) + '_confidence';
             else
-                confInput = authorityInput.substring(0, ci)+"_confidence_"+authorityInput.substring(ci+11);
+                confInput = authorityInput.substring(0, ci) + "_confidence_" + authorityInput.substring(ci + 11);
             // DEBUG:
             // window.alert('Setting fields auth="'+authorityInput+'", conf="'+confInput+'"');
 
             var authValue = null;
-            if (select.selectedIndex >= 0 && select.options[select.selectedIndex].authority != null)
-            {
-                authValue = select.options[select.selectedIndex].authority;
-                of.elements[authorityInput].value = authValue;
+            var selectedOption = select.find(':selected');
+            if (selectedOption.length >= 0 && selectedOption.data('authority') != null) {
+                of.find('*[name = ' + authorityInput + ']').val(selectedOption.data('authority'));
             }
-            if (of.elements[confInput] != null)
-                of.elements[confInput].value = 'accepted';
+            of.find('*[name = ' + confInput + ']').val('accepted');
             // make indicator blank if no authority value
             DSpaceUpdateConfidence(window.opener.document, confIndicatorID,
-                    authValue == null || authValue == '' ? 'blank' :'accepted');
+                    authValue == null || authValue == '' ? 'blank' : 'accepted');
         }
 
         // force the submit button -- if there is an "add"
-        if (isRepeating)
-        {
-            var add = of.elements["submit_"+valueInput+"_add"];
-            if (add != null)
+        if (isRepeating) {
+            var add = of.find('*[name = submit_' + valueInput + '_add]');
+            if (add.length > 0)
                 add.click();
             else
-                alert('Sanity check: Cannot find button named "submit_'+valueInput+'_add"');
+                alert('Sanity check: Cannot find button named "submit_' + valueInput + '_add"');
         }
     }
     window.close();
@@ -427,14 +401,12 @@ function DSpaceChoicesAcceptOnClick ()
 }
 
 // handler for lookup popup's more button
-function DSpaceChoicesMoreOnClick ()
-{
+function DSpaceChoicesMoreOnClick() {
     DSpaceChoicesLoad(this.form);
 }
 
 // handler for lookup popup's cancel button
-function DSpaceChoicesCancelOnClick ()
-{
+function DSpaceChoicesCancelOnClick() {
     window.close();
     return false;
 }
@@ -442,33 +414,29 @@ function DSpaceChoicesCancelOnClick ()
 // -------------------- Utilities
 
 // DSpace person-name conventions, see DCPersonName
-function makePersonName(lastName, firstName)
-{
+function makePersonName(lastName, firstName) {
     return (firstName == null || firstName.length == 0) ? lastName :
-        lastName+", "+firstName;
+            lastName + ", " + firstName;
 }
 
 // DSpace person-name conventions, see DCPersonName
-function firstNameOf(personName)
-{
+function firstNameOf(personName) {
     var comma = personName.indexOf(",");
-    return (comma < 0) ? "" : stringTrim(personName.substring(comma+1));
+    return (comma < 0) ? "" : stringTrim(personName.substring(comma + 1));
 }
 
 // DSpace person-name conventions, see DCPersonName
-function lastNameOf(personName)
-{
+function lastNameOf(personName) {
     var comma = personName.indexOf(",");
     return stringTrim((comma < 0) ? personName : personName.substring(0, comma));
 }
 
 // replicate java String.trim()
-function stringTrim(str)
-{
+function stringTrim(str) {
     var start = 0;
     var end = str.length;
-    for (; str.charAt(start) == ' '&& start < end; ++start) ;
-    for (; end > start && str.charAt(end-1) == ' '; --end) ;
+    for (; str.charAt(start) == ' ' && start < end; ++start) ;
+    for (; end > start && str.charAt(end - 1) == ' '; --end) ;
     return str.slice(start, end);
 }
 
@@ -476,33 +444,34 @@ function stringTrim(str)
 // NOTE params MUST be monotonically increasing
 // NOTE we can't use "{1}" like the i18n catalog because it elides them!!
 // ...UNLESS maybe it were to be fixed not to when no params...
-function dspace_formatMessage()
-{
+function dspace_formatMessage() {
     var template = dspace_formatMessage.arguments[0];
     var i;
-    for (i = 1; i < arguments.length; ++i)
-    {
-        var pattern = '@'+i+'@';
+    for (i = 1; i < arguments.length; ++i) {
+        var pattern = '@' + i + '@';
         if (template.search(pattern) >= 0)
-            template = template.replace(pattern, dspace_formatMessage.arguments[i]);
+            {
+                var value = dspace_formatMessage.arguments[i];
+                if (value == undefined)
+                    value = '';
+                template = template.replace(pattern, value);
+            }
     }
     return template;
 }
 
 // utility to make sub-field name of input field, e.g. _last, _first, _auth..
 // if name ends with _1, _2 etc, put sub-name BEFORE the number
-function dspace_makeFieldInput(name, sub)
-{
-    var i = name.search("_[0-9]+$");
+function dspace_makeFieldInput(name, sub) {
+    var i = name.search("_[0-9]+jQuery");
     if (i < 0)
-        return name+sub;
+        return name + sub;
     else
-        return name.substr(0, i)+sub+name.substr(i);
+        return name.substr(0, i) + sub + name.substr(i);
 }
 
 // update the class value of confidence-indicating element
-function DSpaceUpdateConfidence(doc, confIndicatorID, newValue)
-{
+function DSpaceUpdateConfidence(doc, confIndicatorID, newValue) {
     // sanity checks - need valid ID and a real DOM object
     if (confIndicatorID == null || confIndicatorID == "")
         return;
@@ -512,47 +481,41 @@ function DSpaceUpdateConfidence(doc, confIndicatorID, newValue)
 
     // add or update CSS class with new confidence value, e.g. "cf-accepted".
     if (confElt.className == null)
-        confElt.className = "cf-"+newValue;
-    else
-    {
+        confElt.className = "cf-" + newValue;
+    else {
         var classes = confElt.className.split(" ");
         var newClasses = "";
         var found = false;
-        for (var i = 0; i < classes.length; ++i)
-        {
-            if (classes[i].match('^cf-[a-zA-Z0-9]+$'))
-            {
-                newClasses += "cf-"+newValue+" ";
+        for (var i = 0; i < classes.length; ++i) {
+            if (classes[i].match('^cf-[a-zA-Z0-9]+jQuery')) {
+                newClasses += "cf-" + newValue + " ";
                 found = true;
             }
             else
-                newClasses += classes[i]+" ";
+                newClasses += classes[i] + " ";
         }
         if (!found)
-            newClasses += "cf-"+newValue+" ";
+            newClasses += "cf-" + newValue + " ";
         confElt.className = newClasses;
     }
 }
 
 // respond to "onchanged" event on authority input field
 // set confidence to 'accepted' if authority was changed by user.
-function DSpaceAuthorityOnChange(self, confValueID, confIndicatorID)
-{
+function DSpaceAuthorityOnChange(self, confValueID, confIndicatorID) {
     var confidence = 'accepted';
-    if (confValueID != null && confValueID != '')
-    {
+    if (confValueID != null && confValueID != '') {
         var confValueField = document.getElementById(confValueID);
         if (confValueField != null)
             confValueField.value = confidence;
     }
-    DSpaceUpdateConfidence(document, confIndicatorID, confidence)
+    DSpaceUpdateConfidence(document, confIndicatorID, confidence);
     return false;
 }
 
 // respond to click on the authority-value lock button in Edit Item Metadata:
 // "button" is bound to the image input for the lock button, "this"
-function DSpaceToggleAuthorityLock(button, authInputID)
-{
+function DSpaceToggleAuthorityLock(button, authInputID) {
     // sanity checks - need valid ID and a real DOM object
     if (authInputID == null || authInputID == '')
         return false;
@@ -565,20 +528,17 @@ function DSpaceToggleAuthorityLock(button, authInputID)
     var newClass = '';
     var newLocked = false;
     var found = false;
-    for (var i = 0; i < classes.length; ++i)
-    {
-        if (classes[i] == 'is-locked')
-        {
+    for (var i = 0; i < classes.length; ++i) {
+        if (classes[i] == 'is-locked') {
             newLocked = false;
             found = true;
         }
-        else if (classes[i] == 'is-unlocked')
-        {
+        else if (classes[i] == 'is-unlocked') {
             newLocked = true;
             found = true;
         }
         else
-            newClass += classes[i]+' ';
+            newClass += classes[i] + ' ';
     }
     if (!found)
         return false;

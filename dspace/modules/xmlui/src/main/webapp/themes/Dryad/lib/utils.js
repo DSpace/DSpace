@@ -163,24 +163,30 @@ function initFirstSubmissionForm() {
             jQuery("#journalIDStatusNotYetSubmitted").hide();
             jQuery("#journalIDStatusInReview").hide();
 
-            jQuery("#journalID").show();
+            jQuery("#prism_publicationName").show();
 
-            var journal = jQuery("#journalID :selected").text();
-            if (journal.indexOf('*') != -1) {
-                jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").show();
-                jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").hide();
-            }
-            else {
-                jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").show();
-                jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").hide();
-            }
-
+            //TODO: check this control, it doesn't work anymore being now an authority controlled field
+            var journal = jQuery("#aspect_submission_StepTransformer_field_prism_publicationName").val();
+	    
+	    if(journal==""){
+		jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").hide();
+	        jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").hide();		
+	    }
+	    else if (journal.indexOf('*') != -1) {
+		jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").show();
+	        jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").hide();
+	    }
+	    else {
+		jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").show();
+		jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").hide();
+	    }
+	    
             enableNextButton();
         }
 
         // Status (onLoad of the page): STATUS_PUBLISHED
         else if (jQuery("'#xmlui_submit_publication_article_status_published':checked").val()) {
-            jQuery("#journalID").hide();
+            jQuery("#prism_publicationName").hide();
             jQuery("#manu").hide();
             jQuery("#journalIDStatusNotYetSubmitted").hide();
             jQuery("#manu").hide();
@@ -198,7 +204,7 @@ function initFirstSubmissionForm() {
         // Status (onLoad of the page): STATUS_IN_REVIEW
         else if (jQuery("'#xmlui_submit_publication_article_status_in_review':checked").val()) {
             jQuery("#aspect_submission_StepTransformer_list_doi").hide();
-            jQuery("#journalID").hide();
+            jQuery("#prism_publicationName").hide();
             jQuery("#journalIDStatusNotYetSubmitted").hide();
             jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").hide();
             jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").hide();
@@ -227,7 +233,7 @@ function initFirstSubmissionForm() {
         // Status (onLoad of the page): STATUS_NULL
         else {
             jQuery("#aspect_submission_StepTransformer_list_doi").hide();
-            jQuery("#journalID").hide();
+            jQuery("#prism_publicationName").hide();
             jQuery("#manu").hide();
             jQuery("#journalIDStatusNotYetSubmitted").hide();
             jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").hide();
@@ -240,7 +246,7 @@ function initFirstSubmissionForm() {
 
         // Click: status_published
         jQuery('#xmlui_submit_publication_article_status_published').click(function () {
-            jQuery("#journalID").hide();
+            jQuery("#prism_publicationName").hide();
             jQuery("#manu").hide();
             jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").hide();
             jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").hide();
@@ -258,7 +264,7 @@ function initFirstSubmissionForm() {
         // Click: status_in_review
         jQuery('#xmlui_submit_publication_article_status_in_review').click(function () {
             jQuery("#aspect_submission_StepTransformer_list_doi").hide();
-            jQuery("#journalID").hide();
+            jQuery("#prism_publicationName").hide();
             jQuery("#aspect_submission_StepTransformer_item_new-manu-comp-acc").hide();
             jQuery("#aspect_submission_StepTransformer_item_new-manu-acc").hide();
             jQuery("#journalIDStatusNotYetSubmitted").hide();
@@ -279,7 +285,7 @@ function initFirstSubmissionForm() {
             jQuery("#journalIDStatusInReview").hide();
 
             jQuery("#status_other_than_published").show();
-            jQuery("#journalID").show();
+            jQuery("#prism_publicationName").show();
             enableNextButton();
         });
 
@@ -298,10 +304,16 @@ function initFirstSubmissionForm() {
 //            enableNextButton();
 //        });
 
-        //change: journalID
-        jQuery("#journalID").change(function() {
+        //change: prism_publicationName
+        jQuery("#aspect_submission_StepTransformer_field_prism_publicationName").focusout(function() {
+	    
+	  
+	    
             if (jQuery("'#xmlui_submit_publication_article_status_accepted':checked").val()) {
-                var journal = jQuery("#journalID :selected").text();
+                var journal = jQuery("#aspect_submission_StepTransformer_field_prism_publicationName").val();
+		
+		
+		
                 if (journal.indexOf('*') != -1) {
                     jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").show();
                     jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").hide();
@@ -311,8 +323,9 @@ function initFirstSubmissionForm() {
                     jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").hide();
                 }
             }
+	    enableNextButton();
         });
-
+	
         jQuery('input[name|="license_accept"]').change(function() {
             enableNextButton();
         });
@@ -350,7 +363,7 @@ function enableNextButton() {
 
         // Status: status_accepted ==> must have JOURNAL_ID && (MANUSCRIPT_NUMBER || CB_This manuscript has been accepted)
         if (jQuery("'#xmlui_submit_publication_article_status_accepted':checked").val()) {
-            var journal = jQuery("#journalID :selected").text();
+            var journal = jQuery("#aspect_submission_StepTransformer_field_prism_publicationName").val();
 
             if (journal.indexOf('*') != -1) {
 

@@ -1385,3 +1385,30 @@ span.dynatree-active a
 	width:920px;
 }
 
+
+/*Autocomplete*/
+.ui-autocomplete{
+  position:absolute;
+  width:250px;
+  background-color:white;
+  border:1px solid #888;
+  margin:0;
+  padding:0;
+
+}
+
+#aspect_submission_StepTransformer_field_prism_publicationName_container{
+	display:none;
+}
+
+.ui-menu-item{
+list-style-type:none;
+  display:block;
+  margin:0;
+  padding:2px;
+  cursor:pointer;
+}
+
+img.ds-authority-confidence
+{ width: 16px; height: 16px; margin: 0px 2px; padding: 0px; vertical-align: bottom;}
+

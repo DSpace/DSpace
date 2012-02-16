@@ -10,6 +10,10 @@ import org.dspace.app.xmlui.wing.element.Item;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
+import org.dspace.content.authority.Choice;
+import org.dspace.content.authority.ChoiceAuthorityManager;
+import org.dspace.content.authority.Choices;
+import org.dspace.content.authority.MetadataAuthorityManager;
 import org.dspace.handle.HandleManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
@@ -248,21 +252,24 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
         // JOURNAL ID
         Composite optionsList = newItem.addComposite("new-options-comp");
-        Select journalID = optionsList.addSelect("journalID");
-        java.util.List<String> journalVals = org.dspace.submit.step.SelectPublicationStep.journalVals;
-        java.util.List<String> journalNames = org.dspace.submit.step.SelectPublicationStep.journalNames;
 
-        for (int i = 0; i < journalVals.size(); i++) {
-            String val =  journalVals.get(i);
-            String name =  journalNames.get(i);
-	    if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(val))
-		name += "*";
-	    journalID.addOption(val.equals(selectedJournalId), val, name);
-        }
+        addJournalAuthorityControlled("prism_publicationName", optionsList, "prism_publicationName");
 
-        journalID.setLabel(T_SELECT_LABEL_NEW);
-        if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_INVALID_JOURNAL)
-            journalID.addError(T_SELECT_ERROR);
+        //Select journalID = optionsList.addSelect("journalID");
+        //java.util.List<String> journalVals = org.dspace.submit.step.SelectPublicationStep.journalVals;
+        //java.util.List<String> journalNames = org.dspace.submit.step.SelectPublicationStep.journalNames;
+//
+        //for (int i = 0; i < journalVals.size(); i++) {
+        //    String val =  journalVals.get(i);
+        //    String name =  journalNames.get(i);
+	    //if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(val))
+		//name += "*";
+	    //journalID.addOption(val.equals(selectedJournalId), val, name);
+        //}
+//
+        //journalID.setLabel(T_SELECT_LABEL_NEW);
+        //if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_INVALID_JOURNAL)
+        //    journalID.addError(T_SELECT_ERROR);
 
 
         // MANUSCRIPT NUMBER
@@ -336,6 +343,37 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         return null;
     }
 
+
+    private void addJournalAuthorityControlled(String fieldkey, Composite comp, String fieldName) throws WingException {
+        fieldkey = config2fkey(fieldkey);
+        Text journal = comp.addText(fieldName);
+        journal.setAuthorityControlled();
+        journal.setChoices(fieldkey);
+        journal.setChoicesPresentation(ConfigurationManager.getProperty("choices.presentation.prism.publicationName"));
+        journal.setChoicesClosed(ChoiceAuthorityManager.getManager().isClosed(fieldkey));
+        journal.setLabel(T_SELECT_LABEL_NEW);
+        if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_INVALID_JOURNAL)
+            journal.addError(T_SELECT_ERROR);
+
+    }
+
+
+    private static String config2fkey(String field) {
+        // field is expected to be "schema.element.qualifier"
+        int dot = field.indexOf('.');
+        if (dot < 0) {
+            return null;
+}
+        String schema = field.substring(0, dot);
+        String element = field.substring(dot + 1);
+        String qualifier = null;
+        dot = element.indexOf('.');
+        if (dot >= 0) {
+            qualifier = element.substring(dot + 1);
+            element = element.substring(0, dot);
+        }
+        return MetadataAuthorityManager.makeFieldKey(schema, element, qualifier);
+    }
 
 
 }

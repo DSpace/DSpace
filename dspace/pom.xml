@@ -791,6 +791,13 @@
 			<artifactId>xom</artifactId>
 			<version>1.2.5</version>
 		</dependency>
+
+        <dependency>
+            <groupId>com.atmire</groupId>
+            <artifactId>atmire-authority</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
+
 	</dependencies>
 
 

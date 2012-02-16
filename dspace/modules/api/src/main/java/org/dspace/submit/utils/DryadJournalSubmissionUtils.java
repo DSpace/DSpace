@@ -27,12 +27,12 @@ public class DryadJournalSubmissionUtils {
     private static Logger log = Logger.getLogger(DryadJournalSubmissionUtils.class);
 
     // Reading DryadJournalSubmission.properties
-    private static final String FULLNAME = "fullname";
-    private static final String METADATADIR = "metadataDir";
-    private static final String INTEGRATED = "integrated";
-    private static final String PUBLICATION_BLACKOUT = "publicationBlackout";
-    private static final String NOTIFY_ON_REVIEW = "notifyOnReview";
-    private static final String NOTIFY_ON_ARCHIVE = "notifyOnArchive";
+    public static final String FULLNAME = "fullname";
+    public static final String METADATADIR = "metadataDir";
+    public static final String INTEGRATED = "integrated";
+    public static final String PUBLICATION_BLACKOUT = "publicationBlackout";
+    public static final String NOTIFY_ON_REVIEW = "notifyOnReview";
+    public static final String NOTIFY_ON_ARCHIVE = "notifyOnArchive";
 
 
     public static final java.util.Map<String, Map<String, String>> journalProperties = new HashMap<String, Map<String, String>>();
@@ -94,5 +94,4 @@ public class DryadJournalSubmissionUtils {
      private static boolean isDataPackage(Collection coll) throws SQLException {
         return coll.getHandle().equals(ConfigurationManager.getProperty("submit.publications.collection"));
     }
-
 }
