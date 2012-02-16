@@ -64,6 +64,7 @@
 				<default.solr.search.server>http://localhost:9999/solr/search/</default.solr.search.server>
 				<default.solr.stats.server>http://localhost:9999/solr/statistics/</default.solr.stats.server>
 				<default.solr.dryad.server>http://localhost:9999/solr/dryad/</default.solr.dryad.server>
+                <default.solr.authority.server>http://localhost:9999/solr/authority/</default.solr.authority.server>
 				<!-- Location for the LoC BagIt software; we call from the cmdline -->
 				<default.bagit.executable>/home/dryad/bagit-3.6/bin/bag</default.bagit.executable>
 				<!-- Whether we should send bagit to test/dev server or production -->
