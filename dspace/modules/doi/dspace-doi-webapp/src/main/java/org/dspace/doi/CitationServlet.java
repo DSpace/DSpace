@@ -198,7 +198,7 @@ public class CitationServlet extends HttpServlet {
 			builder.append("JF  - ").append(journalName).append(EOL);
 		}
 
-		builder.append("PB  - ").append("Dryad Data Repository").append(EOL);
+		builder.append("PB  - ").append("Dryad Digital Repository").append(EOL);
 
 		if (doi != null) {
 			builder.append("UR  - ");
@@ -266,7 +266,7 @@ public class CitationServlet extends HttpServlet {
 		}
 
 		// this should always be last so we don't have to worry about a comma
-		builder.append("  publisher = {Dryad Data Repository}").append(EOL);
+		builder.append("  publisher = {Dryad Digital Repository}").append(EOL);
 		return builder.append("}").append(EOL).toString();
 	}
 
