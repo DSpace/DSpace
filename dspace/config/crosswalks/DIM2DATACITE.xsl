@@ -2,69 +2,75 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:dspace="http://www.dspace.org/xmlns/dspace/dim"
                 xmlns:dim="http://www.dspace.org/xmlns/dspace/dim"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                 version="1.0">
 
+    <xsl:strip-space elements="*"/>
+    <xsl:output method="xml" version="1.0"
+                encoding="utf-8" indent="yes"/>
+
     <xsl:template match="/dim:dim">
+
+
         <resource xmlns="http://datacite.org/schema/kernel-2.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  xsi:schemaLocation="http://datacite.org/schema/kernel-2.2 http://schema.datacite.org/meta/kernel-2.2/metadata.xsd">
+                  xsi:schemaLocation="http://datacite.org/schema/kernel-2.2 http://schema.datacite.org/meta/kernel-2.2/metadata.xsd"
+                  lastMetadataUpdate="2006-05-04" metadataVersionNumber="1">
 
 
-            <xsl:if test="dspace:field[@element ='identifier'][starts-with(text(),'doi')][0]">
-
-                <xsl:for-each select="dspace:field[@element ='identifier'][starts-with(text(),'doi')][0]">
-                    <identifier identifierType="DOI"><xsl:value-of select="substring-after(text(),'doi:')"/></identifier>
+            <xsl:if test="dspace:field[@element ='identifier']">
+                <xsl:for-each select="dspace:field[@element ='identifier']">
+                    <xsl:variable name="id" select="."/>
+                    <xsl:if test="starts-with($id,'doi')">
+                        <identifier identifierType="DOI">
+                            <xsl:value-of select="substring-after($id,'doi:')"/>
+                        </identifier>
+                    </xsl:if>
                 </xsl:for-each>
-
             </xsl:if>
+            <!--<identifier identifierType="DOI">10.5061/DRYAD.2222</identifier>-->
 
-            <xsl:if test="dspace:field[@element ='creator']">
+
+            <xsl:if test="dspace:field[@element ='contributor']">
                 <creators>
-                    <xsl:for-each select="dspace:field[@element ='creator']">
+                    <xsl:for-each select="dspace:field[@element ='contributor']">
                         <creator>
-                            <creatorName><xsl:value-of select="."/></creatorName>
+                            <creatorName>
+                                <xsl:value-of select="."/>
+                            </creatorName>
                         </creator>
                     </xsl:for-each>
-            </creators>
-
+                </creators>
             </xsl:if>
 
 
+            <!--titles>
+                <title>National Institute for Environmental Studies and Center for Climate System Research Japan</title>
+            </titles-->
             <xsl:if test="dspace:field[@element ='title']">
                 <titles>
                     <xsl:for-each select="dspace:field[@element ='title']">
-                        <title><xsl:value-of select="."/></title>
+                        <title>
+                            <xsl:value-of select="."/>
+                        </title>
                     </xsl:for-each>
                 </titles>
             </xsl:if>
 
-            <!--
-            <publisher>World Data Center for Climate (WDCC)</publisher>
 
-            <publicationYear>2004</publicationYear>
-            -->
+            <publisher>Dryad Digital Repository</publisher>
 
-             <xsl:if test="dspace:field[@element ='subject']">
-                <subjects>
-                    <xsl:for-each select="dspace:field[@element ='subject']">
-                        <subject><xsl:value-of select="."/></subject>
-                    </xsl:for-each>
-                </subjects>
+            <!--publicationYear>2004</publicationYear-->
+            <xsl:if test="dspace:field[@element='date' and @qualifier='available']">
+                <xsl:for-each select="dspace:field[@qualifier='available']">
+                    <publicationYear>
+                        <xsl:variable name="date" select="."/>
+                        <xsl:value-of select="substring($date, 0, 5)"/>
+                    </publicationYear>
+                </xsl:for-each>
             </xsl:if>
 
-            <xsl:if test="dspace:field[@element ='contributor']">
-                <contributors>
-                    <xsl:for-each select="dspace:field[@element ='contributor']">
-                        <contributor>
-                            <xsl:if test="@qualifier">
-                                <xsl:attribute name="contributorType"><xsl:value-of select="@qualifier"/></xsl:attribute>
-                            </xsl:if>
-                            <contributorName><xsl:value-of select="."/></contributorName>
-                        </contributor>
-                    </xsl:for-each>
-                </contributors>
-            </xsl:if>
 
-            <!--
+             <!--
             <dates>
                 <date dateType="Valid">2005-04-05</date>
                 <date dateType="Accepted">2005-01-01</date>
@@ -107,8 +113,12 @@
 
             -->
 
+
         </resource>
 
     </xsl:template>
 
 </xsl:stylesheet>
+
+
+
