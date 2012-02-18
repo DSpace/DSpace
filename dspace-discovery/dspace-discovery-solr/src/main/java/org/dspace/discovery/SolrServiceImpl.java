@@ -17,6 +17,7 @@ import org.apache.solr.client.solrj.SolrServerException;
 import org.apache.solr.client.solrj.impl.CommonsHttpSolrServer;
 import org.apache.solr.client.solrj.response.FacetField;
 import org.apache.solr.client.solrj.response.QueryResponse;
+import org.apache.solr.client.solrj.util.ClientUtils;
 import org.apache.solr.common.SolrDocument;
 import org.apache.solr.common.SolrDocumentList;
 import org.apache.solr.common.SolrInputDocument;
@@ -1145,7 +1146,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
     @Override
-    public String searchJSON(DiscoverQuery query, DSpaceObject dso, String jsonIdentifier) throws SearchServiceException {
+    public InputStream searchJSON(DiscoverQuery query, DSpaceObject dso, String jsonIdentifier) throws SearchServiceException {
         if(dso != null){
             if (dso instanceof Community) {
                 query.addFilterQueries("location:m" + dso.getID());
@@ -1159,7 +1160,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
     }
 
 
-    public String searchJSON(DiscoverQuery query, String jsonIdentifier) throws SearchServiceException {
+    public InputStream searchJSON(DiscoverQuery query, String jsonIdentifier) throws SearchServiceException {
         Map<String, String> params = new HashMap<String, String>();
 
         String solrRequestUrl = solr.getBaseURL() + "/select";
@@ -1229,7 +1230,7 @@ public class SolrServiceImpl implements SearchService, IndexingService {
         try {
             GetMethod get = new GetMethod(solrRequestUrl);
             new HttpClient().executeMethod(get);
-            return get.getResponseBodyAsString();
+            return get.getResponseBodyAsStream();
 
         } catch (Exception e) {
             log.error("Error while getting json solr result for discovery search recommendation", e);
