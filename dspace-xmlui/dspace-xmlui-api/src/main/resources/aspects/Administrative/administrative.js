@@ -2612,8 +2612,9 @@ function doSetupCollectionHarvesting(collectionID)
 
 		assertAdminCollection(collectionID);
 
-		if (cocoon.request.get("submit_return") || cocoon.request.get("submit_metadata") ||
-			cocoon.request.get("submit_roles") || cocoon.request.get("submit_harvesting"))
+        if (cocoon.request.get("submit_return") || cocoon.request.get("submit_metadata") ||
+			cocoon.request.get("submit_roles") || cocoon.request.get("submit_harvesting") ||
+            cocoon.request.get("submit_curate"))
 		{
 			// return to the editCollection function which will determine where to go next.
 			return null;
