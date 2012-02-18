@@ -25,6 +25,8 @@ import org.dspace.workflow.WorkflowManager;
 import javax.servlet.ServletException;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
+
 /**
  * This is a utility class to aid in the workflow flow scripts.
  * Since data validation is cumbersome inside a flow script this
@@ -113,6 +115,12 @@ public class FlowUtils {
 	public static void processClaimTask(Context context, String id) throws SQLException, UIException, ServletException, AuthorizeException, IOException
 	{
 		WorkflowItem workflowItem = findWorkflow(context, id);
+        if(workflowItem.getState() != WorkflowManager.WFSTATE_STEP1POOL &&
+                workflowItem.getState() != WorkflowManager.WFSTATE_STEP2POOL &&
+                workflowItem.getState() != WorkflowManager.WFSTATE_STEP3POOL){
+            //Only allow tasks in the pool to be claimed !
+            throw new AuthorizeException("Error while claiming task: this task has already been claimed !");
+        }
 
        // Claim the task
        WorkflowManager.claim(context, workflowItem, context.getCurrentUser());
@@ -126,6 +134,38 @@ public class FlowUtils {
                    + "newowner_id=" + workflowItem.getOwner().getID()
                    + "new_state=" + workflowItem.getState()));
 	}
+
+    /**
+     * Verifies if the currently logged in user has proper rights to perform the workflow task on the item
+     * @param context the current dspace context
+     * @param workflowItemId the identifier of the workflow item
+     * @throws org.dspace.authorize.AuthorizeException thrown if the user doesn't have sufficient rights to perform the task at hand
+     * @throws java.sql.SQLException is thrown when something is wrong with the database
+     */
+    public static void authorizeWorkflowItem(Context context, String workflowItemId) throws AuthorizeException, SQLException {
+        WorkflowItem workflowItem = WorkflowItem.find(context, Integer.parseInt(workflowItemId.substring(1)));
+        if((workflowItem.getState() == WorkflowManager.WFSTATE_STEP1 ||
+                workflowItem.getState() == WorkflowManager.WFSTATE_STEP2 ||
+                workflowItem.getState() == WorkflowManager.WFSTATE_STEP3) && workflowItem.getOwner().getID() != context.getCurrentUser().getID()){
+            throw new AuthorizeException("You are not allowed to perform this task.");
+        }else
+        if((workflowItem.getState() == WorkflowManager.WFSTATE_STEP1POOL ||
+                workflowItem.getState() == WorkflowManager.WFSTATE_STEP2POOL ||
+                workflowItem.getState() == WorkflowManager.WFSTATE_STEP3POOL)){
+            //Verify if the current user has the current workflowItem among his pooled tasks
+            boolean hasPooledTask = false;
+            List<WorkflowItem> pooledTasks = WorkflowManager.getPooledTasks(context, context.getCurrentUser());
+            for (WorkflowItem pooledItem : pooledTasks) {
+                if(pooledItem.getID() == workflowItem.getID()){
+                    hasPooledTask = true;
+                }
+            }
+            if(!hasPooledTask){
+                throw new AuthorizeException("You are not allowed to perform this task.");
+            }
+
+        }
+    }
 
 
 	/**
