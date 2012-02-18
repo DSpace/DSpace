@@ -130,6 +130,8 @@ function doWorkflow()
 
     do
     {
+        //Ensure that the currently logged in user can perform the task
+        FlowUtils.authorizeWorkflowItem(getDSContext(), workflowID);
         sendPageAndWait("handle/"+handle+"/workflow/performTaskStep",{"id":workflowID,"step":"0"});
 
         if (cocoon.request.get("submit_leave"))
