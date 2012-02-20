@@ -449,11 +449,19 @@ public class Bundle extends DSpaceObject
         // FIXME: multiple inclusion is affected by this...
         AuthorizeManager.inheritPolicies(ourContext, this, b);
 
+        //Determine the current highest bitstream order in our bundle2bitstream table 
+        //This will always append a newly added bitstream as the last one 
+        int bitstreamOrder = 0;  //bitstream order starts at '0' index
+        TableRow tableRow = DatabaseManager.querySingle(ourContext, "SELECT MAX(bitstream_order) as max_value FROM bundle2bitstream WHERE bundle_id=?", getID());
+        if(tableRow != null){
+            bitstreamOrder = tableRow.getIntColumn("max_value") + 1;
+        }
+
         // Add the mapping row to the database
         TableRow mappingRow = DatabaseManager.row("bundle2bitstream");
         mappingRow.setColumn("bundle_id", getID());
         mappingRow.setColumn("bitstream_id", b.getID());
-        mappingRow.setColumn("bitstream_order", b.getSequenceID());
+        mappingRow.setColumn("bitstream_order", bitstreamOrder);
         DatabaseManager.insert(ourContext, mappingRow);
     }
 
