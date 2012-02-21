@@ -357,10 +357,10 @@ public class CDLDataCiteService {
             try {
 
                 log.debug("obtaining dspace object");
-                //dso = identifierService.resolve(context, doiID);
+                dso = identifierService.resolve(context, doiID);
 
                 // !!!! USE JUST FOR local TEST!
-                dso = identifierService.resolve(context, "doi:10.5061/dryad.7mm0p");
+                //dso = identifierService.resolve(context, "doi:10.5061/dryad.7mm0p");
 
                 log.debug("dspace object is " + dso);
 
