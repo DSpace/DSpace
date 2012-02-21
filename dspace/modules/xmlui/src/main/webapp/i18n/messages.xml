@@ -1835,14 +1835,14 @@
     <!-- org.dspace.app.xmlui.aspect.administrative.item.VersionItemForm -->
     <message key="xmlui.aspect.versioning.VersionItemForm.title">Create Version</message>
 	<message key="xmlui.aspect.versioning.VersionItemForm.trail">Version</message>
-	<message key="xmlui.aspect.versioning.VersionItemForm.head1">Create Version item: {0}</message>
+	<message key="xmlui.aspect.versioning.VersionItemForm.head1">Create new version of item: {0}</message>
 	<message key="xmlui.aspect.versioning.VersionItemForm.submit_version">Version</message>
     <message key="xmlui.aspect.versioning.VersionItemForm.submit_update_version">Update Version</message>
-    <message key="xmlui.aspect.versioning.VersionItemForm.summary">Summary</message>
+    <message key="xmlui.aspect.versioning.VersionItemForm.summary">Reason for creating new version</message>
 
-    <message key="xmlui.aspect.versioning.VersionUpdateForm.title">Udapte Version</message>
+    <message key="xmlui.aspect.versioning.VersionUpdateForm.title">Update Version</message>
 	<message key="xmlui.aspect.versioning.VersionUpdateForm.trail">Version</message>
-	<message key="xmlui.aspect.versioning.VersionUpdateForm.head1">Update Version item: {0}</message>
+	<message key="xmlui.aspect.versioning.VersionUpdateForm.head1">Update version of item: {0}</message>
 	<message key="xmlui.aspect.versioning.VersionUpdateForm.submit_version">Version</message>
     <message key="xmlui.aspect.versioning.VersionUpdateForm.submit_update_version">Update Version</message>
     <message key="xmlui.aspect.versioning.VersionUpdateForm.summary">Summary</message>
