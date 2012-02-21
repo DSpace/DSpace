@@ -309,7 +309,7 @@
                                             &#xa0;&#xa0;
                                             <xsl:element name="a">
                                                 <xsl:attribute name="href">
-                                                    <xsl:value-of select="concat('/doi/citation/ris/', $pkgDOI)"/>
+                                                    <xsl:value-of select="concat('/resource/', $pkgDOI, '/citation/ris')"/>
                                                 </xsl:attribute>
                                                 <xsl:text>RIS </xsl:text>
                                             </xsl:element>
@@ -323,7 +323,7 @@
                                             &#xa0;&#xa0;
                                             <xsl:element name="a">
                                                 <xsl:attribute name="href">
-                                                    <xsl:value-of select="concat('/doi/citation/bib/', $pkgDOI)"/>
+                                                    <xsl:value-of select="concat('/resource/', $pkgDOI, '/citation/bib')"/>
                                                 </xsl:attribute>
                                                 <xsl:text>BibTex </xsl:text>
                                             </xsl:element>
@@ -583,7 +583,7 @@
                             <td rowspace="2">
                             </td>
                         </tr>
-                    </table> 
+                    </table>
                     <xsl:if test="$datafiles">
                         <p class="ds-paragraph">
                             <i18n:text>xmlui.DryadItemSummary.pleaseCite</i18n:text>
@@ -740,7 +740,7 @@
                                             &#xa0;&#xa0;
                                             <xsl:element name="a">
                                                 <xsl:attribute name="href">
-                                                    <xsl:value-of select="concat('/doi/citation/ris/', $my_doi)"/>
+                                                    <xsl:value-of select="concat('/resource/', $my_doi, '/citation/ris')"/>
                                                 </xsl:attribute>
                                                 <xsl:text>RIS </xsl:text>
                                             </xsl:element>
@@ -754,7 +754,7 @@
                                             &#xa0;&#xa0;
                                             <xsl:element name="a">
                                                 <xsl:attribute name="href">
-                                                    <xsl:value-of select="concat('/doi/citation/bib/', $my_doi)"/>
+                                                    <xsl:value-of select="concat('/resource/', $my_doi, '/citation/bib')"/>
                                                 </xsl:attribute>
                                                 <xsl:text>BibTex </xsl:text>
                                             </xsl:element>

@@ -163,6 +163,7 @@ public class ResourceIdentifierController {
         return new ModelAndView(new DapView());
     }
 
+
     @RequestMapping("/resource/{prefix}/{suffix}/{count}.dap")
     public ModelAndView genBankDapRequestDF(@PathVariable String prefix, @PathVariable String suffix, @PathVariable String count, HttpServletRequest request, HttpServletResponse response) {
 
@@ -175,6 +176,44 @@ public class ResourceIdentifierController {
             return null;
 
         return new ModelAndView(new DapView());
+    }
+
+
+    @RequestMapping("/resource/{prefix}/{suffix}/citation/ris")
+    public ModelAndView genRisRepresentation(@PathVariable String prefix, @PathVariable String suffix, HttpServletRequest request, HttpServletResponse response) {
+        String resourceIdentifier = prefix + "/" + suffix;
+        request.setAttribute(DSPACE_OBJECT, getDSO(request, resourceIdentifier));
+        return new ModelAndView(new RisView());
+    }
+
+    @RequestMapping("/resource/{prefix}/{suffix}/citation/bib")
+    public ModelAndView genBibTexRepresentation(@PathVariable String prefix, @PathVariable String suffix, HttpServletRequest request, HttpServletResponse response) {
+        String resourceIdentifier = prefix + "/" + suffix;
+        request.setAttribute(DSPACE_OBJECT, getDSO(request, resourceIdentifier) );
+        return new ModelAndView(new BibTexView());
+    }
+
+
+    private DSpaceObject getDSO(HttpServletRequest request, String resourceIdentifier) {
+        DSpaceObject dso=null;
+        IdentifierService identifierService = new DSpace().getSingletonService(IdentifierService.class);
+        Context context =null;
+        try {
+            context = new Context();
+            context.turnOffAuthorisationSystem();
+            dso = identifierService.resolve(context, resourceIdentifier);
+            if(dso==null) throw new RuntimeException("Invalid DOI! " + resourceIdentifier);
+
+            return dso;
+        }catch (IdentifierNotFoundException e) {
+            throw new RuntimeException(e);
+
+        } catch (IdentifierNotResolvableException e) {
+            throw new RuntimeException(e);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+
+        }
     }
 
 
