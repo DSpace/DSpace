@@ -117,13 +117,13 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         // retrieve request parameters: journlaID, manuscriptNumber
         String selectedJournalId = request.getParameter("journalID");
         String manuscriptNumber = request.getParameter("manu");
-
+        PublicationBean pBean = null;
         // get journal status and name
         String journalStatus = null;
         String journalName = null;
         if(selectedJournalId!=null){
             String journalPath = org.dspace.submit.step.SelectPublicationStep.journalDirs.get(org.dspace.submit.step.SelectPublicationStep.journalVals.indexOf(selectedJournalId));
-            PublicationBean pBean = ModelPublication.getDataFromPublisherFile(manuscriptNumber, selectedJournalId, journalPath);
+            pBean = ModelPublication.getDataFromPublisherFile(manuscriptNumber, selectedJournalId, journalPath);
             journalStatus = pBean.getStatus();
 
             journalName = pBean.getJournalName();
@@ -132,7 +132,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         }
 
         // add radios: Accepted, In Review, Published, Not Yet Submitted
-        addArticleStatusRadios(request, form, journalStatus);
+        addArticleStatusRadios(request, form, journalStatus, pBean);
 
         // case A: (radio selected ==> published)
         addFieldsStatusPublished(request, form);
@@ -148,16 +148,16 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
 
         // case B: (radio selected ==> accepted)
-        addfieldsStatusAccepted(newItem, request, journalStatus, journalName);
+        addfieldsStatusAccepted(newItem, request, journalStatus, journalName, pBean, manuscriptNumber);
 
         // case C: (radio selected ==> Not Yet Submitted)
         //addJournalSelectStatusNotYetSubmitted(selectedJournalId, newItem);
 
         // case D: (radio selected ==>  Not Yet Submitted)
-        addJournalSelectStatusInReview(selectedJournalId, newItem, journalStatus);
+        addJournalSelectStatusInReview(selectedJournalId, newItem, journalStatus, pBean);
 
         // Add manuscriptNumber in any case
-        addManuscriptNumber(request, newItem, journalStatus, manuscriptNumber);
+        addManuscriptNumber(request, newItem, journalStatus, manuscriptNumber, pBean);
 
 
         addPublicationNumberIfSubmitExisting(form, submitExisting, pubIdError, pubColl);
@@ -240,7 +240,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
     }
 
-    private void addArticleStatusRadios(Request request, List form, String journalStatus) throws WingException {
+    private void addArticleStatusRadios(Request request, List form, String journalStatus, PublicationBean pBean) throws WingException {
         // add "article status" radios
         Item articleStatus = form.addItem("article_status", "");
         Radio accessRadios = articleStatus.addRadio("article_status");
@@ -252,10 +252,10 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         //accessRadios.addOption(org.dspace.submit.step.SelectPublicationStep.ARTICLE_STATUS_NOT_YET_SUBMITTED, T_article_status_not_yet_submitted);
 
 
-        if(journalStatus==null || journalStatus.equals(PublicationBean.STATUS_ACCEPTED)){
+        if(pBean!=null && (journalStatus==null || journalStatus.equals(PublicationBean.STATUS_ACCEPTED) )){
             accessRadios.setOptionSelected(org.dspace.submit.step.SelectPublicationStep.ARTICLE_STATUS_ACCEPTED);
         }
-        else if(journalStatus.equals(PublicationBean.STATUS_IN_REVIEW)){
+        else if(pBean!=null && journalStatus.equals(PublicationBean.STATUS_IN_REVIEW)){
             accessRadios.setOptionSelected(org.dspace.submit.step.SelectPublicationStep.ARTICLE_STATUS_IN_REVIEW);
         }
         else{
@@ -268,13 +268,13 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     }
 
 
-    private void addManuscriptNumber(Request request, Item newItem, String journalStatus, String manuscriptNumber) throws WingException {
+    private void addManuscriptNumber(Request request, Item newItem, String journalStatus, String manuscriptNumber, PublicationBean pBean) throws WingException {
         Composite optionsList;
         optionsList = newItem.addComposite("new-manu-comp");
         Text manuText = optionsList.addText("manu");
 
         if(manuscriptNumber != null){
-            if(journalStatus==null || journalStatus.equals(PublicationBean.STATUS_ACCEPTED) || journalStatus.equals(PublicationBean.STATUS_IN_REVIEW)){
+            if(pBean!=null && (journalStatus==null || journalStatus.equals(PublicationBean.STATUS_ACCEPTED) || journalStatus.equals(PublicationBean.STATUS_IN_REVIEW))){
                 manuText.setValue(manuscriptNumber);
             }
         }
@@ -291,7 +291,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     }
 
 
-    private void addfieldsStatusAccepted(Item newItem, Request request, String journalStatus, String journalName) throws WingException {
+    private void addfieldsStatusAccepted(Item newItem, Request request, String journalStatus, String journalName, PublicationBean pBean, String manuscriptNumber) throws WingException {
 
         // JOURNAL ID
         Composite optionsList = newItem.addComposite("new-options-comp");
@@ -319,8 +319,9 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
 
 
-        if(journalStatus==null || journalStatus.equals(PublicationBean.STATUS_ACCEPTED)){
+        if(pBean!=null && (journalStatus==null || journalStatus.equals(PublicationBean.STATUS_ACCEPTED))){
             journalField.setValue(journalName);
+            manuText.setValue(manuscriptNumber);
         }
 
 
@@ -347,7 +348,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     }
 
 
-    private void addJournalSelectStatusInReview(String selectedJournalId, Item newItem, String journalStatus) throws WingException {
+    private void addJournalSelectStatusInReview(String selectedJournalId, Item newItem, String journalStatus, PublicationBean pBean) throws WingException {
         Composite optionsList = newItem.addComposite("journalID_status_in_review");
         Select journalID = optionsList.addSelect("journalIDStatusInReview");
         java.util.List<String> journalVals = org.dspace.submit.step.SelectPublicationStep.journalVals;
@@ -363,7 +364,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
             if(org.dspace.submit.step.SelectPublicationStep.allowReviewWorkflowJournals.contains(val))
 
                 // select journal only if status is "In Review"
-                if(journalStatus!=null && journalStatus.equals(PublicationBean.STATUS_IN_REVIEW)){
+                if(pBean!=null && (journalStatus!=null && journalStatus.equals(PublicationBean.STATUS_IN_REVIEW))){
                     journalID.addOption(val.equals(selectedJournalId), val, name);
                 }
                 else{
