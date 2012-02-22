@@ -24,6 +24,7 @@ import org.omg.CORBA.PUBLIC_MEMBER;
 import org.w3c.dom.Document;
 import org.xml.sax.InputSource;
 
+import javax.management.RuntimeErrorException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.ServletException;
@@ -218,8 +219,10 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             return STATUS_COMPLETE;
         }catch(Exception e){
             log.error(e);
+            e.printStackTrace(System.out);
+            throw new RuntimeException(e);
         }
-        return ERROR_GENERIC;
+        ///return ERROR_GENERIC;
     }
 
 
