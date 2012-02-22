@@ -261,9 +261,8 @@
             </div>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:apply-templates
-                    select="./mets:fileSec/mets:fileGrp[@USE='LICENSE']"/>
-                <p> </p>
+                <i18n:text>xmlui.dri2xhtml.METS-1.0.license-text</i18n:text>
+                <xsl:text> </xsl:text>
             </xsl:otherwise>
         </xsl:choose>
 
