@@ -7,9 +7,11 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.app.xmlui.aspect.submission.AbstractSubmissionStep;
 import org.dspace.app.xmlui.wing.element.Item;
+import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.content.*;
+import org.dspace.content.Collection;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthorityManager;
 import org.dspace.content.authority.Choices;
@@ -18,11 +20,13 @@ import org.dspace.handle.HandleManager;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Constants;
 import org.dspace.submit.AbstractProcessingStep;
+import org.dspace.submit.bean.PublicationBean;
+import org.dspace.submit.model.ModelPublication;
 import org.xml.sax.SAXException;
 
 import java.sql.SQLException;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.*;
 
 /**
  * User: @author kevinvandevelde (kevin at atmire.com)
@@ -109,40 +113,61 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
             content.addContent(T_PUB_HELP_NEW);
 
 
-        addArticleStatusRadios(request, form);
 
-        // case A (published selected): this fields will be displayed.
+        // retrieve request parameters: journlaID, manuscriptNumber
+        String selectedJournalId = request.getParameter("journalID");
+        String manuscriptNumber = request.getParameter("manu");
+
+        // get journal status and name
+        String journalStatus = null;
+        String journalName = null;
+        if(selectedJournalId!=null){
+            String journalPath = org.dspace.submit.step.SelectPublicationStep.journalDirs.get(org.dspace.submit.step.SelectPublicationStep.journalVals.indexOf(selectedJournalId));
+            PublicationBean pBean = ModelPublication.getDataFromPublisherFile(manuscriptNumber, selectedJournalId, journalPath);
+            journalStatus = pBean.getStatus();
+
+            journalName = pBean.getJournalName();
+            if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(selectedJournalId))
+                journalName += "*";
+        }
+
+        // add radios: Accepted, In Review, Published, Not Yet Submitted
+        addArticleStatusRadios(request, form, journalStatus);
+
+        // case A: (radio selected ==> published)
         addFieldsStatusPublished(request, form);
 
         //Get all the data required
         boolean pubIdError = this.errorFlag == org.dspace.submit.step.SelectPublicationStep.STATUS_INVALID_PUBLICATION_ID;
         Collection pubColl = (Collection) HandleManager.resolveToObject(context, ConfigurationManager.getProperty("submit.publications.collection"));
-        String selectedJournalId = request.getParameter("journalID");
 
 
         //Start rendering our info
         Item newItem = form.addItem("select_publication_new", submitExisting ? "" : "odd");
-
         addRadioIfSubmitExisitng(content, submitExisting, pubIdError, pubColl, newItem);
 
 
-        addfieldsStatusAccepted(selectedJournalId, newItem, request);
+        // case B: (radio selected ==> accepted)
+        addfieldsStatusAccepted(newItem, request, journalStatus, journalName);
 
+        // case C: (radio selected ==> Not Yet Submitted)
         //addJournalSelectStatusNotYetSubmitted(selectedJournalId, newItem);
 
-        addJournalSelectStatusInReview(selectedJournalId, newItem);
+        // case D: (radio selected ==>  Not Yet Submitted)
+        addJournalSelectStatusInReview(selectedJournalId, newItem, journalStatus);
 
-        addManuscriptNumber(request, newItem);
+        // Add manuscriptNumber in any case
+        addManuscriptNumber(request, newItem, journalStatus, manuscriptNumber);
 
 
         addPublicationNumberIfSubmitExisting(form, submitExisting, pubIdError, pubColl);
 
-
+        // add License checkbox.
         addLicence(form);
 
         //add "Next" button
-	Item actions = form.addItem();
-	actions.addButton(AbstractProcessingStep.NEXT_BUTTON).setValue(T_next);
+	    Item actions = form.addItem();
+	    actions.addButton(AbstractProcessingStep.NEXT_BUTTON).setValue(T_next);
     }
 
     private void addPublicationNumberIfSubmitExisting(List form, boolean submitExisting, boolean pubIdError, Collection pubColl) throws WingException, SQLException {
@@ -215,7 +240,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
     }
 
-    private void addArticleStatusRadios(Request request, List form) throws WingException {
+    private void addArticleStatusRadios(Request request, List form, String journalStatus) throws WingException {
         // add "article status" radios
         Item articleStatus = form.addItem("article_status", "");
         Radio accessRadios = articleStatus.addRadio("article_status");
@@ -225,17 +250,35 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         accessRadios.addOption(org.dspace.submit.step.SelectPublicationStep.ARTICLE_STATUS_ACCEPTED, T_article_status_accepted);
         accessRadios.addOption(org.dspace.submit.step.SelectPublicationStep.ARTICLE_STATUS_IN_REVIEW, T_article_status_in_review);
         //accessRadios.addOption(org.dspace.submit.step.SelectPublicationStep.ARTICLE_STATUS_NOT_YET_SUBMITTED, T_article_status_not_yet_submitted);
-        accessRadios.setOptionSelected(request.getParameter("article_status"));
+
+
+        if(journalStatus==null || journalStatus.equals(PublicationBean.STATUS_ACCEPTED)){
+            accessRadios.setOptionSelected(org.dspace.submit.step.SelectPublicationStep.ARTICLE_STATUS_ACCEPTED);
+        }
+        else if(journalStatus.equals(PublicationBean.STATUS_IN_REVIEW)){
+            accessRadios.setOptionSelected(org.dspace.submit.step.SelectPublicationStep.ARTICLE_STATUS_IN_REVIEW);
+        }
+        else{
+            accessRadios.setOptionSelected(request.getParameter("article_status"));
+        }
+
+
+
+
     }
 
 
-
-    private void addManuscriptNumber(Request request, Item newItem) throws WingException {
+    private void addManuscriptNumber(Request request, Item newItem, String journalStatus, String manuscriptNumber) throws WingException {
         Composite optionsList;
         optionsList = newItem.addComposite("new-manu-comp");
         Text manuText = optionsList.addText("manu");
-        if(request.getParameter("manu") != null)
-            manuText.setValue(request.getParameter("manu"));
+
+        if(manuscriptNumber != null){
+            if(journalStatus==null || journalStatus.equals(PublicationBean.STATUS_ACCEPTED) || journalStatus.equals(PublicationBean.STATUS_IN_REVIEW)){
+                manuText.setValue(manuscriptNumber);
+            }
+        }
+
         manuText.setLabel(T_MANU_LABEL_NEW);
 
         //Add an error message should our manuscript be invalid
@@ -248,28 +291,11 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     }
 
 
-    private void addfieldsStatusAccepted(String selectedJournalId, Item newItem, Request request) throws WingException {
+    private void addfieldsStatusAccepted(Item newItem, Request request, String journalStatus, String journalName) throws WingException {
 
         // JOURNAL ID
         Composite optionsList = newItem.addComposite("new-options-comp");
-
-        addJournalAuthorityControlled("prism_publicationName", optionsList, "prism_publicationName");
-
-        //Select journalID = optionsList.addSelect("journalID");
-        //java.util.List<String> journalVals = org.dspace.submit.step.SelectPublicationStep.journalVals;
-        //java.util.List<String> journalNames = org.dspace.submit.step.SelectPublicationStep.journalNames;
-//
-        //for (int i = 0; i < journalVals.size(); i++) {
-        //    String val =  journalVals.get(i);
-        //    String name =  journalNames.get(i);
-	    //if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(val))
-		//name += "*";
-	    //journalID.addOption(val.equals(selectedJournalId), val, name);
-        //}
-//
-        //journalID.setLabel(T_SELECT_LABEL_NEW);
-        //if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_INVALID_JOURNAL)
-        //    journalID.addError(T_SELECT_ERROR);
+        Text journalField = addJournalAuthorityControlled("prism_publicationName", optionsList, "prism_publicationName");
 
 
         // MANUSCRIPT NUMBER
@@ -290,6 +316,12 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         // CHECKBOX: CONFIRM MANUSCRIPT NUMBER ACCEPTANCE
         CheckBox checkBox = newItem.addCheckBox("manu_accepted-cb");
         checkBox.addOption(String.valueOf(Boolean.TRUE), T_MANU_ACC_LABEL);
+
+
+
+        if(journalStatus==null || journalStatus.equals(PublicationBean.STATUS_ACCEPTED)){
+            journalField.setValue(journalName);
+        }
 
 
     }
@@ -315,7 +347,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     }
 
 
-    private void addJournalSelectStatusInReview(String selectedJournalId, Item newItem) throws WingException {
+    private void addJournalSelectStatusInReview(String selectedJournalId, Item newItem, String journalStatus) throws WingException {
         Composite optionsList = newItem.addComposite("journalID_status_in_review");
         Select journalID = optionsList.addSelect("journalIDStatusInReview");
         java.util.List<String> journalVals = org.dspace.submit.step.SelectPublicationStep.journalVals;
@@ -327,9 +359,16 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
             if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(val))
                 name += "*";
 
-            // add only journal with   allowReviewWorkflow=true;
+            // add only journal with allowReviewWorkflow=true;
             if(org.dspace.submit.step.SelectPublicationStep.allowReviewWorkflowJournals.contains(val))
-                journalID.addOption(val.equals(selectedJournalId), val, name);
+
+                // select journal only if status is "In Review"
+                if(journalStatus!=null && journalStatus.equals(PublicationBean.STATUS_IN_REVIEW)){
+                    journalID.addOption(val.equals(selectedJournalId), val, name);
+                }
+                else{
+                    journalID.addOption(val, name);
+                }
         }
 
         journalID.setLabel(T_SELECT_LABEL);
@@ -344,7 +383,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     }
 
 
-    private void addJournalAuthorityControlled(String fieldkey, Composite comp, String fieldName) throws WingException {
+    private Text addJournalAuthorityControlled(String fieldkey, Composite comp, String fieldName) throws WingException {
         fieldkey = config2fkey(fieldkey);
         Text journal = comp.addText(fieldName);
         journal.setAuthorityControlled();
@@ -354,6 +393,8 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         journal.setLabel(T_SELECT_LABEL_NEW);
         if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_INVALID_JOURNAL)
             journal.addError(T_SELECT_ERROR);
+
+        return journal;
 
     }
 
@@ -374,6 +415,5 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         }
         return MetadataAuthorityManager.makeFieldKey(schema, element, qualifier);
     }
-
 
 }
