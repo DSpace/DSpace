@@ -281,7 +281,6 @@
                     </xsl:attribute>        
                     License
                 </a>
-                <xsl:value-of select="$license"/>
             </xsl:otherwise>
         </xsl:choose>
 
