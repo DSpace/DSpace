@@ -53,6 +53,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     public static final int ERROR_SELECT_JOURNAL = 3;
     public static final int ERROR_INVALID_JOURNAL = 4;
     public static final int ERROR_PUBMED_DOI = 8;
+    public static final int ERROR_GENERIC = 9;
 
     public static final int DISPLAY_MANUSCRIPT_NUMBER = 5;
     public static final int DISPLAY_CONFIRM_MANUSCRIPT_ACCEPTANCE = 6;
@@ -218,6 +219,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         }catch(Exception e){
             log.error(e);
         }
+        return ERROR_GENERIC;
     }
 
 
