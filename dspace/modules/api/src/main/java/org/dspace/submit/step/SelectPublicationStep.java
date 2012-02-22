@@ -219,10 +219,8 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             return STATUS_COMPLETE;
         }catch(Exception e){
             log.error(e);
-            e.printStackTrace(System.out);
-            throw new RuntimeException(e);
         }
-        ///return ERROR_GENERIC;
+        return ERROR_SELECT_JOURNAL;
     }
 
 
@@ -357,11 +355,10 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                         // check if the status is "in review" or "rejected"
                         if(articleStatus!=null){
                             if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED){
-                                if(pBean.getStatus()!=null && pBean.getStatus().equals(PublicationBean.STATUS_IN_REVIEW) || pBean.getStatus().equals(PublicationBean.STATUS_REJECTED)){
+                                if(pBean.getStatus()!=null && (pBean.getStatus().equals(PublicationBean.STATUS_IN_REVIEW) || pBean.getStatus().equals(PublicationBean.STATUS_REJECTED))){
                                     request.getSession().setAttribute("submit_error", "Invalid manuscript number.");
                                     return false;
                                 }
-
                             }
                         }
 
