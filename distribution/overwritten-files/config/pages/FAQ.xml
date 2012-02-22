@@ -1,0 +1,163 @@
+<document xmlns="http://di.tamu.edu/DRI/1.0/"
+xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
+
+<body><div>
+<head>Preguntas frecuentes</head>
+<div id='pagina_estatica'>
+<![CDATA[
+<div id="preguntas">		
+			<ul>
+				<h2>Sobre SeDiCI</h2>
+				<li><a href="#que_es">¿Qué es SeDiCI?</a></li>
+				<li><a href="#servicios">¿Qué servicios brinda SeDiCI?</a></li>
+				<li><a href="#por_que">¿Por qué publicar en SeDiCI?</a></li>
+				<br>
+				<h2>Servicios de búsqueda y recuperación</h2>
+				<li><a href="#busqueda">¿Cómo realizar una búsqueda en SeDiCI?</a></li>
+				<li><a href="#exploracion">¿Qué tipos de exploración pueden realizarse sobre SeDiCI?</a></li>
+				<li><a href="#externos">¿Qué son los repositorios externos y qué se puede encontrar allí?</a></li>
+				<br>
+				<h2>Servicios a usuarios</h2>
+				<li><a href="#beneficios_usuario">¿Cuáles son los beneficios de registrarse como usuario del sitio?</a></li>
+				<li><a href="#sitio_usuario">¿Qué es y cómo se gestiona el sitio de usuario?</a></li>
+				<br>
+				<h2>Autoarchivo</h2>
+				<li><a href="#autoarchivo">¿Qué es el Autoarchivo?</a></li>
+				<li><a href="#beneficios_autoarchivo">¿Cuáles son los beneficios del Autoarchivo?</a></li>
+				<li><a href="#tipos_documento">¿Qué tipos de documentos están permitidos?</a></li>
+				<li><a href="#embargo">¿Qué es el período de embargo?</a></li>
+				<li><a href="#licencia">¿Qué es la Licencia de Difusión Creative Commons?</a></li>
+				<li><a href="#acuerdo_cesion">¿Qué es y para qué sirve el Acuerdo de Cesión No Exclusiva de Derechos?</a></li>
+			</ul>
+		</div>
+		
+		<div id="respuestas">
+			<div id="que_es">
+				<h2>¿Qué es SeDiCI?</h2>
+				El Servicio de Difusión de la Creación Intelectual (SeDiCI) es el repositorio institucional de la Universidad Nacional de La Plata. Esto significa que alberga, preserva y difunde mundialmente, a través de su sitio web, las creaciones y producciones intelectuales, científicas y artísticas de los diversos actores de la universidad (alumnos, profesores e investigadores). Su principal diferencia con una biblioteca digital es que, además de contener las referencias de catalogación de cada uno de los recursos, también ofrece, en una buena parte de su acervo y en número creciente en los últimos años, el texto completo de los mismos. El acceso a estos textos es completamente abierto y gratuito, ya que SeDiCI se rige bajo el protocolo Open Archives Initiative (OAI).
+			</div>
+			<p><a href="#preguntas" >^Volver</a></p>
+						
+			<div id="servicios">
+				<h2>¿Qué servicios brinda SeDiCI?</h2>
+				Entre los servicios ofrecidos por SeDiCI pueden destacarse: 
+				<ul>
+					<li>Búsqueda</li>
+					<li>Autoarchivo</li>
+				</ul>
+			</div>
+			<p><a href="#preguntas" >^Volver</a></p>
+
+			<div id="busqueda">
+				<h2>¿Cómo realizar una búsqueda en SeDiCI?</h2>
+				Para realizar una búsqueda general basta introducir una palabra (por ejemplo, "física") en el cuadro de búsqueda de la página principal de SeDiCI. El sistema recuperará todos los registros que contengan la palabra "física" en cualquiera de sus metadatos (aquellos datos que sirven para catalogar correctamente un recurso). Sin embargo, este tipo de búsqueda puede traer resultados no deseados o no del todo atinados. Para refinar entonces la búsqueda puede realizarse una búsqueda avanzada, en la que se especifiquen otros criterios además de la palabra deseada. Estos criterios pueden incluir: si la palabra deseada se encuentra en el título del documento, en sus materias, descriptores o palabras claves, o bien en cualquier otro de sus metadatos. También es posible buscar por autor, por director de tesis o por título de la serie documental (publicación periódica). A su vez, también es posible refinar la búsqueda por tipo de documento: por ejemplo, se le puede indicar al sistema que recupere solamente todas las tesis de grado (o el documento que se desee) que contengan la palabra "física" en uno o cualquiera de sus metadatos.			
+			</div>
+			<p><a href="#preguntas" >^Volver</a></p>
+
+			<div id="externos">
+				<h2>¿Qué son los repositorios externos y qué se puede encontrar allí?</h2>
+				Los repositorios externos son sitios similares a SeDiCI que también ofrecen sus contenidos en forma abierta, mediante el protocolo OAI-PMH. SeDiCI, además, ofrece la posibilidad de realizar búsquedas sobre ellos, ya sea sobre un repositorio en particular o sobre todos. Del mismo modo que en la búsqueda general, basta introducir una palabra o bien puede especificarse en qué metadato se desea encontrar esa palabra y en qué repositorio. En estos momentos, SeDiCI cuenta con acceso a 30 repositorios digitales de diversas partes del mundo y de muy variadas temáticas.
+			</div>
+			<p><a href="#preguntas" >^Volver</a></p>
+
+	
+			<div id="sitio_usuario">
+				<h2>¿Qué es y cómo se gestiona el sitio de usuario?</h2>
+			</div>
+			<p><a href="#preguntas" >^Volver</a></p>
+
+			<div id="beneficios_usuario">
+				<h2>¿Cuáles son los beneficios de registrarse como usuario del sitio?</h2>
+				Registrarse como usuario del sitio le brindará a quien lo realice, entre otros, los siguientes beneficios:
+				<ul>
+					<li>Realizar todas las gestiones necesarias para el autoarchivo.</li>
+				</ul>			
+			</div>
+			<p><a href="#preguntas" >^Volver</a></p>
+
+			<div id="autoarchivo">
+				<h2>¿Qué es el Autoarchivo?</h2>
+				El autoarchivo es una modalidad muy eficaz para contribuir con material propio al repositorio institucional. Consiste en una serie de pasos mediante los cuales un alumno, docente o investigador de la universidad puede fácilmente "subir" sus trabajos al sitio para que luego los administradores del mismo completen su catalogación y los pongan a disposición del público. Los pasos para el autoarchivo son:
+				<ul>
+				<li>Carga de información: carga de los datos que servirán para catalogar el recurso (título, autores, año de publicación, etc.).</li>
+				<li>Carga del archivo: se elige el documento (desde su propia computadora o desde un pen-drive) que se desea subir y se le da "abrir".</li>
+				<li>Licencia de Difusión: en este paso el autor puede especificar con qué tipo de licencia Creative Commons desea proteger su trabajo.</li>
+				<li>Confirmación de los datos: en caso de que hubiera algún error, en este paso se lo puede enmendar. Se debe prestar especial atención al tipo de documento elegido, ya que luego no se puede cambiar.</li>
+				<li>Descarga del Acuerdo de Cesión No Exclusiva de Derechos: en este último paso debe descargarse este acuerdo para ser impreso y completado de puño y letra por el autor. Luego, deberá concurrir personalmente a SeDiCI y presentar el mismo para que el documento pueda ser difundido en el portal. En el caso de que el usuario sea un tesista de posgrado, antes de concurrir a SeDiCI deberá hacer firmar y sellar el acuerdo en la Secretaría de Posgrado de su respectiva unidad académica, para hacer constar que la tesis ha sido aprobada antes de ser difundida, tal como lo requiere el artículo 2º de la Resolución 78/11.</li>
+				</ul>
+			</div>
+			<p><a href="#preguntas" >^Volver</a></p>
+
+			<div id="beneficios_autoarchivo">
+				<h2>¿Cuáles son los beneficios del Autoarchivo?</h2>
+				Con el servicio de Autoarchivo el autor se asegura la publicación y difusión de sus trabajos en forma rápida y sencilla. Es especialmente útil para aquellos investigadores o docentes que no residan en la ciudad de La Plata y aledaños o que no puedan acercarse hasta las oficinas de SeDiCI por diversos motivos. El autoarchivo puede realizarse en forma muy sencilla, en el momento que el autor lo desee, sin necesidad de hacer más trámites que completar una planilla, subir el trabajo e imprimir, firmar y traer el Acuerdo de Cesión. Aquellos autores que no puedan concurrir personalmente, pueden enviar por correo postal el mismo o encargarle a otra persona que lo traiga. 				
+			</div>
+			<p><a href="#preguntas" >^Volver</a></p>
+
+			<div id="por_que">
+				<h2>¿Por qué publicar en SeDiCI?</h2>
+				<ul>
+					<li>Visibilidad y estabilidad: a diferencia de una página web, el repositorio institucional constituye un archivo digital organizado y estable, donde los documentos se archivan y difunden en base a la utilización de estándares y protocolos normalizados, que potencian la visibilidad en Internet de autores y documentos. De este modo son recuperables tanto desde recolectores y motores de búsqueda especializados como desde los buscadores generales.</li>
+					<li>Aumento del impacto:  el aumento de la visibilidad y la difusión conlleva un potencial aumento del impacto de sus trabajos para los autores.</li>
+					<li>Integración en redes de investigación nacionales e internacionales:   numerosas instituciones del mundo promueven la creación de portales y estructuras para la difusión y la preservación del patrimonio intelectual, en las que los repositorios institucionales, como SeDiCI, se transforman en una herramienta prioritaria para el logro de estos fines.</li>
+					<li>Facilidad de difusión: para los autores es un medio rápido y económico de difundir su obra de forma sencilla y compatible con la publicación editorial, ya que la difusión en SeDiCI se realiza a título no exclusivo y el autor conserva todos sus derechos.</li>
+				</ul>			
+			</div>
+			<p><a href="#preguntas" >^Volver</a></p>
+
+			<div id="embargo">
+				<h2>¿Qué es el período de embargo?</h2>
+				El período de embargo es el lapso de tiempo durante el cual el texto de la obra no será accesible al público (sí lo serán sus metadatos: título, autor, año de publicación, etc.). Las razones para solicitar período de embargo pueden ir desde el deseo de proteger el contenido de la obra, especialmente si se trata de una patente o un trabajo con un gran potencial de desarrollo futuro, hasta el hecho de no hacer público el texto de una obra que está próxima a editarse por las vías tradicionales. El autor de la obra puede solicitar que el texto de la misma no sea visible por un período mínimo de tres meses hasta un máximo de veinticuatro. Al término del período de embargo, el texto completo de la obra será públicamente accesible desde el portal.
+			</div>
+			<p><a href="#preguntas" >^Volver</a></p>
+
+			<div id="tipos_documento">
+				<h2>¿Qué tipos de documentos están permitidos?</h2>
+				SeDiCI acepta para su publicación y difusión los siguientes tipos de documentos:
+					Tesis de grado y posgrado: son todos aquellos trabajos presentados en forma escrita para obtener a cambio el título universitario correspondiente. Según las carreras y las modalidades pueden llamarse "tesis", "tesina", "trabajo final" y otras denominaciones similares. Los trabajos de especialización entran en esta misma categoría.
+					Artículos: comprenden todos aquellos textos escritos para ser publicados, principalmente, en una publicación periódica de corte científico o académico. También se pueden incluir otros textos, de carácter independiente, referidos a un tema específico y no demasiado extensos (menos de 50 páginas).
+					Libros: se considera como tales a trabajos de mayor envergadura que un artículo (como media general, de más de 50 páginas), referidos a un tema específico y editados ya sea por una casa editorial, una institución (incluyendo la propia universidad) o autoeditados por sus autores, con su correspondiente número de ISBN. SeDiCI, dadas sus características, albergará la versión digital (de preferencia en formato PDF) y no en papel de los libros.
+					Conferencias, disertaciones, presentaciones en congresos y otros eventos: comprenden todos aquellos trabajos, de variada extensión, que cualquier alumno, docente o investigador de la UNLP presente en congresos, seminarios, simposios y otros eventos similares en cualquier lugar del mundo, siempre que lo haga en representación de la universidad y/o de su respectiva unidad académica o grupo de investigación perteneciente a la UNLP.
+					Producciones artísticas: contempla específicamente los trabajos de los alumnos, docentes e investigadores de la Facultad de Bellas Artes de la universidad, pero no excluye las producciones artísticas que pudieran provenir de otros sitios, siempre que estén vinculados a la UNLP. Se entiende por "producciones artísticas", entre otros, cuadros, imágenes (fotografías), animaciones, corto y largometrajes, videos, etc.
+					Publicaciones periódicas: bajo esta denominación figuran todas aquellas revistas académicas y científicas, de preferencia con referato, producidas por cualquier unidad académica de la universidad, así como laboratorio, instituto o grupo de investigación de la misma. Las revistas deben poseer su correspondiente número de ISSN e indicación del staff. SeDiCI puede albergar tanto sus versiones digitales como ofrecer a sus directores/editores la posibilidad de escanear y digitalizar sin costo alguno los números que no estén disponibles en digital en la actualidad.
+					Proyectos de investigación: reúnen todos aquellos trabajos producidos dentro de un proyecto de investigación en particular, con su correspondiente número y designación.
+					Patentes: registro escrito de la invención y de los derechos que ella supone para su autor y sus cesionarios.
+					Revisiones: artículos breves, en general publicados en revistas, que revisan o reseñan otros trabajos, en particular pero no excluyentemente libros.
+				
+			</div>
+			<p><a href="#preguntas" >^Volver</a></p>
+
+			<div id="licencia">
+				<h2>¿Qué es la Licencia de Difusión Creative Commons?</h2>
+					Cuando un recurso es difundido en Internet es una buena práctica indicar, a quienes lo acceden (ya sean personas o procesos de software), cuáles son las acciones permitidas respecto a dicho recurso. Así, debe indicarse si el recurso puede ser leído, copiado, guardado, redistribuido, reimpreso, usado como base de nuevas obras, etc. o nada de lo anterior. Por ello, en SeDiCI están disponibles las siguientes licencias Creative Commons:
+
+				<ul>
+					<li><a href="http://creativecommons.org/licenses/by/2.5/ar/" target="_blank">Atribución 2.5 Argentina</a></li>
+					<li><a href="http://creativecommons.org/licenses/by-nd/2.5/ar/" target="_blank">Atribución- Sin Derivadas 2.5 Argentina</a></li>
+					<li><a href="http://creativecommons.org/licenses/by-nc-nd/2.5/ar/" target="_blank">Atribución- No Comercial- Sin Derivadas 2.5 Argentina</a></li>
+					<li><a href="http://creativecommons.org/licenses/by-nc/2.5/ar/" target="_blank">Atribución- No Comercial 2.5 Argentina</a></li>
+					<li><a href="http://creativecommons.org/licenses/by-nc-sa/2.5/ar/" target="_blank">Atribución- No Comercial- Compartir Derivadas Igual 2.5 Argentina</a></li>
+					<li><a href="http://creativecommons.org/licenses/by-sa/2.5/ar/" target="_blank">Atribución- Compartir Derivadas Igual 2.5 Argentina</a></li>
+				</ul>
+			</div>
+			<p><a href="#preguntas" >^Volver</a></p>
+
+			<div id="acuerdo_cesion">
+				<h2>¿Qué es y para qué sirve el Acuerdo de Cesión No Exclusiva de Derechos?</h2>
+				El Acuerdo de Cesión No Exclusiva de Derechos es un acuerdo mediante el cual el autor y SeDiCI establecen bajo qué condiciones se dará a conocer una obra. El acuerdo habilita a SeDiCI, de forma no exclusiva, como expresamente se indica, a publicar, preservar y difundir los contenidos aportados por los usuarios. La condición de no exclusividad significa que el autor no pierde los derechos sobre su trabajo en ningún momento, y que puede, por ejemplo, publicar el mismo en los medios que considere oportuno en cualquier momento. Este acuerdo, a su vez, obliga a SeDiCI a preservar debidamente el material aportado y a difundirlo por su portal web. De este modo, ambas partes acuerdan y reconocen los derechos que les son inherentes.
+			</div>
+			<p><a href="#preguntas" >^Volver</a></p>
+			
+		</div>
+
+]]></div>
+</div></body>
+<meta>
+<pageMeta>
+<metadata element="title">Preguntas frecuentes</metadata>
+<trail target="/dspace">Repository Home</trail>
+</pageMeta>
+</meta>
+
+</document>
+
