@@ -236,8 +236,8 @@
         </div>
 
         <!-- cc-zero.png && opendata.png -->
-        <xsl:if
-            test=".//dim:field[@element='rights'][.='http://creativecommons.org/publicdomain/zero/1.0/']">
+        <xsl:choose>
+            <xsl:when test=".//dim:field[@element='rights'][.='http://creativecommons.org/publicdomain/zero/1.0/']">
             <div style="padding-left:1px; padding-top:2px;">
             <table>
                 <tr>
@@ -258,8 +258,14 @@
                 </tr>
             </table>
             <xsl:text> &#160; </xsl:text>
-        </div>
-        </xsl:if>
+            </div>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:apply-templates
+                    select="./mets:fileSec/mets:fileGrp[@USE='LICENSE']"/>
+                <p> </p>
+            </xsl:otherwise>
+        </xsl:choose>
 
         <br/>
         <br/>
