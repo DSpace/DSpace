@@ -185,24 +185,37 @@
 			  		<br/>
 			  		1900 La Plata, Buenos Aires - Tel 0221 423 6696/6677 (int 141) 
 			  		<div id="comollegar">
-			  			<img class="vermapa">
-			    			<xsl:attribute name="src">
-			    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img1.png
+			  			<a title="Como llegar a SeDiCI">
+			    			<xsl:attribute name="href">
+			    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/pages/comoLlegar
 			    			</xsl:attribute>
-			  			</img>
+				  			<img class="vermapa">
+				    			<xsl:attribute name="src">
+				    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img1.png
+				    			</xsl:attribute>
+				  			</img>
+			  			</a>
 			  		</div>
 			  	</div>
 			  	<div id="news-contacto-etc">
-			  		<img class="newsletter">
-		    			<xsl:attribute name="src">
-		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img2.png
+		  			<a href="http://mail.prebi.unlp.edu.ar:8080/lists" target="_blank" title="Suscríbase al newsletter">
+				  		<img class="newsletter">
+			    			<xsl:attribute name="src">
+			    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img2.png
+			    			</xsl:attribute>
+				  		</img>
+		  			</a>
+
+		  			<a title="Contáctese">
+		    			<xsl:attribute name="href">
+		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/pages/contacto
 		    			</xsl:attribute>
-			  		</img>
-			  		<img class="contacto">
-		    			<xsl:attribute name="src">
-		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img3.png
-		    			</xsl:attribute>
-			  		</img>
+				  		<img class="contacto">
+			    			<xsl:attribute name="src">
+			    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img3.png
+			    			</xsl:attribute>
+				  		</img>
+				  	</a>
 			  	</div>
 			</div>
 		</div>
