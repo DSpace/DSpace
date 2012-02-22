@@ -269,7 +269,7 @@
             </xsl:when>
             <xsl:otherwise>
                 <xsl:variable name="license"
-                    select="/mets:METS/mets:fileSec/mets:fileGrp[@USE='LICENSE']/mets:file"/>
+                    select="/mets:METS/mets:fileSec/"/>
                     <!-- select="./mets:METS/mets:fileSec/mets:fileGrp[@USE='']/mets:file"/ -->            
                 <i18n:text>xmlui.dri2xhtml.METS-1.0.license-text</i18n:text>
                 <xsl:value-of select="$license"/>
