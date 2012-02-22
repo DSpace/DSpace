@@ -152,66 +152,72 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
 
     public int doProcessing(Context context, HttpServletRequest request, HttpServletResponse response, SubmissionInfo submissionInfo) throws ServletException, IOException, SQLException, AuthorizeException {
-        Item item = submissionInfo.getSubmissionItem().getItem();
+
+        try{
+
+            Item item = submissionInfo.getSubmissionItem().getItem();
 
 
-        String journalID = null;
-        String articleStatus = request.getParameter("article_status");
-        String manuscriptNumber = request.getParameter("manu");
+            String journalID = null;
+            String articleStatus = request.getParameter("article_status");
+            String manuscriptNumber = request.getParameter("manu");
 
 
-        if(articleStatus!=null){
-            if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED){
-                String manuscriptNumberAcc = request.getParameter("manu-number-status-accepted");
-                String manuAcc = request.getParameter("manu_acc");
-                manuscriptNumber = manuscriptNumberAcc;
-                String journalName = request.getParameter("prism_publicationName");
+            if(articleStatus!=null){
+                if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED){
+                    String manuscriptNumberAcc = request.getParameter("manu-number-status-accepted");
+                    String manuAcc = request.getParameter("manu_acc");
+                    manuscriptNumber = manuscriptNumberAcc;
+                    String journalName = request.getParameter("prism_publicationName");
 
-                journalName=journalName.replace("*", "");
-                journalID = DryadJournalSubmissionUtils.findKeyByFullname(journalName);
-                if(journalID==null) journalID=journalName;
-            }
-            else if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_NOT_YET_SUBMITTED){
-                journalID = request.getParameter("journalIDStatusNotYetSubmitted");
-            }
-            else if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_IN_REVIEW){
-                journalID = request.getParameter("journalIDStatusInReview");
-            }
-        }
-
-
-        //First of all check if we have accepted our license
-        if(request.getParameter("license_accept") == null || !Boolean.valueOf(request.getParameter("license_accept")))
-            return STATUS_LICENSE_NOT_ACCEPTED;
-
-
-
-        if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_PUBLISHED){
-            String identifier = request.getParameter("article_doi");
-            if(identifier!=null && !identifier.equals("")){
-
-                if(identifier.indexOf('/')!=-1){
-                    if(!processDOI(context, item, identifier))
-                        return ERROR_PUBMED_DOI;
+                    journalName=journalName.replace("*", "");
+                    journalID = DryadJournalSubmissionUtils.findKeyByFullname(journalName);
+                    if(journalID==null) journalID=journalName;
                 }
-                else{
-                   if(!processPubMed(context, item, identifier))
-                        return ERROR_PUBMED_DOI;
+                else if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_NOT_YET_SUBMITTED){
+                    journalID = request.getParameter("journalIDStatusNotYetSubmitted");
+                }
+                else if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_IN_REVIEW){
+                    journalID = request.getParameter("journalIDStatusInReview");
                 }
             }
 
-        }
-        // ARTICLE_STATUS_ACCEPTED ||  ARTICLE_STATUS_IN_REVIEW ||  ARTICLE_STATUS_NOT_YET_SUBMITTED
-        else{
-            if(!processJournal(journalID, manuscriptNumber, item, context, request, articleStatus)){
 
-                if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED) return ENTER_MANUSCRIPT_NUMBER;
+            //First of all check if we have accepted our license
+            if(request.getParameter("license_accept") == null || !Boolean.valueOf(request.getParameter("license_accept")))
+                return STATUS_LICENSE_NOT_ACCEPTED;
 
-                return ERROR_SELECT_JOURNAL;
+
+
+            if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_PUBLISHED){
+                String identifier = request.getParameter("article_doi");
+                if(identifier!=null && !identifier.equals("")){
+
+                    if(identifier.indexOf('/')!=-1){
+                        if(!processDOI(context, item, identifier))
+                            return ERROR_PUBMED_DOI;
+                    }
+                    else{
+                       if(!processPubMed(context, item, identifier))
+                            return ERROR_PUBMED_DOI;
+                    }
+                }
+
             }
-        }
+            // ARTICLE_STATUS_ACCEPTED ||  ARTICLE_STATUS_IN_REVIEW ||  ARTICLE_STATUS_NOT_YET_SUBMITTED
+            else{
+                if(!processJournal(journalID, manuscriptNumber, item, context, request, articleStatus)){
 
-        return STATUS_COMPLETE;
+                    if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED) return ENTER_MANUSCRIPT_NUMBER;
+
+                    return ERROR_SELECT_JOURNAL;
+                }
+            }
+
+            return STATUS_COMPLETE;
+        }catch(Exception e){
+            log.error(e);
+        }
     }
 
 

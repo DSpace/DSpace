@@ -127,8 +127,10 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
             journalStatus = pBean.getStatus();
 
             journalName = pBean.getJournalName();
-            if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(selectedJournalId))
-                journalName += "*";
+            if(journalName!=null && !journalName.equals("")) {
+                if(org.dspace.submit.step.SelectPublicationStep.integratedJournals.contains(selectedJournalId))
+                    journalName += "*";
+            }
         }
 
         // add radios: Accepted, In Review, Published, Not Yet Submitted
