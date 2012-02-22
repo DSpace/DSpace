@@ -15,6 +15,7 @@ import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,6 +34,7 @@ public class DryadJournalSubmissionUtils {
     public static final String PUBLICATION_BLACKOUT = "publicationBlackout";
     public static final String NOTIFY_ON_REVIEW = "notifyOnReview";
     public static final String NOTIFY_ON_ARCHIVE = "notifyOnArchive";
+    public static final String JOURNAL_ID = "journalID";
 
 
     public static final java.util.Map<String, Map<String, String>> journalProperties = new HashMap<String, Map<String, String>>();
@@ -55,6 +57,7 @@ public class DryadJournalSubmissionUtils {
                 map.put(PUBLICATION_BLACKOUT, properties.getProperty(str + PUBLICATION_BLACKOUT, "false"));
                 map.put(NOTIFY_ON_REVIEW, properties.getProperty(str + NOTIFY_ON_REVIEW));
                 map.put(NOTIFY_ON_ARCHIVE, properties.getProperty(str + NOTIFY_ON_ARCHIVE));
+                map.put(JOURNAL_ID, journalType);
 
                 String key = properties.getProperty(str + FULLNAME);
                 journalProperties.put(key, map);
@@ -93,5 +96,14 @@ public class DryadJournalSubmissionUtils {
 
      private static boolean isDataPackage(Collection coll) throws SQLException {
         return coll.getHandle().equals(ConfigurationManager.getProperty("submit.publications.collection"));
+    }
+
+
+    public static String findKeyByFullname(String fullname){
+        Map<String, String> props = journalProperties.get(fullname);
+        if(props!=null)
+            return props.get(DryadJournalSubmissionUtils.JOURNAL_ID);
+
+        return null;
     }
 }

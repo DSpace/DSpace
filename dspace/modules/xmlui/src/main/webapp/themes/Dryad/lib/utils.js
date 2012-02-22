@@ -165,7 +165,7 @@ function initFirstSubmissionForm() {
 
             jQuery("#prism_publicationName").show();
 
-            //TODO: check this control, it doesn't work anymore being now an authority controlled field
+            
             var journal = jQuery("#aspect_submission_StepTransformer_field_prism_publicationName").val();
 	    
 	    if(journal==""){
@@ -313,8 +313,12 @@ function initFirstSubmissionForm() {
                 var journal = jQuery("#aspect_submission_StepTransformer_field_prism_publicationName").val();
 		
 		
-		
-                if (journal.indexOf('*') != -1) {
+	    
+		if(journal==""){
+		    jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").hide();
+		    jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").hide();		
+		}		
+                else if (journal.indexOf('*') != -1) {
                     jQuery("#aspect_submission_StepTransformer_item_manu-number-status-accepted").show();
                     jQuery("#aspect_submission_StepTransformer_item_manu_accepted-cb").hide();
                 }
@@ -349,6 +353,11 @@ function initFirstSubmissionForm() {
         jQuery('input[name|="manu_acc"]').change(function() {
             enableNextButton();
         });
+	jQuery('input[name|="manu_accepted-cb"]').change(function() {
+            enableNextButton();
+        });
+	
+	
     }
 }
 

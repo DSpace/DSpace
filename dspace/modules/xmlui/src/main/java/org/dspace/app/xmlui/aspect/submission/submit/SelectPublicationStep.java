@@ -170,56 +170,8 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 	    actions.addButton(AbstractProcessingStep.NEXT_BUTTON).setValue(T_next);
     }
 
-    private void addPublicationNumberIfSubmitExisting(List form, boolean submitExisting, boolean pubIdError, Collection pubColl) throws WingException, SQLException {
-        if(submitExisting){
-            Item existItem = form.addItem("select_publication_exist", "");
 
-            Radio publicationSelectRadio = existItem.addRadio("publication_select");
 
-            //Make sure that the current user can submit in the publication collection
-            if (AuthorizeManager.authorizeActionBoolean(context, pubColl, Constants.ADD))
-            {
-                publicationSelectRadio.addOption(pubIdError, "select").addContent(T_PUB_SELECT_EXISTING);
-
-            } else {
-                //We cannot create one so just disable it
-                publicationSelectRadio.addOption(true, "select").addContent(T_PUB_SELECT_EXISTING);
-            }
-
-            Text publicationNr = existItem.addComposite("exits-options-comp").addText("publication_number");
-            publicationNr.setLabel("Data package id");
-            publicationNr.setHelp(T_PUB_SELECT_HELP);
-            if(pubIdError)
-                publicationNr.addError(T_PUB_SELECT_ERROR);
-        }
-    }
-
-    private void addRadioIfSubmitExisitng(Item content, boolean submitExisting, boolean pubIdError, Collection pubColl, Item newItem) throws WingException, SQLException {
-        if(submitExisting){
-            //We need to add a radio
-            Radio radio = newItem.addRadio("publication_select");
-            if (AuthorizeManager.authorizeActionBoolean(context, pubColl, Constants.ADD))
-            {
-                radio.addOption(!pubIdError, "create").addContent(T_PUB_SELECT_NEW);
-            }else{
-                //We cannot create one so just disable it
-                Option createOption = radio.addOption(false, "create");
-                createOption.addContent(T_PUB_SELECT_NEW);
-                radio.setDisabled(true);
-                radio.addOption(true, "select").addContent(T_PUB_SELECT_EXISTING);
-            }
-        }else{
-            //We cannot add a new data set so just add a hidden field to indicate that we want to create a new one
-            content.addHidden("publication_select").setValue("create");
-        }
-    }
-
-    private void addLicence(List form) throws WingException {
-        CheckBox licensebox = form.addItem().addCheckBox("license_accept");
-        licensebox.addOption(String.valueOf(Boolean.TRUE), T_PUB_LICENSE);
-        if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.STATUS_LICENSE_NOT_ACCEPTED)
-            licensebox.addError(T_PUB_LICENSE_ERROR);
-    }
 
     private void addFieldsStatusPublished(Request request, List form) throws WingException {
         List doi = form.addList("doi");
@@ -322,6 +274,8 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         if(pBean!=null && (journalStatus==null || journalStatus.equals(PublicationBean.STATUS_ACCEPTED))){
             journalField.setValue(journalName);
             manuText.setValue(manuscriptNumber);
+        }else{
+          journalField.setValue(request.getParameter("prism_publicationName"));
         }
 
 
@@ -416,5 +370,59 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         }
         return MetadataAuthorityManager.makeFieldKey(schema, element, qualifier);
     }
+
+
+    private void addPublicationNumberIfSubmitExisting(List form, boolean submitExisting, boolean pubIdError, Collection pubColl) throws WingException, SQLException {
+           if(submitExisting){
+               Item existItem = form.addItem("select_publication_exist", "");
+
+               Radio publicationSelectRadio = existItem.addRadio("publication_select");
+
+               //Make sure that the current user can submit in the publication collection
+               if (AuthorizeManager.authorizeActionBoolean(context, pubColl, Constants.ADD))
+               {
+                   publicationSelectRadio.addOption(pubIdError, "select").addContent(T_PUB_SELECT_EXISTING);
+
+               } else {
+                   //We cannot create one so just disable it
+                   publicationSelectRadio.addOption(true, "select").addContent(T_PUB_SELECT_EXISTING);
+               }
+
+               Text publicationNr = existItem.addComposite("exits-options-comp").addText("publication_number");
+               publicationNr.setLabel("Data package id");
+               publicationNr.setHelp(T_PUB_SELECT_HELP);
+               if(pubIdError)
+                   publicationNr.addError(T_PUB_SELECT_ERROR);
+           }
+       }
+
+       private void addRadioIfSubmitExisitng(Item content, boolean submitExisting, boolean pubIdError, Collection pubColl, Item newItem) throws WingException, SQLException {
+           if(submitExisting){
+               //We need to add a radio
+               Radio radio = newItem.addRadio("publication_select");
+               if (AuthorizeManager.authorizeActionBoolean(context, pubColl, Constants.ADD))
+               {
+                   radio.addOption(!pubIdError, "create").addContent(T_PUB_SELECT_NEW);
+               }else{
+                   //We cannot create one so just disable it
+                   Option createOption = radio.addOption(false, "create");
+                   createOption.addContent(T_PUB_SELECT_NEW);
+                   radio.setDisabled(true);
+                   radio.addOption(true, "select").addContent(T_PUB_SELECT_EXISTING);
+               }
+           }else{
+               //We cannot add a new data set so just add a hidden field to indicate that we want to create a new one
+               content.addHidden("publication_select").setValue("create");
+           }
+       }
+
+
+    private void addLicence(List form) throws WingException {
+        CheckBox licensebox = form.addItem().addCheckBox("license_accept");
+        licensebox.addOption(String.valueOf(Boolean.TRUE), T_PUB_LICENSE);
+        if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.STATUS_LICENSE_NOT_ACCEPTED)
+            licensebox.addError(T_PUB_LICENSE_ERROR);
+    }
+
 
 }

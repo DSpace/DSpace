@@ -15,6 +15,7 @@ import org.dspace.authorize.AuthorizeException;
 import org.dspace.handle.HandleManager;
 import org.dspace.submit.bean.PublicationBean;
 import org.dspace.submit.model.ModelPublication;
+import org.dspace.submit.utils.DryadJournalSubmissionUtils;
 import org.dspace.workflow.WorkflowRequirementsManager;
 import org.jdom.Element;
 import org.jdom.input.DOMBuilder;
@@ -154,7 +155,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         Item item = submissionInfo.getSubmissionItem().getItem();
 
 
-        String journalID = request.getParameter("prism_publicationName");
+        String journalID = null;
         String articleStatus = request.getParameter("article_status");
         String manuscriptNumber = request.getParameter("manu");
 
@@ -164,6 +165,11 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                 String manuscriptNumberAcc = request.getParameter("manu-number-status-accepted");
                 String manuAcc = request.getParameter("manu_acc");
                 manuscriptNumber = manuscriptNumberAcc;
+                String journalName = request.getParameter("prism_publicationName");
+
+                journalName=journalName.replace("*", "");
+                journalID = DryadJournalSubmissionUtils.findKeyByFullname(journalName);
+                if(journalID==null) journalID=journalName;
             }
             else if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_NOT_YET_SUBMITTED){
                 journalID = request.getParameter("journalIDStatusNotYetSubmitted");
@@ -172,6 +178,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                 journalID = request.getParameter("journalIDStatusInReview");
             }
         }
+
 
         //First of all check if we have accepted our license
         if(request.getParameter("license_accept") == null || !Boolean.valueOf(request.getParameter("license_accept")))
@@ -310,55 +317,60 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         if(!journalID.equals("other")){
             if(!integratedJournals.contains(journalID) || (integratedJournals.contains(journalID) && manuscriptNumber != null && manuscriptNumber.trim().equals(""))){
                 //Just add the journal title
-                String title = journalNames.get(journalVals.indexOf(journalID));
-                //Should it end with a *, remove it.
-                if(title.endsWith("*"))
-                    title = title.substring(0, title.length() - 1);
+                String title= journalID;
+                if(journalVals.indexOf(journalID)!=-1){
+                    title = journalNames.get(journalVals.indexOf(journalID));
+                    //Should it end with a *, remove it.
+                    if(title.endsWith("*"))
+                        title = title.substring(0, title.length() - 1);
 
-                Boolean embargoAllowed = Boolean.valueOf(journalEmbargo.get(journalVals.indexOf(journalID)));
-                if(!embargoAllowed){
-                    //We don't need to show the embargo option to any of our data files
-                    item.addMetadata("internal", "submit", "showEmbargo", null, String.valueOf(embargoAllowed));
+                    Boolean embargoAllowed = Boolean.valueOf(journalEmbargo.get(journalVals.indexOf(journalID)));
+                    if(!embargoAllowed){
+                        //We don't need to show the embargo option to any of our data files
+                        item.addMetadata("internal", "submit", "showEmbargo", null, String.valueOf(embargoAllowed));
+                    }
                 }
                 item.addMetadata("prism", "publicationName", null, null, title);
                 item.update();
 
 
-            } else {
-                String journalPath = journalDirs.get(journalVals.indexOf(journalID));
-                //We have a valid journal
-                PublicationBean pBean = ModelPublication.getDataFromPublisherFile(manuscriptNumber, journalID, journalPath);
-                if (pBean.getMessage().equals((""))) {
+            }
+            else {
+                if(journalVals.indexOf(journalID)!=-1){
 
-                    // check if the status is "in review" or "rejected"
-                    if(articleStatus!=null){
-                        if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED){
-                            if(pBean.getStatus()!=null && pBean.getStatus().equals(PublicationBean.STATUS_IN_REVIEW) || pBean.getStatus().equals(PublicationBean.STATUS_REJECTED)){
-                                request.getSession().setAttribute("submit_error", "Invalid manuscript number.");
-                                return false;
+                    String journalPath = journalDirs.get(journalVals.indexOf(journalID));
+                    //We have a valid journal
+                    PublicationBean pBean = ModelPublication.getDataFromPublisherFile(manuscriptNumber, journalID, journalPath);
+                    if (pBean.getMessage().equals((""))) {
+
+                        // check if the status is "in review" or "rejected"
+                        if(articleStatus!=null){
+                            if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED){
+                                if(pBean.getStatus()!=null && pBean.getStatus().equals(PublicationBean.STATUS_IN_REVIEW) || pBean.getStatus().equals(PublicationBean.STATUS_REJECTED)){
+                                    request.getSession().setAttribute("submit_error", "Invalid manuscript number.");
+                                    return false;
+                                }
+
                             }
-
                         }
+
+                        importJournalMetadata(context, item, pBean);
+                        List<String> reviewEmails = journalNotifyOnReview.get(journalID);
+                        item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "review", "mailUsers", null, reviewEmails.toArray(new String[reviewEmails.size()]));
+
+                        List<String> archiveEmails = journalNotifyOnArchive.get(journalID);
+                        item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "archive", "mailUsers", null, archiveEmails.toArray(new String[archiveEmails.size()]));
+
+                        boolean embargoAllowed = journalEmbargo.get(journalVals.indexOf(journalID));
+                        if(!embargoAllowed){
+                            //We don't need to show the embargo option to any of our data files
+                            item.addMetadata("internal", "submit", "showEmbargo", null, String.valueOf(embargoAllowed));
+                        }
+                        item.update();
+                    }else{
+                        request.getSession().setAttribute("submit_error", pBean.getMessage());
+                        return false;
                     }
-
-
-
-                    importJournalMetadata(context, item, pBean);
-                    List<String> reviewEmails = journalNotifyOnReview.get(journalID);
-                    item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "review", "mailUsers", null, reviewEmails.toArray(new String[reviewEmails.size()]));
-
-                    List<String> archiveEmails = journalNotifyOnArchive.get(journalID);
-                    item.addMetadata(WorkflowRequirementsManager.WORKFLOW_SCHEMA, "archive", "mailUsers", null, archiveEmails.toArray(new String[archiveEmails.size()]));
-
-                    boolean embargoAllowed = journalEmbargo.get(journalVals.indexOf(journalID));
-                    if(!embargoAllowed){
-                        //We don't need to show the embargo option to any of our data files
-                        item.addMetadata("internal", "submit", "showEmbargo", null, String.valueOf(embargoAllowed));
-                    }
-                    item.update();
-                }else{
-                    request.getSession().setAttribute("submit_error", pBean.getMessage());
-                    return false;
                 }
             }
         }
