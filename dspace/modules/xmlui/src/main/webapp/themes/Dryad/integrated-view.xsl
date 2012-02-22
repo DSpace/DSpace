@@ -263,15 +263,24 @@
             <xsl:when test=".//dim:field[@element='rights'][.='http://opensource.org/licenses/gpl-3.0']">
                 <i18n:text>xmlui.dri2xhtml.METS-1.0.license-text</i18n:text>
                 <xsl:text> &#160; </xsl:text>
-                <a href="http://opensource.org/licenses/gpl-3.0" target="_blank">
+                <a href="http://opensource.org/licenses/gpl-3.0">
                     GPL 3.0
                 </a>
             </xsl:when>
             <xsl:otherwise>
-                <xsl:variable name="license"
+                <!-- <xsl:variable name="license"
                     select="/mets:METS/mets:fileSec" />
-                    <!-- select="./mets:METS/mets:fileSec/mets:fileGrp[@USE='']/mets:file"/ -->            
+                     select="./mets:METS/mets:fileSec/mets:fileGrp[@USE='']/mets:file" /> -->     
+                <xsl:variable name="license"
+                    select=".//dim:field[@element='rights']" />
                 <i18n:text>xmlui.dri2xhtml.METS-1.0.license-text</i18n:text>
+                <xsl:text> &#160; </xsl:text>
+                <a>
+                    <xsl:attribute name="href">
+                        <xsl:value-of select="$license" />
+                    </xsl:attribute>        
+                    License
+                </a>
                 <xsl:value-of select="$license"/>
             </xsl:otherwise>
         </xsl:choose>
