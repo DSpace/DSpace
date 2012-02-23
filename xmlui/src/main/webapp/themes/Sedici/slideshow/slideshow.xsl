@@ -10,8 +10,11 @@
 	<!-- Este es el codigo que deberan tocar para modificar el slideshow -->
 	<ul class="slideshow">
 	    <li>
-	    	<a href="#">
-	    		<img title="SeDiCI" alt="Serivicio de Difusión de la Creación Intelectual de la Universidad Nacional de La Plata">
+	    	<a>
+    			<xsl:attribute name="href">
+    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/pages/queEsSedici
+    			</xsl:attribute>
+	    		<img title="¿Qué es SeDiCI?" alt="SeDiCI (Servicio de Difusión de la Creación Intelectual) es el repositorio institucional central de la Universidad Nacional de La Plata.">
 	    			<xsl:attribute name="src">
 	    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img_slideshow_1.jpg
 	    			</xsl:attribute>
@@ -20,7 +23,7 @@
 	    </li>
 	    <li>
 	    	<a href="#">
-	    		<img title="Nueva colección con libros de medicina" alt="Se ha agregado una nueva colección exclusiva para libros de medicina, con mas de 500 libros en formato digital, accesibles bajo las políticas de Acceso Abierto">
+	    		<img title="Migración a DSpace" alt="Desde marzo de 2012, SeDiCI se encuentra funcionando sobre plataforma de software completamente nueva. Bienvenidos a SeDiCI-DSpace.">
 	    			<xsl:attribute name="src">
 	    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img_slideshow_2.jpg
 	    			</xsl:attribute>
@@ -29,9 +32,21 @@
 	    </li>
 	    <li>
 	    	<a href="#">
-	    		<img title="Reglamentación de Tesis de Posgrado" alt="La Universidad Nacional de La Plata publicó la resolución Nº 785/45 que obliga a los alumnos de posgrado a depositar sus tesis en SeDiCI como requisito para tramitar su título">
+	    		<img title="Libro electrónico supera las 2500 descargas" alt="El libro electrónico Cirugía. Bases clínicas y terapéuticas editado el año pasado por SeDiCI ya superó las 2500 descargas.">
 	    			<xsl:attribute name="src">
 	    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img_slideshow_3.jpg
+	    			</xsl:attribute>
+	    		</img>
+	    	</a>
+	    </li>
+	    <li>
+	    	<a>
+    			<xsl:attribute name="href">
+    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/pages/comoAgregarTrabajos
+    			</xsl:attribute>
+	    		<img title="Depósito de tesis de posgrado" alt="La resolución 78/11 de la UNLP dictamina que todos los alumnos de posgrado deben depositar una copia digital de sus tesis en SeDiCI.">
+	    			<xsl:attribute name="src">
+	    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img_slideshow_4.jpg
 	    			</xsl:attribute>
 	    		</img>
 	    	</a>
