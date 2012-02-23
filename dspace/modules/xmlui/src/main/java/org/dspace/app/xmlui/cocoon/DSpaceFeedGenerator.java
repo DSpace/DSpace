@@ -35,6 +35,7 @@ import org.apache.solr.client.solrj.response.QueryResponse;
 import org.apache.solr.common.SolrDocument;
 import org.dspace.app.xmlui.aspect.discovery.AbstractFiltersTransformer;
 import org.dspace.app.xmlui.aspect.discovery.CollectionRecentSubmissions;
+import org.dspace.app.xmlui.aspect.discovery.FilterSearchUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.FeedUtils;
@@ -101,7 +102,7 @@ import javax.mail.MethodNotSupportedException;
  *
  */
 
-public class DSpaceFeedGenerator extends AbstractFiltersTransformer
+public class DSpaceFeedGenerator extends AbstractGenerator
                 implements Configurable, CacheableProcessingComponent, Recyclable
 {
     private static final Logger log = Logger.getLogger(DSpaceFeedGenerator.class);
@@ -456,7 +457,9 @@ public class DSpaceFeedGenerator extends AbstractFiltersTransformer
 
 
     private Item[] getRecentlySubmittedItemsUsingDiscovery(Context context, DSpaceObject dso) throws SQLException {
-        performSearch(dso);
+        QueryResponse queryResults = performSearch(context, dso);
+
+
         Item[] items = new Item[queryResults.getResults().size()];
         int index = 0;
         for (SolrDocument doc : queryResults.getResults()) {
@@ -495,20 +498,18 @@ public class DSpaceFeedGenerator extends AbstractFiltersTransformer
     }
 
 
-    public void performSearch(DSpaceObject scope) throws SQLException{
-        if(queryResults != null)
-        {
-            return;
-        }// queryResults;
 
-        queryArgs = prepareDefaultFilters(getView(scope));
+    public QueryResponse performSearch(Context context, DSpaceObject scope) throws SQLException{
+        QueryResponse queryResults=null;
+
+
+        FilterSearchUtil fs = new FilterSearchUtil(context);
+        SolrQuery queryArgs = fs.prepareDefaultFilters(getView(scope));
 
         queryArgs.setQuery("search.resourcetype:" + Constants.ITEM);
-
         queryArgs.setRows(ConfigurationManager.getIntProperty("webui.feed.items"));
-
-
         String sortField = SearchUtils.getConfig().getString("recent.submissions.sort-option");
+
         if(sortField != null){
             queryArgs.setSortField(
                     sortField,
@@ -519,14 +520,17 @@ public class DSpaceFeedGenerator extends AbstractFiltersTransformer
         queryArgs.setFilterQueries("location:m" + scope.getID());
 
         try {
-            Context context = ContextUtil.obtainContext(objectModel);
-            queryResults =  getSearchService().search(context, queryArgs);
+
+            queryResults =  fs.getSearchService().search(context, queryArgs);
+
         } catch (RuntimeException e) {
             log.error(e.getMessage(),e);
         } catch (Exception e) {
             log.error(e.getMessage(),e);
         }
+        return queryResults;
     }
+
 
     private String getView(DSpaceObject dso){
         if (dso instanceof Collection){
@@ -538,10 +542,6 @@ public class DSpaceFeedGenerator extends AbstractFiltersTransformer
         return "site";
     }
 
-    public String getView()
-    {
-        throw new NoSuchMethodError();
-    }
 
 
 }

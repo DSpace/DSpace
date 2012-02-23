@@ -120,13 +120,13 @@
     <filter-name>CocoonDebugFilter</filter-name>
     <filter-class>org.apache.cocoon.servlet.DebugFilter</filter-class>
   </filter>
-  
-   <filter>
-    <description>Log debug information about each request</description>
-    <display-name>Cocoon debug filter</display-name>
-    <filter-name>DSpaceCocoonServletFilter</filter-name>
-    <filter-class>org.dspace.app.xmlui.cocoon.DSpaceCocoonServletFilter</filter-class>
-  </filter>
+
+    <filter>
+        <description>DSpace Environemnt Setup for each request</description>
+        <display-name>DSpace Environemnt Setup</display-name>
+        <filter-name>DSpaceCocoonServletFilter</filter-name>
+        <filter-class>org.dspace.app.xmlui.cocoon.DSpaceCocoonServletFilter</filter-class>
+    </filter>
 
   <!--
     - Declare a filter to force UTF-8 encoding for all servlet requests
