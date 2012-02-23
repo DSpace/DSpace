@@ -66,15 +66,15 @@ public class DCInput
     /** is the entry closed to vocabulary terms? */
     private boolean closedVocabulary = false;
 
-    // BEGIN SeDiCI: Tipos para los que el field está permitido
+    /** allowed document types */
     private List<String> typeBind = null;
 
-    // Grupo para el cual este campo es obligatorio 
-    // si el flag hasToBeMember es true, entonces el campo es obligatorio solo si el usuario ES MIEMBRO del grupo especificado
-    // en caso contrario, el campo es obligatorio solo si el usuario NO ES MIEMBRO del grupo especificado
+    /**  
+     * Group-based mandatory attribute
+     * if hasToBeMember is true, the this field is madantory if the user is member of <code>requiredOnGroup</code>
+     */
     private String requiredOnGroup = null;
     private boolean hasToBeMember = true;
-    // END SeDiCI
     
     /** 
      * The scope of the input sets, this restricts hidden metadata fields from 
@@ -130,8 +130,7 @@ public class DCInput
         closedVocabulary = "true".equalsIgnoreCase(closedVocabularyStr)
                             || "yes".equalsIgnoreCase(closedVocabularyStr);
         
-        // BEGIN SeDiCI
-        // Si existe el elemento type-bind y tiene contenido, se parsea usando la coma (,) como separador 
+        // parsing of the <type-bind> element (using the colon as split separator)
         typeBind = new ArrayList<String>();
         String typeBindDef = fieldMap.get("type-bind");
         if(typeBindDef != null && typeBindDef.trim().length() > 0) {
@@ -141,7 +140,7 @@ public class DCInput
         	}
         }
         
-        // Determina si el campo es requerido por algún Rol
+        // Is it a group-based field?
         String requiredOnGroupDef = fieldMap.get("required-on-group");
         if(requiredOnGroupDef != null && requiredOnGroupDef.trim().length() > 0) {
         	//Determina si el usuario debe o no pertenecer al grupo (usa el signo de admiración como negación: !)
@@ -151,7 +150,6 @@ public class DCInput
         	}
         	requiredOnGroup = requiredOnGroupDef;
         }
-        // END SeDiCI
     }
 
     /**
@@ -410,14 +408,12 @@ public class DCInput
 		return closedVocabulary;
 	}
 
-	//BEGIN SeDiCI:
 	/**
-	 * Determina si este campo puede ser editado en el contexto de el tipo typeName
-	 * @param typeName Tipo de documento que se está cargando
-	 * @return true si no hay restriccion de tipos o si el tipo proporcionado figura entre los tipos permitidos
+	 * Decides if this field is valid for the document type
+	 * @param typeName Document type name
+	 * @return true when there is no type restriction or typeName is allowed
 	 */
 	public boolean isAllowedFor(String typeName) {
-		// No hay restriccion de tipos
 		if(typeBind.size() == 0)
 			return true;
 		
@@ -425,7 +421,7 @@ public class DCInput
 	}
 	
 	/**
-	 * Retorna true si este campo tiene una restricción de obligatoriedad basada en un Grupo de usuario
+	 * Returns true if this field has a group-based mandatory restriction
 	 * @return
 	 */
 	public boolean isGroupBased() {
@@ -433,19 +429,17 @@ public class DCInput
 	}
 	
 	/**
-	 * Si este campo tiene una restriccion de obligatoriedad basada en un Grupo, retorna el nombre del grupo. 
-	 * En caso contrario, retorna null.
+	 * Returns the group name for which this field is mandatory.
+	 * Null when there is no group-based restriction
 	 */
 	public String getGroup() {
 		return requiredOnGroup;
 	}
 	
 	/**
-	 * Indica si el usuario debe ser miembro o no del grupo sobre el cual se aplica la restriccion de obligatoriedad.
-	 * Notar que este valor no tiene sentido si isGroupBased() retorna false.
+	 * Returns the hasToBeMember flag
 	 */
 	public boolean hasToBeMemeber() {
 		return hasToBeMember;
 	}
-	//END SeDiCI
 }

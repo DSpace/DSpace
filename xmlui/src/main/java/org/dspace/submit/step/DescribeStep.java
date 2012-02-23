@@ -141,23 +141,20 @@ public class DescribeStep extends AbstractProcessingStep
             throw new ServletException(e);
         }
 
-        // BEGIN SeDiCI: Tipo de documento seleccionado
+        // Fetch the document type (dc.type)
         String documentType = "";
         if( (item.getMetadata("dc.type") != null) && (item.getMetadata("dc.type").length >0) )
         {
             documentType = item.getMetadata("dc.type")[0].value;
         }
-        // END SeDiCI
         
         // Step 1:
         // clear out all item metadata defined on this page
         for (int i = 0; i < inputs.length; i++)
         {
-            // BEGIN SeDiCI
-        	// no se filtran campos por tipo porque deben limpiarse todos los campos, 
-        	// dado que puede cambiar el tipo en cualquier momento durante el proceso de submit
-        	// END SeDiCI
 
+        	// Allow the clearing out of the metadata defined for other document types, provided it can change anytime
+        	
             if (!inputs[i]
                     .isVisible(subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE
                             : DCInput.SUBMISSION_SCOPE))
@@ -184,12 +181,11 @@ public class DescribeStep extends AbstractProcessingStep
         boolean moreInput = false;
         for (int j = 0; j < inputs.length; j++)
         {
-            // BEGIN SeDiCI: si el campo no esta permitido para el tipo de documento seleccionado, se esquiva
+        	// Omit fields not allowed for this document type
             if(!inputs[j].isAllowedFor(documentType))
             {
             	continue;
             }
-            // END SeDiCI
 
             if (!inputs[j]
                         .isVisible(subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE
@@ -306,18 +302,17 @@ public class DescribeStep extends AbstractProcessingStep
         {
             for (int i = 0; i < inputs.length; i++)
             {
-                // BEGIN SeDiCI: se omite el campo si no esta permitido en este scope (submit o workflow) o para el tipo de documento
+            	// Do not check the required attribute if it is not visible or not allowed for the document type
             	String scope = subInfo.isInWorkflow() ? DCInput.WORKFLOW_SCOPE : DCInput.SUBMISSION_SCOPE;
                 if ( !( inputs[i].isVisible(scope) && inputs[i].isAllowedFor(documentType) ) )
                 {
                 	continue;
                 }
-                // END SeDiCI
             	
                 DCValue[] values = item.getMetadata(inputs[i].getSchema(),
                         inputs[i].getElement(), inputs[i].getQualifier(), Item.ANY);
 
-                // BEGIN SeDiCI: chequeo de campo obligatorio según el grupo
+                // Group-based restriction validation
                 if(inputs[i].isGroupBased()) 
                 {
                 	Group group = findGroup(context, inputs[i].getGroup());
@@ -328,7 +323,6 @@ public class DescribeStep extends AbstractProcessingStep
                 	}
                     continue;
                 }
-                // END SeDiCI
                 
                 if (inputs[i].isRequired() && values.length == 0)
                 {
@@ -361,11 +355,10 @@ public class DescribeStep extends AbstractProcessingStep
     }
 
     /**
-     * Mantiene una mini-cache de grupos previamente cargados, con la intención minimizar las consultas a la base de datos
+     * Mini-cache of loaded groups for group-based validation
      * 
-     * @return instancia de Group correspondiente al parametro name
+     * @return Group instance
      */
-    // BEGIN SeDiCI
     private Map<String, Group> loadedGroups = new HashMap<String, Group>();
     private Group findGroup(Context context, String groupName) throws SQLException {
     	Group group = loadedGroups.get(groupName);
@@ -375,7 +368,6 @@ public class DescribeStep extends AbstractProcessingStep
     	}
     	return group;
     }
-    // END SeDiCI
     
 
     /**

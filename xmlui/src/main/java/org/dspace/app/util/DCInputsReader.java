@@ -16,7 +16,6 @@ import javax.xml.parsers.*;
 
 import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
-import org.dspace.eperson.Group;
 
 /**
  * Submission form generator for DSpace. Reads and parses the installation
@@ -334,16 +333,10 @@ public class DCInputsReader
                                                         Map<String, String> field = new HashMap<String, String>();
                                                         page.add(field);
                                                         processPageParts(formName, pgNum, nfld, field);
-                                                        // BEGIN SeDiCI: se omite la validación por campos duplicados para permitir la
-                                                        // definición de campos visibles/requeridos según tipo de documento o rol del usuario
-                                                        /*
-                                                        String error = checkForDups(formName, field, pages);
-                                                        if (error != null)
-                                                        {
-                                                                throw new SAXException(error);
-                                                        }
-                                                        */
-                                                        // END SeDiCI
+
+                                                        // we omit the duplicate validation, allowing multiple fields definition for 
+                                                        // the same metadata and different visibility/type-bind
+
                                                 }
                                         }
                                 } // ignore any child that is not a 'page'
@@ -611,25 +604,10 @@ public class DCInputsReader
                                                 throw new DCInputsReaderException(errString);
                                         }
                                 }
-                    			// BEGIN SeDiCI: Omitimos la validación de obligatoriedad según la visibilidad, 
-                    			// ya que esta validación se hace en la clase de procesamiento: se valida la obligatoriedad
-                    			// solo si el campo es visible en el scope para el que fue declarado
-                    			/*
-                                // if visibility restricted, make sure field is not required
-                                String visibility = fld.get("visibility");
-                                if (visibility != null && visibility.length() > 0 )
-                                {
-                                        String required = fld.get("required");
-                                        if (required != null && required.length() > 0)
-                                        {
-                                                String errString = "Field '" + fld.get("label") +
-                                                                        "' is required but invisible";
-                                                throw new DCInputsReaderException(errString);
-                                        }
-                                }
-                                */
-                    			//TODO Si existe una restriccion por Grupo, verificamos que exista un grupo con el nombre indicado
-                    			// END SeDiCI
+                    
+                    			// we omit the "required" and "visibility" validation, provided this must be checked in the processing class
+                    			// only when it makes sense (if the field isn't visible means that it is not applicable, therefore it can't be required)
+
                         }
                 }
         }
