@@ -22,7 +22,16 @@
 
     <xsl:output indent="yes"/>
     
-    <!-- Cuando es el div del request /community-list lo muestro para que sea desplegable -->
+    <!-- creo la variable con las comunidades que pueden ser desplegables -->
+    <xsl:variable name="communities-desplegables">
+        <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='dropdown-communities']"></xsl:value-of>
+    </xsl:variable>
+   
+    <!-- $autoarchiveId es el id de la coleccion de autoarchivo, encerrado entre '|' -->
+    <xsl:variable name="autoarchiveId">
+        <xsl:value-of select="concat('|', substring-after(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='autoArchive'][@qualifier='handle'], '/'), '|')"></xsl:value-of>
+    </xsl:variable> 
+    
     
     <xsl:template match="dri:div[@id='aspect.artifactbrowser.CommunityBrowser.div.comunity-browser']">
 		 <xsl:apply-templates mode='community-list-page'>
@@ -36,7 +45,7 @@
     </xsl:template>
     
     <xsl:template match="dri:p" mode='community-list-page'>
-       <p class="ds-paragraph" ><i18n:text><xsl:value-of select="."/></i18n:text></p>       
+       <p class="ds-paragraph"><i18n:text><xsl:value-of select="."/></i18n:text></p>       
     </xsl:template>
     
     <xsl:template match="dri:referenceSet[@type = 'summaryList']" priority="2" mode='community-list-page'>
@@ -67,6 +76,11 @@
     <!-- Then we resolve the reference tag to an external mets object -->
     <xsl:template match="dri:reference" mode="community-list-page">
         <xsl:variable name="id" select="translate((translate(substring-after(@url,'/metadata/handle/'),'/','-')),'-mets.xml','')"/>
+        
+        <!-- $communityId es el id de la comunidad actual, encerrado entre '|' -->
+        <xsl:variable name="communityId" select="concat('|',substring-after(substring-before(substring-after(@url,'/metadata/handle/'),'/mets.xml'),'/'), '|')"/>
+        <!-- <p><xsl:value-of select="$communities-desplegables"/><xsl:value-of select="$communityId"/></p> -->
+     
         <xsl:variable name="externalMetadataURL">
             <xsl:text>cocoon:/</xsl:text>
             <xsl:value-of select="@url"/>
@@ -87,16 +101,23 @@
                 </xsl:choose>
             </xsl:attribute>
             
-            <!-- Si es una comunidad muestro el boton para desplegar -->
-            <xsl:if test="@type='DSpace Community'">
-	           <div id='div-{$id}' class='div-boton-menu-desplegable'>
-        	   		<a href="javascript:llamar_alerta('div-{$id}','boton-{$id}','ocultar', 'ver');" type="button" class='ocultador' id='boton-{$id}' value="ver">+</a>
-        	   </div>
+            <!-- Si es una comunidad que se debe desplegar, muestro el boton para desplegar -->
+            <xsl:if test="@type='DSpace Community'">               
+               <xsl:if test="contains($communities-desplegables, $communityId)">
+		           <div id='div-{$id}' class='div-boton-menu-desplegable'>
+	        	   		<a href="javascript:llamar_alerta('div-{$id}','boton-{$id}','ocultar', 'ver');" type="button" class='ocultador' id='boton-{$id}' value="ver">+</a>
+	        	   </div>
+        	   </xsl:if>
             </xsl:if>
             
-            <xsl:apply-templates select="document($externalMetadataURL)" mode="community-list-page"/>
+            <!-- Si la referencia es de la coleccion de autoarchivo no se debe mostrar -->
+           <xsl:if test="not($communityId = $autoarchiveId)">   
+           		<xsl:apply-templates select="document($externalMetadataURL)" mode="community-list-page"/>
+            </xsl:if>
             
-            <xsl:apply-templates mode='community-list-page'/>
+            <xsl:if test="contains($communities-desplegables, $communityId)">
+            	<xsl:apply-templates mode='community-list-page'/>
+            </xsl:if>
         </li>
     </xsl:template>
     

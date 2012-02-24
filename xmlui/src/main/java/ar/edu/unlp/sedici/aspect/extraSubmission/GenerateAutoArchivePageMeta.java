@@ -24,6 +24,7 @@ import java.util.Iterator;
 
 import org.apache.avalon.framework.parameters.ParameterException;
 import org.apache.cocoon.caching.CacheableProcessingComponent;
+import org.apache.cocoon.util.HashUtil;
 import org.apache.excalibur.source.SourceValidity;
 import org.apache.excalibur.source.impl.validity.NOPValidity;
 import org.dspace.app.xmlui.cocoon.AbstractDSpaceTransformer;
@@ -73,15 +74,7 @@ public class GenerateAutoArchivePageMeta  extends AbstractDSpaceTransformer impl
     private static final Message T_go =
         message("xmlui.general.go");
     
-    
-    /**
-     * Generate the unique caching key.
-     * This key must be unique inside the space of this component.
-     */
-    public Serializable getKey() 
-    {
-       return "1";
-    }
+
 
     /**
      * Generate the cache validity object.
@@ -96,9 +89,14 @@ public class GenerateAutoArchivePageMeta  extends AbstractDSpaceTransformer impl
             WingException, UIException, SQLException, IOException,
             AuthorizeException
     {
+    	//Guardo las communities que serán desplegables
+    	String dropdownCommunities = ConfigurationManager.getProperty("sedici-dspace", "xmlui.community-list.expandable-communities");
+    	Metadata meta=pageMeta.addMetadata("dropdown-communities");
+    	meta.addContent(dropdownCommunities);
+    	
     	//Recupero el id de la coleccion de autoarchivo y lo agrego al pageMeta
-    	String handleConfig = ConfigurationManager.getProperty("sedici-dspace", "autoArchiveCollectionId");
-    	Metadata meta=pageMeta.addMetadata("autoArchive", "handle");
+    	String handleConfig = ConfigurationManager.getProperty("sedici-dspace", "autoArchiveCollectionHandle");
+    	meta=pageMeta.addMetadata("autoArchive", "handle");
     	meta.addContent(handleConfig);
     	
     	//Verifico que el usuario solo tenga permiso de escritura solamente en autoarchivo
@@ -120,6 +118,11 @@ public class GenerateAutoArchivePageMeta  extends AbstractDSpaceTransformer impl
 		
 		
     }
+
+	@Override
+	public Serializable getKey() {
+	    return "1";
+	}
     
 
 }

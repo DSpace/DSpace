@@ -7,16 +7,13 @@
 <map:sitemap xmlns:map="http://apache.org/cocoon/sitemap/1.0">
 
   <map:components> 
-    <map:transformers>
-      <map:transformer name="AutoArchive" src="ar.edu.unlp.sedici.aspect.extraSubmission.GenerateAutoArchivePageMeta"/>
-    </map:transformers>   
-    
     <map:selectors>
       <map:selector name="AuthenticatedSelector" src="ar.edu.unlp.sedici.aspect.extraSubmission.AuthenticatedSelector"/>
     </map:selectors>
     
 	<map:transformers>
 		<map:transformer name="Navigation" src="ar.edu.unlp.sedici.aspect.extraSubmission.Navigation"/>
+		<map:transformer name="AutoArchive" src="ar.edu.unlp.sedici.aspect.extraSubmission.GenerateAutoArchivePageMeta"/>
 	</map:transformers>
 
     <map:matchers default="wildcard">
