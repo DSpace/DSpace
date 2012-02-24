@@ -10,15 +10,15 @@
     <parent>
         <groupId>org.dspace</groupId>
         <artifactId>dspace-xmlui</artifactId>
-        <version>1.8.2-SNAPSHOT</version>
+        <version>1.8.2</version>
       <relativePath>..</relativePath>
     </parent>
 
     <scm>
-        <connection>scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-xmlui/dspace-xmlui-wing</connection>
-        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-xmlui/dspace-xmlui-wing
+        <connection>scm:svn:https://scm.dspace.org/svn/repo/tags/dspace-1.8.2</connection>
+        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/tags/dspace-1.8.2
         </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-xmlui/dspace-xmlui-wing</url>
+        <url>http://scm.dspace.org/svn/repo/tags/dspace-1.8.2</url>
     </scm>
 
     <dependencies>

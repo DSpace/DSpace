@@ -5,13 +5,13 @@
     <packaging>pom</packaging>
     <groupId>org.dspace</groupId>
     <artifactId>dspace-discovery</artifactId>
-    <version>1.8.2-SNAPSHOT</version>
+    <version>1.8.2</version>
     <name>DSpace Discovery :: Modules</name>
 
     <parent>
         <artifactId>dspace-parent</artifactId>
         <groupId>org.dspace</groupId>
-        <version>1.8.2-SNAPSHOT</version>
+        <version>1.8.2</version>
         <relativePath>..</relativePath>
     </parent>
     
@@ -54,11 +54,11 @@
        and releases snapshots into the snapshot repository below.
     -->
     <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-discovery</connection>
+        <connection>scm:svn:http://scm.dspace.org/svn/repo/tags/dspace-1.8.2</connection>
         <developerConnection>
-            scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-discovery
+            scm:svn:https://scm.dspace.org/svn/repo/tags/dspace-1.8.2
         </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace-discovery</url>
+        <url>http://scm.dspace.org/svn/repo/tags/dspace-1.8.2</url>
     </scm>
 
     <issueManagement>

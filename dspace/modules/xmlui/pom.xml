@@ -13,14 +13,14 @@
    <parent>
       <groupId>org.dspace</groupId>
       <artifactId>modules</artifactId>
-      <version>1.8.2-SNAPSHOT</version>
+      <version>1.8.2</version>
       <relativePath>..</relativePath>
    </parent>
 
    <scm>
-      <connection>scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace/modules/xmlui</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace/modules/xmlui</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/branches/dspace-1_8_x/dspace/modules/xmlui</url>
+      <connection>scm:svn:https://scm.dspace.org/svn/repo/tags/dspace-1.8.2</connection>
+      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/tags/dspace-1.8.2</developerConnection>
+      <url>http://scm.dspace.org/svn/repo/tags/dspace-1.8.2</url>
    </scm>
 
    <build>
@@ -145,32 +145,32 @@
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-discovery-solr</artifactId>
-         <version>1.8.2-SNAPSHOT</version>
+         <version>1.8.2</version>
       </dependency>
 
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-discovery-xmlui-api</artifactId>
-         <version>1.8.2-SNAPSHOT</version>
+         <version>1.8.2</version>
       </dependency>
 
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-discovery-xmlui-webapp</artifactId>
-         <version>1.8.2-SNAPSHOT</version>
+         <version>1.8.2</version>
          <type>war</type>
       </dependency>
 
         <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-sword-client-xmlui-api</artifactId>
-         <version>1.8.2-SNAPSHOT</version>
+         <version>1.8.2</version>
       </dependency>
 
        <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-sword-client-xmlui-webapp</artifactId>
-         <version>1.8.2-SNAPSHOT</version>
+         <version>1.8.2</version>
          <type>war</type>
       </dependency>
 
