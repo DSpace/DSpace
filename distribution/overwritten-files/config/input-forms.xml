@@ -856,6 +856,18 @@
 				<stored-value>pt</stored-value>
 			</pair>
 			<pair>
+				<displayed-value>Francés</displayed-value>
+				<stored-value>fr</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Italiano</displayed-value>
+				<stored-value>it</stored-value>
+			</pair>
+			<pair>
+				<displayed-value>Alemán</displayed-value>
+				<stored-value>de</stored-value>
+			</pair>
+			<pair>
 				<displayed-value>Otro</displayed-value>
 				<stored-value>other</stored-value>
 			</pair>
