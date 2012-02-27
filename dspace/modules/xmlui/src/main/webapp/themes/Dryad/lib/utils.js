@@ -31,7 +31,6 @@ function initdatasetsubmissionfile() {
         form.attr('action', form.attr('action') + '?processonly=true');
         //Now we submit our form
         form.submit();
-        beginUpload();
     });
 
     jQuery("input[type='radio'][name='datafile_type']").change(function() {
@@ -427,44 +426,7 @@ function enableNextButton() {
     jQuery("#aspect_submission_StepTransformer_field_submit_next").attr("disabled", "disabled");
 }
 
-function beginUpload(form) {
-//alert("beginUpload()");
 
-    jQuery("#uploadprogressbar").fadeIn();
-
-//alert("$(#uploadprogressbar).fadeIn()");
-
-    var percentage = 10;
-    setInterval(function() {
-
-        //alert("setInterval()");
-
-        //alert("form:" + url);
-
-        var url = form.attr('action');
-
-        //alert("url: " + url);
-
-        url = "http://localhost:8100" + url;
-
-        //alert("url: " + url);
-
-        /*jQuery.getJSON(url, function(data) {
-         alert("here");
-         alert("data:" + data);
-
-         if (data == null)
-         return;
-
-         var percentage = Math.floor(100 * parseInt(data.bytes_uploaded) / parseInt(data.bytes_total));
-         jQuery("#uploadprogressbar").progressBar(percentage);
-         });*/
-        percentage = percentage + 10;
-        jQuery("#uploadprogressbar").progressBar(percentage);
-    }, 1);
-
-    return true;
-}
 
 
 
