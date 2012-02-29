@@ -169,7 +169,8 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 
         if (this.validity == null) {
             try {
-                DSpaceValidity validity = new FeedValidity();
+                //DSpaceValidity validity = new FeedValidity();
+                DSpaceValidity validity = new DSpaceValidity();
 
                 Context context = ContextUtil.obtainContext(objectModel);
 
@@ -513,8 +514,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
                 } else {
                     // The cache is past its age
                     log.warn("DSpaceFeedGenerator - SourceValidity.UNKNOWN !!!!!");
-                    //return SourceValidity.UNKNOWN;
-                    return SourceValidity.INVALID;
+                    return SourceValidity.UNKNOWN;
                 }
             } else {
                 // This is an error, state. We are being asked whether we are valid before
