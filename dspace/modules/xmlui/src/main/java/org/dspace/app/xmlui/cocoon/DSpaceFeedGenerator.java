@@ -158,6 +158,9 @@ public class DSpaceFeedGenerator extends AbstractGenerator
      */
     public SourceValidity getValidity()
     {
+
+        log.warn("DSpaceFeedGenerator - getValidity() !!!!!");
+
         if (this.validity == null)
         {
             try
@@ -202,6 +205,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
      */
     public void configure(Configuration conf) throws ConfigurationException
     {
+        log.warn("DSpaceFeedGenerator - configure() !!!!!");
     }
     
     
@@ -224,6 +228,9 @@ public class DSpaceFeedGenerator extends AbstractGenerator
      */
     public void generate() throws IOException, SAXException, ProcessingException
     {
+
+       log.warn("DSpaceFeedGenerator - generate() !!!!!");
+
         try
         {
             Context context = ContextUtil.obtainContext(objectModel);
@@ -246,8 +253,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
             }
         
             SyndicationFeed feed = new SyndicationFeed(SyndicationFeed.UITYPE_XMLUI);
-            feed.populate(ObjectModelHelper.getRequest(objectModel),
-                          dso, getRecentlySubmittedItemsUsingDiscovery(context,dso), FeedUtils.i18nLabels);
+            feed.populate(ObjectModelHelper.getRequest(objectModel), dso, getRecentlySubmittedItemsUsingDiscovery(context,dso), FeedUtils.i18nLabels);
             feed.setType(this.format);
             Document dom = feed.outputW3CDom();
             FeedUtils.unmangleI18N(dom);
@@ -395,8 +401,13 @@ public class DSpaceFeedGenerator extends AbstractGenerator
          */
         public DSpaceValidity complete()
         {
+
+                log.warn("DSpaceFeedGenerator - complete() !!!!!");
+
                 this.expires = System.currentTimeMillis() + CACHE_AGE;
-                
+
+                log.warn("DSpaceFeedGenerator - complete(). this.expires: " + this.expires);
+
                 return super.complete();
         }
         
@@ -406,17 +417,24 @@ public class DSpaceFeedGenerator extends AbstractGenerator
          */
         public int isValid()
         {
+
+            log.warn("DSpaceFeedGenerator - isValid(). this.completed: " + this.completed);
+
             // Return true if we have a hash.
             if (this.completed)
             {
+                log.warn("DSpaceFeedGenerator - System.currentTimeMillis(): " + System.currentTimeMillis());
+                log.warn("DSpaceFeedGenerator - this.expires: " + this.expires);
                 if (System.currentTimeMillis() < this.expires)
                 {
                         // If the cache hasn't expired the just assume that it is still valid.
+                        log.warn("DSpaceFeedGenerator - SourceValidity.VALID !!!!!");
                         return SourceValidity.VALID;
                 }
                 else
                 {
                         // The cache is past its age
+                        log.warn("DSpaceFeedGenerator - SourceValidity.UNKNOWN !!!!!");
                         return SourceValidity.UNKNOWN;
                 }
             }
@@ -424,6 +442,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
             {
                 // This is an error, state. We are being asked whether we are valid before
                 // we have been initialized.
+                log.warn("DSpaceFeedGenerator - SourceValidity.INVALID !!!!!");
                 return SourceValidity.INVALID;
             }
         }
@@ -437,6 +456,8 @@ public class DSpaceFeedGenerator extends AbstractGenerator
          */
         public int isValid(SourceValidity otherValidity)
         {
+            log.warn("DSpaceFeedGenerator - (SourceValidity otherValidity)");
+
             if (this.completed && otherValidity instanceof FeedValidity)
             {
                 FeedValidity other = (FeedValidity) otherValidity;
@@ -446,10 +467,11 @@ public class DSpaceFeedGenerator extends AbstractGenerator
                     this.expires = System.currentTimeMillis() + CACHE_AGE;
                     other.expires = System.currentTimeMillis() + CACHE_AGE;
 
+                    log.warn("DSpaceFeedGenerator - SourceValidity.VALID !!!!!");
                     return SourceValidity.VALID;
                 }
             }
-
+            log.warn("DSpaceFeedGenerator - SourceValidity.INVALID !!!!!");
             return SourceValidity.INVALID;
         }
 
@@ -567,7 +589,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
             if(values != null && values.length > 0)
                 title = values[0].value;
 
-            log.error("item " + item.getID() + ": " + id + " - " + title);
+            log.warn("item " + item.getID() + ": " + id + " - " + title);
         }
 
     }

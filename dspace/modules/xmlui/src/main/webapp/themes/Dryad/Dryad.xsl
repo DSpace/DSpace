@@ -1658,17 +1658,6 @@
      <!-- END First submission form: added and rewrote some templates to manage the form using jquery, to lead the user through the submission -->
 
 
-
-    <!-- Submission file upload step. Adding jquery progres bar-->
-    <!--xsl:template match="dri:body/dri:div/dri:list/dri:item[@n='dataset-item']/dri:field[@n='dataset-file']">
-         <xsl:apply-imports/>
-         <span class="progressbar" id="uploadprogressbar">
-         <img style="width: 120px; height: 12px; background-position: -120px 50%; padding: 0pt; margin: 0pt;" src="/themes/Dryad/images/progressbar.gif" alt=" 0%" title=" 0%" id="uploadprogressbar_pbImage" width="120"/>
-         <span id="uploadprogressbar_pbText"> 0%</span>
-         </span>
-     </xsl:template-->
-
-
     <!-- Quick patch to remove empty lists from options -->
     <xsl:template match="dri:options//dri:list[count(child::*)=0]" priority="5" mode="nested"></xsl:template>
     <xsl:template match="dri:options//dri:list[count(child::*)=0]" priority="5"></xsl:template>
@@ -1722,5 +1711,30 @@
 
 
     </xsl:template>
+
+
+
+
+
+
+
+    <!-- TEST !!!!!!!! -->
+    <!-- Submission file upload step. Adding jquery progres bar-->
+    <!--<xsl:template match="dri:body/dri:div/dri:list/dri:item[@n='dataset-item']/dri:field[@n='dataset-file']">-->
+         <!--<xsl:apply-imports/>-->
+
+        <!--<div class="row">-->
+            <!--<label for="aspect_submission_StepTransformer_field_dataset-file">Select a File to Upload</label><br />-->
+                <!--<input type="file" name="dataset-file" id="aspect_submission_StepTransformer_field_dataset-file" onchange="fileSelected();"/>-->
+            <!--</div>-->
+            <!--<div id="fileName"></div>-->
+            <!--<div id="fileSize"></div>-->
+            <!--<div id="fileType"></div>-->
+            <!--<div class="row">-->
+            <!--<input type="button" onclick="uploadFile()" value="Upload" />-->
+        <!--</div>-->
+        <!--<div id="progressNumber"></div>-->
+     <!--</xsl:template>-->
+    <!-- END TEST !!!!!!!! -->
 
 </xsl:stylesheet>
