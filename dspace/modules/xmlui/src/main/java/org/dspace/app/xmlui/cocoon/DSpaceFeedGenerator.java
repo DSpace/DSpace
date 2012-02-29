@@ -94,183 +94,167 @@ import javax.mail.MethodNotSupportedException;
 
 /**
  * Overriding reasons:
- *
- *  - check if the datafiles contained in the datapackage are accessible
- *    if a datafile is under embargo don't add the dataPackage to the result list.
- *
- *
- *
+ * <p/>
+ * - check if the datafiles contained in the datapackage are accessible
+ * if a datafile is under embargo don't add the dataPackage to the result list.
  */
 
 public class DSpaceFeedGenerator extends AbstractGenerator
-                implements Configurable, CacheableProcessingComponent, Recyclable
-{
+        implements Configurable, CacheableProcessingComponent, Recyclable {
     private static final Logger log = Logger.getLogger(DSpaceFeedGenerator.class);
 
-    /** The feed's requested format */
+    /**
+     * The feed's requested format
+     */
     private String format = null;
-    
-    /** The feed's scope, null if no scope */
+
+    /**
+     * The feed's scope, null if no scope
+     */
     private String handle = null;
-    
-    /** number of DSpace items per feed */
+
+    /**
+     * number of DSpace items per feed
+     */
     private static final int ITEM_COUNT = ConfigurationManager.getIntProperty("webui.feed.items");
-    
+
     /**
      * How long should RSS feed cache entries be valid? milliseconds * seconds *
      * minutes * hours default to 24 hours if config parameter is not present or
      * wrong
      */
     private static final long CACHE_AGE;
-    static
-    {
+
+    static {
         final String ageCfgName = "webui.feed.cache.age";
         final long ageCfg = ConfigurationManager.getIntProperty(ageCfgName, 24);
         CACHE_AGE = 1000 * 60 * 60 * ageCfg;
     }
-    
-    /** configuration option to include Item which does not have READ by Anonymous enabled **/
+
+    /**
+     * configuration option to include Item which does not have READ by Anonymous enabled *
+     */
     private static boolean includeRestrictedItems = ConfigurationManager.getBooleanProperty("harvest.includerestricted.rss", false);
 
 
-    /** Cache of this object's validitity */
+    /**
+     * Cache of this object's validitity
+     */
     private DSpaceValidity validity = null;
-    
-    /** The cache of recently submitted items */
+
+    /**
+     * The cache of recently submitted items
+     */
     private Item recentSubmissionItems[];
-    
+
     /**
      * Generate the unique caching key.
      * This key must be unique inside the space of this component.
      */
-    public Serializable getKey()
-    {
+    public Serializable getKey() {
         String key = "key:" + this.handle + ":" + this.format;
         return HashUtil.hash(key);
     }
 
     /**
      * Generate the cache validity object.
-     *
+     * <p/>
      * The validity object will include the collection being viewed and
      * all recently submitted items. This does not include the community / collection
      * hierarch, when this changes they will not be reflected in the cache.
      */
-    public SourceValidity getValidity()
-    {
+    public SourceValidity getValidity() {
 
         log.warn("DSpaceFeedGenerator - getValidity() !!!!!");
 
-        if (this.validity == null)
-        {
-            try
-            {
+        if (this.validity == null) {
+            try {
                 DSpaceValidity validity = new FeedValidity();
-                
+
                 Context context = ContextUtil.obtainContext(objectModel);
 
                 DSpaceObject dso = null;
-                
-                if (handle != null && !handle.contains("site"))
-                {
+
+                if (handle != null && !handle.contains("site")) {
                     dso = HandleManager.resolveToObject(context, handle);
                 }
-                
+
                 validity.add(dso);
-                
+
                 // add reciently submitted items
-                for(Item item : getRecentlySubmittedItems(context,dso))
-                {
+                for (Item item : getRecentlySubmittedItems(context, dso)) {
                     validity.add(item);
                 }
 
                 this.validity = validity.complete();
-            }
-            catch (RuntimeException e)
-            {
+            } catch (RuntimeException e) {
                 throw e;
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 return null;
             }
         }
         return this.validity;
     }
-    
-    
-    
+
+
     /**
      * Setup component wide configuration
      */
-    public void configure(Configuration conf) throws ConfigurationException
-    {
+    public void configure(Configuration conf) throws ConfigurationException {
         log.warn("DSpaceFeedGenerator - configure() !!!!!");
     }
-    
-    
+
+
     /**
      * Setup configuration for this request
      */
     public void setup(SourceResolver resolver, Map objectModel, String src,
-            Parameters par) throws ProcessingException, SAXException,
-            IOException
-    {
+                      Parameters par) throws ProcessingException, SAXException,
+            IOException {
         super.setup(resolver, objectModel, src, par);
-        
+
         this.format = par.getParameter("feedFormat", null);
-        this.handle = par.getParameter("handle",null);
+        this.handle = par.getParameter("handle", null);
     }
-    
-    
+
+
     /**
      * Generate the syndication feed.
      */
-    public void generate() throws IOException, SAXException, ProcessingException
-    {
+    public void generate() throws IOException, SAXException, ProcessingException {
 
-       log.warn("DSpaceFeedGenerator - generate() !!!!!");
+        log.warn("DSpaceFeedGenerator - generate() !!!!!");
 
-        try
-        {
+        try {
             Context context = ContextUtil.obtainContext(objectModel);
             DSpaceObject dso = null;
-            
-            if (handle != null && !handle.contains("site"))
-            {
+
+            if (handle != null && !handle.contains("site")) {
                 dso = HandleManager.resolveToObject(context, handle);
-                if (dso == null)
-                {
+                if (dso == null) {
                     // If we were unable to find a handle then return page not found.
-                    throw new ResourceNotFoundException("Unable to find DSpace object matching the given handle: "+handle);
+                    throw new ResourceNotFoundException("Unable to find DSpace object matching the given handle: " + handle);
                 }
-                
-                if (!(dso.getType() == Constants.COLLECTION || dso.getType() == Constants.COMMUNITY))
-                {
+
+                if (!(dso.getType() == Constants.COLLECTION || dso.getType() == Constants.COMMUNITY)) {
                     // The handle is valid but the object is not a container.
-                    throw new ResourceNotFoundException("Unable to syndicate DSpace object: "+handle);
+                    throw new ResourceNotFoundException("Unable to syndicate DSpace object: " + handle);
                 }
             }
-        
+
             SyndicationFeed feed = new SyndicationFeed(SyndicationFeed.UITYPE_XMLUI);
-            feed.populate(ObjectModelHelper.getRequest(objectModel), dso, getRecentlySubmittedItemsUsingDiscovery(context,dso), FeedUtils.i18nLabels);
+            feed.populate(ObjectModelHelper.getRequest(objectModel), dso, getRecentlySubmittedItemsUsingDiscovery(context, dso), FeedUtils.i18nLabels);
             feed.setType(this.format);
             Document dom = feed.outputW3CDom();
             FeedUtils.unmangleI18N(dom);
             DOMStreamer streamer = new DOMStreamer(contentHandler, lexicalHandler);
             streamer.stream(dom);
-        }
-        catch (IllegalArgumentException iae)
-        {
-                throw new ResourceNotFoundException("Syndication feed format, '"+this.format+"', is not supported.", iae);
-        }
-        catch (FeedException fe)
-        {
-                throw new SAXException(fe);
-        }
-        catch (SQLException sqle)
-        {
-                throw new SAXException(sqle);
+        } catch (IllegalArgumentException iae) {
+            throw new ResourceNotFoundException("Syndication feed format, '" + this.format + "', is not supported.", iae);
+        } catch (FeedException fe) {
+            throw new SAXException(fe);
+        } catch (SQLException sqle) {
+            throw new SAXException(sqle);
         }
     }
 
@@ -279,33 +263,25 @@ public class DSpaceFeedGenerator extends AbstractGenerator
      */
     @SuppressWarnings("unchecked")
     private Item[] getRecentlySubmittedItems(Context context, DSpaceObject dso)
-            throws SQLException
-    {
-        if (recentSubmissionItems != null)
-        {
+            throws SQLException {
+        if (recentSubmissionItems != null) {
             return recentSubmissionItems;
         }
 
         String source = ConfigurationManager.getProperty("recent.submissions.sort-option");
         BrowserScope scope = new BrowserScope(context);
-        if (dso instanceof Collection)
-        {
+        if (dso instanceof Collection) {
             scope.setCollection((Collection) dso);
-        }
-        else if (dso instanceof Community)
-        {
+        } else if (dso instanceof Community) {
             scope.setCommunity((Community) dso);
         }
         scope.setResultsPerPage(ITEM_COUNT);
 
         // FIXME Exception handling
-        try
-        {
+        try {
             scope.setBrowseIndex(BrowseIndex.getItemBrowseIndex());
-            for (SortOption so : SortOption.getSortOptions())
-            {
-                if (so.getName().equals(source))
-                {
+            for (SortOption so : SortOption.getSortOptions()) {
+                if (so.getName().equals(source)) {
                     scope.setSortBy(so.getNumber());
                     scope.setOrder(SortOption.DESCENDING);
                 }
@@ -315,50 +291,45 @@ public class DSpaceFeedGenerator extends AbstractGenerator
             this.recentSubmissionItems = be.browseMini(scope).getItemResults(context);
 
             // filter out Items that are not world-readable
-            if (!includeRestrictedItems)
-            {
+            if (!includeRestrictedItems) {
                 List<Item> result = new ArrayList<Item>();
-                for (Item item : this.recentSubmissionItems){
-                    checkAccess:{
-                        for (Group group : AuthorizeManager.getAuthorizedGroups(context, item, Constants.READ)){
-                             if ((group.getID() == 0)){
+                for (Item item : this.recentSubmissionItems) {
+                    checkAccess:
+                    {
+                        for (Group group : AuthorizeManager.getAuthorizedGroups(context, item, Constants.READ)) {
+                            if ((group.getID() == 0)) {
 
-                                 // check also its datafiles before add it to the result list
-                                 // if a datafile is under embargo don't add the dataPackage to the result list.
-                                 if(!isADataFileEmbargoed(context, item)){
+                                // check also its datafiles before add it to the result list
+                                // if a datafile is under embargo don't add the dataPackage to the result list.
+                                if (!isADataFileEmbargoed(context, item)) {
                                     result.add(item);
                                     break checkAccess;
-                                 }
+                                }
                             }
                         }
                     }
                 }
                 this.recentSubmissionItems = result.toArray(new Item[result.size()]);
             }
-        }
-        catch (BrowseException bex)
-        {
+        } catch (BrowseException bex) {
             log.error("Caught browse exception", bex);
-        }
-        catch (SortException e)
-        {
+        } catch (SortException e) {
             log.error("Caught sort exception", e);
         }
         return this.recentSubmissionItems;
     }
-    
 
 
     /**
      * check also its datafiles before add it to the result list
      * if a datafile is under embargo don't add the dataPackage to the result list.
      */
-    public boolean isADataFileEmbargoed(Context context, Item item) throws SQLException {
+    private boolean isADataFileEmbargoed(Context context, Item item) throws SQLException {
         Item[] datafiles = DryadWorkflowUtils.getDataFiles(context, item);
-        for(Item i : datafiles){
+        for (Item i : datafiles) {
             String lift = ConfigurationManager.getProperty("embargo.field.lift");
             DCValue[] values = i.getMetadata(lift);
-            if(values!=null && values.length > 0)
+            if (values != null && values.length > 0)
                 return true;
 
         }
@@ -370,111 +341,12 @@ public class DSpaceFeedGenerator extends AbstractGenerator
      * Recycle
      */
 
-    public void recycle()
-    {
+    public void recycle() {
         this.format = null;
         this.handle = null;
         this.validity = null;
         this.recentSubmissionItems = null;
         super.recycle();
-    }
-    
-    /**
-     * Extend the standard DSpaceValidity object to support assumed
-     * caching. Since feeds will constantly be requested we want to
-     * assume that a feed is still valid instead of checking it
-     * against the database anew everytime.
-     *
-     * This validity object will assume that a cache is still valid,
-     * without rechecking it, for 24 hours.
-     *
-     */
-    private static class FeedValidity extends DSpaceValidity
-    {
-        private static final long serialVersionUID = 1L;
-                        
-        /** When the cache's validity expires */
-        private long expires = 0;
-        
-        /**
-         * When the validity is completed record a timestamp to check later.
-         */
-        public DSpaceValidity complete()
-        {
-
-                log.warn("DSpaceFeedGenerator - complete() !!!!!");
-
-                this.expires = System.currentTimeMillis() + CACHE_AGE;
-
-                log.warn("DSpaceFeedGenerator - complete(). this.expires: " + this.expires);
-
-                return super.complete();
-        }
-        
-        
-        /**
-         * Determine if the cache is still valid
-         */
-        public int isValid()
-        {
-
-            log.warn("DSpaceFeedGenerator - isValid(). this.completed: " + this.completed);
-
-            // Return true if we have a hash.
-            if (this.completed)
-            {
-                log.warn("DSpaceFeedGenerator - System.currentTimeMillis(): " + System.currentTimeMillis());
-                log.warn("DSpaceFeedGenerator - this.expires: " + this.expires);
-                if (System.currentTimeMillis() < this.expires)
-                {
-                        // If the cache hasn't expired the just assume that it is still valid.
-                        log.warn("DSpaceFeedGenerator - SourceValidity.VALID !!!!!");
-                        return SourceValidity.VALID;
-                }
-                else
-                {
-                        // The cache is past its age
-                        log.warn("DSpaceFeedGenerator - SourceValidity.UNKNOWN !!!!!");
-                        return SourceValidity.UNKNOWN;
-                }
-            }
-            else
-            {
-                // This is an error, state. We are being asked whether we are valid before
-                // we have been initialized.
-                log.warn("DSpaceFeedGenerator - SourceValidity.INVALID !!!!!");
-                return SourceValidity.INVALID;
-            }
-        }
-
-        /**
-         * Determine if the cache is still valid based
-         * upon the other validity object.
-         *
-         * @param otherValidity
-         *          The other validity object.
-         */
-        public int isValid(SourceValidity otherValidity)
-        {
-            log.warn("DSpaceFeedGenerator - (SourceValidity otherValidity)");
-
-            if (this.completed && otherValidity instanceof FeedValidity)
-            {
-                FeedValidity other = (FeedValidity) otherValidity;
-                if (hash == other.hash)
-                {
-                    // Update both cache's expiration time.
-                    this.expires = System.currentTimeMillis() + CACHE_AGE;
-                    other.expires = System.currentTimeMillis() + CACHE_AGE;
-
-                    log.warn("DSpaceFeedGenerator - SourceValidity.VALID !!!!!");
-                    return SourceValidity.VALID;
-                }
-            }
-            log.warn("DSpaceFeedGenerator - SourceValidity.INVALID !!!!!");
-            return SourceValidity.INVALID;
-        }
-
     }
 
 
@@ -494,7 +366,6 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 
         // test scope.
         printfoundItems(items);
-
 
 
         List<Item> result = new ArrayList<Item>();
@@ -529,9 +400,8 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     }
 
 
-
-    public QueryResponse performSearch(Context context, DSpaceObject scope) throws SQLException{
-        QueryResponse queryResults=null;
+    private QueryResponse performSearch(Context context, DSpaceObject scope) throws SQLException {
+        QueryResponse queryResults = null;
 
 
         FilterSearchUtil fs = new FilterSearchUtil(context);
@@ -541,7 +411,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
         queryArgs.setRows(ConfigurationManager.getIntProperty("webui.feed.items"));
         String sortField = SearchUtils.getConfig().getString("recent.submissions.sort-option");
 
-        if(sortField != null){
+        if (sortField != null) {
             queryArgs.setSortField(
                     sortField,
                     SolrQuery.ORDER.desc
@@ -552,41 +422,39 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 
         try {
 
-            queryResults =  fs.getSearchService().search(context, queryArgs);
+            queryResults = fs.getSearchService().search(context, queryArgs);
 
         } catch (RuntimeException e) {
-            log.error(e.getMessage(),e);
+            log.error(e.getMessage(), e);
         } catch (Exception e) {
-            log.error(e.getMessage(),e);
+            log.error(e.getMessage(), e);
         }
         return queryResults;
     }
 
 
-    private String getView(DSpaceObject dso){
-        if (dso instanceof Collection){
+    private String getView(DSpaceObject dso) {
+        if (dso instanceof Collection) {
             return "collection";
-        }
-        else if (dso instanceof Community){
+        } else if (dso instanceof Community) {
             return "community";
         }
         return "site";
     }
 
 
-
-    private void printfoundItems(Item[] items){
-        for(Item item : items){
+    private void printfoundItems(Item[] items) {
+        for (Item item : items) {
 
             String id = "unknown id";
             DCValue[] values = item.getMetadata("dc.identifier");
-            if(values != null && values.length > 0)
+            if (values != null && values.length > 0)
                 id = values[0].value;
 
 
             String title = "unknown title";
             values = item.getMetadata("dc.title");
-            if(values != null && values.length > 0)
+            if (values != null && values.length > 0)
                 title = values[0].value;
 
             log.warn("item " + item.getID() + ": " + id + " - " + title);
@@ -594,5 +462,92 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 
     }
 
+
+    /**
+     * Extend the standard DSpaceValidity object to support assumed
+     * caching. Since feeds will constantly be requested we want to
+     * assume that a feed is still valid instead of checking it
+     * against the database anew everytime.
+     * <p/>
+     * This validity object will assume that a cache is still valid,
+     * without rechecking it, for 24 hours.
+     */
+    private static class FeedValidity extends DSpaceValidity {
+        private static final long serialVersionUID = 1L;
+
+        /**
+         * When the cache's validity expires
+         */
+        private long expires = 0;
+
+        /**
+         * When the validity is completed record a timestamp to check later.
+         */
+        public DSpaceValidity complete() {
+
+            log.warn("DSpaceFeedGenerator - complete() !!!!!");
+
+            this.expires = System.currentTimeMillis() + CACHE_AGE;
+
+            log.warn("DSpaceFeedGenerator - complete(). this.expires: " + this.expires);
+
+            return super.complete();
+        }
+
+
+        /**
+         * Determine if the cache is still valid
+         */
+        public int isValid() {
+
+            log.warn("DSpaceFeedGenerator - isValid(). this.completed: " + this.completed);
+
+            // Return true if we have a hash.
+            if (this.completed) {
+                log.warn("DSpaceFeedGenerator - System.currentTimeMillis(): " + System.currentTimeMillis());
+                log.warn("DSpaceFeedGenerator - this.expires: " + this.expires);
+                if (System.currentTimeMillis() < this.expires) {
+                    // If the cache hasn't expired the just assume that it is still valid.
+                    log.warn("DSpaceFeedGenerator - SourceValidity.VALID !!!!!");
+                    return SourceValidity.VALID;
+                } else {
+                    // The cache is past its age
+                    log.warn("DSpaceFeedGenerator - SourceValidity.UNKNOWN !!!!!");
+                    //return SourceValidity.UNKNOWN;
+                    return SourceValidity.INVALID;
+                }
+            } else {
+                // This is an error, state. We are being asked whether we are valid before
+                // we have been initialized.
+                log.warn("DSpaceFeedGenerator - SourceValidity.INVALID !!!!!");
+                return SourceValidity.INVALID;
+            }
+        }
+
+        /**
+         * Determine if the cache is still valid based
+         * upon the other validity object.
+         *
+         * @param otherValidity The other validity object.
+         */
+        public int isValid(SourceValidity otherValidity) {
+            log.warn("DSpaceFeedGenerator - (SourceValidity otherValidity)");
+
+            if (this.completed && otherValidity instanceof FeedValidity) {
+                FeedValidity other = (FeedValidity) otherValidity;
+                if (hash == other.hash) {
+                    // Update both cache's expiration time.
+                    this.expires = System.currentTimeMillis() + CACHE_AGE;
+                    other.expires = System.currentTimeMillis() + CACHE_AGE;
+
+                    log.warn("DSpaceFeedGenerator - SourceValidity.VALID !!!!!");
+                    return SourceValidity.VALID;
+                }
+            }
+            log.warn("DSpaceFeedGenerator - SourceValidity.INVALID !!!!!");
+            return SourceValidity.INVALID;
+        }
+
+    }
 
 }
