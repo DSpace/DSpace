@@ -128,7 +128,7 @@ public class CDLDataCiteService {
      */
     public String update(String aDOI, String aURL, Map<String, String> metadata) throws IOException {
 
-        if (ConfigurationManager.getBooleanProperty("doi.datacite.connected", false) || testMode) {
+        if (ConfigurationManager.getBooleanProperty("doi.datacite.connected", false)) {
             if (aDOI.startsWith("doi")) {
                 aDOI = aDOI.substring(4);
             }
