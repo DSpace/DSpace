@@ -393,8 +393,6 @@ public class DSpaceFeedGenerator extends AbstractGenerator
                     SolrQuery.ORDER.desc
             );
         }
-        /* Set the communities facet filters */
-        queryArgs.setFilterQueries("location:m" + scope.getID());
 
         try {
 
