@@ -22,7 +22,7 @@
 /*Font size percentages based on the tables at developer.yahoo.com/yui/fonts/ */
 h1 {
     font-size: 182%;
-    color: black;
+    color: black; 
     text-align: left;
 }
 
@@ -64,9 +64,10 @@ select.multiple {
     background-color: #b0d4ef;
     color: white;
     min-width: 950px;
-	background-image:url(../../images/marca_head.png);
-	height:150px;
+	background-image:url(../../images/marca_head3.png);
+	height:180px;
 	background-repeat:no-repeat;
+	background-position: -750px 0px;
 /*	border-bottom: 10px solid #144961;*/
 }
 
@@ -112,6 +113,7 @@ left:120px;
 #ds-trail-wrapper {
 /*    background-color: #ebf8ff;*/
 /*	background-color: #fff2e5;*/
+background-image:url(../../images/marca_head3.png);
     margin: 0;
     padding: 6px 0px 0px 0px;
 	color:black;
@@ -120,8 +122,10 @@ left:120px;
     min-width: 950px;
 	height:25px;
 /*	background-image:url(../../images/trail.png);*/
-	background-position:100px -10px;
+/*	background-position:100px -10px;*/
 	border-bottom:1px dashed #dedede;
+	background-position:-750px -180px;
+
 }
 
 #ds-trail-wrapper a{
@@ -173,6 +177,12 @@ font-weight:bold;
 .ie6 #ds-content-wrapper {
     text-align: center;
 
+}
+
+#ds-content-wrapper {
+background-image:url(../../images/marca_head3.png);
+background-position: -750px -212px;
+background-repeat: no-repeat;
 }
 
 .ie6 #ds-trail,
@@ -248,7 +258,7 @@ font-weight:bold;
     float: right;
     width: 249px;
     padding-top:10px;
-background-image:url(../../images/columna.png);
+background-image:url(../../images/columna_trans.png);
 background-position:top left;
 background-repeat:no-repeat;
 min-height:800px;
@@ -1035,7 +1045,9 @@ color:#dedede;
 #aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-dateissued-results .artifact-title,
 #aspect_discovery_SiteRecentSubmissions_div_site-recent-submission .artifact-title,
 #aspect_discovery_CommunityRecentSubmissions_div_community-recent-submission .artifact-title,
-#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-title-results .artifact-title
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-title-results .artifact-title,
+#aspect_artifactbrowser_CommunityRecentSubmissions_div_community-recent-submission .artifact-title,
+#aspect_artifactbrowser_CollectionRecentSubmissions_div_collection-recent-submission .artifact-title
 {
     font-size: 100%;
 	font-weight:bold;
@@ -1127,7 +1139,7 @@ margin-left:0px;
 
 .ds-paragraph a {
 padding:0px 3px 0px 0px;
-margin: 0px 2px 0px 0px;
+margin: 0px 0px 0px 4px;
 text-decoration:none;
 color:#f59321;
 }
@@ -1363,6 +1375,7 @@ background-repeat:no-repeat;
 padding-left:25px;
 border-bottom:1px solid #dedede;
 color:#9C4F0A;
+clear:both;
 	padding-top: 0px;
     margin-bottom: 3px;
 }
@@ -1477,16 +1490,16 @@ div
 
 #topNav { 
 	display:block; 
-	position:relative; 
-	background-color:#000000; 
+	position:absolute; 
+	top:150px;
 	font: 13px Tahoma, Sans-serif; 
-	background-image:url(../../images/fondo_topnav.png);
-	background-repeat:repeat-x;
+/*	background-image:url(../../images/fondo_topnav.png);*/
+/*	background-repeat:repeat-x;*/
 }
 #topNav ul { 
 	padding:0; 
 	margin:0; 
-}
+	}
 #topNav li { 
 	position:relative; 
 	float:left; 
@@ -1502,10 +1515,11 @@ div
 #topNav li a { 
 	display:block; 
 	padding:7px 20px; 
-	color:#FFFFFF; 
+	color: black; /*#256e92; */
 	text-decoration:none; 
 	font-family:Arial, Helvetica, sans-serif;
 	font-size:14px;
+ text-shadow:  white 1px 1px;
 }
 
 #topNav li a:focus { 
@@ -1526,38 +1540,47 @@ div
 }
 
 #topNav ul ul a { 
-	background-color:#434343; 
+	background-color:#effaff; 
+
 
 }
 
 #topNav ul ul a:hover { 
-	background-color:#64a7cd; 
-	background-image:url(../../images/topnavhover.png);
-	background-repeat:repeat-x;
+/*	background-color:#64a7cd; */
+/*	background-image:url(../../images/topnavhover.png);
+	background-repeat:repeat-x;*/
+	background-color: white; /*#d8f3ff;*/
 	
 
 	
 }
 #topNav > ul {
 	padding: 0px; 
-	background-color: #000000;
+/*	background-color: #000000;*/
 	position:relative;
 	left:40px;
-	background-image:url(../../images/fondo_topnav.png);
+/*	background-image:url(../../images/fondo_topnav.png);*/
 	background-repeat:repeat-x;
 }
+
+
+
 #topNav a:visited {
-	color: #FFFFFF; 
+/*color:#256e92;*/
+
+
 }
-#topNav a:hover {
-	color: #FFFFFF; 
+
+#topNav li a:hover {
+;
+	
 }
 
 #topNav ul {
 	z-index: 999;
 } 
 #topNav ul li:hover {
-	background-color:#64a7cd;
+	background-color:#f6fcff;
 
 	}
 /*	background-color:#346b8a;/*
@@ -1855,6 +1878,7 @@ float:left;
 background-color:red;
 position:relative;
 width:120px;
+right:10px;
 /*left:-50px;*/
 }
 
@@ -1871,6 +1895,7 @@ div#ds-body div.community-actual-div:first-child {
 float:left;
 position:relative;
 top:5px;
+right:10px;
 
 }
 
@@ -1878,7 +1903,8 @@ top:5px;
 .detail-view {
 padding:40px 0 0 0 ;
 background-image:url(../../images/sombra_abajo.png);
-background-position:top center;
+background-position:center -40px;
+margin-left:120px;
 background-repeat:no-repeat;
 width:100%;
 position:relative;
@@ -1914,7 +1940,7 @@ text-shadow:1px 1px 0 #9c4f0a; /*Color de la sombra - Eje X - Eje Y - Difuminado
 }
 
 h1.ds-div-head {
-background-image:url(../../images/libritos.gif);
+background-image:url(../../images/libritos.png);
 border:none;
 background-repeat:no-repeat;
 background-position:left;
@@ -1932,7 +1958,7 @@ font-size:20px;
 {
 display:inline;
 text-decoration:none;
-color:white;
+color:black;
 margin-right:6px;
 padding: 0px 4px 0px 4px;
 }
@@ -1940,15 +1966,17 @@ padding: 0px 4px 0px 4px;
 #aspect_artifactbrowser_CommunityViewer_list_community-browse,
 #aspect_artifactbrowser_CollectionViewer_div_collection-search-browse 
 #aspect_artifactbrowser_CollectionViewer_list_collection-browse{
-background-color:none;
-height:50px;
+background-color:#dedede;
 position:relative;
+/*
+height:50px;
 background-image:url(../../images/fondo_bandita3.png);
 background-repeat:no-repeat;
-background-position:80px 0px;
+background-position:80px 0px;*/
 padding:3px 0px;
 position:relative;
-top:-5px;
+top:-2px;
+left:80px;
 width:520px;
 /*left:100px;*/
 
@@ -1960,6 +1988,8 @@ width:520px;
 {
 display:inline;
 margin-left:5px;
+position:relative;
+left: -80px;
 }
 
 #aspect_artifactbrowser_CommunityViewer_list_community-browse a:hover,
@@ -2181,6 +2211,7 @@ bottom:10px;
 
 .intro-text {
 float:left;
+width:550px;
 }
 
 
