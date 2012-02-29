@@ -244,6 +244,10 @@ public class DSpaceFeedGenerator extends AbstractGenerator
             }
 
             SyndicationFeed feed = new SyndicationFeed(SyndicationFeed.UITYPE_XMLUI);
+
+
+            log.warn("generate() !!!!!! : calling  getRecentlySubmittedItemsUsingDiscovery(context, dso);");
+
             feed.populate(ObjectModelHelper.getRequest(objectModel), dso, getRecentlySubmittedItemsUsingDiscovery(context, dso), FeedUtils.i18nLabels);
             feed.setType(this.format);
             Document dom = feed.outputW3CDom();
@@ -271,6 +275,9 @@ public class DSpaceFeedGenerator extends AbstractGenerator
         if (recentSubmissionItems != null) {
             return recentSubmissionItems;
         }
+
+
+        log.warn("getRecentlySubmittedItems() !!!!!! : calling  getRecentlySubmittedItemsUsingDiscovery(context, dso);");
 
         return getRecentlySubmittedItemsUsingDiscovery(context, dso);
     }
@@ -307,11 +314,21 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 
 
     private Item[] getRecentlySubmittedItemsUsingDiscovery(Context context, DSpaceObject dso) throws SQLException {
+
+
+        log.warn("getRecentlySubmittedItemsUsingDiscovery(Context context, DSpaceObject dso)!!!!! ");
+
         QueryResponse queryResults = performSearch(context, dso);
+
+        log.warn("getRecentlySubmittedItemsUsingDiscovery(Context context, DSpaceObject dso) - queryResults: " + queryResults);
 
 
         Item[] items = new Item[queryResults.getResults().size()];
         int index = 0;
+
+        log.warn("getRecentlySubmittedItemsUsingDiscovery(Context context, DSpaceObject dso) - items: " + items.length);
+
+
         for (SolrDocument doc : queryResults.getResults()) {
 
             items[index] = (Item) SearchUtils.findDSpaceObject(context, doc);
