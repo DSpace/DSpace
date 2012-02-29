@@ -70,7 +70,7 @@
 		<module>xmlui</module>
 		<module>plugins</module>
 		<module>distribution</module>
-<!-- 		<module>sedici2003</module> Esta en el profile de distributio -->
+<!-- 		<module>sedici2003</module> Esta en un profile  -->
 	</modules>
 
 	<dependencies>
