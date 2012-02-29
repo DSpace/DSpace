@@ -40,12 +40,15 @@ import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.DSpaceValidity;
 import org.dspace.app.xmlui.utils.FeedUtils;
 import org.dspace.app.util.SyndicationFeed;
+import org.dspace.app.xmlui.utils.UIException;
 import org.dspace.authorize.AuthorizeManager;
 import org.dspace.browse.BrowseEngine;
 import org.dspace.browse.BrowseException;
 import org.dspace.browse.BrowseIndex;
 import org.dspace.browse.BrowserScope;
 import org.dspace.content.*;
+import org.dspace.discovery.SearchService;
+import org.dspace.discovery.SearchServiceException;
 import org.dspace.discovery.SearchUtils;
 import org.dspace.sort.SortException;
 import org.dspace.sort.SortOption;
@@ -408,10 +411,13 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 
     private String getView(DSpaceObject dso) {
         if (dso instanceof Collection) {
+            log.warn("getView(). return: collection");
             return "collection";
         } else if (dso instanceof Community) {
+            log.warn("getView(). return: community");
             return "community";
         }
+        log.warn("getView(). return: site");
         return "site";
     }
 
