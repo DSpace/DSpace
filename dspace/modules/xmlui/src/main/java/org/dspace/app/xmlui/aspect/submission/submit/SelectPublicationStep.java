@@ -116,14 +116,10 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
         // retrieve request parameters: journlaID, manuscriptNumber
         String selectedJournalId = request.getParameter("journalID");
-
-        // try to retrieve it from request when in review is selected.
-        if(selectedJournalId==null){
-           selectedJournalId = request.getParameter("journalIDStatusInReview");
-        }
-
         String manuscriptNumber = request.getParameter("manu");
         PublicationBean pBean = null;
+
+
         // get journal status and name
         String journalStatus = null;
         String journalName = null;
@@ -234,9 +230,9 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         Text manuText = optionsList.addText("manu");
 
         if(manuscriptNumber != null){
-            if(pBean!=null && (journalStatus==null || journalStatus.equals(PublicationBean.STATUS_ACCEPTED) || journalStatus.equals(PublicationBean.STATUS_IN_REVIEW))){
+            //if(pBean!=null && (journalStatus==null || journalStatus.equals(PublicationBean.STATUS_ACCEPTED) || journalStatus.equals(PublicationBean.STATUS_IN_REVIEW))){
                 manuText.setValue(manuscriptNumber);
-            }
+            //}
         }
 
         manuText.setLabel(T_MANU_LABEL_NEW);
