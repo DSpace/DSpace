@@ -13,6 +13,7 @@ ul.slideshow li {
    position:absolute;
    left:0;
    right:0;
+      border:1px solid #dedede;
 }
 
 ul.slideshow li.show {
@@ -20,7 +21,7 @@ ul.slideshow li.show {
 }
 
 ul img {
-   border:none;
+   /*border:1px solid #dedede;*/
 }
 
 #slideshow-caption {
