@@ -116,6 +116,12 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
 
         // retrieve request parameters: journlaID, manuscriptNumber
         String selectedJournalId = request.getParameter("journalID");
+
+        // try to retrieve it from request when in review is selected.
+        if(selectedJournalId==null){
+           selectedJournalId = request.getParameter("journalIDStatusInReview");
+        }
+
         String manuscriptNumber = request.getParameter("manu");
         PublicationBean pBean = null;
         // get journal status and name

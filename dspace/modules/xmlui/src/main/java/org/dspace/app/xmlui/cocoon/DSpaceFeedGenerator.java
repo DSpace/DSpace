@@ -182,7 +182,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 
                 validity.add(dso);
 
-                // add reciently submitted items
+                // add recently submitted items
                 for (Item item : getRecentlySubmittedItems(context, dso)) {
                     validity.add(item);
                 }
@@ -265,59 +265,14 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     @SuppressWarnings("unchecked")
     private Item[] getRecentlySubmittedItems(Context context, DSpaceObject dso)
             throws SQLException {
+
+        log.warn("getRecentlySubmittedItems() !!!!!! : recentSubmissionItems ==>> " + recentSubmissionItems);
+
         if (recentSubmissionItems != null) {
             return recentSubmissionItems;
         }
 
-        String source = ConfigurationManager.getProperty("recent.submissions.sort-option");
-        BrowserScope scope = new BrowserScope(context);
-        if (dso instanceof Collection) {
-            scope.setCollection((Collection) dso);
-        } else if (dso instanceof Community) {
-            scope.setCommunity((Community) dso);
-        }
-        scope.setResultsPerPage(ITEM_COUNT);
-
-        // FIXME Exception handling
-        try {
-            scope.setBrowseIndex(BrowseIndex.getItemBrowseIndex());
-            for (SortOption so : SortOption.getSortOptions()) {
-                if (so.getName().equals(source)) {
-                    scope.setSortBy(so.getNumber());
-                    scope.setOrder(SortOption.DESCENDING);
-                }
-            }
-
-            BrowseEngine be = new BrowseEngine(context);
-            this.recentSubmissionItems = be.browseMini(scope).getItemResults(context);
-
-            // filter out Items that are not world-readable
-            if (!includeRestrictedItems) {
-                List<Item> result = new ArrayList<Item>();
-                for (Item item : this.recentSubmissionItems) {
-                    checkAccess:
-                    {
-                        for (Group group : AuthorizeManager.getAuthorizedGroups(context, item, Constants.READ)) {
-                            if ((group.getID() == 0)) {
-
-                                // check also its datafiles before add it to the result list
-                                // if a datafile is under embargo don't add the dataPackage to the result list.
-                                if (!isADataFileEmbargoed(context, item)) {
-                                    result.add(item);
-                                    break checkAccess;
-                                }
-                            }
-                        }
-                    }
-                }
-                this.recentSubmissionItems = result.toArray(new Item[result.size()]);
-            }
-        } catch (BrowseException bex) {
-            log.error("Caught browse exception", bex);
-        } catch (SortException e) {
-            log.error("Caught sort exception", e);
-        }
-        return this.recentSubmissionItems;
+        return getRecentlySubmittedItemsUsingDiscovery(context, dso);
     }
 
 
@@ -464,90 +419,90 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     }
 
 
-    /**
-     * Extend the standard DSpaceValidity object to support assumed
-     * caching. Since feeds will constantly be requested we want to
-     * assume that a feed is still valid instead of checking it
-     * against the database anew everytime.
-     * <p/>
-     * This validity object will assume that a cache is still valid,
-     * without rechecking it, for 24 hours.
-     */
-    private static class FeedValidity extends DSpaceValidity {
-        private static final long serialVersionUID = 1L;
-
-        /**
-         * When the cache's validity expires
-         */
-        private long expires = 0;
-
-        /**
-         * When the validity is completed record a timestamp to check later.
-         */
-        public DSpaceValidity complete() {
-
-            log.warn("DSpaceFeedGenerator - complete() !!!!!");
-
-            this.expires = System.currentTimeMillis() + CACHE_AGE;
-
-            log.warn("DSpaceFeedGenerator - complete(). this.expires: " + this.expires);
-
-            return super.complete();
-        }
-
-
-        /**
-         * Determine if the cache is still valid
-         */
-        public int isValid() {
-
-            log.warn("DSpaceFeedGenerator - isValid(). this.completed: " + this.completed);
-
-            // Return true if we have a hash.
-            if (this.completed) {
-                log.warn("DSpaceFeedGenerator - System.currentTimeMillis(): " + System.currentTimeMillis());
-                log.warn("DSpaceFeedGenerator - this.expires: " + this.expires);
-                if (System.currentTimeMillis() < this.expires) {
-                    // If the cache hasn't expired the just assume that it is still valid.
-                    log.warn("DSpaceFeedGenerator - SourceValidity.VALID !!!!!");
-                    return SourceValidity.VALID;
-                } else {
-                    // The cache is past its age
-                    log.warn("DSpaceFeedGenerator - SourceValidity.UNKNOWN !!!!!");
-                    return SourceValidity.UNKNOWN;
-                }
-            } else {
-                // This is an error, state. We are being asked whether we are valid before
-                // we have been initialized.
-                log.warn("DSpaceFeedGenerator - SourceValidity.INVALID !!!!!");
-                return SourceValidity.INVALID;
-            }
-        }
-
-        /**
-         * Determine if the cache is still valid based
-         * upon the other validity object.
-         *
-         * @param otherValidity The other validity object.
-         */
-        public int isValid(SourceValidity otherValidity) {
-            log.warn("DSpaceFeedGenerator - (SourceValidity otherValidity)");
-
-            if (this.completed && otherValidity instanceof FeedValidity) {
-                FeedValidity other = (FeedValidity) otherValidity;
-                if (hash == other.hash) {
-                    // Update both cache's expiration time.
-                    this.expires = System.currentTimeMillis() + CACHE_AGE;
-                    other.expires = System.currentTimeMillis() + CACHE_AGE;
-
-                    log.warn("DSpaceFeedGenerator - SourceValidity.VALID !!!!!");
-                    return SourceValidity.VALID;
-                }
-            }
-            log.warn("DSpaceFeedGenerator - SourceValidity.INVALID !!!!!");
-            return SourceValidity.INVALID;
-        }
-
-    }
+//    /**
+//     * Extend the standard DSpaceValidity object to support assumed
+//     * caching. Since feeds will constantly be requested we want to
+//     * assume that a feed is still valid instead of checking it
+//     * against the database anew everytime.
+//     * <p/>
+//     * This validity object will assume that a cache is still valid,
+//     * without rechecking it, for 24 hours.
+//     */
+//    private static class FeedValidity extends DSpaceValidity {
+//        private static final long serialVersionUID = 1L;
+//
+//        /**
+//         * When the cache's validity expires
+//         */
+//        private long expires = 0;
+//
+//        /**
+//         * When the validity is completed record a timestamp to check later.
+//         */
+//        public DSpaceValidity complete() {
+//
+//            log.warn("DSpaceFeedGenerator - complete() !!!!!");
+//
+//            this.expires = System.currentTimeMillis() + CACHE_AGE;
+//
+//            log.warn("DSpaceFeedGenerator - complete(). this.expires: " + this.expires);
+//
+//            return super.complete();
+//        }
+//
+//
+//        /**
+//         * Determine if the cache is still valid
+//         */
+//        public int isValid() {
+//
+//            log.warn("DSpaceFeedGenerator - isValid(). this.completed: " + this.completed);
+//
+//            // Return true if we have a hash.
+//            if (this.completed) {
+//                log.warn("DSpaceFeedGenerator - System.currentTimeMillis(): " + System.currentTimeMillis());
+//                log.warn("DSpaceFeedGenerator - this.expires: " + this.expires);
+//                if (System.currentTimeMillis() < this.expires) {
+//                    // If the cache hasn't expired the just assume that it is still valid.
+//                    log.warn("DSpaceFeedGenerator - SourceValidity.VALID !!!!!");
+//                    return SourceValidity.VALID;
+//                } else {
+//                    // The cache is past its age
+//                    log.warn("DSpaceFeedGenerator - SourceValidity.UNKNOWN !!!!!");
+//                    return SourceValidity.UNKNOWN;
+//                }
+//            } else {
+//                // This is an error, state. We are being asked whether we are valid before
+//                // we have been initialized.
+//                log.warn("DSpaceFeedGenerator - SourceValidity.INVALID !!!!!");
+//                return SourceValidity.INVALID;
+//            }
+//        }
+//
+//        /**
+//         * Determine if the cache is still valid based
+//         * upon the other validity object.
+//         *
+//         * @param otherValidity The other validity object.
+//         */
+//        public int isValid(SourceValidity otherValidity) {
+//            log.warn("DSpaceFeedGenerator - (SourceValidity otherValidity)");
+//
+//            if (this.completed && otherValidity instanceof FeedValidity) {
+//                FeedValidity other = (FeedValidity) otherValidity;
+//                if (hash == other.hash) {
+//                    // Update both cache's expiration time.
+//                    this.expires = System.currentTimeMillis() + CACHE_AGE;
+//                    other.expires = System.currentTimeMillis() + CACHE_AGE;
+//
+//                    log.warn("DSpaceFeedGenerator - SourceValidity.VALID !!!!!");
+//                    return SourceValidity.VALID;
+//                }
+//            }
+//            log.warn("DSpaceFeedGenerator - SourceValidity.INVALID !!!!!");
+//            return SourceValidity.INVALID;
+//        }
+//
+//    }
 
 }
