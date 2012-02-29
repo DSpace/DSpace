@@ -469,6 +469,12 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 
         }
 
+
+        // test scope.
+        printfoundItems(items);
+
+
+
         List<Item> result = new ArrayList<Item>();
 
         // filter out Items that are not world-readable
@@ -491,8 +497,11 @@ public class DSpaceFeedGenerator extends AbstractGenerator
                 }
             }
             this.recentSubmissionItems = result.toArray(new Item[result.size()]);
+            items = recentSubmissionItems;
         }
 
+        // test scope.
+        printfoundItems(items);
 
         return items;
     }
@@ -542,6 +551,26 @@ public class DSpaceFeedGenerator extends AbstractGenerator
         return "site";
     }
 
+
+
+    private void printfoundItems(Item[] items){
+        for(Item item : items){
+
+            String id = "unknown id";
+            DCValue[] values = item.getMetadata("dc.identifier");
+            if(values != null && values.length > 0)
+                id = values[0].value;
+
+
+            String title = "unknown title";
+            values = item.getMetadata("dc.title");
+            if(values != null && values.length > 0)
+                title = values[0].value;
+
+            log.error("item " + item.getID() + ": " + id + " - " + title);
+        }
+
+    }
 
 
 }
