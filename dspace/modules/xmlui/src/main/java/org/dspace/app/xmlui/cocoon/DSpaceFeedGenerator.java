@@ -410,14 +410,14 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 
 
     private String getView(DSpaceObject dso) {
-        if (dso instanceof Collection) {
-            log.warn("getView(). return: collection");
-            return "collection";
-        } else if (dso instanceof Community) {
-            log.warn("getView(). return: community");
-            return "community";
-        }
-        log.warn("getView(). return: site");
+//        if (dso instanceof Collection) {
+//            log.warn("getView(). return: collection");
+//            return "collection";
+//        } else if (dso instanceof Community) {
+//            log.warn("getView(). return: community");
+//            return "community";
+//        }
+//        log.warn("getView(). return: site");
         return "site";
     }
 
