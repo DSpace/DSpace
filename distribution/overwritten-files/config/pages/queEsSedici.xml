@@ -4,9 +4,19 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 <body>
 <div>
 <head>¿Qué es SeDiCI?</head>
-<div id="pagina_estatica">
+<div id="pagina_estatica" class="pagina_queEsSedici">
 <![CDATA[
-El Servicio de Difusión de la Creación Intelectual (SeDiCI) es el repositorio institucional de la Universidad Nacional de La Plata. Esto significa que alberga, preserva y difunde mundialmente, a través de su sitio web, las creaciones y producciones intelectuales, científicas y artísticas de los diversos actores de la universidad (alumnos, profesores e investigadores). Su principal diferencia con una biblioteca digital es que, además de contener las referencias de catalogación de cada uno de los recursos, también ofrece, en una buena parte de su acervo y en número creciente en los últimos años, el texto completo de los mismos. El acceso a estos textos es completamente abierto y gratuito, ya que SeDiCI se rige bajo el protocolo Open Archives Initiative (OAI).
+<p>SeDiCI (Servicio de Difusión de la Creación Intelectual) es el repositorio institucional central de la 
+Universidad Nacional de La Plata y como tal su misión es albergar, preservar, difundir y dar 
+visibilidad a nivel mundial a toda la producción científica e intelectual de las distintas 
+unidades acádemicas que la componen. SeDiCI se fundó en el año 2003 con este propósito y 
+desde entonces su acervo ha crecido exponencialmente, alojando en estos momentos más de 1000 tesis 
+de grado, más de 2500 tesis de posgrado y aproximadamente 9700 artículos, buena parte de ellos a 
+texto completo. SeDiCI aloja también revistas producidas por los distintos laboratorios, institutos y 
+centros de investigación con que cuenta la universidad, así como otras publicaciones 
+vinculadas de un modo u otro a esta casa de altos estudios. SeDiCI apoya y se rige por los 
+lineamientos de la Open Archives Iniciative (OAI), en pos de la libre circulación y socialización 
+del conocimiento.</p>
 ]]>
 </div>
 </div>

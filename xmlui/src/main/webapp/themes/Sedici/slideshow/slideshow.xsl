@@ -42,7 +42,7 @@
 	    <li>
 	    	<a>
     			<xsl:attribute name="href">
-    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/pages/comoAgregarTrabajos
+    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/pages/comoAgregarTrabajosTesistas
     			</xsl:attribute>
 	    		<img title="Depósito de tesis de posgrado" alt="La resolución 78/11 de la UNLP dictamina que todos los alumnos de posgrado deben depositar una copia digital de sus tesis en SeDiCI.">
 	    			<xsl:attribute name="src">

@@ -4,7 +4,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 <body>
 <div>
 <head>¿Cómo llegar?</head>
-<div id='pagina_estatica'>
+<div id='pagina_estatica' class="pagina_comoLlegar">
 <![CDATA[
 <div id="como_llegar">
 <div id="mapa_grande"></div>

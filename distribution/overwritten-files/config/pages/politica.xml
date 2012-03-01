@@ -4,69 +4,111 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 <body>
 <div>
 <head>Política del repositorio</head>
-<div id="pagina_estatica">
+<div id="pagina_estatica" class="pagina_politicas">
 <![CDATA[
-<p>SeDiCi es el Repositorio Institucional de la Universidad Nacional de La Plata <a href="./resolucionSedici">creado</a> en el año 2003 para facilitar el depósito de las creaciones de las distintas unidades académicas de la UNLP, dar mayor visibilidad a las mismas, aumentar el impacto y asegurar la preservación digital a largo plazo de dicha producción. El objetivo prioritario es la socialización del conocimiento generado en las diferentes áreas académicas de la Universidad con el fin de devolver a la comunidad los esfuerzos destinados a la Universidad Pública, en conformidad con lo cual, SeDiCi adhiere a la iniciativa <a href="http://www.openarchives.org/" title="Acceso Abierto">Acceso Abierto</a> (<a href="http://www.openarchives.org/" title="Acceso Abierto">Open Access</a>) en el principio de la libre disposición de la información con propósitos, científicos y educativos.</p>
+<p>
+SeDiCI es el Repositorio Institucional de la Universidad Nacional de La Plata, creado en el año 2003 para facilitar el 
+depósito de la producción científica e intelectual de las distintas unidades académicas de la UNLP, darle mayor visibilidad 
+a la misma, aumentar su impacto y asegurar la preservación digital a largo plazo de dicha producción. El objetivo prioritario 
+es la socialización del conocimiento generado en las diferentes áreas académicas de la universidad con el fin de devolver 
+a la comunidad los esfuerzos destinados a la universidad pública. Es por ello que SeDiCI adhiere a la Iniciativa Acceso Abierto 
+(Open Access Initiative), que sustenta el principio de la libre disposición de la información únicamente con propósitos 
+científicos y educativos.
+</p> 
 
-<p>SeDiCi se encuentra registrado en los registros internacionales de repositorios: 
-<a href="http://roar.eprints.org/" title="ROAR">ROAR</a>,
-<a href="http://www.opendoar.org" title="OPENDOAR">OPENDOAR</a>, 
-<a href="http://www.oaister.org/" title="OAISTER">OAISTER</a> y 
-<a href="http://repositories.webometrics.info/" title="Webometrics">Webometrics</a>.
-</p>
-<p>A continuación se definen las <a name="politicas">políticas</a> del Repositorio Institucional SeDiCi.
+<p>
+SeDiCI se encuentra registrado en los siguientes registros internacionales de repositorios: <a href="http://roar.eprints.org" target="_blank">ROAR</a>, 
+<a href="http://www.opendoar.org/" target="_blank">OPENDOAR</a>, <a href="http://www.oaister.org" target="_blank">OAISTER</a> y 
+<a href="http://repositories.webometrics.info" target="_blank">Webometrics</a>.
+</p> 
+
+<p>A continuación, se definen las políticas del repositorio institucional SeDiCI:</p>
 
 <ul>
-	<li><a href="#politicaCotenidos" title="Política de contenidos">Política de contenidos</a></li>
-	<li><a href="#politicaMetadatos" title="Política de metadatos">Política de metadatos</a></li>
-	<li><a href="#politicaDatos" title="Política de datos">Política de datos</a></li>
-	<li><a href="#politicaDiseminacion" title="Política de diseminación">Política de diseminación</a></li>
-	<li><a href="#politicaDeposito" title="Política de depósito">Política de depósito</a></li>
-	<li><a href="#politicaPreservacionDigital" title="Política de preservación digital">Política de preservación digital</a></li>
-	<li><a href="#politicaEstadisticas" title="Política de estadísticas">Política de estadísticas</a></li>
+	<li>Política de contenidos</li>
+	<li>Política de metadatos</li>
+	<li>Política de datos</li>
+	<li>Política de diseminación</li>
+	<li>Política de depósito</li>
+	<li>Política de preservación digital</li>
+	<li>Política de estadísticas</li>
 </ul>
+
+<br/>
+<h1>Política de contenidos</h1>
+<p>
+SeDiCi alberga la producción de los alumnos, docentes e investigadores de la Universidad Nacional de La Plata distribuidos en todas 
+sus unidades académicas sin excepción. De acuerdo a esto, los tipos de documentos aceptados son: tesis de grado y posgrado, artículos, 
+libros, presentaciones en congresos, producciones artísticas, publicaciones periódicas, proyectos de investigación, patentes y 
+revisiones, producidos en cualquiera de las unidades académicas de la UNLP. También se tendrá en cuenta, previo análisis por 
+parte del personal del repositorio, cualquier otra forma de producción que pueda tener valor académico o científico y sea de 
+interés para la comunidad universitaria. Las producciones pueden estar en cualquier idioma y se acepta gran variedad de formatos 
+digitales: textos (Word, PDF), imágenes (jpg), archivos de audio (mp3, wav), de video (mpeg, avi), programas de software, etc.
 </p>
-<h1><a name="politicaCotenidos" title="Política de contenidos">Política de contenidos:</a></h1>
-<p>SeDiCi alberga la producción de los alumnos, docentes e investigadores de la Universidad Nacional de La Plata.
-Los tipos de documentos aceptados, en cualquier idioma, son: tesis (grado y posgrado), artículos, libros, presentaciones en congresos, producciones artísticas, publicaciones periódicas, proyectos de investigación, patentes, revisiones, producidas en cualquiera de las unidades académicas de la UNLP y cualquier otra forma de producción de valor académico. 
-SeDiCi puede trabajar con una gran cantidad de formatos digitales: textos, imágenes, archivos de audio, de video, programas, objetos de aprendizaje, páginas web, etc.
+
+<h1>Política de metadatos</h1>
+<p>
+Los metadatos son la información descriptiva que se aplica sobre un recurso para facilitar su organización, recuperación, 
+preservación e interoperabilidad. Como datos que describen otros datos, se refieren a un recurso digital disponible dentro del 
+repositorio y sirven como índices para organizar y localizar su contenido. De ahí su vital importancia: utilizar los metadatos 
+correctos asegura la localización rápida y efectiva del recurso buscado y posibilita una mayor visibilidad de las obras albergadas 
+en el repositorio. SeDiCi utiliza un formato de metadatos propio: dichos metadatos están traducidos al inglés y al portugués, y 
+el sistema los transforma al formato <a href="http://dublincore.org/" target="_blank">Dublin Core</a> para que sean accedidos por otros repositorios 
+vía <a href="http://www.openarchives.org/" target="_blank">OAI-PMH</a>. 
 </p>
-<p><a href="#politicas" >^Volver</a></p>
 
-<h1><a name="politicaMetadatos" title="Política de metadatos">Política de metadatos:</a></h1>
-<p>Los metadatos son la información descriptiva que se aplica sobre un recurso para facilitar su organización, recuperación, preservación e interoperabilidad. Básicamente son datos que describen otros datos. Los metadatos se refieren a un recurso y sirven como índices para organizar y localizar contenidos. Esa es su importancia: la inclusión de metadatos correctos asegura una localización del recurso y posibilita una mayor visibilidad de las obras. 
-SeDiCi utiliza un formato de metadatos propio, los cuales están traducidos al inglés y al portugués, y los transforma al formato <a href="http://dublincore.org/" title="Dublin Core">Dublin Core</a> para que sean accedidos vía <a href="www.openarchives.org/" title="Open Archives Initiative">OAI</a>.</p>
-<p><a href="#politicas" >^Volver</a></p>
-
-<h1><a name="politicaDatos" title="Política de datos">Política de datos:</a></h1>
-<p>Los documentos alojados en SeDiCi pueden ser visualizados y descargados con fines educativos, de estudio, y no lucrativos, sin necesidad de pedir permisos explícitos, siempre y cuando, en caso de citas textuales, 
-1) se anexe el nombre de los autores, el título y los detalles bibliográficos completos,
-2) el contenido no sea alterado, excepto con la expresa autorización del autor.</p>
-<p><a href="#politicas" >^Volver</a></p>
-
-<h1><a name="politicaDiseminacion" title="Política de diseminación">Política de diseminación:</a></h1>
-<p>SeDiCI fomenta la compartición de sus registros en favor de la difusión a través de protocolos estándares de intercambio de metadatos, como por ejemplo <a href="www.openarchives.org/pmh/" title="OAI-PMH - Open Archives Initiative">OAI-PMH</a>.</p>
-<p><a href="#politicas" >^Volver</a></p>
-
-<h1><a name="politicaDeposito" title="Política de depósito">Política de depósito:</a></h1>
-<p>Cualquier miembro alumno, docente o investigador de la UNLP, o con vínculos probados con ella, puede publicar sus trabajos en forma gratuita en SeDiCi, personalmente o en línea (autoarchivo). Los tipos de materiales aceptados son obras de todo tipo, de naturaleza académica producidas por autores vinculados a la UNLP como se detalla en la política de contenidos.
-Para completar la publicación de los documentos en SeDiCi (mediante autoarchivo o personalmente) es necesaria la aceptación de una licencia no exclusiva de depósito , permitiendo a SeDiCi el archivo, preservación y difusión de la obra. La condición “no exclusiva” significa que el creador no pierde los derechos de autor sobre su trabajo, pudiendo publicar el mismo en publicaciones, otros repositorios, etc.</p>
-<p><a href="#politicas" >^Volver</a></p>
-
-<h1><a name="politicaPreservacionDigital" title="Política de preservación digital">Política de preservación digital:</a></h1>
-<p>SeDiCi tiene el propósito de preservar digitalmente y a tiempo indefinido todos los documentos que alberga. Para ello está desarrollando un plan de acción que incluye medidas capaces de asegurar la perdurabilidad del material digital presente en el Repositorio, entre otras:
-Backups
-Conversión de formatos
-Comprobaciones periódicas de la integridad y accesibilidad de los archivos
-Vigilancia tecnológica
-Identificadores persistentes
-Parte de esta política es la digitalización de material antiguo (tesis, libros, publicaciones, etc.) alojado en las diferentes bibliotecas pertenecientes a la UNLP, no sólo en función de la preservación del mismo, sino como memoria de la producción academica de la Universidad.
+<h1>Política de datos</h1>
+<p>
+Los documentos alojados en SeDiCi pueden ser visualizados y descargados con fines educativos y de investigación, de ningún modo 
+con fines de lucro, y sin necesidad de pedir permisos explícitos, siempre y cuando, en el caso de que se realicen citas textuales 
+de los materiales obtenidos en el repositorio, en éstas se enuncie el nombre de los autores, el título del documento y los detalles 
+bibliográficos completos, así como su ubicación web (enlace al registro en el repositorio), y su contenido no sea alterado en modo 
+alguno, excepto con la expresa autorización del autor.
 </p>
-<p><a href="#politicas" >^Volver</a></p>
 
-<h1><a name="politicaEstadisticas" title="Política de estadísticas">Política de estadísticas:</a></h1>
-<p>SeDiCi realiza estadísticas para analizar no sólo la difusión y visibilidad de la producción de la UNLP, sino también el crecimiento de los contenidos disponibles en el repositorio, las visitas, las descargas y las modalidades de sus usuarios, estas estadísticas son de carácter público y pueden ser consultadas en la web de SeDiCi por todos los visitantes.</p>
-<p><a href="#politicas" >^Volver</a></p>
+<h1>Política de diseminación</h1>
+<p>
+SeDiCI fomenta la compartición de sus registros en favor de la difusión a través de protocolos estándares de intercambio de metadatos, 
+como <a href="http://www.openarchives.org/pmh/" target="_blank">OAI-PMH</a>.
+</p>
+
+<h1>Política de depósito</h1>
+<p>
+Cualquier alumno, docente o investigador de la UNLP puede publicar sus trabajos en forma gratuita en SeDiCI, personalmente o en línea 
+(autoarchivo). Los tipos de materiales aceptados son obras de naturaleza científica, académica y artística, tal como se detalla en la 
+política de contenidos. Para realizar la publicación de los documentos en SeDiCI (mediante autoarchivo o personalmente) es condición 
+necesaria la aceptación, por parte del usuario, de un <a href="resources/licencia_de_deposito.pdf" target="_blank">Acuerdo de Cesión No Exclusiva de Derechos</a>, 
+que permitirá a SeDiCi la preservación y difusión de la obra. La condición “no exclusiva” del mismo significa que el creador no pierde 
+los derechos de autoría ni ningún otro derecho sobre su trabajo, pudiendo disponer de él libremente para publicarlo en otros 
+repositorios, o por cualquier otro medio que crea conveniente.
+</p>
+
+<h1>Política de preservación digital</h1>
+<p>
+SeDiCI tiene el propósito fundamental de preservar digitalmente y a tiempo indefinido todos los documentos que alberga. Para ello, 
+desarrolla un plan de acción que incluye medidas que aseguran la perdurabilidad del material digital presente en el repositorio. 
+Entre ellas, pueden citarse:
+<br/>
+<ul>
+	<li>Back-ups</li>
+	<li>Conversión de formatos</li>
+	<li>Comprobaciones periódicas de la integridad y accesibilidad de los archivos</li>
+	<li>Vigilancia tecnológica</li>
+	<li>Identificadores persistentes</li>
+</ul>
+<br/>
+Además, la política de preservación incluye y enfatiza la digitalización de material antiguo (tesis, libros, publicaciones, etc.) 
+alojado en las diferentes bibliotecas pertenecientes a la UNLP, no sólo en función de la preservación del mismo, sino como memoria 
+de la producción académica de la universidad.
+</p>
+
+<h1>Política de estadísticas</h1>
+<p>
+SeDiCI realiza estadísticas para analizar no sólo la difusión y visibilidad de la producción de la UNLP, sino también el crecimiento 
+de los contenidos disponibles en el repositorio, las visitas, descargas y modalidades de uso y navegación de sus usuarios. 
+Estas estadísticas se actualizan periódicamente, son de carácter público y pueden ser consultadas en la web de SeDiCI por 
+cualquier visitante.
+</p>
 ]]>
 </div>
 </div>

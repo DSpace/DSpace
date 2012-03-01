@@ -4,22 +4,39 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 <body>
 <div>
 <head>¿Cómo agregar trabajos?</head>
-<div id='pagina_estatica'>
+<div id='pagina_estatica' class="pagina_comoAgregarTrabajos">
 <![CDATA[
-<p>Contribuir con material en SeDiCI es muy fácil. A continuación, se detallan los pasos que deben seguir tanto los tesistas de posgrado (quienes están obligados a depositar sus trabajos en el portal) como los demás alumnos e investigadores de la UNLP:</p>
-<h1>Primer paso</h1>
-<p>El alumno, docente, investigador o tesista de la UNLP interesado en difundir sus trabajos a través del repositorio cuenta con dos modalidades para agregar su material:</p> 
-<ul>
-<li>Realizar el autoarchivo de la obra. Para ello, el autor debe <a href="../login" title="Iniciar Sesión">iniciar sesión</a> en el sitio (si aún no es usuario, puede <a href="../register" tilte="Registrarse aquí">registrarse aquí</a>) y luego acceder a la sección de autoarchivo, donde encontrará los pasos para efectuarlo. Éstos consisten en completar un formulario con sus datos, subir el archivo con su trabajo y bajar el  <a href="licencia_de_deposito.pdf" title="Acuerdo de Cesión no exclusiva de Derechos">"Acuerdo de Cesión no exclusiva de Derechos"</a> para su firma.</li>
-<li>Concurrir personalmente a las oficinas de SeDiCI y llevar una copia digital o en papel de sus trabajos.</li></ul>
-<h1>Segundo paso</h1>
-<p>Cualquiera que haya sido la modalidad elegida para aportar el trabajo a SeDiCI (autoarchivo o personalmente), el autor deberá completar y firmar de puño y letra el <a href="licencia_de_deposito.pdf" title="Acuerdo de Cesión no exclusiva de Derechos">"Acuerdo de Cesión no exclusiva de Derechos"</a>. En caso de tratarse de un tesista de posgrado, deberá concurrir primero, con dicho acuerdo firmado, a la Secretaría de Posgrado de su respectiva unidad académica para que allí se complete el recuadro pertinente con fecha de aprobación, número de acta, y firma y sello del funcionario correspondiente. De este modo SeDiCI se asegura de cumplir con lo dispuesto por el <a href="/resolucion/resolucion_tesis98.pdf" title="Resolucion 78/11">Artículo 2º de la Resolución 78/11</a>, respecto a que la tesis haya sido aprobada previamente a su difusión.</p>
-<h1>Último paso</h1>
-<p>El autor deberá entregar en las oficinas de SeDiCI el "Acuerdo de Cesión no exclusiva de Derechos" debidamente completado y firmado. En caso de tratarse de un tesista de posgrado, contra la presentación del mismo se le entregará un comprobante, firmado y sellado por personal de SeDiCI, con el que podrá continuar los trámites pertinentes en el Departamento de Títulos de la Presidencia de la UNLP para la obtención de su título.</p>
-<p>Para facilitar el trámite, y especialmente para aquellos tesistas o investigadores que residen fuera del radio de La Plata, pueden enviar o autoarchivar tanto el acuerdo de cesión de derechos firmado en tinta azul como el acta de posgrado que certifica la aprobación de la tesis escaneados. Del mismo modo, en los casos que corresponda, SeDiCI enviará el comprobante de depósito escaneado por e-mail.</p>
-<p>El autor puede, en todos los casos, escribir a <a href="mailto:info@sedici.unlp.edu.ar">info@sedici.unlp.edu.ar</a> o utilizar el formulario de <a href="./contacto">contacto web</a> o llamar al 0221-4236677/6696 interno 141 para obtener ayuda.</p>
-<p>Por consultas legales dirigirse a la <a href="http://www.unlp.edu.ar/propiedadintelectual" tile="Dirección de Propiedad Intelectual de la UNLP">Dirección de Propiedad Intelectual de la UNLP.</a></p>
-<a href="./comoLlegar" tile="¿Cómo llegar a SeDiCI?">¿Cómo llegar a SeDiCI?</a>
+<p> 
+	Contribuir con material en SeDiCI es muy fácil. El alumno, docente o investigador de la UNLP interesado 
+	en difundir sus trabajos a través del repositorio institucional puede optar por una de las siguientes 
+	modalidades:
+	<ul>
+		<li>
+			Realizar <strong>autoarchivo</strong>. La ventaja de esta opción es que puede realizar el trámite 
+			completo desde la comodidad de su casa y en cualquier momento. Para ello, el autor debe 
+			<a href="/login">iniciar sesión</a> en el sitio (si aún no es usuario, puede registrarse <a href="/register">aquí</a>) 
+			y luego acceder a la sección 
+			de autoarchivo. Allí, el sistema lo guiará por una serie de sencillos pasos que incluyen completar 
+			un formulario con los datos de la obra a agregar, subir el o los archivos de la misma y el 
+			<a href="/static/resources/licencia_de_deposito.pdf" target="_blank">Acuerdo de Cesión No Exclusiva de Derechos</a> firmado. Una vez que SeDiCI recibe el 
+			material, tras chequear que todo esté en orden, a la brevedad será publicado en el repositorio 
+			y el autor será debidamente notificado.
+		</li>
+		<li>
+			Concurrir <strong>personalmente</strong> a las oficinas de SeDiCI y llevar una copia digital o 
+			en papel de sus trabajos y el Acuerdo de Cesión No Exclusiva de Derechos, completado de puño y 
+			letra y en tinta azul. Tras la recepción de los mismos, a la brevedad el material será publicado 
+			en el repositorio.
+		</li>
+	</ul>
+</p> 
+
+<p>Por cualquier duda o inquietud, escribir a <a href="mailto:info@sedici.unlp.edu.ar">info@sedici.unlp.edu.ar</a>, 
+	utilizar el formulario de <a href="/pages/contacto">contacto web</a> o llamar al 0221-4236677/6696 (interno 141).</p>
+
+<p>Por consultas legales dirigirse a la <a href="http://www.unlp.edu.ar/propiedadintelectual" target="_blank">Dirección de Propiedad Intelectual</a> de la UNLP.</p>
+
+
 ]]>
 </div></div>
 </body>

@@ -2421,3 +2421,26 @@ background: url(../../images/mapa_grande_2.jpg);
 	background: url(../../images/maps.png);
 	display: block;
 }
+
+.pagina_estatica {
+	margin-top: 20px;
+	margin-bottom: 20px;
+}
+.pagina_estatica p {
+	text-align: justify;
+	line-height: 17px;
+}
+.pagina_estatica ul {
+	list-style: circle;
+}
+
+.pagina_estatica li {
+	text-align: justify;
+	line-height: 17px;
+}
+
+.pagina_estatica h1 {
+	font-size: 14px;
+	margin-top: 15px;
+	margin-bottom: 5px;
+}

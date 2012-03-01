@@ -1,0 +1,61 @@
+<document xmlns="http://di.tamu.edu/DRI/1.0/"
+xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
+
+<body>
+<div>
+<head>Información para tesistas de posgrado</head>
+<div id='pagina_estatica' class="pagina_informacionTesistas">
+<![CDATA[
+<p>
+	Con el fin de socializar el conocimiento, la UNLP ha dictaminado, mediante la resolución 78/11, que 
+	todos los alumnos de posgrado deben depositar una copia digital de sus tesis en SeDiCI antes de 
+	iniciar los trámites para la obtención de su título.<br/>
+	De este modo, una vez que la tesis ha sido presentada y aprobada, el alumno puede elegir cualquiera 
+	de estas vías para cumplir con el mandato de la universidad:
+	<ul>
+		<li>
+			Realizar <strong>autoarchivo</strong>. La ventaja de esta opción es que puede realizar el trámite 
+			completo desde la comodidad de su casa y en cualquier momento. Para ello, el tesista debe 
+			<a href="/login">iniciar sesión</a> en el sitio (si aún no es usuario, puede registrarse <a href="/register">aquí</a>) 
+			y luego acceder a la sección 
+			de autoarchivo. Allí, el sistema lo guiará por una serie de sencillos pasos que incluyen completar 
+			un formulario con los datos de la obra a agregar y subir el o los archivos de la misma. Luego, el 
+			autor debe completar, de puño y letra y en tinta azul, el 
+			<a href="/static/resources/licencia_de_deposito.pdf" target="_blank">Acuerdo de Cesión No Exclusiva de Derechos</a>. 
+			El mismo contiene, en su segunda hoja, un recuadro, el cual debe ser firmado y sellado por la 
+			secretaría de posgrado de la unidad académica correspondiente. Si por algún motivo el tesista no 
+			puede concurrir a la secretaría pero posee una copia del acta de defensa de la tesis, donde 
+			consta la fecha de aprobación, puede escanearla y adjuntarla al acuerdo y, a los efectos del 
+			depósito, tendrá la misma validez que si hubiera sido firmado y sellado en la secretaría 
+			correspondiente. Una vez que SeDiCI recibe el material, tras chequear que todo esté en orden, 
+			a la brevedad la tesis será publicada en el repositorio y el autor será debidamente notificado, 
+			además de recibir por e-mail el comprobante de depósito, indispensable para iniciar luego el 
+			trámite de su título.
+		</li>
+		<li>
+			Concurrir <strong>personalmente</strong> a las oficinas de SeDiCI y llevar una copia digital o 
+			en papel de la tesis y el Acuerdo de Cesión No Exclusiva de Derechos completado de puño y 
+			letra y en tinta azul, y firmado y sellado por la secretaría de posgrado correspondiente. 
+			También servirá, a los efectos del depósito, traer una copia del acta de defensa de la tesis. 
+			Tras la recepción de los mismos, el tesista obtendrá el comprobante de depósito necesario 
+			para la obtención de su título y a la brevedad el material será publicado en el repositorio.
+		</li>
+	</ul>
+</p> 
+
+<p>Por cualquier duda o inquietud, escribir a <a href="mailto:info@sedici.unlp.edu.ar">info@sedici.unlp.edu.ar</a>, 
+	utilizar el formulario de <a href="/pages/contacto">contacto web</a> o llamar al 0221-4236677/6696 (interno 141).</p>
+
+<p>Por consultas legales dirigirse a la <a href="http://www.unlp.edu.ar/propiedadintelectual" target="_blank">Dirección de Propiedad Intelectual</a> de la UNLP.</p>
+]]>
+</div></div>
+</body>
+<meta>
+<pageMeta>
+<metadata element="title">Información para tesistas de posgrado</metadata>
+<trail target="/dspace">Repository Home</trail>
+</pageMeta>
+</meta>
+
+</document>
+

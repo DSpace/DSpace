@@ -47,6 +47,7 @@
 				<a href="#"><i18n:text>sedici.menuSuperior.informacion</i18n:text></a>
 				<ul>
 				  <li><a href="{$context-path}/pages/comoAgregarTrabajos"><i18n:text>sedici.menuSuperior.informacion.agregacion</i18n:text></a></li>
+				  <li><a href="{$context-path}/pages/informacionTesistas"><i18n:text>sedici.menuSuperior.informacion.infoTesistas</i18n:text></a></li>
 				  <li><a href="{$context-path}/pages/FAQ"> <i18n:text>sedici.menuSuperior.informacion.faq</i18n:text></a></li>
 				</ul>
 			

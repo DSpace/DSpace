@@ -2101,6 +2101,7 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 
 <message key="sedici.menuSuperior.informacion">Información</message>
 <message key="sedici.menuSuperior.informacion.agregacion">Como agrego trabajos?</message>
+<message key="sedici.menuSuperior.informacion.infoTesistas">Información para tesistas</message>
 <message key="sedici.menuSuperior.informacion.faq">FAQ</message>
 
 <message key="sedici.menuSuperior.home">Inicio</message>

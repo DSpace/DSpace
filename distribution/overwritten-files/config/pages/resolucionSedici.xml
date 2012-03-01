@@ -3,7 +3,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 
 <body>
 <div><head>Resolución</head>
-<div id='pagina_estatica'>
+<div id='pagina_estatica' class="pagina_resolucion">
 <![CDATA[
 <a href="http://www.unlp.edu.ar/uploads/docs/ordenanza_n_264.pdf" title="Resolución sobre SeDiCI">ORDENANZA Nº 264/03</a>
 (Versión Taquigráfica Acta Nº 1159)
