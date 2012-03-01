@@ -129,6 +129,7 @@ public class Minter implements org.springframework.beans.factory.InitializingBea
 	 * @return
 	 */
 	public DOI getKnownDOI(String aDOIString) {
+        if(myLocalDatabase==null) myLocalDatabase = DOIDatabase.getInstance();
 		return myLocalDatabase.getByDOI(aDOIString);
 	}
 
