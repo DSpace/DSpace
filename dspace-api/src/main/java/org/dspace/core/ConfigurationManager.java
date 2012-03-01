@@ -58,7 +58,7 @@ public class ConfigurationManager
     private static Properties properties = null;
     
     /** module configuration properties */
-    private static Map<String, Properties> moduleProps = null;
+    private static Map<String, Properties> moduleProps = new HashMap<String, Properties>();
 
     /** The default license */
     private static String license;
@@ -148,7 +148,10 @@ public class ConfigurationManager
 
     private static Properties getMutableProperties(String module)
     {
-        Properties retProps = (module != null) ? moduleProps.get(module) : properties;
+        if (module == null)
+            return properties;
+
+        Properties retProps = moduleProps.get(module);
         if (retProps == null)
         {
             loadModuleConfig(module);
@@ -419,7 +422,7 @@ public class ConfigurationManager
             fatal("Can't load configuration", e);
 
             // FIXME: Maybe something more graceful here, but with the
-           // configuration we can't do anything
+            // configuration we can't do anything
             throw new IllegalStateException("Failed to read default license.", e);
         }
         finally
@@ -917,7 +920,6 @@ public class ConfigurationManager
             else
             {
                 properties = new Properties();
-                moduleProps = new HashMap<String, Properties>();
                 is = url.openStream();
                 properties.load(is);
 
