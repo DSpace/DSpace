@@ -2,6 +2,8 @@ package org.dspace.springmvc;
 
 import org.apache.cocoon.servletservice.DynamicProxyRequestHandler;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -28,8 +30,11 @@ import java.util.*;
 @Controller(value = "cocoonForwardController")
 public class CocoonForwardController {
 
+    private static final Logger log = LoggerFactory.getLogger(CocoonForwardController.class);
+
     @RequestMapping
     public ModelAndView forwardRequest(HttpServletRequest request, HttpServletResponse response) throws SQLException {
+        log.warn("CocoonForwardController!!!!!");
         return new ModelAndView(new CocoonView());
     }
 
