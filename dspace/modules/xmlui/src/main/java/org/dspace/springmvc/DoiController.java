@@ -26,12 +26,15 @@ import java.io.PrintWriter;
 @RequestMapping("/doi")
 public class DoiController {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DoiController.class);
+    private static final Logger log = LoggerFactory.getLogger(DoiController.class);
 
     @RequestMapping("/doi")
     public void doiLookup(HttpServletRequest request, HttpServletResponse response) {
         PrintWriter writer = null;
         try {
+
+            log.warn("Inside Spring Controller!!! ");
+
             writer = response.getWriter();
             Minter myMinter = new Minter();
             String doiID = request.getParameter("lookup");
