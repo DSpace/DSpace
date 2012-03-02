@@ -27,6 +27,7 @@ collections / items / and bitstreams.
 
         <map:transformers>
             <map:transformer name="Navigation" src="ar.edu.unlp.sedici.aspect.staticPages.Navigation"/>
+            <map:transformer name="augment" src="org.apache.cocoon.transformation.AugmentTransformer"/>
         </map:transformers>
 
     </map:components>
@@ -39,9 +40,18 @@ collections / items / and bitstreams.
             
             <map:match pattern="pages/**">
 			        <map:act type="DSpacePropertyFileReader">
-			                <map:parameter name="dspace.dir" value="dspace.dir" />
-			                <map:transform type="Include" src="file://{dspace.dir}/config/pages/{../1}.xml" />
+			        	<!-- Incluimos el XML de la pagina estatica -->
+		                <map:parameter name="dspace.dir" value="dspace.dir" />
+		                <map:transform type="Include" src="file://{dspace.dir}/config/pages/{../1}.xml" />
+						
+						<!-- Completa las URLs -->
+						<map:transform type="augment">
+							<map:parameter name="mount" value=""/>
+							<map:parameter name="attributes" value="href src"/>
+						</map:transform>
+
 			        </map:act>
+
 			        <map:serialize type="xml"/>
 			</map:match>
 

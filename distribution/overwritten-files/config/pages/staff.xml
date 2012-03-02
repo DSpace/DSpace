@@ -1,50 +1,63 @@
 <document xmlns="http://di.tamu.edu/DRI/1.0/"
 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 
+<meta>
+	<pageMeta>
+		<metadata element="title">Staff</metadata>
+	</pageMeta>
+</meta>
+
 <body>
 <div>
+
 <head>Staff</head>
+
 <div id="pagina_estatica" class="pagina_staff">
-<![CDATA[
-<h1>Directora PrEBi-SeDiCI, Directora Iniciativa LibLink (ISTEC)</h1>
-<ul><li><a href="http://prebi.unlp.edu.ar/wp-content/uploads/2007/12/Marisa-De-Giusti-CV-270611.pdf" title="Marisa R. De Giusti">Marisa R. De Giusti</a></li></ul>
 
-<h1>Catalogación, digitalización, edición</h1>
-<ul><li>Analía Pinto</li>
-<li>Silvia Peloche</li>
-<li>Ariel Matías Cánepa</li></ul>
+	<h1>Directora PrEBi-SeDiCI, Directora Iniciativa LibLink (ISTEC)</h1>
+	<ul>
+		<li>
+			<a href="http://prebi.unlp.edu.ar/wp-content/uploads/2007/12/Marisa-De-Giusti-CV-270611.pdf" title="Marisa R. De Giusti">Marisa R. De Giusti</a>
+		</li>
+	</ul>
+	
+	<h1>Catalogación, digitalización, edición</h1>
+	<ul>
+		<li>Analía Pinto</li>
+		<li>Silvia Peloche</li>
+		<li>Ariel Matías Cánepa</li>
+	</ul>
 
-<h1>Diseño gráfico</h1>
-<ul><li>Lucas Folegotto</li></ul>
+	<h1>Diseño gráfico</h1>
+	<ul>
+		<li>Lucas Folegotto</li>
+	</ul>
 
-<h1>Referencistas</h1>
-<ul><li>Carlos Nusch</li>
-<li>Esteban Fernandez</li>
-<li>Bruno Percivale</li>
-</ul>
+	<h1>Referencistas</h1>
+	<ul>
+		<li>Carlos Nusch</li>
+		<li>Esteban Fernandez</li>
+		<li>Bruno Percivale</li>
+	</ul>
 
-<h1>Desarrollo, investigación y mantenimiento de software</h1>
-<ul><li>Agustín Marisi</li>
-<li>Ariel Lira</li>
-<li>Ariel Sobrado</li>
-<li>Gonzalo Villarreal</li>
-<li>José Giraldo</li>
-<li>José Daniel Texier</li>
-<li>María Marta Vila</li>
-<li>Néstor Oviedo</li>
-<li>Nicolás Romagnoli</li>
-</ul>
-]]>
+	<h1>Desarrollo, investigación y mantenimiento de software</h1>
+	<ul>
+		<li>Agustín Marisi</li>
+		<li>Ariel Lira</li>
+		<li>Ariel Sobrado</li>
+		<li>Gonzalo Villarreal</li>
+		<li>José Giraldo</li>
+		<li>José Daniel Texier</li>
+		<li>María Marta Vila</li>
+		<li>Néstor Oviedo</li>
+		<li>Nicolás Romagnoli</li>
+	</ul>
 
-</div></div>
+
+</div>
+
+</div>
 </body>
-
-<meta>
-<pageMeta>
-<metadata element="title">Staff</metadata>
-<trail target="/dspace">Repository Home</trail>
-</pageMeta>
-</meta>
 
 </document>
 

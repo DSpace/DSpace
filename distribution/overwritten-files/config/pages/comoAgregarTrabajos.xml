@@ -1,11 +1,19 @@
 <document xmlns="http://di.tamu.edu/DRI/1.0/"
 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 
+<meta>
+	<pageMeta>
+		<metadata element="title">Cómo agregar trabajos</metadata>
+	</pageMeta>
+</meta>
+
 <body>
 <div>
-<head>¿Cómo agregar trabajos?</head>
+
+<head>Cómo agregar trabajos</head>
+
 <div id='pagina_estatica' class="pagina_comoAgregarTrabajos">
-<![CDATA[
+
 <p> 
 	Contribuir con material en SeDiCI es muy fácil. El alumno, docente o investigador de la UNLP interesado 
 	en difundir sus trabajos a través del repositorio institucional puede optar por una de las siguientes 
@@ -14,11 +22,11 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 		<li>
 			Realizar <strong>autoarchivo</strong>. La ventaja de esta opción es que puede realizar el trámite 
 			completo desde la comodidad de su casa y en cualquier momento. Para ello, el autor debe 
-			<a href="/login">iniciar sesión</a> en el sitio (si aún no es usuario, puede registrarse <a href="/register">aquí</a>) 
+			<a href="login">iniciar sesión</a> en el sitio (si aún no es usuario, puede registrarse <a href="register">aquí</a>) 
 			y luego acceder a la sección 
 			de autoarchivo. Allí, el sistema lo guiará por una serie de sencillos pasos que incluyen completar 
 			un formulario con los datos de la obra a agregar, subir el o los archivos de la misma y el 
-			<a href="/static/resources/licencia_de_deposito.pdf" target="_blank">Acuerdo de Cesión No Exclusiva de Derechos</a> firmado. Una vez que SeDiCI recibe el 
+			<a href="static/resources/licencia_de_deposito.pdf" target="_blank">Acuerdo de Cesión No Exclusiva de Derechos</a> firmado. Una vez que SeDiCI recibe el 
 			material, tras chequear que todo esté en orden, a la brevedad será publicado en el repositorio 
 			y el autor será debidamente notificado.
 		</li>
@@ -31,21 +39,15 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 	</ul>
 </p> 
 
-<p>Por cualquier duda o inquietud, escribir a <a href="mailto:info@sedici.unlp.edu.ar">info@sedici.unlp.edu.ar</a>, 
-	utilizar el formulario de <a href="/pages/contacto">contacto web</a> o llamar al 0221-4236677/6696 (interno 141).</p>
+<p>Por cualquier duda o inquietud, escribir a <strong>info@sedici.unlp.edu.ar</strong>, 
+	utilizar el formulario de <a href="pages/contacto">contacto web</a> o llamar al 0221-4236677/6696 (interno 141).</p>
 
 <p>Por consultas legales dirigirse a la <a href="http://www.unlp.edu.ar/propiedadintelectual" target="_blank">Dirección de Propiedad Intelectual</a> de la UNLP.</p>
 
+</div>
 
-]]>
-</div></div>
+</div>
 </body>
-<meta>
-<pageMeta>
-<metadata element="title">¿Cómo agregar trabajos?</metadata>
-<trail target="/dspace">Repository Home</trail>
-</pageMeta>
-</meta>
 
 </document>
 

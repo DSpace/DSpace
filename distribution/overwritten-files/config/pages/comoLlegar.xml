@@ -1,41 +1,42 @@
 <document xmlns="http://di.tamu.edu/DRI/1.0/"
 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 
+<meta>
+	<pageMeta>
+		<metadata element="title">Cómo llegar</metadata>
+	</pageMeta>
+</meta>
+
 <body>
 <div>
-<head>¿Cómo llegar?</head>
+
+<head>Cómo llegar</head>
+
 <div id='pagina_estatica' class="pagina_comoLlegar">
-<![CDATA[
+
 <div id="como_llegar">
-<div id="mapa_grande"></div>
-<!--
-<p>
-<a href="images/mapa_grande.jpg" title="Mapa de SeDiCI"><img src="/images/mapa.jpg" title="Mapa de SeDiCI" alt="Mapa"></a>
-</p>
--->
+
+<p><a href="static/resources/mapa_grande.jpg" target="_blank" title="Mapa de SeDiCI"><img src="static/resources/mapa.jpg" title="Mapa de SeDiCI" alt="Mapa"/></a></p>
+
 <h1>SeDiCI - UNLP</h1>
 <p>
-Calle 49 y 115 s/n 1er piso
-<br/>
-Edificio ex-Liceo
-<br/>
-1900 La Plata, Buenos Aires
-<br/>
-Tel: (0221) 423-6696/6677 int 141   
+	Calle 49 y 115 s/n 1er piso
+	<br/>
+	Edificio ex-Liceo
+	<br/>
+	1900 La Plata, Buenos Aires
+	<br/>
+	Tel: (0221) 423-6696/6677 int 141   
 </p>
 
 <a id="gmaps" href="http://maps.google.com.ar/maps/place?cid=8758148143025525123&amp;q=prebi+sedici&amp;hl=es&amp;dtab=0&amp;sll=-34.906329,-57.938526&amp;sspn=0.011139,0.026157&amp;ie=UTF8&amp;ll=-34.90075,-57.951615&amp;spn=0,0&amp;z=16" target="_blank"></a>
-</div>
-]]>
-</div></div>
-</body>
 
-<meta>
-<pageMeta>
-<metadata element="title">¿Cómo llegar?</metadata>
-<trail target="/dspace">Repository Home</trail>
-</pageMeta>
-</meta>
+</div>
+
+</div>
+
+</div>
+</body>
 
 </document>
 

@@ -1,11 +1,19 @@
 <document xmlns="http://di.tamu.edu/DRI/1.0/"
 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 
+<meta>
+	<pageMeta>
+		<metadata element="title">Información para tesistas de posgrado</metadata>
+	</pageMeta>
+</meta>
+
 <body>
 <div>
+
 <head>Información para tesistas de posgrado</head>
+
 <div id='pagina_estatica' class="pagina_informacionTesistas">
-<![CDATA[
+
 <p>
 	Con el fin de socializar el conocimiento, la UNLP ha dictaminado, mediante la resolución 78/11, que 
 	todos los alumnos de posgrado deben depositar una copia digital de sus tesis en SeDiCI antes de 
@@ -16,12 +24,12 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 		<li>
 			Realizar <strong>autoarchivo</strong>. La ventaja de esta opción es que puede realizar el trámite 
 			completo desde la comodidad de su casa y en cualquier momento. Para ello, el tesista debe 
-			<a href="/login">iniciar sesión</a> en el sitio (si aún no es usuario, puede registrarse <a href="/register">aquí</a>) 
+			<a href="login">iniciar sesión</a> en el sitio (si aún no es usuario, puede registrarse <a href="register">aquí</a>) 
 			y luego acceder a la sección 
 			de autoarchivo. Allí, el sistema lo guiará por una serie de sencillos pasos que incluyen completar 
 			un formulario con los datos de la obra a agregar y subir el o los archivos de la misma. Luego, el 
 			autor debe completar, de puño y letra y en tinta azul, el 
-			<a href="/static/resources/licencia_de_deposito.pdf" target="_blank">Acuerdo de Cesión No Exclusiva de Derechos</a>. 
+			<a href="static/resources/licencia_de_deposito.pdf" target="_blank">Acuerdo de Cesión No Exclusiva de Derechos</a>. 
 			El mismo contiene, en su segunda hoja, un recuadro, el cual debe ser firmado y sellado por la 
 			secretaría de posgrado de la unidad académica correspondiente. Si por algún motivo el tesista no 
 			puede concurrir a la secretaría pero posee una copia del acta de defensa de la tesis, donde 
@@ -43,19 +51,15 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 	</ul>
 </p> 
 
-<p>Por cualquier duda o inquietud, escribir a <a href="mailto:info@sedici.unlp.edu.ar">info@sedici.unlp.edu.ar</a>, 
-	utilizar el formulario de <a href="/pages/contacto">contacto web</a> o llamar al 0221-4236677/6696 (interno 141).</p>
+<p>Por cualquier duda o inquietud, escribir a <strong>info@sedici.unlp.edu.ar</strong>, 
+	utilizar el formulario de <a href="pages/contacto">contacto web</a> o llamar al 0221-4236677/6696 (interno 141).</p>
 
 <p>Por consultas legales dirigirse a la <a href="http://www.unlp.edu.ar/propiedadintelectual" target="_blank">Dirección de Propiedad Intelectual</a> de la UNLP.</p>
-]]>
-</div></div>
+
+</div>
+
+</div>
 </body>
-<meta>
-<pageMeta>
-<metadata element="title">Información para tesistas de posgrado</metadata>
-<trail target="/dspace">Repository Home</trail>
-</pageMeta>
-</meta>
 
 </document>
 

@@ -1,39 +1,48 @@
 <document xmlns="http://di.tamu.edu/DRI/1.0/"
 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 
-<body><div>
+<meta>
+	<pageMeta>
+		<metadata element="title">Preguntas frecuentes</metadata>
+	</pageMeta>
+</meta>
+
+<body>
+<div>
+
 <head>Preguntas frecuentes</head>
+
 <div id='pagina_estatica' class="pagina_faq">
-<![CDATA[
+
 <div id="preguntas">		
 	<h1>Sobre SeDiCI</h1>
 	<ul>
-		<li><a href="#que_es">¿Qué es SeDiCI?</a></li>
-		<li><a href="#servicios">¿Qué servicios brinda SeDiCI?</a></li>
-		<li><a href="#por_que">¿Por qué publicar en SeDiCI?</a></li>
+		<li><a href="pages/FAQ#que_es">¿Qué es SeDiCI?</a></li>
+		<li><a href="pages/FAQ#servicios">¿Qué servicios brinda SeDiCI?</a></li>
+		<li><a href="pages/FAQ#por_que">¿Por qué publicar en SeDiCI?</a></li>
 	</ul>
 	
 	<h1>Servicios de búsqueda y recuperación</h1>
 	<ul>
-		<li><a href="#busqueda">¿Cómo realizar una búsqueda en SeDiCI?</a></li>
-		<li><a href="#exploracion">¿Qué tipos de exploración pueden realizarse sobre SeDiCI?</a></li>
-		<li><a href="#externos">¿Qué son los repositorios externos y qué se puede encontrar allí?</a></li>
+		<li><a href="pages/FAQ#busqueda">¿Cómo realizar una búsqueda en SeDiCI?</a></li>
+		<li><a href="pages/FAQ#exploracion">¿Qué tipos de exploración pueden realizarse sobre SeDiCI?</a></li>
+		<li><a href="pages/FAQ#externos">¿Qué son los repositorios externos y qué se puede encontrar allí?</a></li>
 	</ul>
 	
 	<h1>Servicios a usuarios</h1>
 	<ul>
-		<li><a href="#beneficios_usuario">¿Cuáles son los beneficios de registrarse como usuario del sitio?</a></li>
-		<li><a href="#sitio_usuario">¿Qué es y cómo se gestiona el sitio de usuario?</a></li>
+		<li><a href="pages/FAQ#beneficios_usuario">¿Cuáles son los beneficios de registrarse como usuario del sitio?</a></li>
+		<li><a href="pages/FAQ#sitio_usuario">¿Qué es y cómo se gestiona el sitio de usuario?</a></li>
 	</ul>
 	
 	<h1>Autoarchivo</h1>
 	<ul>
-		<li><a href="#autoarchivo">¿Qué es el Autoarchivo?</a></li>
-		<li><a href="#beneficios_autoarchivo">¿Cuáles son los beneficios del Autoarchivo?</a></li>
-		<li><a href="#tipos_documento">¿Qué tipos de documentos están permitidos?</a></li>
-		<li><a href="#embargo">¿Qué es el período de embargo?</a></li>
-		<li><a href="#licencia">¿Qué es la Licencia de Difusión Creative Commons?</a></li>
-		<li><a href="#acuerdo_cesion">¿Qué es y para qué sirve el Acuerdo de Cesión No Exclusiva de Derechos?</a></li>
+		<li><a href="pages/FAQ#autoarchivo">¿Qué es el Autoarchivo?</a></li>
+		<li><a href="pages/FAQ#beneficios_autoarchivo">¿Cuáles son los beneficios del Autoarchivo?</a></li>
+		<li><a href="pages/FAQ#tipos_documento">¿Qué tipos de documentos están permitidos?</a></li>
+		<li><a href="pages/FAQ#embargo">¿Qué es el período de embargo?</a></li>
+		<li><a href="pages/FAQ#licencia">¿Qué es la Licencia de Difusión Creative Commons?</a></li>
+		<li><a href="pages/FAQ#acuerdo_cesion">¿Qué es y para qué sirve el Acuerdo de Cesión No Exclusiva de Derechos?</a></li>
 	</ul>
 </div>
 
@@ -51,7 +60,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 			catalogación de cada uno de los recursos, también ofrece, en una buena parte de su acervo y en número creciente en los 
 			últimos años, el texto completo de los mismos. El acceso a estos textos es completamente abierto y gratuito, ya que 
 			SeDiCI se rige bajo el protocolo Open Archives Initiative (OAI).</p>
-		<a class="volver" href="#preguntas">Volver</a>
+		<a class="volver" href="pages/FAQ#preguntas">Volver</a>
 	</div>
 	
 				
@@ -63,7 +72,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 			<li>Autoarchivo</li>
 		</ul>
 		</p>
-		<a class="volver" href="#preguntas">Volver</a>
+		<a class="volver" href="pages/FAQ#preguntas">Volver</a>
 	</div>
 	
 
@@ -79,7 +88,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 		periódica). A su vez, también es posible refinar la búsqueda por tipo de documento: por ejemplo, se le puede indicar al 
 		sistema que recupere solamente todas las tesis de grado (o el documento que se desee) que contengan la palabra "física" en 
 		uno o cualquiera de sus metadatos.</p>
-		<a class="volver" href="#preguntas" >Volver</a>			
+		<a class="volver" href="pages/FAQ#preguntas" >Volver</a>			
 	</div>
 	
 
@@ -90,13 +99,13 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 		o sobre todos. Del mismo modo que en la búsqueda general, basta introducir una palabra o bien puede especificarse en qué metadato 
 		se desea encontrar esa palabra y en qué repositorio. En estos momentos, SeDiCI cuenta con acceso a 30 repositorios digitales de 
 		diversas partes del mundo y de muy variadas temáticas.</p>
-		<a class="volver" href="#preguntas">Volver</a>
+		<a class="volver" href="pages/FAQ#preguntas">Volver</a>
 	</div>
 
 
 	<div id="sitio_usuario">
 		<h1>¿Qué es y cómo se gestiona el sitio de usuario?</h1>
-		<a class="volver" href="#preguntas">Volver</a>
+		<a class="volver" href="pages/FAQ#preguntas">Volver</a>
 	</div>
 
 
@@ -107,7 +116,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 			<li>Realizar todas las gestiones necesarias para el autoarchivo.</li>
 		</ul>
 		</p>
-		<a class="volver" href="#preguntas">Volver</a>		
+		<a class="volver" href="pages/FAQ#preguntas">Volver</a>		
 	</div>
 	
 
@@ -125,7 +134,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 			<li>Descarga del Acuerdo de Cesión No Exclusiva de Derechos: en este último paso debe descargarse este acuerdo para ser impreso y completado de puño y letra por el autor. Luego, deberá concurrir personalmente a SeDiCI y presentar el mismo para que el documento pueda ser difundido en el portal. En el caso de que el usuario sea un tesista de posgrado, antes de concurrir a SeDiCI deberá hacer firmar y sellar el acuerdo en la Secretaría de Posgrado de su respectiva unidad académica, para hacer constar que la tesis ha sido aprobada antes de ser difundida, tal como lo requiere el artículo 2º de la Resolución 78/11.</li>
 		</ul>
 		</p>
-		<a class="volver" href="#preguntas">Volver</a>
+		<a class="volver" href="pages/FAQ#preguntas">Volver</a>
 	</div>
 	
 
@@ -137,7 +146,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 		que el autor lo desee, sin necesidad de hacer más trámites que completar una planilla, subir el trabajo e imprimir, firmar y traer 
 		el Acuerdo de Cesión. Aquellos autores que no puedan concurrir personalmente, pueden enviar por correo postal el mismo o encargarle 
 		a otra persona que lo traiga.</p>
-		<a class="volver" href="#preguntas">Volver</a> 				
+		<a class="volver" href="pages/FAQ#preguntas">Volver</a> 				
 	</div>
 	
 
@@ -160,7 +169,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 					conserva todos sus derechos.</li>
 			</ul>
 		</p>
-		<a class="volver" href="#preguntas">Volver</a>			
+		<a class="volver" href="pages/FAQ#preguntas">Volver</a>			
 	</div>
 	
 
@@ -173,7 +182,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 			tradicionales. El autor de la obra puede solicitar que el texto de la misma no sea visible por un período mínimo de 
 			tres meses hasta un máximo de veinticuatro. Al término del período de embargo, el texto completo de la obra será 
 			públicamente accesible desde el portal.</p>
-		<a class="volver" href="#preguntas">Volver</a>
+		<a class="volver" href="pages/FAQ#preguntas">Volver</a>
 	</div>
 	
 
@@ -212,7 +221,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 				pero no excluyentemente libros.</li>
 		</ul>
 		</p>
-		<a class="volver" href="#preguntas" >Volver</a>
+		<a class="volver" href="pages/FAQ#preguntas" >Volver</a>
 	</div>
 	
 
@@ -232,7 +241,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 				<li><a href="http://creativecommons.org/licenses/by-sa/2.5/ar/" target="_blank">Atribución- Compartir Derivadas Igual 2.5 Argentina</a></li>
 			</ul>
 		</p>
-		<a class="volver" href="#preguntas" >Volver</a>
+		<a class="volver" href="pages/FAQ#preguntas" >Volver</a>
 	</div>
 	
 
@@ -245,20 +254,16 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 		el mismo en los medios que considere oportuno en cualquier momento. Este acuerdo, a su vez, obliga a SeDiCI a preservar 
 		debidamente el material aportado y a difundirlo por su portal web. De este modo, ambas partes acuerdan y reconocen los 
 		derechos que les son inherentes.</p>
-		<a href="#preguntas" >Volver</a>
+		<a href="pages/FAQ#preguntas" >Volver</a>
 	</div>
 	
 	
 </div>
 
-]]></div>
-</div></body>
-<meta>
-<pageMeta>
-<metadata element="title">Preguntas frecuentes</metadata>
-<trail target="/dspace">Repository Home</trail>
-</pageMeta>
-</meta>
+</div>
+
+</div>
+</body>
 
 </document>
 

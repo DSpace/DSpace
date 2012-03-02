@@ -1,11 +1,19 @@
 <document xmlns="http://di.tamu.edu/DRI/1.0/"
 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 
+<meta>
+	<pageMeta>
+		<metadata element="title">Políticas del repositorio</metadata>
+	</pageMeta>
+</meta>
+
 <body>
 <div>
-<head>Política del repositorio</head>
+
+<head>Políticas del repositorio</head>
+
 <div id="pagina_estatica" class="pagina_politicas">
-<![CDATA[
+
 <p>
 SeDiCI es el Repositorio Institucional de la Universidad Nacional de La Plata, creado en el año 2003 para facilitar el 
 depósito de la producción científica e intelectual de las distintas unidades académicas de la UNLP, darle mayor visibilidad 
@@ -77,7 +85,7 @@ como <a href="http://www.openarchives.org/pmh/" target="_blank">OAI-PMH</a>.
 Cualquier alumno, docente o investigador de la UNLP puede publicar sus trabajos en forma gratuita en SeDiCI, personalmente o en línea 
 (autoarchivo). Los tipos de materiales aceptados son obras de naturaleza científica, académica y artística, tal como se detalla en la 
 política de contenidos. Para realizar la publicación de los documentos en SeDiCI (mediante autoarchivo o personalmente) es condición 
-necesaria la aceptación, por parte del usuario, de un <a href="resources/licencia_de_deposito.pdf" target="_blank">Acuerdo de Cesión No Exclusiva de Derechos</a>, 
+necesaria la aceptación, por parte del usuario, de un <a href="static/resources/licencia_de_deposito.pdf" target="_blank">Acuerdo de Cesión No Exclusiva de Derechos</a>, 
 que permitirá a SeDiCi la preservación y difusión de la obra. La condición “no exclusiva” del mismo significa que el creador no pierde 
 los derechos de autoría ni ningún otro derecho sobre su trabajo, pudiendo disponer de él libremente para publicarlo en otros 
 repositorios, o por cualquier otro medio que crea conveniente.
@@ -109,17 +117,12 @@ de los contenidos disponibles en el repositorio, las visitas, descargas y modali
 Estas estadísticas se actualizan periódicamente, son de carácter público y pueden ser consultadas en la web de SeDiCI por 
 cualquier visitante.
 </p>
-]]>
+
 </div>
+
 </div>
 </body>
 
-<meta>
-<pageMeta>
-<metadata element="title">Política del repositorio</metadata>
-<trail target="/dspace">Repository Home</trail>
-</pageMeta>
-</meta>
 
 </document>
 

@@ -1,11 +1,18 @@
 <document xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1"
 	version="1.1">
 
+	<meta>
+		<pageMeta>
+			<metadata element="title">Links</metadata>
+		</pageMeta>
+	</meta>
+
 	<body>
 		<div>
 			<head>Links</head>
+
 			<div id='pagina_estatica' class="pagina_links">
-				<![CDATA[
+				
 				<h1>Links UNLP</h1>
 				<ul>
 					<li>
@@ -147,16 +154,9 @@
 							a la educación superior.</p>
 					</li>
 				</ul>
-				]]>
+				
 			</div>
 		</div>
 	</body>
-
-	<meta>
-		<pageMeta>
-			<metadata element="title">Links</metadata>
-			<trail target="/dspace">Repository Home</trail>
-		</pageMeta>
-	</meta>
 
 </document>

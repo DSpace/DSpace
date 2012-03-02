@@ -1,11 +1,19 @@
 <document xmlns="http://di.tamu.edu/DRI/1.0/"
 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 
+<meta>
+	<pageMeta>
+		<metadata element="title">¿Qué es SeDiCI?</metadata>
+	</pageMeta>
+</meta>
+
 <body>
 <div>
+
 <head>¿Qué es SeDiCI?</head>
+
 <div id="pagina_estatica" class="pagina_queEsSedici">
-<![CDATA[
+
 <p>SeDiCI (Servicio de Difusión de la Creación Intelectual) es el repositorio institucional central de la 
 Universidad Nacional de La Plata y como tal su misión es albergar, preservar, difundir y dar 
 visibilidad a nivel mundial a toda la producción científica e intelectual de las distintas 
@@ -17,17 +25,11 @@ centros de investigación con que cuenta la universidad, así como otras publica
 vinculadas de un modo u otro a esta casa de altos estudios. SeDiCI apoya y se rige por los 
 lineamientos de la Open Archives Iniciative (OAI), en pos de la libre circulación y socialización 
 del conocimiento.</p>
-]]>
+
 </div>
+
 </div>
 </body>
-
-<meta>
-<pageMeta>
-<metadata element="title">Que es SEDICI?</metadata>
-<trail target="/dspace">Repository Home</trail>
-</pageMeta>
-</meta>
 
 </document>
 

@@ -32,12 +32,8 @@
     <xsl:output indent="yes"/>
 
     <xsl:template match="dri:div[@id='pagina_estatica']">
-    	<div>
-    		<xsl:attribute name="id">
-    			<xsl:value-of select="@class"/>
-    		</xsl:attribute>
-    		<xsl:attribute name="class">pagina_estatica</xsl:attribute>
-    		<xsl:value-of select="." disable-output-escaping="yes"/>
+    	<div class="pagina_estatica">
+    		<xsl:copy-of select="."/>
     	</div>
     </xsl:template>
 

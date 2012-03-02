@@ -1,10 +1,19 @@
 <document xmlns="http://di.tamu.edu/DRI/1.0/"
 xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 
+<meta>
+	<pageMeta>
+		<metadata element="title">Resolución</metadata>
+	</pageMeta>
+</meta>
+
 <body>
-<div><head>Resolución</head>
+<div>
+
+<head>Resolución</head>
+
 <div id='pagina_estatica' class="pagina_resolucion">
-<![CDATA[
+
 <a href="http://www.unlp.edu.ar/uploads/docs/ordenanza_n_264.pdf" title="Resolución sobre SeDiCI">ORDENANZA Nº 264/03</a>
 (Versión Taquigráfica Acta Nº 1159)
 
@@ -26,20 +35,11 @@ Proponer las formas de presentación y difusión de creaciones intelectuales no 
 
 <p><h2>ARTÍCULO 5º.</h2> Téngase por Ordenanza Nº 264. Comuníquese a todas la Unidades Académicas. Tomen razón Secretarías de Asuntos Académicos, de Ciencia y Técnica, de Extensión de las Actividades Universitarias, de Relaciones Institucionales, de Planeamiento, Obras y Servicios, Mesa General de Entradas y Archivo, Dirección General Operativa y pase a la Prosecretaría de Asuntos Jurídico-Legales a los efectos de su publicación en el Boletín Oficial. Cumplido, archívese.</p>
 
-
-
 <a href="http://www.unlp.edu.ar/uploads/docs/ordenanza_n_264.pdf" title="Resolución sobre SeDiCI">Leer ordernanza</a>
 
-]]>
 </div>
+
 </div>
 </body>
-
-<meta>
-<pageMeta>
-<metadata element="title">Contacto</metadata>
-<trail target="/dspace">Repository Home</trail>
-</pageMeta>
-</meta>
 
 </document>
