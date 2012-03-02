@@ -198,6 +198,13 @@ public class SyndicationFeed
         // add entries for items
         if (items != null)
         {
+
+            //http://dx.doi.org
+            String host = ConfigurationManager.getProperty("doi.hostname");
+
+            boolean localResolveeEnabled = ConfigurationManager.getBooleanProperty("webui.feed.localresolve", false);
+            String dspaceURL = ConfigurationManager.getProperty("dspace.url");
+
             List<SyndEntry> entries = new ArrayList<SyndEntry>();
             for (DSpaceObject itemDSO : items)
             {
@@ -211,9 +218,38 @@ public class SyndicationFeed
                 entries.add(entry);
              
                 String entryURL = resolveURL(request, item);
-                entry.setLink(entryURL);
-                entry.setUri(entryURL);
-             
+
+                DCValue[] values = item.getMetadata("dc.identifier");
+                if(values!=null && values.length > 0){
+                    // doi:10.5061/dryad.4q34p37b
+                    String id = values[0].value;
+
+                    // resource
+                    if(localResolveeEnabled){
+                        // http://localhost:8100/resource/doi:10.5061/dryad.k3n80
+                        entry.setLink(dspaceURL + "/resource/" + id);
+                        entry.setUri(dspaceURL + "/resource/" + id);
+
+                    }
+                    // dx.doi.org
+                    else{
+                        // http://dx.doi.org/10.5061/dryad.j35f6.3
+                        entry.setLink(host + "/" + id.replace("doi:", ""));
+                        entry.setUri(host + "/" +id.replace("doi:", ""));
+                    }
+                }
+                //  hdl.handle.net
+                else{
+                    // http://hdl.handle.net/10255/dryad.36287
+                    entry.setLink(entryURL);
+                    entry.setUri(entryURL);
+                }
+
+
+
+
+
+
                 String title = getOneDC(item, titleField);
                 entry.setTitle(title == null ? localize(labels, MSG_UNTITLED) : title);
              

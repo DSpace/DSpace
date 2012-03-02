@@ -168,7 +168,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
      */
     public SourceValidity getValidity() {
 
-        log.warn("DSpaceFeedGenerator - getValidity() !!!!!");
+        log.debug("DSpaceFeedGenerator - getValidity() !!!!!");
 
         if (this.validity == null) {
             try {
@@ -205,7 +205,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
      * Setup component wide configuration
      */
     public void configure(Configuration conf) throws ConfigurationException {
-        log.warn("DSpaceFeedGenerator - configure() !!!!!");
+        log.debug("DSpaceFeedGenerator - configure() !!!!!");
     }
 
 
@@ -227,7 +227,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
      */
     public void generate() throws IOException, SAXException, ProcessingException {
 
-        log.warn("DSpaceFeedGenerator - generate() !!!!!");
+        log.debug("DSpaceFeedGenerator - generate() !!!!!");
 
         try {
             Context context = ContextUtil.obtainContext(objectModel);
@@ -249,7 +249,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
             SyndicationFeed feed = new SyndicationFeed(SyndicationFeed.UITYPE_XMLUI);
 
 
-            log.warn("generate() !!!!!! : calling  getRecentlySubmittedItemsUsingDiscovery(context, dso);");
+            log.debug("generate() !!!!!! : calling  getRecentlySubmittedItemsUsingDiscovery(context, dso);");
 
             feed.populate(ObjectModelHelper.getRequest(objectModel), dso, getRecentlySubmittedItemsUsingDiscovery(context, dso), FeedUtils.i18nLabels);
             feed.setType(this.format);
@@ -273,14 +273,14 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     private Item[] getRecentlySubmittedItems(Context context, DSpaceObject dso)
             throws SQLException {
 
-        log.warn("getRecentlySubmittedItems() !!!!!! : recentSubmissionItems ==>> " + recentSubmissionItems);
+        log.debug("getRecentlySubmittedItems() !!!!!! : recentSubmissionItems ==>> " + recentSubmissionItems);
 
         if (recentSubmissionItems != null) {
             return recentSubmissionItems;
         }
 
 
-        log.warn("getRecentlySubmittedItems() !!!!!! : calling  getRecentlySubmittedItemsUsingDiscovery(context, dso);");
+        log.debug("getRecentlySubmittedItems() !!!!!! : calling  getRecentlySubmittedItemsUsingDiscovery(context, dso);");
 
         return getRecentlySubmittedItemsUsingDiscovery(context, dso);
     }
@@ -319,17 +319,17 @@ public class DSpaceFeedGenerator extends AbstractGenerator
     private Item[] getRecentlySubmittedItemsUsingDiscovery(Context context, DSpaceObject dso) throws SQLException {
 
 
-        log.warn("getRecentlySubmittedItemsUsingDiscovery(Context context, DSpaceObject dso)!!!!! ");
+        log.debug("getRecentlySubmittedItemsUsingDiscovery(Context context, DSpaceObject dso)!!!!! ");
 
         QueryResponse queryResults = performSearch(context, dso);
 
-        log.warn("getRecentlySubmittedItemsUsingDiscovery(Context context, DSpaceObject dso) - queryResults: " + queryResults);
+        log.debug("getRecentlySubmittedItemsUsingDiscovery(Context context, DSpaceObject dso) - queryResults: " + queryResults);
 
 
         Item[] items = new Item[queryResults.getResults().size()];
         int index = 0;
 
-        log.warn("getRecentlySubmittedItemsUsingDiscovery(Context context, DSpaceObject dso) - items: " + items.length);
+        log.debug("getRecentlySubmittedItemsUsingDiscovery(Context context, DSpaceObject dso) - items: " + items.length);
 
 
         for (SolrDocument doc : queryResults.getResults()) {
@@ -341,7 +341,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 
 
         // test scope.
-        printfoundItems(items);
+        //printfoundItems(items);
 
 
         List<Item> result = new ArrayList<Item>();
@@ -370,7 +370,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
         }
 
         // test scope.
-        printfoundItems(items);
+        //printfoundItems(items);
 
         return items;
     }
@@ -409,13 +409,13 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 
     private String getView(DSpaceObject dso) {
 //        if (dso instanceof Collection) {
-//            log.warn("getView(). return: collection");
+//            log.debug("getView(). return: collection");
 //            return "collection";
 //        } else if (dso instanceof Community) {
-//            log.warn("getView(). return: community");
+//            log.debug("getView(). return: community");
 //            return "community";
 //        }
-//        log.warn("getView(). return: site");
+//        log.debug("getView(). return: site");
         return "site";
     }
 
@@ -434,7 +434,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
             if (values != null && values.length > 0)
                 title = values[0].value;
 
-            log.warn("item " + item.getID() + ": " + id + " - " + title);
+            log.debug("item " + item.getID() + ": " + id + " - " + title);
         }
 
     }
@@ -462,11 +462,11 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 //         */
 //        public DSpaceValidity complete() {
 //
-//            log.warn("DSpaceFeedGenerator - complete() !!!!!");
+//            log.debug("DSpaceFeedGenerator - complete() !!!!!");
 //
 //            this.expires = System.currentTimeMillis() + CACHE_AGE;
 //
-//            log.warn("DSpaceFeedGenerator - complete(). this.expires: " + this.expires);
+//            log.debug("DSpaceFeedGenerator - complete(). this.expires: " + this.expires);
 //
 //            return super.complete();
 //        }
@@ -477,25 +477,25 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 //         */
 //        public int isValid() {
 //
-//            log.warn("DSpaceFeedGenerator - isValid(). this.completed: " + this.completed);
+//            log.debug("DSpaceFeedGenerator - isValid(). this.completed: " + this.completed);
 //
 //            // Return true if we have a hash.
 //            if (this.completed) {
-//                log.warn("DSpaceFeedGenerator - System.currentTimeMillis(): " + System.currentTimeMillis());
-//                log.warn("DSpaceFeedGenerator - this.expires: " + this.expires);
+//                log.debug("DSpaceFeedGenerator - System.currentTimeMillis(): " + System.currentTimeMillis());
+//                log.debug("DSpaceFeedGenerator - this.expires: " + this.expires);
 //                if (System.currentTimeMillis() < this.expires) {
 //                    // If the cache hasn't expired the just assume that it is still valid.
-//                    log.warn("DSpaceFeedGenerator - SourceValidity.VALID !!!!!");
+//                    log.debug("DSpaceFeedGenerator - SourceValidity.VALID !!!!!");
 //                    return SourceValidity.VALID;
 //                } else {
 //                    // The cache is past its age
-//                    log.warn("DSpaceFeedGenerator - SourceValidity.UNKNOWN !!!!!");
+//                    log.debug("DSpaceFeedGenerator - SourceValidity.UNKNOWN !!!!!");
 //                    return SourceValidity.UNKNOWN;
 //                }
 //            } else {
 //                // This is an error, state. We are being asked whether we are valid before
 //                // we have been initialized.
-//                log.warn("DSpaceFeedGenerator - SourceValidity.INVALID !!!!!");
+//                log.debug("DSpaceFeedGenerator - SourceValidity.INVALID !!!!!");
 //                return SourceValidity.INVALID;
 //            }
 //        }
@@ -507,7 +507,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 //         * @param otherValidity The other validity object.
 //         */
 //        public int isValid(SourceValidity otherValidity) {
-//            log.warn("DSpaceFeedGenerator - (SourceValidity otherValidity)");
+//            log.debug("DSpaceFeedGenerator - (SourceValidity otherValidity)");
 //
 //            if (this.completed && otherValidity instanceof FeedValidity) {
 //                FeedValidity other = (FeedValidity) otherValidity;
@@ -516,11 +516,11 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 //                    this.expires = System.currentTimeMillis() + CACHE_AGE;
 //                    other.expires = System.currentTimeMillis() + CACHE_AGE;
 //
-//                    log.warn("DSpaceFeedGenerator - SourceValidity.VALID !!!!!");
+//                    log.debug("DSpaceFeedGenerator - SourceValidity.VALID !!!!!");
 //                    return SourceValidity.VALID;
 //                }
 //            }
-//            log.warn("DSpaceFeedGenerator - SourceValidity.INVALID !!!!!");
+//            log.debug("DSpaceFeedGenerator - SourceValidity.INVALID !!!!!");
 //            return SourceValidity.INVALID;
 //        }
 //

@@ -34,7 +34,7 @@ public class CocoonForwardController {
 
     @RequestMapping
     public ModelAndView forwardRequest(HttpServletRequest request, HttpServletResponse response) throws SQLException {
-        log.warn("CocoonForwardController!!!!!");
+        log.debug("CocoonForwardController!!!!!");
         return new ModelAndView(new CocoonView());
     }
 

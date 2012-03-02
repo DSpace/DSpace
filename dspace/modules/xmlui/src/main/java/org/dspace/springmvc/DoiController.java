@@ -40,7 +40,7 @@ public class DoiController {
         PrintWriter writer = null;
         try {
 
-            log.warn("Inside Spring Controller!!! ");
+            log.debug("Inside Spring Controller!!! ");
 
             writer = response.getWriter();
             Minter myMinter = new Minter();
