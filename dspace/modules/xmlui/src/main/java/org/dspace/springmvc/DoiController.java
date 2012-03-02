@@ -41,11 +41,11 @@ public class DoiController {
             DOI doi = myMinter.getKnownDOI(doiID);
             if(doi != null){
 
-                // return handle: http://datadryad.org/handle/10255/dryad.20
-                //writer.println(doi.getInternalIdentifier().toString());
+                //return handle: http://datadryad.org/handle/10255/dryad.20
+                writer.println(doi.getInternalIdentifier().toString());
 
                 // return resource: http://localhost:8100/resource/doi:10.5061/dryad.20
-                writer.println(doi.getTargetURL().toString());
+                //writer.println(doi.getTargetURL().toString());
             }
             else{
                 writer.println("DOI not present.");
