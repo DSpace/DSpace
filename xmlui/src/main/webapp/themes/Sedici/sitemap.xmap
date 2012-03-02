@@ -22,6 +22,30 @@
         <map:readers>
             <map:reader name="ConcatenationReader" src="org.dspace.app.xmlui.cocoon.ConcatenationReader"/>
         </map:readers>
+        
+        <map:transformers>  
+	        <map:transformer name="i18n" src="org.dspace.app.xmlui.cocoon.DSpaceI18NTransformer">
+	                <catalogues default="default">
+	                        <catalogue id="default" name="messages" aspects="true">
+	                                <location>context://i18n/</location>
+	                                <!-- Two locations for each installed aspect will be installed, one inside
+	                                         the aspect's directory and another inside the base location listed
+	                                         above -->
+	                        </catalogue>
+	                </catalogues>
+	                <untranslated-text>untranslated</untranslated-text>
+	                <cache-at-startup>true</cache-at-startup>
+	        </map:transformer>    
+
+        </map:transformers>
+        
+        <map:actions>
+			<map:action name="ExceptionAction" src="ar.edu.unlp.sedici.aspect.redirect.ExceptionAction"/>
+		</map:actions>
+		
+		<map:selectors>
+            <map:selector name="ConfigurationParameterSelector" src="ar.edu.unlp.sedici.aspect.redirect.ConfigurationParameterSelector"/>
+        </map:selectors>
     </map:components>
 
     <map:pipelines>
@@ -204,5 +228,109 @@
 
 			</map:match>
 		</map:pipeline>
+		
+		
+        <map:handle-errors>
+                        
+            <map:select type="ConfigurationParameterSelector">
+                <map:parameter name="module" value="sedici-dspace"/>
+                <map:parameter name="property" value="xmlui.debug"/>
+                
+                <!-- esta en modo produccion -->
+                <map:when test="false"> 
+                   <map:select type="exception">	
+                            <map:when test="not-found">                                        
+				                <map:generate type="exception"/>
+                                <map:transform src="exception_production2html.xslt">
+                                   <map:parameter name="contextPath" value="{request:contextPath}"/>
+                                   <map:parameter name="pageTitle" value="Resource not found"/>
+                                </map:transform>
+                                <map:act type="locale">
+                                   <map:transform type="i18n">
+                                   <map:parameter name="locale" value="{locale}"/>
+                                   </map:transform>
+                                </map:act>
+                                <map:serialize type="xhtml" status-code="404"/>		
+                            </map:when>
+
+                            <map:when test="invalid-continuation">
+                            		<map:act type="ExceptionAction"/>
+                                    <map:generate type="exception"/>
+                                    <map:transform src="exception2html.xslt">
+                                            <map:parameter name="contextPath" value="{request:contextPath}"/>
+                                            <map:parameter name="pageTitle" value="Your Session has Expired"/>
+                                    </map:transform>
+                                    <map:act type="locale">
+                                        <map:transform type="i18n">
+                                                <map:parameter name="locale" value="{locale}"/>
+                                        </map:transform>
+                                    </map:act>
+                                    <map:serialize type="xhtml" status-code="404"/>
+                            </map:when>
+
+                            <map:otherwise>
+                            		<map:act type="ExceptionAction"/>
+                                    <map:generate type="exception"/>
+                                    <map:transform src="exception2html.xslt">
+                                            <map:parameter name="contextPath" value="{request:contextPath}"/>
+                                    </map:transform>
+                                    <map:act type="locale">
+                                        <map:transform type="i18n">
+                                                <map:parameter name="locale" value="{locale}"/>
+                                        </map:transform>
+                                    </map:act>
+                                    <map:serialize type="xhtml" status-code="500"/>
+                            </map:otherwise>
+                    </map:select>
+                </map:when>
+                
+                <!-- esta en modo debug -->
+                <map:otherwise>
+                	<map:select type="exception">	
+                            <map:when test="not-found">                                        
+				                <map:generate type="exception"/>
+                                <map:transform src="exception2html.xslt">
+                                        <map:parameter name="contextPath" value="{request:contextPath}"/>
+                                        <map:parameter name="pageTitle" value="Resource not found"/>
+                                </map:transform>
+                                <map:act type="locale">
+                                    <map:transform type="i18n">
+                                            <map:parameter name="locale" value="{locale}"/>
+                                    </map:transform>
+                                </map:act>
+                                <map:serialize type="xhtml" status-code="404"/>	                                    					
+                            </map:when>
+
+                            <map:when test="invalid-continuation">
+                                    <map:generate type="exception"/>
+                                    <map:transform src="exception2html.xslt">
+                                            <map:parameter name="contextPath" value="{request:contextPath}"/>
+                                            <map:parameter name="pageTitle" value="Your Session has Expired"/>
+                                    </map:transform>
+                                    <map:act type="locale">
+                                        <map:transform type="i18n">
+                                                <map:parameter name="locale" value="{locale}"/>
+                                        </map:transform>
+                                    </map:act>
+                                    <map:serialize type="xhtml" status-code="404"/>
+                            </map:when>
+
+                            <map:otherwise>
+                                    <map:generate type="exception"/>
+                                    <map:transform src="exception2html.xslt">
+                                            <map:parameter name="contextPath" value="{request:contextPath}"/>
+                                    </map:transform>
+                                    <map:act type="locale">
+                                        <map:transform type="i18n">
+                                                <map:parameter name="locale" value="{locale}"/>
+                                        </map:transform>
+                                    </map:act>
+                                    <map:serialize type="xhtml" status-code="500"/>
+                            </map:otherwise>
+                    </map:select>
+                </map:otherwise>
+           </map:select>                      
+                        
+        </map:handle-errors>
 	</map:pipelines>
 </map:sitemap>
