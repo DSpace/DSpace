@@ -106,7 +106,7 @@ public class BibTexView implements View {
 		}
 
 		if (journalName != null) {
-			builder.append("  journal = {").append(journalName).append("}");
+			builder.append("  journal = {").append(journalName).append("},");
 			builder.append(EOL);
 		}
 
