@@ -238,19 +238,18 @@
         <!-- cc-zero.png && opendata.png -->
         <xsl:choose>
             <xsl:when test=".//dim:field[@element='rights'][.='http://creativecommons.org/publicdomain/zero/1.0/']">
-            <div style="padding-left:1px; padding-top:2px;">
             <table>
                 <tr>
-                    <td>
+                    <td style="padding-left:2px">
                         <i18n:text>xmlui.dri2xhtml.METS-1.0.license-cc0</i18n:text>
                         <xsl:text> </xsl:text>
                     </td>
-                    <td>
+                    <td style="padding-left:0px">
                         <a href="http://creativecommons.org/publicdomain/zero/1.0/" target="_blank">
                             <img src="/themes/Dryad/images/cc-zero.png"/>
                         </a>
                     </td>
-                    <td>
+                    <td style="padding-left:0px">
                         <a href="http://opendefinition.org/">
                             <img src="/themes/Dryad/images/opendata.png"/>
                         </a>
@@ -258,7 +257,6 @@
                 </tr>
             </table>
             <xsl:text> &#160; </xsl:text>
-            </div>
             </xsl:when>
             <xsl:when test=".//dim:field[@element='rights'][.='http://opensource.org/licenses/gpl-3.0']">
                 <i18n:text>xmlui.dri2xhtml.METS-1.0.license-text</i18n:text>
