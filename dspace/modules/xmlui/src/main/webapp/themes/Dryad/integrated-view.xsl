@@ -238,7 +238,7 @@
         <!-- cc-zero.png && opendata.png -->
         <xsl:choose>
             <xsl:when test=".//dim:field[@element='rights'][.='http://creativecommons.org/publicdomain/zero/1.0/']">
-            <table>
+                <table class=".license-line">
                 <tr>
                     <td style="padding-left:2px">
                         <i18n:text>xmlui.dri2xhtml.METS-1.0.license-cc0</i18n:text>
