@@ -11,9 +11,10 @@ import org.dspace.content.DCDate;
 import org.dspace.content.DCValue;
 import org.dspace.content.Item;
 import org.dspace.content.MetadataField;
+import org.dspace.content.MetadataSchema;
 import org.dspace.core.ConfigurationManager;
 import org.dspace.core.Context;
-import org.dspace.embargo.DayTableEmbargoSetter;
+import org.dspace.embargo.DefaultEmbargoSetter;
 import org.dspace.embargo.EmbargoManager;
 
 /**
@@ -28,32 +29,36 @@ import org.dspace.embargo.EmbargoManager;
  * If field named embargo.field.startDate (dc.date.created by default) is empty , NOW is used
  * as relative Date in order to calculate the end of embargo period (lift)
  */
-public class DaysSinceStartDateEmbargoSetter extends DayTableEmbargoSetter {
+public class DaysSinceStartDateEmbargoSetter extends DaysEmbargoSetter {
 
     private static String startDate_schema = null;
     private static String startDate_element = null;
     private static String startDate_qualifier = null;
-    
-//    item.clearMetadata(lift_schema, lift_element, lift_qualifier, Item.ANY);
-//  item.addMetadata(lift_schema, lift_element, lift_qualifier, null, slift);
-//    
 
-    
-	private static Logger log = Logger.getLogger(EmbargoManager.class);
+	private static Logger log = Logger.getLogger(DaysSinceStartDateEmbargoSetter.class);
 
-	private Properties termProps = new Properties();
+//	private Properties termProps = new Properties();
 
-	private static String startDate = "dc.date.created";
+	private static String startDate = "dc.date.issued";
 
 	public DaysSinceStartDateEmbargoSetter() {
 		super();
-
+//		
+//        String terms = ConfigurationManager.getProperty("embargo.terms.days");
+//        if (terms != null && terms.length() > 0) {
+//            for (String term : terms.split(",")) {
+//                String[] parts = term.trim().split(":");
+//                termProps.setProperty(parts[0].trim(), parts[1].trim());
+//            }
+//        }
+//        
+        //
 		String cfg_startDate = ConfigurationManager.getProperty("embargo.field.startDate");
 		
-		if (cfg_startDate  != null || "".equals(startDate.trim()))
-			throw new IllegalStateException(
-					"Missing required DSpace configuration property 'embargo.field.startDate' for EmbargoManager, check your configuration file.");
-		
+		if (cfg_startDate != null && !"".equals(cfg_startDate.trim()))
+		{
+			startDate=cfg_startDate;
+		}
 	    String sa[] = startDate.split("\\.", 3);
 	    startDate_schema=sa[0];
 	    startDate_element=sa.length > 1 ? sa[1] : null;
@@ -61,61 +66,32 @@ public class DaysSinceStartDateEmbargoSetter extends DayTableEmbargoSetter {
 	    
 	    if (startDate_element == null)
 	    	throw new IllegalStateException(
-				 "Invalid DSpace configuration property 'embargo.field.startDate' for EmbargoManager, it should be like dc.element.qualifier or at least dc.element");
+				 "Invalid DSpace configuration property 'embargo.field.startDate' for EmbargoSetter, it should be like dc.element.qualifier or at least dc.element");
 
-//	    MetadataField.findByElement(Context context, int schemaID,
-//	            String element, String qualifier)
-	}
-
-	/**
-	 * Parse the terms into a definite date. Only terms expressions processed
-	 * are those defined in 'embargo.terms.days' configuration property.
-	 * 
-	 * @param context
-	 *            the DSpace context
-	 * @param item
-	 *            the item to embargo
-	 * @param terms
-	 *            los dias de embargo
-	 * @return parsed date in DCDate format
-	 */
-	public DCDate parseTerms(Context context, Item item, String terms)
-			throws SQLException, AuthorizeException, IOException {
-		Date embargoStartDate = this.checkEmbargoStartDate(item);
-
-		if (terms != null) {
-			if (termsOpen.equals(terms)) {
-				return EmbargoManager.FOREVER;
-			}
-			
-			String days = termProps.getProperty(terms);
-			if (days != null && days.length() > 0) {
-				long lift = embargoStartDate.getTime()
-						+ (Long.parseLong(days) * 24 * 60 * 60 * 1000);
-				if (System.currentTimeMillis() < lift) {
-					// el embargo sigue vigente, se le pone embargo
-					return new DCDate(new Date(lift));
-				}else{
-					log.debug("Se ignora el embargo del doc "+item.getHandle()+" porque cae en el pasado ("+new Date(lift).toString()+")");
-				}
-			}
+		try {
+			Context context = new Context();
+			MetadataSchema schema = MetadataSchema.find(context, startDate_schema);
+			if (schema == null) 
+				throw new IllegalStateException("Unknown MetadataSchema '"+startDate_schema+"' on DSpace configuration property 'embargo.field.startDate' ("+startDate+")");
+			MetadataField field = MetadataField.findByElement(context, schema.getSchemaID(), startDate_element, startDate_qualifier);
+			if (field == null) 
+				throw new IllegalStateException("Unknown MetadataField '"+startDate+"' on DSpace configuration property 'embargo.field.startDate'");
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new IllegalStateException(e);
+		} catch (AuthorizeException e) {
+			e.printStackTrace();
+			throw new IllegalStateException(e);
 		}
-		return null;
+	    
+	    log.info("Se inicialza correctamente el EmbargoSetter del módulo de embargo. Se usa el campo ("+startDate+") como Fecha de inicio de los embargos.");
 	}
 
-	private Date checkEmbargoStartDate(Item item) {
+	protected Date getEmbargoStartDate(Item item) {
 		DCValue embargoStartDates[] = item.getMetadata(startDate);
-		DCDate embargoStartDate;
-		if (embargoStartDates.length > 1){
-			embargoStartDate = new DCDate(embargoStartDates[0].value);
-		}else{
-			// Si no hay un campo inicial para el embargo, uso el current
-			log.debug("No se encontro una fecha para el inicio de embargo ("+startDate+") del doc "+item.getHandle()+" , se usa el dia de hoy");
-			embargoStartDate  = new DCDate(new Date());
-//			item.clearMetadata(lift_schema, lift_element, lift_qualifier, Item.ANY);
-		    item.addMetadata(startDate_schema, startDate_element, startDate_qualifier, null, embargoStartDate.toString());
-		}
-		
-		return embargoStartDate.toDate();
+		if (embargoStartDates.length > 0)
+			return new DCDate(embargoStartDates[0].value).toDate();
+		else 
+			return null;
 	}
 }

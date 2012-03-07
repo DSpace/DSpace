@@ -887,8 +887,8 @@
 		<!-- Los valores se guardan en Dias -->
 		<value-pairs value-pairs-name="embargo_periods">
 			<pair>
-				<displayed-value>NO SE SOLICITA EMBARGO</displayed-value>
-				<stored-value>0</stored-value>
+				<displayed-value>No aplicar embargo (recomendado)</displayed-value>
+				<stored-value></stored-value>
 			</pair>
 			<pair>
 				<displayed-value>1 Mes</displayed-value>
@@ -903,15 +903,15 @@
 				<stored-value>180</stored-value>
 			</pair>
 			<pair>
-				<displayed-value>1 Año</displayed-value>
+				<displayed-value>12 meses</displayed-value>
 				<stored-value>365</stored-value>
 			</pair>
 			<pair>
-				<displayed-value>1 Año y 6 Meses</displayed-value>
+				<displayed-value>18 Meses</displayed-value>
 				<stored-value>545</stored-value>
 			</pair>
 			<pair>
-				<displayed-value>2 Años</displayed-value>
+				<displayed-value>24 meses</displayed-value>
 				<stored-value>730</stored-value>
 			</pair>
 		</value-pairs>
