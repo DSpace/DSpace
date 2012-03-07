@@ -1264,30 +1264,6 @@ h3.bold {
 color:black;
 }
 
-div.item-summary-view-metadata h1,
-div.item-summary-view-metadata h2 {
-    line-height: normal;
-}
-
-div.item-summary-view-metadata {
-    text-align: justify;
-    line-height: 161.6%;
-    margin-bottom: 30px;
-}
-
-div.simple-item-view-authors {
-    font-size: 100%;
-    font-weight: normal;
-    border-bottom:1px solid #D8E8EB;
-    padding-bottom: 2px;
-    margin-bottom: 20px;
-    text-align: justify;
-}
-
-div.simple-item-view-authors span{
-    text-align: justify;
-	color:black;
-}
 
 #aspect_artifactbrowser_ItemViewer_div_item-view h2,
 div.item-summary-view-metadata p.item-view-toggle-bottom,
@@ -2199,7 +2175,7 @@ padding-left:10px;
 }
 
 .publisher {
-margin-left:5px;
+/*margin-left:5px;*/
 }
 
 
@@ -2443,4 +2419,101 @@ background: url(../../images/mapa_grande_2.jpg);
 	font-size: 14px;
 	margin-top: 15px;
 	margin-bottom: 5px;
+}
+
+div.item-summary-view-metadata h1 {
+	line-height: normal;
+	clear: both;
+	margin-top: 10px;
+	color: #505050;
+	text-align: justify;
+}
+div.item-summary-view-metadata h2 {
+    line-height: normal;
+}
+
+div.item-summary-view-metadata {
+    text-align: justify;
+    line-height: 161.6%;
+    margin-bottom: 30px;
+}
+
+div.simple-item-view-authors {
+    font-size: 100%;
+    font-weight: normal;
+    border-bottom:1px solid #D8E8EB;
+    padding-bottom: 2px;
+    margin-bottom: 5px;
+    margin-top: 10px;
+    text-align: justify;
+}
+
+.metadata-label {
+	font-weight: bold;
+	color: #707070;	
+}
+.metadata-value {
+	color: #444444;	
+}
+span.ds-dc_contributor_author-authority {
+	color: inherit !important;
+}
+.metadata-lang {
+	color: #FFFFFF;
+	background-color: #C0C0C0;
+	padding: 2px 5px;
+	font-size: 10px;
+}
+.item-summary-view-metadata .metadata {
+	margin-top: 5px;
+}
+.item-summary-view-metadata #contributors .metadata {
+	/*float: left;*/	
+}
+.item-summary-view-metadata #contributors .metadata .metadata-value {
+	/*display: block;*/
+}
+/*
+.item-summary-view-metadata .metadata.identifier-uri span {
+	display: block;
+}
+.item-summary-view-metadata .metadata.identifier-uri span.metadata-value {
+	padding-left: 20px;
+}
+*/
+.item-summary-view-metadata .metadata.date-available {
+	float: right;
+	margin-top: 0px;
+}
+.item-summary-view-metadata .metadata.date-available span {
+	font-weight: normal;
+	color: #707070;
+	font-size: 75%;
+}
+.item-summary-view-metadata .metadata.date-issued {
+	float: right;
+	margin-top: 0px;
+}
+.item-summary-view-metadata .metadata.title-subtitle span.metadata-label {
+	display: none;
+}
+.item-summary-view-metadata .metadata.title-subtitle span.metadata-value {
+	font-size: 130%;
+}
+.item-summary-view-metadata #view-item-metadata {
+	float: right;
+}
+.item-summary-view-metadata #other_attributes ul {
+	list-style: circle;
+}
+.item-summary-view-metadata .tesis-info {
+	padding: 2px 15px 10px 15px;
+	border: solid 1px #C0C0C0;
+}
+.contenedor_autores {
+	float: left;
+	margin-right: 15px;
+}
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-author-results {
+	clear: both;
 }
