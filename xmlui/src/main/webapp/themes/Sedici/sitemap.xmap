@@ -239,7 +239,8 @@
                 <!-- esta en modo produccion -->
                 <map:when test="false"> 
                    <map:select type="exception">	
-                            <map:when test="not-found">                                        
+                            <map:when test="not-found">  
+                                <map:act type="ExceptionAction"/>                                      
 				                <map:generate type="exception"/>
                                 <map:transform src="exception_production2html.xslt">
                                    <map:parameter name="contextPath" value="{request:contextPath}"/>
@@ -256,7 +257,7 @@
                             <map:when test="invalid-continuation">
                             		<map:act type="ExceptionAction"/>
                                     <map:generate type="exception"/>
-                                    <map:transform src="exception2html.xslt">
+                                    <map:transform src="exception_production2html.xslt">
                                             <map:parameter name="contextPath" value="{request:contextPath}"/>
                                             <map:parameter name="pageTitle" value="Your Session has Expired"/>
                                     </map:transform>
@@ -271,7 +272,7 @@
                             <map:otherwise>
                             		<map:act type="ExceptionAction"/>
                                     <map:generate type="exception"/>
-                                    <map:transform src="exception2html.xslt">
+                                    <map:transform src="exception_production2html.xslt">
                                             <map:parameter name="contextPath" value="{request:contextPath}"/>
                                     </map:transform>
                                     <map:act type="locale">

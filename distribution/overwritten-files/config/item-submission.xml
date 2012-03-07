@@ -234,6 +234,12 @@
 		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.LicenseStep</xmlui-binding>
 		<workflow-editable>false</workflow-editable>
       </step>
+      
+      <!--Step 7 cagará datos fijos en el item. No tendrá interface-->
+      <!-- <step>
+        <processing-class>ar.edu.unlp.sedici.aspect.extraSubmission.submit.AutomaticMetadataStep</processing-class>
+		<workflow-editable>false</workflow-editable>
+      </step>  -->
 
 
      
