@@ -2181,4 +2181,8 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 
 <message key="xmlui.administrative.Navigation.context_edit_item_workflow">Editar Item</message>
 
+<message key="xmlui.discovery.ver_filtros">Ver filtros</message>
+
+<message key="xmlui.discovery.ocultar_filtros">Ocultar filtros</message>
+
 </catalogue>
