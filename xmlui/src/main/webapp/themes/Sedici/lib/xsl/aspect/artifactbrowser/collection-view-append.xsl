@@ -112,7 +112,18 @@
             </img>
     </xsl:if>
     </xsl:template>
-
+    
+    <!-- -----------Templates para el manejo de la vista de una coleccion en especial ------------ -->
+    
+    <xsl:template match="dri:div[@n='collection-home']">
+     <div id="aspect_artifactbrowser_CollectionViewer_div_collection-home" class="ds-static-div primary repository collection">
+        <xsl:apply-templates select="dri:head"/>
+        <xsl:apply-templates select="dri:div[@n='collection-view']"/>
+        <xsl:apply-templates select="dri:div[@n='collection-search-browse']"/>
+        <xsl:apply-templates select="dri:div[@n='collection-recent-submission']"/>
+        <xsl:apply-templates select="dri:div[@n='community-view-root']"/>    
+      </div>           
+    </xsl:template>
        
 
 </xsl:stylesheet>

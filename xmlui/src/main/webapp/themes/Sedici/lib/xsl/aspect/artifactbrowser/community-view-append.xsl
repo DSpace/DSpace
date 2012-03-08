@@ -34,17 +34,6 @@
 
     <xsl:output indent="yes"/>
 
-    <!-- A community rendered in the detailView pattern; default way of viewing a community. -->
-    <xsl:template name="communityDetailView-DIM">
-        <div class="detail-view">&#160;
-            <!-- Generate the logo, if present, from the file section -->
-            <!-- <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='LOGO']"/> -->
-            <!-- Generate the info about the collections from the metadata section -->
-            <xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim"
-                mode="communityDetailView-DIM"/>
-        </div>
-    </xsl:template>
-
     <!-- Capturo el id del div header, y muestra el titulo con el logo de la comunidad -->    
     <xsl:template match="dri:div[@id='aspect.artifactbrowser.CommunityViewer.div.community-home']/dri:head">
           <xsl:choose>
@@ -72,10 +61,7 @@
 	            <xsl:with-param name="id">community-actual-div</xsl:with-param>            
 	          </xsl:apply-templates>
 		  </xsl:if>
-
-
-
-
+		  
     </xsl:template>
 
   
@@ -107,7 +93,46 @@
            <p></p>
            </xsl:otherwise>
            </xsl:choose>           
-   </xsl:template>      
- 
+   </xsl:template>  
+   
+   	<!-- A community rendered in the detailView pattern; default way of viewing a community. -->
+    <xsl:template name="communityDetailView-DIM">
+        <div class="detail-view">&#160;
+            <!-- Generate the logo, if present, from the file section -->
+            <!-- <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='LOGO']"/> -->
+            <!-- Generate the info about the collections from the metadata section -->
+            <xsl:apply-templates select="./mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']/mets:xmlData/dim:dim"
+                mode="communityDetailView-DIM"/>
+        </div>
+        
+    </xsl:template>    
+   
+   <!-- -----------Templates para el manejo de la vista de una comunidad en especial ------------ -->
+   
+   <xsl:template match="dri:div[@n='community-home']">
+     <div id="aspect_artifactbrowser_CommunityViewer_div_community-home" class="ds-static-div primary repository community">
+        <xsl:apply-templates select="dri:head"/>
+        <xsl:apply-templates select="dri:div[@n='community-view']"/>  
+        <xsl:apply-templates select="dri:div[@n='community-recent-submission']"/>
+        <xsl:apply-templates select="dri:div[@n='community-view-root']"/>
+     </div>              
+    </xsl:template>
+    
+    <xsl:template match="dri:div[@n='community-view']">
+         <xsl:apply-templates select="dri:referenceSet/dri:reference" mode='mi-community-view'/>
+         <xsl:apply-templates select="/dri:document/dri:body/dri:div[@id='aspect.artifactbrowser.CommunityViewer.div.community-home']/dri:div[@n='community-search-browse']"/>
+         <xsl:apply-templates select="dri:referenceSet/dri:reference/dri:referenceSet"/>        
+    </xsl:template>
+    
+    <xsl:template match='dri:reference' mode='mi-community-view'>
+        <xsl:variable name="externalMetadataURL">
+            <xsl:text>cocoon:/</xsl:text>
+            <xsl:value-of select="@url"/>
+            <!-- No options selected, render the full METS document -->
+        </xsl:variable>
+        <xsl:comment> External Metadata URL: <xsl:value-of select="$externalMetadataURL"/> </xsl:comment>
+        <xsl:apply-templates select="document($externalMetadataURL)" mode="detailView"/>
+     </xsl:template>
+
 
 </xsl:stylesheet>
