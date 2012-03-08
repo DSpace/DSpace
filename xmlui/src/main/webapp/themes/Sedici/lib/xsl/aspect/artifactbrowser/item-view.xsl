@@ -43,35 +43,27 @@
         mode="itemSummaryView-DIM"/>
 
         <!-- Generate the bitstream information from the file section -->
-        <xsl:choose>
-            <xsl:when test="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']">
-                <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']">
-                    <xsl:with-param name="context" select="."/>
-                    <xsl:with-param name="primaryBitstream" select="./mets:structMap[@TYPE='LOGICAL']/mets:div[@TYPE='DSpace Item']/mets:fptr/@FILEID"/>
-                </xsl:apply-templates>
-            </xsl:when>
-            <!-- Special case for handling ORE resource maps stored as DSpace bitstreams -->
-            <xsl:when test="./mets:fileSec/mets:fileGrp[@USE='ORE']">
-                <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='ORE']"/>
-            </xsl:when>
-            <xsl:otherwise>
-                <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h2>
-                <table class="ds-table file-list">
-                    <tr class="ds-table-header-row">
-                        <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-file</i18n:text></th>
-                        <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-size</i18n:text></th>
-                        <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-format</i18n:text></th>
-                        <th><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-view</i18n:text></th>
-                    </tr>
-                    <tr>
-                        <td colspan="4">
-                            <p><i18n:text>xmlui.dri2xhtml.METS-1.0.item-no-files</i18n:text></p>
-                        </td>
-                    </tr>
-                </table>
-            </xsl:otherwise>
-        </xsl:choose>
-
+        <div id="item-file-section">
+			<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h2>
+	        <xsl:choose>
+	            <xsl:when test="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']">
+	                <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CONTENT' or @USE='ORIGINAL']">
+	                    <xsl:with-param name="context" select="."/>
+	                    <xsl:with-param name="primaryBitstream" select="./mets:structMap[@TYPE='LOGICAL']/mets:div[@TYPE='DSpace Item']/mets:fptr/@FILEID"/>
+	                </xsl:apply-templates>
+	            </xsl:when>
+	            
+	            <!-- Special case for handling ORE resource maps stored as DSpace bitstreams -->
+	            <xsl:when test="./mets:fileSec/mets:fileGrp[@USE='ORE']">
+	                <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='ORE']"/>
+	            </xsl:when>
+	            
+	            <xsl:otherwise>
+					<p><i18n:text>xmlui.dri2xhtml.METS-1.0.item-no-files</i18n:text></p>
+	            </xsl:otherwise>
+	        </xsl:choose>
+		</div>
+		
         <!-- Generate the Creative Commons license information from the file section (DSpace deposit license hidden by default)-->
         <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CC-LICENSE']"/>
 
@@ -243,57 +235,56 @@
 			</div>
 		</xsl:if>
 
-		<xsl:choose>
-			<!-- Si tiene director asumimos que es una tesis -->
-			<xsl:when test="dim:field[@element='contributor' and @qualifier='director']">
-				<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.tesis-info</i18n:text></h2>
-				<!-- contributor.director row -->
-				<xsl:call-template name="render-normal-field">
-					<xsl:with-param name="name" select="'contributor-director'" />
-					<xsl:with-param name="elements" select="dim:field[@element='contributor' and @qualifier='director']" />
-				</xsl:call-template>
-		
-				<!-- contributor.codirector row -->
-				<xsl:call-template name="render-normal-field">
-					<xsl:with-param name="name" select="'contributor-codirector'" />
-					<xsl:with-param name="elements" select="dim:field[@element='contributor' and @qualifier='codirector']" />
-				</xsl:call-template>
-		
-				<!-- date.exposure row -->
-				<xsl:call-template name="render-normal-field">
-					<xsl:with-param name="name" select="'date-exposure'" />
-					<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='exposure']" />
-				</xsl:call-template>
+		<!-- Si tiene director asumimos que es una tesis -->
+		<xsl:if test="dim:field[@element='contributor' and @qualifier='director']">
+			<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.tesis-info</i18n:text></h2>
+			<!-- contributor.director row -->
+			<xsl:call-template name="render-normal-field">
+				<xsl:with-param name="name" select="'contributor-director'" />
+				<xsl:with-param name="elements" select="dim:field[@element='contributor' and @qualifier='director']" />
+			</xsl:call-template>
+	
+			<!-- contributor.codirector row -->
+			<xsl:call-template name="render-normal-field">
+				<xsl:with-param name="name" select="'contributor-codirector'" />
+				<xsl:with-param name="elements" select="dim:field[@element='contributor' and @qualifier='codirector']" />
+			</xsl:call-template>
+	
+			<!-- date.exposure row -->
+			<xsl:call-template name="render-normal-field">
+				<xsl:with-param name="name" select="'date-exposure'" />
+				<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='exposure']" />
+			</xsl:call-template>
 
-				<!-- affiliatedInstitution row -->
-				<xsl:call-template name="render-normal-field">
-					<xsl:with-param name="name" select="'affiliated-institution'" />
-					<xsl:with-param name="elements" select="dim:field[@element='AffiliatedInstitution']" />
-				</xsl:call-template>
-		
-				<!-- degree.name row -->
-				<xsl:call-template name="render-normal-field">
-					<xsl:with-param name="name" select="'degree-name'" />
-					<xsl:with-param name="elements" select="dim:field[@element='degree' and @qualifier='name']" />
-				</xsl:call-template>
-		
-				<!-- degree.grantor row -->
-				<xsl:call-template name="render-normal-field">
-					<xsl:with-param name="name" select="'degree-grantor'" />
-					<xsl:with-param name="elements" select="dim:field[@element='degree' and @qualifier='grantor']" />
-				</xsl:call-template>
-			</xsl:when>
-			<xsl:otherwise>
-				<!-- date.exposure row -->
-				<xsl:call-template name="render-normal-field">
-					<xsl:with-param name="name" select="'date-exposure'" />
-					<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='exposure']" />
-				</xsl:call-template>
-			</xsl:otherwise>		
-		</xsl:choose>
+			<!-- affiliatedInstitution row -->
+			<xsl:call-template name="render-normal-field">
+				<xsl:with-param name="name" select="'affiliated-institution'" />
+				<xsl:with-param name="elements" select="dim:field[@element='AffiliatedInstitution']" />
+			</xsl:call-template>
+	
+			<!-- degree.name row -->
+			<xsl:call-template name="render-normal-field">
+				<xsl:with-param name="name" select="'degree-name'" />
+				<xsl:with-param name="elements" select="dim:field[@element='degree' and @qualifier='name']" />
+			</xsl:call-template>
+	
+			<!-- degree.grantor row -->
+			<xsl:call-template name="render-normal-field">
+				<xsl:with-param name="name" select="'degree-grantor'" />
+				<xsl:with-param name="elements" select="dim:field[@element='degree' and @qualifier='grantor']" />
+			</xsl:call-template>
+		</xsl:if>
 
-
+		
 		<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.general-info</i18n:text></h2>
+		<xsl:if test="not(dim:field[@element='contributor' and @qualifier='director'])">
+			<!-- date.exposure row -->
+			<xsl:call-template name="render-normal-field">
+				<xsl:with-param name="name" select="'date-exposure'" />
+				<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='exposure']" />
+			</xsl:call-template>
+		</xsl:if>
+
 		<xsl:if test="(dim:field[@element='contributor' and (@qualifier='editor' or @qualifier='translator' or @qualifier='compiler' or @qualifier='juror' or @qualifier='colaborator')])">
 			<div id="contributors">
 				<!-- contributor.editor row -->
@@ -648,7 +639,6 @@
         <xsl:param name="context"/>
         <xsl:param name="primaryBitstream" select="-1"/>
 
-        <h2><i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-head</i18n:text></h2>
         <div class="file-list">
             <xsl:choose>
                 <!-- If one exists and it's of text/html MIME type, only display the primary bitstream -->
@@ -679,38 +669,46 @@
                         <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
                     </xsl:attribute>
                     <xsl:choose>
-                        <xsl:when test="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/
-                        mets:file[@GROUPID=current()/@GROUPID]">
+                        <xsl:when test="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[@GROUPID=current()/@GROUPID]">
                             <img alt="Thumbnail">
                                 <xsl:attribute name="src">
-                                    <xsl:value-of select="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/
-                                    mets:file[@GROUPID=current()/@GROUPID]/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
+                                    <xsl:value-of select="$context/mets:fileSec/mets:fileGrp[@USE='THUMBNAIL']/mets:file[@GROUPID=current()/@GROUPID]/mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
                                 </xsl:attribute>
                             </img>
                         </xsl:when>
                         <xsl:otherwise>
-                            <img alt="Icon" src="{concat($theme-path, '/images/mime.png')}" style="height: {$thumbnail.maxheight}px;"/>
+                        	<xsl:variable name="file_type" select="substring-before(@MIMETYPE, '/')"/>
+                        	<xsl:variable name="file_subtype" select="substring-after(@MIMETYPE, '/')"/>
+                        	<xsl:variable name="img_path">
+	                        	<xsl:choose>
+	                        		<xsl:when test="$file_type = 'image'">mime_img.png</xsl:when>
+	                        		<xsl:when test="$file_subtype = 'pdf'">mime_pdf.png</xsl:when>
+	                        		<xsl:when test="$file_subtype = 'msword'">mime_msword.png</xsl:when>
+	                        		<xsl:otherwise>mime.png</xsl:otherwise>
+	                        	</xsl:choose>
+                        	</xsl:variable>
+<!--                         	style="height: {$thumbnail.maxheight}px;" -->
+                            <img alt="Icon" src="{concat($theme-path, '/images/',$img_path)}"/>
                         </xsl:otherwise>
                     </xsl:choose>
                 </a>
             </div>
-            <div class="file-metadata" style="height: {$thumbnail.maxheight}px;">
+<!--             style="height: {$thumbnail.maxheight}px;" -->
+            <div class="file-metadata">
+                <!-- Display the contents of 'Description' only if bitstream contains a description -->
+                <xsl:if test="mets:FLocat[@LOCTYPE='URL']/@xlink:label != ''">
+                    <div>
+		                <a class="image-link">
+		                    <xsl:attribute name="href">
+		                        <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
+		                    </xsl:attribute>
+	                        <span>
+	                            <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label"/>
+	                        </span>
+		                 </a>
+                    </div>
+                </xsl:if>
                 <div>
-                    <span class="bold">
-                        <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-name</i18n:text>
-                        <xsl:text>:</xsl:text>
-                    </span>
-                    <span>
-                        <xsl:attribute name="title"><xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:title"/></xsl:attribute>
-                        <xsl:value-of select="util:shortenString(mets:FLocat[@LOCTYPE='URL']/@xlink:title, 17, 5)"/>
-                    </span>
-                </div>
-                <!-- File size always comes in bytes and thus needs conversion -->
-                <div>
-                    <span class="bold">
-                        <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-size</i18n:text>
-                        <xsl:text>:</xsl:text>
-                    </span>
                     <span>
                         <xsl:choose>
                             <xsl:when test="@SIZE &lt; 1024">
@@ -731,16 +729,11 @@
                             </xsl:otherwise>
                         </xsl:choose>
                     </span>
-                </div>
-                <!-- Lookup File Type description in local messages.xml based on MIME Type.
-         In the original DSpace, this would get resolved to an application via
-         the Bitstream Registry, but we are constrained by the capabilities of METS
-         and can't really pass that info through. -->
-                <div>
-                    <span class="bold">
-                        <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-format</i18n:text>
-                        <xsl:text>:</xsl:text>
-                    </span>
+                    <xsl:text> - </xsl:text>
+	                <!-- Lookup File Type description in local messages.xml based on MIME Type.
+			         In the original DSpace, this would get resolved to an application via
+			         the Bitstream Registry, but we are constrained by the capabilities of METS
+			         and can't really pass that info through. -->
                     <span>
                         <xsl:call-template name="getFileTypeDesc">
                             <xsl:with-param name="mimetype">
@@ -751,29 +744,6 @@
                         </xsl:call-template>
                     </span>
                 </div>
-                <!---->
-                <!-- Display the contents of 'Description' only if bitstream contains a description -->
-                <xsl:if test="mets:FLocat[@LOCTYPE='URL']/@xlink:label != ''">
-                    <div>
-                        <span class="bold">
-                            <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-description</i18n:text>
-                            <xsl:text>:</xsl:text>
-                        </span>
-                        <span>
-                            <xsl:attribute name="title"><xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label"/></xsl:attribute>
-                            <!--<xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:label"/>-->
-                            <xsl:value-of select="util:shortenString(mets:FLocat[@LOCTYPE='URL']/@xlink:label, 17, 5)"/>
-                        </span>
-                    </div>
-                </xsl:if>
-            </div>
-            <div class="file-link" style="height: {$thumbnail.maxheight}px;">
-                <a>
-                    <xsl:attribute name="href">
-                        <xsl:value-of select="mets:FLocat[@LOCTYPE='URL']/@xlink:href"/>
-                    </xsl:attribute>
-                    <i18n:text>xmlui.dri2xhtml.METS-1.0.item-files-viewOpen</i18n:text>
-                </a>
             </div>
         </div>
 

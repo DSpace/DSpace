@@ -1289,18 +1289,13 @@ div.spacer{
 .file-metadata,
 .file-link {
     float: left;
-    margin-right: 15px;
+    margin-right: 5px;
 }
 
 .item-metadata {
     float: left;
 }
 
-.file-metadata {
-    width: 300px;
-}
-
-.file-metadata span,
 .item-metadata span {
     float: left;
 }
@@ -2427,6 +2422,7 @@ div.item-summary-view-metadata h1 {
 	margin-top: 10px;
 	color: #505050;
 	text-align: justify;
+	font-size: 160%;
 }
 div.item-summary-view-metadata h2 {
     line-height: normal;
@@ -2467,20 +2463,6 @@ span.ds-dc_contributor_author-authority {
 .item-summary-view-metadata .metadata {
 	margin-top: 5px;
 }
-.item-summary-view-metadata #contributors .metadata {
-	/*float: left;*/	
-}
-.item-summary-view-metadata #contributors .metadata .metadata-value {
-	/*display: block;*/
-}
-/*
-.item-summary-view-metadata .metadata.identifier-uri span {
-	display: block;
-}
-.item-summary-view-metadata .metadata.identifier-uri span.metadata-value {
-	padding-left: 20px;
-}
-*/
 .item-summary-view-metadata .metadata.date-available {
 	float: right;
 	margin-top: 0px;
