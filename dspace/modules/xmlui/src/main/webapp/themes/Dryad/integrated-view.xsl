@@ -56,9 +56,8 @@
                 <xsl:copy-of select=".//dim:field[@element='title']"/>
             </span>
 
-            <xsl:variable name="pageviews" select=".//dim:field[@element='dryad'][@qualifier='pageviews']"/>
+           <!-- <xsl:variable name="pageviews" select=".//dim:field[@element='dryad'][@qualifier='pageviews']"/>
             <xsl:if test="$pageviews">
-                <span style="font-size: smaller; font-weight: bold;">
                     <xsl:text>   </xsl:text>
                     <xsl:value-of select="$pageviews"/>
                     <xsl:choose>
@@ -70,10 +69,10 @@
                             <xsl:text>&#160;</xsl:text>
                             <i18n:text>xmlui.DryadItemSummary.views</i18n:text>
                         </xsl:otherwise>
-                    </xsl:choose>
-                    <xsl:variable name="downloads"
-                                  select=".//dim:field[@element='dryad'][@qualifier='downloads']"/>
-                    <xsl:if test="$downloads">
+                    </xsl:choose>  -->
+            <xsl:variable name="downloads" select=".//dim:field[@element='dryad'][@qualifier='downloads']"/>
+                <xsl:if test="$downloads">
+                    <span style="font-size: smaller; font-weight: bold;">
                         <xsl:text>   </xsl:text>
                         <xsl:value-of select="$downloads"/>
                         <xsl:choose>
@@ -86,7 +85,6 @@
                                 <i18n:text>xmlui.DryadItemSummary.downloads</i18n:text>
                             </xsl:otherwise>
                         </xsl:choose>
-                    </xsl:if>
                 </span>
             </xsl:if>
 
