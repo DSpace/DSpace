@@ -107,7 +107,7 @@
         
     </xsl:template>    
    
-   <!-- -----------Templates para el manejo de la vista de una comunidad en especial ------------ -->
+   <!-- Templates para el manejo de la vista de una comunidad en especial -->
    
    <xsl:template match="dri:div[@n='community-home']">
      <div id="aspect_artifactbrowser_CommunityViewer_div_community-home" class="ds-static-div primary repository community">
