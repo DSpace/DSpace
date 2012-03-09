@@ -44,8 +44,9 @@
             <list>
                 <ref bean="sidebarFacetAuthor" />
                 <ref bean="sidebarFacetSubject" />
+                <ref bean="sidebarFacetKeywords" />
                 <ref bean="sidebarFacetDateIssued" />
-                <ref bean="sidebarFacetLanguage" />
+                <ref bean="sidebarFacetType" />
             </list>
         </property>
         <!--The search filters which can be used on the discovery search page-->
@@ -137,7 +138,8 @@
         <property name="indexFieldName" value="author"/>
         <property name="metadataFields">
             <list>
-                <value>sedici.creator.*</value>
+                <value>sedici.creator.person</value>
+                <value>sedici.creator.corporate</value>
             </list>
         </property>
         <property name="facetLimit" value="10"/>
@@ -149,12 +151,27 @@
         <property name="metadataFields">
             <list>
                 <value>sedici.subject.materias</value>
+                <value>sedici.subject.lcsh</value>
             </list>
         </property>
         <property name="facetLimit" value="10"/>
         <property name="sortOrder" value="COUNT"/>
     </bean>
-
+    
+    <bean id="sidebarFacetKeywords" class="org.dspace.discovery.configuration.SidebarFacetConfiguration">
+        <property name="indexFieldName" value="keywords"/>
+        <property name="metadataFields">
+            <list>
+                <value>sedici.subject.decs</value>
+                <value>sedici.subject.eurovoc</value>
+                <value>sedici.subject.descriptores</value>
+                <value>sedici.subject.other</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrder" value="COUNT"/>
+    </bean>
+    
     <bean id="sidebarFacetDateIssued" class="org.dspace.discovery.configuration.SidebarFacetConfiguration">
         <property name="indexFieldName" value="dateIssued"/>
         <property name="metadataFields">
@@ -164,6 +181,17 @@
         </property>
         <property name="type" value="date"/>
         <property name="sortOrder" value="VALUE"/>
+    </bean>
+    
+    <bean id="sidebarFacetType" class="org.dspace.discovery.configuration.SidebarFacetConfiguration">
+        <property name="indexFieldName" value="type"/>
+        <property name="metadataFields">
+            <list>
+                <value>sedici.subtype</value>
+            </list>
+        </property>
+        <property name="facetLimit" value="10"/>
+        <property name="sortOrder" value="COUNT"/>
     </bean>
     
     <bean id="sidebarFacetLanguage" class="org.dspace.discovery.configuration.SidebarFacetConfiguration">
