@@ -621,6 +621,7 @@
 
 <!-- Same transformer, completed submissions section -->
 <message key="xmlui.Submission.Submissions.completed.head">Documentos aceptados</message>
+        <message key="xmlui.Submission.Submissions.completed.limit">We've only listed {0} of your archived submissions above. </message>
 
 	<!-- submission progress bar messages -->
 <message key="xmlui.Submission.submit.progressbar.initial-questions">Cuestiones iniciales</message>

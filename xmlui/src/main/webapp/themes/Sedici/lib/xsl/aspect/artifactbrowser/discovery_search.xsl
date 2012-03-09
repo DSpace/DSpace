@@ -126,4 +126,10 @@
         </xsl:apply-templates>
     </xsl:template>
     
+    <xsl:template match="dri:list[@id='aspect.discovery.SimpleSearch.list.primary-search']">
+          <xsl:apply-templates select="dri:head"/>
+          <xsl:apply-templates select="dri:item[2]"/>
+          <xsl:apply-templates select="dri:item[1]"/>
+    </xsl:template>
+    
 </xsl:stylesheet>

@@ -112,7 +112,7 @@
             </img>
     </xsl:if>
     </xsl:template>
-    
+
     <!-- Templates para el manejo de la vista de una coleccion en especial -->
     
     <xsl:template match="dri:div[@n='collection-home']">
