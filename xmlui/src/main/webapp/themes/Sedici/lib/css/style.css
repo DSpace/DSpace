@@ -378,7 +378,8 @@ ol {
 th {
 background-color:#999999;
 text-align:left;
-padding:3px 3px 3px 20px;
+/*padding:3px 3px 3px 20px;*/
+padding: 5px;
 color:white;
 }
 
@@ -635,7 +636,6 @@ input.ds-password-field.error {
     margin-top: 15px;
 }
 
-.submission h2,
 .ds-form-list legend{
     font-size: 182%;
     margin-bottom: 15px;
@@ -1266,18 +1266,20 @@ color:black;
 
 
 #aspect_artifactbrowser_ItemViewer_div_item-view h2,
+.submission h2,
 div.item-summary-view-metadata p.item-view-toggle-bottom,
 div.simple-item-view-description {
     margin-top: 20px;
 }
 
 #aspect_artifactbrowser_ItemViewer_div_item-view h2,
+.submission h2,
 div.simple-item-view-description h3{
     border-bottom:1px solid #D8E8EB;
     margin-bottom: 3px;
 }
 
-#aspect_artifactbrowser_ItemViewer_div_item-view h2 {
+#aspect_artifactbrowser_ItemViewer_div_item-view h2, .submission h2, {
     margin-bottom: 10px;
 }
 
@@ -2187,6 +2189,7 @@ width:550px;
 
 
 #aspect_submission_StepTransformer_field_submit_jump_2_1:hover,
+#aspect_submission_StepTransformer_field_submit_jump_2_2:hover,
 #aspect_submission_StepTransformer_field_submit_jump_3_1:hover,
 #aspect_submission_StepTransformer_field_submit_jump_4_1:hover,
 #aspect_submission_StepTransformer_field_submit_jump_5_1:hover
@@ -2498,4 +2501,45 @@ span.ds-dc_contributor_author-authority {
 }
 #aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-author-results {
 	clear: both;
+}
+form.submission {
+	margin-top: 30px;
+}
+
+#aspect_submission_StepTransformer_list_submit-review > ol > li {
+	margin-bottom: 10px;
+	padding: 15px;
+}
+#aspect_submission_StepTransformer_list_submit-review > ol > li:not(.last) {
+	border: solid 1px #D0D0D0;
+}
+#aspect_submission_StepTransformer_list_submit-review li fieldset h3 {
+    border-bottom:1px solid #D8E8EB;
+    margin-bottom: 10px;
+	font-size: 110%;
+}
+#aspect_submission_StepTransformer_list_submit-review li.ds-form-item {
+	display: table;
+	clear: both;
+}
+#aspect_submission_StepTransformer_list_submit-review li.ds-form-item .ds-form-label {
+	float: left;
+	color: #707070;
+}
+#aspect_submission_StepTransformer_list_submit-review li.ds-form-item .ds-form-content {
+	float: left;
+}
+#aspect_submission_StepTransformer_list_submit-review > ol > li li.ds-form-item.last {
+	margin-top: 12px;
+	float: right;
+}
+#aspect_submission_StepTransformer_table_submit-upload-summary tr td:first-child {
+	text-align: center;
+}
+#aspect_submission_StepTransformer_table_submit-upload-summary tr.odd {
+	display: none;
+}
+#aspect_submission_StepTransformer_table_submit-upload-summary tr td {
+	border-bottom: solid 1px #C0C0C0;
+	padding: 10px 5px 10px 0px;
 }

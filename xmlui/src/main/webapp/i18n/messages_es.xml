@@ -274,9 +274,9 @@
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.ItemViewer.java -->
 <message key="xmlui.ArtifactBrowser.ItemViewer.trail">Ver ítem</message>
-<message key="xmlui.ArtifactBrowser.ItemViewer.head_parent_collections">Este ítem aparece en la(s) siguiente(s) colección(ones)</message>
-<message key="xmlui.ArtifactBrowser.ItemViewer.show_simple">Mostrar el registro sencillo del ítem</message>
-<message key="xmlui.ArtifactBrowser.ItemViewer.show_full">Mostrar metadatos</message>
+<message key="xmlui.ArtifactBrowser.ItemViewer.head_parent_collections">Este ítem aparece en las siguientes colecciones</message>
+<message key="xmlui.ArtifactBrowser.ItemViewer.show_simple">Vista normal </message>
+<message key="xmlui.ArtifactBrowser.ItemViewer.show_full">Vista de metadatos</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.Navigation.java -->
 	<message key="xmlui.ArtifactBrowser.Navigation.head_browse">Exploración</message>
@@ -544,29 +544,29 @@
 	<!-- general submission aspect messages -->
 <message key="xmlui.Submission.general.mydspace_home">SeDiCI Principal</message>
 <message key="xmlui.Submission.general.go_mydspace">Mi SeDiCI</message>
-<message key="xmlui.Submission.general.submission.title">Envío de ítems</message>
-<message key="xmlui.Submission.general.submission.trail">Envío de ítems</message>
-<message key="xmlui.Submission.general.submission.head">Envío de ítems</message>
+<message key="xmlui.Submission.general.submission.title">Carga de documentos</message>
+<message key="xmlui.Submission.general.submission.trail">Carga de documentos</message>
+<message key="xmlui.Submission.general.submission.head">Carga de documentos</message>
 <message key="xmlui.Submission.general.submission.previous">Anterior</message>
 <message key="xmlui.Submission.general.submission.save">Guardar / Cancelar</message>
 <message key="xmlui.Submission.general.submission.next">Siguiente</message>
-<message key="xmlui.Submission.general.submission.complete">Completar el envío</message>
-<message key="xmlui.Submission.general.workflow.title">Envío de ítems</message>
-<message key="xmlui.Submission.general.workflow.trail">Envío de ítems</message>
-<message key="xmlui.Submission.general.workflow.head">Envío de ítems</message>
-<message key="xmlui.Submission.general.showfull">Mostrar registro COMPLETO del ítem</message>
-<message key="xmlui.Submission.general.showsimple">Mostrar registro SENCILLO del ítem</message>
-<message key="xmlui.Submission.general.default.title">Envío</message>
-<message key="xmlui.Submission.general.default.trail">Envío</message>
+<message key="xmlui.Submission.general.submission.complete">Completar la carga</message>
+<message key="xmlui.Submission.general.workflow.title">Carga de documentos</message>
+<message key="xmlui.Submission.general.workflow.trail">Carga de documentos</message>
+<message key="xmlui.Submission.general.workflow.head">Carga de documentos</message>
+<message key="xmlui.Submission.general.showfull">Vista de metadatos</message>
+<message key="xmlui.Submission.general.showsimple">Vista normal</message>
+<message key="xmlui.Submission.general.default.title">Carga</message>
+<message key="xmlui.Submission.general.default.trail">Carga</message>
 
 	<!-- org.dspace.app.xmlui.submission.CollectiovViewer -->
-<message key="xmlui.Submission.CollectionViewer.link1">Enviar un ítem a esta colección</message>
+<message key="xmlui.Submission.CollectionViewer.link1">Cargar un documento en esta colección</message>
 
 	<!-- org.dspace.app.xmlui.submission.Navigation -->
 <message key="xmlui.Submission.Navigation.submissions">Carga de documentos</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submissions -->
-	<message key="xmlui.Submission.Submissions.title">Envíos &amp; Flujos de trabajo</message>
+	<message key="xmlui.Submission.Submissions.title">Carga &amp; flujo de trabajo</message>
 <message key="xmlui.Submission.Submissions.trail">Envíos</message>
 <message key="xmlui.Submission.Submissions.head">Envíos &amp; tareas del flujo de trabajo</message>
 <message key="xmlui.Submission.Submissions.untitled"><i>Sin título</i></message>
@@ -693,18 +693,18 @@
 
 
 	<!-- org.dspace.app.xmlui.Submission.submit.UploadStep -->
-	<message key="xmlui.Submission.submit.UploadStep.head">Adjuntar fichero(s)</message>
-<message key="xmlui.Submission.submit.UploadStep.file">Fichero</message>
-<message key="xmlui.Submission.submit.UploadStep.file_help">Por favor, introduzca la ruta completa del fichero de su ordenador que corresponda con el ítem. Si pincha en "Examinar...", se abrirá una ventana que le permitirá seleccionar un fichero de su ordenador.</message>
-<message key="xmlui.Submission.submit.UploadStep.file_error">El ítem debe contener al menos un fichero.</message>
-<message key="xmlui.Submission.submit.UploadStep.upload_error">Hubo un problema adjuntando su fichero.  Bien el nombre del fichero era incorrecto, o hubo un problema de red  que impidió que el fichero nos llegase correctamente, o ha adjuntado un fichero cuyo formato solo se permite para usos internos del sistema. Por favor, inténtelo de nuevo.</message>
-<message key="xmlui.Submission.submit.UploadStep.description">Descripción del fichero</message>
-<message key="xmlui.Submission.submit.UploadStep.description_help">Si lo desea, puede describir brevemente el fichero; por ejemplo,"</message>
-<message key="xmlui.Submission.submit.UploadStep.submit_upload">Adjuntar fichero y añadir otro más</message>
-<message key="xmlui.Submission.submit.UploadStep.head2">Ficheros adjuntados</message>
+	<message key="xmlui.Submission.submit.UploadStep.head">Adjuntar archivos</message>
+<message key="xmlui.Submission.submit.UploadStep.file">Archivo</message>
+<message key="xmlui.Submission.submit.UploadStep.file_help">Utilice el botón "Examinar..." para seleccionar un archivo de su ordenador.</message>
+<message key="xmlui.Submission.submit.UploadStep.file_error">El documento debe contener al menos un fichero.</message>
+<message key="xmlui.Submission.submit.UploadStep.upload_error">Hubo un problema adjuntando su archivo. Bien el nombre del archivo era incorrecto, o hubo un problema de red que impidió que el archivo nos llegase correctamente, o ha adjuntado un fichero cuyo formato solo se permite para usos internos del sistema. Por favor, inténtelo de nuevo.</message>
+<message key="xmlui.Submission.submit.UploadStep.description">Descripción del archivo</message>
+<message key="xmlui.Submission.submit.UploadStep.description_help">Ingrese un título o descripción breve para este archivo</message>
+<message key="xmlui.Submission.submit.UploadStep.submit_upload">Adjuntar archivo y añadir otro</message>
+<message key="xmlui.Submission.submit.UploadStep.head2">Archivos subidos</message>
 <message key="xmlui.Submission.submit.UploadStep.column0">Primario</message>
 <message key="xmlui.Submission.submit.UploadStep.column1"></message>
-<message key="xmlui.Submission.submit.UploadStep.column2">Fichero</message>
+<message key="xmlui.Submission.submit.UploadStep.column2">Archivo</message>
 <message key="xmlui.Submission.submit.UploadStep.column3">Tamaño</message>
 <message key="xmlui.Submission.submit.UploadStep.column4">Descripción</message>
 <message key="xmlui.Submission.submit.UploadStep.column5">Formato</message>
@@ -715,32 +715,32 @@
 <message key="xmlui.Submission.submit.UploadStep.known">(Conocido)</message>
 <message key="xmlui.Submission.submit.UploadStep.unsupported">(Incompatible)</message>
 <message key="xmlui.Submission.submit.UploadStep.submit_edit">Editar</message>
-<message key="xmlui.Submission.submit.UploadStep.checksum">Verificación de ficheros</message>
-<message key="xmlui.Submission.submit.UploadStep.submit_remove">Eliminar los ficheros seleccionados</message>
+<message key="xmlui.Submission.submit.UploadStep.checksum">Verificación de archivos</message>
+<message key="xmlui.Submission.submit.UploadStep.submit_remove">Eliminar los archivos seleccionados</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.EditFileStep -->
-<message key="xmlui.Submission.submit.EditFileStep.head">Editar fichero</message>
-<message key="xmlui.Submission.submit.EditFileStep.file">Fichero</message>
-<message key="xmlui.Submission.submit.EditFileStep.description">Descripción del fichero</message>
-<message key="xmlui.Submission.submit.EditFileStep.description_help">Opcionalmente, puede indicar una descripción breve de este fichero, por ejemplo "&lt;i&gt;Artículo principal&lt;/i&gt;", o "&lt;i&gt;Lectura de los datos del experimento&lt;/i&gt;".</message>
-<message key="xmlui.Submission.submit.EditFileStep.info1">Seleccione el formato del fichero de la lista, por ejemplo "&lt;i&gt;Adobe PDF&lt;/i&gt;" o "&lt;i&gt;Microsoft Word&lt;/i&gt;", &lt;b&gt;o&lt;/b&gt; si el formato no está en la lista, por favor, describa el formato del fichero en la casilla.</message>
+<message key="xmlui.Submission.submit.EditFileStep.head">Editar archivo</message>
+<message key="xmlui.Submission.submit.EditFileStep.file">Archivo</message>
+<message key="xmlui.Submission.submit.EditFileStep.description">Descripción del archivo</message>
+<message key="xmlui.Submission.submit.EditFileStep.description_help">Ingrese un título o descripción breve para este archivo</message>
+<message key="xmlui.Submission.submit.EditFileStep.info1">Seleccione el formato del archivo de la lista, por ejemplo "<i>Adobe PDF</i>" o "<i>Microsoft Word</i>", <b>o</b> si el formato no está en la lista, por favor, describa el formato del archivo en la casilla.</message>
 <message key="xmlui.Submission.submit.EditFileStep.format_detected">Formato detectado</message>
 <message key="xmlui.Submission.submit.EditFileStep.format_selected">Seleccione formato</message>
 <message key="xmlui.Submission.submit.EditFileStep.format_default">El formato no está en la lista</message>
-<message key="xmlui.Submission.submit.EditFileStep.info2">Si el formato no está en la lista, &lt;strong&gt;seleccione "El formato no está en la lista" &lt;/strong&gt; y describa el formato del fichero en la casilla inferior.</message>
+<message key="xmlui.Submission.submit.EditFileStep.info2">Si el formato no está en la lista, <strong>seleccione "El formato no está en la lista" </strong> y describa el formato del archivo en la casilla inferior.</message>
 <message key="xmlui.Submission.submit.EditFileStep.format_user">Otro formato</message>
-<message key="xmlui.Submission.submit.EditFileStep.format_user_help">El nombre de la aplicación que utilizó para crear el fichero y la versión (por ejemplo, "&lt;i&gt;ACMESoft SuperApp versión 1.5&lt;/i&gt;").</message>
+<message key="xmlui.Submission.submit.EditFileStep.format_user_help">El nombre de la aplicación que utilizó para crear el archivo y la versión (por ejemplo, "<i>ACMESoft SuperApp versión 1.5</i>").</message>
 
 
 	<!-- org.dspace.app.xmlui.Submission.submit.ReviewStep -->
 	<message key="xmlui.Submission.submit.ReviewStep.head">Revisar envío</message>
 <message key="xmlui.Submission.submit.ReviewStep.yes">Sí</message>
 <message key="xmlui.Submission.submit.ReviewStep.no">No</message>
-<message key="xmlui.Submission.submit.ReviewStep.submit_jump">Corregir alguno</message>
-<message key="xmlui.Submission.submit.ReviewStep.submit_jump_files">Añadir o eliminar un fichero</message>
+<message key="xmlui.Submission.submit.ReviewStep.submit_jump">Modificar datos</message>
+<message key="xmlui.Submission.submit.ReviewStep.submit_jump_files">Añadir o eliminar un archivo</message>
 <message key="xmlui.Submission.submit.ReviewStep.head1">Cuestiones iniciales</message>
 <message key="xmlui.Submission.submit.ReviewStep.head2">Describir página {0}</message>
-<message key="xmlui.Submission.submit.ReviewStep.head3">Ficheros cargados</message>
+<message key="xmlui.Submission.submit.ReviewStep.head3">Archivos cargados</message>
 <message key="xmlui.Submission.submit.ReviewStep.multiple_titles">Múltiples títulos</message>
 <message key="xmlui.Submission.submit.ReviewStep.published_before">Publicado antes</message>
 <message key="xmlui.Submission.submit.ReviewStep.no_metadata">-</message>
@@ -776,10 +776,10 @@
 <message key="xmlui.Submission.submit.RemovedStep.go_submission">Ir a la página de envíos</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.CompletedStep -->
-<message key="xmlui.Submission.submit.CompletedStep.head">Envío completado</message>
-<message key="xmlui.Submission.submit.CompletedStep.info1">Su envío pasará por el flujo de trabajo designado para la colección a la que lo está enviando. Recibirá una notificación vía correo electrónico tan pronto como su envío forme parte de la colección, o si por alguna razón hubiera algún problema con el envío. También puede verificar el estado de su envío accediendo a la página 'Mi SeDiCI'.</message>
-<message key="xmlui.Submission.submit.CompletedStep.go_submission">Ir a la página de envíos</message>
-<message key="xmlui.Submission.submit.CompletedStep.submit_again">Enviar otro ítem</message>
+<message key="xmlui.Submission.submit.CompletedStep.head">La carga ha sido completada</message>
+<message key="xmlui.Submission.submit.CompletedStep.info1">Su documento será revisado y se le envirá luego una notificación vía correo electrónico para informarle el estado de su documento. También puede verificar el estado de su documento accediendo a la página 'Mi SeDiCI'.</message>
+<message key="xmlui.Submission.submit.CompletedStep.go_submission">Ir a la página de carga</message>
+<message key="xmlui.Submission.submit.CompletedStep.submit_again">Cargar otro documento</message>
 
 	<!-- org.dspace.app.xmlui.Submission.workflow.PerformTaskStep -->
 <message key="xmlui.Submission.workflow.PerformTaskStep.info1">Acciones posibles para esta tarea:</message>
