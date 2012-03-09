@@ -1773,6 +1773,23 @@
                         alt="Journal of Heredity cover"/>
                 </a>
             </xsl:when>
+            <xsl:when test='$journal-name = "Journal of Paleontology"'>
+                <a>
+                    <xsl:attribute name="href">
+                        <xsl:choose>
+                            <xsl:when test="contains($article-doi,'doi:')">
+                                <xsl:value-of
+                                    select="concat('http://dx.doi.org/', substring-after($article-doi, 'doi:'))"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="string('http://www.journalofpaleontology.org/')"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:attribute>
+                    <img id="journal-logo" src="/themes/Dryad/images/coverimages/JPALEO.png"
+                        alt="Journal of Paleontology cover"/>
+                </a>
+            </xsl:when>
             <xsl:when test='$journal-name = "Molecular Biology and Evolution"'>
                 <a>
                     <xsl:attribute name="href">
