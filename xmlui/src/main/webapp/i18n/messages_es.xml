@@ -569,8 +569,8 @@
 	<message key="xmlui.Submission.Submissions.title">Envíos &amp; Flujos de trabajo</message>
 <message key="xmlui.Submission.Submissions.trail">Envíos</message>
 <message key="xmlui.Submission.Submissions.head">Envíos &amp; tareas del flujo de trabajo</message>
-<message key="xmlui.Submission.Submissions.untitled">&lt;i&gt;Sin título&lt;/i&gt;</message>
-<message key="xmlui.Submission.Submissions.email">correo electrónico:</message>
+<message key="xmlui.Submission.Submissions.untitled"><i>Sin título</i></message>
+<message key="xmlui.Submission.Submissions.email"></message>
 
 	<!-- Same transformer, workflow section -->
 	<message key="xmlui.Submission.Submissions.workflow_head1">Tareas del flujo de trabajo</message>
@@ -625,7 +625,12 @@
 
 <!-- Same transformer, completed submissions section -->
 <message key="xmlui.Submission.Submissions.completed.head">Documentos aceptados</message>
-        <message key="xmlui.Submission.Submissions.completed.limit">We've only listed {0} of your archived submissions above. </message>
+<message key="xmlui.Submission.Submissions.completed.info">Estos son los documentos enviados por usted y que han sido aceptados</message>
+<message key="xmlui.Submission.Submissions.completed.column1">Fecha</message>
+<message key="xmlui.Submission.Submissions.completed.column2">Título</message>
+<message key="xmlui.Submission.Submissions.completed.column3">Colección</message>
+<message key="xmlui.Submission.Submissions.completed.limit">Solo se muestran {0} documentos</message>
+<message key="xmlui.Submission.Submissions.completed.displayall">Mostrar todos los documentos</message>
 
 	<!-- submission progress bar messages -->
 <message key="xmlui.Submission.submit.progressbar.initial-questions">Cuestiones iniciales</message>
@@ -1963,7 +1968,7 @@ Puede reemplazar la plantilla que gestiona el caso general dri2xhtml para mejora
 <message key="xmlui.dri2xhtml.METS-1.0.item-date">Fecha</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-publisher">Editor</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-subject">Tema</message>           
-<message key="xmlui.dri2xhtml.METS-1.0.item-files-head">Ficheros en el ítem</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-files-head">Archivos asociados</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-files-file">Ficheros</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-files-name">Nombre</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-files-size">Tamaño</message>
@@ -1971,11 +1976,11 @@ Puede reemplazar la plantilla que gestiona el caso general dri2xhtml para mejora
 <message key="xmlui.dri2xhtml.METS-1.0.item-files-view">Ver</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-files-description">Descripción</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-files-viewOpen">Abrir</message>
-<message key="xmlui.dri2xhtml.METS-1.0.item-no-files">No hay ficheros asociados a este ítem.</message>
-<message key="xmlui.dri2xhtml.METS-1.0.size-bytes">bytes</message>
-<message key="xmlui.dri2xhtml.METS-1.0.size-kilobytes">Kb</message>
-<message key="xmlui.dri2xhtml.METS-1.0.size-megabytes">Mb</message>
-<message key="xmlui.dri2xhtml.METS-1.0.size-gigabytes">Gb</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-no-files">No hay archivos asociados a este ítem</message>
+<message key="xmlui.dri2xhtml.METS-1.0.size-bytes">Bytes</message>
+<message key="xmlui.dri2xhtml.METS-1.0.size-kilobytes">KB</message>
+<message key="xmlui.dri2xhtml.METS-1.0.size-megabytes">MB</message>
+<message key="xmlui.dri2xhtml.METS-1.0.size-gigabytes">GB</message>
 <message key="xmlui.dri2xhtml.METS-1.0.license-text">El ítem tiene asociados los siguientes ficheros de licencia:</message>
 <message key="xmlui.dri2xhtml.METS-1.0.collection-not-implemented">
 La vista resumen de la colección no está actualmente en uso o implementada. Esto puede solucionarse sobreescribiendo la plantilla dri2xhtml  denominada collectionSummaryView.
@@ -2018,8 +2023,8 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.dri2xhtml.mimetype.application/marc">MARC record</message>
 <message key="xmlui.dri2xhtml.mimetype.application/mathematica">Mathematica</message>
 <message key="xmlui.dri2xhtml.mimetype.application/msword">Microsoft Word</message>
-<message key="xmlui.dri2xhtml.mimetype.application/octet-stream">Desconicido</message>
-<message key="xmlui.dri2xhtml.mimetype.application/pdf">PDF</message>
+<message key="xmlui.dri2xhtml.mimetype.application/octet-stream">Formato desconocido</message>
+<message key="xmlui.dri2xhtml.mimetype.application/pdf">Adobe PDF</message>
 <message key="xmlui.dri2xhtml.mimetype.application/postscript">Postscript</message>
 <message key="xmlui.dri2xhtml.mimetype.application/sgml">SGML</message>
 <message key="xmlui.dri2xhtml.mimetype.application/vnd.ms-excel">Microsoft Excel</message>
@@ -2052,7 +2057,7 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.dri2xhtml.mimetype.audio/flac">FLAC Audio</message>
 <message key="xmlui.dri2xhtml.mimetype.audio/m4a">AAC audio</message>
 <message key="xmlui.dri2xhtml.mimetype.audio/m4a-latm">AAC audio</message>
-<message key="xmlui.dri2xhtml.mimetype.audio/mpeg">mp3 audio</message>
+<message key="xmlui.dri2xhtml.mimetype.audio/mpeg">MP3 audio</message>
 <message key="xmlui.dri2xhtml.mimetype.audio/x-aiff">AIFF audio</message>
 <message key="xmlui.dri2xhtml.mimetype.audio/x-mpeg">MPEG Audio</message>
 <message key="xmlui.dri2xhtml.mimetype.audio/x-ms-wma">WMA Audio</message>
@@ -2062,30 +2067,30 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.dri2xhtml.mimetype.audio/x-wav">WAV audio</message>
 
   <!-- Image-based formats -->
-<message key="xmlui.dri2xhtml.mimetype.image/gif">imagen GIF</message>
-<message key="xmlui.dri2xhtml.mimetype.image/jp2">imagen JPEG 2000</message>
-<message key="xmlui.dri2xhtml.mimetype.image/jpeg">imagen JPEG</message>
-<message key="xmlui.dri2xhtml.mimetype.image/png">imagen PNG</message>
-<message key="xmlui.dri2xhtml.mimetype.image/tiff">imagen TIFF</message>
-<message key="xmlui.dri2xhtml.mimetype.image/x-ms-bmp">BMP image</message>
+<message key="xmlui.dri2xhtml.mimetype.image/gif">Imagen GIF</message>
+<message key="xmlui.dri2xhtml.mimetype.image/jp2">Imagen JPEG 2000</message>
+<message key="xmlui.dri2xhtml.mimetype.image/jpeg">Imagen JPEG</message>
+<message key="xmlui.dri2xhtml.mimetype.image/png">Imagen PNG</message>
+<message key="xmlui.dri2xhtml.mimetype.image/tiff">Imagen TIFF</message>
+<message key="xmlui.dri2xhtml.mimetype.image/x-ms-bmp">Imagen BMP</message>
 <message key="xmlui.dri2xhtml.mimetype.image/x-photo-cd">Photo CD</message>
 
   <!-- Text-based formats -->
-<message key="xmlui.dri2xhtml.mimetype.text/css">Fichero CSS</message>
-<message key="xmlui.dri2xhtml.mimetype.text/csv">Fichero CSV</message>
-<message key="xmlui.dri2xhtml.mimetype.text/html">HTML</message>
-<message key="xmlui.dri2xhtml.mimetype.text/javascript">Javascript</message>
-<message key="xmlui.dri2xhtml.mimetype.text/plain">Fichero de texto</message>
-<message key="xmlui.dri2xhtml.mimetype.text/richtext">Fichero RTF</message>
-<message key="xmlui.dri2xhtml.mimetype.text/xml">XML</message>
+<message key="xmlui.dri2xhtml.mimetype.text/css">Archivo CSS</message>
+<message key="xmlui.dri2xhtml.mimetype.text/csv">Archivo CSV</message>
+<message key="xmlui.dri2xhtml.mimetype.text/html">Archivo HTML</message>
+<message key="xmlui.dri2xhtml.mimetype.text/javascript">Archivo Javascript</message>
+<message key="xmlui.dri2xhtml.mimetype.text/plain">Archivo de texto</message>
+<message key="xmlui.dri2xhtml.mimetype.text/richtext">Archivo RTF</message>
+<message key="xmlui.dri2xhtml.mimetype.text/xml">Archivo XML</message>
 
   <!-- Video-based formats -->
-<message key="xmlui.dri2xhtml.mimetype.video/avi">AVI video</message>
+<message key="xmlui.dri2xhtml.mimetype.video/avi">Video AVI</message>
 <message key="xmlui.dri2xhtml.mimetype.video/mjp2">Motion JPEG 2000</message>
-<message key="xmlui.dri2xhtml.mimetype.video/mpeg">MPEG video</message>
-<message key="xmlui.dri2xhtml.mimetype.video/mpeg2">MPEG-2 video</message>
-<message key="xmlui.dri2xhtml.mimetype.video/mp4">MPEG-4 video</message>
-<message key="xmlui.dri2xhtml.mimetype.video/quicktime">QuickTime video</message>
+<message key="xmlui.dri2xhtml.mimetype.video/mpeg">Video MPEG</message>
+<message key="xmlui.dri2xhtml.mimetype.video/mpeg2">Video MPEG-2</message>
+<message key="xmlui.dri2xhtml.mimetype.video/mp4">Video MPEG-4</message>
+<message key="xmlui.dri2xhtml.mimetype.video/quicktime">Video QuickTime</message>
 
   <!-- explanatory messages for choice authority confidence values -->
  <message key="xmlui.authority.confidence.description.cf_unset">Confianza no establecida para este valor</message>
