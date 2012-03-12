@@ -33,8 +33,12 @@ html { -webkit-font-smoothing: antialiased; }
 /* Accessible focus treatment: people.opera.com/patrickl/experiments/keyboard/test */
 a:hover, a:active { outline: none; }
 
-a, a:active, a:visited { color:#607890; }
-a:hover { color:#036; }
+a, a:active, a:visited { color:#607890; 
+text-decoration:none;
+}
+
+
+a:hover { color:#036; text-decoration:underline;}
 
 
 ul { margin-left:30px; list-style-type:none;}

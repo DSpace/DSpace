@@ -53,6 +53,8 @@ ul img {
 }
 
 #slideshow-caption p {
-   margin:5px 0 0 0;
+   margin:2px 0 0 0;
    padding:0;
+   width:600px;
+   font-size:12px;
 }
