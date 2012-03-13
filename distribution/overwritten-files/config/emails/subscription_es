@@ -1,0 +1,14 @@
+# E-mail sent to DSpace users when new items appear in collections they are
+# subscribed to
+#
+# Parameters: {0} is the details of the new collections and items
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: SeDiCI - Suscripciones
+Hay nuevos items disponibles en las colecciones a las que usted se suscribió:
+
+{0}
+
+Cordialmente, 
+
+SeDiCI - UNLP

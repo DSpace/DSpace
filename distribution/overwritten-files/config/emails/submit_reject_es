@@ -1,0 +1,22 @@
+# Rejection email message
+#
+# {0}  Title of submission
+# {1}  Name of collection
+# {2}  Name of the rejector
+# {3}  Reason for the rejection
+# {4}  Link to 'My DSpace' page
+#
+Subject: SeDiCI - Envío rechazado
+
+Usted envió: {0}
+
+A la colección: {1}
+
+Su envío ha sido rechazado por {2}
+con la siguiente explicación:
+
+{3}
+
+Su envío no ha sido borrado. Puede acceder a él a través de su página en "My DSpace": {4}
+
+SeDiCI - UNLP

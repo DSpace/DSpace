@@ -1,0 +1,24 @@
+# Workflow task email message
+#
+# {0}  Title of submission
+# {1}  Name of collection
+# {2}  submitter's name
+# {3}  Description of task
+# {4}  link to 'my DSpace' page 
+#
+Subject: SeDiCI - Nueva tarea
+
+Un nuevo item ha sido enviado:
+
+Título:        {0}
+Colección:   {1}
+Enviado por: {2}
+
+{3}
+
+Para ocuparse de esta tarea, por favor visite su página en "My DSpace":  {4}
+
+Muchas gracias.
+Cordialmente,
+
+SeDiCI - UNLP

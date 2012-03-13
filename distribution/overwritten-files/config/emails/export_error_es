@@ -1,0 +1,18 @@
+# Email sent to DSpace users when they successfully export an item or collection.
+#
+# Parameters: {0} the export error
+#             {1} the URL to the feedback page
+#             
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: SeDiCI - El ítem de exportación que solicitó no ha sido completado
+El ítem de exportación que usted solicitó no ha sido completado, debido a la siguiente razón:
+
+ {0}
+
+Para más información, por favor contacte al administrador del sistema:
+ {1}
+
+
+SeDiCI - UNLP

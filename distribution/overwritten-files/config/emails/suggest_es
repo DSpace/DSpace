@@ -1,0 +1,27 @@
+# E-mail sent with the information filled out in a suggest form.
+#
+# Parameters: {0} recipient name
+#             {1} sender name
+#             {2} repository name
+#             {3} item title
+#             {4} item handle URI
+#             {5} item local URL - may be used in lieu of {4} if not using handle server
+#             {6} collection name
+#             {7} sender message 
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: Items de interés en SeDiCI
+
+Hola {0}:
+
+{1} solicitó que le enviáramos este e-mail sobre un item disponible en {2}.
+
+Título: {3}
+Ubicación: {5}
+En la colección: {6}
+Mensaje personal: {7}
+
+Los repositorios digitales DSpace capturan, almacenan, catalogan, preservan y distribuyen materiales digitales.
+Para más información, visite www.dspace.org.
+
+SeDiCI - UNLP

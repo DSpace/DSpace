@@ -1,0 +1,19 @@
+# Registration notification email
+#
+# Parameters: {0} The name of the DSpace instance
+#             {1} The URL of the DSpace instance 
+#             {2} Name:
+#             {3} Email:
+#             {4} Registration Date:
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: SeDiCI - Notificación de registro
+
+Un nuevo usuario se ha registrado en {0} de {1}:
+
+Nombre:                   {2}
+Email:                  {3}
+Fecha:                   {4}
+
+SeDiCI - UNLP

@@ -172,7 +172,7 @@
 				<div class="datos_unlp">
 					<strong>2003-2012 &#xA9; <a href="http://prebi.unlp.edu.ar/" target="_blank">PrEBi</a></strong>
 					<br/>
-					<a href="http://www.unlp.edu.ar" target="_blank">Universidad Nacional de La Plata.</a>
+					<a href="http://www.unlp.edu.ar" target="_blank">Universidad Nacional de La Plata</a>
 					<br/>
 					Todos los derechos reservados conforme a la ley 11.723
 				</div>
@@ -181,9 +181,9 @@
 				<div class="datos_sedici">
 					<strong>SeDiCI - Servicio de Difusión de la Creación Intelectual</strong>
 					<br/>
-			  		Calle 49 y 115 s/n 1er piso - Edificio ex-Liceo
+			  		Calle 49 y 115 s/n 1er piso - Edificio ex Liceo
 			  		<br/>
-			  		1900 La Plata, Buenos Aires - Tel 0221 423 6696/6677 (int 141) 
+			  		1900 La Plata, Buenos Aires - Tel 0221 423 6696/6677 (int. 141) 
 			  		<div id="comollegar">
 			  			<a title="Como llegar a SeDiCI">
 			    			<xsl:attribute name="href">

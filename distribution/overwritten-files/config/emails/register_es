@@ -1,0 +1,15 @@
+# E-mail sent to DSpace users when they register for an account
+#
+# Parameters: {0} is expanded to a special registration URL
+#
+# See org.dspace.core.Email for information on the format of this file.
+#
+Subject: SeDiCI - Registro 
+Para completar su registro en SeDiCI, por favor haga click en el siguiente enlace:
+
+  {0}
+
+Si necesita más ayuda con su cuenta, por favor envíe un e-mail a info@sedici.unlp.edu.ar.
+Cordialmente,
+
+SeDiCI - UNLP

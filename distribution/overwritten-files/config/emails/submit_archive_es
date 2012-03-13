@@ -1,0 +1,23 @@
+# Item Archived email message
+#
+# {0}  Title of submission
+# {1}  Name of collection
+# {2}  handle 
+#
+Subject: SeDiCI - Envío aprobado y archivado
+
+Usted envió: {0}
+
+A la colección: {1}
+
+Su envío ha sido aceptado y archivado en SeDiCI,
+y se le ha asignado el siguiente identificador:
+
+{2}
+
+Por favor utilícelo cuando cite su envío.
+
+Muchas gracias.
+Cordialmente,
+
+SeDiCI - UNLP
