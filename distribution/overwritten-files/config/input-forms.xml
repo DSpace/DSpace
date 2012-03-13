@@ -715,31 +715,31 @@
 		<value-pairs value-pairs-name="common_types" dc-term="type">
 			<pair>
 				<displayed-value>Articulo</displayed-value>
-				<stored-value>articulo</stored-value>
+				<stored-value>article</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Tesis</displayed-value>
-				<stored-value>tesis</stored-value>
+				<stored-value>thesis</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Libro</displayed-value>
-				<stored-value>libro</stored-value>
+				<stored-value>book</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Objeto de Conferencia</displayed-value>
-				<stored-value>objeto_conferencia</stored-value>
+				<stored-value>conferenceObject</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Documento institucional</displayed-value>
-				<stored-value>documento_institucional</stored-value>
+				<stored-value>institutionalDocument</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Imagen fija</displayed-value>
-				<stored-value>imagen_fija</stored-value>
+				<stored-value>fixedImage</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Imagen en movimiento</displayed-value>
-				<stored-value>imagen_movimiento</stored-value>
+				<stored-value>movingImage</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Audio</displayed-value>
@@ -754,11 +754,11 @@
 			</pair>
 			<pair>
 				<displayed-value>Documento de trabajo</displayed-value>
-				<stored-value>documento_trabajo</stored-value>
+				<stored-value>workingPaper</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Comunicación</displayed-value>
-				<stored-value>comunicacion</stored-value>
+				<stored-value>communication</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Revisión</displayed-value>
@@ -766,69 +766,69 @@
 			</pair>
 			<pair>
 				<displayed-value>Contribución a revista</displayed-value>
-				<stored-value>contribucion_revista</stored-value>
+				<stored-value>journalContribution</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Informe técnico</displayed-value>
-				<stored-value>informe_tecnico</stored-value>
+				<stored-value>report</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Artículo</displayed-value>
-				<stored-value>articulo</stored-value>
+				<stored-value>article</stored-value>
 			</pair>
 		</value-pairs>
 		
 		<value-pairs value-pairs-name="common_subtypes_tesis" dc-term="type">
 			<pair>
 				<displayed-value>Tesis Doctoral</displayed-value>
-				<stored-value>tesis_doctorado</stored-value>
+				<stored-value>doctoralThesis</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Tesis de Maestría</displayed-value>
-				<stored-value>tesis_maestria</stored-value>
+				<stored-value>masterThesis</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Tesis de Grado</displayed-value>
-				<stored-value>tesis_grado</stored-value>
+				<stored-value>bachelorThesis</stored-value>
 			</pair>
 			<pair>
 				<displayed-value>Trabajo de especialización</displayed-value>
-				<stored-value>tesis_especializacion</stored-value>
+				<stored-value>specialistDegree</stored-value>
 			</pair>
 		</value-pairs>
 		
 		<value-pairs value-pairs-name="common_subtypes_libro" dc-term="type">
 			<pair>
 				<displayed-value>Libro</displayed-value>
-				<stored-value>libro</stored-value>
+				<stored-value>book</stored-value>
 			</pair>
 		</value-pairs>
 
 		<value-pairs value-pairs-name="common_subtypes_objeto_conferencia" dc-term="type">
 			<pair>
 				<displayed-value>Objeto de Conferencia</displayed-value>
-				<stored-value>objeto_conferencia</stored-value>
+				<stored-value>conferenceObject</stored-value>
 			</pair>
 		</value-pairs>
 
 		<value-pairs value-pairs-name="common_subtypes_documento_institucional" dc-term="type">
 			<pair>
 				<displayed-value>Documento institucional</displayed-value>
-				<stored-value>documento_institucional</stored-value>
+				<stored-value>institutionalDocument</stored-value>
 			</pair>
 		</value-pairs>
 
 		<value-pairs value-pairs-name="common_subtypes_imagen_fija" dc-term="type">
 			<pair>
 				<displayed-value>Imagen fija</displayed-value>
-				<stored-value>imagen_fija</stored-value>
+				<stored-value>fixedImage</stored-value>
 			</pair>
 		</value-pairs>
 
 		<value-pairs value-pairs-name="common_subtypes_imagen_movimiento" dc-term="type">
 			<pair>
 				<displayed-value>Imagen en movimiento</displayed-value>
-				<stored-value>imagen_movimiento</stored-value>
+				<stored-value>movingImage</stored-value>
 			</pair>
 		</value-pairs>
 
