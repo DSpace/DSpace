@@ -3073,7 +3073,7 @@
     <message key="xmlui.utils.TombstoneTransformer.message">The requested Item is unavailable. For more information contact an &#160;</message>
     <message key="xmlui.utils.TombstoneTransformer.message_link">administrator</message>
     <message key="xmlui.utils.TombstoneTransformer.head1">Tombstone</message>
-    <message key="xmlui.utils.IdentifierNotFoundTransformer.message">The requested identifier is unavailable for more information contact an &#160;</message>
+    <message key="xmlui.utils.IdentifierNotFoundTransformer.message">The requested identifier is unavailable. For more information contact an &#160;</message>
     <message key="xmlui.utils.IdentifierNotFoundTransformer.message_link">administrator &#160;</message>
     <message key="xmlui.utils.IdentifierNotFoundTransformer.head1">Identifier Not Found</message>
 
