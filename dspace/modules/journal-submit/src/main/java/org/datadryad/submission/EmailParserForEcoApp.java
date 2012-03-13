@@ -71,27 +71,26 @@ public class EmailParserForEcoApp extends EmailParser {
 
 		for (String line : aMessage) {
 			if (!line.equals("")) {
-				String[] parts = line.split(":");
-				String label = parts[0].toLowerCase();
-				int size = parts.length;
+				final String[] parts = line.split(":");
+				final String label = parts[0].toLowerCase();
+				final int size = parts.length;
 
 				if (!SKIPPED.contains(label)) {
 					if (ELEMENT_MAP.containsKey(label)
 							|| NESTED_ELEMENT_MAP.containsKey(label)) {
-						if (!lastLabel.equals("")) {
-							String resultValue = value.toString().trim();
-							String xml;
+						if (!lastLabel.equals("") && !SKIPPED.contains(lastLabel)) {
+							final String resultValue = value.toString().trim();
 
-							if (lastLabel.equalsIgnoreCase("Journal Name")) {
+							if ("Journal Name".equalsIgnoreCase(lastLabel)) {
 								result.journalName = resultValue;
 							}
 							else
-								if (lastLabel.equalsIgnoreCase("ms reference number")) {
+								if ("ms reference number".equalsIgnoreCase(lastLabel)) {
 									result.submissionId = resultValue;
 								}
 
 							try {
-								xml = makeElement(lastLabel, resultValue);
+								final String xml = makeElement(lastLabel, resultValue);
 								resultXML.append(xml);
 							}
 							catch (RuntimeException details) {
@@ -113,11 +112,25 @@ public class EmailParserForEcoApp extends EmailParser {
 							value.append(valuePart.trim()).append(' ');
 						}
 					}
-				} // else ignore
+				}
+				else {
+                    try {
+                        String resultValue = value.toString().trim();
+                        String xml = makeElement(lastLabel, resultValue);
+                        resultXML.append(xml);
+                        value = new StringBuilder();
+                        lastLabel = label;
+                    }
+                    catch (RuntimeException details) {
+                        result.status = details.getMessage();
+                    }
+
+				}
 			} // else ignore
 		}
 
-		resultXML.append(makeElement(lastLabel, value.toString()));
+		if (lastLabel != null)
+		    resultXML.append(makeElement(lastLabel, value.toString()));
 		result.submissionData = resultXML;
 
 		if (myManuscriptID.equals("")) {
@@ -134,7 +147,7 @@ public class EmailParserForEcoApp extends EmailParser {
 	        StringBuilder xml = new StringBuilder();
 	        name = NESTED_ELEMENT_MAP.get(aName.toLowerCase());
 
-	        if (name.equalsIgnoreCase("CorrespondingAuthor")) {
+	        if ("CorrespondingAuthor".equalsIgnoreCase(name)) {
 	            String[] parts = aValue.split("\\r|\\n|\\t");
 	            String location;
 
@@ -166,30 +179,36 @@ public class EmailParserForEcoApp extends EmailParser {
 
 	            return xml.toString();
 	        }
-	        else if (name.equalsIgnoreCase("Manuscript")) {
+	        else if ("Manuscript".equalsIgnoreCase(name)) {
 	            myManuscriptID = aValue.trim();
 	            return ""; // we don't build xml element yet
 	        }
-	        else if (name.equalsIgnoreCase("ArticleTitle")) {
+	        else if ("ArticleTitle".equalsIgnoreCase(name)) {
 	            return new SubmissionMetadata(myManuscriptID, aValue.trim()).toXML();
 	        }
-	        else if (name.equalsIgnoreCase("Classification")){
+	        else if ("Classification".equalsIgnoreCase(name)){
 	            String[] keywords = EmailParser.processKeywordList(aValue);
 	            xml = new StringBuilder();
 	            xml.append(new Classification(keywords).toXML());
 	            return xml.toString();
 
 	        }
+            else if (name == null){
+                if (LOGGER.isWarnEnabled()) {
+                    LOGGER.warn("Received null as element name; value was: " + aValue);
+                }
+                return "";
+            }
 	        else {
 	            return "<" + name + ">" + aValue + "</" + name + ">";
 	        }
 	    }
 
 	    try {
-	        if (name.equalsIgnoreCase("Authors")) {
+	        if ("Authors".equalsIgnoreCase(name)) {
 	            return new Authors(EmailParser.processAuthorList(aValue)).toXML();
 	        }
-	        else if (name.equalsIgnoreCase("Journal Embargo Period")) {
+	        else if ("Journal Embargo Period".equalsIgnoreCase(name)) {
 	            if (aValue.trim().equalsIgnoreCase("1 year")) {
 	                return new JournalEmbargoPeriod("oneyear").toXML();
 	            }
