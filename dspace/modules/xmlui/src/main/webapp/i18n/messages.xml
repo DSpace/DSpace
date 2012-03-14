@@ -3225,6 +3225,9 @@
         For journals using Dryad to host data in review, you may submit data after receiving a manuscript number from the journal. For most journals,
         you must wait until your manuscript has been accepted from publication before depositign data in Dryad.</message>
 
+	<message key="xmlui.submit.publication.journal.manu.acc.asterisk_explanation">
+		"* Asterisks indicate journals that are integrated with Dryad. When you select one of these journals, you will be asked to enter a valid manuscript number."</message>
+
      <message key="xmlui.submit.publication.journal.manu.help">example: 12345678MEC-11-1234.R1</message>
      <message key="xmlui.submit.publication.enter_article_doi">Enter article DOI or PubMed ID</message>
 
@@ -3232,7 +3235,7 @@
      <message key="xmlui.submit.publication.journal.select.label.new">Enter Your Journal Title</message>
      <message key="xmlui.submit.publication.journal.manu.label.new">Enter Your Manuscript Number</message>
 
-    <message key="xmlui.submit.publication.journal.help_in_review">If your journal is not listed, you must wait until your manuscript number has been accepted before submitting dat to Dryad.</message>
+    <message key="xmlui.submit.publication.journal.help_in_review">If your journal is not listed, you must wait until your manuscript number has been accepted before submitting data to Dryad.</message>
 
 
 </catalogue>
