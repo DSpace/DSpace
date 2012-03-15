@@ -19,6 +19,18 @@
  * Primary Styles
  */
 
+/* ATENCION: dejar siempre al principio  del css esta linea, es para detectar errores de sintaxis*/
+body{background-color:red;}
+
+
+a, a:active, a:visited {
+	text-decoration:none;
+}
+a:hover { 
+	text-decoration:underline;
+}
+
+
 /*Font size percentages based on the tables at developer.yahoo.com/yui/fonts/ */
 h1 {
     font-size: 182%;
@@ -54,6 +66,7 @@ select {
 	border:1px solid #dedede;
 	padding:0px;
 	margin-left:3px;
+	margin-right:20px;
 }
 
 select.multiple {
@@ -67,7 +80,7 @@ select.multiple {
 	background-image:url(../../images/marca_head3.png);
 	height:180px;
 	background-repeat:no-repeat;
-	background-position: -750px 0px;
+	background-position: -750px -1px;
 /*	border-bottom: 10px solid #144961;*/
 }
 
@@ -266,6 +279,56 @@ background-repeat:no-repeat;
 min-height:800px;
 }
 
+#ds-options-wrapper a {
+color:#cd642f;
+}
+
+
+#aspect_discovery_Navigation_list_discovery ul.sublist li {
+color:grey;
+line-height:1.5;
+
+}
+
+
+#aspect_discovery_Navigation_list_discovery ul.sublist li a {
+text-decoration:line-through;
+}
+
+#input_mostrar_filtros {
+color:grey;
+margin-left:5px;
+position:relative;
+/*left:540px;*/
+left:10px;
+background-image:url(../../images/filtros.png);
+background-repeat:no-repeat;
+padding-left:25px;
+background-position:0px center; 
+}
+
+#input_mostrar_filtros:hover {
+color:#2882A8;
+background-image:url(../../images/filtros_hover.png);
+
+}
+
+#aspect_discovery_SimpleSearch_item_used-filters {
+margin:0;
+padding-left:20px;
+/*border:1px dashed #c0c0c0;*/
+position:relative;
+bottom:10px;
+}
+
+#aspect_discovery_SimpleSearch_item_used-filters .ds-form-label {
+font-weight:bold;
+} 
+
+ul.ds-simple-list  li a{
+text-decoration:none;!important
+}
+
 #ds-options {
     padding: 0;
 }
@@ -273,22 +336,30 @@ min-height:800px;
 #ds-options #aspect_discovery_Navigation_list_discovery h2{
 font-weight:bold;
 margin-left:20px;
+font-size:14px;
+margin-bottom:3px;
 }
 
 #ds-options #aspect_discovery_Navigation_list_discovery a{
 text-decoration:none;
+line-height:1.4;
 }
 
 
 h1.ds-option-set-head {
-    margin-top: 20px;
+    margin-top: 18px;
 /* background-color: #f0f2f5;*/
-    padding: 8px 10px;
-    border: 1px dashed #dedede;
-   border-bottom: 1px dashed #dedede;
+    padding: 2px 10px 0px 10px;
+/*   border-bottom: 1px solid #dedede;*/
 /*border-bottom:none;*/
     font-size: 108%;
-	color:#2882a8;
+	color:#565656;
+	background-image:url(../../images/fondoh1.png);
+	height:35px;
+	background-position:left -10px;
+	background-repeat:no-repeat;
+	
+	
 }
 
 #ds-search-option-head{
@@ -304,7 +375,7 @@ div.ds-option-set {
 
 div.ds-option-set ul {
     list-style: none;
-    margin-left: 7px;
+    margin-left: 10px;
     padding-top: 5px;
     padding-bottom: 5px;
 
@@ -313,10 +384,14 @@ div.ds-option-set ul {
 div.ds-option-set .ds-sublist-head {
     font-weight: bold;
     font-size: 100%;
+	color:grey;
+	margin-left:18px;
 }
 
 div.ds-option-set ul.sublist {
     margin-left: 20px;
+	border-left:1px solid #dedede;
+	padding-left:8px;
     padding-top: 0;
     padding-bottom: 0;
 	margin-bottom:10px;
@@ -536,7 +611,9 @@ margin-left:8px;
 }
 
 #aspect_artifactbrowser_ConfigurableBrowse_field_submit:hover,
-#aspect_discovery_SiteViewer_field_submit:hover
+#aspect_discovery_SiteViewer_field_submit:hover,
+#aspect_discovery_SimpleSearch_field_submit:hover
+
  {
 color:#52BAE7;
 background-image:url(../../images/lupitahover.png);
@@ -852,10 +929,10 @@ font-size:14px;
 padding-top:20px;
 background-color:white;
 border:none;
-background-image:url(../../images/sombra_abajo.png);
-height:20px;
+background-image:url(../../images/sombra_abajo2.png);
+height:26px;
 background-repeat:no-repeat;
-background-position:center -35px;
+background-position:center -5px;
 padding-bottom:5px;
 
 /*    padding: 7px;
@@ -891,6 +968,7 @@ background-position:right;
 padding-right:15px;
 text-decoration:none;
 color:#949494;
+margin-left:5px;
 }
 
 .previous-page-link,
@@ -918,10 +996,21 @@ background-image:url(../../images/paginaprevia.png);
 color:#607890;
 }
 
+#aspect_general_NoticeTransformer_div_general-message h1.ds-div-head {
+color:red;
+background-image:none;
+position:relative;
+left:250px;
+}
 
-
+#aspect_general_NoticeTransformer_div_general-message p.ds-paragraph {
+text-align:center;
+}
 .current-page-link a{
-    color: red;
+	-moz-border-radius:5px 5px 5px 5px;
+    color: white;
+	background-color:grey;
+	padding:2px 4px;
 }
 
 .pagination-info {
@@ -1153,7 +1242,7 @@ margin-left:0px;
 
 .ds-paragraph a {
 padding:0px 3px 0px 0px;
-margin: 0px 0px 0px 4px;
+margin: 0px 0px 0px 0px;
 text-decoration:none;
 color:#f59321;
 }
@@ -1346,7 +1435,11 @@ div.spacer{
 .notice.failure
 {
     border-color: #c22121;
+	border:1px dashed red;
     background-color: #fff2f2;
+	background-image:url(../../images/alerta2.png);
+	background-repeat:no-repeat;
+	background-position: right center;
 }
 
 #ds-system-wide-alert p {
@@ -1354,13 +1447,15 @@ div.spacer{
 }
 
 #aspect_artifactbrowser_CommunityViewer_div_community-home h2,
-#aspect_artifactbrowser_CollectionViewer_div_collection-home h2 {
+#aspect_artifactbrowser_CollectionViewer_div_collection-home h2,
+h2.ds-div-head
+ {
     margin-top: 30px;
 /*    border-bottom:1px solid #D8E8EB;*/
 background-image:url(../../images/libritos_chicos.png);
 background-repeat:no-repeat;
 padding-left:25px;
-border-bottom:1px solid #dedede;
+/*border-bottom:1px solid #dedede;*/
 color:#9C4F0A;
 clear:both;
 	padding-top: 0px;
@@ -1480,6 +1575,7 @@ div
 	position:absolute; 
 	top:150px;
 	font: 13px Tahoma, Sans-serif; 
+	left: 80px;
 /*	background-image:url(../../images/fondo_topnav.png);*/
 /*	background-repeat:repeat-x;*/
 }
@@ -1749,7 +1845,6 @@ margin-top:10px;
 
 #aspect_eperson_PasswordLogin_div_register {
 
-padding:10px;
 }
 
 #aspect_submission_Submissions_field_submit_submissions_remove,
@@ -1763,6 +1858,12 @@ padding-left:20px;
 background-color:white;
 color:#6c6c6c;
 height:20px;
+}
+
+#aspect_submission_Submissions_field_submit_submissions_remove:hover, #aspect_administrative_eperson_ManageEPeopleMain_field_submit_delete:hover {
+color:#b95151;
+background-image:url(../../images/tachito_hover.png);
+
 }
 
 input.ds-delete-button {
@@ -1795,6 +1896,7 @@ border-right:1px solid #dedede;
 #aspect_discovery_SimpleSearch_field_submit_sort,
 #aspect_artifactbrowser_ConfigurableBrowse_field_update,
 #aspect_administrative_community_CreateCommunityForm_field_submit_save
+
  {
 margin-top:10px;
 background-image:url(../../images/ok_gris.png);
@@ -1817,6 +1919,24 @@ color: #8cb063;
 background-color:white;
 }
 
+#aspect_discovery_SimpleSearch_field_submit_update_filters {
+background-image:url(../../images/ok_gris.png);
+padding-left:20px;
+background-repeat:no-repeat;
+color: #949494;
+background-color:white;
+position:relative;
+left:530px;
+bottom:40px;
+}
+
+#aspect_discovery_SimpleSearch_field_submit_update_filters:hover{
+background-image:url(../../images/ok.png);
+padding-left:20px;
+background-repeat:no-repeat;
+color: #8cb063;
+background-color:white;
+}
 
 
 #aspect_administrative_community_CreateCommunityForm_field_submit_cancel
@@ -2059,15 +2179,13 @@ display:none;
 }
 
 #aspect_discovery_SimpleSearch_div_general-query {
-background-image:url(../../images/sombra_abajo.png);
-background-position:bottom center;
+/*background-image:url(../../images/sombra_abajo.png);
+background-position:bottom center;*/
 background-repeat:no-repeat;
 border:none;
-padding-bottom:50px;
-}
+/*padding-bottom:50px;*/
 
-#aspect_discovery_SimpleSearch_field_submit_update_filters {
-background-color:red;}
+}
 
 #aspect_discovery_SimpleSearch_div_search-filters {
 border-color:#d9e6ed;
@@ -2311,9 +2429,7 @@ line-height:2;
 }
 
 
-h2.ds-div-head {
-padding-top: 20px;
-}
+
 
 #home_feed{
 line-height:1.7;
@@ -2554,6 +2670,14 @@ span.ds-dc_contributor_author-authority {
 .item-summary-view-metadata #other_attributes ul {
 	list-style: circle;
 }
+
+#other_attributes {
+background-color:#cecece;
+}
+
+#item-file-section {
+background-color:#cfcfcf;
+}
 .item-summary-view-metadata .tesis-info {
 	padding: 2px 15px 10px 15px;
 	border: solid 1px #C0C0C0;
@@ -2606,3 +2730,31 @@ form.submission {
 	border-bottom: solid 1px #C0C0C0;
 	padding: 10px 5px 10px 0px;
 }
+
+#aspect_discovery_SimpleSearch_item_search-filter-list label.ds-form-label {
+	font-weight:bold;
+}
+
+#div-search-filters {
+border: 1px dashed #C0C0C0;
+margin-botoom:50px;
+/*  -moz-box-shadow:5px 5px 10px black;
+  -webkit-box-shadow:5px 5px 10px black;*/
+}
+
+#aspect_discovery_SimpleSearch_list_secondary-search {
+position:relative;
+top:20px;
+}
+
+#aspect_discovery_SimpleSearch_item_search-filter-list {
+position:relative;
+bottom:30px;
+border:1px dashed #C0C0C0;
+padding-left:20px;
+}
+
+
+
+/* ATENCION: dejar siempre al final del css esta linea, es para detectar errores de sintaxis*/
+body{ background-color:white;}
