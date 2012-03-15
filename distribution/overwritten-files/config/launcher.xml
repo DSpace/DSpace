@@ -354,8 +354,8 @@
         </step>
     </command>
     <command>
-        <name>import-user</name>
-        <description>Import user </description>
+        <name>import-users</name>
+        <description>Import users from a file</description>
         <step>
             <class>ar.edu.unlp.sedici.dspace.administer.ImportUsers</class>
         </step>

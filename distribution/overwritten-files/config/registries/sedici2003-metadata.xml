@@ -414,4 +414,9 @@
 		<scope_note>67</scope_note>
 		<element>subtitulo-serie</element>
 	</dc-type>
+	<dc-type>
+		<schema>sedici2003</schema>
+		<scope_note>135</scope_note>
+		<element>entidad-origen</element>
+	</dc-type>
 </dspace-dc-types>

@@ -201,6 +201,7 @@
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'subtype'" />
 			<xsl:with-param name="elements" select="dim:field[@element='subtype']" />
+			<xsl:with-param name="type" select="'i18n-code'"/>
 		</xsl:call-template>
 
 		<!-- title.alternative row -->
@@ -254,6 +255,7 @@
 			<xsl:call-template name="render-normal-field">
 				<xsl:with-param name="name" select="'date-exposure'" />
 				<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='exposure']" />
+				<xsl:with-param name="type" select="'date'" />
 			</xsl:call-template>
 
 			<!-- affiliatedInstitution row -->
@@ -282,6 +284,7 @@
 			<xsl:call-template name="render-normal-field">
 				<xsl:with-param name="name" select="'date-exposure'" />
 				<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='exposure']" />
+				<xsl:with-param name="type" select="'date'" />
 			</xsl:call-template>
 		</xsl:if>
 
