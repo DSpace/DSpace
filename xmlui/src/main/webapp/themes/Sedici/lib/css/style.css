@@ -1926,7 +1926,7 @@ background-repeat:no-repeat;
 color: #949494;
 background-color:white;
 position:relative;
-left:530px;
+left:520px;
 bottom:40px;
 }
 
@@ -2737,7 +2737,7 @@ form.submission {
 
 #div-search-filters {
 border: 1px dashed #C0C0C0;
-margin-botoom:50px;
+margin-bottom:15px;
 /*  -moz-box-shadow:5px 5px 10px black;
   -webkit-box-shadow:5px 5px 10px black;*/
 }
