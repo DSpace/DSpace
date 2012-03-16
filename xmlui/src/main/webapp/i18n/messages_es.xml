@@ -135,7 +135,7 @@
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_subject">Materia</message>
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_keywords">Palabra Clave</message>
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dateIssued">Años de Publicación</message>	
-<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_type">Tipo</message>	
+<message key="xmlui.ArtifactBrowser.AdvancedSearch.type_type">Tipo de documento</message>	
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_abstract">Resumen</message>	
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_series">Series</message>	
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_sponsor">Sponsor</message>	
@@ -2347,6 +2347,7 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.dri2xhtml.structural.pagination-info.nototal">Mostrando items {0}-{1}</message>
 <message key="xmlui.Discovery.AbstractSearch.type_author">Filtrado por: Autor</message>
 <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author">Autor</message>
+<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.type_filter">Tipo de documento</message>
 <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.author_filter">Autor</message>
 <message key="xmlui.Discovery.AbstractSearch.type_subject">Filtrado por: Materia</message>
 <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.subject">Materia</message>

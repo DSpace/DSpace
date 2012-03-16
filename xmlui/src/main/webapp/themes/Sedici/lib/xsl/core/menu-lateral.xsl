@@ -95,8 +95,7 @@
                 </xsl:if>
 
                 <!-- Genero la seccion del discovery -->
-                <xsl:apply-templates select="dri:list[@id='aspect.discovery.Navigation.list.discovery']"/>
-
+				<xsl:apply-templates select="dri:list[@id='aspect.discovery.Navigation.list.discovery']"/>
                 
                 <!-- DS-984 Add RSS Links to Options Box -->
                 <!-- <xsl:if test="count(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='feed']) != 0">
@@ -119,6 +118,80 @@
 
     </xsl:template>
     
+    
+    <!-- Templates para el renderizado del Discovery considerando el uso de textos traducidos -->
+
+	<xsl:template match="dri:list[@id='aspect.discovery.Navigation.list.discovery']">
+		<xsl:apply-templates select="dri:head" />
+		<div>
+			<xsl:call-template name="standardAttributes">
+				<xsl:with-param name="class">ds-option-set</xsl:with-param>
+			</xsl:call-template>
+			<ul class="ds-options-list">
+				<xsl:apply-templates select="dri:list" mode="sedici-discovery" />
+			</ul>
+		</div>
+	</xsl:template>
+
+	<xsl:template match="dri:list[not(@n='type')]" mode="sedici-discovery">
+		<li>
+			<xsl:apply-templates select="dri:head" mode="nested" />
+			<ul class="ds-simple-list sublist">
+				<xsl:apply-templates select="dri:item" mode="nested" />
+			</ul>
+		</li>
+	</xsl:template>
+
+	<xsl:template match="dri:list[@n='type']" mode="sedici-discovery">
+		<li>
+			<xsl:apply-templates select="dri:head" mode="nested" />
+			<ul class="ds-simple-list sublist">
+				<xsl:apply-templates select="dri:item[not(dri:xref)]" mode="sedici-discovery" />
+				<xsl:apply-templates select="dri:item/dri:xref" mode="sedici-discovery" />
+			</ul>
+		</li>
+	</xsl:template>
+
+	<xsl:template match="dri:item[not(dri:xref)]" mode="sedici-discovery">
+		<li>
+			<xsl:call-template name="render-discovery-value">
+				<xsl:with-param name="context" select="." />
+			</xsl:call-template>
+		</li>
+	</xsl:template>
+
+	<xsl:template match="dri:item/dri:xref" mode="sedici-discovery">
+		<li>
+			<a>
+				<xsl:attribute name="href">
+          				<xsl:value-of select="@target" />
+      			</xsl:attribute>
+				<xsl:call-template name="render-discovery-value">
+					<xsl:with-param name="context" select="." />
+				</xsl:call-template>
+			</a>
+		</li>
+	</xsl:template>
+
+	<xsl:template name="render-discovery-value">
+		<xsl:param name="context" />
+
+		<xsl:variable name="type-code" select="substring-before(string($context), ' ')" />
+		<xsl:choose>
+			<xsl:when test="$type-code != ''">
+				<xsl:variable name="type-count" select="substring-after(string($context), ' ')" />
+				<i18n:text>xmlui.dri2xhtml.METS-1.0.code-value-<xsl:value-of select="$type-code" /></i18n:text>
+				<xsl:text> </xsl:text>
+				<xsl:value-of select="$type-count" />
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:copy-of select="$context" />
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+	
+	<!-- Fin de templates para el discovery traducido -->
+
     <xsl:template name="buildUsuarioName">
         <xsl:value-of select="/dri:document/dri:meta/dri:userMeta/dri:metadata[@element='identifier' and @qualifier='firstName']"/>
         <xsl:text> </xsl:text>

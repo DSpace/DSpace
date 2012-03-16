@@ -365,7 +365,7 @@
 		<div class="identifiers">
 			<xsl:call-template name="render-normal-field">
 				<xsl:with-param name="name" select="'identifier-uri'" />
-				<xsl:with-param name="elements" select="dim:field[@element='identifier' and @qualifier='uri']" />
+				<xsl:with-param name="elements" select="dim:field[@element='identifier' and @qualifier='uri' and @mdschema='sedici']" />
 				<xsl:with-param name="separator" select="' | '"/>
 				<xsl:with-param name="type" select="'url'"/>
 			</xsl:call-template>
