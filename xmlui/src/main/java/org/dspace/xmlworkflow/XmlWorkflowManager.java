@@ -149,6 +149,46 @@ public class XmlWorkflowManager {
         return (row != null);
     }
     
+    /**
+     * Ya que a la gente de DSpace se les olvido crear un metodo para retornar un XmlWorkflowItem según el Item,
+     * agregamos uno aqui
+     * 
+     * @param item
+     * @return
+     * @throws SQLException 
+     */
+    public static XmlWorkflowItem GetWorkflowItem(Context context, Item item) throws SQLException {
+    	 // Look for the unique workspaceitem entry where 'item_id' references this item
+        TableRow row =  DatabaseManager.findByUnique(context, "cwf_workflowitem", "item_id", item.getID());
+        XmlWorkflowItem retorno=null;
+        if (row!=null){
+        	try {
+				retorno= XmlWorkflowItem.find(context, row.getIntColumn("workflowitem_id"));
+			} catch (AuthorizeException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+        };
+        return retorno;
+    }
+    
+    public static PoolTask GetPoolTask(Context context, XmlWorkflowItem workflowItem, EPerson person) throws SQLException {
+    	PoolTask poolTask=null;    	
+		try {
+			poolTask = PoolTask.findByWorkflowIdAndEPerson(context, workflowItem.getID(), person.getID());
+		} catch (AuthorizeException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+        return poolTask;
+   }
+    
     //END SeDiCI
     
     //TODO: this is currently not used in our notifications. Look at the code used by the original WorkflowManager
