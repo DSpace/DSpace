@@ -156,7 +156,6 @@
 				
 
 				<!-- Autor (persona) -->
-				<!-- TODO Hay que hacerlo controlado -->
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>creator</dc-element>
@@ -170,7 +169,6 @@
 				</field>
 
 				<!-- Autor Institucional (institucion) -->
-				<!-- TODO Hay que hacerlo controlado -->
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>creator</dc-element>
@@ -214,7 +212,6 @@
 				</field>
 
 				<!-- Idioma del recurso -->
-				<!-- TODO Hacerlo controlado -->
 				<field>
 					<dc-schema>dc</dc-schema>
 					<dc-element>language</dc-element>
@@ -294,7 +291,6 @@
 				</field>
 
 				<!-- Entidad de origen -->
-				<!-- TODO Hay que hacerlo controlado -->
 				<field>
 					<dc-schema>mods</dc-schema>
 					<dc-element>originInfo</dc-element>
@@ -369,7 +365,6 @@
 				</field>
 
 				<!-- Materia (de la lista de encabezamiento de LoC) -->
-				<!-- TODO Hay que hacerlo controlado -->
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>subject</dc-element>
@@ -383,7 +378,6 @@
 				</field>
 
 				<!-- Descriptores DECS -->
-				<!-- TODO Hay que hacerlo controlado -->
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>subject</dc-element>
@@ -396,7 +390,6 @@
 				</field>
 
 				<!-- Descriptores Eurovoc -->
-				<!-- TODO Hay que hacerlo controlado -->
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>subject</dc-element>
@@ -524,7 +517,6 @@
 				</field>
 
 				<!-- Director de tesis -->
-				<!-- TODO Hacerlo controlado -->
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>contributor</dc-element>
@@ -537,7 +529,6 @@
 				</field>
 
 				<!-- CoDirecotor de tesis -->
-				<!-- TODO Hacerlo controlado -->
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>contributor</dc-element>
@@ -562,7 +553,6 @@
 				</field>
 
 				<!-- Lugar de desarrollo de la tesis -->
-				<!-- TODO Hacerlo controlado -->
 				<field>
 					<dc-schema>eprints</dc-schema>
 					<dc-element>AffiliatedInstitution</dc-element>
@@ -574,7 +564,6 @@
 				</field>
 
 				<!-- Grado alcanzado -->
-				<!-- TODO Hay que hacerlo controlado -->
 				<field>
 					<dc-schema>thesis</dc-schema>
 					<dc-element>degree</dc-element>
@@ -587,7 +576,6 @@
 				</field>
 
 				<!-- Institución garante -->
-				<!-- TODO ¿Hay que hacerlo controlado? -->
 				<field>
 					<dc-schema>thesis</dc-schema>
 					<dc-element>degree</dc-element>
@@ -599,7 +587,6 @@
 				</field>
 
 				<!-- Compilador de libro -->
-				<!-- TODO Hay que hacerlo controlado -->
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>contributor</dc-element>
