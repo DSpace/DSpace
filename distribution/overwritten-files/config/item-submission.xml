@@ -236,10 +236,10 @@
       </step>
       
       <!--Step 7 cagará datos fijos en el item. No tendrá interface-->
-      <!-- <step>
-        <processing-class>ar.edu.unlp.sedici.aspect.extraSubmission.submit.AutomaticMetadataStep</processing-class>
+      <step>
+        <processing-class>ar.edu.unlp.sedici.aspect.extraSubmission.submit.AutomaticIssuedMetadataStep</processing-class>
 		<workflow-editable>false</workflow-editable>
-      </step>  -->
+      </step> 
 
 
      
