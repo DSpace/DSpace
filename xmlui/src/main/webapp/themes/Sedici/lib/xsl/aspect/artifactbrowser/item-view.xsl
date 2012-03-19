@@ -201,7 +201,6 @@
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'subtype'" />
 			<xsl:with-param name="elements" select="dim:field[@element='subtype']" />
-			<xsl:with-param name="type" select="'i18n-code'"/>
 		</xsl:call-template>
 
 		<!-- title.alternative row -->

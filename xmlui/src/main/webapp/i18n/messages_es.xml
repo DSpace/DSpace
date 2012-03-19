@@ -1910,25 +1910,6 @@ Puede reemplazar la plantilla que gestiona el caso general dri2xhtml para mejora
 <message key="xmlui.dri2xhtml.METS-1.0.code-value-fr">Francés</message>
 <message key="xmlui.dri2xhtml.METS-1.0.code-value-other">Otro</message>
 
-<message key="xmlui.dri2xhtml.METS-1.0.code-value-preprint">Preprint</message>
-<message key="xmlui.dri2xhtml.METS-1.0.code-value-workingPaper">Documento de trabajo</message>
-<message key="xmlui.dri2xhtml.METS-1.0.code-value-communication">Comunicación</message>
-<message key="xmlui.dri2xhtml.METS-1.0.code-value-revision">Revisión</message>
-<message key="xmlui.dri2xhtml.METS-1.0.code-value-journalContribution">Contribución a revista</message>
-<message key="xmlui.dri2xhtml.METS-1.0.code-value-report">Reporte</message>
-<message key="xmlui.dri2xhtml.METS-1.0.code-value-article">Artículo</message>
-<message key="xmlui.dri2xhtml.METS-1.0.code-value-doctoralThesis">Tesis de doctorado</message>
-<message key="xmlui.dri2xhtml.METS-1.0.code-value-masterThesis">Tesis de maestría</message>
-<message key="xmlui.dri2xhtml.METS-1.0.code-value-bachelorThesis">Tesis de grado</message>
-<message key="xmlui.dri2xhtml.METS-1.0.code-value-specialistDegree">Trabajo de especialización</message>
-<message key="xmlui.dri2xhtml.METS-1.0.code-value-book">Libro</message>
-<message key="xmlui.dri2xhtml.METS-1.0.code-value-conferenceObject">Objeto de conferencia</message>
-<message key="xmlui.dri2xhtml.METS-1.0.code-value-institutionalDocument">Documento institucional</message>
-<message key="xmlui.dri2xhtml.METS-1.0.code-value-fixedImage">Imagen fija</message>
-<message key="xmlui.dri2xhtml.METS-1.0.code-value-movingImage">Imagen en movimiento</message>
-<message key="xmlui.dri2xhtml.METS-1.0.code-value-audio">Audio</message>
-
-
 <message key="xmlui.dri2xhtml.METS-1.0.item-lang-es">En español</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-lang-en">En inglés</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-lang-pt">En portugués</message>
