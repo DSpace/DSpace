@@ -133,6 +133,20 @@
         <xsl:comment> External Metadata URL: <xsl:value-of select="$externalMetadataURL"/> </xsl:comment>
         <xsl:apply-templates select="document($externalMetadataURL)" mode="detailView"/>
      </xsl:template>
+     
+          
+     <xsl:template match="dri:div[@n='community-recent-submission']">
+       <xsl:apply-templates select="dri:head"/>
+       <a class="link-community-view-all">
+       <xsl:attribute name="href">
+          <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath']"/>/<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI']"/>/discover
+       </xsl:attribute>
+       (Ver todos)
+       </a>
+       <div id="aspect_artifactbrowser_CommunityRecentSubmissions_div_community-recent-submission" class="ds-static-div secondary recent-submission">
+       <xsl:apply-templates select="dri:referenceSet[@n='community-last-submitted']"/>
+       </div>
+    </xsl:template>
 
 
 </xsl:stylesheet>

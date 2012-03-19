@@ -124,6 +124,19 @@
         <xsl:apply-templates select="dri:div[@n='community-view-root']"/>    
       </div>           
     </xsl:template>
+    
+    <xsl:template match="dri:div[@n='collection-recent-submission']">
+       <xsl:apply-templates select="dri:head"/>
+       <a class="link-collection-view-all">
+       <xsl:attribute name="href">
+          <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath']"/>/<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='request'][@qualifier='URI']"/>/discover
+       </xsl:attribute>
+       (Ver todos)
+       </a>
+       <div id="aspect_artifactbrowser_CollectionRecentSubmissions_div_collection-recent-submission" class="ds-static-div secondary recent-submission">
+       <xsl:apply-templates select="dri:referenceSet[@n='collection-last-submitted']"/>
+       </div>
+    </xsl:template>
        
 
 </xsl:stylesheet>
