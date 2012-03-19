@@ -1629,9 +1629,11 @@
                           </i18n:text>
                           <xsl:text>: </xsl:text>
                       </label>
-                      <i18n:text>xmlui.submit.publication.journal.manu.acc.asterisk_explanation</i18n:text>        
                       <xsl:apply-templates select="../dri:field[@id=$currentId]"/>
                       <xsl:apply-templates select="../dri:field[@id=$currentId]/dri:error"/>
+                      <p>
+                         <i18n:text>xmlui.submit.publication.journal.manu.acc.asterisk_explanation</i18n:text>
+                      </p>
                       </td>
                   </tr>
                   </xsl:if>

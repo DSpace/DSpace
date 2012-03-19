@@ -3226,7 +3226,7 @@
         you must wait until your manuscript has been accepted from publication before depositign data in Dryad.</message>
 
 	<message key="xmlui.submit.publication.journal.manu.acc.asterisk_explanation">
-		"* Asterisks indicate journals that are integrated with Dryad. When you select one of these journals, you will be asked to enter a valid manuscript number."</message>
+		* Asterisks indicate journals that are integrated with Dryad. When you select one of these journals, you will be asked to enter a valid manuscript number.</message>
 
      <message key="xmlui.submit.publication.journal.manu.help">example: 12345678MEC-11-1234.R1</message>
      <message key="xmlui.submit.publication.enter_article_doi">Enter article DOI or PubMed ID</message>
