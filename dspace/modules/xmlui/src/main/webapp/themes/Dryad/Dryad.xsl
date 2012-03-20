@@ -1630,10 +1630,6 @@
                           <xsl:text>: </xsl:text>
                       </label>
                       <xsl:apply-templates select="../dri:field[@id=$currentId]"/>
-                          <p>
-                              <i18n:text>xmlui.submit.publication.journal.manu.acc.asterisk_explanation</i18n:text>
-                          </p>
-                      <xsl:apply-templates select="../dri:field[@id=$currentId]/dri:value/i18n:text"/>
                       <xsl:apply-templates select="../dri:field[@id=$currentId]/dri:error"/>
                       </td>
                   </tr>
