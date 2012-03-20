@@ -254,7 +254,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         // JOURNAL ID
         Composite optionsList = newItem.addComposite("new-options-comp");
         Text journalField = addJournalAuthorityControlled("prism_publicationName", optionsList, "prism_publicationName");
-	journalField.setLabel(T_asterisk_explanation);
+	journalField.setHelp(T_asterisk_explanation);
 
         // MANUSCRIPT NUMBER
         Text manuText = newItem.addText("manu-number-status-accepted");
