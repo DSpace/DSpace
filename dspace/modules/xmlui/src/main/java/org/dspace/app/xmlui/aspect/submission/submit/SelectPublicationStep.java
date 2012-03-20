@@ -81,6 +81,8 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
     private static final Message T_enter_article_doi = message("xmlui.submit.publication.enter_article_doi");
     private static final Message T_unknown_doi = message("xmlui.submit.publication.unknown_doi");
 
+    private static final Message T_asterisk_explanation = message("xmlui.submit.publication.journal.manu.acc.asterisk_explanation");
+
 
     public void addPageMeta(PageMeta pageMeta) throws SAXException,
             WingException, SQLException, IOException,
@@ -252,7 +254,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         // JOURNAL ID
         Composite optionsList = newItem.addComposite("new-options-comp");
         Text journalField = addJournalAuthorityControlled("prism_publicationName", optionsList, "prism_publicationName");
-
+	journalField.setLabel(T_asterisk_explanation);
 
         // MANUSCRIPT NUMBER
         Text manuText = newItem.addText("manu-number-status-accepted");
