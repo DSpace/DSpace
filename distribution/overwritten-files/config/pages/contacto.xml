@@ -31,7 +31,7 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 			<input type="text" name="mail" size="35" value=""/>
 		</div>
 		<div>
-			<label>Descripción:</label>
+			<label>Mensaje:</label>
 			<textarea name="descripcion" rows="10" cols="40" wrap=""> </textarea>
 		</div>
 		<div>

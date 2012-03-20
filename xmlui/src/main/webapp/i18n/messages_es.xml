@@ -378,7 +378,7 @@
 <message key="xmlui.EPerson.EditProfile.telephone">Teléfono de contacto</message>
 <message key="xmlui.EPerson.EditProfile.Language">Idioma</message>
 <message key="xmlui.EPerson.EditProfile.subscriptions">Suscripciones</message>
-<message key="xmlui.EPerson.EditProfile.subscriptions_help">Puede suscribirse a colecciones para recibir correos electrónicos diariamente de los nuevos ítems añadidos. Puede suscribirse a tantas colecciones como desee. Otra opción es usar el servicio RSS disponible para todas las colecciones.</message>
+<message key="xmlui.EPerson.EditProfile.subscriptions_help">Suscríbase a las colecciones de su interés y reciba las novedades por e-mail. Puede suscribirse a tantas colecciones como desee. También puede utilizar el servicio de RSS para recibir las novedades de todas las colecciones.</message>
 <message key="xmlui.EPerson.EditProfile.email_subscriptions">Suscripción electrónica</message>
 <message key="xmlui.EPerson.EditProfile.select_collection">(Elija una colección)</message>
 <message key="xmlui.EPerson.EditProfile.update_password_instructions">Opcionalmente, puede elegir una contraseña nueva tecleándola en la casilla superior y verificarla en la segunda casilla. Debería tener al menos seis caracteres.</message>
@@ -573,7 +573,7 @@
 	<!-- org.dspace.app.xmlui.Submission.submissions -->
 	<message key="xmlui.Submission.Submissions.title">Envíos &amp; Flujos de trabajo</message>
 <message key="xmlui.Submission.Submissions.trail">Envíos</message>
-<message key="xmlui.Submission.Submissions.head">Envíos &amp; tareas del flujo de trabajo</message>
+<message key="xmlui.Submission.Submissions.head">Envíos y tareas</message>
 <message key="xmlui.Submission.Submissions.untitled">&lt;i&gt;Sin título&lt;/i&gt;</message>
 <message key="xmlui.Submission.Submissions.email">correo electrónico:</message>
 
@@ -594,9 +594,9 @@
 
 	<!-- Same transformer, submissions section -->
 <message key="xmlui.Submission.Submissions.submit_head1">Carga de documentos</message>
-<message key="xmlui.Submission.Submissions.submit_info1a">Debería</message>
+<message key="xmlui.Submission.Submissions.submit_info1a">Si desea incorporar nuevos documentos al repositorio institucional de la Universidad Nacional de La Plata, haga click en el siguiente enlace </message>
 <message key="xmlui.Submission.Submissions.submit_info1b">comenzar un envío</message>
-<message key="xmlui.Submission.Submissions.submit_info1c">, esta función permite al usuario añadir ítems a SeDiCI. El proceso de envío supone cumplimentar el formulario de metadatos de información y depositar el fichero(s) que compone(n) el ítem digital. El proceso de envío de cada comunidad o colección puede tener su propia política.</message>
+<message key="xmlui.Submission.Submissions.submit_info1c">. Esta función le permite añadir recursos académicos a SeDiCI con el fin de preservar y difundir la producción intelectual de la Universidad y hacer que los documentos sean libremente accesibles. El proceso de envío consiste en 3 pasos: 1) completar un formulario con información descriptiva del documento; 2) subir los archivos que lo componen y 3) seleccionar la licencia de uso que será adjuntada al documento.</message>
 <message key="xmlui.Submission.Submissions.submit_head2">Cargas no teminadas</message>
 <message key="xmlui.Submission.Submissions.submit_info2a">Estos son los envíos parciales de ítems que no han sido completados. Podría</message>
 <message key="xmlui.Submission.Submissions.submit_info2b">comenzar otro envío</message>
@@ -630,7 +630,9 @@
 
 <!-- Same transformer, completed submissions section -->
 <message key="xmlui.Submission.Submissions.completed.head">Documentos aceptados</message>
-        <message key="xmlui.Submission.Submissions.completed.limit">We've only listed {0} of your archived submissions above. </message>
+<message key="xmlui.Submission.Submissions.completed.limit">Solamente se listan {0} de sus envíos aceptados. </message>
+<message key="xmlui.Submission.Submissions.completed.displayall">Mostrar todos los envíos que he subido.</message>
+<message key="xmlui.Submission.Submissions.completed.info">Estos son sus envíos completados en SeDiCI.</message>
 
 	<!-- submission progress bar messages -->
 <message key="xmlui.Submission.submit.progressbar.initial-questions">Cuestiones iniciales</message>
@@ -1938,7 +1940,7 @@ Puede reemplazar la plantilla que gestiona el caso general dri2xhtml para mejora
 <message key="xmlui.dri2xhtml.METS-1.0.item-language">Idioma del documento</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-publisher">Lugar de publicación</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-affiliated-institution">Lugar de desarrollo</message>
-<message key="xmlui.dri2xhtml.METS-1.0.item-degree-name">Grado al que accede</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-degree-name">Grado alcanzado</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-degree-grantor">Institución otorgante</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-date-exposure">Fecha de exposición</message>
 <message key="xmlui.dri2xhtml.METS-1.0.item-relation-dossier">Dossier</message>
@@ -2156,14 +2158,14 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="sedici.menuSuperior.exploracion.filtrar">Filtrar</message>
 
 <message key="sedici.menuSuperior.institucional">Institucional</message>
-<message key="sedici.menuSuperior.institucional.queEsSedici">Que es SEDICI?</message>
+<message key="sedici.menuSuperior.institucional.queEsSedici">¿Que es SEDICI?</message>
 <message key="sedici.menuSuperior.institucional.politica">Políticas del repositorio</message>
 <message key="sedici.menuSuperior.institucional.links">Links</message>
 <message key="sedici.menuSuperior.institucional.staff">Staff</message>
 <message key="sedici.menuSuperior.institucional.comoLlegar">Cómo llegar</message>
 
 <message key="sedici.menuSuperior.informacion">Información</message>
-<message key="sedici.menuSuperior.informacion.agregacion">Cómo agregar trabajos?</message>
+<message key="sedici.menuSuperior.informacion.agregacion">Cómo agregar trabajos</message>
 <message key="sedici.menuSuperior.informacion.infoTesistas">Información para tesistas</message>
 <message key="sedici.menuSuperior.informacion.faq">FAQ</message>
 
@@ -2289,7 +2291,7 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.date.issued">Fecha de publicación</message>
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dateIssued">Fecha de publicación</message>
 <!-- Site Leve Recently Added Content -->
-<message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Recientemente agregados</message>
+<message key="xmlui.ArtifactBrowser.SiteViewer.head_recent_submissions">Últimos documentos agregados</message>
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_type_filter">Tipo</message>
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_publisher_filter">Editor</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.ispartof">Es parte de</message>
@@ -2339,11 +2341,11 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.title_sort">Título</message>
 <message key="xmlui.ArtifactBrowser.AbstractSearch.sort_by.dc.date.issued_dt">Fecha de publicación</message>
 <message key="xmlui.discovery.SearchFacetFilter.no-results">No se encontarron valores acordes a los filtros.</message>
-<message key="xmlui.discovery.AbstractFiltersTransformer.filters.head">Discover</message>
-<message key="xmlui.discovery.AbstractFiltersTransformer.filters.view-more">... Ver mas</message>
+<message key="xmlui.discovery.AbstractFiltersTransformer.filters.head">Navegar por</message>
+<message key="xmlui.discovery.AbstractFiltersTransformer.filters.view-more">... Ver más</message>
 <message key="xmlui.discovery.SimpleSearch.search_label">Buscar</message>
 <message key="xmlui.Discovery.SimpleSearch.filter_head">Filtros</message>
-<message key="xmlui.Discovery.SimpleSearch.filter_add">Agregar filtros</message>
+<message key="xmlui.Discovery.SimpleSearch.filter_add">Agregar</message>
 <message key="xmlui.Discovery.SimpleSearch.filter_help">Use los filtros para acotar la búsqueda.</message>
 <message key="xmlui.Discovery.SimpleSearch.filter_apply">Actualizar filtros</message>
 <message key="xmlui.Discovery.SimpleSearch.sort_head">Opciones de ordenación</message>
