@@ -122,7 +122,7 @@ public class BibTexView implements View {
 		}
 
 		// this should always be last so we don't have to worry about a comma
-		builder.append("  publisher = {Dryad Data Repository}").append(EOL);
+		builder.append("  publisher = {Dryad Digital Repository}").append(EOL);
 		return builder.append("}").append(EOL).toString();
 	}
 
