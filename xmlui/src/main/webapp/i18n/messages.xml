@@ -2048,4 +2048,129 @@
   <message key="xmlui.ChoiceLookupTransformer.field.dc_contributor_author.title">LC Name Authority author lookup</message>
   <message key="xmlui.ChoiceLookupTransformer.field.dc_contributor_author.nonauthority">Local value "@1@" (not in Naming Authority)</message>
 
+  <!-- Traducciones agregadas por SEDICI -->
+  
+<message key="xmlui.dri2xhtml.METS-1.0.code-value-es">Spanish</message>
+<message key="xmlui.dri2xhtml.METS-1.0.code-value-en">English</message>
+<message key="xmlui.dri2xhtml.METS-1.0.code-value-it">Italian</message>
+<message key="xmlui.dri2xhtml.METS-1.0.code-value-de">German</message>
+<message key="xmlui.dri2xhtml.METS-1.0.code-value-pt">Portuguese</message>
+<message key="xmlui.dri2xhtml.METS-1.0.code-value-fr">French</message>
+<message key="xmlui.dri2xhtml.METS-1.0.code-value-other">Other</message>
+
+<message key="xmlui.dri2xhtml.METS-1.0.item-lang-es">In Spanish</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-lang-en">In English</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-lang-pt">In Portuguese</message>
+<message key="xmlui.dri2xhtml.METS-1.0.embargoed-document">Embargoed document</message>
+<message key="xmlui.dri2xhtml.METS-1.0.embargoed-document-description">This document can not be accesioned because it has embargo until:</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-is-peer-review">Peer reviewed document</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-is-fulltext">Fulltext document</message>
+<message key="xmlui.dri2xhtml.METS-1.0.other-attributes">Other attributes of the document</message>
+<message key="xmlui.dri2xhtml.METS-1.0.tesis-info">Thesis information</message>
+<message key="xmlui.dri2xhtml.METS-1.0.general-info">General information</message>
+
+<message key="xmlui.dri2xhtml.METS-1.0.item-date-available">Available since</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-date-accessioned">Created</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-title-subtitle">Subtitle</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-embargo-liftDate">End of embargo date</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-title-alternative">Alternative title</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-date-issued">Issue date</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-contributor-director">Advisor</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-contributor-codirector">Co-advisor</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-contributor-editor">Editor</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-contributor-translator">Translator</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-contributor-compiler">Compiler</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-contributor-compilers">Compilers</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-contributor-juror">Jury</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-contributor-colaborator">Colaborator</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-language">Document language</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-publisher">Place of publication</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-affiliated-institution">Place of development</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-degree-name">Degree</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-degree-grantor">Grantor</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-date-exposure">Exposure date</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-relation-dossier">Dossier</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-originInfo">Origin</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-identifier-uri">URI</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-identifier-doi">DOI</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-identifier-handle">Handle</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-identifier-other">Other</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-identifier-issn">ISSN</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-identifier-isbn">ISBN</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-location">Location</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-coverage-spatial">Geographical references</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-coverage-temporal">Temporal references</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-format-extent">Extent</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-subject-materias">Subjects</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-subject-decs">DECS Thesaurus</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-subject-eurovoc">Eurovoc Thesaurus</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-subject-descriptores">Descriptors</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-subject-other">Other descriptors</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-subject-keyword">Keywords</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-relation-isPartOf">Journal</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-subtype">Document type</message>
+<message key="xmlui.dri2xhtml.METS-1.0.item-authors">Authors</message>  
+  
+<!-- Choice authority -->
+<message key="sedici.choiceAuthorityControl.messageErrorConfidenceSingular">Check the value</message>
+<message key="sedici.choiceAuthorityControl.messageErrorConfidencePlural">There are errors in the form</message>
+
+<!-- Menu superior -->
+
+<message key="sedici.menuSuperior.exploracion">Browse</message>
+<message key="sedici.menuSuperior.exploracion.colecciones">Collections</message>
+<message key="sedici.menuSuperior.exploracion.fechaPublicacion">Issue date</message>
+<message key="sedici.menuSuperior.exploracion.autor">Authors</message>
+<message key="sedici.menuSuperior.exploracion.titulo">Titles</message>
+<message key="sedici.menuSuperior.exploracion.tema">Subjects</message>
+<message key="sedici.menuSuperior.exploracion.filtrar">Filter</message>
+<message key="sedici.menuSuperior.institucional">Institutional</message>
+<message key="sedici.menuSuperior.institucional.queEsSedici">What is SeDiCI?</message>
+<message key="sedici.menuSuperior.institucional.politica">Repository policies</message>
+<message key="sedici.menuSuperior.institucional.links">Links</message>
+<message key="sedici.menuSuperior.institucional.staff">Staff</message>
+<message key="sedici.menuSuperior.institucional.comoLlegar">How to get here</message>
+<message key="sedici.menuSuperior.informacion">Information</message>
+<message key="sedici.menuSuperior.informacion.agregacion">How to add documents</message>
+<message key="sedici.menuSuperior.informacion.infoTesistas">Information for posgraduated contributors</message>
+<message key="sedici.menuSuperior.informacion.faq">FAQ</message>
+<message key="sedici.menuSuperior.home">Home</message>
+<message key="sedici.menuSuperior.buscar">Search</message>
+<message key="sedici.menuSuperior.contacto">Contact</message>
+
+<!-- Menu lateral -->
+
+<message key="sedici.menuLateral.cuenta.usuario">User</message>
+<message key="sedici.menuLateral.cuenta.perfil">Profile</message>
+<message key="sedici.menuLateral.cuenta.logout">Log out</message>
+<message key="sedici.menuLateral.cuenta.submissions">Document submission</message>
+<message key="sedici.menuLateral.cuenta.export">My exportations</message>
+<message key="sedici.menuLateral.otros.head">Other</message>
+
+<!-- Otras traducciones -->
+
+<message key="sedici.aspect.collectionViewer.addItem">Add document</message>
+<message key="xmlui.administrative.Navigation.context_edit_item_workflow">Edit item</message>
+<message key="xmlui.discovery.ver_filtros">See filters</message>
+<message key="xmlui.discovery.ocultar_filtros">Hide filters</message>
+<message key="xmlui.administrative.item.ViewItem.title">View item</message>
+<message key="xmlui.administrative.item.ViewItem.trail">View item</message>
+
+<!-- De aca en mas estan en las dependencias de dspace -->
+
+<!-- extension al messages.xml de XmlWorkflow -->
+
+<message key="xmlui.XMLWorkflow.default.CollectionLevelReview">Local review</message>
+<message key="xmlui.XMLWorkflow.default.CollectionLevelReview.claimaction">Local review</message>
+<message key="xmlui.XMLWorkflow.default.CollectionLevelReview.editaction">Local review</message>
+<message key="xmlui.XMLWorkflow.default.SeDiCILevelReview">SeDiCI review</message>
+<message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.claimaction">SeDiCI review</message>
+<message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.editaction">SeDiCi review</message>
+
+<!-- extensión al messages.xml de discovery -->
+
+<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.type_filter">Document type</message>
+  
+
+
 </catalogue>

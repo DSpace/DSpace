@@ -1889,7 +1889,7 @@
 	
 <message key="xmlui.dri2xhtml.structural.link_cc">Creative Commons</message>	
 <message key="xmlui.dri2xhtml.structural.link_original_license">Licencia original</message>	
-&gt;
+
 
 
 	<!-- DS-METS-1.0-MODS.xsl -->
@@ -2022,6 +2022,58 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.dri2xhtml.default.textarea.value"> </message>
 
 
+   <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_ANY">Texto completo</message>
+   <message key="xmlui.ArtifactBrowser.AdvancedSearch.and">Y</message>
+   <message key="xmlui.ArtifactBrowser.AdvancedSearch.or">O</message>
+   <message key="xmlui.ArtifactBrowser.AdvancedSearch.not">NO</message>
+   <message key="xmlui.ArtifactBrowser.RestrictedItem.login">Proceda a loguearse</message>
+   <message key="xmlui.ArtifactBrowser.RestrictedItem.head_item_withdrawn">Este item ha sido retirado.</message>
+   <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_withdrawn">El item seleccionado ha sido retirado y ya no está disponible.</message>
+   <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_restricted_auth">El item seleccionado tiene acceso restringido y requiere ser un usuario con privilegios para poder verse. Por favor, loguéese en el sistema para accederlo.</message>
+   <message key="xmlui.ArtifactBrowser.RestrictedItem.para_item_restricted"> Su cuenta de usuario no tiene los privilegios necesarios para ver este item. Por favor, póngase en contacto con el administrador del sistema si tiene alguna pregunta.</message>
+
+   <message key="xmlui.Submission.Submissions.completed.column1">Fecha de aceptación</message>
+   <message key="xmlui.Submission.Submissions.completed.column2">Título</message>
+   <message key="xmlui.Submission.Submissions.completed.column3">Colección</message>
+
+   <message key="xmlui.Submission.submit.progressbar.CClicense">Licencia CC</message>
+    
+   <message key="xmlui.administrative.FlowCurationUtils.curate_success_notice">Esta tarea ha sido completada satisfactoriamente.</message>
+   <message key="xmlui.administrative.FlowCurationUtils.curate_failed_notice">La tarea terminó o falló inesperadamente. Para mayor información, por favor póngase en contacto con el administrador del sistema o consulte sus registros del sistema.</message>
+   <message key="xmlui.administrative.FlowCurationUtils.queue_success_notice"> La tarea fue puesta en la cola satisfactoriamente.</message>
+   <message key="xmlui.administrative.FlowCurationUtils.queue_failed_notice"> La tarea no pudo ser puesta en la cola. Ocurrió un error. Para mayor información, por favor póngase en contacto con el administrador del sistema o consulte sus registros del sistema.</message>
+
+   <message key="xmlui.administrative.Navigation.administrative_curation">Tareas de preservación</message>-->
+   
+    <message key="xmlui.administrative.item.EditBitstreamForm.name_label">Nombre:</message>
+    <message key="xmlui.administrative.item.EditBitstreamForm.name_help">Renombrar. Tenga en cuenta que esto cambiará la URL, pero los enlaces viejos seguirán funcionando mientras no se cambie el ID.</message>
+
+    <message key="xmlui.administrative.item.EditItemBitstreamsForm.column6">Orden</message>
+	<message key="xmlui.administrative.item.EditItemBitstreamsForm.column7"> </message>
+
+	<message key="xmlui.administrative.item.EditItemBitstreamsForm.submit_reorder">Actualizar orden</message>
+	<message key="xmlui.administrative.item.EditItemBitstreamsForm.previous_order">Anterior:</message>
+	<message key="xmlui.administrative.item.EditItemBitstreamsForm.order_up">Subir</message>
+	<message key="xmlui.administrative.item.EditItemBitstreamsForm.order_down">Bajar</message>
+	
+	<message key="xmlui.administrative.metadataimport.MetadataImportConfirm.item_deleted">Item borrado</message>
+    <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.item_withdrawn">Item retirado</message>
+    <message key="xmlui.administrative.metadataimport.MetadataImportConfirm.item_reinstated">Item reestablecido</message>
+
+    <message key="xmlui.administrative.metadataimport.MetadataImportUpload.item_delete">Borrar item</message>
+    <message key="xmlui.administrative.metadataimport.MetadataImportUpload.item_withdraw">Retirar item</message>
+    <message key="xmlui.administrative.metadataimport.MetadataImportUpload.item_reinstate">Reestablecer item</message>
+    
+    <message key="xmlui.administrative.CurateForm.title">Tareas de preservación del sistema</message>
+    <message key="xmlui.administrative.CurateForm.trail">Tareas de preservación</message>
+    <message key="xmlui.administrative.CurateForm.object_label_name">Handle de objeto de DSpace</message>
+    <message key="xmlui.administrative.CurateForm.object_hint">Consejo: Entre [prefijo del handle]/0 para hacer la tarea a través de todo el sitio (no todas las tareas pueden aceptar esto)</message>
+    <message key="xmlui.administrative.CurateForm.task_label_name">Tarea</message>
+    <message key="xmlui.administrative.CurateForm.taskgroup_label_name">Elija de entre los siguientes grupos</message>
+    
+    <message key="xmlui.dri2xhtml.METS-1.0.cc-license-text">Excepto donde se diga explícitamente, este item se publica bajo la siguiente licencia </message>
+    
+
   <!--###### File Format MIME Type Mappings ######-->
 
   <!-- Application-based formats -->
@@ -2147,7 +2199,6 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="sedici.choiceAuthorityControl.messageErrorConfidenceSingular">Verifique el valor</message>
 <message key="sedici.choiceAuthorityControl.messageErrorConfidencePlural">Hay errores en el formulario</message>
 
-
 <!-- Menu superior -->
 <message key="sedici.menuSuperior.exploracion">Explorar</message>
 <message key="sedici.menuSuperior.exploracion.colecciones">Colecciones</message>
@@ -2182,19 +2233,15 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 
 <message key="sedici.menuLateral.otros.head">Otros</message>
 
-<!-- Traducciones para Discover -->
-<message key="xmlui.discovery.AbstractFiltersTransformer.filters.head">Navegar</message>
-
+<!-- Otras traducciones -->
 <message key="sedici.aspect.collectionViewer.addItem">Agregar Item</message>
-
 <message key="xmlui.administrative.Navigation.context_edit_item_workflow">Editar Item</message>
-
 <message key="xmlui.discovery.ver_filtros">Ver filtros</message>
-
 <message key="xmlui.discovery.ocultar_filtros">Ocultar filtros</message>
 
-<!-- XMLWorkflow -->
+<!-- De aca en mas estan en las dependencias de dspace -->
 
+<!-- extension al messages.xml de XmlWorkflow -->
 <message key="xmlui.XMLWorkflow.default.CollectionLevelReview">Revisión Local</message>
 <message key="xmlui.XMLWorkflow.default.CollectionLevelReview.claimaction">Revisión Local</message>
 <message key="xmlui.XMLWorkflow.default.CollectionLevelReview.editaction">Revisión Local</message>
@@ -2283,7 +2330,7 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.XMLWorkflow.scoreReview.scoreReviewStep.scorereviewaction">Resultado de la revisión</message>
 <message key="xmlui.XMLWorkflow.scoreReview.scoreReviewStep">Resultado de la revisión</message>
 
-<!-- discoveryyyyyy -->
+<!-- extensión al messages.xml de discovery -->
 
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.contributor.author_filter">Autor</message>
 <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_dc.subject_filter">Materia</message>
