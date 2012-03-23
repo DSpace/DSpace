@@ -978,6 +978,7 @@
                    <xsl:variable name="pageviews"
                                   select="$meta[@element='dryad'][@qualifier='pageviews']"/>
                     <xsl:if test="$pageviews">
+                        <xsl:if test="$datafiles!=''">
                             <xsl:text>   </xsl:text>
                             <xsl:value-of select="$pageviews"/>
                             <xsl:choose>
@@ -990,6 +991,7 @@
                                     <i18n:text>xmlui.DryadItemSummary.views</i18n:text>
                                 </xsl:otherwise>
                             </xsl:choose>
+                        </xsl:if>
                     </xsl:if>
                     <xsl:variable name="downloads"  select="$meta[@element='dryad'][@qualifier='downloads']"/>
                     <xsl:if test="$downloads">
