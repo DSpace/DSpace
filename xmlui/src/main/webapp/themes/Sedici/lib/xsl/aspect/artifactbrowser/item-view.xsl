@@ -76,14 +76,7 @@
         </div>
     </xsl:template>
 
-    <xsl:template name="itemSummaryView-DIM-fields">
-	
-		<!-- date.available row -->
-		<xsl:call-template name="render-normal-field">
-			<xsl:with-param name="name" select="'date-available'" />
-			<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='available']" />
-			<xsl:with-param name="type" select="'date'"/>
-		</xsl:call-template>
+    <xsl:template name="itemSummaryView-DIM-fields">	
 
 		<!-- Title row -->
 		<xsl:choose>
@@ -111,6 +104,18 @@
 				</h1>
 			</xsl:otherwise>
 		</xsl:choose>
+		
+		<!-- Imprimo el año de issued -->
+		<h1>
+		    <xsl:choose>
+				<xsl:when test="string-length(dim:field[@element='date' and @qualifier='issued']) > 4">
+				    <xsl:value-of select="substring(dim:field[@element='date' and @qualifier='issued'], 1, 4)"/>
+				</xsl:when>
+				<xsl:otherwise>
+				    <xsl:value-of select="dim:field[@element='date' and @qualifier='issued']"/>
+				</xsl:otherwise>
+		    </xsl:choose>	
+		</h1>
 
 		<!-- title.subtitle row -->
 		<xsl:call-template name="render-normal-field">
@@ -191,12 +196,14 @@
 		</xsl:if>
 
 		<!-- date.issued row -->
-		<xsl:call-template name="render-normal-field">
-			<xsl:with-param name="name" select="'date-issued'" />
-			<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='issued']" />
-			<xsl:with-param name="type" select="'date'" />
-		</xsl:call-template>
-
+		<xsl:if test="dim:field[@element='date' and @qualifier='issued'] != substring-before(dim:field[@element='date' and @qualifier='accessioned'], 'T')">
+			<xsl:call-template name="render-normal-field">
+				<xsl:with-param name="name" select="'date-issued'" />
+				<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='issued']" />
+				<xsl:with-param name="type" select="'date'" />
+			</xsl:call-template>
+        </xsl:if>
+        
 		<!-- Para el Tipo de Documento mostramos el sedici.subtype porque es mas especifico -->
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'subtype'" />
@@ -390,7 +397,7 @@
 				<xsl:with-param name="type" select="'url'"/>
 			</xsl:call-template>
 		</div>
-
+		
 		<!-- identifier.issn row -->
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'identifier-issn'" />
@@ -464,7 +471,22 @@
 				<xsl:with-param name="name" select="'subject-keyword'" />
 				<xsl:with-param name="elements" select="dim:field[@element='subject' and @qualifier='keyword']" />
 			</xsl:call-template>
-		</div>
+
+			<!-- date.accessioned row -->
+			<xsl:call-template name="render-normal-field">
+				<xsl:with-param name="name" select="'date-accessioned'" />
+				<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='accessioned']" />
+				<xsl:with-param name="type" select="'date'"/>
+			</xsl:call-template>	
+			
+			<!-- date.available row -->
+			<xsl:call-template name="render-normal-field">
+				<xsl:with-param name="name" select="'date-available'" />
+				<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='available']" />
+				<xsl:with-param name="type" select="'date'"/>
+			</xsl:call-template>
+			
+    	</div>
 
 		<!-- status row -->
 		<xsl:if test="(dim:field[@element='status']='si' or dim:field[@element='fulltext']='si')">

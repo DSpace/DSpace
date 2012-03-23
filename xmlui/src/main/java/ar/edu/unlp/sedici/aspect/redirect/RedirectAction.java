@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.avalon.framework.parameters.Parameters;
+import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.acting.AbstractAction;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Redirector;
@@ -35,6 +36,7 @@ import org.apache.cocoon.environment.http.HttpEnvironment;
 import org.apache.cocoon.sitemap.PatternException;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
+import org.dspace.app.xmlui.wing.Message;
 import org.dspace.authorize.AuthorizeException;
 import org.dspace.content.Item;
 import org.dspace.content.ItemIterator;
@@ -175,79 +177,83 @@ public class RedirectAction extends AbstractAction
         //recupero la clave para la vieja url
         String prefijo=this.recuperarClave(old_url);
         
-        Map<String, Object> propertiesPrefijo=this.recuperarProperties(prefijo);
-        
-        //recupero los valores
-        String new_url=(String)propertiesPrefijo.get(prefijo+"."+RedirectAction.NEW_URL);
-        
-        //recupero la cantidad de parámetros que van a ser pasados al redirect   
-    	Hashtable<String, String> new_url_params=new Hashtable<String, String>();
-    	
-        int inicial=1;
-        String param_old_name="";
-        String param_new_name="";
-    	Boolean url_part=false;
-    	String type;
-    	String param_value="";
-    	String prefijo_parametro=prefijo+"."+RedirectAction.MAP_PREFIX_PARAMS+"."+inicial;
-
-        while (propertiesPrefijo.containsKey(prefijo_parametro+"."+RedirectAction.OLD_PARAM_NAME)){
-            param_old_name=(String)propertiesPrefijo.get(prefijo_parametro+"."+RedirectAction.OLD_PARAM_NAME);
-        	
-    		//debo verificar si el parametro es parte de la url o se pasa como parámetro.
-    		//IMPORTANTE: aca podriamos extender el config en el caso de que varios parametros puedan formar parte de la url, para
-    		//            agregarle el orden y escribir bien la URL nueva.
-    		//            En este caso, solo UN parámetro es parte de la url, los demás se pasan como parámetros.
-    		url_part=(Boolean)propertiesPrefijo.get(prefijo_parametro+"."+RedirectAction.URL_PART);
-    		
-    		//recupero del request el valor del parametro con nomre old_param
-    		param_value=request.getParameter(param_old_name);
-    		
-    		//Transformo en caso de ser necesario el valor del parametro
-    		type=(String)propertiesPrefijo.get(prefijo_parametro+"."+RedirectAction.TYPE); 
-    		if (type!=null){
-    			param_value=this.transformParamValue(request, type, param_value);
-    		}
-    		
-    		//Si el parametro es parte de la url lo agrego separado por /, sino lo agrego como parametro del request
-			if (url_part){
-				new_url=new_url+"/"+param_value;
-			}else{
-				//si no es parte de la url se agrega como parametro a la url
-        		param_new_name=(String)propertiesPrefijo.get(prefijo_parametro+"."+RedirectAction.NEW_PARAM_NAME);
-        		new_url_params.put(param_new_name, param_value);				
-			}
-			
-			inicial+=1;
-	    	prefijo_parametro=prefijo+"."+RedirectAction.MAP_PREFIX_PARAMS+"."+inicial;
-
-		};
-		//recorro el hashtable creado con los parametros y lo agrego a la url
-		Enumeration<String> claves_params=new_url_params.keys();
-		Boolean first_element=true;
-		String clave_param;
-		//agrego los parametros a la nueva url
-		while (claves_params.hasMoreElements()) {
-			if (first_element){
-				new_url+="?";
-				first_element=false;
-			} else {
-				new_url+="&";
+        if (prefijo == null){
+        	throw new ResourceNotFoundException("Page cannot be found", new ResourceNotFoundException("Page cannot be found"));
+        } else {
+	        Map<String, Object> propertiesPrefijo=this.recuperarProperties(prefijo);
+	        
+	        //recupero los valores
+	        String new_url=(String)propertiesPrefijo.get(prefijo+"."+RedirectAction.NEW_URL);
+	        
+	        //recupero la cantidad de parámetros que van a ser pasados al redirect   
+	    	Hashtable<String, String> new_url_params=new Hashtable<String, String>();
+	    	
+	        int inicial=1;
+	        String param_old_name="";
+	        String param_new_name="";
+	    	Boolean url_part=false;
+	    	String type;
+	    	String param_value="";
+	    	String prefijo_parametro=prefijo+"."+RedirectAction.MAP_PREFIX_PARAMS+"."+inicial;
+	
+	        while (propertiesPrefijo.containsKey(prefijo_parametro+"."+RedirectAction.OLD_PARAM_NAME)){
+	            param_old_name=(String)propertiesPrefijo.get(prefijo_parametro+"."+RedirectAction.OLD_PARAM_NAME);
+	        	
+	    		//debo verificar si el parametro es parte de la url o se pasa como parámetro.
+	    		//IMPORTANTE: aca podriamos extender el config en el caso de que varios parametros puedan formar parte de la url, para
+	    		//            agregarle el orden y escribir bien la URL nueva.
+	    		//            En este caso, solo UN parámetro es parte de la url, los demás se pasan como parámetros.
+	    		url_part=(Boolean)propertiesPrefijo.get(prefijo_parametro+"."+RedirectAction.URL_PART);
+	    		
+	    		//recupero del request el valor del parametro con nomre old_param
+	    		param_value=request.getParameter(param_old_name);
+	    		
+	    		//Transformo en caso de ser necesario el valor del parametro
+	    		type=(String)propertiesPrefijo.get(prefijo_parametro+"."+RedirectAction.TYPE); 
+	    		if (type!=null){
+	    			param_value=this.transformParamValue(request, type, param_value);
+	    		}
+	    		
+	    		//Si el parametro es parte de la url lo agrego separado por /, sino lo agrego como parametro del request
+				if (url_part){
+					new_url=new_url+"/"+param_value;
+				}else{
+					//si no es parte de la url se agrega como parametro a la url
+	        		param_new_name=(String)propertiesPrefijo.get(prefijo_parametro+"."+RedirectAction.NEW_PARAM_NAME);
+	        		new_url_params.put(param_new_name, param_value);				
+				}
+				
+				inicial+=1;
+		    	prefijo_parametro=prefijo+"."+RedirectAction.MAP_PREFIX_PARAMS+"."+inicial;
+	
 			};
-			clave_param=claves_params.nextElement();
-			new_url+=clave_param+"="+new_url_params.get(clave_param);
-		};
-
-        
-        String redirectURL = request.getContextPath()+ new_url;
-        
-        System.out.println(redirectURL);
-        
-        final HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-        
-        httpResponse.sendRedirect(redirectURL);
-        
-        return null;
+			//recorro el hashtable creado con los parametros y lo agrego a la url
+			Enumeration<String> claves_params=new_url_params.keys();
+			Boolean first_element=true;
+			String clave_param;
+			//agrego los parametros a la nueva url
+			while (claves_params.hasMoreElements()) {
+				if (first_element){
+					new_url+="?";
+					first_element=false;
+				} else {
+					new_url+="&";
+				};
+				clave_param=claves_params.nextElement();
+				new_url+=clave_param+"="+new_url_params.get(clave_param);
+			};
+	
+	        
+	        String redirectURL = request.getContextPath()+ new_url;
+	        
+	        System.out.println(redirectURL);
+	        
+	        final HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
+	        
+	        httpResponse.sendRedirect(redirectURL);
+	        
+	        return null;
+        }
     }
     
 	/*
