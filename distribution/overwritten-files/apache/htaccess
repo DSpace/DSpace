@@ -1,0 +1,26 @@
+
+RewriteEngine On
+#RewriteLog rewrite_sedici.log
+
+RedirectMatch /comprobantes(.*)$ http://dataserver.prebi.unlp.edu.ar/comprobantes$1
+
+RewriteCond %{HTTP_HOST} ^www\.sedici\.unlp\.edu\.ar$
+RewriteRule ^.*$ http://sedici.unlp.edu.ar%{REQUEST_URI} [R=permanent,L]
+
+#/ARG-UNLP-EBook-0000000001/1789.pdf
+#/search/downloadp.php?id_document=ARG-UNLP-EBook-0000000001&id_parte=1789
+RewriteRule ^([^/\?]+)/([0-9]+)\.[a-z0-9]{3}$ /search/downloadp.php?id_document=$1&id_parte=$2 [NC]
+
+#/?id=ARG-UNLP-EBook-0000000001
+#/search/request.php?id_document=ARG-UNLP-EBook-0000000001
+RewriteCond %{QUERY_STRING} id=([^&]*)
+RewriteRule ^([^/]+)$ /search/request.php?id_document=%1 [NC]
+
+#redirecciono todo lo que es .php, static o autoarchivo
+RewriteCond %{REQUEST_URI} !redirect.php$
+RewriteCond %{REQUEST_URI} \.php$ [OR]
+RewriteCond %{REQUEST_URI} ^/static/.* [OR]
+RewriteCond %{REQUEST_URI} ^/autoarchivo/.*
+#RewriteRule ^(.*)$ /redirect.php?old_url=%{REQUEST_URI}\&%{QUERY_STRING} [R=302,L]
+RewriteRule ^(.*)$ http://testing.prebi.unlp.edu.ar:8080/xmlui/redirect.php?old_url=%{REQUEST_URI}\&%{QUERY_STRING} [R=302,L]
+
