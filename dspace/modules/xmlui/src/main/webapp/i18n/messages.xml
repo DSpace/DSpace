@@ -1989,7 +1989,7 @@
 	<message key="xmlui.administrative.item.EditItemStatusForm.collection_admins_only">(collection
 		administrators only)</message>
 	<message key="xmlui.administrative.item.EditItemStatusForm.not_allowed">(you are not allowed to
-		performe this action)</message>
+		perform this action)</message>
 
 	<!-- org.dspace.app.xmlui.administrative.item.ViewItem -->
 	<message key="xmlui.administrative.item.ViewItem.title">View Item</message>
