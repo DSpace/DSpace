@@ -3235,7 +3235,7 @@
      <message key="xmlui.submit.publication.journal.select.label.new">Enter Your Journal Title</message>
      <message key="xmlui.submit.publication.journal.manu.label.new">Enter Your Manuscript Number</message>
 
-    <message key="xmlui.submit.publication.journal.help_in_review">If your journal is not listed, you must wait until your manuscript number has been accepted before submitting data to Dryad.</message>
+    <message key="xmlui.submit.publication.journal.help_in_review">If your journal is not listed, you must wait until your manuscript has been accepted before submitting data to Dryad.</message>
 
 
 </catalogue>
