@@ -1,0 +1,35 @@
+NameVirtualHost *:80
+<VirtualHost *:80>
+  ServerAdmin webmaster@www.example.com
+  ServerName dspace.localhost
+  ServerAlias sedici.unlp.edu.ar
+
+  #directorio con reglas de escritura y otras yerbas
+  DocumentRoot ${dspace.dir}/config/httpd
+  <Directory ${dspace.dir}/config/httpd>
+    AllowOverride all
+    Order allow,deny
+    Allow from all
+  </Directory>
+  
+  ProxyRequests Off
+
+#  RewriteEngine On 
+#  RewriteRule ^/dspace(.*) $1 [PT,L]
+#  ProxyPass / ajp://localhost:8009/dspace/
+#  ProxyPassReverse / ajp://localhost:8009/dspace/
+
+  <Location />
+    Order allow,deny
+    Allow from all
+
+    ProxyPass ajp://localhost:8009/
+    ProxyPassReverse ajp://localhost:8009/
+  </Location>
+
+  ErrorLog /var/log/apache2/dspace-error.log
+  CustomLog /var/log/apache2/dspace-access.log common
+
+</VirtualHost>
+
+

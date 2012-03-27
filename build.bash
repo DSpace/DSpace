@@ -48,6 +48,33 @@ do_update(){
 	
     print_sec "Felicitaciones! se actualizo correctamente Dspace@SeDiCI en \n\t $DATA_DIR"
 }
+install_vhost()
+{
+	print_sec "habilito el vitual host"
+	sudo a2enmod proxy proxy_ajp
+	sudo cp $DATA_DIR/config/httpd/dspace.vhost /etc/apache2/sites-available/dspace
+	sudo a2ensite dspace
+	sudo service apache2 restart
+	
+	if (! resolveip -s "dspace.localhost") ; then
+		sudo echo " 127.0.0.1 dspace.localhost" >> /etc/hosts
+	fi
+	
+	if [ -d "$CATALINA_HOME" ] ; then
+		echo "Se crean los links simbólicos a las webapps en $CATALINA_HOME/webapps"
+		
+		#check 	<Connector port="8009" protocol="AJP/1.3" redirectPort="8443"/>
+		echo "Recuerde chequear el archivo $CATALINA_HOME/conf/server.xml debe tener el conector para AJP/1.3 habilitado en el puerto 8009" 
+		
+		sudo mv $CATALINA_HOME/webapps/ROOT $CATALINA_HOME/webapps/ROOT_hold
+		sudo ln -s $DATA_DIR/webapps/xmlui $CATALINA_HOME/webapps/ROOT 
+		sudo ln -s $DATA_DIR/webapps/oai $CATALINA_HOME/webapps/oai
+		sudo ln -s $DATA_DIR/webapps/solr $CATALINA_HOME/webapps/solr
+	else
+		echo "No se crean los links simbólicos a las webapps porque no se encontro la variable de entorno CATALINA_HOME"
+	fi
+	 
+}
 
 do_install()
 {
@@ -92,7 +119,10 @@ do_install()
 	$DATA_DIR/bin/dspace create-administrator
 	#sudo chown -R myUser.myGroup $DATA_DIR
 	chmod -R a+rw $DATA_DIR/log $DATA_DIR/assetstore $DATA_DIR/upload
-
+	
+	echo -e "Instalando el virtual host de apache con mod_proxy"
+	install_vhost 
+	
     print_sec "Felicitaciones! se instalo correctamente Dspace@SeDiCI en \n\t $DATA_DIR \n\t con la BBDD $dspace_dbname"
 }
 

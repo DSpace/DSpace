@@ -16,11 +16,17 @@ RewriteRule ^([^/\?]+)/([0-9]+)\.[a-z0-9]{3}$ /search/downloadp.php?id_document=
 RewriteCond %{QUERY_STRING} id=([^&]*)
 RewriteRule ^([^/]+)$ /search/request.php?id_document=%1 [NC]
 
+#/static/redirector.php?adress=oai/oai
+RewriteCond %{REQUEST_URI} ^/static/redirector.php$
+RewriteCond %{QUERY_STRING} adress=([^&]*).*
+RewriteRule ^.*$ /static/%1.php [R=302,L]
+
+
 #redirecciono todo lo que es .php, static o autoarchivo
 RewriteCond %{REQUEST_URI} !redirect.php$
 RewriteCond %{REQUEST_URI} \.php$ [OR]
 RewriteCond %{REQUEST_URI} ^/static/.* [OR]
 RewriteCond %{REQUEST_URI} ^/autoarchivo/.*
-#RewriteRule ^(.*)$ /redirect.php?old_url=%{REQUEST_URI}\&%{QUERY_STRING} [R=302,L]
-RewriteRule ^(.*)$ http://testing.prebi.unlp.edu.ar:8080/xmlui/redirect.php?old_url=%{REQUEST_URI}\&%{QUERY_STRING} [R=302,L]
+RewriteRule ^(.*)$ /redirect.php?old_url=%{REQUEST_URI}\&%{QUERY_STRING} [R=302,L]
+#RewriteRule ^(.*)$ http://2testing.prebi.unlp.edu.ar:8080/xmlui/redirect.php?old_url=%{REQUEST_URI}\&%{QUERY_STRING} [R=302,L]
 
