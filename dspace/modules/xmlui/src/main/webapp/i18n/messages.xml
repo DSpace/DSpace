@@ -3068,7 +3068,7 @@
 
     <message key="xmlui.ItemViewer.versionInSubmission">You have a version of this item in your Submission Queue</message>
     <message key="xmlui.ItemViewer.goToSubmissionPage">&#160;&#160;[go to submission overview]</message>
-    <message key="xmlui.ItemViewer.versionInWorkflow">A version of this item is in workflow waiting for curator review</message>
+    <message key="xmlui.ItemViewer.versionInWorkflow">A newer version of this item has been submitted to Dryad. It is waiting for curator review.</message>
 
 	<message key="xmlui.dryad.page_title">Dryad data file: </message>
     <message key="xmlui.utils.TombstoneTransformer.message">The requested Item is unavailable. For more information contact an &#160;</message>

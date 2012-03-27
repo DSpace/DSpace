@@ -64,7 +64,7 @@ public class CDLDataCiteService {
 
 
     int registeredItems = 0;
-    int synchItems = 0;
+    int syncItems = 0;
     int notProcessItems = 0;
     int itemsWithErrors = 0;
     static boolean testMode=false;
@@ -120,7 +120,7 @@ public class CDLDataCiteService {
 
     /**
      * @param aDOI A DOI in the form <code>10.5061/dryad.1731</code>
-     * @param aURL A URL in the form
+     * @param aURL A redirect URL in the form
      *             <code>http://datadryad.org/handle/10255/dryad.1731</code>
      * @return A response message from the remote service
      * @throws IOException If there was trouble connection and communicating to
@@ -194,10 +194,10 @@ public class CDLDataCiteService {
     }
 
 
-    public void synchAll() {
+    public void syncAll() {
 
         registeredItems = 0;
-        synchItems = 0;
+        syncItems = 0;
         notProcessItems = 0;
         itemsWithErrors = 0;
 
@@ -228,7 +228,7 @@ public class CDLDataCiteService {
                         registeredItems++;
                     } else {
                         updateItem(item, doi);
-                        synchItems++;
+                        syncItems++;
                     }
                 } else {
 
@@ -277,7 +277,7 @@ public class CDLDataCiteService {
             log.debug("Update Item: " + doi + " result: " + this.update(doi, null, createMetadataList(item)));
 
         } catch (DOIFormatException de) {
-            log.debug("Can't synch the following Item: " + item.getID() + " - " + doi);
+            log.debug("Can't sync the following Item: " + item.getID() + " - " + doi);
             de.printStackTrace(System.out);
             itemsWithErrors++;
         }
@@ -317,7 +317,10 @@ public class CDLDataCiteService {
      * @param args
      */
     public static void main(String[] args) throws IOException {
-        String usage = "Usageto register or update a specific Item --> class username password doi target register|update  to lookup a specific item --> class doi to synchronize all the items against dataCite --> class username password synchall";
+	
+        String usage = "\n\nUsage: \n\tregister or update a specific Item: class username password doi target register|update\n" +
+	    "\tlookup a specific item: class doi\n" +
+	    "\tsynchronize all items to dataCite --> class username password syncall\n\n";
         CDLDataCiteService service;
 
 
@@ -327,12 +330,12 @@ public class CDLDataCiteService {
             String doiID = args[0];
             System.out.println(service.lookup(doiID));
         }
-        // SYNCHALL: args= USERNAME PASSWORD synchall
-        else if (args.length == 3 && args[2].equals("synchall")) {
+        // SYNCALL: args= USERNAME PASSWORD syncall
+        else if (args.length == 3 && args[2].equals("syncall")) {
             String username = args[0];
             String password = args[1];
             service = new CDLDataCiteService(username, password);
-            service.synchAll();
+            service.syncAll();
         }
         // REGISTER || UPDATE: args= USERNAME PASSWORD DOI URL ACTION
         else if (args.length == 6) {
