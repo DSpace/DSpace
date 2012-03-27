@@ -19,7 +19,6 @@
                   xsi:schemaLocation="http://datacite.org/schema/kernel-2.2 http://schema.datacite.org/meta/kernel-2.2/metadata.xsd"
                   lastMetadataUpdate="2006-05-04" metadataVersionNumber="1">
 
-
             <xsl:if test="dspace:field[@element ='identifier']">
                 <xsl:for-each select="dspace:field[@element ='identifier']">
                     <xsl:variable name="id" select="."/>
@@ -30,12 +29,10 @@
                     </xsl:if>
                 </xsl:for-each>
             </xsl:if>
-            <!--<identifier identifierType="DOI">10.5061/DRYAD.2222</identifier>-->
 
-
-            <xsl:if test="dspace:field[@element ='contributor']">
+            <xsl:if test="dspace:field[@element ='contributor' and @qualifier='author']">
                 <creators>
-                    <xsl:for-each select="dspace:field[@element ='contributor']">
+                    <xsl:for-each select="dspace:field[@element ='contributor' and @qualifier='author']">
                         <creator>
                             <creatorName>
                                 <xsl:value-of select="."/>
