@@ -8,16 +8,14 @@
         ${propertyKey}.
     -->
     <!-- Levanta el archivo de configuracion desde el directorio de instalación de dspace -->
-	<bean id="dspace_dir" class="org.springframework.web.context.support.ServletContextParameterFactoryBean">
-		<property name="initParamName" value="dspace.dir" />
-	</bean>
-
 	<bean id="propertyPlaceholderConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
 		<property name="ignoreUnresolvablePlaceholders" value="true"/>
+		<property name="ignoreResourceNotFound" value="true"/>
+		<property name="systemPropertiesMode" value="2"/>
 		<property name="locations">
 			<list>
 				<value>classpath*:sedici2003.default.properties</value>
-				<value>#{'file://'+dspace_dir+'/config/sedici2003.properties'}</value>
+				<value>file://${sedici2003_config}</value>
 			</list>
 		</property>
 	</bean>

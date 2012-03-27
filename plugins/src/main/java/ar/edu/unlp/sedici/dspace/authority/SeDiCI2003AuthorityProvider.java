@@ -20,6 +20,7 @@ import java.util.List;
 import org.dspace.content.authority.Choice;
 import org.dspace.content.authority.ChoiceAuthority;
 import org.dspace.content.authority.Choices;
+import org.dspace.core.ConfigurationManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,10 +29,11 @@ import ar.edu.unlp.sedici.sedici2003.service.SeDiCI2003Manager;
 
 public abstract class SeDiCI2003AuthorityProvider implements ChoiceAuthority {
 
-	private Logger log =LoggerFactory.getLogger(getClass()); 
+	private Logger log = LoggerFactory.getLogger(getClass()); 
 	
 	public SeDiCI2003AuthorityProvider() {
-		SeDiCI2003Manager.prepare();
+		String dspaceDir = ConfigurationManager.getProperty("dspace.dir");
+		SeDiCI2003Manager.prepare(dspaceDir+"/config/sedici2003.properties");
 	}
 	
     /**
