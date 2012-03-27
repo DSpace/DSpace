@@ -67,7 +67,6 @@ public class CDLDataCiteService {
     int syncItems = 0;
     int notProcessItems = 0;
     int itemsWithErrors = 0;
-    static boolean testMode=false;
 
     public CDLDataCiteService(final String aUsername, final String aPassword) {
         myUsername = aUsername;
@@ -132,55 +131,45 @@ public class CDLDataCiteService {
             if (aDOI.startsWith("doi")) {
                 aDOI = aDOI.substring(4);
             }
+	    
+	    aDOI = aDOI.toUpperCase();
+	    String fullURL = BASEURL + "/id/doi%3A" + aDOI;
+	    log.debug("posting to " + fullURL);
+            PostMethod post = new PostMethod(fullURL);
 
-            PostMethod post = new PostMethod(BASEURL + "/id/doi%3A" + aDOI);
-
-            if (aURL != null)
-                return executeHttpMethod(aURL, metadata, post);
-
-            return executeHttpMethod(null, metadata, post);
-        }
+	    return executeHttpMethod(aURL, metadata, post);
+	}
         return "datacite.notConnected";
 
     }
 
     private String executeHttpMethod(String aURL, Map<String, String> metadata, EntityEnclosingMethod httpMethod) throws IOException {
-
-//        HashMap<String, String> map = new HashMap<String, String>();
-//
-//        if (aURL != null)
-//            metadata.put("_target", aURL);
-//
-//        if (log.isDebugEnabled()) {
-//            log.debug("Adding _target to metadata for update: " + aURL);
-//        }
-//
-//        if (metadata != null) {
-//            log.debug("Adding other metadata");
-//            map.putAll(metadata);
-//        }
-
         logMetadata(metadata);
 
         httpMethod.setRequestEntity(new StringRequestEntity(encodeAnvl(metadata), "text/plain", "UTF-8"));
-
         httpMethod.setRequestHeader("Content-Type", "text/plain");
         httpMethod.setRequestHeader("Accept", "text/plain");
 
         this.getClient(false).executeMethod(httpMethod);
+	log.info("HTTP status: " + httpMethod.getStatusLine());
+	log.debug("HTTP response text: " + httpMethod.getResponseBodyAsString(1000));
         return httpMethod.getStatusLine().toString();
     }
 
 
 
     private void logMetadata(Map<String, String> metadata) {
-        System.out.println("Adding the following Metadata:");
+        log.debug("Adding the following Metadata:");
         if (metadata != null) {
             Set<String> keys = metadata.keySet();
             for (String key : keys) {
-                System.out.println(key + ": " + metadata.get(key));
+                log.debug(key + ": " + metadata.get(key));
             }
         }
+
+	log.debug("Anvl form of metadata:");
+	log.debug(encodeAnvl(metadata));
+
     }
 
 
@@ -323,6 +312,7 @@ public class CDLDataCiteService {
 	    "\tsynchronize all items to dataCite --> class username password syncall\n\n";
         CDLDataCiteService service;
 
+	log.debug("========== Starting DOI command-line service ===========");
 
         // LOOKUP: args[0]=DOI
         if (args.length == 1) {
@@ -338,15 +328,12 @@ public class CDLDataCiteService {
             service.syncAll();
         }
         // REGISTER || UPDATE: args= USERNAME PASSWORD DOI URL ACTION
-        else if (args.length == 6) {
+        else if (args.length == 5) {
             String username = args[0];
             String password = args[1];
             String doiID = args[2];
             String target = args[3];
             String action = args[4];
-            String testMode_ = args[5];
-
-            if(testMode_.equals("true")) testMode=true;
 
             org.dspace.core.Context context = null;
             try {
@@ -361,9 +348,6 @@ public class CDLDataCiteService {
 
                 log.debug("obtaining dspace object");
                 dso = identifierService.resolve(context, doiID);
-
-                // !!!! USE JUST FOR local TEST!
-                //dso = identifierService.resolve(context, "doi:10.5061/dryad.7mm0p");
 
                 log.debug("dspace object is " + dso);
 
