@@ -26,7 +26,7 @@ public class CDLDataCiteServiceTest {
 
         Map<String, String> metadata = createMetadataListXML();
         CDLDataCiteServiceTest service = new CDLDataCiteServiceTest(username, password);
-        String updateOutput = service.update("10.5061/DRYAD.2222", metadata);
+        String updateOutput = service.update("10.5061/DRYAD.487", metadata);
 	log.info("Output of the update command: " + updateOutput);
     }
 
@@ -95,69 +95,6 @@ public class CDLDataCiteServiceTest {
                 "<publicationYear>2004</publicationYear>" +
                 "</resource>";
 
-	    /*
-	    "<resource  xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" metadataVersionNumber=\"1\"" +
-                " lastMetadataUpdate=\"2006-05-04\" xsi:noNamespaceSchemaLocation=\"datacite-metadata-v2.0.xsd\">" +
-                "<identifier identifierType=\"DOI\">10.5061/DRYAD.2222</identifier>" +
-                "<creators>" +
-                "<creator>" +
-                "<creatorName>Toru, Nozawa</creatorName>" +
-                "</creator>" +
-                "<creator>" +
-                "<creatorName>Utor, Awazon</creatorName>" +
-                "<nameIdentifier nameIdentifierScheme=\"ISNI\">1422 4586 3573 0476</nameIdentifier>" +
-                "</creator>" +
-                "</creators>" +
-                "<titles>" +
-                "<title>National Institute for Environmental Studies and Center for Climate System Research Japan</title>" +
-                "<title titleType=\"Subtitle\">A survey</title>" +
-                "</titles>" +
-                "<publisher>World Data Center for Climate (WDCC)</publisher>" +
-                "<publicationYear>2004</publicationYear>" +
-                "<subjects>" +
-                "<subject>Earth sciences and geology</subject>" +
-                "</subjects>" +
-                "<contributors>" +
-                "<contributor contributorType=\"DataManager\">" +
-                "<contributorName>PANGAEA</contributorName>" +
-                "</contributor>" +
-                "<contributor contributorType=\"ContactPerson\">" +
-                "<contributorName>Doe, John</contributorName>" +
-                "<nameIdentifier nameIdentifierScheme=\"ORCID\">xyz789</nameIdentifier>" +
-                "</contributor>" +
-                "</contributors>" +
-                "<dates>" +
-                "<date dateType=\"Valid\">2005-04-05</date>" +
-                "<date dateType=\"Accepted\">2005-01-01</date>" +
-                "</dates>" +
-                "<language>en</language>" +
-                "<resourceType resourceTypeGeneral=\"Image\">Animation</resourceType>" +
-                "<alternateIdentifiers>" +
-                "<alternateIdentifier alternateIdentifierType=\"ISBN\">937-0-1234-56789-X</alternateIdentifier>" +
-                "</alternateIdentifiers>" +
-                "<relatedIdentifiers>" +
-                "<relatedIdentifier relationType=\"IsCitedBy\" relatedIdentifierType=\"DOI\">10.1234/testpub</relatedIdentifier>" +
-                "<relatedIdentifier relationType=\"Cites\" relatedIdentifierType=\"URN\">http://testing.ts/testpub" +
-                "</relatedIdentifier>" +
-                "</relatedIdentifiers>" +
-                "<sizes>" +
-                "<size>285 kb</size>" +
-                "<size>100 pages</size>" +
-                "</sizes>" +
-                "<formats>" +
-                "<format>text/plain</format>" +
-                "</formats>" +
-                "<version>1.0</version>" +
-                "<rights>Open Database License [ODbL]</rights>" +
-                "<descriptions>" +
-                "<description descriptionType=\"Other\">" +
-                "The current xml-example for a DataCite record is the official example from the documentation." +
-                "<br/>" +
-                "Please look on datacite.org to find the newest versions of sample data and schemas." +
-                "</description>" +
-                "</descriptions>" +
-                "</resource>";
-*/
         log.debug("test metadata is " + xmlout);
         metadata.put("datacite", xmlout);
 
