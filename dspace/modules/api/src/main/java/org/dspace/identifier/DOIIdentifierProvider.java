@@ -622,7 +622,7 @@ public class DOIIdentifierProvider extends IdentifierProvider implements org.spr
 
         log.warn("updateIdentierPreviousDF() - id : " + id);
 
-        item.clearMetadata(DOIIdentifierProvider.identifierMetadata.schema, DOIIdentifierProvider.identifierMetadata.element, DOIIdentifierProvider.identifierMetadata.qualifier, null);
+        item.clearMetadata(DOIIdentifierProvider.identifierMetadata.schema, DOIIdentifierProvider.identifierMetadata.element, DOIIdentifierProvider.identifierMetadata.qualifier, Item.ANY);
 
         String prefix = id.substring(0, id.lastIndexOf(SLASH));
         String suffix = id.substring(id.lastIndexOf(SLASH));
