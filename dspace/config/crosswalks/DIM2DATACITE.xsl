@@ -9,8 +9,11 @@
     <xsl:output method="xml" version="1.0"
                 encoding="utf-8" indent="yes"/>
 
+
     <xsl:template match="/dim:dim">
 
+      <xsl:variable name="smallcase" select="'abcdefghijklmnopqrstuvwxyz'" />
+      <xsl:variable name="uppercase" select="'ABCDEFGHIJKLMNOPQRSTUVWXYZ'" />
 
         <resource xmlns="http://datacite.org/schema/kernel-2.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://datacite.org/schema/kernel-2.2 http://schema.datacite.org/meta/kernel-2.2/metadata.xsd"
@@ -22,8 +25,8 @@
                     <xsl:variable name="id" select="."/>
                     <xsl:if test="starts-with($id,'doi')">
                         <identifier identifierType="DOI">
-                            <xsl:value-of select="substring-after($id,'doi:')"/>
-                        </identifier>
+                            <xsl:value-of select="translate(substring-after($id,'doi:'), $smallcase, $uppercase)"/>
+	                  </identifier>
                     </xsl:if>
                 </xsl:for-each>
             </xsl:if>
