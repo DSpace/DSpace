@@ -19,6 +19,7 @@
                   xsi:schemaLocation="http://datacite.org/schema/kernel-2.2 http://schema.datacite.org/meta/kernel-2.2/metadata.xsd"
                   lastMetadataUpdate="2006-05-04" metadataVersionNumber="1">
 
+	  <!-- ********** Identifier ********** -->
             <xsl:if test="dspace:field[@element ='identifier']">
                 <xsl:for-each select="dspace:field[@element ='identifier']">
                     <xsl:variable name="id" select="."/>
@@ -30,6 +31,7 @@
                 </xsl:for-each>
             </xsl:if>
 
+	    <!-- ********** Creators ************* -->
             <xsl:if test="dspace:field[@element ='contributor' and @qualifier='author']">
                 <creators>
                     <xsl:for-each select="dspace:field[@element ='contributor' and @qualifier='author']">
@@ -42,10 +44,7 @@
                 </creators>
             </xsl:if>
 
-
-            <!--titles>
-                <title>National Institute for Environmental Studies and Center for Climate System Research Japan</title>
-            </titles-->
+	    <!-- ********* Title *************** -->
             <xsl:if test="dspace:field[@element ='title']">
                 <titles>
                     <xsl:for-each select="dspace:field[@element ='title']">
@@ -56,10 +55,10 @@
                 </titles>
             </xsl:if>
 
-
+	    <!-- *********** Publisher ************ -->
             <publisher>Dryad Digital Repository</publisher>
 
-            <!--publicationYear>2004</publicationYear-->
+	    <!-- ************ Publication Year ************** -->
             <xsl:if test="dspace:field[@element='date' and @qualifier='available']">
                 <xsl:for-each select="dspace:field[@qualifier='available']">
                     <publicationYear>
@@ -69,50 +68,51 @@
                 </xsl:for-each>
             </xsl:if>
 
+	    <!-- ************ Subjects ************** -->
+            <xsl:if test="dspace:field[@element ='subject' or @element='coverage']">
+                <subjects>
+                    <xsl:for-each select="dspace:field[@element ='subject']">
+                        <subject>
+                          <xsl:value-of select="."/>
+                        </subject>
+                    </xsl:for-each>
+                    <xsl:for-each select="dspace:field[@element ='coverage']">
+                        <subject>
+                          <xsl:value-of select="."/>
+                        </subject>
+                    </xsl:for-each>
+                </subjects>
+            </xsl:if>
+	    
+	    <!-- *********** Related Identifiers ********* -->
+            <xsl:if test="dspace:field[@element='relation']">
+	      <relatedIdentifiers>
+                <xsl:for-each select="dspace:field[@element='relation' and @qualifier='haspart']">
+                    <relatedIdentifier relatedIdentifierType="DOI" relationType="HasPart">
+                          <xsl:value-of select="."/>
+                    </relatedIdentifier>
+                </xsl:for-each>
+                <xsl:for-each select="dspace:field[@element='relation' and @qualifier='ispartof']">
+                    <relatedIdentifier relatedIdentifierType="DOI" relationType="IsPartOf">
+                          <xsl:value-of select="."/>
+                    </relatedIdentifier>
+                </xsl:for-each>
+                <xsl:for-each select="dspace:field[@element='relation' and @qualifier='isreferencedby']">
+                    <relatedIdentifier relatedIdentifierType="DOI" relationType="IsReferencedBy">
+                          <xsl:value-of select="."/>
+                    </relatedIdentifier>
+                </xsl:for-each>
+	      </relatedIdentifiers>
+            </xsl:if>
 
-             <!--
-            <dates>
-                <date dateType="Valid">2005-04-05</date>
-                <date dateType="Accepted">2005-01-01</date>
-            </dates>
-
-            <language>eng</language>
-
-            <resourceType resourceTypeGeneral="Image">Animation</resourceType>
-
-            <alternateIdentifiers>
-                <alternateIdentifier alternateIdentifierType="ISBN">937-0-1234-56789-X</alternateIdentifier>
-            </alternateIdentifiers>
-
-            <relatedIdentifiers>
-                <relatedIdentifier relatedIdentifierType="DOI" relationType="IsCitedBy">10.1234/testpub
-                </relatedIdentifier>
-                <relatedIdentifier relatedIdentifierType="URN" relationType="Cites">http://testing.ts/testpub
-                </relatedIdentifier>
-            </relatedIdentifiers>
-
-            <sizes>
-                <size>285 kb</size>
-                <size>100 pages</size>
-            </sizes>
-
-            <formats>
-                <format>text/plain</format>
-            </formats>
-
-            <version>1.0</version>
-
-            <rights>Open Database License [ODbL]</rights>
-
-            <descriptions>
-                <description descriptionType="Other">
-                    The current xml-example for a DataCite record is the official example from the documentation.
-                    <br/>Please look on datacite.org to find the newest versions of sample data and schemas.
-                </description>
-            </descriptions>
-
-            -->
-
+	    <!-- ************ Rights *************** -->
+            <xsl:if test="dspace:field[@element='rights']">
+              <xsl:for-each select="dspace:field[@element='rights']">
+                <rights>
+                  <xsl:value-of select="."/>
+                </rights>
+              </xsl:for-each>
+            </xsl:if>
 
         </resource>
 
