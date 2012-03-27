@@ -26,7 +26,7 @@ public class CDLDataCiteServiceTest {
 
         Map<String, String> metadata = createMetadataListXML();
         CDLDataCiteServiceTest service = new CDLDataCiteServiceTest(username, password);
-        String updateOutput = service.update("10.5061/DRYAD.487", metadata);
+        String updateOutput = service.update("10.5061/DRYAD.2222", metadata);
 	log.info("Output of the update command: " + updateOutput);
     }
 
@@ -82,17 +82,20 @@ public class CDLDataCiteServiceTest {
 	    "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " +
 	    "xsi:schemaLocation=\"http://datacite.org/schema/kernel-2.2 http://schema.datacite.org/meta/kernel-2.2/metadata.xsd\" " +
 	    "metadataVersionNumber=\"1\" lastMetadataUpdate=\"2006-05-04\">" +
-                "<identifier identifierType=\"DOI\">10.5061/DRYAD.2222</identifier>" +
+	        "<identifier identifierType=\"DOI\">10.5061/DRYAD.2222</identifier>" +
                 "<creators>" +
                 "<creator>" +
-                "<creatorName>Toru, Nozawa</creatorName>" +
+                "<creatorName>Tester, Testy</creatorName>" +
+                "</creator>" +
+	        "<creator>" +
+                "<creatorName>Tester, Testette</creatorName>" +
                 "</creator>" +
                 "</creators>" +
                 "<titles>" +
-                "<title>National Institute for Environmental Studies and Center for Climate System Research Japan</title>" +
+                "<title>A Test Item for the Purposes of Testing DOI Metadata</title>" +
                 "</titles>" +
-                "<publisher>World Data Center for Climate (WDCC)</publisher>" +
-                "<publicationYear>2004</publicationYear>" +
+                "<publisher>Dryad Digital Repository</publisher>" +
+                "<publicationYear>2012</publicationYear>" +
                 "</resource>";
 
         log.debug("test metadata is " + xmlout);

@@ -250,7 +250,7 @@ public class CDLDataCiteService {
 
         }
 
-        System.out.println("Synchronization executed. Prcocessed Items:" + itemsToProcess.size() + " registeredItems:" + registeredItems + " updateItems:" + synchItems + " notProcessedItems:" + notProcessItems + " itemsWithErrors:" + itemsWithErrors);
+        System.out.println("Synchronization executed. Prcocessed Items:" + itemsToProcess.size() + " registeredItems:" + registeredItems + " updateItems:" + syncItems + " notProcessedItems:" + notProcessItems + " itemsWithErrors:" + itemsWithErrors);
     }
 
 
