@@ -1,11 +1,15 @@
 package ar.edu.unlp.sedici.xmlui.xsl;
 
+import java.net.URL;
+
+import javax.validation.Path.Node;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.xpath.NodeSet;
 import org.w3c.dom.Document;
+import org.w3c.dom.Text;
 
 /**
  * 
@@ -22,9 +26,30 @@ public class XslExtensions {
 	private XslExtensions() {
 	}
 	
-	public static NodeSet isURL(String str) throws ParserConfigurationException {
-		//TODO
-		return null;
+	public static Text getBaseUrl(String str) throws ParserConfigurationException{
+		URL uri;
+        Text node;     
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = dbf.newDocumentBuilder();
+        Document document = docBuilder.newDocument();        
+        try {
+			uri=new URL(str);
+			node=document.createTextNode(uri.getHost());
+		} catch (Exception e) {
+			node=document.createTextNode("");
+		}
+		return node;
+	}
+	
+	public static Boolean isUrl(String str) throws ParserConfigurationException{
+		URL uri;    
+        try {
+			uri=new URL(str);
+			return true;
+		} catch (Exception e) {
+			return false;
+		}
+		
 	}
 	
 	public static NodeSet tokenize(String str, String regExp) throws ParserConfigurationException {

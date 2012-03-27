@@ -374,13 +374,14 @@
 				<xsl:with-param name="elements" select="dim:field[@element='identifier' and @qualifier='uri' and @mdschema='sedici']" />
 				<xsl:with-param name="separator" select="' | '"/>
 				<xsl:with-param name="type" select="'url'"/>
+				<xsl:with-param name="acotar" select="'true'"/>
 			</xsl:call-template>
 		
 			<xsl:call-template name="render-normal-field">
 				<xsl:with-param name="name" select="'identifier-doi'" />
 				<xsl:with-param name="elements" select="dim:field[@element='identifier' and @qualifier='doi']" />
 				<xsl:with-param name="separator" select="' | '"/>
-				<xsl:with-param name="type" select="'url'"/>
+				<xsl:with-param name="type" select="'url'"/>			
 			</xsl:call-template>
 
 			<xsl:call-template name="render-normal-field">
@@ -410,10 +411,12 @@
 			<xsl:with-param name="elements" select="dim:field[@element='identifier' and @qualifier='isbn']" />
 		</xsl:call-template>
 		
-		<!-- location row -->
+		<!-- location row -->		
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'location'" />
 			<xsl:with-param name="elements" select="dim:field[@element='location']" />
+			<xsl:with-param name="type" select="'url'"/>
+			<xsl:with-param name="acotar" select="'true'"/>
 		</xsl:call-template>
 
 		<!-- coverage.spatial row -->
@@ -529,6 +532,7 @@
 		<xsl:param name="elements"/>
 		<xsl:param name="separator" select="'; '"/>
 		<xsl:param name="type" select="'text'"/>
+		<xsl:param name="acotar"/>
 		
 		<!-- Generamos salida solo si hay algun elemento para mostrar -->
 		<xsl:if test="count($elements) &gt; 0">
@@ -545,30 +549,53 @@
 					<xsl:with-param name="index" select="1"/>
 					<xsl:with-param name="separator" select="$separator"/>
 					<xsl:with-param name="type" select="$type"/>
+					<xsl:with-param name="acotar" select="$acotar"/>
 				</xsl:call-template>
 	
 			</div>
 		</xsl:if>
 	</xsl:template>
-
+	
+    <!-- Solo las urls se acotan en caso de que este explicitado -->
 	<xsl:template name="render-field-value">
 		<xsl:param name="elements"/>
 		<xsl:param name="index"/>
 		<xsl:param name="separator"/>
 		<xsl:param name="type"/>
-		
+		<xsl:param name="acotar"/>
+
 		<span class="metadata-value">
+		    
 			<xsl:choose>
 				<xsl:when test="$type='url'">
-					<a target="_blank">
-						<xsl:attribute name="href">
-							<xsl:value-of select="$elements[$index]"/>
-						</xsl:attribute>
-						<xsl:value-of select="$elements[$index]" disable-output-escaping="yes"/>
-					</a>
+				<!-- Si $type =url pero no es una url bien formada no se muestra como link. Si $acotar = true, pero es un handle, se muestra completo, de caso contrario solo se muestra el host -->
+				  <xsl:choose>					      
+			         <xsl:when test="java:ar.edu.unlp.sedici.xmlui.xsl.XslExtensions.isUrl($elements[$index])">
+			            <a target="_blank">
+							<xsl:attribute name="href">
+								<xsl:value-of select="$elements[$index]"/>
+							</xsl:attribute>
+				            <xsl:choose>	
+				                <xsl:when test="contains($elements[$index],'handle.net')">
+							         <xsl:value-of select="$elements[$index]" disable-output-escaping="yes"/>
+							    </xsl:when>					 
+							    <xsl:when test="$acotar = 'true'">
+							        <xsl:value-of select="java:ar.edu.unlp.sedici.xmlui.xsl.XslExtensions.getBaseUrl($elements[$index])" disable-output-escaping="yes"/>/...
+							    </xsl:when>							    
+						         <xsl:otherwise>
+						             <xsl:value-of select="$elements[$index]" disable-output-escaping="yes"/>
+						         </xsl:otherwise>
+					        </xsl:choose>	
+			             </a>
+			         </xsl:when>
+			         <xsl:otherwise>
+			             <xsl:value-of select="$elements[$index]" disable-output-escaping="yes"/>
+			         </xsl:otherwise>			  
+				  </xsl:choose>
+
 				</xsl:when>
 				
-				<xsl:when test="$type='date'">
+				<xsl:when test="$type='date'">				
 					<!-- Se espera el formato YYYY-MM-DD[THH:mm:ssZ] -->
 					<xsl:variable name="dateString" select="$elements[$index]"/>
 					
