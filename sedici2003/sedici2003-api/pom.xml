@@ -5,7 +5,7 @@
   <parent>
     <artifactId>sedici2003</artifactId>
     <groupId>ar.edu.unlp.sedici</groupId>
-    <version>1.8.0</version>
+    <version>1.8.2</version>
   </parent>
   <artifactId>sedici2003-api</artifactId>
   <name>sedici2003-api</name>

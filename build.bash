@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 seed="$RANDOM"
-DSPACE_VERSION="1.8.0-rc1"
+DSPACE_VERSION="1.8.2"
 
 dspace_dbuser="dspace_user$seed"
 dspace_dbname="dspace$seed"

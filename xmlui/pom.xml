@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>dspace-sedici</artifactId>
 		<groupId>ar.edu.unlp.sedici</groupId>
-		<version>1.8.0</version>
+		<version>1.8.2</version>
 		<relativePath>..</relativePath>
 	</parent>
 	<artifactId>xmlui</artifactId>
