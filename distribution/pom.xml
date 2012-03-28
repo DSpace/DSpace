@@ -47,35 +47,13 @@
 		</plugins>
 		<finalName>dspace-sedici-distribution</finalName>
 	</build>
-
-	<dependencies>
-		<dependency>
-			<groupId>ar.edu.unlp.sedici</groupId>
-			<artifactId>xmlui</artifactId>
-			<version>${project.version}</version>
-			<type>war</type>
-		</dependency>
-
-		<dependency>
-			<groupId>org.dspace.modules</groupId>
-			<artifactId>solr</artifactId>
-			<version>${project.version}</version>
-			<type>war</type>
-		</dependency>
-
-		<dependency>
-			<groupId>org.dspace.modules</groupId>
-			<artifactId>oai</artifactId>
-			<version>${project.version}</version>
-			<type>war</type>
-		</dependency>
 		
-		<dependency>
-			<groupId>ar.edu.unlp.sedici</groupId>
-			<artifactId>plugins</artifactId>
-			<version>${project.version}</version>
-			<type>jar</type>
-		</dependency>
+	<modules>
+		<module>dspace-tag-files/modules/solr</module>
+ 		<module>dspace-tag-files/modules/oai</module> 
+	</modules>
+	
+	<dependencies>
 
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -116,9 +94,5 @@
 			<artifactId>postgresql</artifactId>
 		</dependency>
 	</dependencies>
-	
-<!-- 	<modules> -->
-<!-- 		<module>../xmlui</module> -->
-<!-- 		<module>dspace-tag-files/modules/oai</module> -->
-<!-- 	</modules> -->
+
 </project>
