@@ -443,22 +443,32 @@
 				<xsl:with-param name="elements" select="dim:field[@element='subject' and @qualifier='keyword']" />
 			</xsl:call-template>
 
-			<!-- date.accessioned row -->
-			<xsl:call-template name="render-normal-field">
-				<xsl:with-param name="name" select="'date-accessioned'" />
-				<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='accessioned']" />
-				<xsl:with-param name="type" select="'date'"/>
-			</xsl:call-template>	
-			
-			<!-- date.available row -->
-			<xsl:call-template name="render-normal-field">
-				<xsl:with-param name="name" select="'date-available'" />
-				<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='available']" />
-				<xsl:with-param name="type" select="'date'"/>
-			</xsl:call-template>
-			
     	</div>
 
+		<!-- date.accessioned row -->
+		<xsl:call-template name="render-normal-field">
+			<xsl:with-param name="name" select="'date-accessioned'" />
+			<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='accessioned']" />
+			<xsl:with-param name="type" select="'date'"/>
+		</xsl:call-template>	
+		
+		<!-- date.available row -->
+		<xsl:call-template name="render-normal-field">
+			<xsl:with-param name="name" select="'date-available'" />
+			<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='available']" />
+			<xsl:with-param name="type" select="'date'"/>
+		</xsl:call-template>
+
+		<!-- Link para la vista full -->
+		<xsl:if test="$ds_item_view_toggle_url != ''">
+			<div id="view-item-metadata">
+				<a>
+					<xsl:attribute name="href"><xsl:value-of select="$ds_item_view_toggle_url" /></xsl:attribute>
+					<i18n:text>xmlui.ArtifactBrowser.ItemViewer.show_full</i18n:text>
+				</a>
+			</div>
+		</xsl:if>
+			
 		<!-- status row -->
 		<xsl:if test="(dim:field[@element='status']='si' or dim:field[@element='fulltext']='si')">
 			<div id="other_attributes">
@@ -480,16 +490,6 @@
 			</div>
 		</xsl:if>
 
-		<!-- Link para la vista full -->
-		<xsl:if test="$ds_item_view_toggle_url != ''">
-			<div id="view-item-metadata">
-				<a>
-					<xsl:attribute name="href"><xsl:value-of select="$ds_item_view_toggle_url" /></xsl:attribute>
-					<i18n:text>xmlui.ArtifactBrowser.ItemViewer.show_full</i18n:text>
-				</a>
-			</div>
-		</xsl:if>
-			
 		<!-- Generate the Creative Commons license information from the file section (DSpace deposit license hidden by default) -->
 		<xsl:apply-templates select="mets:fileSec/mets:fileGrp[@USE='CC-LICENSE']"/>
     </xsl:template>
@@ -564,24 +564,11 @@
 				</xsl:when>
 				
 				<xsl:when test="$type='date'">				
-					<!-- Se espera el formato YYYY-MM-DD[THH:mm:ssZ] -->
-					<xsl:variable name="dateString" select="$elements[$index]"/>
-					
-					<xsl:choose>
-						<xsl:when test="string-length($dateString) &lt; 10">
-							<xsl:value-of select="$elements[$index]" disable-output-escaping="yes"/>
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:variable name="dateParser" select="java:java.text.SimpleDateFormat.new('yyyy-MM-dd')"/>
-							<xsl:variable name="date" select="java:parse($dateParser, $dateString)"/>
-							
-							<xsl:variable name="locale" select="java:java.util.Locale.new('es')"/>
-							<xsl:variable name="formatter" select="java:java.text.DateFormat.getDateInstance(1, $locale)"/>
-		
-							<xsl:value-of select="java:format($formatter, $date)"/>
-						</xsl:otherwise>
-					</xsl:choose>
+					<xsl:call-template name="render-date">
+						<xsl:with-param name="dateString" select="$elements[$index]"/>
+					</xsl:call-template>
 				</xsl:when>
+				
 				<xsl:when test="$type='i18n-code'">
 					<i18n:text>xmlui.dri2xhtml.METS-1.0.code-value-<xsl:value-of select="$elements[$index]"/></i18n:text>
 				</xsl:when>
@@ -603,6 +590,28 @@
 		</xsl:if>
 	</xsl:template>
 
+
+	<xsl:template name="render-date">
+		<xsl:param name="dateString"/>
+
+		<!-- Se espera el formato YYYY-MM-DD[THH:mm:ssZ] -->
+		
+		
+		<xsl:choose>
+			<xsl:when test="string-length($dateString) &lt; 10">
+				<xsl:value-of select="$dateString" disable-output-escaping="yes"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:variable name="dateParser" select="java:java.text.SimpleDateFormat.new('yyyy-MM-dd')"/>
+				<xsl:variable name="date" select="java:parse($dateParser, $dateString)"/>
+<!-- 				TODO Hay que detectar el locale del usuario -->
+				<xsl:variable name="locale" select="java:java.util.Locale.new('es')"/>
+				<xsl:variable name="formatter" select="java:java.text.DateFormat.getDateInstance(1, $locale)"/>
+
+				<xsl:value-of select="java:format($formatter, $date)"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
 
     <xsl:template match="dim:dim" mode="itemDetailView-DIM">
         <table class="ds-includeSet-table detailtable">
@@ -832,7 +841,9 @@
 	                        <xsl:text>, </xsl:text>
 	                    </xsl:if>
 	                    <span class="date">
-	                        <xsl:value-of select="substring(dim:field[@element='date' and @qualifier='issued']/node(),1,10)"/>
+							<xsl:call-template name="render-date">
+								<xsl:with-param name="dateString" select="dim:field[@element='date' and @qualifier='issued']"/>
+							</xsl:call-template>
 	                    </span>
 	                    <xsl:text>)</xsl:text>
 	                </span>

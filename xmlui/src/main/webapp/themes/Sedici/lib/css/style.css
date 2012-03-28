@@ -2030,7 +2030,7 @@ background-position:center -40px;
 margin-left:120px;
 background-repeat:no-repeat;
 width:100%;
-position:relative;
+/*position:relative;*/
 bottom:130px;
 clear:both;
 min-height:40px;
@@ -2616,7 +2616,7 @@ div.item-summary-view-metadata h2 {
 div.item-summary-view-metadata {
     text-align: justify;
     line-height: 161.6%;
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 div.simple-item-view-authors {
@@ -2648,11 +2648,12 @@ span.ds-dc_contributor_author-authority {
 .item-summary-view-metadata .metadata {
 	margin-top: 5px;
 }
-.item-summary-view-metadata .metadata.date-available {
+.item-summary-view-metadata .metadata.date-available, .item-summary-view-metadata .metadata.date-accessioned {
 	float: right;
 	margin-top: 0px;
+	clear: both;
 }
-.item-summary-view-metadata .metadata.date-available span {
+.item-summary-view-metadata .metadata.date-available span, .item-summary-view-metadata .metadata.date-accessioned span {
 	font-weight: normal;
 	color: #707070;
 	font-size: 75%;
@@ -2669,17 +2670,21 @@ span.ds-dc_contributor_author-authority {
 }
 .item-summary-view-metadata #view-item-metadata {
 	float: right;
+	clear: both;
 }
 .item-summary-view-metadata #other_attributes ul {
 	list-style: circle;
 }
 
 #other_attributes {
-background-color:#cecece;
+	margin-top: 75px;
 }
-
-#item-file-section {
-background-color:#cfcfcf;
+#other_attributes, #item-file-section {
+	border: dashed 1px #CFCFCF;
+	padding: 10px 15px 10px 15px;
+}
+#other_attributes h2, #item-file-section h2 {
+	margin-top: 0px;
 }
 .item-summary-view-metadata .tesis-info {
 	padding: 2px 15px 10px 15px;
@@ -2687,10 +2692,17 @@ background-color:#cfcfcf;
 }
 .contenedor_autores {
 	float: left;
-	margin-right: 15px;
+	margin-right: 10px;
+}
+.contenedor_autores table {
+	width: 215px;
 }
 #aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-author-results {
-	clear: both;
+	display: table;
+	margin-top: 0px;
+}
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-author-results ul {
+	margin-top: 0px;
 }
 form.submission {
 	margin-top: 30px;
