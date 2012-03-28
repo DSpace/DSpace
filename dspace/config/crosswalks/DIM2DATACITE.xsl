@@ -81,6 +81,11 @@
                           <xsl:value-of select="."/>
                         </subject>
                     </xsl:for-each>
+                    <xsl:for-each select="dspace:field[@element ='ScientificName']">
+                        <subject>
+                          <xsl:value-of select="."/>
+                        </subject>
+                    </xsl:for-each>
                 </subjects>
             </xsl:if>
 	    
