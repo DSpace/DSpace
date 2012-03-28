@@ -105,18 +105,6 @@
 			</xsl:otherwise>
 		</xsl:choose>
 		
-		<!-- Imprimo el año de issued -->
-		<h1>
-		    <xsl:choose>
-				<xsl:when test="string-length(dim:field[@element='date' and @qualifier='issued']) > 4">
-				    <xsl:value-of select="substring(dim:field[@element='date' and @qualifier='issued'], 1, 4)"/>
-				</xsl:when>
-				<xsl:otherwise>
-				    <xsl:value-of select="dim:field[@element='date' and @qualifier='issued']"/>
-				</xsl:otherwise>
-		    </xsl:choose>	
-		</h1>
-
 		<!-- title.subtitle row -->
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'title-subtitle'" />
