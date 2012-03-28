@@ -368,36 +368,34 @@
 		</xsl:call-template>
 
 		<!-- identifier rows -->
-		<div class="identifiers">
-			<xsl:call-template name="render-normal-field">
-				<xsl:with-param name="name" select="'identifier-uri'" />
-				<xsl:with-param name="elements" select="dim:field[@element='identifier' and @qualifier='uri' and @mdschema='sedici']" />
-				<xsl:with-param name="separator" select="' | '"/>
-				<xsl:with-param name="type" select="'url'"/>
-				<xsl:with-param name="acotar" select="'true'"/>
-			</xsl:call-template>
-		
-			<xsl:call-template name="render-normal-field">
-				<xsl:with-param name="name" select="'identifier-doi'" />
-				<xsl:with-param name="elements" select="dim:field[@element='identifier' and @qualifier='doi']" />
-				<xsl:with-param name="separator" select="' | '"/>
-				<xsl:with-param name="type" select="'url'"/>			
-			</xsl:call-template>
+		<xsl:call-template name="render-normal-field">
+			<xsl:with-param name="name" select="'identifier-uri'" />
+			<xsl:with-param name="elements" select="dim:field[@element='identifier' and @qualifier='uri' and @mdschema='sedici']" />
+			<xsl:with-param name="separator" select="' | '"/>
+			<xsl:with-param name="type" select="'url'"/>
+			<xsl:with-param name="acotar" select="'true'"/>
+		</xsl:call-template>
+	
+		<xsl:call-template name="render-normal-field">
+			<xsl:with-param name="name" select="'identifier-doi'" />
+			<xsl:with-param name="elements" select="dim:field[@element='identifier' and @qualifier='doi']" />
+			<xsl:with-param name="separator" select="' | '"/>
+			<xsl:with-param name="type" select="'url'"/>			
+		</xsl:call-template>
 
-			<xsl:call-template name="render-normal-field">
-				<xsl:with-param name="name" select="'identifier-handle'" />
-				<xsl:with-param name="elements" select="dim:field[@element='identifier' and @qualifier='handle']" />
-				<xsl:with-param name="separator" select="' | '"/>
-				<xsl:with-param name="type" select="'url'"/>
-			</xsl:call-template>
-			
-			<xsl:call-template name="render-normal-field">
-				<xsl:with-param name="name" select="'identifier-other'" />
-				<xsl:with-param name="elements" select="dim:field[@element='identifier' and @qualifier='other']" />
-				<xsl:with-param name="separator" select="' | '"/>
-				<xsl:with-param name="type" select="'url'"/>
-			</xsl:call-template>
-		</div>
+		<xsl:call-template name="render-normal-field">
+			<xsl:with-param name="name" select="'identifier-handle'" />
+			<xsl:with-param name="elements" select="dim:field[@element='identifier' and @qualifier='handle']" />
+			<xsl:with-param name="separator" select="' | '"/>
+			<xsl:with-param name="type" select="'url'"/>
+		</xsl:call-template>
+		
+		<xsl:call-template name="render-normal-field">
+			<xsl:with-param name="name" select="'identifier-other'" />
+			<xsl:with-param name="elements" select="dim:field[@element='identifier' and @qualifier='other']" />
+			<xsl:with-param name="separator" select="' | '"/>
+			<xsl:with-param name="type" select="'url'"/>
+		</xsl:call-template>
 		
 		<!-- identifier.issn row -->
 		<xsl:call-template name="render-normal-field">
@@ -445,28 +443,10 @@
 				<xsl:with-param name="elements" select="dim:field[@element='subject' and @qualifier='materias']" />
 			</xsl:call-template>
 
-			<!-- subject.decs row -->
-			<xsl:call-template name="render-normal-field">
-				<xsl:with-param name="name" select="'subject-decs'" />
-				<xsl:with-param name="elements" select="dim:field[@element='subject' and @qualifier='decs']" />
-			</xsl:call-template>
-
-			<!-- subject.eurovoc row -->
-			<xsl:call-template name="render-normal-field">
-				<xsl:with-param name="name" select="'subject-eurovoc'" />
-				<xsl:with-param name="elements" select="dim:field[@element='subject' and @qualifier='eurovoc']" />
-			</xsl:call-template>
-
-			<!-- subject.descriptores row -->
+			<!-- todos los descriptores (terminos de tesuaro) -->
 			<xsl:call-template name="render-normal-field">
 				<xsl:with-param name="name" select="'subject-descriptores'" />
-				<xsl:with-param name="elements" select="dim:field[@element='subject' and @qualifier='descriptores']" />
-			</xsl:call-template>
-
-			<!-- subject.other row -->
-			<xsl:call-template name="render-normal-field">
-				<xsl:with-param name="name" select="'subject-other'" />
-				<xsl:with-param name="elements" select="dim:field[@element='subject' and @qualifier='other']" />
+				<xsl:with-param name="elements" select="dim:field[(@element='subject' and @qualifier='descriptores') or (@element='subject' and @qualifier='decs') or (@element='subject' and @qualifier='eurovoc') or (@element='subject' and @qualifier='other')]" />
 			</xsl:call-template>
 
 			<!-- subject.keyword row --> 

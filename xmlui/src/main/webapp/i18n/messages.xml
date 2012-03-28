@@ -2170,7 +2170,7 @@
 <!-- extensión al messages.xml de discovery -->
 
 <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.type_filter">Document type</message>
-  
+<message key="xmlui.ArtifactBrowser.SimpleSearch.filter.keywords_filter">Keyword</message>  
 
 
 </catalogue>
