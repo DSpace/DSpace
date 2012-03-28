@@ -21,7 +21,7 @@
 
 /* ATENCION: dejar siempre al principio  del css esta linea, es para detectar errores de sintaxis*/
 body{background-color:red;}
-
+ 
 
 a, a:active, a:visited {
 	text-decoration:none;
@@ -287,6 +287,7 @@ color:#cd642f;
 #aspect_discovery_Navigation_list_discovery ul.sublist li {
 color:grey;
 line-height:1.5;
+
 
 }
 
@@ -1150,7 +1151,8 @@ color:#dedede;
 #aspect_artifactbrowser_CollectionRecentSubmissions_div_collection-recent-submission .artifact-title,
 #aspect_artifactbrowser_SimpleSearch_div_search-results .artifact-title,
 #aspect_discovery_SimpleSearch_div_search-results .artifact-title, 
-#aspect_artifactbrowser_AdvancedSearch_div_search-results .artifact-title
+#aspect_artifactbrowser_AdvancedSearch_div_search-results .artifact-title,
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-author-results .artifact-title
 {
     font-size: 100%;
 	font-weight:bold;
@@ -2029,7 +2031,7 @@ margin-left:120px;
 background-repeat:no-repeat;
 width:100%;
 position:relative;
-bottom:15px;
+bottom:130px;
 clear:both;
 min-height:40px;
 display: table;
@@ -2087,7 +2089,7 @@ padding: 0px 4px 0px 4px;
 #aspect_artifactbrowser_CommunityViewer_list_community-browse,
 #aspect_artifactbrowser_CollectionViewer_div_collection-search-browse 
 #aspect_artifactbrowser_CollectionViewer_list_collection-browse{
-background-color:#efefef;
+background-color:white;
 position:relative;
 /*
 height:50px;
@@ -2095,9 +2097,10 @@ background-image:url(../../images/fondo_bandita3.png);
 background-repeat:no-repeat;
 background-position:80px 0px;*/
 padding:3px 0px;
-position:relative;
+/*position:relative;
 top:-2px;
-left:80px;
+left:80px;*/
+margin: 0auto;
 width:440px;
 /*left:100px;*/
 
