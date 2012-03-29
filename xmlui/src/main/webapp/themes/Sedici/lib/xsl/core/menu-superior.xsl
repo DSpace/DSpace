@@ -28,7 +28,7 @@
 				<ul>
 					<li><a href="{$context-path}/community-list"><i18n:text>sedici.menuSuperior.exploracion.colecciones</i18n:text></a></li>
 					<li><a href="{$context-path}/browse?type=dateissued"><i18n:text>sedici.menuSuperior.exploracion.fechaPublicacion</i18n:text></a></li>
-					<li><a href="{$context-path}/browse?type=author"><i18n:text>sedici.menuSuperior.exploracion.autor</i18n:text></a></li>
+					<li><a href="{$context-path}/browse?type=author&amp;rpp=60"><i18n:text>sedici.menuSuperior.exploracion.autor</i18n:text></a></li>
 	        		<li><a href="{$context-path}/browse?type=title"><i18n:text>sedici.menuSuperior.exploracion.titulo</i18n:text></a></li>
 	        		<li><a href="{$context-path}/browse?type=subject"><i18n:text>sedici.menuSuperior.exploracion.tema</i18n:text></a></li>
 			    </ul>
