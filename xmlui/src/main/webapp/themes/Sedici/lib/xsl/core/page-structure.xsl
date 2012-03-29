@@ -208,7 +208,7 @@
 
 		  			<a title="Contáctese">
 		    			<xsl:attribute name="href">
-		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/pages/contacto
+		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/feedback
 		    			</xsl:attribute>
 				  		<img class="contacto">
 			    			<xsl:attribute name="src">

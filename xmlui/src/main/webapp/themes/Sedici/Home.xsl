@@ -46,9 +46,7 @@
          </div>
          
          <div id='home_search'>
-	         <xsl:apply-templates select="dri:div[@n='front-page-search']/dri:p[2]">
-	                     <xsl:with-param name="muestra">true</xsl:with-param>
-	         </xsl:apply-templates>
+	         <xsl:apply-templates select="dri:div[@n='front-page-search']" mode="home"/>
 	     </div>
 	     
 	     <div id='home_info'>
@@ -76,7 +74,34 @@
 	     </div>
 	  </div>
          
+   </xsl:template>
+    
+    
+   <xsl:template match="dri:div[@n='front-page-search']" mode="home">
+
+        <form>
+            <xsl:call-template name="standardAttributes">
+                <xsl:with-param name="class">ds-interactive-div</xsl:with-param>
+            </xsl:call-template>
+            <xsl:attribute name="action"><xsl:value-of select="@action"/></xsl:attribute>
+            <xsl:attribute name="method"><xsl:value-of select="@method"/></xsl:attribute>
+            <xsl:if test="@method='multipart'">
+                <xsl:attribute name="method">post</xsl:attribute>
+                <xsl:attribute name="enctype">multipart/form-data</xsl:attribute>
+            </xsl:if>
+            <xsl:attribute name="onsubmit">javascript:tSubmit(this);</xsl:attribute>
+                        <!--For Item Submission process, disable ability to submit a form by pressing 'Enter'-->
+                        <xsl:if test="starts-with(@n,'submit')">
+                                <xsl:attribute name="onkeydown">javascript:return disableEnterKey(event);</xsl:attribute>
+            </xsl:if>
+            <xsl:apply-templates select="dri:p[2]">
+	                     <xsl:with-param name="muestra">true</xsl:with-param>
+	         </xsl:apply-templates>          
+          
+        </form>
+            
     </xsl:template>
+    
     
    <xsl:template match='dri:reference' mode='home'>
      <xsl:call-template name="envio_reciente">

@@ -32,8 +32,27 @@
     <xsl:output indent="yes"/>
 
     <xsl:template match="dri:div[@id='aspect.artifactbrowser.ConfigurableBrowse.div.browse-by-dateissued']/dri:div[@id='aspect.artifactbrowser.ConfigurableBrowse.div.browse-navigation']">
+        <form>
+            <xsl:call-template name="standardAttributes">
+                <xsl:with-param name="class">ds-interactive-div</xsl:with-param>
+            </xsl:call-template>
+            <xsl:attribute name="action"><xsl:value-of select="@action"/></xsl:attribute>
+            <xsl:attribute name="method"><xsl:value-of select="@method"/></xsl:attribute>
+            <xsl:if test="@method='multipart'">
+                <xsl:attribute name="method">post</xsl:attribute>
+                <xsl:attribute name="enctype">multipart/form-data</xsl:attribute>
+            </xsl:if>
+            <xsl:attribute name="onsubmit">javascript:tSubmit(this);</xsl:attribute>
+                        <!--For Item Submission process, disable ability to submit a form by pressing 'Enter'-->
+                        <xsl:if test="starts-with(@n,'submit')">
+                                <xsl:attribute name="onkeydown">javascript:return disableEnterKey(event);</xsl:attribute>
+            </xsl:if>
+            
             <xsl:apply-templates select="dri:p[1]"/>
-            <xsl:apply-templates select="dri:p[2]" mode='dateIssued'/>
+            <xsl:apply-templates select="dri:p[2]" mode='dateIssued'/>            
+          
+        </form>
+            
     </xsl:template>
     
     <xsl:template match='dri:p' mode='dateIssued'>

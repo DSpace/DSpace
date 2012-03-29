@@ -53,7 +53,7 @@
 			
 			</li>
 			<li class="main">
-				<a href="{$context-path}/pages/contacto"><i18n:text>sedici.menuSuperior.contacto</i18n:text></a>
+				<a href="{$context-path}/feedback"><i18n:text>sedici.menuSuperior.contacto</i18n:text></a>
 			</li>
 	     </ul>
      </div>
