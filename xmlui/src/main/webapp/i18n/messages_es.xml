@@ -2398,6 +2398,7 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.Discovery.SimpleSearch.sort_head">Opciones de ordenación</message>
 <message key="xmlui.Discovery.SimpleSearch.sort_apply">Aplicar</message>
 <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.keywords_filter">Palabra clave</message>
-
+<message key="xmlui.Discovery.AbstractSearch.type_type">Filtrado por: Tipos de documento</message>
+<message key="xmlui.Discovery.AbstractSearch.type_keywords">Filtrado por: Palabras clave</message>
 
 </catalogue>

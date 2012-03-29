@@ -2171,6 +2171,7 @@
 
 <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.type_filter">Document type</message>
 <message key="xmlui.ArtifactBrowser.SimpleSearch.filter.keywords_filter">Keyword</message>  
-
+<message key="xmlui.Discovery.AbstractSearch.type_type">Filtered by: Document types</message>
+<message key="xmlui.Discovery.AbstractSearch.type_keywords">Filtered by: Keywords</message>
 
 </catalogue>
