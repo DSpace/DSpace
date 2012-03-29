@@ -445,13 +445,6 @@
 
     	</div>
 
-		<!-- date.accessioned row -->
-		<xsl:call-template name="render-normal-field">
-			<xsl:with-param name="name" select="'date-accessioned'" />
-			<xsl:with-param name="elements" select="dim:field[@element='date' and @qualifier='accessioned']" />
-			<xsl:with-param name="type" select="'date'"/>
-		</xsl:call-template>	
-		
 		<!-- date.available row -->
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'date-available'" />
