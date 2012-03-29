@@ -1994,6 +1994,13 @@ background-image:url(../../images/add_verde.png);
 .logo {
 width:100%;
 float:left;
+   border-right: 1px solid grey;
+    float: left;
+    margin-right: 10px;
+    padding-right: 10px;
+    position: relative;
+    right: 10px;
+    width: 100%;
 }
 
 /*troll*/
@@ -2025,9 +2032,10 @@ right:10px;
 
 .detail-view {
 padding:40px 0 0 0 ;
-background-image:url(../../images/sombra_abajo.png);
+/*background-image:url(../../images/sombra_abajo.png);*/
+/*background-color:#dedede;*/
 background-position:center -40px;
-margin-left:120px;
+/*margin-left:120px;*/
 background-repeat:no-repeat;
 width:100%;
 /*position:relative;*/
@@ -2051,12 +2059,12 @@ padding-top:5px;
 }
 
 #collection-title h1.ds-div-head {
-color:#fdbe83;
+color:#9c4f0a;
 background-image:none;
 padding:0;
 display:inline;
 padding-bottom:5px;
-text-shadow:1px 1px 0 #9c4f0a; /*Color de la sombra - Eje X - Eje Y - Difuminado*/  
+/*text-shadow:1px 1px 0 #9c4f0a; /*Color de la sombra - Eje X - Eje Y - Difuminado*/  
 /*text-shadow: -1px -1px #F48620,1px 1px #cecece;*/
 
 
@@ -2690,18 +2698,24 @@ span.ds-dc_contributor_author-authority {
 	padding: 2px 15px 10px 15px;
 	border: solid 1px #C0C0C0;
 }
-.contenedor_autores {
+.browse_column {
 	float: left;
 	margin-right: 10px;
 }
-.contenedor_autores table {
+.browse_column table {
 	width: 215px;
 }
-#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-author-results {
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-author-results, 
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-subject-results,
+#aspect_discovery_SearchFacetFilter_div_browse-by-author-results,
+#aspect_discovery_SearchFacetFilter_div_browse-by-subject-results,
+#aspect_discovery_SearchFacetFilter_div_browse-by-keywords-results,
+#aspect_discovery_SearchFacetFilter_div_browse-by-type-results {
 	display: table;
 	margin-top: 0px;
 }
-#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-author-results ul {
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-author-results ul,
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-subject-results ul {
 	margin-top: 0px;
 }
 form.submission {
