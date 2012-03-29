@@ -20,8 +20,11 @@ are encouraged to obtain the appropriate version of the Documentation
 
 To obtain files from the repository and build, please see:
 
- - git://github.com/DSpace/DSpace.git
+ - https://github.com/DSpace/DSpace/
 
+or just:
+
+ - git clone git://github.com/DSpace/DSpace.git
 
 Please refer any further problems to the dspace-tech@lists.sourceforge.net
 mailing list.
