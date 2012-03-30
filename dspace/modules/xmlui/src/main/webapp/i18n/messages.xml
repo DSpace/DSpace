@@ -464,9 +464,9 @@
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.unknown">unknown</message>
 
 	<!-- Authentication messages used at the top of the login page:  -->
-	<message key="xmlui.ArtifactBrowser.RestrictedItem.auth_header">The item has been removed from Dryad</message>
+	<message key="xmlui.ArtifactBrowser.RestrictedItem.auth_header">The item is only available to Dryad administrators</message>
 	<message key="xmlui.ArtifactBrowser.RestrictedItem.auth_message">The item you are attempting to
-		access has been removed from public view. For details, please contact <a mailto="help@datadryad.org">help@datadryad.org</a>.</message>
+		access is not available for public view. For details, please contact <a mailto="help@datadryad.org">help@datadryad.org</a>.</message>
 
 	<message key="xmlui.ArtifactBrowser.StatisticsViewer.choose_month">Monthly Reports</message>
 	<message key="xmlui.ArtifactBrowser.StatisticsViewer.report.title">Statistical Summary</message>
