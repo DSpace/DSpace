@@ -248,7 +248,7 @@
 <message key="xmlui.ArtifactBrowser.Contact.title">Contacto</message>
 <message key="xmlui.ArtifactBrowser.Contact.trail">Contacto</message>
 <message key="xmlui.ArtifactBrowser.Contact.head">Contacto</message>
-<message key="xmlui.ArtifactBrowser.Contact.para1">{0} administración en contacto en:</message>
+<message key="xmlui.ArtifactBrowser.Contact.para1">Estimado usuario, puede enviarnos sus dudas o sugerencias a través de las siguientes vías:</message>
 <message key="xmlui.ArtifactBrowser.Contact.feedback_label">Formulario en línea</message>
 <message key="xmlui.ArtifactBrowser.Contact.feedback_link">Sugerencias</message>
 <message key="xmlui.ArtifactBrowser.Contact.email">Correo electrónico</message>
@@ -258,12 +258,12 @@
 
 <message key="xmlui.ArtifactBrowser.FeedbackForm.title">Sugerencias</message>
 <message key="xmlui.ArtifactBrowser.FeedbackForm.trail">Sugerencias</message>
-<message key="xmlui.ArtifactBrowser.FeedbackForm.head">Sugerencias</message>
-<message key="xmlui.ArtifactBrowser.FeedbackForm.para1">Gracias por tomarse un tiempo para compartir sus sugerencias sobre SeDiCI. ¡Tendremos en cuenta sus comentarios!</message>
-<message key="xmlui.ArtifactBrowser.FeedbackForm.email">Su correo electrónico</message>
+<message key="xmlui.ArtifactBrowser.FeedbackForm.head">Dudas, sugerencias sobre SeDiCI</message>
+<message key="xmlui.ArtifactBrowser.FeedbackForm.para1">Gracias por compartir con nosotros sus comentarios e inquietudes sobre SeDiCI. Por favor utilice el siguiente formulario para hacernos llegar sus sugerencias. ¡Tendremos en cuenta sus comentarios! </message>
+<message key="xmlui.ArtifactBrowser.FeedbackForm.email">Su correo electrónico:</message>
 <message key="xmlui.ArtifactBrowser.FeedbackForm.email_help">Esta dirección será utilizada para seguimiento de su sugerencia.</message>
-<message key="xmlui.ArtifactBrowser.FeedbackForm.comments">Comentarios</message>
-<message key="xmlui.ArtifactBrowser.FeedbackForm.submit">Enviar sugerencia</message>
+<message key="xmlui.ArtifactBrowser.FeedbackForm.comments">Comentarios:</message>
+<message key="xmlui.ArtifactBrowser.FeedbackForm.submit">Enviar</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.FeedbackSent.java -->
 <message key="xmlui.ArtifactBrowser.FeedbackSent.title">Sugerencias</message>
@@ -2238,6 +2238,8 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.administrative.Navigation.context_edit_item_workflow">Editar Item</message>
 <message key="xmlui.discovery.ver_filtros">Ver filtros</message>
 <message key="xmlui.discovery.ocultar_filtros">Ocultar filtros</message>
+
+<message key="xmlui.ArtifactBrowser.FeedbackForm.para2">Recuerde que también puede contactarse con nosotros vía email a la direccion </message>
 
 <!-- De aca en mas estan en las dependencias de dspace -->
 
