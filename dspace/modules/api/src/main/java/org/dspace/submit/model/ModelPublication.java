@@ -541,7 +541,9 @@ public class ModelPublication
 				   ) {
 				    pbean.setSkipReviewStep(false);
 				} else if(ttext.equals("accepted") ||
-					  ttext.equals("rejected") ||
+					  ttext.startsWith("reject") ||
+					  ttext.equals("open reject") ||
+					  ttext.equals("transferred") ||
 					  ttext.equals("needs revision")) {
 				    pbean.setSkipReviewStep(true);
 				} else {
