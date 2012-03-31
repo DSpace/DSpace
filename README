@@ -16,12 +16,15 @@ https://wiki.duraspace.org/display/DSPACE/DSpaceContributors
 
 Installation instructions for other versions may be different, so you
 are encouraged to obtain the appropriate version of the Documentation
-(from the links above or from SVN).
+(from the links above or from the source repository).
 
-To obtain files from the SVN repository and build, please see:
+To obtain files from the repository and build, please see:
 
- - https://scm.dspace.org/svn/repo/dspace/tags/
+ - https://github.com/DSpace/DSpace/
 
+or just:
+
+ - git clone git://github.com/DSpace/DSpace.git
 
 Please refer any further problems to the dspace-tech@lists.sourceforge.net
 mailing list.
