@@ -12,6 +12,7 @@ import org.apache.log4j.Logger;
 import org.dspace.app.xmlui.aspect.administrative.FlowResult;
 import org.dspace.app.xmlui.wing.Message;
 import org.dspace.core.Context;
+import org.dspace.sword.client.DSpaceSwordClient;
 import org.dspace.sword.client.exceptions.HttpException;
 import org.dspace.sword.client.exceptions.InvalidHandleException;
 import org.dspace.sword.client.exceptions.PackageFormatException;
