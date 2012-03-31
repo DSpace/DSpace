@@ -154,11 +154,13 @@
          <artifactId>dspace-discovery-solr</artifactId>
       </dependency>
 
+
       <dependency>
          <groupId>org.dspace</groupId>
-         <artifactId>dspace-sword-client</artifactId>
+         <artifactId>dspace-sword</artifactId>
+         <type>jar</type>
+         <classifier>classes</classifier>
       </dependency>
-
 
       <!-- Custom build DSpace cocoon -->
       <dependency>

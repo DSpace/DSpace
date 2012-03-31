@@ -6,7 +6,7 @@
  * http://www.dspace.org/license/
  */
 
-package org.dspace.sword.client.exceptions;
+ package org.dspace.sword.client.exceptions;
 
 /**
  * User: Robin Taylor

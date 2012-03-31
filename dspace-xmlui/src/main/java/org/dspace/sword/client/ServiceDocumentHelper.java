@@ -6,7 +6,7 @@
  * http://www.dspace.org/license/
  */
 
-package org.dspace.sword.client;
+ package org.dspace.sword.client;
 
 import org.dspace.core.ConfigurationManager;
 import org.purl.sword.base.Collection;
