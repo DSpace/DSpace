@@ -438,20 +438,10 @@
           </dependency>
            <dependency>
               <groupId>org.dspace</groupId>
-              <artifactId>dspace-sword-client-api</artifactId>
+              <artifactId>dspace-sword-client</artifactId>
               <version>${project.version}</version>
           </dependency>
-          <dependency>
-              <groupId>org.dspace</groupId>
-              <artifactId>dspace-sword-client-xmlui-api</artifactId>
-              <version>${project.version}</version>
-          </dependency>
-          <dependency>
-              <groupId>org.dspace</groupId>
-              <artifactId>dspace-sword-client-xmlui-webapp</artifactId>
-              <version>${project.version}</version>
-              <type>war</type>
-          </dependency>
+
 
          <dependency>
             <groupId>org.dspace</groupId>
