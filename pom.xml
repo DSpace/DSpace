@@ -491,19 +491,16 @@
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-xmlui-api</artifactId>
+            <artifactId>dspace-xmlui</artifactId>
             <version>${project.version}</version>
+            <type>jar</type>
+            <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-xmlui-webapp</artifactId>
+            <artifactId>dspace-xmlui</artifactId>
             <version>${project.version}</version>
             <type>war</type>
-         </dependency>
-         <dependency>
-            <groupId>org.dspace</groupId>
-            <artifactId>dspace-xmlui-wing</artifactId>
-            <version>${project.version}</version>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>

@@ -19,7 +19,9 @@
 
         <dependency>
                 <groupId>org.dspace</groupId>
-                <artifactId>dspace-xmlui-api</artifactId>
+                <artifactId>dspace-xmlui</artifactId>
+                <type>jar</type>
+                <classifier>classes</classifier>
                 <exclusions>
                 	<exclusion>
                 		<artifactId>solr-solrj</artifactId>
