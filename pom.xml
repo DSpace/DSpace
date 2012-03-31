@@ -225,7 +225,7 @@
                 <activeByDefault>true</activeByDefault>
             </activation>
             <modules>
-                <module>dspace-discovery</module>
+                <module>dspace-discovery-solr</module>
             </modules>
         </profile>
 
@@ -309,6 +309,18 @@
             </modules>
         </profile>
 
+      <!--
+         Builds LNI WAR for DSpace
+      -->
+      <profile>
+         <id>dspace-lni-client</id>
+         <activation>
+            <activeByDefault>true</activeByDefault>
+         </activation>
+         <modules>
+            <module>dspace-lni-client</module>
+         </modules>
+      </profile>
 
       <!--
          Use 'mvn deploy -Paddons' while doing Continuous Integration
@@ -322,10 +334,11 @@
          <modules>
             <module>dspace-api</module>
             <module>dspace-stats</module>
-            <module>dspace-discovery</module>
+            <module>dspace-discovery-solr</module>
             <module>dspace-jspui</module>
             <module>dspace-xmlui</module>
             <module>dspace-lni</module>
+            <module>dspace-lni-client</module>
             <module>dspace-oai</module>
             <module>dspace-sword</module>
             <module>dspace-swordv2</module>

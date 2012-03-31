@@ -10,7 +10,7 @@
 
    <parent>
       <groupId>org.dspace</groupId>
-      <artifactId>dspace-lni</artifactId>
+      <artifactId>dspace-parent</artifactId>
       <version>3.0-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
