@@ -7,7 +7,6 @@
    <description>
       DSpace Lightweight Network Interface Build Modules
    </description>
-   <url>http://projects.dspace.org/dspace-lni</url>
 
    <parent>
       <groupId>org.dspace</groupId>
@@ -15,17 +14,6 @@
       <version>3.0-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
-
-   <!-- 
-      The Subversion repository location is used by Continuum to update against
-      when changes have occured, this spawns a new build cycle and releases snapshots
-      into the snapshot repository below.
-   -->
-   <scm>
-      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-lni</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-lni</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-lni</url>
-   </scm>
 
    <modules>
       <module>dspace-lni-core</module>

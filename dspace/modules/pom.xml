@@ -4,7 +4,6 @@
 	<artifactId>modules</artifactId>
 	<packaging>pom</packaging>
 	<name>DSpace Addon Modules</name>
-	<url>http://www.dspace.org</url>
 	<description>DSpace Addon Modules</description>
 
 	<parent>
@@ -13,12 +12,6 @@
 		<version>3.0-SNAPSHOT</version>
 		<relativePath>../../pom.xml</relativePath>
 	</parent>
-
-    <scm>
-      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules</url>
-    </scm>
     
     <!-- 
          List of enabled DSpace Modules to build/install.

@@ -7,7 +7,6 @@
    <description>
       Example Client for working with DSpace LNI Service.
    </description>
-   <url>http://projects.dspace.org/dspace-lni/dspace-lni-client</url>
 
    <parent>
       <groupId>org.dspace</groupId>
@@ -15,12 +14,6 @@
       <version>3.0-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
-
-   <scm>
-      <connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-lni/dspace-lni-client</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-lni/dspace-lni-client</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-lni/dspace-lni-client</url>
-   </scm>
 
    <profiles>
       <profile>
