@@ -22,7 +22,9 @@
         </dependency>
         <dependency>
                 <groupId>org.dspace</groupId>
-                <artifactId>dspace-sword-api</artifactId>
+                <artifactId>dspace-sword</artifactId>
+                <type>jar</type>
+                <classifier>classes</classifier>
         </dependency>
 
     </dependencies>
