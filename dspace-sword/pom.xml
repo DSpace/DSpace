@@ -129,6 +129,7 @@
       <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-api-lang</artifactId>
+         <optional>true</optional>
       </dependency>
 
       <dependency>

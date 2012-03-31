@@ -25,6 +25,7 @@ import org.apache.solr.common.params.FacetParams;
 import org.dspace.content.*;
 import org.dspace.content.Collection;
 import org.dspace.core.*;
+import org.dspace.discovery.configuration.*;
 import org.dspace.handle.HandleManager;
 import org.dspace.utils.DSpace;
 import org.springframework.stereotype.Service;
