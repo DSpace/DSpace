@@ -453,12 +453,14 @@
 
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-jspui-api</artifactId>
+            <artifactId>dspace-jspui</artifactId>
             <version>${project.version}</version>
+            <type>jar</type>
+            <classifier>classes</classifier>
          </dependency>
          <dependency>
             <groupId>org.dspace</groupId>
-            <artifactId>dspace-jspui-webapp</artifactId>
+            <artifactId>dspace-jspui</artifactId>
             <version>${project.version}</version>
             <type>war</type>
          </dependency>

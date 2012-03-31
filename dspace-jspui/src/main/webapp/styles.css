@@ -98,7 +98,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                border: 0;
                margin: 0 }
 
-.stripe { background: #336699 url(./image/stripe.gif) repeat-x;
+.stripe { background: #336699 url(image/stripe.gif) repeat-x;
           vertical-align: top;
           border: 0;
           padding: 0;
@@ -331,7 +331,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
 .submitProgressButton{ border: 0 }
 
 .submitProgressButtonDone{ border: 0;
-                           background-image: url(./image/submit/done.gif);
+                           background-image: url(image/submit/done.gif);
                            background-position: center;
                            height: 30px;
                            width: 90px;
@@ -340,7 +340,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                            background-repeat: no-repeat; }
 
 .submitProgressButtonCurrent{ border: 0;
-                           background-image: url(./image/submit/current.gif);
+                           background-image: url(image/submit/current.gif);
                            background-position: center;
                            height: 30px;
                            width: 90px;
@@ -349,7 +349,7 @@ UL { font-family: "verdana", "Arial", "Helvetica", sans-serif;
                            background-repeat: no-repeat; }
 
 .submitProgressButtonNotDone{ border: 0;
-                           background-image: url(./image/submit/notdone.gif);
+                           background-image: url(image/submit/notdone.gif);
                            background-position: center;
                            height: 30px;
                            width: 90px;
@@ -631,27 +631,27 @@ span.ds-authority-confidence
   padding: 0px 2px; vertical-align: bottom; color: transparent;}
 img.ds-authority-confidence.cf-unset,
 span.ds-authority-confidence.cf-unset
-  { background-image: url(./image/authority/bug.png);}
+  { background-image: url(image/authority/bug.png);}
 img.ds-authority-confidence.cf-novalue,
 span.ds-authority-confidence.cf-novalue
-  { background-image: url(./image/confidence/0-unauthored.gif);}
+  { background-image: url(image/confidence/0-unauthored.gif);}
 img.ds-authority-confidence.cf-rejected,
 img.ds-authority-confidence.cf-failed,
 span.ds-authority-confidence.cf-rejected,
 span.ds-authority-confidence.cf-failed
-  { background-image: url(./image/confidence/2-errortriangle.gif); }
+  { background-image: url(image/confidence/2-errortriangle.gif); }
 img.ds-authority-confidence.cf-notfound,
 span.ds-authority-confidence.cf-notfound
-  { background-image: url(./image/confidence/3-thumb1.gif); }
+  { background-image: url(image/confidence/3-thumb1.gif); }
 img.ds-authority-confidence.cf-ambiguous,
 span.ds-authority-confidence.cf-ambiguous
-  { background-image: url(./image/confidence/4-question.gif); }
+  { background-image: url(image/confidence/4-question.gif); }
 img.ds-authority-confidence.cf-uncertain,
 span.ds-authority-confidence.cf-uncertain
-  { background-image: url(./image/confidence/5-pinion.gif); }
+  { background-image: url(image/confidence/5-pinion.gif); }
 img.ds-authority-confidence.cf-accepted,
 span.ds-authority-confidence.cf-accepted
-  { background-image: url(./image/confidence/6-greencheck.gif); }
+  { background-image: url(image/confidence/6-greencheck.gif); }
 
 /* hide authority-value inputs in forms */
 input.ds-authority-value { display:none; }
@@ -689,7 +689,7 @@ div#authority-message {
  }
 
 a.authority {
-    background: transparent url(./image/authority/book_key.png) no-repeat;
+    background: transparent url(image/authority/book_key.png) no-repeat;
     background-position: top right;
     padding-right: 20px;
 }
@@ -699,6 +699,6 @@ input.ds-authority-lock
   { vertical-align: bottom; height: 24px; width: 24px; margin-right: 8px;
     background-repeat: no-repeat; background-color: transparent; }
 input.ds-authority-lock.is-locked
-  { background-image: url(./image/lock24.png); }
+  { background-image: url(image/lock24.png); }
 input.ds-authority-lock.is-unlocked
-  { background-image: url(./image/unlock24.png); }
+  { background-image: url(image/unlock24.png); }
