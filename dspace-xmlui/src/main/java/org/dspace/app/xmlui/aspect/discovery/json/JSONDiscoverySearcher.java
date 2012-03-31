@@ -20,13 +20,14 @@ import org.dspace.app.xmlui.utils.ContextUtil;
 import org.dspace.app.xmlui.utils.HandleUtil;
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.discovery.*;
+import org.dspace.discovery.DiscoverFacetField;
+import org.dspace.discovery.DiscoverQuery;
+import org.dspace.discovery.SearchService;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
 import org.dspace.handle.HandleManager;
 import org.dspace.utils.DSpace;
 import org.xml.sax.SAXException;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
