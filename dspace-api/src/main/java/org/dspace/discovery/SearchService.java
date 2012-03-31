@@ -9,7 +9,6 @@ package org.dspace.discovery;
 
 import org.dspace.content.DSpaceObject;
 import org.dspace.core.Context;
-import org.dspace.discovery.configuration.DiscoverySortConfiguration;
 
 import java.io.InputStream;
 import java.sql.SQLException;

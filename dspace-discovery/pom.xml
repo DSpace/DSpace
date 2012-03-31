@@ -16,7 +16,6 @@
     </parent>
     
     <modules>
-        <module>dspace-discovery-provider</module>
         <module>dspace-discovery-solr</module>
     </modules>
 

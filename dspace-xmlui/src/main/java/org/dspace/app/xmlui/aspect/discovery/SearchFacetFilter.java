@@ -30,7 +30,6 @@ import org.dspace.core.Constants;
 import org.dspace.discovery.*;
 import org.dspace.discovery.configuration.DiscoveryConfiguration;
 import org.dspace.discovery.configuration.DiscoveryConfigurationParameters;
-import org.dspace.discovery.configuration.SidebarFacetConfiguration;
 import org.dspace.handle.HandleManager;
 import org.dspace.services.ConfigurationService;
 import org.dspace.utils.DSpace;

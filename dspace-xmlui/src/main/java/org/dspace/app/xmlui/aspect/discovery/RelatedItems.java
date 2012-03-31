@@ -21,7 +21,6 @@ import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.discovery.DiscoverQuery;
 import org.dspace.discovery.DiscoverResult;
-import org.dspace.discovery.SearchUtils;
 import org.xml.sax.SAXException;
 import org.dspace.discovery.SearchServiceException;
 
