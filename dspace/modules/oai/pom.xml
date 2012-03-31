@@ -101,12 +101,14 @@
    <dependencies>
       <dependency>
          <groupId>org.dspace</groupId>
-         <artifactId>dspace-oai-webapp</artifactId>
+         <artifactId>dspace-oai</artifactId>
          <type>war</type>
       </dependency>
       <dependency>
          <groupId>org.dspace</groupId>
-         <artifactId>dspace-oai-api</artifactId>
+         <artifactId>dspace-oai</artifactId>
+         <type>jar</type>
+         <classifier>classes</classifier>
       </dependency>
       <dependency>
          <groupId>javax.servlet</groupId>
