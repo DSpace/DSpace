@@ -315,7 +315,7 @@
       <profile>
          <id>dspace-lni-client</id>
          <activation>
-            <activeByDefault>true</activeByDefault>
+            <activeByDefault>false</activeByDefault>
          </activation>
          <modules>
             <module>dspace-lni-client</module>
@@ -338,7 +338,6 @@
             <module>dspace-jspui</module>
             <module>dspace-xmlui</module>
             <module>dspace-lni</module>
-            <module>dspace-lni-client</module>
             <module>dspace-oai</module>
             <module>dspace-sword</module>
             <module>dspace-swordv2</module>
