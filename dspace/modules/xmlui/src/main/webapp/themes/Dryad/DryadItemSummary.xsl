@@ -219,6 +219,10 @@
 
                         <xsl:variable name="title"
                                       select="$meta[@element='title'][@qualifier='package']"/>
+                        <xsl:copy-of select="$title"/>
+                        <span>
+                            <i18n:text>xmlui.DryadItemSummary.dryadRepo</i18n:text>
+                        </span>
 
 
                         <!-- if Item not_archived don't add the link. -->
