@@ -20,19 +20,6 @@
         <module>dspace-sword-client-xmlui-webapp</module>
     </modules>
 
-    <!--
-       The Subversion repository location is used by Continuum to update
-       against when changes have occurred, this spawns a new build cycle
-       and releases snapshots into the snapshot repository below.
-    -->
-    <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword-client</connection>
-        <developerConnection>
-            scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword-client
-        </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword-client</url>
-    </scm>
-
     <issueManagement>
       <system>JIRA</system>
       <url>http://jira.dspace.org/jira/browse/SWORD</url>

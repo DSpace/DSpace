@@ -8,7 +8,6 @@
         The DSpace Project provides all the functionality required to
         build, install and upgrade and dspace instance.
     </description>
-    <url>http://projects.dspace.org/dspace</url>
     <!--
        A Parent POM that Maven inherits DSpace Default
        POM atrributes from.
@@ -19,17 +18,6 @@
         <version>3.0-SNAPSHOT</version>
         <relativePath>..</relativePath>
     </parent>
-
-    <!--
-         The Subversion repository location is used by Continuum to update against
-         when changes have occured, this spawns a new build cycle and releases snapshots
-         into the snapshot repository below.
-    -->
-    <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace</connection>
-        <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace</developerConnection>
-        <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace</url>
-    </scm>
 
     <properties>
         <default.dspace.dir>/dspace</default.dspace.dir>

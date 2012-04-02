@@ -4,7 +4,6 @@
    <artifactId>dspace-xmlui</artifactId>
    <packaging>pom</packaging>
    <name>DSpace XML-UI (Manakin)</name>
-   <url>http://projects.dspace.org/dspace-xmlui</url>
    <description>
       DSpace web-based user interface based upon Apache Cocoon.
    </description>
@@ -15,17 +14,6 @@
       <version>3.0-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
-
-      <!-- 
-      The Subversion repository location is used by Continuum to update against
-      when changes have occured, this spawns a new build cycle and releases snapshots
-      into the snapshot repository below.
-   -->
-   <scm>
-      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-xmlui</url>
-   </scm>
    
    <modules>
       <module>dspace-xmlui-wing</module>

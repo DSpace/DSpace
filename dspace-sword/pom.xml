@@ -7,7 +7,6 @@
    <description>
       DSpace SWORD Deposit Service Provider Web Application
    </description>
-   <url>http://projects.dspace.org/dspace-sword</url>
 
    <!--
       A Parent POM that Maven inherits DSpace Default
@@ -19,17 +18,6 @@
       <version>3.0-SNAPSHOT</version>
       <relativePath>..</relativePath>
    </parent>
-
-   <!--
-      The Subversion repository location is used by Continuum to update against
-      when changes have occured, this spawns a new build cycle and releases snapshots
-      into the snapshot repository below.
-   -->
-   <scm>
-      <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword</connection>
-      <developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword</developerConnection>
-      <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-sword</url>
-   </scm>
 
 
    <modules>

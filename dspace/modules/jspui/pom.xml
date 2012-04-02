@@ -4,7 +4,6 @@
 	<artifactId>jspui</artifactId>
 	<packaging>war</packaging>
 	<name>DSpace JSP-UI :: Web Application</name>
-	<url>http://www.dspace.org</url>
 	<description>DSpace JSP-UI :: Web Application</description>
 
 	<parent>
@@ -73,12 +72,6 @@
 		</profile>
 
 	</profiles>
-
-	<scm>
-		<connection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/jspui</connection>
-		<developerConnection>scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/jspui</developerConnection>
-		<url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace/modules/jspui</url>
-	</scm>
 
 	<build>
 		<plugins>

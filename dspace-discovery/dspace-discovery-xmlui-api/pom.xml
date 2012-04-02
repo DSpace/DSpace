@@ -115,18 +115,5 @@
             -->
         </plugins>
     </build>
-
-    <!--
-       The Subversion repository location is used by Continuum to update
-       against when changes have occured, this spawns a new build cycle
-       and releases snapshots into the snapshot repository below.
-    -->
-    <scm>
-        <connection>scm:svn:http://scm.dspace.org/svn/repo/dspace/trunk/dspace-discovery/dspace-discovery-xmlui-api</connection>
-        <developerConnection>
-            scm:svn:https://scm.dspace.org/svn/repo/dspace/trunk/dspace-discovery/dspace-discovery-xmlui-api
-        </developerConnection>
-        <url>http://scm.dspace.org/svn/repo/dspace/trunk/dspace-discovery/dspace-discovery-xmlui-api</url>
-    </scm>
     
 </project>
