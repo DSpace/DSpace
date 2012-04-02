@@ -693,7 +693,7 @@ public class ItemViewer extends AbstractDSpaceTransformer implements
         Division div = main.addDivision("notice", "notice");
         Para p = div.addPara();
         p.addContent(message);
-        if (link != null)  //avoid adding worthless links to "/"  PEM 30-Mar-2012
+        if (link != null)  //avoid adding worthless links to "/"
         	p.addXref(link, linkMessage);
 
     }

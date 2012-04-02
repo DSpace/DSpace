@@ -261,7 +261,8 @@ public class DryadReviewTransformer extends AbstractDSpaceTransformer {
         Division div = main.addDivision("notice", "notice");
         Para p = div.addPara();
         p.addContent(message);
-        p.addXref(link, linkMessage);
+        if (link != null)  //avoid adding worthless links to "/"
+	        p.addXref(link, linkMessage);
 
     }
 
