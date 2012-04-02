@@ -18,6 +18,13 @@
      <version>10</version>
    </parent>
 
+   <repositories>
+     <repository>
+       <id>um-libraries-repo</id>
+       <url>http://maven.lib.umd.edu/maven2</url>
+     </repository>
+   </repositories>
+
    <build>
       <plugins>
          <plugin>
@@ -531,8 +538,8 @@
          </dependency>
          <dependency>
             <groupId>edu.umd.lib</groupId>
-            <artifactId>lims-util</artifactId>
-            <version>0.1</version>
+            <artifactId>lib-util</artifactId>
+            <version>1.0</version>
          </dependency>
          <dependency>
             <groupId>org.marc4j</groupId>
