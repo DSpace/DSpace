@@ -54,7 +54,63 @@
 	     </div>
 	     
 	     <div id='home_main_communities'>
-	         Links estaticos
+	     	<h1 class="communities_header">Navegue por nuestras colecciones</h1>
+	         <div id="icono_facultades" class="community_icon_container">
+		 		<a href="#unidades">
+			 		<img id="community_icon_facultades" class="community_icon">
+			            <xsl:attribute name="src">
+			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+			                <xsl:text>/themes/</xsl:text>
+			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+			                <xsl:text>/images/4_unidades.png</xsl:text>
+			            </xsl:attribute>&#160;
+			 		</img>
+			 		<h2>Unidades académicas</h2>
+		 		</a>
+		 	 </div>
+
+	         <div id="icono_revistas" class="community_icon_container">
+		 		<a href="#unidades">
+			 		<img id="community_icon_revistas" class="community_icon">
+			            <xsl:attribute name="src">
+			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+			                <xsl:text>/themes/</xsl:text>
+			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+			                <xsl:text>/images/1_revistas.png</xsl:text>
+			            </xsl:attribute>&#160;
+			 		</img>
+			 		<h2>Revistas</h2>
+		 		</a>
+		 	 </div>
+
+	         <div id="icono_eventos" class="community_icon_container">
+		 		<a href="#unidades">
+			 		<img id="community_icon_eventos" class="community_icon">
+			            <xsl:attribute name="src">
+			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+			                <xsl:text>/themes/</xsl:text>
+			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+			                <xsl:text>/images/3_eventos.png</xsl:text>
+			            </xsl:attribute>&#160;
+			 		</img>
+			 		<h2>Eventos</h2>
+		 		</a>
+		 	 </div>
+
+	         <div id="icono_libros" class="community_icon_container">
+		 		<a href="#unidades">
+			 		<img id="community_icon_libros" class="community_icon">
+			            <xsl:attribute name="src">
+			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+			                <xsl:text>/themes/</xsl:text>
+			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+			                <xsl:text>/images/2_libros.png</xsl:text>
+			            </xsl:attribute>&#160;
+			 		</img>
+			 		<h2>Libros</h2>
+		 		</a>
+		 	 </div>
+	         
 	     </div>
 	     
 	     <div id='home_feed'>

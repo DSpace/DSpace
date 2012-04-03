@@ -27,7 +27,7 @@ a, a:active, a:visited {
 	text-decoration:none;
 }
 a:hover { 
-	text-decoration:underline;
+	text-decoration:none;
 }
 
 
@@ -1994,7 +1994,7 @@ background-image:url(../../images/add_verde.png);
 .logo {
 width:100%;
 float:left;
-   border-right: 1px solid grey;
+/*   border-right: 1px solid grey;*/
     float: left;
     margin-right: 10px;
     padding-right: 10px;
@@ -2007,7 +2007,7 @@ float:left;
 .community-root-div {
 background-color:red;
 position:relative;
-width:120px;
+width:130px;
 right:10px;
 /*left:-50px;*/
 }
@@ -2342,6 +2342,14 @@ bottom:10px;
 .intro-text {
 float:left;
 width:550px;
+border-top:1px solid #dedede;
+padding-top:10px;
+/**/
+  bottom: 130px;
+    float: left;
+    left: 155px;
+    position: relative;
+    width: 500px;
 }
 
 
@@ -2446,6 +2454,9 @@ line-height:2;
 line-height:1.7;
 width:50%;
 float:left;
+background-image:;
+background-position:top right;
+background-repeat:no-repeat;
 
 }
 
@@ -2479,7 +2490,7 @@ font-size:14px;
 
 #home_feed ul,
 #home_envios_recientes ul{
-list-style-type:none;
+list-style-type:circle;
 
 }
 
@@ -2487,6 +2498,7 @@ list-style-type:none;
 #home_envios_recientes ul li a{
 padding:0px;
 text-decoration:none;
+font-size:11px;
 }
 
 
@@ -2784,6 +2796,37 @@ padding-left:20px;
 }
 
 
+#home_main_communities {
+	margin: 30px 0px 60px 0px; 
+	height: 110px
+}
+
+.community_icon_container {
+	float: left;
+	height:106px;
+text-align:center;
+}
+
+.community_icon_container a{
+	color:#e79011;
+/*	text-shadow: grey 1px 1px;*/
+	font-size:12px;
+	font-weight:regular;
+}
+
+.community_icon_container a:hover{
+	color:#a66a12;
+/*	text-shadow: grey 1px 1px;*/
+	font-size:12px;
+	font-weight:regular;
+}
+
+h1.communities_header {
+color:grey;
+font-size:16px;
+margin-bottom:10px;
+border-bottom:1px dashed #dedede;
+}
 
 /* ATENCION: dejar siempre al final del css esta linea, es para detectar errores de sintaxis*/
 body{ background-color:white;}
