@@ -3064,7 +3064,7 @@
     <message key="xmlui.DryadItemSummary.withdrawn">The current Item is withdrawn</message>
     <message key="xmlui.DryadItemSummary.in_workflow">Unpublished data -- the associated article is in review </message>
     <message key="xmlui.DryadItemSummary.notCurrentVersion">This is not the most current version of this Item</message>
-    <message key="xmlui.DryadItemSummary.mostCurrentVersion">&#160;&#160;[Most current version of this Item.]</message>
+    <message key="xmlui.DryadItemSummary.mostCurrentVersion">&#160;&#160;[View current version]</message>
 
     <message key="xmlui.ItemViewer.versionInSubmission">You have a version of this item in your Submission Queue</message>
     <message key="xmlui.ItemViewer.goToSubmissionPage">&#160;&#160;[go to submission overview]</message>
@@ -3099,7 +3099,7 @@
                                         published and the journal has not agreed that Dryad may post the
                                         article details ahead of publication. If you think this is an error,
                                         please let us know by filling out the form below. Thanks!</message>
-    <message key="xmlui.aspect.artifactbrowser.RestrictedItem.div.pendingPublicationStep-resource.help">Please provide a link to the article if it is publised online, or provide a description of where the article has been published.</message>
+    <message key="xmlui.aspect.artifactbrowser.RestrictedItem.div.pendingPublicationStep-resource.help">Please provide a link to the article if it is published online, or provide a description of where the article has been published.</message>
     <message key="xmlui.aspect.artifactbrowser.RestrictedItem.div.pendingPublicationStep-resource.status">The Item is in workflow stage.</message>
 
 
