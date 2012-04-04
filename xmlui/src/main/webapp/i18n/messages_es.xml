@@ -256,20 +256,20 @@
 
 <!-- org.dspace.app.xmlui.artifactbrowser.FeedbackForm.java -->
 
-<message key="xmlui.ArtifactBrowser.FeedbackForm.title">Sugerencias</message>
-<message key="xmlui.ArtifactBrowser.FeedbackForm.trail">Sugerencias</message>
-<message key="xmlui.ArtifactBrowser.FeedbackForm.head">Dudas, sugerencias sobre SeDiCI</message>
-<message key="xmlui.ArtifactBrowser.FeedbackForm.para1">Gracias por compartir con nosotros sus comentarios e inquietudes sobre SeDiCI. Por favor utilice el siguiente formulario para hacernos llegar sus sugerencias. ¡Tendremos en cuenta sus comentarios! </message>
-<message key="xmlui.ArtifactBrowser.FeedbackForm.email">Su correo electrónico:</message>
-<message key="xmlui.ArtifactBrowser.FeedbackForm.email_help">Esta dirección será utilizada para seguimiento de su sugerencia.</message>
-<message key="xmlui.ArtifactBrowser.FeedbackForm.comments">Comentarios:</message>
+<message key="xmlui.ArtifactBrowser.FeedbackForm.title">Comentarios y sugerencias</message>
+<message key="xmlui.ArtifactBrowser.FeedbackForm.trail">Comentarios y sugerencias</message>
+<message key="xmlui.ArtifactBrowser.FeedbackForm.head">Dudas, comentarios y sugerencias sobre SeDiCI</message>
+<message key="xmlui.ArtifactBrowser.FeedbackForm.para1">Gracias por compartir con nosotros sus comentarios y sugerencias sobre SeDiCI. Por favor utilice el siguiente formulario para hacernos llegar sus inquietudes.</message>
+<message key="xmlui.ArtifactBrowser.FeedbackForm.email">Su correo electrónico</message>
+<message key="xmlui.ArtifactBrowser.FeedbackForm.email_help">Esta dirección será utilizada para el seguimiento de su sugerencia.</message>
+<message key="xmlui.ArtifactBrowser.FeedbackForm.comments">Comentarios</message>
 <message key="xmlui.ArtifactBrowser.FeedbackForm.submit">Enviar</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.FeedbackSent.java -->
-<message key="xmlui.ArtifactBrowser.FeedbackSent.title">Sugerencias</message>
-<message key="xmlui.ArtifactBrowser.FeedbackSent.trail">Sugerencias</message>
-<message key="xmlui.ArtifactBrowser.FeedbackSent.head">Sugerencia enviada</message>
-<message key="xmlui.ArtifactBrowser.FeedbackSent.para1">Su comentario ha sido recibido</message>
+<message key="xmlui.ArtifactBrowser.FeedbackSent.title">Comentarios y sugerencias</message>
+<message key="xmlui.ArtifactBrowser.FeedbackSent.trail">Comentarios y sugerencias</message>
+<message key="xmlui.ArtifactBrowser.FeedbackSent.head">Dudas, comentarios y sugerencias sobre SeDiCI</message>
+<message key="xmlui.ArtifactBrowser.FeedbackSent.para1">Muchas gracias por compartir sus comentarios y sugerencias con nosotros. Nos comunicaremos con usted a la brevedad.</message>
 
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.FrontPageSearch.java -->
