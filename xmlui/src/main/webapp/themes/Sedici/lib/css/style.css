@@ -1540,6 +1540,15 @@ span.floatleft {
 /* FOR CC PAGE to GROUP ITEMS horizontally */
 ul.horizontal li span.bold a { color: black; }
 
+/* Estilos para la licencia */
+#aspect_submission_StepTransformer_div_submit-license-standard-text.license-text{
+	background-color: #EFEFEF;
+	font-family: courier;
+	line-height: 1.4;
+	white-space: pre-wrap;
+	font-style: italic;
+	padding: 4px;
+}
 /* group items horizontally in a list */
 
 ul.horizontalVanilla

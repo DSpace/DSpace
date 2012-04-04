@@ -761,15 +761,14 @@
 <message key="xmlui.Submission.submit.CCLicenseStep.no_license">Sin licencia Creative Commons</message>
 <message key="xmlui.Submission.submit.CCLicenseStep.save_changes">Debe hacer click en siguiente para guardar los cambios</message>
 
-
 	<!-- org.dspace.app.xmlui.Submission.submit.LicenseStep -->
 <message key="xmlui.Submission.submit.LicenseStep.head">Licencia de distribución</message>
-<message key="xmlui.Submission.submit.LicenseStep.info1">&lt;strong&gt;Queda un último paso:&lt;/strong&gt; para permitir a SeDiCI reproducir, traducir y distribuir su envío a través del mundo, necesitamos su conformidad en los siguientes términos.</message>
-<message key="xmlui.Submission.submit.LicenseStep.info2">Conceda la licencia de distribución estándar seleccionando Conceder licencia y pulsando Envío completado.</message>
-<message key="xmlui.Submission.submit.LicenseStep.info3">Si tiene alguna duda sobre la licencia, por favor, contacte con el administrador del sistema.</message>
-<message key="xmlui.Submission.submit.LicenseStep.decision_label">Licencia de distribución</message>
-<message key="xmlui.Submission.submit.LicenseStep.decision_checkbox">Conceder licencia</message>
-<message key="xmlui.Submission.submit.LicenseStep.decision_error">Debe conceder la licencia para completar el envío. Si no puede conceder la licencia por ahora, deberá guardar su trabajo y volver más tarde o eliminar inmediatamente el envío pulsando Borrar el envío.</message>
+<message key="xmlui.Submission.submit.LicenseStep.info1">Para permitir a la UNLP reproducir, distribuir al mundo y preservar para el futuro su obra através del SeDiCI, necesitamos su conformidad en los siguientes términos.</message>
+<message key="xmlui.Submission.submit.LicenseStep.info2">Por favor, lea atentamente la licencia de distribución no exclusiva y si está de acuerdo marque la casilla "Conceder licencia" que se encuentra debajo del texto y pulse "Completar el envío". </message>
+<message key="xmlui.Submission.submit.LicenseStep.info3">Si desea más informacion sobre el proceso de Autoarchivo y licencias, puede visitar el siguiente <a href="../../../../pages/comoAgregarTrabajos" target="_blank">Tutorial</a>. Si tiene alguna duda sobre la licencia, por favor, contactáctese con SeDiCI a traves de la siguiente página de <a href="../../../../contact" target="_blank">Contacto</a></message>
+<message key="xmlui.Submission.submit.LicenseStep.decision_label">Conceder Licencia de distribución: </message>
+<message key="xmlui.Submission.submit.LicenseStep.decision_checkbox">(Debe conceder la licencia para completar el envío)</message>
+<message key="xmlui.Submission.submit.LicenseStep.decision_error">Si no puede conceder la licencia por ahora, deberá guardar su trabajo y volver más tarde o eliminar inmediatamente el envío pulsando Borrar el envío.</message>
 
 
 	<!-- org.dspace.app.xmlui.Submission.submit.RemovedStep -->
