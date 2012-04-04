@@ -575,7 +575,7 @@
 <message key="xmlui.Submission.Submissions.trail">Envíos</message>
 <message key="xmlui.Submission.Submissions.head">Envíos y tareas</message>
 <message key="xmlui.Submission.Submissions.untitled">&lt;i&gt;Sin título&lt;/i&gt;</message>
-<message key="xmlui.Submission.Submissions.email">correo electrónico:</message>
+<message key="xmlui.Submission.Submissions.email"></message>
 
 	<!-- Same transformer, workflow section -->
 	<message key="xmlui.Submission.Submissions.workflow_head1">Tareas del flujo de trabajo</message>

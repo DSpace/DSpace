@@ -533,7 +533,7 @@
 	<message key="xmlui.Submission.Submissions.trail">Submissions</message>
 	<message key="xmlui.Submission.Submissions.head">Submissions &amp; workflow tasks</message>
 	<message key="xmlui.Submission.Submissions.untitled"><i>Untitled</i></message>
-	<message key="xmlui.Submission.Submissions.email">email: </message>
+	<message key="xmlui.Submission.Submissions.email"></message>
 	<!-- Same transformer, workflow section -->
 	<message key="xmlui.Submission.Submissions.workflow_head1">Workflow tasks</message>
 	<message key="xmlui.Submission.Submissions.workflow_info1">These tasks are items that are awaiting approval before they are added to the repository. There are two task queues, one for tasks which you have chosen to accept and another for tasks which have not been taken by anyone yet.</message>
