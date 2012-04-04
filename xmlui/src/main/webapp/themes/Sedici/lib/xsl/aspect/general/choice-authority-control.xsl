@@ -243,7 +243,7 @@ No redefino todos los templates, solo los que necesito redefinir.
           </xsl:attribute>
         </xsl:if>
         <xsl:attribute name="value">
-            <xsl:value-of select="substring-after($authValue, '#')"/>
+            <xsl:value-of select="substring-before($authValue, '#')"/>
         </xsl:attribute>
         <!-- this updates confidence after a manual change to authority value -->
         <xsl:attribute name="onChange">
