@@ -435,6 +435,16 @@
 					<hint>Si cuenta con un ISBN, éste debe ser ingresado aquí</hint>
 					<type-bind>Tesis,Objeto de conferencia</type-bind>
 				</field>
+
+				<!-- ISBN - TESIS (opcional) -->
+				<field>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>nro_acta</dc-element>
+					<label>Nro de acta</label>
+					<input-type>onebox</input-type>
+					<hint>Número de acta de aprobación de la tesis</hint>
+					<type-bind>Tesis</type-bind>
+				</field>
 				
 				<!-- ISBN - LIBROS (obligatorio) -->
 				<field>

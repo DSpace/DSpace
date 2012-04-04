@@ -349,4 +349,10 @@
 		<qualifier>dossier</qualifier>
 		<scope_note>Nombre del dossier en el que un artículo fue publicado</scope_note>
 	</dc-type>
+	<dc-type>
+		<schema>sedici</schema>
+		<element>nro_acta</element>
+		<!-- sin calificar -->
+		<scope_note>Numero de acta de una tesis</scope_note>
+	</dc-type>
 </dspace-dc-types>
