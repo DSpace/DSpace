@@ -174,6 +174,80 @@
         </xsl:attribute>
       </input>
     </xsl:template>
+    
+    <!-- Template especiales para la muestra de los valores en las subscripciones del perfil -->     
+    <xsl:template match="dri:field[@n='subscriptions']" priority="2">
+        <div>NICO</div>
+        <xsl:apply-templates select="dri:help" mode="help"/>
+        <!-- Create the first field normally -->
+        <xsl:apply-templates select="." mode="normalField"/>
+        <!-- Follow it up with an ADD button if the add operation is specified. This allows
+            entering more than one value for this field. -->
+        <xsl:if test="contains(dri:params/@operations,'add')">
+            <!-- Add buttons should be named "submit_[field]_add" so that we can ignore errors from required fields when simply adding new values-->
+            <input type="submit" value="Add" id="{concat('submit_',@n,'_add')}" name="{concat('submit_',@n,'_add')}" class="ds-button-field ds-add-button">
+              <!-- Make invisible if we have choice-lookup popup that provides its own Add. -->
+              <xsl:if test="dri:params/@choicesPresentation = 'lookup'">
+                <xsl:attribute name="style">
+                  <xsl:text>display:none;</xsl:text>
+                </xsl:attribute>
+        </xsl:if>
+           </input>
+        </xsl:if>
+        <br/>
+        <xsl:apply-templates select="dri:error" mode="error"/>
+        <xsl:if test="dri:instance">
+            <div class="ds-previous-values">
+                <!-- Iterate over the dri:instance elements contained in this field. The instances contain
+                    stored values as either "interpreted", "raw", or "default" values. -->
+                <xsl:call-template name="subscriptionsSimpleFieldIterator">
+                    <xsl:with-param name="position">1</xsl:with-param>
+                </xsl:call-template>
+                <!-- Conclude with a DELETE button if the delete operation is specified. This allows
+                    removing one or more values stored for this field. -->
+                <xsl:if test="contains(dri:params/@operations,'delete') and dri:instance">
+                    <!-- Delete buttons should be named "submit_[field]_delete" so that we can ignore errors from required fields when simply removing values-->
+                    <input type="submit" value="Remove selected" name="{concat('submit_',@n,'_delete')}" class="ds-button-field ds-delete-button" />
+                </xsl:if>
+                <!-- Behind the scenes, add hidden fields for every instance set. This is to make sure that
+                    the form still submits the information in those instances, even though they are no
+                    longer encoded as HTML fields. The DRI Reference should contain the exact attributes
+                    the hidden fields should have in order for this to work properly. -->
+				<xsl:apply-templates select="dri:instance" mode="hiddenInterpreter"/>                    
+              </div>
+        </xsl:if>
+
+    </xsl:template>
+    
+    <!-- Utilizo un field iterator especial pues los instances del subscription no tienen el valor, y lo tengo que sacar del list -->
+    <xsl:template name="subscriptionsSimpleFieldIterator">
+        <xsl:param name="position"/>
+        
+        <xsl:if test="dri:instance[position()=$position]">
+            <xsl:variable name="authValue" select="substring-before(dri:instance[position()=$position]/dri:value[@type='authority'], '#')"/>            
+            <xsl:variable name="authLabel" select="substring-after(dri:instance[position()=$position]/dri:value[@type='authority'], '#')"/>
+            <xsl:variable name="valor"><xsl:value-of select="dri:instance[position()=$position]/dri:value/@option"/></xsl:variable>
+            <input type="checkbox" value="{concat(@n,'_',$position)}" name="{concat(@n,'_selected')}">
+              <xsl:copy-of select="dri:option[@returnValue=$valor]"/>
+            </input>
+             <!-- look for authority value in instance. -->
+            <xsl:if test="dri:instance[position()=$position]/dri:value[@type='authority']">             	
+              <xsl:call-template name="multipleAuthorityInputFields">
+                <xsl:with-param name="name" select="@n"/>
+      			<xsl:with-param name="position" select="$position"/>
+     			<xsl:with-param name="value" select="dri:instance[position()=$position]/dri:value"/>
+      			<xsl:with-param name="authValue" select="$authValue"/>
+      			<xsl:with-param name="authLabel" select="$authLabel"/>
+      			<xsl:with-param name="confValue" select="dri:instance[position()=$position]/dri:value[@type='authority']/@confidence"/>
+              </xsl:call-template>
+            </xsl:if>
+            <br/>
+            <xsl:call-template name="subscriptionsSimpleFieldIterator">
+                <xsl:with-param name="position"><xsl:value-of select="$position + 1"/></xsl:with-param>
+            </xsl:call-template>
+        </xsl:if>
+    </xsl:template>
+    
 
 
 </xsl:stylesheet>
