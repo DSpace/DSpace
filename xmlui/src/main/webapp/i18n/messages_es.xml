@@ -46,7 +46,7 @@
 <message key="xmlui.general.next">Siguiente</message>
 <message key="xmlui.general.untitled">Sin título</message>
 <message key="xmlui.general.perform">Realizar</message>
-<message key="xmlui.general.queue">Encolar</message>
+<message key="xmlui.general.queue">Agreagr a la cola de tareas</message>
 
 
 <!--
@@ -429,7 +429,7 @@
 <message key="xmlui.EPerson.PasswordLogin.head1">Registrarse en SeDiCI</message>
 <message key="xmlui.EPerson.PasswordLogin.title">Registrarse</message>
 <message key="xmlui.EPerson.PasswordLogin.email_address">Correo electrónico</message>
-<message key="xmlui.EPerson.PasswordLogin.error_bad_login">La dirección de correo electrónico introducida no es válida.</message>
+<message key="xmlui.EPerson.PasswordLogin.error_bad_login">La clave o la dirección de correo electrónico introducida no es válida.</message>
 <message key="xmlui.EPerson.PasswordLogin.password">Clave</message>
 <message key="xmlui.EPerson.PasswordLogin.forgot_link">¿Olvidó su contraseña?</message>
 <message key="xmlui.EPerson.PasswordLogin.submit">Iniciar sesión</message>
@@ -594,9 +594,9 @@
 
 	<!-- Same transformer, submissions section -->
 <message key="xmlui.Submission.Submissions.submit_head1">Carga de documentos</message>
-<message key="xmlui.Submission.Submissions.submit_info1a">Si desea incorporar nuevos documentos al repositorio institucional de la Universidad Nacional de La Plata, haga click en el siguiente enlace </message>
-<message key="xmlui.Submission.Submissions.submit_info1b">comenzar un envío</message>
-<message key="xmlui.Submission.Submissions.submit_info1c">. Esta función le permite añadir recursos académicos a SeDiCI con el fin de preservar y difundir la producción intelectual de la Universidad y hacer que los documentos sean libremente accesibles. El proceso de envío consiste en 3 pasos: 1) completar un formulario con información descriptiva del documento; 2) subir los archivos que lo componen y 3) seleccionar la licencia de uso que será adjuntada al documento.</message>
+<message key="xmlui.Submission.Submissions.submit_info1a">Si desea incorporar nuevos documentos al repositorio haga click en </message>
+<message key="xmlui.Submission.Submissions.submit_info1b">agregar un documento</message>
+<message key="xmlui.Submission.Submissions.submit_info1c">. Podrá cargar todos los recursos académicos que desee para que sean incluidos como parte de la producción intelectual de la UNLP, y consecuentemente preservados y difundidos de forma tal que los documentos sean libremente accesibles a perpetuidad. El proceso de carga consiste en una serie de pasos simples que no debería demandar más de unos pocos minutos.</message>
 <message key="xmlui.Submission.Submissions.submit_head2">Cargas no teminadas</message>
 <message key="xmlui.Submission.Submissions.submit_info2a">Estos son los envíos parciales de ítems que no han sido completados. Podría</message>
 <message key="xmlui.Submission.Submissions.submit_info2b">comenzar otro envío</message>
@@ -611,7 +611,7 @@
 <message key="xmlui.Submission.Submissions.submit_submit_remove">Borrar los envíos seleccionados</message>
 
 	<!-- Same transformer, inprogress section -->
-<message key="xmlui.Submission.Submissions.progress_head1">Envíos en revisión</message>
+<message key="xmlui.Submission.Submissions.progress_head1">Documentos en revisión</message>
 <message key="xmlui.Submission.Submissions.progress_info1">Estos son los envíos completados que están siendo revisados por los responsables de la colección.</message>
 <message key="xmlui.Submission.Submissions.progress_column1">Título</message>
 <message key="xmlui.Submission.Submissions.progress_column2">Colección</message>
@@ -870,9 +870,9 @@
 <message key="xmlui.administrative.Navigation.administrative_groups">Grupos</message>
 <message key="xmlui.administrative.Navigation.administrative_authorizations">Autorizaciones</message>
 <message key="xmlui.administrative.Navigation.administrative_registries">Registros</message>
-<message key="xmlui.administrative.Navigation.administrative_metadata">Metadatos</message>
-<message key="xmlui.administrative.Navigation.administrative_format">Formato</message>
-<message key="xmlui.administrative.Navigation.administrative_items">Ítems</message>
+<message key="xmlui.administrative.Navigation.administrative_metadata">Formatos de Metadatos</message>
+<message key="xmlui.administrative.Navigation.administrative_format">Formatos de Archivos</message>
+<message key="xmlui.administrative.Navigation.administrative_items">Buscar por handle</message>
 <message key="xmlui.administrative.Navigation.administrative_withdrawn">Ítems eliminados</message>
 <message key="xmlui.administrative.Navigation.administrative_control_panel">Panel de control</message>
 <message key="xmlui.administrative.Navigation.statistics">Estadísticas</message>
@@ -1201,7 +1201,7 @@
 <message key="xmlui.administrative.authorization.AuthorizationMain.bad_name">La ID que ha indicado no puede relacionarse con ningún ítem</message>
 <message key="xmlui.administrative.authorization.AuthorizationMain.actions_item_lookup">Buscar un ítem</message>
 <message key="xmlui.administrative.authorization.AuthorizationMain.search_help">Los ítems se buscan por handle o por ID interna</message>
-<message key="xmlui.administrative.authorization.AuthorizationMain.submit_find">Encontrar</message>
+<message key="xmlui.administrative.authorization.AuthorizationMain.submit_find">Buscar</message>
 <message key="xmlui.administrative.authorization.AuthorizationMain.actions_advanced">Herramienta para autorizaciones avanzadas</message>
 <message key="xmlui.administrative.authorization.AuthorizationMain.actions_advanced_link">Herramienta de administración de privilegios</message>
 <message key="xmlui.administrative.authorization.AuthorizationMain.containerList_head">Autorizaciones de comunidades/colecciones</message>
@@ -1293,8 +1293,8 @@
 <message key="xmlui.administrative.item.general.option_bitstreams">Archivos del ítem</message>
 <message key="xmlui.administrative.item.general.option_metadata">Metadatos del ítem</message>
 <message key="xmlui.administrative.item.general.option_view">Visualizar ítem</message>
-<message key="xmlui.administrative.item.general.option_curate">Curar</message>
-<message key="xmlui.administrative.item.general.option_queue">Encolar</message>
+<message key="xmlui.administrative.item.general.option_curate">Aplicar tarea</message>
+<message key="xmlui.administrative.item.general.option_queue">Agregar a la cola de tareas</message>
 
 	<!-- org.dspace.app.xmlui.administrative.item.AddBitstreamForm -->
 <message key="xmlui.administrative.item.AddBitstreamForm.title">Cargar archivo</message>
@@ -1430,11 +1430,11 @@
 
                                         
 <!-- org.dspace.app.xmlui.administrative.item.FindItemForm -->
-	<message key="xmlui.administrative.item.FindItemForm.title">Encontrar ítem</message>
-<message key="xmlui.administrative.item.FindItemForm.head1">Encontrar ítem</message>
+	<message key="xmlui.administrative.item.FindItemForm.title">Buscar ítem</message>
+<message key="xmlui.administrative.item.FindItemForm.head1">Buscar ítem</message>
 <message key="xmlui.administrative.item.FindItemForm.identifier_label">ID interna del ítem/Handle del ítem</message>
 <message key="xmlui.administrative.item.FindItemForm.identifier_error">Imposible resolver el identificador.</message>
-<message key="xmlui.administrative.item.FindItemForm.find">Encontrar</message>
+<message key="xmlui.administrative.item.FindItemForm.find">Buscar</message>
 
 <!-- org.dspace.app.xmlui.administrative.metadataimport -->
 <message key="xmlui.administrative.metadataimport.general.title">Importar Metadatos</message>
@@ -1515,11 +1515,11 @@
 
 
 	<!-- General tags for collection management -->
-	<message key="xmlui.administrative.collection.general.collection_trail">Colecciones</message>
+<message key="xmlui.administrative.collection.general.collection_trail">Colecciones</message>
 <message key="xmlui.administrative.collection.general.options_metadata">Editar metadatos</message>
 <message key="xmlui.administrative.collection.general.options_roles">Asignar roles</message>
-<message key="xmlui.administrative.collection.general.options_curate">Curar</message>
-<message key="xmlui.administrative.collection.general.options_queue">Encolar</message>
+<message key="xmlui.administrative.collection.general.options_curate">Aplicar tarea</message>
+<message key="xmlui.administrative.collection.general.options_queue">Agregar a la cola de tareas</message>
 
 	<!-- org.dspace.app.xmlui.administrative.collection.AssignCollectionRoles.java -->
 <message key="xmlui.administrative.collection.AssignCollectionRoles.title">Editar roles de la colección</message>
@@ -1674,8 +1674,8 @@
 <message key="xmlui.administrative.community.general.community_trail">Comunidades</message>
 <message key="xmlui.administrative.community.general.options_metadata">Editar metadatos</message>
 <message key="xmlui.administrative.community.general.options_roles">Asignar roles</message>
-<message key="xmlui.administrative.community.general.options_curate">Curar</message>
-<message key="xmlui.administrative.community.general.options_queue">Encolar</message>
+<message key="xmlui.administrative.community.general.options_curate">Aplicar tarea</message>
+<message key="xmlui.administrative.community.general.options_queue">Agregar a la cola de tareas</message>
     
 <message key="xmlui.administrative.community.AssignCommunityRoles.title">Editar Roles de Comunidad</message>
 <message key="xmlui.administrative.community.AssignCommunityRoles.trail">Roles</message>
@@ -1873,9 +1873,9 @@
 	
 <message key="xmlui.dri2xhtml.structural.head-subtitle">SeDiCI</message>	
 	
-<message key="xmlui.dri2xhtml.structural.profile">Perfil:</message>	
+<message key="xmlui.dri2xhtml.structural.profile">Mi Perfil</message>	
 <message key="xmlui.dri2xhtml.structural.logout">Salir</message>	
-<message key="xmlui.dri2xhtml.structural.login">Mi SeDiCI</message>	
+<message key="xmlui.dri2xhtml.structural.login">Iniciar sesión</message>	
 	
 <message key="xmlui.dri2xhtml.structural.search">Buscar en SeDiCI</message>	
 <message key="xmlui.dri2xhtml.structural.search-advanced">Búsqueda avanzada</message>	
@@ -2018,7 +2018,7 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.dri2xhtml.pioneer.author">Autor</message>
 
 	<!-- tag used to handle the empty textarea tag added 09/28/2006 -->
-<message key="xmlui.dri2xhtml.default.textarea.value"> </message>
+	<message key="xmlui.dri2xhtml.default.textarea.value"> </message>
 
 
    <message key="xmlui.ArtifactBrowser.AdvancedSearch.type_ANY">Texto completo</message>
@@ -2042,7 +2042,7 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
    <message key="xmlui.administrative.FlowCurationUtils.queue_success_notice"> La tarea fue puesta en la cola satisfactoriamente.</message>
    <message key="xmlui.administrative.FlowCurationUtils.queue_failed_notice"> La tarea no pudo ser puesta en la cola. Ocurrió un error. Para mayor información, por favor póngase en contacto con el administrador del sistema o consulte sus registros del sistema.</message>
 
-   <message key="xmlui.administrative.Navigation.administrative_curation">Tareas de preservación</message>-->
+   <message key="xmlui.administrative.Navigation.administrative_curation">Tareas de Curation</message>
    
     <message key="xmlui.administrative.item.EditBitstreamForm.name_label">Nombre:</message>
     <message key="xmlui.administrative.item.EditBitstreamForm.name_help">Renombrar. Tenga en cuenta que esto cambiará la URL, pero los enlaces viejos seguirán funcionando mientras no se cambie el ID.</message>
@@ -2066,7 +2066,7 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
     <message key="xmlui.administrative.CurateForm.title">Tareas de preservación del sistema</message>
     <message key="xmlui.administrative.CurateForm.trail">Tareas de preservación</message>
     <message key="xmlui.administrative.CurateForm.object_label_name">Handle de objeto de DSpace</message>
-    <message key="xmlui.administrative.CurateForm.object_hint">Consejo: Entre [prefijo del handle]/0 para hacer la tarea a través de todo el sitio (no todas las tareas pueden aceptar esto)</message>
+    <message key="xmlui.administrative.CurateForm.object_hint">Nota: Ingrese [prefijo del handle]/0 para aplicar la tarea a través de todo el sitio (tenga en cuenta que no todas las tareas pueden aceptar esto). Pude aplicarse a todo el sitio, a una comunidad o una colección</message>
     <message key="xmlui.administrative.CurateForm.task_label_name">Tarea</message>
     <message key="xmlui.administrative.CurateForm.taskgroup_label_name">Elija de entre los siguientes grupos</message>
     
@@ -2224,8 +2224,8 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="sedici.menuSuperior.contacto">Contacto</message>
 
 <!-- Menu lateral -->
-<message key="sedici.menuLateral.cuenta.usuario">Usuario</message>
-<message key="sedici.menuLateral.cuenta.perfil">Perfil</message>
+<message key="sedici.menuLateral.cuenta.usuario"></message>
+<message key="sedici.menuLateral.cuenta.perfil">Mi Perfil</message>
 <message key="sedici.menuLateral.cuenta.logout">Salir</message>
 <message key="sedici.menuLateral.cuenta.submissions">Carga de documentos</message>
 <message key="sedici.menuLateral.cuenta.export">Mis exportaciones</message>

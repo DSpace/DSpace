@@ -122,7 +122,7 @@
                     <div id="ds-user-box">
     				   <div id='div-menu-lateral-cuenta-superior'>
     				      <div id='div-menu-lateral-cuenta-superior-izquierdo'>
-    				      	<h1><i18n:text>sedici.menuLateral.cuenta.usuario</i18n:text></h1>
+<!--     				      	<h1><i18n:text>sedici.menuLateral.cuenta.usuario</i18n:text></h1> -->
     				      	<h2><xsl:call-template name="buildUsuarioName"/></h2>
     				      </div>
     				      <div id='div-menu-lateral-cuenta-superior-derecho'>
