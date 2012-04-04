@@ -281,7 +281,7 @@
 <message key="xmlui.ArtifactBrowser.ItemViewer.trail">Ver ítem</message>
 <message key="xmlui.ArtifactBrowser.ItemViewer.head_parent_collections">Este ítem aparece en las siguientes colecciones:</message>
 <message key="xmlui.ArtifactBrowser.ItemViewer.show_simple">Mostrar el registro sencillo del ítem</message>
-<message key="xmlui.ArtifactBrowser.ItemViewer.show_full">Mostrar metadatos</message>
+<message key="xmlui.ArtifactBrowser.ItemViewer.show_full">Mostrar registro completo</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.Navigation.java -->
 	<message key="xmlui.ArtifactBrowser.Navigation.head_browse">Exploración</message>

@@ -63,6 +63,15 @@
 	            </xsl:otherwise>
 	        </xsl:choose>
 		</div>
+
+		<xsl:if test="$ds_item_view_toggle_url != ''">
+			<div id="view-item-metadata">
+				<a>
+					<xsl:attribute name="href"><xsl:value-of select="$ds_item_view_toggle_url" /></xsl:attribute>
+					<i18n:text>xmlui.ArtifactBrowser.ItemViewer.show_full</i18n:text>
+				</a>
+			</div>
+		</xsl:if>
 		
         <!-- Generate the Creative Commons license information from the file section (DSpace deposit license hidden by default)-->
         <xsl:apply-templates select="./mets:fileSec/mets:fileGrp[@USE='CC-LICENSE']"/>
@@ -452,16 +461,6 @@
 			<xsl:with-param name="type" select="'date'"/>
 		</xsl:call-template>
 
-		<!-- Link para la vista full -->
-		<xsl:if test="$ds_item_view_toggle_url != ''">
-			<div id="view-item-metadata">
-				<a>
-					<xsl:attribute name="href"><xsl:value-of select="$ds_item_view_toggle_url" /></xsl:attribute>
-					<i18n:text>xmlui.ArtifactBrowser.ItemViewer.show_full</i18n:text>
-				</a>
-			</div>
-		</xsl:if>
-			
 		<!-- status row -->
 		<xsl:if test="(dim:field[@element='status']='si' or dim:field[@element='fulltext']='si')">
 			<div id="other_attributes">
@@ -485,6 +484,9 @@
 
 		<!-- Generate the Creative Commons license information from the file section (DSpace deposit license hidden by default) -->
 		<xsl:apply-templates select="mets:fileSec/mets:fileGrp[@USE='CC-LICENSE']"/>
+		
+
+			
     </xsl:template>
 
 	<!-- Renderiza un campo con su correspondiente label (solo si hay elementos para mostrar) -->
@@ -766,6 +768,7 @@
                     </span>
                 </div>
             </div>
+
         </div>
 
 
@@ -853,3 +856,5 @@
 
 
 </xsl:stylesheet>
+
+			
