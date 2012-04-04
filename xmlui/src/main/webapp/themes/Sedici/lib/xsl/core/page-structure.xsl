@@ -389,6 +389,16 @@
 			</xsl:text>
 		</script>
         
+		<script type="text/javascript">
+			<xsl:attribute name="src">
+               <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]" />
+               <xsl:text>/themes/</xsl:text>
+               <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']" />
+               <xsl:text>/lib/js/slides.min.jquery.js</xsl:text>
+           </xsl:attribute>
+			&#160;
+		</script>
+		
     </xsl:template>
     
         <!--

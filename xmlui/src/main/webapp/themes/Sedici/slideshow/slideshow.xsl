@@ -4,54 +4,93 @@
      xmlns:dri="http://di.tamu.edu/DRI/1.0/"
      xmlns:mets="http://www.loc.gov/METS/"
      xmlns:dim="http://www.dspace.org/xmlns/dspace/dim">
-<!-- Ver http://www.queness.com/post/1450/jquery-photo-slide-show-with-slick-caption-tutorial-revisited -->
+     
 <xsl:template name='slideshow'>
 
-	<!-- Este es el codigo que deberan tocar para modificar el slideshow -->
-	<ul class="slideshow">
-	    <li>
-	    	<a>
-    			<xsl:attribute name="href">
-    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/pages/queEsSedici
+	<div id="slides">
+		<div class="slides_container">
+		
+			<div class="slide">
+				<a target="_blank">
+	    			<xsl:attribute name="href">
+	    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/pages/queEsSedici
+	    			</xsl:attribute>
+		    		<img>
+		    			<xsl:attribute name="src">
+		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img_slideshow_1.jpg
+		    			</xsl:attribute>
+		    		</img>
+				</a>
+				<div class="caption">
+					<h1>¿Qué es SeDiCI?</h1>
+					<p>SeDiCI (Servicio de Difusión de la Creación Intelectual) es el repositorio institucional central de la Universidad Nacional de La Plata.</p>
+				</div>
+			</div>
+
+			<div class="slide">
+				<a href="http://sedici.unlp.edu.ar/blog/2012/03/13/migracion-a-dspace/ ‎" target="_blank">
+		    		<img>
+		    			<xsl:attribute name="src">
+		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img_slideshow_2.jpg
+		    			</xsl:attribute>
+		    		</img>
+				</a>
+				<div class="caption">
+					<h1>Migración a DSpace</h1>
+					<p>Desde marzo de 2012, SeDiCI se encuentra funcionando sobre plataforma de software completamente nueva. Bienvenidos a SeDiCI-DSpace.</p>
+				</div>
+			</div>
+			
+			
+			<div class="slide">
+				<a href="http://sedici.unlp.edu.ar/blog/2012/03/13/libro-electron…2500-descargas/" target="_blank">
+		    		<img>
+		    			<xsl:attribute name="src">
+		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img_slideshow_3.jpg
+		    			</xsl:attribute>
+		    		</img>
+				</a>
+				<div class="caption">
+					<h1>Libro electrónico supera las 2500 descargas</h1>
+					<p>El libro electrónico Cirugía. Bases clínicas y terapéuticas editado el año pasado por SeDiCI ya superó las 2500 descargas.</p>
+				</div>
+			</div>
+			
+			
+			<div class="slide">
+				<a target="_blank">
+	    			<xsl:attribute name="href">
+	    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/pages/comoAgregarTrabajosTesistas
+	    			</xsl:attribute>
+		    		<img>
+		    			<xsl:attribute name="src">
+		    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img_slideshow_4.jpg
+		    			</xsl:attribute>
+		    		</img>
+				</a>
+				<div class="caption">
+					<h1>Depósito de tesis de posgrado</h1>
+					<p>La resolución 78/11 de la UNLP dictamina que todos los alumnos de posgrado deben depositar una copia digital de sus tesis en SeDiCI.</p>
+				</div>
+			</div>
+
+		</div>
+
+		<a href="#" class="prev">
+			<img>
+    			<xsl:attribute name="src">
+    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/arrow-prev.png
     			</xsl:attribute>
-	    		<img title="¿Qué es SeDiCI?" alt="SeDiCI (Servicio de Difusión de la Creación Intelectual) es el repositorio institucional central de la Universidad Nacional de La Plata.">
-	    			<xsl:attribute name="src">
-	    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img_slideshow_1.jpg
-	    			</xsl:attribute>
-	    		</img>
-	    	</a>
-	    </li>
-	    <li>
-	    	<a href="#">
-	    		<img title="Migración a DSpace" alt="Desde marzo de 2012, SeDiCI se encuentra funcionando sobre plataforma de software completamente nueva. Bienvenidos a SeDiCI-DSpace.">
-	    			<xsl:attribute name="src">
-	    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img_slideshow_2.jpg
-	    			</xsl:attribute>
-	    		</img>
-	    	</a>
-	    </li>
-	    <li>
-	    	<a href="#">
-	    		<img title="Libro electrónico supera las 2500 descargas" alt="El libro electrónico Cirugía. Bases clínicas y terapéuticas editado el año pasado por SeDiCI ya superó las 2500 descargas.">
-	    			<xsl:attribute name="src">
-	    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img_slideshow_3.jpg
-	    			</xsl:attribute>
-	    		</img>
-	    	</a>
-	    </li>
-	    <li>
-	    	<a>
-    			<xsl:attribute name="href">
-    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/pages/comoAgregarTrabajosTesistas
+			</img>
+		</a>
+		<a href="#" class="next">
+			<img>
+    			<xsl:attribute name="src">
+    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/arrow-next.png
     			</xsl:attribute>
-	    		<img title="Depósito de tesis de posgrado" alt="La resolución 78/11 de la UNLP dictamina que todos los alumnos de posgrado deben depositar una copia digital de sus tesis en SeDiCI.">
-	    			<xsl:attribute name="src">
-	    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img_slideshow_4.jpg
-	    			</xsl:attribute>
-	    		</img>
-	    	</a>
-	    </li>
-	</ul>
+			</img>
+		</a>		
+	</div>
 
 </xsl:template>
 

@@ -1,60 +1,114 @@
-ul.slideshow {
-   list-style:none;
-   width:700px;
-   height:300px;
-   overflow:hidden;
-   position:relative;
-   margin:0;
-   padding:0;
+/*
+	Slideshow
+*/
 
+#slides {
+	top:15px;
+	left:4px;
+	z-index:100;
 }
 
-ul.slideshow li {
-   position:absolute;
-   left:0;
-   right:0;
-      border:1px solid #dedede;
+/*
+	Slides container
+	Important:
+	Set the width of your slides container
+	Set to display none, prevents content flash
+*/
+
+.slides_container {
+	width:700px;
+	overflow:hidden;
+	position:relative;
+	display:none;
 }
 
-ul.slideshow li.show {
-   z-index:500;
+/*
+	Each slide
+	Important:
+	Set the width of your slides
+	If height not specified height will be set by the slide content
+	Set to display block
+*/
+
+.slides_container div.slide {
+	width:700px;
+	height:300px;
+	display:block;
 }
 
-ul img {
-   /*border:1px solid #dedede;*/
+
+/*
+	Next/prev buttons
+*/
+
+#slides .next,#slides .prev {
+	position:absolute;
+	top:129px;
+	left:0px;
+	width:24px;
+	height:43px;
+	display:block;
+	z-index:101;
 }
 
-#slideshow-caption {
-   width:700px;
-   height:70px;
-   position:absolute;
-   bottom:0;
-   left:0;
-   color:#fff;
-  background:#000;
-  background-image:url(../../images/fondocaption.png);
-   background-position:620px;
-/*   background-image:url(../../images/aver.png);*/
-   background-repeat:no-repeat;
-   z-index:500;
+#slides .next {
+	left:676px;
 }
 
-#slideshow-caption .slideshow-caption-container {
-   padding:5px 10px;
-   z-index:1000;
+/*
+	Pagination
+*/
+
+#slides .pagination {
+	margin:-15px auto auto;
+	width:100px;
+	background: none;
 }
 
-#slideshow-caption h3 {
-   margin-top:5px;
-   padding:0;
-   font-size:15px;
-   font-weight:bold;
-   
+#slides .pagination li {
+	float:left;
+	margin:0 1px;
+	list-style:none;
 }
 
-#slideshow-caption p {
-   margin:2px 0 0 0;
-   padding:0;
-   width:600px;
-   font-size:12px;
+#slides .pagination li a {
+	display:block;
+	width:12px;
+	height:0;
+	padding-top:12px;
+	background-image:url(../../images/pagination.png);
+	background-position:0 0;
+	float:left;
+	overflow:hidden;
 }
+
+#slides .pagination li.current a {
+	background-position:0 -12px;
+}
+
+/*
+	Caption
+*/
+
+#slides .caption h1 {
+	font-size: 15px;
+	font-weight: bold;
+	color:#fff;
+}
+#slides .caption {
+	z-index:500;
+	position:absolute;
+	bottom:-35px;
+	left:0;
+	height:60px;
+	padding:5px 10px;
+	background:#000;
+	background:rgba(0,0,0,.5);
+	width:700px;
+	font-size: 12px;
+	line-height:1.4;
+	color:#fff;
+	border-top:1px solid #000;
+	text-shadow:none;
+}
+
