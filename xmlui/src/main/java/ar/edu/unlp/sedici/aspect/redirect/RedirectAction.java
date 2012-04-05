@@ -28,11 +28,13 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.avalon.framework.parameters.Parameters;
 import org.apache.cocoon.ResourceNotFoundException;
 import org.apache.cocoon.acting.AbstractAction;
+import org.apache.cocoon.environment.ForwardRedirector;
 import org.apache.cocoon.environment.ObjectModelHelper;
 import org.apache.cocoon.environment.Redirector;
 import org.apache.cocoon.environment.Request;
 import org.apache.cocoon.environment.SourceResolver;
 import org.apache.cocoon.environment.http.HttpEnvironment;
+import org.apache.cocoon.environment.http.HttpResponse;
 import org.apache.cocoon.sitemap.PatternException;
 import org.dspace.app.xmlui.utils.AuthenticationUtil;
 import org.dspace.app.xmlui.utils.ContextUtil;
@@ -207,6 +209,10 @@ public class RedirectAction extends AbstractAction
 	    		
 	    		//recupero del request el valor del parametro con nomre old_param
 	    		param_value=request.getParameter(param_old_name);
+	    		//Si no existe el parametro con ese nombre tiro una excepcion
+	    		if (param_value==null){
+	    			throw new ResourceNotFoundException("Page cannot be found", new ResourceNotFoundException("Page cannot be found"));
+	    		}
 	    		
 	    		//Transformo en caso de ser necesario el valor del parametro
 	    		type=(String)propertiesPrefijo.get(prefijo_parametro+"."+RedirectAction.TYPE); 
@@ -249,8 +255,13 @@ public class RedirectAction extends AbstractAction
 	        System.out.println(redirectURL);
 	        
 	        final HttpServletResponse httpResponse = (HttpServletResponse) objectModel.get(HttpEnvironment.HTTP_RESPONSE_OBJECT);
-	        
-	        httpResponse.sendRedirect(redirectURL);
+	        httpResponse.setStatus(HttpResponse.SC_MOVED_PERMANENTLY);
+	        httpResponse.setHeader("Location", redirectURL);
+	        httpResponse.flushBuffer();
+	        //httpResponse.setHeader("Connection", "close");
+	        //httpResponse.sendRedirect(redirectURL);
+	        //httpResponse.setStatus(301);
+	        //((ForwardRedirector)redirector).permanentRedirect(true, redirectURL);
 	        
 	        return null;
         }
