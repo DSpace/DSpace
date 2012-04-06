@@ -17,4 +17,4 @@ JARS=`echo $DSPACEDIR/lib/*.jar | sed 's/ /\:/g'`
 FULLPATH=$CLASSPATH:$JARS:$DSPACEDIR/config:$DSPACEDIR/groovy
 
 # Now invoke Groovy
-/usr/bin/groovysh -classpath $FULLPATH "$@"
+$GROOVY_HOME/bin/groovysh -classpath $FULLPATH "$@"
