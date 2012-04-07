@@ -359,10 +359,10 @@
                      <execution>
                         <inherited>false</inherited>
                         <configuration>
-                           <descriptorRefs>
-                              <descriptorRef>release</descriptorRef>
-                              <descriptorRef>src-release</descriptorRef>
-                           </descriptorRefs>
+                           <descriptors>
+                              <descriptor>src/main/assembly/release.xml</descriptor>
+                              <descriptor>src/main/assembly/src-release.xml</descriptor>
+                           </descriptors>
                            <tarLongFileMode>gnu</tarLongFileMode>
                            <finalName>dspace-${pom.version}</finalName>
                         </configuration>
@@ -372,13 +372,6 @@
                         </goals>
                      </execution>
                   </executions>
-                  <dependencies>
-                     <dependency>
-                        <groupId>org.dspace.maven.plugins</groupId>
-                        <artifactId>dspace-assembly-plugin</artifactId>
-                        <version>1.2</version>
-                     </dependency>
-                  </dependencies>
                </plugin>
             </plugins>
          </build>
