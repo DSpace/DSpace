@@ -571,9 +571,9 @@
 <message key="xmlui.Submission.Navigation.submissions">Carga de documentos</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submissions -->
-	<message key="xmlui.Submission.Submissions.title">Envíos &amp; Flujos de trabajo</message>
+	<message key="xmlui.Submission.Submissions.title">Carga de documentos</message>
 <message key="xmlui.Submission.Submissions.trail">Envíos</message>
-<message key="xmlui.Submission.Submissions.head">Envíos y tareas</message>
+<message key="xmlui.Submission.Submissions.head">Carga de documentos</message>
 <message key="xmlui.Submission.Submissions.untitled">&lt;i&gt;Sin título&lt;/i&gt;</message>
 <message key="xmlui.Submission.Submissions.email"></message>
 
@@ -702,7 +702,7 @@
 <message key="xmlui.Submission.submit.UploadStep.upload_error">Hubo un problema adjuntando su fichero.  Bien el nombre del fichero era incorrecto, o hubo un problema de red  que impidió que el fichero nos llegase correctamente, o ha adjuntado un fichero cuyo formato solo se permite para usos internos del sistema. Por favor, inténtelo de nuevo.</message>
 <message key="xmlui.Submission.submit.UploadStep.description">Descripción del fichero</message>
 <message key="xmlui.Submission.submit.UploadStep.description_help">Si lo desea, puede describir brevemente el fichero; por ejemplo,"</message>
-<message key="xmlui.Submission.submit.UploadStep.submit_upload">Adjuntar fichero y añadir otro más</message>
+<message key="xmlui.Submission.submit.UploadStep.submit_upload">Adjuntar otro archivo</message>
 <message key="xmlui.Submission.submit.UploadStep.head2">archivos adjuntados</message>
 <message key="xmlui.Submission.submit.UploadStep.column0">Primario</message>
 <message key="xmlui.Submission.submit.UploadStep.column1"></message>
@@ -2237,6 +2237,13 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.administrative.Navigation.context_edit_item_workflow">Editar Item</message>
 <message key="xmlui.discovery.ver_filtros">Ver filtros</message>
 <message key="xmlui.discovery.ocultar_filtros">Ocultar filtros</message>
+
+<message key="xmlui.forms.add">Agregar</message>
+<message key="xmlui.forms.remove_selected">Quitar seleccionados</message>
+
+<message key="xmlui.profile.subscriptions.add">Suscribir</message>
+<message key="xmlui.profile.subscriptions.remove">Anular suscripciones seleccionadas</message>
+
 
 <message key="xmlui.ArtifactBrowser.FeedbackForm.para2">Recuerde que también puede contactarse con nosotros vía email a la direccion </message>
 

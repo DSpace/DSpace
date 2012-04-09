@@ -28,7 +28,7 @@
             entering more than one value for this field. -->
         <xsl:if test="contains(dri:params/@operations,'add')">
             <!-- Add buttons should be named "submit_[field]_add" so that we can ignore errors from required fields when simply adding new values-->
-            <input type="submit" value="Add" id="{concat('submit_',@n,'_add')}" name="{concat('submit_',@n,'_add')}" class="ds-button-field ds-add-button">
+            <input type="submit"  value="xmlui.forms.add" i18n:attr="value" id="{concat('submit_',@n,'_add')}" name="{concat('submit_',@n,'_add')}" class="ds-button-field ds-add-button">
               <!-- Make invisible if we have choice-lookup popup that provides its own Add. -->
               <xsl:if test="dri:params/@choicesPresentation = 'lookup'">
                 <xsl:attribute name="style">
@@ -50,7 +50,7 @@
                     removing one or more values stored for this field. -->
                 <xsl:if test="contains(dri:params/@operations,'delete') and dri:instance">
                     <!-- Delete buttons should be named "submit_[field]_delete" so that we can ignore errors from required fields when simply removing values-->
-                    <input type="submit" value="Remove selected" name="{concat('submit_',@n,'_delete')}" class="ds-button-field ds-delete-button" />
+                    <input type="submit" value="xmlui.forms.remove_selected" i18n:attr="value" name="{concat('submit_',@n,'_delete')}" class="ds-button-field ds-delete-button" />
                 </xsl:if>
                 <!-- Behind the scenes, add hidden fields for every instance set. This is to make sure that
                     the form still submits the information in those instances, even though they are no
@@ -177,7 +177,6 @@
     
     <!-- Template especiales para la muestra de los valores en las subscripciones del perfil -->     
     <xsl:template match="dri:field[@n='subscriptions']" priority="2">
-        <div>NICO</div>
         <xsl:apply-templates select="dri:help" mode="help"/>
         <!-- Create the first field normally -->
         <xsl:apply-templates select="." mode="normalField"/>
@@ -185,13 +184,13 @@
             entering more than one value for this field. -->
         <xsl:if test="contains(dri:params/@operations,'add')">
             <!-- Add buttons should be named "submit_[field]_add" so that we can ignore errors from required fields when simply adding new values-->
-            <input type="submit" value="Add" id="{concat('submit_',@n,'_add')}" name="{concat('submit_',@n,'_add')}" class="ds-button-field ds-add-button">
+            <input type="submit" value="xmlui.profile.subscriptions.add" id="{concat('submit_',@n,'_add')}" name="{concat('submit_',@n,'_add')}" class="ds-button-field ds-add-button" i18n:attr="value">
               <!-- Make invisible if we have choice-lookup popup that provides its own Add. -->
               <xsl:if test="dri:params/@choicesPresentation = 'lookup'">
                 <xsl:attribute name="style">
                   <xsl:text>display:none;</xsl:text>
                 </xsl:attribute>
-        </xsl:if>
+        	  </xsl:if>
            </input>
         </xsl:if>
         <br/>
@@ -207,7 +206,7 @@
                     removing one or more values stored for this field. -->
                 <xsl:if test="contains(dri:params/@operations,'delete') and dri:instance">
                     <!-- Delete buttons should be named "submit_[field]_delete" so that we can ignore errors from required fields when simply removing values-->
-                    <input type="submit" value="Remove selected" name="{concat('submit_',@n,'_delete')}" class="ds-button-field ds-delete-button" />
+                    <input type="submit" value="xmlui.profile.subscriptions.remove" name="{concat('submit_',@n,'_delete')}" class="ds-button-field ds-delete-button" i18n:attr="value"/>
                 </xsl:if>
                 <!-- Behind the scenes, add hidden fields for every instance set. This is to make sure that
                     the form still submits the information in those instances, even though they are no

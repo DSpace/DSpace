@@ -2156,6 +2156,14 @@
 <message key="xmlui.administrative.item.ViewItem.title">View item</message>
 <message key="xmlui.administrative.item.ViewItem.trail">View item</message>
 
+
+<message key="xmlui.forms.add">Add</message>
+<message key="xmlui.forms.remove_selected">Remove selected</message>
+
+<message key="xmlui.profile.subscriptions.add">Add</message>
+<message key="xmlui.profile.subscriptions.remove">Remove selected</message>
+
+
 <message key="xmlui.ArtifactBrowser.FeedbackForm.para2">Remember that you can contact us via e-mail to the following adress</message>
 
 
