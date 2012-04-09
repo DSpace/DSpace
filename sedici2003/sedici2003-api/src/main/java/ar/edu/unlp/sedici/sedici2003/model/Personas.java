@@ -48,7 +48,7 @@ public class Personas {
 		return this.getApellido() + ", " + this.getNombre();
 	}
 	
-	   public static List<Personas> findPersonasesByApellidoYNombre(String apellido,String nombre, int start,int count) {
+	   public static List<Personas> findPersonasesByApellidoYNombre(String apellido, String nombre, int start,int count) {
 	       if (apellido == null || apellido.length() == 0) apellido = "";
 	       if (nombre == null) nombre = "";	   
 	        if (start < 0) start = 0;
@@ -60,7 +60,7 @@ public class Personas {
 	       String where=Personas.generateCondition(apellido, nombre); 
 
 	        EntityManager em = Personas.entityManager();
-	        TypedQuery<Personas> q = em.createQuery("SELECT o FROM Personas AS o " + where , Personas.class);
+	        TypedQuery<Personas> q = em.createQuery("SELECT o FROM Personas AS o " + where + " ORDER BY o.apellido, o.nombre", Personas.class);
 	        if (apellido.length() != 0)
 	        	q.setParameter("apellido", apellido);
 	        if (nombre.length() != 0)
@@ -100,8 +100,8 @@ public class Personas {
 private static String convertirParaQuery(String valor) {
 	if (valor.length() != 0){
 		valor = valor.replace('*', '%');
-	    if (valor.charAt(0) != '%') 
-	    	valor = "%" + valor;
+	    //if (valor.charAt(0) != '%') 
+	    //	valor = "%" + valor;
 	    if (valor.charAt(valor.length() - 1) != '%')
 	    	valor = valor + "%";
 	}
@@ -113,7 +113,7 @@ private static String convertirParaQuery(String valor) {
    private static String generateCondition(String apellido,String nombre){
 	   String where="";
        if (apellido.length() != 0){
-    	   where = "where LOWER(o.apellido) LIKE LOWER(:apellido)";
+    	   where = "WHERE LOWER(o.apellido) LIKE LOWER(:apellido)";
        }
        if (nombre.length() != 0){
 	        where += " AND LOWER(o.nombre) LIKE LOWER(:nombre)";
