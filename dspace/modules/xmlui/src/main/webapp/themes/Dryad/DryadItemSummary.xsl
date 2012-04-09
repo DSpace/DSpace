@@ -1664,7 +1664,7 @@
                     <img id="journal-logo" src="/themes/Dryad/images/coverimages/evolution.png" alt="Evolution cover"/>
                 </a>
             </xsl:when>
-            <xsl:when test='$journal-name = "Evolutionary Applications - suppress cover"'>
+            <xsl:when test='$journal-name = "Evolutionary Applications"'>
                 <a>
                     <xsl:attribute name="href">
                         <xsl:choose>
