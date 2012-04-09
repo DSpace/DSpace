@@ -56,7 +56,10 @@
 	     <div id='home_main_communities'>
 	     	<h1 class="communities_header">Navegue por nuestras colecciones</h1>
 	         <div id="icono_facultades" class="community_icon_container">
-		 		<a href="#unidades">
+		 		<a>
+		 		    <xsl:attribute name="href">
+		 		       handle/<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='home-link'][@qualifier='UnidadesAcademicas']"/>
+			 		</xsl:attribute>
 			 		<img id="community_icon_facultades" class="community_icon">
 			            <xsl:attribute name="src">
 			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
@@ -70,7 +73,10 @@
 		 	 </div>
 
 	         <div id="icono_revistas" class="community_icon_container">
-		 		<a href="#unidades">
+		 		<a>
+		 		    <xsl:attribute name="href">
+		 		    handle/<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='home-link'][@qualifier='Revistas']"/>
+			 		</xsl:attribute>
 			 		<img id="community_icon_revistas" class="community_icon">
 			            <xsl:attribute name="src">
 			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
@@ -84,7 +90,10 @@
 		 	 </div>
 
 	         <div id="icono_eventos" class="community_icon_container">
-		 		<a href="#unidades">
+		 		<a>
+		 		    <xsl:attribute name="href">
+		 		        handle/<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='home-link'][@qualifier='Eventos']"/>
+			 		</xsl:attribute>
 			 		<img id="community_icon_eventos" class="community_icon">
 			            <xsl:attribute name="src">
 			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
@@ -98,7 +107,10 @@
 		 	 </div>
 
 	         <div id="icono_libros" class="community_icon_container">
-		 		<a href="#unidades">
+		 		<a>
+			 		<xsl:attribute name="href">
+			 		handle/<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='home-link'][@qualifier='Libros']"/>
+			 		</xsl:attribute>
 			 		<img id="community_icon_libros" class="community_icon">
 			            <xsl:attribute name="src">
 			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>

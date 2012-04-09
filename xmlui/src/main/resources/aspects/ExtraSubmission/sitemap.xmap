@@ -14,6 +14,7 @@
 	<map:transformers>
 		<map:transformer name="Navigation" src="ar.edu.unlp.sedici.aspect.extraSubmission.Navigation"/>
 		<map:transformer name="AutoArchive" src="ar.edu.unlp.sedici.aspect.extraSubmission.GenerateAutoArchivePageMeta"/>
+		<map:transformer name="HomeLinks" src="ar.edu.unlp.sedici.aspect.extraSubmission.GenerateHomeLinksPageMeta"/>
 	</map:transformers>
 
     <map:matchers default="wildcard">
@@ -37,6 +38,11 @@
       <map:transform type="AutoArchive"/>
 
       <map:transform type="Navigation"/>
+      
+      <!-- Agregar los links a las comunidades en el home -->
+      <map:match pattern="">
+          <map:transform type="HomeLinks"/>
+      </map:match>
       
 
       <!-- Make sure the user is atleast logged in -->
