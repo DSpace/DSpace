@@ -42,11 +42,11 @@
         <!--Which sidebar facets are to be displayed-->
         <property name="sidebarFacets">
             <list>
-                <ref bean="sidebarFacetAuthor" />
-                <ref bean="sidebarFacetSubject" />
-                <ref bean="sidebarFacetKeywords" />
-                <ref bean="sidebarFacetDateIssued" />
                 <ref bean="sidebarFacetType" />
+                <ref bean="sidebarFacetDateIssued" />
+                <ref bean="sidebarFacetSubject" />
+                <ref bean="sidebarFacetAuthor" />
+                <ref bean="sidebarFacetKeywords" />
             </list>
         </property>
         <!--The search filters which can be used on the discovery search page-->
@@ -190,8 +190,8 @@
                 <value>sedici.subtype</value>
             </list>
         </property>
-        <property name="facetLimit" value="10"/>
-        <property name="sortOrder" value="COUNT"/>
+        <property name="facetLimit" value="20"/>
+        <property name="sortOrder" value="VALUE"/>
     </bean>
     
     <bean id="sidebarFacetLanguage" class="org.dspace.discovery.configuration.SidebarFacetConfiguration">

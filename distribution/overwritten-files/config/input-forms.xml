@@ -534,7 +534,6 @@
 					<label>Director de la Tésis</label>
 					<input-type>onebox</input-type>
 					<hint>Nombre del director de la Tésis</hint>
-					<required>Debe indicar el nombre del director de la tesis</required>
 					<type-bind>Tesis</type-bind>
 				</field>
 
