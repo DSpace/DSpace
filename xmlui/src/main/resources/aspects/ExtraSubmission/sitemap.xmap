@@ -66,7 +66,7 @@
             </map:transform>
           </map:match>
           
-          <map:match pattern="handle/*/*/workflow_edit_metadata?*">
+          <map:match pattern="handle/*/*/workflow_edit_metadata">
             <map:transform type="IncludePageMeta">
                 <map:parameter name="administrator" value="true"/>
             	<map:parameter name="javascript#1" value="lib/js/jquery-ui-1.8.15.custom.min.js"/>
@@ -114,7 +114,7 @@
             </map:transform>
           </map:match>
           
-          <map:match pattern="handle/*/*/workflow_edit_metadata?*">
+          <map:match pattern="handle/*/*/workflow_edit_metadata">
             <map:transform type="IncludePageMeta">
                 <map:parameter name="administrator" value="false"/>
                 <map:parameter name="javascript#1" value="lib/js/jquery-ui-1.8.15.custom.min.js"/>
