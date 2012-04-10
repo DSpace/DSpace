@@ -77,10 +77,10 @@ select.multiple {
     background-color: #b0d4ef;
     color: white;
     min-width: 950px;
-	background-image:url(../../images/marca_head3.png);
-	height:180px;
+	background-image:url(../../images/marca_head4.png);
+	height:110px;
 	background-repeat:no-repeat;
-	background-position: -750px -1px;
+	background-position: -750px -42px;
 /*	border-bottom: 10px solid #144961;*/
 }
 
@@ -96,13 +96,15 @@ left:120px;
 
 #ds-header-logo {
     float:left;
-    width: 272px;
-    height: 123px;
+    width: 559px;
+    height: 77px;
     margin-top: 20px;
     background-image:url(../../images/sedici_logo.png);
     background-repeat: no-repeat;
     background-color: transparent;
     margin-right: 15px;
+	position:relative;
+	left:-50px;
 }
 
 #ds-header-logo-text {
@@ -137,7 +139,7 @@ background-image:url(../../images/marca_head3.png);
 /*	background-image:url(../../images/trail.png);*/
 /*	background-position:100px -10px;*/
 	border-bottom:1px dashed #dedede;
-	background-position:-750px -180px;
+	background-position:-750px -182px;
 
 }
 
@@ -152,6 +154,7 @@ font-weight:bold;
     line-height: 138.5%;
     margin: 0;
     padding: 3px 0;
+	
 }
 
 #ds-trail li {
@@ -196,7 +199,7 @@ font-weight:bold;
 
 #ds-content-wrapper {
 background-image:url(../../images/marca_head3.png);
-background-position: -750px -212px;
+background-position: -750px -215px;
 background-repeat: no-repeat;
 }
 
@@ -274,13 +277,16 @@ background-repeat: no-repeat;
     width: 249px;
     padding-top:10px;
 background-image:url(../../images/columna_trans.png);
-background-position:top left;
+background-position:-40px top;
 background-repeat:no-repeat;
-min-height:800px;
+min-height:900px;
+/*clear:both;*/
 }
 
 #ds-options-wrapper a {
-color:#cd642f;
+/*color:#cd642f;*/
+color: #607890;
+line-height:1.5;
 }
 
 
@@ -354,7 +360,7 @@ h1.ds-option-set-head {
 /*   border-bottom: 1px solid #dedede;*/
 /*border-bottom:none;*/
     font-size: 108%;
-	color:#565656;
+	color:#607890;
 	background-image:url(../../images/fondoh1.png);
 	height:35px;
 	background-position:left -10px;
@@ -582,10 +588,14 @@ input.ds-password-field {
     margin-bottom: 5px;
     margin-top: 5px;
     font-size: 93%;
+	-moz-border-radius:9px;
+border-radius:9px;
+padding-left:10px;
 }
 
 input.ds-button-field {
 border:none;
+color: #CD642F;
 }
 
 /* IR */ 
@@ -598,7 +608,8 @@ border:none;
 #aspect_discovery_CollectionSearch_field_submit,
 #aspect_administrative_eperson_ManageEPeopleMain_field_submit_search,
 #aspect_administrative_authorization_AuthorizationMain_field_submit_edit,
-#aspect_administrative_item_FindItemForm_field_submit_find
+#aspect_administrative_item_FindItemForm_field_submit_find,
+#aspect_administrative_WithdrawnItems_field_submit
  {
 font-size:16px;
 background-image:url(../../images/lupita.png);
@@ -613,7 +624,9 @@ margin-left:8px;
 
 #aspect_artifactbrowser_ConfigurableBrowse_field_submit:hover,
 #aspect_discovery_SiteViewer_field_submit:hover,
-#aspect_discovery_SimpleSearch_field_submit:hover
+#aspect_discovery_SimpleSearch_field_submit:hover,
+#aspect_administrative_item_FindItemForm_field_submit_find:hover,
+#aspect_administrative_WithdrawnItems_field_submit:hover
 
  {
 color:#52BAE7;
@@ -627,8 +640,8 @@ textarea.ds-textarea-field,
 input.ds-text-field,
 input.ds-password-field {
     padding: 3px;
-    border: 1px solid #AAAAAA;
-}
+  	padding-left:10px;
+	}
 
 .ie6 input.ds-text-field,
 .ie6 input.ds-password-field {
@@ -747,7 +760,7 @@ li.ds-form-item.last {
 
 .ds-form-item {
 display:block;
-clear:right;
+clear:both;
 }
 
 .ds-form-label {
@@ -783,6 +796,7 @@ li.ds-form-item .ds-select-field {
 label.ds-composite-component .ds-select-field {
     margin-top: 6px;
     margin-bottom: 6px;
+
 }
 
 li.ds-form-item label.ds-composite-component.last{
@@ -797,6 +811,7 @@ li.ds-form-item label.ds-composite-component.last{
 
 .ds-form-content input.ds-button-field {
     font-size: 93%;
+	color:#949494;
 }
 
 #aspect_submission_StepTransformer_field_dc_date_issued_year,
@@ -1127,6 +1142,10 @@ color:#dedede;
 
 #aspect_artifactbrowser_CommunityBrowser_div_comunity-browser .short-description, #aspect_discovery_SiteRecentSubmissions_div_site-home .short-description {
     display: none;
+	}
+
+.short-description {
+
 }
 
 /*#aspect_artifactbrowser_SimpleSearch_div_search-results li, #aspect_discovery_SimpleSearch_div_search-results li, #aspect_artifactbrowser_AdvancedSearch_div_search-results li {
@@ -1238,7 +1257,7 @@ form.search p.ds-paragraph.button-list {
 }
 
 p.ds-paragraph {
-margin-left:0px;
+margin-left:50px;
 
 }
 
@@ -1312,6 +1331,7 @@ table.detailtable {
     margin-top: 10px;
     margin-bottom: 10px;
     border-collapse: collapse;
+	margin-left:50px;
 
 }
 
@@ -1389,7 +1409,7 @@ div.simple-item-view-description h3{
 }
 
 div.spacer{
-    height: 15px;
+    height: 40px;
 }
 
 .thumbnail-wrapper,
@@ -1397,6 +1417,10 @@ div.spacer{
 .file-link {
     float: left;
     margin-right: 5px;
+}
+
+#item-file-section div.file-metadata {
+    width: 90%;
 }
 
 .item-metadata {
@@ -1454,14 +1478,15 @@ h2.ds-div-head
  {
     margin-top: 30px;
 /*    border-bottom:1px solid #D8E8EB;*/
-background-image:url(../../images/libritos_chicos.png);
+/*background-image:url(../../images/libritos_chicos.png);*/
 background-repeat:no-repeat;
-padding-left:25px;
+/*padding-left:25px;*/
 /*border-bottom:1px solid #dedede;*/
 color:#9C4F0A;
 clear:both;
 	padding-top: 0px;
     margin-bottom: 3px;
+	text-decoration:underline;
 }
 
 .ds-logo-wrapper {
@@ -1583,11 +1608,12 @@ div
 
 #topNav { 
 	display:block; 
-	position:absolute; 
-	top:150px;
+/*	position:absolute; */
+	top:110px;
 	font: 13px Tahoma, Sans-serif; 
-	left: 80px;
-/*	background-image:url(../../images/fondo_topnav.png);*/
+	left: -30px;
+	background-image:url(../../images/marca_head4.png);
+	background-position:-750px -152px;
 /*	background-repeat:repeat-x;*/
 }
 #topNav ul { 
@@ -1709,7 +1735,7 @@ border-left:1px solid #D4EEFA;
 border-bottom:1px solid #1072a0;
 border-right:1px solid #1072a0;
 color:#1b86b4;
-    right: 0;
+    right: 0px;
     top: 10px;
     position: absolute;
 	text-align:center;
@@ -1815,6 +1841,8 @@ width: 300px;
 height:25px;
 font-size:13px;
 padding-left:10px;
+-moz-border-radius: 11px;
+border-radius: 11px;
 }
 
 /*#aspect_discovery_SiteViewer_field_query:hover {
@@ -1850,7 +1878,7 @@ margin-bottom:20px;
 background-image:url(../../images/fondoregistro.png);
 background-repeat:no-repeat;
 width:637px;
-height:130px;
+height:153px;;
 margin-top:10px;
 }
 
@@ -1859,7 +1887,9 @@ margin-top:10px;
 }
 
 #aspect_submission_Submissions_field_submit_submissions_remove,
-#aspect_administrative_eperson_ManageEPeopleMain_field_submit_delete
+#aspect_administrative_eperson_ManageEPeopleMain_field_submit_delete,
+#aspect_administrative_group_ManageGroupsMain_field_submit_delete,
+#aspect_administrative_registries_MetadataRegistryMain_field_submit_delete
  {
 background-image:url(../../images/tachito.png);
 background-repeat:no-repeat;
@@ -1871,7 +1901,9 @@ color:#6c6c6c;
 height:20px;
 }
 
-#aspect_submission_Submissions_field_submit_submissions_remove:hover, #aspect_administrative_eperson_ManageEPeopleMain_field_submit_delete:hover {
+#aspect_submission_Submissions_field_submit_submissions_remove:hover, #aspect_administrative_eperson_ManageEPeopleMain_field_submit_delete:hover,
+#aspect_administrative_group_ManageGroupsMain_field_submit_delete:hover,
+#aspect_administrative_registries_MetadataRegistryMain_field_submit_delete:hover {
 color:#b95151;
 background-image:url(../../images/tachito_hover.png);
 
@@ -1906,7 +1938,9 @@ border-right:1px solid #dedede;
 #aspect_eperson_PasswordLogin_field_submit,
 #aspect_discovery_SimpleSearch_field_submit_sort,
 #aspect_artifactbrowser_ConfigurableBrowse_field_update,
-#aspect_administrative_community_CreateCommunityForm_field_submit_save
+#aspect_administrative_community_CreateCommunityForm_field_submit_save,
+#aspect_administrative_WithdrawnItems_field_update,
+#aspect_administrative_group_DeleteGroupsConfirm_field_submit_confirm
 
  {
 margin-top:10px;
@@ -1920,7 +1954,9 @@ background-color:white;
 #aspect_eperson_PasswordLogin_field_submit:hover,
 #aspect_discovery_SimpleSearch_field_submit_sort:hover,
 #aspect_artifactbrowser_ConfigurableBrowse_field_update:hover,
-#aspect_administrative_community_CreateCommunityForm_field_submit_save:hover
+#aspect_administrative_community_CreateCommunityForm_field_submit_save:hover,
+#aspect_administrative_WithdrawnItems_field_update:hover,
+#aspect_administrative_group_DeleteGroupsConfirm_field_submit_confirm:hover
 {
 margin-top:10px;
 background-image:url(../../images/ok.png);
@@ -1950,7 +1986,8 @@ background-color:white;
 }
 
 
-#aspect_administrative_community_CreateCommunityForm_field_submit_cancel
+#aspect_administrative_community_CreateCommunityForm_field_submit_cancel,
+#aspect_administrative_group_DeleteGroupsConfirm_field_submit_cancel
  {
 margin-top:10px;
 background-image:url(../../images/cancel_gris.png);
@@ -1958,15 +1995,17 @@ padding-left:20px;
 background-repeat:no-repeat;
 color: #949494;
 background-color:white;
+background-position:0px;
 }
 
-#aspect_administrative_community_CreateCommunityForm_field_submit_cancel:hover
+#aspect_administrative_community_CreateCommunityForm_field_submit_cancel:hover,
+#aspect_administrative_group_DeleteGroupsConfirm_field_submit_cancel:hover
 {
 margin-top:10px;
 background-image:url(../../images/cancel.png);
 padding-left:20px;
 background-repeat:no-repeat;
-color: red;
+color: #e33b2b;
 background-color:white;
 }
 
@@ -1995,9 +2034,10 @@ margin-left:8px;
 }
 
 .ds-add-button:hover {
-color:#8cb063;
+color:#87a06e;
 background-color:none;
 background-image:url(../../images/add_verde.png);
+
 }
 
 .logo {
@@ -2005,8 +2045,8 @@ width:100%;
 float:left;
 /*   border-right: 1px solid grey;*/
     float: left;
-    margin-right: 10px;
-    padding-right: 10px;
+/*    margin-right: 10px;
+    padding-right: 10px;*/
     position: relative;
     right: 10px;
     width: 100%;
@@ -2108,6 +2148,7 @@ padding: 0px 4px 0px 4px;
 #aspect_artifactbrowser_CollectionViewer_list_collection-browse{
 background-color:white;
 position:relative;
+left:150px;
 /*
 height:50px;
 background-image:url(../../images/fondo_bandita3.png);
@@ -2118,7 +2159,9 @@ padding:3px 0px;
 top:-2px;
 left:80px;*/
 margin: 0auto;
-width:440px;
+border-top:1px dashed #dedede;
+width:380px;
+right:40px;
 /*left:100px;*/
 
 }
@@ -2130,13 +2173,14 @@ width:440px;
 display:inline;
 margin-left:5px;
 position:relative;
-left: -80px;
+/*left: -80px;*/
 }
 
 #aspect_artifactbrowser_CommunityViewer_list_community-browse a:hover,
 #aspect_artifactbrowser_CollectionViewer_list_collection-browse a:hover{
 display:inline;
 text-decoration:none;
+text-decoration:underline;
 color:#0c3e4d;
 /*background-color:#0a8eb7;*/
 
@@ -2221,7 +2265,8 @@ background-position:top center;
 padding-bottom:5px;
 }
 
-#aspect_artifactbrowser_ConfigurableBrowse_list_jump-list {
+#aspect_artifactbrowser_ConfigurableBrowse_list_jump-list,
+#aspect_administrative_WithdrawnItems_list_jump-list {
 width:100%;
 padding:8px;
 margin-left:0PX;
@@ -2230,7 +2275,8 @@ text-align:center;
 margin-bottom:10px;
 }
 
-#aspect_artifactbrowser_ConfigurableBrowse_list_jump-list a{
+#aspect_artifactbrowser_ConfigurableBrowse_list_jump-list a,
+#aspect_administrative_WithdrawnItems_list_jump-list a{
 text-decoration:none;
 /*background-color:#94d2f1;*/
 padding:5px;
@@ -2239,12 +2285,22 @@ display:inline;
 color:#0b4d6c;
 }
 
-#aspect_artifactbrowser_ConfigurableBrowse_list_jump-list a:hover{
+#aspect_artifactbrowser_ConfigurableBrowse_list_jump-list a:hover,
+#aspect_administrative_WithdrawnItems_list_jump-list a:hover{
 background-color:#a9d0e2;
 }
 
 #aspect_artifactbrowser_ConfigurableBrowse_div_browse-controls {
 background-color:white;
+}
+
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-controls p.ds-paragraph
+{margin-left:0px;
+text-align:left;
+}
+
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-navigation p.ds-paragraph{
+margin-left:0px;
 }
 
 tr:nth-child(2n+1) {
@@ -2261,7 +2317,8 @@ color:#85878c;
 }
 
 tr:nth-child(2n+1) a {
-color:#85878c;
+/*color:#85878c;*/
+color:white;
 }
 
 tr a:hover {
@@ -2269,6 +2326,12 @@ text-decoration:none;
 color:black;
 }
 
+.ds-table-header-cell {
+/*color:red;*/
+}
+.ds-table-header-row {
+color:green;
+}
 
 #aspect_artifactbrowser_ConfigurableBrowse_table_browse-by-subject-results {
 margin:0 auto;
@@ -2313,6 +2376,7 @@ clear:right;
 
 .artifact-title a:hover {
 color:#4e5a66;
+text-decoration:underline;
 }
 
 .publisher-date {
@@ -2354,7 +2418,7 @@ width:550px;
 border-top:1px solid #dedede;
 padding-top:10px;
 /**/
-  bottom: 130px;
+  bottom: 70px;
     float: left;
     left: 155px;
     position: relative;
@@ -2419,7 +2483,7 @@ background-position:right center;
 background-repeat:no-repeat;
 background-color:white;
 */
-height:150px;
+
 border:none;
 
 }
@@ -2429,7 +2493,6 @@ border:none;
 background-image:url(../../images/fondo_depositos.png);
 background-position:right top;
 background-repeat:no-repeat;
-height:150px;
 background-color:white;
 border:none;
 }
@@ -2452,7 +2515,7 @@ margin: 0px;
 
 #aspect_submission_Submissions_div_start-submision p.ds-paragraph {
 margin:0px 200px 0px 0px;
-line-height:2;
+/*line-height:2;*/
 
 }
 
@@ -2499,7 +2562,7 @@ font-size:14px;
 
 #home_feed ul,
 #home_envios_recientes ul{
-list-style-type:circle;
+list-style-type:none;
 
 }
 
@@ -2517,7 +2580,8 @@ display:none;
 }
 
 #home_search p.ds-paragraph{
-padding-top:10px;
+padding-top:5.intro-text
+px;
 margin:0px;
 font-family:trebuchet;
 }
@@ -2527,11 +2591,15 @@ padding:0px;
 margin:0px;
 line-height:1.5;
 text-align:justify;
+position:relative;
+bottom:25px;
 } 
 
 #footercol1 {
 float:left;
-width:380px;
+width:33%;
+margin-right:10px;
+/*width:380px;*/
 font-size:12px;
 }
 
@@ -2556,6 +2624,8 @@ float:left;
 .datos_unlp {
 padding-left:10px;
 float:left;
+font-size:11px;
+margin: 6px 0px 0px 0px;
 }
 
 .datos_unlp a {
@@ -2701,6 +2771,11 @@ span.ds-dc_contributor_author-authority {
 	float: right;
 	clear: both;
 }
+
+#view-item-metadata a {
+margin-right:9px;
+}
+
 .item-summary-view-metadata #other_attributes ul {
 	list-style: circle;
 }
@@ -2799,14 +2874,18 @@ top:20px;
 
 #aspect_discovery_SimpleSearch_item_search-filter-list {
 position:relative;
-bottom:30px;
-border:1px dashed #C0C0C0;
+/*bottom:30px;*/
+/*border:1px dashed #C0C0C0;*/
 padding-left:20px;
+padding-top: 20px;
+background-image:url(../../images/fondo_agregar.png);
+background-repeat:no-repeat;
+background-position:center top;
 }
 
 
 #home_main_communities {
-	margin: 30px 0px 60px 0px; 
+	margin: 0px 0px 60px 0px; 
 	height: 110px
 }
 
