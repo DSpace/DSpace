@@ -57,8 +57,8 @@ install_vhost()
 	sudo service apache2 restart
 	
 	if (! resolveip -s "dspace.localhost") ; then
-                su -c "echo '   127.0.0.1 dspace.localhost' >> /etc/hosts"
-#		sudo echo " 127.0.0.1 dspace.localhost" >> /etc/hosts
+ 
+        echo '127.0.0.1 dspace.localhost' | sudo tee --append /etc/hosts
 	fi
 	
 	if [ -d "$CATALINA_HOME" ] ; then
