@@ -363,7 +363,7 @@
 	<!-- org.dspace.app.xmlui.eperson.CannotRegister.java -->
 <message key="xmlui.EPerson.CannotRegister.title">Registro no disponible</message>
 <message key="xmlui.EPerson.CannotRegister.head">Registro no disponible</message>
-<message key="xmlui.EPerson.CannotRegister.para1">La configuración de este repositorio SeDiCI no permite registro en este contexto. Por favor, contacte con el &lt;a href="../contact"&gt;administrador&lt;/a&gt;.</message>
+<message key="xmlui.EPerson.CannotRegister.para1">La configuración de este repositorio SeDiCI no permite registro en este contexto. Por favor, contacte con el <a href="../contact">administrador</a>.</message>
 
 
 	<!-- org.dspace.app.xmlui.eperson.EditProfile.java -->
@@ -574,7 +574,7 @@
 	<message key="xmlui.Submission.Submissions.title">Carga de documentos</message>
 <message key="xmlui.Submission.Submissions.trail">Envíos</message>
 <message key="xmlui.Submission.Submissions.head">Carga de documentos</message>
-<message key="xmlui.Submission.Submissions.untitled">&lt;i&gt;Sin título&lt;/i&gt;</message>
+<message key="xmlui.Submission.Submissions.untitled"><i>Sin título</i></message>
 <message key="xmlui.Submission.Submissions.email"></message>
 
 	<!-- Same transformer, workflow section -->
@@ -671,7 +671,7 @@
 <message key="xmlui.Submission.submit.InitialQuestionsStep.open_set">(</message>
 <message key="xmlui.Submission.submit.InitialQuestionsStep.close_set">)</message>
 <message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles">Múltiples títulos</message>
-<message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles_help">El ítem tiene más de un título, &lt;i&gt;p.e. un título traducido&lt;/i&gt;</message>
+<message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles_help">El ítem tiene más de un título, <i>p.e. un título traducido</i></message>
 <message key="xmlui.Submission.submit.InitialQuestionsStep.multiple_titles_note">Si la casilla contigua está desmarcada, entonces el título(s) será eliminado del ítem:</message>
 <message key="xmlui.Submission.submit.InitialQuestionsStep.published_before">Publicado</message>
 <message key="xmlui.Submission.submit.InitialQuestionsStep.published_before_help">El ítem ha sido publicado o públicamente distribuido antes</message>
@@ -685,8 +685,8 @@
 	<message key="xmlui.Submission.submit.DescribeStep.head">Descripción del ítem</message>
 <message key="xmlui.Submission.submit.DescribeStep.unknown_field">Error: Tipo de campo desconocido</message>
 <message key="xmlui.Submission.submit.DescribeStep.required_field">El campo es requerido</message>
-<message key="xmlui.Submission.submit.DescribeStep.last_name_help">Apellido, &lt;i&gt;p.e. Pérez&lt;/i&gt;</message>
-<message key="xmlui.Submission.submit.DescribeStep.first_name_help">Nombre(s) + "", &lt;i&gt;p.e. Manuel &lt;/i&gt;</message>
+<message key="xmlui.Submission.submit.DescribeStep.last_name_help">Apellido, <i>p.e. Pérez</i></message>
+<message key="xmlui.Submission.submit.DescribeStep.first_name_help">Nombre(s) + "", <i>p.e. Manuel </i></message>
 <message key="xmlui.Submission.submit.DescribeStep.year">Año</message>
 <message key="xmlui.Submission.submit.DescribeStep.month">Mes</message>
 <message key="xmlui.Submission.submit.DescribeStep.day">Día</message>
@@ -724,14 +724,14 @@
 <message key="xmlui.Submission.submit.EditFileStep.head">Editar archivo</message>
 <message key="xmlui.Submission.submit.EditFileStep.file">Fichero</message>
 <message key="xmlui.Submission.submit.EditFileStep.description">Descripción del archivo</message>
-<message key="xmlui.Submission.submit.EditFileStep.description_help">Opcionalmente, puede indicar una descripción breve de este archivo, por ejemplo "<i>Artículo principal</i>", o "&lt;i&gt;Lectura de los datos del experimento&lt;/i&gt;".</message>
-<message key="xmlui.Submission.submit.EditFileStep.info1">Seleccione el formato del archivo de la lista, por ejemplo "&lt;i&gt;Adobe PDF&lt;/i&gt;" o "&lt;i&gt;Microsoft Word&lt;/i&gt;", &lt;b&gt;o&lt;/b&gt; si el formato no está en la lista, por favor, describa el formato del archivo en la casilla.</message>
+<message key="xmlui.Submission.submit.EditFileStep.description_help">Opcionalmente, puede indicar una descripción breve de este archivo, por ejemplo "<i>Artículo principal</i>", o "<i>Lectura de los datos del experimento</i>".</message>
+<message key="xmlui.Submission.submit.EditFileStep.info1">Seleccione el formato del archivo de la lista, por ejemplo "<i>Adobe PDF</i>" o "<i>Microsoft Word</i>", <b>o</b> si el formato no está en la lista, por favor, describa el formato del archivo en la casilla.</message>
 <message key="xmlui.Submission.submit.EditFileStep.format_detected">Formato detectado</message>i
 <message key="xmlui.Submission.submit.EditFileStep.format_selected">Seleccione formato</message>
 <message key="xmlui.Submission.submit.EditFileStep.format_default">El formato no está en la lista</message>
-<message key="xmlui.Submission.submit.EditFileStep.info2">Si el formato no está en la lista, &lt;strong&gt;seleccione "El formato no está en la lista" &lt;/strong&gt; y describa el formato del archivo en la casilla inferior.</message>
+<message key="xmlui.Submission.submit.EditFileStep.info2">Si el formato no está en la lista, <strong>seleccione "El formato no está en la lista" </strong> y describa el formato del archivo en la casilla inferior.</message>
 <message key="xmlui.Submission.submit.EditFileStep.format_user">Otro formato</message>
-<message key="xmlui.Submission.submit.EditFileStep.format_user_help">El nombre de la aplicación que utilizó para crear el archivo y la versión (por ejemplo, "&lt;i&gt;ACMESoft SuperApp versión 1.5&lt;/i&gt;").</message>
+<message key="xmlui.Submission.submit.EditFileStep.format_user_help">El nombre de la aplicación que utilizó para crear el archivo y la versión (por ejemplo, "<i>ACMESoft SuperApp versión 1.5</i>").</message>
 
 
 	<!-- org.dspace.app.xmlui.Submission.submit.ReviewStep -->
@@ -798,7 +798,7 @@
 <message key="xmlui.Submission.workflow.PerformTaskStep.approve_submit">Aprobar</message>
 <message key="xmlui.Submission.workflow.PerformTaskStep.commit_help">Una vez editado el ítem, use esta opción para actualizarlo en el archivo.</message>
 <message key="xmlui.Submission.workflow.PerformTaskStep.commit_submit">Actualizar en el archivo</message>
-<message key="xmlui.Submission.workflow.PerformTaskStep.reject_help">Si ha revisado el ítem y ha encontrado que &lt;strong&gt;no&lt;/strong&gt; es conveniente incluirlo en la colección, elija "Rechazar". Se le pedirá que explique por qué el ítem no es adecuado, y qué debe cambiar el remitente para reenviarlo.</message>
+<message key="xmlui.Submission.workflow.PerformTaskStep.reject_help">Si ha revisado el ítem y ha encontrado que <strong>no</strong> es conveniente incluirlo en la colección, elija "Rechazar". Se le pedirá que explique por qué el ítem no es adecuado, y qué debe cambiar el remitente para reenviarlo.</message>
 <message key="xmlui.Submission.workflow.PerformTaskStep.reject_submit">Rechazar</message>
 <message key="xmlui.Submission.workflow.PerformTaskStep.edit_help">Elija esta opción para corregir o editar los metadatos del ítem.</message>
 <message key="xmlui.Submission.workflow.PerformTaskStep.edit_submit">Editar metadatos</message>
@@ -1074,7 +1074,7 @@
 <message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.title">Borrar campos</message>
 <message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.trail">Borrar campos</message>
 <message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.head">Confirmar Borrado</message>
-<message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.para1">¿Está &lt;b&gt;absolutamente&lt;/b&gt; seguro/a de querer borrar estos campos? Si algún ítem contiene metadatos en estos campos, se producirá un error advirtiéndole de fallo en el borrado. Debe asegurarse de que no hay ítems en el sistema que utilicen estos campos.</message>
+<message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.para1">¿Está <b>absolutamente</b> seguro/a de querer borrar estos campos? Si algún ítem contiene metadatos en estos campos, se producirá un error advirtiéndole de fallo en el borrado. Debe asegurarse de que no hay ítems en el sistema que utilicen estos campos.</message>
 <message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.warning">AVISO:</message>
 <message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.para2">Esto producirá un error si algún ítem contiene metadatos en estos campos.</message>
 <message key="xmlui.administrative.registries.DeleteMetadataFieldsConfirm.column1">ID</message>
@@ -1086,7 +1086,7 @@
 <message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.title">Borrado del esquema</message>
 <message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.trail">Borrado del esquema</message>
 <message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.head">Confirmar borrado</message>
-<message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.para1">Está &lt;b&gt;absolutamente&lt;/b&gt; seguro/a de querer borrar este esquema? Si algún ítem contiene metadatos para estos campos contenidos en este esquema, se producirá un error advirtiéndole del fallo en el borrado. Debe asegurarse de que no hay ítems en el sistema que utilicen campos contenidos en este esquema.</message>
+<message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.para1">Está <b>absolutamente</b> seguro/a de querer borrar este esquema? Si algún ítem contiene metadatos para estos campos contenidos en este esquema, se producirá un error advirtiéndole del fallo en el borrado. Debe asegurarse de que no hay ítems en el sistema que utilicen campos contenidos en este esquema.</message>
 <message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.warning">AVISO:</message>
 <message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.para2">Esto producirá un error si algún ítem contiene metadatos en cualquiera de los campos del esquema.</message>
 <message key="xmlui.administrative.registries.DeleteMetadataSchemaConfirm.column1">ID</message>
@@ -1156,7 +1156,7 @@
 <message key="xmlui.administrative.registries.FormatRegistryMain.column3">Nombre</message>
 <message key="xmlui.administrative.registries.FormatRegistryMain.column4">Tipus MIME</message>
 <message key="xmlui.administrative.registries.FormatRegistryMain.column5">Nivel de soporte</message>
-<message key="xmlui.administrative.registries.FormatRegistryMain.internal">(&lt;i&gt;internal&lt;/i&gt;)</message>
+<message key="xmlui.administrative.registries.FormatRegistryMain.internal">(<i>internal</i>)</message>
 <message key="xmlui.administrative.registries.FormatRegistryMain.support_0">Desconocido</message>
 <message key="xmlui.administrative.registries.FormatRegistryMain.support_1">Conocido</message>
 <message key="xmlui.administrative.registries.FormatRegistryMain.support_2">Soporte</message>
@@ -1315,7 +1315,7 @@
 <message key="xmlui.administrative.item.AddBitstreamForm.file_label">Fichero</message>
 <message key="xmlui.administrative.item.AddBitstreamForm.file_help">Por favor, introduzca el nombre del archivo de su equipo local que corresponde al ítem. Si pulsa en 'Examinar...', aparecerá una nueva ventana en la que podrá localizar y seleccionar el archivo de su equipo local.</message>
 <message key="xmlui.administrative.item.AddBitstreamForm.description_label">Descripción</message>
-<message key="xmlui.administrative.item.AddBitstreamForm.description_help">Si lo desea, puede indicar una breve descripción del contenido de este archivo, por ejemplo "&lt;i&gt;Artículo principal&lt;/i&gt;", o "&lt;i&gt;Lectura de los datos del documento&lt;/i&gt;".</message>
+<message key="xmlui.administrative.item.AddBitstreamForm.description_help">Si lo desea, puede indicar una breve descripción del contenido de este archivo, por ejemplo "<i>Artículo principal</i>", o "<i>Lectura de los datos del documento</i>".</message>
 <message key="xmlui.administrative.item.AddBitstreamForm.submit_upload">Cargar</message>
 <message key="xmlui.administrative.item.AddBitstreamForm.no_bundles">Necesita los privilegios AÑADIR y ESCRIBIR  en al menos un bloque para poder cargar nuevos archivos.</message>
 
@@ -1361,13 +1361,13 @@
 <message key="xmlui.administrative.item.EditBitstreamForm.primary_option_yes">Sí</message>
 <message key="xmlui.administrative.item.EditBitstreamForm.primary_option_no">No</message>
 <message key="xmlui.administrative.item.EditBitstreamForm.description_label">Descripción</message>
-<message key="xmlui.administrative.item.EditBitstreamForm.description_help">Si lo desea, puede indicar una breve descripción del contenido de este archivo, por ejemplo "&lt;i&gt;Artículo principal&lt;/i&gt;", o "&lt;i&gt;Lectura de los datos del documento&lt;/i&gt;".</message>
-<message key="xmlui.administrative.item.EditBitstreamForm.para1">Seleccione el formato del archivo de la lista de abajo, por ejemplo "&lt;i&gt;Adobe PDF&lt;/i&gt;" o "&lt;i&gt;Microsoft Word&lt;/i&gt;", &lt;b&gt;O&lt;/b&gt; si el formato no está en la lista, por favor, describa el formato del archivo en la casilla bajo la lista.</message>
+<message key="xmlui.administrative.item.EditBitstreamForm.description_help">Si lo desea, puede indicar una breve descripción del contenido de este archivo, por ejemplo "<i>Artículo principal</i>", o "<i>Lectura de los datos del documento</i>".</message>
+<message key="xmlui.administrative.item.EditBitstreamForm.para1">Seleccione el formato del archivo de la lista de abajo, por ejemplo "<i>Adobe PDF</i>" o "<i>Microsoft Word</i>", <b>O</b> si el formato no está en la lista, por favor, describa el formato del archivo en la casilla bajo la lista.</message>
 <message key="xmlui.administrative.item.EditBitstreamForm.format_label">Formato elegido</message>
 <message key="xmlui.administrative.item.EditBitstreamForm.format_default">El formato no está en la lista</message>
-<message key="xmlui.administrative.item.EditBitstreamForm.para2">Si el formato no está en la lista, &lt;strong&gt;marque "El formato no está en la lista" &lt;/strong&gt; y describa el formato del archivo en el campo inferior.</message>
+<message key="xmlui.administrative.item.EditBitstreamForm.para2">Si el formato no está en la lista, <strong>marque "El formato no está en la lista" </strong> y describa el formato del archivo en el campo inferior.</message>
 <message key="xmlui.administrative.item.EditBitstreamForm.user_label">Otro formato</message>
-<message key="xmlui.administrative.item.EditBitstreamForm.user_help">El nombre de la aplicación que utilizó para crear el archivo, el número de versión (por ejemplo, "&lt;i&gt;ACMESoft SuperApp version 1.5&lt;/i&gt;").</message>
+<message key="xmlui.administrative.item.EditBitstreamForm.user_help">El nombre de la aplicación que utilizó para crear el archivo, el número de versión (por ejemplo, "<i>ACMESoft SuperApp version 1.5</i>").</message>
 
 	<!-- org.dspace.app.xmlui.administrative.item.EditItemBitstreamsForm -->
 <message key="xmlui.administrative.item.EditItemBitstreamsForm.title">Archivos del ítem</message>
@@ -1378,7 +1378,7 @@
 <message key="xmlui.administrative.item.EditItemBitstreamsForm.column3">Descripción</message>
 <message key="xmlui.administrative.item.EditItemBitstreamsForm.column4">Formato</message>
 <message key="xmlui.administrative.item.EditItemBitstreamsForm.column5">Ver</message>
-<message key="xmlui.administrative.item.EditItemBitstreamsForm.bundle_label">&lt;strong&gt;Bloque: {0}&lt;/strong&gt;</message>
+<message key="xmlui.administrative.item.EditItemBitstreamsForm.bundle_label"><strong>Bloque: {0}</strong></message>
 <message key="xmlui.administrative.item.EditItemBitstreamsForm.primary_label">(principal)</message>
 <message key="xmlui.administrative.item.EditItemBitstreamsForm.view_link">Ver</message>
 <message key="xmlui.administrative.item.EditItemBitstreamsForm.submit_add">Cargar un nuevo archivo</message>
@@ -1488,10 +1488,10 @@
 	<!-- org.dspace.app.xmlui.administrative.mapper.MapperMain -->
 <message key="xmlui.administrative.mapper.MapperMain.title">Relacionador de ítems</message>
 <message key="xmlui.administrative.mapper.MapperMain.head1">Relacionador de ítems - Relaciona ítems de otras colecciones</message>
-<message key="xmlui.administrative.mapper.MapperMain.para1">Colección: "&lt;strong&gt;{0}&lt;/strong&gt;"</message>
+<message key="xmlui.administrative.mapper.MapperMain.para1">Colección: "<strong>{0}</strong>"</message>
 <message key="xmlui.administrative.mapper.MapperMain.para2">Esta es la herramienta relacionadora de ítems que permite a los administradores de colecciones relacionar ítems de otras colecciones en ésta. Puede buscar ítems de otra colección y relacionarlos, o ver la lista de ítems relacionados.</message>
 <message key="xmlui.administrative.mapper.MapperMain.stat_label">Estadísticas</message>
-<message key="xmlui.administrative.mapper.MapperMain.stat_info">&lt;strong&gt;{0} de {1}&lt;/strong&gt; ítems en esta colección están relacionados con otras colecciones</message>
+<message key="xmlui.administrative.mapper.MapperMain.stat_info"><strong>{0} de {1}</strong> ítems en esta colección están relacionados con otras colecciones</message>
 <message key="xmlui.administrative.mapper.MapperMain.search_label">Buscar</message>
 <message key="xmlui.administrative.mapper.MapperMain.submit_search">Buscar ítems</message>
 <message key="xmlui.administrative.mapper.MapperMain.submit_browse">Listar ítems relacionados</message>
@@ -1553,7 +1553,7 @@
 <message key="xmlui.administrative.collection.AssignCollectionRoles.label_wf_step3">Etapa editar metadatos</message>
 <message key="xmlui.administrative.collection.AssignCollectionRoles.label_submitters">Publicadores</message>
 <message key="xmlui.administrative.collection.AssignCollectionRoles.label_default_read">Acceso a lectura por defecto</message>
-<message key="xmlui.administrative.collection.AssignCollectionRoles.sysadmins_only">&lt;nobr&gt;(Sólo para administradores de sistema)&lt;/nobr&gt;</message>
+<message key="xmlui.administrative.collection.AssignCollectionRoles.sysadmins_only"><nobr>(Sólo para administradores de sistema)</nobr></message>
 <message key="xmlui.administrative.collection.AssignCollectionRoles.not_allowed"><nobr>(No tiene permisos para configurar esto)</nobr></message>
 
 <!-- org.dspace.app.xmlui.administrative.collection.CurateCollectionForm.java -->
@@ -1600,7 +1600,7 @@
 <message key="xmlui.administrative.collection.EditCollectionMetadataForm.submit_delete_logo">Borrar logo</message>
 <message key="xmlui.administrative.collection.EditCollectionMetadataForm.submit_delete">Borrar colección</message>
 <message key="xmlui.administrative.collection.EditCollectionMetadataForm.submit_save">Guardar cambios</message>
-<message key="xmlui.administrative.collection.EditCollectionMetadataForm.sysadmins_only">&lt;nobr&gt;(sólo para administradores de sistema)&lt;/nobr&gt;</message>
+<message key="xmlui.administrative.collection.EditCollectionMetadataForm.sysadmins_only"><nobr>(sólo para administradores de sistema)</nobr></message>
 
 
 	<!-- org.dspace.app.xmlui.administrative.collection.CreateCollectionForm.java -->
@@ -1785,7 +1785,7 @@
 <message key="xmlui.administrative.ControlPanel.mail_feedback_recipient">Destinatario de sugerencias</message>
 <message key="xmlui.administrative.ControlPanel.mail_admin">Correo del administrador general</message>
 <message key="xmlui.administrative.ControlPanel.alerts_head">Sistema de alertas</message>
-<message key="xmlui.administrative.ControlPanel.alerts_warning">&lt;strong&gt;Advertencia para sistemas de balanceo de carga&lt;/strong&gt;: Las alertas globales son sólo efectivas para el nodo en el que se han activado. Necesita asegurarse de que cada nodo en el grupo recibe el comando de alerta de activación.</message>
+<message key="xmlui.administrative.ControlPanel.alerts_warning"><strong>Advertencia para sistemas de balanceo de carga</strong>: Las alertas globales son sólo efectivas para el nodo en el que se han activado. Necesita asegurarse de que cada nodo en el grupo recibe el comando de alerta de activación.</message>
 <message key="xmlui.administrative.ControlPanel.alerts_message_label">Mensaje de alerta</message>
 <message key="xmlui.administrative.ControlPanel.alerts_message_default">El sistema se apagará debido a tareas regulares de mantenimiento. Por favor, guarde su trabajo y desconéctese.</message>
 <message key="xmlui.administrative.ControlPanel.alerts_countdown_label">Cuenta atrás</message>
@@ -1818,7 +1818,7 @@
 
 
 	<!-- org.dspace.app.xmlui.administrative.SystemwideAlerts -->
-	<message key="xmlui.administrative.SystemwideAlerts.countdown">&lt;strong&gt;En {0} minutos&lt;/strong&gt;:</message>
+	<message key="xmlui.administrative.SystemwideAlerts.countdown"><strong>En {0} minutos</strong>:</message>
 
 	<!-- org.dspace.app.xmlui.administrative.NotAuthorized -->
 	<message key="xmlui.administrative.NotAuthorized.title">No autorizado</message>
@@ -1838,7 +1838,7 @@
     <message key="xmlui.statistics.title">Estadísticas</message>
 <message key="xmlui.statistics.visits.total">Número total de visitas</message>
 <message key="xmlui.statistics.visits.month">Visitas al mes</message>
-<message key="xmlui.statistics.visits.views">Visualizaciones</message>&gt;
+<message key="xmlui.statistics.visits.views">Visualizaciones</message>
 <message key="xmlui.statistics.visits.countries">Países con más visualizaciones</message>
 <message key="xmlui.statistics.visits.cities">Ciudades con más visualizaciones</message>
 <message key="xmlui.statistics.visits.bitstreams">Visitas al archivo</message>
