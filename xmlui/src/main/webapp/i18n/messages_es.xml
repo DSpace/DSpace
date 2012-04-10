@@ -695,13 +695,13 @@
 
 
 	<!-- org.dspace.app.xmlui.Submission.submit.UploadStep -->
-	<message key="xmlui.Submission.submit.UploadStep.head">Adjuntar fichero(s)</message>
+	<message key="xmlui.Submission.submit.UploadStep.head">Adjuntar archivo(s)</message>
 <message key="xmlui.Submission.submit.UploadStep.file">Fichero</message>
-<message key="xmlui.Submission.submit.UploadStep.file_help">Por favor, introduzca la ruta completa del fichero de su ordenador que corresponda con el ítem. Si pincha en "Examinar...", se abrirá una ventana que le permitirá seleccionar un fichero de su ordenador.</message>
-<message key="xmlui.Submission.submit.UploadStep.file_error">El ítem debe contener al menos un fichero.</message>
-<message key="xmlui.Submission.submit.UploadStep.upload_error">Hubo un problema adjuntando su fichero.  Bien el nombre del fichero era incorrecto, o hubo un problema de red  que impidió que el fichero nos llegase correctamente, o ha adjuntado un fichero cuyo formato solo se permite para usos internos del sistema. Por favor, inténtelo de nuevo.</message>
-<message key="xmlui.Submission.submit.UploadStep.description">Descripción del fichero</message>
-<message key="xmlui.Submission.submit.UploadStep.description_help">Si lo desea, puede describir brevemente el fichero; por ejemplo,"</message>
+<message key="xmlui.Submission.submit.UploadStep.file_help">Por favor, presione el botón "Examinar...", se abrirá una ventana que le permitirá seleccionar un archivo de su computadora que corresponda con el ítem. </message>
+<message key="xmlui.Submission.submit.UploadStep.file_error">El ítem debe contener al menos un archivo.</message>
+<message key="xmlui.Submission.submit.UploadStep.upload_error">Hubo un problema adjuntando su archivo.  Bien el nombre del archivo era incorrecto, o hubo un problema de red  que impidió que el archivo nos llegase correctamente, o ha adjuntado un archivo cuyo formato solo se permite para usos internos del sistema. Por favor, inténtelo de nuevo.</message>
+<message key="xmlui.Submission.submit.UploadStep.description">Descripción del archivo</message>
+<message key="xmlui.Submission.submit.UploadStep.description_help">Si lo desea, puede describir brevemente el archivo; por ejemplo,"</message>
 <message key="xmlui.Submission.submit.UploadStep.submit_upload">Adjuntar otro archivo</message>
 <message key="xmlui.Submission.submit.UploadStep.head2">archivos adjuntados</message>
 <message key="xmlui.Submission.submit.UploadStep.column0">Primario</message>
@@ -721,17 +721,17 @@
 <message key="xmlui.Submission.submit.UploadStep.submit_remove">Eliminar los archivos seleccionados</message>
 
 	<!-- org.dspace.app.xmlui.Submission.submit.EditFileStep -->
-<message key="xmlui.Submission.submit.EditFileStep.head">Editar fichero</message>
+<message key="xmlui.Submission.submit.EditFileStep.head">Editar archivo</message>
 <message key="xmlui.Submission.submit.EditFileStep.file">Fichero</message>
-<message key="xmlui.Submission.submit.EditFileStep.description">Descripción del fichero</message>
-<message key="xmlui.Submission.submit.EditFileStep.description_help">Opcionalmente, puede indicar una descripción breve de este fichero, por ejemplo "&lt;i&gt;Artículo principal&lt;/i&gt;", o "&lt;i&gt;Lectura de los datos del experimento&lt;/i&gt;".</message>
-<message key="xmlui.Submission.submit.EditFileStep.info1">Seleccione el formato del fichero de la lista, por ejemplo "&lt;i&gt;Adobe PDF&lt;/i&gt;" o "&lt;i&gt;Microsoft Word&lt;/i&gt;", &lt;b&gt;o&lt;/b&gt; si el formato no está en la lista, por favor, describa el formato del fichero en la casilla.</message>
-<message key="xmlui.Submission.submit.EditFileStep.format_detected">Formato detectado</message>
+<message key="xmlui.Submission.submit.EditFileStep.description">Descripción del archivo</message>
+<message key="xmlui.Submission.submit.EditFileStep.description_help">Opcionalmente, puede indicar una descripción breve de este archivo, por ejemplo "<i>Artículo principal</i>", o "&lt;i&gt;Lectura de los datos del experimento&lt;/i&gt;".</message>
+<message key="xmlui.Submission.submit.EditFileStep.info1">Seleccione el formato del archivo de la lista, por ejemplo "&lt;i&gt;Adobe PDF&lt;/i&gt;" o "&lt;i&gt;Microsoft Word&lt;/i&gt;", &lt;b&gt;o&lt;/b&gt; si el formato no está en la lista, por favor, describa el formato del archivo en la casilla.</message>
+<message key="xmlui.Submission.submit.EditFileStep.format_detected">Formato detectado</message>i
 <message key="xmlui.Submission.submit.EditFileStep.format_selected">Seleccione formato</message>
 <message key="xmlui.Submission.submit.EditFileStep.format_default">El formato no está en la lista</message>
-<message key="xmlui.Submission.submit.EditFileStep.info2">Si el formato no está en la lista, &lt;strong&gt;seleccione "El formato no está en la lista" &lt;/strong&gt; y describa el formato del fichero en la casilla inferior.</message>
+<message key="xmlui.Submission.submit.EditFileStep.info2">Si el formato no está en la lista, &lt;strong&gt;seleccione "El formato no está en la lista" &lt;/strong&gt; y describa el formato del archivo en la casilla inferior.</message>
 <message key="xmlui.Submission.submit.EditFileStep.format_user">Otro formato</message>
-<message key="xmlui.Submission.submit.EditFileStep.format_user_help">El nombre de la aplicación que utilizó para crear el fichero y la versión (por ejemplo, "&lt;i&gt;ACMESoft SuperApp versión 1.5&lt;/i&gt;").</message>
+<message key="xmlui.Submission.submit.EditFileStep.format_user_help">El nombre de la aplicación que utilizó para crear el archivo y la versión (por ejemplo, "&lt;i&gt;ACMESoft SuperApp versión 1.5&lt;/i&gt;").</message>
 
 
 	<!-- org.dspace.app.xmlui.Submission.submit.ReviewStep -->
@@ -739,7 +739,7 @@
 <message key="xmlui.Submission.submit.ReviewStep.yes">Sí</message>
 <message key="xmlui.Submission.submit.ReviewStep.no">No</message>
 <message key="xmlui.Submission.submit.ReviewStep.submit_jump">Corregir alguno</message>
-<message key="xmlui.Submission.submit.ReviewStep.submit_jump_files">Añadir o eliminar un fichero</message>
+<message key="xmlui.Submission.submit.ReviewStep.submit_jump_files">Agregar o eliminar un archivo</message>
 <message key="xmlui.Submission.submit.ReviewStep.head1">Cuestiones iniciales</message>
 <message key="xmlui.Submission.submit.ReviewStep.head2">Describir página {0}</message>
 <message key="xmlui.Submission.submit.ReviewStep.head3">archivos cargados</message>
@@ -778,8 +778,14 @@
 
 	<!-- org.dspace.app.xmlui.Submission.submit.CompletedStep -->
 <message key="xmlui.Submission.submit.CompletedStep.head">Envío completado</message>
-<message key="xmlui.Submission.submit.CompletedStep.info1">Su envío pasará por el flujo de trabajo designado para la colección a la que lo está enviando. Recibirá una notificación vía correo electrónico tan pronto como su envío forme parte de la colección, o si por alguna razón hubiera algún problema con el envío. También puede verificar el estado de su envío accediendo a la página 'Mi SeDiCI'.</message>
-<message key="xmlui.Submission.submit.CompletedStep.go_submission">Ir a la página de envíos</message>
+<message key="xmlui.Submission.submit.CompletedStep.info1">
+	Muchas gracias por su aporte. Su envío será verificado por el personal del repositorio y luego incorporado 
+	a la colección que corresponda. Una vez que se complete con la etapa de verificación, le enviaremos una 
+	notificación por correo electrónico informándole la incorporación del recurso al repositorio de la UNLP o, 
+	si hubiera algún inconveniente, los motivos que impiden la realización del depósito. También podrá verificar 
+	el estado de su envío accediendo a su <a href="../../../../submissions">sitio de usuario</a>
+</message>
+<message key="xmlui.Submission.submit.CompletedStep.go_submission">Ver todos mis documentos</message>
 <message key="xmlui.Submission.submit.CompletedStep.submit_again">Enviar otro ítem</message>
 
 	<!-- org.dspace.app.xmlui.Submission.workflow.PerformTaskStep -->
@@ -1307,9 +1313,9 @@
 <message key="xmlui.administrative.item.AddBitstreamForm.bundle.LICENSE">Licencias</message>
 <message key="xmlui.administrative.item.AddBitstreamForm.bundle.CC_LICENSE">Licencias Creative Commons</message>
 <message key="xmlui.administrative.item.AddBitstreamForm.file_label">Fichero</message>
-<message key="xmlui.administrative.item.AddBitstreamForm.file_help">Por favor, introduzca el nombre del fichero de su equipo local que corresponde al ítem. Si pulsa en 'Examinar...', aparecerá una nueva ventana en la que podrá localizar y seleccionar el fichero de su equipo local.</message>
+<message key="xmlui.administrative.item.AddBitstreamForm.file_help">Por favor, introduzca el nombre del archivo de su equipo local que corresponde al ítem. Si pulsa en 'Examinar...', aparecerá una nueva ventana en la que podrá localizar y seleccionar el archivo de su equipo local.</message>
 <message key="xmlui.administrative.item.AddBitstreamForm.description_label">Descripción</message>
-<message key="xmlui.administrative.item.AddBitstreamForm.description_help">Si lo desea, puede indicar una breve descripción del contenido de este fichero, por ejemplo "&lt;i&gt;Artículo principal&lt;/i&gt;", o "&lt;i&gt;Lectura de los datos del documento&lt;/i&gt;".</message>
+<message key="xmlui.administrative.item.AddBitstreamForm.description_help">Si lo desea, puede indicar una breve descripción del contenido de este archivo, por ejemplo "&lt;i&gt;Artículo principal&lt;/i&gt;", o "&lt;i&gt;Lectura de los datos del documento&lt;/i&gt;".</message>
 <message key="xmlui.administrative.item.AddBitstreamForm.submit_upload">Cargar</message>
 <message key="xmlui.administrative.item.AddBitstreamForm.no_bundles">Necesita los privilegios AÑADIR y ESCRIBIR  en al menos un bloque para poder cargar nuevos archivos.</message>
 
@@ -1443,8 +1449,8 @@
 <message key="xmlui.administrative.metadataimport.general.changes">cambios</message>
 <message key="xmlui.administrative.metadataimport.general.no_changes">No se detectaron cambios</message>
 <message key="xmlui.administrative.metadataimport.general.new_item">Nuevo ítem</message>
-<message key="xmlui.administrative.metadataimport.flow.upload_successful">Subida de fichero exitosa</message>
-<message key="xmlui.administrative.metadataimport.flow.upload_failed">Fallo en la subida de fichero</message>
+<message key="xmlui.administrative.metadataimport.flow.upload_successful">Subida de archivo exitosa</message>
+<message key="xmlui.administrative.metadataimport.flow.upload_failed">Fallo en la subida de archivo</message>
 <message key="xmlui.administrative.metadataimport.flow.upload_badschema">Esquema de metadatos desconocido en la cabecera</message>
 <message key="xmlui.administrative.metadataimport.flow.upload_badelement">Elemento de metadatos desconocido en la cabecera</message>
 <message key="xmlui.administrative.metadataimport.flow.import_successful">Importación exitosa</message>
@@ -1835,7 +1841,7 @@
 <message key="xmlui.statistics.visits.views">Visualizaciones</message>&gt;
 <message key="xmlui.statistics.visits.countries">Países con más visualizaciones</message>
 <message key="xmlui.statistics.visits.cities">Ciudades con más visualizaciones</message>
-<message key="xmlui.statistics.visits.bitstreams">Visitas al fichero</message>
+<message key="xmlui.statistics.visits.bitstreams">Visitas al archivo</message>
 <message key="xmlui.statistics.Navigation.title">Estadísticas</message>
 <message key="xmlui.statistics.Navigation.view">Visualizar estadísticas</message>
 <message key="xmlui.statistics.trail">Estadísticas</message>
@@ -2253,7 +2259,7 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.XMLWorkflow.default.CollectionLevelReview">Revisión Local</message>
 <message key="xmlui.XMLWorkflow.default.CollectionLevelReview.claimaction">Revisión Local</message>
 <message key="xmlui.XMLWorkflow.default.CollectionLevelReview.editaction">Revisión Local</message>
-<message key="xmlui.XMLWorkflow.default.SeDiCILevelReview">Revisión SeDiCI</message>
+<message key="xmlui.XMLWorkflow.default.SeDiCILevelReview">Revisión </message>
 <message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.claimaction">Revisión SeDiCI</message>
 <message key="xmlui.XMLWorkflow.default.SeDiCILevelReview.editaction">Revisión SeDiCI</message>
 
