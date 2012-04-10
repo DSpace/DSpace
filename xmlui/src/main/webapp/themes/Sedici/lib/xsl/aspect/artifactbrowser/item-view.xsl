@@ -433,27 +433,28 @@
 		</xsl:call-template>
 		
 		<!-- subjects row -->
-		<div id="subjects">
-			<!-- subject.materias row -->
-			<xsl:call-template name="render-normal-field">
-				<xsl:with-param name="name" select="'subject-materias'" />
-				<xsl:with-param name="elements" select="dim:field[@element='subject' and @qualifier='materias']" />
-			</xsl:call-template>
-
-			<!-- todos los descriptores (terminos de tesuaro) -->
-			<xsl:call-template name="render-normal-field">
-				<xsl:with-param name="name" select="'subject-descriptores'" />
-				<xsl:with-param name="elements" select="dim:field[(@element='subject' and @qualifier='descriptores') or (@element='subject' and @qualifier='decs') or (@element='subject' and @qualifier='eurovoc') or (@element='subject' and @qualifier='other')]" />
-			</xsl:call-template>
-
-			<!-- subject.keyword row --> 
-			<xsl:call-template name="render-normal-field">
-				<xsl:with-param name="name" select="'subject-keyword'" />
-				<xsl:with-param name="elements" select="dim:field[@element='subject' and @qualifier='keyword']" />
-			</xsl:call-template>
-
-    	</div>
-
+		<xsl:if test="dim:field[@element='subject']">
+			<div id="subjects">
+				<!-- subject.materias row -->
+				<xsl:call-template name="render-normal-field">
+					<xsl:with-param name="name" select="'subject-materias'" />
+					<xsl:with-param name="elements" select="dim:field[@element='subject' and @qualifier='materias']" />
+				</xsl:call-template>
+	
+				<!-- todos los descriptores (terminos de tesuaro) -->
+				<xsl:call-template name="render-normal-field">
+					<xsl:with-param name="name" select="'subject-descriptores'" />
+					<xsl:with-param name="elements" select="dim:field[(@element='subject' and @qualifier='descriptores') or (@element='subject' and @qualifier='decs') or (@element='subject' and @qualifier='eurovoc') or (@element='subject' and @qualifier='other')]" />
+				</xsl:call-template>
+	
+				<!-- subject.keyword row --> 
+				<xsl:call-template name="render-normal-field">
+					<xsl:with-param name="name" select="'subject-keyword'" />
+					<xsl:with-param name="elements" select="dim:field[@element='subject' and @qualifier='keyword']" />
+				</xsl:call-template>
+	
+	    	</div>
+	</xsl:if>
 		<!-- date.available row -->
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'date-available'" />
