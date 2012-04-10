@@ -25,26 +25,21 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 			Realizar <strong>autoarchivo</strong>. La ventaja de esta opción es que puede realizar el trámite 
 			completo desde la comodidad de su casa y en cualquier momento. Para ello, el tesista debe 
 			<a href="login">iniciar sesión</a> en el sitio (si aún no es usuario, puede registrarse <a href="register">aquí</a>) 
-			y luego acceder a la sección 
-			de autoarchivo. Allí, el sistema lo guiará por una serie de sencillos pasos que incluyen completar 
-			un formulario con los datos de la obra a agregar y subir el o los archivos de la misma. Luego, el 
-			autor debe completar, de puño y letra y en tinta azul, el 
-			<a href="static/resources/licencia_de_deposito.pdf" target="_blank">Acuerdo de Cesión No Exclusiva de Derechos</a>. 
-			El mismo contiene, en su segunda hoja, un recuadro, el cual debe ser firmado y sellado por la 
-			secretaría de posgrado de la unidad académica correspondiente. Si por algún motivo el tesista no 
-			puede concurrir a la secretaría pero posee una copia del acta de defensa de la tesis, donde 
-			consta la fecha de aprobación, puede escanearla y adjuntarla al acuerdo y, a los efectos del 
-			depósito, tendrá la misma validez que si hubiera sido firmado y sellado en la secretaría 
-			correspondiente. Una vez que SeDiCI recibe el material, tras chequear que todo esté en orden, 
+			y luego acceder a la sección de autoarchivo. Allí, el sistema lo guiará por una serie de sencillos 
+			pasos que incluyen completar un formulario con los datos de la obra a agregar, la aceptación de la 
+			<a href="static/resources/licencia_de_deposito.pdf" target="_blank">Licencia de Distribución No Exclusiva</a> 
+			y la elección de la licencia de uso pertinente. A los archivos de la tesis, deberá adjuntar copia del acta 
+			de defensa de la tesis escaneada, como prueba fehaciente de que la misma ha sido aprobada. 
+			Una vez que SeDiCI recibe el material, tras chequear que todo esté en orden, 
 			a la brevedad la tesis será publicada en el repositorio y el autor será debidamente notificado, 
 			además de recibir por e-mail el comprobante de depósito, indispensable para iniciar luego el 
 			trámite de su título.
 		</li>
 		<li>
-			Concurrir <strong>personalmente</strong> a las oficinas de SeDiCI y llevar una copia digital o 
-			en papel de la tesis y el Acuerdo de Cesión No Exclusiva de Derechos completado de puño y 
-			letra y en tinta azul, y firmado y sellado por la secretaría de posgrado correspondiente. 
-			También servirá, a los efectos del depósito, traer una copia del acta de defensa de la tesis. 
+			Concurrir <strong>personalmente</strong> a las oficinas de SeDiCI y 
+			llevar una copia digital o en papel de la tesis y la 
+			<a href="static/resources/licencia_de_deposito.pdf" target="_blank">Licencia de Distribución No Exclusiva</a> 
+			 completada de puño y letra en tinta azul. También servirá, a los efectos del depósito, traer una copia del acta de defensa de la tesis. 
 			Tras la recepción de los mismos, el tesista obtendrá el comprobante de depósito necesario 
 			para la obtención de su título y a la brevedad el material será publicado en el repositorio.
 		</li>

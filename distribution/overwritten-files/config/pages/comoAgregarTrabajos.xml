@@ -23,17 +23,16 @@ xmlns:i18n="http://apache.org/cocoon/i18n/2.1" version="1.1">
 			Realizar <strong>autoarchivo</strong>. La ventaja de esta opción es que puede realizar el trámite 
 			completo desde la comodidad de su casa y en cualquier momento. Para ello, el autor debe 
 			<a href="login">iniciar sesión</a> en el sitio (si aún no es usuario, puede registrarse <a href="register">aquí</a>) 
-			y luego acceder a la sección 
-			de autoarchivo. Allí, el sistema lo guiará por una serie de sencillos pasos que incluyen completar 
-			un formulario con los datos de la obra a agregar, subir el o los archivos de la misma y el 
-			<a href="static/resources/licencia_de_deposito.pdf" target="_blank">Acuerdo de Cesión No Exclusiva de Derechos</a> firmado. Una vez que SeDiCI recibe el 
-			material, tras chequear que todo esté en orden, a la brevedad será publicado en el repositorio 
-			y el autor será debidamente notificado.
+			y luego acceder a la sección de autoarchivo. Allí, el sistema lo guiará por una serie de sencillos pasos que incluyen 
+			completar un formulario con los datos de la obra a agregar, la aceptación de la 
+			 <a href="static/resources/licencia_de_deposito.pdf" target="_blank">Licencia de distribución no exclusiva</a> y la 
+			 elección de la licencia de uso pertinente. Una vez que SeDiCI recibe el material, tras chequear que todo esté en condiciones, 
+			 a la brevedad será publicado en el repositorio y el autor será debidamente notificado.
 		</li>
 		<li>
-			Concurrir <strong>personalmente</strong> a las oficinas de SeDiCI y llevar una copia digital o 
-			en papel de sus trabajos y el Acuerdo de Cesión No Exclusiva de Derechos, completado de puño y 
-			letra y en tinta azul. Tras la recepción de los mismos, a la brevedad el material será publicado 
+			Concurrir <strong>personalmente</strong> a las oficinas de SeDiCI y llevar copia digital o 
+			en papel de sus trabajos y la <a href="static/resources/licencia_de_deposito.pdf" target="_blank">Licencia de distribución no exclusiva</a>, 
+			completada de puño y letra en tinta azul. Tras la recepción de los mismos, a la brevedad el material será publicado 
 			en el repositorio.
 		</li>
 	</ul>
