@@ -57,7 +57,6 @@ install_vhost()
 	sudo service apache2 restart
 	
 	if (! resolveip -s "dspace.localhost") ; then
- 
         echo '127.0.0.1 dspace.localhost' | sudo tee --append /etc/hosts
 	fi
 	
