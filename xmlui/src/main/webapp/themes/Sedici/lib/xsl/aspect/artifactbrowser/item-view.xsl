@@ -35,7 +35,7 @@
     xmlns:fn="http://www.w3.org/2005/xpath-functions"
     exclude-result-prefixes="xalan java encoder i18n dri mets dim xlink xsl util">
 
-    <xsl:output indent="yes"/>
+    <xsl:output indent="yes" method="xhtml" />
 
     <xsl:template name="itemSummaryView-DIM">
         <!-- Generate the info about the item from the metadata section -->
