@@ -19,8 +19,7 @@ RewriteRule ^([^/]+)$ /search/request.php?id_document=%1 [NC]
 #/static/redirector.php?adress=oai/oai
 RewriteCond %{REQUEST_URI} ^/static/redirector.php$
 RewriteCond %{QUERY_STRING} adress=([^&]*).*
-RewriteRule ^.*$ /static/%1.php [R=302,L]
-
+RewriteRule ^.*$ /static/%1.php
 
 #redirecciono todo lo que es .php, static o autoarchivo
 RewriteCond %{REQUEST_URI} !redirect.php$
