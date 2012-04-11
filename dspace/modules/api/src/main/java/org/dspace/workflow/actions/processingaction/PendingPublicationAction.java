@@ -29,8 +29,8 @@ import java.sql.SQLException;
  */
 public class PendingPublicationAction extends ProcessingAction{
 
-    private static final int REVIEW_REQUIRED = 1;
-    private static final int REVIEW_NOT_REQUIRED = 0;
+    private static final int BLACKOUT_REQUIRED = 1;
+    private static final int BLACKOUT_NOT_REQUIRED = 0;
 
 
     @Override
@@ -39,9 +39,9 @@ public class PendingPublicationAction extends ProcessingAction{
     @Override
     public ActionResult execute(Context c, WorkflowItem wfi, Step step, HttpServletRequest request) throws SQLException, AuthorizeException, IOException {
         if(DryadJournalSubmissionUtils.isJournalBlackedOut(c, wfi.getItem(), wfi.getCollection()))
-            return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, REVIEW_REQUIRED);
+            return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, BLACKOUT_REQUIRED);
 
-        return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, REVIEW_NOT_REQUIRED);
+        return new ActionResult(ActionResult.TYPE.TYPE_OUTCOME, BLACKOUT_NOT_REQUIRED);
 
     }
 }
