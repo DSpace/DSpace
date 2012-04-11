@@ -2596,7 +2596,12 @@
 
 	<message key="xmlui.dri2xhtml.structural.link_cc">Creative Commons</message>
 	<message key="xmlui.dri2xhtml.structural.link_original_license">Original License</message>
-
+	<message key="xmlui.dri2xhtml.structural.footer.static.dryad-license">All text on this page is 
+		available under a <a href="http://creativecommons.org/licenses/by/3.0">CC-BY 3.0</a> license.</message>
+	<message key="xmlui.dri2xhtml.structural.footer.data.dryad-license"> Most text on this page is 
+		available under a <a href="http://creativecommons.org/publicdomain/zero/1.0/">CC-0</a> license. See <!-- <<terms of service page>> --> for details.
+	</message>
+	
 
 	<!-- DS-METS-1.0-MODS.xsl -->
 	<!-- DS-METS-1.0-DIM.xsl -->
