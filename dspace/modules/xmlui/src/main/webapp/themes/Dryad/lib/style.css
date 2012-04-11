@@ -906,6 +906,14 @@ ul#aspect_submission_StepTransformer_list_submit-progress li.last {
 	background-color:#FFFFFF;
 	border: none;
 }
+
+/* page license notice*/
+div.page-license {
+    font-size: small; 
+    text-align:left; 
+    padding-top: 15px;
+}
+
 /* last revised */
 div.lastmodified {
 	font-style: italic;
