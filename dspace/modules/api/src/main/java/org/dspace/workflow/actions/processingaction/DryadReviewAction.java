@@ -168,8 +168,7 @@ public class DryadReviewAction extends ProcessingAction {
         //add the submitter
         email.addArgument(wf.getSubmitter().getFullName() + " ("  + wf.getSubmitter().getEmail() + ")");
 
-        // June 2011 - update URL from: submission-review to review
-        //email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/submission-review?wfID=" + wf.getID() + "&token=" + key);
+	// add the review URL (with access token)
         email.addArgument(ConfigurationManager.getProperty("dspace.url") + "/review?wfID=" + wf.getID() + "&token=" + key);
 
 	// add journal's manuscript number
@@ -193,16 +192,4 @@ public class DryadReviewAction extends ProcessingAction {
         }
     }
 
-    /*
-    TODO/ finish this method once the submit_article_approve is up to date
-    private void sendApprovedEmail(Context context, EPerson e, WorkflowItem wf) throws IOException {
-        Email email = ConfigurationManager.getEmail(I18nUtil.getEmailFilename(context.getCurrentLocale(), "submit_article_approve"));
-
-        email.addRecipient(e.getEmail());
-
-        email.addArgument(wf.getItem().getName());
-
-
-    }
-    */
 }
