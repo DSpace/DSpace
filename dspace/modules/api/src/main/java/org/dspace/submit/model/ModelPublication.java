@@ -448,6 +448,8 @@ public class ModelPublication
 	{
 		// TODO: This method has very rudimentary XML parsing. It would be much better to actually run it through the Java XML parser.
 
+	    log.debug("getting data for manu " + manuscriptNumber + " from journal " + journalID + " at path " + journalPath);
+	    
 		// read data from file and add it to bean;
 		PublicationBean pbean = new PublicationBean();
 		pbean.setMetadataFromJournal(true);
