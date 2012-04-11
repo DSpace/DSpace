@@ -34,7 +34,7 @@
             <!-- Data Package Title | dc:title | doi_record/crossref/journal/journal_article/titles/title | will need to add "Data from: " to Crossref value to store correctly in Dryad  -->
             <xsl:if test="crossref/journal/journal_article/titles/title">
                 <dim:field mdschema="dc" element="title">
-                    Data from:<xsl:value-of select="crossref/journal/journal_article/titles/title"/>
+                    Data from: <xsl:value-of select="crossref/journal/journal_article/titles/title"/>
                 </dim:field>
             </xsl:if>
 
