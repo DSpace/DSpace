@@ -119,6 +119,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         // retrieve request parameters: journlaID, manuscriptNumber
         String selectedJournalId = request.getParameter("journalID");
         String manuscriptNumber = request.getParameter("manu");
+	log.debug("initializing submission UI for journal " + selectedJournalId + ", manu " + manuscriptNumber);
         PublicationBean pBean = null;
 
 
@@ -159,7 +160,7 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         // case C: (radio selected ==> Not Yet Submitted)
         //addJournalSelectStatusNotYetSubmitted(selectedJournalId, newItem);
 
-        // case D: (radio selected ==>  Not Yet Submitted)
+        // case D: (radio selected ==>  In Review)
         addJournalSelectStatusInReview(selectedJournalId, newItem, journalStatus, pBean);
 
         // Add manuscriptNumber in any case
@@ -232,14 +233,12 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         Text manuText = optionsList.addText("manu");
 
         if(manuscriptNumber != null){
-            //if(pBean!=null && (journalStatus==null || journalStatus.equals(PublicationBean.STATUS_ACCEPTED) || journalStatus.equals(PublicationBean.STATUS_IN_REVIEW))){
                 manuText.setValue(manuscriptNumber);
-            //}
         }
 
         manuText.setLabel(T_MANU_LABEL_NEW);
 
-        //Add an error message should our manuscript be invalid
+        // Add an error message in case manuscript number is invalid
         if(this.errorFlag == org.dspace.submit.step.SelectPublicationStep.ERROR_SELECT_JOURNAL){
             //Show the error coming from our bean !
             manuText.addError(String.valueOf(request.getSession().getAttribute("submit_error")));
