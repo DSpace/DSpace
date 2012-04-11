@@ -341,7 +341,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
 
 
         // test scope.
-        //printfoundItems(items);
+        printfoundItems(items);
 
 
         List<Item> result = new ArrayList<Item>();
@@ -370,7 +370,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
         }
 
         // test scope.
-        //printfoundItems(items);
+        printfoundItems(items);
 
         return items;
     }
