@@ -23,6 +23,7 @@ import org.dspace.submit.AbstractProcessingStep;
 import org.dspace.submit.bean.PublicationBean;
 import org.dspace.submit.model.ModelPublication;
 import org.xml.sax.SAXException;
+import org.apache.log4j.Logger;
 
 import java.sql.SQLException;
 import java.io.IOException;
@@ -42,6 +43,8 @@ import java.util.*;
  *
  */
 public class SelectPublicationStep extends AbstractSubmissionStep {
+    private static Logger log = Logger.getLogger(SelectPublicationStep.class);
+
     private static final Message T_HEAD = message("xmlui.submit.select.pub.head");
     private static final Message T_FORM_HEAD = message("xmlui.submit.select.pub.form_head");
     private static final Message T_PUB_HELP = message("xmlui.submit.select.pub.help");
