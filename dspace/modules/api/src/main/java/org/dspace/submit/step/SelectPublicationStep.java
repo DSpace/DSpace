@@ -88,9 +88,11 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         journalDirs.add(null);
         journalEmbargo.add(false);
 
+	// initialize settings from journal properties file
         String journalPropFile = ConfigurationManager.getProperty("submit.journal.config");
+	log.info("initializing journal settings from property file " + journalPropFile);
         Properties properties = new Properties();
-
+	
         try {
             properties.load(new FileInputStream(journalPropFile));
             String journalTypes = properties.getProperty("journal.order");
@@ -105,8 +107,6 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
                 String allowReviewWorkflow = properties.getProperty("journal." + journalType + ".allowReviewWorkflow");
 
-
-
                 journalVals.add(journalType);
                 journalNames.add(journalDisplay);
                 journalDirs.add(metadataDir);
@@ -115,7 +115,6 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
                 if(allowReviewWorkflow != null && Boolean.valueOf(allowReviewWorkflow))
                     allowReviewWorkflowJournals.add(journalType);
-
 
                 journalEmbargo.add(Boolean.valueOf(embargo));
                 journalNotifyOnReview.put(journalType, onReviewMails);
@@ -154,7 +153,8 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
 
     public int doProcessing(Context context, HttpServletRequest request, HttpServletResponse response, SubmissionInfo submissionInfo) throws ServletException, IOException, SQLException, AuthorizeException {
-
+	log.debug("processing new submission request");
+	
         try{
 
             Item item = submissionInfo.getSubmissionItem().getItem();
@@ -164,7 +164,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
             String articleStatus = request.getParameter("article_status");
             String manuscriptNumber = request.getParameter("manu");
 
-
+	    // get the journalID selected by the user in the UI
             if(articleStatus!=null){
                 if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_ACCEPTED){
                     String manuscriptNumberAcc = request.getParameter("manu-number-status-accepted");
@@ -190,7 +190,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                 return STATUS_LICENSE_NOT_ACCEPTED;
 
 
-
+	    // attempt to process a DOI or PMID entered in the UI
             if(Integer.parseInt(articleStatus)==ARTICLE_STATUS_PUBLISHED){
                 String identifier = request.getParameter("article_doi");
                 if(identifier!=null && !identifier.equals("")){
@@ -206,6 +206,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                 }
 
             }
+	    
             // ARTICLE_STATUS_ACCEPTED ||  ARTICLE_STATUS_IN_REVIEW ||  ARTICLE_STATUS_NOT_YET_SUBMITTED
             else{
                 if(!processJournal(journalID, manuscriptNumber, item, context, request, articleStatus)){
@@ -223,10 +224,17 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         return ERROR_SELECT_JOURNAL;
     }
 
-
+    /**
+       Process a DOI entered by the submitter. Use the DOI metadata to initialize publication information.
+     **/
     private boolean processDOI(Context context, Item item, String identifier){
-        if(identifier.startsWith("doi:"))
+
+	// normalize and validate the identifier
+	identifier = identifier.toLowerCase().trim();
+        if(identifier.startsWith("doi:")) {
             identifier = identifier.replaceFirst("doi:", "");
+	}
+	
         try{
             Element jElement = retrieveXML("http://api.labs.crossref.org/" + identifier + ".xml");
             if(jElement != null){
@@ -246,7 +254,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                 return true;
             }
         }catch (Exception ex){
-            ex.printStackTrace(System.out);
+            log.error("unable to process DOI metadata", ex);
             return false;
         }
         return false;
@@ -254,7 +262,19 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     }
 
 
+    /**
+       Process a PMID entered by the submitter. Use the PMID metadata to initialize publication information.
+     **/
     private boolean processPubMed(Context context, Item item, String identifier){
+
+	// normalize and validate the identifier
+	identifier = identifier.toLowerCase().trim();
+	if(identifier.startsWith("pmid")) {
+	    identifier = identifier.substring("pmid".length());
+	}
+	if(identifier.startsWith("pmid:")) {
+	    identifier = identifier.substring("pmid:".length());
+	}
         if(!isValidPubmedID(identifier)) return false;
 
         try{
@@ -273,6 +293,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                 return true;
             }
         }catch (Exception ex){
+            log.error("unable to process PMID metadata", ex);
             return false;
         }
         return false;
@@ -320,8 +341,10 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     }
 
 
-    private boolean processJournal(String journalID, String manuscriptNumber, Item item, Context context, HttpServletRequest request, String articleStatus) throws AuthorizeException, SQLException {
-
+    private boolean processJournal(String journalID, String manuscriptNumber, Item item, Context context,
+				   HttpServletRequest request, String articleStatus) throws AuthorizeException, SQLException {
+	log.debug("processing journal ID");
+	
         //We have selected to choose a journal, retrieve it
         if(!journalID.equals("other")){
             if(!integratedJournals.contains(journalID) || (integratedJournals.contains(journalID) && manuscriptNumber != null && manuscriptNumber.trim().equals(""))){
@@ -402,12 +425,13 @@ public class SelectPublicationStep extends AbstractProcessingStep {
     }
 
 
-
-
+    /**
+       Import metadata from the journal settings into the data package item. If data already exists in
+       the pBean, it will take precedence over the journal metadata.
+     **/
     private void importJournalMetadata(Context context, Item item, PublicationBean pBean){
         addSingleMetadataValueFromJournal(context, item, "journalName", pBean.getJournalName());
         addSingleMetadataValueFromJournal(context, item, "journalVolume", pBean.getJournalVolume());
-        //addSingleMetadataValueFromJournal(context, item, "fullCitation", pBean.getFullCitation());
         addSingleMetadataValueFromJournal(context, item, "title", pBean.getTitle());
         addSingleMetadataValueFromJournal(context, item, "abstract", pBean.getAbstract());
         addSingleMetadataValueFromJournal(context, item, "correspondingAuthor", pBean.getCorrespondingAuthor());
@@ -423,11 +447,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         addSingleMetadataValueFromJournal(context, item, "publisher", pBean.getPublisher());
         addSingleMetadataValueFromJournal(context, item, "manuscriptNumber", pBean.getManuscriptNumber());
         addSingleMetadataValueFromJournal(context, item, "journalID", pBean.getJournalID());
-//        if(pBean.getEmail() != null){
-//            addMultiMetadataValueFromJournal(context, item, "email", Arrays.asList(pBean.getEmail().split(",")));
-//        }
         addSingleMetadataValueFromJournal(context, item, "status", String.valueOf(pBean.isSkipReviewStep()));
-
     }
 
 
@@ -478,54 +498,7 @@ public class SelectPublicationStep extends AbstractProcessingStep {
         }
 
         return stepAccessible;
-//        return item.getMetadata(MetadataSchema.DC_SCHEMA, "relation", "ispartof", Item.ANY).length == 0;
     }
 
 
-
-    ////////// TEST ///////////////////////////////////////////
-//    public static void main(String[] args) {
-//        Element jElement = null;
-//        try {
-//            //jElement = retrieveXMLMain("http://eutils.ncbi.nlm.nih.gov/entrez/eutils/efetch.fcgi?db=pubmed&retmode=xml&id=22167771");
-//            jElement = retrieveXMLMain("http://api.labs.crossref.org/10.2307/1935157.xml");
-//            if (jElement != null) {
-//
-//                List<Element> children = jElement.getChildren();
-//                printXML(jElement);
-//
-//                if(!checkDOIXML(jElement))
-//                    System.out.println("ERROR!");
-//                else
-//                    System.out.println("OK!");
-//
-//
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
-//        }
-//
-//    }
-//
-//
-//
-//    static private Element retrieveXMLMain(String urls) throws Exception{
-//        SAXBuilder builder = new SAXBuilder();
-//        org.jdom.Document doc = builder.build(urls);
-//        return doc.getRootElement();
-//
-//    }
-//
-//    static private void printXML(Element root){
-//
-//        List<Element> children = root.getChildren();
-//         if(children.size() > 0){
-//            for(Element e : children){
-//                printXML(e);
-//            }
-//         }
-//         else{
-//             System.out.println(root.getName() + ":" + root.getValue());
-//         }
-//    }
 }
