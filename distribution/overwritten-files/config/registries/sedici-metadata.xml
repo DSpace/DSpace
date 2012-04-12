@@ -351,7 +351,7 @@
 	</dc-type>
 	<dc-type>
 		<schema>sedici</schema>
-		<element>nro_acta</element>
+		<element>acta</element>
 		<!-- sin calificar -->
 		<scope_note>Numero de acta de una tesis</scope_note>
 	</dc-type>

@@ -439,7 +439,7 @@
 				<!-- ISBN - TESIS (opcional) -->
 				<field>
 					<dc-schema>sedici</dc-schema>
-					<dc-element>nro_acta</dc-element>
+					<dc-element>acta</dc-element>
 					<label>Nro de acta</label>
 					<input-type>onebox</input-type>
 					<hint>Número de acta de aprobación de la tesis</hint>

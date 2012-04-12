@@ -280,7 +280,7 @@
 	<!-- org.dspace.app.xmlui.artifactbrowser.ItemViewer.java -->
 <message key="xmlui.ArtifactBrowser.ItemViewer.trail">Ver ítem</message>
 <message key="xmlui.ArtifactBrowser.ItemViewer.head_parent_collections">Este ítem aparece en las siguientes colecciones:</message>
-<message key="xmlui.ArtifactBrowser.ItemViewer.show_simple">Mostrar el registro sencillo del ítem</message>
+<message key="xmlui.ArtifactBrowser.ItemViewer.show_simple">Mostrar registro sencillo</message>
 <message key="xmlui.ArtifactBrowser.ItemViewer.show_full">Mostrar registro completo</message>
 
 	<!-- org.dspace.app.xmlui.artifactbrowser.Navigation.java -->
@@ -559,8 +559,8 @@
 <message key="xmlui.Submission.general.workflow.title">Envío de ítems</message>
 <message key="xmlui.Submission.general.workflow.trail">Envío de ítems</message>
 <message key="xmlui.Submission.general.workflow.head">Envío de ítems</message>
-<message key="xmlui.Submission.general.showfull">Mostrar registro COMPLETO del ítem</message>
-<message key="xmlui.Submission.general.showsimple">Mostrar registro SENCILLO del ítem</message>
+<message key="xmlui.Submission.general.showfull">Mostrar registro completo</message>
+<message key="xmlui.Submission.general.showsimple">Mostrar registro sencillo</message>
 <message key="xmlui.Submission.general.default.title">Envío</message>
 <message key="xmlui.Submission.general.default.trail">Envío</message>
 
@@ -703,7 +703,7 @@
 <message key="xmlui.Submission.submit.UploadStep.description">Descripción del archivo</message>
 <message key="xmlui.Submission.submit.UploadStep.description_help">Si lo desea, puede describir brevemente el archivo; por ejemplo,"</message>
 <message key="xmlui.Submission.submit.UploadStep.submit_upload">Adjuntar otro archivo</message>
-<message key="xmlui.Submission.submit.UploadStep.head2">archivos adjuntados</message>
+<message key="xmlui.Submission.submit.UploadStep.head2">Archivos cargados</message>
 <message key="xmlui.Submission.submit.UploadStep.column0">Primario</message>
 <message key="xmlui.Submission.submit.UploadStep.column1"></message>
 <message key="xmlui.Submission.submit.UploadStep.column2">Fichero</message>
