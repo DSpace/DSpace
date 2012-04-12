@@ -72,25 +72,24 @@ public class DryadJournalSubmissionUtils {
     public static boolean isJournalBlackedOut(Context context, Item item, Collection collection) throws SQLException {
         // get Journal
         Item dataPackage=item;
-        if(!isDataPackage(collection))
+        if(!isDataPackage(collection)) 
             dataPackage = DryadWorkflowUtils.getDataPackage(context, item);
-
-
         DCValue[] journalFullNames = dataPackage.getMetadata("prism.publicationName");
         String journalFullName=null;
         if(journalFullNames!=null && journalFullNames.length > 0){
             journalFullName=journalFullNames[0].value;
         }
 
-        // show "Publish immediately" only if publicationBlackout=false or not defined in DryadJournalSubmission.properties.
+	// get journal's blackout setting
         Map<String, String> values = journalProperties.get(journalFullName);
 
+	// journal is blacked out if its blackout setting is true or if it has no setting
         String isBlackedOut = null;
         if(values!=null && values.size()>0)
             isBlackedOut = values.get(PUBLICATION_BLACKOUT);
-        if(isBlackedOut==null || isBlackedOut.equals("false"))
-            return false;
-        return true;
+        if(isBlackedOut==null || isBlackedOut.equals("true"))
+            return true;
+        return false;
     }
 
 
