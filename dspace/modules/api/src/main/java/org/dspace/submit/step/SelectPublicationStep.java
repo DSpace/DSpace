@@ -170,9 +170,11 @@ public class SelectPublicationStep extends AbstractProcessingStep {
                     String manuscriptNumberAcc = request.getParameter("manu-number-status-accepted");
                     String manuAcc = request.getParameter("manu_acc");
                     manuscriptNumber = manuscriptNumberAcc;
-                    String journalName = request.getParameter("prism_publicationName");
+		    manuscriptNumber = manuscriptNumber.trim();
 
+                    String journalName = request.getParameter("prism_publicationName");
                     journalName=journalName.replace("*", "");
+		    journalName=journalName.trim();
                     journalID = DryadJournalSubmissionUtils.findKeyByFullname(journalName);
                     if(journalID==null) journalID=journalName;
                 }
