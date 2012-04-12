@@ -434,7 +434,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
             if (values != null && values.length > 0)
                 title = values[0].value;
 
-            log.error("item " + item.getID() + ": " + id + " - " + title);
+            log.debug("item " + item.getID() + ": " + id + " - " + title);
         }
 
     }

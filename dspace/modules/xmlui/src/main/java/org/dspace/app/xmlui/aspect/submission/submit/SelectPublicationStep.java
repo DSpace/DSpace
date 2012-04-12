@@ -331,7 +331,11 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
             if(org.dspace.submit.step.SelectPublicationStep.allowReviewWorkflowJournals.contains(val))
 
                 // select journal only if status is "In Review"
-                if(pBean!=null && (journalStatus!=null && journalStatus.equals(PublicationBean.STATUS_IN_REVIEW))){
+                if(pBean!=null && (journalStatus!=null && (journalStatus.equals(PublicationBean.STATUS_IN_REVIEW)
+                                || journalStatus.equals(PublicationBean.STATUS_SUBMITTED)
+                                 || journalStatus.equals(PublicationBean.STATUS_UNDER_REVIEW)
+                                  || journalStatus.equals(PublicationBean.STATUS_REVISION_UNDER_REVIEW)
+                                   || journalStatus.equals(PublicationBean.STATUS_REVISION_IN_REVIEW) ))){
                     journalID.addOption(val.equals(selectedJournalId), val, name);
                 }
                 else{
