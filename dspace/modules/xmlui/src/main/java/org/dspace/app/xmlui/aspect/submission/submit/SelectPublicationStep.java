@@ -217,7 +217,12 @@ public class SelectPublicationStep extends AbstractSubmissionStep {
         if(pBean!=null && (journalStatus==null || journalStatus.equals(PublicationBean.STATUS_ACCEPTED) )){
             accessRadios.setOptionSelected(org.dspace.submit.step.SelectPublicationStep.ARTICLE_STATUS_ACCEPTED);
         }
-        else if(pBean!=null && journalStatus.equals(PublicationBean.STATUS_IN_REVIEW)){
+        else if(pBean!=null && (journalStatus.equals(PublicationBean.STATUS_IN_REVIEW)
+                                || journalStatus.equals(PublicationBean.STATUS_SUBMITTED)
+                                 || journalStatus.equals(PublicationBean.STATUS_UNDER_REVIEW)
+                                  || journalStatus.equals(PublicationBean.STATUS_REVISION_UNDER_REVIEW)
+                                   || journalStatus.equals(PublicationBean.STATUS_REVISION_IN_REVIEW) )){
+
             accessRadios.setOptionSelected(org.dspace.submit.step.SelectPublicationStep.ARTICLE_STATUS_IN_REVIEW);
         }
         else{
