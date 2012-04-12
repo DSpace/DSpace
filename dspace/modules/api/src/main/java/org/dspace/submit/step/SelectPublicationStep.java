@@ -269,11 +269,17 @@ public class SelectPublicationStep extends AbstractProcessingStep {
 
 	// normalize and validate the identifier
 	identifier = identifier.toLowerCase().trim();
-	if(identifier.startsWith("pmid")) {
-	    identifier = identifier.substring("pmid".length());
+	if(identifier.startsWith("pmid: ")) {
+	    identifier = identifier.substring("pmid: ".length());
+	}
+	if(identifier.startsWith("pmid ")) {
+	    identifier = identifier.substring("pmid ".length());
 	}
 	if(identifier.startsWith("pmid:")) {
 	    identifier = identifier.substring("pmid:".length());
+	}
+	if(identifier.startsWith("pmid")) {
+	    identifier = identifier.substring("pmid".length());
 	}
         if(!isValidPubmedID(identifier)) return false;
 
