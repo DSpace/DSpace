@@ -563,12 +563,11 @@
 
 				<!-- Lugar de desarrollo de la tesis -->
 				<field>
-					<dc-schema>eprints</dc-schema>
-					<dc-element>AffiliatedInstitution</dc-element>
+					<dc-schema>sedici</dc-schema>
+					<dc-element>institucionDesarrollo</dc-element>
 					<label>Lugar de desarrollo</label>
 					<input-type>onebox</input-type>
 					<hint>Institución en donde se desarrollo el trabajo de tesis</hint>
-					<required>Debe ingresar la institución en la cual se desarrolló a cabo la tesis</required>
 					<type-bind>Tesis</type-bind>
 				</field>
 

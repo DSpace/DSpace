@@ -263,8 +263,8 @@
 
 			<!-- affiliatedInstitution row -->
 			<xsl:call-template name="render-normal-field">
-				<xsl:with-param name="name" select="'affiliated-institution'" />
-				<xsl:with-param name="elements" select="dim:field[@element='AffiliatedInstitution']" />
+				<xsl:with-param name="name" select="'institucion-desarrollo'" />
+				<xsl:with-param name="elements" select="dim:field[@element='institucionDesarrollo']" />
 			</xsl:call-template>
 	
 			<!-- degree.name row -->

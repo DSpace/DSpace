@@ -302,8 +302,8 @@
 		<scope_note>No utilizado por el momento. Handle o URL que apunta hacia otro recurso, del cual este documento es una versión</scope_note>
 	</dc-type>
 	<dc-type>
-		<schema>eprints</schema>
-		<element>AffiliatedInstitution</element>
+		<schema>sedici</schema>
+		<element>institucionDesarrollo</element>
 		<!-- sin calificar -->
 		<scope_note>Lugar de desarrollo de una tesis</scope_note>
 	</dc-type>
