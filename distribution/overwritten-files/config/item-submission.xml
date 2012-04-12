@@ -18,6 +18,7 @@
  <!-- for handle "default".                                                -->
  <submission-map>
    <name-map collection-handle="default" submission-name="traditional" />
+   <name-map collection-handle="123456789/16245" submission-name="autoarchiveSubmission" />
  </submission-map>
 
 
@@ -111,6 +112,57 @@
        <jspui-binding>org.dspace.app.webui.submit.step.JSPSampleStep</jspui-binding>
        <workflow-editable>true</workflow-editable>
      </step>
+     
+      <!--Step sediciDescribeItem will be to Describe the item.-->
+      <step id="sediciDescribeItem">
+        <heading>submit.progressbar.describe</heading>
+        <processing-class>org.dspace.submit.step.DescribeStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPDescribeStep</jspui-binding>
+		<xmlui-binding>ar.edu.unlp.sedici.aspect.extraSubmission.submit.DescribeStep</xmlui-binding>
+        <workflow-editable>true</workflow-editable>
+      </step>
+      
+      <!--Step sediciUploadItem will be to Upload the item.-->
+      <step id="sediciUploadItem">
+        <heading>submit.progressbar.upload</heading>
+        <processing-class>ar.edu.unlp.sedici.aspect.extraSubmission.submit.UploadStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPUploadStep</jspui-binding>
+		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadStep</xmlui-binding>
+        <workflow-editable>true</workflow-editable>
+      </step>
+      
+      <!--Step sediciVerifyItem will be to Verify/Review everything -->
+ 	  <step id="sediciVerifyItem">
+        <heading>submit.progressbar.verify</heading>
+        <processing-class>org.dspace.submit.step.VerifyStep</processing-class>
+ 	    <jspui-binding>org.dspace.app.webui.submit.step.JSPVerifyStep</jspui-binding>
+		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.ReviewStep</xmlui-binding>
+		<workflow-editable>true</workflow-editable>
+      </step>
+
+      <!--Step sediciCCLicense will be to select a Creative Commons License-->
+      <step id="sediciCCLicense">
+        <heading>submit.progressbar.CClicense</heading>
+        <processing-class>org.dspace.submit.step.CCLicenseStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPCCLicenseStep</jspui-binding>
+		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.CCLicenseStep</xmlui-binding>
+		<workflow-editable>false</workflow-editable>
+      </step>
+
+      <!--Step sediciSignOffLicense will be to Sign off on the License-->
+      <step id="sediciSignOffLicense">
+        <heading>submit.progressbar.license</heading>
+        <processing-class>org.dspace.submit.step.LicenseStep</processing-class>
+        <jspui-binding>org.dspace.app.webui.submit.step.JSPLicenseStep</jspui-binding>
+		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.LicenseStep</xmlui-binding>
+		<workflow-editable>false</workflow-editable>
+      </step>
+      
+      <!--Step sediciAutomaticData cagará datos fijos en el item. No tendrá interface-->
+      <step id="sediciAutomaticData">
+        <processing-class>ar.edu.unlp.sedici.aspect.extraSubmission.submit.AutomaticIssuedMetadataStep</processing-class>
+		<workflow-editable>false</workflow-editable>
+      </step> 
  </step-definitions>
 
  <!-- The submission-definitions map lays out the detailed definition of   -->
@@ -190,59 +242,45 @@
 	</step>
       
       <!--Step 2 will be to Describe the item.-->
-      <step>
-        <heading>submit.progressbar.describe</heading>
-        <processing-class>org.dspace.submit.step.DescribeStep</processing-class>
-        <jspui-binding>org.dspace.app.webui.submit.step.JSPDescribeStep</jspui-binding>
-		<xmlui-binding>ar.edu.unlp.sedici.aspect.extraSubmission.submit.DescribeStep</xmlui-binding>
-        <workflow-editable>true</workflow-editable>
-      </step>
+      <step id="sediciDescribeItem"/>
           
       <!--Step 3 will be to Upload the item-->
-      <step>
-        <heading>submit.progressbar.upload</heading>
-        <processing-class>ar.edu.unlp.sedici.aspect.extraSubmission.submit.UploadStep</processing-class>
-        <jspui-binding>org.dspace.app.webui.submit.step.JSPUploadStep</jspui-binding>
-		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.UploadStep</xmlui-binding>
-        <workflow-editable>true</workflow-editable>
-      </step>
+      <step id="sediciUploadItem"/>
      
- 	  <!--Step 4 will be to Verify/Review everything -->
- 	  <step>
-        <heading>submit.progressbar.verify</heading>
-        <processing-class>org.dspace.submit.step.VerifyStep</processing-class>
- 	    <jspui-binding>org.dspace.app.webui.submit.step.JSPVerifyStep</jspui-binding>
-		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.ReviewStep</xmlui-binding>
-		<workflow-editable>true</workflow-editable>
-      </step>
+      <!--Step 4 will be to Verify/Review everything -->
+ 	  <step id="sediciVerifyItem"/>
 
       <!--Step 5 will be to select a Creative Commons License-->
-      <!-- Uncomment this step to allow the user to select a Creative Commons license -->
-      <step>
-        <heading>submit.progressbar.CClicense</heading>
-        <processing-class>org.dspace.submit.step.CCLicenseStep</processing-class>
-        <jspui-binding>org.dspace.app.webui.submit.step.JSPCCLicenseStep</jspui-binding>
-		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.CCLicenseStep</xmlui-binding>
-		<workflow-editable>false</workflow-editable>
-      </step>
+      <step id="sediciCCLicense"/>
+      
+      <!--Step 6 cagará datos fijos en el item. No tendrá interface-->
+      <step id="sediciAutomaticData"/>
+    
+   </submission-process>
+   
+   <submission-process name="autoarchiveSubmission">
+   <step>
+		<processing-class>org.dspace.submit.step.SkipInitialQuestionsStep</processing-class>
+	</step>
+      
+      <!--Step 2 will be to Describe the item.-->
+      <step id="sediciDescribeItem"/>
+          
+      <!--Step 3 will be to Upload the item-->
+      <step id="sediciUploadItem"/>
+     
+      <!--Step 4 will be to Verify/Review everything -->
+ 	  <step id="sediciVerifyItem"/>
+
+      <!--Step 5 will be to select a Creative Commons License-->
+      <step id="sediciCCLicense"/>
 
       <!--Step 6 will be to Sign off on the License-->
-      <step>
-        <heading>submit.progressbar.license</heading>
-        <processing-class>org.dspace.submit.step.LicenseStep</processing-class>
-        <jspui-binding>org.dspace.app.webui.submit.step.JSPLicenseStep</jspui-binding>
-		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.LicenseStep</xmlui-binding>
-		<workflow-editable>false</workflow-editable>
-      </step>
+      <step id="sediciSignOffLicense"/>
       
       <!--Step 7 cagará datos fijos en el item. No tendrá interface-->
-      <step>
-        <processing-class>ar.edu.unlp.sedici.aspect.extraSubmission.submit.AutomaticIssuedMetadataStep</processing-class>
-		<workflow-editable>false</workflow-editable>
-      </step> 
-
-
-     
+      <step id="sediciAutomaticData"/>
+    
    </submission-process>
 
  </submission-definitions>

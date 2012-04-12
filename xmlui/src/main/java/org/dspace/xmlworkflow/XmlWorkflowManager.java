@@ -19,6 +19,7 @@ import org.dspace.eperson.Group;
 import org.dspace.handle.HandleManager;
 import org.dspace.storage.rdbms.DatabaseManager;
 import org.dspace.storage.rdbms.TableRow;
+import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.state.Step;
 import org.dspace.xmlworkflow.state.Workflow;
 import org.dspace.xmlworkflow.state.actions.*;
@@ -129,10 +130,46 @@ public class XmlWorkflowManager {
             }else{
                 activateFirstStep(context, wf, firstStep, wfi);
             }
-        }
-        
+        }       
         context.restoreAuthSystemState();
         return wfi;
+    }
+    
+    public static boolean tienePermisoDeWorkflow(Workflow wf, Item item, Context context){
+        XmlWorkflowItem wfi=null;
+        Step firstStep = wf.getFirstStep();
+        EPerson usuario=context.getCurrentUser();
+        boolean retorno=false;
+		try {
+			wfi = XmlWorkflowItem.create(context);
+	        wfi.setItem(item);
+	        wfi.setCollection(item.getOwningCollection());
+	        wfi.deleteWrapper();
+			if(!firstStep.isValidStep(context, wfi)){			
+			    //Get our next step, if none is found, archive our item
+			    firstStep = wf.getNextStep(context, wfi, firstStep, ActionResult.OUTCOME_COMPLETE);			    
+			}
+			if(firstStep != null){
+		        RoleMembers miembros=firstStep.getRole().getMembers(context, wfi);
+		        if (miembros.getEPersons().contains(context.getCurrentUser())){
+		        	retorno=true;
+		        } else {
+		            for (Group grupo : miembros.getGroups()) {
+		    			if (grupo.isMember(usuario)){
+		    				retorno=true;
+		    			}
+		    		}
+		        }
+		    };
+		    if (wfi!=null){				
+					wfi.deleteWrapper();
+		    };
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+
+		return retorno;
+
     }
     
     /**

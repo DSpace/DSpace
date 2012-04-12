@@ -34,9 +34,17 @@ import org.dspace.app.xmlui.wing.WingException;
 import org.dspace.app.xmlui.wing.element.List;
 import org.dspace.app.xmlui.wing.element.Options;
 import org.dspace.authorize.AuthorizeException;
+import org.dspace.authorize.AuthorizeManager;
+import org.dspace.content.Collection;
 import org.dspace.content.DSpaceObject;
 import org.dspace.content.Item;
 import org.dspace.core.Constants;
+import org.dspace.core.Context;
+import org.dspace.eperson.EPerson;
+import org.dspace.xmlworkflow.WorkflowFactory;
+import org.dspace.xmlworkflow.XmlWorkflowManager;
+import org.dspace.xmlworkflow.state.Workflow;
+import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.xml.sax.SAXException;
 
 
@@ -56,13 +64,23 @@ public class Navigation  extends AbstractDSpaceTransformer implements CacheableP
     
     	List context = options.addList("context");
     	
-        // Agregamos el menu para editar un item desde el workflow
+        // Agregamos el menu para editar un item desde el workflow si el item no esta ya en workflow
 		DSpaceObject dso = HandleUtil.obtainHandle(objectModel);
 		if (dso != null && dso.getType() == Constants.ITEM) {
 			Item item = (Item) dso;
-			if (item.canEdit()) {
-				context.addItem().addXref(contextPath+"/handle/"+item.getHandle()+"/edit_item_metadata", T_context_edit_item);
+			try {			    
+				XmlWorkflowItem itemWorkflow=XmlWorkflowManager.GetWorkflowItem(this.context, item);
+				/*Workflow wf=WorkflowFactory.getWorkflow(item.getOwningCollection());
+				if (itemWorkflow==null && XmlWorkflowManager.tienePermisoDeWorkflow(wf, item, this.context)) {
+					context.addItem().addXref(contextPath+"/handle/"+item.getHandle()+"/edit_item_metadata", T_context_edit_item);
+				}*/
+				if (itemWorkflow==null && item.canEdit()) {
+					context.addItem().addXref(contextPath+"/handle/"+item.getHandle()+"/edit_item_metadata", T_context_edit_item);
+				}
+			} catch (Exception e) {
+				// TODO: handle exception
 			}
+			
 		}
         
     }
