@@ -3217,6 +3217,8 @@
     <message key="xmlui.Submission.Submissions.step.head.dryadAcceptEditReject_pool">In Curation: Unclaimed</message>
     <message key="xmlui.Submission.Submissions.step.head.reviewStep_claimed">In Journal Review: Claimed</message>
     <message key="xmlui.Submission.Submissions.step.head.reviewStep_pool">In Journal Review: Unclaimed</message>
+    <message key="xmlui.Submission.Submissions.step.head.pendingPublicationStep_pool">Publication Blackout: Unclaimed</message>
+    <message key="xmlui.Submission.Submissions.step.head.pendingPublicationStep_claimed">Publication Blackout: Claimed</message>
 
 
     <message key="xmlui_submit_publication_article_status_published">&#160; Published</message>
