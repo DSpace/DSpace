@@ -259,13 +259,15 @@ public class Submissions extends AbstractDSpaceTransformer
                         renderWorkflowItemRow(row, dataPackage, step_id, action_id, false, true, false);
 
                         //Now that we have rendered our main data file, render our datasets
-                        Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, dataPackage.getItem());
+                        /*
+			  Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, dataPackage.getItem());
                         for (Item datafile : dataFiles) {
                             row = table.addRow();
 
                             WorkflowItem wfDataset = WorkflowItem.findByItemId(context, datafile.getID());
                             renderWorkflowItemRow(row, wfDataset, step_id, action_id, false, true, true);
                         }
+			*/
                     } catch (WorkflowConfigurationException e) {
                         Row row = table.addRow();
                         row.addCell().addContent("Error: Configuration error in workflow.");
@@ -309,6 +311,7 @@ public class Submissions extends AbstractDSpaceTransformer
 
 
                         //Now that we have rendered our main data file, render our datasets
+			/*
                         Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, dataPackage.getItem());
                         for (Item datafile : dataFiles) {
                             row = table.addRow();
@@ -321,6 +324,7 @@ public class Submissions extends AbstractDSpaceTransformer
                             }else
                                 row.addCellContent("Unknown");
                         }
+			*/
                     } catch (WorkflowConfigurationException e) {
                         Row row = table.addRow();
                         row.addCell().addContent("Error: Configuration error in workflow.");
@@ -408,6 +412,7 @@ public class Submissions extends AbstractDSpaceTransformer
                 renderWorkflowItemRow(row, dataPackage, step_id, action_id, false, false, false);
 
                 //Now that we have rendered our main data file, render our datasets
+		/*
                 Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, dataPackage.getItem());
                 for (Item datafile : dataFiles) {
                     row = table.addRow();
@@ -415,6 +420,7 @@ public class Submissions extends AbstractDSpaceTransformer
                     WorkflowItem wfDataset = WorkflowItem.findByItemId(context, datafile.getID());
                     renderWorkflowItemRow(row, wfDataset, step_id, action_id, false, false, true);
                 }
+		*/
             } catch (WorkflowConfigurationException e) {
                 Row row = table.addRow();
                 row.addCell().addContent("Error: Configuration error in workflow.");
@@ -457,6 +463,7 @@ public class Submissions extends AbstractDSpaceTransformer
                         renderWorkflowItemRow(row, dataPackage, step_id, action_id, true, false, false);
 
                         //Now that we have rendered our main data file, render our datasets
+			/*
                         Item[] dataFiles = DryadWorkflowUtils.getDataFiles(context, dataPackage.getItem());
                         for (Item datafile : dataFiles) {
                             row = table.addRow();
@@ -464,6 +471,7 @@ public class Submissions extends AbstractDSpaceTransformer
                             WorkflowItem wfDataset = WorkflowItem.findByItemId(context, datafile.getID());
                             renderWorkflowItemRow(row, wfDataset, step_id, action_id, true, false, true);
                         }
+			*/
                     } catch (WorkflowConfigurationException e) {
                         Row row = table.addRow();
                         row.addCell().addContent("Error: Configuration error in workflow.");
@@ -696,6 +704,7 @@ public class Submissions extends AbstractDSpaceTransformer
                 renderWorkspaceItemRow(row, (WorkspaceItem) publicationItem, "submit-overview", true, false);
 
                 //Now under this publication add it's datasets
+		/*
                 List<InProgressSubmission> datasets = groupOwnedItems.get(publicationItem);
                 for (InProgressSubmission datasetWsItem : datasets) {
                     row = submittedTable.addRow();
@@ -703,16 +712,18 @@ public class Submissions extends AbstractDSpaceTransformer
                     // If not it means that this submission most likely depends on the publication
                     renderWorkspaceItemRow(row, (WorkspaceItem) datasetWsItem, "submit-overview", (datasetWsItem.getItem().getHandle() != null), true);
                 }
+		*/
             }
+	    
+	    /*
             //These shouldn't be here but just in case
-
             for (InProgressSubmission dataset : loneDatasets){
                 //Render all the datasets that do NOT have a publication
                 Row row = submittedTable.addRow();
 
                 renderWorkspaceItemRow(row, (WorkspaceItem) dataset,"submit-overview", true, false);
             }
-
+	    */
 
             //TODO: show lone datasets ?
             Row lastRow = submittedTable.addRow();
@@ -783,12 +794,15 @@ public class Submissions extends AbstractDSpaceTransformer
 //                if(index < groupOwnedItems.size())
 //                    table.addRow().addCell(1, 4).addContent("");
 	        }
+
+		/*
             for (InProgressSubmission dataset : loneDatasets){
                 //Render all the datasets that do NOT have a publication
                 Row row = table.addRow();
 
                 renderWorkspaceItemRow(row, (WorkspaceItem) dataset, "submit", true, false);
             }
+		*/
         }
         else
         {
