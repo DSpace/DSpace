@@ -477,7 +477,7 @@
 					<label>Título y número de la serie</label>
 					<input-type>series</input-type>
 					<hint>Título y volúmen de la serie en la que el documento fué publicado</hint>
-					<required>Debe proveer la información de la serie en la que el documento fue publicado</required>
+<!-- 					<required>Debe proveer la información de la serie en la que el documento fue publicado</required> -->
 					<type-bind>Articulo,Libro</type-bind>
 				</field>
 				
@@ -590,7 +590,8 @@
 					<dc-qualifier>grantor</dc-qualifier>
 					<label>Institución garante</label>
 					<input-type>onebox</input-type>
-					<hint>Institución que respalda el trabajo de tesis y el grado obtenido por el mismo</hint>
+					<hint>Institución que otorga el título</hint>
+					<required>Debe seleccionar la Institución Garante</required>
 					<type-bind>Tesis</type-bind>
 				</field>
 
