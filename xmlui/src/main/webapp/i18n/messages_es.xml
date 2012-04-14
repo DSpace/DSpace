@@ -2238,6 +2238,17 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 
 <message key="sedici.menuLateral.otros.head">Otros</message>
 
+<!-- Creative Commons mensajes -->
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.CommercialQuestion">¿Quiere permitir usos comerciales de su obra?</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.CommercialAnswerNo">No</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.CommercialAnswerYes">Sí</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesQuestion">¿Quiere permitir modificaciones de su obra?</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerNo">No</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerYes">Sin derivativas</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerShareALike">Compartir Igual</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.campos_obligatorios">Ha ocurrido un error: todos los campos son obligatorios</message>
+
+
 <!-- Otras traducciones -->
 <message key="sedici.aspect.collectionViewer.addItem">Agregar Item</message>
 <message key="xmlui.administrative.Navigation.context_edit_item_workflow">Editar Item</message>

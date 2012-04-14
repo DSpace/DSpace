@@ -143,9 +143,9 @@
       <!--Step sediciCCLicense will be to select a Creative Commons License-->
       <step id="sediciCCLicense">
         <heading>submit.progressbar.CClicense</heading>
-        <processing-class>org.dspace.submit.step.CCLicenseStep</processing-class>
+        <processing-class>org.dspace.submit.step.SediciCCLicenseStep</processing-class>
         <jspui-binding>org.dspace.app.webui.submit.step.JSPCCLicenseStep</jspui-binding>
-		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.submit.CCLicenseStep</xmlui-binding>
+		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.SediciCCLicenseStep</xmlui-binding>
 		<workflow-editable>false</workflow-editable>
       </step>
 

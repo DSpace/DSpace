@@ -2147,6 +2147,17 @@
 <message key="sedici.menuLateral.cuenta.export">My exportations</message>
 <message key="sedici.menuLateral.otros.head">Other</message>
 
+<!-- Creative Commons mensajes -->
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.CommercialQuestion">¿Quiere permitir usos comerciales de su obra?</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.CommercialAnswerNo">No</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.CommercialAnswerYes">Yes</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesQuestion">¿Quiere permitir modificaciones de su obra?</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerNo">No</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerYes">Yes</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.DerivativesAnswerShareALike">Share a Like</message>
+<message key="xmlui.Submission.submit.SediciCCLicenseStep.campos_obligatorios">Ha ocurrido un error: todos los campos son obligatorios</message>
+
+
 <!-- Otras traducciones -->
 
 <message key="sedici.aspect.collectionViewer.addItem">Add document</message>
