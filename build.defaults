@@ -1,0 +1,44 @@
+#!/bin/bash
+
+
+DSPACE_VERSION="1.8.2"
+
+dspace_user=tomcat7
+dspace_group=dspace
+
+web_user=tomcat7
+web_group=tomcat7
+web_home=/var/lib/tomcat7/webapps/
+
+TOMCAT_TGZ_URL="http://apache.xfree.com.ar/tomcat/tomcat-7/v7.0.27/bin/apache-tomcat-7.0.27.tar.gz"
+
+seed="$RANDOM"
+dspace_dbuser="dspace"
+dspace_dbname="dspace$seed"
+dspace_dbpassword="dspace"
+
+#INSTALL_DIR=
+
+#/////////////////////////////////////////////////////////////
+
+#Setea los parametros por default
+
+	if [ ! "$INSTALL_DIR"]; then
+		INSTALL_DIR=$BASE_DIR/install
+		echo "[DEFAULT] Se toma como directorio de instalacion a $INSTALL_DIR"
+	fi	
+
+	if [ ! "$dspace_user" ]; then
+		dspace_user=`whoami`
+	fi
+	
+	if [ ! "$dspace_group" ]; then
+		dspace_group=$dspace_user
+	fi
+	
+	if [ ! "$web_user" ]; then
+		web_user=$dspace_user
+	fi
+	
+	
+	
