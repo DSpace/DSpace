@@ -368,7 +368,7 @@
                               <descriptor>src/main/assembly/src-release.xml</descriptor>
                            </descriptors>
                            <tarLongFileMode>gnu</tarLongFileMode>
-                           <finalName>dspace-${pom.version}</finalName>
+                           <finalName>dspace-${project.version}</finalName>
                         </configuration>
                         <phase>package</phase>
                         <goals>
