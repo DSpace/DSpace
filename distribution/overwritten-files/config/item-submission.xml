@@ -146,7 +146,7 @@
         <processing-class>org.dspace.submit.step.SediciCCLicenseStep</processing-class>
         <jspui-binding>org.dspace.app.webui.submit.step.JSPCCLicenseStep</jspui-binding>
 		<xmlui-binding>org.dspace.app.xmlui.aspect.submission.SediciCCLicenseStep</xmlui-binding>
-		<workflow-editable>false</workflow-editable>
+		<workflow-editable>true</workflow-editable>
       </step>
 
       <!--Step sediciSignOffLicense will be to Sign off on the License-->

@@ -41,9 +41,12 @@ import org.dspace.content.Item;
 import org.dspace.core.Constants;
 import org.dspace.core.Context;
 import org.dspace.eperson.EPerson;
+import org.dspace.workflow.WorkflowItem;
 import org.dspace.xmlworkflow.WorkflowFactory;
 import org.dspace.xmlworkflow.XmlWorkflowManager;
 import org.dspace.xmlworkflow.state.Workflow;
+import org.dspace.xmlworkflow.storedcomponents.ClaimedTask;
+import org.dspace.xmlworkflow.storedcomponents.PoolTask;
 import org.dspace.xmlworkflow.storedcomponents.XmlWorkflowItem;
 import org.xml.sax.SAXException;
 
@@ -57,6 +60,9 @@ public class Navigation  extends AbstractDSpaceTransformer implements CacheableP
     
     private static final Message T_context_edit_item =
             message("xmlui.administrative.Navigation.context_edit_item_workflow");
+    
+    private static final Message T_context_in_edit_item =
+            message("xmlui.administrative.Navigation.context_in_edit_item_workflow");
 
     public void addOptions(Options options) throws SAXException, WingException,
     UIException, SQLException, IOException, AuthorizeException
@@ -69,14 +75,38 @@ public class Navigation  extends AbstractDSpaceTransformer implements CacheableP
 		if (dso != null && dso.getType() == Constants.ITEM) {
 			Item item = (Item) dso;
 			try {			    
-				XmlWorkflowItem itemWorkflow=XmlWorkflowManager.GetWorkflowItem(this.context, item);
-				/*Workflow wf=WorkflowFactory.getWorkflow(item.getOwningCollection());
-				if (itemWorkflow==null && XmlWorkflowManager.tienePermisoDeWorkflow(wf, item, this.context)) {
-					context.addItem().addXref(contextPath+"/handle/"+item.getHandle()+"/edit_item_metadata", T_context_edit_item);
-				}*/
-				if (itemWorkflow==null && item.canEdit()) {
-					context.addItem().addXref(contextPath+"/handle/"+item.getHandle()+"/edit_item_metadata", T_context_edit_item);
-				}
+				XmlWorkflowItem workflowItem=XmlWorkflowManager.GetWorkflowItem(this.context, item);
+				if (item.canEdit()) {
+					//si el usuario no puede editar el item, no hace nada, sino entra por aca
+					if (workflowItem!=null){
+						//si existe un workflowitem para este item entra por aca
+						java.util.List<ClaimedTask> ct = ClaimedTask.find(this.context, workflowItem);
+						if (ct.isEmpty()){
+							//si la tarea de edicion no fue tomada por nadie, le proveo la posibilidad de tomarla
+							context.addItem().addXref(contextPath+"/handle/"+item.getHandle()+"/edit_item_metadata", T_context_edit_item);
+						} else {
+							//si la tarea fue tomada, debo verificar que sea el propio usuario el encargado de ella
+				            ClaimedTask claimedT=ct.get(0);
+				            String stepID = claimedT.getStepID();
+				            
+				            String actionID = claimedT.getActionID();
+				            int workflowID = workflowItem.getID();
+				            
+							EPerson usuario=EPerson.find(this.context, claimedT.getOwnerID());
+							
+							if (usuario.getID()==this.context.getCurrentUser().getID()){
+								//la tarea es del usuario, le proveo el link a la edición de metadatos
+								context.addItem().addXref(contextPath+"/handle/"+item.getHandle()+"/workflow_edit_metadata?workflowID=X"+workflowID+"&stepID="+stepID+"&actionID="+actionID, T_context_edit_item);
+							} else {
+								//la tarea fue tomada por otro usuario, notifico quien es el encargado
+								context.addItem(T_context_in_edit_item.parameterize(usuario.getFullName()));
+							}
+						}							
+					} else {
+						//si no existe un workflowitem para este item provee la posibilidad de ingresarlo al workflow
+						context.addItem().addXref(contextPath+"/handle/"+item.getHandle()+"/edit_item_metadata", T_context_edit_item);
+					}					
+				} 
 			} catch (Exception e) {
 				// TODO: handle exception
 			}

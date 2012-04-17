@@ -98,7 +98,8 @@ public class XmlWorkflowManager {
     	
     	// Primero verificamos que exista un XmlWorkflowItem para este item
     	if( workflowItemExists(context, item) )
-    		throw new WorkflowException("El item "+handle+" ya se ecuentra dentro del workflow");
+    		return GetWorkflowItem(context, item); 
+    		//throw new WorkflowException("El item "+handle+" ya se ecuentra dentro del workflow");
     	
         Collection collection = item.getOwningCollection();
         Workflow wf = WorkflowFactory.getWorkflow(collection);

@@ -2177,6 +2177,7 @@
 
 <message key="xmlui.ArtifactBrowser.FeedbackForm.para2">Remember that you can contact us via e-mail to the following adress</message>
 
+<message key="xmlui.administrative.Navigation.context_in_edit_item_workflow">En edición por {0}</message>
 
 <!-- De aca en mas estan en las dependencias de dspace -->
 

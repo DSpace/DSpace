@@ -2264,6 +2264,10 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 
 <message key="xmlui.ArtifactBrowser.FeedbackForm.para2">Recuerde que también puede contactarse con nosotros vía email a la direccion </message>
 
+
+<message key="xmlui.administrative.Navigation.context_in_edit_item_workflow">En edición por {0}</message>
+
+
 <!-- De aca en mas estan en las dependencias de dspace -->
 
 <!-- extension al messages.xml de XmlWorkflow -->
