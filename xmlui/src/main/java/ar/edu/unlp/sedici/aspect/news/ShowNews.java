@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.net.URL;
 import java.sql.SQLException;
+import java.text.SimpleDateFormat;
 import java.util.Iterator;
 
 import org.apache.avalon.framework.parameters.ParameterException;
@@ -118,6 +119,9 @@ public class ShowNews  extends AbstractDSpaceTransformer implements CacheablePro
             	List noticia = browseNewsList.addList("noticia_"+cont);
             	Item titulo=noticia.addItem("titulo", "titulo");
             	titulo.addContent(entrada.getTitle());
+            	Item fecha=noticia.addItem("fecha", "fecha");
+            	SimpleDateFormat formatter = new SimpleDateFormat("dd/MM");
+            	fecha.addContent( formatter.format(entrada.getPublishedDate()) );
             	Item descripcion=noticia.addItem("descripcion", "descripcion");
             	descripcion.addContent(entrada.getDescription().getValue());
             	Item link=noticia.addItem("link", "link");

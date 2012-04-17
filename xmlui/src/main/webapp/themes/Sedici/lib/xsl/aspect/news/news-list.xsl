@@ -72,6 +72,7 @@
     </xsl:template>
     
     <xsl:template name='noticia_individual'>
+          <span class="news_date"><xsl:value-of select="dri:item[@n='fecha']"/></span>
     	  <a>
              <xsl:attribute name="href">
                  <xsl:value-of select="dri:item[@n='link']/dri:xref/@target"/>
