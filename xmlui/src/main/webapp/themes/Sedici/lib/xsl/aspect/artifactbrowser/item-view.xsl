@@ -202,10 +202,22 @@
         </xsl:if>
         
 		<!-- Para el Tipo de Documento mostramos el sedici.subtype porque es mas especifico -->
-		<xsl:call-template name="render-normal-field">
-			<xsl:with-param name="name" select="'subtype'" />
-			<xsl:with-param name="elements" select="dim:field[@element='subtype']" />
-		</xsl:call-template>
+		<!-- Si no hay subtype, mostramos el dc.type -->
+		<xsl:choose>
+			<xsl:when test="dim:field[@element='subtype']">
+				<xsl:call-template name="render-normal-field">
+					<xsl:with-param name="name" select="'subtype'" />
+					<xsl:with-param name="elements" select="dim:field[@element='subtype']" />
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:when test="dim:field[@element='type']">
+				<xsl:call-template name="render-normal-field">
+					<xsl:with-param name="name" select="'subtype'" />
+					<xsl:with-param name="elements" select="dim:field[@element='type']" />
+				</xsl:call-template>
+			</xsl:when>
+			<!-- No hay otherwise -->
+		</xsl:choose>
 
 		<!-- title.alternative row -->
 		<xsl:call-template name="render-normal-field">
