@@ -9,15 +9,11 @@
       DSpace SOLR Service Provider Web Application
    </description>
 
-   <!--
-      Solr uses DSpace POM to avoid limitations forced
-      in dependencies found in dspace-parent pom. Solr is
-      a standalone webapplication.
-   -->
    <parent>
       <groupId>org.dspace</groupId>
-      <artifactId>dspace-pom</artifactId>
-      <version>12</version>
+      <artifactId>modules</artifactId>
+      <version>3.0-SNAPSHOT</version>
+      <relativePath>..</relativePath>
    </parent>
 
    <build>
