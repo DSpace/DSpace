@@ -2476,19 +2476,38 @@ bottom:10px;
 }
 
 .intro-text {
-float:left;
-width:550px;
-border-top:1px solid #dedede;
-padding-top:10px;
-display:inline-block;
-/**/
-/*  bottom: 50px;*/
-    float: left;
+	float:left;
+	width:550px;
+	border-top:1px solid #dedede;
+	padding-top:10px;
+	display:inline-block;
     left: 155px;
     position: relative;
-    width: 500px;
+}
+.intro-text .label {
+	font-weight: bold;
 }
 
+.intro-text .localizacion_electronica, .intro-text .localizacion_fisica {
+	margin-top: 10px;
+	float: right;
+}
+
+.intro-text .titulo_de_la_serie {
+	display: none;
+}
+
+.intro-text .subtitulo_de_la_serie {
+	/*display: none;*/
+	font-size: 110%;
+	color: #9C4F0A;
+	margin-bottom: 10px;
+}
+.intro-text .licencia span div {
+	background: url(../../images/cc-ship.gif) no-repeat center center;
+	width: 150px;
+	height: 50px;
+}
 
 #aspect_submission_StepTransformer_field_submit_jump_2_1:hover,
 #aspect_submission_StepTransformer_field_submit_jump_2_2:hover,
