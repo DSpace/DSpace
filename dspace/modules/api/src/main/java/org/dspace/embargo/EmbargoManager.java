@@ -171,6 +171,9 @@ public class EmbargoManager
         item.addMetadata(MetadataSchema.DC_SCHEMA, "date", "available", null, DCDate.getCurrent().toString());
 
         log.info("Lifting embargo on Item "+item.getHandle());
+
+        log.debug("Lifting embargo on Item:  "  + item.getID());
+
         item.update();
     }
 
@@ -203,6 +206,8 @@ public class EmbargoManager
      */
     public static void main(String argv[])
     {
+
+        log.debug("********* NEW LIFT EMBARGO BEGIN **********");
         init();
         int status = 0;
 
@@ -341,11 +346,13 @@ public class EmbargoManager
 
                 Calendar today = Calendar.getInstance();
                 today.setTime(new Date());
-                today.setTime(liftDate.toDate());
                 today.set(Calendar.MINUTE, 0);
                 today.set(Calendar.SECOND, 0);
                 today.set(Calendar.MILLISECOND, 0);
 
+                
+                log.debug("Item " + item.getID() + "- " + getIdentifier(item) + " || embargoUntilDate: " + printOutDate(cal) + " - today: " + printOutDate(today));
+                
                 // Before or Equals
                 if (cal.compareTo(today) <= 0)
                 {
@@ -384,6 +391,22 @@ public class EmbargoManager
         context.removeCached(item, item.getID());
         return status;
     }
+
+
+    public static String getIdentifier(Item item) {
+        DCValue[] doiVals = item.getMetadata("dc", "identifier", null, Item.ANY);
+        if (doiVals != null && 0 < doiVals.length) {
+            return doiVals[0].value;
+        }
+        return null;
+
+    }
+    
+    private static String printOutDate(Calendar c){
+        return c.get(Calendar.YEAR) + "-" + c.get(Calendar.MONTH) + "-" + c.get(Calendar.DATE);
+    }
+
+
 
     // initialize - get plugins and MD field settings from config
     private static void init()
