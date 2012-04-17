@@ -22,6 +22,10 @@
 /* ATENCION: dejar siempre al principio  del css esta linea, es para detectar errores de sintaxis*/
 body{background-color:red;}
  
+ 
+html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, article, aside, figure, footer, header, hgroup, menu, nav, section, menu, time, mark, audio, video
+{font-family:Arial, Helvetica, sans-serif;
+}
 
 a, a:active, a:visited {
 	text-decoration:none;
@@ -587,9 +591,9 @@ input.ds-file-field,
 input.ds-password-field {
     margin-bottom: 5px;
     margin-top: 5px;
-    font-size: 93%;
-	-moz-border-radius:9px;
-border-radius:9px;
+/*    font-size: 93%;*/
+/*	-moz-border-radius:9px;
+border-radius:9px;*/
 padding-left:10px;
 }
 
@@ -609,7 +613,10 @@ color: #CD642F;
 #aspect_administrative_eperson_ManageEPeopleMain_field_submit_search,
 #aspect_administrative_authorization_AuthorizationMain_field_submit_edit,
 #aspect_administrative_item_FindItemForm_field_submit_find,
-#aspect_administrative_WithdrawnItems_field_submit
+#aspect_administrative_WithdrawnItems_field_submit,
+#aspect_discovery_SearchFacetFilter_field_submit,
+#aspect_xmlworkflow_admin_WorkflowOverviewTransformer_field_submit_search_controls.ds-button-field
+
  {
 font-size:16px;
 background-image:url(../../images/lupita.png);
@@ -626,7 +633,10 @@ margin-left:8px;
 #aspect_discovery_SiteViewer_field_submit:hover,
 #aspect_discovery_SimpleSearch_field_submit:hover,
 #aspect_administrative_item_FindItemForm_field_submit_find:hover,
-#aspect_administrative_WithdrawnItems_field_submit:hover
+#aspect_administrative_WithdrawnItems_field_submit:hover,
+#aspect_administrative_eperson_ManageEPeopleMain_field_submit_search:hover,
+#aspect_discovery_SearchFacetFilter_field_submit:hover,
+#aspect_xmlworkflow_admin_WorkflowOverviewTransformer_field_submit_search_controls.ds-button-field:hover
 
  {
 color:#52BAE7;
@@ -634,13 +644,14 @@ background-image:url(../../images/lupitahover.png);
 }
 
 
- 
-
 textarea.ds-textarea-field,
 input.ds-text-field,
 input.ds-password-field {
     padding: 3px;
   	padding-left:10px;
+	-moz-border-radius:9px;
+	border-top:1px solid #a4a4a4;
+	border-left:1px solid #a4a4a4;
 	}
 
 .ie6 input.ds-text-field,
@@ -685,8 +696,8 @@ input.input.ds-password-field:focus {
 .rgba.boxshadow textarea.ds-textarea-field:focus,
 .rgba.boxshadow input.ds-text-field:focus,
 .rgba.boxshadow input.ds-password-field:focus {
-    -moz-box-shadow:0 0 8px rgba(95, 158, 212, 0.5);
-    -webkit-box-shadow:0 0 8px rgba(95, 158, 212, 0.5);
+/*    -moz-box-shadow:0 0 8px rgba(95, 158, 212, 0.5);
+    -webkit-box-shadow:0 0 8px rgba(95, 158, 212, 0.5);*/
     box-shadow:0 0 8px rgba(95, 158, 212, 0.5);
     border-color:rgba(95, 158, 212, 0.75);
     outline:medium none;
@@ -1006,6 +1017,10 @@ background-image:url(../../images/paginasiguiente.png);
 color:#607890;
 }
 
+.ds-table-row {
+word-break: break-all;}
+
+
 .previous-page-link:hover,
 #aspect_submission_StepTransformer_field_submit_prev:hover{
 background-image:url(../../images/paginaprevia.png);
@@ -1013,7 +1028,7 @@ color:#607890;
 }
 
 #aspect_general_NoticeTransformer_div_general-message h1.ds-div-head {
-color:red;
+color:green;
 background-image:none;
 position:relative;
 left:250px;
@@ -1106,6 +1121,7 @@ background-repeat:repeat-x;
 .ds-artifact-item.community {
     padding-top: 1px;
     padding-bottom: 1px;
+	margin-top:3px;
 
 }
 
@@ -1171,7 +1187,8 @@ color:#dedede;
 #aspect_artifactbrowser_SimpleSearch_div_search-results .artifact-title,
 #aspect_discovery_SimpleSearch_div_search-results .artifact-title, 
 #aspect_artifactbrowser_AdvancedSearch_div_search-results .artifact-title,
-#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-author-results .artifact-title
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-author-results .artifact-title,
+#aspect_artifactbrowser_ConfigurableBrowse_div_browse-by-subject-results .artifact-title
 {
     font-size: 100%;
 	font-weight:bold;
@@ -1261,11 +1278,23 @@ margin-left:50px;
 
 }
 
+#aspect_artifactbrowser_CollectionViewer_div_collection-view .ds-paragraph a {
+position: relative;
+left:95px;
+background-image:url(../../images/flecha_enviar2.png);
+background-position:left;
+background-repeat:no-repeat;
+padding-left:15px;
+height:25px;
+text-decoration:underline;
+}
+
 .ds-paragraph a {
 padding:0px 3px 0px 0px;
 margin: 0px 0px 0px 0px;
 text-decoration:none;
 color:#f59321;
+
 }
 
 .ds-paragraph a:hover {
@@ -1486,7 +1515,12 @@ color:#9C4F0A;
 clear:both;
 	padding-top: 0px;
     margin-bottom: 3px;
-	text-decoration:underline;
+	text-decoration:none;
+	font-size:15px;
+}
+
+.ds-artifact-item {
+list-style-type:none;
 }
 
 .ds-logo-wrapper {
@@ -1568,7 +1602,7 @@ ul.horizontal li span.bold a { color: black; }
 /* Estilos para la licencia */
 #aspect_submission_StepTransformer_div_submit-license-standard-text.license-text{
 	background-color: #EFEFEF;
-	font-family: courier;
+	font-family: 'Courier New', Courier;
 	line-height: 1.4;
 	white-space: pre-wrap;
 	font-style: italic;
@@ -1838,7 +1872,7 @@ border-bottom:1px solid #dedede;
 border-right: 1px solid #dedede;
 background-repeat:repeat-x;
 width: 300px;
-height:25px;
+height:23px;
 font-size:13px;
 padding-left:10px;
 -moz-border-radius: 11px;
@@ -1859,6 +1893,7 @@ background-repeat:repeat-x;
 height:25px;
 font-size:13px;
 margin-left:5px;
+-moz-border-radius:9px;
 }
 
 #aspect_eperson_PasswordLogin_list_password-login span.error {
@@ -1940,8 +1975,8 @@ border-right:1px solid #dedede;
 #aspect_artifactbrowser_ConfigurableBrowse_field_update,
 #aspect_administrative_community_CreateCommunityForm_field_submit_save,
 #aspect_administrative_WithdrawnItems_field_update,
-#aspect_administrative_group_DeleteGroupsConfirm_field_submit_confirm
-
+#aspect_administrative_group_DeleteGroupsConfirm_field_submit_confirm,
+#aspect_xmlworkflow_admin_WorkflowOverviewTransformer_field_submit_submitter
  {
 margin-top:10px;
 background-image:url(../../images/ok_gris.png);
@@ -1956,7 +1991,8 @@ background-color:white;
 #aspect_artifactbrowser_ConfigurableBrowse_field_update:hover,
 #aspect_administrative_community_CreateCommunityForm_field_submit_save:hover,
 #aspect_administrative_WithdrawnItems_field_update:hover,
-#aspect_administrative_group_DeleteGroupsConfirm_field_submit_confirm:hover
+#aspect_administrative_group_DeleteGroupsConfirm_field_submit_confirm:hover,
+#aspect_xmlworkflow_admin_WorkflowOverviewTransformer_field_submit_submitter:hover
 {
 margin-top:10px;
 background-image:url(../../images/ok.png);
@@ -1987,7 +2023,8 @@ background-color:white;
 
 
 #aspect_administrative_community_CreateCommunityForm_field_submit_cancel,
-#aspect_administrative_group_DeleteGroupsConfirm_field_submit_cancel
+#aspect_administrative_group_DeleteGroupsConfirm_field_submit_cancel,
+#aspect_xmlworkflow_admin_WorkflowOverviewTransformer_field_submit_delete
  {
 margin-top:10px;
 background-image:url(../../images/cancel_gris.png);
@@ -1999,7 +2036,8 @@ background-position:0px;
 }
 
 #aspect_administrative_community_CreateCommunityForm_field_submit_cancel:hover,
-#aspect_administrative_group_DeleteGroupsConfirm_field_submit_cancel:hover
+#aspect_administrative_group_DeleteGroupsConfirm_field_submit_cancel:hover,
+#aspect_xmlworkflow_admin_WorkflowOverviewTransformer_field_submit_delete:hover
 {
 margin-top:10px;
 background-image:url(../../images/cancel.png);
@@ -2047,7 +2085,7 @@ float:left;
     float: left;
 /*    margin-right: 10px;
     padding-right: 10px;*/
-    position: relative;
+    position: absolute;
     right: 10px;
     width: 100%;
 }
@@ -2080,7 +2118,7 @@ right:10px;
 
 
 .detail-view {
-padding:40px 0 0 0 ;
+padding:0px 0 0 0 ;
 /*background-image:url(../../images/sombra_abajo.png);*/
 /*background-color:#dedede;*/
 background-position:center -40px;
@@ -2107,12 +2145,19 @@ padding-top:5px;
 
 }
 
+#collection-title {
+display:block;
+}
 #collection-title h1.ds-div-head {
 color:#9c4f0a;
 background-image:none;
+width:550px;	
+display:inline-block;
 padding:0;
-display:inline;
+
 padding-bottom:5px;
+position:relative;
+left:155px;
 /*text-shadow:1px 1px 0 #9c4f0a; /*Color de la sombra - Eje X - Eje Y - Difuminado*/  
 /*text-shadow: -1px -1px #F48620,1px 1px #cecece;*/
 
@@ -2143,12 +2188,26 @@ margin-right:6px;
 padding: 0px 4px 0px 4px;
 }
 
+#aspect_submission_Submissions_div_unfinished-submisions .ds-paragraph a {
+position:relative;
+left:3px;
+}
+
+#aspect_submission_Submissions_div_start-submision  .ds-paragraph a {
+position:relative;
+left:3px;
+}
+
+#aspect_xmlworkflow_admin_WorkflowOverviewTransformer_table_search-controls {
+width:620px;
+}
+
 #aspect_artifactbrowser_CommunityViewer_list_community-browse,
 #aspect_artifactbrowser_CollectionViewer_div_collection-search-browse 
 #aspect_artifactbrowser_CollectionViewer_list_collection-browse{
 background-color:white;
 position:relative;
-left:150px;
+left:110px;
 /*
 height:50px;
 background-image:url(../../images/fondo_bandita3.png);
@@ -2266,7 +2325,8 @@ padding-bottom:5px;
 }
 
 #aspect_artifactbrowser_ConfigurableBrowse_list_jump-list,
-#aspect_administrative_WithdrawnItems_list_jump-list {
+#aspect_administrative_WithdrawnItems_list_jump-list,
+#aspect_discovery_SearchFacetFilter_list_jump-list {
 width:100%;
 padding:8px;
 margin-left:0PX;
@@ -2276,7 +2336,8 @@ margin-bottom:10px;
 }
 
 #aspect_artifactbrowser_ConfigurableBrowse_list_jump-list a,
-#aspect_administrative_WithdrawnItems_list_jump-list a{
+#aspect_administrative_WithdrawnItems_list_jump-list a,
+#aspect_discovery_SearchFacetFilter_list_jump-list a{
 text-decoration:none;
 /*background-color:#94d2f1;*/
 padding:5px;
@@ -2286,7 +2347,8 @@ color:#0b4d6c;
 }
 
 #aspect_artifactbrowser_ConfigurableBrowse_list_jump-list a:hover,
-#aspect_administrative_WithdrawnItems_list_jump-list a:hover{
+#aspect_administrative_WithdrawnItems_list_jump-list a:hover,
+#aspect_discovery_SearchFacetFilter_list_jump-list a:hover{
 background-color:#a9d0e2;
 }
 
@@ -2318,7 +2380,7 @@ color:#85878c;
 
 tr:nth-child(2n+1) a {
 /*color:#85878c;*/
-color:white;
+color:grey;
 }
 
 tr a:hover {
@@ -2417,8 +2479,9 @@ float:left;
 width:550px;
 border-top:1px solid #dedede;
 padding-top:10px;
+display:inline-block;
 /**/
-  bottom: 70px;
+/*  bottom: 50px;*/
     float: left;
     left: 155px;
     position: relative;
@@ -2473,6 +2536,11 @@ border-color:#dedede;
 margin:0px 0px 20px 0px;
 padding:0px;
 }
+
+#aspect_xmlworkflow_admin_WorkflowOverviewTransformer_field_filter_collection {
+width:500px;
+}
+
 
 
 
@@ -2783,11 +2851,26 @@ margin-right:9px;
 #other_attributes {
 	margin-top: 75px;
 }
-#other_attributes, #item-file-section {
+#other_attributes {
+background-color: #E3EEF0;
+    border: 1px dashed #8ECED6;
+    margin-bottom: 15px;
+    padding: 10px 15px;
+	}
+
+
+#item-file-section {
 	border: dashed 1px #CFCFCF;
 	padding: 10px 15px 10px 15px;
+	margin-bottom:15px;
 }
-#other_attributes h2, #item-file-section h2 {
+
+#other_attributes h2{
+margin-top:0px;
+border-bottom:1px solid #dedede;
+}
+
+#item-file-section h2 {
 	margin-top: 0px;
 }
 .item-summary-view-metadata .tesis-info {
@@ -2914,6 +2997,35 @@ color:grey;
 font-size:16px;
 margin-bottom:10px;
 border-bottom:1px dashed #dedede;
+}
+
+#home_slideshow {
+height:310px;
+}
+
+#aspect_submission_StepTransformer_div_submit-upload table {
+	width: 100%;
+}
+#aspect_submission_StepTransformer_list_submit-upload-new {
+    padding: 20px;
+    border: dashed 1px #C0C0C0;	
+}
+
+#aspect_submission_StepTransformer_list_submit-upload-new .ds-form-item {
+	margin-bottom: 15px;
+}
+
+#aspect_submission_StepTransformer_list_submit-upload-new .ds-form-item.last {
+	margin-top: -15px;
+	margin-bottom: 0px;
+}
+
+#aspect_administrative_registries_EditMetadataSchema_table_metadata-schema-edit-existing-fields td:nth-child(2), #aspect_administrative_registries_MetadataRegistryMain_table_metadata-registry-main-table td:nth-child(2), #aspect_administrative_registries_FormatRegistryMain_table_bitstream-format-registry td:nth-child(2), 
+#aspect_submission_Submissions_table_unfinished-submissions td:nth-child(2),
+#aspect_submission_Submissions_table_submissions-inprogress td:nth-child(2), 
+#aspect_submission_Submissions_table_completed-submissions td:nth-child(2), 
+table.detailtable td:nth-child(2){
+	word-break:break-word;
 }
 
 /* ATENCION: dejar siempre al final del css esta linea, es para detectar errores de sintaxis*/

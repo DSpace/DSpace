@@ -36,7 +36,7 @@ Scott Phillips adapted it for Manakin's need.
     <html>
       <head>
         <title>
-          <xsl:value-of select="$pageTitle"/>
+COOC          <xsl:value-of select="$pageTitle"/>
         </title>
         <style>
           h1 { font-size: 200%; color: #336699; text-align: left; margin: 0px 0px 10px 0px; padding: 0px 0px 0px 60px; border-width: 0px 0px 1px 0px; border-style: solid; border-color: #336699;}

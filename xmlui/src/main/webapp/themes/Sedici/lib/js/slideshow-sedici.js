@@ -3,7 +3,8 @@ $(document).ready(function() {
 	$("#slides").slides({
 		play: 8000,
 		pause: 2000,
-		effect: 'fade',
+		effect: 'slide, fade',
+		crossfade: true,
 		hoverPause: true,
 		animationStart: function(current){
 			$('.caption').animate({
