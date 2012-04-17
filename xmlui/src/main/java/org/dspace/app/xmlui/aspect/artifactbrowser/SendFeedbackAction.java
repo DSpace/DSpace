@@ -40,6 +40,7 @@ public class SendFeedbackAction extends AbstractAction
             String source, Parameters parameters) throws Exception
     {
         Request request = ObjectModelHelper.getRequest(objectModel);
+        String requestType=request.getMethod();
 
         String page = request.getParameter("page");
         String address = request.getParameter("email");
@@ -83,11 +84,14 @@ public class SendFeedbackAction extends AbstractAction
             int lastDot = host.lastIndexOf('.');
             basicHost = host.substring(host.substring(0, lastDot).lastIndexOf('.'));
         }
-
-        if ((fromPage == null) || ((fromPage.indexOf(basicHost) == -1) && (!validReferral)))
-        {
+        if ( fromPage == null && requestType.equals("POST")){
             // N.B. must use old message catalog because Cocoon i18n is only available to transformed pages.
             throw new AuthorizeException(I18nUtil.getMessage("feedback.error.forbidden"));
+        } else {
+        	if ((fromPage!=null) && (fromPage.indexOf(basicHost) == -1) && (!validReferral)){
+        		// N.B. must use old message catalog because Cocoon i18n is only available to transformed pages.
+                throw new AuthorizeException(I18nUtil.getMessage("feedback.error.forbidden"));
+        	}
         }
 
         // User email from context
