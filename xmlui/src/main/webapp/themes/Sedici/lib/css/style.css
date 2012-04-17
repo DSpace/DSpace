@@ -1017,9 +1017,10 @@ background-image:url(../../images/paginasiguiente.png);
 color:#607890;
 }
 
-.ds-table-row {
-word-break: break-all;}
-
+/*.ds-table-row {
+   word-break: break-all;
+}
+*/
 
 .previous-page-link:hover,
 #aspect_submission_StepTransformer_field_submit_prev:hover{
