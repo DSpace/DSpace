@@ -16,7 +16,7 @@
 				<h1>Links UNLP</h1>
 				<ul>
 					<li>
-						<a href="http://www.unlp.edu.ar">http://www.unlp.edu.ar</a>
+						<a href="http://www.unlp.edu.ar" target="_blank">http://www.unlp.edu.ar</a>
 						<p>Sitio institucional de la Universidad Nacional de La Plata
 							(UNLP), con vínculos a cada unidad académica e información de
 							todas las carreras que se dictan en esta casa de estudios, entre
@@ -119,7 +119,7 @@
 							desarrollada por la Universidad de Chile. </p>
 					</li>
 					<li>
-						<a href="http://biblioteca.universia.net/">http://biblioteca.universia.net/</a>
+						<a href="http://biblioteca.universia.net/" target="_blank">http://biblioteca.universia.net/</a>
 						<p>La Biblioteca de Recursos de Universia contiene mas de 16 millones recursos de 213 colecciones entre los cuales se encuentra la UNLP con su repositorio central, SeDiCI.</p>
 					</li>
 				</ul>
