@@ -100,42 +100,44 @@ public class SediciCCLicenseStep extends AbstractSubmissionStep
 	    if (carga.length>0){
 	    	dato=carga[0].value;
 	    	int inicio=dato.indexOf("/by")+1;
-	    	String substring=dato.substring(inicio);
-	    	int fin= substring.indexOf("/");	    	
-	    	substring=substring.substring(0,fin);
-	    	HashMap<String, Integer> arreglo=new HashMap<String, Integer>();
-	    	arreglo.put("by-nc-nd", 1);
-	    	arreglo.put("by-nc-sa", 2);
-	    	arreglo.put("by-nc", 3);
-	    	arreglo.put("by-nd", 4);
-	    	arreglo.put("by-sa", 5);
-	    	arreglo.put("by", 6);
-	    	switch (arreglo.get(substring)) {
-			case 1:
-				commercial="nc";
-				derivatives="nd";
-				break;
-			case 2:
-				commercial="nc";
-				derivatives="sa";
-				break;
-			case 3:
-				commercial="nc";
-				derivatives="y";
-				break;
-			case 4:
-				commercial="y";
-				derivatives="nd";
-				break;
-			case 5:
-				commercial="y";
-				derivatives="sa";
-				break;
-			default:
-				commercial="y";
-				derivatives="y";
-				break;
-			}
+	        if (inicio!=0){
+		    	String substring=dato.substring(inicio);
+		    	int fin= substring.indexOf("/");	    	
+		    	substring=substring.substring(0,fin);
+		    	HashMap<String, Integer> arreglo=new HashMap<String, Integer>();
+		    	arreglo.put("by-nc-nd", 1);
+		    	arreglo.put("by-nc-sa", 2);
+		    	arreglo.put("by-nc", 3);
+		    	arreglo.put("by-nd", 4);
+		    	arreglo.put("by-sa", 5);
+		    	arreglo.put("by", 6);
+		    	switch (arreglo.get(substring)) {
+				case 1:
+					commercial="nc";
+					derivatives="nd";
+					break;
+				case 2:
+					commercial="nc";
+					derivatives="sa";
+					break;
+				case 3:
+					commercial="nc";
+					derivatives="y";
+					break;
+				case 4:
+					commercial="y";
+					derivatives="nd";
+					break;
+				case 5:
+					commercial="y";
+					derivatives="sa";
+					break;
+				default:
+					commercial="y";
+					derivatives="y";
+					break;
+				}
+	        };
 	    }
 	    Collection collection = submission.getCollection();
 	    String actionURL = contextPath + "/handle/"+collection.getHandle() + "/submit/" + knot.getId() + ".continue";

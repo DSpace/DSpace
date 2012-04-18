@@ -170,8 +170,8 @@ public class SediciCCLicenseStep extends AbstractProcessingStep
 	    	String uriNameQualifier=(uriName.length>2)?uriName[2]:null;
 	
 	    	Item item = subInfo.getSubmissionItem().getItem();
-	    	item.clearMetadata(uriFieldSchema, uriFieldElement, uriFieldQualifier, null);
 	    	item.clearMetadata(uriNameSchema, uriNameElement, uriNameQualifier, null);
+	    	item.clearMetadata(uriFieldSchema, uriFieldElement, uriFieldQualifier, null);
 	    	
 	    	//cargo los nuevos valores para el metadata 
 	    	String licenseUri="http://creativecommons.org/licenses/by";
