@@ -42,7 +42,7 @@ import ar.edu.unlp.sedici.dspace.utils.*;
  * @author Robert Tansley
  * @author Richard Jones
  * 
- * @file $reference CreateAdministrator
+// * @file $reference CreateAdministrator
  * 
  * @version $Revision: 5844 $
  */
@@ -73,6 +73,7 @@ public final class CreateUser
     	options.addOption("l", "last", true, "user last name");
     	options.addOption("c", "language", true, "user language");
     	options.addOption("p", "password", true, "user password");
+    	options.addOption("g", "group", true, "user group");
     	
     	CommandLine line = parser.parse(options, argv);
     	
@@ -81,7 +82,7 @@ public final class CreateUser
     	{
     		cu.createUser(line.getOptionValue("e"),
     				line.getOptionValue("f"), line.getOptionValue("l"),
-    				line.getOptionValue("c"), line.getOptionValue("p"),"");
+    				line.getOptionValue("c"), line.getOptionValue("p"),"", line.getOptionValue("g"));
     	}
     	else
     	{
@@ -122,6 +123,8 @@ public final class CreateUser
     	String lastName = null;
     	String password1 = null;
     	String password2 = null;
+		String groupName = null;
+
     	String language = I18nUtil.DEFAULTLOCALE.getLanguage();
     	
     	while (!dataOK)
@@ -191,6 +194,16 @@ public final class CreateUser
                 password2 = password2.trim();
             }
     		
+
+    		System.out.print("Default Group (empty for anonymous): ");
+    		System.out.flush();
+    		groupName = input.readLine();
+
+            if (groupName != null)
+            {
+            	groupName = groupName.trim();
+            }
+            
     		if (!StringUtils.isEmpty(password1) && StringUtils.equals(password1, password2))
     		{
     			// password OK
@@ -215,7 +228,7 @@ public final class CreateUser
     	}
     	
     	// if we make it to here, we are ready to create an user
-    	createUser(email, firstName, lastName, language, password1,"");
+    	createUser(email, firstName, lastName, language, password1,"", groupName);
     }
     
     /**
@@ -230,21 +243,29 @@ public final class CreateUser
      * @throws Exception
      */
     public void createUser(String email, String first, String last,
-    		String language, String pw, String sedici_eperson_id)
+    		String language, String pw, String sedici_eperson_id, String groupName)
     	throws Exception
     {
     	// Of course we aren't an user yet so we need to
     	// circumvent authorisation
     	context.setIgnoreAuthorization(true);
     	
-    	// Find user group
-    	Group user_anonymous = Group.find(context, 0);
-    
     	
-    	if (user_anonymous == null)
+    	// Find user group
+    	Group group;
+    	if (groupName == null || "".equals(groupName)){
+    		groupName = "0 {anonymous}";
+    		group = Group.find(context, 0);
+    	}if ("1".equals(groupName) || "administrator".equals(groupName)){
+    		groupName = "1 {administrator}";
+    		group = Group.find(context, 1);
+    	}else{
+    		group = Group.findByName(context, groupName);
+    	}
+    	if (group == null)
     	{
     		context.abort();
-    		throw new IllegalStateException("Error, no user_anonymous group (group 1) found");
+    		throw new IllegalStateException("Error, no group ("+groupName+") found");
     	}
     	// Create the user e-person
         if (email==""){
@@ -294,11 +315,11 @@ public final class CreateUser
         	
         	eperson.update();
         	
-        	user_anonymous.addMember(eperson);
-        	user_anonymous.update();
+        	group.addMember(eperson);
+        	group.update();
         	
         	context.complete();
-        	logger.info("La cuenta de usuario ha sido creada con dspace_eperson_id ="+eperson.getID()+" y sedici_eperson_id ="+sedici_eperson_id);
+        	logger.info("La cuenta de usuario ha sido creada con dspace_eperson_id ="+eperson.getID()+" y sedici_eperson_id ="+sedici_eperson_id+ " y group "+groupName);
             
         	
         }else{

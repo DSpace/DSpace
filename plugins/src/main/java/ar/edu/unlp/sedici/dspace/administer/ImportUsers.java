@@ -90,6 +90,7 @@ public final class ImportUsers
 		String lastname = "";
 		String email = "";
 		String password = "";
+		String groupName = "";
 		String sedici_eperson_id = "";
 
 		for (int i = 0; i < len; i++) {
@@ -105,12 +106,14 @@ public final class ImportUsers
 				password = getValue(nd);
 			} else if (nd.getNodeName().equals("sedici_eperson_id")) {
 				sedici_eperson_id = getValue(nd);
+			} else if (nd.getNodeName().equals("group")) {
+				groupName = getValue(nd);
 			}
 		}
 		
 		try {
 			CreateUser cu = new CreateUser();
-			cu.createUser(email, firstname, lastname, "", password,	sedici_eperson_id);
+			cu.createUser(email, firstname, lastname, "", password,	sedici_eperson_id, groupName);
 		} catch (Exception e1) {
 			// TODO Auto-generated catch block
 			// e1.printStackTrace();

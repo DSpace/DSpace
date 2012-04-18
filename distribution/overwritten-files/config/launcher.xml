@@ -354,6 +354,13 @@
         </step>
     </command>
     <command>
+        <name>create-group</name>
+        <description>Create a DSpace group</description>
+        <step>
+            <class>ar.edu.unlp.sedici.dspace.administer.CreateGroup</class>
+        </step>
+    </command>
+    <command>
         <name>import-users</name>
         <description>Import users from a file</description>
         <step>
