@@ -35,7 +35,7 @@
 						<a href="http://www.roble.unlp.edu.ar" target="_blank">http://www.roble.unlp.edu.ar</a>
 						<p>Sitio de ROBLE, portal de bibliotecas de la Universidad Nacional de La Plata.</p>
 					</li>
-					<a href="http://www.unlp.edu.ar/dpi/" target="_blank">http://www.unlp.edu.ar/dpi/</a>
+					<a href="http://www.unlp.edu.ar/propiedadintelectual" target="_blank">http://www.unlp.edu.ar/propiedadintelectual</a>
 					<p>Dirección de Propiedad Intelectual (DPI) de la UNLP. La Dirección
 					brinda asesoramiento jurídico especializado, realiza trámites de
 					registro de PI pertenecientes a la universidad e interviene en la
@@ -59,7 +59,7 @@
 							estándares de interoperabilidad para el acceso a documentos en
 							forma abierta entre bibliotecas digitales. Allí se pueden
 							encontrar especificaciones sobre el protocolo OAI-PMH para la
-							recolección de metadatos (“harvesting”), entre otros.</p>
+							recolección de metadatos ('harvesting''), entre otros.</p>
 					</li>
 
 					<li>
@@ -72,11 +72,11 @@
 					</li>
 				</ul>
 
-				<h1>Sitios de Tesis </h1>
+				<h1>Sitios de Tesis</h1>
 				<ul>
 
 					<li>
-						<a href="http://www.tdr.cesca.es" target="_blank">http://www.tdr.cesca.es</a>
+						<a href="http://www.tdx.cat" target="_blank">http://www.tdx.cat</a>
 						<p>Tesis Doctorales en Red. Repositorio cooperativo que contiene
 							más de 10.000 tesis a texto completo, depositadas en las
 							univerdades participantes (entre otras, la Autonóma de Barcelona,
@@ -107,18 +107,20 @@
 					</li>
 
 					<li>
-						<a href="http://www.ucm.es/BUCM/buscar/11502.php" target="_blank">http://www.ucm.es/BUCM/buscar/11502.php</a>
+						<a href="http://www.ucm.es/BUCM/" target="_blank">http://www.ucm.es/BUCM/</a>
 						<p>Biblioteca de la Universidad Complutense de Madrid (España). Portal de tesis digitales de REBIUN. 
 							Contiene información y acceso a tesis en el ámbito hispánico.</p>
 					</li>
 
 					<li>
-						<a href="http://www.cybertesis.net" target="_blank">http://www.cybertesis.net</a>
+						<a href="http://www.cybertesis.cl/" target="_blank">http://www.cybertesis.cl</a>
 						<p>Portal de tesis electrónicas. Cybertesis es una herramienta de
 							búsqueda de tesis electrónicas de diversas universidades
-							desarrollada por la Universidad de Chile. Actualmente participan
-							32 universidades de Europa, América Latina y África. La UNLP
-							participa a través de su repositorio central, SeDiCI.</p>
+							desarrollada por la Universidad de Chile. </p>
+					</li>
+					<li>
+						<a href="http://biblioteca.universia.net/">http://biblioteca.universia.net/</a>
+						<p>La Biblioteca de Recursos de Universia contiene mas de 16 millones recursos de 213 colecciones entre los cuales se encuentra la UNLP con su repositorio central, SeDiCI.</p>
 					</li>
 				</ul>
 
@@ -153,8 +155,7 @@
 							universitaria y el desarrollo de las nuevas tecnologías aplicadas
 							a la educación superior.</p>
 					</li>
-				</ul>
-				
+				</ul> 				
 			</div>
 		</div>
 	</body>
