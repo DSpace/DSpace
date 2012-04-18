@@ -21,6 +21,7 @@ dspace_dbpassword="dspace"
 
 #/////////////////////////////////////////////////////////////
 
+
 #Setea los parametros por default
 
 	if [ ! "$INSTALL_DIR"]; then

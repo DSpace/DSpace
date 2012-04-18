@@ -1,9 +1,10 @@
 #!/bin/bash
-
+set -e
 
 OLD_CWD=`pwd`
 BASE_DIR=$(cd `dirname $0` && pwd)
 source $BASE_DIR/build.defaults
+current_user=`whoami`
 
 #=============================================================================
 
@@ -164,7 +165,7 @@ do_install()
 	echo -e "Se setean los permisos para los directorios de trabajo log, assetstore, etc"
 	chmod -R ug+rw,o-w $INSTALL_DIR/log $INSTALL_DIR/assetstore $INSTALL_DIR/upload $INSTALL_DIR/solr/search $INSTALL_DIR/solr/statistics  $INSTALL_DIR/exports  $INSTALL_DIR/reports 
 	sudo chown -R $dspace_user.$dspace_group $INSTALL_DIR
-	echo "coco$1coco";
+	
 	if [ "x$1" = "x--deploy" ]; then
 		print_sec "Instalando el virtual host de apache con mod_proxy"
 		install_httpd_vhost
@@ -195,8 +196,15 @@ do_update(){
 
 	echo -e "\n==========ACTUALIZANDO DSPACE@SEDICI"
 	cd $BASE_DIR/distribution/target/dspace-sedici-distribution-bin
-	ant -Ddspace.dir=$INSTALL_DIR -Ddspace.configuration=$INSTALL_DIR/config/dspace.cfg -Doverwrite=false update
+	 
+	if [ ! "`id $current_user 2>/dev/null  | grep $dspace_group`" ]; then
+		print_err "El usuario que está ejecutando el script ($current_user) no es miembro del dspace_group $dspace_group. Por lo tanto no podrá modificar el directorio $INSTALL_DIR"
+		#No se puede ejecutar el siguiente comando como dspace porque ant crea directorios temporales en ../
+		#sudo su -c "$ANT_UPDATE" $dspace_user
+	fi
 	
+	ant -Ddspace.dir=$INSTALL_DIR -Ddspace.configuration=$INSTALL_DIR/config/dspace.cfg -Doverwrite=false update
+		
     print_sec "Felicitaciones! se actualizo correctamente Dspace@SeDiCI en \n\t $INSTALL_DIR"
 }
 
