@@ -2430,4 +2430,14 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="xmlui.Discovery.AbstractSearch.type_type">Filtrado por: Tipos de documento</message>
 <message key="xmlui.Discovery.AbstractSearch.type_keywords">Filtrado por: Palabras clave</message>
 
+<message key="sedici.comunidades.header">Navegue por nuestras colecciones</message>
+<message key="sedici.comunidades.tesis.nombre">Tesis</message>
+<message key="sedici.comunidades.tesis.info">Tesis de grado, post-grado y otros documentos</message>
+<message key="sedici.comunidades.revistas.nombre">Revistas</message>
+<message key="sedici.comunidades.revistas.info">Publicaciones en revistas científicas</message>
+<message key="sedici.comunidades.libros.nombre">Libros</message>
+<message key="sedici.comunidades.libros.info">Libros digitalizados y e-books</message>
+<message key="sedici.comunidades.eventos.nombre">Eventos</message>
+<message key="sedici.comunidades.eventos.info">Ponencias realizadas en congresos y conferencias</message>
+
 </catalogue>

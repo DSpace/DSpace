@@ -63,7 +63,9 @@
 	                    	<xsl:with-param name="data" select="*[not(name()='head')]"/>
 	                    </xsl:call-template>
 	                </ul>
-	                <xsl:apply-templates select="*[not(name()='head')]" mode="community-list-page-content"/>
+					<xsl:call-template name="community-list-page-content">
+						<xsl:with-param name="data" select="*[not(name()='head')]"/>
+					</xsl:call-template>
                 </div>
             </xsl:when>
             <xsl:otherwise>
@@ -100,20 +102,27 @@
         	</xsl:attribute>
 			<a>
 				<xsl:attribute name="href">#content-<xsl:value-of select="$id"/></xsl:attribute>
-				<xsl:call-template name="render-item-name-only">
-					<xsl:with-param name="url" select="$element/@url"/>
-				</xsl:call-template>
+				<i18n:text>sedici.comunidades.<xsl:value-of select="$configData/@qualifier"/>.nombre</i18n:text>
 			</a>
         </li>
 	</xsl:template>
     
     <!-- matching con los elementos <reference> para la creacion de los divs con el contenido para los tabs -->
-    <xsl:template match="dri:reference" mode="community-list-page-content">
-        <xsl:variable name="id" select="translate((translate(substring-after(@url,'/metadata/handle/'),'/','-')),'-mets.xml','')"/>
-        
-        <div id="content-{$id}">
-           	<xsl:apply-templates mode='community-list-page'/>
-        </div>
+    <xsl:template name="community-list-page-content">
+    	<xsl:param name="data"/>
+    	
+    	<xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='home-link']">
+	        <xsl:variable name="id" select="translate(.,'/','')"/>
+    		<xsl:variable name="community-selector">/metadata/handle/<xsl:value-of select="."/>/mets.xml</xsl:variable>
+
+	        <div id="content-{$id}">
+	        	<div class="tab-info">
+	        		<i18n:text>sedici.comunidades.<xsl:value-of select="@qualifier"/>.info</i18n:text>
+	        	</div>
+	           	<xsl:apply-templates select="$data[@url=$community-selector]/*" mode='community-list-page'/>
+	        </div>
+
+    	</xsl:for-each>
     </xsl:template>
     
     

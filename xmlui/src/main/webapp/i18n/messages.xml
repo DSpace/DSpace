@@ -2197,4 +2197,14 @@
 <message key="xmlui.Discovery.AbstractSearch.type_type">Filtered by: Document types</message>
 <message key="xmlui.Discovery.AbstractSearch.type_keywords">Filtered by: Keywords</message>
 
+<message key="sedici.comunidades.header">Navigate our collections</message>
+<message key="sedici.comunidades.tesis.nombre">Thesis</message>
+<message key="sedici.comunidades.tesis.info">Bachelor and doctoral thesis among other documents</message>
+<message key="sedici.comunidades.revistas.nombre">Journals</message>
+<message key="sedici.comunidades.revistas.info">Cientific journal publications</message>
+<message key="sedici.comunidades.libros.nombre">Books</message>
+<message key="sedici.comunidades.libros.info">Digitized books and e-books</message>
+<message key="sedici.comunidades.eventos.nombre">Events</message>
+<message key="sedici.comunidades.eventos.info">Congress y conference publications</message>
+
 </catalogue>

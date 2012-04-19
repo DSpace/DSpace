@@ -3057,5 +3057,34 @@ table.detailtable td:nth-child(2){
 	word-break:break-word;
 }
 
+#home_main_communities {
+	height: 240px;
+	margin-bottom: 30px;
+}
+h1.communities_header {
+	margin-bottom: 20px;
+}
+.community_icon_container img {
+	max-width: 150px;
+}
+.community_icon_container a {
+	padding: 10px 5px;
+	display: block;
+	border-radius: 10px;
+	min-height: 150px;
+}
+.community_icon_container a:hover, .community_icon_container a:hover p {
+	background-color: #E79011;
+	color: #FFFFFF;
+}
+.community_icon_container h2 {
+	font-size: 14px;
+	margin-bottom: 10px;
+}
+.community_icon_container p {
+	max-width: 150px;
+	color: #444444;
+}
+
 /* ATENCION: dejar siempre al final del css esta linea, es para detectar errores de sintaxis*/
 body{ background-color:white;}

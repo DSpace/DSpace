@@ -54,75 +54,28 @@
 	     </div>
 	     
 	     <div id='home_main_communities'>
-	     	<h1 class="communities_header">Navegue por nuestras colecciones</h1>
-	         <div id="icono_facultades" class="community_icon_container">
-		 		<a>
-		 		    <xsl:attribute name="href">
-		 		       handle/<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='home-link'][@qualifier='UnidadesAcademicas']"/>
-			 		</xsl:attribute>
-			 		<img id="community_icon_facultades" class="community_icon">
-			            <xsl:attribute name="src">
-			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-			                <xsl:text>/themes/</xsl:text>
-			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-			                <xsl:text>/images/4_unidades.png</xsl:text>
-			            </xsl:attribute>&#160;
-			 		</img>
-			 		<h2>Unidades académicas</h2>
-		 		</a>
-		 	 </div>
-
-	         <div id="icono_revistas" class="community_icon_container">
-		 		<a>
-		 		    <xsl:attribute name="href">
-		 		    handle/<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='home-link'][@qualifier='Revistas']"/>
-			 		</xsl:attribute>
-			 		<img id="community_icon_revistas" class="community_icon">
-			            <xsl:attribute name="src">
-			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-			                <xsl:text>/themes/</xsl:text>
-			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-			                <xsl:text>/images/1_revistas.png</xsl:text>
-			            </xsl:attribute>&#160;
-			 		</img>
-			 		<h2>Revistas</h2>
-		 		</a>
-		 	 </div>
-
-	         <div id="icono_eventos" class="community_icon_container">
-		 		<a>
-		 		    <xsl:attribute name="href">
-		 		        handle/<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='home-link'][@qualifier='Eventos']"/>
-			 		</xsl:attribute>
-			 		<img id="community_icon_eventos" class="community_icon">
-			            <xsl:attribute name="src">
-			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-			                <xsl:text>/themes/</xsl:text>
-			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-			                <xsl:text>/images/3_eventos.png</xsl:text>
-			            </xsl:attribute>&#160;
-			 		</img>
-			 		<h2>Eventos</h2>
-		 		</a>
-		 	 </div>
-
-	         <div id="icono_libros" class="community_icon_container">
-		 		<a>
-			 		<xsl:attribute name="href">
-			 		handle/<xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='home-link'][@qualifier='Libros']"/>
-			 		</xsl:attribute>
-			 		<img id="community_icon_libros" class="community_icon">
-			            <xsl:attribute name="src">
-			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
-			                <xsl:text>/themes/</xsl:text>
-			                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
-			                <xsl:text>/images/2_libros.png</xsl:text>
-			            </xsl:attribute>&#160;
-			 		</img>
-			 		<h2>Libros</h2>
-		 		</a>
-		 	 </div>
-	         
+	     	 <h1 class="communities_header"><i18n:text>sedici.comunidades.header</i18n:text></h1>
+	     	
+	     	 <!-- mostramos los links principales basados en la propiedad de configuracion xmlui.community-list.home-links -->
+	     	 <xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='home-link']">
+		         <div class="community_icon_container">
+		         	<xsl:attribute name="id">icono_<xsl:value-of select="@qualifier"/></xsl:attribute>
+			 		<a>
+			 		    <xsl:attribute name="href">handle/<xsl:value-of select="."/></xsl:attribute>
+				 		<h2><i18n:text>sedici.comunidades.<xsl:value-of select="@qualifier"/>.nombre</i18n:text></h2>
+				 		<img class="community_icon">
+				 			<xsl:attribute name="id">community_icon_<xsl:value-of select="@qualifier"/></xsl:attribute>
+				            <xsl:attribute name="src">
+				                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='contextPath'][not(@qualifier)]"/>
+				                <xsl:text>/themes/</xsl:text>
+				                <xsl:value-of select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='theme'][@qualifier='path']"/>
+				                <xsl:text>/images/icono_</xsl:text><xsl:value-of select="@qualifier"/><xsl:text>.png</xsl:text>
+				            </xsl:attribute>&#160;
+				 		</img>
+				 		<p><i18n:text>sedici.comunidades.<xsl:value-of select="@qualifier"/>.info</i18n:text></p>
+			 		</a>
+			 	 </div>
+	     	 </xsl:for-each>
 	     </div>
 	     
 	     <div id='home_feed'>
