@@ -1770,7 +1770,7 @@ border-left:1px solid #D4EEFA;
 border-bottom:1px solid #1072a0;
 border-right:1px solid #1072a0;
 color:#1b86b4;
-    right: 0px;
+    right: 100px;
     top: 10px;
     position: absolute;
 	text-align:center;
@@ -1795,8 +1795,10 @@ margin-bottom:3px;
 }
 
 #ds-user-box h2{
-font-size:16px;
-color:black;
+font-size:15px;
+color:#244453;
+width:160px;
+text-align:left;
 }
 
 #div-menu-lateral-cuenta-superior-derecho {
@@ -2503,7 +2505,8 @@ bottom:10px;
 	color: #9C4F0A;
 	margin-bottom: 10px;
 }
-.intro-text .licencia span div {
+.intro-text .licencia span a {
+	display: block;
 	background: url(../../images/cc-ship.gif) no-repeat center center;
 	width: 150px;
 	height: 50px;
@@ -2787,6 +2790,12 @@ background: url(../../images/mapa_grande_2.jpg);
 	margin-top: 15px;
 	margin-bottom: 5px;
 }
+
+#pagina_estatica .pagina_resolucion li{
+list-style-type:circle;
+margin-left:30px;
+}
+
 
 div.item-summary-view-metadata h1 {
 	line-height: normal;
