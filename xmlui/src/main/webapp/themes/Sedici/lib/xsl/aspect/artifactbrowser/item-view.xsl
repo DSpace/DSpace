@@ -593,6 +593,7 @@
 				<xsl:with-param name="index" select="($index + 1)"/>
 				<xsl:with-param name="separator" select="$separator"/>
 				<xsl:with-param name="type" select="$type"/>
+				<xsl:with-param name="acotar" select="$acotar"/>
 			</xsl:call-template>
 		</xsl:if>
 	</xsl:template>
