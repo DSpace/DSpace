@@ -32,7 +32,6 @@
         <xsl:value-of select="concat('|', substring-after(/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='autoArchive'][@qualifier='handle'], '/'), '|')"></xsl:value-of>
     </xsl:variable> 
     
-    
     <xsl:template match="dri:div[@id='aspect.artifactbrowser.CommunityBrowser.div.comunity-browser']">
 		 <xsl:apply-templates mode='community-list-page'>
 		   <!-- Mando este parametro para definir si es comunidad base o no -->
@@ -48,30 +47,75 @@
        <p class="ds-paragraph"><i18n:text><xsl:value-of select="."/></i18n:text></p>       
     </xsl:template>
     
+    
+    <!-- Matching con los elementos <referenceSet> -->
     <xsl:template match="dri:referenceSet[@type = 'summaryList']" priority="2" mode='community-list-page'>
         <xsl:param name="inicio">false</xsl:param>
+        
         <xsl:apply-templates select="dri:head"/>
-        <!-- Here we decide whether we have a hierarchical list or a flat one -->
+
+		<!-- Decide si tiene que armar los tabs o una lista -->        
         <xsl:choose>
-            <xsl:when test="$inicio = 'false'">
-                <!-- Si el parametro inicio no viene entonces no es una comunidad base, por lo que debe mostrarse oculta la UL -->
-                <ul style='display:none;'>
-                    <xsl:apply-templates select="*[not(name()='head')]" mode="community-list-page"/>
-                </ul>
-            </xsl:when>
-            <xsl:when test="descendant-or-self::dri:referenceSet/@rend='hierarchy' or ancestor::dri:referenceSet/@rend='hierarchy'">
-                <ul>
-                    <xsl:apply-templates select="*[not(name()='head')]" mode="community-list-page"/>
-                </ul>
+            <xsl:when test="$inicio = 'true'">
+		    	<div id="community-tabs">
+	                <ul>
+	                    <xsl:call-template name="community-list-page-tabs">
+	                    	<xsl:with-param name="data" select="*[not(name()='head')]"/>
+	                    </xsl:call-template>
+	                </ul>
+	                <xsl:apply-templates select="*[not(name()='head')]" mode="community-list-page-content"/>
+                </div>
             </xsl:when>
             <xsl:otherwise>
-                <ul class="ds-artifact-list">
+                <ul>
                     <xsl:apply-templates select="*[not(name()='head')]" mode="community-list-page"/>
                 </ul>
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
 
+
+    <!-- creacion de los tabs a partir de la configuracion de home-links: en el mismo orden -->
+    <xsl:template name="community-list-page-tabs">
+    	<xsl:param name="data"/>
+    	
+    	<xsl:for-each select="/dri:document/dri:meta/dri:pageMeta/dri:metadata[@element='home-link']">
+    		<xsl:variable name="community-selector">/metadata/handle/<xsl:value-of select="."/>/mets.xml</xsl:variable>
+    		<xsl:call-template name="render-tab-header">
+    			<xsl:with-param name="configData" select="."/>
+    			<xsl:with-param name="element" select="$data[@url=$community-selector]"/>
+    		</xsl:call-template>
+    	</xsl:for-each>
+    </xsl:template>
+    
+	<xsl:template name="render-tab-header">
+		<xsl:param name="configData"/>
+		<xsl:param name="element"/>
+	
+        <xsl:variable name="id" select="translate((translate(substring-after($element/@url,'/metadata/handle/'),'/','-')),'-mets.xml','')"/>
+        
+        <li id="tab-{$id}">
+        	<xsl:attribute name="class"> ds-artifact-item tab 
+        		<xsl:value-of select="$configData/@qualifier"></xsl:value-of>
+        	</xsl:attribute>
+			<a>
+				<xsl:attribute name="href">#content-<xsl:value-of select="$id"/></xsl:attribute>
+				<xsl:call-template name="render-item-name-only">
+					<xsl:with-param name="url" select="$element/@url"/>
+				</xsl:call-template>
+			</a>
+        </li>
+	</xsl:template>
+    
+    <!-- matching con los elementos <reference> para la creacion de los divs con el contenido para los tabs -->
+    <xsl:template match="dri:reference" mode="community-list-page-content">
+        <xsl:variable name="id" select="translate((translate(substring-after(@url,'/metadata/handle/'),'/','-')),'-mets.xml','')"/>
+        
+        <div id="content-{$id}">
+           	<xsl:apply-templates mode='community-list-page'/>
+        </div>
+    </xsl:template>
+    
     
     <!-- Then we resolve the reference tag to an external mets object -->
     <xsl:template match="dri:reference" mode="community-list-page">
@@ -79,19 +123,7 @@
         
         <!-- $communityId es el id de la comunidad actual, encerrado entre '|' -->
         <xsl:variable name="communityId" select="concat('|',substring-after(substring-before(substring-after(@url,'/metadata/handle/'),'/mets.xml'),'/'), '|')"/>
-        <!-- <p><xsl:value-of select="$communities-desplegables"/><xsl:value-of select="$communityId"/></p> -->
      
-        <xsl:variable name="externalMetadataURL">
-            <xsl:text>cocoon:/</xsl:text>
-            <xsl:value-of select="@url"/>
-            <!-- Since this is a summary only grab the descriptive metadata, and the thumbnails -->
-            <xsl:text>?sections=dmdSec,fileSec&amp;fileGrpTypes=THUMBNAIL</xsl:text>
-            <!-- An example of requesting a specific metadata standard (MODS and QDC crosswalks only work for items)->
-            <xsl:if test="@type='DSpace Item'">
-                <xsl:text>&amp;dmdTypes=DC</xsl:text>
-            </xsl:if>-->
-        </xsl:variable>
-        <xsl:comment> External Metadata URL: <xsl:value-of select="$externalMetadataURL"/> </xsl:comment>
         <li id="li-{$id}">
             <xsl:attribute name="class">
                 <xsl:text>ds-artifact-item </xsl:text>
@@ -112,70 +144,80 @@
             
             <!-- Si la referencia es de la coleccion de autoarchivo no se debe mostrar -->
            <xsl:if test="not($communityId = $autoarchiveId)">   
-           		<xsl:apply-templates select="document($externalMetadataURL)" mode="community-list-page"/>
-            </xsl:if>
+           		<xsl:call-template name="render-item-name">
+           			<xsl:with-param name="url" select="@url"/>
+           		</xsl:call-template>
+           </xsl:if>
             
-            <xsl:if test="contains($communities-desplegables, $communityId)">
-            	<xsl:apply-templates mode='community-list-page'/>
-            </xsl:if>
+           <xsl:if test="contains($communities-desplegables, $communityId)">
+           		<xsl:apply-templates mode='community-list-page'/>
+           </xsl:if>
         </li>
     </xsl:template>
     
-   <xsl:template match="mets:METS[mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']]" mode="community-list-page">
-        <xsl:choose>
-            <xsl:when test="@LABEL='DSpace Collection'">
-                <xsl:call-template name="collectionSummaryList-DIM-communityPage"/>
-            </xsl:when>
-            <xsl:when test="@LABEL='DSpace Community'">
-                <xsl:call-template name="communitySummaryList-DIM-communityPage"/>
-            </xsl:when>                
-            <xsl:otherwise>
-                <i18n:text>xmlui.dri2xhtml.METS-1.0.non-conformant</i18n:text>
-            </xsl:otherwise>
-        </xsl:choose>
+    
+    <!-- entra al mets y genera el toda la estructura de divs, spans y anchor de DSpace para la comunidad/coleccion -->
+    <xsl:template name="render-item-name">
+		<xsl:param name="url"/>
+		
+		<xsl:variable name="externalMetadataURL">
+            <xsl:text>cocoon:/</xsl:text>
+            <xsl:value-of select="$url"/>
+            <!-- Since this is a summary only grab the descriptive metadata, and the thumbnails -->
+            <xsl:text>?sections=dmdSec,fileSec&amp;fileGrpTypes=THUMBNAIL</xsl:text>
+        </xsl:variable>
+		
+		<xsl:apply-templates select="document($externalMetadataURL)" mode="community-list-page"/>
+		
     </xsl:template>
     
+    <!-- entra al mets y genera solo el nombre de la comunidad/coleccion -->
+    <xsl:template name="render-item-name-only">
+		<xsl:param name="url"/>
+		
+		<xsl:variable name="externalMetadataURL">
+            <xsl:text>cocoon:/</xsl:text>
+            <xsl:value-of select="$url"/>
+            <!-- Since this is a summary only grab the descriptive metadata, and the thumbnails -->
+            <xsl:text>?sections=dmdSec,fileSec&amp;fileGrpTypes=THUMBNAIL</xsl:text>
+        </xsl:variable>
+		
+		<xsl:apply-templates select="document($externalMetadataURL)" mode="community-list-page-name-only"/>
+		
+    </xsl:template>
 
-    <xsl:template name="communitySummaryList-DIM-communityPage">
-        <xsl:variable name="data" select="./mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim"/>
-        <xsl:variable name="id" select="translate(substring-after(@OBJID,'/'),'/','-')"/>
-        <div class="artifact-description-community">
+    
+    
+   <xsl:template match="mets:METS[mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']]" mode="community-list-page">
+   		<xsl:variable name="item-type">
+	        <xsl:choose>
+	            <xsl:when test="@LABEL='DSpace Collection'">collection</xsl:when>
+	            <xsl:otherwise>community</xsl:otherwise>                
+	        </xsl:choose>
+        </xsl:variable>
+
+        <div>
+        	<xsl:attribute name="class">artifact-description-<xsl:value-of select="$item-type"/></xsl:attribute>
             <div class="artifact-title">
                 <a href="{@OBJID}">
-                    <span class="Z3988">                    
-                        <xsl:choose>
-                            <xsl:when test="string-length($data/dim:field[@element='title'][1]) &gt; 0">
-                                <xsl:value-of select="$data/dim:field[@element='title'][1]"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </span>
+                	<xsl:apply-templates select="." mode="community-list-page-name-only"/>
                 </a>
             </div>
         </div>
     </xsl:template>
-
-    <!-- A collection rendered in the summaryList pattern. Encountered on the community-list page -->
-    <xsl:template name="collectionSummaryList-DIM-communityPage">
+    
+   <xsl:template match="mets:METS[mets:dmdSec/mets:mdWrap[@OTHERMDTYPE='DIM']]" mode="community-list-page-name-only">
         <xsl:variable name="data" select="./mets:dmdSec/mets:mdWrap/mets:xmlData/dim:dim"/>
-        <div class="artifact-description-collection">
-            <div class="artifact-title">
-                <a href="{@OBJID}">
-                    <span class="Z3988">
-                        <xsl:choose>
-                            <xsl:when test="string-length($data/dim:field[@element='title'][1]) &gt; 0">
-                                <xsl:value-of select="$data/dim:field[@element='title'][1]"/>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
-                            </xsl:otherwise>
-                        </xsl:choose>
-                    </span>
-                </a>
-           
-            </div>
-        </div>
+        <span class="Z3988">                    
+            <xsl:choose>
+                <xsl:when test="string-length($data/dim:field[@element='title'][1]) &gt; 0">
+                    <xsl:value-of select="$data/dim:field[@element='title'][1]"/>
+                </xsl:when>
+                <xsl:otherwise>
+                    <i18n:text>xmlui.dri2xhtml.METS-1.0.no-title</i18n:text>
+                </xsl:otherwise>
+            </xsl:choose>
+        </span>
     </xsl:template>
+
 </xsl:stylesheet>

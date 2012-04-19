@@ -399,6 +399,15 @@
 			&#160;
 		</script>
 		
+		 <script type="text/javascript">
+			$(function() {
+				$( "#community-tabs" ).tabs({
+					collapsible: true,
+					fx: {opacity: 'toggle', duration: 'fast'}
+				});
+			});
+		 </script>
+		
     </xsl:template>
     
         <!--

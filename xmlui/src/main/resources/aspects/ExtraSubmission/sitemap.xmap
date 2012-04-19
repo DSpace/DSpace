@@ -44,6 +44,9 @@
           <map:transform type="HomeLinks"/>
       </map:match>
       
+      <map:match pattern="community-list">
+          <map:transform type="HomeLinks"/>
+      </map:match>
 
       <!-- Make sure the user is atleast logged in -->
       <map:select type="AuthenticatedSelector">
