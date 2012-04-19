@@ -436,7 +436,7 @@
 					<type-bind>Tesis,Objeto de conferencia</type-bind>
 				</field>
 
-				<!-- ISBN - TESIS (opcional) -->
+				<!-- Nro de Acta - TESIS (opcional) -->
 				<field>
 					<dc-schema>sedici</dc-schema>
 					<dc-element>acta</dc-element>

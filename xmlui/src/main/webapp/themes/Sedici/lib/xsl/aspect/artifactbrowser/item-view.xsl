@@ -183,12 +183,12 @@
 		<!-- embargo rows -->
 		<xsl:if test="(dim:field[@element='embargo' and @qualifier='liftDate'])">
 			<div id="embargo-info">
-				<h2><i18n:text>xmlui.dri2xhtml.METS-1.0.embargoed-document</i18n:text></h2>
-				<p><i18n:text>xmlui.dri2xhtml.METS-1.0.embargoed-document-description</i18n:text></p>
-				<xsl:call-template name="render-normal-field">
-					<xsl:with-param name="name" select="'embargo-liftDate'" />
-					<xsl:with-param name="elements" select="dim:field[@element='embargo' and @qualifier='liftDate']" />
-				</xsl:call-template>
+				<span class="embargo_msg"><i18n:text>xmlui.dri2xhtml.METS-1.0.embargoed-document-description</i18n:text></span>
+				<span class="embargo_date">
+					<xsl:call-template name="render-date">
+						<xsl:with-param name="dateString" select="dim:field[@element='embargo' and @qualifier='liftDate']"/>
+					</xsl:call-template>
+				</span>
 			</div>
 		</xsl:if>
 
@@ -223,7 +223,6 @@
 		<xsl:call-template name="render-normal-field">
 			<xsl:with-param name="name" select="'title-alternative'" />
 			<xsl:with-param name="elements" select="dim:field[@element='title' and @qualifier='alternative']" />
-			<xsl:with-param name="type" select="'date'" />
 		</xsl:call-template>
 
 		<!-- Abstract row -->
