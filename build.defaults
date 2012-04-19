@@ -3,7 +3,7 @@
 
 DSPACE_VERSION="1.8.2"
 
-dspace_user=tomcat7
+dspace_user=dspace
 dspace_group=dspace
 
 web_user=tomcat7
