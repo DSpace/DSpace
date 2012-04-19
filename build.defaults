@@ -13,7 +13,7 @@ web_home=/var/lib/tomcat7/webapps/
 TOMCAT_TGZ_URL="http://apache.xfree.com.ar/tomcat/tomcat-7/v7.0.27/bin/apache-tomcat-7.0.27.tar.gz"
 
 seed="$RANDOM"
-dspace_dbuser="dspace"
+dspace_dbuser="dspace$seed"
 dspace_dbname="dspace$seed"
 dspace_dbpassword="dspace"
 
@@ -21,6 +21,11 @@ dspace_dbpassword="dspace"
 
 #/////////////////////////////////////////////////////////////
 
+        if [ -z "`sudo groupmod $dspace_group | grep $dspace_group`" ]; then
+            echo "Se creo el dspace_group $dspace_group"
+        else
+                echo "Ya existe el dspace_group $dspace_group"
+        fi
 
 #Setea los parametros por default
 

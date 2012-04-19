@@ -1,5 +1,7 @@
 #!/bin/bash
-set -e
+
+#http://stackoverflow.com/questions/368744/shell-scripting-die-on-any-error
+#set -e
 
 OLD_CWD=`pwd`
 BASE_DIR=$(cd `dirname $0` && pwd)
@@ -35,18 +37,21 @@ print_err(){
 #Crea el usuario y grupo para dspace y para el web container.
 create_user()
 {
-	if [ "`sudo groupmod $dspace_group`" ]; then
-	    sudo groupadd $dspace_group
-        echo "Se creo el dspace_group $dspace_group"
-	else
-		echo "Ya existe el dspace_group $dspace_group"
-	fi
+
+        sudo adduser -q --group $dspace_group 2>/dev/null
+
+#	if [ ! "`sudo groupmod $dspace_group 2>/dev/null`" ]; then
+#	    sudo groupadd $dspace_group
+        echo "Se creo el dspace_group $dspace_group, no se si existia, pero se trato de crear"
+#	else
+#		echo "Ya existe el dspace_group $dspace_group"
+#	fi
 
 	if [ ! "`id $dspace_user 2>/dev/null`" ]; then
 	    sudo useradd -d $BASE_DIR -g $dspace_group $dspace_user
         sudo chfn -o "umask=002" $dspace_user
-        echo "Se creo el dspace_user $dspace_user"
-	else
+       echo "Se creo el dspace_user $dspace_user"
+else
 		echo "Ya existe el dspace_user $dspace_user"
 	fi
 	
@@ -73,15 +78,15 @@ create_user()
 	        fi
         fi
         
-	 	if [ ! "`id $web_user 2>/dev/null  | grep $web_group`" ]; then
+ 	if [ -z "`id $web_user 2>/dev/null  | grep $web_group`" ]; then
 	 		 sudo adduser $web_user $dspace_group
  			 echo "Se agrego el web_user $web_user al dspace_group $dspace_group" 
         else
-        	 echo "El web_user $web_user ya pertenece al dspace_group $dspace_group" 
+       	 echo "El web_user $web_user ya pertenece al dspace_group $dspace_group" 
         fi
     else
-    	echo "el web_user es igual al dspace_user, $web_user"
-	fi
+  	echo "el web_user es igual al dspace_user, $web_user"
+fi
 }
 
 install_httpd_vhost()
