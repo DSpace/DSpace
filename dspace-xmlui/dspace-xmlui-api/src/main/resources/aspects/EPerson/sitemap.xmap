@@ -11,7 +11,7 @@
 
 <!-- 
 
-The EPerson Aspect is responsible for logging in, logging out, new user 
+The EPerson Aspect is responsible for loging in, loging out, new user 
 registration, forgotten passwords, editing profiles, and changing passwords.
 
 -->
@@ -97,26 +97,26 @@ registration, forgotten passwords, editing profiles, and changing passwords.
 			
 			
 			<!-- 
-					Add the basic navigation content to everypage. This includes:
+					Add the basic navigation content to every page. This includes:
 					
 					1) Metadata about the authenticated user.
-					   - This includes language information whether the user is authenticated or not.
-					2) Navigation links for loging in and logging out.
+					   - This includes language information, whether the user is authenticated or not.
+					2) Navigation links for logging in and logging out.
 					3) User contextual navigation items such as editing your profile, registering etc.
 					-->
 			<map:transform type="Navigation"/>
 			
 			
 			<!--
-					Preform a DSpace login. If the user's credentials are valid then the 
+					Perform a DSpace login. If the user's credentials are valid then the 
 					AuthenticateAction will succeed and a HTTP redirect will be sent to 
 					another page. If the credentials are not valid then a form will be 
 					displayed requesting new credentials.
 					
-					There are typicaly two methods by which the user arives at this url, 
+					There are typically two methods by which the user arrives at this url, 
 					one the user type in or followed a link straight to /login. The other 
 					is that they were trying to access a part of the system that required 
-					authentication. When this happens they will recieve a redirect to the 
+					authentication. When this happens they will receive a redirect to the 
 					/login form, as such they will not be presenting any credentials and 
 					will display the login form.  
 				 	-->
@@ -139,11 +139,11 @@ registration, forgotten passwords, editing profiles, and changing passwords.
 			
 			<!-- 
 				The following are matches to the URL returned by the stackable authentication
-			     methods defined in the dspace.cnf file
+				methods defined in the dspace.cnf file
 			-->
 			<map:match pattern="password-login">
 				<map:act type="AuthenticateAction">
-					<!-- Loggin succeeded, request will be forwarded. -->
+					<!-- Login succeeded, request will be forwarded. -->
 					<map:serialize type="xml"/>
 				</map:act>
 				
@@ -165,7 +165,7 @@ registration, forgotten passwords, editing profiles, and changing passwords.
          
 			<map:match pattern="shibboleth-login">
 				<map:act type="ShibbolethAction">
-					<!-- Loggin succeeded, request will be forwarded. -->
+					<!-- Login succeeded, request will be forwarded. -->
 					<map:serialize type="xml"/>
 				</map:act>
 				
@@ -176,7 +176,7 @@ registration, forgotten passwords, editing profiles, and changing passwords.
 			
 			<map:match pattern="ldap-login">
 				<map:act type="LDAPAuthenticateAction">
-					<!-- Loggin succeeded, request will be forwarded. -->
+					<!-- Login succeeded, request will be forwarded. -->
 					<map:serialize type="xml"/>
 				</map:act>
 				
@@ -199,7 +199,7 @@ registration, forgotten passwords, editing profiles, and changing passwords.
 			
 			
 			<!--
-					Registration multi-part form. The controler for this form is the 
+					Registration multi-part form. The controller for this form is the 
 					register flow script defined above.
 					-->
 			<map:match pattern="register/**">
@@ -244,7 +244,7 @@ registration, forgotten passwords, editing profiles, and changing passwords.
 			
 			
 			<!--
-					Registration multi-part form. The controler for this form is the 
+					Registration multi-part form. The controller for this form is the 
 					register flow script defined above.
 					-->
 			<map:match pattern="forgot/**">

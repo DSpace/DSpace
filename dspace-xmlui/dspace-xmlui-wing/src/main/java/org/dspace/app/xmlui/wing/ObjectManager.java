@@ -11,12 +11,12 @@ import java.util.Map;
 
 /**
  * The object manager is a class that must be implemented by each specific repository 
- * implementation that identifies refrenced objects. Since the DRI document includes 
- * refrences to external resources implementers of this class must know how objects 
- * are refrenced.
+ * implementation that identifies referenced objects. Since the DRI document includes 
+ * references to external resources implementers of this class must know how objects 
+ * are referenced.
  * 
  * The specefic implementation of ObjectManager that is used is determened by the
- * WingComponent that is creating the refrence.
+ * WingComponent that is creating the reference.
  * 
  * @author Scott Phillips
  */
@@ -34,7 +34,7 @@ public interface ObjectManager
     public boolean manageObject(Object object) throws WingException;  
 	
 	/**
-	 * Return a url refrencing the object's metadata. If this is unabvailable 
+	 * Return a url referencing the object's metadata. If this is unabvailable 
 	 * return null.
 	 * 
 	 * @param object The object being managed.

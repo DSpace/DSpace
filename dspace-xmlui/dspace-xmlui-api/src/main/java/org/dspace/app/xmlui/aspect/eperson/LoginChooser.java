@@ -152,24 +152,24 @@ public class LoginChooser extends AbstractDSpaceTransformer implements
 			Division reason = body.addDivision("login-reason");
 
 			if (header != null)
-            {
-                reason.setHead(message(header));
-            }
+			{
+				reason.setHead(message(header));
+			}
 			else
-            {
-                // Allways have a head.
-                reason.setHead("Authentication Required");
-            }
-
+			{
+				// Always have a head.
+				reason.setHead("Authentication Required");
+			}
+			
 			if (message != null)
-            {
-                reason.addPara(message(message));
-            }
-
+			{
+				reason.addPara(message(message));
+			}
+			
 			if (characters != null)
-            {
-                reason.addPara(characters);
-            }
+			{
+				reason.addPara(characters);
+			}
 		}
 
 		Division loginChooser = body.addDivision("login-chooser");

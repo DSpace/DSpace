@@ -38,16 +38,16 @@ import org.dspace.content.DSpaceObject;
 
 
 /**
- * This is an adapter which translate a DSpace item into a METS document
+ * This is an adapter which translates a DSpace item into a METS document
  * following the DSpace METS profile, err well mostly. At least if you use
- * the proper configuration it will be fully complaint with the profile,
+ * the proper configuration it will be fully compliant with the profile,
  * however this adapter will allow you to configure it to be incorrect.
  *
- * When we are configured to be non-complaint with the profile the MET's
- * profile is changed to reflect the diviation. The DSpace profile states
- * that metadata should be given in MODS format. However you can configure
+ * When we are configured to be non-compliant with the profile, the MET's
+ * profile is changed to reflect the deviation. The DSpace profile states
+ * that metadata should be given in MODS format. However, you can configure
  * this adapter to use any metadata crosswalk. When that case is detected we
- * change the profile to say that we are divating from the standard profile
+ * change the profile to say that we are deviating from the standard profile
  * and it lists what metadata has been added.
  *
  * There are four parts to an item's METS document: descriptive metadata,
@@ -61,16 +61,16 @@ public class ItemAdapter extends AbstractAdapter
     /** The item this METS adapter represents */
     private Item item;
 
-    /** List of bitstreams which should be publicaly viewable */
+    /** List of bitstreams which should be publicly viewable */
     private List<Bitstream> contentBitstreams = new ArrayList<Bitstream>();
 
     /** The primary bitstream, or null if none specified */
     private Bitstream primaryBitstream;
 
-    /** A space seperated list of descriptive metadata sections */
+    /** A space-separated list of descriptive metadata sections */
     private StringBuffer dmdSecIDS;
 
-    /** A space seperated list of administrative metadata sections (for item)*/
+    /** A space-separated list of administrative metadata sections (for item)*/
     private StringBuffer amdSecIDS;
     
     /** A hashmap of all Files and their corresponding space separated list of
@@ -157,7 +157,7 @@ public class ItemAdapter extends AbstractAdapter
     }
 
     /**
-     * Return a helpfull label that this is a DSpace Item.
+     * Return a helpful label that this is a DSpace Item.
      */
     protected String getMETSLabel()
     {
@@ -197,8 +197,8 @@ public class ItemAdapter extends AbstractAdapter
 
     /**
      * Render the METS descriptive section. This will create a new metadata
-     * section for each crosswalk configured. Futher more, a special check
-     * has been aded that will add mods descriptive metadata if it is
+     * section for each crosswalk configured. Furthermore, a special check
+     * has been added that will add MODS descriptive metadata if it is
      * available in DSpace.
      *
      * Example:
@@ -212,19 +212,19 @@ public class ItemAdapter extends AbstractAdapter
      */
     protected void renderDescriptiveSection() throws WingException, SAXException, CrosswalkException, IOException, SQLException
     {
-                AttributeMap attributes;
+        AttributeMap attributes;
         String groupID = getGenericID("group_dmd_");
         dmdSecIDS = new StringBuffer();
 
         // Add DIM descriptive metadata if it was requested or if no metadata types
-        // were specified. Further more since this is the default type we also use a
+        // were specified. Furthermore, since this is the default type we also use a
         // faster rendering method that the crosswalk API.
         if(dmdTypes.size() == 0 || dmdTypes.contains("DIM"))
         {
                 // Metadata element's ID
                 String dmdID = getGenericID("dmd_");
                 // Keep track of all descriptive sections
-            dmdSecIDS.append(dmdID);
+                dmdSecIDS.append(dmdID);
                 
                         ////////////////////////////////
                         // Start a metadata wrapper
@@ -292,7 +292,7 @@ public class ItemAdapter extends AbstractAdapter
                 // End elements
                 endElement(METS,"xmlData");
                 endElement(METS,"mdWrap");
-                endElement(METS, "dmdSec");
+                endElement(METS,"dmdSec");
 
         }
                 
@@ -315,7 +315,7 @@ public class ItemAdapter extends AbstractAdapter
                 }
                 
                 String dmdID = getGenericID("dmd_");
-                 // Add our id to the list.
+                // Add our id to the list.
                 dmdSecIDS.append(" ").append(dmdID);
                 
                 ////////////////////////////////
@@ -325,7 +325,7 @@ public class ItemAdapter extends AbstractAdapter
                 attributes.put("GROUPID", groupID);
                 startElement(METS, "dmdSec", attributes);
 
-                 ////////////////////////////////
+                ////////////////////////////////
                 // Start a metadata wrapper
                 attributes = new AttributeMap();
                 if (isDefinedMETStype(dmdType))
@@ -364,8 +364,8 @@ public class ItemAdapter extends AbstractAdapter
                         }
                         catch (AuthorizeException ae)
                         {
-                                // just ignore the authorize exception and continue on with
-                                //out parsing the xml document.
+                                // just ignore the authorize exception and continue on
+                                // without parsing the xml document.
                         }
                 
             
@@ -373,15 +373,15 @@ public class ItemAdapter extends AbstractAdapter
             // End elements
             endElement(METS,"xmlData");
             endElement(METS,"mdWrap");
-            endElement(METS, "dmdSec");
+            endElement(METS,"dmdSec");
         }
 
 
         // Check to see if there is an in-line MODS document
         // stored as a bitstream. If there is then we should also
-        // include these metadata in our METS document. However
+        // include these metadata in our METS document. However,
         // we don't really know what the document describes, so we
-        // but it in it's own dmd group.
+        // but it in its own dmd group.
 
         Boolean include = ConfigurationManager.getBooleanProperty("xmlui.bitstream.mods");
         if (include && dmdTypes.contains("MODS"))
@@ -437,8 +437,8 @@ public class ItemAdapter extends AbstractAdapter
                         }
                         catch (AuthorizeException ae)
                         {
-                                // just ignore the authorize exception and continue on with
-                                //out parsing the xml document.
+                                // just ignore the authorize exception and continue on
+                                // without parsing the xml document.
                         }
                         
                         // ////////////////////////////////
@@ -468,7 +468,7 @@ public class ItemAdapter extends AbstractAdapter
         AttributeMap attributes;
         String groupID;
 
-        //Only create an <amdSec>, if we have amdTypes (or sub-sections) specified...
+        // Only create an <amdSec>, if we have amdTypes (or sub-sections) specified...
         // (this keeps our METS file small, by default, and hides all our admin metadata)
         if(amdTypes.size() > 0)
         {
@@ -488,48 +488,48 @@ public class ItemAdapter extends AbstractAdapter
         // For each administrative metadata section specified
         for (String amdSecName : amdTypes.keySet())
         {
-          //get a list of metadata crosswalks which will be used to build
+          // get a list of metadata crosswalks which will be used to build
           // this administrative metadata section
           List<String> mdTypes = amdTypes.get(amdSecName);
 
           // For each crosswalk
           for (String mdType : mdTypes)
           {
-            //get our dissemination crosswalk
+            // get our dissemination crosswalk
             DisseminationCrosswalk crosswalk = getDisseminationCrosswalk(mdType);
 
-            //skip, if we cannot find this crosswalk in config file
+            // skip, if we cannot find this crosswalk in config file
             if (crosswalk == null)
             {
                 continue;
             }
 
-            //First, check if this crosswalk can handle disseminating Item-level Administrative metadata
+            // First, check if this crosswalk can handle disseminating Item-level Administrative metadata
             if(crosswalk.canDisseminate(item))
             {
-              //Since this crosswalk works with items, first render a section for entire item
+              // Since this crosswalk works with items, first render a section for entire item
               renderAmdSubSection(amdSecName, mdType, crosswalk, item);
             }
 
-            //Next, we'll try and render Bitstream-level administrative metadata
+            // Next, we'll try and render Bitstream-level administrative metadata
             // (Although, we're only rendering this metadata for the bundles specified)
             List<Bundle> bundles = findEnabledBundles();
             for (Bundle bundle : bundles)
             {
               Bitstream[] bitstreams = bundle.getBitstreams();
 
-              //Create a sub-section of <amdSec> for each bitstream in bundle
+              // Create a sub-section of <amdSec> for each bitstream in bundle
               for(Bitstream bitstream : bitstreams)
               {
-                 //Only render the section if crosswalk works with bitstreams
+                 // Only render the section if crosswalk works with bitstreams
                  if(crosswalk.canDisseminate(bitstream))
                  {
                     renderAmdSubSection(amdSecName, mdType, crosswalk, bitstream);
                  }
-              }//end for each bitstream
-            }//end for each bundle
-          }//end for each crosswalk
-        }//end for each amdSec
+              } // end for each bitstream
+            } // end for each bundle
+          } // end for each crosswalk
+        } // end for each amdSec
         
         if(amdTypes.size() > 0)
         {
@@ -567,7 +567,7 @@ public class ItemAdapter extends AbstractAdapter
         attributes.put("ID", amdSecID);
         startElement(METS, amdSecName, attributes);
 
-        //If this is a bitstream
+        // If this is a bitstream
         if (dso.getType() == Constants.BITSTREAM)
         {
           // Add this to our list of each file's administrative section IDs
@@ -580,10 +580,10 @@ public class ItemAdapter extends AbstractAdapter
           {
               fileAmdSecIDs.put(fileID, new StringBuffer(amdSecID));
           }
-        }//else if an Item
+        } // else if an Item
         else if (dso.getType() == Constants.ITEM)
         {
-           //Add this to our list of item's administrative section IDs
+           // Add this to our list of item's administrative section IDs
            if(amdSecIDS==null)
            {
                amdSecIDS = new StringBuffer(amdSecID);
@@ -633,8 +633,8 @@ public class ItemAdapter extends AbstractAdapter
         }
         catch (AuthorizeException ae)
         {
-            // just ignore the authorize exception and continue on with
-            //out parsing the xml document.
+            // just ignore the authorize exception and continue on
+            // without parsing the xml document.
         }
 
         // ////////////////////////////////
@@ -720,7 +720,7 @@ public class ItemAdapter extends AbstractAdapter
                 }
                 String groupID = getGroupFileID((originalBitstream == null) ? bitstream : originalBitstream );
 
-                //Check if there were administrative metadata sections corresponding to this file
+                // Check if there were administrative metadata sections corresponding to this file
                 String admIDs = null;
                 if(fileAmdSecIDs.containsKey(fileID))
                 {
@@ -755,12 +755,12 @@ public class ItemAdapter extends AbstractAdapter
     
     /**
      * Render the item's structural map. This includes a list of
-     * content bitstreams, those are bistreams that are typicaly
+     * content bitstreams, those are bitstreams that are typically
      * viewable by the end user.
      *
-     * Examlpe:
+     * Example:
      * <structMap TYPE="LOGICAL" LABEL="DSpace">
-     *   <div TYPE="DSpace Item" DMDID="space seperated list of ids">
+     *   <div TYPE="DSpace Item" DMDID="space-separated list of ids">
      *     <fptr FILEID="primary bitstream"/>
      *     ... a div for each content bitstream.
      *   </div>
@@ -797,7 +797,7 @@ public class ItemAdapter extends AbstractAdapter
         if (primaryBitstream != null)
         {
                 // ////////////////////////////////
-                // Start & end a refrence to the primary bistream.
+                // Start & end a reference to the primary bitstream.
                 attributes = new AttributeMap();
                 String fileID = getFileID(primaryBitstream);
                 attributes.put("FILEID", fileID);
@@ -809,14 +809,14 @@ public class ItemAdapter extends AbstractAdapter
         for (Bitstream bitstream : contentBitstreams)
         {
                 // ////////////////////////////////////
-                // Start a div for each publicaly viewable bitstream
+                // Start a div for each publicly viewable bitstream
                 attributes = new AttributeMap();
                 attributes.put("ID", getGenericID("div_"));
                 attributes.put("TYPE", "DSpace Content Bitstream");
                 startElement(METS,"div",attributes);
 
                 // ////////////////////////////////
-                // Start a the actualy pointer to the bitstream
+                // Start a the actualy pointer to the bitstream FIXME: what?
                 attributes = new AttributeMap();
                 String fileID = getFileID(bitstream);
                 attributes.put("FILEID", fileID);
@@ -884,8 +884,8 @@ public class ItemAdapter extends AbstractAdapter
                 }
                         catch (AuthorizeException ae)
                         {
-                                // just ignore the authorize exception and continue on with
-                                //out parsing the xml document.
+                                // just ignore the authorize exception and continue on
+                                // without parsing the xml document.
                         }
         }
     }
@@ -935,10 +935,10 @@ public class ItemAdapter extends AbstractAdapter
      */
     protected static Bitstream findOriginalBitstream(Item item,Bitstream derived) throws SQLException
     {
-        // FIXME: this method is a copy of the one found below. However the
+        // FIXME: this method is a copy of the one found below. However, the
         // original method is protected so we can't use it here. I think that
-        // perhaps this should be folded into the DSpace bitstream API. Untill
-        // then a good final solution can be determined I am just going to copy
+        // perhaps this should be folded into the DSpace bitstream API. Until
+        // when a good final solution can be determined I am just going to copy
         // the method here.
         //
         // return org.dspace.content.packager.AbstractMetsDissemination

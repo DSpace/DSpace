@@ -61,23 +61,23 @@ import com.sun.syndication.io.FeedException;
  * or the whole repository. This code was adapted from the syndication found
  * in DSpace's JSP implementation, "org.dspace.app.webui.servlet.FeedServlet".
  *
- * Once thing that has been modified from DSpace's JSP implementation is what
+ * One thing that has been modified from DSpace's JSP implementation is what
  * is placed inside an item's description, we've changed it so that the list
  * of metadata fields is scanned until a value is found and the first one
  * found is used as the description. This means that we look at the abstract,
- * description, alternative title, title, etc... to and the first metadata
+ * description, alternative title, title, etc., too and the first metadata
  * value found is used.
  *
- * I18N: Feed's are internationalized, meaning that they may contain refrences
+ * I18N: Feeds are internationalized, meaning that they may contain references
  * to messages contained in the global messages.xml file using cocoon's i18n
- * schema. However the library used to build the feeds does not understand
- * this schema to work around this limitation I created a little hack. It
- * basicaly works like this, when text that needs to be localized is put into
- * the feed it is allways mangled such that a prefix is added to the messages's
+ * schema. However, the library I used to build the feeds does not understand
+ * this schema to work around this limitation, so I created a little hack. It
+ * basically works like this, when text that needs to be localized is put into
+ * the feed it is always mangled such that a prefix is added to the messages's
  * key. Thus if the key were "xmlui.feed.text" then the resulting text placed
  * into the feed would be "I18N:xmlui.feed.text". After the library is finished
- * and produced it's final result the output is traversed to find these
- * occurances ande replace them with proper cocoon i18n elements.
+ * and produced, its final result the output is traversed to find these
+ * occurrences ande replace them with proper cocoon i18n elements.
  *
  *
  *
@@ -136,7 +136,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
      *
      * The validity object will include the collection being viewed and
      * all recently submitted items. This does not include the community / collection
-     * hierarch, when this changes they will not be reflected in the cache.
+     * hierarchy, when this changes they will not be reflected in the cache.
      */
     public SourceValidity getValidity()
     {
@@ -157,7 +157,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
                 
                 validity.add(dso);
                 
-                // add reciently submitted items
+                // add recently submitted items
                 for(Item item : getRecentlySubmittedItems(context,dso))
                 {
                     validity.add(item);
@@ -290,7 +290,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
             BrowseEngine be = new BrowseEngine(context);
             this.recentSubmissionItems = be.browseMini(scope).getItemResults(context);
 
-            // filter out Items taht are not world-readable
+            // filter out Items that are not world-readable
             if (!includeRestrictedItems)
             {
                 List<Item> result = new ArrayList<Item>();
@@ -382,7 +382,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
             }
             else
             {
-                // This is an error, state. We are being asked whether we are valid before
+                // This is an error state. We are being asked whether we are valid before
                 // we have been initialized.
                 return SourceValidity.INVALID;
             }
@@ -402,7 +402,7 @@ public class DSpaceFeedGenerator extends AbstractGenerator
                 FeedValidity other = (FeedValidity) otherValidity;
                 if (hash == other.hash)
                 {
-                    // Update both cache's expiration time.
+                    // Update expiration time of both caches.
                     this.expires = System.currentTimeMillis() + CACHE_AGE;
                     other.expires = System.currentTimeMillis() + CACHE_AGE;
 

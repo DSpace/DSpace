@@ -135,7 +135,7 @@ public class WingDocument extends AbstractWingElement implements
         String version = attributes.getValue(A_VERSION);
         if (!(DOCUMENT_VERSION.equals(version)))
         {
-            throw new WingException("Incompatable DRI versions, " + DOCUMENT_VERSION + " != " + version);
+            throw new WingException("Incompatible DRI versions, " + DOCUMENT_VERSION + " != " + version);
         }
         
         return true;
@@ -263,7 +263,7 @@ public class WingDocument extends AbstractWingElement implements
 //
 //    /**
 //     * Check the version string and make sure the given version is within the
-//     * minimum and maximum allowed document version. If it is out side these
+//     * minimum and maximum allowed document version. If it is outside these
 //     * bounds then a WingException is thrown.
 //     * 
 //     * @param version

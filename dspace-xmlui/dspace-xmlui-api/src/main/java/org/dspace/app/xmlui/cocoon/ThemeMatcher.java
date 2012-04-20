@@ -108,13 +108,13 @@ public class ThemeMatcher extends AbstractLogEnabled implements Matcher {
 				getLogger().debug("rule=" + rule.getName());
 				if (!(rule.hasRegex() || rule.hasHandle()))
                 {
-                    // Skip any rule with out a pattern or handle
+                    // Skip any rule without a pattern or handle
                     continue;
                 }
 
 				getLogger().debug("checking for patterns");
 				if (rule.hasRegex()) {
-					// If the rule has a pattern insure that the URL matches it.
+					// If the rule has a pattern ensure that the URL matches it.
 					Pattern pattern = rule.getPattern();
 					if (!pattern.matcher(uri).find())
                     {

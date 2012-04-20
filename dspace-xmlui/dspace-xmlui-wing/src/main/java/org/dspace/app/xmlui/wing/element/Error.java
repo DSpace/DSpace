@@ -21,7 +21,7 @@ import org.xml.sax.helpers.NamespaceSupport;
  */
 public class Error extends TextContainer implements StructuralElement
 {
-    /** The name of the erorr element */
+    /** The name of the error element */
     public static final String E_ERROR = "error";
 
     /**

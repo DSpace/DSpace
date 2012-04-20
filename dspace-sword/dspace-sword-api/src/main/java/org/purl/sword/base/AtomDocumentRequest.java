@@ -20,7 +20,7 @@ public class AtomDocumentRequest
    /** The password */
    private String password;
    
-   /** The IP Address */
+   /** The IP address */
    private String  IPAddress;
    
    /** The location */

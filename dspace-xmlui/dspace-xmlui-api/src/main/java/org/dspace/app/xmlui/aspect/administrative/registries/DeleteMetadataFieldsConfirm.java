@@ -27,7 +27,7 @@ import org.dspace.content.MetadataSchema;
  * Prompt the user with a list of to-be-deleted metadata fields and
  * ask the user if they are sure they want them deleted.
  * 
- * @author Scott phillips
+ * @author Scott Phillips
  */
 public class DeleteMetadataFieldsConfirm extends AbstractDSpaceTransformer   
 {

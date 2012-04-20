@@ -231,7 +231,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
     }
 
     /**
-     * Display a single community (and refrence any sub communites or
+     * Display a single community (and reference any sub communites or
      * collections)
      */
     public void addBody(Body body) throws SAXException, WingException,
@@ -307,7 +307,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
                     ReferenceSet.TYPE_DETAIL_VIEW);
             Reference communityInclude = referenceSet.addReference(community);
 
-            // If the community has any children communities also refrence them.
+            // If the community has any children communities also reference them.
             if (subCommunities != null && subCommunities.length > 0)
             {
                 ReferenceSet communityReferenceSet = communityInclude
@@ -315,7 +315,7 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
 
                 communityReferenceSet.setHead(T_head_sub_communities);
 
-                // Sub communities
+                // Subcommunities
                 for (Community subCommunity : subCommunities)
                 {
                     communityReferenceSet.addReference(subCommunity);
@@ -329,14 +329,14 @@ public class CommunityViewer extends AbstractDSpaceTransformer implements Cachea
                 communityReferenceSet.setHead(T_head_sub_collections);
                        
 
-                // Sub collections
+                // Subcollections
                 for (Collection collection : collections)
                 {
                     communityReferenceSet.addReference(collection);
                 }
 
             }
-        }// main refrence
+        } // main reference
     }
     
 

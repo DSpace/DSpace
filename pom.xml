@@ -888,7 +888,7 @@
             <url>http://scm.dspace.org/svn/repo/licenses/LICENSE.txt</url>
             <distribution>repo</distribution>
         <comments>
-            A BSD compatable OSS license for the DSpace codebase.
+            A BSD-compatible OSS license for the DSpace codebase.
          </comments>
       </license>
     </licenses>

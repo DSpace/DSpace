@@ -31,7 +31,7 @@ import org.xml.sax.SAXException;
 /**
  * Allow the user to select a collection they wish to submit an item to, 
  * this step is sort-of but not officialy part of the item submission 
- * processes. Normaly a user will have selected a collection to submit 
+ * processes. Normally a user will have selected a collection to submit 
  * too by going to the collection's page, but if that was invalid or the 
  * user came directly from the mydspace page then this step is given.
  * 

@@ -24,7 +24,7 @@ import org.dspace.eperson.Group;
 
 /**
  * Present the user with a list of soon-to-be-deleted Groups. 
- * If the user clicks confirm deletition then they will be 
+ * If the user clicks confirm deletion then they will be 
  * deleted otherwise they will be spared the wrath of deletion.
  * @author Scott Phillips
  */

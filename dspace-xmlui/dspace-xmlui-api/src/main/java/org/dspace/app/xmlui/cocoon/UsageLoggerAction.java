@@ -50,8 +50,8 @@ public class UsageLoggerAction extends AbstractAction {
             }
             logDspaceObject(request, dso, context);
         }catch(Exception e){
-            //Ignore we cannot let this crash
-            //TODO: log this
+            // Ignore, we cannot let this crash
+            // TODO: log this
             e.printStackTrace();
         }
 
@@ -91,14 +91,14 @@ public class UsageLoggerAction extends AbstractAction {
         String name = par.getParameter("name", null);
 
 
-        // Reslove the bitstream
+        // Resolve the bitstream
         Bitstream bitstream = null;
         Item item;
         DSpaceObject dso;
 
         if (bitstreamID > -1)
         {
-            // Direct refrence to the individual bitstream ID.
+            // Direct reference to the individual bitstream ID.
             bitstream = Bitstream.find(context, bitstreamID);
         }
         else if (itemID > -1)

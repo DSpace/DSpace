@@ -121,7 +121,7 @@
         </div>
     </xsl:template>
 
-    <!-- The hadling of the special case of instanced composite fields under "form" lists -->
+    <!-- The handling of the special case of instanced composite fields under "form" lists -->
     <xsl:template match="dri:field[@type='composite'][dri:field/dri:instance | dri:params/@operations]" mode="formComposite" priority="2">
         <xsl:variable name="confidenceIndicatorID" select="concat(translate(@id,'.','_'),'_confidence_indicator')"/>
         <div class="ds-form-content">

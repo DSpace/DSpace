@@ -164,7 +164,7 @@ public class AddBitstreamForm extends AbstractDSpaceTransformer
                 }
             } else
             {
-                // At least one bundle exists, does the user have privleges to upload to it?
+                // At least one bundle exists, does the user have privileges to upload to it?
                 Bundle bundle = bundles[0];
                 if (!AuthorizeManager.authorizeActionBoolean(context, bundle, Constants.ADD))
                 {

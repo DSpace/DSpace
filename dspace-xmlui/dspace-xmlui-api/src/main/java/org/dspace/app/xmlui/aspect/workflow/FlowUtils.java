@@ -83,7 +83,7 @@ public class FlowUtils {
 
 	/**
 	 * Return the given task back to the pool of unclaimed tasks for another user
-	 * to select and preform.
+	 * to select and perform.
 	 *
 	 * @param context The current DSpace content
 	 * @param id The unique ID of the current workflow
@@ -97,7 +97,7 @@ public class FlowUtils {
 
         context.commit();
 
-        //Log this unclaim action
+        // Log this unclaim action
         log.info(LogManager.getHeader(context, "unclaim_workflow",
                 "workflow_item_id=" + workflowItem.getID() + ",item_id="
                         + workflowItem.getItem().getID() + ",collection_id="
@@ -107,7 +107,7 @@ public class FlowUtils {
 
 	/**
 	 * Claim this task from the pool of unclaimed task so that this user may
-	 * preform the task by either approving or rejecting it.
+	 * perform the task by either approving or rejecting it.
 	 *
 	 * @param context The current DSpace content
 	 * @param id The unique ID of the current workflow
@@ -118,7 +118,7 @@ public class FlowUtils {
         if(workflowItem.getState() != WorkflowManager.WFSTATE_STEP1POOL &&
                 workflowItem.getState() != WorkflowManager.WFSTATE_STEP2POOL &&
                 workflowItem.getState() != WorkflowManager.WFSTATE_STEP3POOL){
-            //Only allow tasks in the pool to be claimed !
+            // Only allow tasks in the pool to be claimed !
             throw new AuthorizeException("Error while claiming task: this task has already been claimed !");
         }
 
@@ -127,7 +127,7 @@ public class FlowUtils {
 
        context.commit();
 
-       //log this claim information
+       // log this claim information
        log.info(LogManager.getHeader(context, "claim_task", "workflow_item_id="
                    + workflowItem.getID() + "item_id=" + workflowItem.getItem().getID()
                    + "collection_id=" + workflowItem.getCollection().getID()
@@ -152,7 +152,7 @@ public class FlowUtils {
         if((workflowItem.getState() == WorkflowManager.WFSTATE_STEP1POOL ||
                 workflowItem.getState() == WorkflowManager.WFSTATE_STEP2POOL ||
                 workflowItem.getState() == WorkflowManager.WFSTATE_STEP3POOL)){
-            //Verify if the current user has the current workflowItem among his pooled tasks
+            // Verify if the current user has the current workflowItem among his pooled tasks
             boolean hasPooledTask = false;
             List<WorkflowItem> pooledTasks = WorkflowManager.getPooledTasks(context, context.getCurrentUser());
             for (WorkflowItem pooledItem : pooledTasks) {
@@ -186,7 +186,7 @@ public class FlowUtils {
 		{
             WorkspaceItem wsi = WorkflowManager.reject(context, workflowItem,context.getCurrentUser(), reason);
 
-			//Load the Submission Process for the collection this WSI is associated with
+            // Load the Submission Process for the collection this WSI is associated with
             Collection c = wsi.getCollection();
             SubmissionConfigReader subConfigReader = new SubmissionConfigReader();
             SubmissionConfig subConfig = subConfigReader.getSubmissionConfig(c.getHandle(), false);
@@ -201,7 +201,7 @@ public class FlowUtils {
 
             context.commit();
 
-            //Submission rejected.  Log this information
+            // Submission rejected.  Log this information
             log.info(LogManager.getHeader(context, "reject_workflow", "workflow_item_id="
                     + wsi.getID() + "item_id=" + wsi.getItem().getID()
                     + "collection_id=" + wsi.getCollection().getID()
