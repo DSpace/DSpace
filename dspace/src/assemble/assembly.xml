@@ -8,80 +8,114 @@
 
 -->
 <assembly xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/assembly-1.1.0-SNAPSHOT.xsd">
-	<id>build</id>
-	<formats>
-		<format>dir</format>
-	</formats>
-	<includeBaseDirectory>false</includeBaseDirectory>
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/assembly-1.1.0-SNAPSHOT.xsd">
+   <id>build</id>
+   <formats>
+      <format>dir</format>
+   </formats>
+   <includeBaseDirectory>false</includeBaseDirectory>
 
-	<fileSets>
-		<fileSet>
-			<directory>src/main/config</directory>
-			<outputDirectory>.</outputDirectory>
-			<includes>
-				<include>build.xml</include>
-			</includes>
-		</fileSet>
-		<fileSet>
-			<outputDirectory>.</outputDirectory>
-			<includes>
-				<include>bin/**</include>
-				<include>config/**</include>
-				<include>docs/**</include>
-				<include>etc/**</include>
-				<include>solr/**</include>
-                <include>build.xml</include>
-				<include>LICENSE*</include>
-				<include>CHANGES</include>
-				<include>KNOWN_BUGS</include>
-				<include>README</include>
-			</includes>
-			<excludes>
-				<exclude>src</exclude>
-				<exclude>config/dspace.cfg</exclude>
-				<exclude>config/modules/**</exclude>
-			</excludes>
-		</fileSet>
-        <fileSet>
-            <outputDirectory>.</outputDirectory>
-            <includes>
-                <include>config/modules/**</include>
-            </includes>
-            <filtered>true</filtered>
-        </fileSet>
-	</fileSets>
+   <fileSets>
+      <fileSet>
+         <directory>src/main/config</directory>
+         <outputDirectory>.</outputDirectory>
+         <includes>
+            <include>build.xml</include>
+         </includes>
+      </fileSet>
+      <fileSet>
+         <outputDirectory>.</outputDirectory>
+         <includes>
+            <include>bin/**</include>
+            <include>config/**</include>
+            <include>docs/**</include>
+            <include>etc/**</include>
+            <include>solr/**</include>
+            <include>build.xml</include>
+            <include>LICENSE*</include>
+            <include>CHANGES</include>
+            <include>KNOWN_BUGS</include>
+            <include>README</include>
+         </includes>
+         <excludes>
+            <exclude>src</exclude>
+            <exclude>config/dspace.cfg</exclude>
+            <exclude>config/modules/**</exclude>
+         </excludes>
+      </fileSet>
+      <fileSet>
+         <outputDirectory>.</outputDirectory>
+         <includes>
+            <include>config/modules/**</include>
+         </includes>
+         <filtered>true</filtered>
+      </fileSet>
+   </fileSets>
 
-	<files>
-		<file>
-			<source>config/dspace.cfg</source>
-			<outputDirectory>config</outputDirectory>
-			<filtered>true</filtered>
-		</file>
-	</files>
+   <files>
+      <file>
+         <source>config/dspace.cfg</source>
+         <outputDirectory>config</outputDirectory>
+         <filtered>true</filtered>
+      </file>
+   </files>
 
-	<dependencySets>
-		<dependencySet>
-			<excludes>
-				<exclude>*:war:*</exclude>
-			</excludes>
-			<outputDirectory>lib</outputDirectory>
-		</dependencySet>
-	</dependencySets>
+   <!--
+   Still allow anyone to put a dependency into
+   dspace/pom.xml and have it go into lib
+   -->
+   <dependencySets>
+      <dependencySet>
+         <includes>
+            <include>*:jar:*</include>
+         </includes>
+         <outputDirectory>lib</outputDirectory>
+      </dependencySet>
+   </dependencySets>
 
-	<moduleSets>
-		<moduleSet>
-			<includes>
-                            <include>org.dspace.modules:*:war:*</include>
-			</includes>
 
-			<binaries>
-                            <includeDependencies>false</includeDependencies>
-                            <outputDirectory>webapps/${module.artifactId}</outputDirectory>
-                            <unpack>true</unpack>
-                        </binaries>
-		</moduleSet>
-	</moduleSets>
+   <moduleSets>
+      <!--
+      take all jar modules in modules dir
+      and add them into lib
+      -->
+      <moduleSet>
+         <excludes>
+            <exclude>*:war:*</exclude>
+         </excludes>
+         <includes>
+            <include>*:jar:*</include>
+         </includes>
+         <binaries>
+            <includeDependencies>true</includeDependencies>
+            <outputDirectory>lib</outputDirectory>
+            <unpack>false</unpack>
+            <dependencySets>
+               <dependencySet>
+                  <includes>
+                     <include>*:jar:*</include>
+                  </includes>
+                  <outputDirectory>lib</outputDirectory>
+               </dependencySet>
+            </dependencySets>
+         </binaries>
+      </moduleSet>
+
+      <!--
+      take all war modules and explode them into
+      webapps
+      -->
+      <moduleSet>
+         <includes>
+            <include>org.dspace.modules:*:war:*</include>
+         </includes>
+         <binaries>
+            <includeDependencies>false</includeDependencies>
+            <outputDirectory>webapps/${module.artifactId}</outputDirectory>
+            <unpack>true</unpack>
+         </binaries>
+      </moduleSet>
+   </moduleSets>
 
 </assembly>

@@ -102,6 +102,12 @@
 
    <dependencies>
 
+      <dependency>
+         <groupId>org.dspace.modules</groupId>
+         <artifactId>api</artifactId>
+
+      </dependency>
+
       <!-- DSpace Custom SWORDv2 Web application -->
       <dependency>
         <groupId>org.dspace</groupId>

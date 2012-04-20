@@ -102,6 +102,11 @@
 
    <dependencies>
       <dependency>
+         <groupId>org.dspace.modules</groupId>
+         <artifactId>api</artifactId>
+
+      </dependency>
+      <dependency>
          <groupId>org.dspace</groupId>
          <artifactId>dspace-sword-webapp</artifactId>
          <type>war</type>

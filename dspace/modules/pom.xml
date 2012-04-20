@@ -25,6 +25,15 @@
          compiling of the corresponding source module.
     -->
     <profiles>
+       <profile>
+          <id>dspace-additions</id>
+          <activation>
+             <activeByDefault>true</activeByDefault>
+          </activation>
+          <modules>
+             <module>api</module>
+          </modules>
+       </profile>
         <profile>
             <id>dspace-xmlui</id>
             <activation>
