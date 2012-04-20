@@ -273,7 +273,7 @@ background-repeat: no-repeat;
     float: left;
     width: 675px;
     padding-top: 10px;
-	
+min-height: 400px;	
 }
 
 #ds-options-wrapper {
@@ -2713,12 +2713,13 @@ float:left;
 }
 
 .datos_unlp {
-padding-left:10px;
-float:left;
-font-size:11px;
-margin: 6px 0px 0px 0px;
+	padding-left: 52px;
+	float: left;
+	font-size: 11px;
+	margin: 6px 0px 0px 0px;
+	background: url('../../images/img_unlp.png') no-repeat left;
+	height: 57px;
 }
-
 .datos_unlp a {
 text-decoration:none;
 color:#e38338;

@@ -37,7 +37,7 @@
 	<message key="xmlui.general.dspace_home">Sedici</message>
 <message key="xmlui.general.search">Búsquedas</message>
 <message key="xmlui.general.go">Ir</message>
-<message key="xmlui.general.go_home">Volver a página principal SeDiCI</message>
+<message key="xmlui.general.go_home">Ir a la página de inicio</message>
 <message key="xmlui.general.save">Guardar</message>
 <message key="xmlui.general.cancel">Cancelar</message>
 <message key="xmlui.general.return">Volver</message>
@@ -2237,6 +2237,14 @@ este momento. Cuando se usa QDC para los elementos de SeDiCI se recomienda el us
 <message key="sedici.menuLateral.cuenta.export">Mis exportaciones</message>
 
 <message key="sedici.menuLateral.otros.head">Otros</message>
+
+<message key="sedici.errorTitle.resourceNotFound">Página no encontrada</message>
+<message key="sedici.errorDescription.resourceNotFound">El recurso solicitado no existe o no se encuentra disponible en este momento.</message>
+<message key="sedici.errorTitle.invalidContinuation">Su sesión ha caducado. </message>
+<message key="sedici.errorDescription.invalidContinuation">Normalmente esto sucede cuando pasan varios minutos sin registrarse actividad desde su computadora . Por favor ingrese nuevamente con su cuenta de usuario.</message>
+<message key="sedici.errorTitle.internalError">Se produjo un Error.</message> 
+<message key="sedici.errorDescription.internalError">Lo sentimos, se produjo un error de origen desconocido en la aplicación. Este incidente será reportado a los administradores para que revisen si existe algún problema. </message>
+<message key="sedici.errorDescription.generalNote">Si considera que existe un problema que debe ser resuelto o quiere realizarnos una consulta, no dude en contactarse por correo electrónico a info@sedici.unlp.edu.ar</message>
 
 <!-- Creative Commons mensajes -->
 <message key="xmlui.Submission.submit.SediciCCLicenseStep.CommercialQuestion">¿Quiere permitir usos comerciales de su obra?</message>

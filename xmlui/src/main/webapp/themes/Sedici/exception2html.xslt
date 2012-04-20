@@ -8,122 +8,195 @@
     http://www.dspace.org/license/
 
 -->
-
-<!-- 
-
-This stylsheet to handle exception display is a modified version of the
-base apache cocoon stylesheet, this is still under the Apache license.
-
-The original author is unknown.
-Scott Phillips adapted it for Manakin's need.
-
--->
-
 <xsl:stylesheet version="1.0"
                 xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                 xmlns:ex="http://apache.org/cocoon/exception/1.0"
                 xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
 
   <xsl:param name="realPath"/>
-
-  <!-- let sitemap override default page title -->
-  <xsl:param name="pageTitle">An error has occurred</xsl:param>
-
-  <!-- let sitemap override default context path -->
+  <xsl:param name="errorKind">internalError</xsl:param>
   <xsl:param name="contextPath">/</xsl:param>
-
-  <xsl:template match="ex:exception-report">
-    <html>
-      <head>
-        <title>
-          <xsl:value-of select="$pageTitle"/>
-        </title>
+  <xsl:param name="printDebug">false</xsl:param>
+  <xsl:param name="requestQueryString"></xsl:param>
+  
+<xsl:template match="/">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<link rel="shortcut icon">
+		<xsl:attribute name="href"><xsl:value-of select="concat($contextPath,'/themes/Sedici/images/favicon.ico')"/></xsl:attribute>
+	</link>
+	<link media="screen" rel="stylesheet" type="text/css" >
+		<xsl:attribute name="href"><xsl:value-of select="concat($contextPath,'/themes/Sedici/lib/css/base.css')"/></xsl:attribute>
+	</link>
+	<link media="screen" rel="stylesheet" type="text/css">
+		<xsl:attribute name="href"><xsl:value-of select="concat($contextPath,'/themes/Sedici/lib/css/reset.css')"/></xsl:attribute>
+	</link>
+	<link media="screen" rel="stylesheet" type="text/css">
+		<xsl:attribute name="href"><xsl:value-of select="concat($contextPath,'/themes/Sedici/lib/css/style.css')"/></xsl:attribute>
+	</link>
+	<title><i18n:text>sedici.errorTitle.<xsl:value-of select="$errorKind"/></i18n:text></title>
         <style>
-          h1 { font-size: 200%; color: #336699; text-align: left; margin: 0px 0px 10px 0px; padding: 0px 0px 0px 60px; border-width: 0px 0px 1px 0px; border-style: solid; border-color: #336699;}
           p.home { padding: 10px 30px 10px 15px; margin-left: 15px; font-size: 100%;}
           p.message { padding: 10px 30px 10px 15px; margin-left: 15px; font-weight: bold; font-size: 100%;  border-left: 1px #336699 dashed;}
           p.description { padding: 10px 30px 20px 30px; border-width: 0px 0px 1px 0px; border-style: solid; border-color: #336699;}
           p.topped { padding-top: 10px; border-width: 1px 0px 0px 0px; border-style: solid; border-color: #336699; }
           span.switch { cursor: pointer; margin-left: 5px; text-decoration: underline; }
           span.description { color: #336699; font-weight: bold; }
-          
           .row-1 { background-color: #F0F0F0;}
           table { border-collapse: collapse; margin-top: 0.3em; }
           td { padding: 0.1em; }
         </style>
-        <script type="text/javascript">
-          function toggle(id) {
-            var element = document.getElementById(id);
-            with (element.style) {
-              if ( display == "none" ) {
-                display = ""
-              } else {
-                display = "none"
-              }
-            }
-          
-            var text = document.getElementById(id + "-switch").firstChild;
-            if (text.nodeValue == "[show]") {
-              text.nodeValue = "[hide]";
-            } else {
-              text.nodeValue = "[show]";
-            }
-          }
-        </script>
-      </head>
-      <body>
+</head>
+<body>
+    <xsl:if test="$printDebug = 'true'">
         <xsl:attribute name="onload">
-          <xsl:if test="ex:cocoon-stacktrace">toggle('locations');</xsl:if>
-          <xsl:if test="ex:stacktrace">toggle('stacktrace');</xsl:if>
-          <xsl:if test="ex:full-stacktrace">toggle('full-stacktrace');</xsl:if>
+          <xsl:if test="ex:exception-report/ex:cocoon-stacktrace">toggle('locations');</xsl:if>
+          <xsl:if test="ex:exception-report/ex:stacktrace">toggle('stacktrace');</xsl:if>
+          <xsl:if test="ex:exception-report/ex:full-stacktrace">toggle('full-stacktrace');</xsl:if>
         </xsl:attribute>
+	</xsl:if>
+		
+	<div id="ds-main" xmlns="http://di.tamu.edu/DRI/1.0/"
+		xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
+		<div id="ds-header-wrapper">
+			<div id="ds-header" class="clearfix">
+				<a href="/xmlui/" id="ds-header-logo-link"> 
+					<span id="ds-header-logo">&#160;</span>
+				</a>
+			</div>
+		</div>
+<!-- 		<div id="topNav" xmlns:i18n="http://apache.org/cocoon/i18n/2.1"> -->
+<!-- 		</div> -->
 
-        <h1><xsl:value-of select="$pageTitle"/></h1>
-        <p>En Debug</p>
-        <p class="home">
-          <a><xsl:attribute name="href"><xsl:value-of select="$contextPath"/></xsl:attribute><i18n:text>xmlui.general.go_home</i18n:text></a>
-        </p>
-        <p class="message">
-          <xsl:value-of select="@class"/>:
-          <xsl:apply-templates select="ex:message" mode="breakLines"/>
-          <xsl:if test="ex:location">
-             <br/><span style="font-weight: normal"><xsl:apply-templates select="ex:location"/></span>
-          </xsl:if>
-        </p>
+		<div id="ds-content-wrapper">
+			<div id="ds-content" class="clearfix">
 
-        <p><span class="description">Cocoon stacktrace</span>
-           <span class="switch" id="locations-switch" onclick="toggle('locations')">[hide]</span>
-        </p>
-        <div id="locations">
-          <xsl:for-each select="ex:cocoon-stacktrace/ex:exception">
-            <xsl:sort select="position()" order="descending"/>
-            <strong>
-               <xsl:apply-templates select="ex:message" mode="breakLines"/>
-            </strong>
-            <table>
-               <xsl:for-each select="ex:locations/*[string(.) != '[cause location]']">
-                 <!-- [cause location] indicates location of a cause, which 
-                      the exception generator outputs separately -->
-                <tr class="row-{position() mod 2}">
-                   <td><xsl:call-template name="print-location"/></td>
-                   <td><em><xsl:value-of select="."/></em></td>
-                </tr>
-              </xsl:for-each>
-            </table>
-            <br/>
-           </xsl:for-each>
-        </div>
+<!--  BODYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY-->
+<div id="ds-body">
+	<h1 class="errorTitle">
+		<i18n:text>sedici.errorTitle.<xsl:value-of select="$errorKind"/></i18n:text>
+		<xsl:value-of select="$requestQueryString"/>
+	</h1>
+	<p class="errorDescription"><i18n:text>sedici.errorDescription.<xsl:value-of select="$errorKind"/></i18n:text></p>
+	<p class="generalNote"><i18n:text>sedici.errorDescription.generalNote</i18n:text></p>
+	
+	
+	<xsl:if test="$printDebug = 'true'">
+  		<xsl:apply-templates select="ex:exception-report" />
+	</xsl:if>
+</div>
+<!--  BODYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYY-->
+				
+				<div id="ds-options-wrapper">
+					<div id="ds-options">
+						<h1 class="ds-option-set-head"><i18n:text>xmlui.general.go</i18n:text></h1>
+						<div class="ds-option-set"
+							id="aspect_discovery_Navigation_list_discovery"
+							xmlns="http://di.tamu.edu/DRI/1.0/"
+							xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
+							
+							<ul class="ds-options-list">
+								<li>
+									<h2 class="ds-sublist-head">
+    								  <a><xsl:attribute name="href">
+    								  	<xsl:value-of select="$contextPath"/></xsl:attribute><i18n:text>xmlui.general.go_home</i18n:text>
+    								  </a>
+    								</h2>
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div><!-- ds-options-wrapper -->
 
-        <xsl:apply-templates select="ex:stacktrace"/>
-        <xsl:apply-templates select="ex:full-stacktrace"/>
+			</div>
+		</div><!-- ds-content-wrapper -->
 
-        <p class="topped">
-          The <a href="http://di.tamu.edu/projects/xmlui/">Manakin</a> / <a href="http://dspace.org/">DSpace</a> digital repository software.
-        </p>
-      </body>
-    </html>
-  </xsl:template>
+		<div id="footer" xmlns="http://di.tamu.edu/DRI/1.0/" xmlns:i18n="http://apache.org/cocoon/i18n/2.1">
+			<div id="footercol1">
+				<div class="datos_unlp">
+					<strong>2003-2012 &#169; <a href="http://prebi.unlp.edu.ar/" target="_blank">PrEBi</a></strong> 
+					<br/> 
+					<a href="http://www.unlp.edu.ar" target="_blank">Universidad Nacional de La Plata</a> 
+					<br/> Todos los derechos reservados conforme a la ley 11.723
+				</div>
+			</div>
+			<div id="footercol2">
+				<div class="datos_sedici">
+					<strong>SeDiCI - Servicio de Difusión de la Creación
+						Intelectual</strong> <br/> Calle 49 y 115 s/n 1er piso - Edificio ex
+					Liceo <br/> 1900 La Plata, Buenos Aires - Tel 0221 423
+					6696/6677 (int. 141)
+				</div>
+			</div>
+		</div> <!-- del footer -->
+		
+		
+	</div><!-- ds-main -->
+	
+
+</body>
+</html>
+</xsl:template>
+
+  		<xsl:template match="ex:exception-report">
+    	
+	        <script type="text/javascript">
+	          function toggle(id) {
+	            var element = document.getElementById(id);
+	            with (element.style) {
+	              if ( display == "none" ) {
+	                display = ""
+	              } else {
+	                display = "none"
+	              }
+	            }
+	          
+	            var text = document.getElementById(id + "-switch").firstChild;
+	            if (text.nodeValue == "[show]") {
+	              text.nodeValue = "[hide]";
+	            } else {
+	              text.nodeValue = "[show]";
+	            }
+	          }
+	        </script>
+	        <p class="message">
+	          <xsl:value-of select="@class"/>:
+	          <xsl:apply-templates select="ex:message" mode="breakLines"/>
+	          <xsl:if test="ex:location">
+	             <br/><span style="font-weight: normal"><xsl:apply-templates select="ex:location"/></span>
+	          </xsl:if>
+	        </p>
+	
+	        <p><span class="description">Cocoon stacktrace</span>
+	           <span class="switch" id="locations-switch" onclick="toggle('locations')">[hide]</span>
+	        </p>
+	        <div id="locations">
+	          <xsl:for-each select="ex:cocoon-stacktrace/ex:exception">
+	            <xsl:sort select="position()" order="descending"/>
+	            <strong>
+	               <xsl:apply-templates select="ex:message" mode="breakLines"/>
+	            </strong>
+	            <table>
+	               <xsl:for-each select="ex:locations/*[string(.) != '[cause location]']">
+	                 <!-- [cause location] indicates location of a cause, which 
+	                      the exception generator outputs separately -->
+	                <tr class="row-{position() mod 2}">
+	                   <td><xsl:call-template name="print-location"/></td>
+	                   <td><em><xsl:value-of select="."/></em></td>
+	                </tr>
+	              </xsl:for-each>
+	            </table>
+	            <br/>
+	           </xsl:for-each>
+	        </div>
+	
+	        <xsl:apply-templates select="ex:stacktrace"/>
+	        <xsl:apply-templates select="ex:full-stacktrace"/>
   
+		</xsl:template>
+
+
   <xsl:template match="ex:stacktrace|ex:full-stacktrace">
       <p class="stacktrace">
        <span class="description">Java <xsl:value-of select="translate(local-name(), '-', ' ')"/></span>
@@ -173,5 +246,6 @@ Scott Phillips adapted it for Manakin's need.
         </xsl:otherwise>
      </xsl:choose>
   </xsl:template>
+
 
 </xsl:stylesheet>

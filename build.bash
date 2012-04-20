@@ -57,17 +57,18 @@ else
 	
   	if [ "x$web_user" != "x$dspace_user" ]; then
  	
-	 	if [ "`sudo groupmod $web_group`" ]; then
-		    sudo groupadd $web_group
+	 	  sudo adduser -q --group $web_group 2>/dev/null
+#		if [ "`sudo groupmod $web_group`" ]; then
+#		    sudo groupadd $web_group
 	        echo "Se creo el web_group $web_group"
-		else
-	        echo "El web_group $web_group ya existe"
-		fi
+#		else
+#	        echo "El web_group $web_group ya existe"
+#		fi
 	
 	 	if [ ! "`id $web_user 2>/dev/null`" ]; then
 		    sudo useradd -d $BASE_DIR -g $web_group $web_user
-	        sudo chfn -o "umask=002" $web_user
-	        echo "Se creo el web_user $web_user"
+		    sudo chfn -o "umask=002" $web_user
+		    echo "Se creo el web_user $web_user"
 		else
 	 		tomcatumask=`sudo su -c 'umask' $web_user`
 	 		if [ "x$tomcatumask" != "x002" -a "x$tomcatumask" != "x0002" ]; then
@@ -78,7 +79,7 @@ else
 	        fi
         fi
         
- 	if [ -z "`id $web_user 2>/dev/null  | grep $web_group`" ]; then
+ 	if [ -z "`id $web_user 2>/dev/null  | grep $dspace_group`" ]; then
 	 		 sudo adduser $web_user $dspace_group
  			 echo "Se agrego el web_user $web_user al dspace_group $dspace_group" 
         else

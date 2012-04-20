@@ -164,11 +164,6 @@
     <xsl:template name="buildFooter">
 		<div id="footer">
 			<div id="footercol1">
-				<img class="unlp">
-	    			<xsl:attribute name="src">
-	    				<xsl:value-of select="//dri:pageMeta/dri:metadata[@element='contextPath']"/>/themes/Sedici/images/img_unlp.png
-	    			</xsl:attribute>
-				</img>
 				<div class="datos_unlp">
 					<strong>2003-2012 &#xA9; <a href="http://prebi.unlp.edu.ar/" target="_blank">PrEBi</a></strong>
 					<br/>
